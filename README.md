@@ -1,2 +1,0 @@
-# OlinkRPackage
-Olink R package
