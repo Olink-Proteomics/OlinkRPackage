@@ -9,7 +9,7 @@ olink_anova(df, variable)
 \arguments{
 \item{df}{NPX data frame in long format with atleast protein name (Assay), OlinkID, UniProt and a factor with at least 3 levels.}
 
-\item{variable}{Character value indicating which column should be used as the grouping variable. Needs have  3 or more levels}
+\item{variable}{Character value indicating which column should be used as the grouping variable. Needs to have 3 or more levels}
 }
 \value{
 A data frame containing the ANOVA results for every protein.

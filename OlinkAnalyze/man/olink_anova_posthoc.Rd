@@ -18,7 +18,7 @@ This function allows you to perform an ANOVA posthoc test per protein (by OlinkI
 }
 \examples{
 \donttest{anova_results <- olink_anova(df, "Group")
-significant_assays <- anova_results \%>\% 
+significant_assays <- anova_results \%>\%
 filter(Threshold == 'Significant') \%>\%
 pull(OlinkID)
 anova_posthoc_results <- olink_anova_posthoc(df, "Group", significant_assay)}

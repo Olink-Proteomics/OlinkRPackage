@@ -72,7 +72,6 @@ olink_boxplot <- function(df, variable, olinkid_list, number_of_proteins_per_plo
       ggplot(aes(y = NPX,
                  x = !!rlang::ensym(variable))) +
       geom_boxplot(aes(fill = !!rlang::ensym(variable))) +
-      set_olink_theme() +
       theme(axis.text.x = element_blank(),
             legend.title = element_blank(),
             axis.ticks.x = element_blank(),
