@@ -35,7 +35,7 @@ This is a basic example which shows you how to solve a common problem:
 ```{r example,eval = FALSE}
 library(OlinkAnalyze)
 
-data <- read_NPX(NPXdata.xlsx)
+data <- read_NPX("C://path/NPXdata.xlsx")
 
 olink_boxplot(data)
 
