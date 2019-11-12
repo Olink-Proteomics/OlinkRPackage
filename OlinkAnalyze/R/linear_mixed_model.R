@@ -296,7 +296,7 @@ olink_lmer_posthoc <- function(df, var1, var2, ID, lmer_result, variable = 3, me
 #' @examples
 #' \donttest{lme_results <- olink_lmer_main(df=npx.data, var1 = "Visit", var2 = "Treatment", ID = "SubjectID")
 #'significant_proteins <- lme_results %>%
-#'  filter(Threshold = 'Significant') %>%
+#'  filter(Threshold == 'Significant') %>%
 #'  pull(OlinkID)
 #' olink_lmer_plot(df=npx.data,  var1 = "Visit", var2 = "Treatment", ID = "Subject", olinkid_list = significant_proteins}
 #' @import dplyr stringr tidyr broom
