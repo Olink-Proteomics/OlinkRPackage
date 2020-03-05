@@ -10,6 +10,8 @@
 #' @import dplyr stringr tidyr
 
 read_NPX <- function(filename){
+  NORM_FLAG <-  F
+
   dat <- readxl::read_excel(filename, skip = 6, col_names = F,.name_repair="minimal")
 
   nr_col<-ncol(dat)
@@ -20,8 +22,14 @@ read_NPX <- function(filename){
 
   missfreq<-dat %>% filter(stringr::str_detect(Name, "Missing Data freq."))
   LOD<-dat %>% filter(stringr::str_detect(Name, "LOD"))
+  norm_method <- dat %>% filter(stringr::str_detect(Name, "Normalization"))
 
-  dat <- dat[c(-1*(nrow(dat) - 2):nrow(dat)),]
+  if(nrow(norm_method) == 0){
+    dat <- dat[c(-1*(nrow(dat) - 2):nrow(dat)),]
+  }else{
+    dat <- dat[c(-1*(nrow(dat) - 3):nrow(dat)),]
+    NORM_FLAG <- T
+  }
 
   meta_dat <-  readxl::read_excel(filename, skip = 2, n_max = 4,col_names = F,.name_repair="minimal")
   meta_dat[4,1] <- 'SampleID'
@@ -32,7 +40,7 @@ read_NPX <- function(filename){
   meta_dat<-meta_dat %>%
     rename(Name = `1`)
 
-  meta_dat<-rbind(meta_dat,missfreq,LOD)
+  meta_dat<-rbind(meta_dat,missfreq,LOD,norm_method)
 
 
   nr_panel<-(ncol(meta_dat)-1)/94
@@ -70,11 +78,16 @@ read_NPX <- function(filename){
 
 
     assay_name_list[[i]]<-tibble(ID=c(t(meta_data_list[[i]][4,])),
-                                     Name=c(t(meta_data_list[[i]][2,])),
-                                     UniProt = c(t(meta_data_list[[i]][3,])),
-                                     Panel=c(t(meta_data_list[[i]][1,])),
-                                     MissingFreq=c(t(meta_data_list[[i]][5,])),
-                                     LOD = as.numeric(c(t(meta_data_list[[i]][6,]))))
+                                 Name=c(t(meta_data_list[[i]][2,])),
+                                 UniProt = c(t(meta_data_list[[i]][3,])),
+                                 Panel=c(t(meta_data_list[[i]][1,])),
+                                 MissingFreq=c(t(meta_data_list[[i]][5,])),
+                                 LOD = as.numeric(c(t(meta_data_list[[i]][6,]))))
+
+    if(NORM_FLAG == T){
+      assay_name_list[[i]] <- bind_cols(assay_name_list[[i]],
+                                        Normalization = c(t(meta_data_list[[i]][7,])))
+    }
 
 
     panel_list_long[[i]]<- panel_list[[i]] %>%
@@ -82,15 +95,20 @@ read_NPX <- function(filename){
       mutate(Index = Index_nr) %>%
       gather(Assay, NPX, -SampleID,-`QC Warning`,-`Plate ID`,-Index) %>%
       left_join(assay_name_list[[i]], by = c('Assay' = 'ID')) %>%
-      select(SampleID,Index,Assay, UniProt, Name,MissingFreq,Panel,`Plate ID`,`QC Warning`,LOD,NPX) %>%
+      select(SampleID,Index,Assay, UniProt, Name,MissingFreq,Panel,`Plate ID`,`QC Warning`,LOD,NPX,matches("Normalization")) %>%
       rename(PlateID =`Plate ID`) %>%
       rename(QC_Warning = `QC Warning`) %>%
-      rename(OlinkID = Assay, Assay = Name) 
-      
+      rename(OlinkID = Assay, Assay = Name)
+
   }
 
   bind_rows(panel_list_long) %>%
     filter(!is.na(SampleID)) %>%
-    tbl_df
+    tbl_df %>%
+    mutate(Panel_Version = gsub(".*\\(","",Panel)) %>%
+    mutate(Panel_Version = gsub("\\)","",Panel_Version)) %>%
+    mutate(Panel =  gsub("\\(.*\\)","",Panel)) %>%
+    select(SampleID, Index, OlinkID, UniProt, Assay, MissingFreq, Panel,Panel_Version,PlateID, QC_Warning,LOD,NPX,matches("Normalization"))
+
 }
 
