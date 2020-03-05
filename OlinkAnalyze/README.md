@@ -17,7 +17,7 @@ You can install the released version of OlinkAnalyze from
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("Olink-Proteomics/OlinkRPackage")
+devtools::install_github(repo ='Olink-Proteomics/OlinkRPackage/OlinkAnalyze')
 ```
 
 ## Example
