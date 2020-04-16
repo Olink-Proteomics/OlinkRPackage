@@ -29,7 +29,7 @@ Creates an array of point-range plots for a given list of proteins (by OlinkID).
 \examples{
 \donttest{lme_results <- olink_lmer_main(df=npx.data, var1 = "Visit", var2 = "Treatment", ID = "SubjectID")
 significant_proteins <- lme_results \%>\%
- filter(Threshold = 'Significant') \%>\%
+ filter(Threshold == 'Significant') \%>\%
  pull(OlinkID)
 olink_lmer_plot(df=npx.data,  var1 = "Visit", var2 = "Treatment", ID = "Subject", olinkid_list = significant_proteins}
 }
