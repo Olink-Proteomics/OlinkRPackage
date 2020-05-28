@@ -17,7 +17,10 @@ olink_volcano_plot(p.val_tbl, x_lab = "Estimate", olinkid_list = NULL)
 An object of class "ggplot"
 }
 \description{
-Creates a volcano plot using the results of the olink_ttest function. The estimated difference is plotted on the x-axis and the p-value on the y-axis. Horizontal dotted line indicates a p-value of 0.05. Significant proteins are colored based on a Benjamini-Hochberg adjusted p-value cutoff of 0.05.
+Generates a volcano plot using the results of the olink_ttest function using ggplot and ggplot2::geom_point. 
+The estimated difference is plotted on the x-axis and the negative 10-log p-value on the y-axis. 
+The horizontal dotted line indicates p-value=0.05. 
+Dots are colored based on the Benjamini-Hochberg adjusted p-value cutoff 0.05 and can optionally be annotated by OlinkID.
 }
 \examples{
 \donttest{ttest_results <- olink_ttest(df=npx.data, variable = 'Group', alternative = 'two.sided')

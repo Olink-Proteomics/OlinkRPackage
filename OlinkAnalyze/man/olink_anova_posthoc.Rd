@@ -2,24 +2,59 @@
 % Please edit documentation in R/Olink_anova.R
 \name{olink_anova_posthoc}
 \alias{olink_anova_posthoc}
-\title{Function which performs an ANOVA posthoc test per protein}
+\title{Function which performs an ANOVA posthoc test per protein.}
 \usage{
-olink_anova_posthoc(df, variable, olinkid_list)
+olink_anova_posthoc(
+  df,
+  olinkid_list = NULL,
+  variable,
+  covariates = NULL,
+  outcome = "NPX",
+  effect,
+  mean_return = F,
+  verbose = T
+)
 }
 \arguments{
-\item{df}{tibble/data frame in long format with atleast protein name (Assay), OlinkID, and a variable with at least 3 levels.}
+\item{df}{NPX data frame in long format with at least protein name (Assay), OlinkID, UniProt, Panel and a factor with at least 3 levels.}
 
-\item{variable}{Variable to performed the ANOVA on.}
+\item{olinkid_list}{Character vector of OlinkID's on which to perform post hoc analysis. If not specified, all assays in df are used.}
 
-\item{olinkid_list}{Vector of significant proteins (OlinkID)}
+\item{variable}{Single character value or character array. 
+Variable(s) to test. If length > 1, the included variable names will be used in crossed analyses .
+Also takes ':' notation.}
+
+\item{covariates}{Single character value or character array. Default: NULL.
+Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be inferred from main effects.}
+
+\item{outcome}{Character. The dependent variable. Default: NPX.}
+
+\item{effect}{Term on which to perform post-hoc. Character vector. Must be subset of or identical to variable.}
+
+\item{mean_return}{Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = T.}
+
+\item{verbose}{Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
+}
+\value{
+Tibble of posthoc tests for specicified effect, arranged by ascending adjusted p-values.
 }
 \description{
-This function allows you to perform an ANOVA posthoc test per protein (by OlinkID).
+Performs a post hoc ANOVA test using emmeans::emmeans with Tukey p-value adjustment per assay (by OlinkID) for each panel at confidence level 0.95.
+See \code{olink_anova} for details of input notation. \cr\cr
+The function handles both factor and numerical variables and/or covariates. 
+The posthoc test for a numerical variable compares the difference in means of the outcome variable (default: NPX) for 1 standard deviation difference in the numerical variable, e.g.
+mean NPX at mean(numerical variable) versus mean NPX at mean(numerical variable) + 1*SD(numerical variable).
 }
 \examples{
-\donttest{anova_results <- olink_anova(df, "Group")
-significant_assays <- anova_results \%>\%
+\donttest{
+anova_results <- olink_anova(df, "Group")
+significant_assays <- anova_results \%>\% 
 filter(Threshold == 'Significant') \%>\%
 pull(OlinkID)
-anova_posthoc_results <- olink_anova_posthoc(df, "Group", significant_assay)}
+
+#Posthoc test for the model NPX~A*B, on the interaction effect A:B.
+anova_posthoc_results <- olink_anova_posthoc(df, 
+variable = c("A", "B"), 
+olinkid_list = significant_assays,
+effect = 'A:B')}
 }

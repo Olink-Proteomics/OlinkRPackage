@@ -2,34 +2,69 @@
 % Please edit documentation in R/linear_mixed_model.R
 \name{olink_lmer_plot}
 \alias{olink_lmer_plot}
-\title{Function which performs a linear mixed model plot per significant protein}
+\title{Function which performs a point-range plot per protein on a linear mixed model}
 \usage{
-olink_lmer_plot(df, var1, var2, ID, olinkid_list,
-  number_of_proteins_per_plot = 6, ...)
+olink_lmer_plot(
+  df,
+  variable,
+  outcome = "NPX",
+  random,
+  olinkid_list = NULL,
+  covariates = NULL,
+  x_axis_variable,
+  col_variable = NULL,
+  number_of_proteins_per_plot = 6,
+  verbose = F
+)
 }
 \arguments{
-\item{df}{NPX data frame in long format with at least protein name, OlinkID, UniProt, 1-2 variables with at least 2 levels and subject ID.}
+\item{df}{NPX data frame in long format with at least protein name (Assay), OlinkID, UniProt, 1-2 variables with at least 2 levels.}
 
-\item{var1}{Character value indicating the name of the column to be used as the first variable in the LME model}
+\item{variable}{Single character value or character array. 
+Variable(s) to test. If length > 1, the included variable names will be used in crossed analyses .
+Also takes ':'/'*' notation.}
 
-\item{var2}{SCharacter value indicating the name of the column to be used as the second variable in the LME model}
+\item{outcome}{Character. The dependent variable. Default: NPX.}
 
-\item{ID}{Character value indicating the column of subject ID's. To be used as a random effect in the LME model}
+\item{random}{Single character value or character array.}
 
-\item{olinkid_list}{Character vector indicating which proteins (by OlinkID) to create figures for}
+\item{olinkid_list}{Character vector indicating which proteins (by OlinkID) for which to create figures.}
 
-\item{number_of_proteins_per_plot}{Number plots to include in the array of point-range plots. Defaults to 6 plots per figure}
+\item{covariates}{Single character value or character array. Default: NULL.
+Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be inferred from main effects.}
+
+\item{x_axis_variable}{Character. Which main effect to use as x-axis in the plot.}
+
+\item{col_variable}{Character. If provided, the interaction effect col_variable:x_axis_variable will be plotted with x_axis_variable on the x-axis and col_variable as color.}
+
+\item{number_of_proteins_per_plot}{Number plots to include in the list of point-range plots. Defaults to 6 plots per figure}
+
+\item{verbose}{Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
 }
 \value{
 A list of objects of class "ggplot"
 }
 \description{
-Creates an array of point-range plots for a given list of proteins (by OlinkID).
+Generates a point-range plot faceted by Assay using ggplot and ggplot2::geom_pointrange based on a linear mixed effects model using lmerTest:lmer and emmeans::emmeans.
+See \code{olink_lmer} for details of input notation.
 }
 \examples{
-\donttest{lme_results <- olink_lmer_main(df=npx.data, var1 = "Visit", var2 = "Treatment", ID = "SubjectID")
-significant_proteins <- lme_results \%>\%
- filter(Threshold == 'Significant') \%>\%
- pull(OlinkID)
-olink_lmer_plot(df=npx.data,  var1 = "Visit", var2 = "Treatment", ID = "Subject", olinkid_list = significant_proteins}
+\donttest{lmer_results <- olink_lmer(df = npx_df,
+variable=c("Time", 'Treatment'),
+random = c('Subject'))
+
+assay_list <- lmer_results \%>\%
+filter(Threshold == 'Significant' & term == 'Time:Treatment') \%>\%
+select(OlinkID) \%>\%
+distinct() \%>\%
+pull()
+
+list_of_pointrange_plots <- olink_lmer_plot(df = NPX,                               
+variable=c("Time", 'Treatment'),
+random = c('Subject'),
+x_axis_variable = 'Time',                  
+col_variable = 'Treatment',              
+verbose=T,
+olinkid_list = assay_list,
+number_of_proteins_per_plot = 10)}
 }

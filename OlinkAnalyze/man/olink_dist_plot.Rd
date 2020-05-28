@@ -15,7 +15,7 @@ olink_dist_plot(df, color_g = "QC_Warning")
 An object of class "ggplot"
 }
 \description{
-Creates an array of plots of NPX distributions for all samples and assays, separated by Panel
+Generates boxplots of NPX vs. protein (OlinkID) colored by QC_Warning and faceted by Panel using ggplot and ggplot2::geom_boxplot.
 }
 \examples{
 \donttest{olink_dist_plot(df, color_g = "Group") }

@@ -1,6 +1,8 @@
 #'Function which performs a t-test per protein
 #'
-#'Performs a 2-sample t-test on for every protein (by OlinkID) for a given grouping variable.
+#'Performs a Welch 2-sample t-test at confidence level 0.95 for every protein (by OlinkID) for a given grouping variable using stats::t.test and corrects for multiple testing by the Benjamini-Hochberg method (“fdr”) using stats::p.adjust. 
+#'Adjusted p-values are logically evaluated towards adjusted p-value<0.05. 
+#'The resulting t-test table is arranged by ascending p-values. 
 #'
 #' @param df NPX data frame in long format with at least protein name (Assay), OlinkID, UniProt and a factor with 2 levels.
 #' @param variable Character value indicating which column should be used as the grouping variable. Needs to have exactly 2 levels
@@ -13,6 +15,11 @@
 
 
 olink_ttest <- function(df, variable, ...){
+  
+  #Filtering on valid OlinkID
+  df <- df %>%
+    filter(stringr::str_detect(OlinkID,
+                               "OID[0-9]{5}"))
   
   df[[variable]] <- as.factor(df[[variable]])
   var_levels <- levels(df[[variable]])

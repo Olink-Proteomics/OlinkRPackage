@@ -2,33 +2,71 @@
 % Please edit documentation in R/linear_mixed_model.R
 \name{olink_lmer_posthoc}
 \alias{olink_lmer_posthoc}
-\title{Function which perform a linear mixed model posthoc per significant protein}
+\title{Function which performs a linear mixed model posthoc per protein.}
 \usage{
-olink_lmer_posthoc(df, var1, var2, ID, lmer_result, variable = 3,
-  mean.return = F)
+olink_lmer_posthoc(
+  df,
+  variable,
+  olinkid_list = NULL,
+  effect,
+  outcome = "NPX",
+  random,
+  covariates = NULL,
+  mean_return = F,
+  verbose = T
+)
 }
 \arguments{
 \item{df}{NPX data frame in long format with at least protein name (Assay), OlinkID, UniProt, 1-2 variables with at least 2 levels and subject ID.}
 
-\item{var1}{Character value indicating the name of the column to be used as the first variable in the LME model}
+\item{variable}{Single character value or character array. 
+Variable(s) to test. If length > 1, the included variable names will be used in crossed analyses .
+Also takes ':'/'*' notation.}
 
-\item{var2}{Character value indicating the name of the column to be used as the second variable in the LME model}
+\item{olinkid_list}{Character vector of OlinkID's on which to perform post hoc analysis. If not specified, all assays in df are used.}
 
-\item{ID}{Character value indicating the column of subject ID's. To be used as a random effect in the LME model.}
+\item{effect}{Term on which to perform post-hoc. Character vector. Must be subset of or identical to variable.}
 
-\item{lmer_result}{Data frame containing the results of fitting the same model to the NPX data using the olink_lmer_main function.}
+\item{outcome}{Character. The dependent variable. Default: NPX.}
 
-\item{variable}{Integer. Which variable on which the posthoc is performed. Must be either 1,2,3. 1 = var1, 2 = var2, 3 = interaction term.}
+\item{random}{Single character value or character array.}
 
-\item{mean.return}{Logical. Should the estimated marginal means for each group be returned (default) or the difference between them.}
+\item{covariates}{Single character value or character array. Default: NULL.
+Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be inferred from main effects.}
+
+\item{mean_return}{Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = T.}
+
+\item{verbose}{Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
 }
 \value{
-A data frame containing the results of the pairwise comparisons between given variable levels for proteins found to be statistically significant by olink_lmer_main.
+A tibble containing the results of the pairwise comparisons between given variable levels for proteins specified in olinkid_list (or full df).
 }
 \description{
-Performs post-hoc analysis for proteins found to be statistically significant by the olink_lmer_main function. Differences in estimated marginal means are calculated for all pairwise levels of a given variable. Degrees of freedom estimated using Satterthwaite's approximation.
+Similar to olink_lmer but performs a post hoc analysis based on a linear mixed model effects model using lmerTest::lmer and emmeans::emmeans on proteins. 
+See \code{olink_lmer} for details of input notation. \cr\cr
+The function handles both factor and numerical variables and/or covariates. 
+Differences in estimated marginal means are calculated for all pairwise levels of a given variable. 
+Degrees of freedom are estimated using Satterthwaite’s approximation. 
+The posthoc test for a numerical variable compares the difference in means of the outcome variable (default: NPX) for 1 standard deviation difference in the numerical variable, e.g.
+mean NPX at mean(numerical variable) versus mean NPX at mean(numerical variable) + 1*SD(numerical variable).
+The output tibble is arranged by ascending Tukey adjusted p-values.
 }
 \examples{
-\donttest{lme_results <- olink_lmer_main(df=npx.data, var1 = "Visit", var2 = "Treatment", ID = "SubjectID")
-results_lmer_posthoc <- olink_lmer_posthoc(df=npx.data, var1 = "Visit", var2 = "Treatment", ID = "SubjectID", lmer_result=lme_results, variable = 1, mean.return = T)}
+\donttest{lmer_results <- olink_lmer(df = npx_df,
+variable=c("Time", 'Treatment'),
+random = c('Subject'))
+
+assay_list <- lmer_results \%>\%
+filter(Threshold == 'Significant' & term == 'Time:Treatment') \%>\%
+select(OlinkID) \%>\%
+distinct() \%>\%
+pull()
+
+results_lmer_posthoc <- local_lmer_posthoc(df = NPX, 
+olinkid_list = assay_list, 
+variable=c("Time", 'Treatment'),
+effect = 'Time:Treatment', 
+random = 'Subject',
+verbose = T)
+}
 }

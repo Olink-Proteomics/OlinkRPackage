@@ -4,19 +4,72 @@
 \alias{olink_anova}
 \title{Function which performs an ANOVA per protein}
 \usage{
-olink_anova(df, variable)
+olink_anova(
+  df,
+  variable,
+  outcome = "NPX",
+  covariates = NULL,
+  return.covariates = F,
+  verbose = T
+)
 }
 \arguments{
-\item{df}{NPX data frame in long format with atleast protein name (Assay), OlinkID, UniProt and a factor with at least 3 levels.}
+\item{df}{NPX data frame in long format with at least protein name (Assay), OlinkID, UniProt, Panel and a factor with at least 3 levels.}
 
-\item{variable}{Character value indicating which column should be used as the grouping variable. Needs to have 3 or more levels}
+\item{variable}{Single character value or character array. 
+Variable(s) to test. If length > 1, the included variable names will be used in crossed analyses .
+Also takes ':'/'*' notation.}
+
+\item{outcome}{Character. The dependent variable. Default: NPX.}
+
+\item{covariates}{Single character value or character array. Default: NULL.
+Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be inferred from main effects.}
+
+\item{return.covariates}{Boolean. Deafult: False. Returns F-test results for the covariates. Note: Adjusted p-values will be NA for the covariates.}
+
+\item{verbose}{Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
 }
 \value{
-A data frame containing the ANOVA results for every protein.
+A tibble containing the ANOVA results for every protein. 
+The tibble is arranged by ascending p-values.
 }
 \description{
-Performs an ANOVA test on every protein (by OlinkID) for a given grouping variable
+Performs an ANOVA F-test for each assay (by OlinkID) in every panel using car::Anova and Type III sum of squares. 
+The function handles both factor and numerical variables and/or covariates. \cr\cr
+Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a messsage if verbose = T).
+Character columns in the input dataframe are automatically converted to factors (specified in a message if verbose = T). \cr\cr
+Crossed analysis, i.e. A*B formula notation, is inferred from the variable argument in the following cases: \cr
+\itemize{ 
+\item c('A','B')
+\item c('A: B') 
+\item c('A: B', 'B') or c('A: B', 'A')
+}
+Inference is specified in a message if verbose = T. \cr 
+For covariates, crossed analyses need to be specified explicity, i.e. two main effects will not be expaned with a c('A','B') notation. Main effects present in the variable takes precedence. 
+The formula notation of the final model is specified in a message if verbose = T. \cr\cr
+Adjusted p-values are calculated by stats::p.adjust according to the Benjamini & Hochberg (1995) method (“fdr”). 
+The threshold is determined by logic evaluation of Adjusted_pval < 0.05. Covariates are not included in the p-value adjustment.
 }
 \examples{
-\donttest{anova_results <- olink_anova(df = npx.data, variable = 'Group')}
+\donttest{
+npx_df <- read_NPX('path_to_npx_file_wide_format.xlsx')
+npx_df <- npx_df \%>\% left_join(sample_info_df, by = c('SampleID'))
+
+# One-way ANOVA, no covariates. 
+# Results in model NPX~A.
+anova_results <- olink_anova(df = npx_data, 
+variable = 'A')
+
+# Two-way ANOVA, one main effect covariate. 
+# Results in model NPX~A*B+C.
+anova_results <- olink_anova(df = npx_data, 
+variable=c("A:B"), 
+covariates="C")
+
+# Two-way ANOVA, interaction effect covariate. 
+# Results in model NPX~A*B+C:D+C+D.
+anova_results <- olink_anova(df = npx_data, 
+variable=c("A:B"), 
+covariates="C:D")}
+
 }

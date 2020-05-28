@@ -7,13 +7,14 @@
 read_NPX(filename)
 }
 \arguments{
-\item{filename}{filename of NPX file exported from NPX manger.}
+\item{filename}{Path to file NPX Manager output file.}
 }
 \value{
 A tibble in long format.
 }
 \description{
-Imports an NPX file exported from NPX manager. Must be an MS Excel file.
+Imports an NPX file exported from NPX Manager. 
+No alterations to the output NPX Manager format is allowed.
 }
 \examples{
 \donttest{read_NPX("~/NPX data.xlsx")}

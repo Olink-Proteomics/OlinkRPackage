@@ -4,23 +4,30 @@
 \alias{olink_boxplot}
 \title{Function which plots boxplots of a selected variable}
 \usage{
-olink_boxplot(df, variable, olinkid_list,
-  number_of_proteins_per_plot = 6)
+olink_boxplot(
+  df,
+  variable,
+  olinkid_list,
+  verbose = F,
+  number_of_proteins_per_plot = 6
+)
 }
 \arguments{
 \item{df}{NPX data frame in long format with at least protein name (Assay), OlinkID (unique), UniProt and a grouping variable.}
 
 \item{variable}{A character value indiciating which column to use as the x-axis grouping variable}
 
-\item{olinkid_list}{Character vector indicating for which OlinkID's to create figures}
+\item{olinkid_list}{Character vector indicating which proteins (OlinkIDs) to plot.}
 
-\item{number_of_proteins_per_plot}{Number boxplots to include in the array of boxplots. (defaults 6 plots per figure)}
+\item{verbose}{Boolean. If the plots are shown as well as returned in the list (default is false).}
+
+\item{number_of_proteins_per_plot}{Number of boxplots to include in the facet plot (default 6).}
 }
 \value{
-A list of objects of class "ggplot"
+A list of objects of class “ggplot” (the actual ggplot object is entry 1 in the list).
 }
 \description{
-Creates an array of boxplots with grouping variable on the x-axis and NPX values on the y-axis for a given list of proteins (by OlinkID).
+Generates faceted boxplots of NPX vs. grouping variable for a given list of proteins (OlinkIDs) using ggplot and ggplot2::geom_boxplot.
 }
 \examples{
 \donttest{anova_results <- anova_olink(df, variable = "Var1")

@@ -1,10 +1,10 @@
 Package: OlinkAnalyze
 Type: Package
 Title: Package to facilitate NPX data handling
-Version: 0.9.91
-Author: Data scientist at Olink (email = "rpackage@olink.com")
-Description: Package for working with Olink NPX data.
+Version: 1.0.0
+Author: DS at Olink (given="Data", family="Science", email = "biostattools@olink.com", role = c("aut", "cre"))
+Description: Package for working with Olink NPX data, primarily exported from Olink NPX Manager. 
 Encoding: UTF-8
 LazyData: true
-Depends: tidyverse, readxl, broom, openxlsx, ggfortify, ggrepel, lmerTest, emmeans
-RoxygenNote: 6.1.1
+Depends: broom, car, emmeans, ggfortify, ggrepel, lmerTest, openxlsx, stringr, tidyverse, readxl
+RoxygenNote: 7.1.0
