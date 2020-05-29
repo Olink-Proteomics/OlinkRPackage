@@ -8,15 +8,13 @@ output: github_document
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.path = "man/figures/README-",
   out.width = "100%"
 )
 ```
 
-# OlinkAnalyze
 
-<!-- badges: start -->
-<!-- badges: end -->
+# OlinkAnalyze <img src="man/figures/OlinkAnalyze_target_hexagon.png" align="right" width="120" />
+
 
 The goal of OlinkAnalyze is to make working with Olink NPX data easy and easily accessible.
 

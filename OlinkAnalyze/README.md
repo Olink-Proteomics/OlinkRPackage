@@ -1,11 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# OlinkAnalyze
-
-<!-- badges: start -->
-
-<!-- badges: end -->
+# OlinkAnalyze <img src="man/figures/OlinkAnalyze_target_hexagon.png" align="right" width="120" />
 
 The goal of OlinkAnalyze is to make working with Olink NPX data easy and
 easily accessible.
@@ -27,7 +23,7 @@ This is a basic example which shows you how to solve a common problem:
 ``` r
 library(OlinkAnalyze)
 
-data <- read_NPX(NPXdata.xlsx)
+data <- read_NPX("C://path/NPXdata.xlsx")
 
 olink_boxplot(data)
 
