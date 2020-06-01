@@ -321,7 +321,7 @@ olink_anova_posthoc <- function(df,
   }
   
   tmp <- unique(unlist(strsplit(effect,":")))
-  if(!all(effect %in% unique(unlist(strsplit(variable,"[\\*:]"))))) { 
+  if(!all(tmp %in% unique(unlist(strsplit(variable,"[\\*:]"))))) { 
     stop("All effect terms must be included in the variable argument.")
   }
   
