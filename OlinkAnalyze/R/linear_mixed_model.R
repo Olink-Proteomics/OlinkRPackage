@@ -556,7 +556,7 @@ olink_lmer_plot <- function(df,
                             ){
   
   if(missing(df) | missing(variable) | missing(x_axis_variable) | missing(random)){
-    stop('The df, variable, random and effect arguments need to be specified.')
+    stop('The df, variable, random and x_axis_variable arguments need to be specified.')
   }
   
   if(!all(x_axis_variable %in% unique(unlist(strsplit(variable,"[\\*:]"))))) { 
