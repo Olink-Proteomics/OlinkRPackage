@@ -9,7 +9,7 @@ olink_ttest(df, variable, ...)
 \arguments{
 \item{df}{NPX data frame in long format with at least protein name (Assay), OlinkID, UniProt and a factor with 2 levels.}
 
-\item{variable}{Character value indicating which column should be used as the grouping variable. Needs to have exactly 2 levels}
+\item{variable}{Character value indicating which column should be used as the grouping variable. Needs to have exactly 2 levels.}
 
 \item{...}{Options to be passed to t.test. See ?t.test for more.}
 }

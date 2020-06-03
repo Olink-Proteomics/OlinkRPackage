@@ -1,7 +1,7 @@
 Package: OlinkAnalyze
 Type: Package
 Title: Package to facilitate NPX data handling
-Version: 1.0.0
+Version: 1.0.1
 Author: DS at Olink (given="Data", family="Science", email = "biostattools@olink.com", role = c("aut", "cre"))
 Description: Package for working with Olink NPX data, primarily exported from Olink NPX Manager. 
 Encoding: UTF-8
