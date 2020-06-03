@@ -59,7 +59,7 @@ select(OlinkID) \%>\%
 distinct() \%>\%
 pull()
 
-list_of_pointrange_plots <- olink_lmer_plot(df = NPX,                               
+list_of_pointrange_plots <- olink_lmer_plot(df = npx_df,                               
 variable=c("Time", 'Treatment'),
 random = c('Subject'),
 x_axis_variable = 'Time',                  
