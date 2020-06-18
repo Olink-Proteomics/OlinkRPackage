@@ -37,7 +37,9 @@ The tibble is arranged by ascending p-values.
 Performs an ANOVA F-test for each assay (by OlinkID) in every panel using car::Anova and Type III sum of squares. 
 The function handles both factor and numerical variables and/or covariates. \cr\cr
 Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a messsage if verbose = T).
-Character columns in the input dataframe are automatically converted to factors (specified in a message if verbose = T). \cr\cr
+Character columns in the input dataframe are automatically converted to factors (specified in a message if verbose = T). 
+Numerical variables are not converted to factors. 
+If a numerical variable is to be used as a factor, this conversion needs to be done on the dataframe before the function call. \cr\cr
 Crossed analysis, i.e. A*B formula notation, is inferred from the variable argument in the following cases: \cr
 \itemize{ 
 \item c('A','B')

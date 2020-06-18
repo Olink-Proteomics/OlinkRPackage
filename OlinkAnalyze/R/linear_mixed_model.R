@@ -3,7 +3,9 @@
 #'Fits a linear mixed effects model for every protein (by OlinkID) in every panel, using lmerTest::lmer and stats::anova.
 #'The function handles both factor and numerical variables and/or covariates. \cr\cr
 #'Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a messsage if verbose = T).
-#'Character columns in the input dataframe are automatically converted to factors (specified in a message if verbose = T). \cr\cr
+#'Character columns in the input dataframe are automatically converted to factors (specified in a message if verbose = T). 
+#'Numerical variables are not converted to factors. 
+#'If a numerical variable is to be used as a factor, this conversion needs to be done on the dataframe before the function call. \cr\cr
 #'Crossed analysis, i.e. A*B formula notation, is inferred from the variable argument in the following cases: \cr
 #'\itemize{ 
 #' \item c('A','B')
@@ -92,7 +94,7 @@ olink_lmer <- function(df,
     #Not testing assays that have all NA:s
     all_nas <- df  %>%
       group_by(OlinkID) %>%
-      summarise(n = n(), n_na = sum(is.na(NPX))) %>%
+      summarise(n = n(), n_na = sum(is.na(!!rlang::ensym(outcome)))) %>%
       ungroup() %>%
       filter(n == n_na) %>%
       pull(OlinkID)
@@ -140,7 +142,7 @@ olink_lmer <- function(df,
       current_nas <- df %>%
         filter(!(OlinkID %in% all_nas)) %>%
         group_by(OlinkID, !!rlang::ensym(effect)) %>%
-        summarise(n = n(), n_na = sum(is.na(NPX))) %>%
+        summarise(n = n(), n_na = sum(is.na(!!rlang::ensym(outcome)))) %>%
         ungroup() %>%
         filter(n == n_na) %>%
         distinct(OlinkID) %>%
@@ -457,6 +459,11 @@ olink_lmer_posthoc <- function(df,
       ungroup() %>%
       mutate(term=paste(effect,collapse=":"))  %>%
       select(Assay, OlinkID, UniProt, Panel, term, everything())
+    
+    if("Adjusted_pval" %in% colnames(output_df)){
+      output_df <- output_df %>%
+        arrange(Adjusted_pval)
+    }
     
     return(output_df)
     

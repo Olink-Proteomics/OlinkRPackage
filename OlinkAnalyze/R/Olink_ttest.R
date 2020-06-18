@@ -79,7 +79,7 @@ olink_ttest <- function(df, variable, ...){
     group_by(OlinkID) %>%
     summarise(n = n(), n_na = sum(is.na(NPX))) %>%
     ungroup() %>%
-    filter(n == n_na) %>%
+    filter(n-n_na <= 1) %>%
     pull(OlinkID)
   
   
