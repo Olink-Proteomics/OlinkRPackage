@@ -27,16 +27,20 @@
 #' @keywords Normalization
 #' @export
 #' @examples \donttest{
-#' data_1 <- read_NPX("~/NPX data1.xlsx")
-#' data_2 <- read_NPX("~/NPX data2.xlsx")
+#' data_1 <- data(npx_data1)
+#' data_2 <- data(npx_data2)
 #' 
 #' #Bridging normalization:
-#' overlap_samples<-intersect(data_1,data_2)
+#' overlap_samples <- intersect(data_1$SampleID,data_2$SampleID)
+#' overlap_samples <- overlap_samples[!grepl("CONTROL_SAMPLE_AS",overlap_samples)]
 #' olink_normalization(df1 = data_1, 
 #' df2 = data_2, 
 #' overlapping_samples_df1 = overlap_samples)
 #' 
 #' #Subset normalization:
+#' data_1 <- read_NPX("~/NPX data1.xlsx")
+#' data_2 <- read_NPX("~/NPX data2.xlsx")
+#' 
 #' olink_normalization(df1 = data_1, 
 #' df2 = data_2, 
 #' overlapping_samples_df1 = some_samples_from_df1, 
