@@ -18,7 +18,11 @@
 #' @return An object of class "ggplot"
 #' @keywords NPX, PCA
 #' @export
-#' @examples \donttest{olink_pca_plot(df=npx.data, color_g = "QC_Warning")  }
+#' @examples 
+#' \donttest{
+#' npx_data <- npx_data1 %>% 
+#'     mutate(SampleID = paste(SampleID, "_", Index, sep = ""))
+#' olink_pca_plot(df=npx_data, color_g = "QC_Warning")}
 #' @import dplyr stringr tidyr ggfortify ggrepel
 
 olink_pca_plot <- function (df, 

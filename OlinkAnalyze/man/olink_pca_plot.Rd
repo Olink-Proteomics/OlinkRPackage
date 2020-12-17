@@ -48,7 +48,10 @@ Unique sample names are required.
 Imputation by the median is done for assays with missingness <10\% for multi-plate projects and <5\% for single plate projects.
 }
 \examples{
-\donttest{olink_pca_plot(df=npx.data, color_g = "QC_Warning")  }
+\donttest{
+npx_data <- npx_data1 \%>\% 
+    mutate(SampleID = paste(SampleID, "_", Index, sep = ""))
+olink_pca_plot(df=npx_data, color_g = "QC_Warning")}
 }
 \keyword{NPX,}
 \keyword{PCA}

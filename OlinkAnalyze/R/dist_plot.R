@@ -7,7 +7,7 @@
 #' @return An object of class "ggplot"
 #' @keywords NPX
 #' @export
-#' @examples \donttest{olink_dist_plot(df, color_g = "Group") }
+#' @examples \donttest{olink_dist_plot(npx_data1, color_g = "QC_Warning")}
 #' @import dplyr stringr tidyr
 
 olink_dist_plot <- function(df, color_g = 'QC_Warning') {

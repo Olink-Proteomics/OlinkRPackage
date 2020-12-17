@@ -49,22 +49,23 @@ Generates a point-range plot faceted by Assay using ggplot and ggplot2::geom_poi
 See \code{olink_lmer} for details of input notation.
 }
 \examples{
-\donttest{lmer_results <- olink_lmer(df = npx_df,
-variable=c("Time", 'Treatment'),
-random = c('Subject'))
+\donttest{
+lmer_results <- olink_lmer(df = npx_data1,
+                           variable=c("Time", 'Treatment'),
+                           random = c('Subject'))
 
 assay_list <- lmer_results \%>\%
-filter(Threshold == 'Significant' & term == 'Time:Treatment') \%>\%
-select(OlinkID) \%>\%
-distinct() \%>\%
-pull()
+    filter(Threshold == 'Significant' & term == 'Time:Treatment') \%>\%
+    select(OlinkID) \%>\%
+    distinct() \%>\%
+    pull()
 
-list_of_pointrange_plots <- olink_lmer_plot(df = npx_df,                               
-variable=c("Time", 'Treatment'),
-random = c('Subject'),
-x_axis_variable = 'Time',                  
-col_variable = 'Treatment',              
-verbose=T,
-olinkid_list = assay_list,
-number_of_proteins_per_plot = 10)}
+list_of_pointrange_plots <- olink_lmer_plot(df = npx_data1,
+                                            variable=c("Time", 'Treatment'),
+                                            random = c('Subject'),
+                                            x_axis_variable = 'Time',
+                                            col_variable = 'Treatment',
+                                            verbose=T,
+                                            olinkid_list = assay_list,
+                                            number_of_proteins_per_plot = 10)}
 }

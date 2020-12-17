@@ -10,7 +10,18 @@
 #' @return A data frame containing the t-test results for every protein.
 #' @export
 #' @examples
-#' \donttest{ttest_results <- olink_ttest(df=npx.data, variable = 'Group', alternative = 'two.sided')}
+#' \donttest{
+#' npx_df <- npx_data1 %>% filter(!grepl('control',SampleID, ignore.case = T))
+#' 
+#' ttest_results <- olink_ttest(df=npx_df,
+#'                              variable = 'Treatment',
+#'                              alternative = 'two.sided')
+#' 
+#' #Paired t-test
+#' npx_data1 %>%
+#'    filter(Time %in% c("Baseline","Week.6")) %>% 
+#'    olink_ttest(variable = "Time", pair_id = "Subject")
+#'}
 #' @import dplyr stringr tidyr broom
 
 

@@ -7,4 +7,4 @@ Description: Package for working with Olink NPX data, primarily exported from Ol
 Encoding: UTF-8
 LazyData: true
 Depends: broom, car, emmeans, ggfortify, ggrepel, lmerTest, openxlsx, stringr, tidyverse, readxl
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1

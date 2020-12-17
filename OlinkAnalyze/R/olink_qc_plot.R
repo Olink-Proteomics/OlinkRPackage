@@ -12,7 +12,7 @@
 #' @return An object of class "ggplot"
 #' @keywords NPX
 #' @export
-#' @examples \donttest{olink_qc_plot(df, color_g = "Group") }
+#' @examples \donttest{olink_qc_plot(npx_data1, color_g = "QC_Warning")}
 #' @import dplyr stringr tidyr
 #' 
 
