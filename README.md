@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# OlinkAnalyze <img src="man/figures/OlinkAnalyze_target_hexagon.png" align="right" width="120" />
+# OlinkAnalyze <img src="OlinkAnalyze/man/figures/OlinkAnalyze_target_hexagon.png" align="right" width="120" />
 
 The goal of OlinkAnalyze is to provide a versatile toolbox to enable
 easy and smooth handling of Olink NPX data to speed up your proteomic
@@ -43,7 +43,7 @@ olink_dist_plot(npx_data1 %>% filter(Panel == 'Olink CARDIOMETABOLIC')) +
   scale_fill_manual(values = c('turquoise3', 'red'))
 ```
 
-![dist\_plot\_example](man/figures/example_distplot.png)
+![dist\_plot\_example](OlinkAnalyze/man/figures/example_distplot.png)
 
 ``` r
 # visualize potential outliers by IQR vs. sample median per panel, example for one panel
@@ -51,7 +51,7 @@ olink_qc_plot(npx_data1 %>% filter(Panel == 'Olink CARDIOMETABOLIC')) +
   scale_color_manual(values = c('turquoise3', 'red'))
 ```
 
-![qc\_plot\_example](man/figures/example_qcplot.png)
+![qc\_plot\_example](OlinkAnalyze/man/figures/example_qcplot.png)
 
 ### Normalization
 
@@ -97,7 +97,7 @@ olink_volcano_plot(p.val_tbl = ttest_results_NPX1,
   scale_color_manual(values = c('turquoise3', 'red'))
 ```
 
-![volcano\_plot\_example](man/figures/example_volcanoplot.png)
+![volcano\_plot\_example](OlinkAnalyze/man/figures/example_volcanoplot.png)
 
 ## Learn more
 
