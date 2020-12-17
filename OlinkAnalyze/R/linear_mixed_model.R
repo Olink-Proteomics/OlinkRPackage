@@ -35,7 +35,7 @@
 #' @examples
 #' \donttest{
 #' # Results in model NPX~Time*Treatment+(1|Subject)+(1|Site)
-#' lmer_results <- olink_lmer(df = npx_df,
+#' lmer_results <- olink_lmer(df = npx_data1,
 #' variable=c("Time", 'Treatment'),
 #' random = c('Subject', 'Site'))
 #' }
@@ -312,23 +312,23 @@ single_lmer <- function(data, formula_string){
 #' @return A tibble containing the results of the pairwise comparisons between given variable levels for proteins specified in olinkid_list (or full df).
 #' @export
 #' @examples
-#' \donttest{lmer_results <- olink_lmer(df = npx_df,
-#' variable=c("Time", 'Treatment'),
-#' random = c('Subject'))
-#' 
+#' \donttest{
+#' lmer_results <- olink_lmer(df = npx_data1,
+#'                            variable=c("Time", 'Treatment'),
+#'                            random = c('Subject'))
+#'
 #' assay_list <- lmer_results %>%
-#' filter(Threshold == 'Significant' & term == 'Time:Treatment') %>%
-#' select(OlinkID) %>%
-#' distinct() %>%
-#' pull()
-#' 
-#' results_lmer_posthoc <- local_lmer_posthoc(df = NPX, 
-#' olinkid_list = assay_list, 
-#' variable=c("Time", 'Treatment'),
-#' effect = 'Time:Treatment', 
-#' random = 'Subject',
-#' verbose = T)
-#'}
+#'     filter(Threshold == 'Significant' & term == 'Time:Treatment') %>%
+#'     select(OlinkID) %>%
+#'     distinct() %>%
+#'     pull()
+#'
+#' results_lmer_posthoc <- olink_lmer_posthoc(df = npx_data1,
+#'                                            olinkid_list = assay_list,
+#'                                            variable=c("Time", 'Treatment'),
+#'                                            effect = 'Time:Treatment',
+#'                                            random = 'Subject',
+#'                                            verbose = T)}
 #' @import dplyr stringr tidyr broom
 
 olink_lmer_posthoc <- function(df,                        
@@ -530,24 +530,25 @@ single_posthoc <- function(data, formula_string, effect, mean_return){
 #' @return A list of objects of class "ggplot"
 #' @export
 #' @examples
-#' \donttest{lmer_results <- olink_lmer(df = npx_df,
-#' variable=c("Time", 'Treatment'),
-#' random = c('Subject'))
-#' 
+#' \donttest{
+#' lmer_results <- olink_lmer(df = npx_data1,
+#'                            variable=c("Time", 'Treatment'),
+#'                            random = c('Subject'))
+#'
 #' assay_list <- lmer_results %>%
-#' filter(Threshold == 'Significant' & term == 'Time:Treatment') %>%
-#' select(OlinkID) %>%
-#' distinct() %>%
-#' pull()
-#' 
-#' list_of_pointrange_plots <- olink_lmer_plot(df = npx_df,                               
-#' variable=c("Time", 'Treatment'),
-#' random = c('Subject'),
-#' x_axis_variable = 'Time',                  
-#' col_variable = 'Treatment',              
-#' verbose=T,
-#' olinkid_list = assay_list,
-#' number_of_proteins_per_plot = 10)}
+#'     filter(Threshold == 'Significant' & term == 'Time:Treatment') %>%
+#'     select(OlinkID) %>%
+#'     distinct() %>%
+#'     pull()
+#'
+#' list_of_pointrange_plots <- olink_lmer_plot(df = npx_data1,
+#'                                             variable=c("Time", 'Treatment'),
+#'                                             random = c('Subject'),
+#'                                             x_axis_variable = 'Time',
+#'                                             col_variable = 'Treatment',
+#'                                             verbose=T,
+#'                                             olinkid_list = assay_list,
+#'                                             number_of_proteins_per_plot = 10)}
 #' @import dplyr stringr tidyr broom
 
 olink_lmer_plot <- function(df,                              

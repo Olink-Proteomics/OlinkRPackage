@@ -58,7 +58,7 @@ Adjusted p-values are logically evaluated towards adjusted p-value<0.05.
 \examples{
 \donttest{
 # Results in model NPX~Time*Treatment+(1|Subject)+(1|Site)
-lmer_results <- olink_lmer(df = npx_df,
+lmer_results <- olink_lmer(df = npx_data1,
 variable=c("Time", 'Treatment'),
 random = c('Subject', 'Site'))
 }

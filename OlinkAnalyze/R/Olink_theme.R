@@ -15,8 +15,3 @@ set_plot_theme <- function() {
     theme(strip.background = element_rect(fill = "white"),
           strip.text = element_text(size = 8), strip.text.x = element_text(size = 13))
 }
-
-
-
-
-

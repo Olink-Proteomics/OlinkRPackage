@@ -18,6 +18,6 @@ An object of class "ggplot"
 Generates boxplots of NPX vs. protein (OlinkID) colored by QC_Warning and faceted by Panel using ggplot and ggplot2::geom_boxplot.
 }
 \examples{
-\donttest{olink_dist_plot(df, color_g = "Group") }
+\donttest{olink_dist_plot(npx_data1, color_g = "QC_Warning")}
 }
 \keyword{NPX}

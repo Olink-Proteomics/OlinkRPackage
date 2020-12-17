@@ -22,5 +22,16 @@ Adjusted p-values are logically evaluated towards adjusted p-value<0.05.
 The resulting t-test table is arranged by ascending p-values.
 }
 \examples{
-\donttest{ttest_results <- olink_ttest(df=npx.data, variable = 'Group', alternative = 'two.sided')}
+\donttest{
+npx_df <- npx_data1 \%>\% filter(!grepl('control',SampleID, ignore.case = T))
+
+ttest_results <- olink_ttest(df=npx_df,
+                             variable = 'Treatment',
+                             alternative = 'two.sided')
+
+#Paired t-test
+npx_data1 \%>\%
+   filter(Time \%in\% c("Baseline","Week.6")) \%>\% 
+   olink_ttest(variable = "Time", pair_id = "Subject")
+}
 }

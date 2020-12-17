@@ -52,21 +52,21 @@ mean NPX at mean(numerical variable) versus mean NPX at mean(numerical variable)
 The output tibble is arranged by ascending Tukey adjusted p-values.
 }
 \examples{
-\donttest{lmer_results <- olink_lmer(df = npx_df,
-variable=c("Time", 'Treatment'),
-random = c('Subject'))
+\donttest{
+lmer_results <- olink_lmer(df = npx_data1,
+                           variable=c("Time", 'Treatment'),
+                           random = c('Subject'))
 
 assay_list <- lmer_results \%>\%
-filter(Threshold == 'Significant' & term == 'Time:Treatment') \%>\%
-select(OlinkID) \%>\%
-distinct() \%>\%
-pull()
+    filter(Threshold == 'Significant' & term == 'Time:Treatment') \%>\%
+    select(OlinkID) \%>\%
+    distinct() \%>\%
+    pull()
 
-results_lmer_posthoc <- local_lmer_posthoc(df = NPX, 
-olinkid_list = assay_list, 
-variable=c("Time", 'Treatment'),
-effect = 'Time:Treatment', 
-random = 'Subject',
-verbose = T)
-}
+results_lmer_posthoc <- olink_lmer_posthoc(df = npx_data1,
+                                           olinkid_list = assay_list,
+                                           variable=c("Time", 'Treatment'),
+                                           effect = 'Time:Treatment',
+                                           random = 'Subject',
+                                           verbose = T)}
 }

@@ -30,9 +30,14 @@ A list of objects of class “ggplot” (the actual ggplot object is entry 1 in 
 Generates faceted boxplots of NPX vs. grouping variable for a given list of proteins (OlinkIDs) using ggplot and ggplot2::geom_boxplot.
 }
 \examples{
-\donttest{anova_results <- anova_olink(df, variable = "Var1")
+\donttest{
+anova_results <- olink_anova(npx_data1, variable = "Site")
 significant_assays <- anova_results \%>\%
-filter(Threshold = 'Significant') \%>\%
-pull(OlinkID)
-olink_boxplot(df, variable = "Var1", olinkid_list = significant_assay, number_of_proteins_per_plot = 3)}
+    filter(Threshold == 'Significant') \%>\%
+    pull(OlinkID)
+olink_boxplot(npx_data1,
+              variable = "Site",
+              olinkid_list = significant_assays,
+              verbose = T,
+              number_of_proteins_per_plot = 3)}
 }

@@ -11,8 +11,12 @@
 #' @return An object of class "ggplot"
 #' @export
 #' @examples
-#' \donttest{ttest_results <- olink_ttest(df=npx.data, variable = 'Group', alternative = 'two.sided')
-#' volcano_plot(ttest_results)}
+#' \donttest{
+#' npx_df <- npx_data1 %>% filter(!grepl('control',SampleID, ignore.case = T))
+#' ttest_results <- olink_ttest(df=npx_df,
+#'                              variable = 'Treatment',
+#'                              alternative = 'two.sided')
+#' olink_volcano_plot(ttest_results)}
 
 
 olink_volcano_plot <- function (p.val_tbl, x_lab = "Estimate", olinkid_list = NULL) 

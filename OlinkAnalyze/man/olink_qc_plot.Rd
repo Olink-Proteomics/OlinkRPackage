@@ -30,6 +30,6 @@ Horizontal dashed lines indicate +/-3 standard deviations from the mean IQR.
 Vertical dashed lines indicate +/-3 standard deviations from the mean sample median.
 }
 \examples{
-\donttest{olink_qc_plot(df, color_g = "Group") }
+\donttest{olink_qc_plot(npx_data1, color_g = "QC_Warning")}
 }
 \keyword{NPX}

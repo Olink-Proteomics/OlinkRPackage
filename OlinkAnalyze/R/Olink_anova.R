@@ -32,27 +32,25 @@
 #' @return A tibble containing the ANOVA results for every protein. 
 #' The tibble is arranged by ascending p-values.
 #' @export
-#' @examples \donttest{
-#' npx_df <- read_NPX('path_to_npx_file_wide_format.xlsx')
-#' npx_df <- npx_df %>% left_join(sample_info_df, by = c('SampleID'))
+#' @examples 
+#' \donttest{
+#' npx_df <- npx_data1 %>% filter(!grepl('control', SampleID, ignore.case = T))
 #' 
-#' # One-way ANOVA, no covariates. 
-#' # Results in model NPX~A.
-#' anova_results <- olink_anova(df = npx_data, 
-#' variable = 'A')
+#' #One-way ANOVA, no covariates.
+#' #Results in a model NPX~Time
+#' anova_results <- olink_anova(df = npx_df, variable = "Time")
 #' 
-#' # Two-way ANOVA, one main effect covariate. 
-#' # Results in model NPX~A*B+C.
-#' anova_results <- olink_anova(df = npx_data, 
-#' variable=c("A:B"), 
-#' covariates="C")
-#' 
-#' # Two-way ANOVA, interaction effect covariate. 
-#' # Results in model NPX~A*B+C:D+C+D.
-#' anova_results <- olink_anova(df = npx_data, 
-#' variable=c("A:B"), 
-#' covariates="C:D")}
-#' 
+#' #Two-way ANOVA, one main effect covariate.
+#' #Results in model NPX~Treatment*Time+Site.
+#' anova_results <- olink_anova(df = npx_df,
+#'                              variable=c("Treatment:Time"),
+#'                              covariates="Site")
+#'
+#' #One-way ANOVA, interaction effect covariate.
+#' #Results in model NPX~Treatment+Site:Time+Site+Time.
+#' anova_results <- olink_anova(df = npx_df,
+#'                              variable="Treatment",
+#'                              covariates="Site:Time")}
 #' @import dplyr stringr tidyr car broom
 
 olink_anova <- function(df,                    

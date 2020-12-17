@@ -23,6 +23,10 @@ The horizontal dotted line indicates p-value=0.05.
 Dots are colored based on the Benjamini-Hochberg adjusted p-value cutoff 0.05 and can optionally be annotated by OlinkID.
 }
 \examples{
-\donttest{ttest_results <- olink_ttest(df=npx.data, variable = 'Group', alternative = 'two.sided')
-volcano_plot(ttest_results)}
+\donttest{
+npx_df <- npx_data1 \%>\% filter(!grepl('control',SampleID, ignore.case = T))
+ttest_results <- olink_ttest(df=npx_df,
+                             variable = 'Treatment',
+                             alternative = 'two.sided')
+olink_volcano_plot(ttest_results)}
 }
