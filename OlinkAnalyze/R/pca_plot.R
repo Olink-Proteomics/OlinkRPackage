@@ -45,7 +45,7 @@ olink_pca_plot <- function (df,
     
     df_temp <- df %>% 
       group_by(SampleID, Index) %>% 
-      mutate(QC_Warning = if_else(any(QC_Warning == "Warning"), "Warning", "Pass")) %>% 
+      mutate(QC_Warning = if_else(any(QC_Warning == "Warning"|QC_Warning == "WARN" ), "Warning", "Pass")) %>% 
       ungroup()
     
     colors_for_pca <- df_temp %>%

@@ -447,8 +447,6 @@ olink_lmer_posthoc <- function(df,
     }
     
     
-    
-    
     output_df <- df %>%
       filter(OlinkID %in% olinkid_list) %>%
       group_by(Assay, OlinkID, UniProt, Panel) %>%
@@ -460,10 +458,12 @@ olink_lmer_posthoc <- function(df,
       mutate(term=paste(effect,collapse=":"))  %>%
       select(Assay, OlinkID, UniProt, Panel, term, everything())
     
+    
     if("Adjusted_pval" %in% colnames(output_df)){
       output_df <- output_df %>%
         arrange(Adjusted_pval)
     }
+    
     
     return(output_df)
     

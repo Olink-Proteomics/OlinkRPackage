@@ -6,6 +6,7 @@
 #'
 #' @param df NPX data frame in long format with at least protein name (Assay), OlinkID, UniProt and a factor with 2 levels.
 #' @param variable Character value indicating which column should be used as the grouping variable. Needs to have exactly 2 levels.
+#' @param pair_id Character value indicating which column indicates the paired sample identifier.
 #' @param ... Options to be passed to t.test. See ?t.test for more.
 #' @return A data frame containing the t-test results for every protein.
 #' @export
@@ -25,8 +26,9 @@
 #' @import dplyr stringr tidyr broom
 
 
-olink_ttest <- function(df, variable, ...){
+olink_ttest <- function(df, variable, pair_id, ...){
   
+
   if (missing(df) | missing(variable)) {
     stop("The df and variable arguments need to be specified.")
   }
@@ -47,6 +49,21 @@ olink_ttest <- function(df, variable, ...){
   if (!is.null(removed.sampleids) & length(removed.sampleids) > 0) {
     message("Samples removed due to missing variable levels: ", 
             paste(removed.sampleids, collapse = ", "))
+  }
+  
+  if(!missing(pair_id)){
+    missing.pair <- NULL
+    missing.pair <- df$SampleID[is.na(df[[pair_id]])]
+    
+    if (!is.null(missing.pair) & length(missing.pair) > 0) {
+      message("Samples removed due to missing pair ID: ", 
+              paste(missing.pair, collapse = ", "))
+    }
+    
+    df <- df[!is.na(df[[pair_id]]), ]
+    
+    removed.sampleids <- unique(c(removed.sampleids,missing.pair))
+    
   }
   
   
@@ -122,19 +139,65 @@ olink_ttest <- function(df, variable, ...){
   }
   
   
-  message(paste0('T-test is performed on ', var_levels[1], ' - ', var_levels[2], '.'))
+  if(!missing(pair_id)){
+    
+    if(!pair_id %in% colnames(df)) stop(paste0("Column ",pair_id," not found."))
+    
+    if(!is_tibble(df)){
+      message("Converting data frame to tibble.")
+      df <- as_tibble(df)
+    }
+    
+    #check that each "pair_id' has only 2 samples
+    ct_pairs <- df %>% 
+      filter(!(OlinkID %in% all_nas)) %>%
+      filter(!(OlinkID %in% nas_in_level)) %>% 
+      filter(!is.na(!!rlang::ensym(variable))) %>% 
+      group_by(OlinkID,!!rlang::ensym(pair_id)) %>% 
+      summarize(n=n()) 
+    if(!all(ct_pairs$n <= 2)) stop(paste0("Each pair identifier must identify no more than 2 unique samples. Check pairs: ",
+                                          paste(unique(ct_pairs[[pair_id]][ct_pairs$n>2]),collapse=", ")))
+
+    message(paste0('Paired t-test is performed on ', var_levels[1], ' - ', var_levels[2], '.'))
+    
+
+    
+    p.val <- df %>%
+      filter(!(OlinkID %in% all_nas)) %>%
+      filter(!(OlinkID %in% nas_in_level)) %>%
+      select(all_of(c("OlinkID","UniProt","Assay","Panel","NPX",variable,pair_id))) %>% 
+      pivot_wider(names_from=all_of(variable),values_from="NPX") %>% 
+      group_by(Assay, OlinkID, UniProt, Panel) %>%
+      do(tidy(t.test(x=.[[var_levels[1]]],y=.[[var_levels[2]]],paired=T, ...))) %>%
+      ungroup() %>%
+      mutate(Adjusted_pval = p.adjust(p.value, method = "fdr")) %>%
+      mutate(Threshold = ifelse(Adjusted_pval < 0.05, "Significant", "Non-significant")) %>%
+      # rename(`:=`(!!var_levels[1], estimate1)) %>%
+      arrange(p.value)
+    
+    
+  } else{
+    
+   
+    
+    
+    message(paste0('T-test is performed on ', var_levels[1], ' - ', var_levels[2], '.'))
+    
+    
+    p.val <- df %>%
+      filter(!(OlinkID %in% all_nas)) %>%
+      filter(!(OlinkID %in% nas_in_level)) %>%
+      group_by(Assay, OlinkID, UniProt, Panel) %>%
+      do(tidy(t.test(NPX ~ !!rlang::ensym(variable), data = ., ...))) %>%
+      ungroup() %>%
+      mutate(Adjusted_pval = p.adjust(p.value, method = "fdr")) %>%
+      mutate(Threshold = ifelse(Adjusted_pval < 0.05, "Significant", "Non-significant")) %>%
+      rename(`:=`(!!var_levels[1], estimate1)) %>%
+      rename(`:=`(!!var_levels[2], estimate2)) %>%
+      arrange(p.value)
+  }
   
-  p.val <- df %>%
-    filter(!(OlinkID %in% all_nas)) %>%
-    filter(!(OlinkID %in% nas_in_level)) %>%
-    group_by(Assay, OlinkID, UniProt, Panel) %>%
-    do(tidy(t.test(NPX ~ !!rlang::ensym(variable), data = ., ...))) %>%
-    ungroup() %>%
-    mutate(Adjusted_pval = p.adjust(p.value, method = "fdr")) %>%
-    mutate(Threshold = ifelse(Adjusted_pval < 0.05, "Significant", "Non-significant")) %>%
-    rename(`:=`(!!var_levels[1], estimate1)) %>%
-    rename(`:=`(!!var_levels[2], estimate2)) %>%
-    arrange(p.value)
+  
   
   return(p.val)
   
