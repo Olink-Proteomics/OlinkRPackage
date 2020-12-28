@@ -27,6 +27,10 @@ olink_dist_plot <- function(df, color_g = 'QC_Warning') {
     ggplot2::scale_x_discrete(labels = function(x) gsub(reg, "", x), ...)
   }
   
+  # Remove "Target 96" and "Target 48" from the panel name(s)
+  df <- df %>% 
+    mutate(Panel = Panel  %>% str_replace("Target 96 ", "") %>% str_replace("Target 48 ", ""))
+  
   df %>%
     filter(!(is.na(NPX))) %>% 
     ggplot(., aes(x = reorder_within(factor(SampleID), NPX, Panel, median), y = NPX, fill=!!rlang::ensym(color_g)))+
@@ -34,6 +38,6 @@ olink_dist_plot <- function(df, color_g = 'QC_Warning') {
     scale_x_reordered()+
     xlab("Samples")+
     facet_wrap(~Panel,  scale="free")+
-    set_plot_theme() 
+    set_plot_theme()
   
 }

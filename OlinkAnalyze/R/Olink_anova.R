@@ -27,14 +27,14 @@
 #' @param covariates Single character value or character array. Default: NULL.
 #' Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be inferred from main effects.
 #' @param return.covariates Boolean. Deafult: False. Returns F-test results for the covariates. Note: Adjusted p-values will be NA for the covariates.
-#' @param verbose Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console. 
+#' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console. 
 #'
 #' @return A tibble containing the ANOVA results for every protein. 
 #' The tibble is arranged by ascending p-values.
 #' @export
 #' @examples 
 #' \donttest{
-#' npx_df <- npx_data1 %>% filter(!grepl('control', SampleID, ignore.case = T))
+#' npx_df <- npx_data1 %>% filter(!grepl('control',SampleID, ignore.case = T))
 #' 
 #' #One-way ANOVA, no covariates.
 #' #Results in a model NPX~Time
