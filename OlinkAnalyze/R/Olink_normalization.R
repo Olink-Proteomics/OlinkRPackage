@@ -214,21 +214,22 @@ olink_normalization <- function(df1,
     adj_factor_df<-df1 %>%
       rbind(df2) %>%
       filter(SampleID %in% overlapping_samples_df1) %>%
-      select(SampleID,OlinkID,UniProt,Panel,QC_Warning,NPX,Project) %>% 
-      mutate(Panel=str_replace(Panel,'\\(.+', '')) %>%
+      select(SampleID,OlinkID,UniProt,NPX,Project) %>% 
       spread(Project,NPX)
     
-    if(reference_project == df1_project_nr){
+    if (reference_project == df1_project_nr) {
       adj_factor_df <- adj_factor_df %>%
-        mutate(Diff = if_else(is.na(!!rlang::ensym(df1_project_nr) - !!rlang::ensym(df2_project_nr)), 0, !!rlang::ensym(df1_project_nr)-!!rlang::ensym(df2_project_nr))) 
-    }else{
+        mutate(Diff = !!rlang::ensym(df1_project_nr) - !!rlang::ensym(df2_project_nr))
+    } else {
       adj_factor_df <- adj_factor_df %>%
-        mutate(Diff = if_else(is.na(!!rlang::ensym(df2_project_nr) - !!rlang::ensym(df1_project_nr)), 0, !!rlang::ensym(df2_project_nr)-!!rlang::ensym(df1_project_nr)))
+        mutate(Diff = !!rlang::ensym(df2_project_nr) - !!rlang::ensym(df1_project_nr))
     }
     
     adj_factor_df <- adj_factor_df %>%
       group_by(OlinkID) %>%
-      summarise(Adj_factor=median(Diff,na.rm = T))
+      summarise(Adj_factor = if_else(is.na(median(Diff, na.rm = T)), 
+                                     0,
+                                     median(Diff, na.rm = T)))
     
   }else{
     
@@ -238,19 +239,22 @@ olink_normalization <- function(df1,
     adj_factor_df <- df1 %>% 
       filter(SampleID %in% overlapping_samples_df1) %>%
       rbind(df2 %>% filter(SampleID %in% overlapping_samples_df2)) %>%
-      select(SampleID,OlinkID,UniProt,Panel,QC_Warning,NPX,Project) %>% 
-      mutate(Panel=str_replace(Panel,'\\(.+', '')) %>%
+      select(SampleID,OlinkID,UniProt,NPX,Project) %>% 
       group_by(Project, OlinkID) %>%
       summarise(Median=median(NPX,na.rm = T)) %>%
       ungroup() %>%
       spread(Project,Median)
     
-    if(reference_project == df1_project_nr){
+    if (reference_project == df1_project_nr) {
       adj_factor_df <- adj_factor_df %>%
-        mutate(Adj_factor = if_else(is.na(!!rlang::ensym(df1_project_nr) - !!rlang::ensym(df2_project_nr)), 0, !!rlang::ensym(df1_project_nr)-!!rlang::ensym(df2_project_nr))) 
-    }else{
+        mutate(Adj_factor = if_else(is.na(!!rlang::ensym(df1_project_nr) - !!rlang::ensym(df2_project_nr)),
+                                    0,
+                                    !!rlang::ensym(df1_project_nr) - !!rlang::ensym(df2_project_nr))) 
+    } else {
       adj_factor_df <- adj_factor_df %>%
-        mutate(Adj_factor = if_else(is.na(!!rlang::ensym(df2_project_nr) - !!rlang::ensym(df1_project_nr)), 0, !!rlang::ensym(df2_project_nr)-!!rlang::ensym(df1_project_nr)))
+        mutate(Adj_factor = if_else(is.na(!!rlang::ensym(df2_project_nr) - !!rlang::ensym(df1_project_nr)),
+                                    0,
+                                    !!rlang::ensym(df2_project_nr) - !!rlang::ensym(df1_project_nr)))
     }
     
     adj_factor_df <- adj_factor_df %>%
@@ -271,4 +275,3 @@ olink_normalization <- function(df1,
   return(df_adjusted_data)
   
 }
-
