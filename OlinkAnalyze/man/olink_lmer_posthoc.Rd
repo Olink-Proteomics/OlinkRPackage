@@ -19,7 +19,7 @@ olink_lmer_posthoc(
 \arguments{
 \item{df}{NPX data frame in long format with at least protein name (Assay), OlinkID, UniProt, 1-2 variables with at least 2 levels and subject ID.}
 
-\item{variable}{Single character value or character array. 
+\item{variable}{Single character value or character array.
 Variable(s) to test. If length > 1, the included variable names will be used in crossed analyses .
 Also takes ':'/'*' notation.}
 
@@ -42,11 +42,11 @@ Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be infe
 A tibble containing the results of the pairwise comparisons between given variable levels for proteins specified in olinkid_list (or full df).
 }
 \description{
-Similar to olink_lmer but performs a post hoc analysis based on a linear mixed model effects model using lmerTest::lmer and emmeans::emmeans on proteins. 
+Similar to olink_lmer but performs a post hoc analysis based on a linear mixed model effects model using lmerTest::lmer and emmeans::emmeans on proteins.
 See \code{olink_lmer} for details of input notation. \cr\cr
-The function handles both factor and numerical variables and/or covariates. 
-Differences in estimated marginal means are calculated for all pairwise levels of a given variable. 
-Degrees of freedom are estimated using Satterthwaite’s approximation. 
+The function handles both factor and numerical variables and/or covariates.
+Differences in estimated marginal means are calculated for all pairwise levels of a given variable.
+Degrees of freedom are estimated using Satterthwaite’s approximation.
 The posthoc test for a numerical variable compares the difference in means of the outcome variable (default: NPX) for 1 standard deviation difference in the numerical variable, e.g.
 mean NPX at mean(numerical variable) versus mean NPX at mean(numerical variable) + 1*SD(numerical variable).
 The output tibble is arranged by ascending Tukey adjusted p-values.

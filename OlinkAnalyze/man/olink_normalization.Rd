@@ -36,17 +36,17 @@ olink_normalization(
 A tibble of NPX data in long format containing normalized NPX values, including adjustment factors.
 }
 \description{
-Normalizes NPX data frames to another data frame or to reference medians. If two dataframes are normalized to one another, the Olink default is using the older dataframe as reference. 
+Normalizes NPX data frames to another data frame or to reference medians. If two dataframes are normalized to one another, Olinks default is using the older dataframe as reference.
 The function handles four different types of normalization: \cr\cr
-Bridging normalization: One of the dataframes is adjusted to another using overlapping samples (bridge samples). 
-The overlapping samples need to be named the same between the dataframes and adjustment is made using the median of the paired differences between the bridge samples in the two data frames. 
-The two dataframes are inputs df1 and df2, the one being adjusted to is specified in the input reference_project and the overlapping samples are specified in overlapping_samples_df1. 
+Bridging normalization: One of the dataframes is adjusted to another using overlapping samples (bridge samples).
+The overlapping samples need to be named the same between the dataframes and adjustment is made using the median of the paired differences between the bridge samples in the two data frames.
+The two dataframes are inputs df1 and df2, the one being adjusted to is specified in the input reference_project and the overlapping samples are specified in overlapping_samples_df1.
 Only overlapping_samples_df1 should be input, no matter which dataframe is used as reference_project.  \cr\cr
-Subset normalization: One of the dataframes is adjusted to the dataframe set as reference_project using a sample subset. 
-Adjustment is made using the differences in median between the subsets from the two data frames. 
-Both overlapping_samples_df1 and overlapping_samples_df2 need to be input. 
+Subset normalization: One of the dataframes is adjusted to the dataframe set as reference_project using a sample subset.
+Adjustment is made using the differences in median between the subsets from the two data frames.
+Both overlapping_samples_df1 and overlapping_samples_df2 need to be input.
 The samples do not need to be named the same. \cr\cr
-Intensity normalization: A version of subset normalization where all samples (except control samples) from the dataframes are input as overlapping_samples_df1 and overlapping_samples_df2, respectively. \cr\cr 
+Intensity normalization: A version of subset normalization where all samples (except control samples) from the dataframes are input as overlapping_samples_df1 and overlapping_samples_df2, respectively. \cr\cr
 Reference median normalization: Working only on one dataframe. This is effectively subset normalization, but using difference of medians to pre-recorded median values.
 df1, overlapping_samples_df1 and reference_medians need to be specified. Adjustment of df1 is made using the differences in median between the overlapping samples and the reference medians.
 }

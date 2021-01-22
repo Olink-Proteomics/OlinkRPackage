@@ -1,29 +1,53 @@
 #' Function to plot an overview of a sample cohort per Panel
 #'
-#' Generates a facet plot per Panel using ggplot and ggplot2::geom_point and stats::IQR plotting IQR vs. median for all samples. 
-#' Horizontal dashed lines indicate +/-3 standard deviations from the mean IQR. 
-#' Vertical dashed lines indicate +/-3 standard deviations from the mean sample median. 
-#' 
+#' Generates a facet plot per Panel using ggplot and ggplot2::geom_point and stats::IQR plotting IQR vs. median for all samples.
+#' Horizontal dashed lines indicate +/-3 standard deviations from the mean IQR.
+#' Vertical dashed lines indicate +/-3 standard deviations from the mean sample median.
+#'
 #' @param df NPX data frame in long format. Must have columns SampleID, Index, NPX and Panel
 #' @param color_g Character value indicating which column to use as fill color (default QC_Warning)
-#' @param plot_index Boolean. If FALSE (default), a point will be plotted for a sample. If TRUE, 
+#' @param plot_index Boolean. If FALSE (default), a point will be plotted for a sample. If TRUE,
 #' a sample's unique index number is displayed.
-#' @param label_outliers Boolean. If TRUE, an outlier sample will be labelled with its SampleID.   
+#' @param label_outliers Boolean. If TRUE, an outlier sample will be labelled with its SampleID.
+#' @param ... coloroption passed to specify color order
 #' @return An object of class "ggplot"
 #' @keywords NPX
 #' @export
 #' @examples \donttest{olink_qc_plot(npx_data1, color_g = "QC_Warning")}
 #' @import dplyr stringr tidyr
-#' 
+#'
 
 
-olink_qc_plot <- function(npx_df, color_g = "QC_Warning", plot_index = F, label_outliers = T){
-  
+olink_qc_plot <- function(df, color_g = "QC_Warning", plot_index = F, label_outliers = T, ...){
+
+  #checking ellipsis
+  if(length(list(...)) > 0){
+
+    ellipsis_variables <- names(list(...))
+
+    if(length(ellipsis_variables) == 1){
+
+      if(!(ellipsis_variables == 'coloroption')){
+
+        stop(paste0('The ... option only takes the coloroption argument. ... currently contains the variable ',
+                    ellipsis_variables,
+                    '.'))
+
+      }
+
+    }else{
+
+      stop(paste0('The ... option only takes one argument. ... currently contains the variables ',
+                  paste(ellipsis_variables, collapse = ', '),
+                  '.'))
+    }
+  }
+
   #Filtering on valid OlinkID
-  npx_df <- npx_df %>%
+  npx_df <- df %>%
     filter(stringr::str_detect(OlinkID,
                                "OID[0-9]{5}"))
-  
+
   npx_df_qr <- npx_df %>%
     group_by(Panel, SampleID, Index) %>%
     mutate(IQR = IQR(NPX, na.rm = T),
@@ -42,13 +66,13 @@ olink_qc_plot <- function(npx_df, color_g = "QC_Warning", plot_index = F, label_
                                IQR > iqr_low &
                                IQR < iqr_high,
                              0, 1))
-  
-  
+
+
   qc_plot <- npx_df_qr %>%
     ggplot(aes(x = sample_median, y = IQR)) +
     geom_hline(aes(yintercept=iqr_low),
-               linetype = 'dashed', 
-               color = 'grey') + 
+               linetype = 'dashed',
+               color = 'grey') +
     geom_hline(aes(yintercept=iqr_high),
                linetype = 'dashed',
                color = 'grey') +
@@ -60,26 +84,27 @@ olink_qc_plot <- function(npx_df, color_g = "QC_Warning", plot_index = F, label_
                color = 'grey') +
     xlab('Sample Median') +
     facet_wrap(~Panel, scale = "free") +
-    set_plot_theme() 
-  
+    set_plot_theme()+
+    olink_color_discrete(...)
+
   if(plot_index){
-    qc_plot <- qc_plot + geom_text(aes(color = !!rlang::ensym(color_g), label = Index), size = 3) 
+    qc_plot <- qc_plot + geom_text(aes(color = !!rlang::ensym(color_g), label = Index), size = 3)
   }else{
-    qc_plot <- qc_plot + geom_point(aes(color = !!rlang::ensym(color_g)), size = 2.5) 
+    qc_plot <- qc_plot + geom_point(aes(color = !!rlang::ensym(color_g)), size = 2.5)
   }
-  
+
   if(label_outliers){
-    
-    qc_plot <- qc_plot + 
+
+    qc_plot <- qc_plot +
       geom_label_repel(data = . %>% filter(Outlier == 1),
                        aes(label=SampleID),
-                       box.padding = 0.5, 
+                       box.padding = 0.5,
                        min.segment.length = 0.1,
                        show.legend=F,
                        size = 3)
-    
+
   }
-  
+
   return(qc_plot)
-  
-} 
+
+}

@@ -14,13 +14,14 @@ olink_lmer_plot(
   x_axis_variable,
   col_variable = NULL,
   number_of_proteins_per_plot = 6,
-  verbose = F
+  verbose = F,
+  ...
 )
 }
 \arguments{
 \item{df}{NPX data frame in long format with at least protein name (Assay), OlinkID, UniProt, 1-2 variables with at least 2 levels.}
 
-\item{variable}{Single character value or character array. 
+\item{variable}{Single character value or character array.
 Variable(s) to test. If length > 1, the included variable names will be used in crossed analyses .
 Also takes ':'/'*' notation.}
 
@@ -40,6 +41,8 @@ Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be infe
 \item{number_of_proteins_per_plot}{Number plots to include in the list of point-range plots. Defaults to 6 plots per figure}
 
 \item{verbose}{Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
+
+\item{...}{coloroption for color ordering}
 }
 \value{
 A list of objects of class "ggplot"

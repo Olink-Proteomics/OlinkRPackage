@@ -27,7 +27,7 @@ Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be infe
 
 \item{return.covariates}{Boolean. Deafult: False. Returns F-test results for the covariates. Note: Adjusted p-values will be NA for the covariates.}
 
-\item{verbose}{Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
+\item{verbose}{Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
 }
 \value{
 A tibble containing the ANOVA results for every protein. 
@@ -54,7 +54,7 @@ The threshold is determined by logic evaluation of Adjusted_pval < 0.05. Covaria
 }
 \examples{
 \donttest{
-npx_df <- npx_data1 \%>\% filter(!grepl('control', SampleID, ignore.case = T))
+npx_df <- npx_data1 \%>\% filter(!grepl('control',SampleID, ignore.case = T))
 
 #One-way ANOVA, no covariates.
 #Results in a model NPX~Time

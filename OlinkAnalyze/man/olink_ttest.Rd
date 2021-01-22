@@ -4,12 +4,14 @@
 \alias{olink_ttest}
 \title{Function which performs a t-test per protein}
 \usage{
-olink_ttest(df, variable, ...)
+olink_ttest(df, variable, pair_id, ...)
 }
 \arguments{
 \item{df}{NPX data frame in long format with at least protein name (Assay), OlinkID, UniProt and a factor with 2 levels.}
 
 \item{variable}{Character value indicating which column should be used as the grouping variable. Needs to have exactly 2 levels.}
+
+\item{pair_id}{Character value indicating which column indicates the paired sample identifier.}
 
 \item{...}{Options to be passed to t.test. See ?t.test for more.}
 }
@@ -17,8 +19,8 @@ olink_ttest(df, variable, ...)
 A data frame containing the t-test results for every protein.
 }
 \description{
-Performs a Welch 2-sample t-test at confidence level 0.95 for every protein (by OlinkID) for a given grouping variable using stats::t.test and corrects for multiple testing by the Benjamini-Hochberg method (“fdr”) using stats::p.adjust. 
-Adjusted p-values are logically evaluated towards adjusted p-value<0.05. 
+Performs a Welch 2-sample t-test at confidence level 0.95 for every protein (by OlinkID) for a given grouping variable using stats::t.test and corrects for multiple testing by the Benjamini-Hochberg method (“fdr”) using stats::p.adjust.
+Adjusted p-values are logically evaluated towards adjusted p-value<0.05.
 The resulting t-test table is arranged by ascending p-values.
 }
 \examples{
@@ -30,8 +32,8 @@ ttest_results <- olink_ttest(df=npx_df,
                              alternative = 'two.sided')
 
 #Paired t-test
-npx_data1 \%>\%
-   filter(Time \%in\% c("Baseline","Week.6")) \%>\% 
+npx_df \%>\%
+   filter(Time \%in\% c("Baseline","Week.6")) \%>\%
    olink_ttest(variable = "Time", pair_id = "Subject")
 }
 }

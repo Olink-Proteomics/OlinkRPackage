@@ -4,12 +4,14 @@
 \alias{olink_dist_plot}
 \title{Function to plot the NPX distribution by panel}
 \usage{
-olink_dist_plot(df, color_g = "QC_Warning")
+olink_dist_plot(df, color_g = "QC_Warning", ...)
 }
 \arguments{
 \item{df}{NPX data frame in long format. Must have columns SampleID, NPX and Panel}
 
 \item{color_g}{Character value indicating which column to use as fill color (default QC_Warning)}
+
+\item{...}{Color option passed to specify color order.}
 }
 \value{
 An object of class "ggplot"

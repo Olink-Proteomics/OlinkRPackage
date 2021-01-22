@@ -9,7 +9,8 @@ olink_boxplot(
   variable,
   olinkid_list,
   verbose = F,
-  number_of_proteins_per_plot = 6
+  number_of_proteins_per_plot = 6,
+  ...
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ olink_boxplot(
 \item{verbose}{Boolean. If the plots are shown as well as returned in the list (default is false).}
 
 \item{number_of_proteins_per_plot}{Number of boxplots to include in the facet plot (default 6).}
+
+\item{...}{coloroption passed to specify color order}
 }
 \value{
 A list of objects of class “ggplot” (the actual ggplot object is entry 1 in the list).
