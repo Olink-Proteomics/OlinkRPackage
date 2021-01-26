@@ -5,6 +5,7 @@ date: "`r Sys.Date()`"
 output: 
   html_vignette:
     toc: true
+    toc_depth: 2
 vignette: >
   %\VignetteIndexEntry{OlinkAnalyze Vignette}
   %\VignetteEngine{knitr::rmarkdown}
@@ -38,6 +39,8 @@ devtools::install_github(repo = 'Olink-Proteomics/OlinkRPackage/OlinkAnalyze')
 **Preprocessing**
 
 + *read_NPX* Function to read NPX data into long format
++ *olink_plate_randomizer* Randomize samples on plate
++ *olink_bridgeselector* Select bridge samples
 + *olink_normalization* Normalization of all proteins (by OlinkID)
 
 **Statistical analysis**
@@ -121,51 +124,51 @@ A tibble in long format containing:
 * LOD: Limit of detection (LOD) is the minimum level of an individual protein that can be measured. LOD is defined as 3 times the standard deviation over background.
 * NPX: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX here [https://www.olink.com/question/what-is-npx/](https://www.olink.com/question/what-is-npx/).
 
-## Randomize sample position (olink_plate_randomizer)
+## Randomize samples on plate (olink_plate_randomizer)
 
-The olink_plate_randomizer function randomly assigne samples to a plate position with the option to keep the same individual on the same plate. Olink don't recommend to force balance based on other clinical variables. 
+The olink_plate_randomizer function randomly assigns samples to a plate well with the option to keep the same individuals on the same plate. Olink does not recommend to force balance based on other clinical variables. 
 
 ### Function arguments
 
-+ Manifest: tibble/data frame in long format containing all sample ID's. Sample ID column must be named SampleID.
-+ SubjectColumn: (Optional) Column name of the subject ID column. Cannot contain missings. If provided, subjects are kept on the same plate.
-+ Groups: (Optional) Currently not implemented! Vector of column names for variables to be balanced across plates.
++ Manifest: tibble/data frame in long format containing all sample ID's. Sample ID column should be named SampleID.
++ SubjectColumn: (Optional) Column name of the subject ID column. Cannot contain missing values. If provided, subjects are kept on the same plate.
++ Groups: (Optional) *Currently not implemented!* Vector of column names for variables to be balanced across plates.
 + iterations: Number of iterations for fitting subjects on the same plate.
-+ available.spots: Default is 88. Number of wells available on each plate. Can also take a vector equal to the number of plates to be used indicating the number of wells available on each plate.
-+ seed: Seed to set. Highly recommend setting this for reproducibility.
++ available.spots: (Default 88). Number of wells available on each plate. Can also take a vector equal to the number of plates to be used indicating the number of wells available on each plate.
++ seed: Seed to set. Highly recommend setting it for reproducibility.
 
 ```{r message=FALSE, eval=FALSE}
-olink_plate_randomizer(manifest, 
-                       SubjetColumn="SubjectID",
-                       seed=111)
+olink_plate_randomizer(Manifest = manifest, 
+                       SubjetColumn = "SubjectID",
+                       seed = 111)
 ```  
 
 ### Function output
 
 A tibble including SampleID, SubjectID etc. assigned to well positions.
 
-## Selecting bridge samples (olink_bridgeselector)
+## Select bridge samples (olink_bridgeselector)
 
-The bridge selection function will select a number of bridge samples based on the input data. Bridge samples are used to normalize two dataframes/projects which have been ran at different times. It select samples with good detection, which passes quality control and cover a good range of the data. 
+The bridge selection function selects a number of bridge samples based on the input data. Bridge samples are used to normalize two dataframes/projects that have been ran at different timepoints, hence, a batch effect is expected. It select samples that fulfill certain criteria that include good detectability, passing quality control and covering a wide range of data points. When possible the function recommends 8-16 bridge samples.
 
-If possible olink recommends 8-16 bridge samples. Bridge sample selection strategy: When running the selector, start at 10% missingness. If there are not enough samples output, increase to 20%. 
+Bridge sample selection strategy: Start by choosing samples with at most 10% missingness, and in case there are not enough samples to output, increase the threshold to 20%. 
 
 ### Function arguments
 
-+ df: Tibble/data frame in long format such as produced by the olinkr read_NPX function.
-+ sampleMissingFreq: The threshhold for sample wise missingness.
++ df: tibble/data frame in long format such as produced by the read_NPX function.
++ sampleMissingFreq: The threshhold for sample missingness.
 + n: Number of bridge samples to be selected.
 
 ```{r message=FALSE, eval=FALSE}
 # Select overlapping samples
 olink_bridgeselector(df = npx_data1, 
                      SampleMissingFreq = 0.1,
-                     n = 8)}
+                     n = 8)
 ```  
 
 ### Function output
 
-Tibble with sample ID:s and mean NPX for a defined number of bridging samples.
+Tibble with sample IDs and mean NPX for the pre-defined number of bridging samples.
 
 ## Normalizing NPX data (olink_normalization)
 
@@ -193,7 +196,6 @@ overlap_samples <- intersect(npx_data1$SampleID, npx_data2$SampleID) %>%
   data.frame() %>% 
   filter(!str_detect(., 'CONTROL_SAMPLE')) %>% #Remove control samples
   pull(.)
-
 # Perform Bridging normalization
 olink_normalization(df1 = npx_data1, 
                     df2 = npx_data2, 
@@ -287,11 +289,9 @@ Adjusted p-values are calculated using the function *p.adjust* from the R librar
 # One-way ANOVA, no covariates
 anova_results_oneway <- olink_anova(df = npx_data1, 
                                     variable = 'Site')
-
 # Two-way ANOVA, no covariates
 anova_results_twoway <- olink_anova(df = npx_data1, 
                                     variable = c('Site', 'Time'))
-
 # One-way ANOVA, Treatment as covariates
 anova_results_oneway <- olink_anova(df = npx_data1, 
                                     variable = 'Site',
@@ -336,12 +336,10 @@ The function handles both factor and numerical variables and/or covariates. The 
 # calculate the p-value for the ANOVA
 anova_results_oneway <- olink_anova(df = npx_data1, 
                                     variable = 'Site')
-
 # extracting the significant proteins
 anova_results_oneway_significant <- anova_results_oneway %>%
   filter(Threshold == 'Significant') %>%
   pull(OlinkID)
-
 anova_posthoc_oneway_results <- olink_anova_posthoc(df = npx_data1,
                                                     olinkid_list = anova_results_oneway_significant,
                                                     variable = 'Site',
@@ -397,7 +395,6 @@ Adjusted p-values are calculated using the function *p.adjust* from the R librar
 lmer_results_oneway <- olink_lmer(df = npx_data1, 
                                   variable = 'Site',
                                   random = 'Subject')
-
 # Linear mixed model with two variables.
 lmer_results_twoway <- olink_lmer(df = npx_data1, 
                                   variable = c('Site', 'Treatment'),
@@ -443,12 +440,10 @@ The olink_lmer_posthoc function is similar to olink_lmer but performs a post-hoc
 lmer_results_twoway <- olink_lmer(df = npx_data1, 
                                   variable = c('Site', 'Treatment'),
                                   random = 'Subject')
-
 # extracting the significant proteins
 lmer_results_twoway_significant <- lmer_results_twoway %>%
   filter(Threshold == 'Significant', term == 'Treatment') %>%
   pull(OlinkID)
-
 # performing post-hoc analysis
 lmer_posthoc_twoway_results <- olink_lmer_posthoc(df = npx_data1,
                                                   olinkid_list = lmer_results_twoway_significant,
@@ -618,12 +613,10 @@ The olink_volcano_plot function generates a volcano plot using results from the 
 # perform t-test
 ttest_results <- olink_ttest(df = npx_data1,
                              variable = 'Treatment')
-
 # select names of proteins to show
 top_10_name <- ttest_results %>%
   slice_head(n = 10) %>%
   pull(OlinkID)
-
 # volcano plot
 olink_volcano_plot(p.val_tbl = ttest_results,
                    x_lab = 'Treatment',
@@ -657,4 +650,4 @@ npx_data1 %>%
   geom_boxplot() +
   set_plot_theme() +
   olink_fill_discrete()
-```  
+```
