@@ -31,7 +31,7 @@ install.packages("devtools")
 Now you can proceed to installing OlinkAnalyze.
 
 ```{r, eval=FALSE}
-devtools::install_github(repo = 'Olink-Proteomics/OlinkRPackage/OlinkAnalyze')
+devtools::install_github(repo = 'Olink-Proteomics/OlinkRPackage/OlinkAnalyze', build_vignettes = TRUE)
 ```
 
 # List of functions
