@@ -38,9 +38,8 @@ olink_dist_plot <- function(df, color_g = 'QC_Warning', ...) {
 
 
 
-
   #Filtering on valid OlinkID
-  df <- df %>%
+  df_OlinkID <- df %>%
     filter(stringr::str_detect(OlinkID,
                                "OID[0-9]{5}"))
 
@@ -54,11 +53,16 @@ olink_dist_plot <- function(df, color_g = 'QC_Warning', ...) {
     ggplot2::scale_x_discrete(labels = function(x) gsub(reg, "", x), ...)
   }
 
-  # Remove "Target 96" and "Target 48" from the panel name(s)
-  df <- df %>%
-    mutate(Panel = Panel  %>% str_replace("Target 96 ", "") %>% str_replace("Target 48 ", ""))
+  # Remove "Olink", Target 96" and "Target 48" from the panel name(s)
+  df_OlinkID_fixed <- df_OlinkID %>%
+    mutate(Panel = Panel  %>% str_replace("Olink ", "") %>%
+             str_replace("Target 96 ", "") %>%
+             str_replace("Target 48 ", "")) %>%
+    group_by(SampleID, Index, Panel) %>%
+    mutate(QC_Warning = if_else(any(QC_Warning == "Warning"|QC_Warning == "WARN" ), "Warning", "Pass"))%>%
+    ungroup()
 
-  df %>%
+  df_OlinkID_fixed %>%
     filter(!(is.na(NPX))) %>%
     ggplot(., aes(x = reorder_within(factor(SampleID), NPX, Panel, median), y = NPX, fill=!!rlang::ensym(color_g)))+
     geom_boxplot()+

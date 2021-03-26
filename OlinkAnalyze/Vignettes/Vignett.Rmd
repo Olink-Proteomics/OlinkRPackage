@@ -5,6 +5,7 @@ date: "`r Sys.Date()`"
 output: 
   html_vignette:
     toc: true
+    toc_depth: 2
 vignette: >
   %\VignetteIndexEntry{OlinkAnalyze Vignette}
   %\VignetteEngine{knitr::rmarkdown}
@@ -136,7 +137,7 @@ The olink_plate_randomizer function randomly assigne samples to a plate position
 
 ```{r message=FALSE, eval=FALSE}
 olink_plate_randomizer(manifest, 
-                       SubjetColumn="SubjectID",
+                       SubjectColumn ="SampleID",
                        seed=111)
 ```  
 
