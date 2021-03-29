@@ -17,6 +17,12 @@ convenient pipeline for your Olink NPX data analysis.
 devtools::install_github(repo ='Olink-Proteomics/OlinkRPackage/OlinkAnalyze', build_vignettes = TRUE)
 ```
 
+## Vignette
+
+```r
+browseVignettes("OlinkAnalyze")
+```
+
 ## Usage
 
 ### Reading Olink NPX data
