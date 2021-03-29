@@ -196,12 +196,14 @@ overlap_samples <- intersect(npx_data1$SampleID, npx_data2$SampleID) %>%
   data.frame() %>% 
   filter(!str_detect(., 'CONTROL_SAMPLE')) %>% #Remove control samples
   pull(.)
+
 # Perform Bridging normalization
 olink_normalization(df1 = npx_data1, 
                     df2 = npx_data2, 
                     overlapping_samples_df1 = overlap_samples,
-                    df1_project_nr = 'Project1',
-                    df2_project_nr = 'Project2')
+                    df1_project_nr = '20200001',
+                    df2_project_nr = '20200002',
+                    reference_project = '20200001')
 ```  
 
 ### Function output
