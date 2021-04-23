@@ -71,5 +71,4 @@ olink_dist_plot <- function(df, color_g = 'QC_Warning', ...) {
     facet_wrap(~Panel,  scale="free")+
     set_plot_theme() +
     olink_fill_discrete(...)
-
 }

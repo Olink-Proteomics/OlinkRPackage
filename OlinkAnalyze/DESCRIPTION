@@ -9,4 +9,8 @@ LazyData: true
 Depends: broom, car, emmeans, ggfortify, ggrepel, lmerTest, openxlsx, stringr, tidyverse, readxl
 RoxygenNote: 7.1.1
 Suggests: knitr, rmarkdown
+<<<<<<< HEAD
 VignetteBuilder: knitr
+=======
+VignetteBuilder: knitr
+>>>>>>> 5b06236d60925a20f541400d79ba3e63e4265ec7
