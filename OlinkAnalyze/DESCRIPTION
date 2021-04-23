@@ -11,10 +11,14 @@ RoxygenNote: 7.1.1
 Suggests: knitr, rmarkdown
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 VignetteBuilder: knitr
 =======
 VignetteBuilder: knitr
 >>>>>>> 5b06236d60925a20f541400d79ba3e63e4265ec7
+=======
+VignetteBuilder: knitr
+>>>>>>> aa781e0b970db685bf414001a563842f819c35f2
 =======
 VignetteBuilder: knitr
 >>>>>>> aa781e0b970db685bf414001a563842f819c35f2

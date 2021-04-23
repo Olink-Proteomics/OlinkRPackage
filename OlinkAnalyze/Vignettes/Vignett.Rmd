@@ -140,6 +140,7 @@ The olink_plate_randomizer function randomly assigns samples to a plate well wit
 ```{r message=FALSE, eval=FALSE}
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 olink_plate_randomizer(manifest, 
                        SubjectColumn ="SampleID",
                        seed=111)
@@ -148,6 +149,11 @@ olink_plate_randomizer(Manifest = manifest,
                        SubjetColumn = "SubjectID",
                        seed = 111)
 >>>>>>> 5b06236d60925a20f541400d79ba3e63e4265ec7
+=======
+olink_plate_randomizer(Manifest = manifest, 
+                       SubjetColumn = "SubjectID",
+                       seed = 111)
+>>>>>>> aa781e0b970db685bf414001a563842f819c35f2
 =======
 olink_plate_randomizer(Manifest = manifest, 
                        SubjetColumn = "SubjectID",
