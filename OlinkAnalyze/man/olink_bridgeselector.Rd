@@ -4,7 +4,7 @@
 \alias{olink_bridgeselector}
 \title{Bridge selection function}
 \usage{
-olink_bridgeselector(df, sampleMissingFreq, n)
+olink_bridgeselector(df, sampleMissingFreq, n, warning_string = NULL)
 }
 \arguments{
 \item{df}{Tibble/data frame in long format such as produced by the olinkr read_NPX function.}
@@ -12,6 +12,8 @@ olink_bridgeselector(df, sampleMissingFreq, n)
 \item{sampleMissingFreq}{The threshhold for sample wise missingness.}
 
 \item{n}{Number of bridge samples to be selected.}
+
+\item{warning_string}{The string used to indicate that a sample received a QC warning. Most common, it is either "WARN" or "Warning". If this is not given, the function tries to detect it from the given data frame.}
 }
 \value{
 Tibble with sample ID:s and mean NPX for a defined number of bridging samples.

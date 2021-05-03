@@ -10,6 +10,7 @@
 #' @param df Tibble/data frame in long format such as produced by the olinkr read_NPX function.
 #' @param sampleMissingFreq The threshhold for sample wise missingness.
 #' @param n Number of bridge samples to be selected.
+#' @param warning_string The string used to indicate that a sample received a QC warning. Most common, it is either "WARN" or "Warning". If this is not given, the function tries to detect it from the given data frame.
 #'
 #' @return Tibble with sample ID:s and mean NPX for a defined number of bridging samples.
 #' @export
@@ -18,8 +19,30 @@
 #' \donttest{bridge_samples <- olink_bridgeselector(npx_data1, sampleMissingFreq = 0.1, n = 20)}
 #' @import dplyr stringr tidyr broom
 
-olink_bridgeselector<-function(df, sampleMissingFreq, n){
+olink_bridgeselector<-function(df, sampleMissingFreq, n, warning_string = NULL){
 
+
+  # Find the string used to indicate a flagged sample
+  if (is.null(warning_string)) {
+    QC_Warning_strings <- (df %>%
+                             select(QC_Warning) %>%
+                             distinct() %>%
+                             arrange(QC_Warning))$QC_Warning
+
+    if (length(QC_Warning_strings) == 2) {
+      warning_string <- QC_Warning_strings[2]
+
+      if (!grepl('W', warning_string, fixed=TRUE)) {
+        stop('Could not identify the string used to indicate a flagged sample. Please specify it with the optional argument warning_string. Most commonly it is either "Warning" or "WARN".')
+      }
+    } else {
+      if (length(QC_Warning_strings) == 1 && grepl('P', QC_Warning_strings[1], fixed=TRUE)) {
+        warning_string <- 'Warning'
+      } else {
+        stop('Could not identify the string used to indicate a flagged sample. Please specify it with the optional argument warning_string. Most commonly it is either "Warning" or "WARN".')
+      }
+    }
+  }
 
   #Filtering on valid OlinkID
   df <- df %>%
