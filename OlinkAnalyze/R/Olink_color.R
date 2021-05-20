@@ -1,21 +1,11 @@
 #' Olink color panel for plotting
 #'
 #' @param alpha transparency (optional)
-#' @param n number of levels in factor (optional)
 #' @param coloroption string, one or more of the following:
 #' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'gray', 'darkblue', 'purple', 'pink')
 #' @return Palette hex codes for colors
 #' @keywords crispy, Olink
 #' @examples
-#' #Olink colorwheel
-#' library(plotrix)
-#' n = 100
-#' sliceValues <- rep(1, n)
-#' pie3D(sliceValues,explode=0, theta=1.2, col=olink_pal()(n), main = 'Olink colorwheel')
-#'
-#' #R standard colors
-#' library(scales)
-#' pie3D(sliceValues,explode=0, theta=1.2, col=hue_pal()(n), main = 'R colorwheel')
 #'
 #' #Color matrices
 #' show_col(olink_pal()(10), labels = F)
