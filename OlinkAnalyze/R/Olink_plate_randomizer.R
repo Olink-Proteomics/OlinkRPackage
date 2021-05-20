@@ -67,7 +67,7 @@ displayPlateLayout <- function(data,fill.color,include.label=F){
 #' @export
 #' @examples
 #' \donttest{randomized.manifest <- olink_plate_randomizer(manifest)}
-#' \donttest{displayPlateDistributions(data=randomized.manifest,fill.color=Site)}
+#' \donttest{displayPlateDistributions(data=randomized.manifest,fill.color="Site")}
 #'
 
 displayPlateDistributions <- function(data,fill.color){
