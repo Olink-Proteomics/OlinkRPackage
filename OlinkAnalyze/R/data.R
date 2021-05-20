@@ -37,3 +37,21 @@
 #'   }
 #'      
 "npx_data2"
+
+#' Example Sample Manifest
+#'
+#' Sample manifest is generated randomly to demonstrate use of functions in this package. 
+#'
+#'
+#' A tibble with 138 rows and 4 columns. This manifest contains 26 example subjects, with 6 visits and 2 sites.
+#' 
+#' 
+#' @format This dataset  contains columns:
+#' \describe{
+#'   \item{SubjectID}{Subject Identifier, A-Z}
+#'   \item{Visit}{Visit Number, 1-6}
+#'   \item{SampleID}{138 unique sample IDs}
+#'   \item{Site}{Site1 or Site2}
+#'   }
+#'      
+"manifest"
