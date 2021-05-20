@@ -1,3 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^README\.Rmd$
+^.*\.RData$
+^.*\.Rhistory$
+^.*\.Rproj\.user$
