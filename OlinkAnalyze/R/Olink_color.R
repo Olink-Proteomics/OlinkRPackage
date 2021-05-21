@@ -8,8 +8,8 @@
 #' @examples
 #'
 #' #Color matrices
-#' show_col(olink_pal()(10), labels = F)
-#' show_col(olink_pal(coloroption = c('gray', 'green'))(2), labels = F)
+#' show_col(olink_pal()(10), labels = FALSE)
+#' show_col(olink_pal(coloroption = c('gray', 'green'))(2), labels = FALSE)
 #'
 #' #Contour plot
 #' filled.contour(volcano, color.palette = olink_pal(), asp = 1)
