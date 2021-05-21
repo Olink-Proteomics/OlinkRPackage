@@ -16,7 +16,7 @@ Displays a bar chart for each plate representing the distribution of the given g
 }
 \examples{
 \donttest{randomized.manifest <- olink_plate_randomizer(manifest)}
-\donttest{displayPlateDistributions(data=randomized.manifest,fill.color=Site)}
+\donttest{displayPlateDistributions(data=randomized.manifest,fill.color="Site")}
 
 }
 \keyword{ggplot}

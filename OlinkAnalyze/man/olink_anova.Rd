@@ -54,7 +54,7 @@ The threshold is determined by logic evaluation of Adjusted_pval < 0.05. Covaria
 }
 \examples{
 \donttest{
-npx_df <- npx_data1 \%>\% filter(!grepl('control',SampleID, ignore.case = T))
+npx_df <- npx_data1 \%>\% filter(!grepl('control',SampleID, ignore.case = TRUE))
 
 #One-way ANOVA, no covariates.
 #Results in a model NPX~Time

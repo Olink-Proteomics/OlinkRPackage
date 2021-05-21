@@ -68,5 +68,5 @@ results_lmer_posthoc <- olink_lmer_posthoc(df = npx_data1,
                                            variable=c("Time", 'Treatment'),
                                            effect = 'Time:Treatment',
                                            random = 'Subject',
-                                           verbose = T)}
+                                           verbose = TRUE)}
 }

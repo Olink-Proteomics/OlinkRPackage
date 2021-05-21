@@ -68,7 +68,7 @@ list_of_pointrange_plots <- olink_lmer_plot(df = npx_data1,
                                             random = c('Subject'),
                                             x_axis_variable = 'Time',
                                             col_variable = 'Treatment',
-                                            verbose=T,
+                                            verbose=TRUE,
                                             olinkid_list = assay_list,
                                             number_of_proteins_per_plot = 10)}
 }

@@ -41,6 +41,6 @@ significant_assays <- anova_results \%>\%
 olink_boxplot(npx_data1,
               variable = "Site",
               olinkid_list = significant_assays,
-              verbose = T,
+              verbose = TRUE,
               number_of_proteins_per_plot = 3)}
 }

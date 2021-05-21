@@ -47,14 +47,14 @@ mean NPX at mean(numerical variable) versus mean NPX at mean(numerical variable)
 }
 \examples{
 \donttest{
-anova_results <- olink_anova(df, "Group")
+anova_results <- olink_anova(npx_data1, "Site")
 significant_assays <- anova_results \%>\% 
 filter(Threshold == 'Significant') \%>\%
 pull(OlinkID)
 
 #Posthoc test for the model NPX~A*B, on the interaction effect A:B.
-anova_posthoc_results <- olink_anova_posthoc(df, 
-variable = c("A", "B"), 
+anova_posthoc_results <- olink_anova_posthoc(npx_data1, 
+variable = "Site", 
 olinkid_list = significant_assays,
-effect = 'A:B')}
+effect = "Site")}
 }
