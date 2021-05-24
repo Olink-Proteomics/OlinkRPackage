@@ -24,7 +24,7 @@ Dots are colored based on the Benjamini-Hochberg adjusted p-value cutoff 0.05 an
 }
 \examples{
 \donttest{
-npx_df <- npx_data1 \%>\% filter(!grepl('control',SampleID, ignore.case = T))
+npx_df <- npx_data1 \%>\% filter(!grepl('control',SampleID, ignore.case = TRUE))
 ttest_results <- olink_ttest(df=npx_df,
                              variable = 'Treatment',
                              alternative = 'two.sided')
