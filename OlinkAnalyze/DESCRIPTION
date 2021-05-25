@@ -11,3 +11,4 @@ RoxygenNote: 7.1.1
 Suggests: knitr, rmarkdown
 License: GPL-3 | file LICENSE
 Maintainer: DS at Olink <biostattools@olink.com>
+VignetteBuilder: knitr
