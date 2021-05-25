@@ -12,6 +12,8 @@ olink_volcano_plot(p.val_tbl, x_lab = "Estimate", olinkid_list = NULL, ...)
 \item{x_lab}{Optional. Character value to use as the X-axis label}
 
 \item{olinkid_list}{Optional. Character vector of proteins (by OlinkID) to label in the plot. If not provided, default is to label all significant proteins.}
+
+\item{...}{Optional. Additional arguments for  olink_color_discrete()}
 }
 \value{
 An object of class "ggplot"

@@ -7,8 +7,9 @@
 #' @return A tibble in long format.
 #' @keywords NPX
 #' @export
-#' @examples \donttest{
-#' file <- system.file("extdata", "Example_NPX_data.csv", package = "OlinkAnalyze)
+#' @examples 
+#' \donttest{
+#' file <- system.file("extdata", "Example_NPX_data.csv", package = "OlinkAnalyze")
 #' read_NPX(file)
 #' }
 #' @import dplyr stringr tidyr

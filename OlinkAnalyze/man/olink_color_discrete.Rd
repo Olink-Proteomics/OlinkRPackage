@@ -7,6 +7,8 @@
 olink_color_discrete(..., alpha = 1, coloroption = NULL)
 }
 \arguments{
+\item{...}{Optional. Additional arguments to pass to discrete_scale()}
+
 \item{alpha}{transparency}
 
 \item{coloroption}{string, one or more of the following:

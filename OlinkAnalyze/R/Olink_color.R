@@ -118,6 +118,7 @@ olink_pal <- function(alpha = 1, coloroption = NULL) {
 #' @param alpha transparency
 #' @param coloroption string, one or more of the following:
 #' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'gray', 'darkblue', 'purple', 'pink')
+#' @param ... Optional. Additional arguments to pass to discrete_scale()
 #'
 #' @return None
 #' @export
@@ -147,7 +148,7 @@ olink_color_discrete <- function(..., alpha = 1, coloroption = NULL) {
 #' @param alpha transparency (optional)
 #' @param coloroption string, one or more of the following:
 #' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'gray', 'darkblue', 'purple', 'pink')
-#'
+#' @param ... Optional. Additional arguments to pass to scale_color_gradientn()
 #' @return None
 #' @export
 #'
@@ -171,7 +172,8 @@ olink_color_gradient <- function(..., alpha = 1, coloroption = NULL) {
 #' @param alpha transparency (optional)
 #' @param coloroption string, one or more of the following:
 #' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'gray', 'darkblue', 'purple', 'pink')
-#'
+#' @param ... Optional. Additional arguments to pass to discrete_scale()
+#' 
 #' @return None
 #' @export
 #'
@@ -193,7 +195,8 @@ olink_fill_discrete <- function(..., alpha = 1, coloroption = NULL) {
 #' @param alpha transparency (optional)
 #' @param coloroption string, one or more of the following:
 #' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'gray', 'darkblue', 'purple', 'pink')
-#'
+#' @param ... Optional. Additional arguments to pass to scale_fill_gradientn()
+#' 
 #' @return None
 #' @export
 #'

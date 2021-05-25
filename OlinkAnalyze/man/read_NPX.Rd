@@ -16,4 +16,10 @@ A tibble in long format.
 Imports an NPX file exported from NPX Manager. 
 No alterations to the output NPX Manager format is allowed.
 }
+\examples{
+\donttest{
+file <- system.file("extdata", "Example_NPX_data.csv", package = "OlinkAnalyze")
+read_NPX(file)
+}
+}
 \keyword{NPX}

@@ -7,6 +7,8 @@
 olink_fill_gradient(..., alpha = 1, coloroption = NULL)
 }
 \arguments{
+\item{...}{Optional. Additional arguments to pass to scale_fill_gradientn()}
+
 \item{alpha}{transparency (optional)}
 
 \item{coloroption}{string, one or more of the following:
