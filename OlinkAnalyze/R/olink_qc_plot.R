@@ -100,7 +100,7 @@ olink_qc_plot <- function(df, color_g = "QC_Warning", plot_index = F, label_outl
                        aes(label=SampleID),
                        box.padding = 0.5,
                        min.segment.length = 0.1,
-                       show.legend=F,
+                       show.legend=FALSE,
                        size = 3)
 
   }

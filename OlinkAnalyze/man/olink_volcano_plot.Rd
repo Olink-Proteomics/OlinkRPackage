@@ -12,6 +12,8 @@ olink_volcano_plot(p.val_tbl, x_lab = "Estimate", olinkid_list = NULL, ...)
 \item{x_lab}{Optional. Character value to use as the X-axis label}
 
 \item{olinkid_list}{Optional. Character vector of proteins (by OlinkID) to label in the plot. If not provided, default is to label all significant proteins.}
+
+\item{...}{Optional. Additional arguments for  olink_color_discrete()}
 }
 \value{
 An object of class "ggplot"
@@ -24,7 +26,7 @@ Dots are colored based on the Benjamini-Hochberg adjusted p-value cutoff 0.05 an
 }
 \examples{
 \donttest{
-npx_df <- npx_data1 \%>\% filter(!grepl('control',SampleID, ignore.case = T))
+npx_df <- npx_data1 \%>\% filter(!grepl('control',SampleID, ignore.case = TRUE))
 ttest_results <- olink_ttest(df=npx_df,
                              variable = 'Treatment',
                              alternative = 'two.sided')

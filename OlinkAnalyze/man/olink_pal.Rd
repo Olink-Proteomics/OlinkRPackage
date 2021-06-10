@@ -11,8 +11,6 @@ olink_pal(alpha = 1, coloroption = NULL)
 
 \item{coloroption}{string, one or more of the following:
 c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'gray', 'darkblue', 'purple', 'pink')}
-
-\item{n}{number of levels in factor (optional)}
 }
 \value{
 Palette hex codes for colors
@@ -21,21 +19,12 @@ Palette hex codes for colors
 Olink color panel for plotting
 }
 \examples{
-Olink colorwheel
-library(plotrix)
-n = 100
-sliceValues <- rep(1, n)
-pie3D(sliceValues,explode=0, theta=1.2, col=olink_pal()(n), main = 'Olink colorwheel')
 
-R standard colors
-library(scales)
-pie3D(sliceValues,explode=0, theta=1.2, col=hue_pal()(n), main = 'R colorwheel')
+#Color matrices
+show_col(olink_pal()(10), labels = FALSE)
+show_col(olink_pal(coloroption = c('gray', 'green'))(2), labels = FALSE)
 
-Color matrices
-show_col(olink_pal()(10), labels = F)
-show_col(olink_pal(coloroption = c('gray', 'green'))(2), labels = F)
-
-Contour plot
+#Contour plot
 filled.contour(volcano, color.palette = olink_pal(), asp = 1)
 filled.contour(volcano, color.palette = hue_pal(), asp = 1)
 

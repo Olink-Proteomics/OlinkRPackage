@@ -328,7 +328,7 @@ single_lmer <- function(data, formula_string){
 #'                                            variable=c("Time", 'Treatment'),
 #'                                            effect = 'Time:Treatment',
 #'                                            random = 'Subject',
-#'                                            verbose = T)}
+#'                                            verbose = TRUE)}
 #' @import dplyr stringr tidyr broom
 
 olink_lmer_posthoc <- function(df,
@@ -547,7 +547,7 @@ single_posthoc <- function(data, formula_string, effect, mean_return){
 #'                                             random = c('Subject'),
 #'                                             x_axis_variable = 'Time',
 #'                                             col_variable = 'Treatment',
-#'                                             verbose=T,
+#'                                             verbose=TRUE,
 #'                                             olinkid_list = assay_list,
 #'                                             number_of_proteins_per_plot = 10)}
 #' @import dplyr stringr tidyr broom

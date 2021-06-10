@@ -1,27 +1,17 @@
 #' Olink color panel for plotting
 #'
 #' @param alpha transparency (optional)
-#' @param n number of levels in factor (optional)
 #' @param coloroption string, one or more of the following:
 #' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'gray', 'darkblue', 'purple', 'pink')
 #' @return Palette hex codes for colors
 #' @keywords crispy, Olink
 #' @examples
-#' Olink colorwheel
-#' library(plotrix)
-#' n = 100
-#' sliceValues <- rep(1, n)
-#' pie3D(sliceValues,explode=0, theta=1.2, col=olink_pal()(n), main = 'Olink colorwheel')
 #'
-#' R standard colors
-#' library(scales)
-#' pie3D(sliceValues,explode=0, theta=1.2, col=hue_pal()(n), main = 'R colorwheel')
+#' #Color matrices
+#' show_col(olink_pal()(10), labels = FALSE)
+#' show_col(olink_pal(coloroption = c('gray', 'green'))(2), labels = FALSE)
 #'
-#' Color matrices
-#' show_col(olink_pal()(10), labels = F)
-#' show_col(olink_pal(coloroption = c('gray', 'green'))(2), labels = F)
-#'
-#' Contour plot
+#' #Contour plot
 #' filled.contour(volcano, color.palette = olink_pal(), asp = 1)
 #' filled.contour(volcano, color.palette = hue_pal(), asp = 1)
 #'
@@ -128,6 +118,7 @@ olink_pal <- function(alpha = 1, coloroption = NULL) {
 #' @param alpha transparency
 #' @param coloroption string, one or more of the following:
 #' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'gray', 'darkblue', 'purple', 'pink')
+#' @param ... Optional. Additional arguments to pass to discrete_scale()
 #'
 #' @return None
 #' @export
@@ -157,7 +148,7 @@ olink_color_discrete <- function(..., alpha = 1, coloroption = NULL) {
 #' @param alpha transparency (optional)
 #' @param coloroption string, one or more of the following:
 #' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'gray', 'darkblue', 'purple', 'pink')
-#'
+#' @param ... Optional. Additional arguments to pass to scale_color_gradientn()
 #' @return None
 #' @export
 #'
@@ -181,13 +172,20 @@ olink_color_gradient <- function(..., alpha = 1, coloroption = NULL) {
 #' @param alpha transparency (optional)
 #' @param coloroption string, one or more of the following:
 #' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'gray', 'darkblue', 'purple', 'pink')
-#'
+#' @param ... Optional. Additional arguments to pass to discrete_scale()
+#' 
 #' @return None
 #' @export
 #'
 #' @examples
-#' See color version
+#'dsub <- subset(diamonds, x > 5 & x < 6 & y > 5 & y < 6)
+#'dsub$diff <- with(dsub, sqrt(abs(x-y))* sign(x-y))
 #'
+#'ggplot(dsub, aes(x, y, colour=diff)) +
+#'geom_point() +
+#'  theme_bw() +
+#'  olink_fill_discrete()
+
 olink_fill_discrete <- function(..., alpha = 1, coloroption = NULL) {
   discrete_scale(aesthetics = "fill", scale_name = 'olink', palette = olink_pal(alpha, coloroption), ...)
 }
@@ -197,12 +195,18 @@ olink_fill_discrete <- function(..., alpha = 1, coloroption = NULL) {
 #' @param alpha transparency (optional)
 #' @param coloroption string, one or more of the following:
 #' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'gray', 'darkblue', 'purple', 'pink')
-#'
+#' @param ... Optional. Additional arguments to pass to scale_fill_gradientn()
+#' 
 #' @return None
 #' @export
 #'
 #' @examples
-#' See color version
+#'dsub <- subset(diamonds, x > 5 & x < 6 & y > 5 & y < 6) 
+#'dsub$diff <- with(dsub, sqrt(abs(x-y))* sign(x-y)) 
+#'ggplot(dsub, aes(x, y, colour=diff)) + 
+#'geom_point() + 
+#'  theme_bw() + 
+#'  olink_fill_gradient()
 olink_fill_gradient <- function(..., alpha = 1, coloroption = NULL) {
   scale_fill_gradientn(colors = rev(olink_pal(alpha, coloroption)(100)), ...)
 }

@@ -8,7 +8,7 @@
 #' @export
 #' @examples
 #' \donttest{randomized.manifest <- olink_plate_randomizer(manifest)}
-#' \donttest{displayPlateLayout(data=randomized.manifest,fill.color=Site)}
+#' \donttest{displayPlateLayout(data=randomized.manifest,fill.color="Site")}
 
 displayPlateLayout <- function(data,fill.color,include.label=F){
 
@@ -67,7 +67,7 @@ displayPlateLayout <- function(data,fill.color,include.label=F){
 #' @export
 #' @examples
 #' \donttest{randomized.manifest <- olink_plate_randomizer(manifest)}
-#' \donttest{displayPlateDistributions(data=randomized.manifest,fill.color=Site)}
+#' \donttest{displayPlateDistributions(data=randomized.manifest,fill.color="Site")}
 #'
 
 displayPlateDistributions <- function(data,fill.color){
@@ -146,7 +146,8 @@ generatePlateHolder <- function(n.plates,n.spots,n.samples){
 #' @export
 #' @examples
 #' \donttest{randomized.manifest <- olink_plate_randomizer(manifest, seed=12345)}
-#' \donttest{randomized.manifest <- olink_plate_randomizer(manifest,SubjectColumn="SubjectID",iterations=1000,available.spots=c(88,88,88,50), seed=12345)}
+#' \donttest{randomized.manifest <- olink_plate_randomizer(manifest,SubjectColumn="SubjectID",
+#'                                                         available.spots=c(88,88), seed=12345)}
 
 #Main randomization function
 olink_plate_randomizer <-function(Manifest, SubjectColumn, Groups, iterations=500, available.spots, seed){

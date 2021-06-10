@@ -30,12 +30,12 @@ olink_pca_plot <- function (df,
                             color_g = "QC_Warning",
                             x_val = 1,
                             y_val = 2,
-                            label_samples = F,
-                            drop_assays = F,
-                            drop_samples = F,
+                            label_samples = FALSE,
+                            drop_assays = FALSE,
+                            drop_samples = FALSE,
                             n_loadings = 0,
                             loadings_list = NULL,
-                            verbose = T,
+                            verbose = TRUE,
                             ...){
 
   #checking ellipsis
@@ -83,7 +83,7 @@ olink_pca_plot <- function (df,
 
     number_of_sample_w_more_than_one_color <- df %>%
       group_by(SampleID, Index) %>%
-      summarise(n_colors = n_distinct(!!rlang::ensym(color_g), na.rm = T)) %>%
+      summarise(n_colors = n_distinct(!!rlang::ensym(color_g), na.rm = TRUE)) %>%
       ungroup() %>%
       filter(n_colors > 1) %>%
       nrow(.)
@@ -109,7 +109,7 @@ olink_pca_plot <- function (df,
 
   df_temp <- df_temp %>%
     group_by(OlinkID) %>%
-    mutate(assay_var = var(NPX, na.rm = T)) %>%
+    mutate(assay_var = var(NPX, na.rm = TRUE)) %>%
     ungroup() %>%
     filter(!(assay_var == 0 | is.na(assay_var))) %>%
     select(-assay_var)
@@ -278,7 +278,7 @@ olink_pca_plot <- function (df,
     column_to_rownames('SampleID') %>%
     as.matrix
 
-  pca_fit <- prcomp(df_wide_matrix, scale. = T, center = T)
+  pca_fit <- prcomp(df_wide_matrix, scale. = TRUE, center = TRUE)
 
   #Standardizing and selecting components
 
@@ -334,7 +334,7 @@ olink_pca_plot <- function (df,
   if(n_loadings > 0 | !is.null(loadings_list)) {
 
     N_loadings <- data.frame(matrix(vector(), 0, ncol(loadings)),
-                             stringsAsFactors=F)
+                             stringsAsFactors=FALSE)
     colnames(N_loadings) <- colnames(loadings)
 
     L_loadings <- N_loadings
@@ -375,7 +375,7 @@ olink_pca_plot <- function (df,
                            y = LY*loadings_scaling_factor,
                            label = variables),
                        box.padding = 1,
-                       show.legend = F,
+                       show.legend = FALSE,
                        segment.colour = 'gray')
   }
 

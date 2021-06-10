@@ -7,7 +7,11 @@
 #' @return A tibble in long format.
 #' @keywords NPX
 #' @export
-#' @examples \donttest{read_NPX("~/NPX data.xlsx")}
+#' @examples 
+#' \donttest{
+#' file <- system.file("extdata", "Example_NPX_data.csv", package = "OlinkAnalyze")
+#' read_NPX(file)
+#' }
 #' @import dplyr stringr tidyr
 
 read_NPX <- function(filename){
@@ -216,7 +220,7 @@ read_NPX <- function(filename){
                                         MissingFreq=c(t(meta_data_list[[i]][5,])),
                                         LOD = as.numeric(c(t(meta_data_list[[i]][6,]))))
       
-      if (NORM_FLAG == T) {
+      if (NORM_FLAG == TRUE) {
         assay_name_list[[i]] <- bind_cols(assay_name_list[[i]], 
                                           Normalization = c(t(meta_data_list[[i]][7,])))
       }

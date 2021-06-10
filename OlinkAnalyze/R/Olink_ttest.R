@@ -12,7 +12,7 @@
 #' @export
 #' @examples
 #' \donttest{
-#' npx_df <- npx_data1 %>% filter(!grepl('control',SampleID, ignore.case = T))
+#' npx_df <- npx_data1 %>% filter(!grepl('control',SampleID, ignore.case = TRUE))
 #'
 #' ttest_results <- olink_ttest(df=npx_df,
 #'                              variable = 'Treatment',
@@ -91,7 +91,7 @@ olink_ttest <- function(df, variable, pair_id, ...){
   #Every sample needs to have a unique level of the factor
   number_of_samples_w_more_than_one_level <- df %>%
     group_by(SampleID, Index) %>%
-    summarise(n_levels = n_distinct(!!rlang::ensym(variable), na.rm = T)) %>%
+    summarise(n_levels = n_distinct(!!rlang::ensym(variable), na.rm = TRUE)) %>%
     ungroup() %>%
     filter(n_levels > 1) %>%
     nrow(.)
@@ -116,7 +116,7 @@ olink_ttest <- function(df, variable, pair_id, ...){
     warning(paste0('The assays ',
                    paste(all_nas, collapse = ', '),
                    ' have only NA:s. They will not be tested.'),
-            call. = F)
+            call. = FALSE)
 
   }
 
@@ -134,7 +134,7 @@ olink_ttest <- function(df, variable, pair_id, ...){
     warning(paste0('The assays ',
                    paste(nas_in_level, collapse = ', '),
                    ' have only NA:s in one level of the factor. They will not be tested.'),
-            call. = F)
+            call. = FALSE)
 
   }
 

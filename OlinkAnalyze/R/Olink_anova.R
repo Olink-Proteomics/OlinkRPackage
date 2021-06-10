@@ -34,7 +34,7 @@
 #' @export
 #' @examples 
 #' \donttest{
-#' npx_df <- npx_data1 %>% filter(!grepl('control',SampleID, ignore.case = T))
+#' npx_df <- npx_data1 %>% filter(!grepl('control',SampleID, ignore.case = TRUE))
 #' 
 #' #One-way ANOVA, no covariates.
 #' #Results in a model NPX~Time
@@ -293,16 +293,16 @@ olink_anova <- function(df,
 #' @return Tibble of posthoc tests for specicified effect, arranged by ascending adjusted p-values.
 #' @export
 #' @examples \donttest{
-#' anova_results <- olink_anova(df, "Group")
+#' anova_results <- olink_anova(npx_data1, "Site")
 #' significant_assays <- anova_results %>% 
 #' filter(Threshold == 'Significant') %>%
 #' pull(OlinkID)
 #' 
 #' #Posthoc test for the model NPX~A*B, on the interaction effect A:B.
-#' anova_posthoc_results <- olink_anova_posthoc(df, 
-#' variable = c("A", "B"), 
+#' anova_posthoc_results <- olink_anova_posthoc(npx_data1, 
+#' variable = "Site", 
 #' olinkid_list = significant_assays,
-#' effect = 'A:B')}
+#' effect = "Site")}
 
 olink_anova_posthoc <- function(df,   
                                 olinkid_list = NULL, 

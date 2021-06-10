@@ -34,7 +34,8 @@ Samples can be randomly assigned to plates using base::sample with an option to 
 }
 \examples{
 \donttest{randomized.manifest <- olink_plate_randomizer(manifest, seed=12345)}
-\donttest{randomized.manifest <- olink_plate_randomizer(manifest,SubjectColumn="SubjectID",iterations=1000,available.spots=c(88,88,88,50), seed=12345)}
+\donttest{randomized.manifest <- olink_plate_randomizer(manifest,SubjectColumn="SubjectID",
+                                                        available.spots=c(88,88), seed=12345)}
 }
 \keyword{plates}
 \keyword{randomized}

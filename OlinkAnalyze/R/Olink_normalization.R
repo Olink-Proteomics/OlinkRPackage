@@ -33,24 +33,26 @@
 #'
 #' #Bridging normalization:
 #' # Find overlaping samples, but exclude Olink controls
-#' overlap_samples <- intersect((npx_df1 %>% filter(!grepl("control", SampleID, ignore.case=T)))$SampleID,
-#'                              (npx_df2 %>% filter(!grepl("control", SampleID, ignore.case=T)))$SampleID)
+#' overlap_samples <- intersect((npx_df1 %>% 
+#'                               filter(!grepl("control", SampleID, ignore.case=TRUE)))$SampleID,
+#'                              (npx_df2 %>%
+#'                               filter(!grepl("control", SampleID, ignore.case=TRUE)))$SampleID)
 #' # Normalize
-#' > olink_normalization(df1 = npx_df1,
-#'                       df2 = npx_df2,
-#'                       overlapping_samples_df1 = overlap_samples,
-#'                       df1_project_nr = 'P1',
-#'                       df2_project_nr = 'P2',
-#'                       reference_project = 'P1')
+#' olink_normalization(df1 = npx_df1,
+#'                     df2 = npx_df2,
+#'                     overlapping_samples_df1 = overlap_samples,
+#'                     df1_project_nr = 'P1',
+#'                     df2_project_nr = 'P2',
+#'                     reference_project = 'P1')
 #'
 #' #Subset normalization:
 #' # Find a suitable subset of samples from both projects, but exclude Olink controls
 #' df1_sampleIDs <- (npx_df1 %>%
-#'     filter(!grepl("control", SampleID, ignore.case=T)) %>%
+#'     filter(!grepl("control", SampleID, ignore.case=TRUE)) %>%
 #'     select(SampleID) %>%
 #'     distinct())$SampleID
 #' df2_sampleIDs <- (npx_df2 %>%
-#'     filter(!grepl("control", SampleID, ignore.case=T)) %>%
+#'     filter(!grepl("control", SampleID, ignore.case=TRUE)) %>%
 #'     select(SampleID) %>%
 #'     distinct())$SampleID
 #' some_samples_df1 <- sample(df1_sampleIDs, 16)
