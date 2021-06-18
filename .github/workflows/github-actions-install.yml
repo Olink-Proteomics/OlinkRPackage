@@ -3,6 +3,9 @@ on: [push]
 jobs:
   Can-it-be-installed:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        R: [ '3.5.3', '3.6.1' , '4.1.0', 'release']    
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -19,6 +22,8 @@ jobs:
       - name: Install curl
         run: sudo apt-get install libcurl4-openssl-dev
       - uses: r-lib/actions/setup-r@v1
+        with:
+          r-version: ${{ matrix.config.r }}      
       - name: Install devtools
         run: |
           install.packages(c("devtools"))
