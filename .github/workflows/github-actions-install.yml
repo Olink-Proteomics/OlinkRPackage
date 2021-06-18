@@ -43,7 +43,7 @@ jobs:
     strategy:
       matrix:
         OS: ['macOS-latest', 'windows-latest']
-        R: [ '3.5.3', '4.0.0', 'release']    
+        R: [ '4.0.0', 'release']    
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
