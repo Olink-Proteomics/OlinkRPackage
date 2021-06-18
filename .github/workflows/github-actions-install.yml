@@ -38,43 +38,12 @@ jobs:
           library("OlinkAnalyze")
           sessionInfo()
         shell: Rscript {0}
-  Can-it-be-installed-on-windows:
-    runs-on: windows-latest
+  Can-it-be-installed-win-and-mac:
+    runs-on: ${{ matrix.OS }}
     strategy:
       matrix:
-        R: [ '4.0.0', 'release']    
-    env:
-      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      - run: echo "⚙ This job uses R version ${{ matrix.R }} "
-      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-      - name: Check out repository code
-        uses: actions/checkout@v2
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-      - uses: r-lib/actions/setup-r@v1
-        with:
-          r-version: ${{ matrix.R }}      
-      - name: Install devtools
-        run: |
-          install.packages(c("devtools"))
-        shell: Rscript {0}
-      - name: Install OlinkAnalyze
-        run: |
-          devtools::install("OlinkAnalyze")
-        shell: Rscript {0}
-      - name: Test if OlinkAnalyze can be loaded
-        run: |
-          library("OlinkAnalyze")
-          sessionInfo()
-        shell: Rscript {0}
-  Can-it-be-installed-on-mac:
-    runs-on: macOS-latest
-    strategy:
-      matrix:
-        R: [ '4.0.0', 'release']    
+        OS: ['macOS-latest', 'windows-latest']
+        R: [ '3.5.3', '4.0.0', 'release']    
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
