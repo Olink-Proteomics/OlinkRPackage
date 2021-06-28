@@ -1,10 +1,11 @@
 name: Installable
 on: [push]
 jobs:
-  Can-it-be-installed-on-linux:
-    runs-on: ubuntu-latest
+  Can-it-be-installed:
+    runs-on: ${{ matrix.OS }}
     strategy:
       matrix:
+        OS: ['macOS-latest', 'windows-latest', 'ubuntu-latest']      
         R: [ '4.0.0', 'release']    
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -17,55 +18,38 @@ jobs:
         uses: actions/checkout@v2
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-      - name: List files in the repository
-        run: |
-          ls ${{ github.workspace }}
       - name: Install curl
+        if: runner.os == 'Linux'      
         run: sudo apt-get install libcurl4-openssl-dev
       - uses: r-lib/actions/setup-r@v1
         with:
           r-version: ${{ matrix.R }}      
-      - name: Install devtools
+
+      - name: Query dependencies
         run: |
-          install.packages(c("devtools"))
+          install.packages('remotes')
+          saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
+          writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
         shell: Rscript {0}
-      - name: Install OlinkAnalyze
-        run: |
-          devtools::install("OlinkAnalyze")
-        shell: Rscript {0}
-      - name: Test if OlinkAnalyze can be loaded
-        run: |
-          library("OlinkAnalyze")
-          sessionInfo()
-        shell: Rscript {0}
-  Can-it-be-installed-win-and-mac:
-    runs-on: ${{ matrix.OS }}
-    strategy:
-      matrix:
-        OS: ['macOS-latest', 'windows-latest']
-        R: [ '4.0.0', 'release']    
-    env:
-      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      - run: echo "⚙ This job uses R version ${{ matrix.R }} "
-      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-      - name: Check out repository code
-        uses: actions/checkout@v2
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-      - uses: r-lib/actions/setup-r@v1
+
+      - name: Cache R packages
+        if: runner.os != 'Windows'
+        uses: actions/cache@v2
         with:
-          r-version: ${{ matrix.R }}      
+          path: ${{ env.R_LIBS_USER }}
+          key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
+          restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-
+
       - name: Install devtools
         run: |
           install.packages(c("devtools"))
         shell: Rscript {0}
+
       - name: Install OlinkAnalyze
         run: |
           devtools::install("OlinkAnalyze")
         shell: Rscript {0}
+
       - name: Test if OlinkAnalyze can be loaded
         run: |
           library("OlinkAnalyze")
