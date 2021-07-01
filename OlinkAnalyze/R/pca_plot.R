@@ -25,14 +25,14 @@
 #'     mutate(SampleID = paste(SampleID, "_", Index, sep = ""))
 #' olink_pca_plot(df=npx_data, color_g = "QC_Warning")}
 #' @importFrom magrittr %>%
-#' @importFrom dplyr filter select group_by ungroup mutate mutate_at if_else n_distinct summarise left_join arrange distinct arrow
+#' @importFrom dplyr filter select group_by ungroup mutate mutate_at if_else n_distinct summarise left_join arrange distinct
 #' @importFrom stringr str_detect
 #' @importFrom tidyr spread
 #' @importFrom tidyselect all_of
 #' @importFrom rlang ensym
 #' @importFrom tibble column_to_rownames
 #' @importFrom stats prcomp
-#' @importFrom ggplot2 ggplot aes xlab ylab geom_text geom_point geom_segment  labs guides
+#' @importFrom ggplot2 ggplot aes xlab ylab geom_text geom_point geom_segment  labs guides arrow
 #' @importFrom ggrepel geom_label_repel
 #' @importFrom utils head
 #' @importFrom grid unit
