@@ -40,7 +40,7 @@
 #' random = c('Subject', 'Site'))
 #' }
 #' @importFrom magrittr %>%
-#' @importFrom dplyr filter group_by summarise ungroup pull distinct group_modify mutate select
+#' @importFrom dplyr filter group_by summarise ungroup pull distinct group_modify mutate select all_of
 #' @importFrom lmerTest lmer
 #' @importFrom rlang ensym
 #' @importFrom stringr str_detect
@@ -497,7 +497,7 @@ single_posthoc <- function(data, formula_string, effect, mean_return){
     return(as_tibble(the_model$emmeans) %>%
              dplyr::rename(conf.low=lower.CL,
                     conf.high=upper.CL) %>%
-             dplyr::select(all_of(c(tmp, "emmean", "conf.low", "conf.high")))
+             dplyr::select(dplyr::all_of(c(tmp, "emmean", "conf.low", "conf.high")))
     )
 
   }else{
