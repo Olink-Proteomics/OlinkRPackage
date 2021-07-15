@@ -15,7 +15,7 @@
 #' @export
 #' @examples \donttest{olink_qc_plot(npx_data1, color_g = "QC_Warning")}
 #' @importFrom magrittr %>%
-#' @importFrom dplyr group_by mutate ungroup select distinct if_else
+#' @importFrom dplyr group_by mutate ungroup select distinct if_else filter
 #' @importFrom rlang ensym
 #' @importFrom ggplot2 ggplot geom_hline geom_vline xlab facet_wrap geom_text geom_point
 #' @importFrom ggrepel geom_label_repel
@@ -47,7 +47,7 @@ olink_qc_plot <- function(df, color_g = "QC_Warning", plot_index = F, label_outl
 
   #Filtering on valid OlinkID
   npx_df <- df %>%
-    filter(stringr::str_detect(OlinkID,
+    dplyr::filter(stringr::str_detect(OlinkID,
                                "OID[0-9]{5}"))
 
   npx_df_qr <- npx_df %>%
@@ -71,7 +71,7 @@ olink_qc_plot <- function(df, color_g = "QC_Warning", plot_index = F, label_outl
 
 
   qc_plot <- npx_df_qr %>%
-    ggplot2::ggplot(ggplot2::ggplot2::aes(x = sample_median, y = IQR)) +
+    ggplot2::ggplot(ggplot2::aes(x = sample_median, y = IQR)) +
     ggplot2::geom_hline(ggplot2::aes(yintercept=iqr_low),
                linetype = 'dashed',
                color = 'grey') +
@@ -100,7 +100,7 @@ olink_qc_plot <- function(df, color_g = "QC_Warning", plot_index = F, label_outl
   if(label_outliers){
 
     qc_plot <- qc_plot +
-      ggrepel::geom_label_repel(data = . %>% filter(Outlier == 1),
+      ggrepel::geom_label_repel(data = . %>% dplyr::filter(Outlier == 1),
                        ggplot2::aes(label=SampleID),
                        box.padding = 0.5,
                        min.segment.length = 0.1,

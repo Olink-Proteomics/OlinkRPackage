@@ -16,7 +16,7 @@
 #' @importFrom tools file_ext
 #' @importFrom dplyr as_tibble distinct pull filter bind_cols mutate left_join select rename matches bind_rows
 #' @importFrom readxl read_excel
-#' @importFrom stringr str_detect
+#' @importFrom stringr str_detect str_replace_all
 #' @importFrom tidyr tibble gather
 
 

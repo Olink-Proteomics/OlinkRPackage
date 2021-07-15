@@ -26,11 +26,12 @@
 #'    olink_ttest(variable = "Time", pair_id = "Subject")
 #'}
 #' @importFrom magrittr %>%
-#' @importFrom dplyr group_by summarise n_distinct ungroup filter as_tibble select mutate
+#' @importFrom dplyr group_by summarise n_distinct ungroup filter as_tibble select mutate pull all_of rename arrange
 #' @importFrom stringr str_detect
 #' @importFrom broom tidy
 #' @importFrom rlang ensym
 #' @importFrom generics do
+#' @importFrom tidyr pivot_wider
 
 olink_ttest <- function(df, variable, pair_id, ...){
 
@@ -114,7 +115,7 @@ olink_ttest <- function(df, variable, pair_id, ...){
     dplyr::summarise(n = n(), n_na = sum(is.na(NPX))) %>%
     dplyr::ungroup() %>%
     dplyr::filter(n-n_na <= 1) %>%
-    pull(OlinkID)
+    dplyr::pull(OlinkID)
 
 
   if(length(all_nas) > 0) {
@@ -132,7 +133,7 @@ olink_ttest <- function(df, variable, pair_id, ...){
     dplyr::summarise(n = n(), n_na = sum(is.na(NPX))) %>%
     dplyr::ungroup() %>%
     dplyr::filter(n == n_na) %>%
-    pull(OlinkID)
+    dplyr::pull(OlinkID)
 
 
   if(length(nas_in_level) > 0) {
@@ -171,15 +172,15 @@ olink_ttest <- function(df, variable, pair_id, ...){
     p.val <- df %>%
       dplyr::filter(!(OlinkID %in% all_nas)) %>%
       dplyr::filter(!(OlinkID %in% nas_in_level)) %>%
-      dplyr::select(all_of(c("OlinkID","UniProt","Assay","Panel","NPX",variable,pair_id))) %>%
-      tidyr::pivot_wider(names_from=all_of(variable),values_from="NPX") %>%
+      dplyr::select(dplyr::all_of(c("OlinkID","UniProt","Assay","Panel","NPX",variable,pair_id))) %>%
+      tidyr::pivot_wider(names_from=dplyr::all_of(variable),values_from="NPX") %>%
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
       generics::do(broom::tidy(t.test(x=.[[var_levels[1]]],y=.[[var_levels[2]]],paired=T, ...))) %>%
       dplyr::ungroup() %>%
       dplyr::mutate(Adjusted_pval = p.adjust(p.value, method = "fdr")) %>%
       dplyr::mutate(Threshold = ifelse(Adjusted_pval < 0.05, "Significant", "Non-significant")) %>%
-      # rename(`:=`(!!var_levels[1], estimate1)) %>%
-      arrange(p.value)
+      # dplyr::rename(`:=`(!!var_levels[1], estimate1)) %>%
+      dplyr::arrange(p.value)
 
 
   } else{
@@ -198,9 +199,9 @@ olink_ttest <- function(df, variable, pair_id, ...){
       dplyr::ungroup() %>%
       dplyr::mutate(Adjusted_pval = p.adjust(p.value, method = "fdr")) %>%
       dplyr::mutate(Threshold = ifelse(Adjusted_pval < 0.05, "Significant", "Non-significant")) %>%
-      rename(`:=`(!!var_levels[1], estimate1)) %>%
-      rename(`:=`(!!var_levels[2], estimate2)) %>%
-      arrange(p.value)
+      dplyr::rename(`:=`(!!var_levels[1], estimate1)) %>%
+      dplyr::rename(`:=`(!!var_levels[2], estimate2)) %>%
+      dplyr::arrange(p.value)
   }
 
 

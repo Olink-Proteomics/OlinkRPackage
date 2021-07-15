@@ -21,7 +21,7 @@
 #' olink_volcano_plot(ttest_results)}
 #' @importFrom magrittr %>%
 #' @importFrom dplyr filter pull
-#' @importFrom geom_point ggplot aes geom_point labs geom_hline
+#' @importFrom ggplot2 ggplot aes geom_point labs geom_hline
 #' @importFrom ggrepel geom_label_repel
 
 
@@ -64,9 +64,9 @@ olink_volcano_plot <- function (p.val_tbl, x_lab = "Estimate", olinkid_list = NU
     ggplot2::ggplot(ggplot2::aes(x = estimate, y = -log10(p.value),
                                  color = Threshold)) +
     ggplot2::geom_point() +
-    geom_point::labs(x = x_lab, y = "-log10(p-value)") +
+    ggplot2::labs(x = x_lab, y = "-log10(p-value)") +
     ggrepel::geom_label_repel(data = subset(p.val_tbl, OlinkID %in% olinkid_list),
-                              aes(label = Assay), box.padding = 1, show.legend = F) +
+                              ggplot2::aes(label = Assay), box.padding = 1, show.legend = F) +
     ggplot2::geom_hline(yintercept = -log10(0.05), linetype="dotted") +
     set_plot_theme() +
     olink_color_discrete(...)

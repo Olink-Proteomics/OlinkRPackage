@@ -10,7 +10,7 @@
 #' \donttest{randomized.manifest <- olink_plate_randomizer(manifest)}
 #' \donttest{displayPlateLayout(data=randomized.manifest,fill.color="Site")}
 #' @importFrom magrittr %>%
-#' @importFrom dplyr filter select
+#' @importFrom dplyr filter select mutate
 #' @importFrom ggplot2 ggplot geom_tile facet_wrap scale_fill_manual labs scale_x_discrete geom_text
 
 displayPlateLayout <- function(data,fill.color,include.label=F){
@@ -73,7 +73,7 @@ displayPlateLayout <- function(data,fill.color,include.label=F){
 #' \donttest{displayPlateDistributions(data=randomized.manifest,fill.color="Site")}
 #' @importFrom magrittr %>%
 #' @importFrom dplyr group_by tally ungroup mutate summarize as_tibble arrange
-#' @importFrom ggplot2 ggplot aes theme labs
+#' @importFrom ggplot2 ggplot aes theme labs geom_bar element_text
 
 
 displayPlateDistributions <- function(data,fill.color){
@@ -90,7 +90,7 @@ displayPlateDistributions <- function(data,fill.color){
     ggplot2::geom_bar(stat="identity",color="gray")+
     olink_fill_discrete()+
     set_plot_theme() +
-    ggplot2::theme(axis.text.x = element_text(angle = 90, hjust=0,vjust=0.5))+
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust=0,vjust=0.5))+
     ggplot2::labs(fill=fill.color,x="Plate",y="Percent")+
     ggplot2::theme(legend.position = "bottom")
 

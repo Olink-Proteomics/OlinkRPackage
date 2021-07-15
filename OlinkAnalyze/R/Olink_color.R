@@ -18,7 +18,6 @@
 #'
 #'
 #' @export
-#' @import RColorBrewer scales
 #' @importFrom grDevices col2rgb rgb colorRampPalette
 
 olink_pal <- function(alpha = 1, coloroption = NULL) {
