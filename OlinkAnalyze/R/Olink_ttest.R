@@ -26,11 +26,10 @@
 #'    olink_ttest(variable = "Time", pair_id = "Subject")
 #'}
 #' @importFrom magrittr %>%
-#' @importFrom dplyr group_by summarise n_distinct ungroup filter as_tibble select mutate pull all_of rename arrange
+#' @importFrom dplyr group_by summarise n_distinct ungroup filter as_tibble select mutate pull all_of rename arrange do
 #' @importFrom stringr str_detect
 #' @importFrom broom tidy
 #' @importFrom rlang ensym
-#' @importFrom generics do
 #' @importFrom tidyr pivot_wider
 
 olink_ttest <- function(df, variable, pair_id, ...){
@@ -175,7 +174,7 @@ olink_ttest <- function(df, variable, pair_id, ...){
       dplyr::select(dplyr::all_of(c("OlinkID","UniProt","Assay","Panel","NPX",variable,pair_id))) %>%
       tidyr::pivot_wider(names_from=dplyr::all_of(variable),values_from="NPX") %>%
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
-      generics::do(broom::tidy(t.test(x=.[[var_levels[1]]],y=.[[var_levels[2]]],paired=T, ...))) %>%
+      dplyr::do(broom::tidy(t.test(x=.[[var_levels[1]]],y=.[[var_levels[2]]],paired=T, ...))) %>%
       dplyr::ungroup() %>%
       dplyr::mutate(Adjusted_pval = p.adjust(p.value, method = "fdr")) %>%
       dplyr::mutate(Threshold = ifelse(Adjusted_pval < 0.05, "Significant", "Non-significant")) %>%
@@ -195,7 +194,7 @@ olink_ttest <- function(df, variable, pair_id, ...){
       dplyr::filter(!(OlinkID %in% all_nas)) %>%
       dplyr::filter(!(OlinkID %in% nas_in_level)) %>%
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
-      generics::do(broom::tidy(t.test(NPX ~ !!rlang::ensym(variable), data = ., ...))) %>%
+      dplyr::do(broom::tidy(t.test(NPX ~ !!rlang::ensym(variable), data = ., ...))) %>%
       dplyr::ungroup() %>%
       dplyr::mutate(Adjusted_pval = p.adjust(p.value, method = "fdr")) %>%
       dplyr::mutate(Threshold = ifelse(Adjusted_pval < 0.05, "Significant", "Non-significant")) %>%

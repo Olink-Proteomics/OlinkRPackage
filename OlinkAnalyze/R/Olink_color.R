@@ -137,7 +137,7 @@ olink_pal <- function(alpha = 1, coloroption = NULL) {
 #' geom_point(size = 4) +
 #' olink_color_discrete(coloroption = c('gray', 'red', 'green')) +
 #' theme_bw()
-#' @importFrom ggplot discrete_scale
+#' @importFrom ggplot2 discrete_scale
 
 
 olink_color_discrete <- function(..., alpha = 1, coloroption = NULL) {
