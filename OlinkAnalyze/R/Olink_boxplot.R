@@ -1,9 +1,10 @@
-#'Function which plots boxplots of a selected variable
+#'Function which plots boxplots of selected variables
 #'
-#'Generates faceted boxplots of NPX vs. grouping variable for a given list of proteins (OlinkIDs) using ggplot and ggplot2::geom_boxplot.
+#'Generates faceted boxplots of NPX vs. grouping variable(s) for a given list of proteins (OlinkIDs) using ggplot and ggplot2::geom_boxplot.
 #'
-#' @param df NPX data frame in long format with at least protein name (Assay), OlinkID (unique), UniProt and a grouping variable.
-#' @param variable  A character value indiciating which column to use as the x-axis grouping variable
+#' @param df NPX data frame in long format with at least protein name (Assay), OlinkID (unique), UniProt and at least one grouping variable.
+#' @param variable  A character vector or character value indicating which column to use as the x-axis and fill grouping variable. 
+#' The first or single value is used as x-axis, the second as fill. Further values in a vector are not plotted.
 #' @param olinkid_list Character vector indicating which proteins (OlinkIDs) to plot.
 #' @param number_of_proteins_per_plot Number of boxplots to include in the facet plot (default 6).
 #' @param verbose Boolean. If the plots are shown as well as returned in the list (default is false).
@@ -73,9 +74,15 @@ olink_boxplot <- function(df,
                 " not found in NPX data frame!"))
 
   }
-
-
+  
   #Setup
+  x_variable <- rlang::syms(variable[1])
+  if(length(variable) > 1){
+    fill_variable <- rlang::syms(variable[2])
+  }else{
+    fill_variable <- x_variable
+  }  
+
   topX <- length(olinkid_list)
 
   protein_index <- seq(from = 1,
@@ -110,25 +117,28 @@ olink_boxplot <- function(df,
       mutate(Name_OID = as_factor(Name_OID))
 
 
-    boxplot <- npx_for_plotting %>%
-      ggplot(aes(y = NPX,
-                 x = !!rlang::ensym(variable))) +
-      geom_boxplot(aes(fill = !!rlang::ensym(variable))) +
+    boxplot <- npx_for_plotting %>% 
+      ggplot(aes(y = NPX, x = !!x_variable[[1]])) + 
+      geom_boxplot(aes(fill = !!fill_variable[[1]])) +
       set_plot_theme() +
       olink_fill_discrete(...)+
-      theme(axis.text.x = element_blank(),
-            legend.title = element_blank(),
-            axis.ticks.x = element_blank(),
+      theme(axis.ticks.x = element_blank(),
             legend.text=element_text(size=13)) +
       facet_wrap(~Name_OID, scales = "free")
+    
+    if(length(variable) == 1){
+      boxplot <- boxplot + 
+        theme(axis.text.x = element_blank(), 
+              legend.title = element_blank())
+    }
+    
+    if(verbose){
+      show(boxplot)
+    }
 
     list_of_plots[[COUNTER]] <- boxplot
     COUNTER <- COUNTER + 1
 
-  }
-
-  if(verbose){
-    show(boxplot)
   }
 
   return(invisible(list_of_plots))
