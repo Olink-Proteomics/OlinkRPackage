@@ -162,7 +162,7 @@ Bridge sample selection strategy: Start by choosing samples with at most 10% mis
 ```{r message=FALSE, eval=FALSE}
 # Select overlapping samples
 olink_bridgeselector(df = npx_data1, 
-                     SampleMissingFreq = 0.1,
+                     sampleMissingFreq = 0.1,
                      n = 8)
 ```  
 

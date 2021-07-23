@@ -29,4 +29,5 @@ ggplot(dsub, aes(x, y, colour=diff)) +
 geom_point() +
  theme_bw() +
  olink_color_gradient()
+ @importFrom ggplot2 scale_colour_gradientn
 }
