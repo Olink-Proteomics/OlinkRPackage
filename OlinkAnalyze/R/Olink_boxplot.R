@@ -75,6 +75,12 @@ olink_boxplot <- function(df,
 
   }
   
+  if (length(variable) > 2){
+    warning(paste0("Variable(s) ", 
+                   paste(setdiff(variable, variable[1:2]), collapse = ", "), 
+                   " will not be used for plotting."))
+  }
+  
   #Setup
   x_variable <- rlang::syms(variable[1])
   if(length(variable) > 1){
