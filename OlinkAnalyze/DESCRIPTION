@@ -8,7 +8,11 @@ Encoding: UTF-8
 LazyData: true
 Depends: broom, car, emmeans, ggfortify, ggrepel, lmerTest, openxlsx, stringr, tidyverse, readxl , RColorBrewer, dplyr, scales, tidyr
 RoxygenNote: 7.1.1
-Suggests: knitr, rmarkdown
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0),
+    vdiffr
 License: GPL-3 | file LICENSE
 Maintainer: DS at Olink <biostattools@olink.com>
 VignetteBuilder: knitr
@@ -22,3 +26,4 @@ Imports:
     tibble,
     tidyselect,
     utils
+Config/testthat/edition: 3
