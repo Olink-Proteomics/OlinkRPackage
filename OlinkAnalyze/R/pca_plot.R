@@ -328,14 +328,14 @@ olink_pca_plot <- function (df,
     pca_plot <- pca_plot +
       ggplot2::geom_text(ggplot2::aes(label = observation_names, color = observation_colors), size = 3) +
       ggplot2::labs(color = color_g) +
-      ggplot2::guides(size = FALSE)
+      ggplot2::guides(size = "none")
 
   }else{
 
     pca_plot <- pca_plot +
       ggplot2::geom_point(ggplot2::aes(color = observation_colors), size = 2.5) +
       ggplot2::labs(color = color_g) +
-      ggplot2::guides(size = FALSE)
+      ggplot2::guides(size = "none")
 
   }
 
