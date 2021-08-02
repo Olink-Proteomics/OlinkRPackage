@@ -20,7 +20,7 @@ olink_anova_posthoc(
 
 \item{olinkid_list}{Character vector of OlinkID's on which to perform post hoc analysis. If not specified, all assays in df are used.}
 
-\item{variable}{Single character value or character array. 
+\item{variable}{Single character value or character array.
 Variable(s) to test. If length > 1, the included variable names will be used in crossed analyses .
 Also takes ':' notation.}
 
@@ -41,20 +41,20 @@ Tibble of posthoc tests for specicified effect, arranged by ascending adjusted p
 \description{
 Performs a post hoc ANOVA test using emmeans::emmeans with Tukey p-value adjustment per assay (by OlinkID) for each panel at confidence level 0.95.
 See \code{olink_anova} for details of input notation. \cr\cr
-The function handles both factor and numerical variables and/or covariates. 
+The function handles both factor and numerical variables and/or covariates.
 The posthoc test for a numerical variable compares the difference in means of the outcome variable (default: NPX) for 1 standard deviation difference in the numerical variable, e.g.
 mean NPX at mean(numerical variable) versus mean NPX at mean(numerical variable) + 1*SD(numerical variable).
 }
 \examples{
 \donttest{
 anova_results <- olink_anova(npx_data1, "Site")
-significant_assays <- anova_results \%>\% 
-filter(Threshold == 'Significant') \%>\%
-pull(OlinkID)
+significant_assays <- anova_results \%>\%
+dplyr::filter(Threshold == 'Significant') \%>\%
+dplyr::pull(OlinkID)
 
 #Posthoc test for the model NPX~A*B, on the interaction effect A:B.
-anova_posthoc_results <- olink_anova_posthoc(npx_data1, 
-variable = "Site", 
+anova_posthoc_results <- olink_anova_posthoc(npx_data1,
+variable = "Site",
 olinkid_list = significant_assays,
 effect = "Site")}
 }

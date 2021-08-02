@@ -2,14 +2,14 @@
 #'
 #' @param alpha transparency (optional)
 #' @param coloroption string, one or more of the following:
-#' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'gray', 'darkblue', 'purple', 'pink')
+#' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'lightblue', 'darkblue', 'purple', 'pink')
 #' @return Palette hex codes for colors
 #' @keywords crispy, Olink
 #' @examples
 #'
 #' #Color matrices
 #' show_col(olink_pal()(10), labels = FALSE)
-#' show_col(olink_pal(coloroption = c('gray', 'green'))(2), labels = FALSE)
+#' show_col(olink_pal(coloroption = c('lightblue', 'green'))(2), labels = FALSE)
 #'
 #' #Contour plot
 #' filled.contour(volcano, color.palette = olink_pal(), asp = 1)
@@ -18,7 +18,7 @@
 #'
 #'
 #' @export
-#' @import RColorBrewer scales
+#' @importFrom grDevices col2rgb rgb colorRampPalette
 
 olink_pal <- function(alpha = 1, coloroption = NULL) {
 
@@ -29,29 +29,30 @@ olink_pal <- function(alpha = 1, coloroption = NULL) {
   function(n) {
 
     alpha = alpha*255
+    
+    red <- grDevices::col2rgb('#FE1F04')
+    orange <- grDevices::col2rgb('#FF8C22')
+    yellow <- grDevices::col2rgb('#FFC700')
+    green <- grDevices::col2rgb('#27AE55')
+    teal <- grDevices::col2rgb('#077183')
+    turqoise <- grDevices::col2rgb('#00C7E1')
+    lightblue <- grDevices::col2rgb('#A2D9F5')
+    darkblue <- grDevices::col2rgb('#00559E')
+    purple <- grDevices::col2rgb('#6A27AE')
+    pink <- grDevices::col2rgb('#FF51B8')
 
-    red <- col2rgb('#FE1F04')
-    orange <- col2rgb('#FF8C22')
-    yellow <- col2rgb('#FFC700')
-    green <- col2rgb('#27AE55')
-    teal <- col2rgb('#077183')
-    turqoise <- col2rgb('#00C7E1')
-    gray <- col2rgb('#AAB1B9')
-    darkblue <- col2rgb('#00559E')
-    purple <- col2rgb('#6A27AE')
-    pink <- col2rgb('#FF51B8')
 
+    red<- grDevices::rgb(red[1], red[2], red[3], alpha, maxColorValue = 255)
+    orange <- grDevices::rgb(orange[1], orange[2], orange[3], alpha, maxColorValue = 255)
+    yellow <- grDevices::rgb(yellow[1], yellow[2], yellow[3], alpha, maxColorValue = 255)
+    green <- grDevices::rgb(green[1], green[2], green[3], alpha, maxColorValue = 255)
+    teal <- grDevices::rgb(teal[1], teal[2], teal[3], alpha, maxColorValue = 255)
+    turqoise <- grDevices::rgb(turqoise[1], turqoise[2], turqoise[3], alpha, maxColorValue = 255)
+   lightblue <-  grDevices::rgb(lightblue[1], lightblue[2], lightblue[3], alpha, maxColorValue = 255)
+    darkblue <- grDevices::rgb(darkblue[1], darkblue[2], darkblue[3], alpha, maxColorValue = 255)
+    purple <- grDevices::rgb(purple[1], purple[2], purple[3], alpha, maxColorValue = 255)
+    pink <- grDevices::rgb(pink[1], pink[2], pink[3], alpha, maxColorValue = 255)
 
-    red<- rgb(red[1], red[2], red[3], alpha, maxColorValue = 255)
-    orange <- rgb(orange[1], orange[2], orange[3], alpha, maxColorValue = 255)
-    yellow <- rgb(yellow[1], yellow[2], yellow[3], alpha, maxColorValue = 255)
-    green <- rgb(green[1], green[2], green[3], alpha, maxColorValue = 255)
-    teal <- rgb(teal[1], teal[2], teal[3], alpha, maxColorValue = 255)
-    turqoise <- rgb(turqoise[1], turqoise[2], turqoise[3], alpha, maxColorValue = 255)
-    gray <- rgb(gray[1], gray[2], gray[3], alpha, maxColorValue = 255)
-    darkblue <- rgb(darkblue[1], darkblue[2], darkblue[3], alpha, maxColorValue = 255)
-    purple <- rgb(purple[1], purple[2], purple[3], alpha, maxColorValue = 255)
-    pink <- rgb(pink[1], pink[2], pink[3], alpha, maxColorValue = 255)
 
 
     hues_length <- NULL
@@ -69,9 +70,10 @@ olink_pal <- function(alpha = 1, coloroption = NULL) {
                                          green,
                                          purple,
                                          orange,
-                                         gray)
+                                         lightblue)
 
-      crispy_colors_hex <- rbind(red, orange, yellow, green, teal, turqoise, gray, darkblue, purple, pink, red)
+      crispy_colors_hex <- rbind(red, orange, yellow, green, teal, turqoise, lightblue, darkblue, purple, pink, red)
+
 
     }else{
 
@@ -102,7 +104,9 @@ olink_pal <- function(alpha = 1, coloroption = NULL) {
         hues_length <- n
       }
 
-      olink_color_ramp_palette <- colorRampPalette(crispy_colors_hex, space = "Lab", interpolate="linear")
+      olink_color_ramp_palette <- grDevices::colorRampPalette(crispy_colors_hex,
+                                                              space = "Lab",
+                                                              interpolate="linear")
 
       m <- 360
       hues <- seq(1, m, length = hues_length)[1:n]
@@ -117,8 +121,8 @@ olink_pal <- function(alpha = 1, coloroption = NULL) {
 #'
 #' @param alpha transparency
 #' @param coloroption string, one or more of the following:
-#' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'gray', 'darkblue', 'purple', 'pink')
-#' @param ... Optional. Additional arguments to pass to discrete_scale()
+#' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'lightblue', 'darkblue', 'purple', 'pink')
+#' @param ... Optional. Additional arguments to pass to ggplot2::discrete_scale()
 #'
 #' @return None
 #' @export
@@ -132,14 +136,14 @@ olink_pal <- function(alpha = 1, coloroption = NULL) {
 #'
 #' ggplot(mtcars, aes(x=wt, y=mpg, color=as.factor(cyl))) +
 #' geom_point(size = 4) +
-#' olink_color_discrete(coloroption = c('gray', 'red', 'green')) +
+#' olink_color_discrete(coloroption = c('lightblue', 'red', 'green')) +
 #' theme_bw()
-#'
-#'
-#
+#' @importFrom ggplot2 discrete_scale
+
+
 olink_color_discrete <- function(..., alpha = 1, coloroption = NULL) {
 
-  discrete_scale(aesthetics = "colour", scale_name = 'olink', palette = olink_pal(alpha, coloroption), ...)
+  ggplot2::discrete_scale(aesthetics = "colour", scale_name = 'olink', palette = olink_pal(alpha, coloroption), ...)
 }
 
 
@@ -147,7 +151,7 @@ olink_color_discrete <- function(..., alpha = 1, coloroption = NULL) {
 #'
 #' @param alpha transparency (optional)
 #' @param coloroption string, one or more of the following:
-#' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'gray', 'darkblue', 'purple', 'pink')
+#' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'lightblue', 'darkblue', 'purple', 'pink')
 #' @param ... Optional. Additional arguments to pass to scale_color_gradientn()
 #' @return None
 #' @export
@@ -161,19 +165,20 @@ olink_color_discrete <- function(..., alpha = 1, coloroption = NULL) {
 #'geom_point() +
 #'  theme_bw() +
 #'  olink_color_gradient()
+#'  @importFrom ggplot2 scale_colour_gradientn
 
 
 olink_color_gradient <- function(..., alpha = 1, coloroption = NULL) {
-  scale_colour_gradientn(colors = rev(olink_pal(alpha, coloroption)(100)), ...)
+  ggplot2::scale_colour_gradientn(colors = rev(olink_pal(alpha, coloroption)(100)), ...)
 }
 
 
 #' Olink fill scale for discrete ggplots
 #' @param alpha transparency (optional)
 #' @param coloroption string, one or more of the following:
-#' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'gray', 'darkblue', 'purple', 'pink')
-#' @param ... Optional. Additional arguments to pass to discrete_scale()
-#' 
+#' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'lightblue', 'darkblue', 'purple', 'pink')
+#' @param ... Optional. Additional arguments to pass to ggplot2::discrete_scale()
+#'
 #' @return None
 #' @export
 #'
@@ -185,29 +190,33 @@ olink_color_gradient <- function(..., alpha = 1, coloroption = NULL) {
 #'geom_point() +
 #'  theme_bw() +
 #'  olink_fill_discrete()
+#'  @importFrom ggplot2 discrete_scale
 
 olink_fill_discrete <- function(..., alpha = 1, coloroption = NULL) {
-  discrete_scale(aesthetics = "fill", scale_name = 'olink', palette = olink_pal(alpha, coloroption), ...)
+  ggplot2::discrete_scale(aesthetics = "fill", scale_name = 'olink',
+                          palette = olink_pal(alpha, coloroption), ...)
 }
 
 #' Olink fill scale for continuous ggplots
 #'
 #' @param alpha transparency (optional)
 #' @param coloroption string, one or more of the following:
-#' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'gray', 'darkblue', 'purple', 'pink')
-#' @param ... Optional. Additional arguments to pass to scale_fill_gradientn()
-#' 
+#' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'lightblue', 'darkblue', 'purple', 'pink')
+#' @param ... Optional. Additional arguments to pass to ggplot2::scale_fill_gradientn()
+#'
 #' @return None
 #' @export
 #'
 #' @examples
-#'dsub <- subset(diamonds, x > 5 & x < 6 & y > 5 & y < 6) 
-#'dsub$diff <- with(dsub, sqrt(abs(x-y))* sign(x-y)) 
-#'ggplot(dsub, aes(x, y, colour=diff)) + 
-#'geom_point() + 
-#'  theme_bw() + 
+#'dsub <- subset(diamonds, x > 5 & x < 6 & y > 5 & y < 6)
+#'dsub$diff <- with(dsub, sqrt(abs(x-y))* sign(x-y))
+#'ggplot(dsub, aes(x, y, colour=diff)) +
+#'geom_point() +
+#'  theme_bw() +
 #'  olink_fill_gradient()
+#'  @importFrom ggplot2 scale_fill_gradientn
+
 olink_fill_gradient <- function(..., alpha = 1, coloroption = NULL) {
-  scale_fill_gradientn(colors = rev(olink_pal(alpha, coloroption)(100)), ...)
+  ggplot2::scale_fill_gradientn(colors = rev(olink_pal(alpha, coloroption)(100)), ...)
 }
 

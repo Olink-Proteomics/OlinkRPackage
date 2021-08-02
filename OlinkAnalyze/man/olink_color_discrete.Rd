@@ -7,7 +7,7 @@
 olink_color_discrete(..., alpha = 1, coloroption = NULL)
 }
 \arguments{
-\item{...}{Optional. Additional arguments to pass to discrete_scale()}
+\item{...}{Optional. Additional arguments to pass to ggplot2::discrete_scale()}
 
 \item{alpha}{transparency}
 
@@ -31,6 +31,4 @@ ggplot(mtcars, aes(x=wt, y=mpg, color=as.factor(cyl))) +
 geom_point(size = 4) +
 olink_color_discrete(coloroption = c('gray', 'red', 'green')) +
 theme_bw()
-
-
 }
