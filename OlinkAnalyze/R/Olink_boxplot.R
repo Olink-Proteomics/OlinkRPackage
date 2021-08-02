@@ -18,6 +18,7 @@
 #' @importFrom ggplot2 ggplot aes geom_boxplot theme facet_wrap
 #' @importFrom rlang ensym
 #' @importFrom forcats as_factor
+#' @importFrom methods show
 #' @export
 #' @examples
 #' \donttest{
@@ -149,7 +150,7 @@ olink_boxplot <- function(df,
     }
     
     if(verbose){
-      show(boxplot)
+      methods::show(boxplot)
     }
 
     list_of_plots[[COUNTER]] <- boxplot
