@@ -12,7 +12,7 @@ olink_color_gradient(..., alpha = 1, coloroption = NULL)
 \item{alpha}{transparency (optional)}
 
 \item{coloroption}{string, one or more of the following:
-c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'gray', 'darkblue', 'purple', 'pink')}
+c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'lightblue', 'darkblue', 'purple', 'pink')}
 }
 \value{
 None
