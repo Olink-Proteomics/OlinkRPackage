@@ -136,9 +136,7 @@ olink_boxplot <- function(df,
       ggplot2::geom_boxplot(ggplot2::aes(fill = !!fill_variable[[1]])) +
       OlinkAnalyze::set_plot_theme() +
       OlinkAnalyze::olink_fill_discrete(...)+
-      ggplot2::theme(axis.text.x = element_blank(),
-            legend.title = element_blank(),
-            axis.ticks.x = element_blank(),
+      ggplot2::theme(axis.ticks.x = element_blank(),
             legend.text=element_text(size=13)) +
       ggplot2::facet_wrap(~Name_OID, scales = "free")
 
