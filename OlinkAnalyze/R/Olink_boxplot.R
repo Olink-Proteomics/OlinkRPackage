@@ -17,6 +17,7 @@
 #' @importFrom tidyr unite
 #' @importFrom ggplot2 ggplot aes geom_boxplot theme facet_wrap
 #' @importFrom rlang ensym
+#' @importFrom forcats as_factor
 #' @export
 #' @examples
 #' \donttest{
@@ -127,7 +128,7 @@ olink_boxplot <- function(df,
       dplyr::select(OlinkID, UniProt, Assay, NPX, eval(variable)) %>%
       with(., .[order(OlinkID),]) %>%
       tidyr::unite(c(Assay, OlinkID), col = 'Name_OID', sep = ' ', remove = F) %>%
-      dplyr::mutate(Name_OID = as_factor(Name_OID))
+      dplyr::mutate(Name_OID = forcats::as_factor(Name_OID))
 
 
     boxplot <- npx_for_plotting %>%
