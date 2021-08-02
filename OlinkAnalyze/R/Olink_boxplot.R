@@ -11,6 +11,12 @@
 #' @param ... coloroption passed to specify color order
 #'
 #' @return A list of objects of class “ggplot” (the actual ggplot object is entry 1 in the list).
+#' @importFrom magrittr %>%
+#' @importFrom dplyr filter mutate select
+#' @importFrom stringr str_detect
+#' @importFrom tidyr unite
+#' @importFrom ggplot2 ggplot aes geom_boxplot theme facet_wrap
+#' @importFrom rlang ensym
 #' @export
 #' @examples
 #' \donttest{
@@ -23,6 +29,7 @@
 #'               olinkid_list = significant_assays,
 #'               verbose = TRUE,
 #'               number_of_proteins_per_plot = 3)}
+#'               
 
 olink_boxplot <- function(df,
                           variable,
@@ -57,7 +64,7 @@ olink_boxplot <- function(df,
 
   #Filtering on valid OlinkID
   df <- df %>%
-    filter(stringr::str_detect(OlinkID,
+    dplyr::filter(stringr::str_detect(OlinkID,
                                "OID[0-9]{5}"))
 
   #Column setup
@@ -115,26 +122,28 @@ olink_boxplot <- function(df,
 
 
     npx_for_plotting <- df %>%
-      filter(OlinkID %in% assays_for_plotting) %>%
-      mutate(OlinkID = factor(OlinkID, levels = assays_for_plotting)) %>%
-      select(OlinkID, UniProt, Assay, NPX, eval(variable)) %>%
+      dplyr::filter(OlinkID %in% assays_for_plotting) %>%
+      dplyr::mutate(OlinkID = factor(OlinkID, levels = assays_for_plotting)) %>%
+      dplyr::select(OlinkID, UniProt, Assay, NPX, eval(variable)) %>%
       with(., .[order(OlinkID),]) %>%
-      unite(c(Assay, OlinkID), col = 'Name_OID', sep = ' ', remove = F) %>%
-      mutate(Name_OID = as_factor(Name_OID))
+      tidyr::unite(c(Assay, OlinkID), col = 'Name_OID', sep = ' ', remove = F) %>%
+      dplyr::mutate(Name_OID = as_factor(Name_OID))
 
 
-    boxplot <- npx_for_plotting %>% 
-      ggplot(aes(y = NPX, x = !!x_variable[[1]])) + 
-      geom_boxplot(aes(fill = !!fill_variable[[1]])) +
-      set_plot_theme() +
-      olink_fill_discrete(...)+
-      theme(axis.ticks.x = element_blank(),
+    boxplot <- npx_for_plotting %>%
+      ggplot2::ggplot(ggplot2::aes(y = NPX,
+                 !!x_variable[[1]])) +
+      ggplot2::geom_boxplot(ggplot2::aes(fill = !!fill_variable[[1]])) +
+      OlinkAnalyze::set_plot_theme() +
+      OlinkAnalyze::olink_fill_discrete(...)+
+      ggplot2::theme(axis.ticks.x = element_blank(),
             legend.text=element_text(size=13)) +
-      facet_wrap(~Name_OID, scales = "free")
+      ggplot2::facet_wrap(~Name_OID, scales = "free")
+
     
     if(length(variable) == 1){
       boxplot <- boxplot + 
-        theme(axis.text.x = element_blank(), 
+        ggplot2::theme(axis.text.x = element_blank(), 
               legend.title = element_blank())
     }
     
