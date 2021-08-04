@@ -392,8 +392,8 @@ olink_pca_plot <- function (df,
 
 
   pca_plot <- pca_plot +
-    set_plot_theme() +
-    olink_color_discrete(...)
+    OlinkAnalyze::set_plot_theme() +
+    OlinkAnalyze::olink_color_discrete(...)
 
   return(pca_plot)
 

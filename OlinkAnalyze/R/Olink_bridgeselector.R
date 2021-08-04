@@ -8,7 +8,7 @@
 #'The function accepts NPX Excel files with data < LOD replaced.
 #'
 #' @param df Tibble/data frame in long format such as produced by the olinkr read_NPX function.
-#' @param sampleMissingFreq The threshhold for sample wise missingness.
+#' @param sampleMissingFreq The threshold for sample wise missingness.
 #' @param n Number of bridge samples to be selected.
 #' @param warning_string The string used to indicate that a sample received a QC warning. Most common, it is either "WARN" or "Warning". If this is not given, the function tries to detect it from the given data frame.
 #'
