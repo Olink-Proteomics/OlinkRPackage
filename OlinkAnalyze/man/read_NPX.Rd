@@ -13,7 +13,7 @@ read_NPX(filename)
 A tibble in long format.
 }
 \description{
-Imports an NPX file exported from NPX Manager. 
+Imports an NPX file exported from NPX Manager.
 No alterations to the output NPX Manager format is allowed.
 }
 \examples{

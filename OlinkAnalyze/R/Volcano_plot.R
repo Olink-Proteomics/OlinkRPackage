@@ -9,7 +9,7 @@
 #' @param x_lab Optional. Character value to use as the X-axis label
 #' @param olinkid_list Optional. Character vector of proteins (by OlinkID) to label in the plot. If not provided, default is to label all significant proteins.
 #' @param ... Optional. Additional arguments for  olink_color_discrete()
-#' 
+#'
 #' @return An object of class "ggplot"
 #' @export
 #' @examples
@@ -19,6 +19,10 @@
 #'                              variable = 'Treatment',
 #'                              alternative = 'two.sided')
 #' olink_volcano_plot(ttest_results)}
+#' @importFrom magrittr %>%
+#' @importFrom dplyr filter pull
+#' @importFrom ggplot2 ggplot aes geom_point labs geom_hline
+#' @importFrom ggrepel geom_label_repel
 
 
 olink_volcano_plot <- function (p.val_tbl, x_lab = "Estimate", olinkid_list = NULL, ...)
@@ -50,18 +54,20 @@ olink_volcano_plot <- function (p.val_tbl, x_lab = "Estimate", olinkid_list = NU
   if(is.null(olinkid_list)){
 
     olinkid_list <- p.val_tbl %>%
-      filter(Threshold == 'Significant') %>%
-      pull(OlinkID)
+      dplyr::filter(Threshold == 'Significant') %>%
+      dplyr::pull(OlinkID)
 
   }
 
 
   volcano_plot <- p.val_tbl %>%
-    ggplot(aes(x = estimate, y = -log10(p.value), color = Threshold)) +
-    geom_point() +
-    labs(x = x_lab, y = "-log10(p-value)") +
-    ggrepel::geom_label_repel(data = subset(p.val_tbl, OlinkID %in% olinkid_list), aes(label = Assay), box.padding = 1, show.legend = F) +
-    geom_hline(yintercept = -log10(0.05), linetype="dotted") +
+    ggplot2::ggplot(ggplot2::aes(x = estimate, y = -log10(p.value),
+                                 color = Threshold)) +
+    ggplot2::geom_point() +
+    ggplot2::labs(x = x_lab, y = "-log10(p-value)") +
+    ggrepel::geom_label_repel(data = subset(p.val_tbl, OlinkID %in% olinkid_list),
+                              ggplot2::aes(label = Assay), box.padding = 1, show.legend = F) +
+    ggplot2::geom_hline(yintercept = -log10(0.05), linetype="dotted") +
     set_plot_theme() +
     olink_color_discrete(...)
 

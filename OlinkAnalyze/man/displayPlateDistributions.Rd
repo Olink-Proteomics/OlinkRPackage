@@ -12,12 +12,11 @@ displayPlateDistributions(data, fill.color)
 \item{fill.color}{Column name to be used as coloring variable for wells.}
 }
 \description{
-Displays a bar chart for each plate representing the distribution of the given grouping variable on each plate using ggplot and ggplot2::geom_bar.
+Displays a bar chart for each plate representing the distribution of the given grouping variable on each plate using ggplot2::ggplot and ggplot2::geom_bar.
 }
 \examples{
 \donttest{randomized.manifest <- olink_plate_randomizer(manifest)}
 \donttest{displayPlateDistributions(data=randomized.manifest,fill.color="Site")}
-
 }
 \keyword{ggplot}
 \keyword{plates,}

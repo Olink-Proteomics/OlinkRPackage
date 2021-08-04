@@ -12,7 +12,7 @@ olink_color_gradient(..., alpha = 1, coloroption = NULL)
 \item{alpha}{transparency (optional)}
 
 \item{coloroption}{string, one or more of the following:
-c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'gray', 'darkblue', 'purple', 'pink')}
+c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'lightblue', 'darkblue', 'purple', 'pink')}
 }
 \value{
 None
@@ -29,4 +29,5 @@ ggplot(dsub, aes(x, y, colour=diff)) +
 geom_point() +
  theme_bw() +
  olink_color_gradient()
+ @importFrom ggplot2 scale_colour_gradientn
 }

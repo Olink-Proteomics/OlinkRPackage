@@ -10,7 +10,7 @@ olink_pal(alpha = 1, coloroption = NULL)
 \item{alpha}{transparency (optional)}
 
 \item{coloroption}{string, one or more of the following:
-c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'gray', 'darkblue', 'purple', 'pink')}
+c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'lightblue', 'darkblue', 'purple', 'pink')}
 }
 \value{
 Palette hex codes for colors
@@ -22,7 +22,7 @@ Olink color panel for plotting
 
 #Color matrices
 show_col(olink_pal()(10), labels = FALSE)
-show_col(olink_pal(coloroption = c('gray', 'green'))(2), labels = FALSE)
+show_col(olink_pal(coloroption = c('lightblue', 'green'))(2), labels = FALSE)
 
 #Contour plot
 filled.contour(volcano, color.palette = olink_pal(), asp = 1)
