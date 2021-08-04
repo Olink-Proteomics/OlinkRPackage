@@ -45,6 +45,7 @@
 #' @importFrom rlang ensym
 #' @importFrom stringr str_detect
 #' @importFrom generics tidy
+#' @importFrom lme4 lmerControl
 
 olink_lmer <- function(df,
                        variable,
@@ -269,13 +270,13 @@ single_lmer <- function(data, formula_string){
   out.model <- tryCatch(lmerTest::lmer(as.formula(formula_string),
                                        data=data,
                                        REML=F,
-                                       control = lmerControl(check.conv.singular = "ignore")),
+                                       control = lme4::lmerControl(check.conv.singular = "ignore")),
                         warning = function(w){
                           return(
                             lmerTest::lmer(as.formula(formula_string),
                                            data=data,
                                            REML=F,
-                                           control=lmerControl(optimizer = "Nelder_Mead",
+                                           control= lme4::lmerControl(optimizer = "Nelder_Mead",
                                                                check.conv.singular = "ignore"))
                           )
 
@@ -562,7 +563,7 @@ single_posthoc <- function(data, formula_string, effect, mean_return){
 #' @importFrom magrittr %>%
 #' @importFrom dplyr filter pull distinct mutate select arrange
 #' @importFrom stringr str_detect
-#' @importFrom ggplot2 ggplot theme ylab geom_pointrange aes element_blank element_text facet_wrap labs
+#' @importFrom ggplot2 ggplot theme ylab geom_pointrange aes element_blank element_text facet_wrap labs position_dodge
 #' @importFrom rlang ensym
 
 olink_lmer_plot <- function(df,
@@ -651,7 +652,7 @@ olink_lmer_plot <- function(df,
                                  effect = current_fixed_effect,
                                  mean_return = T,
                                  verbose=verbose) %>%
-    mutate(Name_Assay = paste0(Assay,"_",OlinkID))
+    dplyr::mutate(Name_Assay = paste0(Assay,"_",OlinkID))
 
 
   #Keep olinkid_list input order
@@ -704,7 +705,7 @@ olink_lmer_plot <- function(df,
                           ymin = conf.low,
                           ymax = conf.high,
                           color = as.factor(!!rlang::ensym(color_for_plot))),
-                      position = position_dodge(width=0.4), size=0.8)+
+                      position = ggplot2::position_dodge(width=0.4), size=0.8)+
       ggplot2::facet_wrap(~ Name_Assay,scales = "free_y")+
       OlinkAnalyze::olink_color_discrete(...) +
       OlinkAnalyze::set_plot_theme()+

@@ -14,7 +14,7 @@
 #' @importFrom ggplot2 ggplot aes scale_x_discrete geom_boxplot xlab facet_wrap 
 #' @importFrom stringr str_replace
 #' @importFrom magrittr %>%
-#' @importFrom rlang esym
+#' @importFrom rlang ensym
 
 olink_dist_plot <- function(df, color_g = 'QC_Warning', ...) {
 
@@ -74,6 +74,6 @@ olink_dist_plot <- function(df, color_g = 'QC_Warning', ...) {
     scale_x_reordered()+
     ggplot2::xlab("Samples")+
     ggplot2::facet_wrap(~Panel,  scale="free")+
-    set_plot_theme() +
-    olink_fill_discrete(...)
+    OlinkAnalyze::set_plot_theme() +
+    OlinkAnalyze::olink_fill_discrete(...)
 }
