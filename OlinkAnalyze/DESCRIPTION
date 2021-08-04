@@ -12,13 +12,5 @@ Suggests: knitr, rmarkdown
 License: GPL-3 | file LICENSE
 Maintainer: DS at Olink <biostattools@olink.com>
 VignetteBuilder: knitr
-Imports: 
-    grid,
-    ggplot2,
-    methods,
-    magrittr,
-    rlang,
-    stats,
-    tibble,
-    tidyselect,
-    utils
+Imports: methods
+

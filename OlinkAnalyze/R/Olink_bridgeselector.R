@@ -8,7 +8,7 @@
 #'The function accepts NPX Excel files with data < LOD replaced.
 #'
 #' @param df Tibble/data frame in long format such as produced by the olinkr read_NPX function.
-#' @param sampleMissingFreq The threshold for sample wise missingness.
+#' @param sampleMissingFreq The threshhold for sample wise missingness.
 #' @param n Number of bridge samples to be selected.
 #' @param warning_string The string used to indicate that a sample received a QC warning. Most common, it is either "WARN" or "Warning". If this is not given, the function tries to detect it from the given data frame.
 #'
@@ -17,9 +17,7 @@
 #'
 #' @examples
 #' \donttest{bridge_samples <- olink_bridgeselector(npx_data1, sampleMissingFreq = 0.1, n = 20)}
-#' @importFrom magrittr %>%
-#' @importFrom dplyr select distinct arrange group_by mutate ungroup left_join filter
-#' @importFrom stringr str_detect
+#' @import dplyr stringr tidyr broom
 
 olink_bridgeselector<-function(df, sampleMissingFreq, n, warning_string = NULL){
 
@@ -27,9 +25,9 @@ olink_bridgeselector<-function(df, sampleMissingFreq, n, warning_string = NULL){
   # Find the string used to indicate a flagged sample
   if (is.null(warning_string)) {
     QC_Warning_strings <- (df %>%
-                             dplyr::select(QC_Warning) %>%
-                             dplyr::distinct() %>%
-                             dplyr::arrange(QC_Warning))$QC_Warning
+                             select(QC_Warning) %>%
+                             distinct() %>%
+                             arrange(QC_Warning))$QC_Warning
 
     if (length(QC_Warning_strings) == 2) {
       warning_string <- QC_Warning_strings[2]
@@ -48,57 +46,57 @@ olink_bridgeselector<-function(df, sampleMissingFreq, n, warning_string = NULL){
 
   #Filtering on valid OlinkID
   df <- df %>%
-    dplyr::filter(stringr::str_detect(OlinkID,
+    filter(stringr::str_detect(OlinkID,
                                "OID[0-9]{5}"))
 
   #Filtering out control samples
   df <- df %>%
-    dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_SAMPLE*"))
+    filter(!str_detect(SampleID, "CONTROL_SAMPLE*"))
 
   #Outlier calculation as in qc_plot for filtering
   qc_outliers <- df %>%
-    dplyr::group_by(Panel, SampleID, Index) %>%
-    dplyr::mutate(IQR = IQR(NPX, na.rm = T),
+    group_by(Panel, SampleID, Index) %>%
+    mutate(IQR = IQR(NPX, na.rm = T),
            sample_median = median(NPX, na.rm = T)) %>%
-    dplyr::ungroup() %>%
-    dplyr::select(SampleID, Index, Panel, IQR, sample_median) %>%
-    dplyr::distinct() %>%
-    dplyr::group_by(Panel) %>%
-    dplyr::mutate(median_low = mean(sample_median, na.rm = T) - 3*sd(sample_median, na.rm = T),
+    ungroup() %>%
+    select(SampleID, Index, Panel, IQR, sample_median) %>%
+    distinct() %>%
+    group_by(Panel) %>%
+    mutate(median_low = mean(sample_median, na.rm = T) - 3*sd(sample_median, na.rm = T),
            median_high = mean(sample_median, na.rm = T) + 3*sd(sample_median, na.rm = T),
            iqr_low = mean(IQR, na.rm = T) - 3*sd(IQR, na.rm = T),
            iqr_high = mean(IQR, na.rm = T) + 3*sd(IQR, na.rm = T)) %>%
-    dplyr::ungroup() %>%
-    dplyr::mutate(Outlier = if_else(sample_median < median_high &
+    ungroup() %>%
+    mutate(Outlier = if_else(sample_median < median_high &
                                sample_median > median_low &
                                IQR > iqr_low &
                                IQR < iqr_high,
                              0, 1)) %>%
-    dplyr::select(SampleID, Index, Panel, Outlier)
+    select(SampleID, Index, Panel, Outlier)
 
   df_1 <- df %>%
-    dplyr::left_join(qc_outliers, by = c('SampleID', 'Index', 'Panel')) %>%
-    dplyr::mutate(NPX = ifelse(NPX <= LOD, NA, NPX)) %>%
-    dplyr::group_by(SampleID) %>%
-    dplyr::mutate(Warnings = sum(QC_Warning == "Warning")) %>%
-    dplyr::filter(Warnings == 0) %>%
-    dplyr::mutate(Outliers = sum(Outlier)) %>%
-    dplyr::filter(Outliers == 0) %>%
-    dplyr::mutate(PercAssaysBelowLOD = sum(is.na(NPX))/n()) %>%
-    dplyr::mutate(MeanNPX = mean(NPX, na.rm = T)) %>%
-    dplyr::ungroup() %>%
-    dplyr::filter(PercAssaysBelowLOD < sampleMissingFreq)
+    left_join(qc_outliers, by = c('SampleID', 'Index', 'Panel')) %>%
+    mutate(NPX = ifelse(NPX <= LOD, NA, NPX)) %>%
+    group_by(SampleID) %>%
+    mutate(Warnings = sum(QC_Warning == "Warning")) %>%
+    filter(Warnings == 0) %>%
+    mutate(Outliers = sum(Outlier)) %>%
+    filter(Outliers == 0) %>%
+    mutate(PercAssaysBelowLOD = sum(is.na(NPX))/n()) %>%
+    mutate(MeanNPX = mean(NPX, na.rm = T)) %>%
+    ungroup() %>%
+    filter(PercAssaysBelowLOD < sampleMissingFreq)
 
   df_2 <- df_1 %>%
-    dplyr::select(SampleID, PercAssaysBelowLOD, MeanNPX) %>%
-    dplyr::distinct() %>%
-    dplyr::arrange(desc(MeanNPX)) %>%
-    dplyr::mutate(Order = c(1:nrow(.)))
+    select(SampleID, PercAssaysBelowLOD, MeanNPX) %>%
+    distinct() %>%
+    arrange(desc(MeanNPX)) %>%
+    mutate(Order = c(1:nrow(.)))
 
   Bridgesamples <- floor(seq(1,nrow(df_2),length.out = n+2)[c(-1, -(n+2))])
 
   SelectedBridges <- df_2 %>%
-    dplyr::filter(Order %in% Bridgesamples)
+    filter(Order %in% Bridgesamples)
 
   return(SelectedBridges)
 }
