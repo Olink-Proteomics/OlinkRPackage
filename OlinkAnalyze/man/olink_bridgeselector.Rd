@@ -9,7 +9,7 @@ olink_bridgeselector(df, sampleMissingFreq, n, warning_string = NULL)
 \arguments{
 \item{df}{Tibble/data frame in long format such as produced by the olinkr read_NPX function.}
 
-\item{sampleMissingFreq}{The threshold for sample wise missingness.}
+\item{sampleMissingFreq}{The threshhold for sample wise missingness.}
 
 \item{n}{Number of bridge samples to be selected.}
 
