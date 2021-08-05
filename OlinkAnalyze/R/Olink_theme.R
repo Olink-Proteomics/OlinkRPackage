@@ -20,12 +20,15 @@
 #'
 #'
 set_plot_theme <- function(font = "Swedish Gothic Thin") {
-  if (requireNamespace("extrafont", quietly = TRUE) & font %in% extrafont::fonts()) {
-    extrafont::loadfonts(quiet = TRUE, device = "win")
-    extrafont::loadfonts(quiet = TRUE, device = "pdf")
-    usefont <- font
-  } else {
-    usefont <- ""
+
+  usefont <- ""
+
+  if (requireNamespace("extrafont", quietly = TRUE)) {
+    if(font %in% extrafont::fonts()){
+      extrafont::loadfonts(quiet = TRUE, device = "win")
+      extrafont::loadfonts(quiet = TRUE, device = "pdf")
+      usefont <- font
+    }
   }
 
   olink_theme <- ggplot2::theme_bw() +
