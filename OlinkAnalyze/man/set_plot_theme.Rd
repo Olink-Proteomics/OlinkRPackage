@@ -4,8 +4,24 @@
 \alias{set_plot_theme}
 \title{Function to set plot theme}
 \usage{
-set_plot_theme()
+set_plot_theme(font = "Swedish Gothic Thin")
+}
+\arguments{
+\item{font}{Font family to use for text elements. Depends on extrafont package.}
 }
 \description{
 This function sets a coherent plot theme for functions.
+}
+\examples{
+library(ggplot2)
+
+ggplot(mtcars, aes(x = wt, y = mpg, color = as.factor(cyl))) +
+  geom_point(size = 4) +
+  set_plot_theme()
+
+ggplot(mtcars, aes(x = wt, y = mpg, color = as.factor(cyl))) +
+  geom_point(size = 4) +
+  set_plot_theme(font = "")
+
+
 }
