@@ -86,8 +86,8 @@ olink_qc_plot <- function(df, color_g = "QC_Warning", plot_index = F, label_outl
                color = 'grey') +
     ggplot2::xlab('Sample Median') +
     ggplot2::facet_wrap(~Panel, scale = "free") +
-    set_plot_theme()+
-    olink_color_discrete(...)
+    OlinkAnalyze::set_plot_theme()+
+    OlinkAnalyze::olink_color_discrete(...)
 
   if(plot_index){
     qc_plot <- qc_plot + ggplot2::geom_text(ggplot2::aes(color = !!rlang::ensym(color_g),

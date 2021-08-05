@@ -178,7 +178,6 @@ olink_ttest <- function(df, variable, pair_id, ...){
       dplyr::ungroup() %>%
       dplyr::mutate(Adjusted_pval = p.adjust(p.value, method = "fdr")) %>%
       dplyr::mutate(Threshold = ifelse(Adjusted_pval < 0.05, "Significant", "Non-significant")) %>%
-      # dplyr::rename(`:=`(!!var_levels[1], estimate1)) %>%
       dplyr::arrange(p.value)
 
 

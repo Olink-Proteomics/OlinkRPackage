@@ -40,14 +40,14 @@ displayPlateLayout <- function(data,fill.color,include.label=F){
     fills[-hld] <- olink_pal()(length(fill.levels)-1)
     fills[hld] <- "#ffffff"
   }else{
-    fills <- olink_pal()(length(fill.levels))
+    fills <- OlinkAnalyze::olink_pal()(length(fill.levels))
   }
 
 
   p <- ggplot2::ggplot(ggplot2::aes(x=column,y=row,fill=fill.color),data=data)+
     ggplot2::geom_tile(color="black")+
     ggplot2::facet_wrap(~plate,ncol=1,scales="fixed")+
-    set_plot_theme()+
+    OlinkAnalyze::set_plot_theme()+
     ggplot2::scale_fill_manual(values=fills)+
     ggplot2::labs(x="",y="",fill=fill.color)+
     ggplot2::scale_x_discrete(labels=paste0("Col",1:11))
@@ -88,8 +88,8 @@ displayPlateDistributions <- function(data,fill.color){
     dplyr::mutate(percent=100*n/sum(n)) %>%
     ggplot2::ggplot(ggplot2::aes(x=plate,y=percent,fill=group.var)) +
     ggplot2::geom_bar(stat="identity",color="gray")+
-    olink_fill_discrete()+
-    set_plot_theme() +
+    OlinkAnalyze::olink_fill_discrete()+
+    OlinkAnalyze::set_plot_theme() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust=0,vjust=0.5))+
     ggplot2::labs(fill=fill.color,x="Plate",y="Percent")+
     ggplot2::theme(legend.position = "bottom")
