@@ -84,7 +84,7 @@ olink_bridgeselector<-function(df, sampleMissingFreq, n, warning_string = NULL){
     dplyr::filter(Warnings == 0) %>%
     dplyr::mutate(Outliers = sum(Outlier)) %>%
     dplyr::filter(Outliers == 0) %>%
-    dplyr::mutate(PercAssaysBelowLOD = sum(is.na(NPX))/n()) %>%
+    dplyr::mutate(PercAssaysBelowLOD = sum(is.na(NPX))/dplyr::n()) %>%
     dplyr::mutate(MeanNPX = mean(NPX, na.rm = T)) %>%
     dplyr::ungroup() %>%
     dplyr::filter(PercAssaysBelowLOD < sampleMissingFreq)
