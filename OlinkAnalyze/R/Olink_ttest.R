@@ -26,7 +26,7 @@
 #'    olink_ttest(variable = "Time", pair_id = "Subject")
 #'}
 #' @importFrom magrittr %>%
-#' @importFrom dplyr group_by summarise n_distinct ungroup filter as_tibble select mutate pull all_of rename arrange do
+#' @importFrom dplyr n group_by summarise n_distinct ungroup filter as_tibble select mutate pull all_of rename arrange do
 #' @importFrom stringr str_detect
 #' @importFrom broom tidy
 #' @importFrom rlang ensym
@@ -111,7 +111,7 @@ olink_ttest <- function(df, variable, pair_id, ...){
   #Not testing assays that have all NA:s or all NA:s in one level
   all_nas <- df  %>%
     dplyr::group_by(OlinkID) %>%
-    dplyr::summarise(n = n(), n_na = sum(is.na(NPX))) %>%
+    dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(NPX))) %>%
     dplyr::ungroup() %>%
     dplyr::filter(n-n_na <= 1) %>%
     dplyr::pull(OlinkID)
