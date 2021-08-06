@@ -4,6 +4,7 @@ jobs:
   Can-it-be-installed:
     runs-on: ${{ matrix.OS }}
     strategy:
+      fail-fast: true
       matrix:
         OS: ['macOS-latest', 'windows-latest', 'ubuntu-latest']      
         R: [ '4.0.0', 'release']    
@@ -42,7 +43,7 @@ jobs:
 
       - name: Install OlinkAnalyze
         run: |
-          remotes::install("OlinkAnalyze")
+          remotes::install_local("OlinkAnalyze")
         shell: Rscript {0}
 
       - name: Test if OlinkAnalyze can be loaded
