@@ -156,7 +156,7 @@ olink_anova <- function(df,
       current_nas <- df %>%
         dplyr::filter(!(OlinkID %in% all_nas)) %>%
         dplyr::group_by(OlinkID, !!rlang::ensym(effect)) %>%
-        dplyr::summarise(n = n(), n_na = sum(is.na(NPX))) %>%
+        dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(NPX))) %>%
         dplyr::ungroup() %>%
         dplyr::filter(n == n_na) %>%
         dplyr::distinct(OlinkID) %>%
