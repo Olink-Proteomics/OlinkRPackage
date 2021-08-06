@@ -40,14 +40,9 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
           restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-
 
-      - name: Install devtools
-        run: |
-          install.packages(c("devtools"))
-        shell: Rscript {0}
-
       - name: Install OlinkAnalyze
         run: |
-          devtools::install("OlinkAnalyze")
+          remotes::install("OlinkAnalyze")
         shell: Rscript {0}
 
       - name: Test if OlinkAnalyze can be loaded
