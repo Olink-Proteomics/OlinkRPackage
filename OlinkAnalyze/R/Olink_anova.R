@@ -51,7 +51,7 @@
 #' anova_results <- olink_anova(df = npx_df,
 #'                              variable="Treatment",
 #'                              covariates="Site:Time")}
-#' @importFrom dplyr filter group_by summarise ungroup pull n_distinct do select arrange mutate n
+#' @importFrom dplyr n filter group_by summarise ungroup pull n_distinct do select arrange mutate n
 #' @importFrom stringr str_detect
 #' @importFrom generics tidy
 #' @importFrom car Anova

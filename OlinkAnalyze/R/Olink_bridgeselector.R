@@ -18,7 +18,7 @@
 #' @examples
 #' \donttest{bridge_samples <- olink_bridgeselector(npx_data1, sampleMissingFreq = 0.1, n = 20)}
 #' @importFrom magrittr %>%
-#' @importFrom dplyr select distinct arrange group_by mutate ungroup left_join filter
+#' @importFrom dplyr n select distinct arrange group_by mutate ungroup left_join filter
 #' @importFrom stringr str_detect
 
 olink_bridgeselector<-function(df, sampleMissingFreq, n, warning_string = NULL){

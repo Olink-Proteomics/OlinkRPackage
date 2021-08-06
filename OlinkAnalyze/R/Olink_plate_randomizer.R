@@ -10,7 +10,7 @@
 #' \donttest{randomized.manifest <- olink_plate_randomizer(manifest)}
 #' \donttest{displayPlateLayout(data=randomized.manifest,fill.color="Site")}
 #' @importFrom magrittr %>%
-#' @importFrom dplyr filter select mutate
+#' @importFrom dplyr n filter select mutate
 #' @importFrom ggplot2 ggplot geom_tile facet_wrap scale_fill_manual labs scale_x_discrete geom_text
 
 displayPlateLayout <- function(data,fill.color,include.label=F){
@@ -233,7 +233,7 @@ olink_plate_randomizer <-function(Manifest, SubjectColumn, Groups, iterations=50
         out.manifest <- Manifest %>%
           dplyr::left_join(all.plates,"SampleID") %>%
           dplyr::group_by(plate) %>%
-          dplyr::mutate(scramble=sample(1:n())) %>%
+          dplyr::mutate(scramble=sample(1:dplyr::n())) %>%
           dplyr::mutate(row=row[scramble],
                  column=column[scramble]) %>%
           dplyr::ungroup() %>%
