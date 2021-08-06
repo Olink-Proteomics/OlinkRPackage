@@ -304,7 +304,7 @@ olink_pca_plot <- function (df,
   observation_names <- df_wide$SampleID
   observation_colors <- df_wide$pca_colors
 
-  scores <- cbind(PCX, PCY)
+  scores <- data.frame(cbind(PCX, PCY))
   loadings <- data.frame(variables = rownames(pca_fit$rotation), LX, LY)
 
   range_PX <- c(-abs(min(PCX, na.rm = TRUE)), abs(max(PCX, na.rm = TRUE)))
