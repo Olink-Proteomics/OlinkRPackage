@@ -51,7 +51,7 @@
 #' anova_results <- olink_anova(df = npx_df,
 #'                              variable="Treatment",
 #'                              covariates="Site:Time")}
-#' @importFrom dplyr filter group_by summarise ungroup pull n_distinct do select arrange mutate
+#' @importFrom dplyr n filter group_by summarise ungroup pull n_distinct do select arrange mutate n
 #' @importFrom stringr str_detect
 #' @importFrom generics tidy
 #' @importFrom car Anova
@@ -108,7 +108,7 @@ olink_anova <- function(df,
     #Not testing assays that have all NA:s
     all_nas <- df  %>%
       dplyr::group_by(OlinkID) %>%
-      dplyr::summarise(n = n(), n_na = sum(is.na(NPX))) %>%
+      dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(NPX))) %>%
       dplyr::ungroup() %>%
       dplyr::filter(n == n_na) %>%
       dplyr::pull(OlinkID)
@@ -156,7 +156,7 @@ olink_anova <- function(df,
       current_nas <- df %>%
         dplyr::filter(!(OlinkID %in% all_nas)) %>%
         dplyr::group_by(OlinkID, !!rlang::ensym(effect)) %>%
-        dplyr::summarise(n = n(), n_na = sum(is.na(NPX))) %>%
+        dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(NPX))) %>%
         dplyr::ungroup() %>%
         dplyr::filter(n == n_na) %>%
         dplyr::distinct(OlinkID) %>%

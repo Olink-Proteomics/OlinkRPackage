@@ -40,7 +40,7 @@
 #' random = c('Subject', 'Site'))
 #' }
 #' @importFrom magrittr %>%
-#' @importFrom dplyr filter group_by summarise ungroup pull distinct group_modify mutate select all_of
+#' @importFrom dplyr n filter group_by summarise ungroup pull distinct group_modify mutate select all_of
 #' @importFrom lmerTest lmer
 #' @importFrom rlang ensym
 #' @importFrom stringr str_detect
@@ -100,7 +100,7 @@ olink_lmer <- function(df,
     #Not testing assays that have all NA:s
     all_nas <- df  %>%
       dplyr::group_by(OlinkID) %>%
-      dplyr::summarise(n = n(), n_na = sum(is.na(!!rlang::ensym(outcome)))) %>%
+      dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(!!rlang::ensym(outcome)))) %>%
       dplyr::ungroup() %>%
       dplyr::filter(n == n_na) %>%
       dplyr::pull(OlinkID)
@@ -148,7 +148,7 @@ olink_lmer <- function(df,
       current_nas <- df %>%
         dplyr::filter(!(OlinkID %in% all_nas)) %>%
         dplyr::group_by(OlinkID, !!rlang::ensym(effect)) %>%
-        dplyr::summarise(n = n(), n_na = sum(is.na(!!rlang::ensym(outcome)))) %>%
+        dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(!!rlang::ensym(outcome)))) %>%
         dplyr::ungroup() %>%
         dplyr::filter(n == n_na) %>%
         dplyr::distinct(OlinkID) %>%

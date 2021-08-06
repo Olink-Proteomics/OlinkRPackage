@@ -26,7 +26,7 @@
 #'    olink_ttest(variable = "Time", pair_id = "Subject")
 #'}
 #' @importFrom magrittr %>%
-#' @importFrom dplyr group_by summarise n_distinct ungroup filter as_tibble select mutate pull all_of rename arrange do
+#' @importFrom dplyr n group_by summarise n_distinct ungroup filter as_tibble select mutate pull all_of rename arrange do
 #' @importFrom stringr str_detect
 #' @importFrom broom tidy
 #' @importFrom rlang ensym
@@ -111,7 +111,7 @@ olink_ttest <- function(df, variable, pair_id, ...){
   #Not testing assays that have all NA:s or all NA:s in one level
   all_nas <- df  %>%
     dplyr::group_by(OlinkID) %>%
-    dplyr::summarise(n = n(), n_na = sum(is.na(NPX))) %>%
+    dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(NPX))) %>%
     dplyr::ungroup() %>%
     dplyr::filter(n-n_na <= 1) %>%
     dplyr::pull(OlinkID)
@@ -129,7 +129,7 @@ olink_ttest <- function(df, variable, pair_id, ...){
   nas_in_level <- df  %>%
     dplyr::filter(!(OlinkID %in% all_nas)) %>%
     dplyr::group_by(OlinkID, !!rlang::ensym(variable)) %>%
-    dplyr::summarise(n = n(), n_na = sum(is.na(NPX))) %>%
+    dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(NPX))) %>%
     dplyr::ungroup() %>%
     dplyr::filter(n == n_na) %>%
     dplyr::pull(OlinkID)
@@ -160,7 +160,7 @@ olink_ttest <- function(df, variable, pair_id, ...){
       dplyr::filter(!(OlinkID %in% nas_in_level)) %>%
       dplyr::filter(!is.na(!!rlang::ensym(variable))) %>%
       dplyr::group_by(OlinkID,!!rlang::ensym(pair_id)) %>%
-      dplyr::summarize(n=n())
+      dplyr::summarize(n=dplyr::n())
     if(!all(ct_pairs$n <= 2)) stop(paste0("Each pair identifier must identify no more than 2 unique samples. Check pairs: ",
                                           paste(unique(ct_pairs[[pair_id]][ct_pairs$n>2]),collapse=", ")))
 
