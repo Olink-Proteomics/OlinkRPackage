@@ -28,6 +28,9 @@
 #' @export
 #' @examples
 #' \donttest{
+#'
+#' library(dplyr)
+#'
 #' npx_df1 <- npx_data1 %>% dplyr::mutate(Project = 'P1')
 #' npx_df2 <- npx_data2 %>% dplyr::mutate(Project = 'P2')
 #'

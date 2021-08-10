@@ -156,6 +156,7 @@ generatePlateHolder <- function(n.plates,n.spots,n.samples){
 #'                                                         available.spots=c(88,88), seed=12345)}
 #' @importFrom magrittr %>%
 #' @importFrom dplyr as_tibble mutate arrange left_join group_by ungroup select
+#' @importFrom tibble is_tibble
 
 #Main randomization function
 olink_plate_randomizer <-function(Manifest, SubjectColumn, Groups, iterations=500, available.spots, seed){
@@ -219,7 +220,7 @@ olink_plate_randomizer <-function(Manifest, SubjectColumn, Groups, iterations=50
         all.plates.tmp <- assignSubject2Plate(plateMap=all.plates,
                                               manifest=Manifest,
                                               SubjectID=sub)
-        if(is_tibble(all.plates.tmp)){
+        if(tibble::is_tibble(all.plates.tmp)){
           all.plates <- all.plates.tmp
         } else if(is.character(all.plates.tmp)){
           passed <- FALSE

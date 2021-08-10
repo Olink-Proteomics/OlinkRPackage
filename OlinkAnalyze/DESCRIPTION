@@ -11,7 +11,8 @@ RoxygenNote: 7.1.1
 Suggests: 
     extrafont,
     knitr,
-    rmarkdown
+    rmarkdown,
+    scales
 License: GPL-3 | file LICENSE
 Maintainer: DS at Olink <biostattools@olink.com>
 VignetteBuilder: knitr
@@ -39,4 +40,3 @@ Imports:
     tidyselect,
     tools,
     utils
-

@@ -16,7 +16,7 @@ olink_boxplot(
 \arguments{
 \item{df}{NPX data frame in long format with at least protein name (Assay), OlinkID (unique), UniProt and at least one grouping variable.}
 
-\item{variable}{A character vector or character value indicating which column to use as the x-axis and fill grouping variable. 
+\item{variable}{A character vector or character value indicating which column to use as the x-axis and fill grouping variable.
 The first or single value is used as x-axis, the second as fill. Further values in a vector are not plotted.}
 
 \item{olinkid_list}{Character vector indicating which proteins (OlinkIDs) to plot.}
@@ -35,6 +35,9 @@ Generates faceted boxplots of NPX vs. grouping variable(s) for a given list of p
 }
 \examples{
 \donttest{
+
+library(dplyr)
+
 anova_results <- olink_anova(npx_data1, variable = "Site")
 significant_assays <- anova_results \%>\%
     filter(Threshold == 'Significant') \%>\%
@@ -44,5 +47,5 @@ olink_boxplot(npx_data1,
               olinkid_list = significant_assays,
               verbose = TRUE,
               number_of_proteins_per_plot = 3)}
-              
+
 }

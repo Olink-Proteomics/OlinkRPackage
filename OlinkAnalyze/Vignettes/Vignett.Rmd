@@ -71,7 +71,13 @@ devtools::install_github(repo = 'Olink-Proteomics/OlinkRPackage/OlinkAnalyze', b
 ## Load the library
 
 ```{r message=FALSE, warning=FALSE}
+# Load OlinkAnalyze
 library(OlinkAnalyze)
+
+# Load other libraries used in Vignette
+library(dplyr)
+library(ggplot2)
+library(stringr)
 ```
 
 ## Introduction to Olink NPX data format

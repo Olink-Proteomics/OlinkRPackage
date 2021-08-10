@@ -319,6 +319,9 @@ single_lmer <- function(data, formula_string){
 #' @export
 #' @examples
 #' \donttest{
+#'
+#' library(dplyr)
+#'
 #' lmer_results <- olink_lmer(df = npx_data1,
 #'                            variable=c("Time", 'Treatment'),
 #'                            random = c('Subject'))
@@ -337,7 +340,7 @@ single_lmer <- function(data, formula_string){
 #'                                            verbose = TRUE)}
 #' @importFrom magrittr %>%
 #' @importFrom dplyr filter group_by summarise ungroup pull distinct group_modify mutate select rename arrange
-#' @importFrom lmerTest lmer 
+#' @importFrom lmerTest lmer
 #' @importFrom stringr str_detect
 #' @importFrom emmeans emmeans
 
@@ -542,6 +545,9 @@ single_posthoc <- function(data, formula_string, effect, mean_return){
 #' @export
 #' @examples
 #' \donttest{
+#'
+#' library(dplyr)
+#'
 #' lmer_results <- olink_lmer(df = npx_data1,
 #'                            variable=c("Time", 'Treatment'),
 #'                            random = c('Subject'))

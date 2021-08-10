@@ -7,6 +7,8 @@
 #' @keywords crispy, Olink
 #' @examples
 #'
+#' library(scales)
+#'
 #' #Color matrices
 #' show_col(olink_pal()(10), labels = FALSE)
 #' show_col(olink_pal(coloroption = c('lightblue', 'green'))(2), labels = FALSE)
@@ -14,7 +16,6 @@
 #' #Contour plot
 #' filled.contour(volcano, color.palette = olink_pal(), asp = 1)
 #' filled.contour(volcano, color.palette = hue_pal(), asp = 1)
-#'
 #'
 #'
 #' @export
@@ -29,7 +30,7 @@ olink_pal <- function(alpha = 1, coloroption = NULL) {
   function(n) {
 
     alpha = alpha*255
-    
+
     red <- grDevices::col2rgb('#FE1F04')
     orange <- grDevices::col2rgb('#FF8C22')
     yellow <- grDevices::col2rgb('#FFC700')
@@ -128,6 +129,7 @@ olink_pal <- function(alpha = 1, coloroption = NULL) {
 #' @export
 #'
 #' @examples
+#' library(ggplot2)
 #'
 #' ggplot(mtcars, aes(x=wt, y=mpg, color=as.factor(cyl))) +
 #' geom_point(size = 4) +
@@ -158,6 +160,8 @@ olink_color_discrete <- function(..., alpha = 1, coloroption = NULL) {
 #'
 #' @examples
 #'
+#' library(ggplot2)
+#'
 #'dsub <- subset(diamonds, x > 5 & x < 6 & y > 5 & y < 6)
 #'dsub$diff <- with(dsub, sqrt(abs(x-y))* sign(x-y))
 #'
@@ -165,7 +169,8 @@ olink_color_discrete <- function(..., alpha = 1, coloroption = NULL) {
 #'geom_point() +
 #'  theme_bw() +
 #'  olink_color_gradient()
-#'  @importFrom ggplot2 scale_colour_gradientn
+#'
+#' @importFrom ggplot2 scale_colour_gradientn
 
 
 olink_color_gradient <- function(..., alpha = 1, coloroption = NULL) {
@@ -183,6 +188,9 @@ olink_color_gradient <- function(..., alpha = 1, coloroption = NULL) {
 #' @export
 #'
 #' @examples
+#'
+#' library(ggplot2)
+#'
 #'dsub <- subset(diamonds, x > 5 & x < 6 & y > 5 & y < 6)
 #'dsub$diff <- with(dsub, sqrt(abs(x-y))* sign(x-y))
 #'
@@ -190,7 +198,8 @@ olink_color_gradient <- function(..., alpha = 1, coloroption = NULL) {
 #'geom_point() +
 #'  theme_bw() +
 #'  olink_fill_discrete()
-#'  @importFrom ggplot2 discrete_scale
+#'
+#' @importFrom ggplot2 discrete_scale
 
 olink_fill_discrete <- function(..., alpha = 1, coloroption = NULL) {
   ggplot2::discrete_scale(aesthetics = "fill", scale_name = 'olink',
@@ -208,13 +217,17 @@ olink_fill_discrete <- function(..., alpha = 1, coloroption = NULL) {
 #' @export
 #'
 #' @examples
+#'
+#' library(ggplot2)
+#'
 #'dsub <- subset(diamonds, x > 5 & x < 6 & y > 5 & y < 6)
 #'dsub$diff <- with(dsub, sqrt(abs(x-y))* sign(x-y))
 #'ggplot(dsub, aes(x, y, colour=diff)) +
 #'geom_point() +
 #'  theme_bw() +
 #'  olink_fill_gradient()
-#'  @importFrom ggplot2 scale_fill_gradientn
+#'
+#' @importFrom ggplot2 scale_fill_gradientn
 
 olink_fill_gradient <- function(..., alpha = 1, coloroption = NULL) {
   ggplot2::scale_fill_gradientn(colors = rev(olink_pal(alpha, coloroption)(100)), ...)
