@@ -12,6 +12,7 @@ Suggests:
     extrafont,
     knitr,
     rmarkdown,
+    testthat (>= 3.0.0),
     scales
 License: GPL-3 | file LICENSE
 Maintainer: DS at Olink <biostattools@olink.com>
@@ -40,3 +41,4 @@ Imports:
     tidyselect,
     tools,
     utils
+Config/testthat/edition: 3
