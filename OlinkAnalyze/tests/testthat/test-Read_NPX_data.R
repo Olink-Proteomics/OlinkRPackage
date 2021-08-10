@@ -1,5 +1,6 @@
 test_that("Data loads correctly with 'read_NPX()'", {
-  df_1 <- read_NPX(filename = system.file("extdata", "Example_NPX_data.csv", package = "OlinkAnalyze")) # load dataset 1
+  npx_file <- system.file("extdata", "Example_NPX_Data.csv", package = "OlinkAnalyze", mustWork = T)
+  df_1 <- read_NPX(filename = npx_file) # load dataset 1
 
   expect(exists("df_1"), failure_message = "read_NPX failed on dataset 1")
   expect_s3_class(df_1, class = "tbl_df")
