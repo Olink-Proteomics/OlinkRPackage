@@ -28,6 +28,8 @@ jobs:
         with:
           r-version: ${{ matrix.config.r }}
 
+      - uses: r-lib/actions/setup-pandoc@v1
+
       - name: Query dependencies
         run: |
           install.packages('remotes')

@@ -13,7 +13,8 @@ Suggests:
     knitr,
     rmarkdown,
     testthat (>= 3.0.0),
-    scales
+    scales,
+    markdown
 License: GPL-3 | file LICENSE
 Maintainer: DS at Olink <biostattools@olink.com>
 VignetteBuilder: knitr
