@@ -34,6 +34,9 @@
 #' @export
 #' @examples
 #' \donttest{
+#'
+#' library(dplyr)
+#'
 #' npx_df <- npx_data1 %>% dplyr::filter(!grepl('control',SampleID, ignore.case = TRUE))
 #'
 #' #One-way ANOVA, no covariates.
@@ -298,6 +301,9 @@ olink_anova <- function(df,
 #' @return Tibble of posthoc tests for specicified effect, arranged by ascending adjusted p-values.
 #' @export
 #' @examples \donttest{
+#'
+#' library(dplyr)
+#'
 #' anova_results <- olink_anova(npx_data1, "Site")
 #' significant_assays <- anova_results %>%
 #' dplyr::filter(Threshold == 'Significant') %>%

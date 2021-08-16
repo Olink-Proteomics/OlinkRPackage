@@ -3,7 +3,7 @@
 #'Generates faceted boxplots of NPX vs. grouping variable(s) for a given list of proteins (OlinkIDs) using ggplot and ggplot2::geom_boxplot.
 #'
 #' @param df NPX data frame in long format with at least protein name (Assay), OlinkID (unique), UniProt and at least one grouping variable.
-#' @param variable  A character vector or character value indicating which column to use as the x-axis and fill grouping variable. 
+#' @param variable  A character vector or character value indicating which column to use as the x-axis and fill grouping variable.
 #' The first or single value is used as x-axis, the second as fill. Further values in a vector are not plotted.
 #' @param olinkid_list Character vector indicating which proteins (OlinkIDs) to plot.
 #' @param number_of_proteins_per_plot Number of boxplots to include in the facet plot (default 6).
@@ -22,6 +22,9 @@
 #' @export
 #' @examples
 #' \donttest{
+#'
+#' library(dplyr)
+#'
 #' anova_results <- olink_anova(npx_data1, variable = "Site")
 #' significant_assays <- anova_results %>%
 #'     filter(Threshold == 'Significant') %>%
@@ -31,7 +34,7 @@
 #'               olinkid_list = significant_assays,
 #'               verbose = TRUE,
 #'               number_of_proteins_per_plot = 3)}
-#'               
+#'
 
 olink_boxplot <- function(df,
                           variable,
@@ -83,20 +86,20 @@ olink_boxplot <- function(df,
                 " not found in NPX data frame!"))
 
   }
-  
+
   if (length(variable) > 2){
-    warning(paste0("Variable(s) ", 
-                   paste(setdiff(variable, variable[1:2]), collapse = ", "), 
+    warning(paste0("Variable(s) ",
+                   paste(setdiff(variable, variable[1:2]), collapse = ", "),
                    " will not be used for plotting."))
   }
-  
+
   #Setup
   x_variable <- rlang::syms(variable[1])
   if(length(variable) > 1){
     fill_variable <- rlang::syms(variable[2])
   }else{
     fill_variable <- x_variable
-  }  
+  }
 
   topX <- length(olinkid_list)
 
@@ -142,13 +145,13 @@ olink_boxplot <- function(df,
             legend.text=element_text(size=13)) +
       ggplot2::facet_wrap(~Name_OID, scales = "free")
 
-    
+
     if(length(variable) == 1){
-      boxplot <- boxplot + 
-        ggplot2::theme(axis.text.x = element_blank(), 
+      boxplot <- boxplot +
+        ggplot2::theme(axis.text.x = element_blank(),
               legend.title = element_blank())
     }
-    
+
     if(verbose){
       methods::show(boxplot)
     }

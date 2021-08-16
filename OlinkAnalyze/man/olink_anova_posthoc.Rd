@@ -47,6 +47,9 @@ mean NPX at mean(numerical variable) versus mean NPX at mean(numerical variable)
 }
 \examples{
 \donttest{
+
+library(dplyr)
+
 anova_results <- olink_anova(npx_data1, "Site")
 significant_assays <- anova_results \%>\%
 dplyr::filter(Threshold == 'Significant') \%>\%

@@ -9,7 +9,7 @@
 #' @export
 #' @examples
 #' \donttest{
-#' file <- system.file("extdata", "Example_NPX_data.csv", package = "OlinkAnalyze")
+#' file <- system.file("extdata", "Example_NPX_Data.csv", package = "OlinkAnalyze")
 #' read_NPX(file)
 #' }
 #' @importFrom magrittr %>%

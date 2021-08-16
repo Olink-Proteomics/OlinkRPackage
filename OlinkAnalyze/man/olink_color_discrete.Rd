@@ -21,6 +21,7 @@ None
 Olink color scale for discrete ggplots
 }
 \examples{
+library(ggplot2)
 
 ggplot(mtcars, aes(x=wt, y=mpg, color=as.factor(cyl))) +
 geom_point(size = 4) +
