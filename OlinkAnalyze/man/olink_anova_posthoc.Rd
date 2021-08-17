@@ -20,7 +20,7 @@ olink_anova_posthoc(
 
 \item{olinkid_list}{Character vector of OlinkID's on which to perform post hoc analysis. If not specified, all assays in df are used.}
 
-\item{variable}{Single character value or character array. 
+\item{variable}{Single character value or character array.
 Variable(s) to test. If length > 1, the included variable names will be used in crossed analyses .
 Also takes ':' notation.}
 
@@ -33,28 +33,34 @@ Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be infe
 
 \item{mean_return}{Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = T.}
 
-\item{verbose}{Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
+\item{verbose}{Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
 }
 \value{
-Tibble of posthoc tests for specicified effect, arranged by ascending adjusted p-values.
+Tibble of posthoc tests for specified effect, arranged by ascending adjusted p-values.
 }
 \description{
 Performs a post hoc ANOVA test using emmeans::emmeans with Tukey p-value adjustment per assay (by OlinkID) for each panel at confidence level 0.95.
 See \code{olink_anova} for details of input notation. \cr\cr
-The function handles both factor and numerical variables and/or covariates. 
+The function handles both factor and numerical variables and/or covariates.
 The posthoc test for a numerical variable compares the difference in means of the outcome variable (default: NPX) for 1 standard deviation difference in the numerical variable, e.g.
 mean NPX at mean(numerical variable) versus mean NPX at mean(numerical variable) + 1*SD(numerical variable).
 }
 \examples{
 \donttest{
-anova_results <- olink_anova(npx_data1, "Site")
-significant_assays <- anova_results \%>\% 
+
+#Two-way ANOVA, one main effect covariate.
+#Results in model NPX~Treatment*Time+Site.
+anova_results <- olink_anova(df = npx_df,
+                             variable=c("Treatment:Time"),
+                             covariates="Site")
+significant_assays <- anova_results \%>\%
 filter(Threshold == 'Significant') \%>\%
 pull(OlinkID)
 
-#Posthoc test for the model NPX~A*B, on the interaction effect A:B.
-anova_posthoc_results <- olink_anova_posthoc(npx_data1, 
-variable = "Site", 
+#Posthoc test for the model NPX~Treatment*Time+Site, on the effect Treatment with covariate Site.
+anova_posthoc_results <- olink_anova_posthoc(npx_data1,
+variable=c("Treatment:Time"),
+covariates="Site",
 olinkid_list = significant_assays,
-effect = "Site")}
+effect = "Treatment")}
 }
