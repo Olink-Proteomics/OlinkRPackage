@@ -37,7 +37,7 @@
 #'
 #' library(dplyr)
 #'
-#' npx_df <- npx_data1 %>% dplyr::filter(!grepl('control',SampleID, ignore.case = TRUE))
+#' npx_df <- npx_data1 %>% filter(!grepl('control',SampleID, ignore.case = TRUE))
 #'
 #' #One-way ANOVA, no covariates.
 #' #Results in a model NPX~Time
@@ -60,6 +60,7 @@
 #' @importFrom car Anova
 #' @importFrom stats IQR as.formula contr.sum lm median na.omit p.adjust sd t.test var
 #' @importFrom utils glob2rx read.table globalVariables
+
 
 olink_anova <- function(df,
                         variable,
@@ -118,7 +119,6 @@ olink_anova <- function(df,
       dplyr::filter(n == n_na) %>%
       dplyr::pull(OlinkID)
 
-
     if(length(all_nas) > 0) {
 
       warning(paste0('The assays ',
@@ -166,6 +166,7 @@ olink_anova <- function(df,
         dplyr::filter(n == n_na) %>%
         dplyr::distinct(OlinkID) %>%
         dplyr::pull(OlinkID)
+
 
       if(length(current_nas) > 0) {
 
@@ -251,6 +252,7 @@ olink_anova <- function(df,
                             data=.,
                             contrasts = sapply(fact.vars,function(x) return(contr.sum),
                                                simplify = FALSE)),type=3))) %>%
+
       dplyr::ungroup() %>%
       dplyr::filter(!term %in% c('(Intercept)','Residuals')) %>%
       dplyr::mutate(covariates = term %in% covariate_filter_string) %>%
@@ -298,26 +300,32 @@ olink_anova <- function(df,
 #' @param outcome Character. The dependent variable. Default: NPX.
 #' @param effect Term on which to perform post-hoc. Character vector. Must be subset of or identical to variable.
 #' @param mean_return Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = T.
-#' @param verbose Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
+#' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #'
-#' @return Tibble of posthoc tests for specicified effect, arranged by ascending adjusted p-values.
+#' @return Tibble of posthoc tests for specified effect, arranged by ascending adjusted p-values.
 #' @export
 #' @examples \donttest{
 #'
 #' library(dplyr)
 #'
-#' anova_results <- olink_anova(npx_data1, "Site")
+#' #Two-way ANOVA, one main effect covariate.
+#' #Results in model NPX~Treatment*Time+Site.
+#' anova_results <- olink_anova(df = npx_df,
+#'                              variable=c("Treatment:Time"),
+#'                              covariates="Site")
 #' significant_assays <- anova_results %>%
-#' dplyr::filter(Threshold == 'Significant') %>%
-#' dplyr::pull(OlinkID)
+#' filter(Threshold == 'Significant') %>%
+#' pull(OlinkID)
 #'
-#' #Posthoc test for the model NPX~A*B, on the interaction effect A:B.
+#' #Posthoc test for the model NPX~Treatment*Time+Site, on the effect Treatment with covariate Site.
 #' anova_posthoc_results <- olink_anova_posthoc(npx_data1,
-#' variable = "Site",
+#' variable=c("Treatment:Time"),
+#' covariates="Site",
 #' olinkid_list = significant_assays,
-#' effect = "Site")}
+#' effect = "Treatment")}
 #' @importFrom dplyr filter group_by ungroup pull do select arrange mutate
 #' @importFrom stringr str_detect
+
 
 olink_anova_posthoc <- function(df,
                                 olinkid_list = NULL,
