@@ -16,7 +16,7 @@ olink_anova(
 \arguments{
 \item{df}{NPX data frame in long format with at least protein name (Assay), OlinkID, UniProt, Panel and a factor with at least 3 levels.}
 
-\item{variable}{Single character value or character array. 
+\item{variable}{Single character value or character array.
 Variable(s) to test. If length > 1, the included variable names will be used in crossed analyses .
 Also takes ':'/'*' notation.}
 
@@ -30,26 +30,26 @@ Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be infe
 \item{verbose}{Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
 }
 \value{
-A tibble containing the ANOVA results for every protein. 
+A tibble containing the ANOVA results for every protein.
 The tibble is arranged by ascending p-values.
 }
 \description{
-Performs an ANOVA F-test for each assay (by OlinkID) in every panel using car::Anova and Type III sum of squares. 
+Performs an ANOVA F-test for each assay (by OlinkID) in every panel using car::Anova and Type III sum of squares.
 The function handles both factor and numerical variables and/or covariates. \cr\cr
 Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a messsage if verbose = T).
-Character columns in the input dataframe are automatically converted to factors (specified in a message if verbose = T). 
-Numerical variables are not converted to factors. 
+Character columns in the input dataframe are automatically converted to factors (specified in a message if verbose = T).
+Numerical variables are not converted to factors.
 If a numerical variable is to be used as a factor, this conversion needs to be done on the dataframe before the function call. \cr\cr
 Crossed analysis, i.e. A*B formula notation, is inferred from the variable argument in the following cases: \cr
-\itemize{ 
+\itemize{
 \item c('A','B')
-\item c('A: B') 
+\item c('A: B')
 \item c('A: B', 'B') or c('A: B', 'A')
 }
-Inference is specified in a message if verbose = T. \cr 
-For covariates, crossed analyses need to be specified explicity, i.e. two main effects will not be expaned with a c('A','B') notation. Main effects present in the variable takes precedence. 
+Inference is specified in a message if verbose = T. \cr
+For covariates, crossed analyses need to be specified explicity, i.e. two main effects will not be expaned with a c('A','B') notation. Main effects present in the variable takes precedence.
 The formula notation of the final model is specified in a message if verbose = T. \cr\cr
-Adjusted p-values are calculated by stats::p.adjust according to the Benjamini & Hochberg (1995) method (“fdr”). 
+Adjusted p-values are calculated by stats::p.adjust according to the Benjamini & Hochberg (1995) method (“fdr”).
 The threshold is determined by logic evaluation of Adjusted_pval < 0.05. Covariates are not included in the p-value adjustment.
 }
 \examples{
