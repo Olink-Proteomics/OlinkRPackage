@@ -303,7 +303,7 @@ single_lmer <- function(data, formula_string){
 #' @param random Single character value or character array.
 #' @param covariates Single character value or character array. Default: NULL.
 #' Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be inferred from main effects.
-#' @param mean_return Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = T.
+#' @param mean_return Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = T and no adjustment is performed.
 #' @param verbose Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #' @param variable Single character value or character array.
 #' Variable(s) to test. If length > 1, the included variable names will be used in crossed analyses .
@@ -479,10 +479,10 @@ single_posthoc <- function(data, formula_string, effect, mean_return){
   the_model <- emmeans::emmeans(single_lmer(data, formula_string),
                                 specs=as.formula(paste0("pairwise~", paste(effect,collapse="+"))),
                                 cov.reduce = function(x) round(c(mean(x),mean(x)+sd(x)),4),
-                                lmer.df="satterthwaite")
-  the_model <- summary(the_model,infer=c(T,T),
-                       adjust="tukey")
-
+                                lmer.df="satterthwaite",
+                                infer = c(T,T), 
+                                adjust = 'tukey')
+  
   if(mean_return){
     tmp <- unique(unlist(strsplit(effect,":")))
     return(as_tibble(the_model$emmeans) %>%
