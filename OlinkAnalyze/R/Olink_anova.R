@@ -58,6 +58,8 @@
 #' @importFrom stringr str_detect
 #' @importFrom generics tidy
 #' @importFrom car Anova
+#' @importFrom stats IQR as.formula contr.sum lm median na.omit p.adjust sd t.test var
+#' @importFrom utils glob2rx read.table globalVariables
 
 olink_anova <- function(df,
                         variable,
