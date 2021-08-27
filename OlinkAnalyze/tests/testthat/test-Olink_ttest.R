@@ -1,8 +1,8 @@
-test_that("T-test function works", {
-  #Load reference results
-  refRes_file <- system.file("extdata", "refResults.RData", package = "OlinkAnalyze", mustWork = T)
-  load(refRes_file)
+#Load reference results
+refRes_file <- '../data/refResults.RData'
+load(refRes_file)
 
+test_that("T-test function works", {
   #Run t-tests
   t.test_results <- olink_ttest(npx_data1, 'Treatment')
 
