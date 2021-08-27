@@ -27,3 +27,14 @@ test_that("olink_lmer works", {
   expect_equal(lmer_results_1, ref_results$lmer_results_1)
   expect_error(olink_lmer(npx_data1))
 })
+
+test_that("olink_lmer_posthoc works", {
+  expect_equal(lmer_results_1_posthoc, ref_results$lmer_results_1_posthoc)
+  expect_error(olink_lmer_posthoc(df = npx_data1,
+                                  variable = c('Treatment', "Time"),
+                                  random = "Subject",
+                                  olinkid_list = {lmer_results_1 %>%
+                                      dplyr::filter(term == 'Treatment:Time') %>%
+                                      dplyr::filter(Threshold == 'Significant') %>%
+                                      dplyr::pull(OlinkID)})) # no effect specified
+})
