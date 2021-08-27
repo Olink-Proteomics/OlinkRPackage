@@ -85,6 +85,14 @@ jobs:
         run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
         shell: bash
 
+      - name: Rerun of tests with detailed output
+        env:
+          _R_CHECK_CRAN_INCOMING_REMOTE_: false
+        run: |
+          testthat::test_local(path = "OlinkAnalyze", reporter = c("location","summary"))
+        shell: Rscript {0}
+
+
       - name: Upload check results
         if: failure()
         uses: actions/upload-artifact@main
