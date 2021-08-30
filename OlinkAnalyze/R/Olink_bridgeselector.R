@@ -31,20 +31,16 @@ olink_bridgeselector<-function(df, sampleMissingFreq, n, warning_string = NULL){
                              dplyr::distinct() %>%
                              dplyr::arrange(QC_Warning))$QC_Warning
 
-    if (length(QC_Warning_strings) == 2) {
-      warning_string <- QC_Warning_strings[2]
-
-      if (!grepl('W', warning_string, fixed=TRUE)) {
-        stop('Could not identify the string used to indicate a flagged sample. Please specify it with the optional argument warning_string. Most commonly it is either "Warning" or "WARN".')
-      }
-    } else {
-      if (length(QC_Warning_strings) == 1 && grepl('P', QC_Warning_strings[1], fixed=TRUE)) {
-        warning_string <- 'Warning'
-      } else {
-        stop('Could not identify the string used to indicate a flagged sample. Please specify it with the optional argument warning_string. Most commonly it is either "Warning" or "WARN".')
-      }
+    if (length(stringr::str_subset(QC_Warning_strings,'W')) == 1) {
+      warning_string <- stringr::str_subset(QC_Warning_strings,'W')}
+    else {
+      stop('Could not identify the string used to indicate a flagged sample.
+             Please specify it with the optional argument warning_string.
+             Most commonly it is either "Warning" or "WARN".')
     }
   }
+
+  warning_string_withFail <- c(warning_string, 'FAIL')
 
   #Filtering on valid OlinkID
   df <- df %>%
@@ -80,7 +76,7 @@ olink_bridgeselector<-function(df, sampleMissingFreq, n, warning_string = NULL){
     dplyr::left_join(qc_outliers, by = c('SampleID', 'Index', 'Panel')) %>%
     dplyr::mutate(NPX = ifelse(NPX <= LOD, NA, NPX)) %>%
     dplyr::group_by(SampleID) %>%
-    dplyr::mutate(Warnings = sum(QC_Warning == "Warning")) %>%
+    dplyr::mutate(Warnings = sum(QC_Warning %in% c(warning_string_withFail))) %>%
     dplyr::filter(Warnings == 0) %>%
     dplyr::mutate(Outliers = sum(Outlier)) %>%
     dplyr::filter(Outliers == 0) %>%

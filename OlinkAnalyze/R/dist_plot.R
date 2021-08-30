@@ -11,7 +11,7 @@
 #' @examples \donttest{olink_dist_plot(npx_data1, color_g = "QC_Warning")}
 #' @importFrom dplyr filter mutate group_by ungroup
 #' @importFrom stats reorder
-#' @importFrom ggplot2 ggplot aes scale_x_discrete geom_boxplot xlab facet_wrap 
+#' @importFrom ggplot2 ggplot aes scale_x_discrete geom_boxplot xlab facet_wrap
 #' @importFrom stringr str_replace
 #' @importFrom magrittr %>%
 #' @importFrom rlang ensym
@@ -64,7 +64,15 @@ olink_dist_plot <- function(df, color_g = 'QC_Warning', ...) {
              stringr::str_replace("Target 96 ", "") %>%
              stringr::str_replace("Target 48 ", "")) %>%
     dplyr::group_by(SampleID, Index, Panel) %>%
-    dplyr::mutate(QC_Warning = if_else(any(QC_Warning == "Warning"|QC_Warning == "WARN" ), "Warning", "Pass"))%>%
+    dplyr::mutate(QC_Warning = if_else(QC_Warning == "WARN",
+                                       "Warning",
+                                       QC_Warning)) %>%
+    dplyr::mutate(QC_Warning = if_else(QC_Warning == "PASS",
+                                       "Pass",
+                                       QC_Warning)) %>%
+    dplyr::mutate(QC_Warning = if_else(QC_Warning == "FAIL",
+                                       "Fail",
+                                       QC_Warning)) %>%
     dplyr::ungroup()
 
   df_OlinkID_fixed %>%
