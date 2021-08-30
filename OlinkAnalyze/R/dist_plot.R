@@ -64,13 +64,13 @@ olink_dist_plot <- function(df, color_g = 'QC_Warning', ...) {
              stringr::str_replace("Target 96 ", "") %>%
              stringr::str_replace("Target 48 ", "")) %>%
     dplyr::group_by(SampleID, Index, Panel) %>%
-    dplyr::mutate(QC_Warning = if_else(QC_Warning == "WARN",
+    dplyr::mutate(QC_Warning = dplyr::if_else(QC_Warning == "WARN",
                                        "Warning",
                                        QC_Warning)) %>%
-    dplyr::mutate(QC_Warning = if_else(QC_Warning == "PASS",
+    dplyr::mutate(QC_Warning = dplyr::if_else(QC_Warning == "PASS",
                                        "Pass",
                                        QC_Warning)) %>%
-    dplyr::mutate(QC_Warning = if_else(QC_Warning == "FAIL",
+    dplyr::mutate(QC_Warning = dplyr::if_else(QC_Warning == "FAIL",
                                        "Fail",
                                        QC_Warning)) %>%
     dplyr::ungroup()
