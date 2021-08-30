@@ -29,20 +29,16 @@ olink_bridgeselector<-function(df, sampleMissingFreq, n, warning_string = NULL){
                              distinct() %>%
                              arrange(QC_Warning))$QC_Warning
 
-    if (length(QC_Warning_strings) == 2) {
-      warning_string <- QC_Warning_strings[2]
-
-      if (!grepl('W', warning_string, fixed=TRUE)) {
-        stop('Could not identify the string used to indicate a flagged sample. Please specify it with the optional argument warning_string. Most commonly it is either "Warning" or "WARN".')
-      }
-    } else {
-      if (length(QC_Warning_strings) == 1 && grepl('P', QC_Warning_strings[1], fixed=TRUE)) {
-        warning_string <- 'Warning'
-      } else {
-        stop('Could not identify the string used to indicate a flagged sample. Please specify it with the optional argument warning_string. Most commonly it is either "Warning" or "WARN".')
-      }
+    if (length(stringr::str_subset(QC_Warning_strings,'W')) == 1) {
+      warning_string <- stringr::str_subset(QC_Warning_strings,'W')}
+    else {
+      stop('Could not identify the string used to indicate a flagged sample.
+             Please specify it with the optional argument warning_string.
+             Most commonly it is either "Warning" or "WARN".')
     }
   }
+
+  warning_string_withFail <- c(warning_string, 'FAIL')
 
   #Filtering on valid OlinkID
   df <- df %>%
@@ -75,17 +71,17 @@ olink_bridgeselector<-function(df, sampleMissingFreq, n, warning_string = NULL){
     select(SampleID, Index, Panel, Outlier)
 
   df_1 <- df %>%
-    left_join(qc_outliers, by = c('SampleID', 'Index', 'Panel')) %>%
-    mutate(NPX = ifelse(NPX <= LOD, NA, NPX)) %>%
-    group_by(SampleID) %>%
-    mutate(Warnings = sum(QC_Warning == "Warning")) %>%
-    filter(Warnings == 0) %>%
-    mutate(Outliers = sum(Outlier)) %>%
-    filter(Outliers == 0) %>%
-    mutate(PercAssaysBelowLOD = sum(is.na(NPX))/n()) %>%
-    mutate(MeanNPX = mean(NPX, na.rm = T)) %>%
-    ungroup() %>%
-    filter(PercAssaysBelowLOD < sampleMissingFreq)
+    dplyr::left_join(qc_outliers, by = c('SampleID', 'Index', 'Panel')) %>%
+    dplyr::mutate(NPX = ifelse(NPX <= LOD, NA, NPX)) %>%
+    dplyr::group_by(SampleID) %>%
+    dplyr::mutate(Warnings = sum(QC_Warning %in% c(warning_string_withFail))) %>%
+    dplyr::filter(Warnings == 0) %>%
+    dplyr::mutate(Outliers = sum(Outlier)) %>%
+    dplyr::filter(Outliers == 0) %>%
+    dplyr::mutate(PercAssaysBelowLOD = sum(is.na(NPX))/dplyr::n()) %>%
+    dplyr::mutate(MeanNPX = mean(NPX, na.rm = T)) %>%
+    dplyr::ungroup() %>%
+    dplyr::filter(PercAssaysBelowLOD < sampleMissingFreq)
 
   df_2 <- df_1 %>%
     select(SampleID, PercAssaysBelowLOD, MeanNPX) %>%
