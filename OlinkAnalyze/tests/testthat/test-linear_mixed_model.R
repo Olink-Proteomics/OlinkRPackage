@@ -23,6 +23,18 @@ lmer_results_1_posthoc <- olink_lmer_posthoc(df = npx_data1,
   arrange(id, contrast) %>%
   select(-id)
 
+#Run olink_lmer_plot
+lmer_plot <- olink_lmer_plot(df = npx_data1,
+                             variable = c('Treatment', 'Time'),
+                             random = "Subject",
+                             olinkid_list = {ref_results$lmer_results_1 %>%
+                                 dplyr::filter(term == 'Treatment:Time' & Threshold == 'Significant') %>%
+                                 head(6) %>%
+                                 dplyr::pull(OlinkID)},
+                             x_axis_variable = "Time",
+                             col_variable = "Treatment")
+
+
 test_that("olink_lmer works", {
   expect_equal(lmer_results_1, ref_results$lmer_results_1)
   expect_error(olink_lmer(npx_data1))
@@ -37,4 +49,8 @@ test_that("olink_lmer_posthoc works", {
                                       dplyr::filter(term == 'Treatment:Time') %>%
                                       dplyr::filter(Threshold == 'Significant') %>%
                                       dplyr::pull(OlinkID)})) # no effect specified
+})
+
+test_that("olink_lmer_plot works", {
+  vdiffr::expect_doppelganger('lmer plot', lmer_plot)
 })
