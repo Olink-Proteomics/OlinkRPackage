@@ -16,7 +16,7 @@
 #' @importFrom tools file_ext
 #' @importFrom dplyr as_tibble distinct pull filter bind_cols mutate left_join select rename matches bind_rows
 #' @importFrom readxl read_excel
-#' @importFrom stringr str_detect str_replace_all
+#' @importFrom stringr str_detect str_replace_all str_to_upper
 #' @importFrom tidyr tibble gather
 
 
@@ -302,6 +302,11 @@ read_NPX <- function(filename){
     dplyr::mutate(Panel_Version = gsub(".*\\(","",Panel)) %>%
     dplyr::mutate(Panel_Version = gsub("\\)","",Panel_Version)) %>%
     dplyr::mutate(Panel =  gsub("\\(.*\\)","",Panel)) %>%
+    dplyr::mutate(Panel = stringr::str_to_upper(Panel)) %>% 
+    dplyr::mutate(Panel = gsub("TARGET 96", "", Panel)) %>% 
+    dplyr::mutate(Panel = gsub("OLINK", "", Panel)) %>% 
+    dplyr::mutate(Panel = trimws(Panel, which = "left")) %>% 
+    mutate(Panel = paste("Olink",Panel)) %>%
     dplyr::select(SampleID, Index, OlinkID,
                   UniProt, Assay, MissingFreq,
                   Panel,Panel_Version,PlateID,
