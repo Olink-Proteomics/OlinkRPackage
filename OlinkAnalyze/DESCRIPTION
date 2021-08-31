@@ -14,7 +14,8 @@ Suggests:
     rmarkdown,
     testthat (>= 3.0.0),
     scales,
-    markdown
+    markdown,
+    vdiffr
 License: GPL-3 | file LICENSE
 Maintainer: DS at Olink <biostattools@olink.com>
 VignetteBuilder: knitr
