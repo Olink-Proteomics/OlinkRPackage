@@ -52,16 +52,22 @@ library(dplyr)
 
 npx_df <- npx_data1 \%>\% filter(!grepl('control',SampleID, ignore.case = TRUE))
 
-#Two-way ANOVA, one main effect covariate.
+#Two-way ANOVA, one main effect (Site) covariate.
 #Results in model NPX~Treatment*Time+Site.
 anova_results <- olink_anova(df = npx_df,
                              variable=c("Treatment:Time"),
                              covariates="Site")
-significant_assays <- anova_results \%>\%
-filter(Threshold == 'Significant') \%>\%
-pull(OlinkID)
 
-#Posthoc test for the model NPX~Treatment*Time+Site, on the effect Treatment with covariate Site.
+Posthoc test for the model NPX~Treatment*Time+Site, on the effect Treatment with covariate Site.
+
+#Filtering out of significant and relevant results.
+significant_assays <- anova_results \%>\%
+filter(Threshold == 'Significant' & term == 'Treatment') \%>\%
+select(OlinkID) \%>\%
+distinct() \%>\%
+pull()
+
+#Posthoc
 anova_posthoc_results <- olink_anova_posthoc(npx_df,
 variable=c("Treatment:Time"),
 covariates="Site",
