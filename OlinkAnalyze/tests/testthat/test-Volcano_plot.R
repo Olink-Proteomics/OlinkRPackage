@@ -2,6 +2,7 @@
 refRes_file <- '../data/refResults.RData'
 load(refRes_file)
 
+set.seed(10) #There's some randomness to how the labels are placed on the plot => failed test. Setting the seed should avoid this
 volcano_plot <- olink_volcano_plot(ref_results$ttestresults,
                                    olinkid_list = {ref_results$ttestresults %>%
                                        head(10) %>%
