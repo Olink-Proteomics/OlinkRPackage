@@ -34,6 +34,15 @@ lmer_plot <- olink_lmer_plot(df = npx_data1,
                              x_axis_variable = "Time",
                              col_variable = "Treatment")
 
+lmer_plot_moreProts <- olink_lmer_plot(df = npx_data1,
+                                       variable = c('Treatment', 'Time'),
+                                       random = "Subject",
+                                       olinkid_list = {ref_results$lmer_results_1 %>%
+                                           dplyr::filter(term == 'Treatment:Time' & Threshold == 'Significant') %>%
+                                           head(10) %>%
+                                           dplyr::pull(OlinkID)},
+                                       x_axis_variable = "Time",
+                                       col_variable = "Treatment", number_of_proteins_per_plot = 5)
 
 test_that("olink_lmer works", {
   expect_equal(lmer_results_1, ref_results$lmer_results_1)
@@ -53,4 +62,5 @@ test_that("olink_lmer_posthoc works", {
 
 test_that("olink_lmer_plot works", {
   vdiffr::expect_doppelganger('lmer plot', lmer_plot)
+  vdiffr::expect_doppelganger('lmer plot more prots than space', lmer_plot_moreProts[[2]])
 })
