@@ -307,6 +307,8 @@ olink_anova <- function(df,
 #' @examples \donttest{
 #'
 #' library(dplyr)
+#' 
+#' npx_df <- npx_data1 %>% filter(!grepl('control',SampleID, ignore.case = TRUE))
 #'
 #' #Two-way ANOVA, one main effect covariate.
 #' #Results in model NPX~Treatment*Time+Site.
@@ -318,7 +320,7 @@ olink_anova <- function(df,
 #' pull(OlinkID)
 #'
 #' #Posthoc test for the model NPX~Treatment*Time+Site, on the effect Treatment with covariate Site.
-#' anova_posthoc_results <- olink_anova_posthoc(npx_data1,
+#' anova_posthoc_results <- olink_anova_posthoc(npx_df,
 #' variable=c("Treatment:Time"),
 #' covariates="Site",
 #' olinkid_list = significant_assays,
