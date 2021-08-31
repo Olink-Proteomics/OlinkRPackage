@@ -316,7 +316,8 @@ olink_anova <- function(df,
 #'                              variable=c("Treatment:Time"),
 #'                              covariates="Site")
 #'
-#' Posthoc test for the model NPX~Treatment*Time+Site, on the interaction effect Treatment:Time with covariate Site.
+#' Posthoc test for the model NPX~Treatment*Time+Site, 
+#' on the interaction effect Treatment:Time with covariate Site.
 #'
 #' #Filtering out significant and relevant results.
 #' significant_assays <- anova_results %>%
