@@ -16,8 +16,8 @@
 #' @importFrom tools file_ext
 #' @importFrom dplyr as_tibble distinct pull filter bind_cols mutate left_join select rename matches bind_rows
 #' @importFrom readxl read_excel
-#' @importFrom stringr str_detect str_replace_all str_to_upper
-#' @importFrom tidyr tibble gather
+#' @importFrom stringr str_detect str_replace_all str_to_upper str_to_title
+#' @importFrom tidyr tibble gather separate
 
 
 read_NPX <- function(filename){
@@ -302,11 +302,16 @@ read_NPX <- function(filename){
     dplyr::mutate(Panel_Version = gsub(".*\\(","",Panel)) %>%
     dplyr::mutate(Panel_Version = gsub("\\)","",Panel_Version)) %>%
     dplyr::mutate(Panel =  gsub("\\(.*\\)","",Panel)) %>%
-    dplyr::mutate(Panel = stringr::str_to_upper(Panel)) %>% 
-    dplyr::mutate(Panel = gsub("TARGET 96", "", Panel)) %>% 
-    dplyr::mutate(Panel = gsub("OLINK", "", Panel)) %>% 
+    dplyr::mutate(Panel = stringr::str_to_title(Panel)) %>% 
+    dplyr::mutate(Panel = gsub("Target 96", "", Panel)) %>% 
+    dplyr::mutate(Panel = gsub("Olink", "", Panel)) %>% 
     dplyr::mutate(Panel = trimws(Panel, which = "left")) %>% 
-    mutate(Panel = paste("Olink",Panel)) %>%
+    tidyr::separate(Panel, " ", into = c("Panel_Start", "Panel_End"), fill = "right") %>% 
+    dplyr::mutate(Panel_End = ifelse(grepl("Ii", Panel_End), stringr::str_to_upper(Panel_End), Panel_End)) %>%
+    dplyr::mutate(Panel_End = ifelse(is.na(Panel_End), " ", Panel_End)) %>% 
+    dplyr::mutate(Panel = paste("Olink", Panel_Start, Panel_End)) %>% 
+    dplyr::mutate(Panel = trimws(Panel, which = "right")) %>% 
+    dplyr::select(-Panel_Start, -Panel_End) %>% 
     dplyr::select(SampleID, Index, OlinkID,
                   UniProt, Assay, MissingFreq,
                   Panel,Panel_Version,PlateID,
