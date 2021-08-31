@@ -58,11 +58,11 @@ anova_results <- olink_anova(df = npx_df,
                              variable=c("Treatment:Time"),
                              covariates="Site")
 
-Posthoc test for the model NPX~Treatment*Time+Site, on the effect Treatment with covariate Site.
+Posthoc test for the model NPX~Treatment*Time+Site, on the interaction effect Treatment:Time with covariate Site.
 
-#Filtering out of significant and relevant results.
+#Filtering out significant and relevant results.
 significant_assays <- anova_results \%>\%
-filter(Threshold == 'Significant' & term == 'Treatment') \%>\%
+filter(Threshold == 'Significant' & term == 'Treatment:Time') \%>\%
 select(OlinkID) \%>\%
 distinct() \%>\%
 pull()
@@ -72,5 +72,5 @@ anova_posthoc_results <- olink_anova_posthoc(npx_df,
 variable=c("Treatment:Time"),
 covariates="Site",
 olinkid_list = significant_assays,
-effect = "Treatment")}
+effect = "Treatment:Time")}
 }
