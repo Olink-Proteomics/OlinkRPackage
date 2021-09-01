@@ -31,12 +31,12 @@ Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be infe
 
 \item{effect}{Term on which to perform post-hoc. Character vector. Must be subset of or identical to variable.}
 
-\item{mean_return}{Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = T.}
+\item{mean_return}{Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = T and no adjustment is performed.}
 
-\item{verbose}{Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
+\item{verbose}{Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
 }
 \value{
-Tibble of posthoc tests for specicified effect, arranged by ascending adjusted p-values.
+Tibble of posthoc tests for specified effect, arranged by ascending adjusted p-values.
 }
 \description{
 Performs a post hoc ANOVA test using emmeans::emmeans with Tukey p-value adjustment per assay (by OlinkID) for each panel at confidence level 0.95.
@@ -50,14 +50,28 @@ mean NPX at mean(numerical variable) versus mean NPX at mean(numerical variable)
 
 library(dplyr)
 
-anova_results <- olink_anova(npx_data1, "Site")
-significant_assays <- anova_results \%>\%
-dplyr::filter(Threshold == 'Significant') \%>\%
-dplyr::pull(OlinkID)
+npx_df <- npx_data1 \%>\% filter(!grepl('control',SampleID, ignore.case = TRUE))
 
-#Posthoc test for the model NPX~A*B, on the interaction effect A:B.
-anova_posthoc_results <- olink_anova_posthoc(npx_data1,
-variable = "Site",
+#Two-way ANOVA, one main effect (Site) covariate.
+#Results in model NPX~Treatment*Time+Site.
+anova_results <- olink_anova(df = npx_df,
+                             variable=c("Treatment:Time"),
+                             covariates="Site")
+
+#Posthoc test for the model NPX~Treatment*Time+Site, 
+#on the interaction effect Treatment:Time with covariate Site.
+
+#Filtering out significant and relevant results.
+significant_assays <- anova_results \%>\%
+filter(Threshold == 'Significant' & term == 'Treatment:Time') \%>\%
+select(OlinkID) \%>\%
+distinct() \%>\%
+pull()
+
+#Posthoc
+anova_posthoc_results <- olink_anova_posthoc(npx_df,
+variable=c("Treatment:Time"),
+covariates="Site",
 olinkid_list = significant_assays,
-effect = "Site")}
+effect = "Treatment:Time")}
 }

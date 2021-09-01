@@ -37,7 +37,7 @@
 #'
 #' library(dplyr)
 #'
-#' npx_df <- npx_data1 %>% dplyr::filter(!grepl('control',SampleID, ignore.case = TRUE))
+#' npx_df <- npx_data1 %>% filter(!grepl('control',SampleID, ignore.case = TRUE))
 #'
 #' #One-way ANOVA, no covariates.
 #' #Results in a model NPX~Time
@@ -60,6 +60,7 @@
 #' @importFrom car Anova
 #' @importFrom stats IQR as.formula contr.sum lm median na.omit p.adjust sd t.test var
 #' @importFrom utils glob2rx read.table globalVariables
+
 
 olink_anova <- function(df,
                         variable,
@@ -118,7 +119,6 @@ olink_anova <- function(df,
       dplyr::filter(n == n_na) %>%
       dplyr::pull(OlinkID)
 
-
     if(length(all_nas) > 0) {
 
       warning(paste0('The assays ',
@@ -166,6 +166,7 @@ olink_anova <- function(df,
         dplyr::filter(n == n_na) %>%
         dplyr::distinct(OlinkID) %>%
         dplyr::pull(OlinkID)
+
 
       if(length(current_nas) > 0) {
 
@@ -247,10 +248,11 @@ olink_anova <- function(df,
       dplyr::filter(!(OlinkID %in% all_nas)) %>%
       dplyr::filter(!(OlinkID %in% nas_in_var)) %>%
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
-      dplyr::do(generics::tidy(car::Anova(lm(as.formula(formula_string),
+      dplyr::do(generics::tidy(car::Anova(stats::lm(as.formula(formula_string),
                             data=.,
                             contrasts = sapply(fact.vars,function(x) return(contr.sum),
                                                simplify = FALSE)),type=3))) %>%
+
       dplyr::ungroup() %>%
       dplyr::filter(!term %in% c('(Intercept)','Residuals')) %>%
       dplyr::mutate(covariates = term %in% covariate_filter_string) %>%
@@ -297,27 +299,42 @@ olink_anova <- function(df,
 #' Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be inferred from main effects.
 #' @param outcome Character. The dependent variable. Default: NPX.
 #' @param effect Term on which to perform post-hoc. Character vector. Must be subset of or identical to variable.
-#' @param mean_return Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = T.
-#' @param verbose Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
+#' @param mean_return Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = T and no adjustment is performed.
+#' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #'
-#' @return Tibble of posthoc tests for specicified effect, arranged by ascending adjusted p-values.
+#' @return Tibble of posthoc tests for specified effect, arranged by ascending adjusted p-values.
 #' @export
 #' @examples \donttest{
 #'
 #' library(dplyr)
+#' 
+#' npx_df <- npx_data1 %>% filter(!grepl('control',SampleID, ignore.case = TRUE))
 #'
-#' anova_results <- olink_anova(npx_data1, "Site")
+#' #Two-way ANOVA, one main effect (Site) covariate.
+#' #Results in model NPX~Treatment*Time+Site.
+#' anova_results <- olink_anova(df = npx_df,
+#'                              variable=c("Treatment:Time"),
+#'                              covariates="Site")
+#'
+#' #Posthoc test for the model NPX~Treatment*Time+Site, 
+#' #on the interaction effect Treatment:Time with covariate Site.
+#'
+#' #Filtering out significant and relevant results.
 #' significant_assays <- anova_results %>%
-#' dplyr::filter(Threshold == 'Significant') %>%
-#' dplyr::pull(OlinkID)
-#'
-#' #Posthoc test for the model NPX~A*B, on the interaction effect A:B.
-#' anova_posthoc_results <- olink_anova_posthoc(npx_data1,
-#' variable = "Site",
+#' filter(Threshold == 'Significant' & term == 'Treatment:Time') %>%
+#' select(OlinkID) %>%
+#' distinct() %>%
+#' pull()
+#' 
+#' #Posthoc
+#' anova_posthoc_results <- olink_anova_posthoc(npx_df,
+#' variable=c("Treatment:Time"),
+#' covariates="Site",
 #' olinkid_list = significant_assays,
-#' effect = "Site")}
+#' effect = "Treatment:Time")}
 #' @importFrom dplyr filter group_by ungroup pull do select arrange mutate
 #' @importFrom stringr str_detect
+
 
 olink_anova_posthoc <- function(df,
                                 olinkid_list = NULL,
@@ -430,15 +447,13 @@ olink_anova_posthoc <- function(df,
       message(paste("Means estimated for each assay from ANOVA model: ",formula_string))
     }
 
-
-
     anova_posthoc_results <- df %>%
       dplyr::filter(OlinkID %in% olinkid_list) %>%
       dplyr::mutate(OlinkID = factor(OlinkID, levels = olinkid_list)) %>%
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
-      dplyr::do(data.frame(summary(emmeans::emmeans(lm(as.formula(formula_string),data=.),
+      dplyr::do(data.frame(emmeans::emmeans(stats::lm(as.formula(formula_string),data=.),
                                     specs=as.formula(paste0("pairwise~", paste(effect,collapse="+"))),
-                                    cov.reduce = function(x) round(c(mean(x),mean(x)+sd(x)),4)),
+                                    cov.reduce = function(x) round(c(mean(x),mean(x)+sd(x)),4),
                             infer=c(T,T),
                             adjust="tukey")[[c("contrasts","emmeans")[1+as.numeric(mean_return)]]],
                     stringsAsFactors=F)) %>%
