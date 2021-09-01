@@ -6,6 +6,7 @@
 \usage{
 olink_plate_randomizer(
   Manifest,
+  PlateSize = 96,
   SubjectColumn,
   Groups,
   iterations = 500,
@@ -16,13 +17,15 @@ olink_plate_randomizer(
 \arguments{
 \item{Manifest}{tibble/data frame in long format containing all sample ID's. Sample ID column must be named SampleID.}
 
+\item{PlateSize}{Integer. Either 96 or 48. 96 is default.}
+
 \item{SubjectColumn}{(Optional) Column name of the subject ID column. Cannot contain missings. If provided, subjects are kept on the same plate.}
 
 \item{Groups}{(Optional) NO LONGER IMPLEMENTED. Vector of column names for variables to be balanced across plates.}
 
 \item{iterations}{Number of iterations for fitting subjects on the same plate.}
 
-\item{available.spots}{Default is 88. Number of wells available on each plate. Can also take a vector equal to the number of plates to be used indicating the number of wells available on each plate.}
+\item{available.spots}{Integer. Number of wells available on each plate. Maximum 40 for T48 and 88 for T96. Can also take a vector equal to the number of plates to be used indicating the number of wells available on each plate.}
 
 \item{seed}{Seed to set. Highly recommend setting this for reproducibility.}
 }
