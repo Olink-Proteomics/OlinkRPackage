@@ -286,6 +286,6 @@
 <circle cx='652.26' cy='310.89' r='4.12' style='stroke-width: 1.42; stroke: #FE1F04; fill: #FE1F04;' />
 <text x='666.88' y='296.91' style='font-size: 9.60px; fill: #737373; font-family: sans;' textLength='33.09px' lengthAdjust='spacingAndGlyphs'>Treated</text>
 <text x='666.88' y='314.19' style='font-size: 9.60px; fill: #737373; font-family: sans;' textLength='42.16px' lengthAdjust='spacingAndGlyphs'>Untreated</text>
-<text x='34.58' y='15.39' style='font-size: 14.40px; fill: #737373; font-family: sans;' textLength='214.53px' lengthAdjust='spacingAndGlyphs'>lmer plot _ more prots than space</text>
+<text x='34.58' y='15.39' style='font-size: 14.40px; fill: #737373; font-family: sans;' textLength='202.52px' lengthAdjust='spacingAndGlyphs'>lmer plot more prots than space</text>
 </g>
 </svg>
