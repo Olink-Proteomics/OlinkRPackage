@@ -291,6 +291,12 @@ olink_pca_plot <- function (df,
     as.matrix
 
   pca_fit <- stats::prcomp(df_wide_matrix, scale. = TRUE, center = TRUE)
+  #Sort by sample name
+  pca_fit$x <- pca_fit$x %>%
+    as.data.frame() %>%
+    tibble::rownames_to_column() %>%
+    arrange(rowname) %>%
+    tibble::column_to_rownames()
 
   #Standardizing and selecting components
 
