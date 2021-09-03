@@ -9,5 +9,6 @@ volcano_plot <- olink_volcano_plot(ref_results$ttestresults,
                                        dplyr::pull(OlinkID)})
 
 test_that("olink_volcano_plot works", {
+  skip_on_ci()
   vdiffr::expect_doppelganger('volcano plot', volcano_plot)
 })
