@@ -20,7 +20,7 @@ anova_results_1_siteTime <- olink_anova(npx_data1, c('Site', 'Time')) %>%
 #### anova posthoc ####
 anova_posthoc_1_site <- olink_anova_posthoc(npx_data1,
                                             variable = 'Site',
-                                            olinkid_list =  {ref_results$anova_results_1_site %>%
+                                            olinkid_list =  {anova_results_1_site %>%
                                                 dplyr::filter(Threshold == 'Significant') %>%
                                                 dplyr::pull(OlinkID)},
                                             effect = 'Site') %>%
@@ -29,7 +29,7 @@ anova_posthoc_1_site <- olink_anova_posthoc(npx_data1,
   select(-id)
 anova_posthoc_1_time <- olink_anova_posthoc(npx_data1,
                                             variable = 'Time',
-                                            {ref_results$anova_results_1_time %>%
+                                            {anova_results_1_time %>%
                                                 dplyr::filter(Threshold == 'Significant') %>%
                                                 dplyr::pull(OlinkID)},
                                             effect = 'Time') %>%
@@ -58,6 +58,42 @@ lmer_results_1_posthoc <- olink_lmer_posthoc(df = npx_data1,
   arrange(id, contrast) %>%
   select(-id)
 
+#### olink_normalization ####
+# Output this subset of samples to reduce the file size
+sampleSubset <- c("A6", "A38","B47","B22","A43","D75","D79","C66","B43","B70","D52","A58","B71","A50","D1", "B8")
+
+# Bridging normalization
+overlap_samples <- intersect(npx_data1$SampleID, npx_data2$SampleID) %>%
+  data.frame() %>%
+  filter(!str_detect(., 'CONTROL_SAMPLE')) %>% #Remove control samples
+  pull(.)
+normalization_results.bridged <- olink_normalization(df1 = npx_data1,
+                                                     df2 = npx_data2,
+                                                     overlapping_samples_df1 = overlap_samples,
+                                                     df1_project_nr = '20200001',
+                                                     df2_project_nr = '20200002',
+                                                     reference_project = '20200001') %>%
+  filter(SampleID %in% sampleSubset)
+
+# Intensity normalization
+normalization_results.intensity <- olink_normalization(df1 = npx_data1,
+                                                       df2 = npx_data2,
+                                                       overlapping_samples_df1 = npx_data1$SampleID,
+                                                       overlapping_samples_df2 = npx_data2$SampleID) %>%
+  filter(SampleID %in% sampleSubset)
+
+# Subset normalization
+#NOTE: this subset is just a random sample in order to test the function
+sampleSubset.adj <- c("C6", "C21","C28","C50","C19","D5", "A30","C52","D77","D3", "D16","C72","A52","D67","C77","C22","D62","D39","C34","C13")
+normalization_results.subset <- olink_normalization(df1 = npx_data1,
+                                                    df2 = npx_data2,
+                                                    overlapping_samples_df1 = npx_data1$SampleID,
+                                                    overlapping_samples_df2 = sampleSubset.adj,
+                                                    df1_project_nr = '20200001',
+                                                    df2_project_nr = '20200002',
+                                                    reference_project = '20200001') %>%
+  filter(SampleID %in% sampleSubset)
+
 #### Wrap up the results ####
 ref_results <- list(ttestresults = t.test_results,
                     anova_results_1_site = anova_results_1_site,
@@ -66,6 +102,9 @@ ref_results <- list(ttestresults = t.test_results,
                     anova_posthoc_1_site = anova_posthoc_1_site,
                     anova_posthoc_1_time = anova_posthoc_1_time,
                     lmer_results_1 = lmer_results_1,
-                    lmer_results_1_posthoc = lmer_results_1_posthoc)
+                    lmer_results_1_posthoc = lmer_results_1_posthoc,
+                    normalization_results.bridged = normalization_results.bridged,
+                    normalization_results.intensity = normalization_results.intensity,
+                    normalization_results.subset = normalization_results.subset)
 save(ref_results, file = 'refResults.RData')
 
