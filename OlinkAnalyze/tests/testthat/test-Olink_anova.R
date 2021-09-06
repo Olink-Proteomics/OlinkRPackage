@@ -25,7 +25,10 @@ anova_posthoc_1_site <- olink_anova_posthoc(npx_data1,
                                             effect = 'Site') %>%
   mutate(id = as.character(OlinkID)) %>%
   arrange(id, contrast) %>% #Since OlinkID is not unique here (=> ties), contrast is used to break the ties
+  mutate(contrast = as.character(contrast)) %>% # In R 3.6.1 we get factors, but reference is characters
   select(-id)
+
+
 anova_posthoc_1_time <- olink_anova_posthoc(npx_data1,
                                             variable = 'Time',
                                             {anova_results_1_time %>%
@@ -34,6 +37,7 @@ anova_posthoc_1_time <- olink_anova_posthoc(npx_data1,
                                             effect = 'Time') %>%
   mutate(id = as.character(OlinkID)) %>%
   arrange(id, contrast) %>% #Just for consistency. Not actually needed in this case
+  mutate(contrast = as.character(contrast)) %>% # In R 3.6.1 we get factors, but reference is characters
   select(-id)
 
 test_that("olink_anova function works", {
