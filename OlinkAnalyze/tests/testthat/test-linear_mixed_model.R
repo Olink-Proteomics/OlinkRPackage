@@ -21,6 +21,7 @@ lmer_results_1_posthoc <- olink_lmer_posthoc(df = npx_data1,
                                              effect = c('Treatment', "Time")) %>%
   mutate(id = as.character(OlinkID)) %>%
   arrange(id, contrast) %>%
+  mutate(contrast = as.character(contrast)) %>% # In R 3.6.1 we get factors, but reference is characters
   select(-id)
 
 #Run olink_lmer_plot
