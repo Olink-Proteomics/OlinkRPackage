@@ -11,9 +11,9 @@ knitr::opts_chunk$set(
   out.width = "100%"
 )
 ```
+[![R-CMD-check](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/R-CMD-check.yaml)
 
-
-# OlinkAnalyze <img src="OlinkAnalyze/man/figures/OlinkAnalyze_target_hexagon.png" align="right" width="120" />
+# OlinkAnalyze <img src="figures/OlinkAnalyze_target_hexagon.png" align="right" width="120" />
 
 The goal of OlinkAnalyze is to provide a versatile toolbox to enable easy and smooth handling of Olink NPX data to speed up your proteomic research. OlinkAnalyze provides functions ranging from reading Olink NPX data as exported by NPX Manager to various statistical tests and modelling, via different QC plot functions. Thereby providing a convenient pipeline for your Olink NPX data analysis.
 
@@ -46,7 +46,7 @@ olink_dist_plot(npx_data1 %>% filter(Panel == 'Olink CARDIOMETABOLIC')) +
   scale_fill_manual(values = c('turquoise3', 'red'))
 ```
 
-![dist_plot_example](OlinkAnalyze/man/figures/example_distplot.png)
+![dist_plot_example](figures/example_distplot.png)
 
 ```{r qc_plot, eval=FALSE}
 # visualize potential outliers by IQR vs. sample median per panel, example for one panel
@@ -54,7 +54,7 @@ olink_qc_plot(npx_data1 %>% filter(Panel == 'Olink CARDIOMETABOLIC')) +
   scale_color_manual(values = c('turquoise3', 'red'))
 ```
 
-![qc_plot_example](OlinkAnalyze/man/figures/example_qcplot.png)
+![qc_plot_example](figures/example_qcplot.png)
 
 ### Normalization
 
@@ -94,7 +94,7 @@ olink_volcano_plot(p.val_tbl = ttest_results_NPX1,
   scale_color_manual(values = c('turquoise3', 'red'))
 ```
 
-![volcano_plot_example](OlinkAnalyze/man/figures/example_volcanoplot.png)
+![volcano_plot_example](figures/example_volcanoplot.png)
 
 ## Learn more
 Please see the function specific help pages. Moreover, OlinkAnalyze includes two simulated NPX datasets for your convenience to help you explore the package and its functions.

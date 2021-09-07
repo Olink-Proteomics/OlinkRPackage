@@ -1,7 +1,9 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# OlinkAnalyze <img src="OlinkAnalyze/man/figures/OlinkAnalyze_target_hexagon.png" align="right" width="120" />
+[![R-CMD-check](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/R-CMD-check.yaml)
+
+# OlinkAnalyze <img src="figures/OlinkAnalyze_target_hexagon.png" align="right" width="120" />
 
 The goal of OlinkAnalyze is to provide a versatile toolbox to enable
 easy and smooth handling of Olink NPX data to speed up your proteomic
@@ -14,13 +16,7 @@ convenient pipeline for your Olink NPX data analysis.
 
 ``` r
 # install.packages("devtools")
-devtools::install_github(repo ='Olink-Proteomics/OlinkRPackage/OlinkAnalyze', build_vignettes = TRUE)
-```
-
-## Vignette
-
-```r
-browseVignettes("OlinkAnalyze")
+devtools::install_github(repo ='Olink-Proteomics/OlinkRPackage/OlinkAnalyze')
 ```
 
 ## Usage
@@ -38,8 +34,7 @@ my_NPX_data <- read_NPX(filename = "path/to/my_NPX_data.xlsx")
 ### QC plot functions
 
 There are several plot functions, below follows two examples using the
-package provided npx\_data1
-dataset:
+package provided npx_data1 dataset:
 
 ``` r
 # visualize the NPX distribution per sample per panel, example for one panel
@@ -49,7 +44,7 @@ olink_dist_plot(npx_data1 %>% filter(Panel == 'Olink CARDIOMETABOLIC')) +
   scale_fill_manual(values = c('turquoise3', 'red'))
 ```
 
-![dist\_plot\_example](OlinkAnalyze/man/figures/example_distplot.png)
+![dist_plot_example](figures/example_distplot.png)
 
 ``` r
 # visualize potential outliers by IQR vs. sample median per panel, example for one panel
@@ -57,14 +52,14 @@ olink_qc_plot(npx_data1 %>% filter(Panel == 'Olink CARDIOMETABOLIC')) +
   scale_color_manual(values = c('turquoise3', 'red'))
 ```
 
-![qc\_plot\_example](OlinkAnalyze/man/figures/example_qcplot.png)
+![qc_plot_example](figures/example_qcplot.png)
 
 ### Normalization
 
 OlinkAnalyze provides several means of normalization when analyzing
 multiple datasets. Below follows an example of reference sample (aka
-bridge) normalization using the two package provided npx\_data1 and
-npx\_data2 datasets:
+bridge) normalization using the two package provided npx_data1 and
+npx_data2 datasets:
 
 ``` r
 # identify bridge samples
@@ -84,7 +79,7 @@ bridge_normalized_data <- olink_normalization(df1 = npx_data1,
 
 OlinkAnalyze provides several statistical tests and model tools. Below
 follows an example of how to perform a t-test and how to visualize the
-t-test output in a volcano plot using the package provided npx\_data1
+t-test output in a volcano plot using the package provided npx_data1
 dataset:
 
 ``` r
@@ -103,7 +98,7 @@ olink_volcano_plot(p.val_tbl = ttest_results_NPX1,
   scale_color_manual(values = c('turquoise3', 'red'))
 ```
 
-![volcano\_plot\_example](OlinkAnalyze/man/figures/example_volcanoplot.png)
+![volcano_plot_example](figures/example_volcanoplot.png)
 
 ## Learn more
 
@@ -113,8 +108,7 @@ explore the package and its functions.
 
 ## Issues
 
-Please report any issues (good or bad) to
-\<biostattools\[a\]olink.com\>.
+Please report any issues (good or bad) to \<biostattools\[a\]olink.com>.
 
 ## Credits
 
