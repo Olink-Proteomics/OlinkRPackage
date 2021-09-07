@@ -23,6 +23,13 @@ The goal of OlinkAnalyze is to provide a versatile toolbox to enable easy and sm
 # install.packages("devtools")
 devtools::install_github(repo ='Olink-Proteomics/OlinkRPackage/OlinkAnalyze')
 ```
+
+## Vignette
+
+```{r, eval=FALSE}
+browseVignettes("OlinkAnalyze")
+```
+
 ## Usage
 ### Reading Olink NPX data
 
