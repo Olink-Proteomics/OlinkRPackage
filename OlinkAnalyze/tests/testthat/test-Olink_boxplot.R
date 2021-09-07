@@ -32,6 +32,14 @@ boxplot_time_coloroption <- npx_data1 %>%
                     pull(OlinkID)},
                 coloroption = c("teal","pink","orange","turqoise"))
 
+boxplot_time_site <- npx_data1 %>%
+  na.omit() %>%
+  olink_boxplot(variable = c("Time","Site"),
+                olinkid_list = {ref_results$anova_results_1_time %>%
+                    filter(Threshold == 'Significant') %>%
+                    pull(OlinkID)})
+
+
 
 test_that("olink_boxplot works", {
   skip_on_ci()
@@ -39,4 +47,5 @@ test_that("olink_boxplot works", {
   vdiffr::expect_doppelganger('boxplot site 10prots', boxplot_site_10prots[[2]])
   vdiffr::expect_doppelganger('boxplot time', boxplot_time)
   vdiffr::expect_doppelganger('boxplot time with coloroption', boxplot_time_coloroption)
+  vdiffr::expect_doppelganger('boxplot time and site', boxplot_time_site)
 })
