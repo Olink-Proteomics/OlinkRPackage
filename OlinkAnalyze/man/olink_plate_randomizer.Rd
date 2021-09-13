@@ -8,7 +8,6 @@ olink_plate_randomizer(
   Manifest,
   PlateSize = 96,
   SubjectColumn,
-  Groups,
   iterations = 500,
   available.spots,
   seed
@@ -20,8 +19,6 @@ olink_plate_randomizer(
 \item{PlateSize}{Integer. Either 96 or 48. 96 is default.}
 
 \item{SubjectColumn}{(Optional) Column name of the subject ID column. Cannot contain missings. If provided, subjects are kept on the same plate.}
-
-\item{Groups}{(Optional) NO LONGER IMPLEMENTED. Vector of column names for variables to be balanced across plates.}
 
 \item{iterations}{Number of iterations for fitting subjects on the same plate.}
 

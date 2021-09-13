@@ -38,8 +38,8 @@ displayPlateLayout <- function(data,fill.color,PlateSize = 96, include.label=F){
     dplyr::select(fill.color,plate,row,column,fill.color) %>%
     rbind(missing.spots) %>%
     dplyr::mutate(row=factor(row,levels=LETTERS[8:1]),
-           column=factor(column,levels=paste("Column",1:(number_of_cols_per_plate-1))),
-           fill.color=factor(fill.color))
+                  column=factor(column,levels=paste("Column",1:(number_of_cols_per_plate-1))),
+                  fill.color=factor(fill.color))
 
   fill.levels <- levels(data$fill.color)
   if("Empty" %in% fill.levels){
@@ -154,7 +154,6 @@ generatePlateHolder <- function(n.plates,n.spots,n.samples, PlateSize){
 #' @param Manifest tibble/data frame in long format containing all sample ID's. Sample ID column must be named SampleID.
 #' @param PlateSize Integer. Either 96 or 48. 96 is default.
 #' @param SubjectColumn (Optional) Column name of the subject ID column. Cannot contain missings. If provided, subjects are kept on the same plate.
-#' @param Groups (Optional) NO LONGER IMPLEMENTED. Vector of column names for variables to be balanced across plates.
 #' @param iterations Number of iterations for fitting subjects on the same plate.
 #' @param available.spots Integer. Number of wells available on each plate. Maximum 40 for T48 and 88 for T96. Can also take a vector equal to the number of plates to be used indicating the number of wells available on each plate.
 #' @param seed Seed to set. Highly recommend setting this for reproducibility.
@@ -170,7 +169,7 @@ generatePlateHolder <- function(n.plates,n.spots,n.samples, PlateSize){
 #' @importFrom tibble is_tibble
 
 #Main randomization function
-olink_plate_randomizer <-function(Manifest, PlateSize = 96, SubjectColumn, Groups, iterations=500, available.spots, seed){
+olink_plate_randomizer <-function(Manifest, PlateSize = 96, SubjectColumn, iterations=500, available.spots, seed){
 
   if(!"SampleID" %in% colnames(Manifest)) {
     stop("SampleID not found! Be sure the column of samples ID's is named 'SampleID'")
@@ -208,10 +207,6 @@ olink_plate_randomizer <-function(Manifest, PlateSize = 96, SubjectColumn, Group
     all.plates <- generatePlateHolder(length(available.spots),available.spots,n.samples=length(Manifest$SampleID), PlateSize = PlateSize)
   }
 
-  if(!missing(Groups)){
-    stop("Data science no longer recommends forcing plate balancing based on groups. Contact DS with any questions.")
-  }
-
   #Complete Random if subjectID not given
   if(missing(SubjectColumn)){
     all.plates <- all.plates[sample(1:nrow(Manifest)),]
@@ -246,37 +241,32 @@ olink_plate_randomizer <-function(Manifest, PlateSize = 96, SubjectColumn, Group
         passed <- T
       }
 
-      if(!passed) next
-
       if(passed){
         out.manifest <- Manifest %>%
           dplyr::left_join(all.plates,"SampleID") %>%
           dplyr::group_by(plate) %>%
           dplyr::mutate(scramble=sample(1:dplyr::n())) %>%
           dplyr::mutate(row=row[scramble],
-                 column=column[scramble]) %>%
+                        column=column[scramble]) %>%
           dplyr::ungroup() %>%
           dplyr::select(-scramble)
-
+        break
       }
-      if(missing(Groups)) break
 
     }
 
-    if(missing(Groups)){
-      cat("Random assignment of SUBJECTS to plates\n")
-      if(passed){
+    cat("Random assignment of SUBJECTS to plates\n")
+    if(passed){
 
-        out.manifest <- out.manifest %>%
-          dplyr::mutate(well=paste0(row,gsub("Column ","",as.character(column)))) %>%
-          dplyr::mutate(well=factor(well,levels=paste0(rep(LETTERS[1:8],each=number_of_cols_per_plate),rep(1:number_of_cols_per_plate,times=8)))) %>%
-          dplyr::arrange(plate, column, row)
+      out.manifest <- out.manifest %>%
+        dplyr::mutate(well=paste0(row,gsub("Column ","",as.character(column)))) %>%
+        dplyr::mutate(well=factor(well,levels=paste0(rep(LETTERS[1:8],each=number_of_cols_per_plate),rep(1:number_of_cols_per_plate,times=8)))) %>%
+        dplyr::arrange(plate, column, row)
 
-        class(out.manifest) <- c("randomizedManifest",class(out.manifest))
-        return(out.manifest)
-      } else{
-        stop("Could not keep all subjects on the same plate! Try increasing the number of iterations.")
-      }
+      class(out.manifest) <- c("randomizedManifest",class(out.manifest))
+      return(out.manifest)
+    } else{
+      stop("Could not keep all subjects on the same plate! Try increasing the number of iterations.")
     }
 
   }
