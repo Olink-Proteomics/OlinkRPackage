@@ -16,7 +16,7 @@ pca_plot_treatCol_topLoadings <- npx_data1 %>%
   mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
   filter(!is.na(Treatment)) %>% #Or else, a warning shows up in the test results
   olink_pca_plot(color_g = 'Treatment',
-                 loadings_list = {ref_results$ttestresults %>%
+                 loadings_list = {ref_results$t.test_results %>%
                      head(5) %>%
                      pull(OlinkID)})
 
