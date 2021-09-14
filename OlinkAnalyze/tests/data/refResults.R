@@ -2,6 +2,10 @@
 
 #### t-test ####
 t.test_results <- olink_ttest(npx_data1, 'Treatment')
+#paired t-test
+t.test_results_paired <- npx_data1 %>%
+  filter(Time %in% c("Baseline","Week.6")) %>%
+  olink_ttest(variable = "Time", pair_id = "Subject")
 
 #### ANOVA ####
 anova_results_1_site <- olink_anova(npx_data1, 'Site') %>%
@@ -95,7 +99,8 @@ normalization_results.subset <- olink_normalization(df1 = npx_data1,
   filter(SampleID %in% sampleSubset)
 
 #### Wrap up the results ####
-ref_results <- list(ttestresults = t.test_results,
+ref_results <- list(t.test_results = t.test_results,
+                    t.test_results_paired = t.test_results_paired,
                     anova_results_1_site = anova_results_1_site,
                     anova_results_1_time = anova_results_1_time,
                     anova_results_1_siteTime = anova_results_1_siteTime,
