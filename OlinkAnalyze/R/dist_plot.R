@@ -10,6 +10,12 @@
 #' @export
 #' @examples \donttest{olink_dist_plot(npx_data1, color_g = "QC_Warning")}
 #' @import dplyr stringr tidyr
+#' @importFrom dplyr filter mutate group_by ungroup
+#' @importFrom stats reorder
+#' @importFrom ggplot2 ggplot aes scale_x_discrete geom_boxplot xlab facet_wrap
+#' @importFrom stringr str_replace
+#' @importFrom magrittr %>%
+#' @importFrom rlang ensym
 
 olink_dist_plot <- function(df, color_g = 'QC_Warning', ...) {
 
@@ -55,12 +61,20 @@ olink_dist_plot <- function(df, color_g = 'QC_Warning', ...) {
 
   # Remove "Olink", Target 96" and "Target 48" from the panel name(s)
   df_OlinkID_fixed <- df_OlinkID %>%
-    mutate(Panel = Panel  %>% str_replace("Olink ", "") %>%
-             str_replace("Target 96 ", "") %>%
-             str_replace("Target 48 ", "")) %>%
-    group_by(SampleID, Index, Panel) %>%
-    mutate(QC_Warning = if_else(any(QC_Warning == "Warning"|QC_Warning == "WARN" ), "Warning", "Pass"))%>%
-    ungroup()
+    dplyr::mutate(Panel = Panel  %>% stringr::str_replace("Olink ", "") %>%
+             stringr::str_replace("Target 96 ", "") %>%
+             stringr::str_replace("Target 48 ", "")) %>%
+    dplyr::group_by(SampleID, Index, Panel) %>%
+    dplyr::mutate(QC_Warning = if_else(QC_Warning == "WARN",
+                                       "Warning",
+                                       QC_Warning)) %>%
+    dplyr::mutate(QC_Warning = if_else(QC_Warning == "PASS",
+                                       "Pass",
+                                       QC_Warning)) %>%
+    dplyr::mutate(QC_Warning = if_else(QC_Warning == "FAIL",
+                                       "Fail",
+                                       QC_Warning)) %>%
+    dplyr::ungroup()
 
   df_OlinkID_fixed %>%
     filter(!(is.na(NPX))) %>%
