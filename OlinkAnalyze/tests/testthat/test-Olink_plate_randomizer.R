@@ -9,6 +9,12 @@ randomized_result2 <- olink_plate_randomizer(manifest,
                                              SubjectColumn="SubjectID",
                                              available.spots=c(88,88),
                                              seed=12345)
+# Clean up factors in old R
+if(R.Version()$major < 4){
+  randomized_result1$plate = as.character(randomized_result1$plate)
+  randomized_result2$plate = as.character(randomized_result2$plate)
+}
+
 
 test_that("olink_plate_randomizer works", {
   expect_equal(randomized_result1, ref_results$randomized_result1)
