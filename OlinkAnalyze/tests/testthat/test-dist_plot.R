@@ -8,7 +8,6 @@ distribution_plot_treatColor <- npx_data1 %>%
   olink_dist_plot(color_g = 'Treatment')
 
 test_that("olink_dist_plot works", {
-  skip_on_ci()
   vdiffr::expect_doppelganger('Distribution plot', distribution_plot)
   vdiffr::expect_doppelganger('Distribution plot col by treatment', distribution_plot_treatColor)
 })

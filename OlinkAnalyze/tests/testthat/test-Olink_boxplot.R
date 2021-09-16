@@ -42,7 +42,6 @@ boxplot_time_site <- npx_data1 %>%
 
 
 test_that("olink_boxplot works", {
-  skip_on_ci()
   vdiffr::expect_doppelganger('boxplot site 2prots', boxplot_site_2prots)
   vdiffr::expect_doppelganger('boxplot site 10prots', boxplot_site_10prots[[2]])
   vdiffr::expect_doppelganger('boxplot time', boxplot_time)
