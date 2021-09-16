@@ -1,0 +1,16 @@
+#Load reference results
+refRes_file <- '../data/refResults.RData'
+load(refRes_file)
+
+#Run olink_plate_randomizer
+randomized_result1 <- olink_plate_randomizer(manifest,
+                                             seed=12345)
+randomized_result2 <- olink_plate_randomizer(manifest,
+                                             SubjectColumn="SubjectID",
+                                             available.spots=c(88,88),
+                                             seed=12345)
+
+test_that("olink_plate_randomizer works", {
+  expect_equal(randomized_result1, ref_results$randomized_result1)
+  expect_equal(randomized_result2, ref_results$randomized_result2)
+})

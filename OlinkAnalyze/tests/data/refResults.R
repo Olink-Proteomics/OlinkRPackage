@@ -98,6 +98,14 @@ normalization_results.subset <- olink_normalization(df1 = npx_data1,
                                                     reference_project = '20200001') %>%
   filter(SampleID %in% sampleSubset)
 
+#### olink_plate_randomizer ####
+randomized_result1 <- olink_plate_randomizer(manifest,
+                                             seed=12345)
+randomized_result2 <- olink_plate_randomizer(manifest,
+                                             SubjectColumn="SubjectID",
+                                             available.spots=c(88,88),
+                                             seed=12345)
+
 #### Wrap up the results ####
 ref_results <- list(t.test_results = t.test_results,
                     t.test_results_paired = t.test_results_paired,
@@ -110,6 +118,8 @@ ref_results <- list(t.test_results = t.test_results,
                     lmer_results_1_posthoc = lmer_results_1_posthoc,
                     normalization_results.bridged = normalization_results.bridged,
                     normalization_results.intensity = normalization_results.intensity,
-                    normalization_results.subset = normalization_results.subset)
+                    normalization_results.subset = normalization_results.subset,
+                    randomized_result1 = randomized_result1,
+                    randomized_result2 = randomized_result2)
 save(ref_results, file = 'refResults.RData')
 
