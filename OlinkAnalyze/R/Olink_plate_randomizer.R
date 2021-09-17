@@ -134,7 +134,8 @@ generatePlateHolder <- function(n.plates,n.spots,n.samples, PlateSize){
   if(any(n.spots>spots_per_plate)) stop("Number of samples per plates cannot exceed 40 for T48 and 88 for T96!")
   if(sum(n.spots)<n.samples) stop("More samples than available spots! Double check your numbers!")
   full.row.col <- expand.grid(column=paste0("Column ",1:(number_of_cols_per_plate-1)),
-                              row=LETTERS[1:8]) %>%
+                              row=LETTERS[1:8],
+                              stringsAsFactors = TRUE) %>%
     dplyr::arrange(column,row)
   plates <- paste0("Plate ",1:n.plates)
   out <- data.frame(plate=NULL,column=NULL,row=NULL,stringsAsFactors = F)
