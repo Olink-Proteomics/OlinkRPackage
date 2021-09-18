@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: ubuntu-18.04,   r: 'release', rspm: "https://packagemanager.rstudio.com/cran/__linux__/bionic/latest"}
+          - {os: ubuntu-20.04,   r: 'release', rspm: "https://packagemanager.rstudio.com/cran/__linux__/bionic/latest"}
           
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
@@ -55,6 +55,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          install.packages("stringi", type="source")
           remotes::install_deps(pkgdir = "OlinkAnalyze", dependencies = TRUE)
           remotes::install_cran("rcmdcheck")
         shell: Rscript {0}
