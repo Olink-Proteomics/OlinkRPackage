@@ -49,6 +49,10 @@ mean NPX at mean(numerical variable) versus mean NPX at mean(numerical variable)
 \donttest{
 
 #Two-way ANOVA, one main effect covariate.
+library(dplyr)
+
+npx_df <- npx_data1 \%>\% filter(!grepl('control',SampleID, ignore.case = TRUE))
+
 #Results in model NPX~Treatment*Time+Site.
 anova_results <- olink_anova(df = npx_df,
                              variable=c("Treatment:Time"),

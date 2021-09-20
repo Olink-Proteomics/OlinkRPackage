@@ -4,12 +4,14 @@
 \alias{displayPlateLayout}
 \title{Plot all plates colored by a variable}
 \usage{
-displayPlateLayout(data, fill.color, include.label = F)
+displayPlateLayout(data, fill.color, PlateSize = 96, include.label = F)
 }
 \arguments{
 \item{data}{tibble/data frame in long format returned from the olink_plate_randomizer function.}
 
 \item{fill.color}{Column name to be used as coloring variable for wells.}
+
+\item{PlateSize}{Integer. Either 96 or 48. 96 is default.}
 
 \item{include.label}{Should the variable group be shown in the plot.}
 }

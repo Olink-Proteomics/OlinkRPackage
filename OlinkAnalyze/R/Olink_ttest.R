@@ -1,6 +1,8 @@
 #'Function which performs a t-test per protein
 #'
-#'Performs a Welch 2-sample t-test at confidence level 0.95 for every protein (by OlinkID) for a given grouping variable using stats::t.test and corrects for multiple testing by the Benjamini-Hochberg method (“fdr”) using stats::p.adjust.
+#'Performs a Welch 2-sample t-test at confidence level 0.95 for every protein (by OlinkID)
+#'for a given grouping variable using stats::t.test and corrects for multiple testing by
+#'the Benjamini-Hochberg method (“fdr”) using stats::p.adjust.
 #'Adjusted p-values are logically evaluated towards adjusted p-value<0.05.
 #'The resulting t-test table is arranged by ascending p-values.
 #'
@@ -12,6 +14,9 @@
 #' @export
 #' @examples
 #' \donttest{
+#'
+#' library(dplyr)
+#'
 #' npx_df <- npx_data1 %>% filter(!grepl('control',SampleID, ignore.case = TRUE))
 #'
 #' ttest_results <- olink_ttest(df=npx_df,
@@ -23,8 +28,12 @@
 #'    filter(Time %in% c("Baseline","Week.6")) %>%
 #'    olink_ttest(variable = "Time", pair_id = "Subject")
 #'}
-#' @import dplyr stringr tidyr broom
-
+#' @importFrom magrittr %>%
+#' @importFrom dplyr n group_by summarise n_distinct ungroup filter as_tibble select mutate pull all_of rename arrange do
+#' @importFrom stringr str_detect
+#' @importFrom broom tidy
+#' @importFrom rlang ensym
+#' @importFrom tidyr pivot_wider
 
 olink_ttest <- function(df, variable, pair_id, ...){
 
@@ -36,7 +45,7 @@ olink_ttest <- function(df, variable, pair_id, ...){
 
   #Filtering on valid OlinkID
   df <- df %>%
-    filter(stringr::str_detect(OlinkID,
+    dplyr::filter(stringr::str_detect(OlinkID,
                                "OID[0-9]{5}"))
 
 
@@ -90,10 +99,10 @@ olink_ttest <- function(df, variable, pair_id, ...){
 
   #Every sample needs to have a unique level of the factor
   number_of_samples_w_more_than_one_level <- df %>%
-    group_by(SampleID, Index) %>%
-    summarise(n_levels = n_distinct(!!rlang::ensym(variable), na.rm = TRUE)) %>%
-    ungroup() %>%
-    filter(n_levels > 1) %>%
+    dplyr::group_by(SampleID, Index) %>%
+    dplyr::summarise(n_levels = dplyr::n_distinct(!!rlang::ensym(variable), na.rm = TRUE)) %>%
+    dplyr::ungroup() %>%
+    dplyr::filter(n_levels > 1) %>%
     nrow(.)
 
   if (number_of_samples_w_more_than_one_level > 0) {
@@ -104,11 +113,11 @@ olink_ttest <- function(df, variable, pair_id, ...){
 
   #Not testing assays that have all NA:s or all NA:s in one level
   all_nas <- df  %>%
-    group_by(OlinkID) %>%
-    summarise(n = n(), n_na = sum(is.na(NPX))) %>%
-    ungroup() %>%
-    filter(n-n_na <= 1) %>%
-    pull(OlinkID)
+    dplyr::group_by(OlinkID) %>%
+    dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(NPX))) %>%
+    dplyr::ungroup() %>%
+    dplyr::filter(n-n_na <= 1) %>%
+    dplyr::pull(OlinkID)
 
 
   if(length(all_nas) > 0) {
@@ -121,12 +130,12 @@ olink_ttest <- function(df, variable, pair_id, ...){
   }
 
   nas_in_level <- df  %>%
-    filter(!(OlinkID %in% all_nas)) %>%
-    group_by(OlinkID, !!rlang::ensym(variable)) %>%
-    summarise(n = n(), n_na = sum(is.na(NPX))) %>%
-    ungroup() %>%
-    filter(n == n_na) %>%
-    pull(OlinkID)
+    dplyr::filter(!(OlinkID %in% all_nas)) %>%
+    dplyr::group_by(OlinkID, !!rlang::ensym(variable)) %>%
+    dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(NPX))) %>%
+    dplyr::ungroup() %>%
+    dplyr::filter(n == n_na) %>%
+    dplyr::pull(OlinkID)
 
 
   if(length(nas_in_level) > 0) {
@@ -145,16 +154,16 @@ olink_ttest <- function(df, variable, pair_id, ...){
 
     if(!is_tibble(df)){
       message("Converting data frame to tibble.")
-      df <- as_tibble(df)
+      df <- dplyr::as_tibble(df)
     }
 
     #check that each "pair_id' has only 2 samples
     ct_pairs <- df %>%
-      filter(!(OlinkID %in% all_nas)) %>%
-      filter(!(OlinkID %in% nas_in_level)) %>%
-      filter(!is.na(!!rlang::ensym(variable))) %>%
-      group_by(OlinkID,!!rlang::ensym(pair_id)) %>%
-      summarize(n=n())
+      dplyr::filter(!(OlinkID %in% all_nas)) %>%
+      dplyr::filter(!(OlinkID %in% nas_in_level)) %>%
+      dplyr::filter(!is.na(!!rlang::ensym(variable))) %>%
+      dplyr::group_by(OlinkID,!!rlang::ensym(pair_id)) %>%
+      dplyr::summarize(n=dplyr::n())
     if(!all(ct_pairs$n <= 2)) stop(paste0("Each pair identifier must identify no more than 2 unique samples. Check pairs: ",
                                           paste(unique(ct_pairs[[pair_id]][ct_pairs$n>2]),collapse=", ")))
 
@@ -163,17 +172,16 @@ olink_ttest <- function(df, variable, pair_id, ...){
 
 
     p.val <- df %>%
-      filter(!(OlinkID %in% all_nas)) %>%
-      filter(!(OlinkID %in% nas_in_level)) %>%
-      select(all_of(c("OlinkID","UniProt","Assay","Panel","NPX",variable,pair_id))) %>%
-      pivot_wider(names_from=all_of(variable),values_from="NPX") %>%
-      group_by(Assay, OlinkID, UniProt, Panel) %>%
-      do(tidy(t.test(x=.[[var_levels[1]]],y=.[[var_levels[2]]],paired=T, ...))) %>%
-      ungroup() %>%
-      mutate(Adjusted_pval = p.adjust(p.value, method = "fdr")) %>%
-      mutate(Threshold = ifelse(Adjusted_pval < 0.05, "Significant", "Non-significant")) %>%
-      # rename(`:=`(!!var_levels[1], estimate1)) %>%
-      arrange(p.value)
+      dplyr::filter(!(OlinkID %in% all_nas)) %>%
+      dplyr::filter(!(OlinkID %in% nas_in_level)) %>%
+      dplyr::select(dplyr::all_of(c("OlinkID","UniProt","Assay","Panel","NPX",variable,pair_id))) %>%
+      tidyr::pivot_wider(names_from=dplyr::all_of(variable),values_from="NPX") %>%
+      dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
+      dplyr::do(broom::tidy(t.test(x=.[[var_levels[1]]],y=.[[var_levels[2]]],paired=T, ...))) %>%
+      dplyr::ungroup() %>%
+      dplyr::mutate(Adjusted_pval = p.adjust(p.value, method = "fdr")) %>%
+      dplyr::mutate(Threshold = ifelse(Adjusted_pval < 0.05, "Significant", "Non-significant")) %>%
+      dplyr::arrange(p.value)
 
 
   } else{
@@ -185,16 +193,16 @@ olink_ttest <- function(df, variable, pair_id, ...){
 
 
     p.val <- df %>%
-      filter(!(OlinkID %in% all_nas)) %>%
-      filter(!(OlinkID %in% nas_in_level)) %>%
-      group_by(Assay, OlinkID, UniProt, Panel) %>%
-      do(tidy(t.test(NPX ~ !!rlang::ensym(variable), data = ., ...))) %>%
-      ungroup() %>%
-      mutate(Adjusted_pval = p.adjust(p.value, method = "fdr")) %>%
-      mutate(Threshold = ifelse(Adjusted_pval < 0.05, "Significant", "Non-significant")) %>%
-      rename(`:=`(!!var_levels[1], estimate1)) %>%
-      rename(`:=`(!!var_levels[2], estimate2)) %>%
-      arrange(p.value)
+      dplyr::filter(!(OlinkID %in% all_nas)) %>%
+      dplyr::filter(!(OlinkID %in% nas_in_level)) %>%
+      dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
+      dplyr::do(broom::tidy(t.test(NPX ~ !!rlang::ensym(variable), data = ., ...))) %>%
+      dplyr::ungroup() %>%
+      dplyr::mutate(Adjusted_pval = p.adjust(p.value, method = "fdr")) %>%
+      dplyr::mutate(Threshold = ifelse(Adjusted_pval < 0.05, "Significant", "Non-significant")) %>%
+      dplyr::rename(`:=`(!!var_levels[1], estimate1)) %>%
+      dplyr::rename(`:=`(!!var_levels[2], estimate2)) %>%
+      dplyr::arrange(p.value)
   }
 
 

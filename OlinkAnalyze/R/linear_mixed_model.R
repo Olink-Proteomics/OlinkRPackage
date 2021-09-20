@@ -39,7 +39,13 @@
 #' variable=c("Time", 'Treatment'),
 #' random = c('Subject', 'Site'))
 #' }
-#' @import dplyr stringr tidyr lmerTest
+#' @importFrom magrittr %>%
+#' @importFrom dplyr n filter group_by summarise ungroup pull distinct group_modify mutate select all_of
+#' @importFrom lmerTest lmer
+#' @importFrom rlang ensym
+#' @importFrom stringr str_detect
+#' @importFrom generics tidy
+#' @importFrom lme4 lmerControl
 
 olink_lmer <- function(df,
                        variable,
@@ -58,7 +64,7 @@ olink_lmer <- function(df,
 
     #Filtering on valid OlinkID
     df <- df %>%
-      filter(stringr::str_detect(OlinkID,
+      dplyr::filter(stringr::str_detect(OlinkID,
                                  "OID[0-9]{5}"))
 
     #Allow for :/* notation in covariates
@@ -93,11 +99,11 @@ olink_lmer <- function(df,
 
     #Not testing assays that have all NA:s
     all_nas <- df  %>%
-      group_by(OlinkID) %>%
-      summarise(n = n(), n_na = sum(is.na(!!rlang::ensym(outcome)))) %>%
-      ungroup() %>%
-      filter(n == n_na) %>%
-      pull(OlinkID)
+      dplyr::group_by(OlinkID) %>%
+      dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(!!rlang::ensym(outcome)))) %>%
+      dplyr::ungroup() %>%
+      dplyr::filter(n == n_na) %>%
+      dplyr::pull(OlinkID)
 
 
     if(length(all_nas) > 0) {
@@ -140,13 +146,13 @@ olink_lmer <- function(df,
     for(effect in single_fixed_effects){
 
       current_nas <- df %>%
-        filter(!(OlinkID %in% all_nas)) %>%
-        group_by(OlinkID, !!rlang::ensym(effect)) %>%
-        summarise(n = n(), n_na = sum(is.na(!!rlang::ensym(outcome)))) %>%
-        ungroup() %>%
-        filter(n == n_na) %>%
-        distinct(OlinkID) %>%
-        pull(OlinkID)
+        dplyr::filter(!(OlinkID %in% all_nas)) %>%
+        dplyr::group_by(OlinkID, !!rlang::ensym(effect)) %>%
+        dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(!!rlang::ensym(outcome)))) %>%
+        dplyr::ungroup() %>%
+        dplyr::filter(n == n_na) %>%
+        dplyr::distinct(OlinkID) %>%
+        dplyr::pull(OlinkID)
 
       if(length(current_nas) > 0) {
 
@@ -161,10 +167,10 @@ olink_lmer <- function(df,
       }
 
       number_of_samples_w_more_than_one_level <- df %>%
-        group_by(SampleID, Index) %>%
-        summarise(n_levels = n_distinct(!!rlang::ensym(effect), na.rm = T)) %>%
-        ungroup() %>%
-        filter(n_levels > 1) %>%
+        dplyr::group_by(SampleID, Index) %>%
+        dplyr::summarise(n_levels = n_distinct(!!rlang::ensym(effect), na.rm = T)) %>%
+        dplyr::ungroup() %>%
+        dplyr::filter(n_levels > 1) %>%
         nrow(.)
 
       if (number_of_samples_w_more_than_one_level > 0) {
@@ -229,25 +235,25 @@ olink_lmer <- function(df,
 
     ##make LMM
     lmer_model<-df %>%
-      filter(!(OlinkID %in% all_nas)) %>%
-      filter(!(OlinkID %in% nas_in_var)) %>%
-      group_by(Assay, OlinkID, UniProt, Panel) %>%
-      group_modify(~tidy(anova(single_lmer(data=.x, formula_string = formula_string)))) %>%
-      ungroup() %>%
-      mutate(covariates = term %in% covariate_filter_string) %>%
-      group_by(covariates) %>%
-      mutate(Adjusted_pval=p.adjust(p.value,method="fdr")) %>%
-      mutate(Threshold  = ifelse(Adjusted_pval<0.05,"Significant","Non-significant")) %>%
-      mutate(Adjusted_pval = ifelse(covariates,NA,Adjusted_pval),
+      dplyr::filter(!(OlinkID %in% all_nas)) %>%
+      dplyr::filter(!(OlinkID %in% nas_in_var)) %>%
+      dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
+      dplyr::group_modify(~generics::tidy(stats::anova(single_lmer(data=.x, formula_string = formula_string)))) %>%
+      dplyr::ungroup() %>%
+      dplyr::mutate(covariates = term %in% covariate_filter_string) %>%
+      dplyr::group_by(covariates) %>%
+      dplyr::mutate(Adjusted_pval=stats::p.adjust(p.value,method="fdr")) %>%
+      dplyr::mutate(Threshold  = ifelse(Adjusted_pval<0.05,"Significant","Non-significant")) %>%
+      dplyr::mutate(Adjusted_pval = ifelse(covariates,NA,Adjusted_pval),
              Threshold = ifelse(covariates,NA,Threshold)) %>%
-      ungroup() %>%
-      select(-covariates) %>%
-      arrange(p.value)
+      dplyr::ungroup() %>%
+      dplyr::select(-covariates) %>%
+      dplyr::arrange(p.value)
 
     if(return.covariates){
       return(lmer_model)
     } else{
-      return(lmer_model %>% filter(!term%in%covariate_filter_string))
+      return(lmer_model %>% dplyr::filter(!term%in%covariate_filter_string))
     }
 
   }, warning = function(w) {
@@ -264,13 +270,13 @@ single_lmer <- function(data, formula_string){
   out.model <- tryCatch(lmerTest::lmer(as.formula(formula_string),
                                        data=data,
                                        REML=F,
-                                       control = lmerControl(check.conv.singular = "ignore")),
+                                       control = lme4::lmerControl(check.conv.singular = "ignore")),
                         warning = function(w){
                           return(
                             lmerTest::lmer(as.formula(formula_string),
                                            data=data,
                                            REML=F,
-                                           control=lmerControl(optimizer = "Nelder_Mead",
+                                           control= lme4::lmerControl(optimizer = "Nelder_Mead",
                                                                check.conv.singular = "ignore"))
                           )
 
@@ -313,6 +319,9 @@ single_lmer <- function(data, formula_string){
 #' @export
 #' @examples
 #' \donttest{
+#'
+#' library(dplyr)
+#'
 #' lmer_results <- olink_lmer(df = npx_data1,
 #'                            variable=c("Time", 'Treatment'),
 #'                            random = c('Subject'))
@@ -329,7 +338,11 @@ single_lmer <- function(data, formula_string){
 #'                                            effect = 'Time:Treatment',
 #'                                            random = 'Subject',
 #'                                            verbose = TRUE)}
-#' @import dplyr stringr tidyr broom
+#' @importFrom magrittr %>%
+#' @importFrom dplyr filter group_by summarise ungroup pull distinct group_modify mutate select rename arrange
+#' @importFrom lmerTest lmer
+#' @importFrom stringr str_detect
+#' @importFrom emmeans emmeans
 
 olink_lmer_posthoc <- function(df,
                                variable,
@@ -355,14 +368,14 @@ olink_lmer_posthoc <- function(df,
   withCallingHandlers({
     #Filtering on valid OlinkID
     df <- df %>%
-      filter(stringr::str_detect(OlinkID,
+      dplyr::filter(stringr::str_detect(OlinkID,
                                  "OID[0-9]{5}"))
 
     if(is.null(olinkid_list)){
       olinkid_list <- df %>%
-        select(OlinkID) %>%
-        distinct() %>%
-        pull()
+        dplyr::select(OlinkID) %>%
+        dplyr::distinct() %>%
+        dplyr::pull()
     }
 
     #Allow for :/* notation in covariates
@@ -448,20 +461,20 @@ olink_lmer_posthoc <- function(df,
 
 
     output_df <- df %>%
-      filter(OlinkID %in% olinkid_list) %>%
-      group_by(Assay, OlinkID, UniProt, Panel) %>%
-      group_modify(~single_posthoc(data = .x,
+      dplyr::filter(OlinkID %in% olinkid_list) %>%
+      dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
+      dplyr::group_modify(~single_posthoc(data = .x,
                                    formula_string=formula_string,
                                    effect = effect,
                                    mean_return = mean_return)) %>%
-      ungroup() %>%
-      mutate(term=paste(effect,collapse=":"))  %>%
-      select(Assay, OlinkID, UniProt, Panel, term, everything())
+      dplyr::ungroup() %>%
+      dplyr::mutate(term=paste(effect,collapse=":"))  %>%
+      dplyr::select(Assay, OlinkID, UniProt, Panel, term, everything())
 
 
     if("Adjusted_pval" %in% colnames(output_df)){
       output_df <- output_df %>%
-        arrange(Adjusted_pval)
+        dplyr::arrange(Adjusted_pval)
     }
 
 
@@ -486,21 +499,21 @@ single_posthoc <- function(data, formula_string, effect, mean_return){
   if(mean_return){
     tmp <- unique(unlist(strsplit(effect,":")))
     return(as_tibble(the_model$emmeans) %>%
-             rename(conf.low=lower.CL,
+             dplyr::rename(conf.low=lower.CL,
                     conf.high=upper.CL) %>%
-             select(all_of(c(tmp, "emmean", "conf.low", "conf.high")))
+             dplyr::select(dplyr::all_of(c(tmp, "emmean", "conf.low", "conf.high")))
     )
 
   }else{
     return(as_tibble(the_model$contrasts) %>%
-             rename(Adjusted_pval = p.value) %>%
-             mutate(Threshold = if_else(Adjusted_pval < 0.05,
+             dplyr::rename(Adjusted_pval = p.value) %>%
+             dplyr::mutate(Threshold = if_else(Adjusted_pval < 0.05,
                                         'Significant',
                                         'Non-significant')) %>%
-             rename(conf.low=lower.CL,
+             dplyr::rename(conf.low=lower.CL,
                     conf.high=upper.CL) %>%
-             select(contrast, estimate, conf.low, conf.high, Adjusted_pval,Threshold) %>%
-             arrange(Adjusted_pval)
+             dplyr::select(contrast, estimate, conf.low, conf.high, Adjusted_pval,Threshold) %>%
+             dplyr::arrange(Adjusted_pval)
     )
 
   }
@@ -532,6 +545,9 @@ single_posthoc <- function(data, formula_string, effect, mean_return){
 #' @export
 #' @examples
 #' \donttest{
+#'
+#' library(dplyr)
+#'
 #' lmer_results <- olink_lmer(df = npx_data1,
 #'                            variable=c("Time", 'Treatment'),
 #'                            random = c('Subject'))
@@ -550,7 +566,11 @@ single_posthoc <- function(data, formula_string, effect, mean_return){
 #'                                             verbose=TRUE,
 #'                                             olinkid_list = assay_list,
 #'                                             number_of_proteins_per_plot = 10)}
-#' @import dplyr stringr tidyr broom
+#' @importFrom magrittr %>%
+#' @importFrom dplyr filter pull distinct mutate select arrange
+#' @importFrom stringr str_detect
+#' @importFrom ggplot2 ggplot theme ylab geom_pointrange aes element_blank element_text facet_wrap labs position_dodge
+#' @importFrom rlang ensym
 
 olink_lmer_plot <- function(df,
                             variable,
@@ -604,14 +624,14 @@ olink_lmer_plot <- function(df,
 
   #Filtering on valid OlinkID
   df <- df %>%
-    filter(stringr::str_detect(OlinkID,
+    dplyr::filter(stringr::str_detect(OlinkID,
                                "OID[0-9]{5}"))
 
   if(is.null(olinkid_list)){
     olinkid_list <- df %>%
-      select(OlinkID) %>%
-      distinct() %>%
-      pull()
+      dplyr::select(OlinkID) %>%
+      dplyr::distinct() %>%
+      dplyr::pull()
   }
 
   #Setting up what needs to be plotted
@@ -638,19 +658,19 @@ olink_lmer_plot <- function(df,
                                  effect = current_fixed_effect,
                                  mean_return = T,
                                  verbose=verbose) %>%
-    mutate(Name_Assay = paste0(Assay,"_",OlinkID))
+    dplyr::mutate(Name_Assay = paste0(Assay,"_",OlinkID))
 
 
   #Keep olinkid_list input order
   assay_name_list <- lm.means %>%
-    mutate(OlinkID = factor(OlinkID,
+    dplyr::mutate(OlinkID = factor(OlinkID,
                             levels = olinkid_list)) %>%
-    arrange(OlinkID) %>%
-    pull(Name_Assay) %>%
+    dplyr::arrange(OlinkID) %>%
+    dplyr::pull(Name_Assay) %>%
     unique()
 
   lm.means <- lm.means %>%
-    mutate(Name_Assay = factor(Name_Assay,
+    dplyr::mutate(Name_Assay = factor(Name_Assay,
                                levels = assay_name_list))
 
 
@@ -681,21 +701,21 @@ olink_lmer_plot <- function(df,
 
 
     lmerplot <- lm.means %>%
-      filter(Name_Assay %in% assays_for_plotting) %>%
-      ggplot()+
-      theme(axis.title.x=element_blank())+
-      ylab("NPX")+
-      theme(axis.text.x =  element_text(size = 10))+
-      geom_pointrange(aes(x = as.factor(!!rlang::ensym(x_axis_variable)),
+      dplyr::filter(Name_Assay %in% assays_for_plotting) %>%
+      ggplot2::ggplot()+
+      ggplot2::theme(axis.title.x=ggplot2::element_blank())+
+      ggplot2::ylab("NPX")+
+      ggplot2::theme(axis.text.x =  ggplot2::element_text(size = 10))+
+      ggplot2::geom_pointrange(ggplot2::aes(x = as.factor(!!rlang::ensym(x_axis_variable)),
                           y = emmean,
                           ymin = conf.low,
                           ymax = conf.high,
                           color = as.factor(!!rlang::ensym(color_for_plot))),
-                      position = position_dodge(width=0.4), size=0.8)+
-      facet_wrap(~ Name_Assay,scales = "free_y")+
-      olink_color_discrete(...) +
-      set_plot_theme()+
-      labs(x=x_axis_variable,color=color_for_plot)
+                      position = ggplot2::position_dodge(width=0.4), size=0.8)+
+      ggplot2::facet_wrap(~ Name_Assay,scales = "free_y")+
+      OlinkAnalyze::olink_color_discrete(...) +
+      OlinkAnalyze::set_plot_theme()+
+      ggplot2::labs(x=x_axis_variable,color=color_for_plot)
 
     list_of_plots[[COUNTER]] <- lmerplot
     COUNTER <- COUNTER + 1

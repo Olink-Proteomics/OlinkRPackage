@@ -3,17 +3,44 @@ Type: Package
 Title: Package to Facilitate NPX Data Handling
 Version: 1.2.7
 Author: DS at Olink (given="Data", family="Science", email = "biostattools@olink.com", role = c("aut", "cre"))
-Description: Package for working with Olink NPX data, primarily exported from Olink NPX Manager. 
+Description: Package for working with Olink NPX data, primarily exported from Olink NPX Manager.
+Depends: R (>= 3.6.0)
 Encoding: UTF-8
 LazyData: true
-Depends: broom, car, emmeans, ggfortify, ggrepel, lmerTest, openxlsx, stringr, tidyverse, readxl , RColorBrewer, dplyr, scales, tidyr
 RoxygenNote: 7.1.1
-Suggests: knitr, rmarkdown
+Suggests: 
+    extrafont,
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0),
+    scales,
+    markdown,
+    vdiffr
 License: GPL-3 | file LICENSE
 Maintainer: DS at Olink <biostattools@olink.com>
 VignetteBuilder: knitr
 Imports: 
-    magrittr,
+    car,
+    broom,
+    dplyr,
+    emmeans,
+    forcats,
+    generics,
     ggplot2,
+    ggrepel,
+    grDevices,
+    grid,
+    lme4,
+    lmerTest,
+    magrittr,
     methods,
-    rlang
+    readxl,
+    rlang,
+    stats,
+    stringr,
+    tibble,
+    tidyr,
+    tidyselect,
+    tools,
+    utils
+

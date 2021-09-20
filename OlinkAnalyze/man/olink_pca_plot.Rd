@@ -52,6 +52,7 @@ Imputation by the median is done for assays with missingness <10\% for multi-pla
 }
 \examples{
 \donttest{
+library(dplyr)
 npx_data <- npx_data1 \%>\%
     mutate(SampleID = paste(SampleID, "_", Index, sep = ""))
 olink_pca_plot(df=npx_data, color_g = "QC_Warning")}

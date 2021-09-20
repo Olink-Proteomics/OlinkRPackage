@@ -53,6 +53,9 @@ See \code{olink_lmer} for details of input notation.
 }
 \examples{
 \donttest{
+
+library(dplyr)
+
 lmer_results <- olink_lmer(df = npx_data1,
                            variable=c("Time", 'Treatment'),
                            random = c('Subject'))

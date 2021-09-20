@@ -19,12 +19,17 @@ olink_ttest(df, variable, pair_id, ...)
 A data frame containing the t-test results for every protein.
 }
 \description{
-Performs a Welch 2-sample t-test at confidence level 0.95 for every protein (by OlinkID) for a given grouping variable using stats::t.test and corrects for multiple testing by the Benjamini-Hochberg method (“fdr”) using stats::p.adjust.
+Performs a Welch 2-sample t-test at confidence level 0.95 for every protein (by OlinkID)
+for a given grouping variable using stats::t.test and corrects for multiple testing by
+the Benjamini-Hochberg method (“fdr”) using stats::p.adjust.
 Adjusted p-values are logically evaluated towards adjusted p-value<0.05.
 The resulting t-test table is arranged by ascending p-values.
 }
 \examples{
 \donttest{
+
+library(dplyr)
+
 npx_df <- npx_data1 \%>\% filter(!grepl('control',SampleID, ignore.case = TRUE))
 
 ttest_results <- olink_ttest(df=npx_df,

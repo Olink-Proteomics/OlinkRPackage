@@ -21,6 +21,7 @@
 #' @export
 #' @examples
 #' \donttest{
+#' library(dplyr)
 #' npx_data <- npx_data1 %>%
 #'     mutate(SampleID = paste(SampleID, "_", Index, sep = ""))
 #' olink_pca_plot(df=npx_data, color_g = "QC_Warning")}
@@ -293,7 +294,7 @@ olink_pca_plot <- function (df,
   observation_names <- df_wide$SampleID
   observation_colors <- df_wide$pca_colors
 
-  scores <- cbind(PCX, PCY)
+  scores <- data.frame(cbind(PCX, PCY))
   loadings <- data.frame(variables = rownames(pca_fit$rotation), LX, LY)
 
   range_PX <- c(-abs(min(PCX, na.rm = TRUE)), abs(max(PCX, na.rm = TRUE)))
@@ -315,16 +316,16 @@ olink_pca_plot <- function (df,
   if(label_samples){
 
     pca_plot <- pca_plot +
-      geom_text(aes(label = observation_names, color = observation_colors), size = 3) +
-      labs(color = color_g) +
-      guides(size = FALSE)
+      ggplot2::geom_text(ggplot2::aes(label = observation_names, color = observation_colors), size = 3) +
+      ggplot2::labs(color = color_g) +
+      ggplot2::guides(size = FALSE)
 
   }else{
 
     pca_plot <- pca_plot +
-      geom_point(aes(color = observation_colors), size = 2.5) +
-      labs(color = color_g) +
-      guides(size = FALSE)
+      ggplot2::geom_point(ggplot2::aes(color = observation_colors), size = 2.5) +
+      ggplot2::labs(color = color_g) +
+      ggplot2::guides(size = FALSE)
 
   }
 

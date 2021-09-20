@@ -13,12 +13,12 @@ read_NPX(filename)
 A tibble in long format.
 }
 \description{
-Imports an NPX file exported from NPX Manager. 
+Imports an NPX file exported from NPX Manager.
 No alterations to the output NPX Manager format is allowed.
 }
 \examples{
 \donttest{
-file <- system.file("extdata", "Example_NPX_data.csv", package = "OlinkAnalyze")
+file <- system.file("extdata", "Example_NPX_Data.csv", package = "OlinkAnalyze")
 read_NPX(file)
 }
 }
