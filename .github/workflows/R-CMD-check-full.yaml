@@ -60,6 +60,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          install.packages("stringi", type="source", repos='http://cran.us.r-project.org')
           remotes::install_deps(pkgdir = "OlinkAnalyze", dependencies = TRUE)
           remotes::install_cran("rcmdcheck")
         shell: Rscript {0}

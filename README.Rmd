@@ -20,8 +20,8 @@ The goal of OlinkAnalyze is to provide a versatile toolbox to enable easy and sm
 ## Installation
 
 ```{r, eval=FALSE}
-# install.packages("devtools")
-devtools::install_github(repo ='Olink-Proteomics/OlinkRPackage/OlinkAnalyze', build_vignettes = TRUE)
+# install.packages("remotes")
+remotes::install_github(repo ='Olink-Proteomics/OlinkRPackage/OlinkAnalyze', ref = "main", build_vignettes = TRUE)
 ```
 
 ## Vignette
