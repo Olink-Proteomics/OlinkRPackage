@@ -94,7 +94,9 @@ olink_bridgeselector<-function(df, sampleMissingFreq, n, warning_string = NULL){
   Bridgesamples <- floor(seq(1,nrow(df_2),length.out = n+2)[c(-1, -(n+2))])
 
   SelectedBridges <- df_2 %>%
-    dplyr::filter(Order %in% Bridgesamples)
+    dplyr::filter(Order %in% Bridgesamples) %>%
+    dplyr::slice_sample(n = nrow(.)) %>%
+    dplyr::select(-Order)
 
   return(SelectedBridges)
 }
