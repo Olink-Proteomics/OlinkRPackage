@@ -9,7 +9,7 @@
 #' @keywords NPX
 #' @export
 #' @examples \donttest{olink_dist_plot(npx_data1, color_g = "QC_Warning")}
-#' @importFrom dplyr filter mutate group_by ungroup
+#' @importFrom dplyr filter mutate group_by ungroup if_else
 #' @importFrom stats reorder
 #' @importFrom ggplot2 ggplot aes scale_x_discrete geom_boxplot xlab facet_wrap
 #' @importFrom stringr str_replace

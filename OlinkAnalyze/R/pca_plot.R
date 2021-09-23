@@ -25,18 +25,7 @@
 #' npx_data <- npx_data1 %>%
 #'     mutate(SampleID = paste(SampleID, "_", Index, sep = ""))
 #' olink_pca_plot(df=npx_data, color_g = "QC_Warning")}
-#' @importFrom magrittr %>%
-#' @importFrom dplyr filter select group_by ungroup mutate mutate_at if_else n_distinct summarise left_join arrange distinct
-#' @importFrom stringr str_detect
-#' @importFrom tidyr spread
-#' @importFrom tidyselect all_of
-#' @importFrom rlang ensym
-#' @importFrom tibble column_to_rownames
-#' @importFrom stats prcomp
-#' @importFrom ggplot2 ggplot aes xlab ylab geom_text geom_point geom_segment  labs guides arrow
-#' @importFrom ggrepel geom_label_repel
-#' @importFrom utils head
-#' @importFrom grid unit
+#' @import dplyr stringr tidyr ggfortify ggrepel
 
 olink_pca_plot <- function (df,
                             color_g = "QC_Warning",
@@ -75,29 +64,29 @@ olink_pca_plot <- function (df,
 
   #Filtering on valid OlinkID
   df <- df %>%
-    dplyr::filter(stringr::str_detect(OlinkID,
+    filter(stringr::str_detect(OlinkID,
                                "OID[0-9]{5}"))
 
   if (color_g == "QC_Warning"){
 
     df_temp <- df %>%
-      dplyr::group_by(SampleID, Index) %>%
-      dplyr::mutate(QC_Warning = dplyr::if_else(any(QC_Warning == "Warning"|QC_Warning == "WARN" ), "Warning", "Pass")) %>%
-      dplyr::ungroup()
+      group_by(SampleID, Index) %>%
+      mutate(QC_Warning = if_else(any(QC_Warning == "Warning"|QC_Warning == "WARN" ), "Warning", "Pass")) %>%
+      ungroup()
 
     colors_for_pca <- df_temp %>%
-      dplyr::group_by(SampleID, Index) %>%
-      dplyr::summarise(pca_colors = unique(!!rlang::ensym(color_g))) %>%
-      dplyr::ungroup()
+      group_by(SampleID, Index) %>%
+      summarise(pca_colors = unique(!!rlang::ensym(color_g))) %>%
+      ungroup()
 
 
   } else {
 
     number_of_sample_w_more_than_one_color <- df %>%
-      dplyr::group_by(SampleID, Index) %>%
-      dplyr::summarise(n_colors = dplyr::n_distinct(!!rlang::ensym(color_g), na.rm = TRUE)) %>%
-      dplyr::ungroup() %>%
-      dplyr::filter(n_colors > 1) %>%
+      group_by(SampleID, Index) %>%
+      summarise(n_colors = n_distinct(!!rlang::ensym(color_g), na.rm = TRUE)) %>%
+      ungroup() %>%
+      filter(n_colors > 1) %>%
       nrow(.)
 
     if(number_of_sample_w_more_than_one_color > 0) {
@@ -109,9 +98,9 @@ olink_pca_plot <- function (df,
       df_temp <- df
 
       colors_for_pca <- df_temp %>%
-        dplyr::group_by(SampleID, Index) %>%
-        dplyr::summarise(pca_colors = unique(!!rlang::ensym(color_g))) %>%
-        dplyr::ungroup()
+        group_by(SampleID, Index) %>%
+        summarise(pca_colors = unique(!!rlang::ensym(color_g))) %>%
+        ungroup()
 
     }
 
@@ -120,18 +109,18 @@ olink_pca_plot <- function (df,
   #Checking if there are any proteins with 0 variance, they are filtered out
 
   df_temp <- df_temp %>%
-    dplyr::group_by(OlinkID) %>%
-    dplyr::mutate(assay_var = var(NPX, na.rm = TRUE)) %>%
-    dplyr::ungroup() %>%
-    dplyr::filter(!(assay_var == 0 | is.na(assay_var))) %>%
-    dplyr::select(-assay_var)
+    group_by(OlinkID) %>%
+    mutate(assay_var = var(NPX, na.rm = TRUE)) %>%
+    ungroup() %>%
+    filter(!(assay_var == 0 | is.na(assay_var))) %>%
+    select(-assay_var)
 
   #wide format
 
   df_wide <- df_temp %>%
-    dplyr::select(SampleID, Index, OlinkID, NPX) %>%
-    dplyr::filter(!is.na(NPX)) %>%
-    tidyr::spread(OlinkID, NPX)
+    select(SampleID, Index, OlinkID, NPX) %>%
+    filter(!is.na(NPX)) %>%
+    spread(OlinkID, NPX)
 
 
   #Dropping any cols with NA
@@ -141,7 +130,7 @@ olink_pca_plot <- function (df,
     dropped_assays <- colnames(df_wide[, -c(1:2)])[apply(df_wide[, -c(1:2)], 2, anyNA)]
 
     df_wide <- df_wide %>%
-      dplyr::select(-tidyselect::all_of(dropped_assays))
+      select(-tidyselect::all_of(dropped_assays))
 
     if(verbose){
       warning(paste0(length(dropped_assays)),
@@ -265,7 +254,7 @@ olink_pca_plot <- function (df,
     imputed_assays <- colnames(df_wide)[imputed_assays_index]
 
     df_wide <- df_wide %>%
-      dplyr::mutate_at(tidyselect::all_of(imputed_assays),
+      mutate_at(tidyselect::all_of(imputed_assays),
                 ~ifelse(is.na(.x), median(.x, na.rm = TRUE), .x))
 
     if(verbose){
@@ -280,17 +269,17 @@ olink_pca_plot <- function (df,
   }
 
   df_wide <- df_wide %>%
-    dplyr::left_join(colors_for_pca,
+    left_join(colors_for_pca,
               by = c('SampleID',
                      'Index')) %>%
-    dplyr::select(SampleID, Index, pca_colors, everything())
+    select(SampleID, Index, pca_colors, everything())
 
   df_wide_matrix <- df_wide %>%
-    dplyr::select(-Index, -pca_colors) %>%
-    tibble::column_to_rownames('SampleID') %>%
+    select(-Index, -pca_colors) %>%
+    column_to_rownames('SampleID') %>%
     as.matrix
 
-  pca_fit <- stats::prcomp(df_wide_matrix, scale. = TRUE, center = TRUE)
+  pca_fit <- prcomp(df_wide_matrix, scale. = TRUE, center = TRUE)
 
   #Standardizing and selecting components
 
@@ -317,9 +306,9 @@ olink_pca_plot <- function (df,
 
   #Plotting
 
-  pca_plot <- ggplot2::ggplot(scores, ggplot2::aes(x = PCX, y = PCY)) +
-    ggplot2::xlab(paste0("PC", x_val,  " (", round(PoV[x_val]*100, digits = 2), "%)")) +
-    ggplot2::ylab(paste0("PC", y_val, " (", round(PoV[y_val]*100, digits = 2), "%)"))
+  pca_plot <- ggplot(scores, aes(x = PCX, y = PCY)) +
+    xlab(paste0("PC", x_val,  " (", round(PoV[x_val]*100, digits = 2), "%)")) +
+    ylab(paste0("PC", y_val, " (", round(PoV[y_val]*100, digits = 2), "%)"))
 
 
   #Drawing scores
@@ -329,14 +318,14 @@ olink_pca_plot <- function (df,
     pca_plot <- pca_plot +
       ggplot2::geom_text(ggplot2::aes(label = observation_names, color = observation_colors), size = 3) +
       ggplot2::labs(color = color_g) +
-      ggplot2::guides(size = "none")
+      ggplot2::guides(size = FALSE)
 
   }else{
 
     pca_plot <- pca_plot +
       ggplot2::geom_point(ggplot2::aes(color = observation_colors), size = 2.5) +
       ggplot2::labs(color = color_g) +
-      ggplot2::guides(size = "none")
+      ggplot2::guides(size = FALSE)
 
   }
 
@@ -356,10 +345,10 @@ olink_pca_plot <- function (df,
       #Largest loadings based on Pythagoras
 
       N_loadings <- loadings %>%
-        dplyr::mutate(abs_loading = sqrt(LX^2 + LY^2)) %>%
-        dplyr::arrange(desc(abs_loading)) %>%
-        utils::head(n_loadings) %>%
-        dplyr::select(-abs_loading)
+        mutate(abs_loading = sqrt(LX^2 + LY^2)) %>%
+        arrange(desc(abs_loading)) %>%
+        head(n_loadings) %>%
+        select(-abs_loading)
     }
 
     if(!is.null(loadings_list)){
@@ -367,23 +356,23 @@ olink_pca_plot <- function (df,
       #Selected loadings
 
       L_loadings <- loadings %>%
-        dplyr::filter(variables %in% loadings_list)
+        filter(variables %in% loadings_list)
     }
 
     loadings <- rbind(N_loadings,
                       L_loadings) %>%
-      dplyr::distinct()
+      distinct()
 
     pca_plot <- pca_plot +
-      ggplot2::geom_segment(data = loadings,
-                   ggplot2::aes(x = 0,
+      geom_segment(data = loadings,
+                   aes(x = 0,
                        y = 0,
                        xend = LX*loadings_scaling_factor,
                        yend = LY*loadings_scaling_factor),
-                   arrow = ggplot2::arrow(length = grid::unit(1/2, "picas")),
+                   arrow = arrow(length = unit(1/2, "picas")),
                    color = "black") +
-      ggrepel::geom_label_repel(data = loadings,
-                       ggplot2::aes(x = LX*loadings_scaling_factor,
+      geom_label_repel(data = loadings,
+                       aes(x = LX*loadings_scaling_factor,
                            y = LY*loadings_scaling_factor,
                            label = variables),
                        box.padding = 1,
@@ -393,8 +382,8 @@ olink_pca_plot <- function (df,
 
 
   pca_plot <- pca_plot +
-    OlinkAnalyze::set_plot_theme() +
-    OlinkAnalyze::olink_color_discrete(...)
+    set_plot_theme() +
+    olink_color_discrete(...)
 
   return(pca_plot)
 
