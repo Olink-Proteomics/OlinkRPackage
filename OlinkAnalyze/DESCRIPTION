@@ -7,7 +7,7 @@ Description: Package for working with Olink NPX data, primarily exported from Ol
 Depends: R (>= 3.6.0)
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Suggests: 
     extrafont,
     knitr,
