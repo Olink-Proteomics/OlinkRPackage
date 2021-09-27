@@ -58,21 +58,12 @@ olink_dist_plot <- function(df, color_g = 'QC_Warning', ...) {
     ggplot2::scale_x_discrete(labels = function(x) gsub(reg, "", x), ...)
   }
 
-  # Remove "Olink", Target 96" and "Target 48" from the panel name(s)
+  #If not all are Pass, the QC_Warning is set as warning for plotting purposes
   df_OlinkID_fixed <- df_OlinkID %>%
-    dplyr::mutate(Panel = Panel  %>% stringr::str_replace("Olink ", "") %>%
-             stringr::str_replace("Target 96 ", "") %>%
-             stringr::str_replace("Target 48 ", "")) %>%
     dplyr::group_by(SampleID, Index, Panel) %>%
-    dplyr::mutate(QC_Warning = dplyr::if_else(QC_Warning == "WARN",
-                                       "Warning",
-                                       QC_Warning)) %>%
-    dplyr::mutate(QC_Warning = dplyr::if_else(QC_Warning == "PASS",
-                                       "Pass",
-                                       QC_Warning)) %>%
-    dplyr::mutate(QC_Warning = dplyr::if_else(QC_Warning == "FAIL",
-                                       "Fail",
-                                       QC_Warning)) %>%
+    dplyr::mutate(QC_Warning = dplyr::if_else(all(toupper(QC_Warning) == 'PASS'),
+                                              'PASS',
+                                              'WARNING')) %>%
     dplyr::ungroup()
 
   df_OlinkID_fixed %>%
