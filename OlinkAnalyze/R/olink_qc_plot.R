@@ -52,6 +52,9 @@ olink_qc_plot <- function(df, color_g = "QC_Warning", plot_index = F, label_outl
 
   npx_df_qr <- npx_df %>%
     dplyr::group_by(Panel, SampleID, Index) %>%
+    dplyr::mutate(QC_Warning = dplyr::if_else(all(toupper(QC_Warning) == 'PASS'),
+                                              'PASS',
+                                              'WARNING')) %>%
     dplyr::mutate(IQR = IQR(NPX, na.rm = T),
            sample_median = median(NPX, na.rm = T)) %>%
     dplyr::ungroup() %>%
