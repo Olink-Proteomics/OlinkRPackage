@@ -19,6 +19,7 @@
 #' @importFrom rlang ensym
 #' @importFrom ggplot2 ggplot geom_hline geom_vline xlab facet_wrap geom_text geom_point
 #' @importFrom ggrepel geom_label_repel
+#' @importFrom stringr str_detect str_replace
 
 olink_qc_plot <- function(df, color_g = "QC_Warning", plot_index = F, label_outliers = T, ...){
 
@@ -74,6 +75,7 @@ olink_qc_plot <- function(df, color_g = "QC_Warning", plot_index = F, label_outl
 
 
   qc_plot <- npx_df_qr %>%
+    dplyr::mutate(Panel = Panel  %>% stringr::str_replace("Olink ", "")) %>%
     ggplot2::ggplot(ggplot2::aes(x = sample_median, y = IQR)) +
     ggplot2::geom_hline(ggplot2::aes(yintercept=iqr_low),
                linetype = 'dashed',
