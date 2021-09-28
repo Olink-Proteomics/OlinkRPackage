@@ -10,7 +10,6 @@
 #' @param df Tibble/data frame in long format such as produced by the olinkr read_NPX function.
 #' @param sampleMissingFreq The threshold for sample wise missingness.
 #' @param n Number of bridge samples to be selected.
-#' @param warning_string The string used to indicate that a sample received a QC warning. Most common, it is either "WARN" or "Warning". If this is not given, the function tries to detect it from the given data frame.
 #'
 #' @return Tibble with sample ID:s and mean NPX for a defined number of bridging samples.
 #' @export
@@ -21,27 +20,9 @@
 #' @importFrom dplyr n select distinct arrange group_by mutate ungroup left_join filter
 #' @importFrom stringr str_detect
 
-olink_bridgeselector<-function(df, sampleMissingFreq, n, warning_string = NULL){
+olink_bridgeselector<-function(df, sampleMissingFreq, n){
 
-
-  # Find the string used to indicate a flagged sample
-  if (is.null(warning_string)) {
-    QC_Warning_strings <- (df %>%
-                             dplyr::select(QC_Warning) %>%
-                             dplyr::distinct() %>%
-                             dplyr::arrange(QC_Warning))$QC_Warning
-
-    if (length(stringr::str_subset(QC_Warning_strings,'W')) == 1) {
-      warning_string <- stringr::str_subset(QC_Warning_strings,'W')}
-    else {
-      stop('Could not identify the string used to indicate a flagged sample.
-             Please specify it with the optional argument warning_string.
-             Most commonly it is either "Warning" or "WARN".')
-    }
-  }
-
-  warning_string_withFail <- c(warning_string, 'FAIL')
-
+  
   #Filtering on valid OlinkID
   df <- df %>%
     dplyr::filter(stringr::str_detect(OlinkID,
@@ -76,15 +57,18 @@ olink_bridgeselector<-function(df, sampleMissingFreq, n, warning_string = NULL){
     dplyr::left_join(qc_outliers, by = c('SampleID', 'Index', 'Panel')) %>%
     dplyr::mutate(NPX = ifelse(NPX <= LOD, NA, NPX)) %>%
     dplyr::group_by(SampleID) %>%
-    dplyr::mutate(Warnings = sum(QC_Warning %in% c(warning_string_withFail))) %>%
-    dplyr::filter(Warnings == 0) %>%
+    dplyr::mutate(QC_Warning = dplyr::if_else(all(toupper(QC_Warning) == 'PASS'),
+                                              'PASS',
+                                              'WARNING')) %>%
+    dplyr::filter(QC_Warning == 'PASS') %>%
     dplyr::mutate(Outliers = sum(Outlier)) %>%
     dplyr::filter(Outliers == 0) %>%
     dplyr::mutate(PercAssaysBelowLOD = sum(is.na(NPX))/dplyr::n()) %>%
     dplyr::mutate(MeanNPX = mean(NPX, na.rm = T)) %>%
     dplyr::ungroup() %>%
     dplyr::filter(PercAssaysBelowLOD < sampleMissingFreq)
-
+  
+  
   df_2 <- df_1 %>%
     dplyr::select(SampleID, PercAssaysBelowLOD, MeanNPX) %>%
     dplyr::distinct() %>%
