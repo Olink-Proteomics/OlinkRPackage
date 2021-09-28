@@ -515,7 +515,7 @@ The olink_dist_plot function generates boxplots of NPX values for each sample, f
 
 ```{r message=FALSE, fig.width=8, fig.height=4}
 npx_data1 %>% 
-  filter(Panel == 'Olink CARDIOMETABOLIC') %>% # For this example only plotting one panel.
+  filter(Panel == 'Olink Cardiometabolic') %>% # For this example only plotting one panel.
   olink_dist_plot() +
   theme(axis.text.x = element_blank()) # Due to the number of samples one can remove the text or rotate it
 ```
@@ -598,7 +598,7 @@ The olink_qc_plot function generates a facet plot per Panel using ggplot and ggp
 ```{r message=FALSE, fig.width=8, fig.height=4}
 npx_data1 %>% 
   filter(!str_detect(SampleID, 'CONTROL_SAMPLE'),
-         Panel == 'Olink DEVELOPMENT') %>% 
+         Panel == 'Olink Development') %>% 
   olink_qc_plot(color_g = "QC_Warning")   
 ```
 
