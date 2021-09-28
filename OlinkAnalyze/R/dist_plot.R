@@ -12,7 +12,7 @@
 #' @importFrom dplyr filter mutate group_by ungroup if_else
 #' @importFrom stats reorder
 #' @importFrom ggplot2 ggplot aes scale_x_discrete geom_boxplot xlab facet_wrap
-#' @importFrom stringr str_replace
+#' @importFrom stringr str_replace str_detect
 #' @importFrom magrittr %>%
 #' @importFrom rlang ensym
 
