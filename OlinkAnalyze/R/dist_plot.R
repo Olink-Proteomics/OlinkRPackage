@@ -64,7 +64,7 @@ olink_dist_plot <- function(df, color_g = 'QC_Warning', ...) {
     dplyr::group_by(SampleID, Index, Panel) %>%
     dplyr::mutate(QC_Warning = dplyr::if_else(all(toupper(QC_Warning) == 'PASS'),
                                               'PASS',
-                                              'WARNING')) %>%
+                                              'Warning')) %>%
     dplyr::ungroup()
 
   df_OlinkID_fixed %>%
