@@ -48,13 +48,13 @@ jobs:
         run: |
           remotes::install_deps(pkgdir = "OlinkAnalyze", dependencies = TRUE)
           install.packages("stringi", type="source")
-          remotes::install_cran("roxygen2")          
+          remotes::install_cran("roxygen2")
         shell: Rscript {0}
 
 
       - name: Render Rmarkdown files
         run: |
-          RMD_PATH=($(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '[.]Rmd$' || echo "No Rmd changed"))
+          RMD_PATH=($(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '[.]Rmd$' | grep -v vignette || echo "No Rmd changed"))
           Rscript -e 'for (f in commandArgs(TRUE)) if (file.exists(f)) rmarkdown::render(f)' ${RMD_PATH[*]}
 
       - name: Commit results
