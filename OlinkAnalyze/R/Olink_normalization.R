@@ -291,22 +291,12 @@ olink_normalization <- function(df1,
 
 #' Normalization of all proteins (by OlinkID).
 #'
-#' Normalizes an NPX data frame to another data frame, or to reference medians. If the two data frames are normalized to one another, Olinks default is using the older data frame as reference.
-#' The function handles four different types of normalization: \cr\cr
-#' Bridging normalization: One of the data frames is adjusted to the other using overlapping samples (bridge samples).
+#' Normalizes an NPX data frame to another data frame using overlapping samples (bridge samples). By default, the older data frame will be used as reference.\cr\cr
 #' The overlapping samples need to be named the same in the two data frames and adjustment is made using the median of the paired differences between the bridge samples in the two data frames.
-#' The two data frames are inputs df1 and df2, the one being adjusted to is specified in the input reference_project and the overlapping samples are specified in overlapping_samples_df1.
-#' Only overlapping_samples_df1 should be input, no matter which dataframe is used as reference_project.  \cr\cr
-#' Subset normalization: One of the data frames is adjusted to the other using a sample subset.
-#' Adjustment is made using the differences in median between the subsets from the two data frames.
-#' Both overlapping_samples_df1 and overlapping_samples_df2 need to be input.
-#' The samples do not need to be named the same. \cr\cr
-#' Intensity normalization: A version of subset normalization where all samples (except control samples) from the data frames are input as overlapping_samples_df1 and overlapping_samples_df2, respectively. \cr\cr
-#' Reference median normalization: Working only on one data frame. This is effectively subset normalization, but using difference of medians to pre-recorded median values.
-#' df1, overlapping_samples_df1 and reference_medians need to be specified. Adjustment of df1 is made using the differences in median between the overlapping samples and the reference medians.
+#' The two data frames are inputs df1 and df2, the one being adjusted to is specified in the input reference_project, and the overlapping samples are specified in overlapping_samples.
 #'
 #' @param df1 First dataframe to be used in normalization (required).
-#' @param df2 Second dataframe to be used in normalization
+#' @param df2 Second dataframe to be used in normalization (required).
 #' @param df1_project_nr Project name of first dataset.
 #' @param df2_project_nr Project name of second dataset.
 #' @param overlapping_samples Samples to be used for adjustment factor calculation (required).
@@ -323,7 +313,6 @@ olink_normalization <- function(df1,
 #' npx_df1 <- npx_data1 %>% dplyr::mutate(Project = 'P1')
 #' npx_df2 <- npx_data2 %>% dplyr::mutate(Project = 'P2')
 #'
-#' #Bridging normalization:
 #' # Find overlapping samples, but exclude Olink control
 #' overlap_samples <- intersect((npx_df1 %>%
 #'                                dplyr::filter(!grepl("control", SampleID,
@@ -338,35 +327,6 @@ olink_normalization <- function(df1,
 #'                     df1_project_nr = 'P1',
 #'                     df2_project_nr = 'P2',
 #'                     reference_project = 'P1')
-#'
-#' #Subset normalization:
-#' # Find a suitable subset of samples from both projects, but exclude Olink controls
-#' df1_sampleIDs <- (npx_df1 %>%
-#'     dplyr::filter(!grepl("control", SampleID, ignore.case=TRUE)) %>%
-#'     dplyr::select(SampleID) %>%
-#'     dplyr::distinct())$SampleID
-#' df2_sampleIDs <- (npx_df2 %>%
-#'     dplyr::filter(!grepl("control", SampleID, ignore.case=TRUE)) %>%
-#'     dplyr::select(SampleID) %>%
-#'     dplyr::distinct())$SampleID
-#' some_samples_df1 <- sample(df1_sampleIDs, 16)
-#' some_samples_df2 <- sample(df2_sampleIDs, 16)
-#' # Normalize
-#' olink_normalization(df1 = npx_df1,
-#'                     df2 = npx_df2,
-#'                     overlapping_samples_df1 = some_samples_df1,
-#'                     overlapping_samples_df2 = some_samples_df2)
-#'
-#' #Reference median normalization:
-#' # For the sake of this example, set the reference median to 1
-#' ref_median_df <- npx_df1 %>%
-#'     dplyr::select(OlinkID) %>%
-#'     dplyr::distinct() %>%
-#'     dplyr::mutate(Reference_NPX = 1)
-#' # Normalize
-#' olink_normalization(df1 = npx_df1,
-#'                     overlapping_samples_df1 = some_samples_df1,
-#'                     reference_medians = ref_median_df)
 #' }
 #' @importFrom magrittr %>%
 #' @importFrom stringr str_detect str_replace
@@ -462,11 +422,7 @@ olink_bridging <- function(df1,
 #' Normalization of all proteins (by OlinkID).
 #'
 #' Normalizes an NPX data frame to another data frame, or to reference medians. If the two data frames are normalized to one another, Olinks default is using the older data frame as reference.
-#' The function handles four different types of normalization: \cr\cr
-#' Bridging normalization: One of the data frames is adjusted to the other using overlapping samples (bridge samples).
-#' The overlapping samples need to be named the same in the two data frames and adjustment is made using the median of the paired differences between the bridge samples in the two data frames.
-#' The two data frames are inputs df1 and df2, the one being adjusted to is specified in the input reference_project and the overlapping samples are specified in overlapping_samples_df1.
-#' Only overlapping_samples_df1 should be input, no matter which dataframe is used as reference_project.  \cr\cr
+#' The function handles three different types of normalization: \cr\cr
 #' Subset normalization: One of the data frames is adjusted to the other using a sample subset.
 #' Adjustment is made using the differences in median between the subsets from the two data frames.
 #' Both overlapping_samples_df1 and overlapping_samples_df2 need to be input.
@@ -479,8 +435,8 @@ olink_bridging <- function(df1,
 #' @param df2 Second dataframe to be used in normalization
 #' @param df1_project_nr Project name of first dataset.
 #' @param df2_project_nr Project name of second dataset.
-#' @param overlapping_samples_df1 Samples to be used for adjustment factor calculation in df1 (required).
-#' @param overlapping_samples_df2 Samples to be used for adjustment factor calculation in df2.
+#' @param normalization_samples_df1 Samples to be used for adjustment factor calculation in df1 (required).
+#' @param normalization_samples_df2 Samples to be used for adjustment factor calculation in df2.
 #' @param reference_project Project name of reference_project. Needs to be the same as either df1_project_nr or df2_project_nr. The project to which the second project is adjusted to.
 #' @param reference_medians Dataframe which needs to contain columns "OlinkID", and "Reference_NPX". Used for reference median normalization.
 #'
@@ -495,21 +451,11 @@ olink_bridging <- function(df1,
 #' npx_df1 <- npx_data1 %>% dplyr::mutate(Project = 'P1')
 #' npx_df2 <- npx_data2 %>% dplyr::mutate(Project = 'P2')
 #'
-#' #Bridging normalization:
-#' # Find overlapping samples, but exclude Olink control
-#' overlap_samples <- intersect((npx_df1 %>%
-#'                                dplyr::filter(!grepl("control", SampleID,
-#'                                                      ignore.case=TRUE)))$SampleID,
-#'                              (npx_df2 %>%
-#'                                dplyr::filter(!grepl("control", SampleID,
-#'                                                      ignore.case=TRUE)))$SampleID)
-#' # Normalize
+#' #Intensity normalization:
 #' olink_normalization(df1 = npx_df1,
 #'                     df2 = npx_df2,
-#'                     overlapping_samples_df1 = overlap_samples,
-#'                     df1_project_nr = 'P1',
-#'                     df2_project_nr = 'P2',
-#'                     reference_project = 'P1')
+#'                     normalization_samples_df1 = npx_df1$SampleID,
+#'                     normalization_samples_df2 = npx_df2$SampleID)
 #'
 #' #Subset normalization:
 #' # Find a suitable subset of samples from both projects, but exclude Olink controls
@@ -526,8 +472,8 @@ olink_bridging <- function(df1,
 #' # Normalize
 #' olink_normalization(df1 = npx_df1,
 #'                     df2 = npx_df2,
-#'                     overlapping_samples_df1 = some_samples_df1,
-#'                     overlapping_samples_df2 = some_samples_df2)
+#'                     normalization_samples_df1 = some_samples_df1,
+#'                     normalization_samples_df2 = some_samples_df2)
 #'
 #' #Reference median normalization:
 #' # For the sake of this example, set the reference median to 1
@@ -537,7 +483,7 @@ olink_bridging <- function(df1,
 #'     dplyr::mutate(Reference_NPX = 1)
 #' # Normalize
 #' olink_normalization(df1 = npx_df1,
-#'                     overlapping_samples_df1 = some_samples_df1,
+#'                     normalization_samples_df1 = some_samples_df1,
 #'                     reference_medians = ref_median_df)
 #' }
 #' @importFrom magrittr %>%
