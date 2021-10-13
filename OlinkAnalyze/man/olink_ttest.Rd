@@ -13,13 +13,13 @@ olink_ttest(df, variable, pair_id, ...)
 
 \item{pair_id}{Character value indicating which column indicates the paired sample identifier.}
 
-\item{...}{Options to be passed to t.test. See ?t.test for more.}
+\item{...}{Options to be passed to t.test. See \code{?t.test} for more information.}
 }
 \value{
 A data frame containing the t-test results for every protein.
 }
 \description{
-Performs a Welch 2-sample t-test at confidence level 0.95 for every protein (by OlinkID)
+Performs a Welch 2-sample t-test or paired t-test at confidence level 0.95 for every protein (by OlinkID)
 for a given grouping variable using stats::t.test and corrects for multiple testing by
 the Benjamini-Hochberg method (“fdr”) using stats::p.adjust.
 Adjusted p-values are logically evaluated towards adjusted p-value<0.05.

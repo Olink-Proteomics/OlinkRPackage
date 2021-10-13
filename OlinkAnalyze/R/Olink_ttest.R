@@ -1,6 +1,6 @@
 #'Function which performs a t-test per protein
 #'
-#'Performs a Welch 2-sample t-test at confidence level 0.95 for every protein (by OlinkID)
+#'Performs a Welch 2-sample t-test or paired t-test at confidence level 0.95 for every protein (by OlinkID)
 #'for a given grouping variable using stats::t.test and corrects for multiple testing by
 #'the Benjamini-Hochberg method (“fdr”) using stats::p.adjust.
 #'Adjusted p-values are logically evaluated towards adjusted p-value<0.05.
@@ -9,7 +9,7 @@
 #' @param df NPX data frame in long format with at least protein name (Assay), OlinkID, UniProt and a factor with 2 levels.
 #' @param variable Character value indicating which column should be used as the grouping variable. Needs to have exactly 2 levels.
 #' @param pair_id Character value indicating which column indicates the paired sample identifier.
-#' @param ... Options to be passed to t.test. See ?t.test for more.
+#' @param ... Options to be passed to t.test. See \code{?t.test} for more information.
 #' @return A data frame containing the t-test results for every protein.
 #' @export
 #' @examples

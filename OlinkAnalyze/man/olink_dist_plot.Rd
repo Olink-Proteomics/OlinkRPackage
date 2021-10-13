@@ -9,7 +9,7 @@ olink_dist_plot(df, color_g = "QC_Warning", ...)
 \arguments{
 \item{df}{NPX data frame in long format. Must have columns SampleID, NPX and Panel}
 
-\item{color_g}{Character value indicating which column to use as fill color (default QC_Warning)}
+\item{color_g}{Character value indicating which column to use as fill color (default: QC_Warning)}
 
 \item{...}{Color option passed to specify color order.}
 }
@@ -17,7 +17,8 @@ olink_dist_plot(df, color_g = "QC_Warning", ...)
 An object of class "ggplot"
 }
 \description{
-Generates boxplots of NPX vs. protein (OlinkID) colored by QC_Warning and faceted by Panel using ggplot and ggplot2::geom_boxplot.
+Generates boxplots of NPX vs. protein (OlinkID) colored by QC_Warning (default) or any other grouping variable 
+and faceted by Panel using ggplot and ggplot2::geom_boxplot.
 }
 \examples{
 \donttest{olink_dist_plot(npx_data1, color_g = "QC_Warning")}

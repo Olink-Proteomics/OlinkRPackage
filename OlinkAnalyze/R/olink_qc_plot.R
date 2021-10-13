@@ -10,7 +10,7 @@
 #' a sample's unique index number is displayed.
 #' @param label_outliers Boolean. If TRUE, an outlier sample will be labelled with its SampleID.
 #' @param ... coloroption passed to specify color order
-#' @return An object of class "ggplot2::ggplot"
+#' @return An object of class "ggplot"
 #' @keywords NPX
 #' @export
 #' @examples \donttest{olink_qc_plot(npx_data1, color_g = "QC_Warning")}

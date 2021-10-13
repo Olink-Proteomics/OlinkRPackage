@@ -25,7 +25,7 @@ Variable(s) to test. If length > 1, the included variable names will be used in 
 Also takes ':' notation.}
 
 \item{covariates}{Single character value or character array. Default: NULL.
-Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be inferred from main effects.}
+Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be inferred from main effects.}
 
 \item{outcome}{Character. The dependent variable. Default: NPX.}
 
