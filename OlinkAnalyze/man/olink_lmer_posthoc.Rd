@@ -21,7 +21,7 @@ olink_lmer_posthoc(
 
 \item{variable}{Single character value or character array.
 Variable(s) to test. If length > 1, the included variable names will be used in crossed analyses .
-Also takes ':'/'*' notation.}
+Also takes ':' or '*' notation.}
 
 \item{olinkid_list}{Character vector of OlinkID's on which to perform post hoc analysis. If not specified, all assays in df are used.}
 
@@ -32,7 +32,7 @@ Also takes ':'/'*' notation.}
 \item{random}{Single character value or character array.}
 
 \item{covariates}{Single character value or character array. Default: NULL.
-Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be inferred from main effects.}
+Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be inferred from main effects.}
 
 \item{mean_return}{Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = T and no adjustment is performed.}
 

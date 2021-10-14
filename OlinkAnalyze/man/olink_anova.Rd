@@ -18,14 +18,14 @@ olink_anova(
 
 \item{variable}{Single character value or character array.
 Variable(s) to test. If length > 1, the included variable names will be used in crossed analyses .
-Also takes ':'/'*' notation.}
+Also takes ':' or '*' notation.}
 
 \item{outcome}{Character. The dependent variable. Default: NPX.}
 
 \item{covariates}{Single character value or character array. Default: NULL.
-Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be inferred from main effects.}
+Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be inferred from main effects.}
 
-\item{return.covariates}{Boolean. Deafult: False. Returns F-test results for the covariates. Note: Adjusted p-values will be NA for the covariates.}
+\item{return.covariates}{Boolean. Default: False. Returns F-test results for the covariates. Note: Adjusted p-values will be NA for the covariates.}
 
 \item{verbose}{Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
 }

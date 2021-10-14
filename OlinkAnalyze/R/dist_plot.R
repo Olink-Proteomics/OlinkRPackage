@@ -1,9 +1,10 @@
 #' Function to plot the NPX distribution by panel
 #'
-#' Generates boxplots of NPX vs. protein (OlinkID) colored by QC_Warning and faceted by Panel using ggplot and ggplot2::geom_boxplot.
+#' Generates boxplots of NPX vs. protein (OlinkID) colored by QC_Warning (default) or any other grouping variable 
+#' and faceted by Panel using ggplot and ggplot2::geom_boxplot.
 #'
 #' @param df NPX data frame in long format. Must have columns SampleID, NPX and Panel
-#' @param color_g Character value indicating which column to use as fill color (default QC_Warning)
+#' @param color_g Character value indicating which column to use as fill color (default: QC_Warning)
 #' @param ... Color option passed to specify color order.
 #' @return An object of class "ggplot"
 #' @keywords NPX

@@ -25,7 +25,7 @@ a sample's unique index number is displayed.}
 \item{...}{coloroption passed to specify color order}
 }
 \value{
-An object of class "ggplot2::ggplot"
+An object of class "ggplot"
 }
 \description{
 Generates a facet plot per Panel using ggplot2::ggplot and ggplot2::geom_point and stats::IQR plotting IQR vs. median for all samples.

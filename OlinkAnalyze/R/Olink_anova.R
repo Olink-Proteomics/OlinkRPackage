@@ -22,11 +22,11 @@
 #' @param df NPX data frame in long format with at least protein name (Assay), OlinkID, UniProt, Panel and a factor with at least 3 levels.
 #' @param variable Single character value or character array.
 #' Variable(s) to test. If length > 1, the included variable names will be used in crossed analyses .
-#' Also takes ':'/'*' notation.
+#' Also takes ':' or '*' notation.
 #' @param outcome Character. The dependent variable. Default: NPX.
 #' @param covariates Single character value or character array. Default: NULL.
-#' Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be inferred from main effects.
-#' @param return.covariates Boolean. Deafult: False. Returns F-test results for the covariates. Note: Adjusted p-values will be NA for the covariates.
+#' Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be inferred from main effects.
+#' @param return.covariates Boolean. Default: False. Returns F-test results for the covariates. Note: Adjusted p-values will be NA for the covariates.
 #' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #'
 #' @return A tibble containing the ANOVA results for every protein.
@@ -296,7 +296,7 @@ olink_anova <- function(df,
 #' Variable(s) to test. If length > 1, the included variable names will be used in crossed analyses .
 #' Also takes ':' notation.
 #' @param covariates Single character value or character array. Default: NULL.
-#' Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be inferred from main effects.
+#' Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be inferred from main effects.
 #' @param outcome Character. The dependent variable. Default: NPX.
 #' @param effect Term on which to perform post-hoc. Character vector. Must be subset of or identical to variable.
 #' @param mean_return Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = T and no adjustment is performed.

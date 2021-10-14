@@ -30,7 +30,7 @@ olink_plate_randomizer(
 Tibble including SampleID, SubjectID etc. assigned to well positions.
 }
 \description{
-Samples can be randomly assigned to plates using base::sample with an option to keep Subjects on the same plate.  DS no longer recommends forced balanced randomization considering other clinical variables. Contact DS with any questions.
+Samples can be randomly assigned to plates using base::sample with an option to keep Subjects on the same plate.  Olink Data Science no longer recommends forced balanced randomization considering other clinical variables.
 }
 \examples{
 \donttest{randomized.manifest <- olink_plate_randomizer(manifest, seed=12345)}
