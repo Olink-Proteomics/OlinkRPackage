@@ -2,7 +2,58 @@ Package: OlinkAnalyze
 Type: Package
 Title: Package to Facilitate NPX Data Handling
 Version: 1.2.8
-Author: DS at Olink (given="Data", family="Science", email = "biostattools@olink.com", role = c("aut", "cre"))
+Authors@R: 
+    c(person(given = "Kathleen",
+            family = "Nevola",
+            email = "biostattools@olink.com",
+            role = c("aut","cre"), 
+            comment = c(ORCID = "0000-0002-5183-6444", Github = "kathy-nevola")),
+      person(given = "Marianne",
+            family = "Sandin",
+            role = "aut",
+            comment = c(ORCID = "0000-0001-6186-963X",Github = "marisand")),
+      person(given = "Jamey",
+             family = "Guess",
+             role = "aut",
+             comment = c(ORCID = "0000-0002-4017-0923", Github = "jrguess")),
+      person(given = "Simon",
+             family = "Forsberg",
+             role = "aut",
+             comment = c(ORCID = "0000-0002-7451-9222", Github = "simfor")),
+      person(given = "Christoffer",
+             family = "Cambronero",
+             role = "aut",
+             comment = c(Github = "Orbmac")),
+      person(given = "Pascal",
+             family = "Pucholt",
+             role = "aut",
+             comment = c(ORCID = "0000-0003-3342-1373", Github = "AskPascal")),
+      person(given = "Boxi", 
+             family = "Zhang",
+             role = "ctb",
+             comment = c(ORCID = "0000-0001-7758-6204", Github = "boxizhang")),
+      person(given = "Per",
+             family = "Eriksson",
+             role = "ctb",
+             comment = c(ORCID = "0000-0001-7633-403X", Github = "b_watcher")),
+      person(given = "Klev",
+             family = "Diamanti",
+             role = "ctb",
+             comment = c(ORCID = "0000-0002-4922-8415", Github = "klevdiamanti")),
+      person(given = "Emmett",
+             family = "Sprecher",
+             role = "ctb",
+             comment = c(ORCID = "0000-0002-7710-695X")),
+      person(given = "Jessica",
+             family = "Barbagallo",
+             role = "ctb",
+             comment = c(Github = "jbarbagallo")),
+      person(given = "Olof",
+             family = "Mansson",
+             role = "ctr",
+             comment = c(Github = "olofmansson")),
+      person(given = "Olink",
+             role = c("cph", "fnd")))
 Description: Package for working with Olink NPX data, primarily exported from Olink NPX Manager.
 Depends: R (>= 3.6.0)
 Encoding: UTF-8
@@ -17,7 +68,6 @@ Suggests:
     markdown,
     vdiffr
 License: GPL-3 | file LICENSE
-Maintainer: DS at Olink <biostattools@olink.com>
 VignetteBuilder: knitr
 Imports: 
     car,
