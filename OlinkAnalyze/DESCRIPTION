@@ -1,7 +1,7 @@
 Package: OlinkAnalyze
 Type: Package
 Title: Package to Facilitate NPX Data Handling
-Version: 1.2.8
+Version: 1.3.0
 Authors@R: 
     c(person(given = "Kathleen",
             family = "Nevola",
