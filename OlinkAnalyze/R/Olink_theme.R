@@ -25,8 +25,7 @@ set_plot_theme <- function(font = "Swedish Gothic Thin") {
 
   if (requireNamespace("extrafont", quietly = TRUE)) {
     if(font %in% extrafont::fonts()){
-      extrafont::loadfonts(quiet = TRUE, device = "win")
-      extrafont::loadfonts(quiet = TRUE, device = "pdf")
+      extrafont::loadfonts(quiet = TRUE)
       usefont <- font
     }
   }
