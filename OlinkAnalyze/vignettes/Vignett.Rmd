@@ -18,20 +18,20 @@ collapse = TRUE,
 comment = "#>")
 ```
 
-Olink Analyze is an R package that provides a versatile toolbox to enable fast and easy handling of Olink NPX data for your proteomics research. OlinkAnalyze provides functions ranging from importing Olink NPX datasets exported from the NPX Manager to various statistical tests and modeling, via different quality control (QC) plot functions. Thereby, providing a convenient pipeline for your Olink NPX data analysis.
+OlinkAnalyze is an R package that provides a versatile toolbox to enable fast and easy handling of Olink NPX data for your proteomics research. OlinkAnalyze provides functions for using Olink data, including functions for importing Olink NPX datasets exported from the NPX Manager, as well as quality control (QC) plot functions and functions for various statistical tests. This package is meant to provide a convenient pipeline for your Olink NPX data analysis.
 
 # Installation 
 
-The package *devtools* is required for the installation.
+The package *remotes* is required for the installation.
 
 ```{r, eval=FALSE}
-install.packages("devtools")
+install.packages("remotes")
 ```
 
-Now you can proceed to installing OlinkAnalyze.
+Now you can proceed to installing OlinkAnalyze from Github.
 
 ```{r, eval=FALSE}
-devtools::install_github(repo = 'Olink-Proteomics/OlinkRPackage/OlinkAnalyze', build_vignettes = TRUE)
+remotes::install_github(repo ='Olink-Proteomics/OlinkRPackage/OlinkAnalyze', ref = "main", build_vignettes = TRUE)
 ```
 
 # List of functions
@@ -65,6 +65,7 @@ devtools::install_github(repo = 'Olink-Proteomics/OlinkRPackage/OlinkAnalyze', b
 
 + *npx_data1* NPX Data in Long format
 + *npx_data2* NPX Data in Long format, Follow-up
++ *manifest* A sample manifest including Sample ID, Subject ID and clinical variables
 
 # Usage
 
@@ -90,12 +91,12 @@ The package contains two test data files named npx_data1 and npx_data2. These ar
 * **UniProt** _\<chr\>_: UniProt ID.
 * **Assay** _\<chr\>_: Common gene name for the assay.
 * **MissingFreq** _\<dbl\>_: Missing frequency for the OlinkID, i.e. frequency of samples with NPX value below limit of detection (LOD).
-* **Panel** _\<chr\>_: Olink Panel that samples ran on. Read more about Olink Panels here: [https://www.olink.com/products/](https://www.olink.com/products/).
+* **Panel** _\<chr\>_: Olink Panel that samples ran on. Read more about Olink Panels here: [https://www.olink.com/products-services/](https://www.olink.com/products-services/).
 * **Panel_Version** _\<chr\>_: Version of the panel. A new panel version might include some different or improved assays.
 * **PlateID** _\<chr\>_: Name of the plate.
-* **QC_Warning** _\<chr\>_: Indication whether the sample passed Olink QC. Read more here [https://www.olink.com/question/how-is-quality-control-of-the-data-performed/](https://www.olink.com/question/how-is-quality-control-of-the-data-performed/). 
+* **QC_Warning** _\<chr\>_: Indication whether the sample passed Olink QC. Read more here: [https://www.olink.com/faq/how-is-quality-control-of-the-data-performed/](https://www.olink.com/faq/how-is-quality-control-of-the-data-performed/).
 * **LOD** _\<dbl\>_: Limit of detection (LOD) is the minimum level of an individual protein that can be measured. LOD is defined as 3 times the standard deviation over background.
-* **NPX** _\<dbl\>_: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX here [https://www.olink.com/question/what-is-npx/](https://www.olink.com/question/what-is-npx/).
+* **NPX** _\<dbl\>_: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX here: [https://www.olink.com/faq/what-is-npx/](https://www.olink.com/faq/what-is-npx/).
 
 **NB** There are 5 additional variables in the sample datasets npx_data1 and npx_data2 that include clinical or other information, namely: Subject _\<chr\>_, Treatment _\<chr\>_, Site _\<chr\>_, Time _\<chr\>_, Project _\<chr\>_.
 
@@ -103,7 +104,7 @@ The package contains two test data files named npx_data1 and npx_data2. These ar
 
 ## Read NPX data (read_NPX)
 
-The read_NPX function imports an NPX file of wide format that has been exported from Olink NPX Manager and converts the data into the (preferred by R) long format. The wide format is the most common way Olink delivers data, however, for data analysis a long format is preferred. No prior alterations to the output of the NPX Manager should be made for this function to work as expected.
+The read_NPX function imports an NPX file of wide format that has been exported from Olink NPX Manager and converts the data into the (preferred by R) long format. The wide format is the most common way Olink delivers data for Target96, however, for data analysis a long format is preferred. No prior alterations to the output of the NPX Manager should be made for this function to work as expected.
 
 ### Function arguments
 
@@ -123,12 +124,12 @@ A tibble in long format containing:
 * UniProt: UniProt ID.
 * Assay: Common gene name for the assay.
 * MissingFreq: Missing frequency for the OlinkID, i.e. frequency of samples with NPX value below limit of detection (LOD).
-* Panel: Olink Panel that samples ran on. Read more about Olink Panels here: [https://www.olink.com/products/](https://www.olink.com/products/).
+* Panel: Olink Panel that samples ran on. Read more about Olink Panels here: [https://www.olink.com/products-services/](https://www.olink.com/products-services/).
 * Panel_Version: Version of the panel. A new panel version might include some different or improved assays.
 * PlateID: Name of the plate.
-* QC_Warning: Indication whether the sample passed Olink QC. Read more here [https://www.olink.com/question/how-is-quality-control-of-the-data-performed/](https://www.olink.com/question/how-is-quality-control-of-the-data-performed/). 
+* QC_Warning: Indication whether the sample passed Olink QC. Read more here: [https://www.olink.com/faq/how-is-quality-control-of-the-data-performed/](https://www.olink.com/faq/how-is-quality-control-of-the-data-performed/).  
 * LOD: Limit of detection (LOD) is the minimum level of an individual protein that can be measured. LOD is defined as 3 times the standard deviation over background.
-* NPX: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX here [https://www.olink.com/question/what-is-npx/](https://www.olink.com/question/what-is-npx/).
+* NPX: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX here: [https://www.olink.com/faq/what-is-npx/](https://www.olink.com/faq/what-is-npx/).
 
 ## Randomize samples on plate (olink_plate_randomizer)
 
@@ -155,14 +156,14 @@ A tibble including SampleID, SubjectID etc. assigned to well positions.
 
 ## Select bridge samples (olink_bridgeselector)
 
-The bridge selection function selects a number of bridge samples based on the input data. Bridge samples are used to normalize two dataframes/projects that have been ran at different timepoints, hence, a batch effect is expected. It select samples that fulfill certain criteria that include good detectability, passing quality control and covering a wide range of data points. When possible the function recommends 8-16 bridge samples.
+The bridge selection function selects a number of bridge samples based on the input data. Bridge samples are used to normalize two dataframes/projects that have been ran at different time points, hence, a batch effect is expected. It select samples that fulfill certain criteria that include good detectability, passing quality control and covering a wide range of data points. When possible the function recommends 8-16 bridge samples.
 
-Bridge sample selection strategy: Start by choosing samples with at most 10% missingness, and in case there are not enough samples to output, increase the threshold to 20%. 
+Bridge sample selection strategy: Start by choosing samples with at most 10% missingness (sampleMissingFreq = 0.1), and in case there are not enough samples to output, increase the threshold to 20% (sampleMissingFreq = 0.2). 
 
 ### Function arguments
 
 + df: tibble/data frame in long format such as produced by the read_NPX function.
-+ sampleMissingFreq: The threshhold for sample missingness.
++ sampleMissingFreq: The threshold for sample wise missingness.
 + n: Number of bridge samples to be selected.
 
 ```{r message=FALSE, eval=FALSE}
@@ -221,12 +222,12 @@ A tibble of NPX data in long format containing normalized NPX values, including 
 * UniProt: UniProt ID.
 * Assay: Common gene name for the assay.
 * MissingFreq: Missing frequency for the OlinkID, i.e. frequency of samples with NPX value below limit of detection (LOD).
-* Panel: Olink Panel that samples ran on. Read more about Olink Panels here: [https://www.olink.com/products/](https://www.olink.com/products/).
+* Panel: Olink Panel that samples ran on. Read more about Olink Panels here: [https://www.olink.com/products-services/](https://www.olink.com/products-services/).
 * Panel_Version: Version of the panel. A new panel version might include some different or improved assays.
 * PlateID: Name of the plate.
-* QC_Warning: Indication whether the sample passed Olink QC. Read more here [https://www.olink.com/question/how-is-quality-control-of-the-data-performed/](https://www.olink.com/question/how-is-quality-control-of-the-data-performed/). 
+* QC_Warning: Indication whether the sample passed Olink QC. Read more here: [https://www.olink.com/faq/how-is-quality-control-of-the-data-performed/](https://www.olink.com/faq/how-is-quality-control-of-the-data-performed/). 
 * LOD: Limit of detection (LOD) is the minimum level of an individual protein that can be measured. LOD is defined as 3 times the standard deviation over background.
-* NPX: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX here [https://www.olink.com/question/what-is-npx/](https://www.olink.com/question/what-is-npx/).
+* NPX: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX here: [https://www.olink.com/faq/what-is-npx/](https://www.olink.com/faq/what-is-npx/).
 * Project: Name given from the dataframe of origin.
 * Adj_factor: Adjustment factor, i.e. how much was added to or subtracted from the original NPX value.
 
@@ -234,12 +235,13 @@ A tibble of NPX data in long format containing normalized NPX values, including 
 
 ## T-test analysis (olink_ttest)
 
-The olink_ttest function performs a Welch 2-sample t-test at confidence level 0.95 for every protein (by OlinkID) for a given grouping variable using the function *t.test* from the R library *stats* and corrects for multiple testing using the Benjamini-Hochberg method (“fdr”) using the function *p.adjust* from the R library *stats*. Adjusted p-values are logically evaluated towards adjusted p-value<0.05. The resulting t-test table is arranged by ascending p-values.
+The olink_ttest function performs a Welch 2-sample t-test or paired t-test at confidence level 0.95 for every protein (by OlinkID) for a given grouping variable using the function *t.test* from the R library *stats* and corrects for multiple testing using the Benjamini-Hochberg method (“fdr”) using the function *p.adjust* from the R library *stats*. Adjusted p-values are logically evaluated towards adjusted p-value<0.05. The resulting t-test table is arranged by ascending p-values.
 
 ### Function arguments
 
 * df: NPX data frame in long format should minimally contain protein name (Assay), OlinkID, UniProt, Panel and an outcome factor with 2 levels.
 * variable: Character value that should represent a column in the df to be used as a grouping variable. Needs to have exactly 2 levels.
+* pair_id: Character value indicating which column contains the paired sample identifier. Only used for paired t-tests.
 
 ```{r message=FALSE, eval=FALSE}
 olink_ttest(df = npx_data1,
@@ -269,7 +271,7 @@ A tibble with the following columns:
 
 The olink_anova is a wrapper function that performs an ANOVA F-test for each assay using the function *Anova* from the R library *car* and Type III sum of squares. The function handles both factor and numerical variables, and/or confounding factors. 
 
-Samples with missing variable information or factor levels are excluded from the analysis. Character columns in the input data frame are converted to factors. Both automatic handlings of data from above are announced by a message if the flag *verbose=T*.
+Samples with missing variable information or factor levels are excluded from the analysis. Character columns in the input data frame are converted to factors. The automatic handling of the data from above is announced by a message if the flag *verbose=T*.
 
 Crossed/interaction analysis, i.e. A*B formula notation, is inferred from the variable argument in the following cases: 
 
@@ -335,7 +337,7 @@ The function handles both factor and numerical variables and/or covariates. The 
 * variable: Single character value or character array. In case of single character then that should represent a column in the df. Otherwise, if length > 1, the included variable names will be used in crossed analyses. It can also accept the notations ':' or '*'.
 * covariates: Single character value or character array. Default: NULL. Confounding factors to include in the analysis. In case of single character then that should represent a column in the df. It can also accept the notations ':' or '*', while crossed analysis will not be inferred from main effects.
 * outcome: Name of the column from df that contains the dependent variable. Default: NPX.
-* effect: Term on which to perform the post-hoc analysis. Character vector. Must be subset of or identical to the variable.
+* effect: Term on which to perform the post-hoc analysis. Character vector. Must be subset of or identical to the variable and no adjustment is performed.
 * mean_return: Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = T.
 * verbose: Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 
@@ -373,7 +375,7 @@ A tibble with the following columns:
 
 The olink_lmer fits a linear mixed effects model for every protein (by OlinkID) in every panel, using the function *lmer* from the R library *lmerTest* and the function *anova* from the R library *stats*. The function handles both factor and numerical variables and/or covariates.
 
-Samples with missing variable information or factor levels are excluded from the analysis. Character columns in the input data frame are converted to factors. Both automatic handlings of data from above are announced by a message if the flag *verbose=T*. 
+Samples with missing variable information or factor levels are excluded from the analysis. Character columns in the input data frame are converted to factors. The automatic handling of the data from above is announced by a message if the flag *verbose=T*. 
 
 Crossed/interaction analysis, i.e. A*B formula notation, is inferred from the variable argument in the following cases: 
 
@@ -439,7 +441,7 @@ The olink_lmer_posthoc function is similar to olink_lmer but performs a post-hoc
 * outcome: Name of the column from df that contains the dependent variable. Default: NPX.
 * random: Single character value or character array with random effects.
 * covariates: Single character value or character array. Default: NULL. Confounding factors to include in the analysis. In case of single character then that should represent a column in the df. It can also accept the notations ':' or '*', while crossed analysis will not be inferred from main effects.
-* mean_return: Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = T.
+* mean_return: Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = T and no adjustment is performed.
 * verbose: Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 
 ```{r message=FALSE, eval=FALSE}
@@ -485,7 +487,7 @@ The olink_boxplot function is used to generate boxplots of NPX values stratified
 
 * df: NPX data frame in long format should minimally contain protein name (Assay), OlinkID, UniProt and a grouping variable.
 * variable: Single character value indicating the column name to use as a grouping variable in the x axis.
-* olinkid_list: Character vector of OlinkID's that should be used for the bocplot. If not specified, all assays in df are used.
+* olinkid_list: Character vector of OlinkID's that should be used for the boxplot. If not specified, all assays in df are used.
 * verbose: Boolean. Default: False. Flag indicating if plots shall be printed additionally to assigned to a list variable.
 * number_of_proteins_per_plot: Number of boxplots to include in the facets plot. Default 6.
 
@@ -506,12 +508,12 @@ A list of objects of class *ggplot*.
 
 ## Boxplots for QC (olink_dist_plot)
 
-The olink_dist_plot function generates boxplots of NPX values for each sample, faceted by Olink panel. This is mainly used as an initial QC step to identify potential outliers. olink_dist_plot uses the functions *ggplot* and *geom_boxplot* of the R library *ggplot2*.
+The olink_dist_plot function generates boxplots of NPX values for each sample, faceted by Olink panel. This is used as an initial QC step to identify potential outliers. olink_dist_plot uses the functions *ggplot* and *geom_boxplot* of the R library *ggplot2*.
 
 ### Function arguments
 
 * df: NPX data frame in long format should minimally contain SampleID, NPX and Panel.
-* color_g: Character value indicating the column name that should be used as fill color. Default QC_Warning.
+* color_g: Character value indicating the column name that should be used as fill color. Default: QC_Warning.
 
 ```{r message=FALSE, fig.width=8, fig.height=4}
 npx_data1 %>% 
@@ -556,7 +558,7 @@ A list of objects of class *ggplot*.
 
 **NB** Please note that plots will not appear in the *plots* panel of *Rstudio* if not assigned to a variable and printing it (see sample code above).
 
-## Principal compnents analysis (PCA) plot (olink_pca_plot)
+## Principal components analysis (PCA) plot (olink_pca_plot)
 
 Generates PCA projection of all samples from NPX data along two principal components (Default PC2 vs PC1) colored by the variable QC_Warning and including the percentage of explained variance. The function used the functions *prcomp* and *ggplot* from the R libraries *stats* and *ggplot2*, respectively. By default, the values scaled and centered in the PCA and proteins with missing NPX values removed from the corresponding assay(s). Unique sample names are required. Imputation by median value is done for assays with missingness <10% and for multi-plate projects, and for missingness <5% for single plate projects.
 
@@ -608,7 +610,7 @@ An object of class *ggplot*.
 
 ## Plot results of t-test (olink_volcano_plot)
 
-The olink_volcano_plot function generates a volcano plot using results from the olink_ttest function using the function *ggplot* and *geom_point* of the R library *ggplot2*. The estimated difference is shown in the x-axis and -log<sub>10</sub>(p-value) in the y-axis. A horizontal dotted line indicates p-value=0.05. Dots are colored based on Benjamini-Hochberg adjusted p-value cutoff 0.05 and can optionally be annotated by OlinkID.
+The olink_volcano_plot function generates a volcano plot using results from the olink_ttest function using the function *ggplot* and *geom_point* of the R library *ggplot2*. The estimated difference is shown in the x-axis and -log<sub>10</sub>(p-value) in the y-axis. A horizontal dotted line indicates p-value = 0.05. Dots are colored based on Benjamini-Hochberg adjusted p-value cutoff 0.05 and can optionally be annotated by OlinkID.
 
 ### Function arguments
 
