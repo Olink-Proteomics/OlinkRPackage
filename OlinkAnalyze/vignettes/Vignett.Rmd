@@ -22,16 +22,16 @@ OlinkAnalyze is an R package that provides a versatile toolbox to enable fast an
 
 # Installation 
 
-The package *devtools* is required for the installation.
+The package *remotes* is required for the installation.
 
 ```{r, eval=FALSE}
-install.packages("devtools")
+install.packages("remotes")
 ```
 
 Now you can proceed to installing OlinkAnalyze from Github.
 
 ```{r, eval=FALSE}
-devtools::install_github(repo = 'Olink-Proteomics/OlinkRPackage/OlinkAnalyze', build_vignettes = TRUE)
+remotes::install_github(repo ='Olink-Proteomics/OlinkRPackage/OlinkAnalyze', ref = "main", build_vignettes = TRUE)
 ```
 
 # List of functions
