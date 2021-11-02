@@ -28,7 +28,7 @@ a sample's unique index number is displayed.}
 An object of class "ggplot"
 }
 \description{
-Generates a facet plot per Panel using ggplot and ggplot2::geom_point and stats::IQR plotting IQR vs. median for all samples.
+Generates a facet plot per Panel using ggplot2::ggplot and ggplot2::geom_point and stats::IQR plotting IQR vs. median for all samples.
 Horizontal dashed lines indicate +/-3 standard deviations from the mean IQR.
 Vertical dashed lines indicate +/-3 standard deviations from the mean sample median.
 }

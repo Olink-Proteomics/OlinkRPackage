@@ -25,7 +25,7 @@ Variable(s) to test. If length > 1, the included variable names will be used in 
 Also takes ':' notation.}
 
 \item{covariates}{Single character value or character array. Default: NULL.
-Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be inferred from main effects.}
+Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be inferred from main effects.}
 
 \item{outcome}{Character. The dependent variable. Default: NPX.}
 
@@ -48,19 +48,30 @@ mean NPX at mean(numerical variable) versus mean NPX at mean(numerical variable)
 \examples{
 \donttest{
 
-#Two-way ANOVA, one main effect covariate.
+library(dplyr)
+
+npx_df <- npx_data1 \%>\% filter(!grepl('control',SampleID, ignore.case = TRUE))
+
+#Two-way ANOVA, one main effect (Site) covariate.
 #Results in model NPX~Treatment*Time+Site.
 anova_results <- olink_anova(df = npx_df,
                              variable=c("Treatment:Time"),
                              covariates="Site")
-significant_assays <- anova_results \%>\%
-filter(Threshold == 'Significant') \%>\%
-pull(OlinkID)
 
-#Posthoc test for the model NPX~Treatment*Time+Site, on the effect Treatment with covariate Site.
-anova_posthoc_results <- olink_anova_posthoc(npx_data1,
+#Posthoc test for the model NPX~Treatment*Time+Site, 
+#on the interaction effect Treatment:Time with covariate Site.
+
+#Filtering out significant and relevant results.
+significant_assays <- anova_results \%>\%
+filter(Threshold == 'Significant' & term == 'Treatment:Time') \%>\%
+select(OlinkID) \%>\%
+distinct() \%>\%
+pull()
+
+#Posthoc
+anova_posthoc_results <- olink_anova_posthoc(npx_df,
 variable=c("Treatment:Time"),
 covariates="Site",
 olinkid_list = significant_assays,
-effect = "Treatment")}
+effect = "Treatment:Time")}
 }

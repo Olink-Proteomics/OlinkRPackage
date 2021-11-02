@@ -52,15 +52,20 @@ df1, overlapping_samples_df1 and reference_medians need to be specified. Adjustm
 }
 \examples{
 \donttest{
-npx_df1 <- npx_data1 \%>\% mutate(Project = 'P1')
-npx_df2 <- npx_data2 \%>\% mutate(Project = 'P2')
+
+library(dplyr)
+
+npx_df1 <- npx_data1 \%>\% dplyr::mutate(Project = 'P1')
+npx_df2 <- npx_data2 \%>\% dplyr::mutate(Project = 'P2')
 
 #Bridging normalization:
-# Find overlaping samples, but exclude Olink controls
-overlap_samples <- intersect((npx_df1 \%>\% 
-                              filter(!grepl("control", SampleID, ignore.case=TRUE)))$SampleID,
+# Find overlapping samples, but exclude Olink control
+overlap_samples <- intersect((npx_df1 \%>\%
+                               dplyr::filter(!grepl("control", SampleID, 
+                                                     ignore.case=TRUE)))$SampleID,
                              (npx_df2 \%>\%
-                              filter(!grepl("control", SampleID, ignore.case=TRUE)))$SampleID)
+                               dplyr::filter(!grepl("control", SampleID, 
+                                                     ignore.case=TRUE)))$SampleID)
 # Normalize
 olink_normalization(df1 = npx_df1,
                     df2 = npx_df2,
@@ -72,13 +77,13 @@ olink_normalization(df1 = npx_df1,
 #Subset normalization:
 # Find a suitable subset of samples from both projects, but exclude Olink controls
 df1_sampleIDs <- (npx_df1 \%>\%
-    filter(!grepl("control", SampleID, ignore.case=TRUE)) \%>\%
-    select(SampleID) \%>\%
-    distinct())$SampleID
+    dplyr::filter(!grepl("control", SampleID, ignore.case=TRUE)) \%>\%
+    dplyr::select(SampleID) \%>\%
+    dplyr::distinct())$SampleID
 df2_sampleIDs <- (npx_df2 \%>\%
-    filter(!grepl("control", SampleID, ignore.case=TRUE)) \%>\%
-    select(SampleID) \%>\%
-    distinct())$SampleID
+    dplyr::filter(!grepl("control", SampleID, ignore.case=TRUE)) \%>\%
+    dplyr::select(SampleID) \%>\%
+    dplyr::distinct())$SampleID
 some_samples_df1 <- sample(df1_sampleIDs, 16)
 some_samples_df2 <- sample(df2_sampleIDs, 16)
 # Normalize
@@ -90,9 +95,9 @@ olink_normalization(df1 = npx_df1,
 #Reference median normalization:
 # For the sake of this example, set the reference median to 1
 ref_median_df <- npx_df1 \%>\%
-    select(OlinkID) \%>\%
-    distinct() \%>\%
-    mutate(Reference_NPX = 1)
+    dplyr::select(OlinkID) \%>\%
+    dplyr::distinct() \%>\%
+    dplyr::mutate(Reference_NPX = 1)
 # Normalize
 olink_normalization(df1 = npx_df1,
                     overlapping_samples_df1 = some_samples_df1,

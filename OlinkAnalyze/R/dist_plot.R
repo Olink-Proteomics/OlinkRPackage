@@ -1,19 +1,19 @@
 #' Function to plot the NPX distribution by panel
 #'
-#' Generates boxplots of NPX vs. protein (OlinkID) colored by QC_Warning and faceted by Panel using ggplot and ggplot2::geom_boxplot.
+#' Generates boxplots of NPX vs. protein (OlinkID) colored by QC_Warning (default) or any other grouping variable 
+#' and faceted by Panel using ggplot and ggplot2::geom_boxplot.
 #'
 #' @param df NPX data frame in long format. Must have columns SampleID, NPX and Panel
-#' @param color_g Character value indicating which column to use as fill color (default QC_Warning)
+#' @param color_g Character value indicating which column to use as fill color (default: QC_Warning)
 #' @param ... Color option passed to specify color order.
 #' @return An object of class "ggplot"
 #' @keywords NPX
 #' @export
 #' @examples \donttest{olink_dist_plot(npx_data1, color_g = "QC_Warning")}
-#' @import dplyr stringr tidyr
-#' @importFrom dplyr filter mutate group_by ungroup
+#' @importFrom dplyr filter mutate group_by ungroup if_else
 #' @importFrom stats reorder
 #' @importFrom ggplot2 ggplot aes scale_x_discrete geom_boxplot xlab facet_wrap
-#' @importFrom stringr str_replace
+#' @importFrom stringr str_replace str_detect
 #' @importFrom magrittr %>%
 #' @importFrom rlang ensym
 
@@ -46,7 +46,7 @@ olink_dist_plot <- function(df, color_g = 'QC_Warning', ...) {
 
   #Filtering on valid OlinkID
   df_OlinkID <- df %>%
-    filter(stringr::str_detect(OlinkID,
+    dplyr::filter(stringr::str_detect(OlinkID,
                                "OID[0-9]{5}"))
 
   reorder_within <- function(x, by, within, fun = mean, sep = "___", ...) {
@@ -59,30 +59,22 @@ olink_dist_plot <- function(df, color_g = 'QC_Warning', ...) {
     ggplot2::scale_x_discrete(labels = function(x) gsub(reg, "", x), ...)
   }
 
-  # Remove "Olink", Target 96" and "Target 48" from the panel name(s)
+  #If not all are Pass, the QC_Warning is set as warning for plotting purposes
   df_OlinkID_fixed <- df_OlinkID %>%
-    dplyr::mutate(Panel = Panel  %>% stringr::str_replace("Olink ", "") %>%
-             stringr::str_replace("Target 96 ", "") %>%
-             stringr::str_replace("Target 48 ", "")) %>%
+    dplyr::mutate(Panel = Panel %>% stringr::str_replace("Olink ", "")) %>%
     dplyr::group_by(SampleID, Index, Panel) %>%
-    dplyr::mutate(QC_Warning = if_else(QC_Warning == "WARN",
-                                       "Warning",
-                                       QC_Warning)) %>%
-    dplyr::mutate(QC_Warning = if_else(QC_Warning == "PASS",
-                                       "Pass",
-                                       QC_Warning)) %>%
-    dplyr::mutate(QC_Warning = if_else(QC_Warning == "FAIL",
-                                       "Fail",
-                                       QC_Warning)) %>%
+    dplyr::mutate(QC_Warning = dplyr::if_else(all(toupper(QC_Warning) == 'PASS'),
+                                              'Pass',
+                                              'Warning')) %>%
     dplyr::ungroup()
 
   df_OlinkID_fixed %>%
-    filter(!(is.na(NPX))) %>%
-    ggplot(., aes(x = reorder_within(factor(SampleID), NPX, Panel, median), y = NPX, fill=!!rlang::ensym(color_g)))+
-    geom_boxplot()+
+    dplyr::filter(!(is.na(NPX))) %>%
+    ggplot2::ggplot(., ggplot2::aes(x = reorder_within(factor(SampleID), NPX, Panel, median), y = NPX, fill=!!rlang::ensym(color_g)))+
+    ggplot2::geom_boxplot()+
     scale_x_reordered()+
-    xlab("Samples")+
-    facet_wrap(~Panel,  scale="free")+
-    set_plot_theme() +
-    olink_fill_discrete(...)
+    ggplot2::xlab("Samples")+
+    ggplot2::facet_wrap(~Panel,  scale="free")+
+    OlinkAnalyze::set_plot_theme() +
+    OlinkAnalyze::olink_fill_discrete(...)
 }

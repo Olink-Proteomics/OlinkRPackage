@@ -12,7 +12,7 @@ olink_color_gradient(..., alpha = 1, coloroption = NULL)
 \item{alpha}{transparency (optional)}
 
 \item{coloroption}{string, one or more of the following:
-c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'gray', 'darkblue', 'purple', 'pink')}
+c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'lightblue', 'darkblue', 'purple', 'pink')}
 }
 \value{
 None
@@ -22,6 +22,8 @@ Olink color scale for continuous ggplots
 }
 \examples{
 
+library(ggplot2)
+
 dsub <- subset(diamonds, x > 5 & x < 6 & y > 5 & y < 6)
 dsub$diff <- with(dsub, sqrt(abs(x-y))* sign(x-y))
 
@@ -29,4 +31,5 @@ ggplot(dsub, aes(x, y, colour=diff)) +
 geom_point() +
  theme_bw() +
  olink_color_gradient()
+
 }

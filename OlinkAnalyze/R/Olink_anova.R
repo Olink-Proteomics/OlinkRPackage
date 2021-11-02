@@ -22,11 +22,11 @@
 #' @param df NPX data frame in long format with at least protein name (Assay), OlinkID, UniProt, Panel and a factor with at least 3 levels.
 #' @param variable Single character value or character array.
 #' Variable(s) to test. If length > 1, the included variable names will be used in crossed analyses .
-#' Also takes ':'/'*' notation.
+#' Also takes ':' or '*' notation.
 #' @param outcome Character. The dependent variable. Default: NPX.
 #' @param covariates Single character value or character array. Default: NULL.
-#' Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be inferred from main effects.
-#' @param return.covariates Boolean. Deafult: False. Returns F-test results for the covariates. Note: Adjusted p-values will be NA for the covariates.
+#' Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be inferred from main effects.
+#' @param return.covariates Boolean. Default: False. Returns F-test results for the covariates. Note: Adjusted p-values will be NA for the covariates.
 #' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #'
 #' @return A tibble containing the ANOVA results for every protein.
@@ -34,6 +34,9 @@
 #' @export
 #' @examples
 #' \donttest{
+#'
+#' library(dplyr)
+#'
 #' npx_df <- npx_data1 %>% filter(!grepl('control',SampleID, ignore.case = TRUE))
 #'
 #' #One-way ANOVA, no covariates.
@@ -51,7 +54,13 @@
 #' anova_results <- olink_anova(df = npx_df,
 #'                              variable="Treatment",
 #'                              covariates="Site:Time")}
-#' @import dplyr stringr tidyr car broom
+#' @importFrom dplyr n filter group_by summarise ungroup pull n_distinct do select arrange mutate n
+#' @importFrom stringr str_detect
+#' @importFrom generics tidy
+#' @importFrom car Anova
+#' @importFrom stats IQR as.formula contr.sum lm median na.omit p.adjust sd t.test var
+#' @importFrom utils glob2rx read.table globalVariables
+
 
 olink_anova <- function(df,
                         variable,
@@ -69,7 +78,7 @@ olink_anova <- function(df,
 
     #Filtering on valid OlinkID
     df <- df %>%
-      filter(stringr::str_detect(OlinkID,
+      dplyr::filter(stringr::str_detect(OlinkID,
                                  "OID[0-9]{5}"))
 
     #Allow for :/* notation in covariates
@@ -104,12 +113,11 @@ olink_anova <- function(df,
 
     #Not testing assays that have all NA:s
     all_nas <- df  %>%
-      group_by(OlinkID) %>%
-      summarise(n = n(), n_na = sum(is.na(NPX))) %>%
-      ungroup() %>%
-      filter(n == n_na) %>%
-      pull(OlinkID)
-
+      dplyr::group_by(OlinkID) %>%
+      dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(NPX))) %>%
+      dplyr::ungroup() %>%
+      dplyr::filter(n == n_na) %>%
+      dplyr::pull(OlinkID)
 
     if(length(all_nas) > 0) {
 
@@ -151,13 +159,14 @@ olink_anova <- function(df,
     for(effect in single_fixed_effects){
 
       current_nas <- df %>%
-        filter(!(OlinkID %in% all_nas)) %>%
-        group_by(OlinkID, !!rlang::ensym(effect)) %>%
-        summarise(n = n(), n_na = sum(is.na(NPX))) %>%
-        ungroup() %>%
-        filter(n == n_na) %>%
-        distinct(OlinkID) %>%
-        pull(OlinkID)
+        dplyr::filter(!(OlinkID %in% all_nas)) %>%
+        dplyr::group_by(OlinkID, !!rlang::ensym(effect)) %>%
+        dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(NPX))) %>%
+        dplyr::ungroup() %>%
+        dplyr::filter(n == n_na) %>%
+        dplyr::distinct(OlinkID) %>%
+        dplyr::pull(OlinkID)
+
 
       if(length(current_nas) > 0) {
 
@@ -172,10 +181,10 @@ olink_anova <- function(df,
       }
 
       number_of_samples_w_more_than_one_level <- df %>%
-        group_by(SampleID, Index) %>%
-        summarise(n_levels = n_distinct(!!rlang::ensym(effect), na.rm = T)) %>%
-        ungroup() %>%
-        filter(n_levels > 1) %>%
+        dplyr::group_by(SampleID, Index) %>%
+        dplyr::summarise(n_levels = dplyr::n_distinct(!!rlang::ensym(effect), na.rm = T)) %>%
+        dplyr::ungroup() %>%
+        dplyr::filter(n_levels > 1) %>%
         nrow(.)
 
       if (number_of_samples_w_more_than_one_level > 0) {
@@ -236,32 +245,35 @@ olink_anova <- function(df,
     }
 
     p.val <- df %>%
-      filter(!(OlinkID %in% all_nas)) %>%
-      filter(!(OlinkID %in% nas_in_var)) %>%
-      group_by(Assay, OlinkID, UniProt, Panel) %>%
-      do(tidy(car::Anova(lm(as.formula(formula_string),
+      dplyr::filter(!(OlinkID %in% all_nas)) %>%
+      dplyr::filter(!(OlinkID %in% nas_in_var)) %>%
+      dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
+      dplyr::do(generics::tidy(car::Anova(stats::lm(as.formula(formula_string),
                             data=.,
                             contrasts = sapply(fact.vars,function(x) return(contr.sum),
                                                simplify = FALSE)),type=3))) %>%
-      ungroup() %>%
-      filter(!term %in% c('(Intercept)','Residuals')) %>%
-      mutate(covariates = term %in% covariate_filter_string) %>%
-      group_by(covariates) %>%
-      mutate(Adjusted_pval=p.adjust(p.value,method="fdr")) %>%
-      mutate(Threshold  = ifelse(Adjusted_pval<0.05,"Significant","Non-significant")) %>%
-      mutate(Adjusted_pval = ifelse(covariates,NA,Adjusted_pval),
+
+      dplyr::ungroup() %>%
+      dplyr::filter(!term %in% c('(Intercept)','Residuals')) %>%
+      dplyr::mutate(covariates = term %in% covariate_filter_string) %>%
+      dplyr::group_by(covariates) %>%
+      dplyr::mutate(Adjusted_pval = p.adjust(p.value,method="fdr")) %>%
+      dplyr::mutate(Threshold  = ifelse(Adjusted_pval<0.05,"Significant","Non-significant")) %>%
+      dplyr::mutate(Adjusted_pval = ifelse(covariates,NA,Adjusted_pval),
              Threshold = ifelse(covariates,NA,Threshold)) %>%
-      ungroup() %>%
-      select(-covariates) %>%
-      mutate(meansq=sumsq/df) %>%
-      select(Assay,OlinkID,UniProt,Panel,term,df,sumsq,meansq,statistic,p.value,Adjusted_pval,Threshold) %>%
-      arrange(Adjusted_pval)
+      dplyr::ungroup() %>%
+      dplyr::select(-covariates) %>%
+      dplyr::mutate(meansq=sumsq/df) %>%
+      dplyr::select(Assay,OlinkID,UniProt,Panel,term,df,sumsq,
+                    meansq,statistic,p.value,Adjusted_pval,Threshold) %>%
+      dplyr::arrange(Adjusted_pval)
 
 
     if(return.covariates){
       return(p.val)
     } else{
-      return(p.val %>% filter(!term%in%covariate_filter_string))
+      return(p.val %>%
+               dplyr::filter(!term%in%covariate_filter_string))
     }
 
   }, warning = function(w) {
@@ -284,7 +296,7 @@ olink_anova <- function(df,
 #' Variable(s) to test. If length > 1, the included variable names will be used in crossed analyses .
 #' Also takes ':' notation.
 #' @param covariates Single character value or character array. Default: NULL.
-#' Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be inferred from main effects.
+#' Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be inferred from main effects.
 #' @param outcome Character. The dependent variable. Default: NPX.
 #' @param effect Term on which to perform post-hoc. Character vector. Must be subset of or identical to variable.
 #' @param mean_return Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = T and no adjustment is performed.
@@ -294,21 +306,35 @@ olink_anova <- function(df,
 #' @export
 #' @examples \donttest{
 #'
-#' #Two-way ANOVA, one main effect covariate.
+#' library(dplyr)
+#' 
+#' npx_df <- npx_data1 %>% filter(!grepl('control',SampleID, ignore.case = TRUE))
+#'
+#' #Two-way ANOVA, one main effect (Site) covariate.
 #' #Results in model NPX~Treatment*Time+Site.
 #' anova_results <- olink_anova(df = npx_df,
 #'                              variable=c("Treatment:Time"),
 #'                              covariates="Site")
-#' significant_assays <- anova_results %>%
-#' filter(Threshold == 'Significant') %>%
-#' pull(OlinkID)
 #'
-#' #Posthoc test for the model NPX~Treatment*Time+Site, on the effect Treatment with covariate Site.
-#' anova_posthoc_results <- olink_anova_posthoc(npx_data1,
+#' #Posthoc test for the model NPX~Treatment*Time+Site, 
+#' #on the interaction effect Treatment:Time with covariate Site.
+#'
+#' #Filtering out significant and relevant results.
+#' significant_assays <- anova_results %>%
+#' filter(Threshold == 'Significant' & term == 'Treatment:Time') %>%
+#' select(OlinkID) %>%
+#' distinct() %>%
+#' pull()
+#' 
+#' #Posthoc
+#' anova_posthoc_results <- olink_anova_posthoc(npx_df,
 #' variable=c("Treatment:Time"),
 #' covariates="Site",
 #' olinkid_list = significant_assays,
-#' effect = "Treatment")}
+#' effect = "Treatment:Time")}
+#' @importFrom dplyr filter group_by ungroup pull do select arrange mutate
+#' @importFrom stringr str_detect
+
 
 olink_anova_posthoc <- function(df,
                                 olinkid_list = NULL,
@@ -336,14 +362,14 @@ olink_anova_posthoc <- function(df,
 
     #Filtering on valid OlinkID
     df <- df %>%
-      filter(stringr::str_detect(OlinkID,
+      dplyr::filter(stringr::str_detect(OlinkID,
                                  "OID[0-9]{5}"))
 
     if(is.null(olinkid_list)){
       olinkid_list <- df %>%
-        select(OlinkID) %>%
-        distinct() %>%
-        pull()
+        dplyr::select(OlinkID) %>%
+        dplyr::distinct() %>%
+        dplyr::pull()
     }
 
     #Allow for :/* notation in covariates
@@ -422,31 +448,33 @@ olink_anova_posthoc <- function(df,
     }
 
     anova_posthoc_results <- df %>%
-      filter(OlinkID %in% olinkid_list) %>%
-      mutate(OlinkID = factor(OlinkID, levels = olinkid_list)) %>%
-      group_by(Assay, OlinkID, UniProt, Panel) %>%
-      do(data.frame(emmeans(lm(as.formula(formula_string),data=.),
+      dplyr::filter(OlinkID %in% olinkid_list) %>%
+      dplyr::mutate(OlinkID = factor(OlinkID, levels = olinkid_list)) %>%
+      dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
+      dplyr::do(data.frame(emmeans::emmeans(stats::lm(as.formula(formula_string),data=.),
                                     specs=as.formula(paste0("pairwise~", paste(effect,collapse="+"))),
                                     cov.reduce = function(x) round(c(mean(x),mean(x)+sd(x)),4),
                             infer=c(T,T),
                             adjust="tukey")[[c("contrasts","emmeans")[1+as.numeric(mean_return)]]],
                     stringsAsFactors=F)) %>%
-      ungroup() %>%
-      mutate(term=paste(effect,collapse=":"))  %>%
-      rename(conf.low=lower.CL,
+      dplyr::ungroup() %>%
+      dplyr::mutate(term=paste(effect,collapse=":"))  %>%
+      dplyr::rename(conf.low=lower.CL,
              conf.high=upper.CL)
 
     if(mean_return){
       anova_posthoc_results <- anova_posthoc_results %>%
-        select(all_of(c("Assay", "OlinkID", "UniProt", "Panel", "term", effect, "emmean", "conf.low", "conf.high")))
+        dplyr::select(all_of(c("Assay", "OlinkID", "UniProt", "Panel", "term",
+                               effect, "emmean", "conf.low", "conf.high")))
     } else if(!mean_return){
       anova_posthoc_results <- anova_posthoc_results %>%
-        rename(Adjusted_pval = p.value) %>%
-        arrange(Adjusted_pval) %>%
-        mutate(Threshold = if_else(Adjusted_pval < 0.05,
+        dplyr::rename(Adjusted_pval = p.value) %>%
+        dplyr::arrange(Adjusted_pval) %>%
+        dplyr::mutate(Threshold = if_else(Adjusted_pval < 0.05,
                                    'Significant',
                                    'Non-significant')) %>%
-        select(Assay, OlinkID, UniProt, Panel, term,  contrast, estimate, conf.low, conf.high, Adjusted_pval,Threshold)
+        dplyr::select(Assay, OlinkID, UniProt, Panel, term,  contrast, estimate,
+                      conf.low, conf.high, Adjusted_pval,Threshold)
     }
 
     return(anova_posthoc_results)

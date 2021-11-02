@@ -28,15 +28,20 @@
 #' @export
 #' @examples
 #' \donttest{
-#' npx_df1 <- npx_data1 %>% mutate(Project = 'P1')
-#' npx_df2 <- npx_data2 %>% mutate(Project = 'P2')
+#'
+#' library(dplyr)
+#'
+#' npx_df1 <- npx_data1 %>% dplyr::mutate(Project = 'P1')
+#' npx_df2 <- npx_data2 %>% dplyr::mutate(Project = 'P2')
 #'
 #' #Bridging normalization:
-#' # Find overlaping samples, but exclude Olink controls
-#' overlap_samples <- intersect((npx_df1 %>% 
-#'                               filter(!grepl("control", SampleID, ignore.case=TRUE)))$SampleID,
+#' # Find overlapping samples, but exclude Olink control
+#' overlap_samples <- intersect((npx_df1 %>%
+#'                                dplyr::filter(!grepl("control", SampleID, 
+#'                                                      ignore.case=TRUE)))$SampleID,
 #'                              (npx_df2 %>%
-#'                               filter(!grepl("control", SampleID, ignore.case=TRUE)))$SampleID)
+#'                                dplyr::filter(!grepl("control", SampleID, 
+#'                                                      ignore.case=TRUE)))$SampleID)
 #' # Normalize
 #' olink_normalization(df1 = npx_df1,
 #'                     df2 = npx_df2,
@@ -48,13 +53,13 @@
 #' #Subset normalization:
 #' # Find a suitable subset of samples from both projects, but exclude Olink controls
 #' df1_sampleIDs <- (npx_df1 %>%
-#'     filter(!grepl("control", SampleID, ignore.case=TRUE)) %>%
-#'     select(SampleID) %>%
-#'     distinct())$SampleID
+#'     dplyr::filter(!grepl("control", SampleID, ignore.case=TRUE)) %>%
+#'     dplyr::select(SampleID) %>%
+#'     dplyr::distinct())$SampleID
 #' df2_sampleIDs <- (npx_df2 %>%
-#'     filter(!grepl("control", SampleID, ignore.case=TRUE)) %>%
-#'     select(SampleID) %>%
-#'     distinct())$SampleID
+#'     dplyr::filter(!grepl("control", SampleID, ignore.case=TRUE)) %>%
+#'     dplyr::select(SampleID) %>%
+#'     dplyr::distinct())$SampleID
 #' some_samples_df1 <- sample(df1_sampleIDs, 16)
 #' some_samples_df2 <- sample(df2_sampleIDs, 16)
 #' # Normalize
@@ -66,15 +71,19 @@
 #' #Reference median normalization:
 #' # For the sake of this example, set the reference median to 1
 #' ref_median_df <- npx_df1 %>%
-#'     select(OlinkID) %>%
-#'     distinct() %>%
-#'     mutate(Reference_NPX = 1)
+#'     dplyr::select(OlinkID) %>%
+#'     dplyr::distinct() %>%
+#'     dplyr::mutate(Reference_NPX = 1)
 #' # Normalize
 #' olink_normalization(df1 = npx_df1,
 #'                     overlapping_samples_df1 = some_samples_df1,
 #'                     reference_medians = ref_median_df)
 #' }
-#' @import dplyr stringr tidyr
+#' @importFrom magrittr %>%
+#' @importFrom stringr str_detect str_replace
+#' @importFrom dplyr filter left_join group_by mutate select distinct summarise if_else
+#' @importFrom tidyr spread
+#' @importFrom rlang ensym
 
 olink_normalization <- function(df1,
                                 df2 = NULL,
@@ -87,18 +96,18 @@ olink_normalization <- function(df1,
 
   #Filtering on valid OlinkID
   df1 <- df1 %>%
-    filter(stringr::str_detect(OlinkID,
+    dplyr::filter(stringr::str_detect(OlinkID,
                                "OID[0-9]{5}"))
 
   if(!is.null(df2)){
 
     df2 <- df2 %>%
-      filter(stringr::str_detect(OlinkID,
+      dplyr::filter(stringr::str_detect(OlinkID,
                                  "OID[0-9]{5}"))
   }
 
   #median of difference flag
-  MOD_FLAG <- T
+  MOD_FLAG <- TRUE
 
   if(!missing(overlapping_samples_df1)){
 
@@ -138,23 +147,23 @@ olink_normalization <- function(df1,
 
 
         adj_factor_df <- df1 %>%
-          filter(SampleID %in% overlapping_samples_df1) %>%
-          left_join(reference_medians, by= c('OlinkID')) %>%
-          group_by(OlinkID) %>%
-          mutate(Assay_Median=median(NPX, na.rm = T)) %>%
+          dplyr::filter(SampleID %in% overlapping_samples_df1) %>%
+          dplyr::left_join(reference_medians, by= c('OlinkID')) %>%
+          dplyr::group_by(OlinkID) %>%
+          dplyr::mutate(Assay_Median=median(NPX, na.rm = TRUE)) %>%
           ungroup() %>%
-          mutate(Adj_factor = if_else(is.na(Reference_NPX - Assay_Median),
+          dplyr::mutate(Adj_factor = dplyr::if_else(is.na(Reference_NPX - Assay_Median),
                                       0,
                                       Reference_NPX - Assay_Median)) %>%
-          select(OlinkID, Adj_factor) %>%
-          distinct()
+          dplyr::select(OlinkID, Adj_factor) %>%
+          dplyr::distinct()
 
 
         df_adjusted_data <- df1 %>%
-          mutate(Panel=str_replace(Panel,'\\(.+', '')) %>%
-          left_join(adj_factor_df,by='OlinkID') %>%
-          mutate(NPX = NPX + Adj_factor) %>%
-          mutate(LOD = LOD + Adj_factor)
+          dplyr::mutate(Panel=stringr::str_replace(Panel,'\\(.+', '')) %>%
+          dplyr::left_join(adj_factor_df,by='OlinkID') %>%
+          dplyr::mutate(NPX = NPX + Adj_factor) %>%
+          dplyr::mutate(LOD = LOD + Adj_factor)
 
         return(df_adjusted_data)
 
@@ -169,7 +178,7 @@ olink_normalization <- function(df1,
 
     }else{
 
-      MOD_FLAG <- F
+      MOD_FLAG <- FALSE
 
       if(!all(overlapping_samples_df2 %in% df2$SampleID)){
 
@@ -203,10 +212,10 @@ olink_normalization <- function(df1,
   }
 
   df1<-df1 %>%
-    mutate(Project = df1_project_nr)
+    dplyr::mutate(Project = df1_project_nr)
 
   df2<-df2 %>%
-    mutate(Project = df2_project_nr)
+    dplyr::mutate(Project = df2_project_nr)
 
   if(MOD_FLAG){
 
@@ -215,23 +224,23 @@ olink_normalization <- function(df1,
     #Calculate adjustment factors
     adj_factor_df<-df1 %>%
       rbind(df2) %>%
-      filter(SampleID %in% overlapping_samples_df1) %>%
-      select(SampleID,OlinkID,UniProt,NPX,Project) %>%
-      spread(Project,NPX)
+      dplyr::filter(SampleID %in% overlapping_samples_df1) %>%
+      dplyr::select(SampleID,OlinkID,UniProt,NPX,Project) %>%
+      tidyr::spread(Project,NPX)
 
     if (reference_project == df1_project_nr) {
       adj_factor_df <- adj_factor_df %>%
-        mutate(Diff = !!rlang::ensym(df1_project_nr) - !!rlang::ensym(df2_project_nr))
+        dplyr::mutate(Diff = !!rlang::ensym(df1_project_nr) - !!rlang::ensym(df2_project_nr))
     } else {
       adj_factor_df <- adj_factor_df %>%
-        mutate(Diff = !!rlang::ensym(df2_project_nr) - !!rlang::ensym(df1_project_nr))
+        dplyr::mutate(Diff = !!rlang::ensym(df2_project_nr) - !!rlang::ensym(df1_project_nr))
     }
 
     adj_factor_df <- adj_factor_df %>%
-      group_by(OlinkID) %>%
-      summarise(Adj_factor = if_else(is.na(median(Diff, na.rm = T)),
+      dplyr::group_by(OlinkID) %>%
+      dplyr::summarise(Adj_factor = dplyr::if_else(is.na(median(Diff, na.rm = TRUE)),
                                      0,
-                                     median(Diff, na.rm = T)))
+                                     median(Diff, na.rm = TRUE)))
 
   }else{
 
@@ -239,39 +248,40 @@ olink_normalization <- function(df1,
 
     #Calculate adjustment factors
     adj_factor_df <- df1 %>%
-      filter(SampleID %in% overlapping_samples_df1) %>%
-      rbind(df2 %>% filter(SampleID %in% overlapping_samples_df2)) %>%
-      select(SampleID,OlinkID,UniProt,NPX,Project) %>%
-      group_by(Project, OlinkID) %>%
-      summarise(Median=median(NPX,na.rm = T)) %>%
+      dplyr::filter(SampleID %in% overlapping_samples_df1) %>%
+      rbind(df2 %>%
+              dplyr::filter(SampleID %in% overlapping_samples_df2)) %>%
+      dplyr::select(SampleID,OlinkID,UniProt,NPX,Project) %>%
+      dplyr::group_by(Project, OlinkID) %>%
+      dplyr::summarise(Median=median(NPX,na.rm = TRUE)) %>%
       ungroup() %>%
-      spread(Project,Median)
+      tidyr::spread(Project,Median)
 
     if (reference_project == df1_project_nr) {
       adj_factor_df <- adj_factor_df %>%
-        mutate(Adj_factor = if_else(is.na(!!rlang::ensym(df1_project_nr) - !!rlang::ensym(df2_project_nr)),
+        dplyr::mutate(Adj_factor = dplyr::if_else(is.na(!!rlang::ensym(df1_project_nr) - !!rlang::ensym(df2_project_nr)),
                                     0,
                                     !!rlang::ensym(df1_project_nr) - !!rlang::ensym(df2_project_nr)))
     } else {
       adj_factor_df <- adj_factor_df %>%
-        mutate(Adj_factor = if_else(is.na(!!rlang::ensym(df2_project_nr) - !!rlang::ensym(df1_project_nr)),
+        dplyr::mutate(Adj_factor = dplyr::if_else(is.na(!!rlang::ensym(df2_project_nr) - !!rlang::ensym(df1_project_nr)),
                                     0,
                                     !!rlang::ensym(df2_project_nr) - !!rlang::ensym(df1_project_nr)))
     }
 
     adj_factor_df <- adj_factor_df %>%
-      select(OlinkID, Adj_factor)
+      dplyr::select(OlinkID, Adj_factor)
   }
 
 
   #Apply adjustment factors
   df_adjusted_data<-df1 %>%
     rbind(df2) %>%
-    mutate(Panel=str_replace(Panel,'\\(.+', '')) %>%
-    left_join(adj_factor_df,by='OlinkID') %>%
-    mutate(Adj_factor = if_else(Project == reference_project,0,Adj_factor)) %>%
-    mutate(NPX = NPX + Adj_factor) %>%
-    mutate(LOD = LOD + Adj_factor)
+    dplyr::mutate(Panel=stringr::str_replace(Panel,'\\(.+', '')) %>%
+    dplyr::left_join(adj_factor_df,by='OlinkID') %>%
+    dplyr::mutate(Adj_factor = dplyr::if_else(Project == reference_project,0,Adj_factor)) %>%
+    dplyr::mutate(NPX = NPX + Adj_factor) %>%
+    dplyr::mutate(LOD = LOD + Adj_factor)
 
 
   return(df_adjusted_data)

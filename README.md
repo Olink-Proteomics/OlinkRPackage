@@ -1,7 +1,9 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# OlinkAnalyze <img src="OlinkAnalyze/man/figures/OlinkAnalyze_target_hexagon.png" align="right" width="120" />
+[![R-CMD-check](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/R-CMD-check.yaml)
+
+# OlinkAnalyze <img src="figures/OlinkAnalyze_target_hexagon.png" align="right" width="120" />
 
 The goal of OlinkAnalyze is to provide a versatile toolbox to enable
 easy and smooth handling of Olink NPX data to speed up your proteomic
@@ -13,13 +15,13 @@ convenient pipeline for your Olink NPX data analysis.
 ## Installation
 
 ``` r
-# install.packages("devtools")
-devtools::install_github(repo ='Olink-Proteomics/OlinkRPackage/OlinkAnalyze', build_vignettes = TRUE)
+# install.packages("remotes")
+remotes::install_github(repo ='Olink-Proteomics/OlinkRPackage/OlinkAnalyze', ref = "main", build_vignettes = TRUE)
 ```
 
 ## Vignette
 
-```r
+``` r
 browseVignettes("OlinkAnalyze")
 ```
 
@@ -38,8 +40,7 @@ my_NPX_data <- read_NPX(filename = "path/to/my_NPX_data.xlsx")
 ### QC plot functions
 
 There are several plot functions, below follows two examples using the
-package provided npx\_data1
-dataset:
+package provided npx\_data1 dataset:
 
 ``` r
 # visualize the NPX distribution per sample per panel, example for one panel
@@ -49,7 +50,7 @@ olink_dist_plot(npx_data1 %>% filter(Panel == 'Olink CARDIOMETABOLIC')) +
   scale_fill_manual(values = c('turquoise3', 'red'))
 ```
 
-![dist\_plot\_example](OlinkAnalyze/man/figures/example_distplot.png)
+![dist\_plot\_example](figures/example_distplot.png)
 
 ``` r
 # visualize potential outliers by IQR vs. sample median per panel, example for one panel
@@ -57,7 +58,7 @@ olink_qc_plot(npx_data1 %>% filter(Panel == 'Olink CARDIOMETABOLIC')) +
   scale_color_manual(values = c('turquoise3', 'red'))
 ```
 
-![qc\_plot\_example](OlinkAnalyze/man/figures/example_qcplot.png)
+![qc\_plot\_example](figures/example_qcplot.png)
 
 ### Normalization
 
@@ -103,7 +104,7 @@ olink_volcano_plot(p.val_tbl = ttest_results_NPX1,
   scale_color_manual(values = c('turquoise3', 'red'))
 ```
 
-![volcano\_plot\_example](OlinkAnalyze/man/figures/example_volcanoplot.png)
+![volcano\_plot\_example](figures/example_volcanoplot.png)
 
 ## Learn more
 

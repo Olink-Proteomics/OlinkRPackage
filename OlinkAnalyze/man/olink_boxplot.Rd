@@ -2,7 +2,7 @@
 % Please edit documentation in R/Olink_boxplot.R
 \name{olink_boxplot}
 \alias{olink_boxplot}
-\title{Function which plots boxplots of a selected variable}
+\title{Function which plots boxplots of selected variables}
 \usage{
 olink_boxplot(
   df,
@@ -14,9 +14,10 @@ olink_boxplot(
 )
 }
 \arguments{
-\item{df}{NPX data frame in long format with at least protein name (Assay), OlinkID (unique), UniProt and a grouping variable.}
+\item{df}{NPX data frame in long format with at least protein name (Assay), OlinkID (unique), UniProt and at least one grouping variable.}
 
-\item{variable}{A character value indiciating which column to use as the x-axis grouping variable}
+\item{variable}{A character vector or character value indicating which column to use as the x-axis and fill grouping variable.
+The first or single value is used as x-axis, the second as fill. Further values in a vector are not plotted.}
 
 \item{olinkid_list}{Character vector indicating which proteins (OlinkIDs) to plot.}
 
@@ -30,10 +31,13 @@ olink_boxplot(
 A list of objects of class “ggplot” (the actual ggplot object is entry 1 in the list).
 }
 \description{
-Generates faceted boxplots of NPX vs. grouping variable for a given list of proteins (OlinkIDs) using ggplot and ggplot2::geom_boxplot.
+Generates faceted boxplots of NPX vs. grouping variable(s) for a given list of proteins (OlinkIDs) using ggplot and ggplot2::geom_boxplot.
 }
 \examples{
 \donttest{
+
+library(dplyr)
+
 anova_results <- olink_anova(npx_data1, variable = "Site")
 significant_assays <- anova_results \%>\%
     filter(Threshold == 'Significant') \%>\%
@@ -43,4 +47,5 @@ olink_boxplot(npx_data1,
               olinkid_list = significant_assays,
               verbose = TRUE,
               number_of_proteins_per_plot = 3)}
+
 }

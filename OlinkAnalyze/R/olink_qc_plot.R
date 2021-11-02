@@ -1,6 +1,6 @@
 #' Function to plot an overview of a sample cohort per Panel
 #'
-#' Generates a facet plot per Panel using ggplot and ggplot2::geom_point and stats::IQR plotting IQR vs. median for all samples.
+#' Generates a facet plot per Panel using ggplot2::ggplot and ggplot2::geom_point and stats::IQR plotting IQR vs. median for all samples.
 #' Horizontal dashed lines indicate +/-3 standard deviations from the mean IQR.
 #' Vertical dashed lines indicate +/-3 standard deviations from the mean sample median.
 #'
@@ -14,9 +14,12 @@
 #' @keywords NPX
 #' @export
 #' @examples \donttest{olink_qc_plot(npx_data1, color_g = "QC_Warning")}
-#' @import dplyr stringr tidyr
-#'
-
+#' @importFrom magrittr %>%
+#' @importFrom dplyr group_by mutate ungroup select distinct if_else filter case_when
+#' @importFrom rlang ensym
+#' @importFrom ggplot2 ggplot geom_hline geom_vline xlab facet_wrap geom_text geom_point
+#' @importFrom ggrepel geom_label_repel
+#' @importFrom stringr str_detect str_replace
 
 olink_qc_plot <- function(df, color_g = "QC_Warning", plot_index = F, label_outliers = T, ...){
 
@@ -45,63 +48,70 @@ olink_qc_plot <- function(df, color_g = "QC_Warning", plot_index = F, label_outl
 
   #Filtering on valid OlinkID
   npx_df <- df %>%
-    filter(stringr::str_detect(OlinkID,
-                               "OID[0-9]{5}"))
+    dplyr::filter(stringr::str_detect(OlinkID,
+                                      "OID[0-9]{5}"))
 
   npx_df_qr <- npx_df %>%
-    group_by(Panel, SampleID, Index) %>%
-    mutate(IQR = IQR(NPX, na.rm = T),
-           sample_median = median(NPX, na.rm = T)) %>%
-    ungroup() %>%
-    select(SampleID, Index, Panel, IQR, sample_median, !!rlang::ensym(color_g)) %>%
-    distinct() %>%
-    group_by(Panel) %>%
-    mutate(median_low = mean(sample_median, na.rm = T) - 3*sd(sample_median, na.rm = T),
-           median_high = mean(sample_median, na.rm = T) + 3*sd(sample_median, na.rm = T),
-           iqr_low = mean(IQR, na.rm = T) - 3*sd(IQR, na.rm = T),
-           iqr_high = mean(IQR, na.rm = T) + 3*sd(IQR, na.rm = T)) %>%
-    ungroup() %>%
-    mutate(Outlier = if_else(sample_median < median_high &
-                               sample_median > median_low &
-                               IQR > iqr_low &
-                               IQR < iqr_high,
-                             0, 1))
+    dplyr::group_by(Panel, SampleID, Index) %>%
+    dplyr::mutate(QC_Warning = dplyr::if_else(all(toupper(QC_Warning) == 'PASS'),
+                                              'Pass',
+                                              'Warning')) %>%
+    dplyr::mutate(IQR = IQR(NPX, na.rm = T),
+                  sample_median = median(NPX, na.rm = T)) %>%
+    dplyr::ungroup() %>%
+    dplyr::select(SampleID, Index, Panel, IQR, sample_median, !!rlang::ensym(color_g)) %>%
+    dplyr::distinct() %>%
+    dplyr::group_by(Panel) %>%
+    dplyr::mutate(median_low = mean(sample_median, na.rm = T) - 3*sd(sample_median, na.rm = T),
+                  median_high = mean(sample_median, na.rm = T) + 3*sd(sample_median, na.rm = T),
+                  iqr_low = mean(IQR, na.rm = T) - 3*sd(IQR, na.rm = T),
+                  iqr_high = mean(IQR, na.rm = T) + 3*sd(IQR, na.rm = T)) %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(Outlier = dplyr::if_else(sample_median < median_high &
+                                             sample_median > median_low &
+                                             IQR > iqr_low &
+                                             IQR < iqr_high,
+                                           0, 1))
 
 
   qc_plot <- npx_df_qr %>%
-    ggplot(aes(x = sample_median, y = IQR)) +
-    geom_hline(aes(yintercept=iqr_low),
-               linetype = 'dashed',
-               color = 'grey') +
-    geom_hline(aes(yintercept=iqr_high),
-               linetype = 'dashed',
-               color = 'grey') +
-    geom_vline(aes(xintercept = median_low),
-               linetype = 'dashed',
-               color = 'grey') +
-    geom_vline(aes(xintercept = median_high),
-               linetype = 'dashed',
-               color = 'grey') +
-    xlab('Sample Median') +
-    facet_wrap(~Panel, scale = "free") +
-    set_plot_theme()+
-    olink_color_discrete(...)
+    dplyr::mutate(Panel = Panel  %>% stringr::str_replace("Olink ", "")) %>%
+    ggplot2::ggplot(ggplot2::aes(x = sample_median, y = IQR)) +
+    ggplot2::geom_hline(ggplot2::aes(yintercept=iqr_low),
+                        linetype = 'dashed',
+                        color = 'grey') +
+    ggplot2::geom_hline(ggplot2::aes(yintercept=iqr_high),
+                        linetype = 'dashed',
+                        color = 'grey') +
+    ggplot2::geom_vline(ggplot2::aes(xintercept = median_low),
+                        linetype = 'dashed',
+                        color = 'grey') +
+    ggplot2::geom_vline(ggplot2::aes(xintercept = median_high),
+                        linetype = 'dashed',
+                        color = 'grey') +
+    ggplot2::xlab('Sample Median') +
+    ggplot2::facet_wrap(~Panel, scale = "free") +
+    OlinkAnalyze::set_plot_theme()+
+    OlinkAnalyze::olink_color_discrete(...)
 
   if(plot_index){
-    qc_plot <- qc_plot + geom_text(aes(color = !!rlang::ensym(color_g), label = Index), size = 3)
+    qc_plot <- qc_plot + ggplot2::geom_text(ggplot2::aes(color = !!rlang::ensym(color_g),
+                                                         label = Index), size = 3)
   }else{
-    qc_plot <- qc_plot + geom_point(aes(color = !!rlang::ensym(color_g)), size = 2.5)
+    qc_plot <- qc_plot + ggplot2::geom_point(ggplot2::aes(color = !!rlang::ensym(color_g)),
+                                             size = 2.5)
   }
 
   if(label_outliers){
 
     qc_plot <- qc_plot +
-      geom_label_repel(data = . %>% filter(Outlier == 1),
-                       aes(label=SampleID),
-                       box.padding = 0.5,
-                       min.segment.length = 0.1,
-                       show.legend=FALSE,
-                       size = 3)
+      ggrepel::geom_label_repel(data = . %>% dplyr::mutate(SampleIDPlot = dplyr::case_when(Outlier == 1 ~ SampleID,
+                                                                                           TRUE ~ "")),
+                                ggplot2::aes(label=SampleIDPlot),
+                                box.padding = 0.5,
+                                min.segment.length = 0.1,
+                                show.legend=FALSE,
+                                size = 3)
 
   }
 

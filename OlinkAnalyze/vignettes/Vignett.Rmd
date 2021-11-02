@@ -1,0 +1,662 @@
+---
+title: "OlinkAnalyze Vignette"
+author: "Olink DS team"
+date: "`r Sys.Date()`"
+output: 
+  html_vignette:
+    toc: true
+    toc_depth: 2
+vignette: >
+  %\VignetteIndexEntry{OlinkAnalyze Vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+  
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+collapse = TRUE,
+comment = "#>")
+```
+
+OlinkAnalyze is an R package that provides a versatile toolbox to enable fast and easy handling of Olink NPX data for your proteomics research. OlinkAnalyze provides functions for using Olink data, including functions for importing Olink NPX datasets exported from the NPX Manager, as well as quality control (QC) plot functions and functions for various statistical tests. This package is meant to provide a convenient pipeline for your Olink NPX data analysis.
+
+# Installation 
+
+The package *remotes* is required for the installation.
+
+```{r, eval=FALSE}
+install.packages("remotes")
+```
+
+Now you can proceed to installing OlinkAnalyze from Github.
+
+```{r, eval=FALSE}
+remotes::install_github(repo ='Olink-Proteomics/OlinkRPackage/OlinkAnalyze', ref = "main", build_vignettes = TRUE)
+```
+
+# List of functions
+
+**Preprocessing**
+
++ *read_NPX* Function to read NPX data into long format
++ *olink_plate_randomizer* Randomize samples on plate
++ *olink_bridgeselector* Select bridge samples
++ *olink_normalization* Normalization of all proteins (by OlinkID)
+
+**Statistical analysis**
+
++ *olink_ttest* Function which performs a t-test per protein
++ *olink_anova* Function which performs an ANOVA per protein
++ *olink_anova_posthoc* Function which performs an ANOVA post-hoc test per protein
++ *olink_lmer* Function which performs a linear mixed model per protein
++ *olink_lmer_posthoc* Function which performs a linear mixed model post-hoc per protein
+
+**Visualization**
+
++ *olink_boxplot* Function which plots boxplots of a selected variable
++ *olink_dist_plot* Function to plot the NPX distribution by panel
++ *olink_lmer_plot* Function which performs a point-range plot per protein on a linear mixed model
++ *olink_pca_plot* Function to plot a PCA of the data
++ *olink_qc_plot* Function to plot an overview of a sample cohort per Panel
++ *olink_volcano_plot* Easy volcano plot with Olink theme
++ *set_plot_theme* Function to set plot theme
+
+**Sample datasets**
+
++ *npx_data1* NPX Data in Long format
++ *npx_data2* NPX Data in Long format, Follow-up
++ *manifest* A sample manifest including Sample ID, Subject ID and clinical variables
+
+# Usage
+
+## Load the library
+
+```{r message=FALSE, warning=FALSE}
+# Load OlinkAnalyze
+library(OlinkAnalyze)
+
+# Load other libraries used in Vignette
+library(dplyr)
+library(ggplot2)
+library(stringr)
+```
+
+## Introduction to Olink NPX data format
+
+The package contains two test data files named npx_data1 and npx_data2. These are synthetic datasets that resemble Olink data accompanied by clinical variables. Olink data in that are delivered in long format or imported with the function *read_NPX* (that converts the data into a long format) contain the following columns:
+
+* **SampleID** _\<chr\>_: Sample names or IDs.
+* **Index** _\<int\>_: Unique number for each SampleID. It is used to make up for non unique sample IDs. 
+* **OlinkID** _\<chr\>_: Unique ID for each assay assigned by Olink. In case the assay is included in more than one panels it  will have a different OlinkID in each one. 
+* **UniProt** _\<chr\>_: UniProt ID.
+* **Assay** _\<chr\>_: Common gene name for the assay.
+* **MissingFreq** _\<dbl\>_: Missing frequency for the OlinkID, i.e. frequency of samples with NPX value below limit of detection (LOD).
+* **Panel** _\<chr\>_: Olink Panel that samples ran on. Read more about Olink Panels here: [https://www.olink.com/products-services/](https://www.olink.com/products-services/).
+* **Panel_Version** _\<chr\>_: Version of the panel. A new panel version might include some different or improved assays.
+* **PlateID** _\<chr\>_: Name of the plate.
+* **QC_Warning** _\<chr\>_: Indication whether the sample passed Olink QC. Read more here: [https://www.olink.com/faq/how-is-quality-control-of-the-data-performed/](https://www.olink.com/faq/how-is-quality-control-of-the-data-performed/).
+* **LOD** _\<dbl\>_: Limit of detection (LOD) is the minimum level of an individual protein that can be measured. LOD is defined as 3 times the standard deviation over background.
+* **NPX** _\<dbl\>_: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX here: [https://www.olink.com/faq/what-is-npx/](https://www.olink.com/faq/what-is-npx/).
+
+**NB** There are 5 additional variables in the sample datasets npx_data1 and npx_data2 that include clinical or other information, namely: Subject _\<chr\>_, Treatment _\<chr\>_, Site _\<chr\>_, Time _\<chr\>_, Project _\<chr\>_.
+
+# Preprocessing
+
+## Read NPX data (read_NPX)
+
+The read_NPX function imports an NPX file of wide format that has been exported from Olink NPX Manager and converts the data into the (preferred by R) long format. The wide format is the most common way Olink delivers data for Target96, however, for data analysis a long format is preferred. No prior alterations to the output of the NPX Manager should be made for this function to work as expected.
+
+### Function arguments
+
+* filename: Path to the NPX Manager output file.
+
+```{r message=FALSE, eval=FALSE}
+data <- read_NPX("~/NPX_file_location.xlsx")
+```  
+
+### Function output
+
+A tibble in long format containing:
+
+* SampleID: Sample names or IDs.
+* Index: Unique number for each SampleID. It is used to make up for non unique sample IDs. 
+* OlinkID: Unique ID for each assay assigned by Olink. In case the assay is included in more than one panels it  will have a different OlinkID in each one. 
+* UniProt: UniProt ID.
+* Assay: Common gene name for the assay.
+* MissingFreq: Missing frequency for the OlinkID, i.e. frequency of samples with NPX value below limit of detection (LOD).
+* Panel: Olink Panel that samples ran on. Read more about Olink Panels here: [https://www.olink.com/products-services/](https://www.olink.com/products-services/).
+* Panel_Version: Version of the panel. A new panel version might include some different or improved assays.
+* PlateID: Name of the plate.
+* QC_Warning: Indication whether the sample passed Olink QC. Read more here: [https://www.olink.com/faq/how-is-quality-control-of-the-data-performed/](https://www.olink.com/faq/how-is-quality-control-of-the-data-performed/).  
+* LOD: Limit of detection (LOD) is the minimum level of an individual protein that can be measured. LOD is defined as 3 times the standard deviation over background.
+* NPX: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX here: [https://www.olink.com/faq/what-is-npx/](https://www.olink.com/faq/what-is-npx/).
+
+## Randomize samples on plate (olink_plate_randomizer)
+
+The olink_plate_randomizer function randomly assigns samples to a plate well with the option to keep the same individuals on the same plate. Olink does not recommend to force balance based on other clinical variables. 
+
+### Function arguments
+
++ Manifest: tibble/data frame in long format containing all sample ID's. Sample ID column should be named SampleID.
++ SubjectColumn: (Optional) Column name of the subject ID column. Cannot contain missing values. If provided, subjects are kept on the same plate.
++ Groups: (Optional) *Currently not implemented!* Vector of column names for variables to be balanced across plates.
++ iterations: Number of iterations for fitting subjects on the same plate.
++ available.spots: (Default 88). Number of wells available on each plate. Can also take a vector equal to the number of plates to be used indicating the number of wells available on each plate.
++ seed: Seed to set. Highly recommend setting it for reproducibility.
+
+```{r message=FALSE, eval=FALSE}
+olink_plate_randomizer(manifest, 
+                       SubjectColumn ="SampleID",
+                       seed=111)
+```  
+
+### Function output
+
+A tibble including SampleID, SubjectID etc. assigned to well positions.
+
+## Select bridge samples (olink_bridgeselector)
+
+The bridge selection function selects a number of bridge samples based on the input data. Bridge samples are used to normalize two dataframes/projects that have been ran at different time points, hence, a batch effect is expected. It select samples that fulfill certain criteria that include good detectability, passing quality control and covering a wide range of data points. When possible the function recommends 8-16 bridge samples.
+
+Bridge sample selection strategy: Start by choosing samples with at most 10% missingness (sampleMissingFreq = 0.1), and in case there are not enough samples to output, increase the threshold to 20% (sampleMissingFreq = 0.2). 
+
+### Function arguments
+
++ df: tibble/data frame in long format such as produced by the read_NPX function.
++ sampleMissingFreq: The threshold for sample wise missingness.
++ n: Number of bridge samples to be selected.
+
+```{r message=FALSE, eval=FALSE}
+# Select overlapping samples
+olink_bridgeselector(df = npx_data1, 
+                     sampleMissingFreq = 0.1,
+                     n = 8)
+```  
+
+### Function output
+
+Tibble with sample IDs and mean NPX for the pre-defined number of bridging samples.
+
+## Normalizing NPX data (olink_normalization)
+
+The olink_normalization is a function used to normalize NPX values between two different dataframes/projects which have been ran at different times. Commonly, there is a shift in (mean) NPX values between runs, however, the spread of the data remains the same. This is why normalization between dataframes/projects is required. When normalization is performed, one of the two provided dataframes/projects shall be used as a reference. If two dataframes/projects have been normalized to one another, Olink by default uses the chronologically older one as reference. The function handles four different types of normalization: 
+
+* **Bridging normalization**: One of the dataframes is adjusted to another using overlapping samples (bridge samples). The overlapping samples should have the same IDs between dataframes, and adjustment is made using the median of the paired differences between the bridge samples. The two dataframes are provided as the inputs df1 and df2, while the one being used as reference is specified by the reference_project and the overlapping samples are specified by the overlapping_samples_df1. Only overlapping_samples_df1 should be provided regardless of which dataframe is used as reference_project.
+* **Subset normalization**: A subset of samples is used to normalize two dataframes, one of which is used as a reference_project. Adjustment is made using the differences of medians between the sample subsets from the two dataframes. Both overlapping_samples_df1 and overlapping_samples_df2 should be provided as input. The sample IDs do not need to overlap.
+* **Intensity normalization**: A version of subset normalization where all samples (except control samples) from the dataframes are used as overlapping_samples_df1 and overlapping_samples_df2, respectively.
+* **Reference median normalization**: Works only on one dataframe. This is effectively subset normalization, but using difference of medians to pre-recorded median values. df1, overlapping_samples_df1 and reference_medians need to be specified. Adjustment of df1 is made using the differences in median between the overlapping samples and the reference medians.
+
+### Function arguments
+
+* df1: First dataframe to be used in normalization (required).
+* df2: Second dataframe to be used in normalization.
+* overlapping_samples_df1:	Samples to be used for adjustment factor calculation in df1 (required).
+* overlapping_samples_df2: Samples to be used for adjustment factor calculation in df2.
+* df1_project_nr: Project name of first dataset.
+* df2_project_nr: Project name of second dataset.
+* reference_project: Project name of reference_project. Needs to be the same as either df1_project_nr or df2_project_nr. The project to which the second project is to be adjusted to.
+* reference_medians: Dataframe which needs to contain columns "OlinkID", and "Reference_NPX". Used for reference median normalization.
+
+```{r message=FALSE, eval=FALSE}
+# Find overlapping samples
+overlap_samples <- intersect(npx_data1$SampleID, npx_data2$SampleID) %>% 
+  data.frame() %>% 
+  filter(!str_detect(., 'CONTROL_SAMPLE')) %>% #Remove control samples
+  pull(.)
+# Perform Bridging normalization
+olink_normalization(df1 = npx_data1, 
+                    df2 = npx_data2, 
+                    overlapping_samples_df1 = overlap_samples,
+                    df1_project_nr = '20200001',
+                    df2_project_nr = '20200002',
+                    reference_project = '20200001')
+```  
+
+### Function output
+
+A tibble of NPX data in long format containing normalized NPX values, including adjustment factors:
+
+* SampleID: Sample names or IDs.
+* Index: Unique number for each SampleID. It is used to make up for non unique sample IDs. 
+* OlinkID: Unique ID for each assay assigned by Olink. In case the assay is included in more than one panels it  will have a different OlinkID in each one. 
+* UniProt: UniProt ID.
+* Assay: Common gene name for the assay.
+* MissingFreq: Missing frequency for the OlinkID, i.e. frequency of samples with NPX value below limit of detection (LOD).
+* Panel: Olink Panel that samples ran on. Read more about Olink Panels here: [https://www.olink.com/products-services/](https://www.olink.com/products-services/).
+* Panel_Version: Version of the panel. A new panel version might include some different or improved assays.
+* PlateID: Name of the plate.
+* QC_Warning: Indication whether the sample passed Olink QC. Read more here: [https://www.olink.com/faq/how-is-quality-control-of-the-data-performed/](https://www.olink.com/faq/how-is-quality-control-of-the-data-performed/). 
+* LOD: Limit of detection (LOD) is the minimum level of an individual protein that can be measured. LOD is defined as 3 times the standard deviation over background.
+* NPX: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX here: [https://www.olink.com/faq/what-is-npx/](https://www.olink.com/faq/what-is-npx/).
+* Project: Name given from the dataframe of origin.
+* Adj_factor: Adjustment factor, i.e. how much was added to or subtracted from the original NPX value.
+
+# Statistical analysis
+
+## T-test analysis (olink_ttest)
+
+The olink_ttest function performs a Welch 2-sample t-test or paired t-test at confidence level 0.95 for every protein (by OlinkID) for a given grouping variable using the function *t.test* from the R library *stats* and corrects for multiple testing using the Benjamini-Hochberg method (“fdr”) using the function *p.adjust* from the R library *stats*. Adjusted p-values are logically evaluated towards adjusted p-value<0.05. The resulting t-test table is arranged by ascending p-values.
+
+### Function arguments
+
+* df: NPX data frame in long format should minimally contain protein name (Assay), OlinkID, UniProt, Panel and an outcome factor with 2 levels.
+* variable: Character value that should represent a column in the df to be used as a grouping variable. Needs to have exactly 2 levels.
+* pair_id: Character value indicating which column contains the paired sample identifier. Only used for paired t-tests.
+
+```{r message=FALSE, eval=FALSE}
+olink_ttest(df = npx_data1,
+            variable = 'Treatment')
+```  
+
+### Function output
+
+A tibble with the following columns:
+
+* Assay _\<chr\>_: Assay name.
+* OlinkID _\<chr\>_: Unique Olink ID.
+* UniProt _\<chr\>_: UniProt ID.
+* Panel _\<chr\>_: Olink Panel.
+* estimate  _\<dbl\>_: Difference in mean NPX between groups.
+* statistic _\<dbl\>_: Value of the t-statistic.
+* p.value _\<dbl\>_: P-value for the test.
+* parameter _\<dbl\>_: Degrees of freedom for the t-statistic.
+* conf.low _\<dbl\>_: Low bound of the confidence interval for the mean.
+* conf.high _\<dbl\>_: High bound of the confidence interval for the mean.
+* method _\<chr\>_: Method that was used.
+* alternative  _\<chr\>_: : Description of the alternative hypothesis.
+* Adjusted_pval _\<dbl\>_: Adjusted p-value for the test (Benjamini & Hochberg).
+* Threshold _\<chr\>_: Text indication if assay is significant (adjusted p-value < 0.05).
+
+## Analysis for variance (ANOVA) (olink_anova)
+
+The olink_anova is a wrapper function that performs an ANOVA F-test for each assay using the function *Anova* from the R library *car* and Type III sum of squares. The function handles both factor and numerical variables, and/or confounding factors. 
+
+Samples with missing variable information or factor levels are excluded from the analysis. Character columns in the input data frame are converted to factors. The automatic handling of the data from above is announced by a message if the flag *verbose=T*.
+
+Crossed/interaction analysis, i.e. A*B formula notation, is inferred from the variable argument in the following cases: 
+
+* c('A','B')
+* c('A:B')
+* c('A:B', 'B') or c('A:B', 'A')
+
+Inference is specified in a message if *verbose=T*.
+
+For covariates, crossed analyses need to be specified explicitly, i.e. two main effects will not be expanded with a c('A','B') notation. Main effects present in the variable take precedence. The formula notation of the final model is specified in a message if *verbose=T*. 
+
+Adjusted p-values are calculated using the function *p.adjust* from the R library *stats* with the Benjamini & Hochberg (1995) method (“fdr”). The threshold is determined by logic evaluation of Adjusted_pval < 0.05. Covariates are not included in the p-value adjustment.
+
+### Function arguments
+
+* df: NPX data frame in long format should minimally contain protein name (Assay), OlinkID, UniProt, Panel and an outcome factor with at least 3 levels.
+* variable: Single character value or character array. In case of single character then that should represent a column in the df. Otherwise, if length > 1, the included variable names will be used in crossed analyses. It can also accept the notations ':' or '*'.
+* outcome: Name of the column from df that contains the dependent variable. Default: NPX.
+* covariates: Single character value or character array. Default: NULL. Confounding factors to include in the analysis. In case of single character then that should represent a column in the df. It can also accept the notations ':' or '*', while crossed analysis will not be inferred from main effects.
+* return.covariates: Boolean. Default: False. Returns F-test results for the covariates. Note: Adjusted p-values will be NA for covariates.
+* verbose: Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
+
+```{r message=FALSE, eval=FALSE}
+# One-way ANOVA, no covariates
+anova_results_oneway <- olink_anova(df = npx_data1, 
+                                    variable = 'Site')
+# Two-way ANOVA, no covariates
+anova_results_twoway <- olink_anova(df = npx_data1, 
+                                    variable = c('Site', 'Time'))
+# One-way ANOVA, Treatment as covariates
+anova_results_oneway <- olink_anova(df = npx_data1, 
+                                    variable = 'Site',
+                                    covariates = 'Treatment')
+```
+
+### Function output
+
+A tibble with the following columns:
+
+* Assay _\<chr\>_: Assay name.
+* OlinkID _\<chr\>_: Unique Olink ID.
+* UniProt _\<chr\>_: UniProt ID.
+* Panel _\<chr\>_: Olink Panel.
+* term _\<chr\>_: Name of the variable that was used for the p-value calculation. The ":" between variables indicates interaction between variables.
+* df _\<dbl\>_: Numerator of degrees of freedom.
+* sumsq _\<dbl\>_: Sum of squares.
+* meansq _\<dbl\>_: Mean of squares.
+* statistic _\<dbl\>_: Value of F-statistic.
+* p.value _\<dbl\>_: P-value for the test.
+* Adjusted_pval _\<dbl\>_: Adjusted p-value for the test (Benjamini & Hochberg).
+* Threshold _\<chr\>_: Text indication if assay is significant (adjusted p-value < 0.05).
+
+## Post-hoc ANOVA analysis (olink_anova_posthoc)
+
+olink_anova_posthoc performs a post-hoc ANOVA test using the function *emmeans* from the R library *emmeans* with Tukey p-value adjustment per assay (by OlinkID) at confidence level 0.95. 
+
+The function handles both factor and numerical variables and/or covariates. The post-hoc test for a numerical variable compares the difference in means of the outcome variable (default: NPX) for 1 standard deviation (SD) difference in the numerical variable, e.g. mean NPX at mean (numerical variable) versus mean NPX at mean (numerical variable) + 1*SD (numerical variable).
+
+### Function arguments
+
+* df: NPX data frame in long format should minimally contain protein name (Assay), OlinkID, UniProt, Panel and an outcome factor with at least 3 levels.
+* olinkid_list: Character vector of OlinkID's on which to perform the post-hoc analysis. If not specified, all assays in df are used.
+* variable: Single character value or character array. In case of single character then that should represent a column in the df. Otherwise, if length > 1, the included variable names will be used in crossed analyses. It can also accept the notations ':' or '*'.
+* covariates: Single character value or character array. Default: NULL. Confounding factors to include in the analysis. In case of single character then that should represent a column in the df. It can also accept the notations ':' or '*', while crossed analysis will not be inferred from main effects.
+* outcome: Name of the column from df that contains the dependent variable. Default: NPX.
+* effect: Term on which to perform the post-hoc analysis. Character vector. Must be subset of or identical to the variable and no adjustment is performed.
+* mean_return: Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = T.
+* verbose: Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
+
+```{r message=FALSE, eval=FALSE}
+# calculate the p-value for the ANOVA
+anova_results_oneway <- olink_anova(df = npx_data1, 
+                                    variable = 'Site')
+# extracting the significant proteins
+anova_results_oneway_significant <- anova_results_oneway %>%
+  filter(Threshold == 'Significant') %>%
+  pull(OlinkID)
+anova_posthoc_oneway_results <- olink_anova_posthoc(df = npx_data1,
+                                                    olinkid_list = anova_results_oneway_significant,
+                                                    variable = 'Site',
+                                                    effect = 'Site')
+```
+
+### Function output
+
+A tibble with the following columns:
+
+* Assay _\<chr\>_: Assay name.
+* OlinkID _\<chr\>_: Unique Olink ID.
+* UniProt _\<chr\>_: UniProt ID.
+* Panel _\<chr\>_: Olink Panel.
+* term _\<chr\>_: Name of the variable that was used for the p-value calculation. The ":" between variables indicates interaction between variables.
+* contrast _\<chr\>_: Variables (in term) that are compared.   
+* estimate _\<dbl\>_: Difference in mean NPX between variables (from contrast).
+* conf.low _\<dbl\>_: Low bound of the confidence interval for the mean.
+* conf.high _\<dbl\>_: High bound of the confidence interval for the mean.
+* Adjusted_pval _\<dbl\>_: Adjusted p-value for the test (Benjamini & Hochberg).
+* Threshold _\<chr\>_: Text indication if assay is significant (adjusted p-value < 0.05).
+
+## Linear mixed effects model analysis (olink_lmer)
+
+The olink_lmer fits a linear mixed effects model for every protein (by OlinkID) in every panel, using the function *lmer* from the R library *lmerTest* and the function *anova* from the R library *stats*. The function handles both factor and numerical variables and/or covariates.
+
+Samples with missing variable information or factor levels are excluded from the analysis. Character columns in the input data frame are converted to factors. The automatic handling of the data from above is announced by a message if the flag *verbose=T*. 
+
+Crossed/interaction analysis, i.e. A*B formula notation, is inferred from the variable argument in the following cases: 
+
+* c('A','B')
+* c('A:B')
+* c('A:B', 'B') or c('A:B', 'A')
+
+Inference is specified in a message if *verbose=T*.
+
+For covariates, crossed analyses need to be specified explicitly, i.e. two main effects will not be expanded with a c('A','B') notation. Main effects present in the variable take precedence. The formula notation of the final model is specified in a message if *verbose=T*.  
+
+Adjusted p-values are calculated using the function *p.adjust* from the R library *stats* with the Benjamini & Hochberg (1995) method (“fdr”). The threshold is determined by logic evaluation of Adjusted_pval < 0.05. Covariates are not included in the p-value adjustment.
+
+### Function arguments
+
+* df: NPX data frame in long format should minimally contain protein name (Assay), OlinkID, UniProt, Panel and 1-2 variables with at least 2 levels and subject ID.
+* variable: Single character value or character array. In case of single character then that should represent a column in the df. Otherwise, if length > 1, the included variable names will be used in crossed analyses. It can also accept the notations ':' or '*'.
+* outcome: Name of the column from df that contains the dependent variable. Default: NPX.
+* random: Single character value or character array with random effects.
+* covariates: Single character value or character array. Default: NULL. Confounding factors to include in the analysis. In case of single character then that should represent a column in the df. It can also accept the notations ':' or '*', while crossed analysis will not be inferred from main effects.
+* return.covariates: Boolean. Default: False. Returns F-test results for the covariates. Note: Adjusted p-values will be NA for covariates.
+* verbose: Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
+
+```{r message=FALSE, eval=FALSE}
+# Linear mixed model with one variable.
+lmer_results_oneway <- olink_lmer(df = npx_data1, 
+                                  variable = 'Site',
+                                  random = 'Subject')
+# Linear mixed model with two variables.
+lmer_results_twoway <- olink_lmer(df = npx_data1, 
+                                  variable = c('Site', 'Treatment'),
+                                  random = 'Subject')
+```
+
+### Function outcome
+
+A tibble with the following columns:
+
+* Assay _\<chr\>_: Assay name.
+* OlinkID _\<chr\>_: Unique Olink ID.
+* UniProt _\<chr\>_: UniProt ID.
+* Panel _\<chr\>_: Olink Panel.
+* term _\<chr\>_: Name of the variable that was used for the p-value calculation. The ":" between variables indicates interaction between variables.
+* sumsq _\<dbl\>_: Sum of squares.
+* meansq _\<dbl\>_: Mean of squares.
+* NumDF _\<dbl\>_: Numerator of degrees of freedom.
+* DenDF _\<dbl\>_: Denominator of degrees of freedom.
+* statistic _\<dbl\>_: Value of F-statistic.
+* p.value _\<dbl\>_: P-value for the test.
+* Adjusted_pval _\<dbl\>_: Adjusted p-value for the test (Benjamini & Hochberg).
+* Threshold _\<chr\>_: Text indication if assay is significant (adjusted p-value < 0.05).
+
+## Post-hoc linear mixed effects model analysis (olink_lmer_posthoc)
+
+The olink_lmer_posthoc function is similar to olink_lmer but performs a post-hoc analysis based on a linear mixed model effects model using the function *lmer* from the R library *lmerTest* and the function *emmeans* from the R library *emmeans*. The function handles both factor and numerical variables and/or covariates. Differences in estimated marginal means are calculated for all pairwise levels of a given output variable. Degrees of freedom are estimated using Satterthwaite’s approximation. The post-hoc test for a numerical variable compares the difference in means of the outcome variable (default: NPX) for 1 standard deviation difference in the numerical variable, e.g. mean NPX at mean(numerical variable) versus mean NPX at mean(numerical variable) + 1*SD(numerical variable). The output tibble is arranged by ascending adjusted p-values.
+
+### Function arguments
+
+* df: NPX data frame in long format should minimally contain protein name (Assay), OlinkID, UniProt, Panel and 1-2 variables with at least 2 levels and subject ID.
+* variable: Single character value or character array. In case of single character then that should represent a column in the df. Otherwise, if length > 1, the included variable names will be used in crossed analyses. It can also accept the notations ':' or '*'.
+* olinkid_list: Character vector of OlinkID's on which to perform the post-hoc analysis. If not specified, all assays in df are used.
+* effect: Term on which to perform the post-hoc analysis. Character vector. Must be subset of or identical to the variable.
+* outcome: Name of the column from df that contains the dependent variable. Default: NPX.
+* random: Single character value or character array with random effects.
+* covariates: Single character value or character array. Default: NULL. Confounding factors to include in the analysis. In case of single character then that should represent a column in the df. It can also accept the notations ':' or '*', while crossed analysis will not be inferred from main effects.
+* mean_return: Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = T and no adjustment is performed.
+* verbose: Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
+
+```{r message=FALSE, eval=FALSE}
+# Linear mixed model with two variables.
+lmer_results_twoway <- olink_lmer(df = npx_data1, 
+                                  variable = c('Site', 'Treatment'),
+                                  random = 'Subject')
+# extracting the significant proteins
+lmer_results_twoway_significant <- lmer_results_twoway %>%
+  filter(Threshold == 'Significant', term == 'Treatment') %>%
+  pull(OlinkID)
+# performing post-hoc analysis
+lmer_posthoc_twoway_results <- olink_lmer_posthoc(df = npx_data1,
+                                                  olinkid_list = lmer_results_twoway_significant,
+                                                  variable = c('Site', 'Treatment'),
+                                                  random = 'Subject',
+                                                  effect = 'Treatment') 
+```
+
+### Function output
+
+A tibble with the following columns:
+
+* Assay _\<chr\>_: Assay name.
+* OlinkID _\<chr\>_: Unique Olink ID.
+* UniProt _\<chr\>_: UniProt ID.
+* Panel _\<chr\>_: Olink Panel.
+* term _\<chr\>_: Name of the variable that was used for the p-value calculation. The ":" between variables indicates interaction between variables.
+* contrast _\<chr\>_: Variables (in term) that are compared.   
+* estimate _\<dbl\>_: Difference in mean NPX between variables (from contrast).
+* conf.low _\<dbl\>_: Low bound of the confidence interval for the mean.
+* conf.high _\<dbl\>_: High bound of the confidence interval for the mean.
+* Adjusted_pval _\<dbl\>_: Adjusted p-value for the test (Benjamini & Hochberg).
+* Threshold _\<chr\>_: Text indication if assay is significant (adjusted p-value < 0.05).
+
+# Visualization
+
+## Boxplots for outcomes (olink_boxplot)
+
+The olink_boxplot function is used to generate boxplots of NPX values stratified on a variable for a given list of proteins. olink_boxplot uses the functions *ggplot* and *geom_boxplot* of the R library *ggplot2*.
+
+### Function arguments
+
+* df: NPX data frame in long format should minimally contain protein name (Assay), OlinkID, UniProt and a grouping variable.
+* variable: Single character value indicating the column name to use as a grouping variable in the x axis.
+* olinkid_list: Character vector of OlinkID's that should be used for the boxplot. If not specified, all assays in df are used.
+* verbose: Boolean. Default: False. Flag indicating if plots shall be printed additionally to assigned to a list variable.
+* number_of_proteins_per_plot: Number of boxplots to include in the facets plot. Default 6.
+
+```{r message=FALSE, fig.width=8, fig.height=4}
+plot <- npx_data1 %>%
+  na.omit() %>% # removing missing values which exists for Site
+  olink_boxplot(variable = "Site", 
+                olinkid_list = c("OID01216", "OID01217"),
+                number_of_proteins_per_plot  = 2)
+plot[[1]]
+```
+
+### Function output
+
+A list of objects of class *ggplot*.
+
+**NB** Please note that plots will not appear in the *plots* panel of *Rstudio* if not assigned to a variable and printing it (see sample code above).
+
+## Boxplots for QC (olink_dist_plot)
+
+The olink_dist_plot function generates boxplots of NPX values for each sample, faceted by Olink panel. This is used as an initial QC step to identify potential outliers. olink_dist_plot uses the functions *ggplot* and *geom_boxplot* of the R library *ggplot2*.
+
+### Function arguments
+
+* df: NPX data frame in long format should minimally contain SampleID, NPX and Panel.
+* color_g: Character value indicating the column name that should be used as fill color. Default: QC_Warning.
+
+```{r message=FALSE, fig.width=8, fig.height=4}
+npx_data1 %>% 
+  filter(Panel == 'Olink Cardiometabolic') %>% # For this example only plotting one panel.
+  olink_dist_plot() +
+  theme(axis.text.x = element_blank()) # Due to the number of samples one can remove the text or rotate it
+```
+
+### Function output
+
+A list of objects of class *ggplot*.
+
+## Point-range plot for LMER (olink_lmer_plot)
+
+The function olink_lmer_plot generates a point-range plot for a given list of proteins based on linear mixed effect model. The points illustrate the mean NPX level for each group and the error bars illustrate 95% confidence intervals. Facets are labeled by the protein name and corresponding OlinkID for the protein.
+
+### Function arguments
+
+* df: NPX data frame in long format should minimally contain protein name (Assay), OlinkID, UniProt, Panel and 1-2 variables with at least 2 levels and subject ID.
+* variable: Single character value or character array. In case of single character then that should represent a column in the df. Otherwise, if length > 1, the included variable names will be used in crossed analyses. It can also accept the notations ':' or '*'.
+* outcome: Name of the column from df that contains the dependent variable. Default: NPX.
+* random: Single character value or character array with random effects.
+* covariates: Single character value or character array. Default: NULL. Confounding factors to include in the analysis. In case of single character then that should represent a column in the df. It can also accept the notations ':' or '*', while crossed analysis will not be inferred from main effects.
+* x_axis_variable: Character. Which main effect to use as x-axis in the plot.
+* col_variable: Character. If provided, the interaction effect col_variable:x_axis_variable will be plotted with x_axis_variable on the x-axis and col_variable as color.
+* number_of_proteins_per_plot: Number plots to include in the list of point-range plots. Defaults to 6 plots per figure.
+* verbose: Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
+
+```{r message=FALSE, fig.width=8, fig.height=4}
+plot <- olink_lmer_plot(df = npx_data1, 
+                        olinkid_list = c("OID01216", "OID01217"), 
+                        variable = c('Site', 'Treatment'), 
+                        x_axis_variable =  'Site',
+                        col_variable = 'Treatment',
+                        random = 'Subject')
+plot[[1]]
+```
+
+### Function output
+
+A list of objects of class *ggplot*.
+
+**NB** Please note that plots will not appear in the *plots* panel of *Rstudio* if not assigned to a variable and printing it (see sample code above).
+
+## Principal components analysis (PCA) plot (olink_pca_plot)
+
+Generates PCA projection of all samples from NPX data along two principal components (Default PC2 vs PC1) colored by the variable QC_Warning and including the percentage of explained variance. The function used the functions *prcomp* and *ggplot* from the R libraries *stats* and *ggplot2*, respectively. By default, the values scaled and centered in the PCA and proteins with missing NPX values removed from the corresponding assay(s). Unique sample names are required. Imputation by median value is done for assays with missingness <10% and for multi-plate projects, and for missingness <5% for single plate projects.
+
+### Function arguments
+
+* df: NPX data frame in long format should minimally contain SampleID, NPX and column that will be used for grouping/coloring.
+* color_g: Character value indicating the column name that should be used as fill color. Default QC_Warning.
+* x_val: Integer indicating which principal component to plot along the x-axis. Default 1.
+* y_val: Integer indicating which principal component to plot along the y-axis. Default 2.
+* label_samples: Logical. If TRUE, points are replaced with SampleID. Default FALSE.
+* drop_assays: Logical. All assays with any missing values will be dropped. Takes precedence over sample drop.
+* drop_samples: Logical. All samples with any missing values will be dropped.
+* n_loadings: Integer. Plot the top n_loadings ranked by size.
+* loadings_list: Character vector indicating for which OlinkID's to plot loadings. Arguments n_loadings and loadings_list can be used together.
+* verbose: Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
+
+```{r message=FALSE, fig.width=8, fig.height=4}
+npx_data1 %>% 
+  filter(!str_detect(SampleID, 'CONTROL_SAMPLE')) %>% 
+  olink_pca_plot(df = .,
+                 color_g = "QC_Warning")  
+```
+
+### Function output
+
+An object of class *ggplot*.
+
+## Scatterplot for QC (olink_qc_plot) 
+
+The olink_qc_plot function generates a facet plot per Panel using ggplot and ggplot2::geom_point and stats::IQR plotting IQR vs. median for all samples. This is a good first check to find out if any samples have a tendency to be classified as outliers. Horizontal dashed lines indicate +/-3 standard deviations from the mean IQR. Vertical dashed lines indicate +/-3 standard deviations from the mean sample median.
+
+### Function arguments
+
+* df: NPX data frame in long format should minimally contain SampleID, Index, NPX and Panel.
+* color_g: Character value indicating the column name that should be used as fill color. Default QC_Warning.
+* plot_index: Boolean. Default FALSE. If FALSE, a point will be plotted for a sample. If TRUE, a sample's unique index number is displayed.
+* label_outliers: Boolean. If TRUE, an outlier sample will be labeled by its SampleID.
+
+```{r message=FALSE, fig.width=8, fig.height=4}
+npx_data1 %>% 
+  filter(!str_detect(SampleID, 'CONTROL_SAMPLE'),
+         Panel == 'Olink Development') %>% 
+  olink_qc_plot(color_g = "QC_Warning")   
+```
+
+### Function output
+
+An object of class *ggplot*.
+
+## Plot results of t-test (olink_volcano_plot)
+
+The olink_volcano_plot function generates a volcano plot using results from the olink_ttest function using the function *ggplot* and *geom_point* of the R library *ggplot2*. The estimated difference is shown in the x-axis and -log<sub>10</sub>(p-value) in the y-axis. A horizontal dotted line indicates p-value = 0.05. Dots are colored based on Benjamini-Hochberg adjusted p-value cutoff 0.05 and can optionally be annotated by OlinkID.
+
+### Function arguments
+
+* p.val_tbl: a data frame of results generated by *olink_ttest*.
+* x_lab: Optional. Character value to use as the x-axis label.
+* olinkid_list: Optional. Character vector of proteins (OlinkID) to label in the plot. If not provided, by default the function will label all significant proteins.
+
+```{r message=FALSE, fig.width=8, fig.height=4}
+# perform t-test
+ttest_results <- olink_ttest(df = npx_data1,
+                             variable = 'Treatment')
+# select names of proteins to show
+top_10_name <- ttest_results %>%
+  slice_head(n = 10) %>%
+  pull(OlinkID)
+# volcano plot
+olink_volcano_plot(p.val_tbl = ttest_results,
+                   x_lab = 'Treatment',
+                   olinkid_list = top_10_name)
+```
+
+### Function output
+
+An object of class *ggplot*.
+
+## Theming function (set_plot_theme)
+
+This function sets a coherent plot theme for plots by adding it to a ggplot object. It is mainly used for aesthetic reasons.
+
+```{r message=FALSE, fig.width=8, fig.height=4}
+npx_data1 %>% 
+  filter(OlinkID == 'OID01216') %>% 
+  ggplot(aes(x = Treatment, y = NPX, fill = Treatment)) +
+  geom_boxplot() +
+  set_plot_theme()
+```  
+
+## Color theming (olink_color_discrete, olink_color_gradient, olink_fill_discrete, olink_fill_gradient)
+
+These functions sets a coherent coloring theme for the plots by adding it to a ggplot object. It is mainly used for aesthetic reasons.
+
+```{r message=FALSE, fig.width=8, fig.height=4}
+npx_data1 %>% 
+  filter(OlinkID == 'OID01216') %>% 
+  ggplot(aes(x = Treatment, y = NPX, fill = Treatment)) +
+  geom_boxplot() +
+  set_plot_theme() +
+  olink_fill_discrete()
+```
