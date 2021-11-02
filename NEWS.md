@@ -19,7 +19,7 @@
 * Panel names in npx_data1 and npx_data2 were fixed to match new `read_NPX()` formatting (@kathy-nevola, #62)
 * `olink_bridgeselector()` QC warning filtering changed to match `olink_qc_plot()` and `olink_dist_plot()` (@marisand, @AskPascal, #61)
 * global variables are now specified (@kathy-nevola, #45)
-* Function documentation updated to remove notes on RMD check (@kathy-nevola, #39)
+* Function documentation updated to remove notes on R CMD check (@kathy-nevola, #39)
 * Fix summary casting "tukey" to "sidak" adjustment warning in `olink_anova_posthoc()` and `olink_lmer_posthoc()` functions (@marisand, #38)
 * Update functions to import selectively (@kathy-nevola, @Orbmac, @AskPascal, @marisand, #21, #20, #19, #18, #15, #29)
 * Fix guides size argument in `olink_pca_plot()` (#17) (@AskPascal, #24)
