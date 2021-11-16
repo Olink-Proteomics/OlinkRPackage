@@ -1,3 +1,15 @@
+# OlinkAnalyze 2.0.0
+
+## Major Changes
+
+* Package is in the process of being submitted to CRAN
+
+## BugFixes
+
+* Moved NEWS.md to correct level (@kathy-nevola)
+* Added cran-comments.md
+
+
 # OlinkAnalyze 1.3.0
 
 ## Major Changes
