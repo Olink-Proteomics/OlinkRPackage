@@ -21,12 +21,12 @@ which likely give several index terms:
   This is new package. Several overlapping keywords are used to index related functions. 
 
 * checking installed packaged size ... NOTE
-     installed size is 23.3Mb
+     installed size is 13.0Mb
      sub-directories of 1Mb or more:
        data      3.2Mb
-       extdata  19.6Mb
+       extdata   9.3Mb
        
-    data included has been chosen to balance both a small package size and utility for the user.
-    data has been compressed to decrease file sizes.
+    data included has been chosen to balance both a small package size, sufficient unit testing, and utility for the user.
+    Rdata files has been compressed to decrease file sizes.
 
 
