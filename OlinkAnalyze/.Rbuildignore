@@ -4,4 +4,5 @@
 ^doc$
 ^Meta$
 ^cran-comments\.md$
-
+^inst/extdata/.*[.]xlsx
+^inst/extdata/.*meta[.]csv
