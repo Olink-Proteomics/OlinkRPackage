@@ -600,7 +600,7 @@ The olink_qc_plot function generates a facet plot per Panel using ggplot and ggp
 ```{r message=FALSE, fig.width=8, fig.height=4}
 npx_data1 %>% 
   filter(!str_detect(SampleID, 'CONTROL_SAMPLE'),
-         Panel == 'Olink Development') %>% 
+         Panel == 'Olink Inflammation') %>% 
   olink_qc_plot(color_g = "QC_Warning")   
 ```
 
