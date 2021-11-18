@@ -14,7 +14,7 @@ test_that("Data loads correctly with 'read_NPX()'", {
   expect_s3_class(manifest_1, class = "data.frame")
 
   #Correct number of cols and rows?
-  expect_equal(nrow(df_1), 176640)
+  expect_equal(nrow(df_1), 29440)
   expect_equal(ncol(df_1), 12)
 
   #Correct col names?
