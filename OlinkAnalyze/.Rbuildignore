@@ -6,3 +6,6 @@
 ^cran-comments\.md$
 ^inst/extdata/npx_data2_meta[.]csv
 ^inst/extdata/npx_data2[.]xlsx
+^inst/extdata/.*original[.]csv
+^inst/extdata/.*original[.]xlsx
+^data/.*_original[.]rda
