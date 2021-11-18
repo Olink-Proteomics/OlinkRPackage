@@ -21,6 +21,6 @@ npx_data2
 Data is generated randomly to demonstrate use of functions in this package. The format is very similar to data(npx_data1). Both datasets can be used together to demonstrate the use of normalization functionality.
 }
 \details{
-A tibble with 194,304 rows and 17 columns. npx_data2 is an Olink NPX data file (tibble) in long format  with 174 unique Sample ID's (including 2 repeats each of control samples: CONTROL_SAMPLE_AS 1 CONTROL_SAMPLE_AS 2). The data also contains 1104 assays (uniquely identified using OlinkID) over 12 Panels. This dataset also contain 16 bridge samples with SampleID's that are also present in data(npx_data1). These sample ID's are: A13, A29, A30, A36, A45, A46, A52, A63, A71, A73, B3, B4, B37, B45, B63, B75
+A tibble with 32,384 rows and 17 columns. npx_data2 is an Olink NPX data file (tibble) in long format  with 174 unique Sample ID's (including 2 repeats each of control samples: CONTROL_SAMPLE_AS 1 CONTROL_SAMPLE_AS 2). The data also contains 1104 assays (uniquely identified using OlinkID) over 12 Panels. This dataset also contain 16 bridge samples with SampleID's that are also present in data(npx_data1). These sample ID's are: A13, A29, A30, A36, A45, A46, A52, A63, A71, A73, B3, B4, B37, B45, B63, B75
 }
 \keyword{datasets}
