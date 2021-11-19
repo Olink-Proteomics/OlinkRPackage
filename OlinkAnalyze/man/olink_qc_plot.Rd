@@ -9,6 +9,8 @@ olink_qc_plot(
   color_g = "QC_Warning",
   plot_index = F,
   label_outliers = T,
+  IQR_outlierDef = 3,
+  median_outlierDef = 3,
   ...
 )
 }
@@ -22,6 +24,10 @@ a sample's unique index number is displayed.}
 
 \item{label_outliers}{Boolean. If TRUE, an outlier sample will be labelled with its SampleID.}
 
+\item{IQR_outlierDef}{The number of standard deviations from the mean IQR that defines an outlier. Default is 3}
+
+\item{median_outlierDef}{The number of standard deviations from the mean sample median that defines an outlier. Default is 3}
+
 \item{...}{coloroption passed to specify color order}
 }
 \value{
@@ -29,8 +35,8 @@ An object of class "ggplot"
 }
 \description{
 Generates a facet plot per Panel using ggplot2::ggplot and ggplot2::geom_point and stats::IQR plotting IQR vs. median for all samples.
-Horizontal dashed lines indicate +/-3 standard deviations from the mean IQR.
-Vertical dashed lines indicate +/-3 standard deviations from the mean sample median.
+Horizontal dashed lines indicate +/-IQR_outlierDef standard deviations from the mean IQR.
+Vertical dashed lines indicate +/-median_outlierDef standard deviations from the mean sample median.
 }
 \examples{
 \donttest{olink_qc_plot(npx_data1, color_g = "QC_Warning")}

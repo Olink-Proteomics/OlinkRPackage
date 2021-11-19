@@ -1,14 +1,16 @@
 #' Function to plot an overview of a sample cohort per Panel
 #'
 #' Generates a facet plot per Panel using ggplot2::ggplot and ggplot2::geom_point and stats::IQR plotting IQR vs. median for all samples.
-#' Horizontal dashed lines indicate +/-3 standard deviations from the mean IQR.
-#' Vertical dashed lines indicate +/-3 standard deviations from the mean sample median.
+#' Horizontal dashed lines indicate +/-IQR_outlierDef standard deviations from the mean IQR.
+#' Vertical dashed lines indicate +/-median_outlierDef standard deviations from the mean sample median.
 #'
 #' @param df NPX data frame in long format. Must have columns SampleID, Index, NPX and Panel
 #' @param color_g Character value indicating which column to use as fill color (default QC_Warning)
 #' @param plot_index Boolean. If FALSE (default), a point will be plotted for a sample. If TRUE,
 #' a sample's unique index number is displayed.
 #' @param label_outliers Boolean. If TRUE, an outlier sample will be labelled with its SampleID.
+#' @param IQR_outlierDef The number of standard deviations from the mean IQR that defines an outlier. Default is 3
+#' @param median_outlierDef The number of standard deviations from the mean sample median that defines an outlier. Default is 3
 #' @param ... coloroption passed to specify color order
 #' @return An object of class "ggplot"
 #' @keywords NPX
@@ -21,7 +23,7 @@
 #' @importFrom ggrepel geom_label_repel
 #' @importFrom stringr str_detect str_replace
 
-olink_qc_plot <- function(df, color_g = "QC_Warning", plot_index = F, label_outliers = T, ...){
+olink_qc_plot <- function(df, color_g = "QC_Warning", plot_index = F, label_outliers = T, IQR_outlierDef = 3, median_outlierDef = 3, ...){
 
   #checking ellipsis
   if(length(list(...)) > 0){
@@ -62,10 +64,10 @@ olink_qc_plot <- function(df, color_g = "QC_Warning", plot_index = F, label_outl
     dplyr::select(SampleID, Index, Panel, IQR, sample_median, !!rlang::ensym(color_g)) %>%
     dplyr::distinct() %>%
     dplyr::group_by(Panel) %>%
-    dplyr::mutate(median_low = mean(sample_median, na.rm = T) - 3*sd(sample_median, na.rm = T),
-                  median_high = mean(sample_median, na.rm = T) + 3*sd(sample_median, na.rm = T),
-                  iqr_low = mean(IQR, na.rm = T) - 3*sd(IQR, na.rm = T),
-                  iqr_high = mean(IQR, na.rm = T) + 3*sd(IQR, na.rm = T)) %>%
+    dplyr::mutate(median_low = mean(sample_median, na.rm = T) - median_outlierDef*sd(sample_median, na.rm = T),
+                  median_high = mean(sample_median, na.rm = T) + median_outlierDef*sd(sample_median, na.rm = T),
+                  iqr_low = mean(IQR, na.rm = T) - IQR_outlierDef*sd(IQR, na.rm = T),
+                  iqr_high = mean(IQR, na.rm = T) + IQR_outlierDef*sd(IQR, na.rm = T)) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(Outlier = dplyr::if_else(sample_median < median_high &
                                              sample_median > median_low &
