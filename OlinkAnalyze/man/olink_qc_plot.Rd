@@ -11,6 +11,8 @@ olink_qc_plot(
   label_outliers = T,
   IQR_outlierDef = 3,
   median_outlierDef = 3,
+  facetNrow = NULL,
+  facetNcol = NULL,
   ...
 )
 }
@@ -27,6 +29,10 @@ a sample's unique index number is displayed.}
 \item{IQR_outlierDef}{The number of standard deviations from the mean IQR that defines an outlier. Default is 3}
 
 \item{median_outlierDef}{The number of standard deviations from the mean sample median that defines an outlier. Default is 3}
+
+\item{facetNrow}{The number of rows that the panels are arranged on}
+
+\item{facetNcol}{The number of columns that the panels are arranged on}
 
 \item{...}{coloroption passed to specify color order}
 }

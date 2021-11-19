@@ -11,6 +11,8 @@
 #' @param label_outliers Boolean. If TRUE, an outlier sample will be labelled with its SampleID.
 #' @param IQR_outlierDef The number of standard deviations from the mean IQR that defines an outlier. Default is 3
 #' @param median_outlierDef The number of standard deviations from the mean sample median that defines an outlier. Default is 3
+#' @param facetNrow The number of rows that the panels are arranged on
+#' @param facetNcol The number of columns that the panels are arranged on
 #' @param ... coloroption passed to specify color order
 #' @return An object of class "ggplot"
 #' @keywords NPX
@@ -23,7 +25,7 @@
 #' @importFrom ggrepel geom_label_repel
 #' @importFrom stringr str_detect str_replace
 
-olink_qc_plot <- function(df, color_g = "QC_Warning", plot_index = F, label_outliers = T, IQR_outlierDef = 3, median_outlierDef = 3, ...){
+olink_qc_plot <- function(df, color_g = "QC_Warning", plot_index = F, label_outliers = T, IQR_outlierDef = 3, median_outlierDef = 3, facetNrow = NULL, facetNcol = NULL, ...){
 
   #checking ellipsis
   if(length(list(...)) > 0){
@@ -92,7 +94,7 @@ olink_qc_plot <- function(df, color_g = "QC_Warning", plot_index = F, label_outl
                         linetype = 'dashed',
                         color = 'grey') +
     ggplot2::xlab('Sample Median') +
-    ggplot2::facet_wrap(~Panel, scale = "free") +
+    ggplot2::facet_wrap(~Panel, scale = "free", nrow = facetNrow, ncol = facetNcol) +
     OlinkAnalyze::set_plot_theme()+
     OlinkAnalyze::olink_color_discrete(...)
 
