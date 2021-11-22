@@ -17,7 +17,18 @@
 #' @return An object of class "ggplot"
 #' @keywords NPX
 #' @export
-#' @examples \donttest{olink_qc_plot(npx_data1, color_g = "QC_Warning")}
+#' @examples
+#' \donttest{
+#' olink_qc_plot(npx_data1, color_g = "QC_Warning")
+#'
+#' #Change the outlier threshold to +-4SD
+#' olink_qc_plot(npx_data1, color_g = "QC_Warning", IQR_outlierDef = 4, median_outlierDef = 4)
+#'
+#' #Identify the outliers
+#' qc <- olink_qc_plot(npx_data1, color_g = "QC_Warning", IQR_outlierDef = 4, median_outlierDef = 4)
+#' outliers <- qc$data %>% filter(Outlier == 1)
+#' qc
+#' }
 #' @importFrom magrittr %>%
 #' @importFrom dplyr group_by mutate ungroup select distinct if_else filter case_when
 #' @importFrom rlang ensym

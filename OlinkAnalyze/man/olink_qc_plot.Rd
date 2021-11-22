@@ -45,6 +45,16 @@ Horizontal dashed lines indicate +/-IQR_outlierDef standard deviations from the 
 Vertical dashed lines indicate +/-median_outlierDef standard deviations from the mean sample median.
 }
 \examples{
-\donttest{olink_qc_plot(npx_data1, color_g = "QC_Warning")}
+\donttest{
+olink_qc_plot(npx_data1, color_g = "QC_Warning")
+
+#Change the outlier threshold to +-4SD
+olink_qc_plot(npx_data1, color_g = "QC_Warning", IQR_outlierDef = 4, median_outlierDef = 4)
+
+#Identify the outliers
+qc <- olink_qc_plot(npx_data1, color_g = "QC_Warning", IQR_outlierDef = 4, median_outlierDef = 4)
+outliers <- qc$data \%>\% filter(Outlier == 1)
+qc
+}
 }
 \keyword{NPX}
