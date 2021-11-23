@@ -53,7 +53,7 @@ olink_qc_plot(npx_data1, color_g = "QC_Warning", IQR_outlierDef = 4, median_outl
 
 #Identify the outliers
 qc <- olink_qc_plot(npx_data1, color_g = "QC_Warning", IQR_outlierDef = 4, median_outlierDef = 4)
-outliers <- qc$data \%>\% filter(Outlier == 1)
+outliers <- qc$data \%>\% dplyr::filter(Outlier == 1)
 qc
 }
 }
