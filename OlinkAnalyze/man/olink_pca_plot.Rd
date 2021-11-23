@@ -14,6 +14,7 @@ olink_pca_plot(
   drop_samples = FALSE,
   n_loadings = 0,
   loadings_list = NULL,
+  byPanel = F,
   verbose = TRUE,
   ...
 )
@@ -37,12 +38,14 @@ olink_pca_plot(
 
 \item{loadings_list}{Character vector indicating for which OlinkID's to plot as loadings. It is possible to use n_loadings and loadings_list simultaneously.}
 
+\item{byPanel}{Perform the PCA per panel (default FALSE)}
+
 \item{verbose}{Logical. Whether warnings about the number of samples and/or assays dropped or imputed should be printed to the console.}
 
 \item{...}{coloroption passed to specify color order.}
 }
 \value{
-An object of class "ggplot"
+A list of objects of class "ggplot"
 }
 \description{
 Generates a PCA projection of all samples from NPX data along two principal components (default PC2 vs. PC1) including the explained variance and dots colored by QC_Warning using stats::prcomp and ggplot2::ggplot.
@@ -50,12 +53,23 @@ The values are by default scaled and centered in the PCA and proteins with missi
 Unique sample names are required.
 Imputation by the median is done for assays with missingness <10\% for multi-plate projects and <5\% for single plate projects.
 }
+\details{
+The plot is printed, and a list of ggplot objects is returned. \cr\cr
+If byPanel = TRUE, the data processing (imputation of missing values etc) and subsequent PCA is performed separately per panel. A faceted plot is printed, while the individual ggplot objects are returned.
+}
 \examples{
 \donttest{
 library(dplyr)
 npx_data <- npx_data1 \%>\%
     mutate(SampleID = paste(SampleID, "_", Index, sep = ""))
-olink_pca_plot(df=npx_data, color_g = "QC_Warning")}
+
+#PCA using all the data
+olink_pca_plot(df=npx_data, color_g = "QC_Warning")
+
+#PCA per panel
+g <- olink_pca_plot(df=npx_data, color_g = "QC_Warning", byPanel = T)
+g[[2]] #Plot only the second panel
+}
 }
 \keyword{NPX,}
 \keyword{PCA}

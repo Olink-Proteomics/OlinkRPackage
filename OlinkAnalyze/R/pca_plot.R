@@ -5,6 +5,9 @@
 #' Unique sample names are required.
 #' Imputation by the median is done for assays with missingness <10\% for multi-plate projects and <5\% for single plate projects.
 #'
+#' The plot is printed, and a list of ggplot objects is returned. \cr\cr
+#' If byPanel = TRUE, the data processing (imputation of missing values etc) and subsequent PCA is performed separately per panel. A faceted plot is printed, while the individual ggplot objects are returned.
+#'
 #' @param df data frame in long format with Sample Id, NPX and column of choice for colors
 #' @param color_g Character value indicating which column to use for colors (default QC_Warning)
 #' @param x_val Integer indicating which principal component to plot along the x-axis (default 1)
@@ -14,9 +17,10 @@
 #' @param drop_samples Logical. All samples with any missing values will be dropped.
 #' @param n_loadings Integer. Will plot the top n_loadings based on size.
 #' @param loadings_list Character vector indicating for which OlinkID's to plot as loadings. It is possible to use n_loadings and loadings_list simultaneously.
+#' @param byPanel Perform the PCA per panel (default FALSE)
 #' @param verbose Logical. Whether warnings about the number of samples and/or assays dropped or imputed should be printed to the console.
 #' @param ... coloroption passed to specify color order.
-#' @return An object of class "ggplot"
+#' @return A list of objects of class "ggplot"
 #' @keywords NPX, PCA
 #' @export
 #' @examples
@@ -24,7 +28,14 @@
 #' library(dplyr)
 #' npx_data <- npx_data1 %>%
 #'     mutate(SampleID = paste(SampleID, "_", Index, sep = ""))
-#' olink_pca_plot(df=npx_data, color_g = "QC_Warning")}
+#'
+#' #PCA using all the data
+#' olink_pca_plot(df=npx_data, color_g = "QC_Warning")
+#'
+#' #PCA per panel
+#' g <- olink_pca_plot(df=npx_data, color_g = "QC_Warning", byPanel = T)
+#' g[[2]] #Plot only the second panel
+#' }
 #' @importFrom magrittr %>%
 #' @importFrom dplyr filter select group_by ungroup mutate mutate_at if_else n_distinct summarise left_join arrange distinct
 #' @importFrom stringr str_detect
@@ -47,6 +58,7 @@ olink_pca_plot <- function (df,
                             drop_samples = FALSE,
                             n_loadings = 0,
                             loadings_list = NULL,
+                            byPanel = F,
                             verbose = TRUE,
                             ...){
 
@@ -76,7 +88,59 @@ olink_pca_plot <- function (df,
   #Filtering on valid OlinkID
   df <- df %>%
     dplyr::filter(stringr::str_detect(OlinkID,
-                               "OID[0-9]{5}"))
+                                      "OID[0-9]{5}"))
+
+  if(byPanel){
+    plotList <- lapply(unique(df$Panel), function(x) {
+      df %>%
+        dplyr::filter(Panel == x) %>%
+        olink_pca_plot.internal(df = .,
+                                color_g = color_g,
+                                x_val = x_val,
+                                y_val = y_val,
+                                label_samples = label_samples,
+                                drop_assays = drop_assays,
+                                drop_samples = drop_samples,
+                                n_loadings = n_loadings,
+                                loadings_list = loadings_list,
+                                verbose = verbose,
+                                ...) +
+        ggplot2::labs(title = x)
+
+    })
+    print(ggpubr::ggarrange(plotlist = plotList, common.legend = T))
+
+  } else{
+    pca_plot <- olink_pca_plot.internal(df = df,
+                                        color_g = color_g,
+                                        x_val = x_val,
+                                        y_val = y_val,
+                                        label_samples = label_samples,
+                                        drop_assays = drop_assays,
+                                        drop_samples = drop_samples,
+                                        n_loadings = n_loadings,
+                                        loadings_list = loadings_list,
+                                        verbose = verbose,
+                                        ...)
+    print(pca_plot)
+    plotList <- list(pca_plot) #For consistency, return a list even when there's just one plot
+  }
+
+  return(invisible(plotList))
+}
+
+olink_pca_plot.internal <- function (df,
+                                     color_g = "QC_Warning",
+                                     x_val = 1,
+                                     y_val = 2,
+                                     label_samples = FALSE,
+                                     drop_assays = FALSE,
+                                     drop_samples = FALSE,
+                                     n_loadings = 0,
+                                     loadings_list = NULL,
+                                     byPanel = F,
+                                     verbose = TRUE,
+                                     ...){
 
   if (color_g == "QC_Warning"){
 
@@ -266,7 +330,7 @@ olink_pca_plot <- function (df,
 
     df_wide <- df_wide %>%
       dplyr::mutate_at(tidyselect::all_of(imputed_assays),
-                ~ifelse(is.na(.x), median(.x, na.rm = TRUE), .x))
+                       ~ifelse(is.na(.x), median(.x, na.rm = TRUE), .x))
 
     if(verbose){
       warning(paste0("There are ",
@@ -281,8 +345,8 @@ olink_pca_plot <- function (df,
 
   df_wide <- df_wide %>%
     dplyr::left_join(colors_for_pca,
-              by = c('SampleID',
-                     'Index')) %>%
+                     by = c('SampleID',
+                            'Index')) %>%
     dplyr::select(SampleID, Index, pca_colors, everything())
 
   df_wide_matrix <- df_wide %>%
@@ -376,19 +440,19 @@ olink_pca_plot <- function (df,
 
     pca_plot <- pca_plot +
       ggplot2::geom_segment(data = loadings,
-                   ggplot2::aes(x = 0,
-                       y = 0,
-                       xend = LX*loadings_scaling_factor,
-                       yend = LY*loadings_scaling_factor),
-                   arrow = ggplot2::arrow(length = grid::unit(1/2, "picas")),
-                   color = "black") +
+                            ggplot2::aes(x = 0,
+                                         y = 0,
+                                         xend = LX*loadings_scaling_factor,
+                                         yend = LY*loadings_scaling_factor),
+                            arrow = ggplot2::arrow(length = grid::unit(1/2, "picas")),
+                            color = "black") +
       ggrepel::geom_label_repel(data = loadings,
-                       ggplot2::aes(x = LX*loadings_scaling_factor,
-                           y = LY*loadings_scaling_factor,
-                           label = variables),
-                       box.padding = 1,
-                       show.legend = FALSE,
-                       segment.colour = 'gray')
+                                ggplot2::aes(x = LX*loadings_scaling_factor,
+                                             y = LY*loadings_scaling_factor,
+                                             label = variables),
+                                box.padding = 1,
+                                show.legend = FALSE,
+                                segment.colour = 'gray')
   }
 
 
