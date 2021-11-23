@@ -14,7 +14,7 @@ olink_pca_plot(
   drop_samples = FALSE,
   n_loadings = 0,
   loadings_list = NULL,
-  byPanel = F,
+  byPanel = FALSE,
   verbose = TRUE,
   ...
 )
@@ -67,7 +67,7 @@ npx_data <- npx_data1 \%>\%
 olink_pca_plot(df=npx_data, color_g = "QC_Warning")
 
 #PCA per panel
-g <- olink_pca_plot(df=npx_data, color_g = "QC_Warning", byPanel = T)
+g <- olink_pca_plot(df=npx_data, color_g = "QC_Warning", byPanel = TRUE)
 g[[2]] #Plot only the second panel
 }
 }
