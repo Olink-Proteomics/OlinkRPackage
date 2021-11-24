@@ -3,5 +3,6 @@
 ^README\.Rmd$
 ^doc$
 ^Meta$
-
-
+^cran-comments\.md$
+^inst/extdata/npx_data2_meta[.]csv
+^inst/extdata/npx_data2[.]xlsx
