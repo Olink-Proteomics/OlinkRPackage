@@ -15,6 +15,8 @@ olink_pca_plot(
   n_loadings = 0,
   loadings_list = NULL,
   byPanel = FALSE,
+  outlierDefX = NA,
+  outlierDefY = NA,
   verbose = TRUE,
   ...
 )
@@ -40,6 +42,10 @@ olink_pca_plot(
 
 \item{byPanel}{Perform the PCA per panel (default FALSE)}
 
+\item{outlierDefX}{The number standard deviations along the PC plotted on the x-axis that defines an outlier. See also 'Details"}
+
+\item{outlierDefY}{The number standard deviations along the PC plotted on the y-axis that defines an outlier. See also 'Details"}
+
 \item{verbose}{Logical. Whether warnings about the number of samples and/or assays dropped or imputed should be printed to the console.}
 
 \item{...}{coloroption passed to specify color order.}
@@ -49,13 +55,14 @@ A list of objects of class "ggplot"
 }
 \description{
 Generates a PCA projection of all samples from NPX data along two principal components (default PC2 vs. PC1) including the explained variance and dots colored by QC_Warning using stats::prcomp and ggplot2::ggplot.
+}
+\details{
 The values are by default scaled and centered in the PCA and proteins with missing NPX values are by default removed from the corresponding assay.
 Unique sample names are required.
 Imputation by the median is done for assays with missingness <10\% for multi-plate projects and <5\% for single plate projects.
-}
-\details{
 The plot is printed, and a list of ggplot objects is returned. \cr\cr
-If byPanel = TRUE, the data processing (imputation of missing values etc) and subsequent PCA is performed separately per panel. A faceted plot is printed, while the individual ggplot objects are returned.
+If byPanel = TRUE, the data processing (imputation of missing values etc) and subsequent PCA is performed separately per panel. A faceted plot is printed, while the individual ggplot objects are returned. \cr\cr
+The arguments outlierDefX and outlierDefY can be used to identify outliers in the PCA. Samples more than +/-outlierDef[X,Y] standard deviations from the mean of the plotted PC will be labelled. Both arguments have to be specified.
 }
 \examples{
 \donttest{

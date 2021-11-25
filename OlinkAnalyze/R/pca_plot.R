@@ -1,12 +1,13 @@
 #' Function to plot a PCA of the data
 #'
 #' Generates a PCA projection of all samples from NPX data along two principal components (default PC2 vs. PC1) including the explained variance and dots colored by QC_Warning using stats::prcomp and ggplot2::ggplot.
+#'
 #' The values are by default scaled and centered in the PCA and proteins with missing NPX values are by default removed from the corresponding assay.
 #' Unique sample names are required.
 #' Imputation by the median is done for assays with missingness <10\% for multi-plate projects and <5\% for single plate projects.
-#'
 #' The plot is printed, and a list of ggplot objects is returned. \cr\cr
-#' If byPanel = TRUE, the data processing (imputation of missing values etc) and subsequent PCA is performed separately per panel. A faceted plot is printed, while the individual ggplot objects are returned.
+#' If byPanel = TRUE, the data processing (imputation of missing values etc) and subsequent PCA is performed separately per panel. A faceted plot is printed, while the individual ggplot objects are returned. \cr\cr
+#' The arguments outlierDefX and outlierDefY can be used to identify outliers in the PCA. Samples more than +/-outlierDef[X,Y] standard deviations from the mean of the plotted PC will be labelled. Both arguments have to be specified.
 #'
 #' @param df data frame in long format with Sample Id, NPX and column of choice for colors
 #' @param color_g Character value indicating which column to use for colors (default QC_Warning)
@@ -18,6 +19,8 @@
 #' @param n_loadings Integer. Will plot the top n_loadings based on size.
 #' @param loadings_list Character vector indicating for which OlinkID's to plot as loadings. It is possible to use n_loadings and loadings_list simultaneously.
 #' @param byPanel Perform the PCA per panel (default FALSE)
+#' @param outlierDefX The number standard deviations along the PC plotted on the x-axis that defines an outlier. See also 'Details"
+#' @param outlierDefY The number standard deviations along the PC plotted on the y-axis that defines an outlier. See also 'Details"
 #' @param verbose Logical. Whether warnings about the number of samples and/or assays dropped or imputed should be printed to the console.
 #' @param ... coloroption passed to specify color order.
 #' @return A list of objects of class "ggplot"
@@ -59,6 +62,8 @@ olink_pca_plot <- function (df,
                             n_loadings = 0,
                             loadings_list = NULL,
                             byPanel = FALSE,
+                            outlierDefX = NA,
+                            outlierDefY = NA,
                             verbose = TRUE,
                             ...){
 
@@ -103,6 +108,8 @@ olink_pca_plot <- function (df,
                                 drop_samples = drop_samples,
                                 n_loadings = n_loadings,
                                 loadings_list = loadings_list,
+                                outlierDefX = outlierDefX,
+                                outlierDefY = outlierDefY,
                                 verbose = verbose,
                                 ...) +
         ggplot2::labs(title = x)
@@ -120,6 +127,8 @@ olink_pca_plot <- function (df,
                                         drop_samples = drop_samples,
                                         n_loadings = n_loadings,
                                         loadings_list = loadings_list,
+                                        outlierDefX = outlierDefX,
+                                        outlierDefY = outlierDefY,
                                         verbose = verbose,
                                         ...)
     print(pca_plot)
@@ -138,6 +147,8 @@ olink_pca_plot.internal <- function (df,
                                      drop_samples = FALSE,
                                      n_loadings = 0,
                                      loadings_list = NULL,
+                                     outlierDefX,
+                                     outlierDefY,
                                      byPanel = F,
                                      verbose = TRUE,
                                      ...){
@@ -379,6 +390,21 @@ olink_pca_plot.internal <- function (df,
 
   loadings_scaling_factor <- 0.8/max(range_LX/range_PX, range_LY/range_PY)
 
+  #Identify outliers
+  if(!is.na(outlierDefX) & !is.na(outlierDefY)){
+    scores <- scores %>%
+      tibble::rownames_to_column(var = 'SampleID') %>%
+      dplyr::mutate( PCX_low = mean(PCX, na.rm = T) - outlierDefX*sd(PCX, na.rm = T),
+                     PCX_high = mean(PCX, na.rm = T) + outlierDefX*sd(PCX, na.rm = T),
+                     PCY_low = mean(PCY, na.rm = T) - outlierDefY*sd(PCY, na.rm = T),
+                     PCY_high = mean(PCY, na.rm = T) + outlierDefY*sd(PCY, na.rm = T)) %>%
+      dplyr::mutate(Outlier = dplyr::if_else(PCX < PCX_high &
+                                               PCX > PCX_low &
+                                               PCY > PCY_low &
+                                               PCY < PCY_high,
+                                             0, 1))
+  }
+
   #Plotting
 
   pca_plot <- ggplot2::ggplot(scores, ggplot2::aes(x = PCX, y = PCY)) +
@@ -453,6 +479,18 @@ olink_pca_plot.internal <- function (df,
                                 box.padding = 1,
                                 show.legend = FALSE,
                                 segment.colour = 'gray')
+  }
+
+  #Label outliers in figure
+  if(!is.na(outlierDefX) & !is.na(outlierDefY)){
+    pca_plot <- pca_plot +
+      ggrepel::geom_label_repel(data = . %>% dplyr::mutate(SampleIDPlot = dplyr::case_when(Outlier == 1 ~ SampleID,
+                                                                                           TRUE ~ "")),
+                                ggplot2::aes(label=SampleIDPlot),
+                                box.padding = 0.5,
+                                min.segment.length = 0.1,
+                                show.legend=FALSE,
+                                size = 3)
   }
 
 
