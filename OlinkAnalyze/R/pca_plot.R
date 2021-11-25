@@ -38,6 +38,16 @@
 #' #PCA per panel
 #' g <- olink_pca_plot(df=npx_data, color_g = "QC_Warning", byPanel = TRUE)
 #' g[[2]] #Plot only the second panel
+#'
+#' #Label outliers
+#' olink_pca_plot(df=npx_data, color_g = "QC_Warning", outlierDefX = 4, outlierDefY = 4) #All data
+#' olink_pca_plot(df=npx_data, color_g = "QC_Warning", outlierDefX = 4, outlierDefY = 4, byPanel = T) #Per panel
+#'
+#' #Retrieve the outliers
+#' g <- olink_pca_plot(df=npx_data, color_g = "QC_Warning", outlierDefX = 4, outlierDefY = 4, byPanel = T)
+#' outliers <- lapply(g, function(x){x$data}) %>%
+#'     bind_rows() %>%
+#'     filter(Outlier == 1)
 #' }
 #' @importFrom magrittr %>%
 #' @importFrom dplyr filter select group_by ungroup mutate mutate_at if_else n_distinct summarise left_join arrange distinct
@@ -97,7 +107,7 @@ olink_pca_plot <- function (df,
 
   if(byPanel){
     plotList <- lapply(unique(df$Panel), function(x) {
-      df %>%
+      g <- df %>%
         dplyr::filter(Panel == x) %>%
         olink_pca_plot.internal(df = .,
                                 color_g = color_g,
@@ -114,7 +124,13 @@ olink_pca_plot <- function (df,
                                 ...) +
         ggplot2::labs(title = x)
 
+      #Add Panel info inside the ggplot object
+      g$data <- g$data %>%
+        dplyr::mutate(Panel = x)
+
+      g
     })
+    names(plotList) <- unique(df$Panel)
     print(ggpubr::ggarrange(plotlist = plotList, common.legend = T))
 
   } else{
