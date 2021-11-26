@@ -8,6 +8,6 @@ utils::globalVariables(unique(c(
   "Outliers", "PercAssaysBelowLOD", "MeanNPX", "desc", "Order", "emmean", "everything", "Reference_NPX",
   "Assay_Median", "LOD", "Project", "Diff", "Median", "n_colors", "assay_var", "pca_colors", "desc", "abs_loading",
   "variables", "well", "scramble", ":=", "estimate1", "estimate2", "1", "Name", "Plate ID", "MissingFreq", "Unit",
-  "Assay_Warning", "Panel_Version", "QC Warning", "Name_Assay", "PlateID", "Adj_factor", "Panel_End", "Panel_Start", 
-  "SampleIDPlot"
+  "Assay_Warning", "Panel_Version", "QC Warning", "Name_Assay", "PlateID", "Adj_factor", "Panel_End", "Panel_Start",
+  "SampleIDPlot", "PCX_low", "PCX_high"
 )))

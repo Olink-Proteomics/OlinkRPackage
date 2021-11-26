@@ -43,11 +43,11 @@
 #' olink_pca_plot(df=npx_data, color_g = "QC_Warning",
 #'                outlierDefX = 4, outlierDefY = 4) #All data
 #' olink_pca_plot(df=npx_data, color_g = "QC_Warning",
-#'                outlierDefX = 4, outlierDefY = 4, byPanel = T) #Per panel
+#'                outlierDefX = 4, outlierDefY = 4, byPanel = TRUE) #Per panel
 #'
 #' #Retrieve the outliers
 #' g <- olink_pca_plot(df=npx_data, color_g = "QC_Warning",
-#'                     outlierDefX = 4, outlierDefY = 4, byPanel = T)
+#'                     outlierDefX = 4, outlierDefY = 4, byPanel = TRUE)
 #' outliers <- lapply(g, function(x){x$data}) %>%
 #'     bind_rows() %>%
 #'     filter(Outlier == 1)
