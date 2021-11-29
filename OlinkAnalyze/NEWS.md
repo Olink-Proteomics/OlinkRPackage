@@ -4,6 +4,7 @@
 
 * Package is in the process of being submitted to CRAN
 * Added ability to prevent OlinkAnalyze from loading fonts and setting to themes (@OlaCaster, #73)
+* Decreased the size of npx_data1 and npx_data2 to 2 panels instead of 12 (@kathy-nevola, #76)
 
 ## BugFixes
 
