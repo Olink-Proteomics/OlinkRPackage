@@ -61,10 +61,10 @@ npx_df2 <- npx_data2 \%>\% dplyr::mutate(Project = 'P2')
 #Bridging normalization:
 # Find overlapping samples, but exclude Olink control
 overlap_samples <- intersect((npx_df1 \%>\%
-                               dplyr::filter(!grepl("control", SampleID, 
+                               dplyr::filter(!grepl("control", SampleID,
                                                      ignore.case=TRUE)))$SampleID,
                              (npx_df2 \%>\%
-                               dplyr::filter(!grepl("control", SampleID, 
+                               dplyr::filter(!grepl("control", SampleID,
                                                      ignore.case=TRUE)))$SampleID)
 # Normalize
 olink_normalization(df1 = npx_df1,

@@ -1,3 +1,70 @@
+#' Normalization of all proteins using reference samples
+#'
+#' Normalizes two NPX data frames using reference samples. This normalization method is referred to as bridge normalization, or bridging for short.
+#'
+#' df1 is adjusted to df2 using overlapping samples (bridge samples).
+#' Each protein is adjusted using the median of the paired differences between the bridge samples in the two data frames.
+#' The overlapping samples need to be named the same in both dataframes, and the dataframe being adjusted to is specified in the input reference_project.
+#' By default, df1 will be used as reference.
+#'
+#' @param df1 First dataframe to be used in normalization
+#' @param df2 Second dataframe to be used in normalization
+#' @param df1_project_nr Project name of first dataset.
+#' @param df2_project_nr Project name of second dataset.
+#' @param overlapping_samples Samples to be used for adjustment factor calculations. These samples have to be present in both df1 and df2.
+#' @param reference_project Project name of reference_project. Needs to be the same as either df1_project_nr or df2_project_nr. The project to which the second project is adjusted to.
+#'
+#' @return A tibble of NPX data in long format containing normalized NPX values, including adjustment factors.
+#' @keywords Normalization
+#' @references https://www.olink.com/application/data-normalization-and-standardization/
+#' @export
+olink_normalization_bridge <- function(df1,
+                                       df2,
+                                       overlapping_samples,
+                                       df1_project_nr = 'P1',
+                                       df2_project_nr = 'P2',
+                                       reference_project = 'P1'){
+  olink_normalization(df1 = df1,
+                      df2 = df2,
+                      overlapping_samples_df1 = overlapping_samples,
+                      df1_project_nr = df1_project_nr,
+                      df2_project_nr = df2_project_nr,
+                      reference_project = reference_project)
+}
+
+#' Intensity normalization of all proteins
+#'
+#' Normalizes two NPX data frames using the median difference per protein. This normalization method is referred to as intensity normalization.
+#'
+#' df1 is adjusted to df2 based on the difference between the medians.
+#' Each protein is adjusted so that the median value in each dataframe is the same.
+#' By default, df1 will be used as reference.
+#'
+#' @param df1 First dataframe to be used in normalization (required).
+#' @param df2 Second dataframe to be used in normalization
+#' @param df1_project_nr Project name of first dataset.
+#' @param df2_project_nr Project name of second dataset.
+#' @param reference_project Project name of reference_project. Needs to be the same as either df1_project_nr or df2_project_nr. The project to which the second project is adjusted to.
+#'
+#' @return A tibble of NPX data in long format containing normalized NPX values, including adjustment factors.
+#' @keywords Normalization
+#' @references https://www.olink.com/application/data-normalization-and-standardization/
+#' @export
+olink_normalization_intensity <- function(df1,
+                                          df2,
+                                          df1_project_nr = 'P1',
+                                          df2_project_nr = 'P2',
+                                          reference_project = 'P1'){
+  olink_normalization(df1 = df1,
+                      df2 = df2,
+                      overlapping_samples_df1 = df1$SampleID,
+                      overlapping_samples_df2 = df2$SampleID,
+                      df1_project_nr = df1_project_nr,
+                      df2_project_nr = df2_project_nr,
+                      reference_project = reference_project)
+}
+
+
 #' Normalization of all proteins (by OlinkID).
 #'
 #' Normalizes NPX data frames to another data frame or to reference medians. If two dataframes are normalized to one another, Olinks default is using the older dataframe as reference.
@@ -37,10 +104,10 @@
 #' #Bridging normalization:
 #' # Find overlapping samples, but exclude Olink control
 #' overlap_samples <- intersect((npx_df1 %>%
-#'                                dplyr::filter(!grepl("control", SampleID, 
+#'                                dplyr::filter(!grepl("control", SampleID,
 #'                                                      ignore.case=TRUE)))$SampleID,
 #'                              (npx_df2 %>%
-#'                                dplyr::filter(!grepl("control", SampleID, 
+#'                                dplyr::filter(!grepl("control", SampleID,
 #'                                                      ignore.case=TRUE)))$SampleID)
 #' # Normalize
 #' olink_normalization(df1 = npx_df1,
