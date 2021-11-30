@@ -111,6 +111,9 @@ olink_pca_plot <- function (df,
                                       "OID[0-9]{5}"))
 
   if(byPanel){
+    df <- df %>%
+      dplyr::mutate(Panel = Panel  %>% stringr::str_replace("Olink ", "")) #Strip "Olink" from the panel names
+
     plotList <- lapply(unique(df$Panel), function(x) {
       g <- df %>%
         dplyr::filter(Panel == x) %>%
