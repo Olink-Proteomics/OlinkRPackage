@@ -28,7 +28,7 @@ pca_plot_byPanel <- npx_data1 %>%
 #Label outliers
 pca_plot_byPanel_outliers <- npx_data1 %>%
   mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
-  olink_pca_plot(byPanel = T, outlierDefX = 4, outlierDefY = 4)
+  olink_pca_plot(byPanel = T, outlierDefX = 4, outlierDefY = 2.5)
 outliers <- lapply(pca_plot_byPanel_outliers, function(x){x$data}) %>%
   bind_rows() %>%
   filter(Outlier == 1)
@@ -44,8 +44,8 @@ test_that("olink_pca_plot works", {
     )
   )
 
-  expect_equal(outliers$SampleID, c("B66_147", "B66_147", "B48_129", "A32_34"))
-  expect_equal(outliers$Panel, c("Development", "Immune Response", "Metabolism", "Neurology"))
+  expect_equal(outliers$SampleID, c("B4_83", "A14_15", "A15_16", "A19_21"))
+  expect_equal(outliers$Panel, c("Cardiometabolic", "Inflammation", "Inflammation", "Inflammation"))
 
   skip_on_ci()
   vdiffr::expect_doppelganger('PCA plot', pca_plot[[1]])
