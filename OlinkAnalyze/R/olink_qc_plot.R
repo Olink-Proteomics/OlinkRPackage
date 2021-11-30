@@ -11,6 +11,7 @@
 #' @param label_outliers Boolean. If TRUE, an outlier sample will be labelled with its SampleID.
 #' @param IQR_outlierDef The number of standard deviations from the mean IQR that defines an outlier. Default is 3
 #' @param median_outlierDef The number of standard deviations from the mean sample median that defines an outlier. Default is 3
+#' @param outlierLines Draw dashed lines at +/-IQR_outlierDef and +/-median_outlierDef standard deviations from the mean IQR and sample median respectively (default TRUE)
 #' @param facetNrow The number of rows that the panels are arranged on
 #' @param facetNcol The number of columns that the panels are arranged on
 #' @param ... coloroption passed to specify color order
@@ -19,6 +20,8 @@
 #' @export
 #' @examples
 #' \donttest{
+#' library(dplyr)
+#'
 #' olink_qc_plot(npx_data1, color_g = "QC_Warning")
 #'
 #' #Change the outlier threshold to +-4SD
@@ -26,7 +29,7 @@
 #'
 #' #Identify the outliers
 #' qc <- olink_qc_plot(npx_data1, color_g = "QC_Warning", IQR_outlierDef = 4, median_outlierDef = 4)
-#' outliers <- qc$data %>% dplyr::filter(Outlier == 1)
+#' outliers <- qc$data %>% filter(Outlier == 1)
 #' qc
 #' }
 #' @importFrom magrittr %>%
@@ -36,7 +39,16 @@
 #' @importFrom ggrepel geom_label_repel
 #' @importFrom stringr str_detect str_replace
 
-olink_qc_plot <- function(df, color_g = "QC_Warning", plot_index = F, label_outliers = T, IQR_outlierDef = 3, median_outlierDef = 3, facetNrow = NULL, facetNcol = NULL, ...){
+olink_qc_plot <- function(df,
+                          color_g = "QC_Warning",
+                          plot_index = FALSE,
+                          label_outliers = TRUE,
+                          IQR_outlierDef = 3,
+                          median_outlierDef = 3,
+                          outlierLines = TRUE,
+                          facetNrow = NULL,
+                          facetNcol = NULL,
+                          ...){
 
   #checking ellipsis
   if(length(list(...)) > 0){
@@ -92,22 +104,27 @@ olink_qc_plot <- function(df, color_g = "QC_Warning", plot_index = F, label_outl
   qc_plot <- npx_df_qr %>%
     dplyr::mutate(Panel = Panel  %>% stringr::str_replace("Olink ", "")) %>%
     ggplot2::ggplot(ggplot2::aes(x = sample_median, y = IQR)) +
-    ggplot2::geom_hline(ggplot2::aes(yintercept=iqr_low),
-                        linetype = 'dashed',
-                        color = 'grey') +
-    ggplot2::geom_hline(ggplot2::aes(yintercept=iqr_high),
-                        linetype = 'dashed',
-                        color = 'grey') +
-    ggplot2::geom_vline(ggplot2::aes(xintercept = median_low),
-                        linetype = 'dashed',
-                        color = 'grey') +
-    ggplot2::geom_vline(ggplot2::aes(xintercept = median_high),
-                        linetype = 'dashed',
-                        color = 'grey') +
     ggplot2::xlab('Sample Median') +
     ggplot2::facet_wrap(~Panel, scale = "free", nrow = facetNrow, ncol = facetNcol) +
     OlinkAnalyze::set_plot_theme()+
     OlinkAnalyze::olink_color_discrete(...)
+
+  #Add outlier lines
+  if(outlierLines){
+    qc_plot <- qc_plot +
+      ggplot2::geom_hline(ggplot2::aes(yintercept=iqr_low),
+                          linetype = 'dashed',
+                          color = 'grey') +
+      ggplot2::geom_hline(ggplot2::aes(yintercept=iqr_high),
+                          linetype = 'dashed',
+                          color = 'grey') +
+      ggplot2::geom_vline(ggplot2::aes(xintercept = median_low),
+                          linetype = 'dashed',
+                          color = 'grey') +
+      ggplot2::geom_vline(ggplot2::aes(xintercept = median_high),
+                          linetype = 'dashed',
+                          color = 'grey')
+  }
 
   if(plot_index){
     qc_plot <- qc_plot + ggplot2::geom_text(ggplot2::aes(color = !!rlang::ensym(color_g),
