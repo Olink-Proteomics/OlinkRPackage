@@ -20,6 +20,19 @@ pca_plot_treatCol_topLoadings <- npx_data1 %>%
                      head(5) %>%
                      pull(OlinkID)})
 
+#PCA by panel
+pca_plot_byPanel <- npx_data1 %>%
+  mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
+  olink_pca_plot(byPanel = T)
+
+#Label outliers
+pca_plot_byPanel_outliers <- npx_data1 %>%
+  mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
+  olink_pca_plot(byPanel = T, outlierDefX = 4, outlierDefY = 4)
+outliers <- lapply(pca_plot_byPanel_outliers, function(x){x$data}) %>%
+  bind_rows() %>%
+  filter(Outlier == 1)
+
 test_that("olink_pca_plot works", {
 
   # Two Warnings thrown: for dropped assays and droppes samples
@@ -31,9 +44,14 @@ test_that("olink_pca_plot works", {
     )
   )
 
+  expect_equal(outliers$SampleID, c("B66_147", "B66_147", "B48_129", "A32_34"))
+  expect_equal(outliers$Panel, c("Development", "Immune Response", "Metabolism", "Neurology"))
+
   skip_on_ci()
-  vdiffr::expect_doppelganger('PCA plot', pca_plot)
-  vdiffr::expect_doppelganger('PCA plot color by treatment', pca_plot_treatCol)
-  vdiffr::expect_doppelganger('PCA plot with loadings', pca_plot_treatCol_topLoadings)
-  vdiffr::expect_doppelganger('PCA plot drop_assays and drop_samples', pca_plot_drop)
+  vdiffr::expect_doppelganger('PCA plot', pca_plot[[1]])
+  vdiffr::expect_doppelganger('PCA plot color by treatment', pca_plot_treatCol[[1]])
+  vdiffr::expect_doppelganger('PCA plot with loadings', pca_plot_treatCol_topLoadings[[1]])
+  vdiffr::expect_doppelganger('PCA plot drop_assays and drop_samples', pca_plot_drop[[1]])
+  vdiffr::expect_doppelganger('PCA plot panel 1', pca_plot_byPanel[[1]])
+  vdiffr::expect_doppelganger('PCA plot panel 2', pca_plot_byPanel[[2]])
 })
