@@ -21,6 +21,7 @@
 #' @param byPanel Perform the PCA per panel (default FALSE)
 #' @param outlierDefX The number standard deviations along the PC plotted on the x-axis that defines an outlier. See also 'Details"
 #' @param outlierDefY The number standard deviations along the PC plotted on the y-axis that defines an outlier. See also 'Details"
+#' @param outlierLines Draw dashed lines at +/-outlierDef[X,Y] standard deviations from the mean of the plotted PCs (default FALSE)
 #' @param verbose Logical. Whether warnings about the number of samples and/or assays dropped or imputed should be printed to the console.
 #' @param ... coloroption passed to specify color order.
 #' @return A list of objects of class "ggplot"
@@ -77,6 +78,7 @@ olink_pca_plot <- function (df,
                             byPanel = FALSE,
                             outlierDefX = NA,
                             outlierDefY = NA,
+                            outlierLines = FALSE,
                             verbose = TRUE,
                             ...){
 
@@ -123,6 +125,7 @@ olink_pca_plot <- function (df,
                                 loadings_list = loadings_list,
                                 outlierDefX = outlierDefX,
                                 outlierDefY = outlierDefY,
+                                outlierLines = outlierLines,
                                 verbose = verbose,
                                 ...) +
         ggplot2::labs(title = x)
@@ -148,6 +151,7 @@ olink_pca_plot <- function (df,
                                         loadings_list = loadings_list,
                                         outlierDefX = outlierDefX,
                                         outlierDefY = outlierDefY,
+                                        outlierLines = outlierLines,
                                         verbose = verbose,
                                         ...)
     print(pca_plot)
@@ -168,7 +172,7 @@ olink_pca_plot.internal <- function (df,
                                      loadings_list = NULL,
                                      outlierDefX,
                                      outlierDefY,
-                                     byPanel = F,
+                                     outlierLines,
                                      verbose = TRUE,
                                      ...){
 
@@ -511,6 +515,24 @@ olink_pca_plot.internal <- function (df,
                                 show.legend=FALSE,
                                 size = 3)
   }
+
+  #Add outlier lines
+  if(outlierLines){
+    pca_plot <- pca_plot +
+      ggplot2::geom_hline(ggplot2::aes(yintercept=PCY_low),
+                          linetype = 'dashed',
+                          color = 'grey') +
+      ggplot2::geom_hline(ggplot2::aes(yintercept=PCY_high),
+                          linetype = 'dashed',
+                          color = 'grey') +
+      ggplot2::geom_vline(ggplot2::aes(xintercept = PCX_low),
+                          linetype = 'dashed',
+                          color = 'grey') +
+      ggplot2::geom_vline(ggplot2::aes(xintercept = PCX_high),
+                          linetype = 'dashed',
+                          color = 'grey')
+  }
+
 
 
   pca_plot <- pca_plot +
