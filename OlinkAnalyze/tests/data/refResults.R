@@ -25,7 +25,7 @@ anova_results_1_siteTime <- olink_anova(npx_data1, c('Site', 'Time')) %>%
 anova_posthoc_1_site <- olink_anova_posthoc(npx_data1,
                                             variable = 'Site',
                                             olinkid_list =  {anova_results_1_site %>%
-                                                dplyr::filter(Threshold == 'Significant') %>%
+                                                head(10)%>%
                                                 dplyr::pull(OlinkID)},
                                             effect = 'Site') %>%
   mutate(id = as.character(OlinkID)) %>%
@@ -34,7 +34,7 @@ anova_posthoc_1_site <- olink_anova_posthoc(npx_data1,
 anova_posthoc_1_time <- olink_anova_posthoc(npx_data1,
                                             variable = 'Time',
                                             {anova_results_1_time %>%
-                                                dplyr::filter(Threshold == 'Significant') %>%
+                                                head(10) %>%
                                                 dplyr::pull(OlinkID)},
                                             effect = 'Time') %>%
   mutate(id = as.character(OlinkID)) %>%
@@ -121,5 +121,5 @@ ref_results <- list(t.test_results = t.test_results,
                     normalization_results.subset = normalization_results.subset,
                     randomized_result1 = randomized_result1,
                     randomized_result2 = randomized_result2)
-save(ref_results, file = 'refResults.RData')
+save(ref_results, file = 'tests/data/refResults.RData')
 

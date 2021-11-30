@@ -22,13 +22,13 @@ boxplot_site_10prots <- npx_data1 %>%
 boxplot_time <- npx_data1 %>%
   olink_boxplot(variable = "Time",
                 olinkid_list = {ref_results$anova_results_1_time %>%
-                    filter(Threshold == 'Significant') %>%
+                    head(10) %>%
                     pull(OlinkID)})
 
 boxplot_time_coloroption <- npx_data1 %>%
   olink_boxplot(variable = "Time",
                 olinkid_list = {ref_results$anova_results_1_time %>%
-                    filter(Threshold == 'Significant') %>%
+                    head(10) %>%
                     pull(OlinkID)},
                 coloroption = c("teal","pink","orange","turqoise"))
 
@@ -36,7 +36,7 @@ boxplot_time_site <- npx_data1 %>%
   na.omit() %>%
   olink_boxplot(variable = c("Time","Site"),
                 olinkid_list = {ref_results$anova_results_1_time %>%
-                    filter(Threshold == 'Significant') %>%
+                    head(10) %>%
                     pull(OlinkID)})
 
 
