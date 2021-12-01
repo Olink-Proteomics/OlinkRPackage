@@ -1,16 +1,16 @@
 #' Function to plot an overview of a sample cohort per Panel
 #'
 #' Generates a facet plot per Panel using ggplot2::ggplot and ggplot2::geom_point and stats::IQR plotting IQR vs. median for all samples.
-#' Horizontal dashed lines indicate +/-IQR_outlierDef standard deviations from the mean IQR.
-#' Vertical dashed lines indicate +/-median_outlierDef standard deviations from the mean sample median.
+#' Horizontal dashed lines indicate +/-IQR_outlierDef standard deviations from the mean IQR (default 3).
+#' Vertical dashed lines indicate +/-median_outlierDef standard deviations from the mean sample median (default 3).
 #'
 #' @param df NPX data frame in long format. Must have columns SampleID, Index, NPX and Panel
 #' @param color_g Character value indicating which column to use as fill color (default QC_Warning)
 #' @param plot_index Boolean. If FALSE (default), a point will be plotted for a sample. If TRUE,
 #' a sample's unique index number is displayed.
 #' @param label_outliers Boolean. If TRUE, an outlier sample will be labelled with its SampleID.
-#' @param IQR_outlierDef The number of standard deviations from the mean IQR that defines an outlier. Default is 3
-#' @param median_outlierDef The number of standard deviations from the mean sample median that defines an outlier. Default is 3
+#' @param IQR_outlierDef The number of standard deviations from the mean IQR that defines an outlier (default 3)
+#' @param median_outlierDef The number of standard deviations from the mean sample median that defines an outlier. (default 3)
 #' @param outlierLines Draw dashed lines at +/-IQR_outlierDef and +/-median_outlierDef standard deviations from the mean IQR and sample median respectively (default TRUE)
 #' @param facetNrow The number of rows that the panels are arranged on
 #' @param facetNcol The number of columns that the panels are arranged on
@@ -30,7 +30,6 @@
 #' #Identify the outliers
 #' qc <- olink_qc_plot(npx_data1, color_g = "QC_Warning", IQR_outlierDef = 4, median_outlierDef = 4)
 #' outliers <- qc$data %>% filter(Outlier == 1)
-#' qc
 #' }
 #' @importFrom magrittr %>%
 #' @importFrom dplyr group_by mutate ungroup select distinct if_else filter case_when

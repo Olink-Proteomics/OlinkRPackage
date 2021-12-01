@@ -27,9 +27,9 @@ a sample's unique index number is displayed.}
 
 \item{label_outliers}{Boolean. If TRUE, an outlier sample will be labelled with its SampleID.}
 
-\item{IQR_outlierDef}{The number of standard deviations from the mean IQR that defines an outlier. Default is 3}
+\item{IQR_outlierDef}{The number of standard deviations from the mean IQR that defines an outlier (default 3)}
 
-\item{median_outlierDef}{The number of standard deviations from the mean sample median that defines an outlier. Default is 3}
+\item{median_outlierDef}{The number of standard deviations from the mean sample median that defines an outlier. (default 3)}
 
 \item{outlierLines}{Draw dashed lines at +/-IQR_outlierDef and +/-median_outlierDef standard deviations from the mean IQR and sample median respectively (default TRUE)}
 
@@ -44,8 +44,8 @@ An object of class "ggplot"
 }
 \description{
 Generates a facet plot per Panel using ggplot2::ggplot and ggplot2::geom_point and stats::IQR plotting IQR vs. median for all samples.
-Horizontal dashed lines indicate +/-IQR_outlierDef standard deviations from the mean IQR.
-Vertical dashed lines indicate +/-median_outlierDef standard deviations from the mean sample median.
+Horizontal dashed lines indicate +/-IQR_outlierDef standard deviations from the mean IQR (default 3).
+Vertical dashed lines indicate +/-median_outlierDef standard deviations from the mean sample median (default 3).
 }
 \examples{
 \donttest{
@@ -59,7 +59,6 @@ olink_qc_plot(npx_data1, color_g = "QC_Warning", IQR_outlierDef = 4, median_outl
 #Identify the outliers
 qc <- olink_qc_plot(npx_data1, color_g = "QC_Warning", IQR_outlierDef = 4, median_outlierDef = 4)
 outliers <- qc$data \%>\% filter(Outlier == 1)
-qc
 }
 }
 \keyword{NPX}
