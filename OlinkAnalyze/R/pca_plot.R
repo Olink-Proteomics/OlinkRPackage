@@ -110,6 +110,18 @@ olink_pca_plot <- function (df,
     dplyr::filter(stringr::str_detect(OlinkID,
                                       "OID[0-9]{5}"))
 
+  #Check that the user didn't specify just one of outlierDefX and outlierDefY
+  if(sum(c(is.numeric(outlierDefX), is.numeric(outlierDefY))) == 1){
+    stop('To label outliers, both outlierDefX and outlierDefY have to be specified as numerical values')
+  }
+
+  #If outlierLines == T, both outlierDefX and outlierDefY have to be specified
+  if(outlierLines){
+    if(!all(is.numeric(outlierDefX), is.numeric(outlierDefY))){
+      stop('outlierLines requested but boundaries not specified. To draw lines, both outlierDefX and outlierDefY have to be specified as numerical values')
+    }
+  }
+
   if(byPanel){
     df <- df %>%
       dplyr::mutate(Panel = Panel  %>% stringr::str_replace("Olink ", "")) #Strip "Olink" from the panel names

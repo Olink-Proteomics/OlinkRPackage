@@ -77,6 +77,11 @@ olink_qc_plot <- function(df,
     dplyr::filter(stringr::str_detect(OlinkID,
                                       "OID[0-9]{5}"))
 
+  #Check that IQR_outlierDef and median_outlierDef are both numeric
+  if(!all(is.numeric(IQR_outlierDef), is.numeric(median_outlierDef))){
+    stop('IQR_outlierDef and median_outlierDef have to be numerical values')
+  }
+
   npx_df_qr <- npx_df %>%
     dplyr::group_by(Panel, SampleID, Index) %>%
     dplyr::mutate(QC_Warning = dplyr::if_else(all(toupper(QC_Warning) == 'PASS'),
