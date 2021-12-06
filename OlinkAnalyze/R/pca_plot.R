@@ -22,6 +22,7 @@
 #' @param outlierDefX The number standard deviations along the PC plotted on the x-axis that defines an outlier. See also 'Details"
 #' @param outlierDefY The number standard deviations along the PC plotted on the y-axis that defines an outlier. See also 'Details"
 #' @param outlierLines Draw dashed lines at +/-outlierDef[X,Y] standard deviations from the mean of the plotted PCs (default FALSE)
+#' @param quiet Logical. If TRUE, the resulting plot is not printed
 #' @param verbose Logical. Whether warnings about the number of samples and/or assays dropped or imputed should be printed to the console.
 #' @param ... coloroption passed to specify color order.
 #' @return A list of objects of class "ggplot"
@@ -79,6 +80,7 @@ olink_pca_plot <- function (df,
                             outlierDefX = NA,
                             outlierDefY = NA,
                             outlierLines = FALSE,
+                            quiet = FALSE,
                             verbose = TRUE,
                             ...){
 
@@ -152,7 +154,7 @@ olink_pca_plot <- function (df,
       g
     })
     names(plotList) <- unique(df$Panel)
-    print(ggpubr::ggarrange(plotlist = plotList, common.legend = T))
+    if(!quiet) print(ggpubr::ggarrange(plotlist = plotList, common.legend = T))
 
   } else{
     pca_plot <- olink_pca_plot.internal(df = df,
@@ -169,7 +171,7 @@ olink_pca_plot <- function (df,
                                         outlierLines = outlierLines,
                                         verbose = verbose,
                                         ...)
-    print(pca_plot)
+    if(!quiet) print(pca_plot)
     plotList <- list(pca_plot) #For consistency, return a list even when there's just one plot
   }
 

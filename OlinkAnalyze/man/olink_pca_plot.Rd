@@ -18,6 +18,7 @@ olink_pca_plot(
   outlierDefX = NA,
   outlierDefY = NA,
   outlierLines = FALSE,
+  quiet = FALSE,
   verbose = TRUE,
   ...
 )
@@ -48,6 +49,8 @@ olink_pca_plot(
 \item{outlierDefY}{The number standard deviations along the PC plotted on the y-axis that defines an outlier. See also 'Details"}
 
 \item{outlierLines}{Draw dashed lines at +/-outlierDef[X,Y] standard deviations from the mean of the plotted PCs (default FALSE)}
+
+\item{quiet}{Logical. If TRUE, the resulting plot is not printed}
 
 \item{verbose}{Logical. Whether warnings about the number of samples and/or assays dropped or imputed should be printed to the console.}
 
