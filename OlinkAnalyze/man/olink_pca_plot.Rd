@@ -82,13 +82,13 @@ g[[2]] #Plot only the second panel
 
 #Label outliers
 olink_pca_plot(df=npx_data, color_g = "QC_Warning",
-               outlierDefX = 4, outlierDefY = 4) #All data
+               outlierDefX = 2, outlierDefY = 4) #All data
 olink_pca_plot(df=npx_data, color_g = "QC_Warning",
-               outlierDefX = 4, outlierDefY = 4, byPanel = TRUE) #Per panel
+               outlierDefX = 2.5, outlierDefY = 4, byPanel = TRUE) #Per panel
 
 #Retrieve the outliers
 g <- olink_pca_plot(df=npx_data, color_g = "QC_Warning",
-                    outlierDefX = 4, outlierDefY = 4, byPanel = TRUE)
+                    outlierDefX = 2.5, outlierDefY = 4, byPanel = TRUE)
 outliers <- lapply(g, function(x){x$data}) \%>\%
     bind_rows() \%>\%
     filter(Outlier == 1)
