@@ -562,7 +562,7 @@ A list of objects of class *ggplot*.
 
 Generates PCA projection of all samples from NPX data along two principal components (Default PC2 vs PC1) colored by the variable QC_Warning and including the percentage of explained variance. The function used the functions *prcomp* and *ggplot* from the R libraries *stats* and *ggplot2*, respectively. By default, the values scaled and centered in the PCA and proteins with missing NPX values removed from the corresponding assay(s). Unique sample names are required. Imputation by median value is done for assays with missingness <10% and for multi-plate projects, and for missingness <5% for single plate projects.
 
-### Function arguments
+### Function arguments (selection)
 
 * df: NPX data frame in long format should minimally contain SampleID, NPX and column that will be used for grouping/coloring.
 * color_g: Character value indicating the column name that should be used as fill color. Default QC_Warning.
@@ -574,6 +574,8 @@ Generates PCA projection of all samples from NPX data along two principal compon
 * n_loadings: Integer. Plot the top n_loadings ranked by size.
 * loadings_list: Character vector indicating for which OlinkID's to plot loadings. Arguments n_loadings and loadings_list can be used together.
 * verbose: Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
+* quiet: Boolean. Default: False. If TRUE, the resulting plot is not printed.
+
 
 ```{r message=FALSE, fig.width=8, fig.height=4}
 npx_data1 %>% 
@@ -584,7 +586,7 @@ npx_data1 %>%
 
 ### Function output
 
-An object of class *ggplot*.
+A list of objects of class *ggplot* (silently returned). Plots are also printed unless option `quiet = TRUE` is set.
 
 ## Scatterplot for QC (olink_qc_plot) 
 
