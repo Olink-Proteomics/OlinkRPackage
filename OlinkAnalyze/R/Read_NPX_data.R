@@ -23,13 +23,13 @@
 read_NPX <- function(filename){
 
   # If the file is csv or txt, read_NPX assumes that the file is explore data in long format
-  if (tools::file_ext(filename) %in% c("csv","txt")) {
+  if (tools::file_ext(filename) %in% c("csv","txt","gz")) {
     #read file using ; as delimiter
-    out <- read.table(filename, header = TRUE, sep=";", stringsAsFactors = F,
+    out <- read.table(gzfile(filename), header = TRUE, sep=";", stringsAsFactors = F,
                       na.strings = c("NA",""))
     if (is.data.frame(out) & ncol(out) == 1) {
       #if only one column in the data, wrong delimiter. use , as delimiter
-      out <- read.table(filename, header = TRUE, sep=",", stringsAsFactors = F,
+      out <- read.table(gzfile(filename), header = TRUE, sep=",", stringsAsFactors = F,
                         na.strings = c("NA",""))
     }
     #check that all colnames are present
