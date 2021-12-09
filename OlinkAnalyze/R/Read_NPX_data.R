@@ -83,7 +83,7 @@ read_NPX <- function(filename){
   } else {
     stop("Cannot find whether the given data is NPX or concentration")
   }
-  
+
   # Load initial meta data (the first rows of the wide file)
   meta_dat <-  readxl::read_excel(filename, skip = 2, n_max = n_max_meta_data,
                                   col_names = F, .name_repair="minimal")
@@ -117,13 +117,13 @@ read_NPX <- function(filename){
   meta_dat[3, control_index] <- '-'
   NR_CONTROLS <- sum(control_index)
   nr_panel<-(ncol(meta_dat)-1-NR_DEVIATIONS-NR_CONTROLS)/(BASE_INDEX+2)
-  
+
   nr_col <- ncol(meta_dat)
   names(meta_dat) <- as.character(1:nr_col)
-  
+
   meta_dat <- meta_dat %>%
     dplyr::rename(Name = `1`)
-  
+
   # Load NPX or QUANT data including the last rows of meta data
   dat <- readxl::read_excel(filename, skip = n_max_meta_data+2, col_names = F,
                             .name_repair="minimal", col_types = c('text'))
@@ -138,35 +138,35 @@ read_NPX <- function(filename){
   
   nr_col <- ncol(dat)
   names(dat) <- as.character(1:nr_col)
-  
+
   dat<-dat %>%
     dplyr::rename(Name = `1`)
-  
+
   # Calc nbr of plates
   plates <- dat[,nr_col-nr_panel] %>% dplyr::distinct() %>% na.omit() %>% dplyr::pull()
   nr_plates <- length(plates)
-  
+
   # Extract the meta data from the last rows of data
   missfreq<-dat %>% dplyr::filter(stringr::str_detect(Name, "Missing Data freq."))
   norm_method <- dat %>% dplyr::filter(stringr::str_detect(Name, "Normalization"))
   if (!is_npx_data) {
     assay_warning <- dat %>% dplyr::filter(stringr::str_detect(Name, "Assay warning"))
     Plate_LQL <- dat %>% dplyr::filter(stringr::str_detect(Name,
-                                                           "Lowest quantifiable level"))
+                                                    "Lowest quantifiable level"))
     LOD <- dat %>% dplyr::filter(stringr::str_detect(Name, "Plate LOD"))
     LLOQ <- dat %>% dplyr::filter(stringr::str_detect(Name, "LLOQ"))
     ULOQ <- dat %>% dplyr::filter(stringr::str_detect(Name, "ULOQ"))
   } else {
     LOD <- dat %>% dplyr::filter(stringr::str_detect(Name, "LOD"))
   }
-  
+
   # Add the new meta data to ´meta_dat´
   meta_dat <- rbind(meta_dat,missfreq)
   if (!is_npx_data) {
     meta_dat <- rbind(meta_dat,LLOQ,ULOQ,assay_warning,Plate_LQL)
   }
   meta_dat <- rbind(meta_dat,LOD,norm_method)
-  
+
   # Remove the meta data from dat
   if (is_npx_data) {
     nbr_meta_data_rows_bottom <- 3
