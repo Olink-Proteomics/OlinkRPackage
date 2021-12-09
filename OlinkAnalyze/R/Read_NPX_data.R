@@ -83,63 +83,90 @@ read_NPX <- function(filename){
   } else {
     stop("Cannot find whether the given data is NPX or concentration")
   }
-
+  
   # Load initial meta data (the first rows of the wide file)
   meta_dat <-  readxl::read_excel(filename, skip = 2, n_max = n_max_meta_data,
                                   col_names = F, .name_repair="minimal")
   meta_dat[4,1] <- 'SampleID'
   NR_DEVIATIONS <- sum(stringr::str_detect(meta_dat[2,],
-                                           'QC Deviation from median'))
+                                           'QC Deviation from median'), na.rm=TRUE)
   control_index <- (stringr::str_detect(meta_dat[2,], 'Det Ctrl') |
                       stringr::str_detect(meta_dat[2,], 'Inc Ctrl 2') |
                       stringr::str_detect(meta_dat[2,], 'Inc Ctrl 1') |
                       stringr::str_detect(meta_dat[2,], 'Ext Ctrl'))
+  
+  # some data files are delivered with extra sample metadata columns
+  # after the data.  Identify the last data columns and extract this 
+  # sample metadata if present
+  extra_metadata_flag <- FALSE
+  last_file_col<-length(control_index)
+  control_index<-na.omit(control_index)
+  last_data_col<-length(control_index)
+  
+  if(last_file_col > last_data_col) {
+    extra_metadata_flag <- TRUE
+    extra_metadata_header <- meta_dat[,c(last_data_col+1, last_file_col)] %>% 
+      tidyr::drop_na() %>%
+      head(n=1) %>% 
+      unlist(., use.names=FALSE)
+    meta_dat <- meta_dat[, c(1:last_data_col)]
+    message(sprintf("Additional metadata columns found after column %d.", last_data_col))
+  }
+  
   meta_dat[4, control_index] <- meta_dat[2, control_index]
   meta_dat[3, control_index] <- '-'
   NR_CONTROLS <- sum(control_index)
   nr_panel<-(ncol(meta_dat)-1-NR_DEVIATIONS-NR_CONTROLS)/(BASE_INDEX+2)
-
+  
   nr_col <- ncol(meta_dat)
   names(meta_dat) <- as.character(1:nr_col)
-
+  
   meta_dat <- meta_dat %>%
     dplyr::rename(Name = `1`)
-
+  
   # Load NPX or QUANT data including the last rows of meta data
   dat <- readxl::read_excel(filename, skip = n_max_meta_data+2, col_names = F,
                             .name_repair="minimal", col_types = c('text'))
-
+  
+  if(extra_metadata_flag) {
+    extra_metadata <- cbind(dat[,1],         # column 1: SampleID
+                            1:nrow(dat), # column 2: Index
+                            dat[,c(last_data_col+1, last_file_col)]) # columns 3-n: Other metadata
+    names(extra_metadata) <- c("SampleID", "Index", extra_metadata_header)
+    dat <- dat[,c(1:last_data_col)]
+  }
+  
   nr_col <- ncol(dat)
   names(dat) <- as.character(1:nr_col)
-
+  
   dat<-dat %>%
     dplyr::rename(Name = `1`)
-
+  
   # Calc nbr of plates
   plates <- dat[,nr_col-nr_panel] %>% dplyr::distinct() %>% na.omit() %>% dplyr::pull()
   nr_plates <- length(plates)
-
+  
   # Extract the meta data from the last rows of data
   missfreq<-dat %>% dplyr::filter(stringr::str_detect(Name, "Missing Data freq."))
   norm_method <- dat %>% dplyr::filter(stringr::str_detect(Name, "Normalization"))
   if (!is_npx_data) {
     assay_warning <- dat %>% dplyr::filter(stringr::str_detect(Name, "Assay warning"))
     Plate_LQL <- dat %>% dplyr::filter(stringr::str_detect(Name,
-                                                    "Lowest quantifiable level"))
+                                                           "Lowest quantifiable level"))
     LOD <- dat %>% dplyr::filter(stringr::str_detect(Name, "Plate LOD"))
     LLOQ <- dat %>% dplyr::filter(stringr::str_detect(Name, "LLOQ"))
     ULOQ <- dat %>% dplyr::filter(stringr::str_detect(Name, "ULOQ"))
   } else {
     LOD <- dat %>% dplyr::filter(stringr::str_detect(Name, "LOD"))
   }
-
+  
   # Add the new meta data to ´meta_dat´
   meta_dat <- rbind(meta_dat,missfreq)
   if (!is_npx_data) {
     meta_dat <- rbind(meta_dat,LLOQ,ULOQ,assay_warning,Plate_LQL)
   }
   meta_dat <- rbind(meta_dat,LOD,norm_method)
-
+  
   # Remove the meta data from dat
   if (is_npx_data) {
     nbr_meta_data_rows_bottom <- 3
@@ -326,6 +353,6 @@ read_NPX <- function(filename){
                   dplyr::matches("Assay_Warning"),
                   dplyr::matches("Normalization"),
                   dplyr::matches("*Inc Ctrl*"),
-                  dplyr::matches("*Det Ctrl*"))
-
+                  dplyr::matches("*Det Ctrl*")) %>%
+    {if (extra_metadata_flag) dplyr::left_join(., extra_metadata, by=c("SampleID", "Index")) else .}
 }
