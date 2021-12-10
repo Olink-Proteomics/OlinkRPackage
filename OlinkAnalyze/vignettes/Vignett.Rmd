@@ -16,6 +16,7 @@ vignette: >
 knitr::opts_chunk$set(
 collapse = TRUE,
 comment = "#>")
+options(tibble.print_min = 4L, tibble.print_max = 4L)
 ```
 
 OlinkAnalyze is an R package that provides a versatile toolbox to enable fast and easy handling of Olink NPX data for your proteomics research. OlinkAnalyze provides functions for using Olink data, including functions for importing Olink NPX datasets exported from the NPX Manager, as well as quality control (QC) plot functions and functions for various statistical tests. This package is meant to provide a convenient pipeline for your Olink NPX data analysis.
@@ -599,16 +600,7 @@ npx_data1 %>%
 
 A list of objects of class *ggplot* (silently returned). Plots are also printed unless option `quiet = TRUE` is set. If outlierDefX and outlierDefY are specified, a list of outliers can be extracted from the **ggplot** object based on these parameters.
 
-```{r message = F, eval=FALSE}
-g <- olink_pca_plot(df=npx_data, color_g = "QC_Warning",
-                    outlierDefX = 2.5, outlierDefY = 4, byPanel = TRUE)
-lapply(g, function(x){x$data}) %>%
-  bind_rows() %>%
-  filter(Outlier == 1) %>% 
-  select(SampleID, Outlier, Panel)
-```
-
-```{r message = F, echo=FALSE}
+```{r message = F}
 npx_data <- npx_data1 %>%
     mutate(SampleID = paste(SampleID, "_", Index, sep = ""))
 g <- olink_pca_plot(df=npx_data, color_g = "QC_Warning",
@@ -616,9 +608,9 @@ g <- olink_pca_plot(df=npx_data, color_g = "QC_Warning",
 lapply(g, function(x){x$data}) %>%
   bind_rows() %>%
   filter(Outlier == 1) %>% 
-  select(SampleID, Outlier, Panel) %>% 
-  kableExtra::kbl(booktabs = T)
+  select(SampleID, Outlier, Panel)
 ```
+
 
 ## Scatterplot for QC (olink_qc_plot) 
 
@@ -648,16 +640,12 @@ npx_data1 %>%
 
 An object of class *ggplot*. A list of outliers can be extracted from the **ggplot** object.
 
-```{r message = F, eval = F}
+```{r message = F}
 qc <- olink_qc_plot(npx_data1, color_g = "QC_Warning", IQR_outlierDef = 3, median_outlierDef = 3)
 qc$data %>% filter(Outlier == 1) %>% select(SampleID, Panel, IQR, sample_median, Outlier)
 ```
 
-```{r message = F, echo = F}
-qc <- olink_qc_plot(npx_data1, color_g = "QC_Warning", IQR_outlierDef = 3, median_outlierDef = 3)
-qc$data %>% filter(Outlier == 1) %>% select(SampleID, Panel, IQR, sample_median, Outlier) %>% 
-  kableExtra::kbl(booktabs = T)
-```
+
 ## Plot results of t-test (olink_volcano_plot)
 
 The olink_volcano_plot function generates a volcano plot using results from the olink_ttest function using the function *ggplot* and *geom_point* of the R library *ggplot2*. The estimated difference is shown in the x-axis and -log<sub>10</sub>(p-value) in the y-axis. A horizontal dotted line indicates p-value = 0.05. Dots are colored based on Benjamini-Hochberg adjusted p-value cutoff 0.05 and can optionally be annotated by OlinkID.
