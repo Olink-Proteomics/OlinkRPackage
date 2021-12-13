@@ -5,11 +5,13 @@
 * Package is in the process of being submitted to CRAN
 * Added ability to prevent OlinkAnalyze from loading fonts and setting to themes (@OlaCaster, #73)
 * Decreased the size of npx_data1 and npx_data2 to 2 panels instead of 12 (@kathy-nevola, #76)
+* Updates to the olink_qc_plot and olink_pca_plot functions (@simfor, #78)
 
 ## BugFixes
 
 * Moved NEWS.md to correct level (@kathy-nevola, #74)
 * Added cran-comments.md file to document Notes for CRAN submission (@kathy-nevola, #74)
+* Update Vignette to reflect new functionality (@kathy-nevola, #78)
 
 
 # OlinkAnalyze 1.3.0
