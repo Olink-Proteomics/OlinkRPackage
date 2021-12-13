@@ -20,19 +20,21 @@
 #'
 #'
 set_plot_theme <- function(font = "Swedish Gothic Thin") {
-
+  
   usefont <- ""
-
-  if (requireNamespace("extrafont", quietly = TRUE)) {
-    if(font %in% extrafont::fonts()){
-      if(.Platform$OS.type == "windows"){
-        extrafont::loadfonts(quiet = TRUE, device = "win")
+  
+  if (getOption("OlinkAnalyze.allow.font.load", default = TRUE)) {
+    if (requireNamespace("extrafont", quietly = TRUE)) {
+      if(font %in% extrafont::fonts()){
+        if(.Platform$OS.type == "windows"){
+          extrafont::loadfonts(quiet = TRUE, device = "win")
+        }
+        extrafont::loadfonts(quiet = TRUE, device = "pdf")
+        usefont <- font
       }
-      extrafont::loadfonts(quiet = TRUE, device = "pdf")
-      usefont <- font
     }
   }
-
+  
   olink_theme <- ggplot2::theme_bw() +
     ggplot2::theme(
       panel.grid.major = ggplot2::element_blank(),

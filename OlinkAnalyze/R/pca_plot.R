@@ -1,9 +1,13 @@
 #' Function to plot a PCA of the data
 #'
 #' Generates a PCA projection of all samples from NPX data along two principal components (default PC2 vs. PC1) including the explained variance and dots colored by QC_Warning using stats::prcomp and ggplot2::ggplot.
+#'
 #' The values are by default scaled and centered in the PCA and proteins with missing NPX values are by default removed from the corresponding assay.
 #' Unique sample names are required.
 #' Imputation by the median is done for assays with missingness <10\% for multi-plate projects and <5\% for single plate projects.
+#' The plot is printed, and a list of ggplot objects is returned. \cr\cr
+#' If byPanel = TRUE, the data processing (imputation of missing values etc) and subsequent PCA is performed separately per panel. A faceted plot is printed, while the individual ggplot objects are returned. \cr\cr
+#' The arguments outlierDefX and outlierDefY can be used to identify outliers in the PCA. Samples more than +/-outlierDef[X,Y] standard deviations from the mean of the plotted PC will be labelled. Both arguments have to be specified.
 #'
 #' @param df data frame in long format with Sample Id, NPX and column of choice for colors
 #' @param color_g Character value indicating which column to use for colors (default QC_Warning)
@@ -14,9 +18,14 @@
 #' @param drop_samples Logical. All samples with any missing values will be dropped.
 #' @param n_loadings Integer. Will plot the top n_loadings based on size.
 #' @param loadings_list Character vector indicating for which OlinkID's to plot as loadings. It is possible to use n_loadings and loadings_list simultaneously.
+#' @param byPanel Perform the PCA per panel (default FALSE)
+#' @param outlierDefX The number standard deviations along the PC plotted on the x-axis that defines an outlier. See also 'Details"
+#' @param outlierDefY The number standard deviations along the PC plotted on the y-axis that defines an outlier. See also 'Details"
+#' @param outlierLines Draw dashed lines at +/-outlierDef[X,Y] standard deviations from the mean of the plotted PCs (default FALSE)
+#' @param quiet Logical. If TRUE, the resulting plot is not printed
 #' @param verbose Logical. Whether warnings about the number of samples and/or assays dropped or imputed should be printed to the console.
 #' @param ... coloroption passed to specify color order.
-#' @return An object of class "ggplot"
+#' @return A list of objects of class "ggplot"
 #' @keywords NPX, PCA
 #' @export
 #' @examples
@@ -24,7 +33,27 @@
 #' library(dplyr)
 #' npx_data <- npx_data1 %>%
 #'     mutate(SampleID = paste(SampleID, "_", Index, sep = ""))
-#' olink_pca_plot(df=npx_data, color_g = "QC_Warning")}
+#'
+#' #PCA using all the data
+#' olink_pca_plot(df=npx_data, color_g = "QC_Warning")
+#'
+#' #PCA per panel
+#' g <- olink_pca_plot(df=npx_data, color_g = "QC_Warning", byPanel = TRUE)
+#' g[[2]] #Plot only the second panel
+#'
+#' #Label outliers
+#' olink_pca_plot(df=npx_data, color_g = "QC_Warning",
+#'                outlierDefX = 2, outlierDefY = 4) #All data
+#' olink_pca_plot(df=npx_data, color_g = "QC_Warning",
+#'                outlierDefX = 2.5, outlierDefY = 4, byPanel = TRUE) #Per panel
+#'
+#' #Retrieve the outliers
+#' g <- olink_pca_plot(df=npx_data, color_g = "QC_Warning",
+#'                     outlierDefX = 2.5, outlierDefY = 4, byPanel = TRUE)
+#' outliers <- lapply(g, function(x){x$data}) %>%
+#'     bind_rows() %>%
+#'     filter(Outlier == 1)
+#' }
 #' @importFrom magrittr %>%
 #' @importFrom dplyr filter select group_by ungroup mutate mutate_at if_else n_distinct summarise left_join arrange distinct
 #' @importFrom stringr str_detect
@@ -47,6 +76,11 @@ olink_pca_plot <- function (df,
                             drop_samples = FALSE,
                             n_loadings = 0,
                             loadings_list = NULL,
+                            byPanel = FALSE,
+                            outlierDefX = NA,
+                            outlierDefY = NA,
+                            outlierLines = FALSE,
+                            quiet = FALSE,
                             verbose = TRUE,
                             ...){
 
@@ -76,7 +110,88 @@ olink_pca_plot <- function (df,
   #Filtering on valid OlinkID
   df <- df %>%
     dplyr::filter(stringr::str_detect(OlinkID,
-                               "OID[0-9]{5}"))
+                                      "OID[0-9]{5}"))
+
+  #Check that the user didn't specify just one of outlierDefX and outlierDefY
+  if(sum(c(is.numeric(outlierDefX), is.numeric(outlierDefY))) == 1){
+    stop('To label outliers, both outlierDefX and outlierDefY have to be specified as numerical values')
+  }
+
+  #If outlierLines == T, both outlierDefX and outlierDefY have to be specified
+  if(outlierLines){
+    if(!all(is.numeric(outlierDefX), is.numeric(outlierDefY))){
+      stop('outlierLines requested but boundaries not specified. To draw lines, both outlierDefX and outlierDefY have to be specified as numerical values')
+    }
+  }
+
+  if(byPanel){
+    df <- df %>%
+      dplyr::mutate(Panel = Panel  %>% stringr::str_replace("Olink ", "")) #Strip "Olink" from the panel names
+
+    plotList <- lapply(unique(df$Panel), function(x) {
+      g <- df %>%
+        dplyr::filter(Panel == x) %>%
+        olink_pca_plot.internal(df = .,
+                                color_g = color_g,
+                                x_val = x_val,
+                                y_val = y_val,
+                                label_samples = label_samples,
+                                drop_assays = drop_assays,
+                                drop_samples = drop_samples,
+                                n_loadings = n_loadings,
+                                loadings_list = loadings_list,
+                                outlierDefX = outlierDefX,
+                                outlierDefY = outlierDefY,
+                                outlierLines = outlierLines,
+                                verbose = verbose,
+                                ...) +
+        ggplot2::labs(title = x)
+
+      #Add Panel info inside the ggplot object
+      g$data <- g$data %>%
+        dplyr::mutate(Panel = x)
+
+      g
+    })
+    names(plotList) <- unique(df$Panel)
+    if(!quiet) print(ggpubr::ggarrange(plotlist = plotList, common.legend = T))
+
+  } else{
+    pca_plot <- olink_pca_plot.internal(df = df,
+                                        color_g = color_g,
+                                        x_val = x_val,
+                                        y_val = y_val,
+                                        label_samples = label_samples,
+                                        drop_assays = drop_assays,
+                                        drop_samples = drop_samples,
+                                        n_loadings = n_loadings,
+                                        loadings_list = loadings_list,
+                                        outlierDefX = outlierDefX,
+                                        outlierDefY = outlierDefY,
+                                        outlierLines = outlierLines,
+                                        verbose = verbose,
+                                        ...)
+    if(!quiet) print(pca_plot)
+    plotList <- list(pca_plot) #For consistency, return a list even when there's just one plot
+  }
+
+  return(invisible(plotList))
+}
+
+olink_pca_plot.internal <- function (df,
+                                     color_g = "QC_Warning",
+                                     x_val = 1,
+                                     y_val = 2,
+                                     label_samples = FALSE,
+                                     drop_assays = FALSE,
+                                     drop_samples = FALSE,
+                                     n_loadings = 0,
+                                     loadings_list = NULL,
+                                     outlierDefX,
+                                     outlierDefY,
+                                     outlierLines,
+                                     verbose = TRUE,
+                                     ...){
 
   if (color_g == "QC_Warning"){
 
@@ -266,7 +381,7 @@ olink_pca_plot <- function (df,
 
     df_wide <- df_wide %>%
       dplyr::mutate_at(tidyselect::all_of(imputed_assays),
-                ~ifelse(is.na(.x), median(.x, na.rm = TRUE), .x))
+                       ~ifelse(is.na(.x), median(.x, na.rm = TRUE), .x))
 
     if(verbose){
       warning(paste0("There are ",
@@ -281,8 +396,8 @@ olink_pca_plot <- function (df,
 
   df_wide <- df_wide %>%
     dplyr::left_join(colors_for_pca,
-              by = c('SampleID',
-                     'Index')) %>%
+                     by = c('SampleID',
+                            'Index')) %>%
     dplyr::select(SampleID, Index, pca_colors, everything())
 
   df_wide_matrix <- df_wide %>%
@@ -314,6 +429,21 @@ olink_pca_plot <- function (df,
   range_LY <- c(-abs(min(LY, na.rm = TRUE)), abs(max(LY, na.rm = TRUE)))
 
   loadings_scaling_factor <- 0.8/max(range_LX/range_PX, range_LY/range_PY)
+
+  #Identify outliers
+  if(!is.na(outlierDefX) & !is.na(outlierDefY)){
+    scores <- scores %>%
+      tibble::rownames_to_column(var = 'SampleID') %>%
+      dplyr::mutate( PCX_low = mean(PCX, na.rm = T) - outlierDefX*sd(PCX, na.rm = T),
+                     PCX_high = mean(PCX, na.rm = T) + outlierDefX*sd(PCX, na.rm = T),
+                     PCY_low = mean(PCY, na.rm = T) - outlierDefY*sd(PCY, na.rm = T),
+                     PCY_high = mean(PCY, na.rm = T) + outlierDefY*sd(PCY, na.rm = T)) %>%
+      dplyr::mutate(Outlier = dplyr::if_else(PCX < PCX_high &
+                                               PCX > PCX_low &
+                                               PCY > PCY_low &
+                                               PCY < PCY_high,
+                                             0, 1))
+  }
 
   #Plotting
 
@@ -376,20 +506,50 @@ olink_pca_plot <- function (df,
 
     pca_plot <- pca_plot +
       ggplot2::geom_segment(data = loadings,
-                   ggplot2::aes(x = 0,
-                       y = 0,
-                       xend = LX*loadings_scaling_factor,
-                       yend = LY*loadings_scaling_factor),
-                   arrow = ggplot2::arrow(length = grid::unit(1/2, "picas")),
-                   color = "black") +
+                            ggplot2::aes(x = 0,
+                                         y = 0,
+                                         xend = LX*loadings_scaling_factor,
+                                         yend = LY*loadings_scaling_factor),
+                            arrow = ggplot2::arrow(length = grid::unit(1/2, "picas")),
+                            color = "black") +
       ggrepel::geom_label_repel(data = loadings,
-                       ggplot2::aes(x = LX*loadings_scaling_factor,
-                           y = LY*loadings_scaling_factor,
-                           label = variables),
-                       box.padding = 1,
-                       show.legend = FALSE,
-                       segment.colour = 'gray')
+                                ggplot2::aes(x = LX*loadings_scaling_factor,
+                                             y = LY*loadings_scaling_factor,
+                                             label = variables),
+                                box.padding = 1,
+                                show.legend = FALSE,
+                                segment.colour = 'gray')
   }
+
+  #Label outliers in figure
+  if(!is.na(outlierDefX) & !is.na(outlierDefY)){
+    pca_plot <- pca_plot +
+      ggrepel::geom_label_repel(data = . %>% dplyr::mutate(SampleIDPlot = dplyr::case_when(Outlier == 1 ~ SampleID,
+                                                                                           TRUE ~ "")),
+                                ggplot2::aes(label=SampleIDPlot),
+                                box.padding = 0.5,
+                                min.segment.length = 0.1,
+                                show.legend=FALSE,
+                                size = 3)
+  }
+
+  #Add outlier lines
+  if(outlierLines){
+    pca_plot <- pca_plot +
+      ggplot2::geom_hline(ggplot2::aes(yintercept=PCY_low),
+                          linetype = 'dashed',
+                          color = 'grey') +
+      ggplot2::geom_hline(ggplot2::aes(yintercept=PCY_high),
+                          linetype = 'dashed',
+                          color = 'grey') +
+      ggplot2::geom_vline(ggplot2::aes(xintercept = PCX_low),
+                          linetype = 'dashed',
+                          color = 'grey') +
+      ggplot2::geom_vline(ggplot2::aes(xintercept = PCX_high),
+                          linetype = 'dashed',
+                          color = 'grey')
+  }
+
 
 
   pca_plot <- pca_plot +
