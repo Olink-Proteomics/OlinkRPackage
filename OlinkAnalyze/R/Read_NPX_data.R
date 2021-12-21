@@ -182,9 +182,13 @@ read_NPX <- function(filename, extra_metadata_start_col=NULL){
   
   if(extra_metadata_flag) {
     extra_metadata <- cbind(dat[,1],         # column 1: SampleID
-                            1:nrow(dat), # column 2: Index
-                            dat[,c(extra_metadata_start_col:last_file_col)]) # columns 3-n: Other metadata
+                            1:nrow(dat),
+                            readxl::read_excel(filename, skip = n_max_meta_data+2, col_names = F,
+                                         .name_repair="minimal")[,c(extra_metadata_start_col:last_file_col)]
+    )
+    
     names(extra_metadata) <- c("SampleID", "Index", extra_metadata_header)
+    
     dat <- dat[,c(1:last_data_col)]
   }
   
