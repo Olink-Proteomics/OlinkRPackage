@@ -4,10 +4,13 @@
 \alias{read_NPX}
 \title{Function to read NPX data into long format}
 \usage{
-read_NPX(filename)
+read_NPX(filename, extra_metadata_start_col = NULL, quiet = TRUE)
 }
 \arguments{
 \item{filename}{Path to file NPX Manager output file.}
+
+\item{extra_metadata_start_col}{optional column number or (Excel) column name
+indicating extra metadata starting column}
 }
 \value{
 A tibble in long format.

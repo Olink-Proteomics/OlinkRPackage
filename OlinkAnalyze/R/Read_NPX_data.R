@@ -1,9 +1,38 @@
+
+#' Convert Excel-style column names to column number
+#'
+#' @param character column name (e.g. 'AWG') or a number to pass-through
+#'
+#' @return return numeric column number
+colname_to_number <- function(x) {
+  # return any numbers passed in
+  if(is.numeric(x)) { return(x) }
+  
+  # letters encoding
+  encoding <- setNames(seq_along(LETTERS), LETTERS)
+  
+  # uppercase
+  x <- toupper(x)
+  
+  # convert string to a list of vectors of single letters
+  x <- strsplit(x, split = "")
+  
+  # convert each letter to the corresponding number
+  # calculate the column number
+  # return a numeric vector
+  sapply(x, function(xs) sum(encoding[xs] * 26^((length(xs)-1):0)))
+}
+
+
 #' Function to read NPX data into long format
 #'
 #' Imports an NPX file exported from NPX Manager.
 #' No alterations to the output NPX Manager format is allowed.
 #'
 #' @param filename Path to file NPX Manager output file.
+#' @param extra_metadata_start_col optional column number or (Excel) column name
+#'   indicating extra metadata starting column
+#'
 #' @return A tibble in long format.
 #' @keywords NPX
 #' @export
@@ -20,8 +49,8 @@
 #' @importFrom tidyr tibble gather separate
 
 
-read_NPX <- function(filename){
-
+read_NPX <- function(filename, extra_metadata_start_col=NULL){
+  
   # If the file is csv or txt, read_NPX assumes that the file is explore data in long format
   if (tools::file_ext(filename) %in% c("csv","txt")) {
     #read file using ; as delimiter
@@ -100,17 +129,40 @@ read_NPX <- function(filename){
   # sample metadata if present
   extra_metadata_flag <- FALSE
   last_file_col<-length(control_index)
-  control_index<-na.omit(control_index)
-  last_data_col<-length(control_index)
+  last_data_col <- last_file_col
   
+  # if defined, use extra_metadata_start_col to determine where extra
+  # metadata starts within the data file, otherwise try to detect 
+  # additional metadata columns based on extracted control data
+  if(!is.null(extra_metadata_start_col)) {
+    # convert extra_metadata_start_col to a number if necessary
+    extra_metadata_start_col <- colname_to_number(extra_metadata_start_col)
+    # infer the last data column
+    last_data_col <- extra_metadata_start_col-1
+    # redefine control index vector
+    control_index <- control_index[c(1:last_data_col)]
+    
+  } else {
+    # redefine the control index by removing NA values
+    # TODO: verify that any NAs are at the very end and not at the start or middle of the control_index
+    control_index<-na.omit(control_index)
+    # infer the last data column based on the control_index length
+    last_data_col<-length(control_index)
+    # infer starting point of any extra metadata
+    extra_metadata_start_col <- last_data_col+1
+  }
+  
+  # if the file's last column is greater than the last data column, assume 
+  # extra metadata fields exist and should be collected
   if(last_file_col > last_data_col) {
     extra_metadata_flag <- TRUE
-    extra_metadata_header <- meta_dat[,c(last_data_col+1, last_file_col)] %>% 
+    
+    extra_metadata_header <- meta_dat[,c(extra_metadata_start_col:last_file_col)] %>% 
       tidyr::drop_na() %>%
       head(n=1) %>% 
       unlist(., use.names=FALSE)
     meta_dat <- meta_dat[, c(1:last_data_col)]
-    message(sprintf("Additional metadata columns found after column %d.", last_data_col))
+    message(sprintf("Additional metadata columns found starting at column %d: %s.", extra_metadata_start_col, paste0("'", extra_metadata_header,"'", collapse=", ") ))
   }
   
   meta_dat[4, control_index] <- meta_dat[2, control_index]
@@ -131,7 +183,7 @@ read_NPX <- function(filename){
   if(extra_metadata_flag) {
     extra_metadata <- cbind(dat[,1],         # column 1: SampleID
                             1:nrow(dat), # column 2: Index
-                            dat[,c(last_data_col+1, last_file_col)]) # columns 3-n: Other metadata
+                            dat[,c(extra_metadata_start_col:last_file_col)]) # columns 3-n: Other metadata
     names(extra_metadata) <- c("SampleID", "Index", extra_metadata_header)
     dat <- dat[,c(1:last_data_col)]
   }
