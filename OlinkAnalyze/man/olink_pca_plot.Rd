@@ -14,6 +14,11 @@ olink_pca_plot(
   drop_samples = FALSE,
   n_loadings = 0,
   loadings_list = NULL,
+  byPanel = FALSE,
+  outlierDefX = NA,
+  outlierDefY = NA,
+  outlierLines = FALSE,
+  quiet = FALSE,
   verbose = TRUE,
   ...
 )
@@ -37,25 +42,60 @@ olink_pca_plot(
 
 \item{loadings_list}{Character vector indicating for which OlinkID's to plot as loadings. It is possible to use n_loadings and loadings_list simultaneously.}
 
+\item{byPanel}{Perform the PCA per panel (default FALSE)}
+
+\item{outlierDefX}{The number standard deviations along the PC plotted on the x-axis that defines an outlier. See also 'Details"}
+
+\item{outlierDefY}{The number standard deviations along the PC plotted on the y-axis that defines an outlier. See also 'Details"}
+
+\item{outlierLines}{Draw dashed lines at +/-outlierDef[X,Y] standard deviations from the mean of the plotted PCs (default FALSE)}
+
+\item{quiet}{Logical. If TRUE, the resulting plot is not printed}
+
 \item{verbose}{Logical. Whether warnings about the number of samples and/or assays dropped or imputed should be printed to the console.}
 
 \item{...}{coloroption passed to specify color order.}
 }
 \value{
-An object of class "ggplot"
+A list of objects of class "ggplot"
 }
 \description{
 Generates a PCA projection of all samples from NPX data along two principal components (default PC2 vs. PC1) including the explained variance and dots colored by QC_Warning using stats::prcomp and ggplot2::ggplot.
+}
+\details{
 The values are by default scaled and centered in the PCA and proteins with missing NPX values are by default removed from the corresponding assay.
 Unique sample names are required.
 Imputation by the median is done for assays with missingness <10\% for multi-plate projects and <5\% for single plate projects.
+The plot is printed, and a list of ggplot objects is returned. \cr\cr
+If byPanel = TRUE, the data processing (imputation of missing values etc) and subsequent PCA is performed separately per panel. A faceted plot is printed, while the individual ggplot objects are returned. \cr\cr
+The arguments outlierDefX and outlierDefY can be used to identify outliers in the PCA. Samples more than +/-outlierDef[X,Y] standard deviations from the mean of the plotted PC will be labelled. Both arguments have to be specified.
 }
 \examples{
 \donttest{
 library(dplyr)
 npx_data <- npx_data1 \%>\%
     mutate(SampleID = paste(SampleID, "_", Index, sep = ""))
-olink_pca_plot(df=npx_data, color_g = "QC_Warning")}
+
+#PCA using all the data
+olink_pca_plot(df=npx_data, color_g = "QC_Warning")
+
+#PCA per panel
+g <- olink_pca_plot(df=npx_data, color_g = "QC_Warning", byPanel = TRUE)
+g[[2]] #Plot only the second panel
+
+#Label outliers
+olink_pca_plot(df=npx_data, color_g = "QC_Warning",
+               outlierDefX = 2, outlierDefY = 4) #All data
+olink_pca_plot(df=npx_data, color_g = "QC_Warning",
+               outlierDefX = 2.5, outlierDefY = 4, byPanel = TRUE) #Per panel
+
+#Retrieve the outliers
+g <- olink_pca_plot(df=npx_data, color_g = "QC_Warning",
+                    outlierDefX = 2.5, outlierDefY = 4, byPanel = TRUE)
+outliers <- lapply(g, function(x){x$data}) \%>\%
+    bind_rows() \%>\%
+    filter(Outlier == 1)
+}
 }
 \keyword{NPX,}
 \keyword{PCA}
