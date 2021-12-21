@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 ```
 [![R-CMD-check](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/R-CMD-check.yaml)
 
-# OlinkAnalyze <img src="figures/OlinkAnalyze_target_hexagon.png" align="right" width="120" />
+# OlinkAnalyze
 
 The goal of OlinkAnalyze is to provide a versatile toolbox to enable easy and smooth handling of Olink NPX data to speed up your proteomic research. OlinkAnalyze provides functions ranging from reading Olink NPX data as exported by NPX Manager to various statistical tests and modelling, via different QC plot functions. Thereby providing a convenient pipeline for your Olink NPX data analysis.
 
