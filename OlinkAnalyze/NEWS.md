@@ -1,3 +1,11 @@
+# OlinkAnalyze 2.0.1
+
+## Bug Fixes
+
+* Remove hexigon from Readme (@kathy-nevola, #86)
+* Replace OlinkAnalyze with Olink:tm: Analyze (@kathy-nevola, #86)
+* Add Ola Caster as author
+
 # OlinkAnalyze 2.0.0
 
 ## Major Changes
