@@ -55,7 +55,7 @@ Authors@R:
       person(given = "Ola",
              family = "Caster",
              role = "ctb",
-             comment = c(Github = "OlaCaster"))
+             comment = c(Github = "OlaCaster")),
       person(given = "Olink",
              role = c("cph", "fnd")))
 Description: Package for working with Olink NPX data, primarily exported from Olink NPX Manager.
