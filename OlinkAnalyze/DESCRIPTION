@@ -71,6 +71,7 @@ License: GPL-3 | file LICENSE
 VignetteBuilder: knitr
 Imports: 
     car,
+    clusterProfiler,
     broom,
     dplyr,
     emmeans,
@@ -85,6 +86,10 @@ Imports:
     lmerTest,
     magrittr,
     methods,
+    msigdbr,
+    org.Hs.eg.db,
+    org.Mm.eg.db,
+    ReactomePA,
     readxl,
     rlang,
     stats,
