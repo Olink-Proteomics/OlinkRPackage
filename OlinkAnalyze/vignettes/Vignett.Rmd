@@ -1,5 +1,5 @@
 ---
-title: "OlinkAnalyze Vignette"
+title: "Olink^TM^ Analyze Vignette"
 author: "Olink DS team"
 date: "`r Sys.Date()`"
 output: 
@@ -7,7 +7,7 @@ output:
     toc: true
     toc_depth: 2
 vignette: >
-  %\VignetteIndexEntry{OlinkAnalyze Vignette}
+  %\VignetteIndexEntry{Olink^TM^ Analyze Vignette}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -19,7 +19,7 @@ comment = "#>")
 options(tibble.print_min = 4L, tibble.print_max = 4L)
 ```
 
-OlinkAnalyze is an R package that provides a versatile toolbox to enable fast and easy handling of Olink NPX data for your proteomics research. OlinkAnalyze provides functions for using Olink data, including functions for importing Olink NPX datasets exported from the NPX Manager, as well as quality control (QC) plot functions and functions for various statistical tests. This package is meant to provide a convenient pipeline for your Olink NPX data analysis.
+Olink^TM^ Analyze is an R package that provides a versatile toolbox to enable fast and easy handling of Olink NPX data for your proteomics research. Olink^TM^ Analyze provides functions for using Olink data, including functions for importing Olink NPX datasets exported from the NPX Manager, as well as quality control (QC) plot functions and functions for various statistical tests. This package is meant to provide a convenient pipeline for your Olink NPX data analysis.
 
 # Installation 
 
@@ -29,7 +29,7 @@ The package *remotes* is required for the installation.
 install.packages("remotes")
 ```
 
-Now you can proceed to installing OlinkAnalyze from Github.
+Now you can proceed to installing Olink:tm: Analyze from Github.
 
 ```{r, eval=FALSE}
 remotes::install_github(repo ='Olink-Proteomics/OlinkRPackage/OlinkAnalyze', ref = "main", build_vignettes = TRUE)
