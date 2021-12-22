@@ -9,7 +9,8 @@ colname_to_number <- function(x) {
   if(is.numeric(x)) { return(x) }
   
   # letters encoding
-  encoding <- setNames(seq_along(LETTERS), LETTERS)
+  encoding <- seq_along(LETTERS)
+  names(encoding) <- LETTERS
   
   # uppercase
   x <- toupper(x)
