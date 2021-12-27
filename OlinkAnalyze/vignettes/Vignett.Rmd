@@ -1,5 +1,5 @@
 ---
-title: "Olink™ Analyze Vignette"
+title: "Olink® Analyze Vignette"
 author: "Olink DS team"
 date: "`r Sys.Date()`"
 output: 
@@ -7,7 +7,7 @@ output:
     toc: true
     toc_depth: 2
 vignette: >
-  %\VignetteIndexEntry{Olink™ Analyze Vignette}
+  %\VignetteIndexEntry{Olink® Analyze Vignette}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -19,7 +19,7 @@ comment = "#>")
 options(tibble.print_min = 4L, tibble.print_max = 4L)
 ```
 
-Olink™ Analyze is an R package that provides a versatile toolbox to enable fast and easy handling of Olink NPX data for your proteomics research. Olink™ Analyze provides functions for using Olink data, including functions for importing Olink NPX datasets exported from the NPX Manager, as well as quality control (QC) plot functions and functions for various statistical tests. This package is meant to provide a convenient pipeline for your Olink NPX data analysis.
+Olink® Analyze is an R package that provides a versatile toolbox to enable fast and easy handling of Olink® NPX data for your proteomics research. Olink® Analyze provides functions for using Olink data, including functions for importing Olink® NPX datasets exported from the NPX Manager, as well as quality control (QC) plot functions and functions for various statistical tests. This package is meant to provide a convenient pipeline for your Olink NPX data analysis.
 
 # Installation 
 
@@ -29,7 +29,7 @@ The package *remotes* is required for the installation.
 install.packages("remotes")
 ```
 
-Now you can proceed to installing Olink™ Analyze from Github.
+Now you can proceed to installing Olink® Analyze from Github.
 
 ```{r, eval=FALSE}
 remotes::install_github(repo ='Olink-Proteomics/OlinkRPackage/OlinkAnalyze', ref = "main", build_vignettes = TRUE)
@@ -84,7 +84,7 @@ library(stringr)
 
 ## Introduction to Olink NPX data format
 
-The package contains two test data files named npx_data1 and npx_data2. These are synthetic datasets that resemble Olink data accompanied by clinical variables. Olink data in that are delivered in long format or imported with the function *read_NPX* (that converts the data into a long format) contain the following columns:
+The package contains two test data files named npx_data1 and npx_data2. These are synthetic datasets that resemble Olink® data accompanied by clinical variables. Olink® data in that are delivered in long format or imported with the function *read_NPX* (that converts the data into a long format) contain the following columns:
 
 * **SampleID** _\<chr\>_: Sample names or IDs.
 * **Index** _\<int\>_: Unique number for each SampleID. It is used to make up for non unique sample IDs. 
@@ -97,7 +97,7 @@ The package contains two test data files named npx_data1 and npx_data2. These ar
 * **PlateID** _\<chr\>_: Name of the plate.
 * **QC_Warning** _\<chr\>_: Indication whether the sample passed Olink QC. Read more here: [https://www.olink.com/faq/how-is-quality-control-of-the-data-performed/](https://www.olink.com/faq/how-is-quality-control-of-the-data-performed/).
 * **LOD** _\<dbl\>_: Limit of detection (LOD) is the minimum level of an individual protein that can be measured. LOD is defined as 3 times the standard deviation over background.
-* **NPX** _\<dbl\>_: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX here: [https://www.olink.com/faq/what-is-npx/](https://www.olink.com/faq/what-is-npx/).
+* **NPX** _\<dbl\>_: Normalized Protein eXpression, is Olink®’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX here: [https://www.olink.com/faq/what-is-npx/](https://www.olink.com/faq/what-is-npx/).
 
 **Note:** There are 5 additional variables in the sample datasets npx_data1 and npx_data2 that include clinical or other information, namely: Subject _\<chr\>_, Treatment _\<chr\>_, Site _\<chr\>_, Time _\<chr\>_, Project _\<chr\>_.
 
@@ -105,7 +105,7 @@ The package contains two test data files named npx_data1 and npx_data2. These ar
 
 ## Read NPX data (read_NPX)
 
-The read_NPX function imports an NPX file of wide format that has been exported from Olink NPX Manager and converts the data into the (preferred by R) long format. The wide format is the most common way Olink delivers data for Target96, however, for data analysis a long format is preferred. No prior alterations to the output of the NPX Manager should be made for this function to work as expected.
+The read_NPX function imports an NPX file of wide format that has been exported from Olink® NPX Manager and converts the data into the (preferred by R) long format. The wide format is the most common way Olink® delivers data for Target 96, however, for data analysis a long format is preferred. No prior alterations to the output of the NPX Manager should be made for this function to work as expected.
 
 ### Function arguments
 
@@ -134,7 +134,7 @@ A tibble in long format containing:
 
 ## Randomize samples on plate (olink_plate_randomizer)
 
-The olink_plate_randomizer function randomly assigns samples to a plate well with the option to keep the same individuals on the same plate. Olink does not recommend to force balance based on other clinical variables. 
+The olink_plate_randomizer function randomly assigns samples to a plate well with the option to keep the same individuals on the same plate. Olink® does not recommend to force balance based on other clinical variables. 
 
 ### Function arguments
 
@@ -180,7 +180,7 @@ Tibble with sample IDs and mean NPX for the pre-defined number of bridging sampl
 
 ## Normalizing NPX data (olink_normalization)
 
-The olink_normalization is a function used to normalize NPX values between two different dataframes/projects which have been ran at different times. Commonly, there is a shift in (mean) NPX values between runs, however, the spread of the data remains the same. This is why normalization between dataframes/projects is required. When normalization is performed, one of the two provided dataframes/projects shall be used as a reference. If two dataframes/projects have been normalized to one another, Olink by default uses the chronologically older one as reference. The function handles four different types of normalization: 
+The olink_normalization is a function used to normalize NPX values between two different dataframes/projects which have been ran at different times. Commonly, there is a shift in (mean) NPX values between runs, however, the spread of the data remains the same. This is why normalization between dataframes/projects is required. When normalization is performed, one of the two provided dataframes/projects shall be used as a reference. If two dataframes/projects have been normalized to one another, Olink® by default uses the chronologically older one as reference. The function handles four different types of normalization: 
 
 * **Bridging normalization**: One of the dataframes is adjusted to another using overlapping samples (bridge samples). The overlapping samples should have the same IDs between dataframes, and adjustment is made using the median of the paired differences between the bridge samples. The two dataframes are provided as the inputs df1 and df2, while the one being used as reference is specified by the reference_project and the overlapping samples are specified by the overlapping_samples_df1. Only overlapping_samples_df1 should be provided regardless of which dataframe is used as reference_project.
 * **Subset normalization**: A subset of samples is used to normalize two dataframes, one of which is used as a reference_project. Adjustment is made using the differences of medians between the sample subsets from the two dataframes. Both overlapping_samples_df1 and overlapping_samples_df2 should be provided as input. The sample IDs do not need to overlap.
@@ -219,7 +219,7 @@ A tibble of NPX data in long format containing normalized NPX values, including 
 
 * SampleID: Sample names or IDs.
 * Index: Unique number for each SampleID. It is used to make up for non unique sample IDs. 
-* OlinkID: Unique ID for each assay assigned by Olink. In case the assay is included in more than one panels it  will have a different OlinkID in each one. 
+* OlinkID: Unique ID for each assay assigned by Olink®. In case the assay is included in more than one panels it  will have a different OlinkID in each one. 
 * UniProt: UniProt ID.
 * Assay: Common gene name for the assay.
 * MissingFreq: Missing frequency for the OlinkID, i.e. frequency of samples with NPX value below limit of detection (LOD).
@@ -228,7 +228,7 @@ A tibble of NPX data in long format containing normalized NPX values, including 
 * PlateID: Name of the plate.
 * QC_Warning: Indication whether the sample passed Olink QC. Read more here: [https://www.olink.com/faq/how-is-quality-control-of-the-data-performed/](https://www.olink.com/faq/how-is-quality-control-of-the-data-performed/). 
 * LOD: Limit of detection (LOD) is the minimum level of an individual protein that can be measured. LOD is defined as 3 times the standard deviation over background.
-* NPX: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX here: [https://www.olink.com/faq/what-is-npx/](https://www.olink.com/faq/what-is-npx/).
+* NPX: Normalized Protein eXpression, is Olink®’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX here: [https://www.olink.com/faq/what-is-npx/](https://www.olink.com/faq/what-is-npx/).
 * Project: Name given from the dataframe of origin.
 * Adj_factor: Adjustment factor, i.e. how much was added to or subtracted from the original NPX value.
 
@@ -254,9 +254,9 @@ olink_ttest(df = npx_data1,
 A tibble with the following columns:
 
 * Assay _\<chr\>_: Assay name.
-* OlinkID _\<chr\>_: Unique Olink ID.
+* OlinkID _\<chr\>_: Unique Olink® ID.
 * UniProt _\<chr\>_: UniProt ID.
-* Panel _\<chr\>_: Olink Panel.
+* Panel _\<chr\>_: Olink® Panel.
 * estimate  _\<dbl\>_: Difference in mean NPX between groups.
 * statistic _\<dbl\>_: Value of the t-statistic.
 * p.value _\<dbl\>_: P-value for the test.
