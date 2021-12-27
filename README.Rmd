@@ -110,6 +110,6 @@ Please see the function specific help pages. Moreover, Olink® Analyze includes 
 Please report any issues (good or bad) to <biostattools[a]olink.com>.
 
 ## Credits
-Olink® Analyze is developed and maintained by the Olink Data Science Team.
+Olink® Analyze is developed and maintained by the Olink Proteomics Data Science Team.
 
 
