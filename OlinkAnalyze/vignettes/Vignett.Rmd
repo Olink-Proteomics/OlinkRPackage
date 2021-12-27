@@ -105,7 +105,7 @@ The package contains two test data files named npx_data1 and npx_data2. These ar
 
 ## Read NPX data (read_NPX)
 
-The read_NPX function imports an NPX file of wide format that has been exported from Olink® NPX Manager and converts the data into the (preferred by R) long format. The wide format is the most common way Olink® delivers data for Target 96, however, for data analysis a long format is preferred. No prior alterations to the output of the NPX Manager should be made for this function to work as expected.
+The read_NPX function imports an NPX file of wide format that has been exported from Olink® NPX Manager and converts the data into the (preferred by R) long format. The wide format is the most common way Olink® delivers data for Olink® Target 96, however, for data analysis a long format is preferred. No prior alterations to the output of the NPX Manager should be made for this function to work as expected.
 
 ### Function arguments
 
@@ -139,10 +139,10 @@ The olink_plate_randomizer function randomly assigns samples to a plate well wit
 ### Function arguments
 
 + Manifest: tibble/data frame in long format containing all sample ID's. Sample ID column should be named SampleID.
-+ PlateSize: Integer, either 96 or 48. 96 is default and should be used for Target 96 and Explore projects. For Target 48 projects, use 48.
++ PlateSize: Integer, either 96 or 48. 96 is default and should be used for Olink® Target 96 and Olink® Explore projects. For Olink® Target 48 projects, use 48.
 + SubjectColumn: (Optional) Column name of the subject ID column. Cannot contain missing values. If provided, subjects are kept on the same plate.
 + iterations: Number of iterations for fitting subjects on the same plate.
-+ available.spots: (Optional) Integer. Number of wells available on each plate. Maximum 40 for Target 48 and 88 for Target 96/Explore. Can also take a vector equal to the number of plates to be used indicating the number of wells available on each plate.
++ available.spots: (Optional) Integer. Number of wells available on each plate. Maximum 40 for Olink® Target 48 and 88 for Olink® Target 96/Explore. Can also take a vector equal to the number of plates to be used indicating the number of wells available on each plate.
 + seed: Seed to set. Highly recommend setting it for reproducibility.
 
 ```{r message=FALSE, eval=FALSE}
