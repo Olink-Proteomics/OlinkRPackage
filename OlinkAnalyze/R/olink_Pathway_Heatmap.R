@@ -1,10 +1,10 @@
 #' Creates a heatmap of selected pathways and proteins
 #'
-#' Creates a heatmap of proteins related to pathways using enrichment results from olink_Pathway_Enrichment. 
+#' Creates a heatmap of proteins related to pathways using enrichment results from olink_pathway_enrichment. 
 #'
-#'@param enrich_results data frame of enrichment results from olink_Pathway_Enrichment()
+#'@param enrich_results data frame of enrichment results from olink_pathway_enrichment()
 #'@param test_results filtered results from statistical test with Assay, OlinkID, and estimate columns
-#'@param method method used in olink_Pathway_Enrichment ("GSEA" (default) or "ORA")
+#'@param method method used in olink_pathway_enrichment ("GSEA" (default) or "ORA")
 #'@param keyword (optional) keyword to filter enrichment results on, if not specified, displays top terms
 #'@param number_of_terms number of terms to display, default is 20
 #'@return heatmap as a ggplot object
@@ -15,17 +15,17 @@
 #'ttest_results <- olink_ttest(df=npx_df,
 #'                              variable = 'Treatment',
 #'                              alternative = 'two.sided')
-#'gsea_results <- olink_Pathway_Enrichment(data = npx_data1, test_results = ttest_results)
-#'ora_results <- olink_Pathway_Enrichment(data = npx_data1,
+#'gsea_results <- olink_pathway_enrichment(data = npx_data1, test_results = ttest_results)
+#'ora_results <- olink_pathway_enrichment(data = npx_data1,
 #'                                       test_results = ttest_results, method = "ORA")
 #'ttest_sub <- ttest_results %>% filter(Panel == "CARDIOMETABOLIC")
-#'olink_Pathway_Heatmap(enrich_results = gsea_results, test_results = ttest_sub)
-#'olink_Pathway_Heatmap(enrich_results = ora_results, test_results = ttest_sub,
+#'olink_pathway_heatmap(enrich_results = gsea_results, test_results = ttest_sub)
+#'olink_pathway_heatmap(enrich_results = ora_results, test_results = ttest_sub,
 #'                      method = "ORA", keyword = "heart")
 #'}
 #'
 #' @seealso \itemize{
-#' \item{\code{\link[OlinkAnalyze:olink_Pathway_Enrichment]{olink_Pathway_Enrichment}} for generating enrichment results}
+#' \item{\code{\link[OlinkAnalyze:olink_pathway_enrichment]{olink_pathway_enrichment}} for generating enrichment results}
 #' \item{\code{\link[OlinkAnalyze:olink_Pathway_Visualization]{olink_Pathway_Visualization}} for generating a bar graph of results}
 #' }
 #'@importFrom dplyr filter left_join distinct inner_join arrange select distinct pull
@@ -35,7 +35,7 @@
 #'@importFrom magrittr %>%
 #'@export
 
-olink_Pathway_Heatmap<- function(enrich_results, test_results, method = "GSEA", keyword = NULL, number_of_terms = 20){
+olink_pathway_heatmap<- function(enrich_results, test_results, method = "GSEA", keyword = NULL, number_of_terms = 20){
   if(is.null(keyword)){
     sub_enrich <- enrich_results %>% head(number_of_terms)
   } else{

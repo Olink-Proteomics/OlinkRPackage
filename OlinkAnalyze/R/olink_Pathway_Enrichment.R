@@ -16,15 +16,15 @@
 #'   variable = "Treatment",
 #'   alternative = "two.sided"
 #' )
-#' gsea_results <- olink_Pathway_Enrichment(data = npx_data1, test_results = ttest_results)
-#' ora_results <- olink_Pathway_Enrichment(
+#' gsea_results <- olink_pathway_enrichment(data = npx_data1, test_results = ttest_results)
+#' ora_results <- olink_pathway_enrichment(
 #'   data = npx_data1,
 #'   test_results = ttest_results, method = "ORA"
 #' )
 #' }
 #' @seealso \itemize{
-#' \item{\code{\link[OlinkAnalyze:olink_Pathway_Heatmap]{olink_Pathway_Heatmap}} for generating a heat map of results}
-#' \item{\code{\link[OlinkAnalyze:olink_Pathway_Visualization]{olink_Pathway_Visualization}} for generating a bar graph of results}
+#' \item{\code{\link[OlinkAnalyze:olink_pathway_heatmap]{olink_pathway_heatmap}} for generating a heat map of results}
+#' \item{\code{\link[OlinkAnalyze:olink_pathway_visualization]{olink_pathway_visualization}} for generating a bar graph of results}
 #' }
 #'
 #' @importFrom dplyr filter mutate select group_by summarise arrange ungroup distinct pull full_join
@@ -37,7 +37,7 @@
 #' @importFrom magrittr %>%
 #' @export
 
-olink_Pathway_Enrichment <- function(data, test_results, method = "GSEA", ontology = "MSigDb", organism = "human") {
+olink_pathway_enrichment <- function(data, test_results, method = "GSEA", ontology = "MSigDb", organism = "human") {
   data2 <- data_prep(data = data)
   test_results2 <- test_prep(data = data2, test_results = test_results, organism = organism)
   geneList <- results_to_genelist(test_results = test_results2)

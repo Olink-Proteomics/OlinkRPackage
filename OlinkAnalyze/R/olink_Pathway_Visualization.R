@@ -1,7 +1,7 @@
-#' Creates bargraph of top/selected enrichment terms from GSEA or ORA results from olink_Pathway_Enrichment()
+#' Creates bargraph of top/selected enrichment terms from GSEA or ORA results from olink_pathway_enrichment()
 #'
-#'@param enrich_results data frame of enrichment results from olink_Pathway_Enrichment()
-#'@param method method used in olink_Pathway_Enrichment ("GSEA" (default) or "ORA")
+#'@param enrich_results data frame of enrichment results from olink_pathway_enrichment()
+#'@param method method used in olink_pathway_enrichment ("GSEA" (default) or "ORA")
 #'@param keyword (optional) keyword to filter enrichment results on, if not specified, displays top terms
 #'@param number_of_terms number of terms to display, default is 20
 #'@return bargraph as a ggplot object
@@ -12,18 +12,18 @@
 #'ttest_results <- olink_ttest(df=npx_df,
 #'                              variable = 'Treatment',
 #'                              alternative = 'two.sided')
-#'gsea_results <- olink_Pathway_Enrichment(data = npx_data1, test_results = ttest_results)
-#'ora_results <- olink_Pathway_Enrichment(data = npx_data1,
+#'gsea_results <- olink_pathway_enrichment(data = npx_data1, test_results = ttest_results)
+#'ora_results <- olink_pathway_enrichment(data = npx_data1,
 #'                                       test_results = ttest_results, method = "ORA")
-#'olink_Pathway_Visualization(enrich_results = gsea_results)
-#'olink_Pathway_Visualization(enrich_results = gsea_results, keyword = "immune")
-#'olink_Pathway_Visualization(enrich_results = ora_results, method = "ORA", number_of_terms = 15)
+#'olink_pathway_visualization(enrich_results = gsea_results)
+#'olink_pathway_visualization(enrich_results = gsea_results, keyword = "immune")
+#'olink_pathway_visualization(enrich_results = ora_results, method = "ORA", number_of_terms = 15)
 #'
 #'}
 #'
 #' @seealso \itemize{
-#' \item{\code{\link[OlinkAnalyze:olink_Pathway_Enrichment]{olink_Pathway_Enrichment}} for generating enrichment results}
-#' \item{\code{\link[OlinkAnalyze:olink_Pathway_Heatmap]{olink_Pathway_Heatmap}} for generating a heat map of results}
+#' \item{\code{\link[OlinkAnalyze:olink_pathway_enrichment]{olink_pathway_enrichment}} for generating enrichment results}
+#' \item{\code{\link[OlinkAnalyze:olink_pathway_heatmap]{olink_pathway_heatmap}} for generating a heat map of results}
 #' }
 #'
 #'@importFrom dplyr filter
@@ -31,7 +31,7 @@
 #'@importFrom stringr str_trunc
 #'@importFrom magrittr %>%
 #'@export
-olink_Pathway_Visualization<- function(enrich_results, method = "GSEA", keyword = NULL, number_of_terms = 20){
+olink_pathway_visualization<- function(enrich_results, method = "GSEA", keyword = NULL, number_of_terms = 20){
   if (method == "ORA"){
     if(is.null(keyword)){
       enrich_results %>%  head(number_of_terms) %>%
