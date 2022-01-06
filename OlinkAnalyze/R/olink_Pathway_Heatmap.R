@@ -26,7 +26,7 @@
 #'
 #' @seealso \itemize{
 #' \item{\code{\link[OlinkAnalyze:olink_pathway_enrichment]{olink_pathway_enrichment}} for generating enrichment results}
-#' \item{\code{\link[OlinkAnalyze:olink_Pathway_Visualization]{olink_Pathway_Visualization}} for generating a bar graph of results}
+#' \item{\code{\link[OlinkAnalyze:olink_pathway_visualization]{olink_pathway_visualization}} for generating a bar graph of results}
 #' }
 #'@importFrom dplyr filter left_join distinct inner_join arrange select distinct pull
 #'@importFrom ggplot2 ggplot geom_tile geom_text aes xlab ylab theme
