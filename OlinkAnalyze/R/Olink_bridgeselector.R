@@ -6,7 +6,7 @@
 #'data below LOD per sample. If there are not enough samples output, increase to 20\%. \cr\cr
 #'The function accepts NPX Excel files with data < LOD replaced.
 #'
-#' @param df Tibble/data frame in long format such as produced by the olinkr read_NPX function.
+#' @param df Tibble/data frame in long format such as produced by the OlinkAnalyze read_NPX function.
 #' @param sampleMissingFreq The threshold for sample wise missingness.
 #' @param n Number of bridge samples to be selected.
 #'
