@@ -3,11 +3,11 @@
 
 [![R-CMD-check](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/R-CMD-check.yaml)
 
-# Olink™ Analyze
+# Olink® Analyze
 
-The goal of Olink™ Analyze is to provide a versatile toolbox to enable
+The goal of Olink® Analyze is to provide a versatile toolbox to enable
 easy and smooth handling of Olink NPX data to speed up your proteomic
-research. Olink™ Analyze provides functions ranging from reading Olink
+research. Olink® Analyze provides functions ranging from reading Olink
 NPX data as exported by NPX Manager to various statistical tests and
 modelling, via different QC plot functions. Thereby providing a
 convenient pipeline for your Olink NPX data analysis.
@@ -62,7 +62,7 @@ olink_qc_plot(npx_data1 %>% filter(Panel == 'Olink CARDIOMETABOLIC')) +
 
 ### Normalization
 
-Olink™ Analyze provides several means of normalization when analyzing
+Olink® Analyze provides several means of normalization when analyzing
 multiple datasets. Below follows an example of reference sample (aka
 bridge) normalization using the two package provided npx\_data1 and
 npx\_data2 datasets:
@@ -83,7 +83,7 @@ bridge_normalized_data <- olink_normalization(df1 = npx_data1,
 
 ### Statistical tests and models
 
-Olink™ Analyze provides several statistical tests and model tools. Below
+Olink® Analyze provides several statistical tests and model tools. Below
 follows an example of how to perform a t-test and how to visualize the
 t-test output in a volcano plot using the package provided npx\_data1
 dataset:
@@ -108,15 +108,16 @@ olink_volcano_plot(p.val_tbl = ttest_results_NPX1,
 
 ## Learn more
 
-Please see the function specific help pages. Moreover, Olink™ Analyze
+Please see the function specific help pages. Moreover, Olink® Analyze
 includes two simulated NPX datasets for your convenience to help you
 explore the package and its functions.
 
 ## Issues
 
-Please report any issues (good or bad) to <biostattools@olink.com>.
+Please report any issues (good or bad) to
+\<biostattools\[a\]olink.com\>.
 
 ## Credits
 
-Olink™ Analyze is developed and maintained by the Olink Data Science
-Team.
+Olink® Analyze is developed and maintained by the Olink Proteomics Data
+Science Team.
