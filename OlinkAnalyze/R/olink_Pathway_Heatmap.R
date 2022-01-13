@@ -28,10 +28,9 @@
 #' \item{\code{\link[OlinkAnalyze:olink_pathway_enrichment]{olink_pathway_enrichment}} for generating enrichment results}
 #' \item{\code{\link[OlinkAnalyze:olink_pathway_visualization]{olink_pathway_visualization}} for generating a bar graph of results}
 #' }
-#'@importFrom dplyr filter left_join distinct inner_join arrange select distinct pull
+#'@importFrom dplyr filter distinct inner_join arrange select distinct pull
 #'@importFrom ggplot2 ggplot geom_tile geom_text aes xlab ylab theme
 #'@importFrom stringr str_trunc
-#'@importFrom clusterProfiler bitr
 #'@importFrom magrittr %>%
 #'@export
 
@@ -52,22 +51,22 @@ olink_pathway_heatmap<- function(enrich_results, test_results, method = "GSEA", 
   long_list<-do.call(rbind, lapply(results_list, data.frame, stringsAsFactors=FALSE))
   long_list$Pathway <- row.names(long_list)
   long_list$Pathway <- gsub("\\..*",replacement = "",x= long_list$Pathway, )
-  names(long_list)[1] <- "ENTREZID"
-  uniprot <- bitr(long_list$ENTREZID, fromType = "ENTREZID", toType = "SYMBOL", OrgDb = "org.Hs.eg.db")
+  names(long_list)[1] <- "Assay"
+  long_list <- as.data.frame(long_list)
 
   long_list1<- long_list %>%
-    left_join(uniprot, by = "ENTREZID" ) %>%
-    distinct() %>%
-    inner_join(test_results, by = c("SYMBOL" = "Assay")) %>%
-    arrange(estimate)
+    dplyr::inner_join(test_results, by = "Assay") %>%
+    dplyr::arrange(estimate)
 
-  orderprot <- long_list1 %>% dplyr::select(SYMBOL) %>% distinct() %>% pull()
+  orderprot <- long_list1 %>% dplyr::select(Assay) %>% dplyr::distinct() %>% dplyr::pull()
 
-
-  p<-ggplot(long_list1, aes(factor(SYMBOL, levels = orderprot), str_trunc(Pathway, 50, "center"))) +
-    geom_tile(aes(fill = estimate)) + olink_fill_gradient(coloroption = c('teal', 'red'), name = "estimate") + set_plot_theme() +
-    theme(panel.grid.major = element_blank(),
-          axis.text.x=element_text(angle = 60, hjust = 1)) +
-    xlab("Protein Symbol") + ylab("Pathway")
+  p<-ggplot2::ggplot(long_list1, ggplot2::aes(factor(Assay, levels = orderprot), stringr::str_trunc(Pathway, 50, "center"))) +
+    ggplot2::geom_tile(aes(fill = estimate)) + 
+    OlinkAnalyze::olink_fill_gradient(coloroption = c('teal', 'red'), name = "estimate") + 
+    OlinkAnalyze::set_plot_theme() +
+    ggplot2::theme(panel.grid.major = element_blank(),
+          axis.text.x=ggplot2::element_text(angle = 60, hjust = 1)) +
+    ggplot2::xlab("Protein Symbol") + ggplot2::ylab("Pathway") 
+    
   return(p)
 }
