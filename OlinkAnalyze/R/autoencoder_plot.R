@@ -48,7 +48,7 @@ olink_autoencoder_plot <- function (df,
     message(paste(length(layers), 'hidden layer(s) specified. Codings will be extracted from layer', codingLayer))
   }
   if(layers[codingLayer] != 2){
-    stop(paste0('The specified coding layer has the size ', layers[codingLayer], '. A size of 2 is expected.'))
+    warning(paste0('The specified coding layer has the size ', layers[codingLayer], '. A size of 2 is expected.'))
   }
 
   if (length(list(...)) > 0) {
@@ -190,28 +190,30 @@ olink_autoencoder_plot <- function (df,
   )
 
   ae1_codings <- as.matrix(h2o.deepfeatures(ae1, features, layer = codingLayer)) # extract the deep features
-  if(ncol(ae1_codings) != 2){ #This should never happen
+  if(ncol(ae1_codings) != 2){
     warning('The extracted hidden layer has the size ', ncol(ae1_codings), '. Using the first two encodings')
   }
   h2o.shutdown() # shut down H2O instance
 
   autoX <- ae1_codings[,1]
   autoY <- ae1_codings[,2]
-  observation_names <- df_wide$SampleID
-  observation_colors <- df_wide$pca_colors
-  scores <- cbind(autoX, autoY)
+  scores <- data.frame(autoX, autoY)
+
+  #I'm slightly uncomfortable with this. Is the row order always preserved from df_wide -> features -> ae1_codings? At least df_wide and features seem to agree
+  scores$id <- df_wide$SampleID
+  scores$color <- df_wide$pca_colors
 
   auto_plot <- ggplot(scores, aes(x = autoX, y = autoY)) +
     xlab('Encoding 1') + ylab('Encoding 2')
 
   if (label_samples) {
     auto_plot <- auto_plot +
-      geom_text(aes(label = observation_names, color = observation_colors), size = 3) +
+      geom_text(aes(label = id, color = color), size = 3) +
       labs(color = color_g)
   }
   else {
     auto_plot <- auto_plot +
-      geom_point(aes(color = observation_colors), size = 2.5) +
+      geom_point(aes(color = color), size = 2.5) +
       labs(color = color_g)
   }
 
