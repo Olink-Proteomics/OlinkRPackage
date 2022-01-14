@@ -50,64 +50,64 @@ olink_autoencoder_plot <- function (df,
   if(layers[codingLayer] != 2){
     stop(paste0('The specified coding layer has the size ', layers[codingLayer], '. A size of 2 is expected.'))
   }
-  
+
   if (length(list(...)) > 0) {
     ellipsis_variables <- names(list(...))
     if (length(ellipsis_variables) == 1) {
       if (!(ellipsis_variables == "coloroption")) {
-        stop(paste0("The ... option only takes the coloroption argument. ... currently contains the variable ", 
+        stop(paste0("The ... option only takes the coloroption argument. ... currently contains the variable ",
                     ellipsis_variables, "."))
       }
     }
     else {
-      stop(paste0("The ... option only takes one argument. ... currently contains the variables ", 
+      stop(paste0("The ... option only takes one argument. ... currently contains the variables ",
                   paste(ellipsis_variables, collapse = ", "), "."))
     }
   }
   df <- df %>% filter(stringr::str_detect(OlinkID, "OID[0-9]{5}"))
   if (color_g == "QC_Warning") {
-    df_temp <- df %>% 
-      group_by(SampleID, Index) %>% 
-      mutate(QC_Warning = if_else(any(QC_Warning == "Warning" | QC_Warning == "WARN"), "Warning", "Pass")) %>% 
+    df_temp <- df %>%
+      group_by(SampleID, Index) %>%
+      mutate(QC_Warning = if_else(any(QC_Warning == "Warning" | QC_Warning == "WARN"), "Warning", "Pass")) %>%
       ungroup()
-    colors_for_pca <- df_temp %>% 
-      group_by(SampleID, Index) %>% 
-      summarise(pca_colors = unique(!!rlang::ensym(color_g))) %>% 
+    colors_for_pca <- df_temp %>%
+      group_by(SampleID, Index) %>%
+      summarise(pca_colors = unique(!!rlang::ensym(color_g))) %>%
       ungroup()
   }
   else {
-    number_of_sample_w_more_than_one_color <- df %>% 
-      group_by(SampleID, Index) %>% 
-      summarise(n_colors = n_distinct(!!rlang::ensym(color_g), na.rm = TRUE)) %>% 
-      ungroup() %>% filter(n_colors > 1) %>% 
+    number_of_sample_w_more_than_one_color <- df %>%
+      group_by(SampleID, Index) %>%
+      summarise(n_colors = n_distinct(!!rlang::ensym(color_g), na.rm = TRUE)) %>%
+      ungroup() %>% filter(n_colors > 1) %>%
       nrow(.)
     if (number_of_sample_w_more_than_one_color > 0) {
       stop(paste0("There are ", number_of_sample_w_more_than_one_color, " samples that do not have a unique color. Only one color per sample is allowed."))
     }
     else {
       df_temp <- df
-      colors_for_pca <- df_temp %>% 
-        group_by(SampleID, Index) %>% 
-        summarise(pca_colors = unique(!!rlang::ensym(color_g))) %>% 
+      colors_for_pca <- df_temp %>%
+        group_by(SampleID, Index) %>%
+        summarise(pca_colors = unique(!!rlang::ensym(color_g))) %>%
         ungroup()
     }
   }
-  df_temp <- df_temp %>% 
-    group_by(OlinkID) %>% 
-    mutate(assay_var = var(NPX, na.rm = TRUE)) %>% 
-    ungroup() %>% 
-    filter(!(assay_var == 0 | is.na(assay_var))) %>% 
+  df_temp <- df_temp %>%
+    group_by(OlinkID) %>%
+    mutate(assay_var = var(NPX, na.rm = TRUE)) %>%
+    ungroup() %>%
+    filter(!(assay_var == 0 | is.na(assay_var))) %>%
     select(-assay_var)
-  
+
   # return(df_temp)
-  df_wide <- df_temp %>% 
-    select(SampleID, Index, OlinkID, NPX) %>% 
-    filter(!is.na(NPX)) %>% 
+  df_wide <- df_temp %>%
+    select(SampleID, Index, OlinkID, NPX) %>%
+    filter(!is.na(NPX)) %>%
     spread(OlinkID, NPX)
-  
+
   if (drop_assays) {
     dropped_assays <- colnames(df_wide[, -c(1:2)])[apply(df_wide[, -c(1:2)], 2, anyNA)]
-    df_wide <- df_wide %>% 
+    df_wide <- df_wide %>%
       select(-tidyselect::all_of(dropped_assays))
     if (verbose) {
       warning(paste0(length(dropped_assays)), " assay(s) contain NA and are dropped. ")
@@ -138,48 +138,48 @@ olink_autoencoder_plot <- function (df,
     removed_assays <- colnames(df_wide)[removed_assays_index]
     df_wide <- df_wide[, -removed_assays_index]
     if (verbose) {
-      warning(paste0("There are ", paste0(length(removed_assays)), 
-                     " assay(s) dropped due to high missingness (>", 
+      warning(paste0("There are ", paste0(length(removed_assays)),
+                     " assay(s) dropped due to high missingness (>",
                      round(PERCENT_CUTOFF * 100), "%)."))
     }
   }
   if (any(percent_missingness <= PERCENT_CUTOFF & percent_missingness > 0)) {
-    nrNAs <- df_wide[,-(1:2)] %>% 
+    nrNAs <- df_wide[,-(1:2)] %>%
       is.na() %>%
       sum()
-    nObs <- df_wide[,-(1:2)] %>% 
-      dim() %>% 
+    nObs <- df_wide[,-(1:2)] %>%
+      dim() %>%
       prod()
-    
+
     imputed_assays_index <- which(percent_missingness <= PERCENT_CUTOFF & percent_missingness > 0)
     percent_missingness <- percent_missingness[-imputed_assays_index]
     imputed_assays_index <- imputed_assays_index + 2
     imputed_assays <- colnames(df_wide)[imputed_assays_index]
-    df_wide <- df_wide %>% 
+    df_wide <- df_wide %>%
       mutate_at(tidyselect::all_of(imputed_assays), ~ifelse(is.na(.x), median(.x, na.rm = TRUE), .x))
     if (verbose) {
-      warning(paste0(nrNAs, ' missing NPX values, out of ', 
-                     nObs, ' total observations (', signif(100*nrNAs/nObs, 3), '%), across ', 
+      warning(paste0(nrNAs, ' missing NPX values, out of ',
+                     nObs, ' total observations (', signif(100*nrNAs/nObs, 3), '%), across ',
                      length(imputed_assays), " assay(s) were imputed by their medians."))
     }
   }
   if (!all(colSums(is.na(df_wide[, -c(1:2)])) == 0)) {
     stop("Missingness imputation failed.")
   }
-  df_wide <- df_wide %>% 
-    left_join(colors_for_pca, by = c("SampleID", "Index")) %>% 
+  df_wide <- df_wide %>%
+    left_join(colors_for_pca, by = c("SampleID", "Index")) %>%
     select(SampleID, Index, pca_colors, everything())
-  
-  df_wide_matrix <- df_wide %>% 
-    select(-Index, -pca_colors) %>% 
-    column_to_rownames("SampleID") %>% 
+
+  df_wide_matrix <- df_wide %>%
+    select(-Index, -pca_colors) %>%
+    column_to_rownames("SampleID") %>%
     as.matrix
-  
+
   #### Autoencoding ####
   h2o.no_progress()  # turn off progress bars
   h2o.init(max_mem_size = max_mem_size)  # initialize H2O instance
   features <- as.h2o(df_wide_matrix) # convert to an h2o input data set
-  
+
   #Train the autoencoder
   ae1 <- h2o.deeplearning(
     x = seq_along(features),
@@ -188,30 +188,33 @@ olink_autoencoder_plot <- function (df,
     hidden = layers,
     activation = activation
   )
-  
-  ae1_codings <- as.matrix(h2o.deepfeatures(ae1, features, layer = 1)) # extract the deep features
+
+  ae1_codings <- as.matrix(h2o.deepfeatures(ae1, features, layer = codingLayer)) # extract the deep features
+  if(ncol(ae1_codings) != 2){ #This should never happen
+    warning('The extracted hidden layer has the size ', ncol(ae1_codings), '. Using the first two encodings')
+  }
   h2o.shutdown() # shut down H2O instance
-  
+
   autoX <- ae1_codings[,1]
   autoY <- ae1_codings[,2]
   observation_names <- df_wide$SampleID
   observation_colors <- df_wide$pca_colors
   scores <- cbind(autoX, autoY)
-  
-  auto_plot <- ggplot(scores, aes(x = autoX, y = autoY)) + 
+
+  auto_plot <- ggplot(scores, aes(x = autoX, y = autoY)) +
     xlab('Encoding 1') + ylab('Encoding 2')
-  
+
   if (label_samples) {
-    auto_plot <- auto_plot + 
-      geom_text(aes(label = observation_names, color = observation_colors), size = 3) + 
+    auto_plot <- auto_plot +
+      geom_text(aes(label = observation_names, color = observation_colors), size = 3) +
       labs(color = color_g)
   }
   else {
-    auto_plot <- auto_plot + 
-      geom_point(aes(color = observation_colors), size = 2.5) + 
+    auto_plot <- auto_plot +
+      geom_point(aes(color = observation_colors), size = 2.5) +
       labs(color = color_g)
   }
-  
+
   auto_plot <- auto_plot + set_plot_theme() + olink_color_discrete(...)
   return(auto_plot)
 }
