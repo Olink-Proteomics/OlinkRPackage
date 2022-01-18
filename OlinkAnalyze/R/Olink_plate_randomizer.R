@@ -151,7 +151,12 @@ generatePlateHolder <- function(n.plates,n.spots,n.samples, PlateSize){
 
 #' Randomly assign samples to plates
 #'
-#' Samples can be randomly assigned to plates using base::sample with an option to keep Subjects on the same plate.  Olink Data Science no longer recommends forced balanced randomization considering other clinical variables.
+#' Generates a scheme for how to plate samples with an option to keep subjects on the same plate.
+#'
+#' Variables of interest should if possible be randomized across plates to avoid confounding with potential plate effects. In the case multiple samples per subject (e.g. in longitudinal studies), Olink recommends keeping each subject on the same plate. This can be achieved using the SubjectColumn argument.
+#'
+#' The generated plating scheme can be visualized using the function \code{\link{olink_displayPlateLayout}}.
+#' How well the relevant variables are randomized can be visualized using the function \code{\link{olink_displayPlateDistributions}}.
 #' @param Manifest tibble/data frame in long format containing all sample ID's. Sample ID column must be named SampleID.
 #' @param PlateSize Integer. Either 96 or 48. 96 is default.
 #' @param SubjectColumn (Optional) Column name of the subject ID column. Cannot contain missings. If provided, subjects are kept on the same plate.

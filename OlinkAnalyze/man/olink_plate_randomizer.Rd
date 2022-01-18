@@ -30,7 +30,13 @@ olink_plate_randomizer(
 Tibble including SampleID, SubjectID etc. assigned to well positions.
 }
 \description{
-Samples can be randomly assigned to plates using base::sample with an option to keep Subjects on the same plate.  Olink Data Science no longer recommends forced balanced randomization considering other clinical variables.
+Generates a scheme for how to plate samples with an option to keep subjects on the same plate.
+}
+\details{
+Variables of interest should if possible be randomized across plates to avoid confounding with potential plate effects. In the case multiple samples per subject (e.g. in longitudinal studies), Olink recommends keeping each subject on the same plate. This can be achieved using the SubjectColumn argument.
+
+The generated plating scheme can be visualized using the function \code{\link{olink_displayPlateLayout}}.
+How well the relevant variables are randomized can be visualized using the function \code{\link{olink_displayPlateDistributions}}.
 }
 \examples{
 \donttest{randomized.manifest <- olink_plate_randomizer(manifest, seed=12345)}
