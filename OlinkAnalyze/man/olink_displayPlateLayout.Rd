@@ -20,7 +20,7 @@ Displays each plate in a facet with cells colored by the given variable using gg
 }
 \examples{
 \donttest{randomized.manifest <- olink_plate_randomizer(manifest)}
-\donttest{displayPlateLayout(data=randomized.manifest,fill.color="Site")}
+\donttest{olink_displayPlateLayout(data=randomized.manifest,fill.color="Site")}
 }
 \keyword{ggplot}
 \keyword{plates,}

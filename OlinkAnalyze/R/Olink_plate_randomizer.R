@@ -9,7 +9,7 @@
 #' @export
 #' @examples
 #' \donttest{randomized.manifest <- olink_plate_randomizer(manifest)}
-#' \donttest{displayPlateLayout(data=randomized.manifest,fill.color="Site")}
+#' \donttest{olink_displayPlateLayout(data=randomized.manifest,fill.color="Site")}
 #' @importFrom magrittr %>%
 #' @importFrom dplyr n filter select mutate
 #' @importFrom ggplot2 ggplot geom_tile facet_wrap scale_fill_manual labs scale_x_discrete geom_text
@@ -78,7 +78,7 @@ olink_displayPlateLayout <- function(data,fill.color,PlateSize = 96, include.lab
 #' @export
 #' @examples
 #' \donttest{randomized.manifest <- olink_plate_randomizer(manifest)}
-#' \donttest{displayPlateDistributions(data=randomized.manifest,fill.color="Site")}
+#' \donttest{olink_displayPlateDistributions(data=randomized.manifest,fill.color="Site")}
 #' @importFrom magrittr %>%
 #' @importFrom dplyr group_by tally ungroup mutate summarize as_tibble arrange
 #' @importFrom ggplot2 ggplot aes theme labs geom_bar element_text
@@ -167,9 +167,26 @@ generatePlateHolder <- function(n.plates,n.spots,n.samples, PlateSize){
 #' @keywords randomized plates
 #' @export
 #' @examples
-#' \donttest{randomized.manifest <- olink_plate_randomizer(manifest, seed=12345)}
-#' \donttest{randomized.manifest <- olink_plate_randomizer(manifest,SubjectColumn="SubjectID",
-#'                                                         available.spots=c(88,88), seed=12345)}
+#' \donttest{
+#' #Generate randomization scheme using complete randomization
+#' randomized.manifest_a <- olink_plate_randomizer(manifest, seed=12345)
+#'
+#' #Generate randomization scheme that keeps subjects on the same plate
+#' randomized.manifest_b <- olink_plate_randomizer(manifest,SubjectColumn="SubjectID",
+#'                                                         available.spots=c(88,88), seed=12345)
+#'
+#' #Visualize the generated plate layouts
+#' olink_displayPlateLayout(randomized.manifest_a, fill.color = 'Site')
+#' olink_displayPlateLayout(randomized.manifest_a, fill.color = 'SubjectID')
+#' olink_displayPlateLayout(randomized.manifest_b, fill.color = 'Site')
+#' olink_displayPlateLayout(randomized.manifest_b, fill.color = 'SubjectID')
+#'
+#' #Validate that sites are properly randomized
+#' olink_displayPlateDistributions(randomized.manifest_a, fill.color = 'Site')
+#' olink_displayPlateDistributions(randomized.manifest_b, fill.color = 'Site')
+#' }
+#'
+#'
 #' @importFrom magrittr %>%
 #' @importFrom dplyr as_tibble mutate arrange left_join group_by ungroup select
 #' @importFrom tibble is_tibble
