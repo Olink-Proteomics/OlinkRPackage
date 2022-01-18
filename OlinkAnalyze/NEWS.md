@@ -1,3 +1,12 @@
+# OlinkAnalyze 2.0.1
+
+## Bug Fixes
+
+* Remove hexagon from Readme (@kathy-nevola, #86)
+* Replace OlinkAnalyze with Olink® Analyze (@kathy-nevola, #86)
+* Add Ola Caster to author list
+* Update documentation to change olinkR to Olink Analyze (@jrguess, #89)
+
 # OlinkAnalyze 2.0.0
 
 ## Major Changes
