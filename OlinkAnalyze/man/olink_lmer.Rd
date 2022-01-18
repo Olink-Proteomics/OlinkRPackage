@@ -30,7 +30,7 @@ Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be i
 
 \item{return.covariates}{Boolean. Default: False. Returns results for the covariates. Note: Adjusted p-values will be NA for the covariates.}
 
-\item{verbose}{Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
+\item{verbose}{Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
 }
 \value{
 A tibble containing the results of fitting the linear mixed effects model to every protein by OlinkID, ordered by ascending p-value.
@@ -49,7 +49,7 @@ Crossed analysis, i.e. A*B formula notation, is inferred from the variable argum
 \item c('A:B', 'B') or c('A:B', 'A')
 }
 Inference is specified in a message if verbose = T. \cr
-For covariates, crossed analyses need to be specified explicity, i.e. two main effects will not be expaned with a c('A','B') notation. Main effects present in the variable takes precedence. \cr
+For covariates, crossed analyses need to be specified explicitly, i.e. two main effects will not be expanded with a c('A','B') notation. Main effects present in the variable takes precedence. \cr
 The random variable only takes main effect(s). \cr
 The formula notation of the final model is specified in a message if verbose = T. \cr\cr
 Output p-values are adjusted by stats::p.adjust according to the Benjamini-Hochberg method (“fdr”).

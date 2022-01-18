@@ -47,7 +47,7 @@ Crossed analysis, i.e. A*B formula notation, is inferred from the variable argum
 \item c('A: B', 'B') or c('A: B', 'A')
 }
 Inference is specified in a message if verbose = T. \cr
-For covariates, crossed analyses need to be specified explicity, i.e. two main effects will not be expaned with a c('A','B') notation. Main effects present in the variable takes precedence.
+For covariates, crossed analyses need to be specified explicitly, i.e. two main effects will not be expanded with a c('A','B') notation. Main effects present in the variable takes precedence.
 The formula notation of the final model is specified in a message if verbose = T. \cr\cr
 Adjusted p-values are calculated by stats::p.adjust according to the Benjamini & Hochberg (1995) method (“fdr”).
 The threshold is determined by logic evaluation of Adjusted_pval < 0.05. Covariates are not included in the p-value adjustment.

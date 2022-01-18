@@ -13,7 +13,7 @@
 #' \item c('A:B', 'B') or c('A:B', 'A')
 #'}
 #'Inference is specified in a message if verbose = T. \cr
-#'For covariates, crossed analyses need to be specified explicity, i.e. two main effects will not be expaned with a c('A','B') notation. Main effects present in the variable takes precedence. \cr
+#'For covariates, crossed analyses need to be specified explicitly, i.e. two main effects will not be expanded with a c('A','B') notation. Main effects present in the variable takes precedence. \cr
 #'The random variable only takes main effect(s). \cr
 #'The formula notation of the final model is specified in a message if verbose = T. \cr\cr
 #'Output p-values are adjusted by stats::p.adjust according to the Benjamini-Hochberg method (“fdr”).
@@ -28,7 +28,7 @@
 #' @param covariates Single character value or character array. Default: NULL.
 #' Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be inferred from main effects.
 #' @param return.covariates Boolean. Default: False. Returns results for the covariates. Note: Adjusted p-values will be NA for the covariates.
-#' @param verbose Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
+#' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #'
 #' @return A tibble containing the results of fitting the linear mixed effects model to every protein by OlinkID, ordered by ascending p-value.
 #' @export
@@ -310,7 +310,7 @@ single_lmer <- function(data, formula_string){
 #' @param covariates Single character value or character array. Default: NULL.
 #' Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be inferred from main effects.
 #' @param mean_return Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = T and no adjustment is performed.
-#' @param verbose Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
+#' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #' @param variable Single character value or character array.
 #' Variable(s) to test. If length > 1, the included variable names will be used in crossed analyses .
 #' Also takes ':' or '*' notation.
@@ -538,7 +538,7 @@ single_posthoc <- function(data, formula_string, effect, mean_return){
 #' Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be inferred from main effects.
 #' @param x_axis_variable Character. Which main effect to use as x-axis in the plot.
 #' @param col_variable Character. If provided, the interaction effect col_variable:x_axis_variable will be plotted with x_axis_variable on the x-axis and col_variable as color.
-#' @param verbose Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
+#' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #' @param ... coloroption for color ordering
 #'
 #' @return A list of objects of class "ggplot"

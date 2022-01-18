@@ -33,7 +33,7 @@
 * `read_NPX` now converts Panel Names to Sentence case except Roman Numerals (@kathy-nevola, #44)
 * Output order of `olink_bridgeselector()` is now randomized (@marisand, #60)
 * PlateSize argument was added to `displayPlateLayout()` and `olink_plate_randomizer` for T48 and T96. Hardcoded sizes have been removed. (@marisand, #47)
-* Changed `olink_pal()` to have gray instread of light blue (@marisand, #22)
+* Changed `olink_pal()` to have gray instead of light blue (@marisand, #22)
 
 ## Bug Fixes
 
