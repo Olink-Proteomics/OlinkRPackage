@@ -1,3 +1,10 @@
+## Resubmission
+This is a resubmission. In this version I have:
+
+* Removed the word 'Package' from the start of the Package title and description.
+* Added descriptive details about the packages functionality and methods in the description text.
+* Removed the License file and reference to the license in the description file.
+
 ## R CMD check results
 There were no ERRORs or WARNINGs.
 
