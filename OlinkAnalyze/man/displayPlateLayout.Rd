@@ -4,7 +4,7 @@
 \alias{displayPlateLayout}
 \title{Plot all plates colored by a variable}
 \usage{
-displayPlateLayout(data, fill.color, PlateSize = 96, include.label = F)
+displayPlateLayout(data, fill.color, PlateSize = 96, include.label = FALSE)
 }
 \arguments{
 \item{data}{tibble/data frame in long format returned from the olink_plate_randomizer function.}
@@ -20,7 +20,7 @@ Displays each plate in a facet with cells colored by the given variable using gg
 }
 \examples{
 \donttest{randomized.manifest <- olink_plate_randomizer(manifest)}
-\donttest{displayPlateLayout(data=randomized.manifest,fill.color="Site")}
+\donttest{displayPlateLayout(data = randomized.manifest, fill.color="Site")}
 }
 \keyword{ggplot}
 \keyword{plates,}

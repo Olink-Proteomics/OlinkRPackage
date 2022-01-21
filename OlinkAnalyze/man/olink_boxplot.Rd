@@ -8,7 +8,7 @@ olink_boxplot(
   df,
   variable,
   olinkid_list,
-  verbose = F,
+  verbose = FALSE,
   number_of_proteins_per_plot = 6,
   ...
 )

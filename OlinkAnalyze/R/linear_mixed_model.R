@@ -2,8 +2,8 @@
 #'
 #'Fits a linear mixed effects model for every protein (by OlinkID) in every panel, using lmerTest::lmer and stats::anova.
 #'The function handles both factor and numerical variables and/or covariates. \cr\cr
-#'Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a messsage if verbose = T).
-#'Character columns in the input dataframe are automatically converted to factors (specified in a message if verbose = T).
+#'Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a messsage if verbose = TRUE).
+#'Character columns in the input dataframe are automatically converted to factors (specified in a message if verbose = TRUE).
 #'Numerical variables are not converted to factors.
 #'If a numerical variable is to be used as a factor, this conversion needs to be done on the dataframe before the function call. \cr\cr
 #'Crossed analysis, i.e. A*B formula notation, is inferred from the variable argument in the following cases: \cr
@@ -12,10 +12,10 @@
 #' \item c('A:B')
 #' \item c('A:B', 'B') or c('A:B', 'A')
 #'}
-#'Inference is specified in a message if verbose = T. \cr
+#'Inference is specified in a message if verbose = TRUE. \cr
 #'For covariates, crossed analyses need to be specified explicity, i.e. two main effects will not be expaned with a c('A','B') notation. Main effects present in the variable takes precedence. \cr
 #'The random variable only takes main effect(s). \cr
-#'The formula notation of the final model is specified in a message if verbose = T. \cr\cr
+#'The formula notation of the final model is specified in a message if verbose = TRUE. \cr\cr
 #'Output p-values are adjusted by stats::p.adjust according to the Benjamini-Hochberg method (“fdr”).
 #'Adjusted p-values are logically evaluated towards adjusted p-value<0.05.
 #'
@@ -52,8 +52,8 @@ olink_lmer <- function(df,
                        outcome="NPX",
                        random,
                        covariates = NULL,
-                       return.covariates=F,
-                       verbose=T
+                       return.covariates = FALSE,
+                       verbose = TRUE
 ) {
 
   if(missing(df) | missing(variable) | missing(random)){
@@ -111,7 +111,7 @@ olink_lmer <- function(df,
       warning(paste0('The assays ',
                      paste(all_nas, collapse = ', '),
                      ' have only NA:s. They will not be tested.'),
-              call. = F)
+              call. = FALSE)
 
     }
 
@@ -163,12 +163,12 @@ olink_lmer <- function(df,
                        ' has only NA:s in atleast one level of ',
                        effect,
                        '. It will not be tested.'),
-                call. = F)
+                call. = FALSE)
       }
 
       number_of_samples_w_more_than_one_level <- df %>%
         dplyr::group_by(SampleID, Index) %>%
-        dplyr::summarise(n_levels = n_distinct(!!rlang::ensym(effect), na.rm = T)) %>%
+        dplyr::summarise(n_levels = n_distinct(!!rlang::ensym(effect), na.rm = TRUE)) %>%
         dplyr::ungroup() %>%
         dplyr::filter(n_levels > 1) %>%
         nrow(.)
@@ -268,15 +268,15 @@ olink_lmer <- function(df,
 single_lmer <- function(data, formula_string){
 
   out.model <- tryCatch(lmerTest::lmer(as.formula(formula_string),
-                                       data=data,
-                                       REML=F,
+                                       data = data,
+                                       REML = FALSE,
                                        control = lme4::lmerControl(check.conv.singular = "ignore")),
                         warning = function(w){
                           return(
                             lmerTest::lmer(as.formula(formula_string),
-                                           data=data,
-                                           REML=F,
-                                           control= lme4::lmerControl(optimizer = "Nelder_Mead",
+                                           data = data,
+                                           REML = FALSE,
+                                           control = lme4::lmerControl(optimizer = "Nelder_Mead",
                                                                check.conv.singular = "ignore"))
                           )
 
@@ -309,7 +309,7 @@ single_lmer <- function(data, formula_string){
 #' @param random Single character value or character array.
 #' @param covariates Single character value or character array. Default: NULL.
 #' Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be inferred from main effects.
-#' @param mean_return Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = T and no adjustment is performed.
+#' @param mean_return Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = TRUE and no adjustment is performed.
 #' @param verbose Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #' @param variable Single character value or character array.
 #' Variable(s) to test. If length > 1, the included variable names will be used in crossed analyses .
@@ -351,8 +351,8 @@ olink_lmer_posthoc <- function(df,
                                outcome="NPX",
                                random,
                                covariates = NULL,
-                               mean_return=F,
-                               verbose=T
+                               mean_return = FALSE,
+                               verbose = TRUE
 ){
 
 
@@ -493,9 +493,9 @@ single_posthoc <- function(data, formula_string, effect, mean_return){
                                 specs=as.formula(paste0("pairwise~", paste(effect,collapse="+"))),
                                 cov.reduce = function(x) round(c(mean(x),mean(x)+sd(x)),4),
                                 lmer.df="satterthwaite",
-                                infer = c(T,T), 
+                                infer = c(TRUE, TRUE),
                                 adjust = 'tukey')
-  
+
   if(mean_return){
     tmp <- unique(unlist(strsplit(effect,":")))
     return(as_tibble(the_model$emmeans) %>%
@@ -581,7 +581,7 @@ olink_lmer_plot <- function(df,
                             x_axis_variable,
                             col_variable = NULL,
                             number_of_proteins_per_plot = 6,
-                            verbose=F,
+                            verbose = FALSE,
                             ...
                             ){
 
@@ -656,7 +656,7 @@ olink_lmer_plot <- function(df,
                                  olinkid_list = olinkid_list,
                                  covariates=covariates,
                                  effect = current_fixed_effect,
-                                 mean_return = T,
+                                 mean_return = TRUE,
                                  verbose=verbose) %>%
     dplyr::mutate(Name_Assay = paste0(Assay,"_",OlinkID))
 
