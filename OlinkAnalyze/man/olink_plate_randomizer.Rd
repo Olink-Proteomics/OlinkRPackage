@@ -30,12 +30,35 @@ olink_plate_randomizer(
 Tibble including SampleID, SubjectID etc. assigned to well positions.
 }
 \description{
-Samples can be randomly assigned to plates using base::sample with an option to keep Subjects on the same plate.  Olink Data Science no longer recommends forced balanced randomization considering other clinical variables.
+Generates a scheme for how to plate samples with an option to keep subjects on the same plate.
+}
+\details{
+Variables of interest should if possible be randomized across plates to avoid confounding with potential plate effects. In the case multiple samples per subject (e.g. in longitudinal studies), Olink recommends keeping each subject on the same plate. This can be achieved using the SubjectColumn argument.
+
+The generated plating scheme can be visualized using the function \code{\link{olink_displayPlateLayout}}.
+How well the relevant variables are randomized can be visualized using the function \code{\link{olink_displayPlateDistributions}}.
 }
 \examples{
-\donttest{randomized.manifest <- olink_plate_randomizer(manifest, seed=12345)}
-\donttest{randomized.manifest <- olink_plate_randomizer(manifest,SubjectColumn="SubjectID",
-                                                        available.spots=c(88,88), seed=12345)}
+\donttest{
+#Generate randomization scheme using complete randomization
+randomized.manifest_a <- olink_plate_randomizer(manifest, seed=12345)
+
+#Generate randomization scheme that keeps subjects on the same plate
+randomized.manifest_b <- olink_plate_randomizer(manifest,SubjectColumn="SubjectID",
+                                                        available.spots=c(88,88), seed=12345)
+
+#Visualize the generated plate layouts
+olink_displayPlateLayout(randomized.manifest_a, fill.color = 'Site')
+olink_displayPlateLayout(randomized.manifest_a, fill.color = 'SubjectID')
+olink_displayPlateLayout(randomized.manifest_b, fill.color = 'Site')
+olink_displayPlateLayout(randomized.manifest_b, fill.color = 'SubjectID')
+
+#Validate that sites are properly randomized
+olink_displayPlateDistributions(randomized.manifest_a, fill.color = 'Site')
+olink_displayPlateDistributions(randomized.manifest_b, fill.color = 'Site')
+}
+
+
 }
 \keyword{plates}
 \keyword{randomized}

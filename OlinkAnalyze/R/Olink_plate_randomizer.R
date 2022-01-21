@@ -9,12 +9,12 @@
 #' @export
 #' @examples
 #' \donttest{randomized.manifest <- olink_plate_randomizer(manifest)}
-#' \donttest{displayPlateLayout(data=randomized.manifest,fill.color="Site")}
+#' \donttest{olink_displayPlateLayout(data=randomized.manifest,fill.color="Site")}
 #' @importFrom magrittr %>%
 #' @importFrom dplyr n filter select mutate
 #' @importFrom ggplot2 ggplot geom_tile facet_wrap scale_fill_manual labs scale_x_discrete geom_text
 
-displayPlateLayout <- function(data,fill.color,PlateSize = 96, include.label=F){
+olink_displayPlateLayout <- function(data,fill.color,PlateSize = 96, include.label=F){
 
   if(!PlateSize %in% c(48,96)){
     stop('Plate size needs to be either 48 or 96.')
@@ -78,13 +78,13 @@ displayPlateLayout <- function(data,fill.color,PlateSize = 96, include.label=F){
 #' @export
 #' @examples
 #' \donttest{randomized.manifest <- olink_plate_randomizer(manifest)}
-#' \donttest{displayPlateDistributions(data=randomized.manifest,fill.color="Site")}
+#' \donttest{olink_displayPlateDistributions(data=randomized.manifest,fill.color="Site")}
 #' @importFrom magrittr %>%
 #' @importFrom dplyr group_by tally ungroup mutate summarize as_tibble arrange
 #' @importFrom ggplot2 ggplot aes theme labs geom_bar element_text
 
 
-displayPlateDistributions <- function(data,fill.color){
+olink_displayPlateDistributions <- function(data,fill.color){
 
   data$group.var <- data[[fill.color]]
 
@@ -151,7 +151,12 @@ generatePlateHolder <- function(n.plates,n.spots,n.samples, PlateSize){
 
 #' Randomly assign samples to plates
 #'
-#' Samples can be randomly assigned to plates using base::sample with an option to keep Subjects on the same plate.  Olink Data Science no longer recommends forced balanced randomization considering other clinical variables. 
+#' Generates a scheme for how to plate samples with an option to keep subjects on the same plate.
+#'
+#' Variables of interest should if possible be randomized across plates to avoid confounding with potential plate effects. In the case multiple samples per subject (e.g. in longitudinal studies), Olink recommends keeping each subject on the same plate. This can be achieved using the SubjectColumn argument.
+#'
+#' The generated plating scheme can be visualized using the function \code{\link{olink_displayPlateLayout}}.
+#' How well the relevant variables are randomized can be visualized using the function \code{\link{olink_displayPlateDistributions}}.
 #' @param Manifest tibble/data frame in long format containing all sample ID's. Sample ID column must be named SampleID.
 #' @param PlateSize Integer. Either 96 or 48. 96 is default.
 #' @param SubjectColumn (Optional) Column name of the subject ID column. Cannot contain missings. If provided, subjects are kept on the same plate.
@@ -162,9 +167,26 @@ generatePlateHolder <- function(n.plates,n.spots,n.samples, PlateSize){
 #' @keywords randomized plates
 #' @export
 #' @examples
-#' \donttest{randomized.manifest <- olink_plate_randomizer(manifest, seed=12345)}
-#' \donttest{randomized.manifest <- olink_plate_randomizer(manifest,SubjectColumn="SubjectID",
-#'                                                         available.spots=c(88,88), seed=12345)}
+#' \donttest{
+#' #Generate randomization scheme using complete randomization
+#' randomized.manifest_a <- olink_plate_randomizer(manifest, seed=12345)
+#'
+#' #Generate randomization scheme that keeps subjects on the same plate
+#' randomized.manifest_b <- olink_plate_randomizer(manifest,SubjectColumn="SubjectID",
+#'                                                         available.spots=c(88,88), seed=12345)
+#'
+#' #Visualize the generated plate layouts
+#' olink_displayPlateLayout(randomized.manifest_a, fill.color = 'Site')
+#' olink_displayPlateLayout(randomized.manifest_a, fill.color = 'SubjectID')
+#' olink_displayPlateLayout(randomized.manifest_b, fill.color = 'Site')
+#' olink_displayPlateLayout(randomized.manifest_b, fill.color = 'SubjectID')
+#'
+#' #Validate that sites are properly randomized
+#' olink_displayPlateDistributions(randomized.manifest_a, fill.color = 'Site')
+#' olink_displayPlateDistributions(randomized.manifest_b, fill.color = 'Site')
+#' }
+#'
+#'
 #' @importFrom magrittr %>%
 #' @importFrom dplyr as_tibble mutate arrange left_join group_by ungroup select
 #' @importFrom tibble is_tibble
