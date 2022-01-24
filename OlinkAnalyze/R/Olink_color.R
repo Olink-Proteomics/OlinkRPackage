@@ -4,7 +4,7 @@
 #' @param coloroption string, one or more of the following:
 #' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'lightblue', 'darkblue', 'purple', 'pink')
 #' @return Palette hex codes for colors
-#' @keywords crispy, Olink
+#' @keywords color palette Olink
 #' @examples
 #'
 #' library(scales)

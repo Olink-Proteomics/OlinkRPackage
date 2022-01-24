@@ -26,7 +26,7 @@
 #' @param verbose Logical. Whether warnings about the number of samples and/or assays dropped or imputed should be printed to the console.
 #' @param ... coloroption passed to specify color order.
 #' @return A list of objects of class "ggplot"
-#' @keywords NPX, PCA
+#' @keywords NPX PCA
 #' @export
 #' @examples
 #' \donttest{
