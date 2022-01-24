@@ -1,9 +1,9 @@
 test_that("Data loads correctly with 'read_NPX()'", {
   #Read data
-  npx_file <- system.file("extdata", "npx_data1.xlsx", package = "OlinkAnalyze", mustWork = T)
-  manifest_file <- system.file("extdata", "npx_data1_meta.csv", package = "OlinkAnalyze", mustWork = T)
+  npx_file <- system.file("extdata", "npx_data1.xlsx", package = "OlinkAnalyze", mustWork = TRUE)
+  manifest_file <- system.file("extdata", "npx_data1_meta.csv", package = "OlinkAnalyze", mustWork = TRUE)
   df_1 <- read_NPX(filename = npx_file) # load dataset 1
-  manifest_1 <- read.delim(manifest_file, header = T, sep = ';') # load manifest 1
+  manifest_1 <- read.delim(manifest_file, header = TRUE, sep = ';') # load manifest 1
 
   #NPX read ok?
   expect(exists("df_1"), failure_message = "read_NPX failed on dataset 1")

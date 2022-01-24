@@ -87,16 +87,16 @@ olink_qc_plot <- function(df,
     dplyr::mutate(QC_Warning = dplyr::if_else(all(toupper(QC_Warning) == 'PASS'),
                                               'Pass',
                                               'Warning')) %>%
-    dplyr::mutate(IQR = IQR(NPX, na.rm = T),
-                  sample_median = median(NPX, na.rm = T)) %>%
+    dplyr::mutate(IQR = IQR(NPX, na.rm = TRUE),
+                  sample_median = median(NPX, na.rm = TRUE)) %>%
     dplyr::ungroup() %>%
     dplyr::select(SampleID, Index, Panel, IQR, sample_median, !!rlang::ensym(color_g)) %>%
     dplyr::distinct() %>%
     dplyr::group_by(Panel) %>%
-    dplyr::mutate(median_low = mean(sample_median, na.rm = T) - median_outlierDef*sd(sample_median, na.rm = T),
-                  median_high = mean(sample_median, na.rm = T) + median_outlierDef*sd(sample_median, na.rm = T),
-                  iqr_low = mean(IQR, na.rm = T) - IQR_outlierDef*sd(IQR, na.rm = T),
-                  iqr_high = mean(IQR, na.rm = T) + IQR_outlierDef*sd(IQR, na.rm = T)) %>%
+    dplyr::mutate(median_low = mean(sample_median, na.rm = TRUE) - median_outlierDef*sd(sample_median, na.rm = TRUE),
+                  median_high = mean(sample_median, na.rm = TRUE) + median_outlierDef*sd(sample_median, na.rm = TRUE),
+                  iqr_low = mean(IQR, na.rm = TRUE) - IQR_outlierDef*sd(IQR, na.rm = TRUE),
+                  iqr_high = mean(IQR, na.rm = TRUE) + IQR_outlierDef*sd(IQR, na.rm = TRUE)) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(Outlier = dplyr::if_else(sample_median < median_high &
                                              sample_median > median_low &

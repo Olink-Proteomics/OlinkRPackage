@@ -69,7 +69,7 @@ olink_volcano_plot <- function (p.val_tbl, x_lab = "Estimate", olinkid_list = NU
     ggplot2::geom_point() +
     ggplot2::labs(x = x_lab, y = "-log10(p-value)") +
     ggrepel::geom_label_repel(data = subset(p.val_tbl, OlinkID %in% olinkid_list),
-                              ggplot2::aes(label = Assay), box.padding = 1, show.legend = F) +
+                              ggplot2::aes(label = Assay), box.padding = 1, show.legend = FALSE) +
     ggplot2::geom_hline(yintercept = -log10(0.05), linetype="dotted") +
     OlinkAnalyze::set_plot_theme() +
     OlinkAnalyze::olink_color_discrete(...)

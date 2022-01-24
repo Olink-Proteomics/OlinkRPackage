@@ -117,7 +117,7 @@ olink_pca_plot <- function (df,
     stop('To label outliers, both outlierDefX and outlierDefY have to be specified as numerical values')
   }
 
-  #If outlierLines == T, both outlierDefX and outlierDefY have to be specified
+  #If outlierLines == TRUE, both outlierDefX and outlierDefY have to be specified
   if(outlierLines){
     if(!all(is.numeric(outlierDefX), is.numeric(outlierDefY))){
       stop('outlierLines requested but boundaries not specified. To draw lines, both outlierDefX and outlierDefY have to be specified as numerical values')
@@ -154,7 +154,7 @@ olink_pca_plot <- function (df,
       g
     })
     names(plotList) <- unique(df$Panel)
-    if(!quiet) print(ggpubr::ggarrange(plotlist = plotList, common.legend = T))
+    if(!quiet) print(ggpubr::ggarrange(plotlist = plotList, common.legend = TRUE))
 
   } else{
     pca_plot <- olink_pca_plot.internal(df = df,
@@ -289,7 +289,7 @@ olink_pca_plot.internal <- function (df,
     }
 
     if(ncol(df_wide) < 4){
-      stop('Too many assays removed. Set drop_assays = F for imputation.')
+      stop('Too many assays removed. Set drop_assays = FALSE for imputation.')
     }
   }
 
@@ -307,7 +307,7 @@ olink_pca_plot.internal <- function (df,
 
     if(nrow(df_wide) < 2){
 
-      stop('Too many samples removed. Set drop_samples = F for imputation.')
+      stop('Too many samples removed. Set drop_samples = FALSE for imputation.')
     }
 
   }
@@ -434,10 +434,10 @@ olink_pca_plot.internal <- function (df,
   if(!is.na(outlierDefX) & !is.na(outlierDefY)){
     scores <- scores %>%
       tibble::rownames_to_column(var = 'SampleID') %>%
-      dplyr::mutate( PCX_low = mean(PCX, na.rm = T) - outlierDefX*sd(PCX, na.rm = T),
-                     PCX_high = mean(PCX, na.rm = T) + outlierDefX*sd(PCX, na.rm = T),
-                     PCY_low = mean(PCY, na.rm = T) - outlierDefY*sd(PCY, na.rm = T),
-                     PCY_high = mean(PCY, na.rm = T) + outlierDefY*sd(PCY, na.rm = T)) %>%
+      dplyr::mutate( PCX_low = mean(PCX, na.rm = TRUE) - outlierDefX*sd(PCX, na.rm = TRUE),
+                     PCX_high = mean(PCX, na.rm = TRUE) + outlierDefX*sd(PCX, na.rm = TRUE),
+                     PCY_low = mean(PCY, na.rm = TRUE) - outlierDefY*sd(PCY, na.rm = TRUE),
+                     PCY_high = mean(PCY, na.rm = TRUE) + outlierDefY*sd(PCY, na.rm = TRUE)) %>%
       dplyr::mutate(Outlier = dplyr::if_else(PCX < PCX_high &
                                                PCX > PCX_low &
                                                PCY > PCY_low &
