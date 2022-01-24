@@ -127,21 +127,37 @@ assignSubject2Plate <- function(plateMap,manifest,SubjectID){
 
 }
 
-generatePlateHolder <- function(n.plates,n.spots,n.samples, PlateSize){
+generatePlateHolder <- function(n.plates,n.spots,n.samples, PlateSize, wellsToUse){
   spots_per_plate <- PlateSize - 8
   number_of_cols_per_plate <- PlateSize/8
   if(n.plates!=length(n.spots)) stop("Vector of available spots must equal number of plates!")
   if(any(n.spots>spots_per_plate)) stop("Number of samples per plates cannot exceed 40 for T48 and 88 for T96!")
   if(sum(n.spots)<n.samples) stop("More samples than available spots! Double check your numbers!")
+  if(!missing(wellsToUse)){
+    if(length(n.spots) != length(wellsToUse)) stop("wellsToUse has ", length(wellsToUse), " entries and n.spots has ", length(n.spots), " entries. Double check your numbers!")
+    if((length(names(wellsToUse)) != length(wellsToUse)) | (class(wellsToUse) != 'list')) stop("wellsToUse must be a list with names corresponding to plates (\"Plate 1\" ... \"Plate n\")")
+    #Add check number of elements in each wellsToUse[[i]] and n.spots[i]. Or take n.spots from length(wellsToUse[[i]])? Would be less redundant
+  }
+
   full.row.col <- expand.grid(column=paste0("Column ",1:(number_of_cols_per_plate-1)),
                               row=LETTERS[1:8],
                               stringsAsFactors = TRUE) %>%
     dplyr::arrange(column,row)
+  full.row.col$well <- paste0(full.row.col$row, sub(pattern = '.* (.*)', replacement = '\\1', x = full.row.col$column))
+
   plates <- paste0("Plate ",1:n.plates)
   out <- data.frame(plate=NULL,column=NULL,row=NULL,stringsAsFactors = F)
   for(i in 1:n.plates){
-    hld <- cbind(plate=rep(paste0("Plate ",i),n.spots[i]),
-                 full.row.col[1:n.spots[i],])
+    if(missing(wellsToUse)){
+      hld <- cbind(plate=rep(paste0("Plate ",i), n.spots[i]),
+                   full.row.col[1:n.spots[i],])
+    }else{
+      # hld <- cbind(plate=rep(paste0("Plate ",i), n.spots[i]),
+      #              full.row.col[full.row.col$well %in% wellsToUse[[paste0("Plate ",i)]],])
+      hld <- cbind(plate=rep(paste0("Plate ",i), n.spots[i]),
+                   full.row.col[full.row.col$well %in% wellsToUse[[i]],])
+    }
+
     out <- rbind(out,hld)
   }
   return(out)
@@ -192,7 +208,7 @@ generatePlateHolder <- function(n.plates,n.spots,n.samples, PlateSize){
 #' @importFrom tibble is_tibble
 
 #Main randomization function
-olink_plate_randomizer <-function(Manifest, PlateSize = 96, SubjectColumn, iterations=500, available.spots, seed){
+olink_plate_randomizer <-function(Manifest, PlateSize = 96, SubjectColumn, iterations=500, available.spots, wellsToUse, seed){
 
   if(!"SampleID" %in% colnames(Manifest)) {
     stop("SampleID not found! Be sure the column of samples ID's is named 'SampleID'")
@@ -225,9 +241,9 @@ olink_plate_randomizer <-function(Manifest, PlateSize = 96, SubjectColumn, itera
 
   if(missing(available.spots)){
     PlatesNeeded <-ceiling(nrow(Manifest)/spots_per_plate)
-    all.plates <- generatePlateHolder(PlatesNeeded,rep(spots_per_plate,times=PlatesNeeded),n.samples=length(Manifest$SampleID), PlateSize = PlateSize)
+    all.plates <- generatePlateHolder(PlatesNeeded,rep(spots_per_plate,times=PlatesNeeded),n.samples=length(Manifest$SampleID), PlateSize = PlateSize, wellsToUse = wellsToUse)
   } else{
-    all.plates <- generatePlateHolder(length(available.spots),available.spots,n.samples=length(Manifest$SampleID), PlateSize = PlateSize)
+    all.plates <- generatePlateHolder(length(available.spots),available.spots,n.samples=length(Manifest$SampleID), PlateSize = PlateSize, wellsToUse = wellsToUse)
   }
 
   #Complete Random if subjectID not given
