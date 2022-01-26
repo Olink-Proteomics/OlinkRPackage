@@ -36,7 +36,7 @@ Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be i
 
 \item{mean_return}{Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = TRUE and no adjustment is performed.}
 
-\item{verbose}{Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
+\item{verbose}{Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
 }
 \value{
 A tibble containing the results of the pairwise comparisons between given variable levels for proteins specified in olinkid_list (or full df).
