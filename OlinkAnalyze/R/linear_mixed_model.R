@@ -28,7 +28,7 @@
 #' @param covariates Single character value or character array. Default: NULL.
 #' Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be inferred from main effects.
 #' @param return.covariates Boolean. Default: False. Returns results for the covariates. Note: Adjusted p-values will be NA for the covariates.
-#' @param verbose Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
+#' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #'
 #' @return A tibble containing the results of fitting the linear mixed effects model to every protein by OlinkID, ordered by ascending p-value.
 #' @export
@@ -538,7 +538,7 @@ single_posthoc <- function(data, formula_string, effect, mean_return){
 #' Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be inferred from main effects.
 #' @param x_axis_variable Character. Which main effect to use as x-axis in the plot.
 #' @param col_variable Character. If provided, the interaction effect col_variable:x_axis_variable will be plotted with x_axis_variable on the x-axis and col_variable as color.
-#' @param verbose Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
+#' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #' @param ... coloroption for color ordering
 #'
 #' @return A list of objects of class "ggplot"

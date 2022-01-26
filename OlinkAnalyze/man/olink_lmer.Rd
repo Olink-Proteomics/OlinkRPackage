@@ -30,7 +30,7 @@ Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be i
 
 \item{return.covariates}{Boolean. Default: False. Returns results for the covariates. Note: Adjusted p-values will be NA for the covariates.}
 
-\item{verbose}{Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
+\item{verbose}{Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
 }
 \value{
 A tibble containing the results of fitting the linear mixed effects model to every protein by OlinkID, ordered by ascending p-value.
