@@ -9,12 +9,12 @@
 #' @export
 #' @examples
 #' \donttest{randomized.manifest <- olink_plate_randomizer(manifest)}
-#' \donttest{displayPlateLayout(data=randomized.manifest,fill.color="Site")}
+#' \donttest{displayPlateLayout(data = randomized.manifest, fill.color="Site")}
 #' @importFrom magrittr %>%
 #' @importFrom dplyr n filter select mutate
 #' @importFrom ggplot2 ggplot geom_tile facet_wrap scale_fill_manual labs scale_x_discrete geom_text
 
-displayPlateLayout <- function(data,fill.color,PlateSize = 96, include.label=F){
+displayPlateLayout <- function(data, fill.color, PlateSize = 96, include.label=FALSE){
 
   if(!PlateSize %in% c(48,96)){
     stop('Plate size needs to be either 48 or 96.')
@@ -138,7 +138,7 @@ generatePlateHolder <- function(n.plates,n.spots,n.samples, PlateSize){
                               stringsAsFactors = TRUE) %>%
     dplyr::arrange(column,row)
   plates <- paste0("Plate ",1:n.plates)
-  out <- data.frame(plate=NULL,column=NULL,row=NULL,stringsAsFactors = F)
+  out <- data.frame(plate = NULL, column = NULL, row = NULL, stringsAsFactors = FALSE)
   for(i in 1:n.plates){
     hld <- cbind(plate=rep(paste0("Plate ",i),n.spots[i]),
                  full.row.col[1:n.spots[i],])
@@ -151,7 +151,7 @@ generatePlateHolder <- function(n.plates,n.spots,n.samples, PlateSize){
 
 #' Randomly assign samples to plates
 #'
-#' Samples can be randomly assigned to plates using base::sample with an option to keep Subjects on the same plate.  Olink Data Science no longer recommends forced balanced randomization considering other clinical variables. 
+#' Samples can be randomly assigned to plates using base::sample with an option to keep Subjects on the same plate.  Olink Data Science no longer recommends forced balanced randomization considering other clinical variables.
 #' @param Manifest tibble/data frame in long format containing all sample ID's. Sample ID column must be named SampleID.
 #' @param PlateSize Integer. Either 96 or 48. 96 is default.
 #' @param SubjectColumn (Optional) Column name of the subject ID column. Cannot contain missings. If provided, subjects are kept on the same plate.
@@ -239,7 +239,7 @@ olink_plate_randomizer <-function(Manifest, PlateSize = 96, SubjectColumn, itera
         } else if(is.character(all.plates.tmp)){
           passed <- FALSE
           break}
-        passed <- T
+        passed <- TRUE
       }
 
       if(passed){

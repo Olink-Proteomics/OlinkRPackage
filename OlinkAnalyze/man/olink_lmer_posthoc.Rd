@@ -12,8 +12,8 @@ olink_lmer_posthoc(
   outcome = "NPX",
   random,
   covariates = NULL,
-  mean_return = F,
-  verbose = T
+  mean_return = FALSE,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -34,7 +34,7 @@ Also takes ':' or '*' notation.}
 \item{covariates}{Single character value or character array. Default: NULL.
 Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be inferred from main effects.}
 
-\item{mean_return}{Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = T and no adjustment is performed.}
+\item{mean_return}{Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = TRUE and no adjustment is performed.}
 
 \item{verbose}{Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
 }

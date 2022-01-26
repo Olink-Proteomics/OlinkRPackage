@@ -14,7 +14,7 @@ olink_lmer_plot(
   x_axis_variable,
   col_variable = NULL,
   number_of_proteins_per_plot = 6,
-  verbose = F,
+  verbose = FALSE,
   ...
 )
 }

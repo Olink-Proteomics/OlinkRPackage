@@ -5,12 +5,12 @@ load(refRes_file)
 
 pca_plot <- npx_data1 %>%
   mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
-  olink_pca_plot(quiet = T)
+  olink_pca_plot(quiet = TRUE)
 
 pca_plot_treatCol <- npx_data1 %>%
   mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
   filter(!is.na(Treatment)) %>% #Or else, a warning shows up in the test results
-  olink_pca_plot(color_g = 'Treatment', quiet = T)
+  olink_pca_plot(color_g = 'Treatment', quiet = TRUE)
 
 pca_plot_treatCol_topLoadings <- npx_data1 %>%
   mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
@@ -19,17 +19,17 @@ pca_plot_treatCol_topLoadings <- npx_data1 %>%
                  loadings_list = {ref_results$t.test_results %>%
                      head(5) %>%
                      pull(OlinkID)},
-                 quiet = T)
+                 quiet = TRUE)
 
 #PCA by panel
 pca_plot_byPanel <- npx_data1 %>%
   mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
-  olink_pca_plot(byPanel = T, quiet = T)
+  olink_pca_plot(byPanel = TRUE, quiet = TRUE)
 
 #Label outliers
 pca_plot_byPanel_outliers <- npx_data1 %>%
   mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
-  olink_pca_plot(byPanel = T, outlierDefX = 4, outlierDefY = 2.5, quiet = T)
+  olink_pca_plot(byPanel = TRUE, outlierDefX = 4, outlierDefY = 2.5, quiet = TRUE)
 outliers <- lapply(pca_plot_byPanel_outliers, function(x){x$data}) %>%
   bind_rows() %>%
   filter(Outlier == 1)
@@ -41,7 +41,7 @@ test_that("olink_pca_plot works", {
     expect_warning(
       pca_plot_drop <- npx_data1 %>%
       mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
-      olink_pca_plot(drop_assays = TRUE, drop_samples = TRUE, quiet = T)
+      olink_pca_plot(drop_assays = TRUE, drop_samples = TRUE, quiet = TRUE)
     )
   )
 

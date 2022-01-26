@@ -174,10 +174,10 @@ olink_ttest <- function(df, variable, pair_id, ...){
     p.val <- df %>%
       dplyr::filter(!(OlinkID %in% all_nas)) %>%
       dplyr::filter(!(OlinkID %in% nas_in_level)) %>%
-      dplyr::select(dplyr::all_of(c("OlinkID","UniProt","Assay","Panel","NPX",variable,pair_id))) %>%
-      tidyr::pivot_wider(names_from=dplyr::all_of(variable),values_from="NPX") %>%
+      dplyr::select(dplyr::all_of(c("OlinkID", "UniProt", "Assay", "Panel", "NPX", variable, pair_id))) %>%
+      tidyr::pivot_wider(names_from = dplyr::all_of(variable), values_from = "NPX") %>%
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
-      dplyr::do(broom::tidy(t.test(x=.[[var_levels[1]]],y=.[[var_levels[2]]],paired=T, ...))) %>%
+      dplyr::do(broom::tidy(t.test(x = .[[var_levels[1]]], y = .[[var_levels[2]]], paired = TRUE, ...))) %>%
       dplyr::ungroup() %>%
       dplyr::mutate(Adjusted_pval = p.adjust(p.value, method = "fdr")) %>%
       dplyr::mutate(Threshold = ifelse(Adjusted_pval < 0.05, "Significant", "Non-significant")) %>%
