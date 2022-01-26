@@ -5,7 +5,7 @@
 #' @param fill.color Column name to be used as coloring variable for wells.
 #' @param PlateSize Integer. Either 96 or 48. 96 is default.
 #' @param include.label Should the variable group be shown in the plot.
-#' @keywords randomized plates, ggplot
+#' @keywords randomized plates ggplot
 #' @export
 #' @examples
 #' \donttest{randomized.manifest <- olink_plate_randomizer(manifest)}
@@ -74,7 +74,7 @@ displayPlateLayout <- function(data, fill.color, PlateSize = 96, include.label=F
 #' Displays a bar chart for each plate representing the distribution of the given grouping variable on each plate using ggplot2::ggplot and ggplot2::geom_bar.
 #' @param data tibble/data frame in long format returned from the olink_plate_randomizer function.
 #' @param fill.color Column name to be used as coloring variable for wells.
-#' @keywords randomized plates, ggplot
+#' @keywords randomized plates ggplot
 #' @export
 #' @examples
 #' \donttest{randomized.manifest <- olink_plate_randomizer(manifest)}

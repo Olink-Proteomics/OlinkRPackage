@@ -19,5 +19,5 @@ Displays a bar chart for each plate representing the distribution of the given g
 \donttest{displayPlateDistributions(data=randomized.manifest,fill.color="Site")}
 }
 \keyword{ggplot}
-\keyword{plates,}
+\keyword{plates}
 \keyword{randomized}

@@ -23,5 +23,5 @@ Displays each plate in a facet with cells colored by the given variable using gg
 \donttest{displayPlateLayout(data = randomized.manifest, fill.color="Site")}
 }
 \keyword{ggplot}
-\keyword{plates,}
+\keyword{plates}
 \keyword{randomized}
