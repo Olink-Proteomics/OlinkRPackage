@@ -22,7 +22,7 @@ olink_plate_randomizer(
 
 \item{iterations}{Number of iterations for fitting subjects on the same plate.}
 
-\item{available.spots}{Integer. Number of wells available on each plate. Maximum 40 for T48 and 88 for T96. Takes a vector equal to the number of plates to be used indicating the number of wells available on each plate.}
+\item{available.spots}{Numeric. Number of wells available on each plate. Maximum 40 for T48 and 88 for T96. Takes a vector equal to the number of plates to be used indicating the number of wells available on each plate.}
 
 \item{seed}{Seed to set. Highly recommend setting this for reproducibility.}
 }
