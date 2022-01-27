@@ -10,6 +10,7 @@ olink_plate_randomizer(
   SubjectColumn,
   iterations = 500,
   available.spots,
+  wellsToUse,
   seed
 )
 }
@@ -23,6 +24,8 @@ olink_plate_randomizer(
 \item{iterations}{Number of iterations for fitting subjects on the same plate.}
 
 \item{available.spots}{Integer. Number of wells available on each plate. Maximum 40 for T48 and 88 for T96. Can also take a vector equal to the number of plates to be used indicating the number of wells available on each plate.}
+
+\item{wellsToUse}{A List specifying the wells to use on each plate. Each element is a character vector specifying the available wells on the corresponding plate. List elements must be named according to plates ("Plate 1" ... "Plate n")}
 
 \item{seed}{Seed to set. Highly recommend setting this for reproducibility.}
 }

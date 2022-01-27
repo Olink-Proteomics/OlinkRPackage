@@ -145,17 +145,22 @@ generatePlateHolder <- function(n.plates,n.spots,n.samples, PlateSize, wellsToUs
     dplyr::arrange(column,row)
   full.row.col$well <- paste0(full.row.col$row, sub(pattern = '.* (.*)', replacement = '\\1', x = full.row.col$column))
 
-  plates <- paste0("Plate ",1:n.plates)
+  plates <- paste0("Plate ",1:n.plates) #This isn't used for anything is it?
   out <- data.frame(plate=NULL,column=NULL,row=NULL,stringsAsFactors = F)
   for(i in 1:n.plates){
     if(missing(wellsToUse)){
       hld <- cbind(plate=rep(paste0("Plate ",i), n.spots[i]),
                    full.row.col[1:n.spots[i],])
     }else{
-      # hld <- cbind(plate=rep(paste0("Plate ",i), n.spots[i]),
-      #              full.row.col[full.row.col$well %in% wellsToUse[[paste0("Plate ",i)]],])
-      hld <- cbind(plate=rep(paste0("Plate ",i), n.spots[i]),
-                   full.row.col[full.row.col$well %in% wellsToUse[[i]],])
+      if(all(names(wellsToUse) %in% paste('Plate', 1:length(wellsToUse)))){
+        hld <- cbind(plate = names(wellsToUse)[i],
+                     full.row.col[full.row.col$well %in% wellsToUse[[names(wellsToUse)[i]]],])
+      }
+      # else{
+      #   warning('The list wellsToUse is not named. Assuming that list order matches plate order')
+      #   hld <- cbind(plate=rep(paste0("Plate ",i), n.spots[i]),
+      #                full.row.col[full.row.col$well %in% wellsToUse[[i]],])
+      # }
     }
 
     out <- rbind(out,hld)
@@ -178,6 +183,7 @@ generatePlateHolder <- function(n.plates,n.spots,n.samples, PlateSize, wellsToUs
 #' @param SubjectColumn (Optional) Column name of the subject ID column. Cannot contain missings. If provided, subjects are kept on the same plate.
 #' @param iterations Number of iterations for fitting subjects on the same plate.
 #' @param available.spots Integer. Number of wells available on each plate. Maximum 40 for T48 and 88 for T96. Can also take a vector equal to the number of plates to be used indicating the number of wells available on each plate.
+#' @param wellsToUse A List specifying the wells to use on each plate. Each element is a character vector specifying the available wells on the corresponding plate. List elements must be named according to plates ("Plate 1" ... "Plate n")
 #' @param seed Seed to set. Highly recommend setting this for reproducibility.
 #' @return Tibble including SampleID, SubjectID etc. assigned to well positions.
 #' @keywords randomized plates
@@ -240,10 +246,29 @@ olink_plate_randomizer <-function(Manifest, PlateSize = 96, SubjectColumn, itera
   }
 
   if(missing(available.spots)){
-    PlatesNeeded <-ceiling(nrow(Manifest)/spots_per_plate)
-    all.plates <- generatePlateHolder(PlatesNeeded,rep(spots_per_plate,times=PlatesNeeded),n.samples=length(Manifest$SampleID), PlateSize = PlateSize, wellsToUse = wellsToUse)
+    if(missing(wellsToUse)){
+      PlatesNeeded <-ceiling(nrow(Manifest)/spots_per_plate)
+      all.plates <- generatePlateHolder(n.plates = PlatesNeeded,
+                                        n.spots = rep(spots_per_plate,times=PlatesNeeded),
+                                        n.samples=length(Manifest$SampleID),
+                                        PlateSize = PlateSize)
+    } else{
+      #Simons NOTE:
+      #I think it would be better to let the user input a manifest with existing plating info.
+      #And then in here get the missing wells per plate and build wellsToUse list. And at the same time make sure that the correct plates "line up" in wellsToUse
+
+      all.plates <- generatePlateHolder(n.plates = length(wellsToUse), #wellsToUse is a list with one element per plate => length(wellsToUse) gives number of plates
+                                        n.spots = sapply(wellsToUse, length), #Each element in wellsToUse is vector with available wells => length(wellsToUse[[i]]) gives n.spots on plate i
+                                        n.samples=length(Manifest$SampleID),
+                                        PlateSize = PlateSize,
+                                        wellsToUse = wellsToUse)
+    }
   } else{
-    all.plates <- generatePlateHolder(length(available.spots),available.spots,n.samples=length(Manifest$SampleID), PlateSize = PlateSize, wellsToUse = wellsToUse)
+    all.plates <- generatePlateHolder(n.plates = length(available.spots),
+                                      n.spots = available.spots,
+                                      n.samples=length(Manifest$SampleID),
+                                      PlateSize = PlateSize,
+                                      wellsToUse = wellsToUse)
   }
 
   #Complete Random if subjectID not given
