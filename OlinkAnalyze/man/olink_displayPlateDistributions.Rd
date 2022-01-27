@@ -18,6 +18,12 @@ Displays a bar chart for each plate representing the distribution of the given g
 \donttest{randomized.manifest <- olink_plate_randomizer(manifest)}
 \donttest{olink_displayPlateDistributions(data=randomized.manifest,fill.color="Site")}
 }
+\seealso{
+\itemize{
+\item{\code{\link[OlinkAnalyze:olink_plate_randomizer]{olink_plate_randomizer()}} for generating a plating scheme}
+\item{\code{\link[OlinkAnalyze:olink_displayPlateLayout]{olink_displayPlateLayout()}} for visualizing the generated plate layouts}
+}
+}
 \keyword{ggplot}
 \keyword{plates,}
 \keyword{randomized}

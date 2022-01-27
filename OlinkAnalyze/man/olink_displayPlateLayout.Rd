@@ -22,6 +22,12 @@ Displays each plate in a facet with cells colored by the given variable using gg
 \donttest{randomized.manifest <- olink_plate_randomizer(manifest)}
 \donttest{olink_displayPlateLayout(data=randomized.manifest,fill.color="Site")}
 }
+\seealso{
+\itemize{
+\item{\code{\link[OlinkAnalyze:olink_plate_randomizer]{olink_plate_randomizer()}} for generating a plating scheme}
+\item{\code{\link[OlinkAnalyze:olink_displayPlateDistributions]{olink_displayPlateDistributions()}} for validating that sites are properly randomized}
+}
+}
 \keyword{ggplot}
 \keyword{plates,}
 \keyword{randomized}

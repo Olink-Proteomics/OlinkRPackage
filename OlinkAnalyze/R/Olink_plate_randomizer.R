@@ -7,6 +7,11 @@
 #' @param include.label Should the variable group be shown in the plot.
 #' @keywords randomized plates, ggplot
 #' @export
+#' @seealso \itemize{
+#' \item{\code{\link[OlinkAnalyze:olink_plate_randomizer]{olink_plate_randomizer()}} for generating a plating scheme}
+#' \item{\code{\link[OlinkAnalyze:olink_displayPlateDistributions]{olink_displayPlateDistributions()}} for validating that sites are properly randomized}
+#' }
+#'
 #' @examples
 #' \donttest{randomized.manifest <- olink_plate_randomizer(manifest)}
 #' \donttest{olink_displayPlateLayout(data=randomized.manifest,fill.color="Site")}
@@ -76,6 +81,11 @@ olink_displayPlateLayout <- function(data,fill.color,PlateSize = 96, include.lab
 #' @param fill.color Column name to be used as coloring variable for wells.
 #' @keywords randomized plates, ggplot
 #' @export
+#' @seealso \itemize{
+#' \item{\code{\link[OlinkAnalyze:olink_plate_randomizer]{olink_plate_randomizer()}} for generating a plating scheme}
+#' \item{\code{\link[OlinkAnalyze:olink_displayPlateLayout]{olink_displayPlateLayout()}} for visualizing the generated plate layouts}
+#' }
+#'
 #' @examples
 #' \donttest{randomized.manifest <- olink_plate_randomizer(manifest)}
 #' \donttest{olink_displayPlateDistributions(data=randomized.manifest,fill.color="Site")}
@@ -154,9 +164,6 @@ generatePlateHolder <- function(n.plates,n.spots,n.samples, PlateSize){
 #' Generates a scheme for how to plate samples with an option to keep subjects on the same plate.
 #'
 #' Variables of interest should if possible be randomized across plates to avoid confounding with potential plate effects. In the case multiple samples per subject (e.g. in longitudinal studies), Olink recommends keeping each subject on the same plate. This can be achieved using the SubjectColumn argument.
-#'
-#' The generated plating scheme can be visualized using the function \code{\link{olink_displayPlateLayout}}.
-#' How well the relevant variables are randomized can be visualized using the function \code{\link{olink_displayPlateDistributions}}.
 #' @param Manifest tibble/data frame in long format containing all sample ID's. Sample ID column must be named SampleID.
 #' @param PlateSize Integer. Either 96 or 48. 96 is default.
 #' @param SubjectColumn (Optional) Column name of the subject ID column. Cannot contain missings. If provided, subjects are kept on the same plate.
@@ -166,6 +173,11 @@ generatePlateHolder <- function(n.plates,n.spots,n.samples, PlateSize){
 #' @return Tibble including SampleID, SubjectID etc. assigned to well positions.
 #' @keywords randomized plates
 #' @export
+#' @seealso \itemize{
+#' \item{\code{\link[OlinkAnalyze:olink_displayPlateLayout]{olink_displayPlateLayout()}} for visualizing the generated plate layouts}
+#' \item{\code{\link[OlinkAnalyze:olink_displayPlateDistributions]{olink_displayPlateDistributions()}} for validating that sites are properly randomized}
+#' }
+#'
 #' @examples
 #' \donttest{
 #' #Generate randomization scheme using complete randomization

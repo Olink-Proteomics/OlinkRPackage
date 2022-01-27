@@ -34,9 +34,6 @@ Generates a scheme for how to plate samples with an option to keep subjects on t
 }
 \details{
 Variables of interest should if possible be randomized across plates to avoid confounding with potential plate effects. In the case multiple samples per subject (e.g. in longitudinal studies), Olink recommends keeping each subject on the same plate. This can be achieved using the SubjectColumn argument.
-
-The generated plating scheme can be visualized using the function \code{\link{olink_displayPlateLayout}}.
-How well the relevant variables are randomized can be visualized using the function \code{\link{olink_displayPlateDistributions}}.
 }
 \examples{
 \donttest{
@@ -59,6 +56,12 @@ olink_displayPlateDistributions(randomized.manifest_b, fill.color = 'Site')
 }
 
 
+}
+\seealso{
+\itemize{
+\item{\code{\link[OlinkAnalyze:olink_displayPlateLayout]{olink_displayPlateLayout()}} for visualizing the generated plate layouts}
+\item{\code{\link[OlinkAnalyze:olink_displayPlateDistributions]{olink_displayPlateDistributions()}} for validating that sites are properly randomized}
+}
 }
 \keyword{plates}
 \keyword{randomized}
