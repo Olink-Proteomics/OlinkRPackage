@@ -45,7 +45,7 @@ Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be i
 \item{...}{coloroption for color ordering}
 }
 \value{
-A list of objects of class "ggplot"
+A list of objects of class "ggplot" showing point-range plot of NPX (y-axis) over x_axis_variable for each assay (facet), colored by col_variable if provided.
 }
 \description{
 Generates a point-range plot faceted by Assay using ggplot and ggplot2::geom_pointrange based on a linear mixed effects model using lmerTest:lmer and emmeans::emmeans.

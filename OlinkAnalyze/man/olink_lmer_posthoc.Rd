@@ -39,7 +39,21 @@ Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be i
 \item{verbose}{Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
 }
 \value{
-A tibble containing the results of the pairwise comparisons between given variable levels for proteins specified in olinkid_list (or full df).
+A "tibble" containing the results of the pairwise comparisons between given variable levels for proteins specified in olinkid_list (or full df).
+Columns include:
+\itemize{
+ \item{Assay:} "character" Protein symbol
+ \item{OlinkID:} "character" Olink specific ID  
+ \item{UniProt:} "character" Olink specific ID  
+ \item{Panel:} "character" Name of Olink Panel
+ \item{term:} "character" term in model
+ \item{contrast:} "character" the groups that were compared
+ \item{estimate:} "numeric" difference in mean NPX between groups
+ \item{conf.low:} "numeric" confidence interval for the mean (lower end)
+ \item{conf.high:} "numeric" confidence interval for the mean (upper end)
+ \item{Adjusted_pval:} "numeric" adjusted p-value for the test (Benjamini&Hochberg)
+ \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
+}
 }
 \description{
 Similar to olink_lmer but performs a post hoc analysis based on a linear mixed model effects model using lmerTest::lmer and emmeans::emmeans on proteins.

@@ -33,7 +33,23 @@ Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be i
 \item{verbose}{Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
 }
 \value{
-A tibble containing the results of fitting the linear mixed effects model to every protein by OlinkID, ordered by ascending p-value.
+A "tibble" containing the results of fitting the linear mixed effects model to every protein by OlinkID, ordered by ascending p-value.
+Columns include:
+\itemize{
+ \item{Assay:} "character" Protein symbol
+ \item{OlinkID:} "character" Olink specific ID  
+ \item{UniProt:} "character" Olink specific ID  
+ \item{Panel:} "character" Name of Olink Panel
+ \item{term:} "character" term in model
+ \item{sumsq:} "numeric" sum of square
+ \item{meansq:} "numeric" mean of square
+ \item{NumDF:} "integer" numerator of degrees of freedom
+ \item{DenDF:} "numeric" denominator of decrees of freedom
+ \item{statistic:} "numeric" value of the statistic
+ \item{p.value:} "numeric" nominal p-value
+ \item{Adjusted_pval:} "numeric" adjusted p-value for the test (Benjamini&Hochberg)
+ \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
+}
 }
 \description{
 Fits a linear mixed effects model for every protein (by OlinkID) in every panel, using lmerTest::lmer and stats::anova.
