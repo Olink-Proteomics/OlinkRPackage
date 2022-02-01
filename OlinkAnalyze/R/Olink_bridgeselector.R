@@ -2,7 +2,7 @@
 #'
 #'The bridge selection function will select a number of bridge samples based on the input data. It selects samples with
 #'good detection, which passes QC and cover a good range of the data. If possible, Olink recommends 8-16 bridge samples.
-#'When running the selector, Olink recommends starting at sampleMissingFreq = 0.010 which represents a maximum of 10\% 
+#'When running the selector, Olink recommends starting at sampleMissingFreq = 0.10 which represents a maximum of 10\%
 #'data below LOD per sample. If there are not enough samples output, increase to 20\%. \cr\cr
 #'The function accepts NPX Excel files with data < LOD replaced.
 #'
@@ -20,38 +20,38 @@
 #' @importFrom stringr str_detect
 
 olink_bridgeselector<-function(df, sampleMissingFreq, n){
-
+  
   
   #Filtering on valid OlinkID
   df <- df %>%
     dplyr::filter(stringr::str_detect(OlinkID,
-                               "OID[0-9]{5}"))
-
+                                      "OID[0-9]{5}"))
+  
   #Filtering out control samples
   df <- df %>%
     dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_SAMPLE*"))
-
+  
   #Outlier calculation as in qc_plot for filtering
   qc_outliers <- df %>%
     dplyr::group_by(Panel, SampleID, Index) %>%
-    dplyr::mutate(IQR = IQR(NPX, na.rm = T),
-           sample_median = median(NPX, na.rm = T)) %>%
+    dplyr::mutate(IQR = IQR(NPX, na.rm = TRUE),
+                  sample_median = median(NPX, na.rm = TRUE)) %>%
     dplyr::ungroup() %>%
     dplyr::select(SampleID, Index, Panel, IQR, sample_median) %>%
     dplyr::distinct() %>%
     dplyr::group_by(Panel) %>%
-    dplyr::mutate(median_low = mean(sample_median, na.rm = T) - 3*sd(sample_median, na.rm = T),
-           median_high = mean(sample_median, na.rm = T) + 3*sd(sample_median, na.rm = T),
-           iqr_low = mean(IQR, na.rm = T) - 3*sd(IQR, na.rm = T),
-           iqr_high = mean(IQR, na.rm = T) + 3*sd(IQR, na.rm = T)) %>%
+    dplyr::mutate(median_low = mean(sample_median, na.rm = TRUE) - 3*sd(sample_median, na.rm = TRUE),
+                  median_high = mean(sample_median, na.rm = TRUE) + 3*sd(sample_median, na.rm = TRUE),
+                  iqr_low = mean(IQR, na.rm = TRUE) - 3*sd(IQR, na.rm = TRUE),
+                  iqr_high = mean(IQR, na.rm = TRUE) + 3*sd(IQR, na.rm = TRUE)) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(Outlier = if_else(sample_median < median_high &
-                               sample_median > median_low &
-                               IQR > iqr_low &
-                               IQR < iqr_high,
-                             0, 1)) %>%
+                                      sample_median > median_low &
+                                      IQR > iqr_low &
+                                      IQR < iqr_high,
+                                    0, 1)) %>%
     dplyr::select(SampleID, Index, Panel, Outlier)
-
+  
   df_1 <- df %>%
     dplyr::left_join(qc_outliers, by = c('SampleID', 'Index', 'Panel')) %>%
     dplyr::mutate(NPX = ifelse(NPX <= LOD, NA, NPX)) %>%
@@ -63,23 +63,32 @@ olink_bridgeselector<-function(df, sampleMissingFreq, n){
     dplyr::mutate(Outliers = sum(Outlier)) %>%
     dplyr::filter(Outliers == 0) %>%
     dplyr::mutate(PercAssaysBelowLOD = sum(is.na(NPX))/dplyr::n()) %>%
-    dplyr::mutate(MeanNPX = mean(NPX, na.rm = T)) %>%
+    dplyr::mutate(MeanNPX = mean(NPX, na.rm = TRUE)) %>%
     dplyr::ungroup() %>%
     dplyr::filter(PercAssaysBelowLOD < sampleMissingFreq)
   
   
   df_2 <- df_1 %>%
     dplyr::select(SampleID, PercAssaysBelowLOD, MeanNPX) %>%
-    dplyr::distinct() %>%
+    dplyr::distinct() 
+  
+  if(nrow(df_2) < n){
+    stop(paste0('With the current settings only ', 
+                nrow(df_2), 
+                ' samples can be selected. Please increase sampleMissingFreq and/or decrease n.'))
+    
+  }
+  
+  df_2  <- df_2  %>%
     dplyr::arrange(desc(MeanNPX)) %>%
     dplyr::mutate(Order = c(1:nrow(.)))
-
+  
   Bridgesamples <- floor(seq(1,nrow(df_2),length.out = n+2)[c(-1, -(n+2))])
-
+  
   SelectedBridges <- df_2 %>%
     dplyr::filter(Order %in% Bridgesamples) %>%
     dplyr::slice_sample(n = nrow(.)) %>%
     dplyr::select(-Order)
-
+  
   return(SelectedBridges)
 }

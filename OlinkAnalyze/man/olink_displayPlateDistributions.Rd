@@ -25,5 +25,5 @@ Displays a bar chart for each plate representing the distribution of the given g
 }
 }
 \keyword{ggplot}
-\keyword{plates,}
+\keyword{plates}
 \keyword{randomized}

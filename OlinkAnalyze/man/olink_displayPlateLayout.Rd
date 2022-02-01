@@ -4,7 +4,12 @@
 \alias{olink_displayPlateLayout}
 \title{Plot all plates colored by a variable}
 \usage{
-olink_displayPlateLayout(data, fill.color, PlateSize = 96, include.label = F)
+olink_displayPlateLayout(
+  data,
+  fill.color,
+  PlateSize = 96,
+  include.label = FALSE
+)
 }
 \arguments{
 \item{data}{tibble/data frame in long format returned from the olink_plate_randomizer function.}
@@ -20,7 +25,7 @@ Displays each plate in a facet with cells colored by the given variable using gg
 }
 \examples{
 \donttest{randomized.manifest <- olink_plate_randomizer(manifest)}
-\donttest{olink_displayPlateLayout(data=randomized.manifest,fill.color="Site")}
+\donttest{displayPlateLayout(data = randomized.manifest, fill.color="Site")}
 }
 \seealso{
 \itemize{
@@ -29,5 +34,5 @@ Displays each plate in a facet with cells colored by the given variable using gg
 }
 }
 \keyword{ggplot}
-\keyword{plates,}
+\keyword{plates}
 \keyword{randomized}

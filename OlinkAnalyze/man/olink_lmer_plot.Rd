@@ -14,7 +14,7 @@ olink_lmer_plot(
   x_axis_variable,
   col_variable = NULL,
   number_of_proteins_per_plot = 6,
-  verbose = F,
+  verbose = FALSE,
   ...
 )
 }
@@ -40,7 +40,7 @@ Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be i
 
 \item{number_of_proteins_per_plot}{Number plots to include in the list of point-range plots. Defaults to 6 plots per figure}
 
-\item{verbose}{Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
+\item{verbose}{Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
 
 \item{...}{coloroption for color ordering}
 }

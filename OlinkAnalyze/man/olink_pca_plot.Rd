@@ -97,5 +97,5 @@ outliers <- lapply(g, function(x){x$data}) \%>\%
     filter(Outlier == 1)
 }
 }
-\keyword{NPX,}
+\keyword{NPX}
 \keyword{PCA}

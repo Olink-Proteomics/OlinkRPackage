@@ -272,7 +272,7 @@ A tibble with the following columns:
 
 The olink_anova is a wrapper function that performs an ANOVA F-test for each assay using the function *Anova* from the R library *car* and Type III sum of squares. The function handles both factor and numerical variables, and/or confounding factors. 
 
-Samples with missing variable information or factor levels are excluded from the analysis. Character columns in the input data frame are converted to factors. The automatic handling of the data from above is announced by a message if the flag *verbose=T*.
+Samples with missing variable information or factor levels are excluded from the analysis. Character columns in the input data frame are converted to factors. The automatic handling of the data from above is announced by a message if the flag *verbose=TRUE*.
 
 Crossed/interaction analysis, i.e. A*B formula notation, is inferred from the variable argument in the following cases: 
 
@@ -280,9 +280,9 @@ Crossed/interaction analysis, i.e. A*B formula notation, is inferred from the va
 * c('A:B')
 * c('A:B', 'B') or c('A:B', 'A')
 
-Inference is specified in a message if *verbose=T*.
+Inference is specified in a message if *verbose=TRUE*.
 
-For covariates, crossed analyses need to be specified explicitly, i.e. two main effects will not be expanded with a c('A','B') notation. Main effects present in the variable take precedence. The formula notation of the final model is specified in a message if *verbose=T*. 
+For covariates, crossed analyses need to be specified explicitly, i.e. two main effects will not be expanded with a c('A','B') notation. Main effects present in the variable take precedence. The formula notation of the final model is specified in a message if *verbose=TRUE*. 
 
 Adjusted p-values are calculated using the function *p.adjust* from the R library *stats* with the Benjamini & Hochberg (1995) method (“fdr”). The threshold is determined by logic evaluation of Adjusted_pval < 0.05. Covariates are not included in the p-value adjustment.
 
@@ -339,7 +339,7 @@ The function handles both factor and numerical variables and/or covariates. The 
 * covariates: Single character value or character array. Default: NULL. Confounding factors to include in the analysis. In case of single character then that should represent a column in the df. It can also accept the notations ':' or '*', while crossed analysis will not be inferred from main effects.
 * outcome: Name of the column from df that contains the dependent variable. Default: NPX.
 * effect: Term on which to perform the post-hoc analysis. Character vector. Must be subset of or identical to the variable and no adjustment is performed.
-* mean_return: Logical. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = T.
+* mean_return: Logical. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = TRUE.
 * verbose: Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 
 ```{r message=FALSE, eval=FALSE}
@@ -376,7 +376,7 @@ A tibble with the following columns:
 
 The olink_lmer fits a linear mixed effects model for every protein (by OlinkID) in every panel, using the function *lmer* from the R library *lmerTest* and the function *anova* from the R library *stats*. The function handles both factor and numerical variables and/or covariates.
 
-Samples with missing variable information or factor levels are excluded from the analysis. Character columns in the input data frame are converted to factors. The automatic handling of the data from above is announced by a message if the flag *verbose=T*. 
+Samples with missing variable information or factor levels are excluded from the analysis. Character columns in the input data frame are converted to factors. The automatic handling of the data from above is announced by a message if the flag *verbose=TRUE*. 
 
 Crossed/interaction analysis, i.e. A*B formula notation, is inferred from the variable argument in the following cases: 
 
@@ -384,9 +384,9 @@ Crossed/interaction analysis, i.e. A*B formula notation, is inferred from the va
 * c('A:B')
 * c('A:B', 'B') or c('A:B', 'A')
 
-Inference is specified in a message if *verbose=T*.
+Inference is specified in a message if *verbose=TRUE*.
 
-For covariates, crossed analyses need to be specified explicitly, i.e. two main effects will not be expanded with a c('A','B') notation. Main effects present in the variable take precedence. The formula notation of the final model is specified in a message if *verbose=T*.  
+For covariates, crossed analyses need to be specified explicitly, i.e. two main effects will not be expanded with a c('A','B') notation. Main effects present in the variable take precedence. The formula notation of the final model is specified in a message if *verbose=TRUE*.  
 
 Adjusted p-values are calculated using the function *p.adjust* from the R library *stats* with the Benjamini & Hochberg (1995) method (“fdr”). The threshold is determined by logic evaluation of Adjusted_pval < 0.05. Covariates are not included in the p-value adjustment.
 
@@ -442,7 +442,7 @@ The olink_lmer_posthoc function is similar to olink_lmer but performs a post-hoc
 * outcome: Name of the column from df that contains the dependent variable. Default: NPX.
 * random: Single character value or character array with random effects.
 * covariates: Single character value or character array. Default: NULL. Confounding factors to include in the analysis. In case of single character then that should represent a column in the df. It can also accept the notations ':' or '*', while crossed analysis will not be inferred from main effects.
-* mean_return: Logical. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = T and no adjustment is performed.
+* mean_return: Logical. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = TRUE and no adjustment is performed.
 * verbose: Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 
 ```{r message=FALSE, eval=FALSE}
@@ -593,18 +593,18 @@ The arguments outlierDefX and outlierDefY can be used to identify outliers in th
 npx_data1 %>% 
   filter(!str_detect(SampleID, 'CONTROL_SAMPLE')) %>% 
   olink_pca_plot(df = .,
-                 color_g = "QC_Warning", byPanel = T)  
+                 color_g = "QC_Warning", byPanel = TRUE)  
 ```
 
 ### Function output
 
 A list of objects of class *ggplot* (silently returned). Plots are also printed unless option `quiet = TRUE` is set. If outlierDefX and outlierDefY are specified, a list of outliers can be extracted from the **ggplot** object based on these parameters.
 
-```{r message = F}
+```{r message = FALSE}
 npx_data <- npx_data1 %>%
     mutate(SampleID = paste(SampleID, "_", Index, sep = ""))
 g <- olink_pca_plot(df=npx_data, color_g = "QC_Warning",
-                    outlierDefX = 2.5, outlierDefY = 4, byPanel = TRUE, quiet = T)
+                    outlierDefX = 2.5, outlierDefY = 4, byPanel = TRUE, quiet = TRUE)
 lapply(g, function(x){x$data}) %>%
   bind_rows() %>%
   filter(Outlier == 1) %>% 
@@ -640,7 +640,7 @@ npx_data1 %>%
 
 An object of class *ggplot*. A list of outliers can be extracted from the **ggplot** object.
 
-```{r message = F}
+```{r message = FALSE}
 qc <- olink_qc_plot(npx_data1, color_g = "QC_Warning", IQR_outlierDef = 3, median_outlierDef = 3)
 qc$data %>% filter(Outlier == 1) %>% select(SampleID, Panel, IQR, sample_median, Outlier)
 ```

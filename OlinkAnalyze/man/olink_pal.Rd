@@ -33,4 +33,5 @@ filled.contour(volcano, color.palette = hue_pal(), asp = 1)
 
 }
 \keyword{Olink}
-\keyword{crispy,}
+\keyword{color}
+\keyword{palette}

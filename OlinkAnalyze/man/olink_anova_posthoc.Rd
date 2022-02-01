@@ -11,8 +11,8 @@ olink_anova_posthoc(
   covariates = NULL,
   outcome = "NPX",
   effect,
-  mean_return = F,
-  verbose = T
+  mean_return = FALSE,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -31,7 +31,7 @@ Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be i
 
 \item{effect}{Term on which to perform post-hoc. Character vector. Must be subset of or identical to variable.}
 
-\item{mean_return}{Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = T and no adjustment is performed.}
+\item{mean_return}{Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = TRUE and no adjustment is performed.}
 
 \item{verbose}{Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
 }
@@ -58,7 +58,7 @@ anova_results <- olink_anova(df = npx_df,
                              variable=c("Treatment:Time"),
                              covariates="Site")
 
-#Posthoc test for the model NPX~Treatment*Time+Site, 
+#Posthoc test for the model NPX~Treatment*Time+Site,
 #on the interaction effect Treatment:Time with covariate Site.
 
 #Filtering out significant and relevant results.
