@@ -27,7 +27,14 @@ olink_plate_randomizer(
 \item{seed}{Seed to set. Highly recommend setting this for reproducibility.}
 }
 \value{
-Tibble including SampleID, SubjectID etc. assigned to well positions.
+A "tibble" including SampleID, SubjectID etc. assigned to well positions.
+Columns include same columns as Manifest with additional columns:
+\itemize{
+   \item{plate:} Plate number
+   \item{column:} Column on the plate
+   \item{row:} Row on the plate
+   \item{well:} Well location on the plate
+}
 }
 \description{
 Generates a scheme for how to plate samples with an option to keep subjects on the same plate.

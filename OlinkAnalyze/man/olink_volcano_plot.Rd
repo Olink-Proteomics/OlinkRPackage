@@ -16,7 +16,7 @@ olink_volcano_plot(p.val_tbl, x_lab = "Estimate", olinkid_list = NULL, ...)
 \item{...}{Optional. Additional arguments for  olink_color_discrete()}
 }
 \value{
-An object of class "ggplot"
+An object of class "ggplot", plotting significance (y-axis) by estimated difference between groups (x-axis) for each protein.
 }
 \description{
 Generates a volcano plot using the results of the olink_ttest function using ggplot and ggplot2::geom_point.

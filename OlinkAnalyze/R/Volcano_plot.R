@@ -10,7 +10,7 @@
 #' @param olinkid_list Optional. Character vector of proteins (by OlinkID) to label in the plot. If not provided, default is to label all significant proteins.
 #' @param ... Optional. Additional arguments for  olink_color_discrete()
 #'
-#' @return An object of class "ggplot"
+#' @return An object of class "ggplot", plotting significance (y-axis) by estimated difference between groups (x-axis) for each protein.
 #' @export
 #' @examples
 #' \donttest{

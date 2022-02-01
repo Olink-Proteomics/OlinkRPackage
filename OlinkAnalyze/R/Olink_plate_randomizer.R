@@ -6,6 +6,7 @@
 #' @param PlateSize Integer. Either 96 or 48. 96 is default.
 #' @param include.label Should the variable group be shown in the plot.
 #' @keywords randomized plates ggplot
+#' @return An object of class "ggplot" showing the each plate in a facet with the cells colored by fill.color.
 #' @export
 #' @seealso \itemize{
 #' \item{\code{\link[OlinkAnalyze:olink_plate_randomizer]{olink_plate_randomizer()}} for generating a plating scheme}
@@ -14,7 +15,8 @@
 #'
 #' @examples
 #' \donttest{randomized.manifest <- olink_plate_randomizer(manifest)}
-#' \donttest{displayPlateLayout(data = randomized.manifest, fill.color="Site")}
+#' \donttest{olink_displayPlateLayout(data = randomized.manifest, fill.color="Site")}
+#' 
 #' @importFrom magrittr %>%
 #' @importFrom dplyr n filter select mutate
 #' @importFrom ggplot2 ggplot geom_tile facet_wrap scale_fill_manual labs scale_x_discrete geom_text
@@ -86,6 +88,7 @@ olink_displayPlateLayout <- function(data, fill.color, PlateSize = 96, include.l
 #' \item{\code{\link[OlinkAnalyze:olink_displayPlateLayout]{olink_displayPlateLayout()}} for visualizing the generated plate layouts}
 #' }
 #'
+#' @return An object of class "ggplot" showing the percent distribution of fill.color in each plate (x-axis)
 #' @examples
 #' \donttest{randomized.manifest <- olink_plate_randomizer(manifest)}
 #' \donttest{olink_displayPlateDistributions(data=randomized.manifest,fill.color="Site")}
@@ -170,7 +173,14 @@ generatePlateHolder <- function(n.plates,n.spots,n.samples, PlateSize){
 #' @param iterations Number of iterations for fitting subjects on the same plate.
 #' @param available.spots Numeric. Number of wells available on each plate. Maximum 40 for T48 and 88 for T96. Takes a vector equal to the number of plates to be used indicating the number of wells available on each plate.
 #' @param seed Seed to set. Highly recommend setting this for reproducibility.
-#' @return Tibble including SampleID, SubjectID etc. assigned to well positions.
+#' @return A "tibble" including SampleID, SubjectID etc. assigned to well positions.
+#' Columns include same columns as Manifest with additional columns:
+#' \itemize{
+#'    \item{plate:} Plate number
+#'    \item{column:} Column on the plate
+#'    \item{row:} Row on the plate
+#'    \item{well:} Well location on the plate
+#' }
 #' @keywords randomized plates
 #' @export
 #' @seealso \itemize{

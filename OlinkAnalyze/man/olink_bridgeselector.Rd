@@ -14,7 +14,13 @@ olink_bridgeselector(df, sampleMissingFreq, n)
 \item{n}{Number of bridge samples to be selected.}
 }
 \value{
-Tibble with sample IDs and mean NPX for a defined number of bridging samples.
+A "tibble" with sample IDs and mean NPX for a defined number of bridging samples. Columns include:
+
+\itemize{
+  \item{SampleID:} Sample ID
+  \item{PercAssaysBelowLOD:} Percent of Assays that are below LOD for the sample
+  \item{MeanNPX:} Mean NPX for the sample
+}
 }
 \description{
 The bridge selection function will select a number of bridge samples based on the input data. It selects samples with

@@ -16,7 +16,26 @@ olink_ttest(df, variable, pair_id, ...)
 \item{...}{Options to be passed to t.test. See \code{?t.test} for more information.}
 }
 \value{
-A data frame containing the t-test results for every protein.
+A "tibble" containing the t-test results for every protein.
+Columns include:
+\itemize{
+ \item{Assay:} "character" Protein symbol
+ \item{OlinkID:} "character" Olink specific ID  
+ \item{UniProt:} "character" Olink specific ID  
+ \item{Panel:} "character" Name of Olink Panel
+ \item{estimate:} "numeric" difference in mean NPX between groups
+ \item{Group 1:} "numeric" Column is named first level of variable when converted to factor, contains mean NPX for that group
+ \item{Group 2:} "numeric" Column is named second level of variable when converted to factor, contains mean NPX for that group
+ \item{statistic:} "named numeric" value of the t-statistic
+ \item{p.value:} "numeric" p-value for the test
+ \item{parameter:} "named numeric" degrees of freedom for the t-statistic
+ \item{conf.low:} "numeric" confidence interval for the mean (lower end)
+ \item{conf.high:} "numeric" confidence interval for the mean (upper end)
+ \item{method:} "character" which t-test method was used
+ \item{alternative:} "character" describes the alternative hypothesis
+ \item{Adjusted_pval:} "numeric" adjusted p-value for the test (Benjamini&Hochberg)
+ \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
+}
 }
 \description{
 Performs a Welch 2-sample t-test or paired t-test at confidence level 0.95 for every protein (by OlinkID)
