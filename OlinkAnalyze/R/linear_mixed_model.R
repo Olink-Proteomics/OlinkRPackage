@@ -30,7 +30,24 @@
 #' @param return.covariates Boolean. Default: False. Returns results for the covariates. Note: Adjusted p-values will be NA for the covariates.
 #' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #'
-#' @return A tibble containing the results of fitting the linear mixed effects model to every protein by OlinkID, ordered by ascending p-value.
+#' @return A "tibble" containing the results of fitting the linear mixed effects model to every protein by OlinkID, ordered by ascending p-value.
+#' Columns include:
+#' \itemize{
+#'  \item{Assay:} "character" Protein symbol
+#'  \item{OlinkID:} "character" Olink specific ID  
+#'  \item{UniProt:} "character" Olink specific ID  
+#'  \item{Panel:} "character" Name of Olink Panel
+#'  \item{term:} "character" term in model
+#'  \item{sumsq:} "numeric" sum of square
+#'  \item{meansq:} "numeric" mean of square
+#'  \item{NumDF:} "integer" numerator of degrees of freedom
+#'  \item{DenDF:} "numeric" denominator of decrees of freedom
+#'  \item{statistic:} "numeric" value of the statistic
+#'  \item{p.value:} "numeric" nominal p-value
+#'  \item{Adjusted_pval:} "numeric" adjusted p-value for the test (Benjamini&Hochberg)
+#'  \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
+#' }
+#'  
 #' @export
 #' @examples
 #' \donttest{
@@ -315,7 +332,22 @@ single_lmer <- function(data, formula_string){
 #' Variable(s) to test. If length > 1, the included variable names will be used in crossed analyses .
 #' Also takes ':' or '*' notation.
 #'
-#' @return A tibble containing the results of the pairwise comparisons between given variable levels for proteins specified in olinkid_list (or full df).
+#' @return A "tibble" containing the results of the pairwise comparisons between given variable levels for proteins specified in olinkid_list (or full df).
+#' Columns include:
+#' \itemize{
+#'  \item{Assay:} "character" Protein symbol
+#'  \item{OlinkID:} "character" Olink specific ID  
+#'  \item{UniProt:} "character" Olink specific ID  
+#'  \item{Panel:} "character" Name of Olink Panel
+#'  \item{term:} "character" term in model
+#'  \item{contrast:} "character" the groups that were compared
+#'  \item{estimate:} "numeric" difference in mean NPX between groups
+#'  \item{conf.low:} "numeric" confidence interval for the mean (lower end)
+#'  \item{conf.high:} "numeric" confidence interval for the mean (upper end)
+#'  \item{Adjusted_pval:} "numeric" adjusted p-value for the test (Benjamini&Hochberg)
+#'  \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
+#' }
+#' 
 #' @export
 #' @examples
 #' \donttest{
@@ -541,7 +573,7 @@ single_posthoc <- function(data, formula_string, effect, mean_return){
 #' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #' @param ... coloroption for color ordering
 #'
-#' @return A list of objects of class "ggplot"
+#' @return A list of objects of class "ggplot" showing point-range plot of NPX (y-axis) over x_axis_variable for each assay (facet), colored by col_variable if provided. 
 #' @export
 #' @examples
 #' \donttest{

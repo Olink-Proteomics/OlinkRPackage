@@ -10,7 +10,13 @@
 #' @param sampleMissingFreq The threshold for sample wise missingness.
 #' @param n Number of bridge samples to be selected.
 #'
-#' @return Tibble with sample IDs and mean NPX for a defined number of bridging samples.
+#' @return A "tibble" with sample IDs and mean NPX for a defined number of bridging samples. Columns include:
+#' 
+#' \itemize{
+#'   \item{SampleID:} Sample ID
+#'   \item{PercAssaysBelowLOD:} Percent of Assays that are below LOD for the sample
+#'   \item{MeanNPX:} Mean NPX for the sample
+#' }
 #' @export
 #'
 #' @examples

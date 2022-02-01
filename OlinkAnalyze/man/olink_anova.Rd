@@ -30,8 +30,23 @@ Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be i
 \item{verbose}{Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
 }
 \value{
-A tibble containing the ANOVA results for every protein.
-The tibble is arranged by ascending p-values.
+A "tibble" containing the ANOVA results for every protein. The tibble is arranged by ascending p-values.
+Columns include:
+
+\itemize{
+ \item{Assay:} "character" Protein symbol
+ \item{OlinkID:} "character" Olink specific ID  
+ \item{UniProt:} "character" Olink specific ID  
+ \item{Panel:} "character" Name of Olink Panel
+ \item{term:} "character" term in model
+ \item{df:} "numeric" degrees of freedom
+ \item{sumsq:} "numeric" sum of square
+ \item{meansq:} "numeric" mean of square
+ \item{statistic:} "numeric" value of the statistic
+ \item{p.value:} "numeric" nominal p-value
+ \item{Adjusted_pval:} "numeric" adjusted p-value for the test (Benjamini&Hochberg)
+ \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
+}
 }
 \description{
 Performs an ANOVA F-test for each assay (by OlinkID) in every panel using car::Anova and Type III sum of squares.

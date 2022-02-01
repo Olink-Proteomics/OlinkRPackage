@@ -36,7 +36,21 @@ Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be i
 \item{verbose}{Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
 }
 \value{
-Tibble of posthoc tests for specified effect, arranged by ascending adjusted p-values.
+A "tibble" of posthoc tests for specified effect, arranged by ascending adjusted p-values.
+Columns include:
+\itemize{
+ \item{Assay:} "character" Protein symbol
+ \item{OlinkID:} "character" Olink specific ID  
+ \item{UniProt:} "character" Olink specific ID  
+ \item{Panel:} "character" Name of Olink Panel
+ \item{term:} "character" term in model
+ \item{contrast:} "character" the groups that were compared
+ \item{estimate:} "numeric" difference in mean NPX between groups
+ \item{conf.low:} "numeric" confidence interval for the mean (lower end)
+ \item{conf.high:} "numeric" confidence interval for the mean (upper end)
+ \item{Adjusted_pval:} "numeric" adjusted p-value for the test (Benjamini&Hochberg)
+ \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
+}
 }
 \description{
 Performs a post hoc ANOVA test using emmeans::emmeans with Tukey p-value adjustment per assay (by OlinkID) for each panel at confidence level 0.95.
