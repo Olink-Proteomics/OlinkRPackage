@@ -14,7 +14,7 @@
 #'
 #' @examples
 #' \donttest{randomized.manifest <- olink_plate_randomizer(manifest)}
-#' \donttest{displayPlateLayout(data = randomized.manifest, fill.color="Site")}
+#' \donttest{olink_displayPlateLayout(data = randomized.manifest, fill.color="Site")}
 #' @importFrom magrittr %>%
 #' @importFrom dplyr n filter select mutate
 #' @importFrom ggplot2 ggplot geom_tile facet_wrap scale_fill_manual labs scale_x_discrete geom_text
