@@ -22,7 +22,7 @@ olink_plate_randomizer(
 
 \item{iterations}{Number of iterations for fitting subjects on the same plate.}
 
-\item{available.spots}{Integer. Number of wells available on each plate. Maximum 40 for T48 and 88 for T96. Can also take a vector equal to the number of plates to be used indicating the number of wells available on each plate.}
+\item{available.spots}{Numeric. Number of wells available on each plate. Maximum 40 for T48 and 88 for T96. Takes a vector equal to the number of plates to be used indicating the number of wells available on each plate.}
 
 \item{seed}{Seed to set. Highly recommend setting this for reproducibility.}
 }
@@ -30,12 +30,38 @@ olink_plate_randomizer(
 Tibble including SampleID, SubjectID etc. assigned to well positions.
 }
 \description{
-Samples can be randomly assigned to plates using base::sample with an option to keep Subjects on the same plate.  Olink Data Science no longer recommends forced balanced randomization considering other clinical variables.
+Generates a scheme for how to plate samples with an option to keep subjects on the same plate.
+}
+\details{
+Variables of interest should if possible be randomized across plates to avoid confounding with potential plate effects. In the case of multiple samples per subject (e.g. in longitudinal studies), Olink recommends keeping each subject on the same plate. This can be achieved using the SubjectColumn argument.
 }
 \examples{
-\donttest{randomized.manifest <- olink_plate_randomizer(manifest, seed=12345)}
-\donttest{randomized.manifest <- olink_plate_randomizer(manifest,SubjectColumn="SubjectID",
-                                                        available.spots=c(88,88), seed=12345)}
+\donttest{
+#Generate randomization scheme using complete randomization
+randomized.manifest_a <- olink_plate_randomizer(manifest, seed=12345)
+
+#Generate randomization scheme that keeps subjects on the same plate
+randomized.manifest_b <- olink_plate_randomizer(manifest,SubjectColumn="SubjectID",
+                                                        available.spots=c(88,88), seed=12345)
+
+#Visualize the generated plate layouts
+olink_displayPlateLayout(randomized.manifest_a, fill.color = 'Site')
+olink_displayPlateLayout(randomized.manifest_a, fill.color = 'SubjectID')
+olink_displayPlateLayout(randomized.manifest_b, fill.color = 'Site')
+olink_displayPlateLayout(randomized.manifest_b, fill.color = 'SubjectID')
+
+#Validate that sites are properly randomized
+olink_displayPlateDistributions(randomized.manifest_a, fill.color = 'Site')
+olink_displayPlateDistributions(randomized.manifest_b, fill.color = 'Site')
+}
+
+
+}
+\seealso{
+\itemize{
+\item{\code{\link[OlinkAnalyze:olink_displayPlateLayout]{olink_displayPlateLayout()}} for visualizing the generated plate layouts}
+\item{\code{\link[OlinkAnalyze:olink_displayPlateDistributions]{olink_displayPlateDistributions()}} for validating that sites are properly randomized}
+}
 }
 \keyword{plates}
 \keyword{randomized}
