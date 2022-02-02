@@ -40,7 +40,7 @@ a sample's unique index number is displayed.}
 \item{...}{coloroption passed to specify color order}
 }
 \value{
-An object of class "ggplot"
+An object of class "ggplot". Scatterplot shows IQR vs median for all samples per panel
 }
 \description{
 Generates a facet plot per Panel using ggplot2::ggplot and ggplot2::geom_point and stats::IQR plotting IQR vs. median for all samples.

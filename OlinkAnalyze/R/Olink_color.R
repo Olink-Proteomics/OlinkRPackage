@@ -3,7 +3,7 @@
 #' @param alpha transparency (optional)
 #' @param coloroption string, one or more of the following:
 #' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'lightblue', 'darkblue', 'purple', 'pink')
-#' @return Palette hex codes for colors
+#' @return A character vector of palette hex codes for colors 
 #' @keywords color palette Olink
 #' @examples
 #'
@@ -125,7 +125,7 @@ olink_pal <- function(alpha = 1, coloroption = NULL) {
 #' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'lightblue', 'darkblue', 'purple', 'pink')
 #' @param ... Optional. Additional arguments to pass to ggplot2::discrete_scale()
 #'
-#' @return None
+#' @return No return value, called for side effects
 #' @export
 #'
 #' @examples
@@ -155,7 +155,7 @@ olink_color_discrete <- function(..., alpha = 1, coloroption = NULL) {
 #' @param coloroption string, one or more of the following:
 #' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'lightblue', 'darkblue', 'purple', 'pink')
 #' @param ... Optional. Additional arguments to pass to scale_color_gradientn()
-#' @return None
+#' @return No return value, called for side effects
 #' @export
 #'
 #' @examples
@@ -184,7 +184,7 @@ olink_color_gradient <- function(..., alpha = 1, coloroption = NULL) {
 #' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'lightblue', 'darkblue', 'purple', 'pink')
 #' @param ... Optional. Additional arguments to pass to ggplot2::discrete_scale()
 #'
-#' @return None
+#' @return No return value, called for side effects
 #' @export
 #'
 #' @examples
@@ -213,7 +213,7 @@ olink_fill_discrete <- function(..., alpha = 1, coloroption = NULL) {
 #' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'lightblue', 'darkblue', 'purple', 'pink')
 #' @param ... Optional. Additional arguments to pass to ggplot2::scale_fill_gradientn()
 #'
-#' @return None
+#' @return No return value, called for side effects
 #' @export
 #'
 #' @examples

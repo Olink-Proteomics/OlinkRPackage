@@ -10,7 +10,7 @@
 #' @param verbose Boolean. If the plots are shown as well as returned in the list (default is false).
 #' @param ... coloroption passed to specify color order
 #'
-#' @return A list of objects of class “ggplot” (the actual ggplot object is entry 1 in the list).
+#' @return A list of objects of class “ggplot” (the actual ggplot object is entry 1 in the list). Box and whisker plot of NPX (y-axis) by variable (x-axis) for each Assay
 #' @importFrom magrittr %>%
 #' @importFrom dplyr filter mutate select
 #' @importFrom stringr str_detect

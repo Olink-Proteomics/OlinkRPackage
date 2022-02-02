@@ -29,8 +29,24 @@
 #' @param return.covariates Boolean. Default: False. Returns F-test results for the covariates. Note: Adjusted p-values will be NA for the covariates.
 #' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #'
-#' @return A tibble containing the ANOVA results for every protein.
-#' The tibble is arranged by ascending p-values.
+#' @return A "tibble" containing the ANOVA results for every protein. The tibble is arranged by ascending p-values.
+#' Columns include:
+#' 
+#' \itemize{
+#'  \item{Assay:} "character" Protein symbol
+#'  \item{OlinkID:} "character" Olink specific ID  
+#'  \item{UniProt:} "character" Olink specific ID  
+#'  \item{Panel:} "character" Name of Olink Panel
+#'  \item{term:} "character" term in model
+#'  \item{df:} "numeric" degrees of freedom
+#'  \item{sumsq:} "numeric" sum of square
+#'  \item{meansq:} "numeric" mean of square
+#'  \item{statistic:} "numeric" value of the statistic
+#'  \item{p.value:} "numeric" nominal p-value
+#'  \item{Adjusted_pval:} "numeric" adjusted p-value for the test (Benjamini&Hochberg)
+#'  \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
+#' }
+#'  
 #' @export
 #' @examples
 #' \donttest{
@@ -302,7 +318,23 @@ olink_anova <- function(df,
 #' @param mean_return Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = TRUE and no adjustment is performed.
 #' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #'
-#' @return Tibble of posthoc tests for specified effect, arranged by ascending adjusted p-values.
+#' @return 
+#' A "tibble" of posthoc tests for specified effect, arranged by ascending adjusted p-values.
+#' Columns include:
+#' \itemize{
+#'  \item{Assay:} "character" Protein symbol
+#'  \item{OlinkID:} "character" Olink specific ID  
+#'  \item{UniProt:} "character" Olink specific ID  
+#'  \item{Panel:} "character" Name of Olink Panel
+#'  \item{term:} "character" term in model
+#'  \item{contrast:} "character" the groups that were compared
+#'  \item{estimate:} "numeric" difference in mean NPX between groups
+#'  \item{conf.low:} "numeric" confidence interval for the mean (lower end)
+#'  \item{conf.high:} "numeric" confidence interval for the mean (upper end)
+#'  \item{Adjusted_pval:} "numeric" adjusted p-value for the test (Benjamini&Hochberg)
+#'  \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
+#' }
+#' 
 #' @export
 #' @examples \donttest{
 #'

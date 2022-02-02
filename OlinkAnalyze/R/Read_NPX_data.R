@@ -4,7 +4,21 @@
 #' No alterations to the output NPX Manager format is allowed.
 #'
 #' @param filename Path to file NPX Manager output file.
-#' @return A tibble in long format.
+#' @return A "tibble" in long format. Columns include:
+#' \itemize{
+#'    \item{SampleID:} Sample ID
+#'    \item{Index:} Index
+#'    \item{OlinkID:} Olink ID
+#'    \item{UniProt:} UniProt ID
+#'    \item{Assay:} Protein symbol
+#'    \item{MissingFreq:} Proportion of sample below LOD
+#'    \item{Panel_Version:} Panel Version
+#'    \item{PlateID:} Plate ID
+#'    \item{QC_Warning:} QC Warning Status
+#'    \item{LOD:} Limit of detection
+#'    \item{NPX:} Normalized Protein Expression
+#' }
+#' Additional columns may be present or missing depending on the platform
 #' @keywords NPX
 #' @export
 #' @examples

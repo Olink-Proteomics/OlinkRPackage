@@ -15,7 +15,7 @@
 #' @param facetNrow The number of rows that the panels are arranged on
 #' @param facetNcol The number of columns that the panels are arranged on
 #' @param ... coloroption passed to specify color order
-#' @return An object of class "ggplot"
+#' @return An object of class "ggplot". Scatterplot shows IQR vs median for all samples per panel
 #' @keywords NPX
 #' @export
 #' @examples

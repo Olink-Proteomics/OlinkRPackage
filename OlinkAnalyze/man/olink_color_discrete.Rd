@@ -15,7 +15,7 @@ olink_color_discrete(..., alpha = 1, coloroption = NULL)
 c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'lightblue', 'darkblue', 'purple', 'pink')}
 }
 \value{
-None
+No return value, called for side effects
 }
 \description{
 Olink color scale for discrete ggplots

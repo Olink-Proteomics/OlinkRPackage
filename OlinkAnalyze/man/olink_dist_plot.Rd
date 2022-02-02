@@ -14,10 +14,10 @@ olink_dist_plot(df, color_g = "QC_Warning", ...)
 \item{...}{Color option passed to specify color order.}
 }
 \value{
-An object of class "ggplot"
+An object of class "ggplot" which displays NPX distribution for each sample per panel
 }
 \description{
-Generates boxplots of NPX vs. protein (OlinkID) colored by QC_Warning (default) or any other grouping variable 
+Generates boxplots of NPX vs. SampleID colored by QC_Warning (default) or any other grouping variable 
 and faceted by Panel using ggplot and ggplot2::geom_boxplot.
 }
 \examples{

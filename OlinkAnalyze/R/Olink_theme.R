@@ -4,6 +4,7 @@
 #'
 #' @param font Font family to use for text elements. Depends on extrafont package.
 #'
+#' @return No return value, used as theme for ggplots 
 #' @export
 #' @importFrom ggplot2 theme element_blank element_line element_rect element_text
 #'
