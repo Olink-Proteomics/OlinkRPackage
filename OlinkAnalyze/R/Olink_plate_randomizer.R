@@ -6,7 +6,7 @@
 #' @param PlateSize Integer. Either 96 or 48. 96 is default.
 #' @param include.label Should the variable group be shown in the plot.
 #' @keywords randomized plates ggplot
-#' @return An object of class "ggplot" showing the each plate in a facet with the cells colored by fill.color.
+#' @return An object of class "ggplot" showing each plate in a facet with the cells colored by values in column fill.color in input \code{data}.
 #' @export
 #' @seealso \itemize{
 #' \item{\code{\link[OlinkAnalyze:olink_plate_randomizer]{olink_plate_randomizer()}} for generating a plating scheme}
