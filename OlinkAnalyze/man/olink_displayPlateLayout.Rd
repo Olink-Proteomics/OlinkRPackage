@@ -21,7 +21,7 @@ olink_displayPlateLayout(
 \item{include.label}{Should the variable group be shown in the plot.}
 }
 \value{
-An object of class "ggplot" showing the each plate in a facet with the cells colored by fill.color.
+An object of class "ggplot" showing each plate in a facet with the cells colored by values in column fill.color in input \code{data}.
 }
 \description{
 Displays each plate in a facet with cells colored by the given variable using ggplot and ggplot2::geom_tile.
