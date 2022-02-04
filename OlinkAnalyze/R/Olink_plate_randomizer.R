@@ -259,7 +259,7 @@ olink_plate_randomizer <-function(Manifest, PlateSize = 96, SubjectColumn, itera
       dplyr::mutate(well=paste0(row,gsub("Column ","",as.character(column)))) %>%
       dplyr::mutate(well=factor(well,levels=paste0(rep(LETTERS[1:8],each=number_of_cols_per_plate),rep(1:number_of_cols_per_plate,times=8)))) %>%
       dplyr::arrange(plate, column, row)
-    message("Random assignment of SAMPLES to plates")
+    cat("Random assignment of SAMPLES to plates\n")
     class(out.manifest) <- c("randomizedManifest",class(out.manifest))
     return(out.manifest)
   }
@@ -267,8 +267,9 @@ olink_plate_randomizer <-function(Manifest, PlateSize = 96, SubjectColumn, itera
 
   ##Keep subjects together
   if(!missing(SubjectColumn)){
-    message("Assigning subjects to plates")
+    cat("Assigning subjects to plates\n")
     for(i in 1:iterations){
+      cat(".")
       all.plates$SampleID <- NA
       rand.subjects <- sample(unique(Manifest$SubjectID))
 
@@ -299,6 +300,7 @@ olink_plate_randomizer <-function(Manifest, PlateSize = 96, SubjectColumn, itera
 
     }
 
+    cat("Random assignment of SUBJECTS to plates\n")
     if(passed){
 
       out.manifest <- out.manifest %>%
