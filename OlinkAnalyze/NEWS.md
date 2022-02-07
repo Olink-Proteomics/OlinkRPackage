@@ -1,3 +1,25 @@
+# OlinkAnalyze 3.0.0
+
+## Major Changes
+
+* displayPlateDistributions and displayPlateLayout names were updated to olink_displayPlateDistributions and olink_displayPlateLayout (@simfor, #98)
+
+## Minor Changes
+
+* Update CI to Ubuntu 20.04 (@AskPascal, #97)
+* olink_bridgeselector will now give an error if less n number of bridge samples can be selected based on set sampleMissingFreq (@marisand, #100)
+* update return value documentation for all functions to specify columns and class of output (@kathy-nevola, #102)
+* replaced or removed cat/print with message/stop so messages printed to the console can be suppressed (@jrguess, #103)
+
+## Bugfixes
+
+* fixed spelling mistakes in documentation (@kathy-nevola, #92)
+* updated DESCRIPTION to fit CRAN specification (@kathy-nevola, #94)
+* change T/F to TRUE/FALSE for stability (@AskPascal, #96)
+* updated documentation to olink_plate_randomizer, olink_displayPlateDistributions and olink_displayPlateLayout to link related functions and clarify olink_plate_randomizer documentation (@simfor, #98)
+* fixed keywords in documentation (@kathy-nevola, #99)
+
+
 # OlinkAnalyze 2.0.1
 
 ## Bug Fixes
