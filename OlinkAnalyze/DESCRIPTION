@@ -9,7 +9,7 @@ Description: A collection of functions to facilitate analysis of proteomic data
     statistical analysis and generating figures to visualize the results of
     the statistical analysis. The goal of this package is to help users extract
     biological insights from proteomic data run on the Olink platform.
-Version: 2.0.1
+Version: 3.0.0
 Authors@R: 
     c(person(given = "Kathleen",
             family = "Nevola",
