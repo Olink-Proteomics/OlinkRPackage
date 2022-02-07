@@ -6,14 +6,14 @@ This is a resubmission. In this version I have:
 * Added descriptive details about the packages functionality and methods in the description text.
 * Replaced all instances of T and F with TRUE and FALSE
 * Improved \value in all functions to include structure of output (class) and what the output means including documenting columns of output. For functions that do not return a value, the \value has documented that as well.
-* Removed print()/cat() calls and replaced with message()/stop().Function olink_pca_plot() uses print() to print ggplot objects but is controlled by the quiet argument (TRUE/FALSE) so can be surpressed
+* Removed print()/cat() calls and replaced with message()/stop(). Function olink_pca_plot() uses print() to print ggplot objects but is controlled by the quiet argument (TRUE/FALSE) so can be surpressed
 * Removed the License file and reference to the license file in the description file.
 * displayPlateDistributions and displayPlateLayout names were updated to olink_displayPlateDistributions and olink_displayPlateLayout
 * updated documentation to olink_plate_randomizer, olink_displayPlateDistributions and olink_displayPlateLayout to link related functions and clarify olink_plate_randomizer documentation
 *  olink_bridgeselector will now give an error if less n number of bridge samples can be selected based on set sampleMissingFreq
 
 ## R CMD check results
-There were no ERRORs, or WARNINGs.
+There were no ERRORs or WARNINGs.
 
 There was 1 NOTE:
 
