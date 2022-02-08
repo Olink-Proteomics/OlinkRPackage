@@ -9,6 +9,9 @@ set_plot_theme(font = "Swedish Gothic Thin")
 \arguments{
 \item{font}{Font family to use for text elements. Depends on extrafont package.}
 }
+\value{
+No return value, used as theme for ggplots
+}
 \description{
 This function sets a coherent plot theme for functions.
 }

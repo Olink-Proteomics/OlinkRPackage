@@ -4,7 +4,21 @@
 #' No alterations to the output NPX Manager format is allowed.
 #'
 #' @param filename Path to file NPX Manager output file.
-#' @return A tibble in long format.
+#' @return A "tibble" in long format. Columns include:
+#' \itemize{
+#'    \item{SampleID:} Sample ID
+#'    \item{Index:} Index
+#'    \item{OlinkID:} Olink ID
+#'    \item{UniProt:} UniProt ID
+#'    \item{Assay:} Protein symbol
+#'    \item{MissingFreq:} Proportion of sample below LOD
+#'    \item{Panel_Version:} Panel Version
+#'    \item{PlateID:} Plate ID
+#'    \item{QC_Warning:} QC Warning Status
+#'    \item{LOD:} Limit of detection
+#'    \item{NPX:} Normalized Protein Expression
+#' }
+#' Additional columns may be present or missing depending on the platform
 #' @keywords NPX
 #' @export
 #' @examples
@@ -25,11 +39,11 @@ read_NPX <- function(filename){
   # If the file is csv or txt, read_NPX assumes that the file is explore data in long format
   if (tools::file_ext(filename) %in% c("csv","txt")) {
     #read file using ; as delimiter
-    out <- read.table(filename, header = TRUE, sep=";", stringsAsFactors = F,
+    out <- read.table(filename, header = TRUE, sep=";", stringsAsFactors = FALSE,
                       na.strings = c("NA",""))
     if (is.data.frame(out) & ncol(out) == 1) {
       #if only one column in the data, wrong delimiter. use , as delimiter
-      out <- read.table(filename, header = TRUE, sep=",", stringsAsFactors = F,
+      out <- read.table(filename, header = TRUE, sep=",", stringsAsFactors = FALSE,
                         na.strings = c("NA",""))
     }
     #check that all colnames are present
@@ -59,14 +73,14 @@ read_NPX <- function(filename){
   # Check if the data is npx or concentration as well as if it is tg48 or tg96
 
   data_type <- readxl::read_excel(filename, range='A2',
-                                  col_names = F, .name_repair="minimal")
+                                  col_names = FALSE, .name_repair="minimal")
   if (grepl('NPX', data_type, fixed=TRUE)) {
     is_npx_data <- TRUE
     n_max_meta_data <- 4
 
     # Check whether it is target 48 or 96
     panel_name <- readxl::read_excel(filename, range='B3',
-                                     col_names = F, .name_repair="minimal")
+                                     col_names = FALSE, .name_repair="minimal")
     if (grepl('Target 48', panel_name, fixed=TRUE)) {
       target_type <- '48'
       BASE_INDEX <- 45
@@ -86,7 +100,7 @@ read_NPX <- function(filename){
 
   # Load initial meta data (the first rows of the wide file)
   meta_dat <-  readxl::read_excel(filename, skip = 2, n_max = n_max_meta_data,
-                                  col_names = F, .name_repair="minimal")
+                                  col_names = FALSE, .name_repair="minimal")
   meta_dat[4,1] <- 'SampleID'
   NR_DEVIATIONS <- sum(stringr::str_detect(meta_dat[2,],
                                            'QC Deviation from median'))
@@ -106,7 +120,7 @@ read_NPX <- function(filename){
     dplyr::rename(Name = `1`)
 
   # Load NPX or QUANT data including the last rows of meta data
-  dat <- readxl::read_excel(filename, skip = n_max_meta_data+2, col_names = F,
+  dat <- readxl::read_excel(filename, skip = n_max_meta_data+2, col_names = FALSE,
                             .name_repair="minimal", col_types = c('text'))
 
   nr_col <- ncol(dat)
@@ -302,16 +316,16 @@ read_NPX <- function(filename){
     dplyr::mutate(Panel_Version = gsub(".*\\(","",Panel)) %>%
     dplyr::mutate(Panel_Version = gsub("\\)","",Panel_Version)) %>%
     dplyr::mutate(Panel =  gsub("\\(.*\\)","",Panel)) %>%
-    dplyr::mutate(Panel = stringr::str_to_title(Panel)) %>% 
-    dplyr::mutate(Panel = gsub("Target 96", "", Panel)) %>% 
-    dplyr::mutate(Panel = gsub("Olink", "", Panel)) %>% 
-    dplyr::mutate(Panel = trimws(Panel, which = "left")) %>% 
-    tidyr::separate(Panel, " ", into = c("Panel_Start", "Panel_End"), fill = "right") %>% 
+    dplyr::mutate(Panel = stringr::str_to_title(Panel)) %>%
+    dplyr::mutate(Panel = gsub("Target 96", "", Panel)) %>%
+    dplyr::mutate(Panel = gsub("Olink", "", Panel)) %>%
+    dplyr::mutate(Panel = trimws(Panel, which = "left")) %>%
+    tidyr::separate(Panel, " ", into = c("Panel_Start", "Panel_End"), fill = "right") %>%
     dplyr::mutate(Panel_End = ifelse(grepl("Ii", Panel_End), stringr::str_to_upper(Panel_End), Panel_End)) %>%
-    dplyr::mutate(Panel_End = ifelse(is.na(Panel_End), " ", Panel_End)) %>% 
-    dplyr::mutate(Panel = paste("Olink", Panel_Start, Panel_End)) %>% 
-    dplyr::mutate(Panel = trimws(Panel, which = "right")) %>% 
-    dplyr::select(-Panel_Start, -Panel_End) %>% 
+    dplyr::mutate(Panel_End = ifelse(is.na(Panel_End), " ", Panel_End)) %>%
+    dplyr::mutate(Panel = paste("Olink", Panel_Start, Panel_End)) %>%
+    dplyr::mutate(Panel = trimws(Panel, which = "right")) %>%
+    dplyr::select(-Panel_Start, -Panel_End) %>%
     dplyr::select(SampleID, Index, OlinkID,
                   UniProt, Assay, MissingFreq,
                   Panel,Panel_Version,PlateID,

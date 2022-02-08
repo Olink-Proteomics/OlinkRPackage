@@ -14,7 +14,7 @@ olink_lmer_plot(
   x_axis_variable,
   col_variable = NULL,
   number_of_proteins_per_plot = 6,
-  verbose = F,
+  verbose = FALSE,
   ...
 )
 }
@@ -40,12 +40,12 @@ Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be i
 
 \item{number_of_proteins_per_plot}{Number plots to include in the list of point-range plots. Defaults to 6 plots per figure}
 
-\item{verbose}{Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
+\item{verbose}{Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
 
 \item{...}{coloroption for color ordering}
 }
 \value{
-A list of objects of class "ggplot"
+A list of objects of class "ggplot" showing point-range plot of NPX (y-axis) over x_axis_variable for each assay (facet), colored by col_variable if provided.
 }
 \description{
 Generates a point-range plot faceted by Assay using ggplot and ggplot2::geom_pointrange based on a linear mixed effects model using lmerTest:lmer and emmeans::emmeans.

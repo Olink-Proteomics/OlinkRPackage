@@ -9,8 +9,8 @@ olink_anova(
   variable,
   outcome = "NPX",
   covariates = NULL,
-  return.covariates = F,
-  verbose = T
+  return.covariates = FALSE,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -30,14 +30,29 @@ Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be i
 \item{verbose}{Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
 }
 \value{
-A tibble containing the ANOVA results for every protein.
-The tibble is arranged by ascending p-values.
+A "tibble" containing the ANOVA results for every protein. The tibble is arranged by ascending p-values.
+Columns include:
+
+\itemize{
+ \item{Assay:} "character" Protein symbol
+ \item{OlinkID:} "character" Olink specific ID  
+ \item{UniProt:} "character" Olink specific ID  
+ \item{Panel:} "character" Name of Olink Panel
+ \item{term:} "character" term in model
+ \item{df:} "numeric" degrees of freedom
+ \item{sumsq:} "numeric" sum of square
+ \item{meansq:} "numeric" mean of square
+ \item{statistic:} "numeric" value of the statistic
+ \item{p.value:} "numeric" nominal p-value
+ \item{Adjusted_pval:} "numeric" adjusted p-value for the test (Benjamini&Hochberg)
+ \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
+}
 }
 \description{
 Performs an ANOVA F-test for each assay (by OlinkID) in every panel using car::Anova and Type III sum of squares.
 The function handles both factor and numerical variables and/or covariates. \cr\cr
-Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a messsage if verbose = T).
-Character columns in the input dataframe are automatically converted to factors (specified in a message if verbose = T).
+Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a messsage if verbose = TRUE).
+Character columns in the input dataframe are automatically converted to factors (specified in a message if verbose = TRUE).
 Numerical variables are not converted to factors.
 If a numerical variable is to be used as a factor, this conversion needs to be done on the dataframe before the function call. \cr\cr
 Crossed analysis, i.e. A*B formula notation, is inferred from the variable argument in the following cases: \cr
@@ -46,9 +61,9 @@ Crossed analysis, i.e. A*B formula notation, is inferred from the variable argum
 \item c('A: B')
 \item c('A: B', 'B') or c('A: B', 'A')
 }
-Inference is specified in a message if verbose = T. \cr
+Inference is specified in a message if verbose = TRUE. \cr
 For covariates, crossed analyses need to be specified explicity, i.e. two main effects will not be expaned with a c('A','B') notation. Main effects present in the variable takes precedence.
-The formula notation of the final model is specified in a message if verbose = T. \cr\cr
+The formula notation of the final model is specified in a message if verbose = TRUE. \cr\cr
 Adjusted p-values are calculated by stats::p.adjust according to the Benjamini & Hochberg (1995) method (“fdr”).
 The threshold is determined by logic evaluation of Adjusted_pval < 0.05. Covariates are not included in the p-value adjustment.
 }

@@ -2,8 +2,8 @@
 #'
 #'Performs an ANOVA F-test for each assay (by OlinkID) in every panel using car::Anova and Type III sum of squares.
 #'The function handles both factor and numerical variables and/or covariates. \cr\cr
-#'Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a messsage if verbose = T).
-#'Character columns in the input dataframe are automatically converted to factors (specified in a message if verbose = T).
+#'Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a messsage if verbose = TRUE).
+#'Character columns in the input dataframe are automatically converted to factors (specified in a message if verbose = TRUE).
 #'Numerical variables are not converted to factors.
 #'If a numerical variable is to be used as a factor, this conversion needs to be done on the dataframe before the function call. \cr\cr
 #'Crossed analysis, i.e. A*B formula notation, is inferred from the variable argument in the following cases: \cr
@@ -12,9 +12,9 @@
 #' \item c('A: B')
 #' \item c('A: B', 'B') or c('A: B', 'A')
 #'}
-#'Inference is specified in a message if verbose = T. \cr
+#'Inference is specified in a message if verbose = TRUE. \cr
 #'For covariates, crossed analyses need to be specified explicity, i.e. two main effects will not be expaned with a c('A','B') notation. Main effects present in the variable takes precedence.
-#'The formula notation of the final model is specified in a message if verbose = T. \cr\cr
+#'The formula notation of the final model is specified in a message if verbose = TRUE. \cr\cr
 #'Adjusted p-values are calculated by stats::p.adjust according to the Benjamini & Hochberg (1995) method (“fdr”).
 #'The threshold is determined by logic evaluation of Adjusted_pval < 0.05. Covariates are not included in the p-value adjustment.
 #'
@@ -29,8 +29,24 @@
 #' @param return.covariates Boolean. Default: False. Returns F-test results for the covariates. Note: Adjusted p-values will be NA for the covariates.
 #' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #'
-#' @return A tibble containing the ANOVA results for every protein.
-#' The tibble is arranged by ascending p-values.
+#' @return A "tibble" containing the ANOVA results for every protein. The tibble is arranged by ascending p-values.
+#' Columns include:
+#' 
+#' \itemize{
+#'  \item{Assay:} "character" Protein symbol
+#'  \item{OlinkID:} "character" Olink specific ID  
+#'  \item{UniProt:} "character" Olink specific ID  
+#'  \item{Panel:} "character" Name of Olink Panel
+#'  \item{term:} "character" term in model
+#'  \item{df:} "numeric" degrees of freedom
+#'  \item{sumsq:} "numeric" sum of square
+#'  \item{meansq:} "numeric" mean of square
+#'  \item{statistic:} "numeric" value of the statistic
+#'  \item{p.value:} "numeric" nominal p-value
+#'  \item{Adjusted_pval:} "numeric" adjusted p-value for the test (Benjamini&Hochberg)
+#'  \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
+#' }
+#'  
 #' @export
 #' @examples
 #' \donttest{
@@ -66,8 +82,8 @@ olink_anova <- function(df,
                         variable,
                         outcome="NPX",
                         covariates = NULL,
-                        return.covariates=F,
-                        verbose=T
+                        return.covariates = FALSE,
+                        verbose = TRUE
 ){
 
   if(missing(df) | missing(variable)){
@@ -124,7 +140,7 @@ olink_anova <- function(df,
       warning(paste0('The assays ',
                      paste(all_nas, collapse = ', '),
                      ' have only NA:s. They will not be tested.'),
-              call. = F)
+              call. = FALSE)
 
     }
 
@@ -177,12 +193,12 @@ olink_anova <- function(df,
                        ' has only NA:s in atleast one level of ',
                        effect,
                        '. It will not be tested.'),
-                call. = F)
+                call. = FALSE)
       }
 
       number_of_samples_w_more_than_one_level <- df %>%
         dplyr::group_by(SampleID, Index) %>%
-        dplyr::summarise(n_levels = dplyr::n_distinct(!!rlang::ensym(effect), na.rm = T)) %>%
+        dplyr::summarise(n_levels = dplyr::n_distinct(!!rlang::ensym(effect), na.rm = TRUE)) %>%
         dplyr::ungroup() %>%
         dplyr::filter(n_levels > 1) %>%
         nrow(.)
@@ -299,15 +315,31 @@ olink_anova <- function(df,
 #' Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be inferred from main effects.
 #' @param outcome Character. The dependent variable. Default: NPX.
 #' @param effect Term on which to perform post-hoc. Character vector. Must be subset of or identical to variable.
-#' @param mean_return Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = T and no adjustment is performed.
+#' @param mean_return Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = TRUE and no adjustment is performed.
 #' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #'
-#' @return Tibble of posthoc tests for specified effect, arranged by ascending adjusted p-values.
+#' @return 
+#' A "tibble" of posthoc tests for specified effect, arranged by ascending adjusted p-values.
+#' Columns include:
+#' \itemize{
+#'  \item{Assay:} "character" Protein symbol
+#'  \item{OlinkID:} "character" Olink specific ID  
+#'  \item{UniProt:} "character" Olink specific ID  
+#'  \item{Panel:} "character" Name of Olink Panel
+#'  \item{term:} "character" term in model
+#'  \item{contrast:} "character" the groups that were compared
+#'  \item{estimate:} "numeric" difference in mean NPX between groups
+#'  \item{conf.low:} "numeric" confidence interval for the mean (lower end)
+#'  \item{conf.high:} "numeric" confidence interval for the mean (upper end)
+#'  \item{Adjusted_pval:} "numeric" adjusted p-value for the test (Benjamini&Hochberg)
+#'  \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
+#' }
+#' 
 #' @export
 #' @examples \donttest{
 #'
 #' library(dplyr)
-#' 
+#'
 #' npx_df <- npx_data1 %>% filter(!grepl('control',SampleID, ignore.case = TRUE))
 #'
 #' #Two-way ANOVA, one main effect (Site) covariate.
@@ -316,7 +348,7 @@ olink_anova <- function(df,
 #'                              variable=c("Treatment:Time"),
 #'                              covariates="Site")
 #'
-#' #Posthoc test for the model NPX~Treatment*Time+Site, 
+#' #Posthoc test for the model NPX~Treatment*Time+Site,
 #' #on the interaction effect Treatment:Time with covariate Site.
 #'
 #' #Filtering out significant and relevant results.
@@ -325,7 +357,7 @@ olink_anova <- function(df,
 #' select(OlinkID) %>%
 #' distinct() %>%
 #' pull()
-#' 
+#'
 #' #Posthoc
 #' anova_posthoc_results <- olink_anova_posthoc(npx_df,
 #' variable=c("Treatment:Time"),
@@ -340,10 +372,10 @@ olink_anova_posthoc <- function(df,
                                 olinkid_list = NULL,
                                 variable,
                                 covariates = NULL,
-                                outcome="NPX",
+                                outcome = "NPX",
                                 effect,
-                                mean_return=F,
-                                verbose=T
+                                mean_return = FALSE,
+                                verbose = TRUE
 ){
 
 
@@ -454,9 +486,9 @@ olink_anova_posthoc <- function(df,
       dplyr::do(data.frame(emmeans::emmeans(stats::lm(as.formula(formula_string),data=.),
                                     specs=as.formula(paste0("pairwise~", paste(effect,collapse="+"))),
                                     cov.reduce = function(x) round(c(mean(x),mean(x)+sd(x)),4),
-                            infer=c(T,T),
+                            infer=c(TRUE,TRUE),
                             adjust="tukey")[[c("contrasts","emmeans")[1+as.numeric(mean_return)]]],
-                    stringsAsFactors=F)) %>%
+                    stringsAsFactors=FALSE)) %>%
       dplyr::ungroup() %>%
       dplyr::mutate(term=paste(effect,collapse=":"))  %>%
       dplyr::rename(conf.low=lower.CL,
