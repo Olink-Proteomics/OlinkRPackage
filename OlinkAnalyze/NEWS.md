@@ -7,7 +7,7 @@
 ## Minor Changes
 
 * Update CI to Ubuntu 20.04 (@AskPascal, #97)
-* olink_bridgeselector will now give an error if less n number of bridge samples can be selected based on set sampleMissingFreq (@marisand, #100)
+* olink_bridgeselector will now give an error if less than n (number of) bridge samples can be selected based on set sampleMissingFreq (@marisand, #100)
 * update return value documentation for all functions to specify columns and class of output (@kathy-nevola, #102)
 * replaced or removed cat/print with message/stop so messages printed to the console can be suppressed (@jrguess, #103)
 
