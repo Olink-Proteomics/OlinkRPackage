@@ -144,7 +144,7 @@ olink_ttest <- function(df, variable, pair_id, ...){
 
     warning(paste0('The assays ',
                    paste(all_nas, collapse = ', '),
-                   ' have only NA:s. They will not be tested.'),
+                   ' have too few datapoints. They will not be tested.'),
             call. = FALSE)
 
   }
@@ -154,7 +154,7 @@ olink_ttest <- function(df, variable, pair_id, ...){
     dplyr::group_by(OlinkID, !!rlang::ensym(variable)) %>%
     dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(NPX))) %>%
     dplyr::ungroup() %>%
-    dplyr::filter(n == n_na) %>%
+    dplyr::filter(n-n_na <= 1) %>%
     dplyr::pull(OlinkID)
 
 
@@ -162,7 +162,7 @@ olink_ttest <- function(df, variable, pair_id, ...){
 
     warning(paste0('The assays ',
                    paste(nas_in_level, collapse = ', '),
-                   ' have only NA:s in one level of the factor. They will not be tested.'),
+                   ' have too few datapoints in one level of the factor. They will not be tested.'),
             call. = FALSE)
 
   }
