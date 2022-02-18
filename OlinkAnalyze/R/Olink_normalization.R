@@ -1,6 +1,6 @@
 #' Normalization of all proteins (by OlinkID).
 #'
-#' Normalizes NPX data frames to another data frame or to reference medians. If two dataframes are normalized to one another, Olinks default is using the older dataframe as reference.
+#' Normalizes NPX data frames to another data frame or to reference medians. If two dataframes are normalized to one another, Olink's default is using the older dataframe as reference.
 #' The function handles four different types of normalization: \cr\cr
 #' Bridging normalization: One of the dataframes is adjusted to another using overlapping samples (bridge samples).
 #' The overlapping samples need to be named the same between the dataframes and adjustment is made using the median of the paired differences between the bridge samples in the two data frames.
@@ -23,7 +23,8 @@
 #' @param reference_project Project name of reference_project. Needs to be the same as either df1_project_nr or df2_project_nr. The project to which the second project is adjusted to.
 #' @param reference_medians Dataframe which needs to contain columns "OlinkID", and "Reference_NPX". Used for reference median normalization.
 #'
-#' @return A tibble of NPX data in long format containing normalized NPX values, including adjustment factors.
+#' @return A "tibble" of NPX data in long format containing normalized NPX values, including adjustment factors.
+#' Columns include same as df1/df2 with additional column Adj_factor which includes the adjustment factor in the normalization.
 #' @keywords Normalization
 #' @export
 #' @examples

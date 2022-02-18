@@ -10,7 +10,7 @@
 #' @param olinkid_list Optional. Character vector of proteins (by OlinkID) to label in the plot. If not provided, default is to label all significant proteins.
 #' @param ... Optional. Additional arguments for  olink_color_discrete()
 #'
-#' @return An object of class "ggplot"
+#' @return An object of class "ggplot", plotting significance (y-axis) by estimated difference between groups (x-axis) for each protein.
 #' @export
 #' @examples
 #' \donttest{
@@ -69,7 +69,7 @@ olink_volcano_plot <- function (p.val_tbl, x_lab = "Estimate", olinkid_list = NU
     ggplot2::geom_point() +
     ggplot2::labs(x = x_lab, y = "-log10(p-value)") +
     ggrepel::geom_label_repel(data = subset(p.val_tbl, OlinkID %in% olinkid_list),
-                              ggplot2::aes(label = Assay), box.padding = 1, show.legend = F) +
+                              ggplot2::aes(label = Assay), box.padding = 1, show.legend = FALSE) +
     ggplot2::geom_hline(yintercept = -log10(0.05), linetype="dotted") +
     OlinkAnalyze::set_plot_theme() +
     OlinkAnalyze::olink_color_discrete(...)

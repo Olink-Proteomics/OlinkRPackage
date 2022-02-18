@@ -57,7 +57,7 @@ olink_pca_plot(
 \item{...}{coloroption passed to specify color order.}
 }
 \value{
-A list of objects of class "ggplot"
+A list of objects of class "ggplot", each plot contains scatter plot of PCs
 }
 \description{
 Generates a PCA projection of all samples from NPX data along two principal components (default PC2 vs. PC1) including the explained variance and dots colored by QC_Warning using stats::prcomp and ggplot2::ggplot.
@@ -97,5 +97,5 @@ outliers <- lapply(g, function(x){x$data}) \%>\%
     filter(Outlier == 1)
 }
 }
-\keyword{NPX,}
+\keyword{NPX}
 \keyword{PCA}

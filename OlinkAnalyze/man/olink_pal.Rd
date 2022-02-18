@@ -13,7 +13,7 @@ olink_pal(alpha = 1, coloroption = NULL)
 c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'lightblue', 'darkblue', 'purple', 'pink')}
 }
 \value{
-Palette hex codes for colors
+A character vector of palette hex codes for colors
 }
 \description{
 Olink color panel for plotting
@@ -33,4 +33,5 @@ filled.contour(volcano, color.palette = hue_pal(), asp = 1)
 
 }
 \keyword{Olink}
-\keyword{crispy,}
+\keyword{color}
+\keyword{palette}

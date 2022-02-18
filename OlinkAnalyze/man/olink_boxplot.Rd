@@ -8,7 +8,7 @@ olink_boxplot(
   df,
   variable,
   olinkid_list,
-  verbose = F,
+  verbose = FALSE,
   number_of_proteins_per_plot = 6,
   ...
 )
@@ -28,7 +28,7 @@ The first or single value is used as x-axis, the second as fill. Further values 
 \item{...}{coloroption passed to specify color order}
 }
 \value{
-A list of objects of class “ggplot” (the actual ggplot object is entry 1 in the list).
+A list of objects of class “ggplot” (the actual ggplot object is entry 1 in the list). Box and whisker plot of NPX (y-axis) by variable (x-axis) for each Assay
 }
 \description{
 Generates faceted boxplots of NPX vs. grouping variable(s) for a given list of proteins (OlinkIDs) using ggplot and ggplot2::geom_boxplot.

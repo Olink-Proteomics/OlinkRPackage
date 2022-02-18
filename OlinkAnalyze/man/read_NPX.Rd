@@ -10,7 +10,21 @@ read_NPX(filename)
 \item{filename}{Path to file NPX Manager output file.}
 }
 \value{
-A tibble in long format.
+A "tibble" in long format. Columns include:
+\itemize{
+   \item{SampleID:} Sample ID
+   \item{Index:} Index
+   \item{OlinkID:} Olink ID
+   \item{UniProt:} UniProt ID
+   \item{Assay:} Protein symbol
+   \item{MissingFreq:} Proportion of sample below LOD
+   \item{Panel_Version:} Panel Version
+   \item{PlateID:} Plate ID
+   \item{QC_Warning:} QC Warning Status
+   \item{LOD:} Limit of detection
+   \item{NPX:} Normalized Protein Expression
+}
+Additional columns may be present or missing depending on the platform
 }
 \description{
 Imports an NPX file exported from NPX Manager.

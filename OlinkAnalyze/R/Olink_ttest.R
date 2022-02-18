@@ -10,7 +10,27 @@
 #' @param variable Character value indicating which column should be used as the grouping variable. Needs to have exactly 2 levels.
 #' @param pair_id Character value indicating which column indicates the paired sample identifier.
 #' @param ... Options to be passed to t.test. See \code{?t.test} for more information.
-#' @return A data frame containing the t-test results for every protein.
+#' @return A "tibble" containing the t-test results for every protein.
+#' Columns include:
+#' \itemize{
+#'  \item{Assay:} "character" Protein symbol
+#'  \item{OlinkID:} "character" Olink specific ID  
+#'  \item{UniProt:} "character" Olink specific ID  
+#'  \item{Panel:} "character" Name of Olink Panel
+#'  \item{estimate:} "numeric" difference in mean NPX between groups
+#'  \item{Group 1:} "numeric" Column is named first level of variable when converted to factor, contains mean NPX for that group
+#'  \item{Group 2:} "numeric" Column is named second level of variable when converted to factor, contains mean NPX for that group
+#'  \item{statistic:} "named numeric" value of the t-statistic
+#'  \item{p.value:} "numeric" p-value for the test
+#'  \item{parameter:} "named numeric" degrees of freedom for the t-statistic
+#'  \item{conf.low:} "numeric" confidence interval for the mean (lower end)
+#'  \item{conf.high:} "numeric" confidence interval for the mean (upper end)
+#'  \item{method:} "character" which t-test method was used
+#'  \item{alternative:} "character" describes the alternative hypothesis
+#'  \item{Adjusted_pval:} "numeric" adjusted p-value for the test (Benjamini&Hochberg)
+#'  \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
+#' }
+#' 
 #' @export
 #' @examples
 #' \donttest{
@@ -174,10 +194,10 @@ olink_ttest <- function(df, variable, pair_id, ...){
     p.val <- df %>%
       dplyr::filter(!(OlinkID %in% all_nas)) %>%
       dplyr::filter(!(OlinkID %in% nas_in_level)) %>%
-      dplyr::select(dplyr::all_of(c("OlinkID","UniProt","Assay","Panel","NPX",variable,pair_id))) %>%
-      tidyr::pivot_wider(names_from=dplyr::all_of(variable),values_from="NPX") %>%
+      dplyr::select(dplyr::all_of(c("OlinkID", "UniProt", "Assay", "Panel", "NPX", variable, pair_id))) %>%
+      tidyr::pivot_wider(names_from = dplyr::all_of(variable), values_from = "NPX") %>%
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
-      dplyr::do(broom::tidy(t.test(x=.[[var_levels[1]]],y=.[[var_levels[2]]],paired=T, ...))) %>%
+      dplyr::do(broom::tidy(t.test(x = .[[var_levels[1]]], y = .[[var_levels[2]]], paired = TRUE, ...))) %>%
       dplyr::ungroup() %>%
       dplyr::mutate(Adjusted_pval = p.adjust(p.value, method = "fdr")) %>%
       dplyr::mutate(Threshold = ifelse(Adjusted_pval < 0.05, "Significant", "Non-significant")) %>%
