@@ -166,7 +166,16 @@ olink_ttest <- function(df, variable, pair_id, ...){
             call. = FALSE)
 
   }
-
+  
+  
+  #Filtering out non-tested assays
+  df <- df %>%
+    dplyr::filter(!(OlinkID %in% all_nas)) %>%
+    dplyr::filter(!(OlinkID %in% nas_in_level))
+  
+  if(nrow(df) == 0) {
+    stop('No assays passing initial check. T-test will not be performed.')
+  }
 
   if(!missing(pair_id)){
 
@@ -192,8 +201,6 @@ olink_ttest <- function(df, variable, pair_id, ...){
 
 
     p.val <- df %>%
-      dplyr::filter(!(OlinkID %in% all_nas)) %>%
-      dplyr::filter(!(OlinkID %in% nas_in_level)) %>%
       dplyr::select(dplyr::all_of(c("OlinkID", "UniProt", "Assay", "Panel", "NPX", variable, pair_id))) %>%
       tidyr::pivot_wider(names_from = dplyr::all_of(variable), values_from = "NPX") %>%
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
@@ -207,14 +214,9 @@ olink_ttest <- function(df, variable, pair_id, ...){
   } else{
 
 
-
-
     message(paste0('T-test is performed on ', var_levels[1], ' - ', var_levels[2], '.'))
 
-
     p.val <- df %>%
-      dplyr::filter(!(OlinkID %in% all_nas)) %>%
-      dplyr::filter(!(OlinkID %in% nas_in_level)) %>%
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
       dplyr::do(broom::tidy(t.test(NPX ~ !!rlang::ensym(variable), data = ., ...))) %>%
       dplyr::ungroup() %>%
