@@ -24,7 +24,7 @@ olink_pathway_heatmap(
 \item{number_of_terms}{number of terms to display, default is 20}
 }
 \value{
-heatmap as a ggplot object
+A heatmap as a ggplot object
 }
 \description{
 Creates a heatmap of proteins related to pathways using enrichment results from olink_pathway_enrichment.
@@ -38,11 +38,10 @@ ttest_results <- olink_ttest(df=npx_df,
                              alternative = 'two.sided')
 gsea_results <- olink_pathway_enrichment(data = npx_data1, test_results = ttest_results)
 ora_results <- olink_pathway_enrichment(data = npx_data1,
-                                      test_results = ttest_results, method = "ORA")
-ttest_sub <- ttest_results \%>\% filter(Panel == "CARDIOMETABOLIC")
-olink_pathway_heatmap(enrich_results = gsea_results, test_results = ttest_sub)
-olink_pathway_heatmap(enrich_results = ora_results, test_results = ttest_sub,
-                     method = "ORA", keyword = "heart")
+                                        test_results = ttest_results, method = "ORA")
+olink_pathway_heatmap(enrich_results = gsea_results, test_results = ttest_results)
+olink_pathway_heatmap(enrich_results = ora_results, test_results = ttest_results,
+                      method = "ORA", keyword = "cell")
 }
 
 }

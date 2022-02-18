@@ -21,7 +21,7 @@ olink_pathway_visualization(
 \item{number_of_terms}{number of terms to display, default is 20}
 }
 \value{
-bargraph as a ggplot object
+A bargraph as a ggplot object
 }
 \description{
 Creates bargraph of top/selected enrichment terms from GSEA or ORA results from olink_pathway_enrichment()

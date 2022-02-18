@@ -1,11 +1,52 @@
-#' Performs pathway enrichment using over-representation analysis (ORA) or gene set enrichment analysis (GSEA) based on statistical test results and full data using clusterProfiler's gsea and enrich functions for various databases.
-#'
+#' Performs pathway enrichment using over-representation analysis (ORA) or gene set enrichment analysis (GSEA) 
+#' 
+#' This enrichment analysis based on statistical test results and full data using clusterProfiler's gsea and enrich functions for MSigDB.
+#' clusterProfiler is originally developed by Guangchuang Yu at the School of Basic Medical Sciences at Southern Medical University/
+#' T Wu, E Hu, S Xu, M Chen, P Guo, Z Dai, T Feng, L Zhou, W Tang, L Zhan, X Fu, S Liu, X Bo, and G Yu. 
+#' clusterProfiler 4.0: A universal enrichment tool for interpreting omics data. The Innovation. 2021, 2(3):100141. 
+#' doi: 10.1016/j.xinn.2021.100141
+#' 
 #' @param data NPX data frame in long format with at least protein name (Assay), OlinkID, UniProt,SampleID, QC_Warning, NPX, and LOD
 #' @param test_results a dataframe of statistical test results including Adjusted_pval and estimate columns. Currently only works for tests with estimates for all assays.
 #' @param method Either "GSEA" (default) or "ORA"
 #' @param ontology Supports "MSigDb" (default), "KEGG", "GO", and "Reactome" as arguements. MSigDb contains C2 and C5 genesets. C2 and C5 encompass KEGG, GO, and Reactome.
 #' @param organism Either "human" (default) or "mouse"
-#' @return A data frame of enriched pathway/ontological terms including pvalue, p.adjust, and qvalues, and list of Entrez IDs in that pathway and the data
+#' @return A data frame of enrichment results.
+#' Columns for ORA include:
+#' \itemize{
+#'  \item{ID:} "character" Pathway ID from MSigDB
+#'  \item{Description:} "character" Description of Pathway from MSigDB  
+#'  \item{GeneRatio:} "character" ratio of input proteins that are annotated in a term
+#'  \item{BgRatio:} "character" ratio of all genes that are annotated in this term
+#'  \item{pvalue:} "numeric" p-value of enrichment
+#'  \item{p.adjust:} "numeric" Adjusted p-value (Benjamini-Hochberg)
+#'  \item{qvalue:} "numeric" false discovery rate, the estimated probability that the normalized enrichment score represents
+#'  a false positive finding
+#'  \item{geneID:} "character" list of input proteins (Gene Symbols) annotated in a term delimited by "/"
+#'  \item{Count:} "integer" Number of input proteins that are annotated in a term
+#' }
+#' 
+#' Columns for GSEA:
+#' \itemize{
+#'  \item{ID:} "character" Pathway ID from MSigDB
+#'  \item{Description:} "character" Description of Pathway from MSigDB  
+#'  \item{setSize:} "integer" ratio of input proteins that are annotated in a term
+#'  \item{enrichmentScore:} "numeric" Enrichment score, degree to which a gene set is over-represented at the top or
+#'  bottom of the ranked list of genes
+#'  \item{NES:} "numeric" Normalized Enrichment Score, normalized to account for differences in gene set size and in
+#'  correlations between gene sets and expression data sets. NES can be used to compare analysis results
+#'  across gene sets. 
+#'  \item{pvalue:} "numeric" p-value of enrichment
+#'  \item{p.adjust:} "numeric" Adjusted p-value (Benjamini-Hochberg)
+#'  \item{qvalue:} "numeric" false discovery rate, the estimated probability that the normalized enrichment score represents
+#'  a false positive finding
+#'  \item{rank:} "numeric" the position in the ranked list where the maximum enrichment score occurred
+#'  \item{leading_edge:} "character" contains tags, list, and signal. Tags gives an indication of the percentage of genes
+#'  contributing to the enrichment score. List gives an indication of where in the list the enrichment
+#'  score is obtained. Signal represents the enrichment signal strength and combines the tag and list.
+#'  \item{core_enrichment:} "character" list of input proteins (Gene Symbols) annotated in a term delimited by "/"
+#' }
+#' 
 #' @examples
 #' \donttest{
 #' library(dplyr)

@@ -4,7 +4,7 @@
 #'@param method method used in olink_pathway_enrichment ("GSEA" (default) or "ORA")
 #'@param keyword (optional) keyword to filter enrichment results on, if not specified, displays top terms
 #'@param number_of_terms number of terms to display, default is 20
-#'@return bargraph as a ggplot object
+#'@return A bargraph as a ggplot object
 #'@examples
 #'\donttest{
 #'library(dplyr)
