@@ -104,5 +104,7 @@ Imports:
     tidyr,
     tidyselect,
     tools,
-    utils
+    utils,
+    ordinal,
+    rstatix
 Config/testthat/edition: 3

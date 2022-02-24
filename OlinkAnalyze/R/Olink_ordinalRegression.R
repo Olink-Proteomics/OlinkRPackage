@@ -28,9 +28,8 @@
 #' @return A tibble containing the ANOVA results for every protein.
 #' The tibble is arranged by ascending p-values.
 #' @export
-#' @examples
-#' \donttest{
-#' npx_df <- npx_data1 %>% filter(!grepl('control',SampleID, ignore.case = TRUE))
+#' @examples \donttest{
+#' npx_df <- npx_data1 %>% filter(!grepl('control','SampleID', ignore.case = TRUE))
 #'
 #'
 #' #Two-way Ordinal Regression with CLM.
@@ -55,7 +54,7 @@ olink_ordinalRegression <- function(df,
   withCallingHandlers({
     #Filtering on valid OlinkID
     df <- df %>%
-      filter(stringr::str_detect(OlinkID,
+      dplyr::filter(stringr::str_detect(OlinkID,
                                  "OID[0-9]{5}"))
 
     #Allow for :/* notation in covariates
@@ -91,11 +90,11 @@ olink_ordinalRegression <- function(df,
 
     #Not testing assays that have all NA:s
     all_nas <- df  %>%
-      group_by(OlinkID) %>%
-      summarise(n = n(), n_na = sum(is.na(NPX))) %>%
-      ungroup() %>%
-      filter(n == n_na) %>%
-      pull(OlinkID)
+      dplyr::group_by(OlinkID) %>%
+      dplyr::summarise(n = n(), n_na = sum(is.na(NPX))) %>%
+      dplyr::ungroup() %>%
+      dplyr::filter(n == n_na) %>%
+      dplyr::pull(OlinkID)
 
     if(length(all_nas) > 0) {
       warning(paste0('The assays ',
@@ -133,13 +132,13 @@ olink_ordinalRegression <- function(df,
 
     for(effect in single_fixed_effects){
       current_nas <- df %>%
-        filter(!(OlinkID %in% all_nas)) %>%
-        group_by(OlinkID, !!rlang::ensym(effect)) %>%
-        summarise(n = n(), n_na = sum(is.na(NPX))) %>%
-        ungroup() %>%
-        filter(n == n_na) %>%
-        distinct(OlinkID) %>%
-        pull(OlinkID)
+        dplyr::filter(!(OlinkID %in% all_nas)) %>%
+        dplyr::group_by(OlinkID, !!rlang::ensym(effect)) %>%
+        dplyr::summarise(n = n(), n_na = sum(is.na(NPX))) %>%
+        dplyr::ungroup() %>%
+        dplyr::filter(n == n_na) %>%
+        dplyr::distinct(OlinkID) %>%
+        dplyr::pull(OlinkID)
 
       if(length(current_nas) > 0) {
         nas_in_var <- c(nas_in_var, current_nas)
@@ -152,11 +151,12 @@ olink_ordinalRegression <- function(df,
         }
 
       number_of_samples_w_more_than_one_level <- df %>%
-        group_by(SampleID, Index) %>%
-        summarise(n_levels = n_distinct(!!rlang::ensym(effect), na.rm = T)) %>%
-        ungroup() %>%
-        filter(n_levels > 1) %>%
-        nrow(.)
+        dplyr::group_by(SampleID, Index) %>%
+        dplyr::summarise(n_levels = n_distinct(!!rlang::ensym(effect), na.rm = T)) %>%
+        dplyr::ungroup() %>%
+        dplyr::filter(n_levels > 1) %>%
+        dplyr::summarise(n = n()) %>% 
+        dplyr::pull(n)
 
       if (number_of_samples_w_more_than_one_level > 0) {
         stop(paste0("There are ",
@@ -221,7 +221,7 @@ olink_ordinalRegression <- function(df,
       dplyr::do(generics::tidy(car::Anova(ordinal::clm(as.formula(formula_string),
                             data=.,
                             threshold = "symmetric"),type=2))) %>%
-      ungroup() %>%
+      dplyr::ungroup() %>%
       dplyr::filter(!term %in% c('(Intercept)','Residuals')) %>%
       dplyr::mutate(covariates = term %in% covariate_filter_string) %>%
       dplyr::group_by(covariates) %>%
@@ -237,7 +237,7 @@ olink_ordinalRegression <- function(df,
     if(return.covariates){
       return(p.val)
     } else{
-      return(p.val %>% filter(!term%in%covariate_filter_string))
+      return(p.val %>% dplyr::filter(!term%in%covariate_filter_string))
     }
 
   }, warning = function(w) {
@@ -263,7 +263,6 @@ olink_ordinalRegression <- function(df,
 #' Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be inferred from main effects.
 #' @param outcome Character. The dependent variable. Default: NPX.
 #' @param effect Term on which to perform post-hoc. Character vector. Must be subset of or identical to variable.
-#' @param mean_return Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = T.
 #' @param verbose Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #'
 #' @return Tibble of posthoc tests for specicified effect, arranged by ascending adjusted p-values.
@@ -319,7 +318,7 @@ olink_ordinalRegression_posthoc <- function(df,
 
     #Filtering on valid OlinkID
     df <- df %>%
-      filter(stringr::str_detect(OlinkID,
+      dplyr::filter(stringr::str_detect(OlinkID,
                                  "OID[0-9]{5}"))
 
     if(is.null(olinkid_list)){

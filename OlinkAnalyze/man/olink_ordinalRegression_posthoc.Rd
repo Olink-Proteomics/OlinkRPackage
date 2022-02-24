@@ -31,8 +31,6 @@ Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be infe
 \item{effect}{Term on which to perform post-hoc. Character vector. Must be subset of or identical to variable.}
 
 \item{verbose}{Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
-
-\item{mean_return}{Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = T.}
 }
 \value{
 Tibble of posthoc tests for specicified effect, arranged by ascending adjusted p-values.

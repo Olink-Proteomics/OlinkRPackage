@@ -23,8 +23,7 @@
 #' @return A tibble containing the Kruskal-Wallis Test or Friedman Test results for every protein.
 #' The tibble is arranged by ascending p-values.
 #' @export
-#' @examples
-#' \donttest{
+#' @examples \donttest{
 #'
 #' library(dplyr)
 #'
@@ -257,27 +256,27 @@ olink_one_non_parametric <- function(df,
 #' npx_df <- npx_data1 %>% filter(!grepl('control',SampleID, ignore.case = TRUE))
 #'
 #' #Kruskal-Wallis Test
-#' kruskal_wallis_results <- olink_one_non_parametric(npx_df, "Group")
+#' kruskal_wallis_results <- olink_one_non_parametric(npx_df, "Site")
 #'
 #' #Friedman Test
-#' friedman_results <- olink_one_non_parametric(npx_df, "Group", dependence = TRUE)
+#' Friedman_results <- olink_one_non_parametric(npx_df, "Time", dependence = TRUE)
 #'
 #' #Posthoc test for the results from Friedman Test
 #' #Filtering out significant and relevant results.
-#' significant_assays <- friedman_results %>%
+#' significant_assays <- Friedman_results %>%
 #' filter(Threshold == 'Significant') %>%
-#' select(OlinkID) %>%
+#' dplyr::select(OlinkID) %>%
 #' distinct() %>%
 #' pull()
 #'
 #' #Posthoc
-#' friedman_posthoc_results <- olink_one_non_parametric_posthoc(npx_df,
-#' variable = c("A"),
+#' friedman_posthoc_results <- olink_one_non_parametric_posthoc(npx_df, variable = c("Time"),
 #' olinkid_list = significant_assays)}
 #'
 #' @importFrom dplyr filter group_by ungroup pull do select arrange mutate
 #' @importFrom stringr str_detect
 #' @importFrom rstatix wilcox_test
+
 
 olink_one_non_parametric_posthoc <- function(df,
                                              olinkid_list = NULL,
@@ -368,7 +367,7 @@ olink_one_non_parametric_posthoc <- function(df,
       dplyr::mutate(Threshold = if_else(p.adj < 0.05,'Significant','Non-significant')) %>%
       dplyr::rename(term = variable) %>%
       dplyr::mutate(contrast = paste(group1, group2, sep = " - ")) %>%
-      dplyr::rename(Adjusted_pval = p.adj)
+      dplyr::rename(Adjusted_pval = p.adj) %>% 
       dplyr::select(all_of(c("Assay", "OlinkID", "UniProt", "Panel", "term", "contrast", "estimate","conf.low", "conf.high", "Adjusted_pval","Threshold")))
 
 

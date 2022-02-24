@@ -47,22 +47,21 @@ library(dplyr)
 npx_df <- npx_data1 \%>\% filter(!grepl('control',SampleID, ignore.case = TRUE))
 
 #Kruskal-Wallis Test
-kruskal_wallis_results <- olink_one_non_parametric(npx_df, "Group")
+kruskal_wallis_results <- olink_one_non_parametric(npx_df, "Site")
 
 #Friedman Test
-friedman_results <- olink_one_non_parametric(npx_df, "Group", dependence = TRUE)
+Friedman_results <- olink_one_non_parametric(npx_df, "Time", dependence = TRUE)
 
 #Posthoc test for the results from Friedman Test
 #Filtering out significant and relevant results.
-significant_assays <- friedman_results \%>\%
+significant_assays <- Friedman_results \%>\%
 filter(Threshold == 'Significant') \%>\%
-select(OlinkID) \%>\%
+dplyr::select(OlinkID) \%>\%
 distinct() \%>\%
 pull()
 
 #Posthoc
-friedman_posthoc_results <- olink_one_non_parametric_posthoc(npx_df,
-variable = c("A"),
+friedman_posthoc_results <- olink_one_non_parametric_posthoc(npx_df, variable = c("Time"),
 olinkid_list = significant_assays)}
 
 }

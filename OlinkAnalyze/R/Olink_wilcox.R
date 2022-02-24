@@ -12,8 +12,7 @@
 #' @param ... Options to be passed to wilcox.test. See \code{?wilcox_test} for more information.
 #' @return A data frame containing the Mann-Whitney U Test results for every protein.
 #' @export
-#' @examples
-#' \donttest{
+#' @examples \donttest{
 #' 
 #' library(dplyr)
 #'
@@ -34,6 +33,7 @@
 #' @importFrom broom tidy
 #' @importFrom rlang ensym
 #' @importFrom tidyr pivot_wider
+#' @importFrom stats wilcox.test
 
 
 olink_wilcox <- function(df, variable, pair_id, ...){
@@ -162,9 +162,9 @@ olink_wilcox <- function(df, variable, pair_id, ...){
       dplyr::filter(!(OlinkID %in% all_nas)) %>%
       dplyr::filter(!(OlinkID %in% nas_in_level)) %>%
       dplyr::select(all_of(c("OlinkID","UniProt","Assay","Panel","NPX",variable,pair_id))) %>%
-      dplyr::pivot_wider(names_from=all_of(variable),values_from="NPX") %>%
+      tidyr::pivot_wider(names_from=all_of(variable),values_from="NPX") %>%
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
-      dplyr::do(tidy(wilcox.test(x=.[[var_levels[1]]],y=.[[var_levels[2]]],paired=T, ...))) %>%
+      dplyr::do(tidy(stats::wilcox.test(x=.[[var_levels[1]]],y=.[[var_levels[2]]],paired=T, ...))) %>%
       dplyr::ungroup() %>%
       dplyr::mutate(Adjusted_pval = p.adjust(p.value, method = "fdr")) %>%
       dplyr::mutate(Threshold = ifelse(Adjusted_pval < 0.05, "Significant", "Non-significant")) %>%
