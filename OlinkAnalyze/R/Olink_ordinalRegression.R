@@ -29,8 +29,8 @@
 #' The tibble is arranged by ascending p-values.
 #' @export
 #' @examples \donttest{
-#' npx_df <- npx_data1 %>% filter(!grepl('control','SampleID', ignore.case = TRUE))
-#'
+#' library(dplyr)
+#' npx_df <- npx_data1 %>% filter(!grepl('control',SampleID, ignore.case = TRUE))
 #'
 #' #Two-way Ordinal Regression with CLM.
 #' #Results in model NPX~Treatment+Time+Treatment:Time.
@@ -40,6 +40,7 @@
 #' @importFrom stringr str_detect
 #' @importFrom rstatix convert_as_factor
 #' @importFrom ordinal clm
+#' @importFrom utils glob2rx read.table globalVariables
 
 olink_ordinalRegression <- function(df,
                                     variable,
@@ -51,6 +52,7 @@ olink_ordinalRegression <- function(df,
   if(missing(df) | missing(variable)){
     stop('The df and variable arguments need to be specified.')
     }
+  
   withCallingHandlers({
     #Filtering on valid OlinkID
     df <- df %>%
@@ -237,7 +239,7 @@ olink_ordinalRegression <- function(df,
     if(return.covariates){
       return(p.val)
     } else{
-      return(p.val %>% dplyr::filter(!term%in%covariate_filter_string))
+      return(p.val %>% dplyr::filter(!term %in% covariate_filter_string))
     }
 
   }, warning = function(w) {
@@ -268,6 +270,8 @@ olink_ordinalRegression <- function(df,
 #' @return Tibble of posthoc tests for specicified effect, arranged by ascending adjusted p-values.
 #' @export
 #' @examples \donttest{
+#' library(dplyr)
+#' npx_df <- npx_data1 %>% filter(!grepl('control',SampleID, ignore.case = TRUE))
 #' #Two-way Ordinal Regression.
 #' #Results in model NPX~Treatment*Time.
 #' ordinalRegression_results <- olink_ordinalRegression(df = npx_df,
@@ -411,7 +415,6 @@ olink_ordinalRegression_posthoc <- function(df,
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
       dplyr::mutate(NPX = rank(NPX))%>%
       rstatix::convert_as_factor(NPX)%>%
-
       dplyr::do(data.frame(summary(emmeans::emmeans(ordinal::clm(as.formula(formula_string),data=.),
                                     specs=as.formula(paste0("pairwise~", paste(effect,collapse="+"))),
                                     cov.reduce = function(x) round(c(mean(x),mean(x)+sd(x)),4)),

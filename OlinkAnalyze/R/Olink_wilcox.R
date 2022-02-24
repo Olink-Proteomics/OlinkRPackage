@@ -180,12 +180,10 @@ olink_wilcox <- function(df, variable, pair_id, ...){
       dplyr::filter(!(OlinkID %in% all_nas)) %>%
       dplyr::filter(!(OlinkID %in% nas_in_level)) %>%
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
-      dplyr::do(tidy(wilcox.test(NPX ~ !!rlang::ensym(variable), data = ., ...))) %>%
+      dplyr::do(broom::tidy(stats::wilcox.test(NPX ~ !!rlang::ensym(variable), data = ., conf.int = TRUE, ...))) %>%
       dplyr::ungroup() %>%
       dplyr::mutate(Adjusted_pval = p.adjust(p.value, method = "fdr")) %>%
       dplyr::mutate(Threshold = ifelse(Adjusted_pval < 0.05, "Significant", "Non-significant")) %>%
-      dplyr::rename(`:=`(!!var_levels[1], estimate1)) %>%
-      dplyr::rename(`:=`(!!var_levels[2], estimate2)) %>%
       dplyr::arrange(p.value)
   }
 

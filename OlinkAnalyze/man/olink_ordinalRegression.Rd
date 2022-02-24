@@ -50,8 +50,8 @@ The threshold is determined by logic evaluation of Adjusted_pval < 0.05. Covaria
 }
 \examples{
 \donttest{
-npx_df <- npx_data1 \%>\% filter(!grepl('control','SampleID', ignore.case = TRUE))
-
+library(dplyr)
+npx_df <- npx_data1 \%>\% filter(!grepl('control',SampleID, ignore.case = TRUE))
 
 #Two-way Ordinal Regression with CLM.
 #Results in model NPX~Treatment+Time+Treatment:Time.

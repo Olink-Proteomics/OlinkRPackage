@@ -44,6 +44,8 @@ mean NPX at mean(numerical variable) versus mean NPX at mean(numerical variable)
 }
 \examples{
 \donttest{
+library(dplyr)
+npx_df <- npx_data1 \%>\% filter(!grepl('control',SampleID, ignore.case = TRUE))
 #Two-way Ordinal Regression.
 #Results in model NPX~Treatment*Time.
 ordinalRegression_results <- olink_ordinalRegression(df = npx_df,
