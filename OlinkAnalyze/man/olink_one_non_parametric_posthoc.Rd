@@ -2,14 +2,13 @@
 % Please edit documentation in R/Olink_one_non_parametric.R
 \name{olink_one_non_parametric_posthoc}
 \alias{olink_one_non_parametric_posthoc}
-\title{Function which performs an posthoc test per protein.}
+\title{Function which performs a Wilcox posthoc test per protein.}
 \usage{
 olink_one_non_parametric_posthoc(
   df,
   olinkid_list = NULL,
   variable,
   outcome = "NPX",
-  comparisons = NULL,
   p_adjust_method = "BH",
   verbose = T
 )
@@ -23,8 +22,6 @@ olink_one_non_parametric_posthoc(
 
 \item{outcome}{Character. The dependent variable. Default: NPX.}
 
-\item{comparisons}{A list of length-2 vectors specifying the groups of interest to be compared. For example to compare groups "A" vs "B" and "B" vs "C", the argument is as follow: comparisons = list(c("A", "B"), c("B", "C")).}
-
 \item{p_adjust_method}{Adjust P-value for Multiple Comparisons.}
 
 \item{verbose}{Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
@@ -33,11 +30,11 @@ olink_one_non_parametric_posthoc(
 Tibble of posthoc tests for specicified effect, arranged by ascending adjusted p-values.
 }
 \description{
-Performs a post hoc test using rstatix::wilcox_test with Benjamini-Hochberg p-value adjustment per assay (by OlinkID) for each panel at confidence level 0.95.
+Performs a posthoc test using rstatix::wilcox_test with Benjamini-Hochberg p-value adjustment per assay (by OlinkID) for each panel at confidence level 0.95.
 See \code{olink_kruskal} for details of input notation. \cr\cr
 The function handles both factor and numerical variables.
-The posthoc test for a numerical variable compares the difference in means of the outcome variable (default: NPX) for 1 standard deviation difference in the numerical variable, e.g.
-mean NPX at mean(numerical variable) versus mean NPX at mean(numerical variable) + 1*SD(numerical variable).
+The posthoc test for a numerical variable compares the difference in medians of the outcome variable (default: NPX) for 1 standard deviation difference in the numerical variable, e.g.
+median NPX at mean(numerical variable) versus median NPX at median(numerical variable) + 1*SD(numerical variable).
 }
 \examples{
 \donttest{
