@@ -1,6 +1,6 @@
 #' Function to read NPX data into long format
 #'
-#' Imports an NPX file exported from NPX Manager.
+#' Imports an NPX file exported from NPX Manager or MyData.
 #' No alterations to the output NPX Manager format is allowed.
 #'
 #' @param filename Path to file NPX Manager output file.
@@ -41,14 +41,14 @@ read_NPX <- function(filename){
   if (tools::file_ext(filename) %in% c("csv","txt","zip")) {
     file_is_compressed <- FALSE
     if (tools::file_ext(filename) == "zip") {
-      
+
       file_is_compressed <- TRUE
-      
+
       # check contents of the compressed file
       compressed_file_contents <- unzip(zipfile = filename, list = T) %>%
         dplyr::filter(Name != "README.txt") %>%
         dplyr::pull(Name) # extract all but README.txt
-      
+
       # check if MD5 file exists and prepare list of files to unzip
       if ("MD5_checksum.txt" %in% compressed_file_contents) {
         compressed_file_md5 <- compressed_file_contents[compressed_file_contents == "MD5_checksum.txt"] # name of md5 .txt file
@@ -59,51 +59,51 @@ read_NPX <- function(filename){
         compressed_file_csv <- compressed_file_contents
         files_to_extract <- compressed_file_csv
       }
-      
+
       # check that there is only one NOX file left
       if (length(compressed_file_csv) != 1 || !(tools::file_ext(compressed_file_csv) %in% c("csv","txt"))) {
         # clean up files
         stop("The compressed file does not conatin a valid NPX file. Expecting: \"README.txt\", \"MD5_checksum.txt\" and the NPX file.")
       }
-      
+
       # unzip
       unzip(zipfile = filename, files = files_to_extract, exdir = dirname(filename), overwrite = T)
-      
+
       # File name after unzip
       extracted_file_csv <- paste(dirname(filename), compressed_file_csv, sep = "/")
-      
+
       if (!is.na(compressed_file_md5)) {
         extracted_file_md5 <- paste(dirname(filename), compressed_file_md5, sep = "/") # MD5 relative path
-        
+
         # check for matching
         if (readr::read_lines(extracted_file_md5) != unname(tools::md5sum(extracted_file_csv))) { # check if MD5's match
           # clean up files
           invisible(file.remove(c(extracted_file_csv, extracted_file_md5)))
           stop(paste("MD5 checksum of NPX file does not match the one from \"MD5_checksum.txt\"! Loss of data?", sep = ""))
         }
-        
+
         # clean up files
         invisible(file.remove(extracted_file_md5))
       }
-      
+
       filename <- extracted_file_csv
     }
-    
+
     #read file using ; as delimiter
     out <- read.table(filename, header = TRUE, sep=";", stringsAsFactors = FALSE,
                       na.strings = c("NA",""))
-    
+
     if (is.data.frame(out) & ncol(out) == 1) {
       #if only one column in the data, wrong delimiter. use , as delimiter
       out <- read.table(filename, header = TRUE, sep=",", stringsAsFactors = FALSE,
                         na.strings = c("NA",""))
     }
-    
+
     # remove unzipped NPX file
     if (file_is_compressed == TRUE) {
       invisible(file.remove(filename)) # remove files
     }
-    
+
     #check that all colnames are present
     match_old_header <- all(c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
                               "MissingFreq", "Panel", "Panel_Version", "PlateID",
