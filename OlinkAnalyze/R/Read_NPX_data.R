@@ -32,7 +32,6 @@
 #' @importFrom readxl read_excel
 #' @importFrom stringr str_detect str_replace_all str_to_upper str_to_title
 #' @importFrom tidyr tibble gather separate
-#' @importFrom readr read_lines
 
 
 read_NPX <- function(filename){
@@ -76,7 +75,7 @@ read_NPX <- function(filename){
         extracted_file_md5 <- paste(dirname(filename), compressed_file_md5, sep = "/") # MD5 relative path
 
         # check for matching
-        if (readr::read_lines(extracted_file_md5) != unname(tools::md5sum(extracted_file_csv))) { # check if MD5's match
+        if ({ file(extracted_file_md5, "r") %>% readLines(con = ., n = 1) } != unname(tools::md5sum(extracted_file_csv))) { # check if MD5's match
           # clean up files
           invisible(file.remove(c(extracted_file_csv, extracted_file_md5)))
           stop(paste("MD5 checksum of NPX file does not match the one from \"MD5_checksum.txt\"! Loss of data?", sep = ""))

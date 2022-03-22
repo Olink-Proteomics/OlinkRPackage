@@ -27,7 +27,7 @@ A "tibble" in long format. Columns include:
 Additional columns may be present or missing depending on the platform
 }
 \description{
-Imports an NPX file exported from NPX Manager.
+Imports an NPX file exported from NPX Manager or MyData.
 No alterations to the output NPX Manager format is allowed.
 }
 \examples{
