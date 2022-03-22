@@ -27,7 +27,7 @@
 #' read_NPX(file)
 #' }
 #' @importFrom magrittr %>%
-#' @importFrom tools file_ext md5sum
+#' @importFrom tools file_ext md5sum file_path_sans_ext
 #' @importFrom dplyr as_tibble distinct pull filter bind_cols mutate left_join select rename matches bind_rows
 #' @importFrom readxl read_excel
 #' @importFrom stringr str_detect str_replace_all str_to_upper str_to_title
@@ -61,28 +61,30 @@ read_NPX <- function(filename){
 
       # check that there is only one NOX file left
       if (length(compressed_file_csv) != 1 || !(tools::file_ext(compressed_file_csv) %in% c("csv","txt"))) {
-        # clean up files
         stop("The compressed file does not conatin a valid NPX file. Expecting: \"README.txt\", \"MD5_checksum.txt\" and the NPX file.")
       }
 
       # unzip
-      unzip(zipfile = filename, files = files_to_extract, exdir = dirname(filename), overwrite = T)
+      tmp_unzip_dir <- paste(tools::file_path_sans_ext(filename),
+                             paste(sample(x = c(LETTERS, letters), size = 5, replace = T), collapse = ""),
+                             sep = "_")
+      unzip(zipfile = filename, files = files_to_extract, exdir = tmp_unzip_dir, overwrite = T)
 
       # File name after unzip
-      extracted_file_csv <- paste(dirname(filename), compressed_file_csv, sep = "/")
+      extracted_file_csv <- paste(tmp_unzip_dir, compressed_file_csv, sep = "/")
 
       if (!is.na(compressed_file_md5)) {
-        extracted_file_md5 <- paste(dirname(filename), compressed_file_md5, sep = "/") # MD5 relative path
+        extracted_file_md5 <- paste(tmp_unzip_dir, compressed_file_md5, sep = "/") # MD5 relative path
 
         # check for matching
-        if ({ file(extracted_file_md5, "r") %>% readLines(con = ., n = 1) } != unname(tools::md5sum(extracted_file_csv))) { # check if MD5's match
+        extracted_file_md5_con <- file(extracted_file_md5, "r")
+        if (readLines(con = extracted_file_md5_con, n = 1) != unname(tools::md5sum(extracted_file_csv))) { # check if MD5's match
           # clean up files
-          invisible(file.remove(c(extracted_file_csv, extracted_file_md5)))
+          close(extracted_file_md5_con)
+          invisible(unlink(x = tmp_unzip_dir, recursive = TRUE))
           stop(paste("MD5 checksum of NPX file does not match the one from \"MD5_checksum.txt\"! Loss of data?", sep = ""))
         }
-
-        # clean up files
-        invisible(file.remove(extracted_file_md5))
+        close(extracted_file_md5_con)
       }
 
       filename <- extracted_file_csv
@@ -100,7 +102,8 @@ read_NPX <- function(filename){
 
     # remove unzipped NPX file
     if (file_is_compressed == TRUE) {
-      invisible(file.remove(filename)) # remove files
+      invisible(unlink(x = tmp_unzip_dir, recursive = TRUE)) # remove files
+      rm(tmp_unzip_dir)
     }
 
     #check that all colnames are present
