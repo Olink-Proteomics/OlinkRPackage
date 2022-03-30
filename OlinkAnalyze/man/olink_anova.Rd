@@ -9,6 +9,7 @@ olink_anova(
   variable,
   outcome = "NPX",
   covariates = NULL,
+  model_formula,
   return.covariates = FALSE,
   verbose = TRUE
 )
@@ -24,6 +25,8 @@ Also takes ':' or '*' notation.}
 
 \item{covariates}{Single character value or character array. Default: NULL.
 Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be inferred from main effects.}
+
+\item{model_formula}{(optional) Symbolic description of the model to be fitted in standard formula notation (e.g. "NPX~A*B"). If provided, this will override the \code{outcome}, \code{variable} and \code{covariates} arguments. Can be a string or of class \code{stats::formula()}.}
 
 \item{return.covariates}{Boolean. Default: False. Returns F-test results for the covariates. Note: Adjusted p-values will be NA for the covariates.}
 

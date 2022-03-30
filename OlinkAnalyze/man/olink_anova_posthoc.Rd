@@ -10,8 +10,11 @@ olink_anova_posthoc(
   variable,
   covariates = NULL,
   outcome = "NPX",
+  model_formula,
   effect,
+  effect_formula,
   mean_return = FALSE,
+  post_hoc_padjust_method = "tukey",
   verbose = TRUE
 )
 }
@@ -29,9 +32,15 @@ Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be i
 
 \item{outcome}{Character. The dependent variable. Default: NPX.}
 
+\item{model_formula}{(optional) Symbolic description of the model to be fitted in standard formula notation (e.g. "NPX~A*B"). If provided, this will override the \code{outcome}, \code{variable} and \code{covariates} arguments. Can be a string or of class \code{stats::formula()}.}
+
 \item{effect}{Term on which to perform post-hoc. Character vector. Must be subset of or identical to variable.}
 
+\item{effect_formula}{(optional) A character vector specifying the names of the predictors over which EMMs are desired. specs may also be a formula. If provided, this will override the \code{effect} argument. See \code{?emmeans::emmeans()} for more information.}
+
 \item{mean_return}{Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = TRUE and no adjustment is performed.}
+
+\item{post_hoc_padjust_method}{P-value adjustment method to use for post-hoc comparisons within an assay. Options include \code{tukey}, \code{sidak}, \code{bonferroni} and \code{none}.}
 
 \item{verbose}{Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
 }
