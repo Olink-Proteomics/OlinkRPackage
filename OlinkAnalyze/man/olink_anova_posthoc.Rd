@@ -27,8 +27,7 @@ olink_anova_posthoc(
 Variable(s) to test. If length > 1, the included variable names will be used in crossed analyses .
 Also takes ':' notation.}
 
-\item{covariates}{Single character value or character array. Default: NULL.
-Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be inferred from main effects.}
+\item{covariates}{Single character value or character array. Default: NULL. Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be inferred from main effects.}
 
 \item{outcome}{Character. The dependent variable. Default: NPX.}
 
@@ -36,7 +35,7 @@ Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be i
 
 \item{effect}{Term on which to perform post-hoc. Character vector. Must be subset of or identical to variable.}
 
-\item{effect_formula}{(optional) A character vector specifying the names of the predictors over which EMMs are desired. specs may also be a formula. If provided, this will override the \code{effect} argument. See \code{?emmeans::emmeans()} for more information.}
+\item{effect_formula}{(optional) A character vector specifying the names of the predictors over which estimated marginal means are desired as defined in the \code{emmeans} package. May also be a formula. If provided, this will override the \code{effect} argument. See \code{?emmeans::emmeans()} for more information.}
 
 \item{mean_return}{Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = TRUE and no adjustment is performed.}
 
@@ -57,7 +56,7 @@ Columns include:
  \item{estimate:} "numeric" difference in mean NPX between groups
  \item{conf.low:} "numeric" confidence interval for the mean (lower end)
  \item{conf.high:} "numeric" confidence interval for the mean (upper end)
- \item{Adjusted_pval:} "numeric" adjusted p-value for the test (Benjamini&Hochberg)
+ \item{Adjusted_pval:} "numeric" adjusted p-value for the test 
  \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
 }
 }
@@ -91,10 +90,20 @@ select(OlinkID) \%>\%
 distinct() \%>\%
 pull()
 
-#Posthoc
+#Posthoc, all pairwise comparisons
 anova_posthoc_results <- olink_anova_posthoc(npx_df,
 variable=c("Treatment:Time"),
 covariates="Site",
 olinkid_list = significant_assays,
-effect = "Treatment:Time")}
+effect = "Treatment:Time")
+
+
+#Posthoc, treated vs untreated at each timepoint, adjusted for Site effect
+anova_posthoc_results <- olink_anova_posthoc(npx_df,
+model_formula = "NPX~Treatment*Time+Site",
+olinkid_list = significant_assays,
+effect_formula = "pairwise~Treatment|Time")
+
+
+}
 }

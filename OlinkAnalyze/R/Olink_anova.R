@@ -89,15 +89,17 @@ olink_anova <- function(df,
 ){
   
   if(!missing(model_formula)){
-    if("formula" %in% class(model_formula)) model_formula <- deparse(model_formula)
-    tryCatch(as.formula(model_formula),error=function(e) stop(paste0(model_formula," is not a recognized formula.")))
+    if("formula" %in% class(model_formula)) model_formula <- deparse(model_formula) #Convert to string if is formula
+    tryCatch(as.formula(model_formula),error=function(e) stop(paste0(model_formula," is not a recognized formula."))) #If cannot be coerced into formula, error
+    #If variable and covariates were included, message that they will not be used
+    if(!missing(variable) | !is.null(covariates)) message("model_formula overriding variable and covariate arguments.")
+    #Parse formula so checks on the  variable and outcome objects can continue as usual
     model_formula <- gsub(" ","",model_formula)
     splt_form <- strsplit(model_formula,c("\\+|~|\\*|:"))[[1]]
     if("-1" %in% splt_form) splt_form <- splt_form[-which(splt_form=="-1")]
     outcome <- splt_form[1]
     variable <- splt_form[-1]
     covariates <- NULL
-    if(!missing(variable) | !is.null(covariates)) message("model_formula overriding variable and covariate arguments.")
   }
 
   if(missing(df) | missing(variable)){
@@ -330,8 +332,7 @@ olink_anova <- function(df,
 #' @param variable Single character value or character array.
 #' Variable(s) to test. If length > 1, the included variable names will be used in crossed analyses .
 #' Also takes ':' notation.
-#' @param covariates Single character value or character array. Default: NULL.
-#' Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be inferred from main effects.
+#' @param covariates Single character value or character array. Default: NULL. Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be inferred from main effects.
 #' @param outcome Character. The dependent variable. Default: NPX.
 #' @param model_formula (optional) Symbolic description of the model to be fitted in standard formula notation (e.g. "NPX~A*B"). If provided, this will override the \code{outcome}, \code{variable} and \code{covariates} arguments. Can be a string or of class \code{stats::formula()}.
 #' @param effect Term on which to perform post-hoc. Character vector. Must be subset of or identical to variable.
@@ -353,7 +354,7 @@ olink_anova <- function(df,
 #'  \item{estimate:} "numeric" difference in mean NPX between groups
 #'  \item{conf.low:} "numeric" confidence interval for the mean (lower end)
 #'  \item{conf.high:} "numeric" confidence interval for the mean (upper end)
-#'  \item{Adjusted_pval:} "numeric" adjusted p-value for the test (Benjamini&Hochberg)
+#'  \item{Adjusted_pval:} "numeric" adjusted p-value for the test 
 #'  \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
 #' }
 #' 
@@ -415,30 +416,33 @@ olink_anova_posthoc <- function(df,
 ){
   
   if(!missing(model_formula)){
-    if("formula" %in% class(model_formula)) model_formula <- deparse(model_formula)
-    tryCatch(as.formula(model_formula),error=function(e) stop(paste0(model_formula," is not a recognized formula.")))
+    if("formula" %in% class(model_formula)) model_formula <- deparse(model_formula) #Convert to string if is formula
+    tryCatch(as.formula(model_formula),error=function(e) stop(paste0(model_formula," is not a recognized formula."))) #If cannot be coerced into formula, error
+    #If variable and covariates were included, message that they will not be used
+    if(!missing(variable) | !is.null(covariates)) message("model_formula overriding variable and covariate arguments.")
+    #Parse formula so checks on the  variable and outcome objects can continue as usual
     model_formula <- gsub(" ","",model_formula)
     splt_form <- strsplit(model_formula,c("\\+|~|\\*|:"))[[1]]
     if("-1" %in% splt_form) splt_form <- splt_form[-which(splt_form=="-1")]
     outcome <- splt_form[1]
     variable <- splt_form[-1]
     covariates <- NULL
-    if(!missing(variable) | !is.null(covariates)) message("model_formula overriding variable and covariate arguments.")
   }
   
   if(!missing(effect_formula)){
     
     if(length(effect_formula)==1){
+      #Parse formula so the check on the effect object can continue as usual
+      if(!missing(effect)) message("effect_formula overriding effect argument.")
       if("formula" %in% class(effect_formula)) effect_formula <- deparse(effect_formula)
       splt_effect <- effect_formula
       if(grepl("~",splt_effect)) splt_effect <- strsplit(splt_effect,"~")[[1]][2] #Pull out variables from right hand side of formula. e.g. pairwise~A+B|C = "A+B|C"
       if(grepl("\\||+|\\*",splt_effect)) splt_effect <- strsplit(splt_effect,"\\||\\+|\\*")[[1]] #Split rhs of formula into vector of variables. e.g. "A+B|C"=c("A","B","C")
       
-      if(!missing(effect)) message("effect_formula overriding effect argument.")
       
       effect <- splt_effect
     } else{
-      stop("Unrecognized effect formula. Should be a character string of length 1.")
+      stop("Unrecognized effect formula. Should be a character string of length 1. If listing in the form c('A','B'), use the effects argument.")
     }
   }
 
@@ -582,6 +586,8 @@ olink_anova_posthoc <- function(df,
                                    'Non-significant')) %>%
         dplyr::select(tidyselect::any_of(c("Assay", "OlinkID", "UniProt", "Panel", "term",  "contrast", effect, "estimate",
                       "conf.low", "conf.high", "Adjusted_pval","Threshold")))
+      
+      if(post_hoc_padjust_method=="none") anova_posthoc_results <- anova_posthoc_results %>% rename(pvalue=Adjusted_pval)
     }
 
     return(anova_posthoc_results)
