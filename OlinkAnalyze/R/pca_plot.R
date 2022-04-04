@@ -125,6 +125,10 @@ olink_pca_plot <- function (df,
   }
 
   if(byPanel){
+    # Convert color_g variable to factor
+    if(!is.factor(df[[paste(color_g)]])){
+      df[[paste(color_g)]] <- as.factor(df[[paste(color_g)]])
+    }
     df <- df %>%
       dplyr::mutate(Panel = Panel  %>% stringr::str_replace("Olink ", "")) #Strip "Olink" from the panel names
 
@@ -554,7 +558,7 @@ olink_pca_plot.internal <- function (df,
 
   pca_plot <- pca_plot +
     OlinkAnalyze::set_plot_theme() +
-    OlinkAnalyze::olink_color_discrete(...)
+    OlinkAnalyze::olink_color_discrete(...,drop=FALSE)
 
   return(pca_plot)
 
