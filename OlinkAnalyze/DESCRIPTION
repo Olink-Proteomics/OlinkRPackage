@@ -40,7 +40,7 @@ Authors@R:
              family = "Zhang",
              role = "aut",
              comment = c(ORCID = "0000-0001-7758-6204", Github = "boxizhang")),
-      person(given = "Masoumeh".
+      person(given = "Masoumeh",
              family = "Sheikhi",
              role = "aut",
              comment = c(Github = "MasoumehSheikhi")),
