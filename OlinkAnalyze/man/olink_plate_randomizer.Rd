@@ -14,7 +14,7 @@ olink_plate_randomizer(
 )
 }
 \arguments{
-\item{Manifest}{tibble/data frame in long format containing all sample ID's. Sample ID column must be named SampleID.}
+\item{Manifest}{tibble/data frame in long format containing all sample ID's. Sample ID column must be named SampleID. If containing a column called study, different studies will be kept together on the plates and randomized internally.}
 
 \item{PlateSize}{Integer. Either 96 or 48. 96 is default.}
 
