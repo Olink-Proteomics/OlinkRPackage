@@ -167,7 +167,7 @@ generatePlateHolder <- function(n.plates,n.spots,n.samples, PlateSize){
 #' Generates a scheme for how to plate samples with an option to keep subjects on the same plate.
 #'
 #' Variables of interest should if possible be randomized across plates to avoid confounding with potential plate effects. In the case of multiple samples per subject (e.g. in longitudinal studies), Olink recommends keeping each subject on the same plate. This can be achieved using the SubjectColumn argument.
-#' @param Manifest tibble/data frame in long format containing all sample ID's. Sample ID column must be named SampleID.
+#' @param Manifest tibble/data frame in long format containing all sample ID's. Sample ID column must be named SampleID. If containing a column called study, different studies will be kept together on the plates and randomized internally.
 #' @param PlateSize Integer. Either 96 or 48. 96 is default.
 #' @param SubjectColumn (Optional) Column name of the subject ID column. Cannot contain missings. If provided, subjects are kept on the same plate.
 #' @param iterations Number of iterations for fitting subjects on the same plate.
@@ -314,6 +314,70 @@ olink_plate_randomizer <-function(Manifest, PlateSize = 96, SubjectColumn, itera
       stop("Could not keep all subjects on the same plate! Try increasing the number of iterations.")
     }
 
+  }
+  
+  ##Keep subjects together and keep studies together
+  if(!missing(SubjectColumn) & !is.null(Manifest$study)){
+    cat("Assigning subjects to plates\n")
+    for(i in 1:iterations){
+      cat(".")
+      all.plates$SampleID <- NA
+      out.manifest <- matrix(nrow = 0,ncol = ncol(Manifest))
+      
+      for (studyNo in unique(Manifest$study)){
+        rand.subjects <- sample(Manifest %>% filter(study == studyNo) %>%
+                                  select(SubjectID) %>% unique() %>% pull())
+        studyInterval <- which(Manifest$study == studyNo)
+        ManifestStudy <- Manifest[studyInterval,]
+        for (sub in rand.subjects) {
+          all.plates.tmp <- assignSubject2Plate(plateMap = all.plates[studyInterval,], 
+                                                manifest = Manifest, SubjectID = sub)
+          if (tibble::is_tibble(all.plates.tmp)) {
+            all.plates[studyInterval,] <- all.plates.tmp
+          }
+          else if (is.character(all.plates.tmp)) {
+            passed <- FALSE
+            break
+          }
+          passed <- TRUE
+        }
+        
+        if(passed){
+          out.manifestStudy <- ManifestStudy %>%
+            dplyr::left_join(all.plates,"SampleID") %>%
+            dplyr::group_by(plate) %>%
+            dplyr::mutate(scramble=sample(1:dplyr::n())) %>%
+            dplyr::mutate(row=row[scramble],
+                          column=column[scramble]) %>%
+            dplyr::ungroup() %>%
+            dplyr::select(-scramble) %>% 
+            dplyr::arrange(plate, column, row)
+          print(paste(studyNo,"successful!"))
+          out.manifest <- rbind(out.manifest, out.manifestStudy)
+          ManifestStudy2 <- ManifestStudy %>%
+            dplyr::left_join(all.plates,"SampleID") %>%
+            dplyr::group_by(plate) %>%
+            dplyr::mutate(scramble=sample(1:dplyr::n()))
+          ManifestStudy2 %>% mutate(row = row[scramble], 
+                                    column = column[scramble])
+        }
+      }
+      break
+    }
+    
+    cat("Random assignment of SUBJECTS to plates\n")
+    if(passed){
+      out.manifest <- out.manifest %>%
+        dplyr::mutate(well=paste0(row,gsub("Column ","",as.character(column)))) %>%
+        dplyr::mutate(well=factor(well,levels=paste0(rep(LETTERS[1:8],each=number_of_cols_per_plate),rep(1:number_of_cols_per_plate,times=8)))) %>%
+        dplyr::arrange(plate, column, row)
+      
+      print("Duplicated")
+      class(out.manifest) <- c("randomizedManifest",class(out.manifest))
+      return(out.manifest)
+    } else{
+      stop("Could not keep all subjects on the same plate! Try increasing the number of iterations.")
+    }
   }
 
 }
