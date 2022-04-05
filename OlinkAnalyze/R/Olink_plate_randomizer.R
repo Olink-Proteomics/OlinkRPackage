@@ -219,6 +219,11 @@ olink_plate_randomizer <-function(Manifest, PlateSize = 96, SubjectColumn, itera
   if(!"SampleID" %in% colnames(Manifest)) {
     stop("SampleID not found! Be sure the column of samples ID's is named 'SampleID'")
   }
+  
+  if(any(which(duplicated(manifest$SampleID)))){
+    duplications <- manifest$SampleID[which(duplicated(manifest$SampleID))]
+    warning(paste("Following SampleID were duplicated:",paste(duplications,collapse = "\n"), sep = "\n"))
+  }
 
   if(any(is.na(Manifest$SampleID))) {
     stop("No NA allowed in the SampleID column. Check that all the samples are named.")
