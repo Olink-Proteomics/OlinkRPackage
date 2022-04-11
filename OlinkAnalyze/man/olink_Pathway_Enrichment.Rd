@@ -15,11 +15,11 @@ olink_pathway_enrichment(
 \arguments{
 \item{data}{NPX data frame in long format with at least protein name (Assay), OlinkID, UniProt,SampleID, QC_Warning, NPX, and LOD}
 
-\item{test_results}{a dataframe of statistical test results including Adjusted_pval and estimate columns. Currently only works for tests with estimates for all assays.}
+\item{test_results}{a dataframe of statistical test results including Adjusted_pval and estimate columns.}
 
 \item{method}{Either "GSEA" (default) or "ORA"}
 
-\item{ontology}{Supports "MSigDb" (default), "KEGG", "GO", and "Reactome" as arguements. MSigDb contains C2 and C5 genesets. C2 and C5 encompass KEGG, GO, and Reactome.}
+\item{ontology}{Supports "MSigDb" (default), "KEGG", "GO", and "Reactome" as arguments. MSigDb contains C2 and C5 genesets. C2 and C5 encompass KEGG, GO, and Reactome.}
 
 \item{organism}{Either "human" (default) or "mouse"}
 }
@@ -62,7 +62,12 @@ Columns for GSEA:
 }
 \description{
 This enrichment analysis based on statistical test results and full data using clusterProfiler's gsea and enrich functions for MSigDB.
-clusterProfiler is originally developed by Guangchuang Yu at the School of Basic Medical Sciences at Southern Medical University/
+}
+\details{
+MSigDB is subset if ontology is KEGG, GO, or Reactome. test_results must contain estimates for all assays. 
+Posthoc results can be used but should be filtered for one contrast to improve interpretability.
+clusterProfiler is originally developed by Guangchuang Yu at the School of Basic Medical Sciences at Southern Medical University.
+
 T Wu, E Hu, S Xu, M Chen, P Guo, Z Dai, T Feng, L Zhou, W Tang, L Zhan, X Fu, S Liu, X Bo, and G Yu. 
 clusterProfiler 4.0: A universal enrichment tool for interpreting omics data. The Innovation. 2021, 2(3):100141. 
 doi: 10.1016/j.xinn.2021.100141
