@@ -7,7 +7,7 @@
 read_NPX(filename)
 }
 \arguments{
-\item{filename}{Path to file NPX Manager output file.}
+\item{filename}{Path to NPX Manager or MyData output file.}
 }
 \value{
 A "tibble" in long format. Columns include:
