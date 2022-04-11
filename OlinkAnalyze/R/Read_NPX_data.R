@@ -44,7 +44,7 @@ read_NPX <- function(filename){
       file_is_compressed <- TRUE
 
       # check contents of the compressed file
-      compressed_file_contents <- unzip(zipfile = filename, list = T) %>%
+      compressed_file_contents <- utils::unzip(zipfile = filename, list = T) %>%
         dplyr::filter(Name != "README.txt") %>%
         dplyr::pull(Name) # extract all but README.txt
 
@@ -72,7 +72,7 @@ read_NPX <- function(filename){
       tmp_unzip_dir <- paste(tools::file_path_sans_ext(filename),
                              paste(sample(x = c(LETTERS, letters), size = 5, replace = T), collapse = ""),
                              sep = "_")
-      unzip(zipfile = filename, files = files_to_extract, exdir = tmp_unzip_dir, overwrite = T, unzip = getOption("unzip"))
+      utils::unzip(zipfile = filename, files = files_to_extract, exdir = tmp_unzip_dir, overwrite = T, unzip = getOption("unzip"))
 
       # File name after unzip
       extracted_file_csv <- file.path(tmp_unzip_dir, compressed_file_csv)
