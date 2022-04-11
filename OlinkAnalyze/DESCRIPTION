@@ -104,5 +104,6 @@ Imports:
     tidyr,
     tidyselect,
     tools,
-    utils
+    utils,
+    openssl
 Config/testthat/edition: 3

@@ -3,7 +3,7 @@
 #' Imports an NPX file exported from NPX Manager or MyData.
 #' No alterations to the output NPX Manager format is allowed.
 #'
-#' @param filename Path to file NPX Manager output file.
+#' @param filename Path to NPX Manager or MyData output file.
 #' @return A "tibble" in long format. Columns include:
 #' \itemize{
 #'    \item{SampleID:} Sample ID
@@ -50,18 +50,22 @@ read_NPX <- function(filename){
 
       # check if MD5 file exists and prepare list of files to unzip
       if ("MD5_checksum.txt" %in% compressed_file_contents) {
-        compressed_file_md5 <- compressed_file_contents[compressed_file_contents == "MD5_checksum.txt"] # name of md5 .txt file
+        compressed_file_chksm <- compressed_file_contents[compressed_file_contents == "MD5_checksum.txt"] # name of md5 .txt file
         compressed_file_csv <- compressed_file_contents[compressed_file_contents != "MD5_checksum.txt"]
-        files_to_extract <- c(compressed_file_csv, compressed_file_md5)
-      } else {
-        compressed_file_md5 <- NA_character_
+        files_to_extract <- c(compressed_file_csv, compressed_file_chksm)
+      } else if("checksum_sha256.txt" %in% compressed_file_contents){
+        compressed_file_chksm <- compressed_file_contents[compressed_file_contents == "checksum_sha256.txt"] # name of sha256 .txt file
+        compressed_file_csv <- compressed_file_contents[compressed_file_contents != "checksum_sha256.txt"]
+        files_to_extract <- c(compressed_file_csv, compressed_file_chksm)
+      }else{
+        compressed_file_chksm <- NA_character_
         compressed_file_csv <- compressed_file_contents
         files_to_extract <- compressed_file_csv
       }
 
-      # check that there is only one NOX file left
+      # check that there is only one NPX file left
       if (length(compressed_file_csv) != 1 || !(tools::file_ext(compressed_file_csv) %in% c("csv","txt"))) {
-        stop("The compressed file does not conatin a valid NPX file. Expecting: \"README.txt\", \"MD5_checksum.txt\" and the NPX file.")
+        stop("The compressed file does not contain a valid NPX file. Expecting: \"README.txt\", \"MD5_checksum.txt\" or \"checksum_sha256.txt\" and the NPX file.")
       }
 
       # unzip
@@ -71,20 +75,35 @@ read_NPX <- function(filename){
       unzip(zipfile = filename, files = files_to_extract, exdir = tmp_unzip_dir, overwrite = T)
 
       # File name after unzip
-      extracted_file_csv <- paste(tmp_unzip_dir, compressed_file_csv, sep = "/")
+      extracted_file_csv <- file.path(tmp_unzip_dir, compressed_file_csv)
 
-      if (!is.na(compressed_file_md5)) {
-        extracted_file_md5 <- paste(tmp_unzip_dir, compressed_file_md5, sep = "/") # MD5 relative path
+      if (!is.na(compressed_file_chksm)) {
+        extracted_file_chksm <- file.path(tmp_unzip_dir, compressed_file_chksm) # MD5 relative path
+
+        # make the checksum filename easier to parse
+        chksm_string <- tolower(tools::file_path_sans_ext(compressed_file_chksm))
 
         # check for matching
-        extracted_file_md5_con <- file(extracted_file_md5, "r")
-        if (readLines(con = extracted_file_md5_con, n = 1) != unname(tools::md5sum(extracted_file_csv))) { # check if MD5's match
-          # clean up files
-          close(extracted_file_md5_con)
-          invisible(unlink(x = tmp_unzip_dir, recursive = TRUE))
-          stop(paste("MD5 checksum of NPX file does not match the one from \"MD5_checksum.txt\"! Loss of data?", sep = ""))
+        extracted_file_chksm_con <- file(extracted_file_chksm, "r")
+        if(stringr::str_detect(chksm_string, "md5")){
+          if (readLines(con = extracted_file_chksm_con, n = 1) != unname(tools::md5sum(extracted_file_csv))) { # check if MD5's match
+            # clean up files
+            close(extracted_file_chksm_con)
+            invisible(unlink(x = tmp_unzip_dir, recursive = TRUE))
+            stop(paste("MD5 checksum of NPX file does not match the one from \"MD5_checksum.txt\"! Loss of data?", sep = ""))
+          }
+          close(extracted_file_chksm_con)
+        }else if(stringr::str_detect(chksm_string, "sha256")){
+          chksm <- openssl::sha256(file(extracted_file_csv)) %>%
+            stringr::str_replace(":","")
+          if (readLines(con = extracted_file_chksm_con, n = 1, warn = FALSE) != chksm) { # check if Sha256's match
+            # clean up files
+            close(extracted_file_chksm_con)
+            invisible(unlink(x = tmp_unzip_dir, recursive = TRUE))
+            stop(paste("Sha256 checksum of NPX file does not match the one from \"checksum_sha256.txt\"! Loss of data?", sep = ""))
+          }
+          close(extracted_file_chksm_con)
         }
-        close(extracted_file_md5_con)
       }
 
       filename <- extracted_file_csv
