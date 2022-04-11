@@ -19,6 +19,10 @@ test_that("Data loads correctly with 'read_NPX()'", {
   zip_npx_file_success <- system.file("extdata", "Example_NPX_Data_3K.zip", package = "OlinkAnalyze", mustWork = TRUE)
   df_2 <- read_NPX(filename = zip_npx_file_success)
 
+  zip_npx_file_success_sha <- system.file("extdata", "Example_NPX_Data_sha256.zip", package = "OlinkAnalyze", mustWork = TRUE)
+  expect_snapshot(read_NPX(filename = zip_npx_file_success_sha))
+
+
   #Manifest read ok?
   expect(exists("manifest_1"), failure_message = "Failed to read manifest_1.")
   expect_s3_class(manifest_1, class = "data.frame")
