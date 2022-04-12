@@ -13,7 +13,7 @@
 - [ ] Make sure you are requesting to **pull a feature/bugfix branch** (right side). This should not be main or develop.
 - [ ] Make sure you are make a pull request against either **main or develop** (left side). (Requesting to main should be reserved for bugfixes and new releases)
 - [ ] Add or update unit tests (if applicable)
-- [ ] Check your code with any unit tests (Run devtools::check() and devtools::test() locally)
+- [ ] Check your code with any unit tests (Run devtools::check() locally)
 - [ ] Add neccessary documentation (if applicable)
 
 ## Type of changes
