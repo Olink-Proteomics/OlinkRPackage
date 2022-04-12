@@ -31,4 +31,4 @@ _Put an `x` in the boxes that apply_
 ## Further comments
 If this is a relatively large or complex change, kick off the discussion by explaining why you chose the solution you did and what alternatives you considered, any questions you have, etc...
 
-Consider linking any issues or adding @mentions to ensure specific people see it.
+Consider linking any issues (#issue-number ) or adding @mentions to ensure specific people see it.
