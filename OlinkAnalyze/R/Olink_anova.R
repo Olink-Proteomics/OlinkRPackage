@@ -26,6 +26,7 @@
 #' @param outcome Character. The dependent variable. Default: NPX.
 #' @param covariates Single character value or character array. Default: NULL.
 #' Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be inferred from main effects.
+#' @param model_formula (optional) Symbolic description of the model to be fitted in standard formula notation (e.g. "NPX~A*B"). If provided, this will override the \code{outcome}, \code{variable} and \code{covariates} arguments. Can be a string or of class \code{stats::formula()}.
 #' @param return.covariates Boolean. Default: False. Returns F-test results for the covariates. Note: Adjusted p-values will be NA for the covariates.
 #' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #'
@@ -82,9 +83,24 @@ olink_anova <- function(df,
                         variable,
                         outcome="NPX",
                         covariates = NULL,
+                        model_formula,
                         return.covariates = FALSE,
                         verbose = TRUE
 ){
+  
+  if(!missing(model_formula)){
+    if("formula" %in% class(model_formula)) model_formula <- deparse(model_formula) #Convert to string if is formula
+    tryCatch(as.formula(model_formula),error=function(e) stop(paste0(model_formula," is not a recognized formula."))) #If cannot be coerced into formula, error
+    #If variable and covariates were included, message that they will not be used
+    if(!missing(variable) | !is.null(covariates)) message("model_formula overriding variable and covariate arguments.")
+    #Parse formula so checks on the  variable and outcome objects can continue as usual
+    model_formula <- gsub(" ","",model_formula)
+    splt_form <- strsplit(model_formula,c("\\+|~|\\*|:"))[[1]]
+    if("-1" %in% splt_form) splt_form <- splt_form[-which(splt_form=="-1")]
+    outcome <- splt_form[1]
+    variable <- splt_form[-1]
+    covariates <- NULL
+  }
 
   if(missing(df) | missing(variable)){
     stop('The df and variable arguments need to be specified.')
@@ -214,15 +230,20 @@ olink_anova <- function(df,
 
     }
 
-    if(!is.null(covariates)){
-      formula_string <- paste0(outcome, "~",
-                               paste(variable,collapse="*"),
-                               "+",
-                               paste(covariates, sep = '', collapse = '+'))
-    }else{
-
-      formula_string <- paste0(outcome, "~", paste(variable,collapse="*"))
+    if(missing(model_formula)){
+      if(!is.null(covariates)){
+        formula_string <- paste0(outcome, "~",
+                                 paste(variable,collapse="*"),
+                                 "+",
+                                 paste(covariates, sep = '', collapse = '+'))
+      }else{
+        
+        formula_string <- paste0(outcome, "~", paste(variable,collapse="*"))
+      }
+    } else if(!missing(model_formula)){
+      formula_string <- model_formula
     }
+    
 
     #Get factors
     fact.vars <- sapply(variable_testers, function(x) is.factor(df[[x]]))
@@ -311,11 +332,13 @@ olink_anova <- function(df,
 #' @param variable Single character value or character array.
 #' Variable(s) to test. If length > 1, the included variable names will be used in crossed analyses .
 #' Also takes ':' notation.
-#' @param covariates Single character value or character array. Default: NULL.
-#' Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be inferred from main effects.
+#' @param covariates Single character value or character array. Default: NULL. Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be inferred from main effects.
 #' @param outcome Character. The dependent variable. Default: NPX.
+#' @param model_formula (optional) Symbolic description of the model to be fitted in standard formula notation (e.g. "NPX~A*B"). If provided, this will override the \code{outcome}, \code{variable} and \code{covariates} arguments. Can be a string or of class \code{stats::formula()}.
 #' @param effect Term on which to perform post-hoc. Character vector. Must be subset of or identical to variable.
+#' @param effect_formula (optional) A character vector specifying the names of the predictors over which estimated marginal means are desired as defined in the \code{emmeans} package. May also be a formula. If provided, this will override the \code{effect} argument. See \code{?emmeans::emmeans()} for more information.
 #' @param mean_return Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = TRUE and no adjustment is performed.
+#' @param post_hoc_padjust_method P-value adjustment method to use for post-hoc comparisons within an assay. Options include \code{tukey}, \code{sidak}, \code{bonferroni} and \code{none}.
 #' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #'
 #' @return 
@@ -331,7 +354,7 @@ olink_anova <- function(df,
 #'  \item{estimate:} "numeric" difference in mean NPX between groups
 #'  \item{conf.low:} "numeric" confidence interval for the mean (lower end)
 #'  \item{conf.high:} "numeric" confidence interval for the mean (upper end)
-#'  \item{Adjusted_pval:} "numeric" adjusted p-value for the test (Benjamini&Hochberg)
+#'  \item{Adjusted_pval:} "numeric" adjusted p-value for the test 
 #'  \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
 #' }
 #' 
@@ -358,14 +381,25 @@ olink_anova <- function(df,
 #' distinct() %>%
 #' pull()
 #'
-#' #Posthoc
+#' #Posthoc, all pairwise comparisons
 #' anova_posthoc_results <- olink_anova_posthoc(npx_df,
 #' variable=c("Treatment:Time"),
 #' covariates="Site",
 #' olinkid_list = significant_assays,
-#' effect = "Treatment:Time")}
+#' effect = "Treatment:Time")
+#' 
+#' 
+#' #Posthoc, treated vs untreated at each timepoint, adjusted for Site effect
+#' anova_posthoc_results <- olink_anova_posthoc(npx_df,
+#' model_formula = "NPX~Treatment*Time+Site",
+#' olinkid_list = significant_assays,
+#' effect_formula = "pairwise~Treatment|Time")
+#' 
+#' 
+#' }
 #' @importFrom dplyr filter group_by ungroup pull do select arrange mutate
 #' @importFrom stringr str_detect
+#' @importFrom tidyselect any_of
 
 
 olink_anova_posthoc <- function(df,
@@ -373,10 +407,44 @@ olink_anova_posthoc <- function(df,
                                 variable,
                                 covariates = NULL,
                                 outcome = "NPX",
+                                model_formula,
                                 effect,
+                                effect_formula,
                                 mean_return = FALSE,
+                                post_hoc_padjust_method="tukey",
                                 verbose = TRUE
 ){
+  
+  if(!missing(model_formula)){
+    if("formula" %in% class(model_formula)) model_formula <- deparse(model_formula) #Convert to string if is formula
+    tryCatch(as.formula(model_formula),error=function(e) stop(paste0(model_formula," is not a recognized formula."))) #If cannot be coerced into formula, error
+    #If variable and covariates were included, message that they will not be used
+    if(!missing(variable) | !is.null(covariates)) message("model_formula overriding variable and covariate arguments.")
+    #Parse formula so checks on the  variable and outcome objects can continue as usual
+    model_formula <- gsub(" ","",model_formula)
+    splt_form <- strsplit(model_formula,c("\\+|~|\\*|:"))[[1]]
+    if("-1" %in% splt_form) splt_form <- splt_form[-which(splt_form=="-1")]
+    outcome <- splt_form[1]
+    variable <- splt_form[-1]
+    covariates <- NULL
+  }
+  
+  if(!missing(effect_formula)){
+    
+    if(length(effect_formula)==1){
+      #Parse formula so the check on the effect object can continue as usual
+      if(!missing(effect)) message("effect_formula overriding effect argument.")
+      if("formula" %in% class(effect_formula)) effect_formula <- deparse(effect_formula)
+      splt_effect <- effect_formula
+      if(grepl("~",splt_effect)) splt_effect <- strsplit(splt_effect,"~")[[1]][2] #Pull out variables from right hand side of formula. e.g. pairwise~A+B|C = "A+B|C"
+      if(grepl("\\||+|\\*",splt_effect)) splt_effect <- strsplit(splt_effect,"\\||\\+|\\*")[[1]] #Split rhs of formula into vector of variables. e.g. "A+B|C"=c("A","B","C")
+      
+      
+      effect <- splt_effect
+    } else{
+      stop("Unrecognized effect formula. Should be a character string of length 1. If listing in the form c('A','B'), use the effects argument.")
+    }
+  }
 
 
 
@@ -386,7 +454,7 @@ olink_anova_posthoc <- function(df,
 
   tmp <- unique(unlist(strsplit(effect,":")))
   if(!all(tmp %in% unique(unlist(strsplit(variable,"[\\*:]"))))) {
-    stop("All effect terms must be included in the variable argument.")
+    stop("All effect terms must be included in the variable argument or model formula.")
   }
 
 
@@ -445,13 +513,18 @@ olink_anova_posthoc <- function(df,
     }
 
 
-    if(!is.null(covariates)){
-      formula_string <- paste0(outcome, "~",
-                               paste(variable,collapse="*"),
-                               "+",
-                               paste(covariates, sep = '', collapse = '+'))
-    }else{
-      formula_string <- paste0(outcome, "~", paste(variable,collapse="*"))
+    if(missing(model_formula)){
+      if(!is.null(covariates)){
+        formula_string <- paste0(outcome, "~",
+                                 paste(variable,collapse="*"),
+                                 "+",
+                                 paste(covariates, sep = '', collapse = '+'))
+      }else{
+        
+        formula_string <- paste0(outcome, "~", paste(variable,collapse="*"))
+      }
+    } else if(!missing(model_formula)){
+      formula_string <- model_formula
     }
 
     #Print verbose message
@@ -478,16 +551,22 @@ olink_anova_posthoc <- function(df,
       }
       message(paste("Means estimated for each assay from ANOVA model: ",formula_string))
     }
+    
+    if(!missing(effect_formula)){
+      e_form <- as.formula(effect_formula)
+    } else if(missing(effect_formula)){
+      e_form <- as.formula(paste0("pairwise~", paste(effect,collapse="+")))
+    }
 
     anova_posthoc_results <- df %>%
       dplyr::filter(OlinkID %in% olinkid_list) %>%
       dplyr::mutate(OlinkID = factor(OlinkID, levels = olinkid_list)) %>%
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
       dplyr::do(data.frame(emmeans::emmeans(stats::lm(as.formula(formula_string),data=.),
-                                    specs=as.formula(paste0("pairwise~", paste(effect,collapse="+"))),
+                                    specs=e_form,
                                     cov.reduce = function(x) round(c(mean(x),mean(x)+sd(x)),4),
                             infer=c(TRUE,TRUE),
-                            adjust="tukey")[[c("contrasts","emmeans")[1+as.numeric(mean_return)]]],
+                            adjust=post_hoc_padjust_method)[[c("contrasts","emmeans")[1+as.numeric(mean_return)]]],
                     stringsAsFactors=FALSE)) %>%
       dplyr::ungroup() %>%
       dplyr::mutate(term=paste(effect,collapse=":"))  %>%
@@ -505,8 +584,10 @@ olink_anova_posthoc <- function(df,
         dplyr::mutate(Threshold = if_else(Adjusted_pval < 0.05,
                                    'Significant',
                                    'Non-significant')) %>%
-        dplyr::select(Assay, OlinkID, UniProt, Panel, term,  contrast, estimate,
-                      conf.low, conf.high, Adjusted_pval,Threshold)
+        dplyr::select(tidyselect::any_of(c("Assay", "OlinkID", "UniProt", "Panel", "term",  "contrast", effect, "estimate",
+                      "conf.low", "conf.high", "Adjusted_pval","Threshold")))
+      
+      if(post_hoc_padjust_method=="none") anova_posthoc_results <- anova_posthoc_results %>% rename(pvalue=Adjusted_pval)
     }
 
     return(anova_posthoc_results)
@@ -516,3 +597,4 @@ olink_anova_posthoc <- function(df,
       invokeRestart("muffleWarning")
   })
 }
+
