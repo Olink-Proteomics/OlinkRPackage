@@ -216,6 +216,6 @@ ora_pathwayenrichment <- function(test_results, organism, ontology = ontology, p
                    " assays are not found in the database. Please check the Assay names for the following assays:\n ", 
                    toString(setdiff(names(universe), msig_df$gene_symbol))))
   }
-  ORA <- enricher(gene = sig_genes, universe = universe, TERM2GENE = msig_df, pvalueCutoff = 1)
+  ORA <- clusterProfiler::enricher(gene = sig_genes, universe = universe, TERM2GENE = msig_df, pvalueCutoff = 1)
   return(ORA@result)
 }

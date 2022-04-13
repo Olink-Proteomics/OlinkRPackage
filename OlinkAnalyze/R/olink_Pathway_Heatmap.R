@@ -38,7 +38,7 @@ olink_pathway_heatmap<- function(enrich_results, test_results, method = "GSEA", 
     sub_enrich <- enrich_results %>% head(number_of_terms)
   } else{
     sub_enrich <- enrich_results %>%
-      filter(grepl(pattern = toupper(keyword), Description)) %>%
+      dplyr::filter(grepl(pattern = toupper(keyword), Description)) %>%
       head(number_of_terms)
     if (nrow(sub_enrich) == 0) {
       stop("Keyword not found. Please choose a different keyword or use a set number of terms.")
