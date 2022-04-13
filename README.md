@@ -14,9 +14,10 @@ convenient pipeline for your Olink NPX data analysis.
 
 ## Installation
 
+Olink® Analyze is now available on CRAN: https://cran.r-project.org/web/packages/OlinkAnalyze/index.html 
+
 ``` r
-# install.packages("remotes")
-remotes::install_github(repo ='Olink-Proteomics/OlinkRPackage/OlinkAnalyze', ref = "main", build_vignettes = TRUE)
+install.packages("OlinkAnalyze")
 ```
 
 ## Vignette
