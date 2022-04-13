@@ -42,7 +42,7 @@ olink_pathway_visualization<- function(enrich_results, method = "GSEA", keyword 
                                   gsub(x = BgRatio,pattern = "/.*", replacement = ""), sep = "/")),
                   hjust=-0.1, color="black", size=3.5)
     }else{
-      if (nrow((enrich_results %>%  filter(grepl(pattern = toupper(keyword), Description)))) == 0) {
+      if (nrow(enrich_results %>%  filter(grepl(pattern = toupper(keyword), Description))) == 0) {
         stop("Keyword not found. Please choose a different keyword or use a set number of terms.")
       }
       enrich_results %>%  filter(grepl(pattern = toupper(keyword), Description)) %>%  head(number_of_terms) %>%
@@ -60,7 +60,10 @@ olink_pathway_visualization<- function(enrich_results, method = "GSEA", keyword 
         geom_bar(stat = "identity", aes(fill = p.adjust))+
         olink_fill_gradient(coloroption = c('teal', 'red')) + coord_flip() + xlab("Description")
     }else{
-     enrich_results %>%  filter(grepl(pattern = toupper(keyword), Description)) %>%  head(number_of_terms) %>%
+      if (nrow(enrich_results %>%  filter(grepl(pattern = toupper(keyword), Description))) == 0) {
+        stop("Keyword not found. Please choose a different keyword or use a set number of terms.")
+      }
+      enrich_results %>%  filter(grepl(pattern = toupper(keyword), Description)) %>%  head(number_of_terms) %>%
         ggplot(., aes(x = str_trunc(Description, 50, "center"), y=NES)) +
         geom_bar(stat = "identity", aes(fill = p.adjust))+
         olink_fill_gradient(coloroption = c('teal', 'red')) + coord_flip() + xlab("Description")
