@@ -1,6 +1,6 @@
 #' Performs pathway enrichment using over-representation analysis (ORA) or gene set enrichment analysis (GSEA) 
 #' 
-#' This enrichment analysis based on statistical test results and full data using clusterProfiler's gsea and enrich functions for MSigDB. 
+#' This function performs enrichment analysis based on statistical test results and full data using clusterProfiler's gsea and enrich functions for MSigDB. 
 #' 
 #' MSigDB is subset if ontology is KEGG, GO, or Reactome. test_results must contain estimates for all assays. 
 #' Posthoc results can be used but should be filtered for one contrast to improve interpretability.
