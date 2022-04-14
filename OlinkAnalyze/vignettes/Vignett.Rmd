@@ -23,16 +23,10 @@ Olink® Analyze is an R package that provides a versatile toolbox to enable fast
 
 # Installation 
 
-The package *remotes* is required for the installation.
+You can install Olink® Analyze from CRAN.
 
 ```{r, eval=FALSE}
-install.packages("remotes")
-```
-
-Now you can proceed to installing Olink® Analyze from Github.
-
-```{r, eval=FALSE}
-remotes::install_github(repo ='Olink-Proteomics/OlinkRPackage/OlinkAnalyze', ref = "main", build_vignettes = TRUE)
+install.packages("OlinkAnalyze")
 ```
 
 # List of functions
