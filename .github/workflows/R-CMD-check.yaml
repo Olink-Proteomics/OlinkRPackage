@@ -65,6 +65,7 @@ jobs:
         
       - name: Install clusterProfiler
         run: |
+          BiocManager::install("enrichplot")
           BiocManager::install("clusterProfiler") 
         shell: Rscript {0}
         
