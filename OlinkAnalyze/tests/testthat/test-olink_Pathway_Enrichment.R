@@ -18,51 +18,63 @@ tt_ora_go <- olink_pathway_enrichment(npx_df, test_results = ttest_results, meth
 ttest_results_no_estimate <- ttest_results %>% dplyr::select(-estimate)
 
 test_that("T-test GSEA works", {
+  set.seed(123)
   expect_equal(nrow(tt_gsea), 565)
 })
 
 test_that("Reactome GSEA works", {
+  set.seed(123)
   expect_equal(nrow(tt_gsea_reactome), 18)
 })
 
 test_that("KEGG GSEA works", {
+  set.seed(123)
   expect_equal(nrow(tt_gsea_kegg), 5)
 })
 
 test_that("GO GSEA works", {
+  set.seed(123)
   expect_equal(nrow(tt_gsea_go), 387)
 })
 
 
 test_that("T-test ORA works", {
+  set.seed(123)
   expect_equal(nrow(tt_ora), 366)
 })
 
 test_that("Reactome ORA works", {
+  set.seed(123)
   expect_equal(nrow(tt_ora_reactome), 15)
 })
 
 test_that("KEGG ORA works", {
+  set.seed(123)
   expect_equal(nrow(tt_ora_kegg), 3)
 })
 
 test_that("GO ORA works", {
+  set.seed(123)
   expect_equal(nrow(tt_ora_go), 263)
 })
 
 
 test_that("Error if more than 1 contrast", {
+  set.seed(123)
   expect_error(olink_pathway_enrichment(npx_df, anova_posthoc_results))
 })
 
 test_that("Nonsense method errors",{
+  set.seed(123)
   expect_error(olink_pathway_enrichment(npx_df, anova_posthoc_results, method = "IRA"))
 })
 
 test_that("Unsupported databases flag",{
+  set.seed(123)
   expect_error(olink_pathway_enrichment(npx_df, anova_posthoc_results, ontology = "WikiPathways"))
 })
 
 test_that("Estimate column must be present",{
+  set.seed(123)
   expect_error(olink_pathway_enrichment(npx_df, ttest_results_no_estimate))
 })

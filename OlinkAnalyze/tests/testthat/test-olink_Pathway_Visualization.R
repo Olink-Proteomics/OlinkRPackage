@@ -1,3 +1,4 @@
+set.seed(123)
 npx_df <- npx_data1 %>% filter(!grepl('control',SampleID, ignore.case = TRUE))
 ttest_results <- olink_ttest(df=npx_df,
                              variable = 'Treatment',
@@ -16,6 +17,7 @@ test_that("Valid Keyword needed", {
 })
 
 test_that("Plot works",{
+  set.seed(123)
   skip_on_ci()
   vdiffr::expect_doppelganger("GSEA Visualization", gsea_vis)
   vdiffr::expect_doppelganger("GSEA Vis with Keyword", gsea_vis_keyword)
