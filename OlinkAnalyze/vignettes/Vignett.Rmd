@@ -490,7 +490,7 @@ T Wu, E Hu, S Xu, M Chen, P Guo, Z Dai, T Feng, L Zhou, W Tang, L Zhan, X Fu, S 
 * ontology: String of database to query. Must be either "MSigDb", "KEGG", "GO", and "Reactome"
 * organism: String of name of organism. Must be either "human" or "mouse"
 
-```{r message=FALSE, eval=FALSE}
+```{r message=FALSE}
 npx_df <- npx_data1 %>% filter(!grepl("control", SampleID, ignore.case = TRUE))
 ttest_results <- olink_ttest(
   df = npx_df,
