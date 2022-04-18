@@ -46,12 +46,13 @@ jobs:
 
       - name: Install dependencies
         run: |
+          install.packages("BiocManager")
+          BiocManager::install("enrichplot",type = "source")
+          BiocManager::install("clusterProfiler") 
           remotes::install_deps(pkgdir = "OlinkAnalyze", dependencies = TRUE)
           install.packages("stringi", type="source")
           remotes::install_cran("roxygen2")
-          install.packages("BiocManager")
-          BiocManager::install("enrichplot")
-          BiocManager::install("clusterProfiler") 
+      
         shell: Rscript {0}
 
 
