@@ -61,7 +61,7 @@ Columns for GSEA:
 }
 }
 \description{
-This enrichment analysis based on statistical test results and full data using clusterProfiler's gsea and enrich functions for MSigDB.
+This function performs enrichment analysis based on statistical test results and full data using clusterProfiler's gsea and enrich functions for MSigDB.
 }
 \details{
 MSigDB is subset if ontology is KEGG, GO, or Reactome. test_results must contain estimates for all assays. 
