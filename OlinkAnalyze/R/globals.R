@@ -10,5 +10,6 @@ utils::globalVariables(unique(c(
   "variables", "well", "scramble", ":=", "estimate1", "estimate2", "1", "Name", "Plate ID", "MissingFreq", "Unit",
   "Assay_Warning", "Panel_Version", "QC Warning", "Name_Assay", "PlateID", "Adj_factor", "Panel_End", "Panel_Start",
   "SampleIDPlot", "PCX_low", "PCX_high", "PCY_low", "PCY_high", "BgRatio", "Count", "Description", "Detected",
-  "GeneRatio", "NES", "Pathway", "geneList", "Sum","gene_symbol", "gs_name", "gs_subcat"
+  "GeneRatio", "NES", "Pathway", "geneList", "Sum","gene_symbol", "gs_name", "gs_subcat", ".y.", "SE", "df", "group1",
+  "group2", "method", "p", "p.adj", "parameter", "t.ratio"
 )))
