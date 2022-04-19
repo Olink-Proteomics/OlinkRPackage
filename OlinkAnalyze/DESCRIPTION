@@ -1,93 +1,54 @@
-Package: OlinkAnalyze
 Type: Package
+Package: OlinkAnalyze
 Title: Facilitate Analysis of Proteomic Data from Olink
-Description: A collection of functions to facilitate analysis of proteomic data
-    from Olink, primarily NPX data that has been exported from Olink NPX 
-    Manager or MyData. The functions also work on QUANT data from Olink by log-
-    transforming the QUANT data. The functions are focused on reading data,
-    facilitating data wrangling and quality control analysis, performing
-    statistical analysis and generating figures to visualize the results of
-    the statistical analysis. The goal of this package is to help users extract
-    biological insights from proteomic data run on the Olink platform.
 Version: 3.1.0
-Authors@R: 
-    c(person(given = "Kathleen",
-            family = "Nevola",
-            email = "biostattools@olink.com",
-            role = c("aut","cre"), 
-            comment = c(ORCID = "0000-0002-5183-6444", Github = "kathy-nevola")),
-      person(given = "Marianne",
-            family = "Sandin",
-            role = "aut",
-            comment = c(ORCID = "0000-0001-6186-963X",Github = "marisand")),
-      person(given = "Jamey",
-             family = "Guess",
-             role = "aut",
-             comment = c(ORCID = "0000-0002-4017-0923", Github = "jrguess")),
-      person(given = "Simon",
-             family = "Forsberg",
-             role = "aut",
-             comment = c(ORCID = "0000-0002-7451-9222", Github = "simfor")),
-      person(given = "Christoffer",
-             family = "Cambronero",
-             role = "aut",
-             comment = c(Github = "Orbmac")),
-      person(given = "Pascal",
-             family = "Pucholt",
-             role = "aut",
-             comment = c(ORCID = "0000-0003-3342-1373", Github = "AskPascal")),
-      person(given = "Boxi", 
-             family = "Zhang",
-             role = "aut",
-             comment = c(ORCID = "0000-0001-7758-6204", Github = "boxizhang")),
-      person(given = "Masoumeh",
-             family = "Sheikhi",
-             role = "aut",
-             comment = c(Github = "MasoumehSheikhi")),
-      person(given = "Per",
-             family = "Eriksson",
-             role = "ctb",
-             comment = c(ORCID = "0000-0001-7633-403X", Github = "b_watcher")),
-      person(given = "Klev",
-             family = "Diamanti",
-             role = "ctb",
-             comment = c(ORCID = "0000-0002-4922-8415", Github = "klevdiamanti")),
-      person(given = "Emmett",
-             family = "Sprecher",
-             role = "ctb",
-             comment = c(ORCID = "0000-0002-7710-695X")),
-      person(given = "Jessica",
-             family = "Barbagallo",
-             role = "ctb",
-             comment = c(Github = "jbarbagallo")),
-      person(given = "Olof",
-             family = "Mansson",
-             role = "ctr",
-             comment = c(Github = "olofmansson")),
-      person(given = "Ola",
-             family = "Caster",
-             role = "ctb",
-             comment = c(Github = "OlaCaster")),
-      person(given = "Olink",
-             role = c("cph", "fnd")))
-Depends: R (>= 3.6.0)
-Encoding: UTF-8
-LazyData: true
-RoxygenNote: 7.1.2
-Suggests: 
-    extrafont,
-    knitr,
-    rmarkdown,
-    testthat (>= 3.0.0),
-    scales,
-    markdown,
-    vdiffr
+Authors@R: c(
+    person("Kathleen", "Nevola", , "biostattools@olink.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-5183-6444", Github = "kathy-nevola")),
+    person("Marianne", "Sandin", role = "aut",
+           comment = c(ORCID = "0000-0001-6186-963X", Github = "marisand")),
+    person("Jamey", "Guess", role = "aut",
+           comment = c(ORCID = "0000-0002-4017-0923", Github = "jrguess")),
+    person("Simon", "Forsberg", role = "aut",
+           comment = c(ORCID = "0000-0002-7451-9222", Github = "simfor")),
+    person("Christoffer", "Cambronero", role = "aut",
+           comment = c(Github = "Orbmac")),
+    person("Pascal", "Pucholt", role = "aut",
+           comment = c(ORCID = "0000-0003-3342-1373", Github = "AskPascal")),
+    person("Boxi", "Zhang", role = "aut",
+           comment = c(ORCID = "0000-0001-7758-6204", Github = "boxizhang")),
+    person("Masoumeh", "Sheikhi", role = "aut",
+           comment = c(Github = "MasoumehSheikhi")),
+    person("Per", "Eriksson", role = "ctb",
+           comment = c(ORCID = "0000-0001-7633-403X", Github = "b_watcher")),
+    person("Klev", "Diamanti", role = "ctb",
+           comment = c(ORCID = "0000-0002-4922-8415", Github = "klevdiamanti")),
+    person("Emmett", "Sprecher", role = "ctb",
+           comment = c(ORCID = "0000-0002-7710-695X")),
+    person("Jessica", "Barbagallo", role = "ctb",
+           comment = c(Github = "jbarbagallo")),
+    person("Olof", "Mansson", role = "ctr",
+           comment = c(Github = "olofmansson")),
+    person("Ola", "Caster", role = "ctb",
+           comment = c(Github = "OlaCaster")),
+    person("Olink", role = c("cph", "fnd"))
+  )
+Description: A collection of functions to facilitate analysis of proteomic
+    data from Olink, primarily NPX data that has been exported from Olink
+    NPX Manager or MyData. The functions also work on QUANT data from
+    Olink by log- transforming the QUANT data. The functions are focused
+    on reading data, facilitating data wrangling and quality control
+    analysis, performing statistical analysis and generating figures to
+    visualize the results of the statistical analysis. The goal of this
+    package is to help users extract biological insights from proteomic
+    data run on the Olink platform.
 License: GPL-3
-VignetteBuilder: knitr
+Depends: 
+    R (>= 3.6.0)
 Imports: 
+    broom,
     car,
     clusterProfiler,
-    broom,
     dplyr,
     emmeans,
     forcats,
@@ -102,15 +63,28 @@ Imports:
     magrittr,
     methods,
     msigdbr,
+    ordinal,
     readxl,
     rlang,
+    rstatix,
     stats,
     stringr,
     tibble,
     tidyr,
     tidyselect,
     tools,
-    utils,
-    ordinal,
-    rstatix
+    utils
+Suggests: 
+    extrafont,
+    knitr,
+    markdown,
+    rmarkdown,
+    scales,
+    testthat (>= 3.0.0),
+    vdiffr
+VignetteBuilder: 
+    knitr
 Config/testthat/edition: 3
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.1.2

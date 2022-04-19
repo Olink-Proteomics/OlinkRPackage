@@ -79,6 +79,16 @@
 #' @export
 
 olink_pathway_enrichment <- function(data, test_results, method = "GSEA", ontology = "MSigDb", organism = "human") {
+  # Is Package installed
+  package_available <- require("clusterProfiler", quietly = TRUE)
+  if(package_available == FALSE){
+    stop(" Pathway enrichment requires clusterProfiler package.
+         Please install clusterProfiler before continuing.
+         
+         if (!require(\"BiocManager\", quietly = TRUE))
+            install.packages(\"BiocManager\")
+         BiocManager::install(\"clusterProfiler\")")
+  }
   # Data Checks
   
   if(length(unique(data$OlinkID)) != length(unique(test_results$OlinkID))) {
