@@ -62,10 +62,19 @@ jobs:
         run: |
           options(install.packages.compile.from.source = "never") # use binary package if available, even if older
           install.packages("stringi", type="source", repos='http://cran.us.r-project.org')
+          install.packages("statmod", type="source", repos='http://cran.us.r-project.org')
+          install.packages("BiocManager", type="source", repos='http://cran.us.r-project.org')
+          BiocManager::install("clusterProfiler")          
           remotes::install_deps(pkgdir = "OlinkAnalyze", dependencies = TRUE)
           remotes::install_cran("rcmdcheck")
         shell: Rscript {0}
-
+        
+      - name: Install clusterProfiler
+        run: |
+          BiocManager::install("enrichplot",type = "source")
+          BiocManager::install("clusterProfiler") 
+        shell: Rscript {0}
+        
       - name: Session info
         run: |
           options(width = 100)

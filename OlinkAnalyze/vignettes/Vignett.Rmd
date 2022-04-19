@@ -23,16 +23,10 @@ Olink® Analyze is an R package that provides a versatile toolbox to enable fast
 
 # Installation 
 
-The package *remotes* is required for the installation.
+You can install Olink® Analyze from CRAN.
 
 ```{r, eval=FALSE}
-install.packages("remotes")
-```
-
-Now you can proceed to installing Olink® Analyze from Github.
-
-```{r, eval=FALSE}
-remotes::install_github(repo ='Olink-Proteomics/OlinkRPackage/OlinkAnalyze', ref = "main", build_vignettes = TRUE)
+install.packages("OlinkAnalyze")
 ```
 
 # List of functions
@@ -51,16 +45,20 @@ remotes::install_github(repo ='Olink-Proteomics/OlinkRPackage/OlinkAnalyze', ref
 + *olink_anova_posthoc* Function which performs an ANOVA post-hoc test per protein
 + *olink_lmer* Function which performs a linear mixed model per protein
 + *olink_lmer_posthoc* Function which performs a linear mixed model post-hoc per protein
++ *olink_pathway_enrichment* Function which performs GSEA or ORA pathway enrichment using outcome from other statistical tests
 
 **Visualization**
 
 + *olink_boxplot* Function which plots boxplots of a selected variable
 + *olink_dist_plot* Function to plot the NPX distribution by panel
 + *olink_lmer_plot* Function which performs a point-range plot per protein on a linear mixed model
++ *olink_pathway_visualization* Function which plots a bar graph for pathways of interest
++ *olink_pathway_heatmap* Function which plots estimates of proteins associated with pathways of interest
 + *olink_pca_plot* Function to plot a PCA of the data
 + *olink_qc_plot* Function to plot an overview of a sample cohort per Panel
 + *olink_volcano_plot* Easy volcano plot with Olink theme
 + *set_plot_theme* Function to set plot theme
+
 
 **Sample datasets**
 
@@ -478,6 +476,60 @@ A tibble with the following columns:
 * Adjusted_pval _\<dbl\>_: Adjusted p-value for the test (Benjamini & Hochberg).
 * Threshold _\<chr\>_: Text indication if assay is significant (adjusted p-value < 0.05).
 
+## Pathway Enrichment (olink_pathway_enrichment)
+
+The olink_pathway_enrichment function can be used to perform Gene Set Enrichment Analysis (GSEA) or Over-representation Analysis (ORA) using MSigDB, Reactome, KEGG, or GO. MSigDB includes curated gene sets (C2) and ontology gene sets (C5) which encompasses Reactome, KEGG, and GO. This function performs enrichment using the *gsea* or *enrich* functions from clusterProfiler from BioConductor. The function uses the estimate from a previous statistical analysis for one contrast for all proteins. MSigDB is subset if ontology is KEGG, GO, or Reactome. test_results must contain estimates for all assays. Posthoc results can be used but should be filtered for one contrast to improve interpretability. clusterProfiler is originally developed by Guangchuang Yu at the School of Basic Medical Sciences at Southern Medical University.
+
+T Wu, E Hu, S Xu, M Chen, P Guo, Z Dai, T Feng, L Zhou, W Tang, L Zhan, X Fu, S Liu, X Bo, and G Yu. clusterProfiler 4.0: A universal enrichment tool for interpreting omics data. The Innovation. 2021, 2(3):100141. doi: 10.1016/j.xinn.2021.100141
+
+### Function Arguments
+
+* data: NPX data frame in long format with columns Assay, OlinkID, UniProt, SampleID, QC_Warning, NPX, and LOD
+* test_results: a data frame of statistical test results including Adjusted_pval and estimate columns
+* method: String of method name. Must be either "GSEA" (default) or "ORA"
+* ontology: String of database to query. Must be either "MSigDb", "KEGG", "GO", and "Reactome"
+* organism: String of name of organism. Must be either "human" or "mouse"
+
+```{r message=FALSE}
+npx_df <- npx_data1 %>% filter(!grepl("control", SampleID, ignore.case = TRUE))
+ttest_results <- olink_ttest(
+  df = npx_df,
+  variable = "Treatment",
+  alternative = "two.sided")
+gsea_results <- olink_pathway_enrichment(data = npx_data1, test_results = ttest_results)
+ora_results <- olink_pathway_enrichment(
+  data = npx_data1,
+  test_results = ttest_results, method = "ORA")
+```
+
+
+### Function Output
+A data frame of enrichment results. Columns for ORA include:
+
+* ID _\<chr\>_: Pathway ID from MSigDB
+* Description _\<chr\>_: Description of Pathway from MSigDB
+* GeneRatio _\<chr\>_: ratio of input proteins that are annotated in a term
+* BgRatio _\<chr\>_: ratio of all genes that are annotated in this term
+* pvalue _\<dbl\>_: p-value of enrichment
+* p.adjust _\<dbl\>_: Adjusted p-value (Benjamini-Hochberg)
+* qvalue _\<dbl\>_: false discovery rate, the estimated probability that the normalized enrichment score represents a false positive finding
+* geneID: _\<chr\>_ list of input proteins (Gene Symbols) annotated in a term delimited by "/"
+* Count _\<dbl\>_: Number of input proteins that are annotated in a term
+
+Columns for GSEA:
+
+* ID _\<chr\>_: Pathway ID from MSigDB
+* Description _\<chr\>_: Description of Pathway from MSigDB
+* setSize _\<dbl\>_: ratio of input proteins that are annotated in a term
+* enrichmentScore _\<dbl\>_: Enrichment score, degree to which a gene set is over-represented at the top or bottom of the ranked list of genes
+* NES _\<dbl\>_: Normalized Enrichment Score, normalized to account for differences in gene set size and in correlations between gene sets and expression data sets. NES can be used to compare analysis results across gene sets.
+* pvalue _\<dbl\>_: p-value of enrichment
+* p.adjust _\<dbl\>_: Adjusted p-value (Benjamini-Hochberg)
+* qvalue _\<dbl\>_: false discovery rate, the estimated probability that the normalized enrichment score represents a false positive finding
+* rank _\<dbl\>_: the position in the ranked list where the maximum enrichment score occurred
+* leading_edge _\<chr\>_: contains tags, list, and signal. Tags gives an indication of the percentage of genes contributing to the enrichment score. List gives an indication of where in the list the enrichment score is obtained. Signal represents the enrichment signal strength and combines the tag and list.
+* core_enrichment _\<chr\>_: list of input proteins (Gene Symbols) annotated in a term delimited by "/"
+
 # Visualization
 
 ## Boxplots for outcomes (olink_boxplot)
@@ -611,6 +663,44 @@ lapply(g, function(x){x$data}) %>%
   select(SampleID, Outlier, Panel)
 ```
 
+## Heatmap for visualizing pathway enrichment (olink_pathway_heatmap)
+
+The olink_pathway_heatmap function generates a heatmap of proteins related to pathways using the enrichment results from the  olink_pathway_enrichment function. Either the top terms can be visualized or terms containing a certain keyword. For each term, the proteins in the test_result data frame that are related to that term will be visualized by their estimate. This visualization can be used to determining how many proteins of interest are involved in a particular pathway and in which direction their estimates are.
+
+### Function arguments
+
+* enrich_results: data frame of enrichment results from olink_pathway_enrichment()
+* test_results: filtered results from statistical test with Assay, OlinkID, and estimate columns
+* method: method used in olink_pathway_enrichment ("GSEA" (default) or "ORA")
+* keyword: (optional) keyword to filter enrichment results on, if not specified, displays top terms
+* number_of_terms: number of terms to display, default is 20
+
+
+```{r  message=FALSE, fig.width=8, fig.height=4}
+# GSEA Heatmap from t-test results
+olink_pathway_heatmap(enrich_results = gsea_results, test_results = ttest_results)
+```
+```{r message = FALSE, fig.width=8, fig.height=4}
+# ORA Heatmap from t-test results with cell keyword
+olink_pathway_heatmap(enrich_results = ora_results, test_results = ttest_results,
+                      method = "ORA", keyword = "cell")
+```
+
+### Function output
+A heatmap as a ggplot object
+
+## Bargraph for visualizating pathway enrichment (olink_pathway_visualization)
+The olink_pathway_visualization function generates a bar graph of the top terms or terms related to a certain keyword for results from the olink_pathway_enrichment function. The bar represents eithre the normalized enrichment score (NES) for GSEA results or counts (number of proteins) for ORA results colored by adjusted p-value. The ORA visualization also contains the number of proteins out of the total proteins in that pathway as a ratio after the bar.
+
+### Function arguments
+
+* enrich_results: data frame of enrichment results from olink_pathway_enrichment()
+* method: method used in olink_pathway_enrichment ("GSEA" (default) or "ORA")
+* keyword: (optional) keyword to filter enrichment results on, if not specified, displays top terms
+* number_of_terms: number of terms to display, default is 20
+
+### Function output
+A bar graph as a **ggplot** object.
 
 ## Scatterplot for QC (olink_qc_plot) 
 

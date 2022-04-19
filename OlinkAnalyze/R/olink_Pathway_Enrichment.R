@@ -1,15 +1,19 @@
 #' Performs pathway enrichment using over-representation analysis (ORA) or gene set enrichment analysis (GSEA) 
 #' 
-#' This enrichment analysis based on statistical test results and full data using clusterProfiler's gsea and enrich functions for MSigDB.
-#' clusterProfiler is originally developed by Guangchuang Yu at the School of Basic Medical Sciences at Southern Medical University/
+#' This function performs enrichment analysis based on statistical test results and full data using clusterProfiler's gsea and enrich functions for MSigDB. 
+#' 
+#' MSigDB is subset if ontology is KEGG, GO, or Reactome. test_results must contain estimates for all assays. 
+#' Posthoc results can be used but should be filtered for one contrast to improve interpretability.
+#' clusterProfiler is originally developed by Guangchuang Yu at the School of Basic Medical Sciences at Southern Medical University.
+#' 
 #' T Wu, E Hu, S Xu, M Chen, P Guo, Z Dai, T Feng, L Zhou, W Tang, L Zhan, X Fu, S Liu, X Bo, and G Yu. 
 #' clusterProfiler 4.0: A universal enrichment tool for interpreting omics data. The Innovation. 2021, 2(3):100141. 
 #' doi: 10.1016/j.xinn.2021.100141
 #' 
 #' @param data NPX data frame in long format with at least protein name (Assay), OlinkID, UniProt,SampleID, QC_Warning, NPX, and LOD
-#' @param test_results a dataframe of statistical test results including Adjusted_pval and estimate columns. Currently only works for tests with estimates for all assays.
+#' @param test_results a dataframe of statistical test results including Adjusted_pval and estimate columns. 
 #' @param method Either "GSEA" (default) or "ORA"
-#' @param ontology Supports "MSigDb" (default), "KEGG", "GO", and "Reactome" as arguements. MSigDb contains C2 and C5 genesets. C2 and C5 encompass KEGG, GO, and Reactome.
+#' @param ontology Supports "MSigDb" (default), "KEGG", "GO", and "Reactome" as arguments. MSigDb contains C2 and C5 genesets. C2 and C5 encompass KEGG, GO, and Reactome.
 #' @param organism Either "human" (default) or "mouse"
 #' @return A data frame of enrichment results.
 #' Columns for ORA include:
@@ -75,6 +79,26 @@
 #' @export
 
 olink_pathway_enrichment <- function(data, test_results, method = "GSEA", ontology = "MSigDb", organism = "human") {
+  # Data Checks
+  
+  if(length(unique(data$OlinkID)) != length(unique(test_results$OlinkID))) {
+    warning("The number of Olink IDs in the data does not equal the number of Olink IDs in the test results.")
+  }
+  
+  if("contrast" %in% colnames(test_results) && length(unique(test_results$contrast)) > 1){
+    stop("More than one contrast is specified in test results. Filter test_results for desired contrast.")
+  }
+  if(!("estimate" %in% colnames(test_results))){
+    stop("Estimate column is not present in test results. Please check arguments.")
+  }
+  
+  if(!(method %in% c("GSEA", "ORA"))){
+    stop("Method must be \"GSEA\" or \"ORA\".")
+  }
+  
+  if(!(ontology %in% c("MSigDb", "Reactome", "KEGG", "GO"))){
+    stop("Ontology must be one of MSigDb, Reactome, KEGG, or GO.")
+  }
   data2 <- data_prep(data = data)
   test_results2 <- test_prep(data = data2, test_results = test_results, organism = organism)
   
@@ -192,6 +216,6 @@ ora_pathwayenrichment <- function(test_results, organism, ontology = ontology, p
                    " assays are not found in the database. Please check the Assay names for the following assays:\n ", 
                    toString(setdiff(names(universe), msig_df$gene_symbol))))
   }
-  ORA <- enricher(gene = sig_genes, universe = universe, TERM2GENE = msig_df, pvalueCutoff = 1)
+  ORA <- clusterProfiler::enricher(gene = sig_genes, universe = universe, TERM2GENE = msig_df, pvalueCutoff = 1)
   return(ORA@result)
 }
