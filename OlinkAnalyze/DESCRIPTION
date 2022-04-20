@@ -110,5 +110,6 @@ Imports:
     tools,
     utils,
     ordinal,
-    rstatix
+    rstatix,
+    pheatmap
 Config/testthat/edition: 3
