@@ -80,7 +80,7 @@
 
 olink_pathway_enrichment <- function(data, test_results, method = "GSEA", ontology = "MSigDb", organism = "human") {
   # Is Package installed
-  package_available <- require("clusterProfiler", quietly = TRUE)
+  package_available <- requireNamespace("clusterProfiler", quietly = TRUE)
   if(package_available == FALSE){
     stop(" Pathway enrichment requires clusterProfiler package.
          Please install clusterProfiler before continuing.
