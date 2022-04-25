@@ -48,7 +48,6 @@ Depends:
 Imports: 
     broom,
     car,
-    clusterProfiler,
     dplyr,
     emmeans,
     forcats,
@@ -62,7 +61,6 @@ Imports:
     lmerTest,
     magrittr,
     methods,
-    msigdbr,
     ordinal,
     readxl,
     rlang,
@@ -75,9 +73,11 @@ Imports:
     tools,
     utils
 Suggests: 
+    clusterProfiler,
     extrafont,
     knitr,
     markdown,
+    msigdbr,
     rmarkdown,
     scales,
     testthat (>= 3.0.0),

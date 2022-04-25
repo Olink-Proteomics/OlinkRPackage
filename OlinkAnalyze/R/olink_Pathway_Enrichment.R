@@ -72,22 +72,26 @@
 #' }
 #'
 #' @importFrom dplyr filter mutate select group_by summarise arrange ungroup distinct pull full_join
-#' @importFrom clusterProfiler  GSEA enricher
-#' @importFrom msigdbr msigdbr
 #' @importFrom stringr str_length
 #' @importFrom magrittr %>%
 #' @export
 
 olink_pathway_enrichment <- function(data, test_results, method = "GSEA", ontology = "MSigDb", organism = "human") {
   # Is Package installed
-  package_available <- requireNamespace("clusterProfiler", quietly = TRUE)
-  if(package_available == FALSE){
+  if(!requireNamespace("clusterProfiler", quietly = TRUE) ){
     stop(" Pathway enrichment requires clusterProfiler package.
          Please install clusterProfiler before continuing.
          
          if (!require(\"BiocManager\", quietly = TRUE))
             install.packages(\"BiocManager\")
          BiocManager::install(\"clusterProfiler\")")
+  }
+   
+  if(!requireNamespace("msigdbr", quietly = TRUE)){
+    stop(" Pathway enrichment requires msigdbr package.
+         Please install msigdbr before continuing.
+         
+         install.packages(\"msigdbr\")")
   }
   # Data Checks
   
