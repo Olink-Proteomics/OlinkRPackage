@@ -7,7 +7,7 @@
 olink_heatmap_plot(
   df,
   variable_list = NULL,
-  scale_data = TRUE,
+  center_scale = TRUE,
   cluster_rows = TRUE,
   cluster_cols = TRUE,
   show_rownames = TRUE,
@@ -23,7 +23,7 @@ olink_heatmap_plot(
 
 \item{variable_list}{Columns in \code{df} to be annotated.}
 
-\item{scale_data}{Logical. If data should be scaled and centered across assays (default \code{TRUE}).}
+\item{center_scale}{Logical. If data should be centered and scaled across assays (default \code{TRUE}).}
 
 \item{cluster_rows}{Logical. Determining if rows should be clustered (default \code{TRUE}).}
 

@@ -8,7 +8,7 @@
 #'
 #' @param df Data frame in long format with SampleID, NPX, OlinkID, Assay and columns of choice for annotations.
 #' @param variable_list Columns in \code{df} to be annotated.
-#' @param scale_data Logical. If data should be scaled and centered across assays (default \code{TRUE}).
+#' @param center_scale Logical. If data should be centered and scaled across assays (default \code{TRUE}).
 #' @param cluster_rows Logical. Determining if rows should be clustered (default \code{TRUE}).
 #' @param cluster_cols Logical. Determining if columns should be clustered (default \code{TRUE}).
 #' @param show_rownames Logical. Determining if row names are shown (default \code{TRUE}).
@@ -41,7 +41,7 @@
 
 olink_heatmap_plot <- function(df,
                                variable_list     = NULL,
-                               scale_data        = TRUE,
+                               center_scale      = TRUE,
                                cluster_rows      = TRUE,
                                cluster_cols      = TRUE,
                                show_rownames     = TRUE,
@@ -120,7 +120,7 @@ olink_heatmap_plot <- function(df,
                        values_from = NPX) %>%
     tibble::column_to_rownames('SampleID')
   
-  scale <- ifelse(scale_data, "column", "none")
+  scale <- ifelse(center_scale, "column", "none")
   
   # Prepare argument list
   pheatmap_args <- list(
