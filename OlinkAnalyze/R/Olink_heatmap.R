@@ -122,51 +122,53 @@ olink_heatmap_plot <- function(df,
   
   scale <- ifelse(scale_data, "column", "none")
   
-  if(!is.null(variable_list)){
+  # Prepare argument list
+  pheatmap_args <- list(
+    mat               = npxWide,
+    scale             = scale,
+    cluster_rows      = cluster_rows,
+    cluster_cols      = cluster_cols,
+    na_col            = na_col,
+    show_rownames     = show_rownames,
+    show_colnames     = show_colnames,
+    annotation_legend = annotation_legend,
+    fontsize          = fontsize
+  )
+  
+  # Add annotations to call, if requested
+  if (!is.null(variable_list)){
     variable_df <- df %>%
       select(SampleID, variable_list) %>%
       unique() %>%
       column_to_rownames('SampleID')
-    
-    tryCatch({
-      pheatmap::pheatmap(npxWide,
-                         scale = scale,
-                         cluster_rows = cluster_rows,
-                         cluster_cols = cluster_cols,
-                         na_col = na_col,
-                         annotation_row = variable_df,
-                         show_rownames = show_rownames,
-                         show_colnames = show_colnames,
-                         annotation_legend = annotation_legend,
-                         fontsize = fontsize,
-                         ...)},
-      error = function(e){
-        if(grepl("NA/NaN/Inf", e$message, fixed = TRUE)){
-          print("Error when clustering. Try setting cluster of rows or columns to FALSE.")
-        }
-        else{
-          e$message
-        }
-      })
-  } else{
-    tryCatch({
-      pheatmap::pheatmap(npxWide,
-                         cluster_rows = cluster_rows,
-                         cluster_cols = cluster_cols,
-                         na_col = na_col,
-                         show_rownames = show_rownames,
-                         show_colnames = show_colnames,
-                         annotation_legend = annotation_legend,
-                         fontsize = fontsize,
-                         ...)},
-      error = function(e){
-        if(grepl("NA/NaN/Inf", e$message, fixed = TRUE)){
-          print("Error when clustering. Try setting cluster of rows or columns to FALSE.")
-        }
-        else{
-          e$message
-        }
-      }
-    )
+    pheatmap_args[["annotation_row"]] <- variable_df
   }
+  
+  # Check ellipsis and add further arguments, if requested
+  n_ellipsis <- length(list(...))
+  if (n_ellipsis > 0L) {
+    ellipsis_variables <- names(list(...))
+    
+    for (i in 1L:n_ellipsis) {
+      if (ellipsis_variables[i] %in% c("mat", "scale", "annotation_row")) {
+        # These arguments should not be over-written
+        warning(paste0("Argument '", ellipsis_variables[i] ,"' to pheatmap cannot be manually set - ignoring"))
+      }
+      else {
+        # Add to call
+        pheatmap_args[[ ellipsis_variables[i] ]] <- list(...)[[i]]
+      }
+    }
+  }
+  
+  # Run call
+  tryCatch({ do.call(pheatmap::pheatmap, args=pheatmap_args) },
+           error = function(e){
+             if(grepl("NA/NaN/Inf", e$message, fixed = TRUE)){
+               print("Error when clustering. Try setting cluster of rows or columns to FALSE.")
+             }
+             else{
+               e$message
+             }
+           })
 }
