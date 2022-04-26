@@ -7,20 +7,17 @@
 olink_ordinalRegression(
   df,
   variable,
-  outcome = "NPX",
   covariates = NULL,
   return.covariates = F,
   verbose = T
 )
 }
 \arguments{
-\item{df}{NPX data frame in long format with at least protein name (Assay), OlinkID, UniProt, Panel and a factor with at least 3 levels.}
+\item{df}{NPX or Quantified_value data frame in long format with at least protein name (Assay), OlinkID, UniProt, Panel and a factor with at least 3 levels.}
 
 \item{variable}{Single character value or character array.
 Variable(s) to test. If length > 1, the included variable names will be used in crossed analyses .
 Also takes ':'/'*' notation.}
-
-\item{outcome}{Character. The dependent variable. Default: NPX.}
 
 \item{covariates}{Single character value or character array. Default: NULL.
 Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be inferred from main effects.}

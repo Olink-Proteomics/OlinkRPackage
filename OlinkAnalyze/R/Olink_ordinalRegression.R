@@ -15,11 +15,10 @@
 #'The threshold is determined by logic evaluation of Adjusted_pval < 0.05. Covariates are not included in the p-value adjustment.
 #'
 #'
-#' @param df NPX data frame in long format with at least protein name (Assay), OlinkID, UniProt, Panel and a factor with at least 3 levels.
+#' @param df NPX or Quantified_value data frame in long format with at least protein name (Assay), OlinkID, UniProt, Panel and a factor with at least 3 levels.
 #' @param variable Single character value or character array.
 #' Variable(s) to test. If length > 1, the included variable names will be used in crossed analyses .
 #' Also takes ':'/'*' notation.
-#' @param outcome Character. The dependent variable. Default: NPX.
 #' @param covariates Single character value or character array. Default: NULL.
 #' Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be inferred from main effects.
 #' @param return.covariates Boolean. Deafult: False. Returns F-test results for the covariates. Note: Adjusted p-values will be NA for the covariates.
@@ -44,7 +43,6 @@
 
 olink_ordinalRegression <- function(df,
                                     variable,
-                                    outcome="NPX",
                                     covariates = NULL,
                                     return.covariates=F,
                                     verbose=T
@@ -52,7 +50,7 @@ olink_ordinalRegression <- function(df,
   if(missing(df) | missing(variable)){
     stop('The df and variable arguments need to be specified.')
     }
-  
+
   withCallingHandlers({
     #Filtering on valid OlinkID
     df <- df %>%
@@ -88,12 +86,22 @@ olink_ordinalRegression <- function(df,
     for(i in variable_testers){
       removed.sampleids <- unique(c(removed.sampleids,df$SampleID[is.na(df[[i]])]))
       df <- df[!is.na(df[[i]]),]
-      }
+    }
+
+
+    # # Check whether it is NPX or QUANT
+    if ('NPX' %in% colnames(df)) {
+      data_type <- 'NPX'
+    } else if ('Quantified_value' %in% colnames(df)) {
+      data_type <- 'Quantified_value'
+    } else {
+      stop('The NPX or Quantified_value is not in the df.')}
+
 
     #Not testing assays that have all NA:s
     all_nas <- df  %>%
       dplyr::group_by(OlinkID) %>%
-      dplyr::summarise(n = n(), n_na = sum(is.na(NPX))) %>%
+      dplyr::summarise(n = n(), n_na = sum(is.na(!!rlang::ensym(data_type)))) %>%
       dplyr::ungroup() %>%
       dplyr::filter(n == n_na) %>%
       dplyr::pull(OlinkID)
@@ -136,7 +144,7 @@ olink_ordinalRegression <- function(df,
       current_nas <- df %>%
         dplyr::filter(!(OlinkID %in% all_nas)) %>%
         dplyr::group_by(OlinkID, !!rlang::ensym(effect)) %>%
-        dplyr::summarise(n = n(), n_na = sum(is.na(NPX))) %>%
+        dplyr::summarise(n = n(), n_na = sum(is.na(!!rlang::ensym(data_type)))) %>%
         dplyr::ungroup() %>%
         dplyr::filter(n == n_na) %>%
         dplyr::distinct(OlinkID) %>%
@@ -157,7 +165,7 @@ olink_ordinalRegression <- function(df,
         dplyr::summarise(n_levels = n_distinct(!!rlang::ensym(effect), na.rm = T)) %>%
         dplyr::ungroup() %>%
         dplyr::filter(n_levels > 1) %>%
-        dplyr::summarise(n = n()) %>% 
+        dplyr::summarise(n = n()) %>%
         dplyr::pull(n)
 
       if (number_of_samples_w_more_than_one_level > 0) {
@@ -170,12 +178,12 @@ olink_ordinalRegression <- function(df,
       }
 
     if(!is.null(covariates)){
-      formula_string <- paste0(outcome, "~",
+      formula_string <- paste0(data_type, "~",
                                paste(variable,collapse="*"),
                                "+",
                                paste(covariates, sep = '', collapse = '+'))
       }else{
-        formula_string <- paste0(outcome, "~", paste(variable,collapse="*"))
+        formula_string <- paste0(data_type, "~", paste(variable,collapse="*"))
     }
 
     #Get factors
@@ -218,8 +226,8 @@ olink_ordinalRegression <- function(df,
       dplyr::filter(!(OlinkID %in% all_nas)) %>%
       dplyr::filter(!(OlinkID %in% nas_in_var)) %>%
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
-      dplyr::mutate(NPX = rank(NPX))%>%
-      rstatix::convert_as_factor(NPX)%>%
+      dplyr::mutate(!!data_type := rank(!!rlang::ensym(data_type))) %>%
+      rstatix::convert_as_factor(!!rlang::ensym(data_type))%>%
       dplyr::do(generics::tidy(car::Anova(ordinal::clm(as.formula(formula_string),
                             data=.,
                             threshold = "symmetric"),type=2))) %>%
@@ -263,7 +271,6 @@ olink_ordinalRegression <- function(df,
 #' Also takes ':' notation.
 #' @param covariates Single character value or character array. Default: NULL.
 #' Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be inferred from main effects.
-#' @param outcome Character. The dependent variable. Default: NPX.
 #' @param effect Term on which to perform post-hoc. Character vector. Must be subset of or identical to variable.
 #' @param verbose Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #'
@@ -304,7 +311,6 @@ olink_ordinalRegression_posthoc <- function(df,
                                 olinkid_list = NULL,
                                 variable,
                                 covariates = NULL,
-                                outcome="NPX",
                                 effect,
                                 verbose=T
                                 ){
@@ -331,6 +337,15 @@ olink_ordinalRegression_posthoc <- function(df,
         dplyr::distinct() %>%
         dplyr::pull()
     }
+
+    # # Check whether it is NPX or QUANT
+    if ('NPX' %in% colnames(df)) {
+      data_type <- 'NPX'
+    } else if ('Quantified_value' %in% colnames(df)) {
+      data_type <- 'Quantified_value'
+    } else {
+      stop('The NPX or Quantified_value is not in the df.')}
+
 
     #Allow for :/* notation in covariates
     variable <- gsub("\\*",":",variable)
@@ -374,12 +389,12 @@ olink_ordinalRegression_posthoc <- function(df,
 
 
     if(!is.null(covariates)){
-      formula_string <- paste0(outcome, "~",
+      formula_string <- paste0(data_type, "~",
                                paste(variable,collapse="*"),
                                "+",
                                paste(covariates, sep = '', collapse = '+'))
     }else{
-      formula_string <- paste0(outcome, "~", paste(variable,collapse="*"))
+      formula_string <- paste0(data_type, "~", paste(variable,collapse="*"))
     }
 
     #Print verbose message
@@ -413,8 +428,8 @@ olink_ordinalRegression_posthoc <- function(df,
       dplyr::filter(OlinkID %in% olinkid_list) %>%
       dplyr::mutate(OlinkID = factor(OlinkID, levels = olinkid_list)) %>%
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
-      dplyr::mutate(NPX = rank(NPX))%>%
-      rstatix::convert_as_factor(NPX)%>%
+      dplyr::mutate(!!data_type := rank(!!rlang::ensym(data_type)))%>%
+      rstatix::convert_as_factor(!!rlang::ensym(data_type))%>%
       dplyr::do(data.frame(summary(emmeans::emmeans(ordinal::clm(as.formula(formula_string),data=.),
                                     specs=as.formula(paste0("pairwise~", paste(effect,collapse="+"))),
                                     cov.reduce = function(x) round(c(mean(x),mean(x)+sd(x)),4)),

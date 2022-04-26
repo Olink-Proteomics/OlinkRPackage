@@ -7,18 +7,15 @@
 olink_one_non_parametric(
   df,
   variable,
-  outcome = "NPX",
   p_adjust_method = "BH",
   dependence = FALSE,
   verbose = T
 )
 }
 \arguments{
-\item{df}{NPX data frame in long format with at least protein name (Assay), OlinkID, UniProt, Panel and a factor with at least 3 levels.}
+\item{df}{NPX or Quantified_value data frame in long format with at least protein name (Assay), OlinkID, UniProt, Panel and a factor with at least 3 levels.}
 
 \item{variable}{Single character value.}
-
-\item{outcome}{Character. The dependent variable. Default: NPX.}
 
 \item{p_adjust_method}{Adjust P-value for Multiple Comparisons.}
 
