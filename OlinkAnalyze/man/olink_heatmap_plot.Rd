@@ -7,47 +7,61 @@
 olink_heatmap_plot(
   df,
   variable_list = NULL,
-  scaledata = T,
-  cluster_rows = T,
-  cluster_cols = T,
-  show_rownames = T,
-  show_colnames = T,
-  annotation_legend = T,
+  scale_data = TRUE,
+  cluster_rows = TRUE,
+  cluster_cols = TRUE,
+  show_rownames = TRUE,
+  show_colnames = TRUE,
+  annotation_legend = TRUE,
   fontsize = 10,
   na_col = "black",
   ...
 )
 }
 \arguments{
-\item{df}{data frame in long format with SampleID, NPX, OlinkID, Assay and columns of choice for annotations.}
+\item{df}{Data frame in long format with SampleID, NPX, OlinkID, Assay and columns of choice for annotations.}
 
-\item{variable_list}{coloumns in df to be annotated.}
+\item{variable_list}{Columns in \code{df} to be annotated.}
 
-\item{scaledata}{Logical. If data should be scaled and centered across assays (default TRUE).}
+\item{scale_data}{Logical. If data should be scaled and centered across assays (default \code{TRUE}).}
 
-\item{cluster_rows}{Logical. Determining if rows should be clustered (default TRUE).}
+\item{cluster_rows}{Logical. Determining if rows should be clustered (default \code{TRUE}).}
 
-\item{cluster_cols}{Logical. Determining if columns should be clustered (default TRUE).}
+\item{cluster_cols}{Logical. Determining if columns should be clustered (default \code{TRUE}).}
 
-\item{show_rownames}{Logical. Determining if row names are shown (default TRUE).}
+\item{show_rownames}{Logical. Determining if row names are shown (default \code{TRUE}).}
 
-\item{show_colnames}{Logical. Determining if column names are shown (default TRUE).}
+\item{show_colnames}{Logical. Determining if column names are shown (default \code{TRUE}).}
 
-\item{annotation_legend}{Logical. Determain if legend for annotations should be shown (default TRUE).}
+\item{annotation_legend}{Logical. Determining if legend for annotations should be shown (default \code{TRUE}).}
 
-\item{fontsize}{Integer. Fontsize.}
+\item{fontsize}{Fontsize (default 10)}
 
-\item{na_col}{Color of cells with NA (default black).}
+\item{na_col}{Color of cells with \code{NA} (default black)}
 
-\item{...}{additional arguments used in pheatmap::pheatmap}
+\item{...}{Additional arguments used in \code{pheatmap::pheatmap}}
 }
 \description{
-Generates a heatmap using pheatmap::pheatmap of all samples from NPX data.
+Generates a heatmap using \code{pheatmap::pheatmap} of all samples from NPX data.
 }
 \details{
 The values are by default scaled across and centered in the heatmap. Columns
 and rows are by default sorted by by dendrogram.
 Unique sample names are required.
+}
+\examples{
+\donttest{
+library(dplyr)
+npx_data <- npx_data1 \%>\%
+      filter(!str_detect(SampleID,'CONT'))
+
+#Heatmap
+olink_pca_heatmap(df=npx_data)
+
+#Heatmap with annotation
+olink_pca_heatmap(df=npx_data, variable_list = c('Time','Site'))
+}
+
 }
 \keyword{Heatmap}
 \keyword{NPX}

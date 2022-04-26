@@ -1,22 +1,22 @@
 #' Function to plot a heatmap of the NPX data
 #'
-#' Generates a heatmap using pheatmap::pheatmap of all samples from NPX data.
+#' Generates a heatmap using \code{pheatmap::pheatmap} of all samples from NPX data.
 #'
 #' The values are by default scaled across and centered in the heatmap. Columns
 #' and rows are by default sorted by by dendrogram.
 #' Unique sample names are required.
 #'
-#' @param df data frame in long format with SampleID, NPX, OlinkID, Assay and columns of choice for annotations.
-#' @param variable_list coloumns in df to be annotated.
-#' @param scale_data Logical. If data should be scaled and centered across assays (default TRUE).
-#' @param cluster_rows Logical. Determining if rows should be clustered (default TRUE).
-#' @param cluster_cols Logical. Determining if columns should be clustered (default TRUE).
-#' @param show_rownames Logical. Determining if row names are shown (default TRUE).
-#' @param show_colnames Logical. Determining if column names are shown (default TRUE).
-#' @param annotation_legend Logical. Determain if legend for annotations should be shown (default TRUE).
-#' @param fontsize Integer. Fontsize.
-#' @param na_col Color of cells with NA (default black).
-#' @param ... additional arguments used in pheatmap::pheatmap
+#' @param df Data frame in long format with SampleID, NPX, OlinkID, Assay and columns of choice for annotations.
+#' @param variable_list Columns in \code{df} to be annotated.
+#' @param scale_data Logical. If data should be scaled and centered across assays (default \code{TRUE}).
+#' @param cluster_rows Logical. Determining if rows should be clustered (default \code{TRUE}).
+#' @param cluster_cols Logical. Determining if columns should be clustered (default \code{TRUE}).
+#' @param show_rownames Logical. Determining if row names are shown (default \code{TRUE}).
+#' @param show_colnames Logical. Determining if column names are shown (default \code{TRUE}).
+#' @param annotation_legend Logical. Determining if legend for annotations should be shown (default \code{TRUE}).
+#' @param fontsize Fontsize (default 10)
+#' @param na_col Color of cells with \code{NA} (default black)
+#' @param ... Additional arguments used in \code{pheatmap::pheatmap}
 #' @keywords NPX Heatmap
 #' @export
 #' @examples
@@ -30,6 +30,7 @@
 #'
 #' #Heatmap with annotation
 #' olink_pca_heatmap(df=npx_data, variable_list = c('Time','Site'))
+#' }
 #'
 #' @importFrom magrittr %>%
 #' @importFrom dplyr filter group_by summarise ungroup select mutate across
@@ -39,15 +40,15 @@
 #' @importFrom pheatmap pheatmap
 
 olink_heatmap_plot <- function(df,
-                               variable_list = NULL,
-                               scale_data = T,
-                               cluster_rows = T,
-                               cluster_cols = T,
-                               show_rownames = T,
-                               show_colnames =T,
-                               annotation_legend = T,
-                               fontsize = 10,
-                               na_col = 'black',
+                               variable_list     = NULL,
+                               scale_data        = TRUE,
+                               cluster_rows      = TRUE,
+                               cluster_cols      = TRUE,
+                               show_rownames     = TRUE,
+                               show_colnames     = TRUE,
+                               annotation_legend = TRUE,
+                               fontsize          = 10,
+                               na_col            = 'black',
                                ...) {
   
   
