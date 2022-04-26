@@ -51,6 +51,11 @@ olink_heatmap_plot <- function(df,
                                ...) {
   
   
+  #Force data frame as tibble
+  if (!tibble::is_tibble(df)) {
+    df <- tibble::as_tibble(df)
+  }
+  
   #Filtering on valid OlinkID
   df_temp<-df %>%
     dplyr::filter(stringr::str_detect(OlinkID,
