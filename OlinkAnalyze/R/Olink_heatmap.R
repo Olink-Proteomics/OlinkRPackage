@@ -99,12 +99,12 @@ olink_heatmap_plot <- function(df,
   
   if(Sample_to_remove %>% nrow > 0){
     if (Sample_to_remove %>% nrow == 1) {
-      print(paste0('The following sampleID ',
+      warning(paste0('The following sampleID ',
                    Sample_to_remove$SampleID %>% toString(),
                    ' is removed due all NPX values being NA.'))
     }
     if (Sample_to_remove %>% nrow > 1) {
-      print(paste0('The following sampleIDs ',
+      warning(paste0('The following sampleIDs ',
                    Sample_to_remove$SampleID %>% toString(),
                    ' are removed due all NPX values being NA.'))
     }
@@ -165,10 +165,10 @@ olink_heatmap_plot <- function(df,
   tryCatch({ do.call(pheatmap::pheatmap, args=pheatmap_args) },
            error = function(e){
              if(grepl("NA/NaN/Inf", e$message, fixed = TRUE)){
-               print("Error when clustering. Try setting cluster of rows or columns to FALSE.")
+               stop("Error when clustering. Try setting cluster of rows or columns to FALSE.")
              }
              else{
-               e$message
+               stop(e$message)
              }
            })
 }
