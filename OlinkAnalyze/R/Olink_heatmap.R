@@ -206,6 +206,12 @@ set_plot_theme_pheatmap <- function(x, fontsize, col="#737373", font="Swedish Go
         set_font <- TRUE
       }
     }
+    else if (requireNamespace("systemfonts", quietly = TRUE)) {
+      # NOTE: This is a special for OI, where the above fails but the font should already have been registered
+      if (font %in% unique(systemfonts::registry_fonts()$family)) {
+        set_font <- TRUE
+      }
+    }
   }
   
   # Dendogram styling
