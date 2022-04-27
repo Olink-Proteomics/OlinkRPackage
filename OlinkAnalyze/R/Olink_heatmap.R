@@ -17,6 +17,7 @@
 #' @param fontsize Fontsize (default 10)
 #' @param na_col Color of cells with \code{NA} (default black)
 #' @param ... Additional arguments used in \code{pheatmap::pheatmap}
+#' @return An object of class \code{ggplot}, generated from the \code{gtable} returned by \code{pheatmap::pheatmap}.
 #' @keywords NPX Heatmap
 #' @export
 #' @examples

@@ -41,6 +41,9 @@ olink_heatmap_plot(
 
 \item{...}{Additional arguments used in \code{pheatmap::pheatmap}}
 }
+\value{
+An object of class \code{ggplot}, generated from the \code{gtable} returned by \code{pheatmap::pheatmap}.
+}
 \description{
 Generates a heatmap using \code{pheatmap::pheatmap} of all samples from NPX data.
 }
