@@ -38,6 +38,7 @@
 #' @importFrom tidyr pivot_wider
 #' @importFrom tibble column_to_rownames
 #' @importFrom pheatmap pheatmap
+#' @importFrom ggplotify as.ggplot
 
 olink_heatmap_plot <- function(df,
                                variable_list     = NULL,
@@ -100,13 +101,13 @@ olink_heatmap_plot <- function(df,
   if(Sample_to_remove %>% nrow > 0){
     if (Sample_to_remove %>% nrow == 1) {
       warning(paste0('The following sampleID ',
-                   Sample_to_remove$SampleID %>% toString(),
-                   ' is removed due all NPX values being NA.'))
+                     Sample_to_remove$SampleID %>% toString(),
+                     ' is removed due all NPX values being NA.'))
     }
     if (Sample_to_remove %>% nrow > 1) {
       warning(paste0('The following sampleIDs ',
-                   Sample_to_remove$SampleID %>% toString(),
-                   ' are removed due all NPX values being NA.'))
+                     Sample_to_remove$SampleID %>% toString(),
+                     ' are removed due all NPX values being NA.'))
     }
     
     df_temp2<- df_temp2 %>%
@@ -126,14 +127,14 @@ olink_heatmap_plot <- function(df,
   pheatmap_args <- list(
     mat               = npxWide,
     scale             = scale,
+    silent            = TRUE,
     cluster_rows      = cluster_rows,
     cluster_cols      = cluster_cols,
     na_col            = na_col,
     show_rownames     = show_rownames,
     show_colnames     = show_colnames,
     annotation_legend = annotation_legend,
-    fontsize          = fontsize
-  )
+    fontsize          = fontsize)
   
   # Add annotations to call, if requested
   if (!is.null(variable_list)){
@@ -150,7 +151,7 @@ olink_heatmap_plot <- function(df,
     ellipsis_variables <- names(list(...))
     
     for (i in 1L:n_ellipsis) {
-      if (ellipsis_variables[i] %in% c("mat", "scale", "annotation_row")) {
+      if (ellipsis_variables[i] %in% c("mat", "silent", "scale", "annotation_row")) {
         # These arguments should not be over-written
         warning(paste0("Argument '", ellipsis_variables[i] ,"' to pheatmap cannot be manually set - ignoring"))
       }
@@ -162,7 +163,7 @@ olink_heatmap_plot <- function(df,
   }
   
   # Run call
-  tryCatch({ do.call(pheatmap::pheatmap, args=pheatmap_args) },
+  tryCatch({ p <- do.call(pheatmap::pheatmap, args=pheatmap_args)$gtable },
            error = function(e){
              if(grepl("NA/NaN/Inf", e$message, fixed = TRUE)){
                stop("Error when clustering. Try setting cluster of rows or columns to FALSE.")
@@ -170,5 +171,115 @@ olink_heatmap_plot <- function(df,
              else{
                stop(e$message)
              }
-           })
+           },
+           finally = {
+             # Apply retroactive theming for the existing parts of the plot
+             p <- set_plot_theme_pheatmap(p, fontsize=fontsize)
+             # Convert to ggplot object, and set theming (which applies to components added post-hoc)
+             return( ggplotify::as.ggplot(p) +
+                       OlinkAnalyze::set_plot_theme() +
+                       ggplot2::theme(text       = ggplot2::element_text(size=fontsize),
+                                      axis.line  = ggplot2::element_blank(),
+                                      axis.ticks = ggplot2::element_blank(),
+                                      axis.text  = ggplot2::element_blank()) +
+                       ggplot2::xlab(NULL) +
+                       ggplot2::ylab(NULL) )
+           }
+  )
+}
+
+# set_plot_theme_pheatmap() is a non-exported function
+# It emulates some of the styling that OlinkAnalyze::set_plot_theme() would otherwise provide for a ggplot
+set_plot_theme_pheatmap <- function(x, fontsize, col="#737373", font="Swedish Gothic") {
+  xnames <- x$layout$name
+
+  # Prepare font
+  set_font <- FALSE
+  if (getOption("OlinkAnalyze.allow.font.load", default = TRUE)) {
+    if (requireNamespace("extrafont", quietly = TRUE)) {
+      if (font %in% extrafont::fonts()){
+        if (.Platform$OS.type == "windows"){
+          extrafont::loadfonts(quiet = TRUE, device = "win")
+        }
+        extrafont::loadfonts(quiet = TRUE, device = "pdf")
+        set_font <- TRUE
+      }
+    }
+  }
+  
+  # Dendogram styling
+  col_tree_i <- which(x$layout$name == "col_tree")
+  row_tree_i <- which(x$layout$name == "row_tree")
+  if (length(col_tree_i) > 0L) {
+    x$grobs[[col_tree_i]] <- grid::editGrob(x$grobs[[col_tree_i]], gp=grid::gpar(col=col, lwd=0.5))
+  }
+  if (length(row_tree_i) > 0L) {
+    x$grobs[[row_tree_i]] <- grid::editGrob(x$grobs[[row_tree_i]], gp=grid::gpar(col=col, lwd=0.5))
+  }
+  
+  # Main title
+  main_i <- which(x$layout$name == "main")
+  if (length(main_i) > 0L) {
+    if (set_font) {
+      x$grobs[[main_i]] <- grid::editGrob(x$grobs[[main_i]], gp=grid::gpar(col=col, fontface="bold", fontfamily=font))
+    }
+    else {
+      x$grobs[[main_i]] <- grid::editGrob(x$grobs[[main_i]], gp=grid::gpar(col=col, fontface="bold"))
+    }
+  }
+  
+  # Row / column names
+  col_names_i <- which(x$layout$name == "col_names")
+  row_names_i <- which(x$layout$name == "row_names")
+  if (length(col_names_i) > 0L) {
+    if (set_font) {
+      x$grobs[[col_names_i]] <- grid::editGrob(x$grobs[[col_names_i]], gp=grid::gpar(col=col, fontsize=fontsize, fontfamily=font))
+    }
+    else {
+      x$grobs[[col_names_i]] <- grid::editGrob(x$grobs[[col_names_i]], gp=grid::gpar(col=col, fontsize=fontsize))
+    }
+  }
+  if (length(row_names_i) > 0L) {
+    if (set_font) {
+      x$grobs[[row_names_i]] <- grid::editGrob(x$grobs[[row_names_i]], gp=grid::gpar(col=col, fontsize=fontsize, fontfamily=font))
+    }
+    else {
+      x$grobs[[row_names_i]] <- grid::editGrob(x$grobs[[row_names_i]], gp=grid::gpar(col=col, fontsize=fontsize))
+    }
+  }
+  
+  # Row annotation
+  row_annotation_names_i <- which(x$layout$name == "row_annotation_names")
+  if (length(row_annotation_names_i) > 0L) {
+    if (set_font) {
+      x$grobs[[row_annotation_names_i]] <- grid::editGrob(x$grobs[[row_annotation_names_i]], gp=grid::gpar(col=col, fontsize=fontsize, fontface="bold", fontfamily=font))
+    }
+    else {
+      x$grobs[[row_annotation_names_i]] <- grid::editGrob(x$grobs[[row_annotation_names_i]], gp=grid::gpar(col=col, fontsize=fontsize, fontface="bold"))
+    }
+  }
+  
+  # Annotation legend
+  annotation_legend_i <- which(x$layout$name == "annotation_legend")
+  if (length(annotation_legend_i) > 0L) {
+    if (set_font) {
+      x$grobs[[annotation_legend_i]] <- grid::editGrob(x$grobs[[annotation_legend_i]], gp=grid::gpar(col=col, fontsize=fontsize, fontfamily=font))
+    }
+    else {
+      x$grobs[[annotation_legend_i]] <- grid::editGrob(x$grobs[[annotation_legend_i]], gp=grid::gpar(col=col, fontsize=fontsize))
+    }
+  }
+  
+  # Standard legend
+  legend_i <- which(x$layout$name == "legend")
+  if (length(legend_i) > 0L) {
+    if (set_font) {
+      x$grobs[[legend_i]] <- grid::editGrob(x$grobs[[legend_i]], gp=grid::gpar(col=col, fontsize=fontsize, fontfamily=font))
+    }
+    else {
+      x$grobs[[legend_i]] <- grid::editGrob(x$grobs[[legend_i]], gp=grid::gpar(col=col, fontsize=fontsize))
+    }
+  }
+  
+  x
 }

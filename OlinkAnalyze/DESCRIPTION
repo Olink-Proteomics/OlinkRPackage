@@ -111,5 +111,6 @@ Imports:
     utils,
     ordinal,
     rstatix,
-    pheatmap
+    pheatmap,
+    ggplotify
 Config/testthat/edition: 3
