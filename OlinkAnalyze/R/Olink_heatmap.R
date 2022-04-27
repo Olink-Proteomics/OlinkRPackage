@@ -218,10 +218,10 @@ set_plot_theme_pheatmap <- function(x, fontsize, col="#737373", font="Swedish Go
   col_tree_i <- which(x$layout$name == "col_tree")
   row_tree_i <- which(x$layout$name == "row_tree")
   if (length(col_tree_i) > 0L) {
-    x$grobs[[col_tree_i]] <- grid::editGrob(x$grobs[[col_tree_i]], gp=grid::gpar(col=col, lwd=0.5))
+    x$grobs[[col_tree_i]] <- grid::editGrob(x$grobs[[col_tree_i]], gp=grid::gpar(col=col, lwd=0.4))
   }
   if (length(row_tree_i) > 0L) {
-    x$grobs[[row_tree_i]] <- grid::editGrob(x$grobs[[row_tree_i]], gp=grid::gpar(col=col, lwd=0.5))
+    x$grobs[[row_tree_i]] <- grid::editGrob(x$grobs[[row_tree_i]], gp=grid::gpar(col=col, lwd=0.4))
   }
   
   # Main title
@@ -240,10 +240,10 @@ set_plot_theme_pheatmap <- function(x, fontsize, col="#737373", font="Swedish Go
   row_names_i <- which(x$layout$name == "row_names")
   if (length(col_names_i) > 0L) {
     if (set_font) {
-      x$grobs[[col_names_i]] <- grid::editGrob(x$grobs[[col_names_i]], gp=grid::gpar(col=col, fontsize=fontsize, fontfamily=font))
+      x$grobs[[col_names_i]] <- grid::editGrob(x$grobs[[col_names_i]], gp=grid::gpar(col="black", fontsize=fontsize, fontfamily=font))
     }
     else {
-      x$grobs[[col_names_i]] <- grid::editGrob(x$grobs[[col_names_i]], gp=grid::gpar(col=col, fontsize=fontsize))
+      x$grobs[[col_names_i]] <- grid::editGrob(x$grobs[[col_names_i]], gp=grid::gpar(col="black", fontsize=fontsize))
     }
   }
   if (length(row_names_i) > 0L) {
@@ -259,10 +259,10 @@ set_plot_theme_pheatmap <- function(x, fontsize, col="#737373", font="Swedish Go
   row_annotation_names_i <- which(x$layout$name == "row_annotation_names")
   if (length(row_annotation_names_i) > 0L) {
     if (set_font) {
-      x$grobs[[row_annotation_names_i]] <- grid::editGrob(x$grobs[[row_annotation_names_i]], gp=grid::gpar(col=col, fontsize=fontsize, fontface="bold", fontfamily=font))
+      x$grobs[[row_annotation_names_i]] <- grid::editGrob(x$grobs[[row_annotation_names_i]], gp=grid::gpar(col="black", fontsize=fontsize, fontface="bold", fontfamily=font))
     }
     else {
-      x$grobs[[row_annotation_names_i]] <- grid::editGrob(x$grobs[[row_annotation_names_i]], gp=grid::gpar(col=col, fontsize=fontsize, fontface="bold"))
+      x$grobs[[row_annotation_names_i]] <- grid::editGrob(x$grobs[[row_annotation_names_i]], gp=grid::gpar(col="black", fontsize=fontsize, fontface="bold"))
     }
   }
   
