@@ -191,25 +191,36 @@ olink_heatmap_plot <- function(df,
 
 # set_plot_theme_pheatmap() is a non-exported function
 # It emulates some of the styling that OlinkAnalyze::set_plot_theme() would otherwise provide for a ggplot
-set_plot_theme_pheatmap <- function(x, fontsize, col="#737373", font="Swedish Gothic") {
+set_plot_theme_pheatmap <- function(x, fontsize, col="#737373", font1="Swedish Gothic Thin", font2="Swedish Gothic") {
   xnames <- x$layout$name
 
-  # Prepare font
-  set_font <- FALSE
+  # Prepare fonts
+  set_font1 <- FALSE
+  set_font2 <- FALSE
   if (getOption("OlinkAnalyze.allow.font.load", default = TRUE)) {
     if (requireNamespace("extrafont", quietly = TRUE)) {
-      if (font %in% extrafont::fonts()){
+      if (font1 %in% extrafont::fonts()){
         if (.Platform$OS.type == "windows"){
           extrafont::loadfonts(quiet = TRUE, device = "win")
         }
         extrafont::loadfonts(quiet = TRUE, device = "pdf")
-        set_font <- TRUE
+        set_font1 <- TRUE
+      }
+      if (font2 %in% extrafont::fonts()){
+        if (.Platform$OS.type == "windows"){
+          extrafont::loadfonts(quiet = TRUE, device = "win")
+        }
+        extrafont::loadfonts(quiet = TRUE, device = "pdf")
+        set_font2 <- TRUE
       }
     }
     else if (requireNamespace("systemfonts", quietly = TRUE)) {
-      # NOTE: This is a special for OI, where the above fails but the font should already have been registered
-      if (font %in% unique(systemfonts::registry_fonts()$family)) {
-        set_font <- TRUE
+      # NOTE: This is a special for OI, where the above fails but the fonts should already have been registered
+      if (font1 %in% unique(systemfonts::registry_fonts()$family)) {
+        set_font1 <- TRUE
+      }
+      if (font2 %in% unique(systemfonts::registry_fonts()$family)) {
+        set_font2 <- TRUE
       }
     }
   }
@@ -224,64 +235,79 @@ set_plot_theme_pheatmap <- function(x, fontsize, col="#737373", font="Swedish Go
     x$grobs[[row_tree_i]] <- grid::editGrob(x$grobs[[row_tree_i]], gp=grid::gpar(col=col, lwd=0.4))
   }
   
-  # Main title
+  # Main title (use Swedish Goth Thin if exists, otherwise Swedish Gothic)
   main_i <- which(x$layout$name == "main")
   if (length(main_i) > 0L) {
-    if (set_font) {
-      x$grobs[[main_i]] <- grid::editGrob(x$grobs[[main_i]], gp=grid::gpar(col=col, fontface="bold", fontfamily=font))
+    if (set_font1) {
+      x$grobs[[main_i]] <- grid::editGrob(x$grobs[[main_i]], gp=grid::gpar(col=col, fontface="bold", fontfamily=font1))
+    }
+    else if (set_font2) {
+      x$grobs[[main_i]] <- grid::editGrob(x$grobs[[main_i]], gp=grid::gpar(col=col, fontface="bold", fontfamily=font2))
     }
     else {
       x$grobs[[main_i]] <- grid::editGrob(x$grobs[[main_i]], gp=grid::gpar(col=col, fontface="bold"))
     }
   }
   
-  # Row / column names
+  # Row / column names (use Swedish Goth Thin if exists, otherwise Swedish Gothic)
   col_names_i <- which(x$layout$name == "col_names")
   row_names_i <- which(x$layout$name == "row_names")
   if (length(col_names_i) > 0L) {
-    if (set_font) {
-      x$grobs[[col_names_i]] <- grid::editGrob(x$grobs[[col_names_i]], gp=grid::gpar(col="black", fontsize=fontsize, fontfamily=font))
+    if (set_font1) {
+      x$grobs[[col_names_i]] <- grid::editGrob(x$grobs[[col_names_i]], gp=grid::gpar(col="black", fontsize=fontsize, fontfamily=font1))
+    }
+    else if (set_font2) {
+      x$grobs[[col_names_i]] <- grid::editGrob(x$grobs[[col_names_i]], gp=grid::gpar(col="black", fontsize=fontsize, fontfamily=font2))
     }
     else {
       x$grobs[[col_names_i]] <- grid::editGrob(x$grobs[[col_names_i]], gp=grid::gpar(col="black", fontsize=fontsize))
     }
   }
   if (length(row_names_i) > 0L) {
-    if (set_font) {
-      x$grobs[[row_names_i]] <- grid::editGrob(x$grobs[[row_names_i]], gp=grid::gpar(col=col, fontsize=fontsize, fontfamily=font))
+    if (set_font1) {
+      x$grobs[[row_names_i]] <- grid::editGrob(x$grobs[[row_names_i]], gp=grid::gpar(col=col, fontsize=fontsize, fontfamily=font1))
+    }
+    else if (set_font2) {
+      x$grobs[[row_names_i]] <- grid::editGrob(x$grobs[[row_names_i]], gp=grid::gpar(col=col, fontsize=fontsize, fontfamily=font2))
     }
     else {
       x$grobs[[row_names_i]] <- grid::editGrob(x$grobs[[row_names_i]], gp=grid::gpar(col=col, fontsize=fontsize))
     }
   }
   
-  # Row annotation
+  # Row annotation (use Swedish Goth Thin if exists, otherwise Swedish Gothic)
   row_annotation_names_i <- which(x$layout$name == "row_annotation_names")
   if (length(row_annotation_names_i) > 0L) {
-    if (set_font) {
-      x$grobs[[row_annotation_names_i]] <- grid::editGrob(x$grobs[[row_annotation_names_i]], gp=grid::gpar(col="black", fontsize=fontsize, fontface="bold", fontfamily=font))
+    if (set_font1) {
+      x$grobs[[row_annotation_names_i]] <- grid::editGrob(x$grobs[[row_annotation_names_i]], gp=grid::gpar(col="black", fontsize=fontsize, fontface="bold", fontfamily=font1))
+    }
+    else if (set_font2) {
+      x$grobs[[row_annotation_names_i]] <- grid::editGrob(x$grobs[[row_annotation_names_i]], gp=grid::gpar(col="black", fontsize=fontsize, fontface="bold", fontfamily=font2))
     }
     else {
       x$grobs[[row_annotation_names_i]] <- grid::editGrob(x$grobs[[row_annotation_names_i]], gp=grid::gpar(col="black", fontsize=fontsize, fontface="bold"))
     }
   }
   
-  # Annotation legend
+  # Annotation legend (must use Swedish Gothic - otherwise result is poor)
   annotation_legend_i <- which(x$layout$name == "annotation_legend")
   if (length(annotation_legend_i) > 0L) {
-    if (set_font) {
-      x$grobs[[annotation_legend_i]] <- grid::editGrob(x$grobs[[annotation_legend_i]], gp=grid::gpar(col=col, fontsize=fontsize, fontfamily=font))
+    if (set_font2) {
+      x$grobs[[annotation_legend_i]] <- grid::editGrob(x$grobs[[annotation_legend_i]], gp=grid::gpar(col=col, fontsize=fontsize, fontfamily=font2))
     }
     else {
       x$grobs[[annotation_legend_i]] <- grid::editGrob(x$grobs[[annotation_legend_i]], gp=grid::gpar(col=col, fontsize=fontsize))
     }
   }
   
-  # Standard legend
+  # Standard legend (use Swedish Goth Thin if exists, otherwise Swedish Gothic)
   legend_i <- which(x$layout$name == "legend")
   if (length(legend_i) > 0L) {
-    if (set_font) {
-      x$grobs[[legend_i]] <- grid::editGrob(x$grobs[[legend_i]], gp=grid::gpar(col=col, fontsize=fontsize, fontfamily=font))
+    if (set_font1) {
+      x$grobs[[legend_i]] <- grid::editGrob(x$grobs[[legend_i]], gp=grid::gpar(col=col, fontsize=fontsize, fontfamily=font1))
+    }
+    if (set_font2) {
+      x$grobs[[legend_i]] <- grid::editGrob(x$grobs[[legend_i]], gp=grid::gpar(col=col, fontsize=fontsize, fontfamily=font2))
     }
     else {
       x$grobs[[legend_i]] <- grid::editGrob(x$grobs[[legend_i]], gp=grid::gpar(col=col, fontsize=fontsize))
