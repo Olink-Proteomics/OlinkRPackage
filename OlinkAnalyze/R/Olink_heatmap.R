@@ -59,6 +59,9 @@ olink_heatmap_plot <- function(df,
     df <- tibble::as_tibble(df)
   }
   
+  #Save column classes
+  col_classes <- sapply(df, "class")
+  
   #Filtering on valid OlinkID
   df_temp<-df %>%
     dplyr::filter(stringr::str_detect(OlinkID,
@@ -137,29 +140,84 @@ olink_heatmap_plot <- function(df,
     annotation_legend = annotation_legend,
     fontsize          = fontsize)
   
-  # Add annotations to call, if requested
-  if (!is.null(variable_list)){
-    variable_df <- df %>%
-      select(SampleID, variable_list) %>%
-      unique() %>%
-      column_to_rownames('SampleID')
-    pheatmap_args[["annotation_row"]] <- variable_df
-  }
-  
   # Check ellipsis and add further arguments, if requested
+  annotation_cols <- NULL
   n_ellipsis <- length(list(...))
   if (n_ellipsis > 0L) {
     ellipsis_variables <- names(list(...))
     
     for (i in 1L:n_ellipsis) {
-      if (ellipsis_variables[i] %in% c("mat", "silent", "scale", "annotation_row")) {
-        # These arguments should not be over-written
-        warning(paste0("Argument '", ellipsis_variables[i] ,"' to pheatmap cannot be manually set - ignoring"))
+      if (ellipsis_variables[i] == "annotation_colors") {
+        # This is handled below
+        annotation_cols <- list(...)[[i]]
       }
       else {
-        # Add to call
-        pheatmap_args[[ ellipsis_variables[i] ]] <- list(...)[[i]]
+        if (ellipsis_variables[i] %in% c("mat", "silent", "scale", "annotation_row")) {
+          # These arguments should not be over-written
+          warning(paste0("Argument '", ellipsis_variables[i] ,"' to pheatmap cannot be manually set - ignoring"))
+        }
+        else {
+          # Add to call
+          pheatmap_args[[ ellipsis_variables[i] ]] <- list(...)[[i]]
+        }
       }
+    }
+  }
+  
+  # Add annotations to call, if requested
+  if (!is.null(variable_list)){
+    variable_df <- df %>%
+      dplyr::select(SampleID, variable_list) %>%
+      dplyr::distinct() %>%
+      tibble::column_to_rownames('SampleID')
+    pheatmap_args[["annotation_row"]] <- variable_df
+    # Use Olink color palette for characters and factors, unless user set specific colors
+    vars_to_col <- rev(variable_list)
+    vars_to_col <- vars_to_col[ col_classes[vars_to_col] %in% c("character", "factor") ]
+    if (!is.null(annotation_cols)) {
+      vars_to_col <- vars_to_col[!vars_to_col %in% names(annotation_cols)]
+    }
+    if (length(vars_to_col) > 0L) {
+      # 'cols' contains all new colors for all variables to be annotated
+      cols <- OlinkAnalyze::olink_pal()(
+        sum(sapply(dplyr::select(df, vars_to_col), function(x) length(unique(x))))
+      )
+      # 'var_cols' is a list that fits the format expected by pheatmap
+      # Each entry is named by the variable to be annotated, and the content is a named vector of colors
+      var_cols <- vector("list", length=length(vars_to_col))
+      names(var_cols) <- vars_to_col
+      col_index <- 1L
+      for (var_to_col in vars_to_col) {
+        n_cols_i <- length(unique(df[[var_to_col]]))
+        cols_i   <- cols[col_index:(col_index + n_cols_i - 1L)]
+        if (col_classes[var_to_col] == "character") {
+          # Character: Sort unique values
+          names(cols_i) <- sort(unique(df[[var_to_col]]))
+        }
+        else {
+          # Factor: Take the levels
+          names(cols_i) <- levels(df[[var_to_col]])
+        }
+        var_cols[[var_to_col]] <- cols_i
+        col_index <- col_index + n_cols_i
+      }
+      if (is.null(annotation_cols)) {
+        # No colors specified by user -> our new list of color specs is the complete list
+        annotation_cols <- var_cols
+      }
+      else {
+        # Add the new color specs to those provided by the user
+        annotation_cols <- append(annotation_cols, var_cols)
+      }
+    }
+    # Add annotation colors to function call
+    if (is.null(annotation_cols)) {
+      # NA is the default no-specification expected by pheatmap
+      pheatmap_args[["annotation_colors"]] <- NA
+    }
+    else {
+      # Use the created list
+      pheatmap_args[["annotation_colors"]] <- annotation_cols
     }
   }
   
@@ -193,7 +251,7 @@ olink_heatmap_plot <- function(df,
 # It emulates some of the styling that OlinkAnalyze::set_plot_theme() would otherwise provide for a ggplot
 set_plot_theme_pheatmap <- function(x, fontsize, col="#737373", font1="Swedish Gothic Thin", font2="Swedish Gothic") {
   xnames <- x$layout$name
-
+  
   # Prepare fonts
   set_font1 <- FALSE
   set_font2 <- FALSE
