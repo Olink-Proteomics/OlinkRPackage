@@ -10,6 +10,8 @@ olink_boxplot(
   olinkid_list,
   verbose = FALSE,
   number_of_proteins_per_plot = 6,
+  posthoc_results,
+  ttest_results,
   ...
 )
 }
@@ -24,6 +26,10 @@ The first or single value is used as x-axis, the second as fill. Further values 
 \item{verbose}{Boolean. If the plots are shown as well as returned in the list (default is false).}
 
 \item{number_of_proteins_per_plot}{Number of boxplots to include in the facet plot (default 6).}
+
+\item{posthoc_results}{Data frame from Anova posthoc analysis using olink_anova_posthoc() function.}
+
+\item{ttest_results}{Data frame from ttest analysis using olink_ttest() function.}
 
 \item{...}{coloroption passed to specify color order}
 }
