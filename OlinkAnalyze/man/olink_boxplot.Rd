@@ -10,8 +10,8 @@ olink_boxplot(
   olinkid_list,
   verbose = FALSE,
   number_of_proteins_per_plot = 6,
-  posthoc_results,
-  ttest_results,
+  posthoc_results = NULL,
+  ttest_results = NULL,
   ...
 )
 }
