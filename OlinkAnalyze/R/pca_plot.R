@@ -240,47 +240,11 @@ olink_pca_plot.internal <- function (df,
     }
   }
 
-  #<= PERCENT_CUTOFF assays imputed
-
-  if(any(percent_missingness <= PERCENT_CUTOFF & percent_missingness > 0)){
-
-    imputed_assays_index <- which(percent_missingness <= PERCENT_CUTOFF & percent_missingness > 0)
-    percent_missingness <- percent_missingness[-imputed_assays_index]
-
-    imputed_assays_index <- imputed_assays_index + 2
-    imputed_assays <- colnames(procData$df_wide)[imputed_assays_index]
-
-    procData$df_wide <- procData$df_wide %>%
-      dplyr::mutate_at(tidyselect::all_of(imputed_assays),
-                       ~ifelse(is.na(.x), median(.x, na.rm = TRUE), .x))
-
-    if(verbose){
-      warning(paste0("There are ",
-                     paste0(length(imputed_assays)),
-                     " assay(s) that were imputed by their medians."))
-    }
-  }
-
-  if(!all(colSums(is.na(procData$df_wide[, -c(1:2)])) == 0)){
-    stop('Missingness imputation failed.')
-  }
-
-  procData$df_wide <- procData$df_wide %>%
-    dplyr::left_join(procData$plotColors,
-                     by = c('SampleID',
-                            'Index')) %>%
-    dplyr::select(SampleID, Index, colors, everything())
-
-  df_wide_matrix <- procData$df_wide %>%
-    dplyr::select(-Index, -colors) %>%
-    tibble::column_to_rownames('SampleID') %>%
-    as.matrix
-
-  pca_fit <- stats::prcomp(df_wide_matrix, scale. = TRUE, center = TRUE)
+  #### PCA ####
+  pca_fit <- stats::prcomp(procData$df_wide_matrix, scale. = TRUE, center = TRUE)
 
   #Standardizing and selecting components
-
-  scaling_factor_lambda <- pca_fit$sdev*sqrt(nrow(df_wide_matrix))
+  scaling_factor_lambda <- pca_fit$sdev*sqrt(nrow(procData$df_wide_matrix))
 
   PCX <- pca_fit$x[,x_val]/scaling_factor_lambda[x_val]
   PCY <- pca_fit$x[,y_val]/scaling_factor_lambda[y_val]

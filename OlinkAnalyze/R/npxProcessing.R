@@ -1,5 +1,5 @@
 npxProcessing_forDimRed <- function(df, color_g, drop_assays, drop_samples, verbose){
-  #Set up plotting colors
+  #### Set up plotting colors ####
   if (color_g == "QC_Warning"){
     df_temp <- df %>%
       dplyr::group_by(SampleID, Index) %>%
@@ -31,7 +31,7 @@ npxProcessing_forDimRed <- function(df, color_g, drop_assays, drop_samples, verb
     }
   }
 
-  #remove proteins with 0 variance
+  #### Remove assays with 0 variance ####
   df_temp <- df_temp %>%
     dplyr::group_by(OlinkID) %>%
     dplyr::mutate(assay_var = var(NPX, na.rm = TRUE)) %>%
@@ -45,7 +45,7 @@ npxProcessing_forDimRed <- function(df, color_g, drop_assays, drop_samples, verb
     dplyr::filter(!is.na(NPX)) %>%
     tidyr::spread(OlinkID, NPX)
 
-  #Dropping assays with any missing values
+  #### If drop_assays == T, drop assays with any missing values ####
   if(drop_assays){
 
     dropped_assays.na <- colnames(df_wide[, -c(1:2)])[apply(df_wide[, -c(1:2)], 2, anyNA)]
@@ -65,7 +65,7 @@ npxProcessing_forDimRed <- function(df, color_g, drop_assays, drop_samples, verb
     dropped_assays.na <- NULL
   }
 
-  #Dropping samples with any missing values
+  #### If drop_samples == T, drop samples with any missing values ####
   if(drop_samples){
 
     dropped_samples <- apply(df_wide[, -c(1:2)], 1, anyNA)
@@ -81,7 +81,8 @@ npxProcessing_forDimRed <- function(df, color_g, drop_assays, drop_samples, verb
     }
   }
 
-  #Missingness per sample
+  #### Drop assays with to many missing values ####
+  #Missingness per assay
   percent_missingness <- colSums(is.na(df_wide[, -c(1:2)]))/nrow(df_wide)
 
   # assays with missingness > 10% are dropped from the PCA
@@ -113,8 +114,44 @@ npxProcessing_forDimRed <- function(df, color_g, drop_assays, drop_samples, verb
     dropped_assays.missingness <- NULL
   }
 
+  #### Impute remaing missing values by the assay median ####
+  if(any(percent_missingness <= PERCENT_CUTOFF & percent_missingness > 0)){
+
+    imputed_assays_index <- which(percent_missingness <= PERCENT_CUTOFF & percent_missingness > 0)
+    percent_missingness <- percent_missingness[-imputed_assays_index]
+
+    imputed_assays_index <- imputed_assays_index + 2
+    imputed_assays <- colnames(df_wide)[imputed_assays_index]
+
+    df_wide <- df_wide %>%
+      dplyr::mutate_at(tidyselect::all_of(imputed_assays),
+                       ~ifelse(is.na(.x), median(.x, na.rm = TRUE), .x))
+
+    if(verbose){
+      warning(paste0("There are ",
+                     paste0(length(imputed_assays)),
+                     " assay(s) that were imputed by their medians."))
+    }
+  }
+
+  if(!all(colSums(is.na(df_wide[, -c(1:2)])) == 0)){
+    stop('Missingness imputation failed.')
+  }
+
+  #### Format data and wrap up results ####
+  df_wide <- df_wide %>%
+    dplyr::left_join(plotColors,
+                     by = c('SampleID',
+                            'Index')) %>%
+    dplyr::select(SampleID, Index, colors, everything())
+
+  df_wide_matrix <- df_wide %>%
+    dplyr::select(-Index, -colors) %>%
+    tibble::column_to_rownames('SampleID') %>%
+    as.matrix
+
   return(list(df_wide = df_wide,
-              plotColors = plotColors,
+              df_wide_matrix = df_wide_matrix,
               dropped_assays.na = dropped_assays.na,
               dropped_assays.missingness = dropped_assays.missingness))
 }
