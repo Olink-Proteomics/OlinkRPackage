@@ -106,6 +106,13 @@ randomized_result2 <- olink_plate_randomizer(manifest,
                                              available.spots=c(88,88),
                                              seed=12345)
 
+#### npxProcessing_forDimRed ####
+procData <- npxProcessing_forDimRed(df = {npx_data1 %>% mutate(SampleID = paste(SampleID, "_", Index, sep = ""))},
+                                    color_g = 'QC_Warning',
+                                    drop_assays = F,
+                                    drop_samples = F,
+                                    verbose = T)
+
 #### Wrap up the results ####
 ref_results <- list(t.test_results = t.test_results,
                     t.test_results_paired = t.test_results_paired,
@@ -120,6 +127,7 @@ ref_results <- list(t.test_results = t.test_results,
                     normalization_results.intensity = normalization_results.intensity,
                     normalization_results.subset = normalization_results.subset,
                     randomized_result1 = randomized_result1,
-                    randomized_result2 = randomized_result2)
+                    randomized_result2 = randomized_result2,
+                    procData = procData)
 save(ref_results, file = 'tests/data/refResults.RData')
 
