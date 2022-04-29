@@ -162,9 +162,9 @@ olink_boxplot <- function(df,
         ggplot2::facet_wrap(~Name_OID, scales = "free")
       
     } else if (!is.null(posthoc_results) && is.null(ttest_results)){
-      star.info <- data.frame(x.vals = levels(npx_for_plotting %>% dplyr::pull(eval(variable)) %>% addNA()),
-                              id = 1:length(levels(npx_for_plotting %>% dplyr::pull(eval(variable)) %>%addNA()))) %>%
-        mutate(x.vals=replace(x.vals, is.na(x.vals), "NA"))
+      star.info <- data.frame(x.vals = npx_for_plotting %>% dplyr::pull(eval(variable)) %>% unique(),
+                              id = 1:length(npx_for_plotting %>% dplyr::pull(eval(variable)) %>% unique())) %>%
+        dplyr::mutate(x.vals = replace(x.vals, is.na(x.vals), "NA"))
       
       posthoc.results_temp <- posthoc_results %>% 
         dplyr::filter(OlinkID %in% assays_for_plotting) %>% 
@@ -214,8 +214,8 @@ olink_boxplot <- function(df,
       
     } else if (is.null(posthoc_results) && !is.null(ttest_results)){
       
-      star.info <- data.frame(x.vals = levels(npx_for_plotting %>% dplyr::pull(eval(variable)) %>% addNA()),
-                              id = 1:length(levels(npx_for_plotting %>% dplyr::pull(eval(variable)) %>%addNA()))) %>%
+      star.info <- data.frame(x.vals = npx_for_plotting %>% dplyr::pull(eval(variable)) %>% unique(),
+                              id = 1:length(npx_for_plotting %>% dplyr::pull(eval(variable)) %>% unique())) %>%
         dplyr::mutate(x.vals = replace(x.vals, is.na(x.vals), "NA"))
       
       ttest_results_temp <- ttest_results %>% 
