@@ -107,7 +107,24 @@ randomized_result2 <- olink_plate_randomizer(manifest,
                                              seed=12345)
 
 #### npxProcessing_forDimRed ####
-procData <- npxProcessing_forDimRed(df = {npx_data1 %>% mutate(SampleID = paste(SampleID, "_", Index, sep = ""))},
+npx_data1.uniqIDs <- npx_data1 %>%
+  mutate(SampleID = paste(SampleID, "_", Index, sep = ""))
+
+procData <- npxProcessing_forDimRed(df = npx_data1.uniqIDs,
+                                    color_g = 'QC_Warning',
+                                    drop_assays = F,
+                                    drop_samples = F,
+                                    verbose = T)
+
+#With missing data
+samples <- sample({npx_data1.uniqIDs$SampleID %>% unique()},
+               size = {ceiling( (npx_data1.uniqIDs$SampleID %>% unique() %>% length())*.15 )})
+
+npx_data1.uniqIDs_missingData <- npx_data1.uniqIDs %>%
+  mutate(NPX = ifelse(SampleID %in% samples & OlinkID %in% c('OID00482', 'OID00483', 'OID00484', 'OID00485'), NA, NPX)) %>% #These should be removed due to to high missingness
+  mutate(NPX = ifelse(SampleID %in% c('A18_19', 'B8_87') & OlinkID %in% c('OID00562', 'OID01213', 'OID05124'), NA, NPX))    #These should be median imputed
+
+procData_missingData <- npxProcessing_forDimRed(df = npx_data1.uniqIDs_missingData,
                                     color_g = 'QC_Warning',
                                     drop_assays = F,
                                     drop_samples = F,
@@ -128,6 +145,7 @@ ref_results <- list(t.test_results = t.test_results,
                     normalization_results.subset = normalization_results.subset,
                     randomized_result1 = randomized_result1,
                     randomized_result2 = randomized_result2,
-                    procData = procData)
+                    procData = procData,
+                    procData_missingData = procData_missingData)
 save(ref_results, file = 'tests/data/refResults.RData')
 
