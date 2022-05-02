@@ -28,14 +28,14 @@ w <- testthat::capture_warnings(
 
 
 test_that("npxProcessing_forDimRed works", {
-  expect_equal(procData$df_wide, ref_results$procData$df_wide)
+  expect_equal(procData$df_wide %>% arrange(SampleID), ref_results$procData$df_wide %>% arrange(SampleID))
   expect_equal(procData$df_wide_matrix, ref_results$procData$df_wide_matrix)
   expect_null(procData$dropped_assays.na)
   expect_null(procData$dropped_assays.missingness)
 
   #With missing data
   expect_equal(w, c("There are 4 assay(s) dropped due to high missingness (>10%).", "There are 3 assay(s) that were imputed by their medians."))
-  expect_equal(procData_missingData$df_wide, ref_results$procData_missingData$df_wide)
+  expect_equal(procData_missingData$df_wide %>% arrange(SampleID), ref_results$procData_missingData$df_wide  %>% arrange(SampleID))
   expect_equal(procData_missingData$df_wide_matrix, ref_results$procData_missingData$df_wide_matrix)
   expect_null(procData_missingData$dropped_assays.na)
   expect_equal(procData_missingData$dropped_assays.missingness, c('OID00482', 'OID00483', 'OID00484', 'OID00485'))
