@@ -109,6 +109,7 @@ Imports:
     tidyselect,
     tools,
     utils,
+    openssl,
     ordinal,
     rstatix
 Config/testthat/edition: 3
