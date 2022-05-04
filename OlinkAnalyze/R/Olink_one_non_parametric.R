@@ -26,7 +26,7 @@
 #'
 #' library(dplyr)
 #'
-#' npx_df <- npx_data1 %>% filter(!grepl('control','SampleID', ignore.case = TRUE))
+#' npx_df <- npx_data1 %>% filter(!grepl('control', SampleID, ignore.case = TRUE))
 #'
 #' #One-way Kruskal-Wallis Test.
 #' #Results in a model NPX~Time
@@ -130,7 +130,7 @@ olink_one_non_parametric <- function(df,
       current_nas <- df %>%
         dplyr::filter(!(OlinkID %in% all_nas)) %>%
         dplyr::group_by(OlinkID, !!rlang::ensym(effect)) %>%
-        dplyr::summarise(n = n(), n_na = sum(is.na(!!rlang::ensym(data_type))),.groups="drop") %>%
+        dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(!!rlang::ensym(data_type))),.groups="drop") %>%
         dplyr::filter(n == n_na) %>%
         dplyr::distinct(OlinkID) %>%
         dplyr::pull(OlinkID)
@@ -196,7 +196,7 @@ olink_one_non_parametric <- function(df,
         dplyr::filter(!(OlinkID %in% all_nas)) %>%
         dplyr::filter(!(OlinkID %in% nas_in_var)) %>%
         dplyr::group_by(Assay,OlinkID, UniProt, Panel,!!!rlang::syms(variable)) %>%
-        dplyr::mutate(group_id = as.factor (1:n()))%>%
+        dplyr::mutate(group_id = as.factor (1:dplyr::n()))%>%
         rstatix::convert_as_factor(!!!rlang::syms(variable)) %>%
         dplyr::ungroup(!!!rlang::syms(variable))%>%
         dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
@@ -219,7 +219,7 @@ olink_one_non_parametric <- function(df,
         dplyr::filter(!(OlinkID %in% all_nas)) %>%
         dplyr::filter(!(OlinkID %in% nas_in_var)) %>%
         dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
-        dplyr::do(groom::tidy(kruskal.test(as.formula(formula_string),
+        dplyr::do(broom::tidy(kruskal.test(as.formula(formula_string),
                               data=.))) %>%
         dplyr::ungroup() %>%
         dplyr::mutate(Adjusted_pval=p.adjust(p.value,method=p_adjust_method)) %>%

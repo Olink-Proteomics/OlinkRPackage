@@ -43,8 +43,8 @@ olink_boxplot <- function(df,
                           olinkid_list,
                           verbose = FALSE,
                           number_of_proteins_per_plot = 6,
-                          posthoc_results,
-                          ttest_results,
+                          posthoc_results = NULL,
+                          ttest_results = NULL,
                           ...){
   
   myRound <- function(x){
@@ -162,9 +162,13 @@ olink_boxplot <- function(df,
         ggplot2::facet_wrap(~Name_OID, scales = "free")
       
     } else if (!is.null(posthoc_results) && is.null(ttest_results)){
-      star.info <- data.frame(x.vals = levels(npx_for_plotting %>% dplyr::pull(eval(variable)) %>% addNA()),
-                              id = 1:length(levels(npx_for_plotting %>% dplyr::pull(eval(variable)) %>%addNA()))) %>%
-        mutate(x.vals=replace(x.vals, is.na(x.vals), "NA"))
+      # star.info <- data.frame(x.vals = npx_for_plotting %>% dplyr::pull(eval(variable)) %>% unique() %>% as.factor(),
+      #                         id = 1:length(npx_for_plotting %>% dplyr::pull(eval(variable)) %>% unique())) %>% 
+      #   dplyr::mutate(x.vals = replace(x.vals, is.na(x.vals), "NA"))
+      
+      star.info <- data.frame(x.vals = levels(npx_for_plotting %>% pull(eval(variable)) %>% addNA()), 
+                              id = 1:length(levels(npx_for_plotting %>% dplyr::pull(eval(variable)) %>%addNA()))) %>% 
+        dplyr::mutate(x.vals = replace(x.vals, is.na(x.vals), "NA"))
       
       posthoc.results_temp <- posthoc_results %>% 
         dplyr::filter(OlinkID %in% assays_for_plotting) %>% 
@@ -190,7 +194,7 @@ olink_boxplot <- function(df,
         dplyr::ungroup() %>% 
         dplyr::mutate(y.anchor = maxNPX + rowNum * rangeNPX *(.5)/max(rowNum)) %>%
         dplyr::select(Name_OID,contrast,Adjusted_pval,C1,C2,p.value,Threshold,c.sort,y.anchor) %>% 
-        dplyr::pivot_longer(-c(Name_OID,Threshold,contrast,Adjusted_pval,p.value,c.sort,y.anchor),names_to="tmp",values_to = "x.vals") %>% 
+        tidyr::pivot_longer(-c(Name_OID,Threshold,contrast,Adjusted_pval,p.value,c.sort,y.anchor),names_to="tmp",values_to = "x.vals") %>% 
         dplyr::mutate(Star = case_when(Adjusted_pval <0.05 & Adjusted_pval > 0.01 ~ "*",
                                        Adjusted_pval <= 0.01 & Adjusted_pval > 0.005 ~ "**",
                                        Adjusted_pval <= 0.005  ~ "***",
@@ -214,8 +218,8 @@ olink_boxplot <- function(df,
       
     } else if (is.null(posthoc_results) && !is.null(ttest_results)){
       
-      star.info <- data.frame(x.vals = levels(npx_for_plotting %>% dplyr::pull(eval(variable)) %>% addNA()),
-                              id = 1:length(levels(npx_for_plotting %>% dplyr::pull(eval(variable)) %>%addNA()))) %>%
+      star.info <- data.frame(x.vals = npx_for_plotting %>% dplyr::pull(eval(variable)) %>% unique(),
+                              id = 1:length(npx_for_plotting %>% dplyr::pull(eval(variable)) %>% unique())) %>%
         dplyr::mutate(x.vals = replace(x.vals, is.na(x.vals), "NA"))
       
       ttest_results_temp <- ttest_results %>% 
@@ -230,7 +234,7 @@ olink_boxplot <- function(df,
       
       ttest_variable <- npx_for_plotting %>% 
         dplyr::select(!!rlang::ensym(variable)) %>% 
-        dplyr::unique() %>% na.omit() %>% 
+        unique() %>% na.omit() %>% 
         dplyr::pull(!!rlang::ensym(variable))
       
       line.data <- ttest_results_temp %>% 
@@ -243,7 +247,7 @@ olink_boxplot <- function(df,
         dplyr::ungroup() %>% 
         dplyr::mutate(y.anchor = maxNPX + rangeNPX *(.2)) %>%
         dplyr::select(Name_OID,Adjusted_pval,C1,C2,Threshold,c.sort,y.anchor) %>% 
-        dplyr::pivot_longer(-c(Name_OID, Threshold, Adjusted_pval, c.sort, y.anchor), names_to = "tmp", values_to = "x.vals") %>% 
+        tidyr::pivot_longer(-c(Name_OID, Threshold, Adjusted_pval, c.sort, y.anchor), names_to = "tmp", values_to = "x.vals") %>% 
         dplyr::mutate(Star = case_when(Adjusted_pval <0.05 & Adjusted_pval > 0.01 ~ "*",
                                        Adjusted_pval <= 0.01 & Adjusted_pval > 0.005 ~ "**",
                                        Adjusted_pval <= 0.005  ~ "***",

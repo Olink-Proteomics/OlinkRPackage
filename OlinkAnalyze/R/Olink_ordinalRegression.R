@@ -101,7 +101,7 @@ olink_ordinalRegression <- function(df,
     #Not testing assays that have all NA:s
     all_nas <- df  %>%
       dplyr::group_by(OlinkID) %>%
-      dplyr::summarise(n = n(), n_na = sum(is.na(!!rlang::ensym(data_type)))) %>%
+      dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(!!rlang::ensym(data_type)))) %>%
       dplyr::ungroup() %>%
       dplyr::filter(n == n_na) %>%
       dplyr::pull(OlinkID)
@@ -144,7 +144,7 @@ olink_ordinalRegression <- function(df,
       current_nas <- df %>%
         dplyr::filter(!(OlinkID %in% all_nas)) %>%
         dplyr::group_by(OlinkID, !!rlang::ensym(effect)) %>%
-        dplyr::summarise(n = n(), n_na = sum(is.na(!!rlang::ensym(data_type)))) %>%
+        dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(!!rlang::ensym(data_type)))) %>%
         dplyr::ungroup() %>%
         dplyr::filter(n == n_na) %>%
         dplyr::distinct(OlinkID) %>%
@@ -165,7 +165,7 @@ olink_ordinalRegression <- function(df,
         dplyr::summarise(n_levels = n_distinct(!!rlang::ensym(effect), na.rm = T)) %>%
         dplyr::ungroup() %>%
         dplyr::filter(n_levels > 1) %>%
-        dplyr::summarise(n = n()) %>%
+        dplyr::summarise(n = dplyr::n()) %>%
         dplyr::pull(n)
 
       if (number_of_samples_w_more_than_one_level > 0) {
