@@ -81,7 +81,8 @@ Suggests:
     testthat (>= 3.0.0),
     scales,
     markdown,
-    vdiffr
+    vdiffr,
+    umap
 License: GPL-3
 VignetteBuilder: knitr
 Imports: 

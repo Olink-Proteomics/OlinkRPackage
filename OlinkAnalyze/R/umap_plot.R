@@ -1,13 +1,12 @@
-#' Function to plot a PCA of the data
+#' Function to make a UMAP plot from the data
 #'
-#' Generates a PCA projection of all samples from NPX data along two principal components (default PC2 vs. PC1) including the explained variance and dots colored by QC_Warning using stats::prcomp and ggplot2::ggplot.
+#' Computes a manifold approximation and projection using umap::umap and plots the two specified components.
+#' Unique sample names are required and imputation by the median is done for assays with missingness <10\% for multi-plate projects and <5\% for single plate projects.
 #'
-#' The values are by default scaled and centered in the PCA and proteins with missing NPX values are by default removed from the corresponding assay.
-#' Unique sample names are required.
-#' Imputation by the median is done for assays with missingness <10\% for multi-plate projects and <5\% for single plate projects.
 #' The plot is printed, and a list of ggplot objects is returned. \cr\cr
-#' If byPanel = TRUE, the data processing (imputation of missing values etc) and subsequent PCA is performed separately per panel. A faceted plot is printed, while the individual ggplot objects are returned. \cr\cr
-#' The arguments outlierDefX and outlierDefY can be used to identify outliers in the PCA. Samples more than +/-outlierDef[X,Y] standard deviations from the mean of the plotted PC will be labelled. Both arguments have to be specified.
+#' If byPanel = TRUE, the data processing (imputation of missing values etc) and subsequent UMAP is performed separately per panel. A faceted plot is printed, while the individual ggplot objects are returned. \cr\cr
+#' The arguments outlierDefX and outlierDefY can be used to identify outliers in the UMAP results. Samples more than +/-outlierDef[X,Y] standard deviations from the mean of the plotted UMAP component will be labelled. Both arguments have to be specified.
+#' NOTE: UMAP is a non-linear data transformation that might not accurately preserve the properties of the data. Distances in the UMAP plane should therefore be interpreted with caution
 #'
 #' @param df data frame in long format with Sample Id, NPX and column of choice for colors
 #' @param color_g Character value indicating which column to use for colors (default QC_Warning)
@@ -17,9 +16,7 @@
 #' @param config object of class umap.config, specifying the parameters for the UMAP algorithm.
 #' @param drop_assays Logical. All assays with any missing values will be dropped. Takes precedence over sample drop.
 #' @param drop_samples Logical. All samples with any missing values will be dropped.
-#' @param n_loadings Integer. Will plot the top n_loadings based on size.
-#' @param loadings_list Character vector indicating for which OlinkID's to plot as loadings. It is possible to use n_loadings and loadings_list simultaneously.
-#' @param byPanel Perform the PCA per panel (default FALSE)
+#' @param byPanel Perform the UMAP per panel (default FALSE)
 #' @param outlierDefX The number standard deviations along the PC plotted on the x-axis that defines an outlier. See also 'Details"
 #' @param outlierDefY The number standard deviations along the PC plotted on the y-axis that defines an outlier. See also 'Details"
 #' @param outlierLines Draw dashed lines at +/-outlierDef[X,Y] standard deviations from the mean of the plotted PCs (default FALSE)
@@ -27,7 +24,7 @@
 #' @param verbose Logical. Whether warnings about the number of samples and/or assays dropped or imputed should be printed to the console.
 #' @param ... coloroption passed to specify color order.
 #' @return A list of objects of class "ggplot", each plot contains scatter plot of PCs
-#' @keywords NPX PCA
+#' @keywords NPX UMAP
 #' @export
 #' @examples
 #' \donttest{
@@ -35,22 +32,22 @@
 #' npx_data <- npx_data1 %>%
 #'     mutate(SampleID = paste(SampleID, "_", Index, sep = ""))
 #'
-#' #PCA using all the data
-#' olink_pca_plot(df=npx_data, color_g = "QC_Warning")
+#' #UMAP using all the data
+#' olink_umap_plot(df=npx_data, color_g = "QC_Warning")
 #'
-#' #PCA per panel
-#' g <- olink_pca_plot(df=npx_data, color_g = "QC_Warning", byPanel = TRUE)
-#' g[[2]] #Plot only the second panel
+#' #UMAP per panel
+#' g <- olink_umap_plot(df=npx_data, color_g = "QC_Warning", byPanel = TRUE)
+#' g#Inflammation #Plot only the Inflammation panel
 #'
 #' #Label outliers
-#' olink_pca_plot(df=npx_data, color_g = "QC_Warning",
+#' olink_umap_plot(df=npx_data, color_g = "QC_Warning",
 #'                outlierDefX = 2, outlierDefY = 4) #All data
-#' olink_pca_plot(df=npx_data, color_g = "QC_Warning",
-#'                outlierDefX = 2.5, outlierDefY = 4, byPanel = TRUE) #Per panel
+#' olink_umap_plot(df=npx_data, color_g = "QC_Warning",
+#'                outlierDefX = 3, outlierDefY = 2, byPanel = TRUE) #Per panel
 #'
 #' #Retrieve the outliers
-#' g <- olink_pca_plot(df=npx_data, color_g = "QC_Warning",
-#'                     outlierDefX = 2.5, outlierDefY = 4, byPanel = TRUE)
+#' g <- olink_umap_plot(df=npx_data, color_g = "QC_Warning",
+#'                     outlierDefX = 3, outlierDefY = 2, byPanel = TRUE)
 #' outliers <- lapply(g, function(x){x$data}) %>%
 #'     bind_rows() %>%
 #'     filter(Outlier == 1)
@@ -67,13 +64,12 @@
 #' @importFrom ggrepel geom_label_repel
 #' @importFrom utils head
 #' @importFrom grid unit
-#' @importFrom umap umap
 
 olink_umap_plot <- function (df,
                              color_g = "QC_Warning",
                              x_val = 1,
                              y_val = 2,
-                             config = umap.defaults,
+                             config = NULL,
                              label_samples = FALSE,
                              drop_assays = FALSE,
                              drop_samples = FALSE,
@@ -84,6 +80,15 @@ olink_umap_plot <- function (df,
                              quiet = FALSE,
                              verbose = TRUE,
                              ...){
+  #Is the umap package installed?
+  if(!requireNamespace("umap")){
+    stop("Could not load the package umap")
+  }
+
+  #
+  if(is.null(config)){
+    config <- umap::umap.defaults
+  }
 
   #checking ellipsis
   if(length(list(...)) > 0){
@@ -161,7 +166,7 @@ olink_umap_plot <- function (df,
     if(!quiet) print(ggpubr::ggarrange(plotlist = plotList, common.legend = TRUE))
 
   } else{
-    pca_plot <- olink_umap_plot.internal(df = df,
+    umap_plot <- olink_umap_plot.internal(df = df,
                                          color_g = color_g,
                                          x_val = x_val,
                                          y_val = y_val,
@@ -174,8 +179,8 @@ olink_umap_plot <- function (df,
                                          outlierLines = outlierLines,
                                          verbose = verbose,
                                          ...)
-    if(!quiet) print(pca_plot)
-    plotList <- list(pca_plot) #For consistency, return a list even when there's just one plot
+    if(!quiet) print(umap_plot)
+    plotList <- list(umap_plot) #For consistency, return a list even when there's just one plot
   }
 
   return(invisible(plotList))
@@ -185,11 +190,10 @@ olink_umap_plot.internal <- function (df,
                                      color_g = "QC_Warning",
                                      x_val = 1,
                                      y_val = 2,
-                                     label_samples = FALSE,
-                                     drop_assays = FALSE,
-                                     drop_samples = FALSE,
-                                     n_loadings = 0,
-                                     loadings_list = NULL,
+                                     label_samples,
+                                     config,
+                                     drop_assays,
+                                     drop_samples,
                                      outlierDefX,
                                      outlierDefY,
                                      outlierLines,
@@ -210,11 +214,11 @@ olink_umap_plot.internal <- function (df,
     n_components <- max(c(x_val, y_val))
   }
 
-  umap_fit <- umap(procData$df_wide_matrix, config = config, n_components = n_components)
+  umap_fit <- umap::umap(procData$df_wide_matrix, config = config, n_components = n_components)
   umapX <- umap_fit$layout[, x_val]
   umapY <- umap_fit$layout[, y_val]
   observation_names <- procData$df_wide$SampleID
-  observation_colors <- procData$df_wide$pca_colors
+  observation_colors <- procData$df_wide$colors
   scores <- data.frame(umapX, umapY)
 
   #Identify outliers
