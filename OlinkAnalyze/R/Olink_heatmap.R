@@ -7,7 +7,8 @@
 #' Unique sample names are required.
 #'
 #' @param df Data frame in long format with SampleID, NPX, OlinkID, Assay and columns of choice for annotations.
-#' @param variable_list Columns in \code{df} to be annotated.
+#' @param variable_list Columns in \code{df} to be annotated for rows in the heatmap.
+#' @param variable_col_list Columns in \code{df} to be annotated for columns in the heatmap.
 #' @param center_scale Logical. If data should be centered and scaled across assays (default \code{TRUE}).
 #' @param cluster_rows Logical. Determining if rows should be clustered (default \code{TRUE}).
 #' @param cluster_cols Logical. Determining if columns should be clustered (default \code{TRUE}).
@@ -31,18 +32,24 @@
 #'
 #' #Heatmap with annotation
 #' olink_heatmap_plot(df=npx_data, variable_list = c('Time','Site'))
+#'
+#' #Heatmap with calls from pheatmap
+#' olink_heatmap_plot(df=npx_data, cutree_rows = 3)
+#'
 #' }
 #'
 #' @importFrom magrittr %>%
-#' @importFrom dplyr filter group_by summarise ungroup select mutate across
+#' @importFrom dplyr filter group_by summarise ungroup select mutate
 #' @importFrom stringr str_detect
 #' @importFrom tidyr pivot_wider
-#' @importFrom tibble column_to_rownames
-#' @importFrom pheatmap pheatmap
-#' @importFrom ggplotify as.ggplot
+#' @importFrom tibble column_to_rownames as_tibble
+#' @importFrom extrafont loadfonts fonts
+#' @importFrom grid editGrob gpar
+#' @importFrom ggplot2 theme element_text element_blank xlab ylab
 
 olink_heatmap_plot <- function(df,
                                variable_list     = NULL,
+                               variable_col_list = NULL,
                                center_scale      = TRUE,
                                cluster_rows      = TRUE,
                                cluster_cols      = TRUE,
@@ -52,21 +59,35 @@ olink_heatmap_plot <- function(df,
                                fontsize          = 10,
                                na_col            = 'black',
                                ...) {
-  
-  
+
+  #Checking if packages are installed
+  if(!requireNamespace("ggplotify", quietly = TRUE)){
+    stop("Olink Heatmap function requires ggplotify package.
+         Please install ggplotify before continuing.
+
+         install.packages(\"ggplotify\")")
+  }
+
+  if(!requireNamespace("pheatmap", quietly = TRUE)){
+    stop("Olink Heatmap function requires pheatmap package.
+         Please install pheatmap before continuing.
+
+         install.packages(\"pheatmap\")")
+  }
+
   #Force data frame as tibble
   if (!tibble::is_tibble(df)) {
     df <- tibble::as_tibble(df)
   }
-  
+
   #Save column classes
   col_classes <- sapply(df, "class")
-  
+
   #Filtering on valid OlinkID
   df_temp<-df %>%
     dplyr::filter(stringr::str_detect(OlinkID,
                                       "OID[0-9]{5}"))
-  
+
   #Halt if muliple samplenames
   nr_dup<-df_temp %>%
     dplyr::group_by(OlinkID, SampleID) %>%
@@ -75,7 +96,7 @@ olink_heatmap_plot <- function(df,
     dplyr::select(SampleID, N) %>%
     dplyr::filter(N > 1) %>%
     unique()
-  
+
   if (nr_dup %>% nrow == 1) {
     stop(paste0('The following sampleID is not unique: ',
                 nr_dup$SampleID %>% toString(),
@@ -86,7 +107,7 @@ olink_heatmap_plot <- function(df,
                 nr_dup$SampleID  %>% toString(),
                 '.'))
   }
-  
+
   #Remove assays with no variance
   df_temp2 <- df_temp %>%
     dplyr::group_by(OlinkID) %>%
@@ -94,14 +115,14 @@ olink_heatmap_plot <- function(df,
     dplyr::ungroup() %>%
     dplyr::filter(!(assay_var == 0 | is.na(assay_var))) %>%
     dplyr::select(-assay_var)
-  
+
   #Remove samples with only NA
   Sample_to_remove<-df_temp2 %>%
     dplyr::group_by(SampleID) %>%
     dplyr::mutate(NrNA = ifelse(is.na(NPX),0,1)) %>%
     dplyr::summarise(SumNA = sum(NrNA)) %>%
     dplyr::filter(SumNA == 0)
-  
+
   if(Sample_to_remove %>% nrow > 0){
     if (Sample_to_remove %>% nrow == 1) {
       warning(paste0('The following sampleID ',
@@ -113,20 +134,20 @@ olink_heatmap_plot <- function(df,
                      Sample_to_remove$SampleID %>% toString(),
                      ' are removed due all NPX values being NA.'))
     }
-    
+
     df_temp2<- df_temp2 %>%
       filter(!(SampleID %in% Sample_to_remove$SampleID))
   }
-  
+
   npxWide<-df_temp2 %>%
     mutate(Assay_OlinkID = paste0(Assay,'_',OlinkID)) %>%
     tidyr::pivot_wider(id_cols = SampleID,
                        names_from = Assay_OlinkID,
                        values_from = NPX) %>%
     tibble::column_to_rownames('SampleID')
-  
+
   scale <- ifelse(center_scale, "column", "none")
-  
+
   # Prepare argument list
   pheatmap_args <- list(
     mat               = npxWide,
@@ -139,20 +160,20 @@ olink_heatmap_plot <- function(df,
     show_colnames     = show_colnames,
     annotation_legend = annotation_legend,
     fontsize          = fontsize)
-  
+
   # Check ellipsis and add further arguments, if requested
   annotation_cols <- NULL
   n_ellipsis <- length(list(...))
   if (n_ellipsis > 0L) {
     ellipsis_variables <- names(list(...))
-    
+
     for (i in 1L:n_ellipsis) {
       if (ellipsis_variables[i] == "annotation_colors") {
         # This is handled below
         annotation_cols <- list(...)[[i]]
       }
       else {
-        if (ellipsis_variables[i] %in% c("mat", "silent", "scale", "annotation_row")) {
+        if (ellipsis_variables[i] %in% c("mat", "silent", "scale", "annotation_row", "annotation_col")) {
           # These arguments should not be over-written
           warning(paste0("Argument '", ellipsis_variables[i] ,"' to pheatmap cannot be manually set - ignoring"))
         }
@@ -163,7 +184,7 @@ olink_heatmap_plot <- function(df,
       }
     }
   }
-  
+
   # Add annotations to call, if requested
   if (!is.null(variable_list)){
     variable_df <- df %>%
@@ -220,7 +241,65 @@ olink_heatmap_plot <- function(df,
       pheatmap_args[["annotation_colors"]] <- annotation_cols
     }
   }
-  
+
+  # Add annotations to call for columns, if requested
+  if (!is.null(variable_col_list)){
+    variable_df <- df %>%
+      mutate(Assay_OlinkID = paste0(Assay,'_',OlinkID)) %>%
+      dplyr::select(Assay_OlinkID, variable_col_list) %>%
+      dplyr::distinct() %>%
+      tibble::column_to_rownames('Assay_OlinkID')
+    pheatmap_args[["annotation_col"]] <- variable_df
+    # Use Olink color palette for characters and factors, unless user set specific colors
+    vars_to_col <- rev(variable_col_list)
+    vars_to_col <- vars_to_col[ col_classes[vars_to_col] %in% c("character", "factor") ]
+    if (!is.null(annotation_cols)) {
+      vars_to_col <- vars_to_col[!vars_to_col %in% names(annotation_cols)]
+    }
+    if (length(vars_to_col) > 0L) {
+      # 'cols' contains all new colors for all variables to be annotated
+      cols <- OlinkAnalyze::olink_pal()(
+        sum(sapply(dplyr::select(df, vars_to_col), function(x) length(unique(x))))
+      )
+      # 'var_cols' is a list that fits the format expected by pheatmap
+      # Each entry is named by the variable to be annotated, and the content is a named vector of colors
+      var_cols <- vector("list", length=length(vars_to_col))
+      names(var_cols) <- vars_to_col
+      col_index <- 1L
+      for (var_to_col in vars_to_col) {
+        n_cols_i <- length(unique(df[[var_to_col]]))
+        cols_i   <- cols[col_index:(col_index + n_cols_i - 1L)]
+        if (col_classes[var_to_col] == "character") {
+          # Character: Sort unique values
+          names(cols_i) <- sort(unique(df[[var_to_col]]))
+        }
+        else {
+          # Factor: Take the levels
+          names(cols_i) <- levels(df[[var_to_col]])
+        }
+        var_cols[[var_to_col]] <- cols_i
+        col_index <- col_index + n_cols_i
+      }
+      if (is.null(annotation_cols)) {
+        # No colors specified by user -> our new list of color specs is the complete list
+        annotation_cols <- var_cols
+      }
+      else {
+        # Add the new color specs to those provided by the user
+        annotation_cols <- append(annotation_cols, var_cols)
+      }
+    }
+    # Add annotation colors to function call
+    if (is.null(annotation_cols)) {
+      # NA is the default no-specification expected by pheatmap
+      pheatmap_args[["annotation_colors"]] <- NA
+    }
+    else {
+      # Use the created list
+      pheatmap_args[["annotation_colors"]] <- annotation_cols
+    }
+  }
+
   # Run call
   tryCatch({ p <- do.call(pheatmap::pheatmap, args=pheatmap_args)$gtable },
            error = function(e){
@@ -251,7 +330,7 @@ olink_heatmap_plot <- function(df,
 # It emulates some of the styling that OlinkAnalyze::set_plot_theme() would otherwise provide for a ggplot
 set_plot_theme_pheatmap <- function(x, fontsize, col="#737373", font1="Swedish Gothic Thin", font2="Swedish Gothic") {
   xnames <- x$layout$name
-  
+
   # Prepare fonts
   set_font1 <- FALSE
   set_font2 <- FALSE
@@ -282,7 +361,7 @@ set_plot_theme_pheatmap <- function(x, fontsize, col="#737373", font1="Swedish G
       }
     }
   }
-  
+
   # Dendogram styling
   col_tree_i <- which(x$layout$name == "col_tree")
   row_tree_i <- which(x$layout$name == "row_tree")
@@ -292,7 +371,7 @@ set_plot_theme_pheatmap <- function(x, fontsize, col="#737373", font1="Swedish G
   if (length(row_tree_i) > 0L) {
     x$grobs[[row_tree_i]] <- grid::editGrob(x$grobs[[row_tree_i]], gp=grid::gpar(col=col, lwd=0.4))
   }
-  
+
   # Main title (use Swedish Goth Thin if exists, otherwise Swedish Gothic)
   main_i <- which(x$layout$name == "main")
   if (length(main_i) > 0L) {
@@ -306,7 +385,7 @@ set_plot_theme_pheatmap <- function(x, fontsize, col="#737373", font1="Swedish G
       x$grobs[[main_i]] <- grid::editGrob(x$grobs[[main_i]], gp=grid::gpar(col=col, fontface="bold"))
     }
   }
-  
+
   # Row / column names (use Swedish Goth Thin if exists, otherwise Swedish Gothic)
   col_names_i <- which(x$layout$name == "col_names")
   row_names_i <- which(x$layout$name == "row_names")
@@ -332,7 +411,7 @@ set_plot_theme_pheatmap <- function(x, fontsize, col="#737373", font1="Swedish G
       x$grobs[[row_names_i]] <- grid::editGrob(x$grobs[[row_names_i]], gp=grid::gpar(col=col, fontsize=fontsize))
     }
   }
-  
+
   # Row annotation (use Swedish Goth Thin if exists, otherwise Swedish Gothic)
   row_annotation_names_i <- which(x$layout$name == "row_annotation_names")
   if (length(row_annotation_names_i) > 0L) {
@@ -346,7 +425,21 @@ set_plot_theme_pheatmap <- function(x, fontsize, col="#737373", font1="Swedish G
       x$grobs[[row_annotation_names_i]] <- grid::editGrob(x$grobs[[row_annotation_names_i]], gp=grid::gpar(col="black", fontsize=fontsize, fontface="bold"))
     }
   }
-  
+
+  # Columns annotation (use Swedish Goth Thin if exists, otherwise Swedish Gothic)
+  col_annotation_names_i <- which(x$layout$name == "col_annotation_names")
+  if (length(col_annotation_names_i) > 0L) {
+    if (set_font1) {
+      x$grobs[[col_annotation_names_i]] <- grid::editGrob(x$grobs[[col_annotation_names_i]], gp=grid::gpar(col="black", fontsize=fontsize, fontface="bold", fontfamily=font1))
+    }
+    else if (set_font2) {
+      x$grobs[[col_annotation_names_i]] <- grid::editGrob(x$grobs[[col_annotation_names_i]], gp=grid::gpar(col="black", fontsize=fontsize, fontface="bold", fontfamily=font2))
+    }
+    else {
+      x$grobs[[col_annotation_names_i]] <- grid::editGrob(x$grobs[[col_annotation_names_i]], gp=grid::gpar(col="black", fontsize=fontsize, fontface="bold"))
+    }
+  }
+
   # Annotation legend (must use Swedish Gothic - otherwise result is poor)
   annotation_legend_i <- which(x$layout$name == "annotation_legend")
   if (length(annotation_legend_i) > 0L) {
@@ -357,7 +450,7 @@ set_plot_theme_pheatmap <- function(x, fontsize, col="#737373", font1="Swedish G
       x$grobs[[annotation_legend_i]] <- grid::editGrob(x$grobs[[annotation_legend_i]], gp=grid::gpar(col=col, fontsize=fontsize))
     }
   }
-  
+
   # Standard legend (use Swedish Goth Thin if exists, otherwise Swedish Gothic)
   legend_i <- which(x$layout$name == "legend")
   if (length(legend_i) > 0L) {
@@ -371,6 +464,6 @@ set_plot_theme_pheatmap <- function(x, fontsize, col="#737373", font1="Swedish G
       x$grobs[[legend_i]] <- grid::editGrob(x$grobs[[legend_i]], gp=grid::gpar(col=col, fontsize=fontsize))
     }
   }
-  
+
   x
 }
