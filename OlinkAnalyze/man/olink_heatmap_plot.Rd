@@ -7,6 +7,7 @@
 olink_heatmap_plot(
   df,
   variable_list = NULL,
+  variable_col_list = NULL,
   center_scale = TRUE,
   cluster_rows = TRUE,
   cluster_cols = TRUE,
@@ -21,7 +22,9 @@ olink_heatmap_plot(
 \arguments{
 \item{df}{Data frame in long format with SampleID, NPX, OlinkID, Assay and columns of choice for annotations.}
 
-\item{variable_list}{Columns in \code{df} to be annotated.}
+\item{variable_list}{Columns in \code{df} to be annotated for rows in the heatmap.}
+
+\item{variable_col_list}{Columns in \code{df} to be annotated for columns in the heatmap.}
 
 \item{center_scale}{Logical. If data should be centered and scaled across assays (default \code{TRUE}).}
 
@@ -63,6 +66,10 @@ olink_heatmap_plot(df=npx_data)
 
 #Heatmap with annotation
 olink_heatmap_plot(df=npx_data, variable_list = c('Time','Site'))
+
+#Heatmap with calls from pheatmap
+olink_heatmap_plot(df=npx_data, cutree_rows = 3)
+
 }
 
 }
