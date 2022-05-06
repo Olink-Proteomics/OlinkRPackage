@@ -649,7 +649,7 @@ Group variable can be annotated and colored in the left side of the heatmap.
 ### Function arguments
 
 * df: NPX data frame in long format which should minimally contain SampleID, NPX, OlinkID, Assay. Optionally columns of choice for annotations.
-* variable_list: Columns in df to be annotated for rows in the heatmap.
+* variable_row_list: Columns in df to be annotated for rows in the heatmap.
 * variable_col_list: Columns in df to be annotated for columns in the heatmap.
 * center_scale: Logical. Default: True. If data should be centered and scaled across assays.
 * cluster_rows: Logical. Default: True. Determining if rows should be clustered.
@@ -676,7 +676,7 @@ npx_data_small <- npx_data1 %>%
   filter(OlinkID %in% first10) %>% 
   filter(SampleID %in% first15samples)
 
-olink_heatmap_plot(npx_data_small, variable_list =  'Treatment')
+olink_heatmap_plot(npx_data_small, variable_row_list =  'Treatment')
 ```
 
 ### Function output

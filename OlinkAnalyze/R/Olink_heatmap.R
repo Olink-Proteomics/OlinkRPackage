@@ -7,7 +7,7 @@
 #' Unique sample names are required.
 #'
 #' @param df Data frame in long format with SampleID, NPX, OlinkID, Assay and columns of choice for annotations.
-#' @param variable_list Columns in \code{df} to be annotated for rows in the heatmap.
+#' @param variable_row_list Columns in \code{df} to be annotated for rows in the heatmap.
 #' @param variable_col_list Columns in \code{df} to be annotated for columns in the heatmap.
 #' @param center_scale Logical. If data should be centered and scaled across assays (default \code{TRUE}).
 #' @param cluster_rows Logical. Determining if rows should be clustered (default \code{TRUE}).
@@ -31,7 +31,7 @@
 #' olink_heatmap_plot(df=npx_data)
 #'
 #' #Heatmap with annotation
-#' olink_heatmap_plot(df=npx_data, variable_list = c('Time','Site'))
+#' olink_heatmap_plot(df=npx_data, variable_row_list = c('Time','Site'))
 #'
 #' #Heatmap with calls from pheatmap
 #' olink_heatmap_plot(df=npx_data, cutree_rows = 3)
@@ -43,12 +43,11 @@
 #' @importFrom stringr str_detect
 #' @importFrom tidyr pivot_wider
 #' @importFrom tibble column_to_rownames as_tibble
-#' @importFrom extrafont loadfonts fonts
 #' @importFrom grid editGrob gpar
 #' @importFrom ggplot2 theme element_text element_blank xlab ylab
 
 olink_heatmap_plot <- function(df,
-                               variable_list     = NULL,
+                               variable_row_list = NULL,
                                variable_col_list = NULL,
                                center_scale      = TRUE,
                                cluster_rows      = TRUE,
@@ -186,14 +185,14 @@ olink_heatmap_plot <- function(df,
   }
 
   # Add row annotations to call, if requested
-  if (!is.null(variable_list)){
+  if (!is.null(variable_row_list)){
     variable_df <- df %>%
-      dplyr::select(SampleID, variable_list) %>%
+      dplyr::select(SampleID, variable_row_list) %>%
       dplyr::distinct() %>%
       tibble::column_to_rownames('SampleID')
     pheatmap_args[["annotation_row"]] <- variable_df
   }
-  
+
   # Add column annotations to call, if requested
   if (!is.null(variable_col_list)){
     variable_df <- df %>%
@@ -203,13 +202,13 @@ olink_heatmap_plot <- function(df,
       tibble::column_to_rownames('Assay_OlinkID')
     pheatmap_args[["annotation_col"]] <- variable_df
   }
-    
+
   # Set annotation colors for rows and columns
-  if (!is.null(variable_list) || !is.null(variable_col_list)){
+  if (!is.null(variable_row_list) || !is.null(variable_col_list)){
     row_variables <- character(0L)
     col_variables <- character(0L)
-    if (!is.null(variable_list)) {
-      row_variables <- rev(variable_list)
+    if (!is.null(variable_row_list)) {
+      row_variables <- rev(variable_row_list)
     }
     if (!is.null(variable_col_list)) {
       col_variables <- rev(variable_col_list)
