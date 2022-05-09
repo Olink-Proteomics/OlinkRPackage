@@ -7,7 +7,7 @@
 read_NPX(filename)
 }
 \arguments{
-\item{filename}{Path to file NPX Manager output file.}
+\item{filename}{Path to NPX Manager or MyData output file.}
 }
 \value{
 A "tibble" in long format. Columns include:
@@ -27,7 +27,7 @@ A "tibble" in long format. Columns include:
 Additional columns may be present or missing depending on the platform
 }
 \description{
-Imports an NPX file exported from NPX Manager.
+Imports an NPX file exported from NPX Manager or MyData.
 No alterations to the output NPX Manager format is allowed.
 }
 \examples{
