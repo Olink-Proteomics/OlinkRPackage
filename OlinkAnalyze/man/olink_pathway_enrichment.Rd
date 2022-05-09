@@ -64,13 +64,25 @@ Columns for GSEA:
 This function performs enrichment analysis based on statistical test results and full data using clusterProfiler's gsea and enrich functions for MSigDB.
 }
 \details{
-MSigDB is subset if ontology is KEGG, GO, or Reactome. test_results must contain estimates for all assays. 
+MSigDB is subset if the  ontology argument is KEGG, GO, or Reactome. test_results must contain estimates for all assays. 
 Posthoc results can be used but should be filtered for one contrast to improve interpretability.
 clusterProfiler is originally developed by Guangchuang Yu at the School of Basic Medical Sciences at Southern Medical University.
 
 T Wu, E Hu, S Xu, M Chen, P Guo, Z Dai, T Feng, L Zhou, W Tang, L Zhan, X Fu, S Liu, X Bo, and G Yu. 
 clusterProfiler 4.0: A universal enrichment tool for interpreting omics data. The Innovation. 2021, 2(3):100141. 
 doi: 10.1016/j.xinn.2021.100141
+
+\strong{A few notes on Pathway Enrichment with Olink Data}
+
+It is important to note that sometimes the proteins that are assayed in Olink Panels
+ are related to specific biological areas and therefore do not represent an unbiased overview of the proteome as a whole. 
+ Pathways can only interpreted based on the background/context they came from. For this reason, an estimate for all assays measured must 
+ be provided. Furthermore, certain pathways cannot come up based on Olink's  coverage in this area.  Additionally, 
+  if only the Inflammation panel was run, then the available pathways would be given based on a background
+  of proteins related to inflammation. Both ORA and GSEA can provide mechanistic and disease related insight and are best to use when 
+  trying to uncover pathways/annotations of interest. It is recommended to only use pathway enrichment for hypothesis generating data, which 
+  is more well suited for data on the Explore platform or on multiple Target 96 panels. For smaller lists of proteins it may be more informative to use biological annotation in directed research, 
+  to discover which significant assay are related to keywords of interest.
 }
 \examples{
 \donttest{
