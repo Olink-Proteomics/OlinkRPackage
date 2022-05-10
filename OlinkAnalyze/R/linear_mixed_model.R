@@ -301,7 +301,7 @@ single_lmer <- function(data, formula_string){
   )
 
 
-  if(class(out.model)=="lmerModLmerTest"){
+  if(inherits(out.model,"lmerModLmerTest")){
     return(out.model)
   } else{
     stop("Convergence issue not caught by single_lmer")
