@@ -27,7 +27,7 @@ The first or single value is used as x-axis, the second as fill. Further values 
 
 \item{number_of_proteins_per_plot}{Number of boxplots to include in the facet plot (default 6).}
 
-\item{posthoc_results}{Data frame from Anova posthoc analysis using olink_anova_posthoc() function.}
+\item{posthoc_results}{Data frame from ANOVA posthoc analysis using olink_anova_posthoc() function.}
 
 \item{ttest_results}{Data frame from ttest analysis using olink_ttest() function.}
 
