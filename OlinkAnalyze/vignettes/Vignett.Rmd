@@ -483,6 +483,8 @@ The olink_boxplot function is used to generate boxplots of NPX values stratified
 * df: NPX data frame in long format should minimally contain protein name (Assay), OlinkID, UniProt and a grouping variable.
 * variable: Single character value indicating the column name to use as a grouping variable in the x axis.
 * olinkid_list: Character vector of OlinkID's that should be used for the boxplot. If not specified, all assays in df are used.
+* posthoc_results: Data frame from ANOVA posthoc analysis. This data frame need to be generated using the olink_anova_posthoc() function.
+* ttest_results: Data frame from ttest analysis. This data frame need to be generated using the olink_ttest() function.
 * verbose: Logical. Default: False. Flag indicating if plots shall be printed additionally to assigned to a list variable.
 * number_of_proteins_per_plot: Number of boxplots to include in the facets plot. Default 6.
 
@@ -490,9 +492,24 @@ The olink_boxplot function is used to generate boxplots of NPX values stratified
 plot <- npx_data1 %>%
   na.omit() %>% # removing missing values which exists for Site
   olink_boxplot(variable = "Site", 
-                olinkid_list = c("OID01216", "OID01217"),
+                olinkid_list = c("OID00488", "OID01276"),
                 number_of_proteins_per_plot  = 2)
 plot[[1]]
+
+anova_posthoc_results<-npx_data1 %>% 
+  olink_anova_posthoc(olinkid_list = c("OID00488", "OID01276"),
+                      variable = 'Site',
+                      effect = 'Site')
+
+plot2 <- npx_data1 %>%
+  na.omit() %>% # removing missing values which exists for Site
+  olink_boxplot(variable = "Site", 
+                olinkid_list = c("OID00488", "OID01276"),
+                number_of_proteins_per_plot  = 2,
+                posthoc_results = anova_posthoc_results)
+
+plot2[[1]]
+
 ```
 
 ### Function output

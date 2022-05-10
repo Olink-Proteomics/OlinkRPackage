@@ -6,7 +6,7 @@
 #' @param variable  A character vector or character value indicating which column to use as the x-axis and fill grouping variable.
 #' The first or single value is used as x-axis, the second as fill. Further values in a vector are not plotted.
 #' @param olinkid_list Character vector indicating which proteins (OlinkIDs) to plot.
-#' @param posthoc_results Data frame from Anova posthoc analysis using olink_anova_posthoc() function.
+#' @param posthoc_results Data frame from ANOVA posthoc analysis using olink_anova_posthoc() function.
 #' @param ttest_results Data frame from ttest analysis using olink_ttest() function.
 #' @param number_of_proteins_per_plot Number of boxplots to include in the facet plot (default 6).
 #' @param verbose Boolean. If the plots are shown as well as returned in the list (default is false).
@@ -162,9 +162,6 @@ olink_boxplot <- function(df,
         ggplot2::facet_wrap(~Name_OID, scales = "free")
 
     } else if (!is.null(posthoc_results) && is.null(ttest_results)){
-      # star.info <- data.frame(x.vals = npx_for_plotting %>% dplyr::pull(eval(variable)) %>% unique() %>% as.factor(),
-      #                         id = 1:length(npx_for_plotting %>% dplyr::pull(eval(variable)) %>% unique())) %>%
-      #   dplyr::mutate(x.vals = replace(x.vals, is.na(x.vals), "NA"))
 
       star.info <- data.frame(x.vals = levels(npx_for_plotting %>%
                                                 dplyr::pull(eval(variable)) %>%
