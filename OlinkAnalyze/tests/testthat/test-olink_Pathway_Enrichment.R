@@ -19,7 +19,7 @@ ttest_results_no_estimate <- ttest_results %>% dplyr::select(-estimate)
 
 test_that("T-test GSEA works", {
   set.seed(123)
-  expect_equal(nrow(tt_gsea), 565)
+  expect_equal(nrow(tt_gsea), 560)
 })
 
 test_that("Reactome GSEA works", {
@@ -34,13 +34,13 @@ test_that("KEGG GSEA works", {
 
 test_that("GO GSEA works", {
   set.seed(123)
-  expect_equal(nrow(tt_gsea_go), 387)
+  expect_equal(nrow(tt_gsea_go), 384)
 })
 
 
 test_that("T-test ORA works", {
   set.seed(123)
-  expect_equal(nrow(tt_ora), 366)
+  expect_equal(nrow(tt_ora), 329)
 })
 
 test_that("Reactome ORA works", {
@@ -55,7 +55,7 @@ test_that("KEGG ORA works", {
 
 test_that("GO ORA works", {
   set.seed(123)
-  expect_equal(nrow(tt_ora_go), 263)
+  expect_equal(nrow(tt_ora_go), 226)
 })
 
 

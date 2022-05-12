@@ -61,6 +61,7 @@ Imports:
     lmerTest,
     magrittr,
     methods,
+    openssl,
     ordinal,
     readxl,
     rlang,
