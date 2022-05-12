@@ -111,5 +111,6 @@ Imports:
     utils,
     openssl,
     ordinal,
-    rstatix
+    rstatix,
+    zip
 Config/testthat/edition: 3
