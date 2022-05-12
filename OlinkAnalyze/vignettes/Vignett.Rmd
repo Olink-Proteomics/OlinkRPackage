@@ -496,10 +496,13 @@ ttest_results <- olink_ttest(
   df = npx_df,
   variable = "Treatment",
   alternative = "two.sided")
+
+try({ # This expression might fail if dependencies are not installed
 gsea_results <- olink_pathway_enrichment(data = npx_data1, test_results = ttest_results)
 ora_results <- olink_pathway_enrichment(
   data = npx_data1,
   test_results = ttest_results, method = "ORA")
+}, silent = TRUE)
 ```
 
 
@@ -678,12 +681,16 @@ The olink_pathway_heatmap function generates a heatmap of proteins related to pa
 
 ```{r  message=FALSE, fig.width=8, fig.height=4}
 # GSEA Heatmap from t-test results
+try({ # This expression might fail if dependencies are not installed
 olink_pathway_heatmap(enrich_results = gsea_results, test_results = ttest_results)
+})
 ```
 ```{r message = FALSE, fig.width=8, fig.height=4}
 # ORA Heatmap from t-test results with cell keyword
+try({ # This expression might fail if dependencies are not installed
 olink_pathway_heatmap(enrich_results = ora_results, test_results = ttest_results,
                       method = "ORA", keyword = "cell")
+})
 ```
 
 ### Function output
