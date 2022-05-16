@@ -85,7 +85,6 @@ olink_umap_plot <- function (df,
     stop("Could not load the package umap")
   }
 
-  #
   if(is.null(config)){
     config <- umap::umap.defaults
   }
@@ -187,9 +186,9 @@ olink_umap_plot <- function (df,
 }
 
 olink_umap_plot.internal <- function (df,
-                                     color_g = "QC_Warning",
-                                     x_val = 1,
-                                     y_val = 2,
+                                     color_g,
+                                     x_val,
+                                     y_val,
                                      label_samples,
                                      config,
                                      drop_assays,
