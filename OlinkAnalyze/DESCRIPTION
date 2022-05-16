@@ -62,7 +62,6 @@ Imports:
     magrittr,
     methods,
     openssl,
-    ordinal,
     readxl,
     rlang,
     rstatix,
@@ -72,19 +71,22 @@ Imports:
     tidyr,
     tidyselect,
     tools,
-    utils
+    util,
 Suggests: 
     clusterProfiler,
     extrafont,
+    ggplotify,
     knitr,
     markdown,
     msigdbr,
+    pheatmap,
     rmarkdown,
     scales,
     testthat (>= 3.0.0),
     vdiffr
 VignetteBuilder: 
     knitr
+
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true

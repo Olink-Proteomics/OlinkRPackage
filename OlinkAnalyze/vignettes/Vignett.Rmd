@@ -57,6 +57,7 @@ install.packages("OlinkAnalyze")
 + *olink_pca_plot* Function to plot a PCA of the data
 + *olink_qc_plot* Function to plot an overview of a sample cohort per Panel
 + *olink_volcano_plot* Easy volcano plot with Olink theme
++ *olink_heatmap_plot* Function which generate a heatmap over all proteins
 + *set_plot_theme* Function to set plot theme
 
 
@@ -742,6 +743,48 @@ qc <- olink_qc_plot(npx_data1, color_g = "QC_Warning", IQR_outlierDef = 3, media
 qc$data %>% filter(Outlier == 1) %>% select(SampleID, Panel, IQR, sample_median, Outlier)
 ```
 
+## Heatmap (olink_heatmap_plot)
+
+The olink_heatmap_plot function generates a heatmap for all samples and proteins using pheatmap::pheatmap. By default the heatmap center and scaled NPX across all proteins and cluster samples and proteins using a dendrogram. Unique sample names are required.
+
+Group variable can be annotated and colored in the left side of the heatmap. 
+
+### Function arguments
+
+* df: NPX data frame in long format which should minimally contain SampleID, NPX, OlinkID, Assay. Optionally columns of choice for annotations.
+* variable_row_list: Columns in df to be annotated for rows in the heatmap.
+* variable_col_list: Columns in df to be annotated for columns in the heatmap.
+* center_scale: Logical. Default: True. If data should be centered and scaled across assays.
+* cluster_rows: Logical. Default: True. Determining if rows should be clustered.
+* cluster_cols: Logical. Default: True. Determining if columns should be clustered.
+* show_rownames: Logical. Default: True. Determining if row names are shown.
+* show_colnames: Logical. Defualt: True. Determining if column names are shown.
+* annotation_legend: Logical. Defualt: True. Determining if legend for annotations should be shown.
+* fontsize. Defualt: 10. Fontsize for all text. 
+* na_col. Defualt: Black. Color of the cells with NA.
+
+
+```{r message=FALSE, fig.width=8, fig.height=4}
+first10 <- npx_data1 %>%
+  pull(OlinkID) %>% 
+  unique() %>% 
+  head(10)
+
+first15samples <- npx_data1$SampleID %>% 
+  unique() %>% 
+  head(15)
+
+npx_data_small <- npx_data1 %>% 
+  filter(!str_detect(SampleID, 'CONT')) %>% 
+  filter(OlinkID %in% first10) %>% 
+  filter(SampleID %in% first15samples)
+
+olink_heatmap_plot(npx_data_small, variable_row_list =  'Treatment')
+```
+
+### Function output
+
+An object of class *ggplot*.
 
 ## Plot results of t-test (olink_volcano_plot)
 
