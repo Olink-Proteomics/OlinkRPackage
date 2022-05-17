@@ -8,6 +8,7 @@
 #'\itemize{
 #' \item c('A','B')
 #' \item c('A: B')
+#' \item c('A: B', 'B') or c('A: B', 'A')
 #'}
 #'Inference is specified in a message if verbose = T. \cr
 #'The formula notation of the final model is specified in a message if verbose = T. \cr\cr
@@ -21,8 +22,8 @@
 #' Also takes ':'/'*' notation.
 #' @param covariates Single character value or character array. Default: NULL.
 #' Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be inferred from main effects.
-#' @param return.covariates Boolean. Deafult: False. Returns F-test results for the covariates. Note: Adjusted p-values will be NA for the covariates.
-#' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
+#' @param return.covariates Logical. Deafult: False. Returns F-test results for the covariates. Note: Adjusted p-values will be NA for the covariates.
+#' @param verbose Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #'
 #' @return A tibble containing the ANOVA results for every protein.
 #' The tibble is arranged by ascending p-values.
