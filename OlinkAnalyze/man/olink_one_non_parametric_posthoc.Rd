@@ -8,7 +8,6 @@ olink_one_non_parametric_posthoc(
   df,
   olinkid_list = NULL,
   variable,
-  p_adjust_method = "BH",
   verbose = T
 )
 }
@@ -18,8 +17,6 @@ olink_one_non_parametric_posthoc(
 \item{olinkid_list}{Character vector of OlinkID's on which to perform post hoc analysis. If not specified, all assays in df are used.}
 
 \item{variable}{Single character value or character array.}
-
-\item{p_adjust_method}{Adjust P-value for Multiple Comparisons.}
 
 \item{verbose}{Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
 }

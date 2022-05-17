@@ -22,9 +22,9 @@ Also takes ':'/'*' notation.}
 \item{covariates}{Single character value or character array. Default: NULL.
 Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be inferred from main effects.}
 
-\item{return.covariates}{Boolean. Deafult: False. Returns F-test results for the covariates. Note: Adjusted p-values will be NA for the covariates.}
+\item{return.covariates}{Logical. Deafult: False. Returns F-test results for the covariates. Note: Adjusted p-values will be NA for the covariates.}
 
-\item{verbose}{Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
+\item{verbose}{Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
 }
 \value{
 A tibble containing the ANOVA results for every protein.
@@ -39,6 +39,7 @@ Crossed analysis, i.e. A*B formula notation, is inferred from the variable argum
 \itemize{
 \item c('A','B')
 \item c('A: B')
+\item c('A: B', 'B') or c('A: B', 'A')
 }
 Inference is specified in a message if verbose = T. \cr
 The formula notation of the final model is specified in a message if verbose = T. \cr\cr

@@ -4,20 +4,12 @@
 \alias{olink_one_non_parametric}
 \title{Function which performs a Kruskal-Wallis Test or Friedman Test per protein}
 \usage{
-olink_one_non_parametric(
-  df,
-  variable,
-  p_adjust_method = "BH",
-  dependence = FALSE,
-  verbose = T
-)
+olink_one_non_parametric(df, variable, dependence = FALSE, verbose = T)
 }
 \arguments{
 \item{df}{NPX or Quantified_value data frame in long format with at least protein name (Assay), OlinkID, UniProt, Panel and a factor with at least 3 levels.}
 
 \item{variable}{Single character value.}
-
-\item{p_adjust_method}{Adjust P-value for Multiple Comparisons.}
 
 \item{dependence}{Boolean. Default: FALSE. When the groups are independent, the kruskal-Wallis will run, when the groups are dependent, the Friedman test will run.}
 
