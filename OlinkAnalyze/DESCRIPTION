@@ -76,6 +76,7 @@ Imports:
 Suggests: 
     clusterProfiler,
     extrafont,
+    systemfonts,
     ggplotify,
     knitr,
     markdown,
