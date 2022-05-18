@@ -71,7 +71,8 @@ Imports:
     tidyr,
     tidyselect,
     tools,
-    utils
+    utils,
+    ordinal
 Suggests: 
     clusterProfiler,
     extrafont,
