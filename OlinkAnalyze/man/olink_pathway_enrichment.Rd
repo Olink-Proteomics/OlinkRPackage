@@ -28,7 +28,7 @@ A data frame of enrichment results.
 Columns for ORA include:
 \itemize{
  \item{ID:} "character" Pathway ID from MSigDB
- \item{Description:} "character" Description of Pathway from MSigDB  
+ \item{Description:} "character" Description of Pathway from MSigDB
  \item{GeneRatio:} "character" ratio of input proteins that are annotated in a term
  \item{BgRatio:} "character" ratio of all genes that are annotated in this term
  \item{pvalue:} "numeric" p-value of enrichment
@@ -42,13 +42,13 @@ Columns for ORA include:
 Columns for GSEA:
 \itemize{
  \item{ID:} "character" Pathway ID from MSigDB
- \item{Description:} "character" Description of Pathway from MSigDB  
+ \item{Description:} "character" Description of Pathway from MSigDB
  \item{setSize:} "integer" ratio of input proteins that are annotated in a term
  \item{enrichmentScore:} "numeric" Enrichment score, degree to which a gene set is over-represented at the top or
  bottom of the ranked list of genes
  \item{NES:} "numeric" Normalized Enrichment Score, normalized to account for differences in gene set size and in
  correlations between gene sets and expression data sets. NES can be used to compare analysis results
- across gene sets. 
+ across gene sets.
  \item{pvalue:} "numeric" p-value of enrichment
  \item{p.adjust:} "numeric" Adjusted p-value (Benjamini-Hochberg)
  \item{qvalue:} "numeric" false discovery rate, the estimated probability that the normalized enrichment score represents
@@ -64,24 +64,24 @@ Columns for GSEA:
 This function performs enrichment analysis based on statistical test results and full data using clusterProfiler's gsea and enrich functions for MSigDB.
 }
 \details{
-MSigDB is subset if the  ontology argument is KEGG, GO, or Reactome. test_results must contain estimates for all assays. 
+MSigDB is subset if the  ontology argument is KEGG, GO, or Reactome. test_results must contain estimates for all assays.
 Posthoc results can be used but should be filtered for one contrast to improve interpretability.
 clusterProfiler is originally developed by Guangchuang Yu at the School of Basic Medical Sciences at Southern Medical University.
 
-T Wu, E Hu, S Xu, M Chen, P Guo, Z Dai, T Feng, L Zhou, W Tang, L Zhan, X Fu, S Liu, X Bo, and G Yu. 
-clusterProfiler 4.0: A universal enrichment tool for interpreting omics data. The Innovation. 2021, 2(3):100141. 
+T Wu, E Hu, S Xu, M Chen, P Guo, Z Dai, T Feng, L Zhou, W Tang, L Zhan, X Fu, S Liu, X Bo, and G Yu.
+clusterProfiler 4.0: A universal enrichment tool for interpreting omics data. The Innovation. 2021, 2(3):100141.
 doi: 10.1016/j.xinn.2021.100141
 
 \strong{A few notes on Pathway Enrichment with Olink Data}
 
 It is important to note that sometimes the proteins that are assayed in Olink Panels
- are related to specific biological areas and therefore do not represent an unbiased overview of the proteome as a whole. 
- Pathways can only interpreted based on the background/context they came from. For this reason, an estimate for all assays measured must 
- be provided. Furthermore, certain pathways cannot come up based on Olink's  coverage in this area.  Additionally, 
+ are related to specific biological areas and therefore do not represent an unbiased overview of the proteome as a whole.
+ Pathways can only interpreted based on the background/context they came from. For this reason, an estimate for all assays measured must
+ be provided. Furthermore, certain pathways cannot come up based on Olink's  coverage in this area.  Additionally,
   if only the Inflammation panel was run, then the available pathways would be given based on a background
-  of proteins related to inflammation. Both ORA and GSEA can provide mechanistic and disease related insight and are best to use when 
-  trying to uncover pathways/annotations of interest. It is recommended to only use pathway enrichment for hypothesis generating data, which 
-  is more well suited for data on the Explore platform or on multiple Target 96 panels. For smaller lists of proteins it may be more informative to use biological annotation in directed research, 
+  of proteins related to inflammation. Both ORA and GSEA can provide mechanistic and disease related insight and are best to use when
+  trying to uncover pathways/annotations of interest. It is recommended to only use pathway enrichment for hypothesis generating data, which
+  is more well suited for data on the Explore platform or on multiple Target 96 panels. For smaller lists of proteins it may be more informative to use biological annotation in directed research,
   to discover which significant assay are related to keywords of interest.
 }
 \examples{
@@ -93,11 +93,13 @@ ttest_results <- olink_ttest(
   variable = "Treatment",
   alternative = "two.sided"
 )
+try({ # This expression might fail if dependencies are not installed
 gsea_results <- olink_pathway_enrichment(data = npx_data1, test_results = ttest_results)
 ora_results <- olink_pathway_enrichment(
   data = npx_data1,
   test_results = ttest_results, method = "ORA"
 )
+}, silent = TRUE)
 }
 }
 \seealso{
