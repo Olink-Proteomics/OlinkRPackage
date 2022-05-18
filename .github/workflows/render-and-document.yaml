@@ -10,12 +10,13 @@ jobs:
     name: render-and-document
     runs-on: ubuntu-latest
     env:
-      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_PAT: ${{ secrets.PAT }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
         with: 
           fetch-depth: 0
+          token: ${{ secrets.PAT }}
 
       - uses: r-lib/actions/setup-pandoc@v1
 
