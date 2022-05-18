@@ -86,7 +86,6 @@ Suggests:
     vdiffr
 VignetteBuilder: 
     knitr
-
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
