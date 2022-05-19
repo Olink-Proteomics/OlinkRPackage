@@ -1,6 +1,6 @@
 #' Creates a heatmap of selected pathways and proteins
 #'
-#' Creates a heatmap of proteins related to pathways using enrichment results from olink_pathway_enrichment. 
+#' Creates a heatmap of proteins related to pathways using enrichment results from olink_pathway_enrichment.
 #'
 #'@param enrich_results data frame of enrichment results from olink_pathway_enrichment()
 #'@param test_results filtered results from statistical test with Assay, OlinkID, and estimate columns
@@ -15,12 +15,17 @@
 #' ttest_results <- olink_ttest(df=npx_df,
 #'                              variable = 'Treatment',
 #'                              alternative = 'two.sided')
+#'
+#' try({ # This expression might fail if dependencies are not installed
 #' gsea_results <- olink_pathway_enrichment(data = npx_data1, test_results = ttest_results)
 #' ora_results <- olink_pathway_enrichment(data = npx_data1,
 #'                                         test_results = ttest_results, method = "ORA")
 #' olink_pathway_heatmap(enrich_results = gsea_results, test_results = ttest_results)
 #' olink_pathway_heatmap(enrich_results = ora_results, test_results = ttest_results,
 #'                       method = "ORA", keyword = "cell")
+#' })
+#'
+#'
 #'}
 #'
 #' @seealso \itemize{
@@ -63,12 +68,12 @@ olink_pathway_heatmap<- function(enrich_results, test_results, method = "GSEA", 
   orderprot <- long_list1 %>% dplyr::select(Assay) %>% dplyr::distinct() %>% dplyr::pull()
 
   p<-ggplot2::ggplot(long_list1, ggplot2::aes(factor(Assay, levels = orderprot), stringr::str_trunc(Pathway, 50, "center"))) +
-    ggplot2::geom_tile(aes(fill = estimate)) + 
-    OlinkAnalyze::olink_fill_gradient(coloroption = c('teal', 'red'), name = "estimate") + 
+    ggplot2::geom_tile(aes(fill = estimate)) +
+    OlinkAnalyze::olink_fill_gradient(coloroption = c('teal', 'red'), name = "estimate") +
     OlinkAnalyze::set_plot_theme() +
     ggplot2::theme(panel.grid.major = element_blank(),
           axis.text.x=ggplot2::element_text(angle = 60, hjust = 1)) +
-    ggplot2::xlab("Protein Symbol") + ggplot2::ylab("Pathway") 
-    
+    ggplot2::xlab("Protein Symbol") + ggplot2::ylab("Pathway")
+
   return(p)
 }
