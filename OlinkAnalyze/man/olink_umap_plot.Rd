@@ -27,11 +27,11 @@ olink_umap_plot(
 
 \item{color_g}{Character value indicating which column to use for colors (default QC_Warning)}
 
-\item{x_val}{Integer indicating which principal component to plot along the x-axis (default 1)}
+\item{x_val}{Integer indicating which UMAP component to plot along the x-axis (default 1)}
 
-\item{y_val}{Integer indicating which principal component to plot along the y-axis (default 2)}
+\item{y_val}{Integer indicating which UMAP component to plot along the y-axis (default 2)}
 
-\item{config}{object of class umap.config, specifying the parameters for the UMAP algorithm.}
+\item{config}{object of class umap.config, specifying the parameters for the UMAP algorithm (default umap::umap.defaults)}
 
 \item{label_samples}{Logical. If TRUE, points are replaced with SampleID (default FALSE)}
 
@@ -77,7 +77,7 @@ olink_umap_plot(df=npx_data, color_g = "QC_Warning")
 
 #UMAP per panel
 g <- olink_umap_plot(df=npx_data, color_g = "QC_Warning", byPanel = TRUE)
-g#Inflammation #Plot only the Inflammation panel
+g$Inflammation #Plot only the Inflammation panel
 
 #Label outliers
 olink_umap_plot(df=npx_data, color_g = "QC_Warning",

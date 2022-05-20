@@ -10,10 +10,10 @@
 #'
 #' @param df data frame in long format with Sample Id, NPX and column of choice for colors
 #' @param color_g Character value indicating which column to use for colors (default QC_Warning)
-#' @param x_val Integer indicating which principal component to plot along the x-axis (default 1)
-#' @param y_val Integer indicating which principal component to plot along the y-axis (default 2)
+#' @param x_val Integer indicating which UMAP component to plot along the x-axis (default 1)
+#' @param y_val Integer indicating which UMAP component to plot along the y-axis (default 2)
 #' @param label_samples Logical. If TRUE, points are replaced with SampleID (default FALSE)
-#' @param config object of class umap.config, specifying the parameters for the UMAP algorithm.
+#' @param config object of class umap.config, specifying the parameters for the UMAP algorithm (default umap::umap.defaults)
 #' @param drop_assays Logical. All assays with any missing values will be dropped. Takes precedence over sample drop.
 #' @param drop_samples Logical. All samples with any missing values will be dropped.
 #' @param byPanel Perform the UMAP per panel (default FALSE)
@@ -37,7 +37,7 @@
 #'
 #' #UMAP per panel
 #' g <- olink_umap_plot(df=npx_data, color_g = "QC_Warning", byPanel = TRUE)
-#' g#Inflammation #Plot only the Inflammation panel
+#' g$Inflammation #Plot only the Inflammation panel
 #'
 #' #Label outliers
 #' olink_umap_plot(df=npx_data, color_g = "QC_Warning",

@@ -73,7 +73,7 @@ Authors@R:
 Depends: R (>= 3.6.0)
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.0
 Suggests: 
     extrafont,
     knitr,
