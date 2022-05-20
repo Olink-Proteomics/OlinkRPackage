@@ -149,13 +149,13 @@ olink_pathway_enrichment <- function(data, test_results, method = "GSEA", ontolo
 data_prep <- function(data) {
   # Filter highest detectibility for repeated IDs
   olink_ids <- data %>%
-    dplyr::filter(!str_detect(SampleID, "CONTROL*.")) %>%
-    dplyr::filter(QC_Warning == "Pass") %>%
+    dplyr::filter(!stringr::str_detect(SampleID, "CONTROL*.")) %>%
+    dplyr::filter(toupper(QC_Warning) == "PASS") %>%
     dplyr::mutate(Detected = as.numeric(NPX > LOD)) %>%
-    dplyr::select(OlinkID, UniProt, Assay, Panel, Detected) %>%
+    dplyr::select(OlinkID, Assay, Detected) %>%
     dplyr::group_by(OlinkID, Assay) %>%
     dplyr::summarise(Sum = (sum(Detected) / n())) %>%
-    dplyr::arrange(desc(Sum)) %>%
+    dplyr::arrange(dplyr::desc(Sum)) %>%
     dplyr::ungroup() %>%
     dplyr::distinct(Assay, .keep_all = TRUE) %>%
     dplyr::pull(OlinkID)

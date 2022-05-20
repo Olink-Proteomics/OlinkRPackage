@@ -40,7 +40,7 @@
 
 olink_pathway_heatmap<- function(enrich_results, test_results, method = "GSEA", keyword = NULL, number_of_terms = 20){
   if(is.null(keyword)){
-    sub_enrich <- enrich_results %>% head(number_of_terms)
+    sub_enrich <- enrich_results %>% dplyr::arrange(dplyr::desc(estimate)) %>% head(number_of_terms)
   } else{
     sub_enrich <- enrich_results %>%
       dplyr::filter(grepl(pattern = toupper(keyword), Description)) %>%
@@ -51,13 +51,19 @@ olink_pathway_heatmap<- function(enrich_results, test_results, method = "GSEA", 
   }
   if (method == "ORA"){
     results_list<-strsplit(sub_enrich$geneID, "/")
+  } else if (method == "GSEA") {
+    results_list<- strsplit(sub_enrich$core_enrichment, "/")
+  } else {
+    stop("Method must be \"GSEA\" or \"ORA\".")
+  }
+    results_list<-strsplit(sub_enrich$geneID, "/")
   }else{
     results_list<- strsplit(sub_enrich$core_enrichment, "/")
   }
   names(results_list) <- sub_enrich$Description
   long_list<-do.call(rbind, lapply(results_list, data.frame, stringsAsFactors=FALSE))
   long_list$Pathway <- row.names(long_list)
-  long_list$Pathway <- gsub("\\..*",replacement = "",x= long_list$Pathway, )
+  long_list$Pathway <- gsub("\\..*",replacement = "",x= long_list$Pathway)
   names(long_list)[1] <- "Assay"
   long_list <- as.data.frame(long_list)
 
@@ -65,7 +71,7 @@ olink_pathway_heatmap<- function(enrich_results, test_results, method = "GSEA", 
     dplyr::inner_join(test_results, by = "Assay") %>%
     dplyr::arrange(estimate)
 
-  orderprot <- long_list1 %>% dplyr::select(Assay) %>% dplyr::distinct() %>% dplyr::pull()
+  orderprot <- unique(long_list1$Assay)
 
   p<-ggplot2::ggplot(long_list1, ggplot2::aes(factor(Assay, levels = orderprot), stringr::str_trunc(Pathway, 50, "center"))) +
     ggplot2::geom_tile(aes(fill = estimate)) +

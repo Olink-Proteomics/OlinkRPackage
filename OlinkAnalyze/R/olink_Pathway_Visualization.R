@@ -37,9 +37,9 @@
 olink_pathway_visualization<- function(enrich_results, method = "GSEA", keyword = NULL, number_of_terms = 20){
   if (method == "ORA"){
     if(is.null(keyword)){
-      enrich_results %>%
+      enrich_results %>% dplyr::arrange(dplyr::desc(estimate)) %>%
         head(number_of_terms) %>%
-        ggplot2::ggplot(., ggplot2::aes(x = str_trunc(Description, 50, "center"), y=Count)) +
+        ggplot2::ggplot(., ggplot2::aes(x = stringr::str_trunc(Description, 50, "center"), y=Count)) +
         ggplot2::geom_bar(stat = "identity", ggplot2::aes(fill = p.adjust))+
         OlinkAnalyze::olink_fill_gradient(coloroption = c('teal', 'red')) +
         ggplot2::coord_flip() +
@@ -53,7 +53,7 @@ olink_pathway_visualization<- function(enrich_results, method = "GSEA", keyword 
         stop("Keyword not found. Please choose a different keyword or use a set number of terms.")
       }
       enrich_results %>%
-        dplyr::filter(grepl(pattern = toupper(keyword), Description)) %>%
+        dplyr::filter(grepl(pattern = toupper(keyword), Description)) %>% dplyr::arrange(dplyr::desc(estimate)) %>%
         head(number_of_terms) %>%
         ggplot2::ggplot(., ggplot2::aes(x = stringr::str_trunc(Description, 50, "center"), y=Count)) +
         ggplot2::geom_bar(stat = "identity", ggplot2::aes(fill = p.adjust))+
@@ -64,11 +64,11 @@ olink_pathway_visualization<- function(enrich_results, method = "GSEA", keyword 
                                   gsub(x = BgRatio,pattern = "/.*", replacement = ""), sep = "/")),
                   hjust=-0.1, color="black", size=3.5)
     }
-  }else{
+  } else if (method == "GSEA") {
     if(is.null(keyword)){
      enrich_results %>%
-        head(number_of_terms) %>%
-        ggplot2::ggplot(., ggplot2::aes(x = str_trunc(Description, 50, "center"), y=NES)) +
+        head(number_of_terms) %>% dplyr::arrange(dplyr::desc(estimate)) %>%
+        ggplot2::ggplot(., ggplot2::aes(x = stringr::str_trunc(Description, 50, "center"), y=NES)) +
         ggplot2::geom_bar(stat = "identity", ggplot2::aes(fill = p.adjust))+
         OlinkAnalyze::olink_fill_gradient(coloroption = c('teal', 'red')) +
         ggplot2::coord_flip() +
@@ -79,7 +79,7 @@ olink_pathway_visualization<- function(enrich_results, method = "GSEA", keyword 
         stop("Keyword not found. Please choose a different keyword or use a set number of terms.")
       }
       enrich_results %>%
-        dplyr::filter(grepl(pattern = toupper(keyword), Description)) %>%
+        dplyr::filter(grepl(pattern = toupper(keyword), Description)) %>% dplyr::arrange(dplyr::desc(estimate)) %>%
         head(number_of_terms) %>%
         ggplot2::ggplot(., ggplot2::aes(x = stringr::str_trunc(Description, 50, "center"), y=NES)) +
         ggplot2::geom_bar(stat = "identity", ggplot2::aes(fill = p.adjust))+
@@ -87,5 +87,7 @@ olink_pathway_visualization<- function(enrich_results, method = "GSEA", keyword 
         ggplot2::coord_flip() +
         ggplot2::xlab("Description")
     }
+  } else {
+    stop("Method must be \"GSEA\" or \"ORA\".")
   }
 }
