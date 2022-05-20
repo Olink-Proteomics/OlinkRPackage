@@ -83,7 +83,7 @@ Suggests:
     scales,
     markdown,
     vdiffr
-License: GPL-3
+License: AGPL (>= 3)
 VignetteBuilder: knitr
 Imports: 
     car,
