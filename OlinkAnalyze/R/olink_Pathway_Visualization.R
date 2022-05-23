@@ -1,4 +1,6 @@
 #' Creates bargraph of top/selected enrichment terms from GSEA or ORA results from olink_pathway_enrichment()
+#' 
+#' Pathways are ordered by increasing p-value (unadjusted)
 #'
 #'@param enrich_results data frame of enrichment results from olink_pathway_enrichment()
 #'@param method method used in olink_pathway_enrichment ("GSEA" (default) or "ORA")
@@ -37,7 +39,7 @@
 olink_pathway_visualization<- function(enrich_results, method = "GSEA", keyword = NULL, number_of_terms = 20){
   if (method == "ORA"){
     if(is.null(keyword)){
-      enrich_results %>% dplyr::arrange(dplyr::desc(estimate)) %>%
+      enrich_results %>% dplyr::arrange(dplyr::desc(-pvalue)) %>%
         head(number_of_terms) %>%
         ggplot2::ggplot(., ggplot2::aes(x = stringr::str_trunc(Description, 50, "center"), y=Count)) +
         ggplot2::geom_bar(stat = "identity", ggplot2::aes(fill = p.adjust))+
@@ -53,7 +55,7 @@ olink_pathway_visualization<- function(enrich_results, method = "GSEA", keyword 
         stop("Keyword not found. Please choose a different keyword or use a set number of terms.")
       }
       enrich_results %>%
-        dplyr::filter(grepl(pattern = toupper(keyword), Description)) %>% dplyr::arrange(dplyr::desc(estimate)) %>%
+        dplyr::filter(grepl(pattern = toupper(keyword), Description)) %>% dplyr::arrange(dplyr::desc(-pvalue)) %>%
         head(number_of_terms) %>%
         ggplot2::ggplot(., ggplot2::aes(x = stringr::str_trunc(Description, 50, "center"), y=Count)) +
         ggplot2::geom_bar(stat = "identity", ggplot2::aes(fill = p.adjust))+
@@ -67,7 +69,7 @@ olink_pathway_visualization<- function(enrich_results, method = "GSEA", keyword 
   } else if (method == "GSEA") {
     if(is.null(keyword)){
      enrich_results %>%
-        head(number_of_terms) %>% dplyr::arrange(dplyr::desc(estimate)) %>%
+        head(number_of_terms) %>% dplyr::arrange(dplyr::desc(-pvalue)) %>%
         ggplot2::ggplot(., ggplot2::aes(x = stringr::str_trunc(Description, 50, "center"), y=NES)) +
         ggplot2::geom_bar(stat = "identity", ggplot2::aes(fill = p.adjust))+
         OlinkAnalyze::olink_fill_gradient(coloroption = c('teal', 'red')) +
@@ -79,7 +81,7 @@ olink_pathway_visualization<- function(enrich_results, method = "GSEA", keyword 
         stop("Keyword not found. Please choose a different keyword or use a set number of terms.")
       }
       enrich_results %>%
-        dplyr::filter(grepl(pattern = toupper(keyword), Description)) %>% dplyr::arrange(dplyr::desc(estimate)) %>%
+        dplyr::filter(grepl(pattern = toupper(keyword), Description)) %>% dplyr::arrange(dplyr::desc(-pvalue)) %>%
         head(number_of_terms) %>%
         ggplot2::ggplot(., ggplot2::aes(x = stringr::str_trunc(Description, 50, "center"), y=NES)) +
         ggplot2::geom_bar(stat = "identity", ggplot2::aes(fill = p.adjust))+
