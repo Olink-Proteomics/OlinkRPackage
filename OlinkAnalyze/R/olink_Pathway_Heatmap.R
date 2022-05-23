@@ -56,10 +56,6 @@ olink_pathway_heatmap<- function(enrich_results, test_results, method = "GSEA", 
   } else {
     stop("Method must be \"GSEA\" or \"ORA\".")
   }
-    results_list<-strsplit(sub_enrich$geneID, "/")
-  }else{
-    results_list<- strsplit(sub_enrich$core_enrichment, "/")
-  }
   names(results_list) <- sub_enrich$Description
   long_list<-do.call(rbind, lapply(results_list, data.frame, stringsAsFactors=FALSE))
   long_list$Pathway <- row.names(long_list)
