@@ -24,7 +24,7 @@ olink_pathway_visualization(
 A bargraph as a ggplot object
 }
 \description{
-Creates bargraph of top/selected enrichment terms from GSEA or ORA results from olink_pathway_enrichment()
+Pathways are ordered by increasing p-value (unadjusted)
 }
 \examples{
 \donttest{
