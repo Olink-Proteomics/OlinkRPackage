@@ -40,7 +40,7 @@
 
 olink_pathway_heatmap<- function(enrich_results, test_results, method = "GSEA", keyword = NULL, number_of_terms = 20){
   if(is.null(keyword)){
-    sub_enrich <- enrich_results %>% dplyr::arrange(dplyr::desc(estimate)) %>% head(number_of_terms)
+    sub_enrich <- enrich_results %>% dplyr::arrange(dplyr::desc(-pvalue)) %>% head(number_of_terms)
   } else{
     sub_enrich <- enrich_results %>%
       dplyr::filter(grepl(pattern = toupper(keyword), Description)) %>%
