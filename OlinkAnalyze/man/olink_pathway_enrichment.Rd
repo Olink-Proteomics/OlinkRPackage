@@ -9,7 +9,9 @@ olink_pathway_enrichment(
   test_results,
   method = "GSEA",
   ontology = "MSigDb",
-  organism = "human"
+  organism = "human",
+  pvalue_cutoff = 0.05,
+  estimate_cutoff = 0
 )
 }
 \arguments{
@@ -22,9 +24,13 @@ olink_pathway_enrichment(
 \item{ontology}{Supports "MSigDb" (default), "KEGG", "GO", and "Reactome" as arguments. MSigDb contains C2 and C5 genesets. C2 and C5 encompass KEGG, GO, and Reactome.}
 
 \item{organism}{Either "human" (default) or "mouse"}
+
+\item{pvalue_cutoff}{(numeric) maximum Adjusted p-value cutoff for ORA filtering of foreground set (default = 0.05). This argument is not used for GSEA.}
+
+\item{estimate_cutoff}{(numeric) minimum estimate cutoff for ORA filtering of foreground set (default = 0) This argument is not used for GSEA.}
 }
 \value{
-A data frame of enrichment results.
+A data frame of enrichment results. 
 Columns for ORA include:
 \itemize{
  \item{ID:} "character" Pathway ID from MSigDB
