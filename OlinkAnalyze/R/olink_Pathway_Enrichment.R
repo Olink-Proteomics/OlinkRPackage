@@ -131,15 +131,15 @@ olink_pathway_enrichment <- function(data, test_results, method = "GSEA", ontolo
   }
   data2 <- data_prep(data = data)
   test_results2 <- test_prep(data = data2, test_results = test_results, organism = organism)
+  msig_df <- select_db(ontology = ontology, organism =organism)
 
   if (method == "ORA") {
     results <- ora_pathwayenrichment(
-      test_results = test_results2, ontology = ontology,
-      organism = organism)
+      test_results = test_results2, msig_df = msig_df)
     message("Over-representation Analysis performed")
   } else {
     geneList <- results_to_genelist(test_results = test_results2)
-    results <- gsea_pathwayenrichment(geneList = geneList, ontology = ontology, organism = organism)
+    results <- gsea_pathwayenrichment(geneList = geneList, msig_df = msig_df)
     message("Gene set enrichment analysis used by default.")
   }
   return(results)
@@ -177,54 +177,14 @@ results_to_genelist <- function(test_results) {
   message("Test results converted to gene list")
   return(geneList)
 }
-gsea_pathwayenrichment <- function(geneList, ontology, organism) {
+select_db <- function(ontology = ontology, organism = organism){
   if (organism == "human") {
     msig_df <- msigdbr::msigdbr(species = "Homo sapiens", category = "C2") %>%
       rbind(msigdbr::msigdbr(species = "Homo sapiens", category = "C5"))
   } else if (organism == "mouse") {
     msig_df <- msigdbr::msigdbr(species = "Mus musculus", category = "C2") %>%
       rbind(msigdbr::msigdbr(species = "Mus musculus", category = "C5"))
-
-  } else {
-    stop(print("organism should be \"human\" or \"mouse\""))
-  }
-  if (ontology == "Reactome"){
-    message("Extracting Reactome Database from MSigDB...")
-    msig_df<-  msig_df %>% dplyr::filter(gs_subcat == "CP:REACTOME")
-   } else if (ontology == "KEGG"){
-     message("Extracting KEGG Database from MSigDB...")
-     msig_df<-  msig_df %>% dplyr::filter(gs_subcat == "CP:KEGG")
-  } else if (ontology == "GO"){
-    message("Extracting GO Database from MSigDB...")
-    msig_df<-  msig_df %>% dplyr::filter(gs_subcat %in% c("GO:BP", "GO:CC", "GO:MF"))
-  } else{
-    message("Using MSigDB...")
-  }
-  msig_df <- msig_df  %>% dplyr::select(gs_name, gene_symbol)
-  if(length(setdiff(names(geneList), msig_df$gene_symbol) != 0)){
-     message(paste0(length(setdiff(names(geneList), msig_df$gene_symbol)),
-                        " assays are not found in the database. Please check the Assay names for the following assays:\n ",
-                        toString(setdiff(names(geneList), msig_df$gene_symbol))))
-  }
-  GSEA <- clusterProfiler::GSEA(geneList = geneList, TERM2GENE = msig_df, pvalueCutoff = 1)
-  return(GSEA@result)
-}
-ora_pathwayenrichment <- function(test_results, organism, ontology = ontology, pvalue_cutoff = 0.05, estimate_cutoff = 0) {
-  sig_genes <- test_results %>%
-    filter(Adjusted_pval < pvalue_cutoff) %>%
-    filter(abs(estimate) > estimate_cutoff) %>%
-    distinct(Assay) %>%
-    pull(Assay)
-  universe <- test_results %>%
-    distinct(Assay) %>%
-    pull(Assay)
-  if (organism == "human") {
-    msig_df <- msigdbr::msigdbr(species = "Homo sapiens", category = "C2") %>%
-      rbind(msigdbr::msigdbr(species = "Homo sapiens", category = "C5"))
-  } else if (organism == "mouse") {
-    msig_df <- msigdbr::msigdbr(species = "Mus musculus", category = "C2") %>%
-      rbind(msigdbr::msigdbr(species = "Mus musculus", category = "C5"))
-
+    
   } else {
     stop(print("organism should be \"human\" or \"mouse\""))
   }
@@ -241,8 +201,30 @@ ora_pathwayenrichment <- function(test_results, organism, ontology = ontology, p
     message("Using MSigDB...")
   }
   msig_df <- msig_df  %>% dplyr::select(gs_name, gene_symbol)
-  if(length(setdiff(names(universe), msig_df$gene_symbol) != 0)){
+  return(msig_df)
+}
+
+gsea_pathwayenrichment <- function(geneList, msig_df) {
+  if(length(setdiff(names(geneList), msig_df$gene_symbol) != 0)){
     message(paste0(length(setdiff(names(geneList), msig_df$gene_symbol)),
+                   " assays are not found in the database. Please check the Assay names for the following assays:\n ",
+                   toString(setdiff(names(geneList), msig_df$gene_symbol))))
+  }
+  GSEA <- clusterProfiler::GSEA(geneList = geneList, TERM2GENE = msig_df, pvalueCutoff = 1)
+  return(GSEA@result)
+}
+
+ora_pathwayenrichment <- function(test_results, msig_df, pvalue_cutoff = 0.05, estimate_cutoff = 0) {
+  sig_genes <- test_results %>%
+    filter(Adjusted_pval < pvalue_cutoff) %>%
+    filter(abs(estimate) > estimate_cutoff) %>%
+    distinct(Assay) %>%
+    pull(Assay)
+  universe <- test_results %>%
+    distinct(Assay) %>%
+    pull(Assay)
+  if(length(setdiff(names(universe), msig_df$gene_symbol) != 0)){
+    message(paste0(length(setdiff(names(universe), msig_df$gene_symbol)),
                    " assays are not found in the database. Please check the Assay names for the following assays:\n ",
                    toString(setdiff(names(universe), msig_df$gene_symbol))))
   }
