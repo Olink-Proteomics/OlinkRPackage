@@ -479,7 +479,11 @@ A tibble with the following columns:
 
 ## Pathway Enrichment (olink_pathway_enrichment)
 
-The olink_pathway_enrichment function can be used to perform Gene Set Enrichment Analysis (GSEA) or Over-representation Analysis (ORA) using MSigDB, Reactome, KEGG, or GO. MSigDB includes curated gene sets (C2) and ontology gene sets (C5) which encompasses Reactome, KEGG, and GO. This function performs enrichment using the *gsea* or *enrich* functions from clusterProfiler from BioConductor. The function uses the estimate from a previous statistical analysis for one contrast for all proteins. MSigDB is subset if ontology is KEGG, GO, or Reactome. test_results must contain estimates for all assays. Posthoc results can be used but should be filtered for one contrast to improve interpretability. clusterProfiler is originally developed by Guangchuang Yu at the School of Basic Medical Sciences at Southern Medical University.
+The olink_pathway_enrichment function can be used to perform Gene Set Enrichment Analysis (GSEA) or Over-representation Analysis (ORA) using MSigDB, Reactome, KEGG, or GO. MSigDB includes curated gene sets (C2) and ontology gene sets (C5) which encompasses Reactome, KEGG, and GO. This function performs enrichment using the *gsea* or *enrich* functions from clusterProfiler from BioConductor. The function uses the estimate from a previous statistical analysis for one contrast for all proteins. MSigDB is subset if ontology is KEGG, GO, or Reactome. test_results must contain estimates for all assays. Posthoc results can be used but should be filtered for one contrast to improve interpretability.  
+
+Alternative statistical results can be used as input as long as they include the columns "OlinkID", "Assay", and "estimate". A column named "Adjusted_pal" is also needed for ORA. Any statistical results that contains one estimate per protein will work as long as the estimates are comparable to each other.
+
+clusterProfiler is originally developed by Guangchuang Yu at the School of Basic Medical Sciences at Southern Medical University.
 
 T Wu, E Hu, S Xu, M Chen, P Guo, Z Dai, T Feng, L Zhou, W Tang, L Zhan, X Fu, S Liu, X Bo, and G Yu. clusterProfiler 4.0: A universal enrichment tool for interpreting omics data. The Innovation. 2021, 2(3):100141. doi: 10.1016/j.xinn.2021.100141
 
