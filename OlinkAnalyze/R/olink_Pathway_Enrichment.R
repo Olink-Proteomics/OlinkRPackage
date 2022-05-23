@@ -29,7 +29,9 @@
 #' @param method Either "GSEA" (default) or "ORA"
 #' @param ontology Supports "MSigDb" (default), "KEGG", "GO", and "Reactome" as arguments. MSigDb contains C2 and C5 genesets. C2 and C5 encompass KEGG, GO, and Reactome.
 #' @param organism Either "human" (default) or "mouse"
-#' @return A data frame of enrichment results.
+#' @param pvalue_cutoff (numeric) maximum Adjusted p-value cutoff for ORA filtering of foreground set (default = 0.05). This argument is not used for GSEA.
+#' @param estimate_cutoff (numeric) minimum estimate cutoff for ORA filtering of foreground set (default = 0) This argument is not used for GSEA.
+#' @return A data frame of enrichment results. 
 #' Columns for ORA include:
 #' \itemize{
 #'  \item{ID:} "character" Pathway ID from MSigDB
@@ -92,7 +94,7 @@
 #' @importFrom magrittr %>%
 #' @export
 
-olink_pathway_enrichment <- function(data, test_results, method = "GSEA", ontology = "MSigDb", organism = "human") {
+olink_pathway_enrichment <- function(data, test_results, method = "GSEA", ontology = "MSigDb", organism = "human", pvalue_cutoff = 0.05, estimate_cutoff = 0) {
   # Is Package installed
   if(!requireNamespace("clusterProfiler", quietly = TRUE) ){
     stop(" Pathway enrichment requires clusterProfiler package.
@@ -135,7 +137,7 @@ olink_pathway_enrichment <- function(data, test_results, method = "GSEA", ontolo
 
   if (method == "ORA") {
     results <- ora_pathwayenrichment(
-      test_results = test_results2, msig_df = msig_df)
+      test_results = test_results2, msig_df = msig_df, pvalue_cutoff = pvalue_cutoff, estimate_cutoff = estimate_cutoff)
     message("Over-representation Analysis performed")
   } else {
     geneList <- results_to_genelist(test_results = test_results2)
@@ -214,7 +216,7 @@ gsea_pathwayenrichment <- function(geneList, msig_df) {
   return(GSEA@result)
 }
 
-ora_pathwayenrichment <- function(test_results, msig_df, pvalue_cutoff = 0.05, estimate_cutoff = 0) {
+ora_pathwayenrichment <- function(test_results, msig_df, pvalue_cutoff = pvalue_cutoff, estimate_cutoff = estimate_cutoff) {
   sig_genes <- test_results %>%
     filter(Adjusted_pval < pvalue_cutoff) %>%
     filter(abs(estimate) > estimate_cutoff) %>%
