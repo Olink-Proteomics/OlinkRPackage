@@ -71,8 +71,7 @@ Imports:
     tidyr,
     tidyselect,
     tools,
-    utils,
-    ordinal
+    utils
 Suggests: 
     clusterProfiler,
     extrafont,
@@ -81,11 +80,15 @@ Suggests:
     knitr,
     markdown,
     msigdbr,
+    openssl,
+    ordinal,
     pheatmap,
     rmarkdown,
+    rstatix,
     scales,
     testthat (>= 3.0.0),
-    vdiffr
+    vdiffr,
+    zip
 VignetteBuilder: 
     knitr
 Config/testthat/edition: 3
