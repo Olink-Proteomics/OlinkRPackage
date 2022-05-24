@@ -42,7 +42,7 @@ Description: A collection of functions to facilitate analysis of proteomic
     visualize the results of the statistical analysis. The goal of this
     package is to help users extract biological insights from proteomic
     data run on the Olink platform.
-License: GPL-3
+License: AGPL (>= 3)
 Depends: 
     R (>= 3.6.0)
 Imports: 
