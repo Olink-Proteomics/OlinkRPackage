@@ -113,6 +113,7 @@ Imports:
     openssl,
     ordinal,
     rstatix,
+    zip,
     pheatmap,
     ggplotify
 Config/testthat/edition: 3
