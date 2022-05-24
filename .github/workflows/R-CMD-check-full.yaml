@@ -24,6 +24,7 @@ jobs:
 
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
+      _R_CHECK_FORCE_SUGGESTS_: false
       RSPM: ${{ matrix.config.rspm }}
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
@@ -53,10 +54,12 @@ jobs:
       - name: Install system dependencies
         if: runner.os == 'Linux'
         run: |
+          sudo apt-get -y install libglpk-dev libcurl4-openssl-dev
           while read -r cmd
           do
             eval sudo $cmd
           done < <(Rscript -e 'writeLines(remotes::system_requirements("ubuntu", "20.04", path = "OlinkAnalyze")); writeLines(remotes::system_requirements("ubuntu", "20.04", package = "curl"))')
+
       - name: Install dependencies
         run: |
           options(install.packages.compile.from.source = "never") # use binary package if available, even if older
@@ -65,7 +68,15 @@ jobs:
           remotes::install_deps(pkgdir = "OlinkAnalyze", dependencies = TRUE)
           remotes::install_cran("rcmdcheck")
         shell: Rscript {0}
-
+        
+      - name: Install Bioconductor packages
+        if: matrix.config.r != 'devel'
+        run: |
+          install.packages("BiocManager", type="source", repos='http://cran.us.r-project.org')
+          BiocManager::install("enrichplot",type = "source")
+          BiocManager::install("clusterProfiler") 
+        shell: Rscript {0}
+        
       - name: Session info
         run: |
           options(width = 100)

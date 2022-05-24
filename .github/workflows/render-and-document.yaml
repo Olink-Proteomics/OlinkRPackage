@@ -39,6 +39,7 @@ jobs:
       - name: Install system dependencies
         if: runner.os == 'Linux'
         run: |
+          sudo apt-get -y install libglpk-dev libcurl4-openssl-dev
           while read -r cmd
           do
             eval sudo $cmd
@@ -47,9 +48,13 @@ jobs:
 
       - name: Install dependencies
         run: |
+          install.packages("BiocManager")
+          BiocManager::install("enrichplot",type = "source")
+          BiocManager::install("clusterProfiler") 
           remotes::install_deps(pkgdir = "OlinkAnalyze", dependencies = TRUE)
           install.packages("stringi", type="source")
           remotes::install_cran("roxygen2")
+      
         shell: Rscript {0}
 
 
