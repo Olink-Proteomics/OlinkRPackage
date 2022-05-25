@@ -4,11 +4,20 @@
 
 * Non-parametric functions are now available (@boxizhang, #114)
 * Updated installation instructions to reflect CRAN acceptance (@kathy-nevola, #107)
+* Zipped files from MyData can now be used as input for read_NPX (@klevdiamanti, #115)
+* LME and ANOVA formulas can now be customized (@jrguess, #120)
+* Pathway enrichment functions and visualizations are now available (@kathy-nevola, #125)
+* Heatmaps can now be generated (@Orbmac, $127)
+* olink_boxplot function now has significance bars and stars (@boxizhang, #132)
+* PCA preprocessing was moved to internal function (@simfor, #133)
 * Added Masoumeh Sheikhi and Boxi Zhang as authors
 
 ## Bug Fixes
 
 * olink_pca_plot by Panel will now show correct colors when a variable is missing (@MasoumehSheikhi, Issue #117) 
+* olink_ttest will now return a warning message if an assay has less than 2 datapoints in a group. (@marisand, #110)
+* LMER class is now checked using inherits (@MasoumehSheikhi, #134)
+* License was corrected to AGPL-3 (@Orbmac, #138)
 
 
 # Olink Analyze 3.0.0
