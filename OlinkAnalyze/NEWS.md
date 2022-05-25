@@ -18,6 +18,7 @@
 * olink_ttest will now return a warning message if an assay has less than 2 datapoints in a group. (@marisand, #110)
 * LMER class is now checked using inherits (@MasoumehSheikhi, #134)
 * License was corrected to AGPL-3 (@Orbmac, #138)
+* Correct output type of olink_dist_plot in vignette to ggplot object (@kathy-nevola, Issue #112, # 141)
 
 
 # Olink Analyze 3.0.0
