@@ -602,7 +602,7 @@ npx_data1 %>%
 
 ### Function output
 
-A list of objects of class *ggplot*.
+A *ggplot* object.
 
 ## Point-range plot for LMER (olink_lmer_plot)
 
