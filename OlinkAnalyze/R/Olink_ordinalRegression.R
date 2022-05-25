@@ -39,7 +39,6 @@
 #' @importFrom dplyr filter group_by ungroup pull do select arrange mutate
 #' @importFrom stringr str_detect
 #' @importFrom rstatix convert_as_factor
-#' @importFrom ordinal clm
 #' @importFrom utils glob2rx read.table globalVariables
 
 olink_ordinalRegression <- function(df,
@@ -49,6 +48,12 @@ olink_ordinalRegression <- function(df,
                                     return.covariates=F,
                                     verbose=T
                                     ){
+  # Is Package installed
+  if(!requireNamespace("ordinal", quietly = TRUE) ){
+    stop("Ordinal Regression requires the ordinal package.
+         Please install ordinal before continuing.")
+  }
+  
   if(missing(df) | missing(variable)){
     stop('The df and variable arguments need to be specified.')
     }
@@ -296,7 +301,6 @@ olink_ordinalRegression <- function(df,
 #' @importFrom dplyr filter group_by ungroup pull do select arrange mutate
 #' @importFrom stringr str_detect
 #' @importFrom rstatix convert_as_factor
-#' @importFrom ordinal clm
 
 
 
@@ -308,6 +312,12 @@ olink_ordinalRegression_posthoc <- function(df,
                                 effect,
                                 verbose=T
                                 ){
+  if(!requireNamespace("ordinal", quietly = TRUE) ){
+    stop("Ordinal Regression requires the ordinal package.
+         Please install ordinal before continuing.")
+  }
+  
+  
   if(missing(df) | missing(variable) | missing(effect)){
     stop('The df and variable and effect arguments need to be specified.')
     }
