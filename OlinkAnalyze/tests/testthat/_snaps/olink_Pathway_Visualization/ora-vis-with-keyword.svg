@@ -27,21 +27,21 @@
 </defs>
 <g clip-path='url(#cpMjkyLjA1fDYzOS4yMHwyMi43OHw1NDUuMTE=)'>
 <rect x='292.05' y='22.78' width='347.15' height='522.33' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
-<rect x='307.83' y='414.53' width='315.59' height='111.93' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #AB5F4C;' />
-<rect x='307.83' y='165.80' width='157.79' height='111.93' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #AB5F4C;' />
+<rect x='307.83' y='414.53' width='157.79' height='111.93' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #AB5F4C;' />
 <rect x='307.83' y='290.17' width='157.79' height='111.93' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #AB5F4C;' />
-<rect x='307.83' y='41.44' width='157.79' height='111.93' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #AB5F4C;' />
-<text x='625.36' y='473.92' style='font-size: 9.96px; font-family: sans;' textLength='19.38px' lengthAdjust='spacingAndGlyphs'>2/15</text>
-<text x='467.56' y='225.19' style='font-size: 9.96px; font-family: sans;' textLength='19.38px' lengthAdjust='spacingAndGlyphs'>1/10</text>
+<rect x='307.83' y='165.80' width='157.79' height='111.93' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #AB5F4C;' />
+<rect x='307.83' y='41.44' width='315.59' height='111.93' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #AB5F4C;' />
+<text x='467.56' y='473.92' style='font-size: 9.96px; font-family: sans;' textLength='19.38px' lengthAdjust='spacingAndGlyphs'>1/14</text>
 <text x='467.56' y='349.56' style='font-size: 9.96px; font-family: sans;' textLength='19.38px' lengthAdjust='spacingAndGlyphs'>1/12</text>
-<text x='467.56' y='100.83' style='font-size: 9.96px; font-family: sans;' textLength='19.38px' lengthAdjust='spacingAndGlyphs'>1/14</text>
+<text x='467.56' y='225.19' style='font-size: 9.96px; font-family: sans;' textLength='19.38px' lengthAdjust='spacingAndGlyphs'>1/10</text>
+<text x='625.36' y='100.83' style='font-size: 9.96px; font-family: sans;' textLength='19.38px' lengthAdjust='spacingAndGlyphs'>2/15</text>
 <rect x='292.05' y='22.78' width='347.15' height='522.33' style='stroke-width: 1.07; stroke: #333333;' />
 </g>
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
-<text x='287.12' y='473.52' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='269.05px' lengthAdjust='spacingAndGlyphs'>BLANCO_MELO_RESPIRATORY_...INFECTION_A594_CELLS_UP</text>
+<text x='287.12' y='473.52' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='103.72px' lengthAdjust='spacingAndGlyphs'>GOBP_VIRAL_PROCESS</text>
 <text x='287.12' y='349.16' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='128.17px' lengthAdjust='spacingAndGlyphs'>GOBP_RESPONSE_TO_VIRUS</text>
 <text x='287.12' y='224.79' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='113.50px' lengthAdjust='spacingAndGlyphs'>GOBP_VIRAL_LIFE_CYCLE</text>
-<text x='287.12' y='100.43' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='103.72px' lengthAdjust='spacingAndGlyphs'>GOBP_VIRAL_PROCESS</text>
+<text x='287.12' y='100.43' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='269.05px' lengthAdjust='spacingAndGlyphs'>BLANCO_MELO_RESPIRATORY_...INFECTION_A594_CELLS_UP</text>
 <polyline points='289.31,470.49 292.05,470.49 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
 <polyline points='289.31,346.13 292.05,346.13 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
 <polyline points='289.31,221.77 292.05,221.77 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
