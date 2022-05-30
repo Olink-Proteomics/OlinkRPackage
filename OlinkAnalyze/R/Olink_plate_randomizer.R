@@ -166,8 +166,8 @@ generatePlateHolder <- function(n.plates,n.spots,n.samples, PlateSize){
 #'
 #' Generates a scheme for how to plate samples with an option to keep subjects on the same plate.
 #'
-#' Variables of interest should if possible be randomized across plates to avoid confounding with potential plate effects. In the case of multiple samples per subject (e.g. in longitudinal studies), Olink recommends keeping each subject on the same plate. This can be achieved using the SubjectColumn argument.
-#' @param Manifest tibble/data frame in long format containing all sample ID's. Sample ID column must be named SampleID.
+#' Variables of interest should if possible be randomized across plates to avoid confounding with potential plate effects. In the case of multiple samples per subject (e.g. in longitudinal studies), Olink recommends keeping each subject on the same plate. This can be achieved using the SubjectColumn argument. If adding a manifest column called study with study information, each study will be kept together during randomization.  
+#' @param Manifest tibble/data frame in long format containing all sample ID's. Sample ID column must be named SampleID. If containing a column called study, different studies will be kept together on the plates and randomized internally.
 #' @param PlateSize Integer. Either 96 or 48. 96 is default.
 #' @param SubjectColumn (Optional) Column name of the subject ID column. Cannot contain missings. If provided, subjects are kept on the same plate.
 #' @param iterations Number of iterations for fitting subjects on the same plate.
@@ -214,46 +214,53 @@ generatePlateHolder <- function(n.plates,n.spots,n.samples, PlateSize){
 #' @importFrom tibble is_tibble
 
 #Main randomization function
-olink_plate_randomizer <-function(Manifest, PlateSize = 96, SubjectColumn, iterations=500, available.spots, seed){
-
+olink_plate_randomizer <- function(Manifest, PlateSize = 96, SubjectColumn, iterations=500, available.spots, seed){
+  
   if(!"SampleID" %in% colnames(Manifest)) {
     stop("SampleID not found! Be sure the column of samples ID's is named 'SampleID'")
   }
-
+  
+  if(any(which(duplicated(Manifest$SampleID)))){
+    duplications <- Manifest$SampleID[which(duplicated(Manifest$SampleID))]
+    warning(paste("Following SampleID(s) was/were duplicated:",paste(duplications,collapse = "\n"), sep = "\n"))
+  }
+  
   if(any(is.na(Manifest$SampleID))) {
     stop("No NA allowed in the SampleID column. Check that all the samples are named.")
   }
-
+  
   if(!PlateSize %in% c(48,96)){
     stop('Plate size needs to be either 48 or 96.')
   }
-
+  
   spots_per_plate <- PlateSize - 8
   number_of_cols_per_plate <- PlateSize/8
-
+  
   if(!missing(seed)) {
     set.seed(seed)
   }
-
+  
   if(!missing(SubjectColumn)){
+    if(!any(colnames(Manifest) == SubjectColumn)){
+      stop("The user assigned SubjectColumn name was not found! Make sure the SubjectColumn is present in the dataset.")
+    }
     Manifest$SubjectID <- Manifest[[SubjectColumn]]
-
   }
-
+  
   if(any(is.na(Manifest$SubjectID))) {
-
     stop("No NA allowed in the SubjectID column. Check that all the subjects are named.")
   }
-
+  
   if(missing(available.spots)){
     PlatesNeeded <-ceiling(nrow(Manifest)/spots_per_plate)
     all.plates <- generatePlateHolder(PlatesNeeded,rep(spots_per_plate,times=PlatesNeeded),n.samples=length(Manifest$SampleID), PlateSize = PlateSize)
   } else{
     all.plates <- generatePlateHolder(length(available.spots),available.spots,n.samples=length(Manifest$SampleID), PlateSize = PlateSize)
+    
   }
-
-  #Complete Random if subjectID not given
-  if(missing(SubjectColumn)){
+  
+  #Complete randomization if subjectID not given
+  if(missing(SubjectColumn) & suppressWarnings(is.null(Manifest$study))){
     all.plates <- all.plates[sample(1:nrow(Manifest)),]
     out.manifest <- dplyr::as_tibble(cbind(Manifest,all.plates)) %>%
       dplyr::mutate(well=paste0(row,gsub("Column ","",as.character(column)))) %>%
@@ -263,17 +270,17 @@ olink_plate_randomizer <-function(Manifest, PlateSize = 96, SubjectColumn, itera
     class(out.manifest) <- c("randomizedManifest",class(out.manifest))
     return(out.manifest)
   }
-
-
+  
+  
   ##Keep subjects together
-  if(!missing(SubjectColumn)){
+  if(!missing(SubjectColumn) & suppressWarnings(is.null(Manifest$study))){
     cat("Assigning subjects to plates\n")
     for(i in 1:iterations){
       cat(".")
       all.plates$SampleID <- NA
       rand.subjects <- sample(unique(Manifest$SubjectID))
-
-
+      
+      
       for(sub in rand.subjects){
         all.plates.tmp <- assignSubject2Plate(plateMap=all.plates,
                                               manifest=Manifest,
@@ -285,7 +292,7 @@ olink_plate_randomizer <-function(Manifest, PlateSize = 96, SubjectColumn, itera
           break}
         passed <- TRUE
       }
-
+      
       if(passed){
         out.manifest <- Manifest %>%
           dplyr::left_join(all.plates,"SampleID") %>%
@@ -297,26 +304,169 @@ olink_plate_randomizer <-function(Manifest, PlateSize = 96, SubjectColumn, itera
           dplyr::select(-scramble)
         break
       }
-
+      
     }
-
+    
     cat("Random assignment of SUBJECTS to plates\n")
     if(passed){
-
+      
       out.manifest <- out.manifest %>%
         dplyr::mutate(well=paste0(row,gsub("Column ","",as.character(column)))) %>%
         dplyr::mutate(well=factor(well,levels=paste0(rep(LETTERS[1:8],each=number_of_cols_per_plate),rep(1:number_of_cols_per_plate,times=8)))) %>%
         dplyr::arrange(plate, column, row)
-
+      
       class(out.manifest) <- c("randomizedManifest",class(out.manifest))
       return(out.manifest)
     } else{
       stop("Could not keep all subjects on the same plate! Try increasing the number of iterations.")
     }
-
+    
   }
-
+  
+  ##Keep subjects together and keep studies together
+  if(!missing(SubjectColumn) & suppressWarnings(!is.null(Manifest$study))){
+    cat("Assigning subjects to plates. 'study' column detected so keeping studies together during randomization. \n")
+    all.plates$SampleID <- NA
+    out.manifest <- matrix(nrow = 0,ncol = ncol(Manifest))
+    
+    #Randomize on SubjectID_study in case SubjectID is duplicated over studies
+    Manifest <- Manifest %>% dplyr::mutate(
+      SubjectID_old = SubjectID,
+      SubjectID = paste0(SubjectID,"_",study))
+    
+    Manifest <- Manifest %>% dplyr::arrange(study) 
+    j_tot <- 0 
+    
+    #Keep every study together
+    for (studyNo in unique(Manifest$study)){
+      passed <- FALSE
+      rand.subjects <- sample(Manifest %>% dplyr::filter(study == studyNo) %>%
+                                dplyr::select(SubjectID) %>% unique() %>% dplyr::pull())
+      studyInterval <- which(Manifest$study == studyNo)
+      sub.groups <- Manifest %>% 
+        dplyr::filter(study == studyNo) %>%
+        dplyr::select(SubjectID) %>% table()
+      sub.groups.max <- as.numeric(max(sub.groups))
+      
+      #Append j for every well left empty
+      for(j in 0:sub.groups.max){
+        
+        #Extend number of positions available on the last plate
+        if(j>0){
+          extendedStudyInterval <- unique(c(studyInterval+ j_tot,(max(studyInterval+j_tot):(max(studyInterval)+j_tot+j))))
+          platesThisLap <- all.plates[extendedStudyInterval,"plate"] %>% unique()
+          
+          #Extend number of plates if needed
+          if(missing(available.spots)){
+            PlatesNeeded <-ceiling((length(Manifest$SampleID)+j_tot+j)/spots_per_plate)
+            all.plates.New <- generatePlateHolder(PlatesNeeded,
+                                                  rep(spots_per_plate,
+                                                      times=PlatesNeeded),
+                                                  n.samples=length(Manifest$SampleID)+j_tot+j,
+                                                  PlateSize = PlateSize)
+          }else{
+            all.plates.New <- generatePlateHolder(length(available.spots),available.spots,n.samples=length(Manifest$SampleID), PlateSize = PlateSize)
+          }
+          all.plates.New$SampleID <- rep(NA,nrow(all.plates.New)) 
+          all.plates <- all.plates.New
+        }else{
+          extendedStudyInterval <- unique(c(studyInterval+ j_tot,(max(studyInterval+j_tot):(max(studyInterval)+j_tot+j))))
+          platesThisLap <- all.plates[extendedStudyInterval,"plate"] %>% unique()
+        }
+        cat(paste0("Testing with ",j, " empty well(s) in the plate. \n"))
+        ManifestStudy <- Manifest[studyInterval,]
+        for(i in 1:iterations){
+          cat(".")
+          for (sub in rand.subjects) {
+            all.plates.tmp <- assignSubject2Plate(plateMap = all.plates[extendedStudyInterval,], 
+                                                  manifest = Manifest, SubjectID = sub)
+            if (tibble::is_tibble(all.plates.tmp)) {
+              all.plates[extendedStudyInterval,] <- all.plates.tmp
+            }
+            else if (is.character(all.plates.tmp)) {
+              passed <- FALSE
+              break
+            }
+            passed <- TRUE
+          }
+          if(passed){
+            out.manifestStudy <- ManifestStudy %>%
+              tidyr::drop_na() %>% 
+              dplyr::left_join(all.plates,"SampleID") %>%
+              dplyr::arrange(plate) %>% 
+              dplyr::group_by(plate) %>%
+              dplyr::mutate(scramble=sample(1:dplyr::n())) %>%
+              dplyr::mutate(row=row[scramble],
+                            column=column[scramble]) %>%
+              dplyr::arrange(plate) %>% 
+              dplyr::ungroup() %>%
+              dplyr::select(-scramble) %>% 
+              dplyr::arrange(plate, column, row)
+            cat(paste(studyNo,"successful! \n"))
+            out.manifest <- rbind(out.manifest, out.manifestStudy)
+            ManifestStudy2 <- ManifestStudy %>%
+              dplyr::left_join(all.plates,"SampleID") %>%
+              dplyr::group_by(plate) %>%
+              dplyr::mutate(scramble=sample(1:dplyr::n()))
+            ManifestStudy2 %>% mutate(row = row[scramble], 
+                                      column = column[scramble])
+          }
+          if(passed){
+            j_tot <- j_tot + j
+            break
+          } 
+        }
+        if(passed) break
+      }
+    }
+    cat("Random assignment of SUBJECTS to plates\n")
+    if(passed){
+      cat(paste("Totally included", j_tot, "empty well(s) in first and/or intermediate plate(s) to accomplish the randomization.\n"))
+      cat(paste("Please try another seed or increase the number of iterations if there are indications that another randomization might leave fewer empty wells.\n"))      
+      out.manifest <- out.manifest %>%
+        dplyr::mutate(well=paste0(row,gsub("Column ","",as.character(column)))) %>%
+        dplyr::mutate(well=factor(well,levels=paste0(rep(LETTERS[1:8],each=number_of_cols_per_plate),rep(1:number_of_cols_per_plate,times=8))),
+                      SubjectID = SubjectID_old) %>%
+        dplyr::select(-SubjectID_old) %>% 
+        dplyr::arrange(plate, column, row)
+      class(out.manifest) <- c("randomizedManifest",class(out.manifest))
+      return(out.manifest)
+    } else{
+      stop("Could not keep all subjects on the same plate! Try increasing the number of iterations.")
+    }
+  }
+  
+  #Complete randomization within studies when subjectID is not given
+  if(missing(SubjectColumn) & suppressWarnings(!is.null(Manifest$study))){
+    cat("Assigning subjects to plates. 'study' column detected so keeping studies together during randomization. \n")
+    
+    out.manifest <- matrix(nrow = 0,ncol = ncol(Manifest))
+    
+    Manifest <- Manifest %>% dplyr::arrange(study) 
+    for (studyNo in unique(Manifest$study)){
+      studyInterval <- which(Manifest$study == studyNo)
+      
+      ManifestStudy <- Manifest[studyInterval,]
+      all.plates_study <- all.plates[studyInterval,]
+      
+      all.plates_study <- all.plates_study[sample(1:nrow(ManifestStudy)),]
+      
+      out.manifestStudy <- dplyr::as_tibble(cbind(ManifestStudy,all.plates_study)) %>%
+        dplyr::mutate(well=paste0(row,gsub("Column ","",as.character(column)))) %>%
+        dplyr::mutate(well=factor(well,levels=paste0(rep(LETTERS[1:8],each=number_of_cols_per_plate),rep(1:number_of_cols_per_plate,times=8)))) %>%
+        dplyr::arrange(plate, column, row)
+      out.manifest <- rbind(out.manifest, out.manifestStudy)
+      
+    }
+    cat("Random assignment of SAMPLES to plates by study\n")
+    class(out.manifest) <- c("randomizedManifest",class(out.manifest))
+    return(out.manifest)
+  }
 }
+
+
+
+
 
 
 
