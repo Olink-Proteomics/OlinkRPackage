@@ -245,11 +245,9 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, SubjectColumn, iter
       stop("The user assigned SubjectColumn name was not found! Make sure the SubjectColumn is present in the dataset.")
     }
     Manifest$SubjectID <- Manifest[[SubjectColumn]]
-    
   }
   
   if(any(is.na(Manifest$SubjectID))) {
-    
     stop("No NA allowed in the SubjectID column. Check that all the subjects are named.")
   }
   
@@ -258,10 +256,11 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, SubjectColumn, iter
     all.plates <- generatePlateHolder(PlatesNeeded,rep(spots_per_plate,times=PlatesNeeded),n.samples=length(Manifest$SampleID), PlateSize = PlateSize)
   } else{
     all.plates <- generatePlateHolder(length(available.spots),available.spots,n.samples=length(Manifest$SampleID), PlateSize = PlateSize)
+    
   }
   
   #Complete randomization if subjectID not given
-  if(missing(SubjectColumn) & is.null(Manifest$study)){
+  if(missing(SubjectColumn) & suppressWarnings(is.null(Manifest$study))){
     all.plates <- all.plates[sample(1:nrow(Manifest)),]
     out.manifest <- dplyr::as_tibble(cbind(Manifest,all.plates)) %>%
       dplyr::mutate(well=paste0(row,gsub("Column ","",as.character(column)))) %>%
@@ -274,7 +273,7 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, SubjectColumn, iter
   
   
   ##Keep subjects together
-  if(!missing(SubjectColumn) & is.null(Manifest$study)){
+  if(!missing(SubjectColumn) & suppressWarnings(is.null(Manifest$study))){
     cat("Assigning subjects to plates\n")
     for(i in 1:iterations){
       cat(".")
@@ -325,7 +324,7 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, SubjectColumn, iter
   }
   
   ##Keep subjects together and keep studies together
-  if(!missing(SubjectColumn) & !is.null(Manifest$study)){
+  if(!missing(SubjectColumn) & suppressWarnings(!is.null(Manifest$study))){
     cat("Assigning subjects to plates. 'study' column detected so keeping studies together during randomization. \n")
     all.plates$SampleID <- NA
     out.manifest <- matrix(nrow = 0,ncol = ncol(Manifest))
@@ -356,13 +355,18 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, SubjectColumn, iter
         if(j>0){
           extendedStudyInterval <- unique(c(studyInterval+ j_tot,(max(studyInterval+j_tot):(max(studyInterval)+j_tot+j))))
           platesThisLap <- all.plates[extendedStudyInterval,"plate"] %>% unique()
+          
           #Extend number of plates if needed
-          PlatesNeeded <-ceiling((length(Manifest$SampleID)+j_tot+j)/spots_per_plate)
-          all.plates.New <- generatePlateHolder(PlatesNeeded,
-                                                rep(spots_per_plate,
-                                                    times=PlatesNeeded),
-                                                n.samples=length(Manifest$SampleID)+j_tot+j,
-                                                PlateSize = PlateSize)
+          if(missing(available.spots)){
+            PlatesNeeded <-ceiling((length(Manifest$SampleID)+j_tot+j)/spots_per_plate)
+            all.plates.New <- generatePlateHolder(PlatesNeeded,
+                                                  rep(spots_per_plate,
+                                                      times=PlatesNeeded),
+                                                  n.samples=length(Manifest$SampleID)+j_tot+j,
+                                                  PlateSize = PlateSize)
+          }else{
+            all.plates.New <- generatePlateHolder(length(available.spots),available.spots,n.samples=length(Manifest$SampleID), PlateSize = PlateSize)
+          }
           all.plates.New$SampleID <- rep(NA,nrow(all.plates.New)) 
           all.plates <- all.plates.New
         }else{
@@ -433,7 +437,7 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, SubjectColumn, iter
   }
   
   #Complete randomization within studies when subjectID is not given
-  if(missing(SubjectColumn) & !is.null(Manifest$study)){
+  if(missing(SubjectColumn) & suppressWarnings(!is.null(Manifest$study))){
     cat("Assigning subjects to plates. 'study' column detected so keeping studies together during randomization. \n")
     
     out.manifest <- matrix(nrow = 0,ncol = ncol(Manifest))
@@ -459,6 +463,10 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, SubjectColumn, iter
     return(out.manifest)
   }
 }
+
+
+
+
 
 
 
