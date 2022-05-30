@@ -9,7 +9,6 @@ olink_ordinalRegression_posthoc(
   olinkid_list = NULL,
   variable,
   covariates = NULL,
-  outcome = "NPX",
   effect,
   verbose = T
 )
@@ -25,8 +24,6 @@ Also takes ':' notation.}
 
 \item{covariates}{Single character value or character array. Default: NULL.
 Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be inferred from main effects.}
-
-\item{outcome}{Character. The dependent variable. Default: NPX.}
 
 \item{effect}{Term on which to perform post-hoc. Character vector. Must be subset of or identical to variable.}
 

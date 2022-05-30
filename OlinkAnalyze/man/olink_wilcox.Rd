@@ -7,7 +7,7 @@
 olink_wilcox(df, variable, pair_id, ...)
 }
 \arguments{
-\item{df}{NPX data frame in long format with at least protein name (Assay), OlinkID, UniProt and a factor with 2 levels.}
+\item{df}{NPX or Quantified_value data frame in long format with at least protein name (Assay), OlinkID, UniProt and a factor with 2 levels.}
 
 \item{variable}{Character value indicating which column should be used as the grouping variable. Needs to have exactly 2 levels.}
 
@@ -20,7 +20,7 @@ A data frame containing the Mann-Whitney U Test results for every protein.
 }
 \description{
 Performs a Welch 2-sample Mann-Whitney U Test at confidence level 0.95 for every protein (by OlinkID)
-for a given grouping variable using stats::t.test and corrects for multiple testing by 
+for a given grouping variable using stats::t.test and corrects for multiple testing by
 the Benjamini-Hochberg method (“fdr”) using stats::p.adjust.
 Adjusted p-values are logically evaluated towards adjusted p-value<0.05.
 The resulting Mann-Whitney U Test table is arranged by ascending p-values.

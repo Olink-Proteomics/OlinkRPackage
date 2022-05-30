@@ -13,10 +13,8 @@
 #'The threshold is determined by logic evaluation of Adjusted_pval < 0.05.
 #'
 #'
-#' @param df NPX data frame in long format with at least protein name (Assay), OlinkID, UniProt, Panel and a factor with at least 3 levels.
+#' @param df NPX or Quantified_value data frame in long format with at least protein name (Assay), OlinkID, UniProt, Panel and a factor with at least 3 levels.
 #' @param variable Single character value.
-#' @param outcome Character. The dependent variable. Default: NPX.
-#' @param p_adjust_method Adjust P-value for Multiple Comparisons.
 #' @param dependence Boolean. Default: FALSE. When the groups are independent, the kruskal-Wallis will run, when the groups are dependent, the Friedman test will run.
 #' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #'
@@ -27,7 +25,7 @@
 #'
 #' library(dplyr)
 #'
-#' npx_df <- npx_data1 %>% filter(!grepl('control','SampleID', ignore.case = TRUE))
+#' npx_df <- npx_data1 %>% filter(!grepl('control', SampleID, ignore.case = TRUE))
 #'
 #' #One-way Kruskal-Wallis Test.
 #' #Results in a model NPX~Time
@@ -46,8 +44,6 @@
 
 olink_one_non_parametric <- function(df,
                                      variable,
-                                     outcome="NPX",
-                                     p_adjust_method="BH",
                                      dependence = FALSE,
                                      verbose=T
 ){
@@ -77,10 +73,19 @@ olink_one_non_parametric <- function(df,
 
     df <- df[!is.na(df[[variable_testers]]),]
 
+    # # Check whether it is NPX or QUANT
+
+    if ('NPX' %in% colnames(df)) {
+      data_type <- 'NPX'
+    } else if ('Quantified_value' %in% colnames(df)) {
+      data_type <- 'Quantified_value'
+    } else {
+      stop('The NPX or Quantified_value is not in the df.')}
+
     #Not testing assays that have all NA:s
     all_nas <- df  %>%
       dplyr::group_by(OlinkID) %>%
-      dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(NPX))) %>%
+      dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(!!rlang::ensym(data_type)))) %>%
       dplyr::ungroup() %>%
       dplyr::filter(n == n_na) %>%
       dplyr::pull(OlinkID)
@@ -123,7 +128,7 @@ olink_one_non_parametric <- function(df,
       current_nas <- df %>%
         dplyr::filter(!(OlinkID %in% all_nas)) %>%
         dplyr::group_by(OlinkID, !!rlang::ensym(effect)) %>%
-        dplyr::summarise(n = n(), n_na = sum(is.na(NPX)),.groups="drop") %>%
+        dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(!!rlang::ensym(data_type))),.groups="drop") %>%
         dplyr::filter(n == n_na) %>%
         dplyr::distinct(OlinkID) %>%
         dplyr::pull(OlinkID)
@@ -157,7 +162,7 @@ olink_one_non_parametric <- function(df,
 
     }
 
-    formula_string <- paste0(outcome, "~", paste(variable,collapse="*"))
+    formula_string <- paste0(data_type, "~", paste(variable,collapse="*"))
 
 
     #Get factors
@@ -189,14 +194,14 @@ olink_one_non_parametric <- function(df,
         dplyr::filter(!(OlinkID %in% all_nas)) %>%
         dplyr::filter(!(OlinkID %in% nas_in_var)) %>%
         dplyr::group_by(Assay,OlinkID, UniProt, Panel,!!!rlang::syms(variable)) %>%
-        dplyr::mutate(group_id = as.factor (1:n()))%>%
+        dplyr::mutate(group_id = as.factor (1:dplyr::n()))%>%
         rstatix::convert_as_factor(!!!rlang::syms(variable)) %>%
         dplyr::ungroup(!!!rlang::syms(variable))%>%
         dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
         dplyr::do(rstatix::friedman_test(as.formula(formula_string),
                                    data=.,na.action=na.omit)) %>%
         dplyr::ungroup() %>%
-        dplyr::mutate(Adjusted_pval = p.adjust(p, method = p_adjust_method)) %>%
+        dplyr::mutate(Adjusted_pval = p.adjust(p, method = "BH")) %>%
         dplyr::mutate(Threshold  = ifelse(Adjusted_pval<0.05, "Significant","Non-significant")) %>%
         dplyr::ungroup() %>%
         dplyr::arrange(Adjusted_pval) %>%
@@ -212,10 +217,10 @@ olink_one_non_parametric <- function(df,
         dplyr::filter(!(OlinkID %in% all_nas)) %>%
         dplyr::filter(!(OlinkID %in% nas_in_var)) %>%
         dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
-        dplyr::do(tidy(kruskal.test(as.formula(formula_string),
+        dplyr::do(broom::tidy(kruskal.test(as.formula(formula_string),
                               data=.))) %>%
         dplyr::ungroup() %>%
-        dplyr::mutate(Adjusted_pval=p.adjust(p.value,method=p_adjust_method)) %>%
+        dplyr::mutate(Adjusted_pval=p.adjust(p.value,method="BH")) %>%
         dplyr::mutate(Threshold  = ifelse(Adjusted_pval<0.05,"Significant","Non-significant")) %>%
         dplyr::ungroup() %>%
         dplyr::arrange(Adjusted_pval)} %>%
@@ -243,8 +248,6 @@ olink_one_non_parametric <- function(df,
 #' @param df NPX data frame in long format with at least protein name (Assay), OlinkID, UniProt, Panel and a factor with at least 3 levels.
 #' @param olinkid_list Character vector of OlinkID's on which to perform post hoc analysis. If not specified, all assays in df are used.
 #' @param variable Single character value or character array.
-#' @param outcome Character. The dependent variable. Default: NPX.
-#' @param p_adjust_method Adjust P-value for Multiple Comparisons.
 #' @param verbose Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #' @return Tibble of posthoc tests for specicified effect, arranged by ascending adjusted p-values.
 #' @export
@@ -280,8 +283,6 @@ olink_one_non_parametric <- function(df,
 olink_one_non_parametric_posthoc <- function(df,
                                              olinkid_list = NULL,
                                              variable,
-                                             outcome="NPX",
-                                             p_adjust_method="BH",
                                              verbose=T
                                              ){
 
@@ -305,6 +306,14 @@ olink_one_non_parametric_posthoc <- function(df,
         dplyr::pull()
     }
 
+    # # Check whether it is NPX or QUANT
+
+    if ('NPX' %in% colnames(df)) {
+      data_type <- 'NPX'
+    } else if ('Quantified_value' %in% colnames(df)) {
+      data_type <- 'Quantified_value'
+    } else {
+      stop('The NPX or Quantified_value is not in the df.')}
 
 
     variable_testers <- intersect(c(variable), names(df))
@@ -330,7 +339,7 @@ olink_one_non_parametric_posthoc <- function(df,
         num.vars <- c(num.vars,variable_testers)
         }
 
-    formula_string <- paste0(outcome, "~", paste(variable,collapse="*"))
+    formula_string <- paste0(data_type, "~", paste(variable,collapse="*"))
 
     #Print verbose message
     if(verbose){
@@ -359,7 +368,7 @@ olink_one_non_parametric_posthoc <- function(df,
       dplyr::filter(OlinkID %in% olinkid_list) %>%
       dplyr::mutate(OlinkID = factor(OlinkID, levels = olinkid_list)) %>%
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
-      dplyr::do(rstatix::wilcox_test(data =., as.formula(formula_string), p.adjust.method = p_adjust_method,detailed = TRUE, conf.level = 0.95)) %>%
+      dplyr::do(rstatix::wilcox_test(data =., as.formula(formula_string), p.adjust.method = "BH",detailed = TRUE, conf.level = 0.95)) %>%
       dplyr::ungroup() %>%
       dplyr::mutate("variable" = variable) %>%
       dplyr::mutate(Threshold = if_else(p.adj < 0.05,'Significant','Non-significant')) %>%
