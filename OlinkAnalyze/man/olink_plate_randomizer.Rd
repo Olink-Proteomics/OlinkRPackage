@@ -14,7 +14,7 @@ olink_plate_randomizer(
 )
 }
 \arguments{
-\item{Manifest}{tibble/data frame in long format containing all sample ID's. Sample ID column must be named SampleID. If containing a column called study, different studies will be kept together on the plates and randomized internally.}
+\item{Manifest}{tibble/data frame in long format containing all sample ID's. Sample ID column must be named SampleID.}
 
 \item{PlateSize}{Integer. Either 96 or 48. 96 is default.}
 
@@ -40,7 +40,7 @@ Columns include same columns as Manifest with additional columns:
 Generates a scheme for how to plate samples with an option to keep subjects on the same plate.
 }
 \details{
-Variables of interest should if possible be randomized across plates to avoid confounding with potential plate effects. In the case of multiple samples per subject (e.g. in longitudinal studies), Olink recommends keeping each subject on the same plate. This can be achieved using the SubjectColumn argument. If adding a manifest column called study with study information, each study will be kept together during randomization.
+Variables of interest should if possible be randomized across plates to avoid confounding with potential plate effects. In the case of multiple samples per subject (e.g. in longitudinal studies), Olink recommends keeping each subject on the same plate. This can be achieved using the SubjectColumn argument.
 }
 \examples{
 \donttest{
