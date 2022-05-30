@@ -365,7 +365,7 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, SubjectColumn, iter
                                                   n.samples=length(Manifest$SampleID)+j_tot+j,
                                                   PlateSize = PlateSize)
           }else{
-            all.plates.New <- generatePlateHolder(length(available.spots),available.spots,n.samples=length(Manifest$SampleID), PlateSize = PlateSize)
+            all.plates.New <- generatePlateHolder(length(available.spots),available.spots,n.samples=length(Manifest$SampleID)+j_tot+j, PlateSize = PlateSize)
           }
           all.plates.New$SampleID <- rep(NA,nrow(all.plates.New)) 
           all.plates <- all.plates.New
