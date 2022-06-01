@@ -43,11 +43,11 @@ Bridging normalization: One of the dataframes is adjusted to another using overl
 The overlapping samples need to be named the same between the dataframes and adjustment is made using the median of the paired differences between the bridge samples in the two data frames.
 The two dataframes are inputs df1 and df2, the one being adjusted to is specified in the input reference_project and the overlapping samples are specified in overlapping_samples_df1.
 Only overlapping_samples_df1 should be input, no matter which dataframe is used as reference_project.  \cr\cr
-Subset normalization: One of the dataframes is adjusted to the dataframe set as reference_project using
-a sample subset.
-Adjustment is made using the differences in median between the subsets from the two data frames.
-Both overlapping_samples_df1 and overlapping_samples_df2 need to be input.
-The samples do not need to be named the same. \cr
+Subset normalization: One of the dataframes is adjusted to another dataframe
+using a sample subset. Adjustment is made using the differences in median
+between the subsets from the two dataframes. Both overlapping_samples_df1 and
+overlapping_samples_df2 need to be input. The samples do not need to be
+named the same. \cr
 A special case of subset normalization are to use all samples (except control
 samples and samples with QC warning) from df1 as input in overlapping_samples_df1
 and all samples from df2 as input in overlapping_samples_df2.  \cr\cr
