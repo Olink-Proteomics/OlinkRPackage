@@ -43,11 +43,11 @@ Bridging normalization: One of the dataframes is adjusted to another using overl
 The overlapping samples need to be named the same between the dataframes and adjustment is made using the median of the paired differences between the bridge samples in the two data frames.
 The two dataframes are inputs df1 and df2, the one being adjusted to is specified in the input reference_project and the overlapping samples are specified in overlapping_samples_df1.
 Only overlapping_samples_df1 should be input, no matter which dataframe is used as reference_project.  \cr\cr
-Subset normalization: One of the dataframes is adjusted to the dataframe set as reference_project using
-a sample subset.
-Adjustment is made using the differences in median between the subsets from the two data frames.
-Both overlapping_samples_df1 and overlapping_samples_df2 need to be input.
-The samples do not need to be named the same. \cr
+Subset normalization: One of the dataframes is adjusted to another dataframe
+using a sample subset. Adjustment is made using the differences in median
+between the subsets from the two dataframes. Both overlapping_samples_df1 and
+overlapping_samples_df2 need to be input. The samples do not need to be
+named the same. \cr
 A special case of subset normalization are to use all samples (except control
 samples and samples with QC warning) from df1 as input in overlapping_samples_df1
 and all samples from df2 as input in overlapping_samples_df2.  \cr\cr
@@ -80,21 +80,34 @@ olink_normalization(df1 = npx_df1,
 
 #Subset normalization:
 # Find a suitable subset of samples from both projects, but exclude Olink controls
-df1_sampleIDs <- (npx_df1 \%>\%
-    dplyr::filter(!grepl("control", SampleID, ignore.case=TRUE)) \%>\%
+# and samples which do not pass QC.
+df1_sampleIDs <- npx_df1 \%>\%
+    dplyr::filter(QC_Warning == 'Pass') \%>\%
+    dplyr::filter(!str_detect(SampleID, 'CONTROL_SAMPLE')) \%>\%
     dplyr::select(SampleID) \%>\%
-    dplyr::distinct())$SampleID
-df2_sampleIDs <- (npx_df2 \%>\%
-    dplyr::filter(!grepl("control", SampleID, ignore.case=TRUE)) \%>\%
+    unique() \%>\%
+    dplyr::pull(SampleID)
+df2_sampleIDs <- npx_df2 \%>\%
+    dplyr::filter(QC_Warning == 'Pass') \%>\%
+    dplyr::filter(!str_detect(SampleID, 'CONTROL_SAMPLE')) \%>\%
     dplyr::select(SampleID) \%>\%
-    dplyr::distinct())$SampleID
+    unique() \%>\%
+    dplyr::pull(SampleID)
 some_samples_df1 <- sample(df1_sampleIDs, 16)
 some_samples_df2 <- sample(df2_sampleIDs, 16)
-# Normalize
+
 olink_normalization(df1 = npx_df1,
                     df2 = npx_df2,
                     overlapping_samples_df1 = some_samples_df1,
                     overlapping_samples_df2 = some_samples_df2)
+
+
+## Special case of subset normalization when using all samples.
+olink_normalization(df1 = npx_df1,
+                    df2 = npx_df2,
+                    overlapping_samples_df1 = df1_sampleIDs,
+                    overlapping_samples_df2 = df2_sampleIDs)
+
 
 #Reference median normalization:
 # For the sake of this example, set the reference median to 1
