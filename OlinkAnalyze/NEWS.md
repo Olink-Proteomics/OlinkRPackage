@@ -2,7 +2,7 @@
 
 ## Minor Changes
 
-* Non-parametric functions are now available (@boxizhang, #114)
+* Non-parametric functions are now available (@boxizhang, #114, #142)
 * Updated installation instructions to reflect CRAN acceptance (@kathy-nevola, #107)
 * Zipped files from MyData can now be used as input for read_NPX (@klevdiamanti, #115)
 * LME and ANOVA formulas can now be customized (@jrguess, #120)
@@ -18,7 +18,8 @@
 * olink_ttest will now return a warning message if an assay has less than 2 datapoints in a group. (@marisand, #110)
 * LMER class is now checked using inherits (@MasoumehSheikhi, #134)
 * License was corrected to AGPL-3 (@Orbmac, #138)
-* Correct output type of olink_dist_plot in vignette to ggplot object (@kathy-nevola, Issue #112, # 141)
+* Correct output type of olink_dist_plot in vignette to ggplot object (@kathy-nevola, Issue #112, #141)
+* Previously called "intensity normalization" has been clarified as a special type of subset normalization and an example has been added to the documentation and vignette (@Orbmac, #144)
 
 
 # Olink Analyze 3.0.0
