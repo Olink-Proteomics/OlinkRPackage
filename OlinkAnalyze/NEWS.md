@@ -1,4 +1,17 @@
-# OlinkAnalyze 3.0.0
+# Olink Analyze 3.1.0
+
+## Minor Changes
+
+* Non-parametric functions are now available (@boxizhang, #114)
+* Updated installation instructions to reflect CRAN acceptance (@kathy-nevola, #107)
+* Added Masoumeh Sheikhi and Boxi Zhang as authors
+
+## Bug Fixes
+
+* olink_pca_plot by Panel will now show correct colors when a variable is missing (@MasoumehSheikhi, Issue #117) 
+
+
+# Olink Analyze 3.0.0
 
 ## Major Changes
 
@@ -20,7 +33,7 @@
 * fixed keywords in documentation (@kathy-nevola, #99)
 
 
-# OlinkAnalyze 2.0.1
+# Olink Analyze 2.0.1
 
 ## Bug Fixes
 
@@ -29,7 +42,7 @@
 * Add Ola Caster to author list
 * Update documentation to change olinkR to Olink Analyze (@jrguess, #89)
 
-# OlinkAnalyze 2.0.0
+# Olink Analyze 2.0.0
 
 ## Major Changes
 
@@ -45,7 +58,7 @@
 * Update Vignette to reflect new functionality (@kathy-nevola, #78)
 
 
-# OlinkAnalyze 1.3.0
+# Olink Analyze 1.3.0
 
 ## Major Changes
 

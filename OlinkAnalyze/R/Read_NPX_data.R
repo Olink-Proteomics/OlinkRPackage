@@ -1,9 +1,9 @@
 #' Function to read NPX data into long format
 #'
-#' Imports an NPX file exported from NPX Manager.
+#' Imports an NPX file exported from NPX Manager or MyData.
 #' No alterations to the output NPX Manager format is allowed.
 #'
-#' @param filename Path to file NPX Manager output file.
+#' @param filename Path to NPX Manager or MyData output file.
 #' @return A "tibble" in long format. Columns include:
 #' \itemize{
 #'    \item{SampleID:} Sample ID
@@ -27,32 +27,112 @@
 #' read_NPX(file)
 #' }
 #' @importFrom magrittr %>%
-#' @importFrom tools file_ext
+#' @importFrom tools file_ext md5sum file_path_sans_ext
 #' @importFrom dplyr as_tibble distinct pull filter bind_cols mutate left_join select rename matches bind_rows
 #' @importFrom readxl read_excel
 #' @importFrom stringr str_detect str_replace_all str_to_upper str_to_title
 #' @importFrom tidyr tibble gather separate
+#' @importFrom zip unzip
 
 
 read_NPX <- function(filename){
 
   # If the file is csv or txt, read_NPX assumes that the file is explore data in long format
-  if (tools::file_ext(filename) %in% c("csv","txt")) {
+  if (tools::file_ext(filename) %in% c("csv","txt","zip")) {
+    file_is_compressed <- FALSE
+    if (tools::file_ext(filename) == "zip") {
+
+      file_is_compressed <- TRUE
+
+      # check contents of the compressed file
+      compressed_file_contents <- utils::unzip(zipfile = filename, list = T) %>%
+        dplyr::filter(Name != "README.txt") %>%
+        dplyr::pull(Name) # extract all but README.txt
+
+      # check if MD5 file exists and prepare list of files to unzip
+      if ("MD5_checksum.txt" %in% compressed_file_contents) {
+        compressed_file_chksm <- compressed_file_contents[compressed_file_contents == "MD5_checksum.txt"] # name of md5 .txt file
+        compressed_file_csv <- compressed_file_contents[compressed_file_contents != "MD5_checksum.txt"]
+        files_to_extract <- c(compressed_file_csv, compressed_file_chksm)
+      } else if("checksum_sha256.txt" %in% compressed_file_contents){
+        compressed_file_chksm <- compressed_file_contents[compressed_file_contents == "checksum_sha256.txt"] # name of sha256 .txt file
+        compressed_file_csv <- compressed_file_contents[compressed_file_contents != "checksum_sha256.txt"]
+        files_to_extract <- c(compressed_file_csv, compressed_file_chksm)
+      }else{
+        compressed_file_chksm <- NA_character_
+        compressed_file_csv <- compressed_file_contents
+        files_to_extract <- compressed_file_csv
+      }
+
+      # check that there is only one NPX file left
+      if (length(compressed_file_csv) != 1 || !(tools::file_ext(compressed_file_csv) %in% c("csv","txt"))) {
+        stop("The compressed file does not contain a valid NPX file. Expecting: \"README.txt\", \"MD5_checksum.txt\" or \"checksum_sha256.txt\" and the NPX file.")
+      }
+
+      # unzip
+      tmp_unzip_dir <- paste(tools::file_path_sans_ext(filename),
+                             paste(sample(x = c(LETTERS, letters), size = 5, replace = T), collapse = ""),
+                             sep = "_")
+      zip::unzip(zipfile = filename, files = files_to_extract, exdir = tmp_unzip_dir, overwrite = T)
+
+      # File name after unzip
+      extracted_file_csv <- file.path(tmp_unzip_dir, compressed_file_csv)
+
+      if (!is.na(compressed_file_chksm)) {
+        extracted_file_chksm <- file.path(tmp_unzip_dir, compressed_file_chksm) # MD5 relative path
+
+        # make the checksum filename easier to parse
+        chksm_string <- tolower(tools::file_path_sans_ext(compressed_file_chksm))
+
+        # check for matching
+        extracted_file_chksm_con <- file(extracted_file_chksm, "r")
+        if(stringr::str_detect(chksm_string, "md5")){
+          if (readLines(con = extracted_file_chksm_con, n = 1) != unname(tools::md5sum(extracted_file_csv))) { # check if MD5's match
+            # clean up files
+            close(extracted_file_chksm_con)
+            invisible(unlink(x = tmp_unzip_dir, recursive = TRUE))
+            stop(paste("MD5 checksum of NPX file does not match the one from \"MD5_checksum.txt\"! Loss of data?", sep = ""))
+          }
+          close(extracted_file_chksm_con)
+        }else if(stringr::str_detect(chksm_string, "sha256")){
+          chksm <- openssl::sha256(file(extracted_file_csv)) %>%
+            stringr::str_replace(":","")
+          if (readLines(con = extracted_file_chksm_con, n = 1, warn = FALSE) != chksm) { # check if Sha256's match
+            # clean up files
+            close(extracted_file_chksm_con)
+            invisible(unlink(x = tmp_unzip_dir, recursive = TRUE))
+            stop(paste("Sha256 checksum of NPX file does not match the one from \"checksum_sha256.txt\"! Loss of data?", sep = ""))
+          }
+          close(extracted_file_chksm_con)
+        }
+      }
+
+      filename <- extracted_file_csv
+    }
+
     #read file using ; as delimiter
     out <- read.table(filename, header = TRUE, sep=";", stringsAsFactors = FALSE,
                       na.strings = c("NA",""))
+
     if (is.data.frame(out) & ncol(out) == 1) {
       #if only one column in the data, wrong delimiter. use , as delimiter
       out <- read.table(filename, header = TRUE, sep=",", stringsAsFactors = FALSE,
                         na.strings = c("NA",""))
     }
+
+    # remove unzipped NPX file
+    if (file_is_compressed == TRUE) {
+      invisible(unlink(x = tmp_unzip_dir, recursive = TRUE)) # remove files
+      rm(tmp_unzip_dir)
+    }
+
     #check that all colnames are present
     match_old_header <- all(c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
                               "MissingFreq", "Panel", "Panel_Version", "PlateID",
                               "QC_Warning", "LOD", "NPX") %in% colnames(out))
     match_new_header <- all(c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
                               "MissingFreq", "Panel", "Panel_Lot_Nr", "PlateID",
-                              "QC_Warning", "LOD", "NPX") %in% colnames(out))
+                              "QC_Warning", "LOD", "NPX", "Normalization", "Assay_Warning") %in% colnames(out))
     if (match_old_header || match_new_header) {
       out$NPX <- as.numeric(out$NPX)
       out$LOD <- as.numeric(out$LOD)

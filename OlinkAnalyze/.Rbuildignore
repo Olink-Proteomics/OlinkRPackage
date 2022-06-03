@@ -9,3 +9,4 @@
 ^inst/extdata/.*original[.]csv
 ^inst/extdata/.*original[.]xlsx
 ^data/.*_original[.]rda
+^LICENSE\.md$
