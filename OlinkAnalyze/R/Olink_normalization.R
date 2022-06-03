@@ -65,7 +65,7 @@
 #'     dplyr::pull(SampleID)
 #' df2_sampleIDs <- npx_df2 %>%
 #'     dplyr::filter(QC_Warning == 'Pass') %>%
-#'     dplyr::filter(!str_detect(SampleID, 'CONTROL_SAMPLE')) %>%
+#'     dplyr::filter(!stringr::str_detect(SampleID, 'CONTROL_SAMPLE')) %>%
 #'     dplyr::select(SampleID) %>%
 #'     unique() %>%
 #'     dplyr::pull(SampleID)
