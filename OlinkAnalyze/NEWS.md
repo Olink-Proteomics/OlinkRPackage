@@ -10,7 +10,10 @@
 * Heatmaps can now be generated (@Orbmac, $127)
 * olink_boxplot function now has significance bars and stars (@boxizhang, #132)
 * PCA preprocessing was moved to internal function (@simfor, #133)
+* olink_plate_randomizer will now return a warning if there are duplicate SampleIDs or if SubjectColumn is missing (@kristianHoden, #146)
+* olink_plate_randomizer can now keep studies together on plates (@kristianHoden, #146)
 * Added Masoumeh Sheikhi and Boxi Zhang as authors
+* Added Kristian Hodén as contributor
 
 ## Bug Fixes
 
