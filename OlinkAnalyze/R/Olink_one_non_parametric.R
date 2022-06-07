@@ -3,7 +3,7 @@
 #'Performs an Kruskal-Wallis Test for each assay (by OlinkID) in every panel using stats::kruskal.test.
 #'Performs an Friedman Test for each assay (by OlinkID) in every panel using rstatix::friedman_test.
 #'The function handles factor variable. \cr\cr
-#'Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a messsage if verbose = T).
+#'Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a message if verbose = T).
 #'Character columns in the input dataframe are automatically converted to factors (specified in a message if verbose = T).
 #'Numerical variables are not converted to factors.
 #'If a numerical variable is to be used as a factor, this conversion needs to be done on the dataframe before the function call. \cr\cr
@@ -245,8 +245,8 @@ olink_one_non_parametric <- function(df,
 #' @param variable Single character value or character array.
 #' @param outcome Character. The dependent variable. Default: NPX.
 #' @param p_adjust_method Adjust P-value for Multiple Comparisons.
-#' @param verbose Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
-#' @return Tibble of posthoc tests for specicified effect, arranged by ascending adjusted p-values.
+#' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
+#' @return Tibble of posthoc tests for specified effect, arranged by ascending adjusted p-values.
 #' @export
 #' @examples \donttest{
 #'

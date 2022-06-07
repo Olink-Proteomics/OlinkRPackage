@@ -56,7 +56,7 @@ Columns include:
 \description{
 Fits a linear mixed effects model for every protein (by OlinkID) in every panel, using lmerTest::lmer and stats::anova.
 The function handles both factor and numerical variables and/or covariates. \cr\cr
-Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a messsage if verbose = TRUE).
+Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a message if verbose = TRUE).
 Character columns in the input dataframe are automatically converted to factors (specified in a message if verbose = TRUE).
 Numerical variables are not converted to factors.
 If a numerical variable is to be used as a factor, this conversion needs to be done on the dataframe before the function call. \cr\cr
@@ -67,7 +67,7 @@ Crossed analysis, i.e. A*B formula notation, is inferred from the variable argum
 \item c('A:B', 'B') or c('A:B', 'A')
 }
 Inference is specified in a message if verbose = TRUE. \cr
-For covariates, crossed analyses need to be specified explicity, i.e. two main effects will not be expaned with a c('A','B') notation. Main effects present in the variable takes precedence. \cr
+For covariates, crossed analyses need to be specified explicitly, i.e. two main effects will not be expanded with a c('A','B') notation. Main effects present in the variable takes precedence. \cr
 The random variable only takes main effect(s). \cr
 The formula notation of the final model is specified in a message if verbose = TRUE. \cr\cr
 Output p-values are adjusted by stats::p.adjust according to the Benjamini-Hochberg method (“fdr”).

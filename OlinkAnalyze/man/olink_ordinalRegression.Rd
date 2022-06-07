@@ -25,7 +25,7 @@ Also takes ':'/'*' notation.}
 \item{covariates}{Single character value or character array. Default: NULL.
 Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be inferred from main effects.}
 
-\item{return.covariates}{Boolean. Deafult: False. Returns F-test results for the covariates. Note: Adjusted p-values will be NA for the covariates.}
+\item{return.covariates}{Boolean. Default: False. Returns F-test results for the covariates. Note: Adjusted p-values will be NA for the covariates.}
 
 \item{verbose}{Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
 }
@@ -36,7 +36,7 @@ The tibble is arranged by ascending p-values.
 \description{
 Performs an ANOVA F-test for each assay (by OlinkID) in every panel using car::Anova and Type II sum of squares.
 The function handles only factor and/or covariates. \cr\cr
-Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a messsage if verbose = T).
+Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a message if verbose = T).
 Character columns in the input dataframe are automatically converted to factors (specified in a message if verbose = T).
 Crossed analysis, i.e. A*B formula notation, is inferred from the variable argument in the following cases: \cr
 \itemize{

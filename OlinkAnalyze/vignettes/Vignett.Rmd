@@ -623,7 +623,7 @@ npx_data1 %>%
 
 ### Function output
 
-A list of objects of class *ggplot*.
+A *ggplot* object.
 
 ## Point-range plot for LMER (olink_lmer_plot)
 
@@ -739,8 +739,8 @@ olink_pathway_heatmap(enrich_results = ora_results, test_results = ttest_results
 ### Function output
 A heatmap as a ggplot object
 
-## Bargraph for visualizating pathway enrichment (olink_pathway_visualization)
-The olink_pathway_visualization function generates a bar graph of the top terms or terms related to a certain keyword for results from the olink_pathway_enrichment function. The bar represents eithre the normalized enrichment score (NES) for GSEA results or counts (number of proteins) for ORA results colored by adjusted p-value. The ORA visualization also contains the number of proteins out of the total proteins in that pathway as a ratio after the bar.
+## Bargraph for visualizing pathway enrichment (olink_pathway_visualization)
+The olink_pathway_visualization function generates a bar graph of the top terms or terms related to a certain keyword for results from the olink_pathway_enrichment function. The bar represents either the normalized enrichment score (NES) for GSEA results or counts (number of proteins) for ORA results colored by adjusted p-value. The ORA visualization also contains the number of proteins out of the total proteins in that pathway as a ratio after the bar.
 
 ### Function arguments
 
@@ -800,10 +800,10 @@ Group variable can be annotated and colored in the left side of the heatmap.
 * cluster_rows: Logical. Default: True. Determining if rows should be clustered.
 * cluster_cols: Logical. Default: True. Determining if columns should be clustered.
 * show_rownames: Logical. Default: True. Determining if row names are shown.
-* show_colnames: Logical. Defualt: True. Determining if column names are shown.
-* annotation_legend: Logical. Defualt: True. Determining if legend for annotations should be shown.
-* fontsize. Defualt: 10. Fontsize for all text. 
-* na_col. Defualt: Black. Color of the cells with NA.
+* show_colnames: Logical. Default: True. Determining if column names are shown.
+* annotation_legend: Logical. Default: True. Determining if legend for annotations should be shown.
+* fontsize. Default: 10. Fontsize for all text. 
+* na_col. Default: Black. Color of the cells with NA.
 
 
 ```{r message=FALSE, fig.width=8, fig.height=4}
