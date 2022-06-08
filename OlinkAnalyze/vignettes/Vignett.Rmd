@@ -469,7 +469,7 @@ A tibble with the following columns:
 * Adjusted_pval _\<dbl\>_: Adjusted p-value for the test (Benjamini & Hochberg).
 * Threshold _\<chr\>_: Text indication if assay is significant (adjusted p-value < 0.05).
 
-## Post-hoc one way non-parpametric analysis (olink_one_non_parametric_posthoc)
+## Post-hoc one way non-parametric analysis (olink_one_non_parametric_posthoc)
 
 olink_one_non_parametric_posthoc performs a post-hoc Wilcoxon test using the function *wilcox_test* from the R library *rstatix* with Benjamini & Hochberg p-value adjustment per assay (by OlinkID) at confidence level 0.95. The function handles both factor and numerical variables and/or covariates. 
 
