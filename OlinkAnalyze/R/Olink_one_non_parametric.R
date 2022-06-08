@@ -248,8 +248,6 @@ olink_one_non_parametric <- function(df,
 #' @param df NPX data frame in long format with at least protein name (Assay), OlinkID, UniProt, Panel and a factor with at least 3 levels.
 #' @param olinkid_list Character vector of OlinkID's on which to perform post hoc analysis. If not specified, all assays in df are used.
 #' @param variable Single character value or character array.
-#' @param outcome Character. The dependent variable. Default: NPX.
-#' @param p_adjust_method Adjust P-value for Multiple Comparisons.
 #' @param verbose Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #' @return Tibble of posthoc tests for specified effect, arranged by ascending adjusted p-values.
 #' @export
