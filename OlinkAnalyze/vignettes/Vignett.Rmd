@@ -440,7 +440,6 @@ Adjusted p-values are calculated using the function *wilcox_test* from the R lib
 
 * df: NPX data frame in long format should minimally contain protein name (Assay), OlinkID, UniProt, Panel and an outcome factor with at least 3 levels.
 * variable: Single character value or character array. In case of single character then that should represent a column in the df.
-* outcome: Name of the column from df that contains the dependent variable. Default: NPX.
 * dependence: Logical. Default: FALSE. When the groups are independent, the kruskal-Wallis will run, when the groups are dependent, the Friedman test will run.
 * verbose: Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 
@@ -516,7 +515,7 @@ A tibble with the following columns:
 
 ## Regression models for ordinal data (olink_ordinalRegression)
 
-The olink_anova is a wrapper function that performs an ANOVA F-test for each assay (ordinal transformed) using the function *Anova* from the R library *car* and Type II sum of squares. The function handles both factor and numerical variables, and/or confounding factors. 
+The olink_ordinalRegression is a wrapper function that performs an ANOVA F-test for each assay (ordinal transformed) using the function *Anova* from the R library *car* and Type II sum of squares. The function handles both factor and numerical variables, and/or confounding factors. 
 
 Samples with missing variable information or factor levels are excluded from the analysis. Character columns in the input data frame are converted to factors. The automatic handling of the data from above is announced by a message if the flag *verbose=TRUE*.
 
