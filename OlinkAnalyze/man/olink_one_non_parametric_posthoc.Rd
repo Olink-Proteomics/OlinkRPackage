@@ -8,8 +8,6 @@ olink_one_non_parametric_posthoc(
   df,
   olinkid_list = NULL,
   variable,
-  outcome = "NPX",
-  p_adjust_method = "BH",
   verbose = T
 )
 }
@@ -20,11 +18,7 @@ olink_one_non_parametric_posthoc(
 
 \item{variable}{Single character value or character array.}
 
-\item{outcome}{Character. The dependent variable. Default: NPX.}
-
-\item{p_adjust_method}{Adjust P-value for Multiple Comparisons.}
-
-\item{verbose}{Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
+\item{verbose}{Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
 }
 \value{
 Tibble of posthoc tests for specified effect, arranged by ascending adjusted p-values.

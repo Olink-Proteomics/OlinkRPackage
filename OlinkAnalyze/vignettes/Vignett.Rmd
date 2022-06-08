@@ -41,8 +41,13 @@ install.packages("OlinkAnalyze")
 **Statistical analysis**
 
 + *olink_ttest* Function which performs a t-test per protein
++ *olink_wilcox* Function which performs a Mann-Whitney U Test per protein
 + *olink_anova* Function which performs an ANOVA per protein
 + *olink_anova_posthoc* Function which performs an ANOVA post-hoc test per protein
++ *olink_one_non_parametric* Function which performs a Kruskal-Wallis Test or Friedman Test per protein
++ *olink_one_non_parametric_posthoc* Function which performs post-hoc test for one way non-parametric test
++ *olink_ordinalRegression* Function which performs an ordinal regression per protein
++ *olink_ordinalRegression_posthoc* Function which performs an ordinal regression post-hoc test per protein
 + *olink_lmer* Function which performs a linear mixed model per protein
 + *olink_lmer_posthoc* Function which performs a linear mixed model post-hoc per protein
 + *olink_pathway_enrichment* Function which performs GSEA or ORA pathway enrichment using outcome from other statistical tests
@@ -288,6 +293,36 @@ A tibble with the following columns:
 * Adjusted_pval _\<dbl\>_: Adjusted p-value for the test (Benjamini & Hochberg).
 * Threshold _\<chr\>_: Text indication if assay is significant (adjusted p-value < 0.05).
 
+## Mann-Whitney U Test analysis (olink_wilcox)
+
+The olink_wilcox function performs a welch 2-sample Mann-Whitney U test or paired Mann-Whitney U test at confidence level 0.95 for every protein (by OlinkID) for a given grouping variable using the function *wilcox.test* from the R library *stats* and corrects for multiple testing using the Benjamini-Hochberg method (“fdr”) based on the function *p.adjust* from the R library *stats*. Adjusted p-values are logically evaluated towards adjusted p-value<0.05. The resulting Mann-Whitney U table is arranged by ascending p-values.
+
+### Function arguments
+
+* df: NPX data frame in long format should minimally contain protein name (Assay), OlinkID, UniProt, Panel and an outcome factor with 2 levels.
+* variable: Character value that should represent a column in the df to be used as a grouping variable. Needs to have exactly 2 levels.
+* pair_id: Character value indicating which column contains the paired sample identifier. Only used for paired Mann-Whitney U tests.
+
+```{r message=FALSE, eval=FALSE}
+olink_wilcox(df = npx_data1,
+             variable = 'Treatment')
+```  
+
+### Function output
+
+A tibble with the following columns:
+
+* Assay _\<chr\>_: Assay name.
+* OlinkID _\<chr\>_: Unique Olink® ID.
+* UniProt _\<chr\>_: UniProt ID.
+* Panel _\<chr\>_: Olink® Panel.
+* statistic _\<dbl\>_: Value of the Mann-Whitney U statistic.
+* p.value _\<dbl\>_: P-value for the test.
+* method _\<chr\>_: Method that was used.
+* alternative  _\<chr\>_: : Description of the alternative hypothesis.
+* Adjusted_pval _\<dbl\>_: Adjusted p-value for the test (Benjamini & Hochberg).
+* Threshold _\<chr\>_: Text indication if assay is significant (adjusted p-value < 0.05).
+
 ## Analysis for variance (ANOVA) (olink_anova)
 
 The olink_anova is a wrapper function that performs an ANOVA F-test for each assay using the function *Anova* from the R library *car* and Type III sum of squares. The function handles both factor and numerical variables, and/or confounding factors. 
@@ -389,6 +424,191 @@ A tibble with the following columns:
 * estimate _\<dbl\>_: Difference in mean NPX between variables (from contrast).
 * conf.low _\<dbl\>_: Low bound of the confidence interval for the mean.
 * conf.high _\<dbl\>_: High bound of the confidence interval for the mean.
+* Adjusted_pval _\<dbl\>_: Adjusted p-value for the test (Benjamini & Hochberg).
+* Threshold _\<chr\>_: Text indication if assay is significant (adjusted p-value < 0.05).
+
+## One way non-parametric test (olink_one_non_parametric)
+
+The olink_one_non_parametric is a wrapper function that performs either a Kruskal-Wallis test or a Friedman test for each assay using the function *kruskal.test* from the R library *stats* or the function *friedman_test* from the R library *rstatix* and a posthoc test using the function *wilcox_test* from the R library *rstatix*. The function handles both factor and numerical variables, and/or confounding factors. 
+
+Samples with missing variable information or factor levels are excluded from the analysis. Character columns in the input data frame are converted to factors. The automatic handling of the data from above is announced by a message if the flag *verbose=TRUE*.
+
+Adjusted p-values are calculated using the function *wilcox_test* from the R library *rstatix* with the Benjamini & Hochberg (1995) method (“fdr”). The threshold is determined by logic evaluation of Adjusted_pval < 0.05.
+
+
+### Function arguments
+
+* df: NPX data frame in long format should minimally contain protein name (Assay), OlinkID, UniProt, Panel and an outcome factor with at least 3 levels.
+* variable: Single character value or character array. In case of single character then that should represent a column in the df.
+* dependence: Logical. Default: FALSE. When the groups are independent, the kruskal-Wallis will run, when the groups are dependent, the Friedman test will run.
+* verbose: Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
+
+```{r message=FALSE, eval=FALSE}
+# One-way Kruskal-Wallis Test
+kruskal_results <- olink_one_non_parametric(df = npx_df, 
+                                            variable = "Time")
+# One-way Friedman Test
+friedman_results <- olink_one_non_parametric(df = npx_df, 
+                                             variable = "Time", 
+                                             dependence = TRUE)
+```
+
+### Function output
+
+A tibble with the following columns:
+
+* Assay _\<chr\>_: Assay name.
+* OlinkID _\<chr\>_: Unique Olink ID.
+* UniProt _\<chr\>_: UniProt ID.
+* Panel _\<chr\>_: Olink Panel.
+* term _\<chr\>_: Name of the variable that was used for the p-value calculation.
+* df _\<dbl\>_: Numerator of degrees of freedom.
+* method _\<dbl\>_: Name of the performed test.
+* statistic _\<dbl\>_: Value of the test's statistic.
+* p.value _\<dbl\>_: P-value for the test.
+* Adjusted_pval _\<dbl\>_: Adjusted p-value for the test (Benjamini & Hochberg).
+* Threshold _\<chr\>_: Text indication if assay is significant (adjusted p-value < 0.05).
+
+## Post-hoc one way non-parpametric analysis (olink_one_non_parametric_posthoc)
+
+olink_one_non_parametric_posthoc performs a post-hoc Wilcoxon test using the function *wilcox_test* from the R library *rstatix* with Benjamini & Hochberg p-value adjustment per assay (by OlinkID) at confidence level 0.95. The function handles both factor and numerical variables and/or covariates. 
+
+### Function arguments
+
+* df: NPX data frame in long format should minimally contain protein name (Assay), OlinkID, UniProt, Panel and an outcome factor with at least 3 levels.
+* olinkid_list: Character vector of OlinkID's on which to perform the post-hoc analysis. If not specified, all assays in df are used.
+* variable: Single character value or character array. In case of single character then that should represent a column in the df.
+* verbose: Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
+
+```{r message=FALSE, eval=FALSE}
+#Friedman Test
+Friedman_results <- olink_one_non_parametric(npx_df, "Time", dependence = TRUE)
+
+#Filtering out significant and relevant results.
+significant_assays <- Friedman_results %>%
+  filter(Threshold == 'Significant') %>%
+  dplyr::select(OlinkID) %>%
+  distinct() %>%
+  pull()
+
+#Posthoc test for the results from Friedman Test
+friedman_posthoc_results <- olink_one_non_parametric_posthoc(npx_df, variable = c("Time"), olinkid_list = significant_assays)
+```
+
+### Function output
+
+A tibble with the following columns:
+
+* Assay _\<chr\>_: Assay name.
+* OlinkID _\<chr\>_: Unique Olink ID.
+* UniProt _\<chr\>_: UniProt ID.
+* Panel _\<chr\>_: Olink Panel.
+* term _\<chr\>_: Name of the variable that was used for the p-value calculation. 
+* contrast _\<chr\>_: Variables (in term) that are compared.   
+* estimate _\<dbl\>_: Difference in mean NPX between variables (from contrast).
+* conf.low _\<dbl\>_: Low bound of the confidence interval for the location parameter.
+* conf.high _\<dbl\>_: High bound of the confidence interval for the location parameter.
+* Adjusted_pval _\<dbl\>_: Adjusted p-value for the test (Benjamini & Hochberg).
+* Threshold _\<chr\>_: Text indication if assay is significant (adjusted p-value < 0.05).
+
+## Regression models for ordinal data (olink_ordinalRegression)
+
+The olink_ordinalRegression is a wrapper function that performs an ANOVA F-test for each assay (ordinal transformed) using the function *Anova* from the R library *car* and Type II sum of squares. The function handles both factor and numerical variables, and/or confounding factors. 
+
+Samples with missing variable information or factor levels are excluded from the analysis. Character columns in the input data frame are converted to factors. The automatic handling of the data from above is announced by a message if the flag *verbose=TRUE*.
+
+Crossed/interaction analysis, i.e. A*B formula notation, is inferred from the variable argument in the following cases: 
+
+* c('A','B')
+* c('A:B')
+* c('A:B', 'B') or c('A:B', 'A')
+
+Inference is specified in a message if *verbose=TRUE*.
+
+For covariates, crossed analyses need to be specified explicitly, i.e. two main effects will not be expanded with a c('A','B') notation. Main effects present in the variable take precedence. The formula notation of the final model is specified in a message if *verbose=TRUE*. 
+
+Adjusted p-values are calculated using the function *p.adjust* from the R library *stats* with the Benjamini & Hochberg (1995) method (“fdr”). The threshold is determined by logic evaluation of Adjusted_pval < 0.05. Covariates are not included in the p-value adjustment.
+
+### Function arguments
+
+* df: NPX data frame in long format should minimally contain protein name (Assay), OlinkID, UniProt, Panel and an outcome factor with at least 3 levels.
+* variable: Single character value or character array. In case of single character then that should represent a column in the df. Otherwise, if length > 1, the included variable names will be used in crossed analyses. It can also accept the notations ':' or '*'.
+* outcome: Name of the column from df that contains the dependent variable. Default: NPX.
+* covariates: Single character value or character array. Default: NULL. Confounding factors to include in the analysis. In case of single character then that should represent a column in the df. It can also accept the notations ':' or '*', while crossed analysis will not be inferred from main effects.
+* return.covariates: Logical. Default: False. Returns F-test results for the covariates. Note: Adjusted p-values will be NA for covariates.
+* verbose: Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
+
+```{r message=FALSE, eval=FALSE}
+# Two-way ordinal regression, no covariates
+ordinalRegression_results_twoway <- olink_ordinalRegression(df = npx_data1, 
+                                                            variable = c('Site', 'Time'))
+# One-way ordinal regression, Treatment as covariates
+ordinalRegression_oneway <- olink_anova(df = npx_data1, 
+                                        variable = 'Site',
+                                        covariates = 'Treatment')
+```
+
+### Function output
+
+A tibble with the following columns:
+
+* Assay _\<chr\>_: Assay name.
+* OlinkID _\<chr\>_: Unique Olink ID.
+* UniProt _\<chr\>_: UniProt ID.
+* Panel _\<chr\>_: Olink Panel.
+* term _\<chr\>_: Name of the variable that was used for the p-value calculation. The ":" between variables indicates interaction between variables.
+* df _\<dbl\>_: Numerator of degrees of freedom.
+* statistic _\<dbl\>_: Value of F-statistic.
+* p.value _\<dbl\>_: P-value for the test.
+* Adjusted_pval _\<dbl\>_: Adjusted p-value for the test (Benjamini & Hochberg).
+* Threshold _\<chr\>_: Text indication if assay is significant (adjusted p-value < 0.05).
+
+
+## Post-hoc of regression models for ordinal data analysis (olink_ordinalRegression_posthoc)
+
+olink_ordinalRegression_posthoc performs a post-hoc ANOVA test using the function *emmeans* from the R library *emmeans* with Tukey p-value adjustment per assay (by OlinkID) at confidence level 0.95. The function handles both factor and numerical variables and/or covariates.
+
+### Function arguments
+
+* df: NPX data frame in long format should minimally contain protein name (Assay), OlinkID, UniProt, Panel and an outcome factor with at least 3 levels.
+* olinkid_list: Character vector of OlinkID's on which to perform the post-hoc analysis. If not specified, all assays in df are used.
+* variable: Single character value or character array. In case of single character then that should represent a column in the df. Otherwise, if length > 1, the included variable names will be used in crossed analyses. It can also accept the notations ':' or '*'.
+* covariates: Single character value or character array. Default: NULL. Confounding factors to include in the analysis. In case of single character then that should represent a column in the df. It can also accept the notations ':' or '*', while crossed analysis will not be inferred from main effects.
+* outcome: Name of the column from df that contains the dependent variable. Default: NPX.
+* effect: Term on which to perform the post-hoc analysis. Character vector. Must be subset of or identical to the variable and no adjustment is performed.
+* mean_return: Logical. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = TRUE.
+* verbose: Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
+
+```{r message=FALSE, eval=FALSE}
+# Two-way Ordinal Regression
+ordinalRegression_results <- olink_ordinalRegression(df = npx_data1,
+                             variable="Treatment:Time")
+# extracting the significant proteins
+significant_assays <- ordinalRegression_results %>% 
+  filter(Threshold == 'Significant' & term == 'Treatment:Time') %>%
+  select(OlinkID) %>%
+  distinct() %>%
+  pull()
+# Posthoc test for the model NPX~Treatment*Time,
+ordinalRegression_posthoc_results <- olink_ordinalRegression_posthoc(npx_data1, 
+                                                                     variable=c("Treatment:Time"),
+                                                                     covariates="Site",
+                                                                     olinkid_list = significant_assays,
+                                                                     effect = "Treatment:Time")
+
+```
+
+### Function output
+
+A tibble with the following columns:
+
+* Assay _\<chr\>_: Assay name.
+* OlinkID _\<chr\>_: Unique Olink ID.
+* UniProt _\<chr\>_: UniProt ID.
+* Panel _\<chr\>_: Olink Panel.
+* term _\<chr\>_: Name of the variable that was used for the p-value calculation. The ":" between variables indicates interaction between variables.
+* contrast _\<chr\>_: Variables (in term) that are compared.   
+* estimate _\<dbl\>_: Difference in mean NPX between variables (from contrast).
 * Adjusted_pval _\<dbl\>_: Adjusted p-value for the test (Benjamini & Hochberg).
 * Threshold _\<chr\>_: Text indication if assay is significant (adjusted p-value < 0.05).
 
