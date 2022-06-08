@@ -18,10 +18,15 @@ olink_one_non_parametric_posthoc(
 
 \item{variable}{Single character value or character array.}
 
-\item{verbose}{Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
+\item{outcome}{Character. The dependent variable. Default: NPX.}
+
+\item{p_adjust_method}{Adjust P-value for Multiple Comparisons.}
+
+\item{verbose}{Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
+
 }
 \value{
-Tibble of posthoc tests for specicified effect, arranged by ascending adjusted p-values.
+Tibble of posthoc tests for specified effect, arranged by ascending adjusted p-values.
 }
 \description{
 Performs a posthoc test using rstatix::wilcox_test with Benjamini-Hochberg p-value adjustment per assay (by OlinkID) for each panel at confidence level 0.95.
