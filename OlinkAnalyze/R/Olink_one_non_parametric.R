@@ -15,8 +15,8 @@
 #'
 #' @param df NPX or Quantified_value data frame in long format with at least protein name (Assay), OlinkID, UniProt, Panel and a factor with at least 3 levels.
 #' @param variable Single character value.
-#' @param dependence Boolean. Default: FALSE. When the groups are independent, the kruskal-Wallis will run, when the groups are dependent, the Friedman test will run.
-#' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
+#' @param dependence Logical. Default: FALSE. When the groups are independent, the kruskal-Wallis will run, when the groups are dependent, the Friedman test will run.
+#' @param verbose Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #'
 #' @return A tibble containing the Kruskal-Wallis Test or Friedman Test results for every protein.
 #' The tibble is arranged by ascending p-values.
