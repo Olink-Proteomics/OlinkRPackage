@@ -20,7 +20,7 @@ A data frame containing the Mann-Whitney U Test results for every protein.
 }
 \description{
 Performs a Welch 2-sample Mann-Whitney U Test at confidence level 0.95 for every protein (by OlinkID)
-for a given grouping variable using stats::t.test and corrects for multiple testing by
+for a given grouping variable using stats::wilcox.test and corrects for multiple testing by
 the Benjamini-Hochberg method (“fdr”) using stats::p.adjust.
 Adjusted p-values are logically evaluated towards adjusted p-value<0.05.
 The resulting Mann-Whitney U Test table is arranged by ascending p-values.

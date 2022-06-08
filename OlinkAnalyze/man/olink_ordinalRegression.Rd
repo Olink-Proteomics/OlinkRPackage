@@ -24,7 +24,6 @@ Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be infe
 
 \item{return.covariates}{Logical. Default: False. Returns F-test results for the covariates. Note: Adjusted p-values will be NA for the covariates.}
 
-
 \item{verbose}{Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
 }
 \value{

@@ -11,9 +11,9 @@ olink_one_non_parametric(df, variable, dependence = FALSE, verbose = T)
 
 \item{variable}{Single character value.}
 
-\item{dependence}{Boolean. Default: FALSE. When the groups are independent, the kruskal-Wallis will run, when the groups are dependent, the Friedman test will run.}
+\item{dependence}{Logical. Default: FALSE. When the groups are independent, the kruskal-Wallis will run, when the groups are dependent, the Friedman test will run.}
 
-\item{verbose}{Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
+\item{verbose}{Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
 }
 \value{
 A tibble containing the Kruskal-Wallis Test or Friedman Test results for every protein.

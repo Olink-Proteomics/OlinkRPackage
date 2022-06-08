@@ -1,7 +1,7 @@
 #'Function which performs a Mann-Whitney U Test per protein
 #'
 #'Performs a Welch 2-sample Mann-Whitney U Test at confidence level 0.95 for every protein (by OlinkID)
-#'for a given grouping variable using stats::t.test and corrects for multiple testing by
+#'for a given grouping variable using stats::wilcox.test and corrects for multiple testing by
 #'the Benjamini-Hochberg method (“fdr”) using stats::p.adjust.
 #'Adjusted p-values are logically evaluated towards adjusted p-value<0.05.
 #'The resulting Mann-Whitney U Test table is arranged by ascending p-values.
@@ -34,6 +34,7 @@
 #' @importFrom rlang ensym
 #' @importFrom tidyr pivot_wider
 #' @importFrom stats wilcox.test
+#' @importFrom tibble is_tibble
 
 
 olink_wilcox <- function(df, variable, pair_id, ...){
@@ -148,7 +149,7 @@ olink_wilcox <- function(df, variable, pair_id, ...){
 
     if(!pair_id %in% colnames(df)) stop(paste0("Column ",pair_id," not found."))
 
-    if(!is_tibble(df)){
+    if(!tibble::is_tibble(df)){
       message("Converting data frame to tibble.")
       df <- dplyr::as_tibble(df)
     }
