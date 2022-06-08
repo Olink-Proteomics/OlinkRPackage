@@ -22,7 +22,7 @@
 #' @examples
 #' \donttest{bridge_samples <- olink_bridgeselector(npx_data1, sampleMissingFreq = 0.1, n = 20)}
 #' @importFrom magrittr %>%
-#' @importFrom dplyr n select distinct arrange group_by mutate ungroup left_join filter
+#' @importFrom dplyr n select distinct arrange group_by mutate ungroup left_join filter if_else
 #' @importFrom stringr str_detect
 
 olink_bridgeselector<-function(df, sampleMissingFreq, n){
@@ -51,7 +51,7 @@ olink_bridgeselector<-function(df, sampleMissingFreq, n){
                   iqr_low = mean(IQR, na.rm = TRUE) - 3*sd(IQR, na.rm = TRUE),
                   iqr_high = mean(IQR, na.rm = TRUE) + 3*sd(IQR, na.rm = TRUE)) %>%
     dplyr::ungroup() %>%
-    dplyr::mutate(Outlier = if_else(sample_median < median_high &
+    dplyr::mutate(Outlier = dplyr::if_else(sample_median < median_high &
                                       sample_median > median_low &
                                       IQR > iqr_low &
                                       IQR < iqr_high,

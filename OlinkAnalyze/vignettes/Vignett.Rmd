@@ -184,11 +184,11 @@ Tibble with sample IDs and mean NPX for the pre-defined number of bridging sampl
 
 ## Normalizing NPX data (olink_normalization)
 
-The olink_normalization is a function used to normalize NPX values between two different dataframes/projects which have been ran at different times. Commonly, there is a shift in (mean) NPX values between runs, however, the spread of the data remains the same. This is why normalization between dataframes/projects is required. When normalization is performed, one of the two provided dataframes/projects shall be used as a reference. If two dataframes/projects have been normalized to one another, Olink® by default uses the chronologically older one as reference. The function handles four different types of normalization: 
+The olink_normalization is a function used to normalize NPX values between two different dataframes/projects which have been ran at different times. Commonly, there is a shift in (mean) NPX values between runs, however, the spread of the data remains the same. This is why normalization between dataframes/projects is required. When normalization is performed, one of the two provided dataframes/projects shall be used as a reference. If two dataframes/projects have been normalized to one another, Olink® by default uses the chronologically older one as reference. The function handles three different types of normalization: 
 
 * **Bridging normalization**: One of the dataframes is adjusted to another using overlapping samples (bridge samples). The overlapping samples should have the same IDs between dataframes, and adjustment is made using the median of the paired differences between the bridge samples. The two dataframes are provided as the inputs df1 and df2, while the one being used as reference is specified by the reference_project and the overlapping samples are specified by the overlapping_samples_df1. Only overlapping_samples_df1 should be provided regardless of which dataframe is used as reference_project.
 * **Subset normalization**: A subset of samples is used to normalize two dataframes, one of which is used as a reference_project. Adjustment is made using the differences of medians between the sample subsets from the two dataframes. Both overlapping_samples_df1 and overlapping_samples_df2 should be provided as input. The sample IDs do not need to overlap.
-* **Intensity normalization**: A version of subset normalization where all samples (except control samples) from the dataframes are used as overlapping_samples_df1 and overlapping_samples_df2, respectively.
+A special case of subset normalization is where all samples (except control samples and samples with QC warning) from df1 are used as input in overlapping_samples_df1 and all samples from df2 are used as input in overlapping_samples_df2. This is useful if no bridge samples was included and one can assume that the distribution of the two datasets should be very similar. 
 * **Reference median normalization**: Works only on one dataframe. This is effectively subset normalization, but using difference of medians to pre-recorded median values. df1, overlapping_samples_df1 and reference_medians need to be specified. Adjustment of df1 is made using the differences in median between the overlapping samples and the reference medians.
 
 ### Function arguments
@@ -212,6 +212,27 @@ overlap_samples <- intersect(npx_data1$SampleID, npx_data2$SampleID) %>%
 olink_normalization(df1 = npx_data1, 
                     df2 = npx_data2, 
                     overlapping_samples_df1 = overlap_samples,
+                    df1_project_nr = '20200001',
+                    df2_project_nr = '20200002',
+                    reference_project = '20200001')
+
+# Example of using all samples for normalization
+subset_df1 <- npx_data1 %>% 
+  filter(QC_Warning == 'Pass') %>% 
+  filter(!str_detect(SampleID, 'CONTROL_SAMPLE')) %>%
+  pull(SampleID) %>% 
+  unique()
+
+subset_df2 <- npx_data2 %>% 
+  filter(QC_Warning == 'Pass') %>% 
+  filter(!str_detect(SampleID, 'CONTROL_SAMPLE')) %>%
+  pull(SampleID) %>% 
+  unique()
+
+olink_normalization(df1 = npx_data1, 
+                    df2 = npx_data2, 
+                    overlapping_samples_df1 = subset_df1,
+                    overlapping_samples_df2 = subset_df2,
                     df1_project_nr = '20200001',
                     df2_project_nr = '20200002',
                     reference_project = '20200001')
@@ -825,7 +846,7 @@ npx_data1 %>%
 
 ### Function output
 
-A list of objects of class *ggplot*.
+A *ggplot* object.
 
 ## Point-range plot for LMER (olink_lmer_plot)
 
@@ -941,8 +962,8 @@ olink_pathway_heatmap(enrich_results = ora_results, test_results = ttest_results
 ### Function output
 A heatmap as a ggplot object
 
-## Bargraph for visualizating pathway enrichment (olink_pathway_visualization)
-The olink_pathway_visualization function generates a bar graph of the top terms or terms related to a certain keyword for results from the olink_pathway_enrichment function. The bar represents eithre the normalized enrichment score (NES) for GSEA results or counts (number of proteins) for ORA results colored by adjusted p-value. The ORA visualization also contains the number of proteins out of the total proteins in that pathway as a ratio after the bar.
+## Bargraph for visualizing pathway enrichment (olink_pathway_visualization)
+The olink_pathway_visualization function generates a bar graph of the top terms or terms related to a certain keyword for results from the olink_pathway_enrichment function. The bar represents either the normalized enrichment score (NES) for GSEA results or counts (number of proteins) for ORA results colored by adjusted p-value. The ORA visualization also contains the number of proteins out of the total proteins in that pathway as a ratio after the bar.
 
 ### Function arguments
 
@@ -1002,10 +1023,10 @@ Group variable can be annotated and colored in the left side of the heatmap.
 * cluster_rows: Logical. Default: True. Determining if rows should be clustered.
 * cluster_cols: Logical. Default: True. Determining if columns should be clustered.
 * show_rownames: Logical. Default: True. Determining if row names are shown.
-* show_colnames: Logical. Defualt: True. Determining if column names are shown.
-* annotation_legend: Logical. Defualt: True. Determining if legend for annotations should be shown.
-* fontsize. Defualt: 10. Fontsize for all text. 
-* na_col. Defualt: Black. Color of the cells with NA.
+* show_colnames: Logical. Default: True. Determining if column names are shown.
+* annotation_legend: Logical. Default: True. Determining if legend for annotations should be shown.
+* fontsize. Default: 10. Fontsize for all text. 
+* na_col. Default: Black. Color of the cells with NA.
 
 
 ```{r message=FALSE, fig.width=8, fig.height=4}

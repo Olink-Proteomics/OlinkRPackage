@@ -2,7 +2,7 @@
 #'
 #'Performs an ANOVA F-test for each assay (by OlinkID) in every panel using car::Anova and Type II sum of squares.
 #'The function handles only factor and/or covariates. \cr\cr
-#'Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a messsage if verbose = T).
+#'Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a message if verbose = T).
 #'Character columns in the input dataframe are automatically converted to factors (specified in a message if verbose = T).
 #'Crossed analysis, i.e. A*B formula notation, is inferred from the variable argument in the following cases: \cr
 #'\itemize{
@@ -22,7 +22,7 @@
 #' Also takes ':'/'*' notation.
 #' @param covariates Single character value or character array. Default: NULL.
 #' Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be inferred from main effects.
-#' @param return.covariates Logical. Deafult: False. Returns F-test results for the covariates. Note: Adjusted p-values will be NA for the covariates.
+#' @param return.covariates Logical. Default: False. Returns F-test results for the covariates. Note: Adjusted p-values will be NA for the covariates.
 #' @param verbose Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #'
 #' @return A tibble containing the ANOVA results for every protein.
@@ -39,7 +39,6 @@
 #' @importFrom dplyr filter group_by ungroup pull do select arrange mutate
 #' @importFrom stringr str_detect
 #' @importFrom rstatix convert_as_factor
-#' @importFrom ordinal clm
 #' @importFrom utils glob2rx read.table globalVariables
 
 olink_ordinalRegression <- function(df,
@@ -48,6 +47,12 @@ olink_ordinalRegression <- function(df,
                                     return.covariates=F,
                                     verbose=T
                                     ){
+  # Is Package installed
+  if(!requireNamespace("ordinal", quietly = TRUE) ){
+    stop("Ordinal Regression requires the ordinal package.
+         Please install ordinal before continuing.")
+  }
+  
   if(missing(df) | missing(variable)){
     stop('The df and variable arguments need to be specified.')
     }
@@ -273,9 +278,9 @@ olink_ordinalRegression <- function(df,
 #' @param covariates Single character value or character array. Default: NULL.
 #' Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be inferred from main effects.
 #' @param effect Term on which to perform post-hoc. Character vector. Must be subset of or identical to variable.
-#' @param verbose Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
+#' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #'
-#' @return Tibble of posthoc tests for specicified effect, arranged by ascending adjusted p-values.
+#' @return Tibble of posthoc tests for specified effect, arranged by ascending adjusted p-values.
 #' @export
 #' @examples \donttest{
 #' library(dplyr)
@@ -304,7 +309,6 @@ olink_ordinalRegression <- function(df,
 #' @importFrom dplyr filter group_by ungroup pull do select arrange mutate
 #' @importFrom stringr str_detect
 #' @importFrom rstatix convert_as_factor
-#' @importFrom ordinal clm
 
 
 
@@ -315,6 +319,12 @@ olink_ordinalRegression_posthoc <- function(df,
                                 effect,
                                 verbose=T
                                 ){
+  if(!requireNamespace("ordinal", quietly = TRUE) ){
+    stop("Ordinal Regression requires the ordinal package.
+         Please install ordinal before continuing.")
+  }
+  
+  
   if(missing(df) | missing(variable) | missing(effect)){
     stop('The df and variable and effect arguments need to be specified.')
     }
