@@ -19,10 +19,6 @@ olink_one_non_parametric_posthoc(
 \item{variable}{Single character value or character array.}
 
 \item{verbose}{Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
-
-\item{outcome}{Character. The dependent variable. Default: NPX.}
-
-\item{p_adjust_method}{Adjust P-value for Multiple Comparisons.}
 }
 \value{
 Tibble of posthoc tests for specified effect, arranged by ascending adjusted p-values.
