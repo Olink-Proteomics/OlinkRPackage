@@ -144,7 +144,7 @@ olink_ttest <- function(df, variable, pair_id, ...){
 
     warning(paste0('The assays ',
                    paste(all_nas, collapse = ', '),
-                   ' have only NA:s. They will not be tested.'),
+                   ' have too few datapoints. They will not be tested.'),
             call. = FALSE)
 
   }
@@ -154,7 +154,7 @@ olink_ttest <- function(df, variable, pair_id, ...){
     dplyr::group_by(OlinkID, !!rlang::ensym(variable)) %>%
     dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(NPX))) %>%
     dplyr::ungroup() %>%
-    dplyr::filter(n == n_na) %>%
+    dplyr::filter(n-n_na <= 1) %>%
     dplyr::pull(OlinkID)
 
 
@@ -162,11 +162,20 @@ olink_ttest <- function(df, variable, pair_id, ...){
 
     warning(paste0('The assays ',
                    paste(nas_in_level, collapse = ', '),
-                   ' have only NA:s in one level of the factor. They will not be tested.'),
+                   ' have too few datapoints in one level of the factor. They will not be tested.'),
             call. = FALSE)
 
   }
-
+  
+  
+  #Filtering out non-tested assays
+  df <- df %>%
+    dplyr::filter(!(OlinkID %in% all_nas)) %>%
+    dplyr::filter(!(OlinkID %in% nas_in_level))
+  
+  if(nrow(df) == 0) {
+    stop('No assays passing initial check. T-test will not be performed.')
+  }
 
   if(!missing(pair_id)){
 
@@ -192,8 +201,6 @@ olink_ttest <- function(df, variable, pair_id, ...){
 
 
     p.val <- df %>%
-      dplyr::filter(!(OlinkID %in% all_nas)) %>%
-      dplyr::filter(!(OlinkID %in% nas_in_level)) %>%
       dplyr::select(dplyr::all_of(c("OlinkID", "UniProt", "Assay", "Panel", "NPX", variable, pair_id))) %>%
       tidyr::pivot_wider(names_from = dplyr::all_of(variable), values_from = "NPX") %>%
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
@@ -207,14 +214,9 @@ olink_ttest <- function(df, variable, pair_id, ...){
   } else{
 
 
-
-
     message(paste0('T-test is performed on ', var_levels[1], ' - ', var_levels[2], '.'))
 
-
     p.val <- df %>%
-      dplyr::filter(!(OlinkID %in% all_nas)) %>%
-      dplyr::filter(!(OlinkID %in% nas_in_level)) %>%
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
       dplyr::do(broom::tidy(t.test(NPX ~ !!rlang::ensym(variable), data = ., ...))) %>%
       dplyr::ungroup() %>%

@@ -1,4 +1,31 @@
-# OlinkAnalyze 3.0.0
+# Olink Analyze 3.1.0
+
+## Minor Changes
+
+* Non-parametric functions are now available (@boxizhang, #114, #142)
+* Updated installation instructions to reflect CRAN acceptance (@kathy-nevola, #107)
+* Zipped files from MyData can now be used as input for read_NPX (@klevdiamanti, #115)
+* LME and ANOVA formulas can now be customized (@jrguess, #120)
+* Pathway enrichment functions and visualizations are now available (@kathy-nevola, #125)
+* Heatmaps can now be generated (@Orbmac, $127)
+* olink_boxplot function now has significance bars and stars (@boxizhang, #132)
+* PCA preprocessing was moved to internal function (@simfor, #133)
+* olink_plate_randomizer will now return a warning if there are duplicate SampleIDs or if SubjectColumn is missing (@kristianHoden, #146)
+* olink_plate_randomizer can now keep studies together on plates (@kristianHoden, #146)
+* Added Masoumeh Sheikhi and Boxi Zhang as authors
+* Added Kristian Hodén as contributor
+
+## Bug Fixes
+
+* olink_pca_plot by Panel will now show correct colors when a variable is missing (@MasoumehSheikhi, Issue #117, Commit 0f2f157) 
+* olink_ttest will now return a warning message if an assay has less than 2 datapoints in a group. (@marisand, #110)
+* LMER class is now checked using inherits (@MasoumehSheikhi, #134)
+* License was corrected to AGPL-3 (@Orbmac, #138)
+* Correct output type of olink_dist_plot in vignette to ggplot object (@kathy-nevola, Issue #112, #141)
+* Previously called "intensity normalization" has been clarified as a special type of subset normalization and an example has been added to the documentation and vignette (@Orbmac, #144)
+
+
+# Olink Analyze 3.0.0
 
 ## Major Changes
 
@@ -20,7 +47,7 @@
 * fixed keywords in documentation (@kathy-nevola, #99)
 
 
-# OlinkAnalyze 2.0.1
+# Olink Analyze 2.0.1
 
 ## Bug Fixes
 
@@ -29,7 +56,7 @@
 * Add Ola Caster to author list
 * Update documentation to change olinkR to Olink Analyze (@jrguess, #89)
 
-# OlinkAnalyze 2.0.0
+# Olink Analyze 2.0.0
 
 ## Major Changes
 
@@ -45,7 +72,7 @@
 * Update Vignette to reflect new functionality (@kathy-nevola, #78)
 
 
-# OlinkAnalyze 1.3.0
+# Olink Analyze 1.3.0
 
 ## Major Changes
 

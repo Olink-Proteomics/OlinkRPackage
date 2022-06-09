@@ -125,6 +125,10 @@ olink_pca_plot <- function (df,
   }
 
   if(byPanel){
+    # Convert color_g variable to factor
+    if(!is.factor(df[[paste(color_g)]])){
+      df[[paste(color_g)]] <- as.factor(df[[paste(color_g)]])
+    }
     df <- df %>%
       dplyr::mutate(Panel = Panel  %>% stringr::str_replace("Olink ", "")) #Strip "Olink" from the panel names
 
@@ -193,223 +197,54 @@ olink_pca_plot.internal <- function (df,
                                      verbose = TRUE,
                                      ...){
 
-  if (color_g == "QC_Warning"){
+  #Data pre-processing
+  procData <- npxProcessing_forDimRed(df = df,
+                                      color_g = color_g,
+                                      drop_assays = drop_assays,
+                                      drop_samples = drop_samples,
+                                      verbose = verbose)
 
-    df_temp <- df %>%
-      dplyr::group_by(SampleID, Index) %>%
-      dplyr::mutate(QC_Warning = dplyr::if_else(any(QC_Warning == "Warning"|QC_Warning == "WARN" ), "Warning", "Pass")) %>%
-      dplyr::ungroup()
+  #Did we drop any of the of the assays specified in the loadings_list?
+  if(!is.null(loadings_list)){
+    #Dropped because of NAs
+    dropped_loadings <- intersect(procData$dropped_assays.na,
+                                  loadings_list)
 
-    colors_for_pca <- df_temp %>%
-      dplyr::group_by(SampleID, Index) %>%
-      dplyr::summarise(pca_colors = unique(!!rlang::ensym(color_g))) %>%
-      dplyr::ungroup()
-
-
-  } else {
-
-    number_of_sample_w_more_than_one_color <- df %>%
-      dplyr::group_by(SampleID, Index) %>%
-      dplyr::summarise(n_colors = dplyr::n_distinct(!!rlang::ensym(color_g), na.rm = TRUE)) %>%
-      dplyr::ungroup() %>%
-      dplyr::filter(n_colors > 1) %>%
-      nrow(.)
-
-    if(number_of_sample_w_more_than_one_color > 0) {
-
-      stop(paste0("There are ", number_of_sample_w_more_than_one_color, " samples that do not have a unique color. Only one color per sample is allowed."))
-
-    }else{
-
-      df_temp <- df
-
-      colors_for_pca <- df_temp %>%
-        dplyr::group_by(SampleID, Index) %>%
-        dplyr::summarise(pca_colors = unique(!!rlang::ensym(color_g))) %>%
-        dplyr::ungroup()
-
-    }
-
-  }
-
-  #Checking if there are any proteins with 0 variance, they are filtered out
-
-  df_temp <- df_temp %>%
-    dplyr::group_by(OlinkID) %>%
-    dplyr::mutate(assay_var = var(NPX, na.rm = TRUE)) %>%
-    dplyr::ungroup() %>%
-    dplyr::filter(!(assay_var == 0 | is.na(assay_var))) %>%
-    dplyr::select(-assay_var)
-
-  #wide format
-
-  df_wide <- df_temp %>%
-    dplyr::select(SampleID, Index, OlinkID, NPX) %>%
-    dplyr::filter(!is.na(NPX)) %>%
-    tidyr::spread(OlinkID, NPX)
-
-
-  #Dropping any cols with NA
-  #drop_assays take precedence
-  if(drop_assays){
-
-    dropped_assays <- colnames(df_wide[, -c(1:2)])[apply(df_wide[, -c(1:2)], 2, anyNA)]
-
-    df_wide <- df_wide %>%
-      dplyr::select(-tidyselect::all_of(dropped_assays))
-
-    if(verbose){
-      warning(paste0(length(dropped_assays)),
-              " assay(s) contain NA and are dropped. ")
-    }
-
-    if(!is.null(loadings_list)){
-
-      dropped_loadings <- intersect(dropped_assays,
-                                    loadings_list)
-
-
-      if(length(dropped_loadings) > 0){
-
-        if(verbose){
-          warning(paste0("The loading(s) ",
-                         paste0(dropped_loadings, collapse=", "),
-                         " from the loadings_list contain NA and are dropped . "))
-        }
-
-        loadings_list <- setdiff(loadings_list, dropped_loadings)
-
-        if(length(loadings_list) == 0){
-
-          loadings_list <- NULL
-
-        }
+    if(length(dropped_loadings) > 0){
+      if(verbose){
+        warning(paste0("The loading(s) ",
+                       paste0(dropped_loadings, collapse=", "),
+                       " from the loadings_list contain NA and are dropped . "))
       }
 
+      loadings_list <- setdiff(loadings_list, dropped_loadings)
     }
 
-    if(ncol(df_wide) < 4){
-      stop('Too many assays removed. Set drop_assays = FALSE for imputation.')
-    }
-  }
 
+    #Dropped because of to high missingness
+    dropped_loadings <- intersect(procData$dropped_assays.missingness,
+                                  loadings_list)
 
-  if(drop_samples){
-
-    dropped_samples <- apply(df_wide[, -c(1:2)], 1, anyNA)
-
-    df_wide <- df_wide[!dropped_samples, ]
-
-    if(verbose){
-      warning(paste0(sum(dropped_samples)),
-              " sample(s) contain NA and are dropped. ")
-    }
-
-    if(nrow(df_wide) < 2){
-
-      stop('Too many samples removed. Set drop_samples = FALSE for imputation.')
-    }
-
-  }
-
-
-
-  percent_missingness <- colSums(is.na(df_wide[, -c(1:2)]))/nrow(df_wide)
-
-  # assays with missingness > 10% are dropped from the PCA
-  PERCENT_CUTOFF <- 0.1
-
-  #If there are fewer samples than one plate (88), the PERCENT_CUTOFF is 0.05
-  if(nrow(df_wide) <= 88){
-    PERCENT_CUTOFF <- 0.05
-  }
-
-  if(any(percent_missingness > PERCENT_CUTOFF)){
-
-    removed_assays_index <- which(percent_missingness > PERCENT_CUTOFF)
-    percent_missingness <- percent_missingness[-removed_assays_index]
-
-    removed_assays_index <- removed_assays_index + 2
-    removed_assays <- colnames(df_wide)[removed_assays_index]
-
-    df_wide <- df_wide[, -removed_assays_index]
-
-    if(verbose){
-      warning(paste0("There are ",
-                     paste0(length(removed_assays)),
-                     " assay(s) dropped due to high missingness (>",
-                     round(PERCENT_CUTOFF*100),
-                     "%)."))
-    }
-
-    if(!is.null(loadings_list)){
-
-      dropped_loadings <- intersect(removed_assays,
-                                    loadings_list)
-
-
-      if(length(dropped_loadings) > 0){
-
-        if(verbose){
-          warning(paste0("The loading(s) ",
-                         paste0(dropped_loadings, collapse=", "),
-                         " from the loadings_list are dropped due to high missingness. "))
-        }
-
-        loadings_list <- setdiff(loadings_list, dropped_loadings)
-
-        if(length(loadings_list) == 0){
-
-          loadings_list <- NULL
-
-        }
+    if(length(dropped_loadings) > 0){
+      if(verbose){
+        warning(paste0("The loading(s) ",
+                       paste0(dropped_loadings, collapse=", "),
+                       " from the loadings_list are dropped due to high missingness. "))
       }
 
+      loadings_list <- setdiff(loadings_list, dropped_loadings)
     }
 
-  }
-
-  #<= PERCENT_CUTOFF assays imputed
-
-  if(any(percent_missingness <= PERCENT_CUTOFF & percent_missingness > 0)){
-
-    imputed_assays_index <- which(percent_missingness <= PERCENT_CUTOFF & percent_missingness > 0)
-    percent_missingness <- percent_missingness[-imputed_assays_index]
-
-    imputed_assays_index <- imputed_assays_index + 2
-    imputed_assays <- colnames(df_wide)[imputed_assays_index]
-
-    df_wide <- df_wide %>%
-      dplyr::mutate_at(tidyselect::all_of(imputed_assays),
-                       ~ifelse(is.na(.x), median(.x, na.rm = TRUE), .x))
-
-    if(verbose){
-      warning(paste0("There are ",
-                     paste0(length(imputed_assays)),
-                     " assay(s) that were imputed by their medians."))
+    if(length(loadings_list) == 0){
+      loadings_list <- NULL
     }
   }
 
-  if(!all(colSums(is.na(df_wide[, -c(1:2)])) == 0)){
-    stop('Missingness imputation failed.')
-  }
-
-  df_wide <- df_wide %>%
-    dplyr::left_join(colors_for_pca,
-                     by = c('SampleID',
-                            'Index')) %>%
-    dplyr::select(SampleID, Index, pca_colors, everything())
-
-  df_wide_matrix <- df_wide %>%
-    dplyr::select(-Index, -pca_colors) %>%
-    tibble::column_to_rownames('SampleID') %>%
-    as.matrix
-
-  pca_fit <- stats::prcomp(df_wide_matrix, scale. = TRUE, center = TRUE)
+  #### PCA ####
+  pca_fit <- stats::prcomp(procData$df_wide_matrix, scale. = TRUE, center = TRUE)
 
   #Standardizing and selecting components
-
-  scaling_factor_lambda <- pca_fit$sdev*sqrt(nrow(df_wide_matrix))
+  scaling_factor_lambda <- pca_fit$sdev*sqrt(nrow(procData$df_wide_matrix))
 
   PCX <- pca_fit$x[,x_val]/scaling_factor_lambda[x_val]
   PCY <- pca_fit$x[,y_val]/scaling_factor_lambda[y_val]
@@ -417,8 +252,8 @@ olink_pca_plot.internal <- function (df,
   LX <- pca_fit$rotation[, x_val]
   LY <- pca_fit$rotation[, y_val]
 
-  observation_names <- df_wide$SampleID
-  observation_colors <- df_wide$pca_colors
+  observation_names <- procData$df_wide$SampleID
+  observation_colors <- procData$df_wide$colors
 
   scores <- data.frame(cbind(PCX, PCY))
   loadings <- data.frame(variables = rownames(pca_fit$rotation), LX, LY)
@@ -554,7 +389,7 @@ olink_pca_plot.internal <- function (df,
 
   pca_plot <- pca_plot +
     OlinkAnalyze::set_plot_theme() +
-    OlinkAnalyze::olink_color_discrete(...)
+    OlinkAnalyze::olink_color_discrete(...,drop=FALSE)
 
   return(pca_plot)
 
