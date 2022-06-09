@@ -17,7 +17,7 @@
 
 ## Bug Fixes
 
-* olink_pca_plot by Panel will now show correct colors when a variable is missing (@MasoumehSheikhi, Issue #117) 
+* olink_pca_plot by Panel will now show correct colors when a variable is missing (@MasoumehSheikhi, Issue #117, Commit 0f2f157) 
 * olink_ttest will now return a warning message if an assay has less than 2 datapoints in a group. (@marisand, #110)
 * LMER class is now checked using inherits (@MasoumehSheikhi, #134)
 * License was corrected to AGPL-3 (@Orbmac, #138)
