@@ -67,6 +67,7 @@
 #' @importFrom ggplot2 ggplot aes xlab ylab geom_text geom_point geom_segment  labs guides arrow
 #' @importFrom ggrepel geom_label_repel
 #' @importFrom utils head
+#' @importFrom utils modifyList
 #' @importFrom grid unit
 
 olink_pca_plot <- function (df,
@@ -239,6 +240,12 @@ olink_pca_plot.internal <- function (df,
     extra_columns <- c(extra_columns, "data_id")
     interactivity <- TRUE
   }
+  # Check ggiraph availability
+  if (interactivity && !requireNamespace("ggiraph", quietly = TRUE)) {
+    stop(paste0("To be able to add interactivity, the ggiraph package is required.\n",
+                "Please install ggiraph before continuing.\n\n",
+                "install.packages(\"ggiraph\")"))
+  }
 
   #Data pre-processing
   procData <- npxProcessing_forDimRed(df = df,
@@ -312,10 +319,10 @@ olink_pca_plot.internal <- function (df,
   # If interactivity columns selected, add these to scores
   if (interactivity) {
     if (!is.null(tooltip_variable)) {
-      scores <- dplyr::bind_cols(scores, tooltip=procData$df_wide[["tooltip"]])
+      scores <- cbind(scores, tooltip=procData$df_wide[["tooltip"]])
     }
     if (!is.null(data_id_variable)) {
-      scores <- dplyr::bind_cols(scores, data_id=procData$df_wide[["data_id"]])
+      scores <- cbind(scores, data_id=procData$df_wide[["data_id"]])
     }
   }
 
