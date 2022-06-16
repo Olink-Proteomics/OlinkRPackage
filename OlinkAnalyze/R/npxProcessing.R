@@ -1,4 +1,4 @@
-npxProcessing_forDimRed <- function(df, color_g, drop_assays, drop_samples, verbose){
+npxProcessing_forDimRed <- function(df, color_g, drop_assays, drop_samples, verbose, extra_columns=character(0L)){
   #### Set up plotting colors ####
   if (color_g == "QC_Warning"){
     df_temp <- df %>%
@@ -41,14 +41,17 @@ npxProcessing_forDimRed <- function(df, color_g, drop_assays, drop_samples, verb
 
   #wide format
   df_wide <- df_temp %>%
-    dplyr::select(SampleID, Index, OlinkID, NPX) %>%
+    dplyr::select(c("SampleID", "Index", "OlinkID", "NPX", extra_columns)) %>%
     dplyr::filter(!is.na(NPX)) %>%
     tidyr::spread(OlinkID, NPX)
+
+  # Count number of non-NPX columns
+  n_non_NPX <- length(c("SampleID", "Index", extra_columns))
 
   #### If drop_assays == T, drop assays with any missing values ####
   if(drop_assays){
 
-    dropped_assays.na <- colnames(df_wide[, -c(1:2)])[apply(df_wide[, -c(1:2)], 2, anyNA)]
+    dropped_assays.na <- colnames(df_wide[, -c(1L:n_non_NPX)])[apply(df_wide[, -c(1L:n_non_NPX)], 2L, anyNA)]
 
     df_wide <- df_wide %>%
       dplyr::select(-tidyselect::all_of(dropped_assays.na))
@@ -58,7 +61,7 @@ npxProcessing_forDimRed <- function(df, color_g, drop_assays, drop_samples, verb
               " assay(s) contain NA and are dropped. ")
     }
 
-    if(ncol(df_wide) < 4){
+    if(ncol(df_wide) < n_non_NPX + 2L){
       stop('Too many assays removed. Set drop_assays = FALSE for imputation.')
     }
   } else{
@@ -68,7 +71,7 @@ npxProcessing_forDimRed <- function(df, color_g, drop_assays, drop_samples, verb
   #### If drop_samples == T, drop samples with any missing values ####
   if(drop_samples){
 
-    dropped_samples <- apply(df_wide[, -c(1:2)], 1, anyNA)
+    dropped_samples <- apply(df_wide[, -c(1L:n_non_NPX)], 1L, anyNA)
     df_wide <- df_wide[!dropped_samples, ]
 
     if(verbose){
@@ -83,7 +86,7 @@ npxProcessing_forDimRed <- function(df, color_g, drop_assays, drop_samples, verb
 
   #### Drop assays with to many missing values ####
   #Missingness per assay
-  percent_missingness <- colSums(is.na(df_wide[, -c(1:2)]))/nrow(df_wide)
+  percent_missingness <- colSums(is.na(df_wide[, -c(1L:n_non_NPX)]))/nrow(df_wide)
 
   # assays with missingness > 10% are dropped from the PCA
   PERCENT_CUTOFF <- 0.1
@@ -98,7 +101,7 @@ npxProcessing_forDimRed <- function(df, color_g, drop_assays, drop_samples, verb
     removed_assays_index <- which(percent_missingness > PERCENT_CUTOFF)
     percent_missingness <- percent_missingness[-removed_assays_index]
 
-    removed_assays_index <- removed_assays_index + 2
+    removed_assays_index <- removed_assays_index + n_non_NPX
     dropped_assays.missingness <- colnames(df_wide)[removed_assays_index]
 
     df_wide <- df_wide[, -removed_assays_index]
@@ -120,7 +123,7 @@ npxProcessing_forDimRed <- function(df, color_g, drop_assays, drop_samples, verb
     imputed_assays_index <- which(percent_missingness <= PERCENT_CUTOFF & percent_missingness > 0)
     percent_missingness <- percent_missingness[-imputed_assays_index]
 
-    imputed_assays_index <- imputed_assays_index + 2
+    imputed_assays_index <- imputed_assays_index + n_non_NPX
     imputed_assays <- colnames(df_wide)[imputed_assays_index]
 
     df_wide <- df_wide %>%
@@ -134,7 +137,7 @@ npxProcessing_forDimRed <- function(df, color_g, drop_assays, drop_samples, verb
     }
   }
 
-  if(!all(colSums(is.na(df_wide[, -c(1:2)])) == 0)){
+  if(!all(colSums(is.na(df_wide[, -c(1L:n_non_NPX)])) == 0)){
     stop('Missingness imputation failed.')
   }
 
@@ -143,10 +146,10 @@ npxProcessing_forDimRed <- function(df, color_g, drop_assays, drop_samples, verb
     dplyr::left_join(plotColors,
                      by = c('SampleID',
                             'Index')) %>%
-    dplyr::select(SampleID, Index, colors, everything())
+    dplyr::select(SampleID, Index, colors, tidyselect::everything())
 
   df_wide_matrix <- df_wide %>%
-    dplyr::select(-Index, -colors) %>%
+    dplyr::select(-c("Index", "colors", extra_columns)) %>%
     tibble::column_to_rownames('SampleID') %>%
     as.matrix
 

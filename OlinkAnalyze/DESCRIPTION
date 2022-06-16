@@ -88,7 +88,8 @@ Suggests:
     rmarkdown,
     scales,
     testthat (>= 3.0.0),
-    vdiffr
+    vdiffr,
+    ggiraph
 VignetteBuilder: 
     knitr
 Config/testthat/edition: 3

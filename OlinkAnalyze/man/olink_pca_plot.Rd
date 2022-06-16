@@ -20,6 +20,8 @@ olink_pca_plot(
   outlierLines = FALSE,
   quiet = FALSE,
   verbose = TRUE,
+  tooltip_variable = NULL,
+  data_id_variable = NULL,
   ...
 )
 }
@@ -53,6 +55,10 @@ olink_pca_plot(
 \item{quiet}{Logical. If TRUE, the resulting plot is not printed}
 
 \item{verbose}{Logical. Whether warnings about the number of samples and/or assays dropped or imputed should be printed to the console.}
+
+\item{tooltip_variable}{Optional. Name of column in \code{df} to set as \code{tooltip}, using \code{ggiraph::geom_point_interactive} instead of \code{ggplot2::geom_point}. Must be unique per sample.}
+
+\item{data_id_variable}{Optional. Name of column in \code{df} to set as \code{data_id}, using \code{ggiraph::geom_point_interactive} instead of \code{ggplot2::geom_point}. Must be unique per sample.}
 
 \item{...}{coloroption passed to specify color order.}
 }
