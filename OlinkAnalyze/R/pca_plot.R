@@ -24,6 +24,8 @@
 #' @param outlierLines Draw dashed lines at +/-outlierDef[X,Y] standard deviations from the mean of the plotted PCs (default FALSE)
 #' @param quiet Logical. If TRUE, the resulting plot is not printed
 #' @param verbose Logical. Whether warnings about the number of samples and/or assays dropped or imputed should be printed to the console.
+#' @param tooltip_variable Optional. Name of column in \code{df} to set as \code{tooltip}, using \code{ggiraph::geom_point_interactive} instead of \code{ggplot2::geom_point}. Must be unique per sample.
+#' @param data_id_variable Optional. Name of column in \code{df} to set as \code{data_id}, using \code{ggiraph::geom_point_interactive} instead of \code{ggplot2::geom_point}. Must be unique per sample.
 #' @param ... coloroption passed to specify color order.
 #' @return A list of objects of class "ggplot", each plot contains scatter plot of PCs
 #' @keywords NPX PCA
@@ -82,6 +84,8 @@ olink_pca_plot <- function (df,
                             outlierLines = FALSE,
                             quiet = FALSE,
                             verbose = TRUE,
+                            tooltip_variable = NULL,
+                            data_id_variable = NULL,
                             ...){
 
   #checking ellipsis
@@ -148,6 +152,8 @@ olink_pca_plot <- function (df,
                                 outlierDefY = outlierDefY,
                                 outlierLines = outlierLines,
                                 verbose = verbose,
+                                tooltip_variable = tooltip_variable,
+                                data_id_variable = data_id_variable,
                                 ...) +
         ggplot2::labs(title = x)
 
@@ -174,6 +180,8 @@ olink_pca_plot <- function (df,
                                         outlierDefY = outlierDefY,
                                         outlierLines = outlierLines,
                                         verbose = verbose,
+                                        tooltip_variable = tooltip_variable,
+                                        data_id_variable = data_id_variable,
                                         ...)
     if(!quiet) print(pca_plot)
     plotList <- list(pca_plot) #For consistency, return a list even when there's just one plot
@@ -195,14 +203,50 @@ olink_pca_plot.internal <- function (df,
                                      outlierDefY,
                                      outlierLines,
                                      verbose = TRUE,
+                                     tooltip_variable = NULL,
+                                     data_id_variable = NULL,
                                      ...){
+
+  # Handle interactivity
+  # To avoid issues in data management (for example if interactivity is desired on SampleID), we duplicate columns
+  interactivity <- FALSE
+  extra_columns <- character(0L)
+  if (!is.null(tooltip_variable)) {
+    # Variable must be unique per SampleID
+    tooltip_per_sample <- df %>%
+      dplyr::group_by(SampleID) %>%
+      dplyr::summarize(n = length(unique(!!rlang::ensym(tooltip_variable))), .groups="drop") %>%
+      dplyr::pull(n)
+    if (max(tooltip_per_sample) > 1L) {
+      stop("Selected tooltip variable '", tooltip_variable, "' is not unique per SampleID")
+    }
+    # Add 'tooltip' to df
+    df[["tooltip"]] <- df[[tooltip_variable]]
+    extra_columns <- c(extra_columns, "tooltip")
+    interactivity <- TRUE
+  }
+  if (!is.null(data_id_variable)) {
+    # Variable must be unique per SampleID
+    data_id_per_sample <- df %>%
+      dplyr::group_by(SampleID) %>%
+      dplyr::summarize(n = length(unique(!!rlang::ensym(data_id_variable))), .groups="drop") %>%
+      dplyr::pull(n)
+    if (max(data_id_per_sample) > 1L) {
+      stop("Selected data_id variable '", data_id_variable, "' is not unique per SampleID")
+    }
+    # Add 'data_id' to df
+    df[["data_id"]] <- df[[data_id_variable]]
+    extra_columns <- c(extra_columns, "data_id")
+    interactivity <- TRUE
+  }
 
   #Data pre-processing
   procData <- npxProcessing_forDimRed(df = df,
                                       color_g = color_g,
                                       drop_assays = drop_assays,
                                       drop_samples = drop_samples,
-                                      verbose = verbose)
+                                      verbose = verbose,
+                                      extra_columns = extra_columns)
 
   #Did we drop any of the of the assays specified in the loadings_list?
   if(!is.null(loadings_list)){
@@ -221,7 +265,7 @@ olink_pca_plot.internal <- function (df,
     }
 
 
-    #Dropped because of to high missingness
+    #Dropped because of too high missingness
     dropped_loadings <- intersect(procData$dropped_assays.missingness,
                                   loadings_list)
 
@@ -229,7 +273,7 @@ olink_pca_plot.internal <- function (df,
       if(verbose){
         warning(paste0("The loading(s) ",
                        paste0(dropped_loadings, collapse=", "),
-                       " from the loadings_list are dropped due to high missingness. "))
+                       " from the loadings_list are dropped due too high missingness. "))
       }
 
       loadings_list <- setdiff(loadings_list, dropped_loadings)
@@ -265,6 +309,16 @@ olink_pca_plot.internal <- function (df,
 
   loadings_scaling_factor <- 0.8/max(range_LX/range_PX, range_LY/range_PY)
 
+  # If interactivity columns selected, add these to scores
+  if (interactivity) {
+    if (!is.null(tooltip_variable)) {
+      scores <- dplyr::bind_cols(scores, tooltip=procData$df_wide[["tooltip"]])
+    }
+    if (!is.null(data_id_variable)) {
+      scores <- dplyr::bind_cols(scores, data_id=procData$df_wide[["data_id"]])
+    }
+  }
+
   #Identify outliers
   if(!is.na(outlierDefX) & !is.na(outlierDefY)){
     scores <- scores %>%
@@ -291,19 +345,40 @@ olink_pca_plot.internal <- function (df,
 
   if(label_samples){
 
-    pca_plot <- pca_plot +
-      ggplot2::geom_text(ggplot2::aes(label = observation_names, color = observation_colors), size = 3) +
-      ggplot2::labs(color = color_g) +
-      ggplot2::guides(size = "none")
+    if (!interactivity) {
+      pca_plot <- pca_plot + ggplot2::geom_text(ggplot2::aes(label = observation_names, color = observation_colors), size = 3)
+    }
+    else {
+      add_aes <- ggplot2::aes(label = observation_names, color = observation_colors)
+      if (!is.null(tooltip_variable)) {
+        add_aes <- utils::modifyList(add_aes, ggplot2::aes(tooltip = tooltip))
+      }
+      if (!is.null(data_id_variable)) {
+        add_aes <- utils::modifyList(add_aes, ggplot2::aes(data_id = data_id))
+      }
+      pca_plot <- pca_plot + ggiraph::geom_text_interactive(add_aes, size = 3)
+    }
 
   }else{
 
-    pca_plot <- pca_plot +
-      ggplot2::geom_point(ggplot2::aes(color = observation_colors), size = 2.5) +
-      ggplot2::labs(color = color_g) +
-      ggplot2::guides(size = "none")
+    if (!interactivity) {
+      pca_plot <- pca_plot + ggplot2::geom_point(ggplot2::aes(color = observation_colors), size = 2.5)
+    }
+    else {
+      add_aes <- ggplot2::aes(color = observation_colors)
+      if (!is.null(tooltip_variable)) {
+        add_aes <- utils::modifyList(add_aes, ggplot2::aes(tooltip = tooltip))
+      }
+      if (!is.null(data_id_variable)) {
+        add_aes <- utils::modifyList(add_aes, ggplot2::aes(data_id = data_id))
+      }
+      pca_plot <- pca_plot + ggiraph::geom_point_interactive(add_aes, size = 2.5)
+    }
 
   }
+  pca_plot <- pca_plot +
+    ggplot2::labs(color = color_g) +
+    ggplot2::guides(size = "none")
 
 
   #Drawing loadings
