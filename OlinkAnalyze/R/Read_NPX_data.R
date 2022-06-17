@@ -127,12 +127,16 @@ read_NPX <- function(filename){
     }
 
     #check that all colnames are present
-    match_old_header <- all(c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
-                              "MissingFreq", "Panel", "Panel_Version", "PlateID",
-                              "QC_Warning", "LOD", "NPX") %in% colnames(out))
-    match_new_header <- all(c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
-                              "MissingFreq", "Panel", "Panel_Lot_Nr", "PlateID",
-                              "QC_Warning", "LOD", "NPX", "Normalization", "Assay_Warning") %in% colnames(out))
+    match_old_new_header <- all(c("SampleID", "Index", "OlinkID", "UniProt",
+                                  "Assay", "MissingFreq", "Panel", "PlateID", 
+                                  "QC_Warning", "LOD", "NPX") %in% colnames(out))
+    match_lot_number <- any(c("Panel_Version", "Panel_Lot_Nr") %in% colnames(out))
+    match_old_header <- match_old_new_header && match_lot_number
+    
+    
+    match_add_new_header <- all(c("Normalization", "Assay_Warning") %in% colnames(out))
+    match_new_header <- match_old_header && match_add_new_header
+    
     if (match_old_header || match_new_header) {
       out$NPX <- as.numeric(out$NPX)
       out$LOD <- as.numeric(out$LOD)
