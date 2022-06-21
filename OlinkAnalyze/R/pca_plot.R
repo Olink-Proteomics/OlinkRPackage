@@ -149,6 +149,7 @@ olink_pca_plot <- function (df,
                                 outlierDefX = outlierDefX,
                                 outlierDefY = outlierDefY,
                                 outlierLines = outlierLines,
+                                label_outliers = label_outliers,
                                 verbose = verbose,
                                 ...) +
         ggplot2::labs(title = x)
@@ -175,6 +176,7 @@ olink_pca_plot <- function (df,
                                         outlierDefX = outlierDefX,
                                         outlierDefY = outlierDefY,
                                         outlierLines = outlierLines,
+                                        label_outliers = label_outliers,
                                         verbose = verbose,
                                         ...)
     if(!quiet) print(pca_plot)
@@ -196,6 +198,7 @@ olink_pca_plot.internal <- function (df,
                                      outlierDefX,
                                      outlierDefY,
                                      outlierLines,
+                                     label_outliers,
                                      verbose = TRUE,
                                      ...){
 
