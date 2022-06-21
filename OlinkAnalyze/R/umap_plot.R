@@ -20,6 +20,7 @@
 #' @param outlierDefX The number standard deviations along the PC plotted on the x-axis that defines an outlier. See also 'Details"
 #' @param outlierDefY The number standard deviations along the PC plotted on the y-axis that defines an outlier. See also 'Details"
 #' @param outlierLines Draw dashed lines at +/-outlierDef[X,Y] standard deviations from the mean of the plotted PCs (default FALSE)
+#' @param label_outliers Use ggrepel to label samples lying outside the limits set by the outlierLines (default TRUE)
 #' @param quiet Logical. If TRUE, the resulting plot is not printed
 #' @param verbose Logical. Whether warnings about the number of samples and/or assays dropped or imputed should be printed to the console.
 #' @param ... coloroption passed to specify color order.
@@ -77,6 +78,7 @@ olink_umap_plot <- function (df,
                              outlierDefX = NA,
                              outlierDefY = NA,
                              outlierLines = FALSE,
+                             label_outliers = TRUE,
                              quiet = FALSE,
                              verbose = TRUE,
                              ...){
@@ -151,6 +153,7 @@ olink_umap_plot <- function (df,
                                  outlierDefX = outlierDefX,
                                  outlierDefY = outlierDefY,
                                  outlierLines = outlierLines,
+                                 label_outliers = label_outliers,
                                  verbose = verbose,
                                  ...) +
         ggplot2::labs(title = x)
@@ -176,6 +179,7 @@ olink_umap_plot <- function (df,
                                          outlierDefX = outlierDefX,
                                          outlierDefY = outlierDefY,
                                          outlierLines = outlierLines,
+                                         label_outliers = label_outliers,
                                          verbose = verbose,
                                          ...)
     if(!quiet) print(umap_plot)
@@ -196,6 +200,7 @@ olink_umap_plot.internal <- function (df,
                                      outlierDefX,
                                      outlierDefY,
                                      outlierLines,
+                                     label_outliers,
                                      verbose = TRUE,
                                      ...){
 
@@ -261,7 +266,7 @@ olink_umap_plot.internal <- function (df,
 
 
   #Label outliers in figure
-  if(!is.na(outlierDefX) & !is.na(outlierDefY)){
+  if(!is.na(outlierDefX) & !is.na(outlierDefY) & label_outliers){
     umap_plot <- umap_plot +
       ggrepel::geom_label_repel(data = . %>% dplyr::mutate(SampleIDPlot = dplyr::case_when(Outlier == 1 ~ SampleID,
                                                                                            TRUE ~ "")),
