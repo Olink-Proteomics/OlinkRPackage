@@ -15,7 +15,7 @@
 #' doi: 10.1016/j.xinn.2021.100141
 #'
 #' \strong{NB:}
-#' You are strongly advised to set a seed prior to performing pathway enrichment analysis in order to ensure reproducibility of the results.
+#' You are strongly advised to set a seed prior to running this function in order to ensure reproducibility of the results.
 #'
 #' \strong{A few notes on Pathway Enrichment with Olink Data}
 #'
