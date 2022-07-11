@@ -14,6 +14,9 @@
 #' clusterProfiler 4.0: A universal enrichment tool for interpreting omics data. The Innovation. 2021, 2(3):100141.
 #' doi: 10.1016/j.xinn.2021.100141
 #'
+#' \strong{NB:}
+#' You are strongly advised to set a seed prior to performing pathway enrichment analysis in order to ensure reproducibility of the results.
+#'
 #' \strong{A few notes on Pathway Enrichment with Olink Data}
 #'
 #' It is important to note that sometimes the proteins that are assayed in Olink Panels
@@ -34,7 +37,6 @@
 #' @param organism Either "human" (default) or "mouse"
 #' @param pvalue_cutoff (numeric) maximum Adjusted p-value cutoff for ORA filtering of foreground set (default = 0.05). This argument is not used for GSEA.
 #' @param estimate_cutoff (numeric) minimum estimate cutoff for ORA filtering of foreground set (default = 0) This argument is not used for GSEA.
-#' @param seed (integer)
 #' @return A data frame of enrichment results.
 #' Columns for ORA include:
 #' \itemize{
@@ -98,7 +100,7 @@
 #' @importFrom magrittr %>%
 #' @export
 
-olink_pathway_enrichment <- function(data, test_results, method = "GSEA", ontology = "MSigDb", organism = "human", pvalue_cutoff = 0.05, estimate_cutoff = 0, seed = 1) {
+olink_pathway_enrichment <- function(data, test_results, method = "GSEA", ontology = "MSigDb", organism = "human", pvalue_cutoff = 0.05, estimate_cutoff = 0) {
   # Is Package installed
   if(!requireNamespace("clusterProfiler", quietly = TRUE) ){
     stop(" Pathway enrichment requires clusterProfiler package.
@@ -108,43 +110,43 @@ olink_pathway_enrichment <- function(data, test_results, method = "GSEA", ontolo
             install.packages(\"BiocManager\")
          BiocManager::install(\"clusterProfiler\")")
   }
-  
+
   if(!requireNamespace("msigdbr", quietly = TRUE)){
     stop(" Pathway enrichment requires msigdbr package.
          Please install msigdbr before continuing.
 
          install.packages(\"msigdbr\")")
   }
-  
+
   # Data Checks
   if(length(unique(data$OlinkID)) != length(unique(test_results$OlinkID))) {
     warning("The number of Olink IDs in the data does not equal the number of Olink IDs in the test results.")
   }
-  
+
   if("contrast" %in% colnames(test_results) && length(unique(test_results$contrast)) > 1){
     stop("More than one contrast is specified in test results. Filter test_results for desired contrast.")
   }
   if(!("estimate" %in% colnames(test_results))){
     stop("Estimate column is not present in test results. Please check arguments.")
   }
-  
+
   if(!(method %in% c("GSEA", "ORA"))){
     stop("Method must be \"GSEA\" or \"ORA\".")
   }
-  
+
   if(!(ontology %in% c("MSigDb", "Reactome", "KEGG", "GO"))){
     stop("Ontology must be one of MSigDb, Reactome, KEGG, or GO.")
   }
-  
+
   if (!is.integer(seed) && !is.numeric(seed)) {
     stop("Seed has to be integer or numeric.")
   }
   set.seed(seed)
-  
+
   data2 <- data_prep(data = data)
   test_results2 <- test_prep(data = data2, test_results = test_results, organism = organism)
   msig_df <- select_db(ontology = ontology, organism = organism)
-  
+
   if (method == "ORA") {
     results <- ora_pathwayenrichment(
       test_results = test_results2, msig_df = msig_df, pvalue_cutoff = pvalue_cutoff, estimate_cutoff = estimate_cutoff)
@@ -154,7 +156,7 @@ olink_pathway_enrichment <- function(data, test_results, method = "GSEA", ontolo
     results <- gsea_pathwayenrichment(geneList = geneList, msig_df = msig_df)
     message("Gene set enrichment analysis used by default.")
   }
-  
+
   return(results)
 }
 
@@ -172,10 +174,10 @@ data_prep <- function(data) {
     dplyr::ungroup() %>%
     dplyr::distinct(Assay, .keep_all = TRUE) %>%
     dplyr::pull(OlinkID)
-  
+
   data <- data %>% dplyr::filter(OlinkID %in% olink_ids)
   message("Data filtered for highest detectibility in duplicate assay names.")
-  
+
   return(data)
 }
 
@@ -183,7 +185,7 @@ test_prep <- function(data, test_results, organism = "human") {
   test_results <- test_results %>%
     dplyr::filter(OlinkID %in% unique(data$OlinkID))
   message("Test results filtered for highest detectibility in duplicate assay names.")
-  
+
   return(test_results)
 }
 
@@ -192,7 +194,7 @@ results_to_genelist <- function(test_results) {
   names(estimate)<- test_results$Assay
   geneList <- sort(x = estimate, decreasing = TRUE)
   message("Test results converted to gene list")
-  
+
   return(geneList)
 }
 
@@ -206,7 +208,7 @@ select_db <- function(ontology = ontology, organism = organism){
   } else {
     stop(print("organism should be \"human\" or \"mouse\""))
   }
-  
+
   if (ontology == "Reactome") {
     message("Extracting Reactome Database from MSigDB...")
     msig_df <-  msig_df %>% dplyr::filter(gs_subcat == "CP:REACTOME")
@@ -219,9 +221,9 @@ select_db <- function(ontology = ontology, organism = organism){
   } else{
     message("Using MSigDB...")
   }
-  
+
   msig_df <- msig_df  %>% dplyr::select(gs_name, gene_symbol)
-  
+
   return(msig_df)
 }
 
@@ -231,9 +233,9 @@ gsea_pathwayenrichment <- function(geneList, msig_df) {
                    " assays are not found in the database. Please check the Assay names for the following assays:\n ",
                    toString(setdiff(names(geneList), msig_df$gene_symbol))))
   }
-  
+
   GSEA <- clusterProfiler::GSEA(geneList = geneList, TERM2GENE = msig_df, pvalueCutoff = 1)
-  
+
   return(GSEA@result)
 }
 
@@ -243,18 +245,18 @@ ora_pathwayenrichment <- function(test_results, msig_df, pvalue_cutoff = pvalue_
     dplyr::filter(abs(estimate) > estimate_cutoff) %>%
     dplyr::distinct(Assay) %>%
     dplyr::pull(Assay)
-  
+
   universe <- test_results %>%
     dplyr::distinct(Assay) %>%
     dplyr::pull(Assay)
-  
+
   if(length(setdiff(x = names(universe), y = msig_df$gene_symbol) != 0)){
     message(paste0(length(setdiff(x = names(universe), y = msig_df$gene_symbol)),
                    " assays are not found in the database. Please check the Assay names for the following assays:\n ",
                    toString(setdiff(names(universe), msig_df$gene_symbol))))
   }
-  
+
   ORA <- clusterProfiler::enricher(gene = sig_genes, universe = universe, TERM2GENE = msig_df, pvalueCutoff = 1)
-  
+
   return(ORA@result)
 }

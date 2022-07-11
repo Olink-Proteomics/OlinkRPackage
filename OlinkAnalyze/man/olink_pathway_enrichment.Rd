@@ -11,8 +11,7 @@ olink_pathway_enrichment(
   ontology = "MSigDb",
   organism = "human",
   pvalue_cutoff = 0.05,
-  estimate_cutoff = 0,
-  seed = 1
+  estimate_cutoff = 0
 )
 }
 \arguments{
@@ -29,8 +28,6 @@ olink_pathway_enrichment(
 \item{pvalue_cutoff}{(numeric) maximum Adjusted p-value cutoff for ORA filtering of foreground set (default = 0.05). This argument is not used for GSEA.}
 
 \item{estimate_cutoff}{(numeric) minimum estimate cutoff for ORA filtering of foreground set (default = 0) This argument is not used for GSEA.}
-
-\item{seed}{(integer)}
 }
 \value{
 A data frame of enrichment results.
@@ -83,6 +80,9 @@ clusterProfiler is originally developed by Guangchuang Yu at the School of Basic
 T Wu, E Hu, S Xu, M Chen, P Guo, Z Dai, T Feng, L Zhou, W Tang, L Zhan, X Fu, S Liu, X Bo, and G Yu.
 clusterProfiler 4.0: A universal enrichment tool for interpreting omics data. The Innovation. 2021, 2(3):100141.
 doi: 10.1016/j.xinn.2021.100141
+
+\strong{NB:}
+You are strongly advised to set a seed prior to performing pathway enrichment analysis in order to ensure reproducibility of the results.
 
 \strong{A few notes on Pathway Enrichment with Olink Data}
 
