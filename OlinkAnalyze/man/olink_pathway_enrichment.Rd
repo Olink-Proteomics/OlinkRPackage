@@ -11,7 +11,8 @@ olink_pathway_enrichment(
   ontology = "MSigDb",
   organism = "human",
   pvalue_cutoff = 0.05,
-  estimate_cutoff = 0
+  estimate_cutoff = 0,
+  seed = 1
 )
 }
 \arguments{
@@ -28,9 +29,11 @@ olink_pathway_enrichment(
 \item{pvalue_cutoff}{(numeric) maximum Adjusted p-value cutoff for ORA filtering of foreground set (default = 0.05). This argument is not used for GSEA.}
 
 \item{estimate_cutoff}{(numeric) minimum estimate cutoff for ORA filtering of foreground set (default = 0) This argument is not used for GSEA.}
+
+\item{seed}{(integer)}
 }
 \value{
-A data frame of enrichment results. 
+A data frame of enrichment results.
 Columns for ORA include:
 \itemize{
  \item{ID:} "character" Pathway ID from MSigDB
@@ -70,11 +73,11 @@ Columns for GSEA:
 This function performs enrichment analysis based on statistical test results and full data using clusterProfiler's gsea and enrich functions for MSigDB.
 }
 \details{
-MSigDB is subset if the  ontology argument is KEGG, GO, or Reactome. test_results must contain estimates for all assays. 
+MSigDB is subset if the  ontology argument is KEGG, GO, or Reactome. test_results must contain estimates for all assays.
 Posthoc results can be used but should be filtered for one contrast to improve interpretability.
 Alternative statistical results can be used as input as long as they include the columns
  "OlinkID", "Assay", and "estimate". A column named "Adjusted_pal" is also needed for ORA. Any statistical results that contains one estimate per protein will work as long as the estimates are comparable to each other.
- 
+
 clusterProfiler is originally developed by Guangchuang Yu at the School of Basic Medical Sciences at Southern Medical University.
 
 T Wu, E Hu, S Xu, M Chen, P Guo, Z Dai, T Feng, L Zhou, W Tang, L Zhan, X Fu, S Liu, X Bo, and G Yu.

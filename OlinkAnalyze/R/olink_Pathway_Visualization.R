@@ -1,5 +1,5 @@
 #' Creates bargraph of top/selected enrichment terms from GSEA or ORA results from olink_pathway_enrichment()
-#' 
+#'
 #' Pathways are ordered by increasing p-value (unadjusted)
 #'
 #'@param enrich_results data frame of enrichment results from olink_pathway_enrichment()
@@ -31,72 +31,72 @@
 #' \item{\code{\link[OlinkAnalyze:olink_pathway_heatmap]{olink_pathway_heatmap}} for generating a heat map of results}
 #' }
 #'
-#'@importFrom dplyr filter
+#'@importFrom dplyr filter arrange slice_head mutate
 #'@importFrom ggplot2 ggplot geom_bar geom_text aes coord_flip xlab
 #'@importFrom stringr str_trunc
 #'@importFrom forcats fct_inorder
 #'@importFrom magrittr %>%
 #'@export
 olink_pathway_visualization<- function(enrich_results, method = "GSEA", keyword = NULL, number_of_terms = 20){
-  if (method == "ORA"){
+  if (method == "ORA") {
     if(is.null(keyword)){
-      enrich_results %>% 
-        dplyr::arrange(dplyr::desc(pvalue)) %>%
-        head(number_of_terms) %>%
-        dplyr::mutate(Description = stringr::str_trunc(Description, 50, "center")) %>% 
-        dplyr::mutate(Description = forcats::fct_inorder(Description)) %>% 
-        ggplot2::ggplot(., ggplot2::aes(x = Description, y=Count)) +
+      enrich_results %>%
+        dplyr::arrange(pvalue) %>%
+        dplyr::slice_head(n = number_of_terms) %>%
+        dplyr::mutate(Description = stringr::str_trunc(string = Description, width = 50, side = "center")) %>%
+        dplyr::mutate(Description = forcats::fct_inorder(Description)) %>%
+        ggplot2::ggplot(data = ., ggplot2::aes(x = Description, y = Count)) +
         ggplot2::geom_bar(stat = "identity", ggplot2::aes(fill = p.adjust))+
         OlinkAnalyze::olink_fill_gradient(coloroption = c('teal', 'red')) +
         ggplot2::coord_flip() +
         ggplot2::xlab("Description")+
-        ggplot2::geom_text(ggplot2::aes(label=paste(gsub(x = GeneRatio,pattern = "/.*", replacement = ""),
-                                  gsub(x = BgRatio,pattern = "/.*", replacement = ""), sep = "/")),
-                  hjust=-0.1, color="black", size=3.5)
-    }else{
+        ggplot2::geom_text(ggplot2::aes(label = paste(gsub(x = GeneRatio,pattern = "/.*", replacement = ""),
+                                                      gsub(x = BgRatio,pattern = "/.*", replacement = ""), sep = "/")),
+                           hjust = -0.1, color = "black", size = 3.5)
+    } else {
       if (nrow(enrich_results %>%
-               dplyr::filter(grepl(pattern = toupper(keyword), Description))) == 0) {
+               dplyr::filter(grepl(pattern = toupper(keyword), x = Description))) == 0) {
         stop("Keyword not found. Please choose a different keyword or use a set number of terms.")
       }
       enrich_results %>%
-        dplyr::filter(grepl(pattern = toupper(keyword), Description)) %>% 
-        dplyr::arrange(dplyr::desc(pvalue)) %>%
-        head(number_of_terms) %>%
-        dplyr::mutate(Description = stringr::str_trunc(Description, 50, "center")) %>% 
-        dplyr::mutate(Description = forcats::fct_inorder(Description)) %>% 
-        ggplot2::ggplot(., ggplot2::aes(x = Description, y=Count))+
+        dplyr::filter(grepl(pattern = toupper(keyword), x = Description)) %>%
+        dplyr::arrange(pvalue) %>%
+        dplyr::slice_head(n = number_of_terms) %>%
+        dplyr::mutate(Description = stringr::str_trunc(string = Description, width = 50, side = "center")) %>%
+        dplyr::mutate(Description = forcats::fct_inorder(Description)) %>%
+        ggplot2::ggplot(data = ., ggplot2::aes(x = Description, y = Count))+
         ggplot2::geom_bar(stat = "identity", ggplot2::aes(fill = p.adjust))+
         OlinkAnalyze::olink_fill_gradient(coloroption = c('teal', 'red')) +
         ggplot2::coord_flip() +
         ggplot2::xlab("Description")+
-        ggplot2::geom_text(ggplot2::aes(label=paste(gsub(x = GeneRatio,pattern = "/.*", replacement = ""),
-                                  gsub(x = BgRatio,pattern = "/.*", replacement = ""), sep = "/")),
-                  hjust=-0.1, color="black", size=3.5)
+        ggplot2::geom_text(ggplot2::aes(label = paste(gsub(x = GeneRatio,pattern = "/.*", replacement = ""),
+                                                      gsub(x = BgRatio,pattern = "/.*", replacement = ""), sep = "/")),
+                           hjust = -0.1, color = "black", size = 3.5)
     }
   } else if (method == "GSEA") {
     if(is.null(keyword)){
-     enrich_results %>%
-        head(number_of_terms) %>% 
-        dplyr::arrange(dplyr::desc(pvalue)) %>%
-        dplyr::mutate(Description = stringr::str_trunc(Description, 50, "center")) %>% 
-        dplyr::mutate(Description = forcats::fct_inorder(Description)) %>% 
-        ggplot2::ggplot(., ggplot2::aes(x = Description, y=NES)) +
+      enrich_results %>%
+        dplyr::arrange(pvalue) %>%
+        dplyr::slice_head(n = number_of_terms) %>%
+        dplyr::mutate(Description = stringr::str_trunc(string = Description, width = 50, side = "center")) %>%
+        dplyr::mutate(Description = forcats::fct_inorder(Description)) %>%
+        ggplot2::ggplot(data = ., ggplot2::aes(x = Description, y = NES)) +
         ggplot2::geom_bar(stat = "identity", ggplot2::aes(fill = p.adjust))+
         OlinkAnalyze::olink_fill_gradient(coloroption = c('teal', 'red')) +
         ggplot2::coord_flip() +
         ggplot2::xlab("Description")
     }else{
       if (nrow(enrich_results %>%
-               dplyr::filter(grepl(pattern = toupper(keyword), Description))) == 0) {
+               dplyr::filter(grepl(pattern = toupper(keyword), x = Description))) == 0) {
         stop("Keyword not found. Please choose a different keyword or use a set number of terms.")
       }
       enrich_results %>%
-        dplyr::filter(grepl(pattern = toupper(keyword), Description)) %>% 
-        dplyr::arrange(dplyr::desc(pvalue)) %>%
-        head(number_of_terms) %>%
-        dplyr::mutate(Description = stringr::str_trunc(Description, 50, "center")) %>% 
-        dplyr::mutate(Description = forcats::fct_inorder(Description)) %>% 
-        ggplot2::ggplot(., ggplot2::aes(x = Description, y=NES)) +
+        dplyr::filter(grepl(pattern = toupper(keyword), x = Description)) %>%
+        dplyr::arrange(pvalue) %>%
+        dplyr::slice_head(n = number_of_terms) %>%
+        dplyr::mutate(Description = stringr::str_trunc(string = Description, width = 50, side = "center")) %>%
+        dplyr::mutate(Description = forcats::fct_inorder(Description)) %>%
+        ggplot2::ggplot(., ggplot2::aes(x = Description, y = NES)) +
         ggplot2::geom_bar(stat = "identity", ggplot2::aes(fill = p.adjust))+
         OlinkAnalyze::olink_fill_gradient(coloroption = c('teal', 'red')) +
         ggplot2::coord_flip() +
