@@ -138,11 +138,6 @@ olink_pathway_enrichment <- function(data, test_results, method = "GSEA", ontolo
     stop("Ontology must be one of MSigDb, Reactome, KEGG, or GO.")
   }
 
-  if (!is.integer(seed) && !is.numeric(seed)) {
-    stop("Seed has to be integer or numeric.")
-  }
-  set.seed(seed)
-
   data2 <- data_prep(data = data)
   test_results2 <- test_prep(data = data2, test_results = test_results, organism = organism)
   msig_df <- select_db(ontology = ontology, organism = organism)
