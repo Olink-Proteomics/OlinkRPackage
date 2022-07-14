@@ -3,11 +3,11 @@
 #' This function performs enrichment analysis based on statistical test results and full data using clusterProfiler's gsea and enrich functions for MSigDB.
 #'
 #' @details
-#' MSigDB is subset if the  ontology argument is KEGG, GO, or Reactome. test_results must contain estimates for all assays. 
+#' MSigDB is subset if the  ontology argument is KEGG, GO, or Reactome. test_results must contain estimates for all assays.
 #' Posthoc results can be used but should be filtered for one contrast to improve interpretability.
 #' Alternative statistical results can be used as input as long as they include the columns
 #'  "OlinkID", "Assay", and "estimate". A column named "Adjusted_pal" is also needed for ORA. Any statistical results that contains one estimate per protein will work as long as the estimates are comparable to each other.
-#'  
+#'
 #' clusterProfiler is originally developed by Guangchuang Yu at the School of Basic Medical Sciences at Southern Medical University.
 #'
 #' T Wu, E Hu, S Xu, M Chen, P Guo, Z Dai, T Feng, L Zhou, W Tang, L Zhan, X Fu, S Liu, X Bo, and G Yu.
@@ -36,7 +36,7 @@
 #' @param organism Either "human" (default) or "mouse"
 #' @param pvalue_cutoff (numeric) maximum Adjusted p-value cutoff for ORA filtering of foreground set (default = 0.05). This argument is not used for GSEA.
 #' @param estimate_cutoff (numeric) minimum estimate cutoff for ORA filtering of foreground set (default = 0) This argument is not used for GSEA.
-#' @return A data frame of enrichment results. 
+#' @return A data frame of enrichment results.
 #' Columns for ORA include:
 #' \itemize{
 #'  \item{ID:} "character" Pathway ID from MSigDB
@@ -94,8 +94,10 @@
 #' \item{\code{\link[OlinkAnalyze:olink_pathway_visualization]{olink_pathway_visualization}} for generating a bar graph of results}
 #' }
 #'
-#' @importFrom dplyr filter mutate select group_by summarise arrange ungroup distinct pull full_join
-#' @importFrom stringr str_length
+#' @importFrom dplyr filter mutate select group_by summarise arrange desc ungroup distinct pull
+#' @importFrom msigdbr msigdbr
+#' @importFrom stringr str_detect
+#' @importFrom clusterProfiler GSEA enricher
 #' @importFrom magrittr %>%
 #' @export
 
@@ -116,7 +118,7 @@ olink_pathway_enrichment <- function(data, test_results, method = "GSEA", ontolo
 
          install.packages(\"msigdbr\")")
   }
-  
+
   # Data Checks
   if(length(unique(data$OlinkID)) != length(unique(test_results$OlinkID))) {
     warning("The number of Olink IDs in the data does not equal the number of Olink IDs in the test results.")
@@ -125,7 +127,7 @@ olink_pathway_enrichment <- function(data, test_results, method = "GSEA", ontolo
   if("contrast" %in% colnames(test_results) && length(unique(test_results$contrast)) > 1) {
     stop("More than one contrast is specified in test results. Filter test_results for desired contrast.")
   }
-  
+
   if(!("estimate" %in% colnames(test_results))) {
     stop("Estimate column is not present in test results. Please check arguments.")
   }
@@ -137,11 +139,11 @@ olink_pathway_enrichment <- function(data, test_results, method = "GSEA", ontolo
   if(!(ontology %in% c("MSigDb", "Reactome", "KEGG", "GO"))) {
     stop("Ontology must be one of MSigDb, Reactome, KEGG, or GO.")
   }
-  
+
   if (!(organism %in% c("human", "mouse"))) {
     stop(print("organism should be \"human\" or \"mouse\""))
   }
-  
+
   data2 <- data_prep(data = data)
   test_results2 <- test_prep(data = data2, test_results = test_results, organism = organism)
   msig_df <- select_db(ontology = ontology, organism = organism)
@@ -158,7 +160,7 @@ olink_pathway_enrichment <- function(data, test_results, method = "GSEA", ontolo
                                       msig_df = msig_df)
     message("Gene set enrichment analysis used by default.")
   }
-  
+
   return(results)
 }
 
@@ -175,20 +177,20 @@ data_prep <- function(data) {
     dplyr::ungroup() %>%
     dplyr::distinct(Assay, .keep_all = TRUE) %>%
     dplyr::pull(OlinkID)
-  
+
   data <- data %>% dplyr::filter(OlinkID %in% olink_ids)
-  
+
   message("Data filtered for highest detectibility in duplicate assay names.")
-  
+
   return(data)
 }
 
 test_prep <- function(data, test_results, organism = "human") {
   test_results <- test_results %>%
     dplyr::filter(OlinkID %in% unique(data$OlinkID))
-  
+
   message("Test results filtered for highest detectibility in duplicate assay names.")
-  
+
   return(test_results)
 }
 
@@ -197,9 +199,9 @@ results_to_genelist <- function(test_results) {
   # names(estimate) <- test_results$ENTREZID
   names(estimate) <- test_results$Assay
   geneList <- sort(estimate, decreasing = TRUE)
-  
+
   message("Test results converted to gene list")
-  
+
   return(geneList)
 }
 
@@ -211,7 +213,7 @@ select_db <- function(ontology = ontology, organism = organism){
     msig_df <- msigdbr::msigdbr(species = "Mus musculus", category = "C2") %>%
       rbind(msigdbr::msigdbr(species = "Mus musculus", category = "C5"))
   }
-  
+
   if (ontology == "Reactome") {
     message("Extracting Reactome Database from MSigDB...")
     msig_df <- msig_df %>%
@@ -227,10 +229,10 @@ select_db <- function(ontology = ontology, organism = organism){
   } else {
     message("Using MSigDB...")
   }
-  
+
   msig_df <- msig_df %>%
     dplyr::select(gs_name, gene_symbol)
-  
+
   return(msig_df)
 }
 
@@ -240,9 +242,9 @@ gsea_pathwayenrichment <- function(geneList, msig_df) {
                    " assays are not found in the database. Please check the Assay names for the following assays:\n ",
                    toString(setdiff(names(geneList), msig_df$gene_symbol))))
   }
-  
+
   GSEA <- clusterProfiler::GSEA(geneList = geneList, TERM2GENE = msig_df, pvalueCutoff = 1)
-  
+
   return(GSEA@result)
 }
 
@@ -252,18 +254,18 @@ ora_pathwayenrichment <- function(test_results, msig_df, pvalue_cutoff = pvalue_
     dplyr::filter(abs(estimate) > estimate_cutoff) %>%
     dplyr::distinct(Assay) %>%
     dplyr::pull(Assay)
-  
+
   universe <- test_results %>%
     dplyr::distinct(Assay) %>%
     dplyr::pull(Assay)
-  
+
   if(length(setdiff(names(universe), msig_df$gene_symbol) != 0)){
     message(paste0(length(setdiff(names(universe), msig_df$gene_symbol)),
                    " assays are not found in the database. Please check the Assay names for the following assays:\n ",
                    toString(setdiff(names(universe), msig_df$gene_symbol))))
   }
-  
+
   ORA <- clusterProfiler::enricher(gene = sig_genes, universe = universe, TERM2GENE = msig_df, pvalueCutoff = 1)
-  
+
   return(ORA@result)
 }

@@ -32,8 +32,8 @@
 #' \item{\code{\link[OlinkAnalyze:olink_pathway_enrichment]{olink_pathway_enrichment}} for generating enrichment results}
 #' \item{\code{\link[OlinkAnalyze:olink_pathway_visualization]{olink_pathway_visualization}} for generating a bar graph of results}
 #' }
-#'@importFrom dplyr filter distinct inner_join arrange select distinct pull
-#'@importFrom ggplot2 ggplot geom_tile geom_text aes xlab ylab theme
+#'@importFrom dplyr filter arrange slice_head desc inner_join
+#'@importFrom ggplot2 ggplot aes geom_tile theme xlab ylab
 #'@importFrom stringr str_trunc
 #'@importFrom magrittr %>%
 #'@export
@@ -42,40 +42,40 @@ olink_pathway_heatmap<- function(enrich_results, test_results, method = "GSEA", 
   if (!(method %in% c("ORA", "GSEA"))) {
     stop("Method must be \"GSEA\" or \"ORA\".")
   }
-  
+
   if(!is.null(keyword)) {
     enrich_results <- enrich_results %>%
       dplyr::filter(grepl(pattern = toupper(keyword), x = Description))
-    
+
     if (nrow(enrich_results) == 0) {
       stop("Keyword not found. Please choose a different keyword or use a set number of terms.")
     }
   }
-  
-  sub_enrich <- enrich_results %>% 
+
+  sub_enrich <- enrich_results %>%
     dplyr::arrange(pvalue) %>%
     dplyr::slice_head(n = number_of_terms) %>%
     dplyr::arrange(dplyr::desc(x = pvalue))
-  
+
   if (method == "ORA"){
     results_list <- strsplit(x = sub_enrich$geneID, split = "/")
   } else if (method == "GSEA") {
     results_list <- strsplit(x = sub_enrich$core_enrichment, split = "/")
   }
   names(results_list) <- sub_enrich$Description
-  
+
   long_list <- do.call(rbind, lapply(results_list, data.frame, stringsAsFactors = FALSE))
   long_list$Pathway <- row.names(long_list)
   long_list$Pathway <- gsub(pattern = "\\..*", replacement = "", x = long_list$Pathway)
   names(long_list)[1] <- "Assay"
-  
+
   long_list1 <- long_list %>%
-    as.data.frame() %>% 
+    as.data.frame() %>%
     dplyr::inner_join(test_results, by = "Assay") %>%
     dplyr::arrange(estimate)
-  
+
   orderprot <- unique(long_list1$Assay)
-  
+
   p <- ggplot2::ggplot(data = long_list1, ggplot2::aes(factor(x = Assay, levels = orderprot),
                                                        stringr::str_trunc(string = Pathway, width = 50, side = "center"))) +
     ggplot2::geom_tile(ggplot2::aes(fill = estimate)) +
@@ -85,6 +85,6 @@ olink_pathway_heatmap<- function(enrich_results, test_results, method = "GSEA", 
                    axis.text.x = ggplot2::element_text(angle = 60, hjust = 1)) +
     ggplot2::xlab("Protein Symbol") +
     ggplot2::ylab("Pathway")
-  
+
   return(p)
 }
