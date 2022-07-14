@@ -54,13 +54,21 @@ olink_pathway_visualization <- function(enrich_results, method = "GSEA", keyword
   }
   
   # plot
-  p <- enrich_results %>%
+  enrich_results <- enrich_results %>%
     dplyr::arrange(pvalue) %>% # sort by pvalue
     dplyr::slice_head(n = number_of_terms) %>% # take top x terms
     dplyr::arrange(desc(pvalue)) %>% # strongest pvalue at the top of the y axis
     dplyr::mutate(Description = stringr::str_trunc(string = Description, width = 50, side = "center")) %>%
-    dplyr::mutate(Description = forcats::fct_inorder(Description)) %>%
-    ggplot2::ggplot(., ggplot2::aes(x = Description, y = NES)) +
+    dplyr::mutate(Description = forcats::fct_inorder(Description))
+  
+  # add text if method was ORA
+  if (method == "ORA") {
+    p <- ggplot2::ggplot(data = enrich_results, ggplot2::aes(x = Description, y = Count))
+  } else if (method == "GSEA") {
+    p <- ggplot2::ggplot(data = enrich_results, ggplot2::aes(x = Description, y = NES))
+  }
+  
+  p <- p +
     ggplot2::geom_bar(stat = "identity", ggplot2::aes(fill = p.adjust))+
     OlinkAnalyze::olink_fill_gradient(coloroption = c('teal', 'red')) +
     ggplot2::coord_flip() +
