@@ -155,7 +155,6 @@ olink_pathway_enrichment <- function(data, test_results, method = "GSEA", ontolo
   return(results)
 }
 
-
 data_prep <- function(data) {
   # Filter highest detectibility for repeated IDs
   olink_ids <- data %>%
