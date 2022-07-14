@@ -95,9 +95,7 @@
 #' }
 #'
 #' @importFrom dplyr filter mutate select group_by summarise arrange desc ungroup distinct pull
-#' @importFrom msigdbr msigdbr
 #' @importFrom stringr str_detect
-#' @importFrom clusterProfiler GSEA enricher
 #' @importFrom magrittr %>%
 #' @export
 
