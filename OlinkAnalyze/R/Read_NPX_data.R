@@ -33,6 +33,7 @@
 #' @importFrom stringr str_detect str_replace_all str_to_upper str_to_title
 #' @importFrom tidyr tibble gather separate
 #' @importFrom zip unzip
+#' @importFrom utils tail
 
 
 read_NPX <- function(filename){
@@ -126,30 +127,48 @@ read_NPX <- function(filename){
       rm(tmp_unzip_dir)
     }
 
-    #check that all colnames are present
-    match_old_new_header <- all(c("SampleID", "Index", "OlinkID", "UniProt",
-                                  "Assay", "MissingFreq", "Panel", "PlateID", 
-                                  "QC_Warning", "LOD", "NPX") %in% colnames(out))
-    match_lot_number <- any(c("Panel_Version", "Panel_Lot_Nr") %in% colnames(out))
-    match_old_header <- match_old_new_header && match_lot_number
-    
-    
-    match_add_new_header <- all(c("Normalization", "Assay_Warning") %in% colnames(out))
-    match_new_header <- match_old_header && match_add_new_header
-    
-    if (match_old_header || match_new_header) {
-      out$NPX <- as.numeric(out$NPX)
-      out$LOD <- as.numeric(out$LOD)
-      out$MissingFreq <- as.numeric(out$MissingFreq)
-      out$SampleID <- as.character(out$SampleID)
-      return(dplyr::as_tibble(out))
+    # Check that all column names are present
+    # We have had 3 column names versions so far: 1, 1.1 and 2
+    # please add newer versions to the list chronologically
+    header_standard <-    c("SampleID", "Index", "OlinkID", "UniProt", "Assay", "MissingFreq",
+                            "Panel", "PlateID", "QC_Warning", "LOD", "NPX")
+    header_v        <- list("header_v1"   = c(header_standard, "Panel_Version"),
+                            "header_v1.1" = c(header_standard, "Panel_Version", "Normalization", "Assay_Warning"),
+                            "header_v2"   = c(header_standard, "Panel_Lot_Nr", "Normalization", "Assay_Warning"))
+    header_match    <-  any( sapply(header_v, function(x) all(x %in% colnames(out))) ) # look for one full match
+
+    if (header_match == TRUE) {
+
+      out <- out %>%
+        dplyr::mutate(NPX         = as.numeric(NPX),
+                      LOD         = as.numeric(LOD),
+                      MissingFreq = as.numeric(MissingFreq),
+                      SampleID    = as.character(SampleID)) %>%
+        dplyr::as_tibble()
+
+      return(out)
+
     } else {
-      missing.cols <- setdiff(c("SampleID", "Index", "OlinkID", "UniProt",
-                                "Assay", "MissingFreq", "Panel", "Panel_Lot_Nr",
-                                "PlateID", "QC_Warning", "LOD", "NPX"),
-                              colnames(out))
-      #If columns are missing, stop and print out which are missing
-      stop(paste0("Cannot find columns ", paste(missing.cols,collapse=",")))
+
+      # if there is a mismatch of the input data with the expected column names
+      # - we pick the set of column names with the shortest distance to any of the expected ones
+      # - if multiple matches occur, we pick the most recent
+      header_diff <- lapply(header_v, function(x) setdiff(x, colnames(out))) %>%
+        lapply(length)
+      header_idx  <- unlist(header_diff) %>% min
+      if(sum(header_diff == header_idx) > 1) {
+        header_pick <- header_diff[header_diff == header_idx] %>% tail(1)
+      } else {
+        header_pick <- header_diff[header_diff == header_idx]
+      }
+      header_pick <- names(header_pick)
+
+      # find missing columns
+      missing_cols <- setdiff(header_v[[header_pick]], colnames(out))
+
+      # If missing columns, stop and print out which are missing
+      stop(paste0("Cannot find columns: ", paste(missing_cols, collapse = ",")))
+
     }
   }
   NORM_FLAG <-  FALSE
