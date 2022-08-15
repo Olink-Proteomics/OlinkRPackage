@@ -6,7 +6,7 @@
 #'
 #' @examples
 #'
-#' nexusr:::print_and_capture(npx_data1)
+#' OlinkAnalyze:::print_and_capture(npx_data1)
 #'
 print_and_capture <- function(x)
 {

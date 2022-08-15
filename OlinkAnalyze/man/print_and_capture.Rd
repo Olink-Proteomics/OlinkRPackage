@@ -17,6 +17,6 @@ Capture the output of printing an object
 }
 \examples{
 
-nexusr:::print_and_capture(npx_data1)
+OlinkAnalyze:::print_and_capture(npx_data1)
 
 }
