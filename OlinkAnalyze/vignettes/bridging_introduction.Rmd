@@ -1,0 +1,126 @@
+---
+title: "Introduction to bridging datasets"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to bridging datasets}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+date: 'Compiled: `r format(Sys.Date(), "%B %d, %Y")`'
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  tidy = TRUE,
+  tidy.opts = list(width.cutoff = 95),
+  fig.width = 10,
+  message = FALSE,
+  warning = FALSE,
+  time_it = TRUE,
+  fig.width = 7
+)
+```
+
+# Introduction to bridging Olink®NPX datasets
+
+Olink® NPX datasets are normalized datasets using either plate control
+normalization or intensity normalization methods. Intensity
+normalization method assumes that all samples within a project are fully
+randomized.
+
+The joint analysis of two or more Olink® NPX datasets often requires
+additional batch correction step to remove technical variations, which
+is referred to as bridging.
+
+Bridging is needed if Olink® NPX datasets are:
+
+-   plate control normalized only and run conditions (e.g lab and
+    reagent lots) have changes.
+
+-   intensity normalized but from two different sample populations.
+
+To bridge two or more Olink® NPX datasets, bridging samples are needed
+to calculate adjustment factors between datasets. The recommended number
+of bridging samples for Explore 1536 datasets is between 8-16.
+
+The following tutorial is designed to give you an overview of the kinds
+of data combining methods that are possible using the Olink® bridging
+procedure.
+
+## Setup the bridging objects
+
+To demonstrate how bridging works, we will use the example datasets
+(`npx_data1` and `npx_data2`) from **OlinkAnalyze** package. They are in
+standard Olink® NPX table format that Olink® delivers to customers.
+
+```{r setup}
+library(OlinkAnalyze)
+library(dplyr)
+library(stringr)
+```
+
+## Perform bridging
+
+We can use `olink_normalization()` function to bridge two datasets. The bridging 
+procedure is to first calculate **the median of the paired NPX differences** per
+assay between the bridging samples as adjustment factor then use these adjustment 
+factors to adjust NPX values between two datasets. The output from 
+`olink_normalization()` function is a table with adjusted NPX value in the column 
+`NPX`.
+
+```{r bridging, message=FALSE}
+           
+# Find overlapping samples
+npx_1 <- npx_data1 %>% 
+  mutate(dataset = "data1")
+npx_2 <- npx_data2 %>% 
+  mutate(dataset = "data2")
+
+overlap_samples <- intersect(npx_1$SampleID, npx_2$SampleID) %>% 
+  data.frame() %>% 
+  filter(!str_detect(., 'CONTROL_SAMPLE')) %>% #Remove control samples
+  pull(.)
+# Perform Bridging normalization
+npx_br_data <- olink_normalization(df1 = npx_1, 
+                                   df2 = npx_2, 
+                                   overlapping_samples_df1 = overlap_samples,
+                                   df1_project_nr = '20200001',
+                                   df2_project_nr = '20200002',
+                                   reference_project = '20200001')
+glimpse(npx_br_data)
+
+```
+
+## Perform evaluation of bridging normalization
+
+PCA plot is used to visualize sample-to-sample distance before and after bridging.
+
+```{r pca1, message=FALSE, fig.cap="PCA plot of combined datasets without bridging"}
+## before bridging
+npx_1 <- npx_data1 %>% 
+  mutate(dataset = "data1") %>% 
+  mutate(SampleID = paste0(dataset, PlateID, SampleID))
+  
+npx_2 <- npx_data2 %>% 
+  mutate(dataset = "data2") %>% 
+  mutate(SampleID = paste0(dataset, PlateID, SampleID))
+             
+npx_data <- rbind(npx_1, npx_2)
+OlinkAnalyze::olink_pca_plot(df = npx_data,
+                               color_g = "dataset", byPanel = TRUE, coloroption = c('orange', 'darkblue')) 
+
+```
+
+
+```{r pca2, message=FALSE, fig.cap="PCA plot of combined datasets after bridging"}
+## After bridging
+npx_br_plot <- npx_br_data %>% 
+  mutate(SampleID = paste0(dataset, PlateID, SampleID))
+OlinkAnalyze::olink_pca_plot(df = npx_br_plot,
+                               color_g = "dataset", byPanel = TRUE, coloroption = c('orange', 'darkblue')) 
+```
+
