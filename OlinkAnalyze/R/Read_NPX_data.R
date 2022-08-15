@@ -485,5 +485,47 @@ read_NPX_target <- function(filename) {
                   dplyr::matches("*Inc Ctrl*"),
                   dplyr::matches("*Det Ctrl*"))
 
+  if (is_npx_data) {
+    # Check for data completeness and warn on problems
+    check_data_completeness(out)
+  }
+
   return(out)
 }
+
+
+
+#' Check data completeness
+#'
+#' Throw informative warnings if a dataset appears to have problems
+#'
+#' @param df a NPX dataframe, e.g. from read_NPX()
+#'
+#' @return None. Used for side effects (warnings)
+#'
+#' @examples
+#'
+#' npx_data1 %>%
+#'     mutate(NPX = if_else(SampleID == "A1" & Panel == "Olink Cardiometabolic",
+#'                          NA_real_,
+#'                          NPX)) %>%
+#'     check_data_completeness()
+
+
+check_data_completeness <- function(df){
+  NA_panel_sample <- df %>%
+    group_by(SampleID, Panel) %>%
+    summarize(`number of NA values` = sum(is.na(NPX)),
+              .groups = "drop") %>%
+    filter(`number of NA values` > 0) %>%
+    as.data.frame()
+
+  if (dim(NA_panel_sample)[1] > 0) {
+    warning("The following samples have NA NPX values for the following panels.\n\n",
+            print_and_capture(NA_panel_sample))
+  }
+
+}
+
+
+

@@ -50,3 +50,23 @@ test_that("Data loads correctly with 'read_NPX()'", {
     dplyr::distinct(SampleID)
   expect(all(dplyr::pull(sample_names) %in% manifest_1$SampleID), failure_message = "Some samples not in manifest.")
 })
+
+
+
+test_that("data completeness check", {
+  expect_warning(
+    npx_data1 %>%
+       mutate(NPX = if_else(SampleID == "A1" & Panel == "Olink Cardiometabolic",
+                            NA_real_,
+                            NPX)) %>%
+       check_data_completeness(),
+    "The following samples have NA NPX values for the following panels"
+  )
+
+  expect_warning(
+    npx_data1 %>%
+      check_data_completeness(),
+    NA
+  )
+
+})
