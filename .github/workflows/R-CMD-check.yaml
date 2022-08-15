@@ -49,20 +49,9 @@ jobs:
           pandoc-version: '2.18'      
 
       - uses: r-lib/actions/setup-r-dependencies@v2
-        if: ${{ matrix.r == '3.6.1' }}
-        with:
-          packages: any::devtools          
-        
-      - name: Install emmeans 1.7.5
-        run: |
-          devtools::install_version("emmeans", version = "1.7.5", repos = "http://cran.us.r-project.org")
-        shell: Rscript {0}
-        if: ${{ matrix.r == '3.6.1' }}
-
-      - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           working-directory: OlinkAnalyze
-          extra-packages: any::rcmdcheck, any::emmeans
+          extra-packages: any::rcmdcheck, github::rvlenth/emmeans@8b6c089e6b1bb4377834afdb853bc5844eac6fa4
 
       - uses: r-lib/actions/check-r-package@v2
         with:
