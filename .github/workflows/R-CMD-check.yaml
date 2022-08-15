@@ -49,7 +49,7 @@ jobs:
           pandoc-version: '2.18'      
 
       - uses: r-lib/actions/setup-r-dependencies@v2
-        if: ${{ matrix.r == "3.6.1" }}
+        if: ${{ matrix.r == '3.6.1' }}
         with:
           packages: any::devtools          
         
@@ -57,7 +57,7 @@ jobs:
         run: |
           devtools::install_version("emmeans", version = "1.7.5", repos = "http://cran.us.r-project.org")
         shell: Rscript {0}
-        if: ${{ matrix.r == "3.6.1" }}
+        if: ${{ matrix.r == '3.6.1' }}
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
