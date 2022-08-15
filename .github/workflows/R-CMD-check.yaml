@@ -7,6 +7,7 @@ name: R-CMD-check
 jobs:
   R-CMD-check:
     runs-on: ${{ matrix.config.os }}
+    timeout-minutes: 60       
 
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})
 
@@ -14,90 +15,30 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: ubuntu-20.04,   r: 'release', rspm: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"}
+          - {os: ubuntu-20.04,   r: 'release'}
           
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
       _R_CHECK_FORCE_SUGGESTS_: false
-      RSPM: ${{ matrix.config.rspm }}
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - uses: actions/checkout@v2
 
-      - uses: r-lib/actions/setup-r@v1
+      - uses: r-lib/actions/setup-r@v2
         with:
           r-version: ${{ matrix.config.r }}
+          use-public-rspm: true            
 
-      - uses: r-lib/actions/setup-pandoc@v1
-
-      - name: Query dependencies
-        run: |
-          install.packages('remotes')
-          saveRDS(remotes::dev_package_deps(pkgdir = "OlinkAnalyze", dependencies = TRUE), ".github/depends.Rds", version = 2)
-          writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
-        shell: Rscript {0}
-
-      - name: Restore R package cache
-        uses: actions/cache@v2
+      - uses: r-lib/actions/setup-pandoc@v2
         with:
-          path: ${{ env.R_LIBS_USER }}
-          key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
-          restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-
-
-      - name: Install system dependencies
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get -y install libglpk-dev libcurl4-openssl-dev
-          while read -r cmd
-          do
-            eval sudo $cmd
-          done < <(Rscript -e 'writeLines(remotes::system_requirements("ubuntu", "20.04", path = "OlinkAnalyze")); writeLines(remotes::system_requirements("ubuntu", "20.04", package = "curl"))')
-
-
-      - name: Install dependencies
-        run: |
-          options(install.packages.compile.from.source = "never") # use binary package if available, even if older        
-          install.packages("stringi", type="source", repos='http://cran.us.r-project.org')
-          remotes::install_deps(pkgdir = "OlinkAnalyze", dependencies = TRUE)
-          remotes::install_cran("rcmdcheck")
-        shell: Rscript {0}
-        
-      - name: Install Bioconductor packages
-        if: matrix.config.r != 'devel'
-        run: |
-          install.packages("BiocManager", type="source", repos='http://cran.us.r-project.org')
-          BiocManager::install("enrichplot",type = "source")
-          BiocManager::install("clusterProfiler") 
-        shell: Rscript {0}
-
-      - name: Session info
-        run: |
-          options(width = 100)
-          pkgs <- installed.packages()[, "Package"]
-          sessioninfo::session_info(pkgs, include_base = TRUE)
-        shell: Rscript {0}
-
-      - name: Check
-        env:
-          _R_CHECK_CRAN_INCOMING_REMOTE_: false
-        run: |
-          options(crayon.enabled = TRUE)
-          rcmdcheck::rcmdcheck(path = "OlinkAnalyze", args = c("--no-manual", "--as-cran"), error_on = "warning", check_dir = "check")
-        shell: Rscript {0}
-
-
-      - name: Rerun of tests with detailed output
-        env:
-          _R_CHECK_CRAN_INCOMING_REMOTE_: false
-        run: |
-          testthat::test_local(path = "OlinkAnalyze", reporter = c("location","summary"))
-        shell: Rscript {0}
-
-
-      - name: Upload check results
-        if: failure()
-        uses: actions/upload-artifact@main
+          pandoc-version: '2.18'      
+          
+      - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          name: ${{ runner.os }}-r${{ matrix.config.r }}-results
-          path: check
+          working-directory: OlinkAnalyze
+          extra-packages: any::rcmdcheck          
+
+      - uses: r-lib/actions/check-r-package@v2
+        with:
+          working-directory: OlinkAnalyze     
