@@ -6,7 +6,7 @@
 #'
 #' @examples
 #'
-#' print_and_capture(npx_data1)
+#' nexusr:::print_and_capture(npx_data1)
 #'
 print_and_capture <- function(x)
 {

@@ -21,5 +21,5 @@ npx_data1 \%>\%
     mutate(NPX = if_else(SampleID == "A1" & Panel == "Olink Cardiometabolic",
                          NA_real_,
                          NPX)) \%>\%
-    check_data_completeness()
+    nexusr:::check_data_completeness()
 }

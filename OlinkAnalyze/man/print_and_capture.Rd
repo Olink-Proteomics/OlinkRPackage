@@ -17,6 +17,6 @@ Capture the output of printing an object
 }
 \examples{
 
-print_and_capture(npx_data1)
+nexusr:::print_and_capture(npx_data1)
 
 }
