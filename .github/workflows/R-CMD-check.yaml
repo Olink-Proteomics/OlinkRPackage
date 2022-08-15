@@ -17,7 +17,7 @@ jobs:
         uses: JoshuaTheMiller/conditional-build-matrix@main        
         with:
           inputFile: '.github/workflows/matrix_config_check.json' 
-          filter: '[?runOnBranch==`${{ github.event_name }}` || runOn==`always`]'
+          filter: '[?runOn==`${{ github.event_name }}` || runOn==`always`]'
           # addInclude: true
 
   R-CMD-check:

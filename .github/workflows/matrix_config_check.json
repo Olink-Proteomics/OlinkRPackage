@@ -1,37 +1,37 @@
 [
    {
       "os": "macOS-latest",
-      "r": "release"
+      "r": "release",
       "runOn": "pull_request"
    },
    {
       "os": "windows-latest",
-      "r": "release"
+      "r": "release",
       "runOn": "pull_request"
    },
    {
       "os": "windows-latest",
-      "r": "3.6.1"
+      "r": "3.6.1",
       "runOn": "pull_request"
    },
    {
       "os": "ubuntu-20.04",
-      "r": "release"
+      "r": "release",
       "runOn": "always"
    },
    {
       "os": "ubuntu-20.04",
-      "r": "devel"
+      "r": "devel",
       "runOn": "pull_request"
    },
    {
       "os": "ubuntu-20.04",
-      "r": "oldrel"
+      "r": "oldrel",
       "runOn": "pull_request"
    },
    {
       "os": "ubuntu-20.04",
-      "r": "3.6.1"
+      "r": "3.6.1",
       "runOn": "pull_request"
    }
 ]
