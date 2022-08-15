@@ -31,7 +31,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          working-directory: nexusr
+          working-directory: OlinkAnalyze
           extra-packages: rmarkdown, roxygen2, devtools
 
       - name: Render Rmarkdown files
