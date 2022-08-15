@@ -506,7 +506,8 @@ read_NPX_target <- function(filename) {
 #' @examples
 #'
 #' npx_data1 %>%
-#'     mutate(NPX = if_else(SampleID == "A1" & Panel == "Olink Cardiometabolic",
+#'     dplyr::mutate(NPX = dplyr::if_else(
+#'                          SampleID == "A1" & Panel == "Olink Cardiometabolic",
 #'                          NA_real_,
 #'                          NPX)) %>%
 #'     OlinkAnalyze:::check_data_completeness()

@@ -10,5 +10,5 @@
 #'
 print_and_capture <- function(x)
 {
-  paste(capture.output(print(x)), collapse = "\n")
+  paste(utils::capture.output(print(x)), collapse = "\n")
 }
