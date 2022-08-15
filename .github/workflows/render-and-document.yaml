@@ -11,6 +11,7 @@ jobs:
   render-and-document:
     name: render-and-document
     runs-on: ubuntu-latest
+    timeout-minutes: 30        
     env:
       GITHUB_PAT: ${{ secrets.PAT }}
     steps:
@@ -20,49 +21,22 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.PAT }}
 
-      - uses: r-lib/actions/setup-pandoc@v1
-
-      - uses: r-lib/actions/setup-r@v1
-
-      - name: Query dependencies
-        run: |
-          install.packages('remotes')
-          saveRDS(remotes::dev_package_deps(pkgdir = "OlinkAnalyze", dependencies = TRUE), ".github/depends.Rds", version = 2)
-          writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
-        shell: Rscript {0}
-
-      - name: Restore R package cache
-        uses: actions/cache@v2
+      - uses: r-lib/actions/setup-pandoc@v2
         with:
-          path: ${{ env.R_LIBS_USER }}
-          key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
-          restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-
+          pandoc-version: '2.18'
 
-      - name: Install system dependencies
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get -y install libglpk-dev libcurl4-openssl-dev
-          while read -r cmd
-          do
-            eval sudo $cmd
-          done < <(Rscript -e 'writeLines(remotes::system_requirements("ubuntu", "20.04", path = "OlinkAnalyze"))')
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true        
 
-
-      - name: Install dependencies
-        run: |
-          install.packages("BiocManager")
-          BiocManager::install("enrichplot",type = "source")
-          BiocManager::install("clusterProfiler") 
-          remotes::install_deps(pkgdir = "OlinkAnalyze", dependencies = TRUE)
-          install.packages("stringi", type="source")
-          remotes::install_cran("roxygen2")
-      
-        shell: Rscript {0}
-
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          working-directory: nexusr
+          extra-packages: rmarkdown, roxygen2, devtools
 
       - name: Render Rmarkdown files
         run: |
-          RMD_PATH=($(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '[.]Rmd$' | grep -v vignette || echo "No Rmd changed"))
+          RMD_PATH=($(find . -iname "*.rmd" | grep -v vignette || echo "No Rmd found"))
           Rscript -e 'for (f in commandArgs(TRUE)) if (file.exists(f)) rmarkdown::render(f)' ${RMD_PATH[*]}
 
       - name: Commit results
@@ -70,7 +44,6 @@ jobs:
           git config --local user.name "$GITHUB_ACTOR"
           git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
           git commit -am 'Re-build Rmarkdown files' || echo "No changes to commit"
-
 
       - name: Document
         run: Rscript -e 'roxygen2::roxygenise(package.dir = "OlinkAnalyze")'
