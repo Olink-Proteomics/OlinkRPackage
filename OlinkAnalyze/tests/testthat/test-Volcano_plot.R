@@ -4,14 +4,10 @@ load(refRes_file)
 
 set.seed(10) #There's some randomness to how the labels are placed on the plot => failed test. Setting the seed should avoid this
 volcano_plot <- olink_volcano_plot(ref_results$t.test_results,
-                                   olinkid_list = {ref_results$t.test_results %>%
-                                       head(10) %>%
-                                       dplyr::pull(OlinkID)})
+                                   olinkid_list = c(""))
 
 volcano_plot2 <- olink_volcano_plot(ref_results$t.test_results,
-                                   olinkid_list = {ref_results$t.test_results %>%
-                                       head(10) %>%
-                                       dplyr::pull(OlinkID)},
+                                   olinkid_list = c(""),
                                    coloroption =  c('teal', 'pink'))
 
 
