@@ -3,20 +3,21 @@
 #'Performs an Kruskal-Wallis Test for each assay (by OlinkID) in every panel using stats::kruskal.test.
 #'Performs an Friedman Test for each assay (by OlinkID) in every panel using rstatix::friedman_test.
 #'The function handles factor variable. \cr\cr
-#'Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a message if verbose = T).
+#'Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a messsage if verbose = TRUE).
 #'Character columns in the input dataframe are automatically converted to factors (specified in a message if verbose = T).
 #'Numerical variables are not converted to factors.
 #'If a numerical variable is to be used as a factor, this conversion needs to be done on the dataframe before the function call. \cr\cr
-#'Inference is specified in a message if verbose = T. \cr
-#'The formula notation of the final model is specified in a message if verbose = T. \cr\cr
+#'Inference is specified in a message if verbose = TRUE. \cr
+#'The formula notation of the final model is specified in a message if verbose = TRUE. \cr\cr
 #'Adjusted p-values are calculated by stats::p.adjust according to the Benjamini & Hochberg (1995) method (“fdr”).
 #'The threshold is determined by logic evaluation of Adjusted_pval < 0.05.
 #'
 #'
 #' @param df NPX or Quantified_value data frame in long format with at least protein name (Assay), OlinkID, UniProt, Panel and a factor with at least 3 levels.
 #' @param variable Single character value.
-#' @param dependence Logical. Default: FALSE. When the groups are independent, the kruskal-Wallis will run, when the groups are dependent, the Friedman test will run.
-#' @param verbose Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
+#' @param dependence Boolean. Default: FALSE. When the groups are independent, the kruskal-Wallis will run, when the groups are dependent, the Friedman test will run.
+#' @param subject Group information for the repeated measurement. If (dependence = TRUE), this parameter need to be specified.
+#' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #'
 #' @return A tibble containing the Kruskal-Wallis Test or Friedman Test results for every protein.
 #' The tibble is arranged by ascending p-values.
@@ -45,43 +46,42 @@
 olink_one_non_parametric <- function(df,
                                      variable,
                                      dependence = FALSE,
-                                     verbose=T
-){
-
+                                     subject = NULL,
+                                     verbose=TRUE
+                                     ){
   if(missing(df) | missing(variable)){
     stop('The df and variable arguments need to be specified.')
   }
-
+  
   withCallingHandlers({
-
     #Filtering on valid OlinkID
     df <- df %>%
       dplyr::filter(stringr::str_detect(OlinkID,
-                                 "OID[0-9]{5}"))
-
+                                        "OID[0-9]{5}"))
+    
     #Variables to check
     variable_testers <- intersect(c(variable), names(df))
-
+    
     ##Remove rows where variables is NA (cant include in analysis anyway)
     removed.sampleids <- NULL
-
+    
     #removed.sampleids <- unique(c(removed.sampleids,df$SampleID[is.na(df[[variable_testers]])]))
     for(i in variable_testers){
       removed.sampleids <- unique(c(removed.sampleids,df$SampleID[is.na(df[[i]])]))
       df <- df[!is.na(df[[i]]),]
     }
-
+    
     df <- df[!is.na(df[[variable_testers]]),]
-
+    
     # # Check whether it is NPX or QUANT
-
+    
     if ('NPX' %in% colnames(df)) {
       data_type <- 'NPX'
     } else if ('Quantified_value' %in% colnames(df)) {
       data_type <- 'Quantified_value'
     } else {
       stop('The NPX or Quantified_value is not in the df.')}
-
+    
     #Not testing assays that have all NA:s
     all_nas <- df  %>%
       dplyr::group_by(OlinkID) %>%
@@ -89,17 +89,15 @@ olink_one_non_parametric <- function(df,
       dplyr::ungroup() %>%
       dplyr::filter(n == n_na) %>%
       dplyr::pull(OlinkID)
-
-
+    
+    
     if(length(all_nas) > 0) {
-
       warning(paste0('The assays ',
                      paste(all_nas, collapse = ', '),
                      ' have only NA:s. They will not be tested.'),
               call. = F)
-
     }
-
+    
     ##Convert character vars to factor
     converted.vars <- NULL
     num.vars <- NULL
@@ -111,20 +109,16 @@ olink_one_non_parametric <- function(df,
         num.vars <- c(num.vars,i)
       }
     }
-
-
+    
     #Not testing assays that have all NA:s in one level
     #Every sample needs to have a unique level of the factor
-
+    
     nas_in_var <- character(0)
-
-
+    
     single_fixed_effects <- variable
-
-
-
+    
     for(effect in single_fixed_effects){
-
+      
       current_nas <- df %>%
         dplyr::filter(!(OlinkID %in% all_nas)) %>%
         dplyr::group_by(OlinkID, !!rlang::ensym(effect)) %>%
@@ -132,11 +126,9 @@ olink_one_non_parametric <- function(df,
         dplyr::filter(n == n_na) %>%
         dplyr::distinct(OlinkID) %>%
         dplyr::pull(OlinkID)
-
+      
       if(length(current_nas) > 0) {
-
         nas_in_var <- c(nas_in_var, current_nas)
-
         warning(paste0('The assay(s) ',
                        current_nas,
                        ' has only NA:s in atleast one level of ',
@@ -144,13 +136,13 @@ olink_one_non_parametric <- function(df,
                        '. It will not be tested.'),
                 call. = F)
       }
-
+      
       number_of_samples_w_more_than_one_level <- df %>%
         dplyr::group_by(SampleID, Index) %>%
         dplyr::summarise(n_levels = dplyr::n_distinct(!!rlang::ensym(effect), na.rm = T),.groups = "drop") %>%
         dplyr::filter(n_levels > 1) %>%
         nrow(.)
-
+      
       if (number_of_samples_w_more_than_one_level > 0) {
         stop(paste0("There are ",
                     number_of_samples_w_more_than_one_level,
@@ -158,18 +150,14 @@ olink_one_non_parametric <- function(df,
                     effect,
                     ". Only one level per sample is allowed."))
       }
-
-
     }
-
+    
     formula_string <- paste0(data_type, "~", paste(variable,collapse="*"))
-
-
+    
     #Get factors
     fact.vars <- sapply(variable_testers, function(x) is.factor(df[[x]]))
     fact.vars <- names(fact.vars)[fact.vars]
-
-
+    
     #Print verbose message
     if(verbose){
       if(!is.null(removed.sampleids) & length(removed.sampleids) >0){
@@ -185,21 +173,38 @@ olink_one_non_parametric <- function(df,
                        paste(num.vars,collapse = ", ")))
       }
     }
-
-
+    
     if (dependence){
+      if (is.null(subject)){
+        stop("Subject variable need to be specified!")
+      }
       if(verbose){message(paste("Friedman model fit to each assay: "),formula_string)}
-      formula_string <- paste0(formula_string,"|","group_id")
-      p.val <- df %>%
+      
+      formula_string <- paste0(formula_string,"|",subject)
+      # add repeat measurement groups
+      df_nas_remove <- df %>%
         dplyr::filter(!(OlinkID %in% all_nas)) %>%
-        dplyr::filter(!(OlinkID %in% nas_in_var)) %>%
-        dplyr::group_by(Assay,OlinkID, UniProt, Panel,!!!rlang::syms(variable)) %>%
-        dplyr::mutate(group_id = as.factor (1:dplyr::n()))%>%
+        dplyr::filter(!(OlinkID %in% nas_in_var))
+      # remove subject without complete data
+      subject_remove <- df_nas_remove %>% 
+        dplyr::filter(!is.na(NPX)) %>%  
+        dplyr::group_by(Assay, !!!rlang::syms(subject)) %>% 
+        dplyr::summarize(n = n()) %>% 
+        dplyr::filter(n == max(n)) %>% 
+        dplyr::mutate(Friedman_remove = "no") %>% 
+        dplyr::select(-n)
+      
+      if(nrow(subject_remove) > 0){
+        message(paste("Subjects removed due to incomplete data"))
+      }
+      
+      p.val <- df_nas_remove %>% 
+        dplyr::left_join(subject_remove, by = c("Assay",subject)) %>% 
+        dplyr::filter(Friedman_remove == "no") %>%  
         rstatix::convert_as_factor(!!!rlang::syms(variable)) %>%
-        dplyr::ungroup(!!!rlang::syms(variable))%>%
         dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
         dplyr::do(rstatix::friedman_test(as.formula(formula_string),
-                                   data=.,na.action=na.omit)) %>%
+                                         data=.,na.action=na.omit)) %>%
         dplyr::ungroup() %>%
         dplyr::mutate(Adjusted_pval = p.adjust(p, method = "BH")) %>%
         dplyr::mutate(Threshold  = ifelse(Adjusted_pval<0.05, "Significant","Non-significant")) %>%
@@ -209,16 +214,14 @@ olink_one_non_parametric <- function(df,
         dplyr::mutate(term = variable) %>%
         dplyr::rename(p.value = p) %>%
         dplyr::select(Assay, OlinkID, UniProt, Panel, term, df, method, statistic, p.value, Adjusted_pval, Threshold)
-
-
- }else{
-   if(verbose){message(paste("Kruskal model fit to each assay: "),formula_string)}
+    }else{
+      if(verbose){message(paste("Kruskal model fit to each assay: "),formula_string)}
       p.val <- df %>%
         dplyr::filter(!(OlinkID %in% all_nas)) %>%
         dplyr::filter(!(OlinkID %in% nas_in_var)) %>%
         dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
         dplyr::do(broom::tidy(kruskal.test(as.formula(formula_string),
-                              data=.))) %>%
+                                           data=.))) %>%
         dplyr::ungroup() %>%
         dplyr::mutate(Adjusted_pval=p.adjust(p.value,method="BH")) %>%
         dplyr::mutate(Threshold  = ifelse(Adjusted_pval<0.05,"Significant","Non-significant")) %>%
@@ -227,7 +230,6 @@ olink_one_non_parametric <- function(df,
         dplyr::mutate(term = variable) %>%
         dplyr::rename(df = parameter) %>%
         dplyr::select(Assay, OlinkID, UniProt, Panel, term, df, method, statistic, p.value, Adjusted_pval, Threshold)
-
   }, warning = function(w) {
     if (grepl(x = w, pattern = glob2rx("*contains implicit NA, consider using*")))
       invokeRestart("muffleWarning")
@@ -242,14 +244,13 @@ olink_one_non_parametric <- function(df,
 #'Performs a posthoc test using rstatix::wilcox_test with Benjamini-Hochberg p-value adjustment per assay (by OlinkID) for each panel at confidence level 0.95.
 #'See \code{olink_kruskal} for details of input notation. \cr\cr
 #'The function handles both factor and numerical variables.
-#'The posthoc test for a numerical variable compares the difference in medians of the outcome variable (default: NPX) for 1 standard deviation difference in the numerical variable, e.g.
-#'median NPX at mean(numerical variable) versus median NPX at median(numerical variable) + 1*SD(numerical variable).
-#'
+#'The alternative is that they differ by some other location shift, while the null hypothesis is that the distributions of x and y differ by a location shift of mu.
+
 #' @param df NPX data frame in long format with at least protein name (Assay), OlinkID, UniProt, Panel and a factor with at least 3 levels.
 #' @param olinkid_list Character vector of OlinkID's on which to perform post hoc analysis. If not specified, all assays in df are used.
 #' @param variable Single character value or character array.
-#' @param verbose Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
-#' @return Tibble of posthoc tests for specified effect, arranged by ascending adjusted p-values.
+#' @param verbose Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
+#' @return Tibble of posthoc tests for specicified effect, arranged by ascending adjusted p-values.
 #' @export
 #' @examples \donttest{
 #'
@@ -283,64 +284,55 @@ olink_one_non_parametric <- function(df,
 olink_one_non_parametric_posthoc <- function(df,
                                              olinkid_list = NULL,
                                              variable,
-                                             verbose=T
+                                             verbose=TRUE
                                              ){
-
-
-
   if(missing(df) | missing(variable)){
     stop('The df and variable and effect arguments need to be specified.')
   }
-
+  
   withCallingHandlers({
-
-    #Filtering on valid OlinkID
+    
+    # Filtering on valid OlinkID
     df <- df %>%
-      dplyr::filter(stringr::str_detect(OlinkID,
-                                 "OID[0-9]{5}"))
-
+      dplyr::filter(stringr::str_detect(OlinkID, "OID[0-9]{5}"))
+    
     if(is.null(olinkid_list)){
       olinkid_list <- df %>%
         dplyr::select(OlinkID) %>%
         dplyr::distinct() %>%
         dplyr::pull()
     }
-
-    # # Check whether it is NPX or QUANT
-
+    
+    # Check whether it is NPX or QUANT
     if ('NPX' %in% colnames(df)) {
       data_type <- 'NPX'
     } else if ('Quantified_value' %in% colnames(df)) {
       data_type <- 'Quantified_value'
     } else {
       stop('The NPX or Quantified_value is not in the df.')}
-
-
+    
     variable_testers <- intersect(c(variable), names(df))
     ##Remove rows where variables or covariate is NA (cant include in analysis anyway)
     removed.sampleids <- NULL
-
-    #removed.sampleids <- unique(c(removed.sampleids,df$SampleID[is.na(df[[variable_testers]])]))
-    #df <- df[!is.na(df[[variable_testers]]),]
-
+    
     for(i in variable_testers){
       removed.sampleids <- unique(c(removed.sampleids,df$SampleID[is.na(df[[i]])]))
       df <- df[!is.na(df[[i]]),]
     }
-
+    
     ##Convert character vars to factor
     converted.vars <- NULL
     num.vars <- NULL
-
+    
     if(is.character(df[[variable_testers]])){
-        df[[variable_testers]] <- factor(df[[variable_testers]])
-        converted.vars <- c(converted.vars,variable_testers)
-        } else if(is.numeric(df[[variable_testers]])){
-        num.vars <- c(num.vars,variable_testers)
-        }
-
+      df[[variable_testers]] <- factor(df[[variable_testers]])
+      converted.vars <- c(converted.vars,variable_testers)
+    } else if(is.numeric(df[[variable_testers]])){
+      num.vars <- c(num.vars,variable_testers)
+    }
+    
     formula_string <- paste0(data_type, "~", paste(variable,collapse="*"))
-
+    
     #Print verbose message
     if(verbose){
       if(!is.null(removed.sampleids) & length(removed.sampleids) >0){
@@ -361,9 +353,7 @@ olink_one_non_parametric_posthoc <- function(df,
       }
       message(paste("Means estimated for each assay from non-parametric model: ",formula_string))
     }
-
-
-
+    
     p.hoc_val <- df %>%
       dplyr::filter(OlinkID %in% olinkid_list) %>%
       dplyr::mutate(OlinkID = factor(OlinkID, levels = olinkid_list)) %>%
@@ -376,10 +366,9 @@ olink_one_non_parametric_posthoc <- function(df,
       dplyr::mutate(contrast = paste(group1, group2, sep = " - ")) %>%
       dplyr::rename(Adjusted_pval = p.adj) %>%
       dplyr::select(all_of(c("Assay", "OlinkID", "UniProt", "Panel", "term", "contrast", "estimate","conf.low", "conf.high", "Adjusted_pval","Threshold")))
-
-
+    
     return(p.hoc_val)
-
+    
   }, warning = function(w) {
     if (grepl(x = w, pattern = glob2rx("*contains implicit NA, consider using*")))
       invokeRestart("muffleWarning")

@@ -8,7 +8,7 @@ olink_one_non_parametric_posthoc(
   df,
   olinkid_list = NULL,
   variable,
-  verbose = T
+  verbose = TRUE
 )
 }
 \arguments{
@@ -18,17 +18,16 @@ olink_one_non_parametric_posthoc(
 
 \item{variable}{Single character value or character array.}
 
-\item{verbose}{Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
+\item{verbose}{Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
 }
 \value{
-Tibble of posthoc tests for specified effect, arranged by ascending adjusted p-values.
+Tibble of posthoc tests for specicified effect, arranged by ascending adjusted p-values.
 }
 \description{
 Performs a posthoc test using rstatix::wilcox_test with Benjamini-Hochberg p-value adjustment per assay (by OlinkID) for each panel at confidence level 0.95.
 See \code{olink_kruskal} for details of input notation. \cr\cr
 The function handles both factor and numerical variables.
-The posthoc test for a numerical variable compares the difference in medians of the outcome variable (default: NPX) for 1 standard deviation difference in the numerical variable, e.g.
-median NPX at mean(numerical variable) versus median NPX at median(numerical variable) + 1*SD(numerical variable).
+The alternative is that they differ by some other location shift, while the null hypothesis is that the distributions of x and y differ by a location shift of mu.
 }
 \examples{
 \donttest{
