@@ -44,8 +44,11 @@ Bridging is needed if Olink® NPX datasets are:
 -   intensity normalized but from two different sample populations.
 
 To bridge two or more Olink® NPX datasets, bridging samples are needed
-to calculate adjustment factors between datasets. The recommended number
-of bridging samples for Explore 1536 datasets is between 8-16.
+to calculate adjustment factors between datasets. Bridging samples are 
+overlapping samples between datasets. The recommended number
+of bridging samples for Explore 1536 datasets is between 8-16. Olink® 
+NPX datasets without overlapping samples can not be combined to perform 
+joint analysis using the bridging approach described below.
 
 The following tutorial is designed to give you an overview of the kinds
 of data combining methods that are possible using the Olink® bridging
@@ -53,15 +56,23 @@ procedure.
 
 ## Setup the bridging objects
 
-To demonstrate how bridging works, we will use the example datasets
-(`npx_data1` and `npx_data2`) from **OlinkAnalyze** package. They are in
-standard Olink® NPX table format that Olink® delivers to customers.
-
 ```{r setup}
 library(OlinkAnalyze)
 library(dplyr)
 library(stringr)
 ```
+
+The bridging objects are standard Olink® NPX tables. They can be loaded using 
+`read_NPX()` function with NPX manager output file as input.
+
+```{r message=FALSE, eval=FALSE}
+data1 <- read_NPX("~/NPX_file1_location.xlsx")
+data2 <- read_NPX("~/NPX_file2_location.xlsx")
+```  
+
+To demonstrate how bridging works, we will use the example datasets
+(`npx_data1` and `npx_data2`) from **OlinkAnalyze** package.
+
 
 ## Perform bridging
 
@@ -69,8 +80,8 @@ We can use `olink_normalization()` function to bridge two datasets. The bridging
 procedure is to first calculate **the median of the paired NPX differences** per
 assay between the bridging samples as adjustment factor then use these adjustment 
 factors to adjust NPX values between two datasets. The output from 
-`olink_normalization()` function is a table with adjusted NPX value in the column 
-`NPX`.
+`olink_normalization()` function is a NPX table with adjusted NPX value in the 
+column `NPX`.
 
 ```{r bridging, message=FALSE}
            
@@ -101,6 +112,8 @@ PCA plot is used to visualize sample-to-sample distance before and after bridgin
 
 ```{r pca1, message=FALSE, fig.cap="PCA plot of combined datasets without bridging"}
 ## before bridging
+
+### Generate unique SampleIDs
 npx_1 <- npx_data1 %>% 
   mutate(dataset = "data1") %>% 
   mutate(SampleID = paste0(dataset, PlateID, SampleID))
@@ -109,8 +122,10 @@ npx_2 <- npx_data2 %>%
   mutate(dataset = "data2") %>% 
   mutate(SampleID = paste0(dataset, PlateID, SampleID))
              
-npx_data <- rbind(npx_1, npx_2)
-OlinkAnalyze::olink_pca_plot(df = npx_data,
+npx_before_br <- rbind(npx_1, npx_2)
+
+### PCA plot
+OlinkAnalyze::olink_pca_plot(df = npx_before_br,
                                color_g = "dataset", byPanel = TRUE, coloroption = c('orange', 'darkblue')) 
 
 ```
@@ -118,9 +133,12 @@ OlinkAnalyze::olink_pca_plot(df = npx_data,
 
 ```{r pca2, message=FALSE, fig.cap="PCA plot of combined datasets after bridging"}
 ## After bridging
-npx_br_plot <- npx_br_data %>% 
+
+### Generate unique SampleIDs
+npx_after_br <- npx_br_data %>% 
   mutate(SampleID = paste0(dataset, PlateID, SampleID))
-OlinkAnalyze::olink_pca_plot(df = npx_br_plot,
+### PCA plot
+OlinkAnalyze::olink_pca_plot(df = npx_after_br,
                                color_g = "dataset", byPanel = TRUE, coloroption = c('orange', 'darkblue')) 
 ```
 
