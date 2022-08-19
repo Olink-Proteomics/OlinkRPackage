@@ -6,7 +6,7 @@
 #' The plot is printed, and a list of ggplot objects is returned. \cr\cr
 #' If byPanel = TRUE, the data processing (imputation of missing values etc) and subsequent UMAP is performed separately per panel. A faceted plot is printed, while the individual ggplot objects are returned. \cr\cr
 #' The arguments outlierDefX and outlierDefY can be used to identify outliers in the UMAP results. Samples more than +/-outlierDef[X,Y] standard deviations from the mean of the plotted UMAP component will be labelled. Both arguments have to be specified.
-#' NOTE: UMAP is a non-linear data transformation that might not accurately preserve the properties of the data. Distances in the UMAP plane should therefore be interpreted with caution
+#' NOTE: UMAP is a non-linear data transformation that might not accurately preserve the properties of the data. Distances in the UMAP plane should therefore be interpreted with caution.
 #'
 #' @param df data frame in long format with Sample Id, NPX and column of choice for colors
 #' @param color_g Character value indicating which column to use for colors (default QC_Warning)
@@ -17,14 +17,14 @@
 #' @param drop_assays Logical. All assays with any missing values will be dropped. Takes precedence over sample drop.
 #' @param drop_samples Logical. All samples with any missing values will be dropped.
 #' @param byPanel Perform the UMAP per panel (default FALSE)
-#' @param outlierDefX The number standard deviations along the PC plotted on the x-axis that defines an outlier. See also 'Details"
-#' @param outlierDefY The number standard deviations along the PC plotted on the y-axis that defines an outlier. See also 'Details"
+#' @param outlierDefX The number standard deviations along the UMAP dimension plotted on the x-axis that defines an outlier. See also 'Details"
+#' @param outlierDefY The number standard deviations along the UMAP dimension plotted on the y-axis that defines an outlier. See also 'Details"
 #' @param outlierLines Draw dashed lines at +/-outlierDef[X,Y] standard deviations from the mean of the plotted PCs (default FALSE)
 #' @param label_outliers Use ggrepel to label samples lying outside the limits set by the outlierLines (default TRUE)
 #' @param quiet Logical. If TRUE, the resulting plot is not printed
 #' @param verbose Logical. Whether warnings about the number of samples and/or assays dropped or imputed should be printed to the console.
 #' @param ... coloroption passed to specify color order.
-#' @return A list of objects of class "ggplot", each plot contains scatter plot of PCs
+#' @return A list of objects of class "ggplot", each plot contains scatter plot of UMAPs
 #' @keywords NPX UMAP
 #' @export
 #' @examples
@@ -280,16 +280,16 @@ olink_umap_plot.internal <- function (df,
   #Add outlier lines
   if(outlierLines){
     umap_plot <- umap_plot +
-      ggplot2::geom_hline(ggplot2::aes(yintercept=PCY_low),
+      ggplot2::geom_hline(ggplot2::aes(yintercept=umapY_low),
                           linetype = 'dashed',
                           color = 'grey') +
-      ggplot2::geom_hline(ggplot2::aes(yintercept=PCY_high),
+      ggplot2::geom_hline(ggplot2::aes(yintercept=umapY_high),
                           linetype = 'dashed',
                           color = 'grey') +
-      ggplot2::geom_vline(ggplot2::aes(xintercept = PCX_low),
+      ggplot2::geom_vline(ggplot2::aes(xintercept = umapX_low),
                           linetype = 'dashed',
                           color = 'grey') +
-      ggplot2::geom_vline(ggplot2::aes(xintercept = PCX_high),
+      ggplot2::geom_vline(ggplot2::aes(xintercept = umapX_high),
                           linetype = 'dashed',
                           color = 'grey')
   }
