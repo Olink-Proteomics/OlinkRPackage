@@ -65,7 +65,7 @@ library(stringr)
 The bridging objects are standard Olink® NPX tables. They can be loaded using 
 `read_NPX()` function with NPX manager output file as input.
 
-```{r message=FALSE, eval=FALSE}
+```{r message=FALSE, eval=FALSE, echo = TRUE}
 data1 <- read_NPX("~/NPX_file1_location.xlsx")
 data2 <- read_NPX("~/NPX_file2_location.xlsx")
 ```  
