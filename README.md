@@ -14,9 +14,11 @@ convenient pipeline for your Olink NPX data analysis.
 
 ## Installation
 
+Olink® Analyze is now available on CRAN:
+<https://cran.r-project.org/web/packages/OlinkAnalyze/index.html>
+
 ``` r
-# install.packages("remotes")
-remotes::install_github(repo ='Olink-Proteomics/OlinkRPackage/OlinkAnalyze', ref = "main", build_vignettes = TRUE)
+install.packages("OlinkAnalyze")
 ```
 
 ## Vignette
@@ -114,8 +116,25 @@ explore the package and its functions.
 
 ## Issues
 
-Please report any issues (good or bad) to
-\<biostattools\[a\]olink.com\>.
+Please report any issues (good or bad) to \<biostattools\[a\]olink.com\>
+or use the github [issue
+function](https://github.com/Olink-Proteomics/OlinkRPackage/issues).
+
+## Alternative install methods
+
+To install directly from the github repository:
+
+``` r
+# install.packages("remotes")
+remotes::install_github(repo ='Olink-Proteomics/OlinkRPackage/OlinkAnalyze', ref = "main", build_vignettes = TRUE)
+```
+
+To install Olink Analyze into a new
+[conda](https://docs.conda.io/en/latest/) environment:
+
+``` bash
+conda create -n OlinkAnalyze -c conda-forge r-olinkanalyze
+```
 
 ## Credits
 
