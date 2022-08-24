@@ -1,3 +1,6 @@
+skip_on_cran()
+skip_if_not_installed("clusterProfiler")
+
 npx_df <- npx_data1 %>%
   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL"))
 ttest_results <- olink_ttest(df = npx_df, variable = "Treatment")

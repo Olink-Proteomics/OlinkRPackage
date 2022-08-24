@@ -1,3 +1,5 @@
+skip_on_cran()
+
 #Load reference results
 refRes_file <- '../data/refResults.RData'
 load(refRes_file)
