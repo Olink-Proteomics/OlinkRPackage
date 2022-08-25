@@ -25,7 +25,21 @@ olink_one_non_parametric(
 }
 \value{
 A tibble containing the Kruskal-Wallis Test or Friedman Test results for every protein.
-The tibble is arranged by ascending p-values.
+
+Columns include:
+\itemize{
+ \item{Assay:} "character" Protein symbol
+ \item{OlinkID:} "character" Olink specific ID
+ \item{UniProt:} "character" Olink specific ID
+ \item{Panel:} "character" Name of Olink Panel
+ \item{term:} "character" term in model
+ \item{df:} "numeric" degrees of freedom
+ \item{method:} "character" which method was used
+ \item{statistic:} "named numeric" the value of the test statistic with a name describing it
+ \item{p.value:} "numeric" p-value for the test
+ \item{Adjusted_pval:} "numeric" adjusted p-value for the test (Benjamini&Hochberg)
+ \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
+}
 }
 \description{
 Performs an Kruskal-Wallis Test for each assay (by OlinkID) in every panel using stats::kruskal.test.

@@ -296,7 +296,6 @@ olink_ordinalRegression <- function(df,
 #' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #'
 #' @return Tibble of posthoc tests for specified effect, arranged by ascending adjusted p-values.
-#' @export
 #'
 #' #' Columns include:
 #' \itemize{
@@ -310,7 +309,8 @@ olink_ordinalRegression <- function(df,
 #'  \item{Adjusted_pval:} "numeric" adjusted p-value for the test
 #'  \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
 #' }
-#'
+
+#' @export
 #' @examples \donttest{
 #' library(dplyr)
 #' npx_df <- npx_data1 %>% filter(!grepl('control',SampleID, ignore.case = TRUE))

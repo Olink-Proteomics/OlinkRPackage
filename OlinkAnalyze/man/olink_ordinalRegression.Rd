@@ -29,6 +29,19 @@ Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be infe
 \value{
 A tibble containing the ANOVA results for every protein.
 The tibble is arranged by ascending p-values.
+
+Columns include:
+\itemize{
+ \item{Assay:} "character" Protein symbol
+ \item{OlinkID:} "character" Olink specific ID
+ \item{UniProt:} "character" Olink specific ID
+ \item{Panel:} "character" Name of Olink Panel
+ \item{term:} "character" term in model
+ \item{statistic:} "numeric" value of the statistic
+ \item{p.value:} "numeric" nominal p-value
+ \item{Adjusted_pval:} "numeric" adjusted p-value for the test
+ \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
+}
 }
 \description{
 Performs an ANOVA F-test for each assay (by OlinkID) in every panel using car::Anova and Type II sum of squares.
@@ -55,4 +68,5 @@ npx_df <- npx_data1 \%>\% filter(!grepl('control',SampleID, ignore.case = TRUE))
 #Results in model NPX~Treatment+Time+Treatment:Time.
 ordinalRegression_results <- olink_ordinalRegression(df = npx_df,
                              variable="Treatment:Time")}
+
 }

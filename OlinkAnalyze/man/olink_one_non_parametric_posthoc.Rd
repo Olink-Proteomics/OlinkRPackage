@@ -2,12 +2,13 @@
 % Please edit documentation in R/Olink_one_non_parametric.R
 \name{olink_one_non_parametric_posthoc}
 \alias{olink_one_non_parametric_posthoc}
-\title{Function which performs a Wilcox posthoc test per protein.}
+\title{Function which performs posthoc test per protein for the results from Friedman or Kruskal-Wallis Test.}
 \usage{
 olink_one_non_parametric_posthoc(
   df,
   olinkid_list = NULL,
   variable,
+  test = "kruskal",
   verbose = TRUE
 )
 }
@@ -18,20 +19,33 @@ olink_one_non_parametric_posthoc(
 
 \item{variable}{Single character value or character array.}
 
+\item{test}{Single character value indicates running the post hoc test for friedman or kruskal.}
+
 \item{verbose}{Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
 }
 \value{
 Tibble of posthoc tests for specicified effect, arranged by ascending adjusted p-values.
+
+Columns include:
+\itemize{
+ \item{Assay:} "character" Protein symbol
+ \item{OlinkID:} "character" Olink specific ID
+ \item{UniProt:} "character" Olink specific ID
+ \item{Panel:} "character" Name of Olink Panel
+ \item{term:} "character" term in model
+ \item{contrast:} "character" the groups that were compared
+ \item{estimate:} "numeric" the value of the test statistic with a name describing it
+ \item{Adjusted_pval:} "numeric" adjusted p-value for the test
+ \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
+}
 }
 \description{
-Performs a posthoc test using rstatix::wilcox_test with Benjamini-Hochberg p-value adjustment per assay (by OlinkID) for each panel at confidence level 0.95.
-See \code{olink_kruskal} for details of input notation. \cr\cr
+Performs a posthoc test using rstatix::wilcox_test or FSA::dennTest with Benjamini-Hochberg p-value adjustment per assay (by OlinkID) for each panel at confidence level 0.95.
+See \code{olink_one_non_parametric} for details of input notation. \cr\cr
 The function handles both factor and numerical variables.
-The alternative is that they differ by some other location shift, while the null hypothesis is that the distributions of x and y differ by a location shift of mu.
 }
 \examples{
 \donttest{
-
 library(dplyr)
 
 npx_df <- npx_data1 \%>\% filter(!grepl('control',SampleID, ignore.case = TRUE))
@@ -40,7 +54,7 @@ npx_df <- npx_data1 \%>\% filter(!grepl('control',SampleID, ignore.case = TRUE))
 kruskal_wallis_results <- olink_one_non_parametric(npx_df, "Site")
 
 #Friedman Test
-Friedman_results <- olink_one_non_parametric(npx_df, "Time", dependence = TRUE)
+Friedman_results <- olink_one_non_parametric(npx_df, "Time", subject = "Subject", dependence = TRUE)
 
 #Posthoc test for the results from Friedman Test
 #Filtering out significant and relevant results.
@@ -51,7 +65,7 @@ distinct() \%>\%
 pull()
 
 #Posthoc
-friedman_posthoc_results <- olink_one_non_parametric_posthoc(npx_df, variable = c("Time"),
+friedman_posthoc_results <- olink_one_non_parametric_posthoc(npx_df, variable = c("Time"), test = "friedman",
 olinkid_list = significant_assays)}
 
 }
