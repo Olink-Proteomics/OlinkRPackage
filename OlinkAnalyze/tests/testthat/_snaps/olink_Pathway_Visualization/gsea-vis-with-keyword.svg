@@ -21,93 +21,35 @@
 <rect x='-0.000000000000064' y='0.00' width='720.00' height='576.00' style='stroke-width: 1.07; stroke: #FFFFFF; fill: #FFFFFF;' />
 </g>
 <defs>
-  <clipPath id='cpMzA5LjE0fDY2NS4wM3wyMi43OHw1NDUuMTE='>
-    <rect x='309.14' y='22.78' width='355.89' height='522.33' />
+  <clipPath id='cpMjcwLjk5fDYzOS4yMHwyMi43OHw1NDUuMTE='>
+    <rect x='270.99' y='22.78' width='368.21' height='522.33' />
   </clipPath>
 </defs>
-<g clip-path='url(#cpMzA5LjE0fDY2NS4wM3wyMi43OHw1NDUuMTE=)'>
-<rect x='309.14' y='22.78' width='355.89' height='522.33' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
-<rect x='397.74' y='517.96' width='83.31' height='23.27' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #AB5F4C;' />
-<rect x='380.56' y='492.10' width='100.49' height='23.27' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #AB5F4C;' />
-<rect x='481.04' y='466.25' width='99.36' height='23.27' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #AB5F4C;' />
-<rect x='382.40' y='440.39' width='98.65' height='23.27' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #AB5F4C;' />
-<rect x='481.04' y='414.53' width='100.99' height='23.27' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #AB5F4C;' />
-<rect x='481.04' y='388.67' width='100.99' height='23.27' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #AB5F4C;' />
-<rect x='370.79' y='362.81' width='110.25' height='23.27' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #AB5F4C;' />
-<rect x='367.31' y='336.96' width='113.73' height='23.27' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #AB5F4C;' />
-<rect x='372.35' y='311.10' width='108.70' height='23.27' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #AB5F4C;' />
-<rect x='481.04' y='285.24' width='134.98' height='23.27' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #AB5F4C;' />
-<rect x='481.04' y='259.38' width='133.62' height='23.27' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #AB5F4C;' />
-<rect x='481.04' y='233.53' width='138.88' height='23.27' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #AB5F4C;' />
-<rect x='481.04' y='207.67' width='133.04' height='23.27' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #AB5F4C;' />
-<rect x='333.06' y='181.81' width='147.98' height='23.27' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #AB5F4C;' />
-<rect x='331.61' y='155.95' width='149.44' height='23.27' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #AB5F4C;' />
-<rect x='481.04' y='130.09' width='144.24' height='23.27' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #AB5F4C;' />
-<rect x='328.14' y='104.24' width='152.90' height='23.27' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #AB5F4C;' />
-<rect x='325.32' y='78.38' width='155.73' height='23.27' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #AB5F4C;' />
-<rect x='481.04' y='52.52' width='165.90' height='23.27' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #AB5F4C;' />
-<rect x='481.04' y='26.66' width='167.81' height='23.27' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #AB5F4C;' />
-<rect x='309.14' y='22.78' width='355.89' height='522.33' style='stroke-width: 1.07; stroke: #333333;' />
+<g clip-path='url(#cpMjcwLjk5fDYzOS4yMHwyMi43OHw1NDUuMTE=)'>
+<rect x='270.99' y='22.78' width='368.21' height='522.33' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<rect x='287.73' y='295.82' width='167.92' height='213.68' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #AB5F4C;' />
+<rect x='455.65' y='58.40' width='166.82' height='213.68' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #AB5F4C;' />
+<rect x='270.99' y='22.78' width='368.21' height='522.33' style='stroke-width: 1.07; stroke: #333333;' />
 </g>
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
-<text x='304.21' y='532.63' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='276.35px' lengthAdjust='spacingAndGlyphs'>GOBP_POSITIVE_REGULATION...IMMUNE_EFFECTOR_PROCESS</text>
-<text x='304.21' y='506.77' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='247.99px' lengthAdjust='spacingAndGlyphs'>REACTOME_CYTOKINE_SIGNALING_IN_IMMUNE_SYSTEM</text>
-<text x='304.21' y='480.91' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='276.36px' lengthAdjust='spacingAndGlyphs'>GOBP_POSITIVE_REGULATION...ATOR_OF_IMMUNE_RESPONSE</text>
-<text x='304.21' y='455.05' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='273.92px' lengthAdjust='spacingAndGlyphs'>GOBP_LYMPHOCYTE_ACTIVATI...LVED_IN_IMMUNE_RESPONSE</text>
-<text x='304.21' y='429.19' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='286.13px' lengthAdjust='spacingAndGlyphs'>GOBP_PRODUCTION_OF_MOLEC...ATOR_OF_IMMUNE_RESPONSE</text>
-<text x='304.21' y='403.34' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='284.67px' lengthAdjust='spacingAndGlyphs'>GOBP_REGULATION_OF_PRODU...ATOR_OF_IMMUNE_RESPONSE</text>
-<text x='304.21' y='377.48' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='245.54px' lengthAdjust='spacingAndGlyphs'>GOBP_REGULATION_OF_IMMUNE_EFFECTOR_PROCESS</text>
-<text x='304.21' y='351.62' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='178.54px' lengthAdjust='spacingAndGlyphs'>GOBP_IMMUNE_SYSTEM_DEVELOPMENT</text>
-<text x='304.21' y='325.76' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='267.57px' lengthAdjust='spacingAndGlyphs'>GOBP_CELL_ACTIVATION_INVOLVED_IN_IMMUNE_RESPONSE</text>
-<text x='304.21' y='299.90' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='168.74px' lengthAdjust='spacingAndGlyphs'>REACTOME_INNATE_IMMUNE_SYSTEM</text>
-<text x='304.21' y='274.05' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='166.30px' lengthAdjust='spacingAndGlyphs'>GOBP_IMMUNE_EFFECTOR_PROCESS</text>
-<text x='304.21' y='248.19' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='271.48px' lengthAdjust='spacingAndGlyphs'>GOBP_ADAPTIVE_IMMUNE_RES...LIN_SUPERFAMILY_DOMAINS</text>
-<text x='304.21' y='222.33' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='266.08px' lengthAdjust='spacingAndGlyphs'>GOBP_ANTIMICROBIAL_HUMOR...Y_ANTIMICROBIAL_PEPTIDE</text>
-<text x='304.21' y='196.47' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='283.70px' lengthAdjust='spacingAndGlyphs'>GOBP_NEGATIVE_REGULATION_OF_IMMUNE_SYSTEM_PROCESS</text>
-<text x='304.21' y='170.62' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='217.18px' lengthAdjust='spacingAndGlyphs'>HP_ABNORMAL_IMMUNE_SYSTEM_MORPHOLOGY</text>
-<text x='304.21' y='144.76' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='283.21px' lengthAdjust='spacingAndGlyphs'>GOBP_IMMUNE_RESPONSE_REGULATING_SIGNALING_PATHWAY</text>
-<text x='304.21' y='118.90' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='280.26px' lengthAdjust='spacingAndGlyphs'>GOBP_NEGATIVE_REGULATION...IMMUNE_EFFECTOR_PROCESS</text>
-<text x='304.21' y='93.04' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='247.51px' lengthAdjust='spacingAndGlyphs'>GOBP_REGULATION_OF_ADAPTIVE_IMMUNE_RESPONSE</text>
-<text x='304.21' y='67.18' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='279.79px' lengthAdjust='spacingAndGlyphs'>GOBP_POSITIVE_REGULATION_OF_IMMUNE_SYSTEM_PROCESS</text>
-<text x='304.21' y='41.33' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='244.57px' lengthAdjust='spacingAndGlyphs'>GOBP_POSITIVE_REGULATION_OF_IMMUNE_RESPONSE</text>
-<polyline points='306.40,529.60 309.14,529.60 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
-<polyline points='306.40,503.74 309.14,503.74 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
-<polyline points='306.40,477.88 309.14,477.88 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
-<polyline points='306.40,452.02 309.14,452.02 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
-<polyline points='306.40,426.17 309.14,426.17 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
-<polyline points='306.40,400.31 309.14,400.31 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
-<polyline points='306.40,374.45 309.14,374.45 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
-<polyline points='306.40,348.59 309.14,348.59 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
-<polyline points='306.40,322.73 309.14,322.73 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
-<polyline points='306.40,296.88 309.14,296.88 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
-<polyline points='306.40,271.02 309.14,271.02 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
-<polyline points='306.40,245.16 309.14,245.16 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
-<polyline points='306.40,219.30 309.14,219.30 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
-<polyline points='306.40,193.45 309.14,193.45 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
-<polyline points='306.40,167.59 309.14,167.59 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
-<polyline points='306.40,141.73 309.14,141.73 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
-<polyline points='306.40,115.87 309.14,115.87 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
-<polyline points='306.40,90.01 309.14,90.01 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
-<polyline points='306.40,64.16 309.14,64.16 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
-<polyline points='306.40,38.30 309.14,38.30 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
-<polyline points='317.32,547.85 317.32,545.11 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
-<polyline points='399.18,547.85 399.18,545.11 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
-<polyline points='481.04,547.85 481.04,545.11 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
-<polyline points='562.91,547.85 562.91,545.11 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
-<polyline points='644.77,547.85 644.77,545.11 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
-<text x='317.32' y='556.10' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='15.16px' lengthAdjust='spacingAndGlyphs'>-1.0</text>
-<text x='399.18' y='556.10' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='15.16px' lengthAdjust='spacingAndGlyphs'>-0.5</text>
-<text x='481.04' y='556.10' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>0.0</text>
-<text x='562.91' y='556.10' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>0.5</text>
-<text x='644.77' y='556.10' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>1.0</text>
-<text x='487.08' y='568.24' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='22.62px' lengthAdjust='spacingAndGlyphs'>NES</text>
+<text x='266.06' y='405.69' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='168.74px' lengthAdjust='spacingAndGlyphs'>REACTOME_INNATE_IMMUNE_SYSTEM</text>
+<text x='266.06' y='168.26' text-anchor='end' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='247.99px' lengthAdjust='spacingAndGlyphs'>REACTOME_CYTOKINE_SIGNALING_IN_IMMUNE_SYSTEM</text>
+<polyline points='268.25,402.66 270.99,402.66 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='268.25,165.24 270.99,165.24 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='351.83,547.85 351.83,545.11 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='455.65,547.85 455.65,545.11 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='559.47,547.85 559.47,545.11 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<text x='351.83' y='556.10' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='15.16px' lengthAdjust='spacingAndGlyphs'>-0.5</text>
+<text x='455.65' y='556.10' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>0.0</text>
+<text x='559.47' y='556.10' text-anchor='middle' style='font-size: 8.80px; fill: #4D4D4D; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>0.5</text>
+<text x='455.10' y='568.24' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='22.62px' lengthAdjust='spacingAndGlyphs'>NES</text>
 <text transform='translate(13.05,283.95) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='55.03px' lengthAdjust='spacingAndGlyphs'>Description</text>
-<rect x='675.99' y='233.08' width='38.53' height='101.73' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
-<image width='17.28' height='86.40' x='675.99' y='248.41' preserveAspectRatio='none' xlink:href='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAEsCAYAAAACUNnVAAAAHUlEQVQ4jWNYHe/zn4mBgYFhlBglRolRYpQYLgQAgr8ErJiOwEEAAAAASUVORK5CYII='/>
-<text x='698.75' y='294.64' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>1</text>
-<text x='675.99' y='241.79' style='font-size: 11.00px; font-family: sans;' textLength='38.53px' lengthAdjust='spacingAndGlyphs'>p.adjust</text>
-<line x1='675.99' y1='291.61' x2='679.45' y2='291.61' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<line x1='689.81' y1='291.61' x2='693.27' y2='291.61' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
-<text x='309.14' y='14.56' style='font-size: 13.20px; font-family: sans;' textLength='140.88px' lengthAdjust='spacingAndGlyphs'>GSEA Vis with Keyword</text>
+<rect x='650.16' y='233.08' width='64.36' height='101.73' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<image width='17.28' height='86.40' x='650.16' y='248.41' preserveAspectRatio='none' xlink:href='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAEsCAYAAAACUNnVAAAAHUlEQVQ4jWNYHe/zn4mBgYFhlBglRolRYpQYLgQAgr8ErJiOwEEAAAAASUVORK5CYII='/>
+<text x='672.92' y='294.64' style='font-size: 8.80px; font-family: sans;' textLength='41.60px' lengthAdjust='spacingAndGlyphs'>0.9376054</text>
+<text x='650.16' y='241.79' style='font-size: 11.00px; font-family: sans;' textLength='38.53px' lengthAdjust='spacingAndGlyphs'>p.adjust</text>
+<line x1='650.16' y1='291.61' x2='653.62' y2='291.61' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<line x1='663.98' y1='291.61' x2='667.44' y2='291.61' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<text x='270.99' y='14.56' style='font-size: 13.20px; font-family: sans;' textLength='140.88px' lengthAdjust='spacingAndGlyphs'>GSEA Vis with Keyword</text>
 </g>
 </svg>
