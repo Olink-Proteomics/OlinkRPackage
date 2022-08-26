@@ -83,12 +83,13 @@ Suggests:
     markdown,
     msigdbr,
     openssl,
-    ordinal, 
+    ordinal,
     pheatmap,
     rmarkdown,
     scales,
     testthat (>= 3.0.0),
-    vdiffr
+    vdiffr,
+    here
 VignetteBuilder: 
     knitr
 Config/testthat/edition: 3

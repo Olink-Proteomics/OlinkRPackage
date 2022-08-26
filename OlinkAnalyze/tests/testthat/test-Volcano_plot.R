@@ -1,4 +1,5 @@
 #Load reference results
+testthat::skip_if_not_installed("here")
 refRes_file <- here::here('tests/data/refResults.RData')
 load(refRes_file)
 
