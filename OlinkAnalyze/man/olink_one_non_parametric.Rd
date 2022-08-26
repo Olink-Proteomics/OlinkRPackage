@@ -4,27 +4,16 @@
 \alias{olink_one_non_parametric}
 \title{Function which performs a Kruskal-Wallis Test or Friedman Test per protein}
 \usage{
-olink_one_non_parametric(
-  df,
-  variable,
-  outcome = "NPX",
-  p_adjust_method = "BH",
-  dependence = FALSE,
-  verbose = T
-)
+olink_one_non_parametric(df, variable, dependence = FALSE, verbose = T)
 }
 \arguments{
-\item{df}{NPX data frame in long format with at least protein name (Assay), OlinkID, UniProt, Panel and a factor with at least 3 levels.}
+\item{df}{NPX or Quantified_value data frame in long format with at least protein name (Assay), OlinkID, UniProt, Panel and a factor with at least 3 levels.}
 
 \item{variable}{Single character value.}
 
-\item{outcome}{Character. The dependent variable. Default: NPX.}
+\item{dependence}{Logical. Default: FALSE. When the groups are independent, the kruskal-Wallis will run, when the groups are dependent, the Friedman test will run.}
 
-\item{p_adjust_method}{Adjust P-value for Multiple Comparisons.}
-
-\item{dependence}{Boolean. Default: FALSE. When the groups are independent, the kruskal-Wallis will run, when the groups are dependent, the Friedman test will run.}
-
-\item{verbose}{Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
+\item{verbose}{Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
 }
 \value{
 A tibble containing the Kruskal-Wallis Test or Friedman Test results for every protein.
@@ -34,7 +23,7 @@ The tibble is arranged by ascending p-values.
 Performs an Kruskal-Wallis Test for each assay (by OlinkID) in every panel using stats::kruskal.test.
 Performs an Friedman Test for each assay (by OlinkID) in every panel using rstatix::friedman_test.
 The function handles factor variable. \cr\cr
-Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a messsage if verbose = T).
+Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a message if verbose = T).
 Character columns in the input dataframe are automatically converted to factors (specified in a message if verbose = T).
 Numerical variables are not converted to factors.
 If a numerical variable is to be used as a factor, this conversion needs to be done on the dataframe before the function call. \cr\cr
@@ -48,7 +37,7 @@ The threshold is determined by logic evaluation of Adjusted_pval < 0.05.
 
 library(dplyr)
 
-npx_df <- npx_data1 \%>\% filter(!grepl('control','SampleID', ignore.case = TRUE))
+npx_df <- npx_data1 \%>\% filter(!grepl('control', SampleID, ignore.case = TRUE))
 
 #One-way Kruskal-Wallis Test.
 #Results in a model NPX~Time

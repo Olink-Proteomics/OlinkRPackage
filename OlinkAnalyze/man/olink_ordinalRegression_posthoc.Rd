@@ -9,7 +9,6 @@ olink_ordinalRegression_posthoc(
   olinkid_list = NULL,
   variable,
   covariates = NULL,
-  outcome = "NPX",
   effect,
   verbose = T
 )
@@ -26,14 +25,12 @@ Also takes ':' notation.}
 \item{covariates}{Single character value or character array. Default: NULL.
 Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be inferred from main effects.}
 
-\item{outcome}{Character. The dependent variable. Default: NPX.}
-
 \item{effect}{Term on which to perform post-hoc. Character vector. Must be subset of or identical to variable.}
 
-\item{verbose}{Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
+\item{verbose}{Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
 }
 \value{
-Tibble of posthoc tests for specicified effect, arranged by ascending adjusted p-values.
+Tibble of posthoc tests for specified effect, arranged by ascending adjusted p-values.
 }
 \description{
 Performs a post hoc ANOVA test using emmeans::emmeans with Tukey p-value adjustment per assay (by OlinkID) for each panel at confidence level 0.95.

@@ -1,7 +1,9 @@
 # Workflow derived from https://github.com/r-lib/actions/tree/master/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
-  push
+  push:
+    branches-ignore:    
+      - 'main'  
 
 name: render-and-document
 
@@ -10,12 +12,13 @@ jobs:
     name: render-and-document
     runs-on: ubuntu-latest
     env:
-      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_PAT: ${{ secrets.PAT }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
         with: 
           fetch-depth: 0
+          token: ${{ secrets.PAT }}
 
       - uses: r-lib/actions/setup-pandoc@v1
 
@@ -38,6 +41,7 @@ jobs:
       - name: Install system dependencies
         if: runner.os == 'Linux'
         run: |
+          sudo apt-get -y install libglpk-dev libcurl4-openssl-dev
           while read -r cmd
           do
             eval sudo $cmd
@@ -46,9 +50,13 @@ jobs:
 
       - name: Install dependencies
         run: |
+          install.packages("BiocManager")
+          BiocManager::install("enrichplot",type = "source")
+          BiocManager::install("clusterProfiler") 
           remotes::install_deps(pkgdir = "OlinkAnalyze", dependencies = TRUE)
           install.packages("stringi", type="source")
           remotes::install_cran("roxygen2")
+      
         shell: Rscript {0}
 
 

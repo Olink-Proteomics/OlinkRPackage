@@ -9,5 +9,9 @@ utils::globalVariables(unique(c(
   "Assay_Median", "LOD", "Project", "Diff", "Median", "n_colors", "assay_var", "pca_colors", "desc", "abs_loading",
   "variables", "well", "scramble", ":=", "estimate1", "estimate2", "1", "Name", "Plate ID", "MissingFreq", "Unit",
   "Assay_Warning", "Panel_Version", "QC Warning", "Name_Assay", "PlateID", "Adj_factor", "Panel_End", "Panel_Start",
-  "SampleIDPlot", "PCX_low", "PCX_high", "PCY_low", "PCY_high"
+  "SampleIDPlot", "PCX_low", "PCX_high", "PCY_low", "PCY_high", "BgRatio", "Count", "Description", "Detected",
+  "GeneRatio", "NES", "Pathway", "geneList", "Sum","gene_symbol", "gs_name", "gs_subcat", ".y.", "SE", "df", "group1",
+  "group2", "method", "p", "p.adj", "parameter", "t.ratio", "Assay_OlinkID", "C1", "C2", "N", "NrNA", "Star",
+  "SumNA", "c.sort", "colors", "id", "maxNPX", "pvalue","rangeNPX", "rowNum", "tmp", "x.m", "x.vals", "y.anchor",
+  "SubjectID", "study", "SubjectID_old"
 )))

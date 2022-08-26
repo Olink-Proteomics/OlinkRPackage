@@ -2,7 +2,7 @@
 #'
 #'Fits a linear mixed effects model for every protein (by OlinkID) in every panel, using lmerTest::lmer and stats::anova.
 #'The function handles both factor and numerical variables and/or covariates. \cr\cr
-#'Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a messsage if verbose = TRUE).
+#'Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a message if verbose = TRUE).
 #'Character columns in the input dataframe are automatically converted to factors (specified in a message if verbose = TRUE).
 #'Numerical variables are not converted to factors.
 #'If a numerical variable is to be used as a factor, this conversion needs to be done on the dataframe before the function call. \cr\cr
@@ -13,7 +13,7 @@
 #' \item c('A:B', 'B') or c('A:B', 'A')
 #'}
 #'Inference is specified in a message if verbose = TRUE. \cr
-#'For covariates, crossed analyses need to be specified explicity, i.e. two main effects will not be expaned with a c('A','B') notation. Main effects present in the variable takes precedence. \cr
+#'For covariates, crossed analyses need to be specified explicitly, i.e. two main effects will not be expanded with a c('A','B') notation. Main effects present in the variable takes precedence. \cr
 #'The random variable only takes main effect(s). \cr
 #'The formula notation of the final model is specified in a message if verbose = TRUE. \cr\cr
 #'Output p-values are adjusted by stats::p.adjust according to the Benjamini-Hochberg method (“fdr”).
@@ -327,7 +327,7 @@ single_lmer <- function(data, formula_string){
   )
 
 
-  if(class(out.model)=="lmerModLmerTest"){
+  if(inherits(out.model,"lmerModLmerTest")){
     return(out.model)
   } else{
     stop("Convergence issue not caught by single_lmer")
@@ -358,7 +358,7 @@ single_lmer <- function(data, formula_string){
 #' @param effect_formula (optional) A character vector specifying the names of the predictors over which estimated marginal means are desired as defined in the \code{emmeans} package. May also be a formula. If provided, this will override the \code{effect} argument. See \code{?emmeans::emmeans()} for more information.
 #' @param mean_return Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = TRUE and no adjustment is performed.
 #' @param post_hoc_padjust_method P-value adjustment method to use for post-hoc comparisons within an assay. Options include \code{tukey}, \code{sidak}, \code{bonferroni} and \code{none}.
-#' @param verbose Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
+#' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #'
 #' @return A "tibble" containing the results of the pairwise comparisons between given variable levels for proteins specified in olinkid_list (or full df).
 #' Columns include:

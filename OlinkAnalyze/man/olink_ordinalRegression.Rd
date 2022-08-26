@@ -7,27 +7,24 @@
 olink_ordinalRegression(
   df,
   variable,
-  outcome = "NPX",
   covariates = NULL,
   return.covariates = F,
   verbose = T
 )
 }
 \arguments{
-\item{df}{NPX data frame in long format with at least protein name (Assay), OlinkID, UniProt, Panel and a factor with at least 3 levels.}
+\item{df}{NPX or Quantified_value data frame in long format with at least protein name (Assay), OlinkID, UniProt, Panel and a factor with at least 3 levels.}
 
 \item{variable}{Single character value or character array.
 Variable(s) to test. If length > 1, the included variable names will be used in crossed analyses .
 Also takes ':'/'*' notation.}
 
-\item{outcome}{Character. The dependent variable. Default: NPX.}
-
 \item{covariates}{Single character value or character array. Default: NULL.
 Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be inferred from main effects.}
 
-\item{return.covariates}{Boolean. Deafult: False. Returns F-test results for the covariates. Note: Adjusted p-values will be NA for the covariates.}
+\item{return.covariates}{Logical. Default: False. Returns F-test results for the covariates. Note: Adjusted p-values will be NA for the covariates.}
 
-\item{verbose}{Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
+\item{verbose}{Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
 }
 \value{
 A tibble containing the ANOVA results for every protein.
@@ -36,12 +33,13 @@ The tibble is arranged by ascending p-values.
 \description{
 Performs an ANOVA F-test for each assay (by OlinkID) in every panel using car::Anova and Type II sum of squares.
 The function handles only factor and/or covariates. \cr\cr
-Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a messsage if verbose = T).
+Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a message if verbose = T).
 Character columns in the input dataframe are automatically converted to factors (specified in a message if verbose = T).
 Crossed analysis, i.e. A*B formula notation, is inferred from the variable argument in the following cases: \cr
 \itemize{
 \item c('A','B')
 \item c('A: B')
+\item c('A: B', 'B') or c('A: B', 'A')
 }
 Inference is specified in a message if verbose = T. \cr
 The formula notation of the final model is specified in a message if verbose = T. \cr\cr
