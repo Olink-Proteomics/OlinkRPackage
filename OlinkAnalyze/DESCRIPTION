@@ -46,7 +46,7 @@ Description: A collection of functions to facilitate analysis of proteomic
     data run on the Olink platform.
 License: AGPL (>= 3)
 Depends: 
-    R (>= 3.6.0)
+    R (>= 4.1.0)
 Imports: 
     broom,
     car,
