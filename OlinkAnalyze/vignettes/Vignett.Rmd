@@ -429,11 +429,11 @@ A tibble with the following columns:
 
 ## One way non-parametric test (olink_one_non_parametric)
 
-The olink_one_non_parametric is a wrapper function that performs either a Kruskal-Wallis test or a Friedman test for each assay using the function *kruskal.test* from the R library *stats* or the function *friedman_test* from the R library *rstatix* and a posthoc test using the function *wilcox_test* from the R library *rstatix*. The function handles both factor and numerical variables, and/or confounding factors. 
+The olink_one_non_parametric is a wrapper function that performs either a Kruskal-Wallis test or a Friedman test for each assay using the function *kruskal.test* from the R library *stats* or the function *friedman_test* from the R library *rstatix*. The posthoc test for Friedman test is performed using the function *wilcox_test* from the R library *rstatix*,  whereas for Kruskal-Wallis test the fuction *dunnTest* from the R library *FSA* is applied. The function handles both factor and numerical variables, and/or confounding factors. 
 
 Samples with missing variable information or factor levels are excluded from the analysis. Character columns in the input data frame are converted to factors. The automatic handling of the data from above is announced by a message if the flag *verbose=TRUE*.
 
-Adjusted p-values are calculated using the function *wilcox_test* from the R library *rstatix* with the Benjamini & Hochberg (1995) method (“fdr”). The threshold is determined by logic evaluation of Adjusted_pval < 0.05.
+Adjusted p-values are calculated based on the Benjamini & Hochberg (1995) method (“fdr”). The threshold is determined by logic evaluation of Adjusted_pval < 0.05.
 
 
 ### Function arguments
@@ -483,7 +483,10 @@ olink_one_non_parametric_posthoc performs a post-hoc Wilcoxon test using the fun
 
 ```{r message=FALSE, eval=FALSE}
 #Friedman Test
-Friedman_results <- olink_one_non_parametric(npx_df, "Time", dependence = TRUE)
+Friedman_results <- olink_one_non_parametric(df = npx_data1, 
+                                             variable = "Time", 
+                                             subject = "Subject",
+                                             dependence = TRUE)
 
 #Filtering out significant and relevant results.
 significant_assays <- Friedman_results %>%
@@ -493,7 +496,10 @@ significant_assays <- Friedman_results %>%
   pull()
 
 #Posthoc test for the results from Friedman Test
-friedman_posthoc_results <- olink_one_non_parametric_posthoc(npx_df, variable = c("Time"), olinkid_list = significant_assays)
+friedman_posthoc_results <- olink_one_non_parametric_posthoc(npx_data1, 
+                                                             variable = "Time", 
+                                                             test = "friedman",
+                                                             olinkid_list = significant_assays)
 ```
 
 ### Function output
@@ -544,7 +550,7 @@ Adjusted p-values are calculated using the function *p.adjust* from the R librar
 ordinalRegression_results_twoway <- olink_ordinalRegression(df = npx_data1, 
                                                             variable = c('Site', 'Time'))
 # One-way ordinal regression, Treatment as covariates
-ordinalRegression_oneway <- olink_anova(df = npx_data1, 
+ordinalRegression_oneway <- olink_ordinalRegression(df = npx_data1, 
                                         variable = 'Site',
                                         covariates = 'Treatment')
 ```
