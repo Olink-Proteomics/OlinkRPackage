@@ -48,8 +48,8 @@ test_that("olink_one_non_parametric_posthoc function works", {
   expect_equal(kruskal_posthoc_results, ref_results$kruskal_posthoc_results) ## result equal to testfile - posthoc
   expect_equal(friedman_posthoc_results, ref_results$friedman_posthoc_results) ## result equal to testfile - posthoc
 
-  expect_equal(nrow(kruskal_posthoc_results), 3) ## check nr of rows
-  expect_equal(nrow(friedman_posthoc_results), 190) ## check nr of rows
+  expect_equal(nrow(kruskal_posthoc_results), 190) ## check nr of rows
+  expect_equal(nrow(friedman_posthoc_results), 3) ## check nr of rows
 
   expect_error(olink_one_non_parametric_posthoc(npx_data1, 'Site')) ##no olinkid list
   expect_equal(friedman_posthoc_results %>%
