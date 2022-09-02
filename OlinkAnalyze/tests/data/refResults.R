@@ -53,7 +53,10 @@ friedman_posthoc_results <- olink_one_non_parametric_posthoc(npx_data1,
 #### Ordinal regression ####
 #Two-way Ordinal Regression with CLM.
 ordinalRegression_results <- olink_ordinalRegression(df = npx_data1,
-                             variable="Treatment:Time")
+                             variable="Treatment:Time") %>% 
+  mutate(id = as.character(OlinkID)) %>%
+  arrange(id, Assay) %>% #Just for consistency. Not actually needed in this case
+  select(-id)
 
 #Posthoc
 ordinalRegression_results_posthoc_results <- olink_ordinalRegression_posthoc(npx_data1,

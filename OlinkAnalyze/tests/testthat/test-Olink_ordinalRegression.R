@@ -4,7 +4,10 @@ load(refRes_file)
 
 #Two-way Ordinal Regression
 ordinalRegression_results <- olink_ordinalRegression(df = npx_data1,
-                                                     variable="Treatment:Time")
+                                                     variable="Treatment:Time") %>% 
+  mutate(id = as.character(OlinkID)) %>%
+  arrange(id, Assay) %>% #Just for consistency. Not actually needed in this case
+  select(-id)
 
 #Posthoc
 ordinalRegression_results_posthoc_results <- olink_ordinalRegression_posthoc(npx_data1,
