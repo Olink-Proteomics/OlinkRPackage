@@ -30,6 +30,8 @@ Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be infe
 
 \item{effect}{Term on which to perform post-hoc. Character vector. Must be subset of or identical to variable.}
 
+\item{effect_formula}{(optional) A character vector specifying the names of the predictors over which estimated marginal means are desired as defined in the \code{emmeans} package. May also be a formula. If provided, this will override the \code{effect} argument. See \code{?emmeans::emmeans()} for more information.}
+
 \item{mean_return}{Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = TRUE and no adjustment is performed.}
 
 \item{post_hoc_padjust_method}{P-value adjustment method to use for post-hoc comparisons within an assay. Options include \code{tukey}, \code{sidak}, \code{bonferroni} and \code{none}.}

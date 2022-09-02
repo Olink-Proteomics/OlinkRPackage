@@ -293,7 +293,7 @@ olink_ordinalRegression <- function(df,
 #' @param covariates Single character value or character array. Default: NULL.
 #' Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be inferred from main effects.
 #' @param effect Term on which to perform post-hoc. Character vector. Must be subset of or identical to variable.
-#' @param post_hoc_padjust_method P-value adjustment method to use for post-hoc comparisons within an assay. Options include \code{tukey}, \code{sidak}, \code{bonferroni} and \code{none}.
+#' @param effect_formula (optional) A character vector specifying the names of the predictors over which estimated marginal means are desired as defined in the \code{emmeans} package. May also be a formula. If provided, this will override the \code{effect} argument. See \code{?emmeans::emmeans()} for more information.
 #' @param mean_return Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = TRUE and no adjustment is performed.
 #' @param post_hoc_padjust_method P-value adjustment method to use for post-hoc comparisons within an assay. Options include \code{tukey}, \code{sidak}, \code{bonferroni} and \code{none}.
 #' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
@@ -386,10 +386,10 @@ olink_ordinalRegression_posthoc <- function(df,
     ## Check whether it is NPX or QUANT
     if ('NPX' %in% colnames(df)) {
       data_type <- 'NPX'
-      df$NPX <- factor(df$NPX, order = TRUE)
+      df$NPX <- factor(df$NPX, ordered = TRUE)
     } else if ('Quantified_value' %in% colnames(df)) {
       data_type <- 'Quantified_value'
-      df$Quantified_value <- factor(df$Quantified_value, order = TRUE)
+      df$Quantified_value <- factor(df$Quantified_value, ordered = TRUE)
     } else {
       stop('The NPX or Quantified_value is not in the df.')}
 
