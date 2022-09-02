@@ -32,7 +32,10 @@ kruskal_posthoc_results <- olink_one_non_parametric_posthoc(npx_data1,
                                                                 filter(Threshold == 'Significant') %>%
                                                                 dplyr::select(OlinkID) %>%
                                                                 distinct() %>%
-                                                                pull()})
+                                                                pull()}) %>% 
+  mutate(id = as.character(OlinkID)) %>%
+  arrange(id, contrast) %>% #Just for consistency. Not actually needed in this case
+  select(-id)
 
 #Posthoc test for the results from Friedman Test
 friedman_posthoc_results <- olink_one_non_parametric_posthoc(npx_data1,
@@ -42,7 +45,11 @@ friedman_posthoc_results <- olink_one_non_parametric_posthoc(npx_data1,
                                                                  filter(Threshold == 'Significant') %>%
                                                                  dplyr::select(OlinkID) %>%
                                                                  distinct() %>%
-                                                                 pull()})
+                                                                 pull()}) %>% 
+  mutate(id = as.character(OlinkID)) %>%
+  arrange(id, contrast) %>% #Just for consistency. Not actually needed in this case
+  select(-id)
+
 #### Ordinal regression ####
 #Two-way Ordinal Regression with CLM.
 ordinalRegression_results <- olink_ordinalRegression(df = npx_data1,
@@ -50,14 +57,17 @@ ordinalRegression_results <- olink_ordinalRegression(df = npx_data1,
 
 #Posthoc
 ordinalRegression_results_posthoc_results <- olink_ordinalRegression_posthoc(npx_data1,
-variable=c("Treatment:Time"),
-covariates="Site",
-olinkid_list = {ordinalRegression_results %>%
-  filter(Threshold == 'Significant' & term == 'Treatment:Time') %>%
-  dplyr::select(OlinkID) %>%
-  distinct() %>%
-  pull()},
-effect = "Treatment:Time")
+                                                                             variable=c("Treatment:Time"),
+                                                                             covariates="Site",
+                                                                             olinkid_list = {ordinalRegression_results %>%
+                                                                                 filter(Threshold == 'Significant' & term == 'Treatment:Time') %>%
+                                                                                 dplyr::select(OlinkID) %>%
+                                                                                 distinct() %>%
+                                                                                 pull()},
+                                                                             effect = "Treatment:Time") %>% 
+  mutate(id = as.character(OlinkID)) %>%
+  arrange(id, contrast) %>% #Just for consistency. Not actually needed in this case
+  select(-id)
 
 
 #### ANOVA ####

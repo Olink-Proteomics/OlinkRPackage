@@ -15,7 +15,10 @@ ordinalRegression_results_posthoc_results <- olink_ordinalRegression_posthoc(npx
                                                                                dplyr::select(OlinkID) %>%
                                                                                distinct() %>%
                                                                                pull(),
-                                                                             effect = "Treatment:Time")
+                                                                             effect = "Treatment:Time") %>% 
+  mutate(id = as.character(OlinkID)) %>%
+  arrange(id, contrast) %>% #Just for consistency. Not actually needed in this case
+  select(-id)
 
 
 

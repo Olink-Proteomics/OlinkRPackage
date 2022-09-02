@@ -19,7 +19,10 @@ kruskal_posthoc_results <- olink_one_non_parametric_posthoc(npx_data1,
                                                               filter(Threshold == 'Significant') %>%
                                                               dplyr::select(OlinkID) %>%
                                                               distinct() %>%
-                                                              pull()})
+                                                              pull()}) %>% 
+  mutate(id = as.character(OlinkID)) %>%
+  arrange(id, contrast) %>% #Just for consistency. Not actually needed in this case
+  select(-id)
 
 #Posthoc test for the results from Friedman Test
 friedman_posthoc_results <- olink_one_non_parametric_posthoc(npx_data1,
@@ -29,7 +32,10 @@ friedman_posthoc_results <- olink_one_non_parametric_posthoc(npx_data1,
                                                                filter(Threshold == 'Significant') %>%
                                                                dplyr::select(OlinkID) %>%
                                                                distinct() %>%
-                                                               pull()})
+                                                               pull()}) %>% 
+  mutate(id = as.character(OlinkID)) %>%
+  arrange(id, contrast) %>% #Just for consistency. Not actually needed in this case
+  select(-id)
 
 test_that("olink_one_non_parametric function works", {
   expect_equal(kruskal_results, ref_results$kruskal_results)  ##result equal to testfile
@@ -61,3 +67,4 @@ test_that("olink_one_non_parametric_posthoc function works", {
                  unique() %>%
                  nrow(),10)
 })
+
