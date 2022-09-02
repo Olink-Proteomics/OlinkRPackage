@@ -18,6 +18,7 @@ olink_pca_plot(
   outlierDefX = NA,
   outlierDefY = NA,
   outlierLines = FALSE,
+  label_outliers = TRUE,
   quiet = FALSE,
   verbose = TRUE,
   ...
@@ -49,6 +50,8 @@ olink_pca_plot(
 \item{outlierDefY}{The number standard deviations along the PC plotted on the y-axis that defines an outlier. See also 'Details"}
 
 \item{outlierLines}{Draw dashed lines at +/-outlierDef[X,Y] standard deviations from the mean of the plotted PCs (default FALSE)}
+
+\item{label_outliers}{Use ggrepel to label samples lying outside the limits set by the outlierLines (default TRUE)}
 
 \item{quiet}{Logical. If TRUE, the resulting plot is not printed}
 

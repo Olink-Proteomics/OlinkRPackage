@@ -903,6 +903,7 @@ The arguments outlierDefX and outlierDefY can be used to identify outliers in th
 * outlierDefX: (Optional) The number standard deviations along the PC plotted on the x-axis that defines an outlier.
 * outlierDefY: (Optional) The number standard deviations along the PC plotted on the y-axis that defines an outlier.
 * OutlierLines: Logical. Draw dashed lines at +/-outlierDef[X,Y] standard deviations from the mean of the plotted PCs (default FALSE)
+* label_outliers: Use ggrepel to label samples lying outside the limits set by the outlierLines (default TRUE)
 * verbose: Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 * quiet: Logical. Default: False. If TRUE, the resulting plot is not printed.
 
