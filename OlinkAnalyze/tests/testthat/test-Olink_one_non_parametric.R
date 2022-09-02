@@ -15,21 +15,21 @@ friedman_results <- olink_one_non_parametric(df = npx_data1,
 kruskal_posthoc_results <- olink_one_non_parametric_posthoc(npx_data1,
                                                             variable = "Site",
                                                             test = "kruskal",
-                                                            olinkid_list = kruskal_results %>%
+                                                            olinkid_list = {kruskal_results %>%
                                                               filter(Threshold == 'Significant') %>%
                                                               dplyr::select(OlinkID) %>%
                                                               distinct() %>%
-                                                              pull())
+                                                              pull()})
 
 #Posthoc test for the results from Friedman Test
 friedman_posthoc_results <- olink_one_non_parametric_posthoc(npx_data1,
                                                              variable = "Time",
                                                              test = "friedman",
-                                                             olinkid_list = friedman_results %>%
+                                                             olinkid_list = {friedman_results %>%
                                                                filter(Threshold == 'Significant') %>%
                                                                dplyr::select(OlinkID) %>%
                                                                distinct() %>%
-                                                               pull())
+                                                               pull()})
 
 test_that("olink_one_non_parametric function works", {
   expect_equal(kruskal_results, ref_results$kruskal_results)  ##result equal to testfile

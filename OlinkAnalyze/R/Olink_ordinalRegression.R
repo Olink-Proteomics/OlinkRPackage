@@ -43,12 +43,11 @@
 #' @export
 #' @examples \donttest{
 #' library(dplyr)
-#' npx_df <- npx_data1 %>% filter(!grepl('control',SampleID, ignore.case = TRUE))
 #'
 #' #Two-way Ordinal Regression with CLM.
 #' #Results in model NPX~Treatment+Time+Treatment:Time.
-#' ordinalRegression_results <- olink_ordinalRegression(df = npx_df,
-#'                              variable="Treatment:Time")}
+#' ordinalRegression_results <- olink_ordinalRegression(df = npx_data1,
+#'                                                      variable="Treatment:Time")}
 #'
 #' @importFrom dplyr filter group_by ungroup pull do select arrange mutate
 #' @importFrom stringr str_detect
@@ -111,10 +110,10 @@ olink_ordinalRegression <- function(df,
     ## Check whether it is NPX or QUANT
     if ('NPX' %in% colnames(df)) {
       data_type <- 'NPX'
-      df$NPX <- factor(df$NPX, order = TRUE)
+      df$NPX <- factor(df$NPX, ordered = TRUE)
     } else if ('Quantified_value' %in% colnames(df)) {
       data_type <- 'Quantified_value'
-      df$Quantified_value <- factor(df$Quantified_value, order = TRUE)
+      df$Quantified_value <- factor(df$Quantified_value, ordered = TRUE)
     } else {
       stop('The NPX or Quantified_value is not in the df.')}
 
@@ -312,32 +311,29 @@ olink_ordinalRegression <- function(df,
 #'  \item{Adjusted_pval:} "numeric" adjusted p-value for the test
 #'  \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
 #' }
-
+#' 
 #' @export
 #' @examples \donttest{
 #' library(dplyr)
-#' npx_df <- npx_data1 %>% filter(!grepl('control',SampleID, ignore.case = TRUE))
 #' #Two-way Ordinal Regression.
 #' #Results in model NPX~Treatment*Time.
-#' ordinalRegression_results <- olink_ordinalRegression(df = npx_df,
+#' ordinalRegression_results <- olink_ordinalRegression(df = npx_data1,
 #'                              variable="Treatment:Time")
 #'
 #' #Posthoc test for the model NPX~Treatment*Time,
 #' #on the interaction effect Treatment:Time.
 #'
-#' #Filtering out significant and relevant results.
-#' significant_assays <- ordinalRegression_results %>%
-#' filter(Threshold == 'Significant' & term == 'Treatment:Time') %>%
-#' select(OlinkID) %>%
-#' distinct() %>%
-#' pull()
-#'
 #' #Posthoc
-#' ordinalRegression_results_posthoc_results <- olink_ordinalRegression_posthoc(npx_df,
-#' variable=c("Treatment:Time"),
-#' covariates="Site",
-#' olinkid_list = significant_assays,
-#' effect = "Treatment:Time")}
+#' ordinalRegression_results_posthoc_results <- olink_ordinalRegression_posthoc(npx_data1,
+#'                                                            variable=c("Treatment:Time"),
+#'                                                            covariates="Site",
+#'                                                            olinkid_list = {ordinalRegression_results %>%
+#'                                                            filter(term == 'Treatment:Time') %>% 
+#'                                                            filter(Threshold == 'Significant') %>%
+#'                                                                  dplyr::select(OlinkID) %>%
+#'                                                                  distinct() %>%
+#'                                                                  pull()},
+#'                                                                  effect = "Treatment:Time")}
 #' @importFrom dplyr filter group_by ungroup pull do select arrange mutate
 #' @importFrom stringr str_detect
 #' @importFrom rstatix convert_as_factor

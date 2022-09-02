@@ -40,15 +40,15 @@
 #'
 #' library(dplyr)
 #'
-#' npx_df <- npx_data1 %>% filter(!grepl('control', SampleID, ignore.case = TRUE))
+#' # One-way Kruskal-Wallis Test
+#' kruskal_results <- olink_one_non_parametric(df = npx_data1,
+#'                                             variable = "Site")
 #'
-#' #One-way Kruskal-Wallis Test.
-#' #Results in a model NPX~Time
-#' Kruskal_results <- olink_one_non_parametric(df = npx_df, variable = "Time")
-#'
-#' #One-way Friedman Test.
-#' #Results in a model NPX~Time
-#' Friedman_results <- olink_one_non_parametric(df = npx_df, variable = "Time", dependence = TRUE)}
+#' #Friedman Test
+#' friedman_results <- olink_one_non_parametric(df = npx_data1,
+#'                                              variable = "Time",
+#'                                              subject = "Subject",
+#'                                              dependence = TRUE)}
 #'
 #' @importFrom dplyr n filter group_by summarise ungroup pull n_distinct do select arrange mutate
 #' @importFrom stringr str_detect
@@ -298,25 +298,25 @@ olink_one_non_parametric <- function(df,
 #' @examples \donttest{
 #' library(dplyr)
 #'
-#' npx_df <- npx_data1 %>% filter(!grepl('control',SampleID, ignore.case = TRUE))
-#'
-#' #Kruskal-Wallis Test
-#' kruskal_wallis_results <- olink_one_non_parametric(npx_df, "Site")
+#' # One-way Kruskal-Wallis Test
+#' kruskal_results <- olink_one_non_parametric(df = npx_data1,
+#'                                             variable = "Site")
 #'
 #' #Friedman Test
-#' Friedman_results <- olink_one_non_parametric(npx_df, "Time", subject = "Subject", dependence = TRUE)
+#' friedman_results <- olink_one_non_parametric(df = npx_data1,
+#'                                             variable = "Time",
+#'                                             subject = "Subject",
+#'                                             dependence = TRUE)
 #'
 #' #Posthoc test for the results from Friedman Test
-#' #Filtering out significant and relevant results.
-#' significant_assays <- Friedman_results %>%
-#' filter(Threshold == 'Significant') %>%
-#' dplyr::select(OlinkID) %>%
-#' distinct() %>%
-#' pull()
-#'
-#' #Posthoc
-#' friedman_posthoc_results <- olink_one_non_parametric_posthoc(npx_df, variable = c("Time"), test = "friedman",
-#' olinkid_list = significant_assays)}
+#'friedman_posthoc_results <- olink_one_non_parametric_posthoc(npx_data1,
+#'                                                             variable = "Time",
+#'                                                             test = "friedman",
+#'                                                             olinkid_list = {friedman_results %>%
+#'                                                               filter(Threshold == 'Significant') %>%
+#'                                                               dplyr::select(OlinkID) %>%
+#'                                                               distinct() %>%
+#'                                                               pull()})}
 #'
 #' @importFrom dplyr filter group_by ungroup pull do select arrange mutate
 #' @importFrom stringr str_detect

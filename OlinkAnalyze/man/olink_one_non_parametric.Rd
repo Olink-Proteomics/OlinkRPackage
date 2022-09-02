@@ -59,14 +59,14 @@ The threshold is determined by logic evaluation of Adjusted_pval < 0.05.
 
 library(dplyr)
 
-npx_df <- npx_data1 \%>\% filter(!grepl('control', SampleID, ignore.case = TRUE))
+# One-way Kruskal-Wallis Test
+kruskal_results <- olink_one_non_parametric(df = npx_data1,
+                                            variable = "Site")
 
-#One-way Kruskal-Wallis Test.
-#Results in a model NPX~Time
-Kruskal_results <- olink_one_non_parametric(df = npx_df, variable = "Time")
-
-#One-way Friedman Test.
-#Results in a model NPX~Time
-Friedman_results <- olink_one_non_parametric(df = npx_df, variable = "Time", dependence = TRUE)}
+#Friedman Test
+friedman_results <- olink_one_non_parametric(df = npx_data1,
+                                             variable = "Time",
+                                             subject = "Subject",
+                                             dependence = TRUE)}
 
 }
