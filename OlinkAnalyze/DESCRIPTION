@@ -73,7 +73,8 @@ Imports:
     tidyselect,
     tools,
     utils,
-    zip
+    zip,
+    FSA
 Suggests: 
     clusterProfiler,
     extrafont,
