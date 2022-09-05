@@ -1,7 +1,7 @@
 Type: Package
 Package: OlinkAnalyze
 Title: Facilitate Analysis of Proteomic Data from Olink
-Version: 3.1.0
+Version: 3.1.0.9000
 Authors@R: c(
     person("Kathleen", "Nevola", , "biostattools@olink.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-5183-6444", Github = "kathy-nevola")),
@@ -46,7 +46,7 @@ Description: A collection of functions to facilitate analysis of proteomic
     data run on the Olink platform.
 License: AGPL (>= 3)
 Depends: 
-    R (>= 3.6.0)
+    R (>= 4.1.0)
 Imports: 
     broom,
     car,
