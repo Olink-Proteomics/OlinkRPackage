@@ -10,5 +10,4 @@
 ^inst/extdata/.*original[.]xlsx
 ^data/.*_original[.]rda
 ^LICENSE\.md$
-^inst/extdata/.*3K[.]zip
 ^revdep$
