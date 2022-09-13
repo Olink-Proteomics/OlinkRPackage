@@ -779,7 +779,6 @@ Columns for GSEA:
 * leading_edge _\<chr\>_: contains tags, list, and signal. Tags gives an indication of the percentage of genes contributing to the enrichment score. List gives an indication of where in the list the enrichment score is obtained. Signal represents the enrichment signal strength and combines the tag and list.
 * core_enrichment _\<chr\>_: list of input proteins (Gene Symbols) annotated in a term delimited by "/"
 
-
 # Exploratory analysis
 
 ## Principal components analysis (PCA) plot (olink_pca_plot)
@@ -970,7 +969,6 @@ plot[[1]]
 A list of objects of class *ggplot*.
 
 **Note:** Please note that plots will not appear in the *plots* panel of *Rstudio* if not assigned to a variable and printing it (see sample code above).
-
 
 ## Heatmap for visualizing pathway enrichment (olink_pathway_heatmap)
 
