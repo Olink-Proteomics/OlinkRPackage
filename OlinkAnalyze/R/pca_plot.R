@@ -186,21 +186,41 @@ olink_pca_plot <- function (df,
   return(invisible(plotList))
 }
 
-olink_pca_plot.internal <- function (df,
-                                     color_g = "QC_Warning",
-                                     x_val = 1,
-                                     y_val = 2,
-                                     label_samples = FALSE,
-                                     drop_assays = FALSE,
-                                     drop_samples = FALSE,
-                                     n_loadings = 0,
-                                     loadings_list = NULL,
-                                     outlierDefX,
-                                     outlierDefY,
-                                     outlierLines,
-                                     label_outliers,
-                                     verbose = TRUE,
-                                     ...){
+
+olink_calculate_pca <- function(df,
+                                color_g = "QC_Warning",
+                                drop_assays = FALSE,
+                                drop_samples = FALSE,
+                                verbose = TRUE) {
+  #Data pre-processing
+  procData <- npxProcessing_forDimRed(df = df,
+                                      color_g = color_g,
+                                      drop_assays = drop_assays,
+                                      drop_samples = drop_samples,
+                                      verbose = verbose)
+
+  #### PCA ####
+  pca_fit <- stats::prcomp(procData$df_wide_matrix,
+                           scale. = TRUE, center = TRUE)
+  return(pca_fit)
+}
+
+
+olink_pca_plot.internal <- function(df,
+                                    color_g = "QC_Warning",
+                                    x_val = 1,
+                                    y_val = 2,
+                                    label_samples = FALSE,
+                                    drop_assays = FALSE,
+                                    drop_samples = FALSE,
+                                    n_loadings = 0,
+                                    loadings_list = NULL,
+                                    outlierDefX,
+                                    outlierDefY,
+                                    outlierLines,
+                                    label_outliers,
+                                    verbose = TRUE,
+                                    ...) {
 
   #Data pre-processing
   procData <- npxProcessing_forDimRed(df = df,

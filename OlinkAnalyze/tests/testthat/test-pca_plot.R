@@ -56,3 +56,22 @@ test_that("olink_pca_plot works", {
   vdiffr::expect_doppelganger('PCA plot panel 1', pca_plot_byPanel[[1]])
   vdiffr::expect_doppelganger('PCA plot panel 2', pca_plot_byPanel[[2]])
 })
+
+
+
+# PCA calculation ---------------------------------------------------------
+
+test_that("PCA calculation", {
+  pca <- npx_data1 %>%
+    mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
+    olink_calculate_pca()
+
+  pca_test_set <- pca$x %>%
+    as_tibble(rownames = NA) %>%
+    tibble::rownames_to_column() %>%
+    select("rowname", "PC1", "PC2") %>%
+    as.data.frame()
+
+  expect_snapshot_value(pca_test_set, style = "deparse")
+})
+
