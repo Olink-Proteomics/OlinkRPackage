@@ -89,10 +89,11 @@ Suggests:
     scales,
     testthat (>= 3.0.0),
     vdiffr,
-    here
+    here,
+    umap
 VignetteBuilder: 
     knitr
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.1
