@@ -16,8 +16,8 @@ test_that("Data loads correctly with 'read_NPX()'", {
   zip_npx_file_fail_2 <- system.file("extdata", "Example_NPX_Data_empty.zip", package = "OlinkAnalyze", mustWork = TRUE)
   expect_error(read_NPX(filename = zip_npx_file_fail_2), "The compressed file does not contain a valid NPX file. Expecting: \"README.txt\", \"MD5_checksum.txt\" or \"checksum_sha256.txt\" and the NPX file.")
 
-  # zip_npx_file_success <- system.file("extdata", "Example_NPX_Data_3K.zip", package = "OlinkAnalyze", mustWork = TRUE)
-  # df_2 <- read_NPX(filename = zip_npx_file_success)
+  zip_npx_file_success <- system.file("extdata", "Example_NPX_Data_3K.zip", package = "OlinkAnalyze", mustWork = TRUE)
+  df_2 <- read_NPX(filename = zip_npx_file_success)
 
   zip_npx_file_success_sha <- system.file("extdata", "Example_NPX_Data_sha256.zip", package = "OlinkAnalyze", mustWork = TRUE)
   expect_snapshot(read_NPX(filename = zip_npx_file_success_sha))
@@ -30,19 +30,18 @@ test_that("Data loads correctly with 'read_NPX()'", {
   #Correct number of cols and rows?
   expect_equal(nrow(df_1), 29440)
   expect_equal(ncol(df_1), 12)
-#
-#   expect_equal(nrow(df_2), 264870)
-#   expect_equal(ncol(df_2), 14)
+  expect_equal(nrow(df_2), 11772)
+  expect_equal(ncol(df_2), 14)
 
   #Correct col names?
   expect_identical(colnames(df_1),
                    c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
                      "MissingFreq", "Panel","Panel_Version", "PlateID", "QC_Warning", "LOD",
                      "NPX"))
-  # expect_identical(colnames(df_2),
-  #                  c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
-  #                    "MissingFreq", "Panel","Panel_Lot_Nr", "PlateID", "QC_Warning", "LOD",
-  #                    "NPX", "Normalization", "Assay_Warning"))
+  expect_identical(colnames(df_2),
+                   c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
+                     "MissingFreq", "Panel","Panel_Lot_Nr", "PlateID", "QC_Warning", "LOD",
+                     "NPX", "Normalization", "Assay_Warning"))
 
   #All samples in the manifest?
   sample_names <- df_1 %>%

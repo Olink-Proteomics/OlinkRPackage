@@ -779,6 +779,99 @@ Columns for GSEA:
 * leading_edge _\<chr\>_: contains tags, list, and signal. Tags gives an indication of the percentage of genes contributing to the enrichment score. List gives an indication of where in the list the enrichment score is obtained. Signal represents the enrichment signal strength and combines the tag and list.
 * core_enrichment _\<chr\>_: list of input proteins (Gene Symbols) annotated in a term delimited by "/"
 
+# Exploratory analysis
+
+## Principal components analysis (PCA) plot (olink_pca_plot)
+
+Generates PCA projection of all samples from NPX data along two principal components (Default PC2 vs PC1) colored by the variable QC_Warning and including the percentage of explained variance. The function used the functions *prcomp* and *ggplot* from the R libraries *stats* and *ggplot2*, respectively. By default, the values scaled and centered in the PCA and proteins with missing NPX values removed from the corresponding assay(s). Unique sample names are required. Imputation by median value is done for assays with missingness <10% and for multi-plate projects, and for missingness <5% for single plate projects.
+
+The values are by default scaled and centered in the PCA and proteins with missing NPX values are by default removed from the corresponding assay. Unique sample names are required. Imputation by the median is done for assays with missingness <10% for multi-plate projects and <5% for single plate projects. The plot is printed, and a list of ggplot objects is returned. 
+
+If byPanel = TRUE, the data processing (imputation of missing values etc) and subsequent PCA is performed separately per panel. A faceted plot is printed, while the individual ggplot objects are returned. 
+
+The arguments outlierDefX and outlierDefY can be used to identify outliers in the PCA. Samples more than +/-outlierDef[X,Y] standard deviations from the mean of the plotted PC will be labelled. Both arguments have to be specified.
+
+
+### Function arguments (selection)
+
+* df: NPX data frame in long format should minimally contain SampleID, NPX and column that will be used for grouping/coloring.
+* color_g: Character value indicating the column name that should be used as fill color. Default QC_Warning.
+* x_val: Integer indicating which principal component to plot along the x-axis. Default 1.
+* y_val: Integer indicating which principal component to plot along the y-axis. Default 2.
+* label_samples: Logical. If TRUE, points are replaced with SampleID. Default FALSE.
+* drop_assays: Logical. All assays with any missing values will be dropped. Takes precedence over sample drop.
+* drop_samples: Logical. All samples with any missing values will be dropped.
+* n_loadings: Integer. Plot the top n_loadings ranked by size.
+* loadings_list: Character vector indicating for which OlinkID's to plot loadings. Arguments n_loadings and loadings_list can be used together.
+* byPanel: Logical. Perform the PCA per panel (default FALSE)
+* outlierDefX: (Optional) The number standard deviations along the PC plotted on the x-axis that defines an outlier.
+* outlierDefY: (Optional) The number standard deviations along the PC plotted on the y-axis that defines an outlier.
+* OutlierLines: Logical. Draw dashed lines at +/-outlierDef[X,Y] standard deviations from the mean of the plotted PCs (default FALSE)
+* verbose: Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
+* quiet: Logical. Default: False. If TRUE, the resulting plot is not printed.
+
+
+```{r message=FALSE, fig.width=8, fig.height=4}
+npx_data1 %>% 
+  filter(!str_detect(SampleID, 'CONTROL_SAMPLE')) %>% 
+  olink_pca_plot(df = .,
+                 color_g = "QC_Warning", byPanel = TRUE)  
+```
+
+### Function output
+
+A list of objects of class *ggplot* (silently returned). Plots are also printed unless option `quiet = TRUE` is set. If outlierDefX and outlierDefY are specified, a list of outliers can be extracted from the **ggplot** object based on these parameters.
+
+```{r message = FALSE}
+npx_data <- npx_data1 %>%
+    mutate(SampleID = paste(SampleID, "_", Index, sep = ""))
+g <- olink_pca_plot(df=npx_data, color_g = "QC_Warning",
+                    outlierDefX = 2.5, outlierDefY = 4, byPanel = TRUE, quiet = TRUE)
+lapply(g, function(x){x$data}) %>%
+  bind_rows() %>%
+  filter(Outlier == 1) %>% 
+  select(SampleID, Outlier, Panel)
+```
+
+
+## Uniform Manifold Approximation and Projection for Dimension Reduction (UMAP) (olink_umap_plot)
+
+Computes a manifold approximation and projection using umap::umap and plots the two specified components. Unique sample names are required and imputation by the median is done for assays with missingness <10% for multi-plate projects and <5% for single plate projects. 
+
+If byPanel = TRUE, the data processing (imputation of missing values etc) and subsequent UMAP is performed separately per panel. A faceted plot is printed, while the individual ggplot objects are returned. 
+
+The arguments outlierDefX and outlierDefY can be used to identify outliers in the UMAP results. Samples more than +/-outlierDef[X,Y] standard deviations from the mean of the plotted UMAP component will be labelled. Both arguments have to be specified. NOTE: UMAP is a non-linear data transformation that might not accurately preserve the properties of the data. Distances in the UMAP plane should therefore be interpreted with caution
+
+### Function arguments (selection)
+
+* df: NPX data frame in long format should minimally contain SampleID, NPX and column that will be used for grouping/coloring.
+* color_g: Character value indicating the column name that should be used as fill color. Default QC_Warning.
+* x_val: Integer indicating which principal component to plot along the x-axis. Default 1.
+* y_val: Integer indicating which principal component to plot along the y-axis. Default 2.
+* config: Object of class umap.config, specifying the parameters for the UMAP algorithm.
+* label_samples: Logical. If TRUE, points are replaced with SampleID. Default FALSE.
+* drop_assays: Logical. All assays with any missing values will be dropped. Takes precedence over sample drop.
+* drop_samples: Logical. All samples with any missing values will be dropped.
+* byPanel: Logical. Perform the UMAP per panel (default FALSE)
+* outlierDefX: (Optional) The number standard deviations along the UMAP dimension plotted on the x-axis that defines an outlier.
+* outlierDefY: (Optional) The number standard deviations along the UMAP dimension plotted on the y-axis that defines an outlier.
+* OutlierLines: Logical. Draw dashed lines at +/-outlierDef[X,Y] standard deviations from the mean of the plotted UMAP dimensions (default FALSE)
+* verbose: Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
+* quiet: Logical. Default: False. If TRUE, the resulting plot is not printed.
+
+
+```{r message=FALSE, fig.width=8, fig.height=4}
+npx_data1 %>% 
+  filter(!str_detect(SampleID, 'CONTROL_SAMPLE')) %>% 
+  olink_umap_plot(df = .,
+                 color_g = "QC_Warning", byPanel = TRUE)  
+```
+
+### Function output
+
+A list of objects of class *ggplot* (silently returned). Plots are also printed unless option `quiet = TRUE` is set. 
+
+
 # Visualization
 
 ## Boxplots for outcomes (olink_boxplot)
@@ -876,58 +969,6 @@ plot[[1]]
 A list of objects of class *ggplot*.
 
 **Note:** Please note that plots will not appear in the *plots* panel of *Rstudio* if not assigned to a variable and printing it (see sample code above).
-
-## Principal components analysis (PCA) plot (olink_pca_plot)
-
-Generates PCA projection of all samples from NPX data along two principal components (Default PC2 vs PC1) colored by the variable QC_Warning and including the percentage of explained variance. The function used the functions *prcomp* and *ggplot* from the R libraries *stats* and *ggplot2*, respectively. By default, the values scaled and centered in the PCA and proteins with missing NPX values removed from the corresponding assay(s). Unique sample names are required. Imputation by median value is done for assays with missingness <10% and for multi-plate projects, and for missingness <5% for single plate projects.
-
-The values are by default scaled and centered in the PCA and proteins with missing NPX values are by default removed from the corresponding assay. Unique sample names are required. Imputation by the median is done for assays with missingness <10% for multi-plate projects and <5% for single plate projects. The plot is printed, and a list of ggplot objects is returned. 
-
-If byPanel = TRUE, the data processing (imputation of missing values etc) and subsequent PCA is performed separately per panel. A faceted plot is printed, while the individual ggplot objects are returned. 
-
-The arguments outlierDefX and outlierDefY can be used to identify outliers in the PCA. Samples more than +/-outlierDef[X,Y] standard deviations from the mean of the plotted PC will be labelled. Both arguments have to be specified.
-
-
-### Function arguments (selection)
-
-* df: NPX data frame in long format should minimally contain SampleID, NPX and column that will be used for grouping/coloring.
-* color_g: Character value indicating the column name that should be used as fill color. Default QC_Warning.
-* x_val: Integer indicating which principal component to plot along the x-axis. Default 1.
-* y_val: Integer indicating which principal component to plot along the y-axis. Default 2.
-* label_samples: Logical. If TRUE, points are replaced with SampleID. Default FALSE.
-* drop_assays: Logical. All assays with any missing values will be dropped. Takes precedence over sample drop.
-* drop_samples: Logical. All samples with any missing values will be dropped.
-* n_loadings: Integer. Plot the top n_loadings ranked by size.
-* loadings_list: Character vector indicating for which OlinkID's to plot loadings. Arguments n_loadings and loadings_list can be used together.
-* byPanel: Logical. Perform the PCA per panel (default FALSE)
-* outlierDefX: (Optional) The number standard deviations along the PC plotted on the x-axis that defines an outlier.
-* outlierDefY: (Optional) The number standard deviations along the PC plotted on the y-axis that defines an outlier.
-* OutlierLines: Logical. Draw dashed lines at +/-outlierDef[X,Y] standard deviations from the mean of the plotted PCs (default FALSE)
-* verbose: Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
-* quiet: Logical. Default: False. If TRUE, the resulting plot is not printed.
-
-
-```{r message=FALSE, fig.width=8, fig.height=4}
-npx_data1 %>% 
-  filter(!str_detect(SampleID, 'CONTROL_SAMPLE')) %>% 
-  olink_pca_plot(df = .,
-                 color_g = "QC_Warning", byPanel = TRUE)  
-```
-
-### Function output
-
-A list of objects of class *ggplot* (silently returned). Plots are also printed unless option `quiet = TRUE` is set. If outlierDefX and outlierDefY are specified, a list of outliers can be extracted from the **ggplot** object based on these parameters.
-
-```{r message = FALSE}
-npx_data <- npx_data1 %>%
-    mutate(SampleID = paste(SampleID, "_", Index, sep = ""))
-g <- olink_pca_plot(df=npx_data, color_g = "QC_Warning",
-                    outlierDefX = 2.5, outlierDefY = 4, byPanel = TRUE, quiet = TRUE)
-lapply(g, function(x){x$data}) %>%
-  bind_rows() %>%
-  filter(Outlier == 1) %>% 
-  select(SampleID, Outlier, Panel)
-```
 
 ## Heatmap for visualizing pathway enrichment (olink_pathway_heatmap)
 
