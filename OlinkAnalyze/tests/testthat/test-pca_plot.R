@@ -64,8 +64,10 @@ test_that("olink_pca_plot works", {
 test_that("PCA calculation", {
   pca <- npx_data1 %>%
     mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
+    npxProcessing_forDimRed() %>%
     olink_calculate_pca()
 
-  expect_snapshot_value(pca, style = "deparse")
+  expect_snapshot_value(pca$scores, style = "deparse")
+  expect_snapshot_value(pca$loadings, style = "deparse")
 })
 
