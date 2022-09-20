@@ -141,6 +141,12 @@ test_that("minimal PCA plot", {
 
   vdiffr::expect_doppelganger("PCA plot - not label outliers", pca_plot[[1]])
 
+  pca_plot_outliers <- npx_data1 %>%
+    mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
+    olink_pca_plot(quiet = TRUE)
+
+  vdiffr::expect_doppelganger("PCA plot - label outliers", pca_plot_outliers[[1]])
+
 })
 
 
