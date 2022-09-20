@@ -66,12 +66,6 @@ test_that("PCA calculation", {
     mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
     olink_calculate_pca()
 
-  pca_test_set <- pca$x %>%
-    as_tibble(rownames = NA) %>%
-    tibble::rownames_to_column() %>%
-    select("rowname", "PC1", "PC2") %>%
-    as.data.frame()
-
-  expect_snapshot_value(pca_test_set, style = "deparse")
+  expect_snapshot_value(pca, style = "deparse")
 })
 

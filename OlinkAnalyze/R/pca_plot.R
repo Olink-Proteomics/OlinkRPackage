@@ -189,6 +189,8 @@ olink_pca_plot <- function (df,
 
 olink_calculate_pca <- function(df,
                                 color_g = "QC_Warning",
+                                x_val = 1,
+                                y_val = 2,
                                 drop_assays = FALSE,
                                 drop_samples = FALSE,
                                 verbose = TRUE) {
@@ -202,7 +204,19 @@ olink_calculate_pca <- function(df,
   #### PCA ####
   pca_fit <- stats::prcomp(procData$df_wide_matrix,
                            scale. = TRUE, center = TRUE)
-  return(pca_fit)
+
+  #Standardizing and selecting components
+  scaling_factor_lambda <- pca_fit$sdev*sqrt(nrow(procData$df_wide_matrix))
+
+  PCX <- pca_fit$x[,x_val]/scaling_factor_lambda[x_val]
+  PCY <- pca_fit$x[,y_val]/scaling_factor_lambda[y_val]
+  PoV <- pca_fit$sdev^2/sum(pca_fit$sdev^2)
+  LX <- pca_fit$rotation[, x_val]
+  LY <- pca_fit$rotation[, y_val]
+
+  scores <- data.frame(cbind(PCX, PCY))
+
+  return(scores)
 }
 
 
