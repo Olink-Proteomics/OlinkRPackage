@@ -48,9 +48,8 @@ test_that("olink_pca_plot works", {
   expect_equal(outliers$SampleID, c("B4_83", "A14_15", "A15_16", "A19_21"))
   expect_equal(outliers$Panel, c("Cardiometabolic", "Inflammation", "Inflammation", "Inflammation"))
 
-  vdiffr::expect_doppelganger('PCA plot', pca_plot[[1]])
-
   skip_on_ci()
+  vdiffr::expect_doppelganger('PCA plot', pca_plot[[1]])
   vdiffr::expect_doppelganger('PCA plot color by treatment', pca_plot_treatCol[[1]])
   vdiffr::expect_doppelganger('PCA plot with loadings', pca_plot_treatCol_topLoadings[[1]])
   vdiffr::expect_doppelganger('PCA plot drop_assays and drop_samples', pca_plot_drop[[1]])
@@ -59,6 +58,21 @@ test_that("olink_pca_plot works", {
 })
 
 
+# PCA plot internal -------------------------------------------------------
+
+test_that("PCA plot internal", {
+
+  pca_p2 <- npx_data1 %>%
+    mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
+    olink_pca_plot.internal(outlierDefX = NA,
+                            outlierDefY = NA,
+                            label_outliers = FALSE,
+                            outlierLines = FALSE)
+
+
+  vdiffr::expect_doppelganger("PCA plot internal", pca_p2)
+
+})
 
 # PCA calculation ---------------------------------------------------------
 
