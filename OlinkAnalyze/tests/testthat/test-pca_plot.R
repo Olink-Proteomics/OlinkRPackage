@@ -71,3 +71,16 @@ test_that("PCA calculation", {
   expect_snapshot_value(pca$loadings, style = "deparse")
 })
 
+test_that("PCA basic plotting", {
+  pca <- npx_data1 %>%
+    mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
+    npxProcessing_forDimRed() %>%
+    olink_calculate_pca()
+
+  pca_p1 <- ggplot(pca$scores, aes(PCX, PCY)) +
+    geom_point()
+  vdiffr::expect_doppelganger('PCA basic plotting', pca_p1)
+})
+
+
+
