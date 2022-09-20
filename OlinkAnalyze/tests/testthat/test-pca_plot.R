@@ -110,3 +110,20 @@ test_that("PCA basic plotting", {
 
 
 
+# PCA plot function -------------------------------------------------------
+
+test_that("minimal PCA plot", {
+  pca_plot <- npx_data1 %>%
+    mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
+    olink_pca_plot(quiet = TRUE,
+                   label_outliers = FALSE)
+
+  vdiffr::expect_doppelganger("PCA plot - not label outliers", pca_plot[[1]])
+
+})
+
+
+
+
+
+
