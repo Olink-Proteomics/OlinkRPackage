@@ -72,6 +72,17 @@ test_that("PCA plot internal", {
 
   vdiffr::expect_doppelganger("PCA plot internal", pca_p2)
 
+
+  pca_p3 <- npx_data1 %>%
+    mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
+    olink_pca_plot.internal(outlierDefX = NA,
+                            outlierDefY = NA,
+                            label_outliers = TRUE,
+                            outlierLines = FALSE)
+
+
+  vdiffr::expect_doppelganger("PCA plot internal 2", pca_p3)
+
 })
 
 # PCA calculation ---------------------------------------------------------
