@@ -206,8 +206,20 @@ olink_calculate_pca <- function(procData,
   LX <- pca_fit$rotation[, x_val]
   LY <- pca_fit$rotation[, y_val]
 
-  scores <- data.frame(cbind(PCX, PCY))
+
+  # Sort order is dependent on locale -> set locale here to make code
+  # deterministic
+  old_collate <- Sys.getlocale("LC_COLLATE")
+  Sys.setlocale("LC_COLLATE", "C")
+
+  scores <- data.frame(cbind(PCX, PCY)) %>%
+    tibble::rownames_to_column() %>%
+    dplyr::arrange(rowname, .locale = "C") %>%
+    tibble::column_to_rownames()
   loadings <- data.frame(variables = rownames(pca_fit$rotation), LX, LY)
+
+  Sys.setlocale("LC_COLLATE", old_collate)
+
 
   range_PX <- c(-abs(min(PCX, na.rm = TRUE)), abs(max(PCX, na.rm = TRUE)))
   range_PY <- c(-abs(min(PCY, na.rm = TRUE)), abs(max(PCY, na.rm = TRUE)))

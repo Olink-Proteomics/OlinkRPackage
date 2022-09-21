@@ -34,6 +34,7 @@ outliers <- lapply(pca_plot_byPanel_outliers, function(x){x$data}) %>%
   bind_rows() %>%
   filter(Outlier == 1)
 
+
 test_that("olink_pca_plot works", {
 
   # Two Warnings thrown: for dropped assays and droppes samples
@@ -108,23 +109,84 @@ test_that("PCA plot internal", {
 
 # PCA calculation ---------------------------------------------------------
 
-test_that("PCA calculation", {
+## Order of output
+
+### With set locale -----
+
+old_collate <- Sys.getlocale("LC_COLLATE")
+Sys.setlocale("LC_COLLATE", "C")
+
+locale_outside <- Sys.getlocale(category = "LC_ALL")
+
+pca_outside <- npx_data1 %>%
+  mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
+  npxProcessing_forDimRed() %>%
+  olink_calculate_pca()
+
+locale_outside <- Sys.getlocale (category = "LC_ALL")
+
+Sys.setlocale("LC_COLLATE", old_collate)
+
+test_that("PCA calculation - output order 2", {
   pca <- npx_data1 %>%
     mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
     npxProcessing_forDimRed() %>%
     olink_calculate_pca()
+
+  locale_inside <- Sys.getlocale (category = "LC_ALL")
+
+  expect_equal(locale_outside, locale_inside)
+  expect_equal(rownames(pca$scores), rownames(pca_outside$scores))
 
   expect_snapshot_value(pca$scores, style = "deparse")
   expect_snapshot_value(pca$loadings, style = "deparse")
 })
 
-test_that("PCA basic plotting", {
+### Without set locale -----
+
+pca_outside <- npx_data1 %>%
+  mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
+  npxProcessing_forDimRed() %>%
+  olink_calculate_pca()
+
+test_that("PCA calculation - output order 2", {
   pca <- npx_data1 %>%
     mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
     npxProcessing_forDimRed() %>%
     olink_calculate_pca()
 
-  pca_p1 <- ggplot(pca$scores, aes(PCX, PCY)) +
+  expect_equal(rownames(pca$scores), rownames(pca_outside$scores))
+})
+
+
+pca_outside <- npx_data1 %>%
+  mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
+  npxProcessing_forDimRed() %>%
+  olink_calculate_pca()
+
+test_that("PCA calculation - output values", {
+  pca <- npx_data1 %>%
+    mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
+    npxProcessing_forDimRed() %>%
+    olink_calculate_pca()
+
+  expect_equal(pca$loadings_scaling_factor, pca_outside$loadings_scaling_factor)
+  expect_equal(pca$loadings, pca_outside$loadings)
+  expect_equal(pca$PoV, pca_outside$PoV)
+  expect_equal(pca$scores, pca_outside$scores)
+
+})
+
+
+
+test_that("PCA basic plotting", {
+  pca_input <- npx_data1 %>%
+    mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
+    npxProcessing_forDimRed()
+  pca <- pca_input %>%
+    olink_calculate_pca()
+
+  pca_p1 <- ggplot(pca$scores, aes(x = PCX, y = PCY)) +
     geom_point()
   vdiffr::expect_doppelganger('PCA basic plotting', pca_p1)
 })
@@ -143,14 +205,45 @@ test_that("minimal PCA plot", {
 
   pca_plot_outliers <- npx_data1 %>%
     mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
-    olink_pca_plot(quiet = TRUE)
+    olink_pca_plot(quiet = TRUE, label_outliers = TRUE)
 
   vdiffr::expect_doppelganger("PCA plot - label outliers", pca_plot_outliers[[1]])
 
 })
 
 
+# prcomp ------------------------------------------------------------------
+
+C <- chol(S <- toeplitz(.9 ^ (0:31))) # Cov.matrix and its root
+set.seed(17)
+X <- matrix(rnorm(32000), 1000, 32)
+Z <- X %*% C  ## ==>  cov(Z) ~=  C'C = S
+
+pZ_outside <- prcomp(Z, tol = 0.1)
+
+test_that("prcomp", {
+  pZ_inside <- prcomp(Z, tol = 0.1)
+
+  expect_equal(pZ_outside, pZ_inside)
+
+})
 
 
+# locale ------------------------------------------------------------------
 
+old_collate <- Sys.getlocale("LC_COLLATE")
+Sys.setlocale("LC_COLLATE", "C")
 
+locale_outside <- Sys.getlocale(category = "LC_ALL")
+
+Sys.setlocale("LC_COLLATE", old_collate)
+
+#----
+
+test_that("PCA calculation", {
+
+  locale_inside <- Sys.getlocale (category = "LC_ALL")
+
+  expect_equal(locale_outside, locale_inside)
+
+})
