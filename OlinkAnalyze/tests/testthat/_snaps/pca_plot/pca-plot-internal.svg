@@ -221,6 +221,6 @@
 <circle cx='648.32' cy='300.68' r='3.02' style='stroke-width: 0.71; stroke: #FE1F04; fill: #FE1F04;' />
 <text x='662.93' y='286.71' style='font-size: 9.60px; fill: #737373; font-family: sans;' textLength='21.35px' lengthAdjust='spacingAndGlyphs'>Pass</text>
 <text x='662.93' y='303.99' style='font-size: 9.60px; fill: #737373; font-family: sans;' textLength='35.75px' lengthAdjust='spacingAndGlyphs'>Warning</text>
-<text x='40.44' y='15.39' style='font-size: 14.40px; fill: #737373; font-family: sans;' textLength='56.83px' lengthAdjust='spacingAndGlyphs'>PCA plot</text>
+<text x='40.44' y='15.39' style='font-size: 14.40px; fill: #737373; font-family: sans;' textLength='108.06px' lengthAdjust='spacingAndGlyphs'>PCA plot internal</text>
 </g>
 </svg>
