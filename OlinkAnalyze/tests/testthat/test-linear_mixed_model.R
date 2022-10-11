@@ -4,6 +4,9 @@ skip_on_cran()
 refRes_file <- '../data/refResults.RData'
 load(refRes_file)
 
+#Load data with hidden/excluded assays (all NPX=NA)
+load(file = '../data/npx_data_format221010.RData')
+
 #Run olink_lmer
 lmer_results_1 <- olink_lmer(df = npx_data1,
                              variable = c('Treatment', "Time"),
@@ -50,6 +53,7 @@ lmer_plot_moreProts <- olink_lmer_plot(df = npx_data1,
 test_that("olink_lmer works", {
   expect_equal(lmer_results_1, ref_results$lmer_results_1, tolerance = 1e-4)
   expect_error(olink_lmer(npx_data1))
+  expect_warning(olink_lmer(npx_data_format221010, variable = 'treatment1', random = 'SubjectDummy')) # data with all NPX=NA for some assays
 })
 
 test_that("olink_lmer_posthoc works", {

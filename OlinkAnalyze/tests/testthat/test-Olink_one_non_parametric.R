@@ -2,6 +2,9 @@
 refRes_file <- '../data/refResults.RData'
 load(refRes_file)
 
+#Load data with hidden/excluded assays (all NPX=NA)
+load(file = '../data/npx_data_format221010.RData')
+
 # One-way Kruskal-Wallis Test
 kruskal_results <- olink_one_non_parametric(df = npx_data1,
                                             variable = "Site")
@@ -19,7 +22,7 @@ kruskal_posthoc_results <- olink_one_non_parametric_posthoc(npx_data1,
                                                               filter(Threshold == 'Significant') %>%
                                                               dplyr::select(OlinkID) %>%
                                                               distinct() %>%
-                                                              pull()}) %>% 
+                                                              pull()}) %>%
   mutate(id = as.character(OlinkID)) %>%
   arrange(id, contrast) %>% #Just for consistency. Not actually needed in this case
   select(-id)
@@ -32,7 +35,7 @@ friedman_posthoc_results <- olink_one_non_parametric_posthoc(npx_data1,
                                                                filter(Threshold == 'Significant') %>%
                                                                dplyr::select(OlinkID) %>%
                                                                distinct() %>%
-                                                               pull()}) %>% 
+                                                               pull()}) %>%
   mutate(id = as.character(OlinkID)) %>%
   arrange(id, contrast) %>% #Just for consistency. Not actually needed in this case
   select(-id)
@@ -47,7 +50,9 @@ test_that("olink_one_non_parametric function works", {
   expect_equal(nrow(friedman_results), 184)
   expect_equal(ncol(friedman_results), 11)
 
-  expect_error(olink_anova(npx_data1,)) ##no input data
+  expect_error(olink_one_non_parametric(npx_data1,)) ##no input data
+
+  expect_warning(olink_one_non_parametric(npx_data_format221010, 'treatment2')) # data with all NPX=NA for some assays
 })
 
 test_that("olink_one_non_parametric_posthoc function works", {
