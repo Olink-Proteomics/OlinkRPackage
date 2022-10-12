@@ -123,33 +123,12 @@ olink_wilcox <- function(df, variable, pair_id, ...){
                 " samples that do not have a unique level for your variable. Only one level per sample is allowed."))
   }
 
-  # # Check whether it is NPX or QUANT
-  if ('NPX' %in% colnames(df)) {
-    data_type <- 'NPX'
-  } else if ('Quantified_value' %in% colnames(df)) {
-    data_type <- 'Quantified_value'
-  } else {
-    stop('The NPX or Quantified_value is not in the df.')}
-
-
-  #Not testing assays that have all NA:s or all NA:s in one level
-  all_nas <- df  %>%
-    dplyr::group_by(OlinkID) %>%
-    dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(!!rlang::ensym(data_type)))) %>%
-    dplyr::ungroup() %>%
-    dplyr::filter(n-n_na <= 1) %>%
-    dplyr::pull(OlinkID)
-
-
-  if(length(all_nas) > 0) {
-    warning(paste0('The assays ',
-                   paste(all_nas, collapse = ', '),
-                   ' have only NA:s. They will not be tested.'),
-            call. = F)
-  }
+  #Check data format
+  npxCheck <- npxCheck(df)
+  data_type <- npxCheck$data_type #Temporary fix to avoid issues with rlang::ensym downstream
 
   nas_in_level <- df  %>%
-    dplyr::filter(!(OlinkID %in% all_nas)) %>%
+    dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>%
     dplyr::group_by(OlinkID, !!rlang::ensym(variable)) %>%
     dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(!!rlang::ensym(data_type)))) %>%
     dplyr::ungroup() %>%
@@ -176,7 +155,7 @@ olink_wilcox <- function(df, variable, pair_id, ...){
 
     #check that each "pair_id' has only 2 samples
     ct_pairs <- df %>%
-      dplyr::filter(!(OlinkID %in% all_nas)) %>%
+      dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>%
       dplyr::filter(!(OlinkID %in% nas_in_level)) %>%
       dplyr::filter(!is.na(!!rlang::ensym(variable))) %>%
       dplyr::group_by(OlinkID,!!rlang::ensym(pair_id)) %>%
@@ -188,7 +167,7 @@ olink_wilcox <- function(df, variable, pair_id, ...){
 
 
     p.val <- df %>%
-      dplyr::filter(!(OlinkID %in% all_nas)) %>%
+      dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>%
       dplyr::filter(!(OlinkID %in% nas_in_level)) %>%
       dplyr::select(all_of(c("OlinkID","UniProt","Assay","Panel",data_type,variable,pair_id))) %>%
       tidyr::pivot_wider(names_from=all_of(variable),values_from=data_type) %>%
@@ -206,7 +185,7 @@ olink_wilcox <- function(df, variable, pair_id, ...){
 
 
     p.val <- df %>%
-      dplyr::filter(!(OlinkID %in% all_nas)) %>%
+      dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>%
       dplyr::filter(!(OlinkID %in% nas_in_level)) %>%
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
       dplyr::do(broom::tidy(stats::wilcox.test(!!rlang::ensym(data_type) ~ !!rlang::ensym(variable), data = ., conf.int = TRUE, ...))) %>%

@@ -143,22 +143,8 @@ olink_anova <- function(df,
       df <- df[!is.na(df[[i]]),]
     }
 
-    #Not testing assays that have all NA:s
-    all_nas <- df  %>%
-      dplyr::group_by(OlinkID) %>%
-      dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(NPX))) %>%
-      dplyr::ungroup() %>%
-      dplyr::filter(n == n_na) %>%
-      dplyr::pull(OlinkID)
-
-    if(length(all_nas) > 0) {
-
-      warning(paste0('The assays ',
-                     paste(all_nas, collapse = ', '),
-                     ' have only NA:s. They will not be tested.'),
-              call. = FALSE)
-
-    }
+    #Check data format
+    npxCheck <- npxCheck(df)
 
     ##Convert character vars to factor
     converted.vars <- NULL
@@ -191,7 +177,7 @@ olink_anova <- function(df,
     for(effect in single_fixed_effects){
 
       current_nas <- df %>%
-        dplyr::filter(!(OlinkID %in% all_nas)) %>%
+        dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>% #Exclude assays that have all NA:s
         dplyr::group_by(OlinkID, !!rlang::ensym(effect)) %>%
         dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(NPX))) %>%
         dplyr::ungroup() %>%
@@ -282,7 +268,7 @@ olink_anova <- function(df,
     }
 
     p.val <- df %>%
-      dplyr::filter(!(OlinkID %in% all_nas)) %>%
+      dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>% #Exclude assays that have all NA:s
       dplyr::filter(!(OlinkID %in% nas_in_var)) %>%
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
       dplyr::do(generics::tidy(car::Anova(stats::lm(as.formula(formula_string),

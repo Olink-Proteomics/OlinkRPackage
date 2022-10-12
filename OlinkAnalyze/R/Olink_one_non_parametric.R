@@ -87,30 +87,9 @@ olink_one_non_parametric <- function(df,
 
     df <- df[!is.na(df[[variable_testers]]),]
 
-    # # Check whether it is NPX or QUANT
-
-    if ('NPX' %in% colnames(df)) {
-      data_type <- 'NPX'
-    } else if ('Quantified_value' %in% colnames(df)) {
-      data_type <- 'Quantified_value'
-    } else {
-      stop('The NPX or Quantified_value is not in the df.')}
-
-    #Not testing assays that have all NA:s
-    all_nas <- df  %>%
-      dplyr::group_by(OlinkID) %>%
-      dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(!!rlang::ensym(data_type)))) %>%
-      dplyr::ungroup() %>%
-      dplyr::filter(n == n_na) %>%
-      dplyr::pull(OlinkID)
-
-
-    if(length(all_nas) > 0) {
-      warning(paste0('The assays ',
-                     paste(all_nas, collapse = ', '),
-                     ' have only NA:s. They will not be tested.'),
-              call. = F)
-    }
+    #Check data format
+    npxCheck <- npxCheck(df)
+    data_type <- npxCheck$data_type #Temporary fix to avoid issues with rlang::ensym downstream
 
     ##Convert character vars to factor
     converted.vars <- NULL
@@ -134,7 +113,7 @@ olink_one_non_parametric <- function(df,
     for(effect in single_fixed_effects){
 
       current_nas <- df %>%
-        dplyr::filter(!(OlinkID %in% all_nas)) %>%
+        dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>%
         dplyr::group_by(OlinkID, !!rlang::ensym(effect)) %>%
         dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(!!rlang::ensym(data_type))),.groups="drop") %>%
         dplyr::filter(n == n_na) %>%
@@ -197,7 +176,7 @@ olink_one_non_parametric <- function(df,
       formula_string <- paste0(formula_string,"|",subject)
       # add repeat measurement groups
       df_nas_remove <- df %>%
-        dplyr::filter(!(OlinkID %in% all_nas)) %>%
+        dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>%
         dplyr::filter(!(OlinkID %in% nas_in_var))
       # remove subject without complete data
       ## number of the items in the subject
@@ -246,7 +225,7 @@ olink_one_non_parametric <- function(df,
     }else{
       if(verbose){message(paste("Kruskal model fit to each assay: "),formula_string)}
       p.val <- df %>%
-        dplyr::filter(!(OlinkID %in% all_nas)) %>%
+        dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>%
         dplyr::filter(!(OlinkID %in% nas_in_var)) %>%
         dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
         dplyr::do(broom::tidy(kruskal.test(as.formula(formula_string),

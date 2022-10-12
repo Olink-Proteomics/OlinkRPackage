@@ -106,31 +106,15 @@ olink_ordinalRegression <- function(df,
       df <- df[!is.na(df[[i]]),]
     }
 
+    #Check data format
+    npxCheck <- npxCheck(df)
+    data_type <- npxCheck$data_type #Temporary fix to avoid issues with rlang::ensym downstream
 
-    ## Check whether it is NPX or QUANT
-    if ('NPX' %in% colnames(df)) {
-      data_type <- 'NPX'
+    ## Convert outcome to factor
+    if (data_type == 'NPX') {
       df$NPX <- factor(df$NPX, ordered = TRUE)
-    } else if ('Quantified_value' %in% colnames(df)) {
-      data_type <- 'Quantified_value'
+    } else if (data_type == 'Quantified_value') {
       df$Quantified_value <- factor(df$Quantified_value, ordered = TRUE)
-    } else {
-      stop('The NPX or Quantified_value is not in the df.')}
-
-
-    #Not testing assays that have all NA:s
-    all_nas <- df  %>%
-      dplyr::group_by(OlinkID) %>%
-      dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(!!rlang::ensym(data_type)))) %>%
-      dplyr::ungroup() %>%
-      dplyr::filter(n == n_na) %>%
-      dplyr::pull(OlinkID)
-
-    if(length(all_nas) > 0) {
-      warning(paste0('The assays ',
-                     paste(all_nas, collapse = ', '),
-                     ' have only NA:s. They will not be tested.'),
-              call. = F)
     }
 
     ##Convert character vars to factor
@@ -162,7 +146,7 @@ olink_ordinalRegression <- function(df,
 
     for(effect in single_fixed_effects){
       current_nas <- df %>%
-        dplyr::filter(!(OlinkID %in% all_nas)) %>%
+        dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>%
         dplyr::group_by(OlinkID, !!rlang::ensym(effect)) %>%
         dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(!!rlang::ensym(data_type)))) %>%
         dplyr::ungroup() %>%
@@ -243,7 +227,7 @@ olink_ordinalRegression <- function(df,
     }
 
     p.val <- df %>%
-      dplyr::filter(!(OlinkID %in% all_nas)) %>%
+      dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>%
       dplyr::filter(!(OlinkID %in% nas_in_var)) %>%
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
       dplyr::mutate(!!data_type := rank(!!rlang::ensym(data_type))) %>%
@@ -296,7 +280,7 @@ olink_ordinalRegression <- function(df,
 #' @param mean_return Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = TRUE and no adjustment is performed.
 #' @param post_hoc_padjust_method P-value adjustment method to use for post-hoc comparisons within an assay. Options include \code{tukey}, \code{sidak}, \code{bonferroni} and \code{none}.
 #' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
-#' 
+#'
 #' @return Tibble of posthoc tests for specified effect, arranged by ascending adjusted p-values.
 #'
 #' #' Columns include:
@@ -311,7 +295,7 @@ olink_ordinalRegression <- function(df,
 #'  \item{Adjusted_pval:} "numeric" adjusted p-value for the test
 #'  \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
 #' }
-#' 
+#'
 #' @export
 #' @examples \donttest{
 #' library(dplyr)
@@ -328,7 +312,7 @@ olink_ordinalRegression <- function(df,
 #'                                                    variable=c("Treatment:Time"),
 #'                                                    covariates="Site",
 #'                                                    olinkid_list = {ordinalRegression_results %>%
-#'                                                    filter(term == 'Treatment:Time') %>% 
+#'                                                    filter(term == 'Treatment:Time') %>%
 #'                                                    filter(Threshold == 'Significant') %>%
 #'                                                                  dplyr::select(OlinkID) %>%
 #'                                                                  distinct() %>%
