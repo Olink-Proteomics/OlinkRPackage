@@ -68,4 +68,6 @@ test_that("olink_anova_posthoc function works", {
   expect_equal(anova_posthoc_1_time, ref_results$anova_posthoc_1_time)
   expect_equal(nrow(anova_posthoc_1_time), 30)
   expect_equal(anova_posthoc_1_time %>% ncol(), 11)
+
+  expect_warning(olink_anova_posthoc(npx_data_format221010, variable = 'treatment2', effect = 'treatment2')) # data with all NPX=NA for some assays
 })
