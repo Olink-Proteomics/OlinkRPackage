@@ -473,6 +473,9 @@ olink_lmer_posthoc <- function(df,
         dplyr::pull()
     }
 
+    #Check data format
+    npxCheck <- npxCheck(df)
+
     #Allow for :/* notation in covariates
     variable <- gsub("\\*",":",variable)
     if(!is.null(covariates)) covariates <- gsub("\\*",":",covariates)
@@ -567,6 +570,7 @@ olink_lmer_posthoc <- function(df,
 
     output_df <- df %>%
       dplyr::filter(OlinkID %in% olinkid_list) %>%
+      dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>%
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
       dplyr::group_modify(~single_posthoc(data = .x,
                                    formula_string=formula_string,
