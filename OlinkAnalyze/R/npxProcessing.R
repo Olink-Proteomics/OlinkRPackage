@@ -160,10 +160,18 @@ npxProcessing_forDimRed <- function(df, color_g, drop_assays, drop_samples, verb
 
 #This function is called by various other functions to perform checks of NPX-data. For now, it only looks for assays which have all NPX=NA, but there are other redundant tasks that could be moved here
 npxCheck <- function(df){
-  #Identify assays that have only NA:s
+  # # Check whether df contains NPX or QUANT
+  if ('NPX' %in% colnames(df)) {
+    data_type <- 'NPX'
+  } else if ('Quantified_value' %in% colnames(df)) {
+    data_type <- 'Quantified_value'
+  } else {
+    stop('Neither NPX or Quantified_value column present in the data')}
+
+  #### Identify assays that have only NA:s ####
   all_nas <- df  %>%
     dplyr::group_by(OlinkID) %>%
-    dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(NPX))) %>%
+    dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(!!rlang::ensym(data_type)))) %>%
     dplyr::ungroup() %>%
     dplyr::filter(n == n_na) %>%
     dplyr::pull(OlinkID)
@@ -177,5 +185,5 @@ npxCheck <- function(df){
 
   }
 
-  return(list(all_nas = all_nas))
+  return(list(all_nas = all_nas, data_type = data_type))
 }
