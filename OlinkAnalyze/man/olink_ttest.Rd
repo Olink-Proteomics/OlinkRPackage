@@ -20,8 +20,8 @@ A "tibble" containing the t-test results for every protein.
 Columns include:
 \itemize{
  \item{Assay:} "character" Protein symbol
- \item{OlinkID:} "character" Olink specific ID  
- \item{UniProt:} "character" Olink specific ID  
+ \item{OlinkID:} "character" Olink specific ID
+ \item{UniProt:} "character" Olink specific ID
  \item{Panel:} "character" Name of Olink Panel
  \item{estimate:} "numeric" difference in mean NPX between groups
  \item{Group 1:} "numeric" Column is named first level of variable when converted to factor, contains mean NPX for that group

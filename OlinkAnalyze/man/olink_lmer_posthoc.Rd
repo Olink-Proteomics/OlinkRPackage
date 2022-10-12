@@ -51,15 +51,15 @@ A "tibble" containing the results of the pairwise comparisons between given vari
 Columns include:
 \itemize{
  \item{Assay:} "character" Protein symbol
- \item{OlinkID:} "character" Olink specific ID  
- \item{UniProt:} "character" Olink specific ID  
+ \item{OlinkID:} "character" Olink specific ID
+ \item{UniProt:} "character" Olink specific ID
  \item{Panel:} "character" Name of Olink Panel
  \item{term:} "character" term in model
  \item{contrast:} "character" the groups that were compared
  \item{estimate:} "numeric" difference in mean NPX between groups
  \item{conf.low:} "numeric" confidence interval for the mean (lower end)
  \item{conf.high:} "numeric" confidence interval for the mean (upper end)
- \item{Adjusted_pval:} "numeric" adjusted p-value for the test 
+ \item{Adjusted_pval:} "numeric" adjusted p-value for the test
  \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
 }
 }
@@ -94,7 +94,7 @@ results_lmer_posthoc <- olink_lmer_posthoc(df = npx_data1,
                                            effect = 'Time:Treatment',
                                            random = 'Subject',
                                            verbose = TRUE)
-                                           
+
 #Estimate treated vs untreated at each timepoint
 
 
@@ -104,5 +104,5 @@ results_lmer_posthoc <- olink_lmer_posthoc(df = npx_data1,
                                            effect_formula = "pairwise~Treatment|Time",
                                            verbose = TRUE)
 }
-                                                                                    
+
 }
