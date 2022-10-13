@@ -119,6 +119,10 @@ olink_umap_plot <- function (df,
     dplyr::filter(stringr::str_detect(OlinkID,
                                       "OID[0-9]{5}"))
 
+  #Check data format
+  npxCheck <- npxCheck(df)
+  df <- df %>% dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) #Exclude assays that have all NA:s
+
   #Check that the user didn't specify just one of outlierDefX and outlierDefY
   if(sum(c(is.numeric(outlierDefX), is.numeric(outlierDefY))) == 1){
     stop('To label outliers, both outlierDefX and outlierDefY have to be specified as numerical values')
