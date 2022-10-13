@@ -3,6 +3,9 @@ set.seed(10)
 refRes_file <- '../data/refResults.RData'
 load(refRes_file)
 
+#Load data with hidden/excluded assays (all NPX=NA)
+load(file = '../data/npx_data_format221010.RData')
+
 pca_plot <- npx_data1 %>%
   mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
   olink_pca_plot(quiet = TRUE)
@@ -47,6 +50,8 @@ test_that("olink_pca_plot works", {
 
   expect_equal(outliers$SampleID, c("B4_83", "A14_15", "A15_16", "A19_21"))
   expect_equal(outliers$Panel, c("Cardiometabolic", "Inflammation", "Inflammation", "Inflammation"))
+
+  expect_warning(olink_pca_plot(npx_data_format221010)) # data with all NPX=NA for some assays
 
   skip_on_ci()
   vdiffr::expect_doppelganger('PCA plot', pca_plot[[1]])

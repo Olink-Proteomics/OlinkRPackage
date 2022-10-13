@@ -180,7 +180,7 @@ npxCheck <- function(df){
 
     warning(paste0('The assays ',
                    paste(all_nas, collapse = ', '),
-                   ' have NPX=NA for all samples. They will not be tested.'),
+                   ' have NPX=NA for all samples. They will be excluded from the analysis'),
             call. = FALSE)
 
   }
