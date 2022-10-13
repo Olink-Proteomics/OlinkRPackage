@@ -77,7 +77,7 @@ ordinalRegression_results_posthoc_results <- olink_ordinalRegression_posthoc(npx
                                                    variable=c("Treatment:Time"),
                                                    covariates="Site",
                                                    olinkid_list = {ordinalRegression_results \%>\%
-                                                   filter(term == 'Treatment:Time') \%>\% 
+                                                   filter(term == 'Treatment:Time') \%>\%
                                                    filter(Threshold == 'Significant') \%>\%
                                                                  dplyr::select(OlinkID) \%>\%
                                                                  distinct() \%>\%
