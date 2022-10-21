@@ -2,7 +2,7 @@
 #'
 #' @param alpha transparency (optional)
 #' @param coloroption string, one or more of the following:
-#' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'lightblue', 'darkblue', 'purple', 'pink')
+#' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'lightblue', 'darkblue', 'DarkBlue', 'purple', 'pink')
 #' @return A character vector of palette hex codes for colors 
 #' @keywords color palette Olink
 #' @examples
@@ -39,6 +39,7 @@ olink_pal <- function(alpha = 1, coloroption = NULL) {
     turqoise <- grDevices::col2rgb('#00C7E1')
     lightblue <- grDevices::col2rgb('#A2D9F5')
     darkblue <- grDevices::col2rgb('#00559E')
+    DarkBlue <- grDevices::col2rgb('#0D2948')
     purple <- grDevices::col2rgb('#6A27AE')
     pink <- grDevices::col2rgb('#FF51B8')
 
@@ -50,8 +51,9 @@ olink_pal <- function(alpha = 1, coloroption = NULL) {
     teal <- grDevices::rgb(teal[1], teal[2], teal[3], alpha, maxColorValue = 255)
     turqoise <- grDevices::rgb(turqoise[1], turqoise[2], turqoise[3], alpha, maxColorValue = 255)
    lightblue <-  grDevices::rgb(lightblue[1], lightblue[2], lightblue[3], alpha, maxColorValue = 255)
-    darkblue <- grDevices::rgb(darkblue[1], darkblue[2], darkblue[3], alpha, maxColorValue = 255)
-    purple <- grDevices::rgb(purple[1], purple[2], purple[3], alpha, maxColorValue = 255)
+   darkblue <- grDevices::rgb(darkblue[1], darkblue[2], darkblue[3], alpha, maxColorValue = 255)
+   DarkBlue <- grDevices::rgb(DarkBlue[1], DarkBlue[2], DarkBlue[3], alpha, maxColorValue = 255)
+   purple <- grDevices::rgb(purple[1], purple[2], purple[3], alpha, maxColorValue = 255)
     pink <- grDevices::rgb(pink[1], pink[2], pink[3], alpha, maxColorValue = 255)
 
 
@@ -65,6 +67,7 @@ olink_pal <- function(alpha = 1, coloroption = NULL) {
       crispy_colors_hex_ordered <- rbind(turqoise,
                                          red,
                                          darkblue,
+                                         DarkBlue,
                                          yellow,
                                          teal,
                                          pink,
@@ -73,7 +76,7 @@ olink_pal <- function(alpha = 1, coloroption = NULL) {
                                          orange,
                                          lightblue)
 
-      crispy_colors_hex <- rbind(red, orange, yellow, green, teal, turqoise, lightblue, darkblue, purple, pink, red)
+      crispy_colors_hex <- rbind(red, orange, yellow, green, teal, turqoise, lightblue, darkblue, DarkBlue, purple, pink, red)
 
 
     }else{
@@ -122,7 +125,7 @@ olink_pal <- function(alpha = 1, coloroption = NULL) {
 #'
 #' @param alpha transparency
 #' @param coloroption string, one or more of the following:
-#' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'lightblue', 'darkblue', 'purple', 'pink')
+#' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'lightblue', 'darkblue', 'DarkBlue', 'purple', 'pink')
 #' @param ... Optional. Additional arguments to pass to ggplot2::discrete_scale()
 #'
 #' @return No return value, called for side effects
@@ -153,7 +156,7 @@ olink_color_discrete <- function(..., alpha = 1, coloroption = NULL) {
 #'
 #' @param alpha transparency (optional)
 #' @param coloroption string, one or more of the following:
-#' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'lightblue', 'darkblue', 'purple', 'pink')
+#' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'lightblue', 'darkblue', 'DarkBlue', 'purple', 'pink')
 #' @param ... Optional. Additional arguments to pass to scale_color_gradientn()
 #' @return No return value, called for side effects
 #' @export
@@ -181,7 +184,7 @@ olink_color_gradient <- function(..., alpha = 1, coloroption = NULL) {
 #' Olink fill scale for discrete ggplots
 #' @param alpha transparency (optional)
 #' @param coloroption string, one or more of the following:
-#' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'lightblue', 'darkblue', 'purple', 'pink')
+#' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'lightblue', 'darkblue', 'DarkBlue', 'purple', 'pink')
 #' @param ... Optional. Additional arguments to pass to ggplot2::discrete_scale()
 #'
 #' @return No return value, called for side effects
@@ -210,7 +213,7 @@ olink_fill_discrete <- function(..., alpha = 1, coloroption = NULL) {
 #'
 #' @param alpha transparency (optional)
 #' @param coloroption string, one or more of the following:
-#' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'lightblue', 'darkblue', 'purple', 'pink')
+#' c('red', 'orange', 'yellow', 'green', 'teal', 'turqoise', 'lightblue', 'darkblue', 'DarkBlue', 'purple', 'pink')
 #' @param ... Optional. Additional arguments to pass to ggplot2::scale_fill_gradientn()
 #'
 #' @return No return value, called for side effects
