@@ -32,7 +32,7 @@ normalization or intensity normalization methods. Intensity
 normalization method assumes that all samples within a project are fully
 randomized.
 
-The joint analysis of two or more Olink® NPX datasets often requires
+The joint analysis of two or more Olink® NPX datasets often requires an 
 additional batch correction step to remove technical variations, which
 is referred to as bridging.
 
@@ -45,14 +45,13 @@ Bridging is needed if Olink® NPX datasets are:
 
 To bridge two or more Olink® NPX datasets, bridging samples are needed
 to calculate adjustment factors between datasets. Bridging samples are 
-overlapping samples between datasets. The recommended number
-of bridging samples for Explore 1536 datasets is between 8-16. Olink® 
-NPX datasets without overlapping samples can not be combined to perform 
+shared samples among datasets. The recommended number
+of bridge samples for Explore 1536 datasets is between 8-16. Olink® 
+NPX datasets without overlapping samples should not be combined to perform 
 joint analysis using the bridging approach described below.
 
-The following tutorial is designed to give you an overview of the kinds
-of data combining methods that are possible using the Olink® bridging
-procedure.
+The following tutorial is designed to provide an overview of the types 
+of methods that are applicable using the Olink® bridging procedure.
 
 ## Setup the bridging objects
 
@@ -84,26 +83,26 @@ factors to adjust NPX values between two datasets. The output from
 column `NPX`.
 
 ```{r bridging, message=FALSE}
-           
 # Find overlapping samples
 npx_1 <- npx_data1 %>% 
-  mutate(dataset = "data1")
+  mutate(dataset = "data1") %>% 
+  filter(!str_detect(SampleID, 'CONTROL_SAMPLE'))
+
 npx_2 <- npx_data2 %>% 
-  mutate(dataset = "data2")
+  mutate(dataset = "data2") %>% 
+  filter(!str_detect(SampleID, 'CONTROL_SAMPLE'))
 
-overlap_samples <- intersect(npx_1$SampleID, npx_2$SampleID) %>% 
-  data.frame() %>% 
-  filter(!str_detect(., 'CONTROL_SAMPLE')) %>% #Remove control samples
-  pull(.)
+overlap_samples <- intersect(npx_1$SampleID, npx_2$SampleID)
+
 # Perform Bridging normalization
-npx_br_data <- olink_normalization(df1 = npx_1, 
-                                   df2 = npx_2, 
+npx_br_data <- olink_normalization(df1                     = npx_1, 
+                                   df2                     = npx_2, 
                                    overlapping_samples_df1 = overlap_samples,
-                                   df1_project_nr = '20200001',
-                                   df2_project_nr = '20200002',
-                                   reference_project = '20200001')
-glimpse(npx_br_data)
+                                   df1_project_nr          = '20200001',
+                                   df2_project_nr          = '20200002',
+                                   reference_project       = '20200001')
 
+glimpse(npx_br_data)
 ```
 
 ## Perform evaluation of bridging normalization
@@ -115,18 +114,20 @@ PCA plot is used to visualize sample-to-sample distance before and after bridgin
 
 ### Generate unique SampleIDs
 npx_1 <- npx_data1 %>% 
-  mutate(dataset = "data1") %>% 
-  mutate(SampleID = paste0(dataset, PlateID, SampleID))
+  mutate(dataset  = "data1",
+         SampleID = paste0(dataset, PlateID, SampleID))
   
 npx_2 <- npx_data2 %>% 
-  mutate(dataset = "data2") %>% 
-  mutate(SampleID = paste0(dataset, PlateID, SampleID))
+  mutate(dataset  = "data2",
+         SampleID = paste0(dataset, PlateID, SampleID))
              
-npx_before_br <- rbind(npx_1, npx_2)
+npx_before_br <- bind_rows(npx_1, npx_2)
 
 ### PCA plot
-OlinkAnalyze::olink_pca_plot(df = npx_before_br,
-                               color_g = "dataset", byPanel = TRUE, coloroption = c('orange', 'darkblue')) 
+OlinkAnalyze::olink_pca_plot(df          = npx_before_br,
+                             color_g     = "dataset",
+                             byPanel     = TRUE,
+                             coloroption = c('orange', 'darkblue')) 
 
 ```
 
@@ -137,8 +138,11 @@ OlinkAnalyze::olink_pca_plot(df = npx_before_br,
 ### Generate unique SampleIDs
 npx_after_br <- npx_br_data %>% 
   mutate(SampleID = paste0(dataset, PlateID, SampleID))
+
 ### PCA plot
-OlinkAnalyze::olink_pca_plot(df = npx_after_br,
-                               color_g = "dataset", byPanel = TRUE, coloroption = c('orange', 'darkblue')) 
+OlinkAnalyze::olink_pca_plot(df          = npx_after_br,
+                             color_g     = "dataset",
+                             byPanel     = TRUE,
+                             coloroption = c('orange', 'darkblue')) 
 ```
 
