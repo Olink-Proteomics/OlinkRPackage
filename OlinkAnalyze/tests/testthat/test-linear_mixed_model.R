@@ -66,7 +66,10 @@ test_that("olink_lmer_posthoc works", {
                                       dplyr::filter(Threshold == 'Significant') %>%
                                       dplyr::pull(OlinkID)})) # no effect specified
 
-  expect_warning(olink_lmer_posthoc(variable = 'treatment1', effect = 'treatment1', random = 'SubjectDummy')) # data with all NPX=NA for some assays
+  expect_warning(olink_lmer_posthoc(df = npx_data_format221010,
+                                    variable = 'treatment1',
+                                    effect = 'treatment1',
+                                    random = 'SubjectDummy')) # data with all NPX=NA for some assays
 })
 
 test_that("olink_lmer_plot works", {
