@@ -58,8 +58,13 @@ excludedOIDs.proj2<-
 overlap_samples <- intersect(npx_data_format221010$SampleID, npx_data_format221010.project2$SampleID)
 npxBridged <- olink_normalization(df1 = npx_data_format221010,
                                   df2 = npx_data_format221010.project2,
-                                  overlapping_samples_df1 = overlap_samples)
+                                  overlapping_samples_df1 = overlap_samples,
+                                  reference_project = 'P1')
 
+npxBridged_proj2ref <- olink_normalization(df1 = npx_data_format221010,
+                                           df2 = npx_data_format221010.project2,
+                                           overlapping_samples_df1 = overlap_samples,
+                                           reference_project = 'P2')
 
 test_that("olink_normalization works", {
   expect_equal(normalization_results.bridged, ref_results$normalization_results.bridged)
@@ -71,7 +76,8 @@ test_that("olink_normalization works", {
                                    df2 = npx_data2,
                                    overlapping_samples_df1 = c("B64", "B36", "A77", "B7", "A24", "A49", "B76"))) # Non overlapping samples for bridging
 
-  # Testing the excluded assay bridging
+  ### Testing the excluded assay bridging ###
+  ## With P1 as the reference
   #Test that all excluded assays from project 1 remain NA after bridging
   expect_true(npxBridged %>%
                 filter(Project == 'P1' & OlinkID %in% excludedOIDs.proj1) %>%
@@ -81,6 +87,22 @@ test_that("olink_normalization works", {
 
   #Test that the non-excluded assays in project 2 remain unchanged
   expect_true(npxBridged %>%
+                filter(Project == 'P2' & OlinkID %in% setdiff(excludedOIDs.proj1, excludedOIDs.proj2)) %>%
+                left_join(npx_data_format221010.project2, by = c('SampleID', 'OlinkID')) %>%
+                mutate(match = NPX.x == NPX.y) %>%
+                pull(match) %>%
+                all())
+
+  ## With P2 as the reference
+  #Test that all excluded assays from project 1 remain NA after bridging
+  expect_true(npxBridged_proj2ref %>%
+                filter(Project == 'P1' & OlinkID %in% excludedOIDs.proj1) %>%
+                pull(NPX) %>%
+                is.na() %>%
+                all())
+
+  #Test that the non-excluded assays in project 2 remain unchanged
+  expect_true(npxBridged_proj2ref %>%
                 filter(Project == 'P2' & OlinkID %in% setdiff(excludedOIDs.proj1, excludedOIDs.proj2)) %>%
                 left_join(npx_data_format221010.project2, by = c('SampleID', 'OlinkID')) %>%
                 mutate(match = NPX.x == NPX.y) %>%
