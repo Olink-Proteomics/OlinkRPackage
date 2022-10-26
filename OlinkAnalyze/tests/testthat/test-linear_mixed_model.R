@@ -3,6 +3,8 @@ skip_on_cran()
 #Load reference results
 refRes_file <- '../data/refResults.RData'
 load(refRes_file)
+load(file = '../data/npx_data_format221010.RData')
+npx_Check <- suppressWarnings(npxCheck(npx_data_format221010))
 
 #Load data with hidden/excluded assays (all NPX=NA)
 load(file = '../data/npx_data_format221010.RData')
@@ -72,7 +74,14 @@ test_that("olink_lmer_posthoc works", {
                                     random = 'SubjectDummy')) # data with all NPX=NA for some assays
 })
 
+lmer_plot_excludedids<- suppressWarnings(olink_lmer_plot(df = npx_data_format221010,
+               variable = c('treatment1'),
+               random = "SubjectDummy",
+               olinkid_list = c(npx_Check$all_nas[1:5],"OID30538"),
+               x_axis_variable = "treatment1", number_of_proteins_per_plot = 5))
+
 test_that("olink_lmer_plot works", {
   vdiffr::expect_doppelganger('lmer plot', lmer_plot)
   vdiffr::expect_doppelganger('lmer plot more prots than space', lmer_plot_moreProts[[2]])
+  expect_length(unique(lmer_plot_excludedids[[1]]$data$OlinkID), 1)
 })
