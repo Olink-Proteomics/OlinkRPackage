@@ -124,20 +124,21 @@ npxProcessing_forDimRed <- function(df,
     dropped_assays.missingness <- NULL
   }
 
-  #### Impute remaing missing values by the assay median ####
-  if(any(percent_missingness <= PERCENT_CUTOFF & percent_missingness > 0)){
+  #### Impute remaining missing values by the assay median ####
+  if (any(percent_missingness <= PERCENT_CUTOFF & percent_missingness > 0)) {
 
-    imputed_assays_index <- which(percent_missingness <= PERCENT_CUTOFF & percent_missingness > 0)
+    imputed_assays_index <- which(percent_missingness <= PERCENT_CUTOFF &
+                                    percent_missingness > 0)
     percent_missingness <- percent_missingness[-imputed_assays_index]
 
     imputed_assays_index <- imputed_assays_index + 2
     imputed_assays <- colnames(df_wide)[imputed_assays_index]
 
     df_wide <- df_wide %>%
-      dplyr::mutate_at(tidyselect::all_of(imputed_assays),
-                       ~ifelse(is.na(.x), median(.x, na.rm = TRUE), .x))
+      dplyr::mutate(dplyr::across(all_of(imputed_assays),
+                       ~ ifelse(is.na(.x), median(.x, na.rm = TRUE), .x)))
 
-    if(verbose){
+    if (verbose) {
       warning(paste0("There are ",
                      paste0(length(imputed_assays)),
                      " assay(s) that were imputed by their medians."))

@@ -1,6 +1,6 @@
 set.seed(10)
 #Load reference results
-refRes_file <- '../data/refResults.RData'
+refRes_file <- here::here('tests/data/refResults.RData')
 load(refRes_file)
 
 pca_plot <- npx_data1 %>%
