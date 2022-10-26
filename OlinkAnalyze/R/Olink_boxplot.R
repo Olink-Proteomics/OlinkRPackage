@@ -81,12 +81,16 @@ olink_boxplot <- function(df,
                   '.'))
     }
   }
-
+  
+  # Exclude OlinkIDs with missing NPX
+  npx_check <- npxCheck(df)
+  
 
   #Filtering on valid OlinkID
   df <- df %>%
     dplyr::filter(stringr::str_detect(OlinkID,
-                                      "OID[0-9]{5}"))
+                                      "OID[0-9]{5}")) %>% 
+    dplyr::filter(!(OlinkID %in% npx_check$all_nas)) 
 
   #Column setup
   columns_for_npx_data <- c("OlinkID","UniProt","Assay", "NPX", eval(variable))
