@@ -42,3 +42,16 @@ test_that("npxProcessing_forDimRed works", {
   expect_null(procData_missingData$dropped_assays.na)
   expect_equal(procData_missingData$dropped_assays.missingness, c('OID00482', 'OID00483', 'OID00484', 'OID00485'))
 })
+
+#Load data with hidden/excluded assays (all NPX=NA)
+load(file = '../data/npx_data_format221010.RData')
+npx_Check <- suppressWarnings(npxCheck(npx_data_format221010))
+
+test_that("Assays with NA are removed in NPX check", {
+  na_oids<-npx_data_format221010 %>% 
+    dplyr::filter(is.na(NPX)) %>% 
+    dplyr::select(OlinkID) %>% 
+    dplyr::distinct()
+  expect_equal(sort(na_oids$OlinkID), sort(npx_Check$all_nas))
+})
+
