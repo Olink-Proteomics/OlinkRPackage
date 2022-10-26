@@ -1,4 +1,14 @@
-npxProcessing_forDimRed <- function(df, color_g, drop_assays, drop_samples, verbose){
+npxProcessing_forDimRed <- function(df,
+                                    color_g = "QC_Warning",
+                                    drop_assays = FALSE,
+                                    drop_samples = FALSE,
+                                    verbose = FALSE) {
+
+  # Sort order is dependent on locale -> set locale here to make code
+  # deterministic
+  old_collate <- Sys.getlocale("LC_COLLATE")
+  Sys.setlocale("LC_COLLATE", "C")
+
   #### Set up plotting colors ####
   if (color_g == "QC_Warning"){
     df_temp <- df %>%
@@ -149,6 +159,8 @@ npxProcessing_forDimRed <- function(df, color_g, drop_assays, drop_samples, verb
     dplyr::select(-Index, -colors) %>%
     tibble::column_to_rownames('SampleID') %>%
     as.matrix
+
+  Sys.setlocale("LC_COLLATE", old_collate)
 
   return(list(df_wide = df_wide,
               df_wide_matrix = df_wide_matrix,
