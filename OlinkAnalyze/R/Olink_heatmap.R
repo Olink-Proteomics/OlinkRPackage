@@ -81,11 +81,17 @@ olink_heatmap_plot <- function(df,
 
   #Save column classes
   col_classes <- sapply(df, "class")
-
+  
+  # Exclude OlinkIDs with missing NPX
+  npx_check <- npxCheck(df)
+  
+  
   #Filtering on valid OlinkID
-  df_temp<-df %>%
+  df_temp <- df %>%
     dplyr::filter(stringr::str_detect(OlinkID,
-                                      "OID[0-9]{5}"))
+                                      "OID[0-9]{5}")) %>% 
+    dplyr::filter(!(OlinkID %in% npx_check$all_nas)) 
+
 
   #Halt if muliple samplenames
   nr_dup<-df_temp %>%
