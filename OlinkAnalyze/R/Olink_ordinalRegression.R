@@ -24,18 +24,31 @@
 #' Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be inferred from main effects.
 #' @param return.covariates Logical. Default: False. Returns F-test results for the covariates. Note: Adjusted p-values will be NA for the covariates.
 #' @param verbose Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
-#'
 #' @return A tibble containing the ANOVA results for every protein.
 #' The tibble is arranged by ascending p-values.
+#'
+#' Columns include:
+#' \itemize{
+#'  \item{Assay:} "character" Protein symbol
+#'  \item{OlinkID:} "character" Olink specific ID
+#'  \item{UniProt:} "character" Olink specific ID
+#'  \item{Panel:} "character" Name of Olink Panel
+#'  \item{term:} "character" term in model
+#'  \item{statistic:} "numeric" value of the statistic
+#'  \item{p.value:} "numeric" nominal p-value
+#'  \item{Adjusted_pval:} "numeric" adjusted p-value for the test
+#'  \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
+#' }
+#'
 #' @export
 #' @examples \donttest{
 #' library(dplyr)
-#' npx_df <- npx_data1 %>% filter(!grepl('control',SampleID, ignore.case = TRUE))
 #'
 #' #Two-way Ordinal Regression with CLM.
 #' #Results in model NPX~Treatment+Time+Treatment:Time.
-#' ordinalRegression_results <- olink_ordinalRegression(df = npx_df,
-#'                              variable="Treatment:Time")}
+#' ordinalRegression_results <- olink_ordinalRegression(df = npx_data1,
+#'                                                      variable="Treatment:Time")}
+#'
 #' @importFrom dplyr filter group_by ungroup pull do select arrange mutate
 #' @importFrom stringr str_detect
 #' @importFrom rstatix convert_as_factor
@@ -45,23 +58,22 @@ olink_ordinalRegression <- function(df,
                                     variable,
                                     covariates = NULL,
                                     return.covariates=F,
-                                    verbose=T
-                                    ){
+                                    verbose=T){
   # Is Package installed
   if(!requireNamespace("ordinal", quietly = TRUE) ){
     stop("Ordinal Regression requires the ordinal package.
          Please install ordinal before continuing.")
   }
-  
+
   if(missing(df) | missing(variable)){
     stop('The df and variable arguments need to be specified.')
-    }
+  }
 
   withCallingHandlers({
     #Filtering on valid OlinkID
     df <- df %>%
       dplyr::filter(stringr::str_detect(OlinkID,
-                                 "OID[0-9]{5}"))
+                                        "OID[0-9]{5}"))
 
     #Allow for :/* notation in covariates
     variable <- gsub("\\*",":",variable)
@@ -73,13 +85,13 @@ olink_ordinalRegression <- function(df,
       tmp <- unlist(strsplit(covariates,":"))
       add.main.effects <- c(add.main.effects,setdiff(tmp,covariates))
       covariates <- union(covariates,add.main.effects)
-      }
+    }
     if(any(grepl(":",variable))){
       tmp <- unlist(strsplit(variable,":"))
       add.main.effects <- c(add.main.effects,setdiff(tmp,variable))
       variable <- union(variable,unlist(strsplit(variable,":")))
       variable <- variable[!grepl(":",variable)]
-      }
+    }
     #If variable is in both variable and covariate, keep it in variable or will get removed from final table
     covariates <- setdiff(covariates,variable)
     add.main.effects <- setdiff(add.main.effects, variable)
@@ -95,11 +107,13 @@ olink_ordinalRegression <- function(df,
     }
 
 
-    # # Check whether it is NPX or QUANT
+    ## Check whether it is NPX or QUANT
     if ('NPX' %in% colnames(df)) {
       data_type <- 'NPX'
+      df$NPX <- factor(df$NPX, ordered = TRUE)
     } else if ('Quantified_value' %in% colnames(df)) {
       data_type <- 'Quantified_value'
+      df$Quantified_value <- factor(df$Quantified_value, ordered = TRUE)
     } else {
       stop('The NPX or Quantified_value is not in the df.')}
 
@@ -117,7 +131,7 @@ olink_ordinalRegression <- function(df,
                      paste(all_nas, collapse = ', '),
                      ' have only NA:s. They will not be tested.'),
               call. = F)
-      }
+    }
 
     ##Convert character vars to factor
     converted.vars <- NULL
@@ -126,10 +140,10 @@ olink_ordinalRegression <- function(df,
       if(is.character(df[[i]])){
         df[[i]] <- factor(df[[i]])
         converted.vars <- c(converted.vars,i)
-        }else if(is.numeric(df[[i]])){
+      }else if(is.numeric(df[[i]])){
         warning(paste0('The variable ',i,' should not be as numeric'))
-        }
       }
+    }
 
     #Not testing assays that have all NA:s in one level
     #Every sample needs to have a unique level of the factor
@@ -164,7 +178,7 @@ olink_ordinalRegression <- function(df,
                        effect,
                        '. It will not be tested.'),
                 call. = F)
-        }
+      }
 
       number_of_samples_w_more_than_one_level <- df %>%
         dplyr::group_by(SampleID, Index) %>%
@@ -181,15 +195,15 @@ olink_ordinalRegression <- function(df,
                     effect,
                     ". Only one level per sample is allowed."))
       }
-      }
+    }
 
     if(!is.null(covariates)){
       formula_string <- paste0(data_type, "~",
                                paste(variable,collapse="*"),
                                "+",
                                paste(covariates, sep = '', collapse = '+'))
-      }else{
-        formula_string <- paste0(data_type, "~", paste(variable,collapse="*"))
+    }else{
+      formula_string <- paste0(data_type, "~", paste(variable,collapse="*"))
     }
 
     #Get factors
@@ -235,8 +249,8 @@ olink_ordinalRegression <- function(df,
       dplyr::mutate(!!data_type := rank(!!rlang::ensym(data_type))) %>%
       rstatix::convert_as_factor(!!rlang::ensym(data_type))%>%
       dplyr::do(generics::tidy(car::Anova(ordinal::clm(as.formula(formula_string),
-                            data=.,
-                            threshold = "symmetric"),type=2))) %>%
+                                                       data=.,
+                                                       threshold = "symmetric"),type=2))) %>%
       dplyr::ungroup() %>%
       dplyr::filter(!term %in% c('(Intercept)','Residuals')) %>%
       dplyr::mutate(covariates = term %in% covariate_filter_string) %>%
@@ -244,7 +258,7 @@ olink_ordinalRegression <- function(df,
       dplyr::mutate(Adjusted_pval=p.adjust(p.value,method="fdr")) %>%
       dplyr::mutate(Threshold  = ifelse(Adjusted_pval<0.05,"Significant","Non-significant")) %>%
       dplyr::mutate(Adjusted_pval = ifelse(covariates,NA,Adjusted_pval),
-             Threshold = ifelse(covariates,NA,Threshold)) %>%
+                    Threshold = ifelse(covariates,NA,Threshold)) %>%
       dplyr::ungroup()%>%
       dplyr::select(-covariates) %>%
       dplyr::select(Assay,OlinkID,UniProt,Panel,term,df,statistic,p.value,Adjusted_pval,Threshold) %>%
@@ -267,8 +281,8 @@ olink_ordinalRegression <- function(df,
 #'Performs a post hoc ANOVA test using emmeans::emmeans with Tukey p-value adjustment per assay (by OlinkID) for each panel at confidence level 0.95.
 #'See \code{olink_anova} for details of input notation. \cr\cr
 #'The function handles both factor and numerical variables and/or covariates.
-#'The posthoc test for a numerical variable compares the difference in means of the outcome variable (default: NPX) for 1 standard deviation difference in the numerical variable, e.g.
-#'mean NPX at mean(numerical variable) versus mean NPX at mean(numerical variable) + 1*SD(numerical variable).
+#'The posthoc test for a numerical variable compares the difference in means of the ordinal outcome variable (default: NPX) for 1 standard deviation difference in the numerical variable, e.g.
+#'mean ordinal NPX at mean(numerical variable) versus mean NPX at mean(numerical variable) + 1*SD(numerical variable).
 #'
 #' @param df NPX data frame in long format with at least protein name (Assay), OlinkID, UniProt, Panel and a factor with at least 3 levels.
 #' @param olinkid_list Character vector of OlinkID's on which to perform post hoc analysis. If not specified, all assays in df are used.
@@ -278,34 +292,48 @@ olink_ordinalRegression <- function(df,
 #' @param covariates Single character value or character array. Default: NULL.
 #' Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be inferred from main effects.
 #' @param effect Term on which to perform post-hoc. Character vector. Must be subset of or identical to variable.
+#' @param effect_formula (optional) A character vector specifying the names of the predictors over which estimated marginal means are desired as defined in the \code{emmeans} package. May also be a formula. If provided, this will override the \code{effect} argument. See \code{?emmeans::emmeans()} for more information.
+#' @param mean_return Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = TRUE and no adjustment is performed.
+#' @param post_hoc_padjust_method P-value adjustment method to use for post-hoc comparisons within an assay. Options include \code{tukey}, \code{sidak}, \code{bonferroni} and \code{none}.
 #' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
-#'
+#' 
 #' @return Tibble of posthoc tests for specified effect, arranged by ascending adjusted p-values.
+#'
+#' #' Columns include:
+#' \itemize{
+#'  \item{Assay:} "character" Protein symbol
+#'  \item{OlinkID:} "character" Olink specific ID
+#'  \item{UniProt:} "character" Olink specific ID
+#'  \item{Panel:} "character" Name of Olink Panel
+#'  \item{term:} "character" term in model
+#'  \item{contrast:} "character" the groups that were compared
+#'  \item{estimate:} "numeric" difference in mean of the ordinal NPX between groups
+#'  \item{Adjusted_pval:} "numeric" adjusted p-value for the test
+#'  \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
+#' }
+#' 
 #' @export
 #' @examples \donttest{
 #' library(dplyr)
-#' npx_df <- npx_data1 %>% filter(!grepl('control',SampleID, ignore.case = TRUE))
 #' #Two-way Ordinal Regression.
 #' #Results in model NPX~Treatment*Time.
-#' ordinalRegression_results <- olink_ordinalRegression(df = npx_df,
+#' ordinalRegression_results <- olink_ordinalRegression(df = npx_data1,
 #'                              variable="Treatment:Time")
 #'
 #' #Posthoc test for the model NPX~Treatment*Time,
 #' #on the interaction effect Treatment:Time.
 #'
-#' #Filtering out significant and relevant results.
-#' significant_assays <- ordinalRegression_results %>%
-#' filter(Threshold == 'Significant' & term == 'Treatment:Time') %>%
-#' select(OlinkID) %>%
-#' distinct() %>%
-#' pull()
-#'
 #' #Posthoc
-#' ordinalRegression_results_posthoc_results <- olink_ordinalRegression_posthoc(npx_df,
-#' variable=c("Treatment:Time"),
-#' covariates="Site",
-#' olinkid_list = significant_assays,
-#' effect = "Treatment:Time")}
+#' ordinalRegression_results_posthoc_results <- olink_ordinalRegression_posthoc(npx_data1,
+#'                                                    variable=c("Treatment:Time"),
+#'                                                    covariates="Site",
+#'                                                    olinkid_list = {ordinalRegression_results %>%
+#'                                                    filter(term == 'Treatment:Time') %>% 
+#'                                                    filter(Threshold == 'Significant') %>%
+#'                                                                  dplyr::select(OlinkID) %>%
+#'                                                                  distinct() %>%
+#'                                                                  pull()},
+#'                                                                  effect = "Treatment:Time")}
 #' @importFrom dplyr filter group_by ungroup pull do select arrange mutate
 #' @importFrom stringr str_detect
 #' @importFrom rstatix convert_as_factor
@@ -313,34 +341,36 @@ olink_ordinalRegression <- function(df,
 
 
 olink_ordinalRegression_posthoc <- function(df,
-                                olinkid_list = NULL,
-                                variable,
-                                covariates = NULL,
-                                effect,
-                                verbose=T
-                                ){
+                                            olinkid_list = NULL,
+                                            variable,
+                                            covariates = NULL,
+                                            effect,
+                                            effect_formula,
+                                            mean_return = FALSE,
+                                            post_hoc_padjust_method="tukey",
+                                            verbose=T){
+
   if(!requireNamespace("ordinal", quietly = TRUE) ){
     stop("Ordinal Regression requires the ordinal package.
          Please install ordinal before continuing.")
   }
-  
-  
+
+
   if(missing(df) | missing(variable) | missing(effect)){
     stop('The df and variable and effect arguments need to be specified.')
-    }
+  }
 
   tmp <- unique(unlist(strsplit(effect,":")))
   if(!all(tmp %in% unique(unlist(strsplit(variable,"[\\*:]"))))) {
     stop("All effect terms must be included in the variable argument.")
-    }
-
+  }
 
   withCallingHandlers({
 
     #Filtering on valid OlinkID
     df <- df %>%
       dplyr::filter(stringr::str_detect(OlinkID,
-                                 "OID[0-9]{5}"))
+                                        "OID[0-9]{5}"))
 
     if(is.null(olinkid_list)){
       olinkid_list <- df %>%
@@ -349,11 +379,13 @@ olink_ordinalRegression_posthoc <- function(df,
         dplyr::pull()
     }
 
-    # # Check whether it is NPX or QUANT
+    ## Check whether it is NPX or QUANT
     if ('NPX' %in% colnames(df)) {
       data_type <- 'NPX'
+      df$NPX <- factor(df$NPX, ordered = TRUE)
     } else if ('Quantified_value' %in% colnames(df)) {
       data_type <- 'Quantified_value'
+      df$Quantified_value <- factor(df$Quantified_value, ordered = TRUE)
     } else {
       stop('The NPX or Quantified_value is not in the df.')}
 
@@ -398,7 +430,6 @@ olink_ordinalRegression_posthoc <- function(df,
       }
     }
 
-
     if(!is.null(covariates)){
       formula_string <- paste0(data_type, "~",
                                paste(variable,collapse="*"),
@@ -433,7 +464,11 @@ olink_ordinalRegression_posthoc <- function(df,
       message(paste("Means estimated for each assay from ANOVA model: ",formula_string))
     }
 
-
+    if(!missing(effect_formula)){
+      e_form <- as.formula(effect_formula)
+    } else if(missing(effect_formula)){
+      e_form <- as.formula(paste0("pairwise~", paste(effect,collapse="+")))
+    }
 
     anova_posthoc_results <- df %>%
       dplyr::filter(OlinkID %in% olinkid_list) %>%
@@ -441,32 +476,32 @@ olink_ordinalRegression_posthoc <- function(df,
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
       dplyr::mutate(!!data_type := rank(!!rlang::ensym(data_type)))%>%
       rstatix::convert_as_factor(!!rlang::ensym(data_type))%>%
-      dplyr::do(data.frame(summary(emmeans::emmeans(ordinal::clm(as.formula(formula_string),data=.),
-                                    specs=as.formula(paste0("pairwise~", paste(effect,collapse="+"))),
-                                    cov.reduce = function(x) round(c(mean(x),mean(x)+sd(x)),4)),
-                            infer=c(T,T),
-                            adjust="tukey")[[c("contrasts","emmeans")[1]]],
-                    stringsAsFactors=F)) %>%
+      dplyr::do(data.frame(emmeans::emmeans(ordinal::clm(as.formula(formula_string),data=.),
+                                                    specs=e_form,
+                                                    cov.reduce = function(x) round(c(mean(x),mean(x)+sd(x)),4),
+                                   infer=c(TRUE,TRUE),
+                                   adjust=post_hoc_padjust_method)[[c("contrasts","emmeans")[1+as.numeric(mean_return)]]],
+                           stringsAsFactors=FALSE)) %>%
       dplyr::ungroup()%>%
       dplyr::mutate(term=paste(effect,collapse=":"))
 
 
 
-      anova_posthoc_results <- anova_posthoc_results %>%
-        dplyr::rename(Adjusted_pval = p.value) %>%
-        dplyr::arrange(Adjusted_pval) %>%
-        dplyr::mutate(Threshold = if_else(Adjusted_pval < 0.05,
-                                   'Significant',
-                                   'Non-significant')) %>%
-        dplyr::select(Assay, OlinkID, UniProt, Panel, term,contrast, estimate, Adjusted_pval,Threshold)
+    anova_posthoc_results <- anova_posthoc_results %>%
+      dplyr::rename(Adjusted_pval = p.value) %>%
+      dplyr::arrange(Adjusted_pval) %>%
+      dplyr::mutate(Threshold = if_else(Adjusted_pval < 0.05,
+                                        'Significant',
+                                        'Non-significant')) %>%
+      dplyr::select(Assay, OlinkID, UniProt, Panel, term,contrast, estimate, Adjusted_pval,Threshold)
 
 
     return(anova_posthoc_results)
-      }, warning = function(w) {
+  }, warning = function(w) {
     if (grepl(x = w, pattern = glob2rx("*contains implicit NA, consider using*")))
       invokeRestart("muffleWarning")
-      })
-  }
+  })
+}
 
 
 

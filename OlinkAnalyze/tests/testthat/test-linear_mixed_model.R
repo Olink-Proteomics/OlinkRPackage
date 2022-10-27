@@ -1,3 +1,5 @@
+skip_on_cran()
+
 #Load reference results
 refRes_file <- '../data/refResults.RData'
 load(refRes_file)
@@ -62,7 +64,6 @@ test_that("olink_lmer_posthoc works", {
 })
 
 test_that("olink_lmer_plot works", {
-  skip_on_ci()
   vdiffr::expect_doppelganger('lmer plot', lmer_plot)
   vdiffr::expect_doppelganger('lmer plot more prots than space', lmer_plot_moreProts[[2]])
 })

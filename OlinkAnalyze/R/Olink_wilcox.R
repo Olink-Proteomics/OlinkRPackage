@@ -11,6 +11,25 @@
 #' @param pair_id Character value indicating which column indicates the paired sample identifier.
 #' @param ... Options to be passed to wilcox.test. See \code{?wilcox_test} for more information.
 #' @return A data frame containing the Mann-Whitney U Test results for every protein.
+#'
+#' Columns include:
+#' \itemize{
+#'  \item{Assay:} "character" Protein symbol
+#'  \item{OlinkID:} "character" Olink specific ID
+#'  \item{UniProt:} "character" Olink specific ID
+#'  \item{Panel:} "character" Name of Olink Panel
+#'  \item{estimate:} "numeric" difference in mean NPX between groups
+#'  \item{statistic:} "named numeric" ehe value of the test statistic with a name describing it
+#'  \item{p.value:} "numeric" p-value for the test
+#'  \item{parameter:} "named numeric" degrees of freedom for the t-statistic
+#'  \item{conf.low:} "numeric" confidence interval for the mean (lower end)
+#'  \item{conf.high:} "numeric" confidence interval for the mean (upper end)
+#'  \item{method:} "character" which wilcoxon method was used
+#'  \item{alternative:} "character" describes the alternative hypothesis
+#'  \item{Adjusted_pval:} "numeric" adjusted p-value for the test (Benjamini&Hochberg)
+#'  \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
+#' }
+#'
 #' @export
 #' @examples \donttest{
 #'
@@ -27,6 +46,7 @@
 #'    filter(Time %in% c("Baseline","Week.6")) %>%
 #'    olink_wilcox(variable = "Time", pair_id = "Subject")
 #'}
+
 #' @importFrom magrittr %>%
 #' @importFrom dplyr n group_by summarise n_distinct ungroup filter as_tibble select mutate pull all_of rename arrange do
 #' @importFrom stringr str_detect
@@ -170,16 +190,23 @@ olink_wilcox <- function(df, variable, pair_id, ...){
     p.val <- df %>%
       dplyr::filter(!(OlinkID %in% all_nas)) %>%
       dplyr::filter(!(OlinkID %in% nas_in_level)) %>%
-      dplyr::select(all_of(c("OlinkID","UniProt","Assay","Panel",data_type,variable,pair_id))) %>%
-      tidyr::pivot_wider(names_from=all_of(variable),values_from=data_type) %>%
+      dplyr::select(all_of(c("OlinkID", "UniProt", "Assay", "Panel", data_type,
+                             variable, pair_id))) %>%
+      tidyr::pivot_wider(names_from = all_of(variable),
+                         values_from = all_of(data_type)) %>%
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
-      dplyr::do(tidy(stats::wilcox.test(x=.[[var_levels[1]]],y=.[[var_levels[2]]],paired=T, ...))) %>%
+      dplyr::do(tidy(stats::wilcox.test(x = .[[var_levels[1]]],
+                                        y = .[[var_levels[2]]],
+                                        paired = TRUE,
+                                        ...))) %>%
       dplyr::ungroup() %>%
       dplyr::mutate(Adjusted_pval = p.adjust(p.value, method = "fdr")) %>%
-      dplyr::mutate(Threshold = ifelse(Adjusted_pval < 0.05, "Significant", "Non-significant")) %>%
+      dplyr::mutate(Threshold = ifelse(Adjusted_pval < 0.05,
+                                       "Significant",
+                                       "Non-significant")) %>%
       dplyr::arrange(p.value)
 
-  }else{
+  } else {
 
 
     message(paste0('Mann-Whitney U Test is performed on ', var_levels[1], ' - ', var_levels[2], '.'))
