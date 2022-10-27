@@ -169,16 +169,23 @@ olink_wilcox <- function(df, variable, pair_id, ...){
     p.val <- df %>%
       dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>%
       dplyr::filter(!(OlinkID %in% nas_in_level)) %>%
-      dplyr::select(all_of(c("OlinkID","UniProt","Assay","Panel",data_type,variable,pair_id))) %>%
-      tidyr::pivot_wider(names_from=all_of(variable),values_from=data_type) %>%
+      dplyr::select(all_of(c("OlinkID", "UniProt", "Assay", "Panel", data_type,
+                             variable, pair_id))) %>%
+      tidyr::pivot_wider(names_from = all_of(variable),
+                         values_from = all_of(data_type)) %>%
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
-      dplyr::do(tidy(stats::wilcox.test(x=.[[var_levels[1]]],y=.[[var_levels[2]]],paired=T, ...))) %>%
+      dplyr::do(tidy(stats::wilcox.test(x = .[[var_levels[1]]],
+                                        y = .[[var_levels[2]]],
+                                        paired = TRUE,
+                                        ...))) %>%
       dplyr::ungroup() %>%
       dplyr::mutate(Adjusted_pval = p.adjust(p.value, method = "fdr")) %>%
-      dplyr::mutate(Threshold = ifelse(Adjusted_pval < 0.05, "Significant", "Non-significant")) %>%
+      dplyr::mutate(Threshold = ifelse(Adjusted_pval < 0.05,
+                                       "Significant",
+                                       "Non-significant")) %>%
       dplyr::arrange(p.value)
 
-  }else{
+  } else {
 
 
     message(paste0('Mann-Whitney U Test is performed on ', var_levels[1], ' - ', var_levels[2], '.'))

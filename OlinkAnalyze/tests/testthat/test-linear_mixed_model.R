@@ -1,5 +1,8 @@
 skip_on_cran()
 
+# Suppress messages
+sink(file = file(tempfile(), open = "wt"), type = "message")
+
 #Load reference results
 refRes_file <- '../data/refResults.RData'
 load(refRes_file)

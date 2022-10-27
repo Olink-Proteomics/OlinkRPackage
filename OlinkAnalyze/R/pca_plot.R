@@ -113,7 +113,6 @@ olink_pca_plot <- function (df,
   df <- df %>%
     dplyr::filter(stringr::str_detect(OlinkID,
                                       "OID[0-9]{5}"))
-
   #Check data format
   npxCheck <- npxCheck(df)
   df <- df %>% dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) #Exclude assays that have all NA:s
@@ -190,21 +189,90 @@ olink_pca_plot <- function (df,
   return(invisible(plotList))
 }
 
-olink_pca_plot.internal <- function (df,
-                                     color_g = "QC_Warning",
-                                     x_val = 1,
-                                     y_val = 2,
-                                     label_samples = FALSE,
-                                     drop_assays = FALSE,
-                                     drop_samples = FALSE,
-                                     n_loadings = 0,
-                                     loadings_list = NULL,
-                                     outlierDefX,
-                                     outlierDefY,
-                                     outlierLines,
-                                     label_outliers,
-                                     verbose = TRUE,
-                                     ...){
+
+olink_calculate_pca <- function(procData,
+                                x_val = 1,
+                                y_val = 2,
+                                outlierDefX = NA,
+                                outlierDefY = NA) {
+
+  #### PCA ####
+  pca_fit <- stats::prcomp(procData$df_wide_matrix,
+                           scale. = TRUE, center = TRUE)
+
+  #Standardizing and selecting components
+  scaling_factor_lambda <- pca_fit$sdev * sqrt(nrow(procData$df_wide_matrix))
+
+  PCX <- pca_fit$x[, x_val] / scaling_factor_lambda[x_val]
+  PCY <- pca_fit$x[, y_val] / scaling_factor_lambda[y_val]
+  PoV <- pca_fit$sdev^2 / sum(pca_fit$sdev^2)
+  LX <- pca_fit$rotation[, x_val]
+  LY <- pca_fit$rotation[, y_val]
+
+
+  # Sort order is dependent on locale -> set locale here to make code
+  # deterministic
+  old_collate <- Sys.getlocale("LC_COLLATE")
+  Sys.setlocale("LC_COLLATE", "C")
+
+  scores <- data.frame(cbind(PCX, PCY)) %>%
+    tibble::rownames_to_column() %>%
+    dplyr::arrange(rowname, .locale = "C") %>%
+    tibble::column_to_rownames()
+  loadings <- data.frame(variables = rownames(pca_fit$rotation), LX, LY)
+
+  Sys.setlocale("LC_COLLATE", old_collate)
+
+
+  range_PX <- c(-abs(min(PCX, na.rm = TRUE)), abs(max(PCX, na.rm = TRUE)))
+  range_PY <- c(-abs(min(PCY, na.rm = TRUE)), abs(max(PCY, na.rm = TRUE)))
+  range_LX <- c(-abs(min(LX, na.rm = TRUE)), abs(max(LX, na.rm = TRUE)))
+  range_LY <- c(-abs(min(LY, na.rm = TRUE)), abs(max(LY, na.rm = TRUE)))
+
+  loadings_scaling_factor <- 0.8 / max(range_LX / range_PX, range_LY / range_PY)
+
+  #Identify outliers
+  if (!is.na(outlierDefX) && !is.na(outlierDefY)) {
+    scores <- scores %>%
+      tibble::rownames_to_column(var = "SampleID") %>%
+      dplyr::mutate(PCX_low = mean(PCX, na.rm = TRUE) -
+                      outlierDefX * sd(PCX, na.rm = TRUE),
+                    PCX_high = mean(PCX, na.rm = TRUE) +
+                      outlierDefX * sd(PCX, na.rm = TRUE),
+                    PCY_low = mean(PCY, na.rm = TRUE) -
+                      outlierDefY * sd(PCY, na.rm = TRUE),
+                    PCY_high = mean(PCY, na.rm = TRUE) +
+                      outlierDefY * sd(PCY, na.rm = TRUE)) %>%
+      dplyr::mutate(Outlier = dplyr::if_else(PCX < PCX_high &
+                                               PCX > PCX_low &
+                                               PCY > PCY_low &
+                                               PCY < PCY_high,
+                                             0, 1))
+  }
+
+
+  return(list(scores = scores,
+              loading = loadings,
+              loadings_scaling_factor = loadings_scaling_factor,
+              PoV = PoV))
+}
+
+
+olink_pca_plot.internal <- function(df,
+                                    color_g = "QC_Warning",
+                                    x_val = 1,
+                                    y_val = 2,
+                                    label_samples = FALSE,
+                                    drop_assays = FALSE,
+                                    drop_samples = FALSE,
+                                    n_loadings = 0,
+                                    loadings_list = NULL,
+                                    outlierDefX,
+                                    outlierDefY,
+                                    outlierLines,
+                                    label_outliers,
+                                    verbose = TRUE,
+                                    ...) {
 
   #Data pre-processing
   procData <- npxProcessing_forDimRed(df = df,
@@ -249,48 +317,23 @@ olink_pca_plot.internal <- function (df,
     }
   }
 
-  #### PCA ####
-  pca_fit <- stats::prcomp(procData$df_wide_matrix, scale. = TRUE, center = TRUE)
-
-  #Standardizing and selecting components
-  scaling_factor_lambda <- pca_fit$sdev*sqrt(nrow(procData$df_wide_matrix))
-
-  PCX <- pca_fit$x[,x_val]/scaling_factor_lambda[x_val]
-  PCY <- pca_fit$x[,y_val]/scaling_factor_lambda[y_val]
-  PoV <- pca_fit$sdev^2/sum(pca_fit$sdev^2)
-  LX <- pca_fit$rotation[, x_val]
-  LY <- pca_fit$rotation[, y_val]
 
   observation_names <- procData$df_wide$SampleID
   observation_colors <- procData$df_wide$colors
 
-  scores <- data.frame(cbind(PCX, PCY))
-  loadings <- data.frame(variables = rownames(pca_fit$rotation), LX, LY)
+  #### PCA ####
+  pca_results <- olink_calculate_pca(procData = procData,
+                                     x_val = x_val,
+                                     y_val = y_val,
+                                     outlierDefX = outlierDefX,
+                                     outlierDefY = outlierDefY)
 
-  range_PX <- c(-abs(min(PCX, na.rm = TRUE)), abs(max(PCX, na.rm = TRUE)))
-  range_PY <- c(-abs(min(PCY, na.rm = TRUE)), abs(max(PCY, na.rm = TRUE)))
-  range_LX <- c(-abs(min(LX, na.rm = TRUE)), abs(max(LX, na.rm = TRUE)))
-  range_LY <- c(-abs(min(LY, na.rm = TRUE)), abs(max(LY, na.rm = TRUE)))
-
-  loadings_scaling_factor <- 0.8/max(range_LX/range_PX, range_LY/range_PY)
-
-  #Identify outliers
-  if(!is.na(outlierDefX) & !is.na(outlierDefY)){
-    scores <- scores %>%
-      tibble::rownames_to_column(var = 'SampleID') %>%
-      dplyr::mutate( PCX_low = mean(PCX, na.rm = TRUE) - outlierDefX*sd(PCX, na.rm = TRUE),
-                     PCX_high = mean(PCX, na.rm = TRUE) + outlierDefX*sd(PCX, na.rm = TRUE),
-                     PCY_low = mean(PCY, na.rm = TRUE) - outlierDefY*sd(PCY, na.rm = TRUE),
-                     PCY_high = mean(PCY, na.rm = TRUE) + outlierDefY*sd(PCY, na.rm = TRUE)) %>%
-      dplyr::mutate(Outlier = dplyr::if_else(PCX < PCX_high &
-                                               PCX > PCX_low &
-                                               PCY > PCY_low &
-                                               PCY < PCY_high,
-                                             0, 1))
-  }
+  scores <- pca_results$scores
+  loadings <- pca_results$loading
+  loadings_scaling_factor <- pca_results$loadings_scaling_factor
+  PoV <- pca_results$PoV
 
   #Plotting
-
   pca_plot <- ggplot2::ggplot(scores, ggplot2::aes(x = PCX, y = PCY)) +
     ggplot2::xlab(paste0("PC", x_val,  " (", round(PoV[x_val]*100, digits = 2), "%)")) +
     ggplot2::ylab(paste0("PC", y_val, " (", round(PoV[y_val]*100, digits = 2), "%)"))
@@ -404,3 +447,4 @@ olink_pca_plot.internal <- function (df,
 
 
 }
+

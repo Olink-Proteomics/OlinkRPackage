@@ -9,7 +9,7 @@ dat <- npx_data1 %>%
          group = ifelse(SampleID %in% outGroup, 'A', 'B'))
 
 #Run UMAP and cluster the results
-umap_plot <- olink_umap_plot(dat, color_g = 'group') #UMAP
+umap_plot <- olink_umap_plot(dat, color_g = 'group', quiet = TRUE) #UMAP
 umap_plot.cl <- kmeans(umap_plot[[1]]$data, centers = 2) #Cluster umap results
 
 #Get the samples in the smallest cluster
