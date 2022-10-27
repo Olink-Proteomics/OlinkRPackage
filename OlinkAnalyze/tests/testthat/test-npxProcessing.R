@@ -1,5 +1,5 @@
 #Load reference results
-refRes_file <- here::here('tests/data/refResults.RData')
+refRes_file <- testthat::test_path("../data/refResults.RData")
 load(refRes_file)
 
 npx_data1.uniqIDs <- npx_data1 %>%
@@ -48,9 +48,9 @@ load(file = '../data/npx_data_format221010.RData')
 npx_Check <- suppressWarnings(npxCheck(npx_data_format221010))
 
 test_that("Assays with NA are removed in NPX check", {
-  na_oids<-npx_data_format221010 %>% 
-    dplyr::filter(is.na(NPX)) %>% 
-    dplyr::select(OlinkID) %>% 
+  na_oids<-npx_data_format221010 %>%
+    dplyr::filter(is.na(NPX)) %>%
+    dplyr::select(OlinkID) %>%
     dplyr::distinct()
   expect_equal(sort(na_oids$OlinkID), sort(npx_Check$all_nas))
 })

@@ -1,6 +1,6 @@
 set.seed(10)
 #Load reference results
-refRes_file <- here::here('tests/data/refResults.RData')
+refRes_file <- testthat::test_path('../data/refResults.RData')
 load(refRes_file)
 
 #Load data with hidden/excluded assays (all NPX=NA)
