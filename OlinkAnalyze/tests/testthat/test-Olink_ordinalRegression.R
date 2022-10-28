@@ -45,4 +45,6 @@ test_that("olink_ordinalRegression_posthoc works", {
                                       dplyr::filter(term == 'Treatment:Time') %>%
                                       dplyr::filter(Threshold == 'Significant') %>%
                                       dplyr::pull(OlinkID)})) # no effect specified
+
+  expect_warning(olink_ordinalRegression_posthoc(npx_data_format221010, variable = 'treatment2', effect = 'treatment2')) # data with all NPX=NA for some assays
 })

@@ -363,15 +363,9 @@ olink_ordinalRegression_posthoc <- function(df,
         dplyr::pull()
     }
 
-    ## Check whether it is NPX or QUANT
-    if ('NPX' %in% colnames(df)) {
-      data_type <- 'NPX'
-      df$NPX <- factor(df$NPX, ordered = TRUE)
-    } else if ('Quantified_value' %in% colnames(df)) {
-      data_type <- 'Quantified_value'
-      df$Quantified_value <- factor(df$Quantified_value, ordered = TRUE)
-    } else {
-      stop('The NPX or Quantified_value is not in the df.')}
+    #Check data format
+    npxCheck <- npxCheck(df)
+    data_type <- npxCheck$data_type #Temporary fix to avoid issues with rlang::ensym downstream
 
 
     #Allow for :/* notation in covariates
@@ -456,6 +450,7 @@ olink_ordinalRegression_posthoc <- function(df,
 
     anova_posthoc_results <- df %>%
       dplyr::filter(OlinkID %in% olinkid_list) %>%
+      dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>% #Exclude assays where all samples have NPX=NA
       dplyr::mutate(OlinkID = factor(OlinkID, levels = olinkid_list)) %>%
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
       dplyr::mutate(!!data_type := rank(!!rlang::ensym(data_type)))%>%
