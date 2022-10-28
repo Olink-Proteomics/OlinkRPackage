@@ -25,7 +25,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-
 Olink® NPX datasets are normalized datasets using either plate control
 normalization or intensity normalization methods. Intensity
 normalization method assumes that all samples within a project are fully
@@ -57,19 +56,22 @@ library(kableExtra)
 
 
 ```{r brnrtab, message=FALSE, echo=FALSE}
-data.frame(Platform = c("Explore 1536",
+data.frame(Platform = c("Target 96",
+                         "Explore 1536",
                         "Explore Expansion"),
            BridgingSamples = c("8-16",
+                               "8-16",
                               "16-24")) %>%
   kbl(booktabs = TRUE,
       digits = 2,
-      caption = "Reommended number of bridging samples for Olink platforms") %>%
+      caption = "Recommended number of bridging samples for Olink platforms") %>%
   kable_styling(bootstrap_options = "striped",
                 full_width = FALSE,
                 position = "center",
                 latex_options = "HOLD_position")
 
 ```
+
 The following tutorial is designed to give you an overview of the kinds
 of data combining methods that are possible using the Olink® bridging
 procedure. Before starting bridging, it is important to check if the 
@@ -77,14 +79,6 @@ same sample IDs were assigned to the bridging samples.
 
 
 ## Setup bridging datasets
-
-```{r setup, eval=FALSE, echo=T}
-library(OlinkAnalyze)
-library(dplyr)
-library(stringr)
-library(ggplot2)
-library(kableExtra)
-```
 
 Bridging datasets are standard Olink® NPX tables. They can be loaded using 
 `read_NPX()` function with NPX manager output file as input.
@@ -181,7 +175,6 @@ OlinkAnalyze::olink_pca_plot(df          = npx_before_br,
 ```
 
 
-
 ## Perform bridging between two data sets
 
 We can use `olink_normalization()` function to bridge two datasets. The bridging 
@@ -197,7 +190,7 @@ NPX value in the column `NPX`.
 
 `olink_normalization()` uses the information from column `Project` to distinguish 
 between reference dataset from the other dataset. It is up to the user to define 
-which dataset is the reference dataset.
+which dataset is the reference dataset and specify the names of the bridge samples.
 
 ```{r bridging, message=FALSE}
 # Find shared samples
@@ -224,7 +217,6 @@ glimpse(npx_br_data)
 
 ## Perform evaluation of bridging normalization
 
-
 First, check NPX distribution in datasets after bridging normalization.
 
 ```{r densitybr, message=FALSE}
@@ -246,7 +238,7 @@ npx_br_data %>%
 
 ``` 
 
-Then summarize number of assays that have adjustment factors in certain ranges.
+Then summarize number of assays that have adjustment factors in certain ranges. High adjustment factors can result from variations between projects, such as panel versions or technical modifications. Such assays can be visualized individually with violin plots and may warrant further investigation to confirm they are still comparable between projects.
 
 ```{r tbl_adj_fct, message=FALSE}
 breaks <- c(-Inf, -1, -0.25, 0.25, 1, Inf)
