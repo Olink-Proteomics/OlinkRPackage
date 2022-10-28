@@ -60,15 +60,14 @@ library(kableExtra)
 data.frame(Platform = c("Explore 1536",
                         "Explore Expansion"),
            BridgingSamples = c("8-16",
-                              "16-24")) %>% 
-  kbl(booktabs = T,
+                              "16-24")) %>%
+  kbl(booktabs = TRUE,
       digits = 2,
       caption = "Reommended number of bridging samples for Olink platforms") %>%
-  kable_styling(bootstrap_options = "striped", 
-                full_width = F, 
+  kable_styling(bootstrap_options = "striped",
+                full_width = FALSE,
                 position = "center",
                 latex_options = "HOLD_position")
-
 
 ```
 The following tutorial is designed to give you an overview of the kinds
@@ -105,28 +104,28 @@ example, plot and compare NPX distribution between datasets.
 
 ```{r check, message=FALSE}
 # Load datasets
-npx_1 <- npx_data1 %>% 
-  filter(!str_detect(SampleID, 'CONTROL_SAMPLE')) %>% #Remove control samples
+npx_1 <- npx_data1 %>%
+  filter(!str_detect(SampleID, "CONTROL_SAMPLE")) %>% #Remove control samples
   mutate(dataset = "data1")
-npx_2 <- npx_data2 %>% 
-  filter(!str_detect(SampleID, 'CONTROL_SAMPLE')) %>% #Remove control samples
+npx_2 <- npx_data2 %>%
+  filter(!str_detect(SampleID, "CONTROL_SAMPLE")) %>% #Remove control samples
   mutate(dataset = "data2")
 
-npx_df <- bind_rows(npx_1,npx_2)
+npx_df <- bind_rows(npx_1, npx_2)
 
 
 # Plot NPX density before bridging normalization
-npx_df %>% 
-  mutate(Panel = gsub("Olink ", "", Panel)) %>% 
+npx_df %>%
+  mutate(Panel = gsub("Olink ", "", Panel)) %>%
   ggplot(aes(x = NPX, fill = dataset)) +
-  geom_density(alpha = 0.7) + 
+  geom_density(alpha = 0.7) +
   facet_grid(~Panel) +
-  olink_fill_discrete(coloroption = c('teal','yellow')) +
-  set_plot_theme() + 
+  olink_fill_discrete(coloroption = c("teal", "yellow")) +
+  set_plot_theme() +
   ggtitle("Before bridging normalization: NPX distribution") +
   theme(axis.title.x = element_blank(),
         axis.title.y = element_blank(),
-        strip.text = element_text(size=16),
+        strip.text = element_text(size = 16),
         legend.title = element_blank(),
         legend.position = "top")
 ```  
@@ -137,46 +136,47 @@ Use PCA plot to visualize sample-to-sample distance before bridging. Typically t
 ## before bridging
 
 #### Extract bridging samples
-npx_1 <- npx_data1 %>% 
+npx_1 <- npx_data1 %>%
   mutate(dataset = "data1")
-npx_2 <- npx_data2 %>% 
+npx_2 <- npx_data2 %>%
   mutate(dataset = "data2")
 
-overlap_samples <- intersect(npx_1$SampleID, npx_2$SampleID) %>% 
-  data.frame() %>% 
-  filter(!str_detect(., 'CONTROL_SAMPLE')) %>% #Remove control samples
+overlap_samples <- intersect(npx_1$SampleID, npx_2$SampleID) %>%
+  data.frame() %>%
+  filter(!str_detect(., "CONTROL_SAMPLE")) %>% #Remove control samples
   pull(.)
 
 
 ### Generate unique SampleIDs
-npx_1 <- npx_data1 %>% 
+npx_1 <- npx_data1 %>%
   mutate(dataset  = "data1",
          SampleID = paste0(dataset, PlateID, SampleID))
 
-br_1 <- npx_data1 %>% 
-  mutate(dataset = "data1") %>% 
-  filter(SampleID %in% overlap_samples) %>% 
+br_1 <- npx_data1 %>%
+  mutate(dataset = "data1") %>%
+  filter(SampleID %in% overlap_samples) %>%
   mutate(SampleID = paste0(dataset, PlateID, SampleID))
-  
-npx_2 <- npx_data2 %>% 
+
+npx_2 <- npx_data2 %>%
   mutate(dataset  = "data2",
          SampleID = paste0(dataset, PlateID, SampleID))
 
-br_2 <- npx_data2 %>% 
-  mutate(dataset = "data2") %>% 
-  filter(SampleID %in% overlap_samples) %>% 
+br_2 <- npx_data2 %>%
+  mutate(dataset = "data2") %>%
+  filter(SampleID %in% overlap_samples) %>%
   mutate(SampleID = paste0(dataset, PlateID, SampleID))
 
-npx_before_br <- rbind(npx_1, npx_2) %>% 
-  mutate(datatype = ifelse(SampleID %in% c(br_1$SampleID, br_2$SampleID), "bridges", dataset))
+npx_before_br <- rbind(npx_1, npx_2) %>%
+  mutate(datatype = ifelse(SampleID %in% c(br_1$SampleID, br_2$SampleID),
+                           "bridges", dataset))
 
 
 
 ### PCA plot
 OlinkAnalyze::olink_pca_plot(df          = npx_before_br,
-                             color_g     = "datatype", 
-                             byPanel     = TRUE, 
-                             coloroption = c("green",'orange', 'darkblue')) 
+                             color_g     = "datatype",
+                             byPanel     = TRUE,
+                             coloroption = c("green", "orange", "darkblue"))
 
 ```
 
@@ -201,22 +201,23 @@ which dataset is the reference dataset.
 
 ```{r bridging, message=FALSE}
 # Find shared samples
-npx_1 <- npx_data1 %>% 
+npx_1 <- npx_data1 %>%
   mutate(dataset = "data1")
-npx_2 <- npx_data2 %>% 
+npx_2 <- npx_data2 %>%
   mutate(dataset = "data2")
 
-overlap_samples <- intersect(npx_1$SampleID, npx_2$SampleID) %>% 
-  data.frame() %>% 
-  filter(!str_detect(., 'CONTROL_SAMPLE')) %>% #Remove control samples
+overlap_samples <- intersect(npx_1$SampleID, npx_2$SampleID) %>%
+  data.frame() %>%
+  filter(!str_detect(., "CONTROL_SAMPLE")) %>% #Remove control samples
   pull(.)
+
 # Perform Bridging normalization
-npx_br_data <- olink_normalization(df1                     = npx_1, 
-                                   df2                     = npx_2, 
+npx_br_data <- olink_normalization(df1                     = npx_1,
+                                   df2                     = npx_2,
                                    overlapping_samples_df1 = overlap_samples,
-                                   df1_project_nr          = '20200001',
-                                   df2_project_nr          = '20200002',
-                                   reference_project       = '20200001')
+                                   df1_project_nr          = "20200001",
+                                   df2_project_nr          = "20200002",
+                                   reference_project       = "20200001")
 glimpse(npx_br_data)
 
 ```
@@ -229,17 +230,17 @@ First, check NPX distribution in datasets after bridging normalization.
 ```{r densitybr, message=FALSE}
 # Plot NPX density after bridging normalization
 
-npx_br_data %>% 
-  mutate(Panel = gsub("Olink ", "", Panel)) %>% 
+npx_br_data %>%
+  mutate(Panel = gsub("Olink ", "", Panel)) %>%
   ggplot(aes(x = NPX, fill = dataset)) +
-  geom_density(alpha = 0.7) + 
+  geom_density(alpha = 0.7) +
   facet_grid(~Panel) +
-  olink_fill_discrete(coloroption = c('teal','yellow')) +
-  set_plot_theme() + 
+  olink_fill_discrete(coloroption = c("teal", "yellow")) +
+  set_plot_theme() +
   ggtitle("After bridging normalization: NPX distribution") +
   theme(axis.title.x = element_blank(),
         axis.title.y = element_blank(),
-        strip.text = element_text(size=16),
+        strip.text = element_text(size = 16),
         legend.title = element_blank(),
         legend.position = "top")
 
@@ -251,30 +252,34 @@ Then summarize number of assays that have adjustment factors in certain ranges.
 breaks <- c(-Inf, -1, -0.25, 0.25, 1, Inf)
 labels <- c("[< -1]", "(-1,-0.25]", "(-0.25,0.25]", "(0.25,1]", "(>1]")
 
-reference_project <- '20200001' # reference project defined in bridging normalization
-npx_br_data %>% 
-  mutate(Panel = gsub("Olink ", "", Panel)) %>% 
-  filter(Project != reference_project) %>% # remove adjustment factors from reference project.
-  mutate(group = cut(Adj_factor, breaks = breaks, 
-            labels = labels)) %>% 
-  select(OlinkID, Adj_factor, Panel, group) %>% 
-  distinct() %>% 
-  group_by(Panel, group) %>% tally() %>% 
-  tidyr::pivot_wider(names_from = group, values_from = n) %>% 
-  tibble::column_to_rownames(var = "Panel") %>% 
-  relocate(any_of(labels)) %>% 
-  kbl(booktabs = T,
+# reference project defined in bridging normalization
+reference_project <- "20200001"
+npx_br_data %>%
+  mutate(Panel = gsub("Olink ", "", Panel)) %>%
+  # remove adjustment factors from reference project.
+  filter(Project != reference_project) %>%
+  mutate(group = cut(Adj_factor, breaks = breaks,
+            labels = labels)) %>%
+  select(OlinkID, Adj_factor, Panel, group) %>%
+  distinct() %>%
+  group_by(Panel, group) %>%
+  tally() %>%
+  tidyr::pivot_wider(names_from = group, values_from = n) %>%
+  tibble::column_to_rownames(var = "Panel") %>%
+  relocate(any_of(labels)) %>%
+  kbl(booktabs = TRUE,
       digits = 2,
-      caption = "Distribution of assays in different ranges of adjustment factors") %>%
-  kable_styling(bootstrap_options = "striped", full_width = F, position = "center",
-                latex_options = "HOLD_position")
+      caption = paste("Distribution of assays in different ranges of",
+                      "adjustment factors")) %>%
+  kable_styling(bootstrap_options = "striped", full_width = FALSE,
+                position = "center", latex_options = "HOLD_position")
 
 ``` 
 
 
-Finally, use PCA plot to check whether bridging normalization has effect in correcting batch effects. 
-In the example below, it is clear that before bridging samples from data 1 and 2 are divided 
-into separate clusters due to the batch effects, but after bridging they are shown as one cluster in the PCA plot. 
+Finally, use PCA plot to check whether bridging normalization has effect in correcting batch effects.
+In the example below, it is clear that before bridging samples from data 1 and 2 are divided
+into separate clusters due to the batch effects, but after bridging they are shown as one cluster in the PCA plot.
 Bridging normalization has sufficiently removed the batch effects between two data sets.
 
 
@@ -282,15 +287,15 @@ Bridging normalization has sufficiently removed the batch effects between two da
 ## After bridging
 
 ### Generate unique SampleIDs
-br_ids <- npx_before_br %>% 
+br_ids <- npx_before_br %>%
   select(SampleID, OlinkID, datatype)
-npx_after_br <- npx_br_data %>% 
-  mutate(SampleID = paste0(dataset, PlateID, SampleID)) %>% 
-  left_join(br_ids, by=c("SampleID", "OlinkID"))
+npx_after_br <- npx_br_data %>%
+  mutate(SampleID = paste0(dataset, PlateID, SampleID)) %>%
+  left_join(br_ids, by = c("SampleID", "OlinkID"))
 ### PCA plot
 OlinkAnalyze::olink_pca_plot(df          = npx_after_br,
-                             color_g     = "datatype", 
-                             byPanel     = TRUE, 
-                             coloroption = c("green",'orange', 'darkblue')) 
+                             color_g     = "datatype",
+                             byPanel     = TRUE,
+                             coloroption = c("green", "orange", "darkblue"))
 ```
 
