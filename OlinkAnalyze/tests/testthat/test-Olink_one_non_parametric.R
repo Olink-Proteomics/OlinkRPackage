@@ -71,5 +71,7 @@ test_that("olink_one_non_parametric_posthoc function works", {
                  dplyr::select(contrast) %>%
                  unique() %>%
                  nrow(),10)
+
+  expect_warning(olink_one_non_parametric_posthoc(npx_data_format221010, variable = 'treatment2')) # data with all NPX=NA for some assays
 })
 

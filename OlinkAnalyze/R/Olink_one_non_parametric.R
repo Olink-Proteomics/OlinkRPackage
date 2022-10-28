@@ -311,7 +311,7 @@ olink_one_non_parametric_posthoc <- function(df,
                                              verbose=TRUE
                                              ){
   if(missing(df) | missing(variable)){
-    stop('The df and variable and effect arguments need to be specified.')
+    stop('The df and variable arguments need to be specified.')
   }
   if (!(test %in% c("friedman","kruskal"))){
     stop('The type of the test need to be specified as kruskal or friedman')
@@ -330,13 +330,9 @@ olink_one_non_parametric_posthoc <- function(df,
         dplyr::pull()
     }
 
-    # Check whether it is NPX or QUANT
-    if ('NPX' %in% colnames(df)) {
-      data_type <- 'NPX'
-    } else if ('Quantified_value' %in% colnames(df)) {
-      data_type <- 'Quantified_value'
-    } else {
-      stop('The NPX or Quantified_value is not in the df.')}
+    #Check data format
+    npxCheck <- npxCheck(df)
+    data_type <- npxCheck$data_type #Temporary fix to avoid issues with rlang::ensym downstream
 
     variable_testers <- intersect(c(variable), names(df))
     ##Remove rows where variables or covariate is NA (cant include in analysis anyway)
@@ -380,6 +376,7 @@ olink_one_non_parametric_posthoc <- function(df,
       message("Pairwise comparisons for Friedman test using paired Wilcoxon signed-rank test were performed")
       p.hoc_val <- df %>%
         dplyr::filter(OlinkID %in% olinkid_list) %>%
+        dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>% #Exclude assays where all samples have NPX=NA
         dplyr::mutate(OlinkID = factor(OlinkID, levels = olinkid_list)) %>%
         dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
         dplyr::do(rstatix::wilcox_test(data =., as.formula(formula_string), p.adjust.method = "BH",detailed = TRUE, conf.level = 0.95,paired = T)) %>%
@@ -394,6 +391,7 @@ olink_one_non_parametric_posthoc <- function(df,
       message("Pairwise comparisons for Kruskal-Wallis test using Dunn test were performed")
       p.hoc_val <- df %>%
         dplyr::filter(OlinkID %in% olinkid_list) %>%
+        dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>% #Exclude assays where all samples have NPX=NA
         dplyr::mutate(OlinkID = factor(OlinkID, levels = olinkid_list)) %>%
         dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
         dplyr::do(FSA::dunnTest(data =., as.formula(formula_string), method = "bh")$res) %>%
