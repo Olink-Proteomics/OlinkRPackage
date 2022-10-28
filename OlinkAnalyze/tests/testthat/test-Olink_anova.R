@@ -2,6 +2,9 @@
 refRes_file <- '../data/refResults.RData'
 load(refRes_file)
 
+#Load data with hidden/excluded assays (all NPX=NA)
+load(file = '../data/npx_data_format221010.RData')
+
 #Run olink_anova
 anova_results_1_site <- olink_anova(npx_data1, 'Site') %>%
   mutate(id = as.character(OlinkID)) %>%
@@ -49,6 +52,8 @@ test_that("olink_anova function works", {
   expect_equal(ncol(anova_results_1_siteTime), 12)
 
   expect_error(olink_anova(npx_data1,)) ##no input data
+
+  expect_warning(olink_anova(npx_data_format221010, 'treatment2')) # data with all NPX=NA for some assays
 })
 
 test_that("olink_anova_posthoc function works", {
@@ -63,4 +68,6 @@ test_that("olink_anova_posthoc function works", {
   expect_equal(anova_posthoc_1_time, ref_results$anova_posthoc_1_time)
   expect_equal(nrow(anova_posthoc_1_time), 30)
   expect_equal(anova_posthoc_1_time %>% ncol(), 11)
+
+  expect_warning(olink_anova_posthoc(npx_data_format221010, variable = 'treatment2', effect = 'treatment2')) # data with all NPX=NA for some assays
 })
