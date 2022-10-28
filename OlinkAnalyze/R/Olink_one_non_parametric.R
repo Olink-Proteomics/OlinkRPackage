@@ -300,7 +300,6 @@ olink_one_non_parametric <- function(df,
 #' @importFrom dplyr filter group_by ungroup pull do select arrange mutate
 #' @importFrom stringr str_detect
 #' @importFrom rstatix wilcox_test
-#' @importFrom FSA dunnTest
 
 
 
