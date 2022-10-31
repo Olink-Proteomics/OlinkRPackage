@@ -1,10 +1,10 @@
 ## Release Summary
 
-This release contains additional functionality to Olink Analyze 3.0.
+This release contains additional functionality to Olink Analyze 3.1.
 
 ## R CMD check results
 
-0 ERRORs | 0 WARNINGs | 0 NOTES
+There were no ERRORs, WARNINGs, or NOTEs. 
 
 ## revdepcheck results
 
