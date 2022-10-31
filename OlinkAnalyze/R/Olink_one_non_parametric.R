@@ -300,7 +300,6 @@ olink_one_non_parametric <- function(df,
 #' @importFrom dplyr filter group_by ungroup pull do select arrange mutate
 #' @importFrom stringr str_detect
 #' @importFrom rstatix wilcox_test
-#' @importFrom FSA dunnTest
 
 
 
@@ -310,6 +309,14 @@ olink_one_non_parametric_posthoc <- function(df,
                                              test = "kruskal",
                                              verbose=TRUE
                                              ){
+  if (test != "friedman"){
+    if(!requireNamespace("FSA", quietly = TRUE)){
+      stop("Kruskal test requires FSA package.
+         Please install FSA before continuing.
+
+         install.packages(\"FSA\")")
+    }
+  }
   if(missing(df) | missing(variable)){
     stop('The df and variable arguments need to be specified.')
   }
