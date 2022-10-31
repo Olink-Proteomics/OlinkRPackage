@@ -67,7 +67,7 @@ library(dplyr)
 #Two-way Ordinal Regression.
 #Results in model NPX~Treatment*Time.
 ordinalRegression_results <- olink_ordinalRegression(df = npx_data1,
-                             variable="Treatment:Time")
+                              variable="Treatment:Time")
 
 #Posthoc test for the model NPX~Treatment*Time,
 #on the interaction effect Treatment:Time.
