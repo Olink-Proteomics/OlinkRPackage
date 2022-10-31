@@ -258,7 +258,7 @@ olink_one_non_parametric <- function(df,
 #' @param variable Single character value or character array.
 #' @param test Single character value indicates running the post hoc test for friedman or kruskal.
 #' @param verbose Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
-#' @return Tibble of posthoc tests for specicified effect, arranged by ascending adjusted p-values.
+#' @return Tibble of posthoc tests for specified effect, arranged by ascending adjusted p-values.
 #'
 #' Columns include:
 #' \itemize{
