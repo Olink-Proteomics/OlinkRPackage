@@ -19,7 +19,7 @@
 #'  \item{UniProt:} "character" Olink specific ID
 #'  \item{Panel:} "character" Name of Olink Panel
 #'  \item{estimate:} "numeric" difference in mean NPX between groups
-#'  \item{statistic:} "named numeric" ehe value of the test statistic with a name describing it
+#'  \item{statistic:} "named numeric" the value of the test statistic with a name describing it
 #'  \item{p.value:} "numeric" p-value for the test
 #'  \item{parameter:} "named numeric" degrees of freedom for the t-statistic
 #'  \item{conf.low:} "numeric" confidence interval for the mean (lower end)
