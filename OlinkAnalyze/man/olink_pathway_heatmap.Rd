@@ -32,12 +32,14 @@ Creates a heatmap of proteins related to pathways using enrichment results from 
 \examples{
 \donttest{
 library(dplyr)
+# Run t-test results (see olink_ttest documentation)
 npx_df <- npx_data1 \%>\% filter(!grepl('control',SampleID, ignore.case = TRUE))
 ttest_results <- olink_ttest(df=npx_df,
                              variable = 'Treatment',
-                             alternative = 'two.sided')
+                            alternative = 'two.sided')
 
 try({ # This expression might fail if dependencies are not installed
+#  Run olink_pathway_enrichment (see documentation)
 gsea_results <- olink_pathway_enrichment(data = npx_data1, test_results = ttest_results)
 ora_results <- olink_pathway_enrichment(data = npx_data1,
                                         test_results = ttest_results, method = "ORA")

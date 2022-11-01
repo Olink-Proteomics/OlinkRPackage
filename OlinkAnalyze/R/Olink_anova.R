@@ -32,11 +32,11 @@
 #'
 #' @return A "tibble" containing the ANOVA results for every protein. The tibble is arranged by ascending p-values.
 #' Columns include:
-#' 
+#'
 #' \itemize{
 #'  \item{Assay:} "character" Protein symbol
-#'  \item{OlinkID:} "character" Olink specific ID  
-#'  \item{UniProt:} "character" Olink specific ID  
+#'  \item{OlinkID:} "character" Olink specific ID
+#'  \item{UniProt:} "character" Olink specific ID
 #'  \item{Panel:} "character" Name of Olink Panel
 #'  \item{term:} "character" term in model
 #'  \item{df:} "numeric" degrees of freedom
@@ -47,7 +47,7 @@
 #'  \item{Adjusted_pval:} "numeric" adjusted p-value for the test (Benjamini&Hochberg)
 #'  \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
 #' }
-#'  
+#'
 #' @export
 #' @examples
 #' \donttest{
@@ -87,7 +87,7 @@ olink_anova <- function(df,
                         return.covariates = FALSE,
                         verbose = TRUE
 ){
-  
+
   if(!missing(model_formula)){
     if("formula" %in% class(model_formula)) model_formula <- deparse(model_formula) #Convert to string if is formula
     tryCatch(as.formula(model_formula),error=function(e) stop(paste0(model_formula," is not a recognized formula."))) #If cannot be coerced into formula, error
@@ -143,22 +143,8 @@ olink_anova <- function(df,
       df <- df[!is.na(df[[i]]),]
     }
 
-    #Not testing assays that have all NA:s
-    all_nas <- df  %>%
-      dplyr::group_by(OlinkID) %>%
-      dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(NPX))) %>%
-      dplyr::ungroup() %>%
-      dplyr::filter(n == n_na) %>%
-      dplyr::pull(OlinkID)
-
-    if(length(all_nas) > 0) {
-
-      warning(paste0('The assays ',
-                     paste(all_nas, collapse = ', '),
-                     ' have only NA:s. They will not be tested.'),
-              call. = FALSE)
-
-    }
+    #Check data format
+    npxCheck <- npxCheck(df)
 
     ##Convert character vars to factor
     converted.vars <- NULL
@@ -191,7 +177,7 @@ olink_anova <- function(df,
     for(effect in single_fixed_effects){
 
       current_nas <- df %>%
-        dplyr::filter(!(OlinkID %in% all_nas)) %>%
+        dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>% #Exclude assays that have all NA:s
         dplyr::group_by(OlinkID, !!rlang::ensym(effect)) %>%
         dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(NPX))) %>%
         dplyr::ungroup() %>%
@@ -237,13 +223,13 @@ olink_anova <- function(df,
                                  "+",
                                  paste(covariates, sep = '', collapse = '+'))
       }else{
-        
+
         formula_string <- paste0(outcome, "~", paste(variable,collapse="*"))
       }
     } else if(!missing(model_formula)){
       formula_string <- model_formula
     }
-    
+
 
     #Get factors
     fact.vars <- sapply(variable_testers, function(x) is.factor(df[[x]]))
@@ -282,7 +268,7 @@ olink_anova <- function(df,
     }
 
     p.val <- df %>%
-      dplyr::filter(!(OlinkID %in% all_nas)) %>%
+      dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>% #Exclude assays that have all NA:s
       dplyr::filter(!(OlinkID %in% nas_in_var)) %>%
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
       dplyr::do(generics::tidy(car::Anova(stats::lm(as.formula(formula_string),
@@ -341,23 +327,23 @@ olink_anova <- function(df,
 #' @param post_hoc_padjust_method P-value adjustment method to use for post-hoc comparisons within an assay. Options include \code{tukey}, \code{sidak}, \code{bonferroni} and \code{none}.
 #' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #'
-#' @return 
+#' @return
 #' A "tibble" of posthoc tests for specified effect, arranged by ascending adjusted p-values.
 #' Columns include:
 #' \itemize{
 #'  \item{Assay:} "character" Protein symbol
-#'  \item{OlinkID:} "character" Olink specific ID  
-#'  \item{UniProt:} "character" Olink specific ID  
+#'  \item{OlinkID:} "character" Olink specific ID
+#'  \item{UniProt:} "character" Olink specific ID
 #'  \item{Panel:} "character" Name of Olink Panel
 #'  \item{term:} "character" term in model
 #'  \item{contrast:} "character" the groups that were compared
 #'  \item{estimate:} "numeric" difference in mean NPX between groups
 #'  \item{conf.low:} "numeric" confidence interval for the mean (lower end)
 #'  \item{conf.high:} "numeric" confidence interval for the mean (upper end)
-#'  \item{Adjusted_pval:} "numeric" adjusted p-value for the test 
+#'  \item{Adjusted_pval:} "numeric" adjusted p-value for the test
 #'  \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
 #' }
-#' 
+#'
 #' @export
 #' @examples \donttest{
 #'
@@ -387,15 +373,15 @@ olink_anova <- function(df,
 #' covariates="Site",
 #' olinkid_list = significant_assays,
 #' effect = "Treatment:Time")
-#' 
-#' 
+#'
+#'
 #' #Posthoc, treated vs untreated at each timepoint, adjusted for Site effect
 #' anova_posthoc_results <- olink_anova_posthoc(npx_df,
 #' model_formula = "NPX~Treatment*Time+Site",
 #' olinkid_list = significant_assays,
 #' effect_formula = "pairwise~Treatment|Time")
-#' 
-#' 
+#'
+#'
 #' }
 #' @importFrom dplyr filter group_by ungroup pull do select arrange mutate
 #' @importFrom stringr str_detect
@@ -414,7 +400,7 @@ olink_anova_posthoc <- function(df,
                                 post_hoc_padjust_method="tukey",
                                 verbose = TRUE
 ){
-  
+
   if(!missing(model_formula)){
     if("formula" %in% class(model_formula)) model_formula <- deparse(model_formula) #Convert to string if is formula
     tryCatch(as.formula(model_formula),error=function(e) stop(paste0(model_formula," is not a recognized formula."))) #If cannot be coerced into formula, error
@@ -428,9 +414,9 @@ olink_anova_posthoc <- function(df,
     variable <- splt_form[-1]
     covariates <- NULL
   }
-  
+
   if(!missing(effect_formula)){
-    
+
     if(length(effect_formula)==1){
       #Parse formula so the check on the effect object can continue as usual
       if(!missing(effect)) message("effect_formula overriding effect argument.")
@@ -438,8 +424,8 @@ olink_anova_posthoc <- function(df,
       splt_effect <- effect_formula
       if(grepl("~",splt_effect)) splt_effect <- strsplit(splt_effect,"~")[[1]][2] #Pull out variables from right hand side of formula. e.g. pairwise~A+B|C = "A+B|C"
       if(grepl("\\||+|\\*",splt_effect)) splt_effect <- strsplit(splt_effect,"\\||\\+|\\*")[[1]] #Split rhs of formula into vector of variables. e.g. "A+B|C"=c("A","B","C")
-      
-      
+
+
       effect <- splt_effect
     } else{
       stop("Unrecognized effect formula. Should be a character string of length 1. If listing in the form c('A','B'), use the effects argument.")
@@ -471,6 +457,9 @@ olink_anova_posthoc <- function(df,
         dplyr::distinct() %>%
         dplyr::pull()
     }
+
+    #Check data format
+    npxCheck <- npxCheck(df)
 
     #Allow for :/* notation in covariates
     variable <- gsub("\\*",":",variable)
@@ -520,7 +509,7 @@ olink_anova_posthoc <- function(df,
                                  "+",
                                  paste(covariates, sep = '', collapse = '+'))
       }else{
-        
+
         formula_string <- paste0(outcome, "~", paste(variable,collapse="*"))
       }
     } else if(!missing(model_formula)){
@@ -551,7 +540,7 @@ olink_anova_posthoc <- function(df,
       }
       message(paste("Means estimated for each assay from ANOVA model: ",formula_string))
     }
-    
+
     if(!missing(effect_formula)){
       e_form <- as.formula(effect_formula)
     } else if(missing(effect_formula)){
@@ -560,6 +549,7 @@ olink_anova_posthoc <- function(df,
 
     anova_posthoc_results <- df %>%
       dplyr::filter(OlinkID %in% olinkid_list) %>%
+      dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>% #Exclude assays that have all NA:s
       dplyr::mutate(OlinkID = factor(OlinkID, levels = olinkid_list)) %>%
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
       dplyr::do(data.frame(emmeans::emmeans(stats::lm(as.formula(formula_string),data=.),
@@ -586,7 +576,7 @@ olink_anova_posthoc <- function(df,
                                    'Non-significant')) %>%
         dplyr::select(tidyselect::any_of(c("Assay", "OlinkID", "UniProt", "Panel", "term",  "contrast", effect, "estimate",
                       "conf.low", "conf.high", "Adjusted_pval","Threshold")))
-      
+
       if(post_hoc_padjust_method=="none") anova_posthoc_results <- anova_posthoc_results %>% rename(pvalue=Adjusted_pval)
     }
 

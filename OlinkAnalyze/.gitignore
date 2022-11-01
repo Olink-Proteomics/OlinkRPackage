@@ -1,4 +1,6 @@
 inst/doc
 /doc/
 /Meta/
+/revdep/
 
+**/_snaps/**/*.new.*

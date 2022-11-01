@@ -1,4 +1,16 @@
-npxProcessing_forDimRed <- function(df, color_g, drop_assays, drop_samples, verbose){
+#### Internal functions ####
+
+npxProcessing_forDimRed <- function(df,
+                                    color_g = "QC_Warning",
+                                    drop_assays = FALSE,
+                                    drop_samples = FALSE,
+                                    verbose = FALSE) {
+
+  # Sort order is dependent on locale -> set locale here to make code
+  # deterministic
+  old_collate <- Sys.getlocale("LC_COLLATE")
+  Sys.setlocale("LC_COLLATE", "C")
+
   #### Set up plotting colors ####
   if (color_g == "QC_Warning"){
     df_temp <- df %>%
@@ -114,20 +126,21 @@ npxProcessing_forDimRed <- function(df, color_g, drop_assays, drop_samples, verb
     dropped_assays.missingness <- NULL
   }
 
-  #### Impute remaing missing values by the assay median ####
-  if(any(percent_missingness <= PERCENT_CUTOFF & percent_missingness > 0)){
+  #### Impute remaining missing values by the assay median ####
+  if (any(percent_missingness <= PERCENT_CUTOFF & percent_missingness > 0)) {
 
-    imputed_assays_index <- which(percent_missingness <= PERCENT_CUTOFF & percent_missingness > 0)
+    imputed_assays_index <- which(percent_missingness <= PERCENT_CUTOFF &
+                                    percent_missingness > 0)
     percent_missingness <- percent_missingness[-imputed_assays_index]
 
     imputed_assays_index <- imputed_assays_index + 2
     imputed_assays <- colnames(df_wide)[imputed_assays_index]
 
     df_wide <- df_wide %>%
-      dplyr::mutate_at(tidyselect::all_of(imputed_assays),
-                       ~ifelse(is.na(.x), median(.x, na.rm = TRUE), .x))
+      dplyr::mutate(dplyr::across(all_of(imputed_assays),
+                       ~ ifelse(is.na(.x), median(.x, na.rm = TRUE), .x)))
 
-    if(verbose){
+    if (verbose) {
       warning(paste0("There are ",
                      paste0(length(imputed_assays)),
                      " assay(s) that were imputed by their medians."))
@@ -150,8 +163,40 @@ npxProcessing_forDimRed <- function(df, color_g, drop_assays, drop_samples, verb
     tibble::column_to_rownames('SampleID') %>%
     as.matrix
 
+  Sys.setlocale("LC_COLLATE", old_collate)
+
   return(list(df_wide = df_wide,
               df_wide_matrix = df_wide_matrix,
               dropped_assays.na = dropped_assays.na,
               dropped_assays.missingness = dropped_assays.missingness))
+}
+
+#This function is called by various other functions to perform checks of NPX-data. For now, it only looks for assays which have all NPX=NA, but there are other redundant tasks that could be moved here
+npxCheck <- function(df){
+  # # Check whether df contains NPX or QUANT
+  if ('NPX' %in% colnames(df)) {
+    data_type <- 'NPX'
+  } else if ('Quantified_value' %in% colnames(df)) {
+    data_type <- 'Quantified_value'
+  } else {
+    stop('Neither NPX or Quantified_value column present in the data')}
+
+  #### Identify assays that have only NA:s ####
+  all_nas <- df  %>%
+    dplyr::group_by(OlinkID) %>%
+    dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(!!rlang::ensym(data_type)))) %>%
+    dplyr::ungroup() %>%
+    dplyr::filter(n == n_na) %>%
+    dplyr::pull(OlinkID)
+
+  if(length(all_nas) > 0) {
+
+    warning(paste0('The assays ',
+                   paste(all_nas, collapse = ', '),
+                   ' have NPX=NA for all samples. They will be excluded from the analysis'),
+            call. = FALSE)
+
+  }
+
+  return(list(all_nas = all_nas, data_type = data_type))
 }

@@ -10,6 +10,9 @@ olink_ordinalRegression_posthoc(
   variable,
   covariates = NULL,
   effect,
+  effect_formula,
+  mean_return = FALSE,
+  post_hoc_padjust_method = "tukey",
   verbose = T
 )
 }
@@ -27,41 +30,57 @@ Covariates to include. Takes ':'/'*' notation. Crossed analysis will not be infe
 
 \item{effect}{Term on which to perform post-hoc. Character vector. Must be subset of or identical to variable.}
 
+\item{effect_formula}{(optional) A character vector specifying the names of the predictors over which estimated marginal means are desired as defined in the \code{emmeans} package. May also be a formula. If provided, this will override the \code{effect} argument. See \code{?emmeans::emmeans()} for more information.}
+
+\item{mean_return}{Boolean. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = TRUE and no adjustment is performed.}
+
+\item{post_hoc_padjust_method}{P-value adjustment method to use for post-hoc comparisons within an assay. Options include \code{tukey}, \code{sidak}, \code{bonferroni} and \code{none}.}
+
 \item{verbose}{Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
 }
 \value{
 Tibble of posthoc tests for specified effect, arranged by ascending adjusted p-values.
+
+#' Columns include:
+\itemize{
+ \item{Assay:} "character" Protein symbol
+ \item{OlinkID:} "character" Olink specific ID
+ \item{UniProt:} "character" Olink specific ID
+ \item{Panel:} "character" Name of Olink Panel
+ \item{term:} "character" term in model
+ \item{contrast:} "character" the groups that were compared
+ \item{estimate:} "numeric" difference in mean of the ordinal NPX between groups
+ \item{Adjusted_pval:} "numeric" adjusted p-value for the test
+ \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
+}
 }
 \description{
 Performs a post hoc ANOVA test using emmeans::emmeans with Tukey p-value adjustment per assay (by OlinkID) for each panel at confidence level 0.95.
 See \code{olink_anova} for details of input notation. \cr\cr
 The function handles both factor and numerical variables and/or covariates.
-The posthoc test for a numerical variable compares the difference in means of the outcome variable (default: NPX) for 1 standard deviation difference in the numerical variable, e.g.
-mean NPX at mean(numerical variable) versus mean NPX at mean(numerical variable) + 1*SD(numerical variable).
+The posthoc test for a numerical variable compares the difference in means of the ordinal outcome variable (default: NPX) for 1 standard deviation difference in the numerical variable, e.g.
+mean ordinal NPX at mean(numerical variable) versus mean NPX at mean(numerical variable) + 1*SD(numerical variable).
 }
 \examples{
 \donttest{
 library(dplyr)
-npx_df <- npx_data1 \%>\% filter(!grepl('control',SampleID, ignore.case = TRUE))
 #Two-way Ordinal Regression.
 #Results in model NPX~Treatment*Time.
-ordinalRegression_results <- olink_ordinalRegression(df = npx_df,
-                             variable="Treatment:Time")
+ordinalRegression_results <- olink_ordinalRegression(df = npx_data1,
+                              variable="Treatment:Time")
 
 #Posthoc test for the model NPX~Treatment*Time,
 #on the interaction effect Treatment:Time.
 
-#Filtering out significant and relevant results.
-significant_assays <- ordinalRegression_results \%>\%
-filter(Threshold == 'Significant' & term == 'Treatment:Time') \%>\%
-select(OlinkID) \%>\%
-distinct() \%>\%
-pull()
-
 #Posthoc
-ordinalRegression_results_posthoc_results <- olink_ordinalRegression_posthoc(npx_df,
-variable=c("Treatment:Time"),
-covariates="Site",
-olinkid_list = significant_assays,
-effect = "Treatment:Time")}
+ordinalRegression_results_posthoc_results <- olink_ordinalRegression_posthoc(npx_data1,
+                                                   variable=c("Treatment:Time"),
+                                                   covariates="Site",
+                                                   olinkid_list = {ordinalRegression_results \%>\%
+                                                   filter(term == 'Treatment:Time') \%>\%
+                                                   filter(Threshold == 'Significant') \%>\%
+                                                                 dplyr::select(OlinkID) \%>\%
+                                                                 distinct() \%>\%
+                                                                 pull()},
+                                                                 effect = "Treatment:Time")}
 }

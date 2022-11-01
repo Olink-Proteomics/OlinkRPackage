@@ -2,6 +2,9 @@
 refRes_file <- '../data/refResults.RData'
 load(refRes_file)
 
+#Load data with hidden/excluded assays (all NPX=NA)
+load(file = '../data/npx_data_format221010.RData')
+
 # Sample subset used to reduce file size of the ref results
 sampleSubset <- c("A6", "A38","B47","B22","A43","D75","D79","C66","B43","B70","D52","A58","B71","A50","D1", "B8")
 
@@ -37,6 +40,32 @@ normalization_results.subset <- olink_normalization(df1 = npx_data1,
                                                     reference_project = '20200001') %>%
   filter(SampleID %in% sampleSubset)
 
+# Bridge normalization with excluded assays
+excludedOIDs.proj1 <-
+  npx_data_format221010 %>%
+  group_by(OlinkID) %>%
+  summarise(fracNA = sum(is.na(NPX))/n()) %>%
+  filter(fracNA == 1) %>%
+  pull(OlinkID)
+
+excludedOIDs.proj2<-
+  npx_data_format221010.project2 %>%
+  group_by(OlinkID) %>%
+  summarise(fracNA = sum(is.na(NPX))/n()) %>%
+  filter(fracNA == 1) %>%
+  pull(OlinkID)
+
+overlap_samples <- intersect(npx_data_format221010$SampleID, npx_data_format221010.project2$SampleID)
+npxBridged <- olink_normalization(df1 = npx_data_format221010,
+                                  df2 = npx_data_format221010.project2,
+                                  overlapping_samples_df1 = overlap_samples,
+                                  reference_project = 'P1')
+
+npxBridged_proj2ref <- olink_normalization(df1 = npx_data_format221010,
+                                           df2 = npx_data_format221010.project2,
+                                           overlapping_samples_df1 = overlap_samples,
+                                           reference_project = 'P2')
+
 test_that("olink_normalization works", {
   expect_equal(normalization_results.bridged, ref_results$normalization_results.bridged)
   expect_equal(normalization_results.intensity, ref_results$normalization_results.intensity)
@@ -47,4 +76,36 @@ test_that("olink_normalization works", {
                                    df2 = npx_data2,
                                    overlapping_samples_df1 = c("B64", "B36", "A77", "B7", "A24", "A49", "B76"))) # Non overlapping samples for bridging
 
+  ### Testing the excluded assay bridging ###
+  ## With P1 as the reference
+  #Test that all excluded assays from project 1 remain NA after bridging
+  expect_true(npxBridged %>%
+                filter(Project == 'P1' & OlinkID %in% excludedOIDs.proj1) %>%
+                pull(NPX) %>%
+                is.na() %>%
+                all())
+
+  #Test that the non-excluded assays in project 2 remain unchanged
+  expect_true(npxBridged %>%
+                filter(Project == 'P2' & OlinkID %in% setdiff(excludedOIDs.proj1, excludedOIDs.proj2)) %>%
+                left_join(npx_data_format221010.project2, by = c('SampleID', 'OlinkID')) %>%
+                mutate(match = NPX.x == NPX.y) %>%
+                pull(match) %>%
+                all())
+
+  ## With P2 as the reference
+  #Test that all excluded assays from project 1 remain NA after bridging
+  expect_true(npxBridged_proj2ref %>%
+                filter(Project == 'P1' & OlinkID %in% excludedOIDs.proj1) %>%
+                pull(NPX) %>%
+                is.na() %>%
+                all())
+
+  #Test that the non-excluded assays in project 2 remain unchanged
+  expect_true(npxBridged_proj2ref %>%
+                filter(Project == 'P2' & OlinkID %in% setdiff(excludedOIDs.proj1, excludedOIDs.proj2)) %>%
+                left_join(npx_data_format221010.project2, by = c('SampleID', 'OlinkID')) %>%
+                mutate(match = NPX.x == NPX.y) %>%
+                pull(match) %>%
+                all())
 })

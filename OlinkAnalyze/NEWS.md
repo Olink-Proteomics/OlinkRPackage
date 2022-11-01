@@ -1,3 +1,24 @@
+# Olink Analyze 3.2.0
+
+## Minor Changes
+* Addition of functions to perform Uniform Manifold Approximation and Projection (UMAP) dimensional reduction and plots (@simfor, #139)
+* Add additional install methods to Readme (@AskPascal, #153)
+* ggrepel can now be disabled when outlier lines are present in the PCA plot (@klevdiamanti, #158)
+* Long running unit tests are now skipped on CRAN (@AskPascal, #163)
+* Internal functions were added to read_NPX to support future development (@klevdiamanti, #167)
+* CI workflows were refactored to utilize external actions (@AskPascal, #169)
+* Read_NPX will now warn the user when NAs are detected in the NPX column (@AskPascal, #170)
+* Friedman test interface and documentation was updated to be more intuitive (@boxizhang, #171)
+
+
+## Bug fixes
+* Pathway enrichment p-values are now in the correct order when plotting (@klevdiamanti, #164)
+* PCAs now behave the same with any locale (@AskPascal, #173)
+* Read_NPX now accepts either Panel_Version or Panel_Lot_Nr in input files (@klevdiamanti, #156)
+* Assays that only have NPX = NA will now be excluded from all analyses and figures (@simfor, @kathy-nevola, @AskPascal, #176)
+* Refactor code to use tidyselect::all_of() in recommended way (@AskPascal, #177)
+* vdiffr based unit tests were reactivated (@AskPascal, #172)
+
 # Olink Analyze 3.1.0
 
 ## Minor Changes
