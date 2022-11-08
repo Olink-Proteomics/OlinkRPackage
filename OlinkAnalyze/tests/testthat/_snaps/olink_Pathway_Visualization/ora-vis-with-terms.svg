@@ -27,11 +27,11 @@
 </defs>
 <g clip-path='url(#cpMjcwLjk5fDY1My44OHwyMi43OHw1NDUuMTE=)'>
 <rect x='270.99' y='22.78' width='382.89' height='522.33' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
-<rect x='288.39' y='439.64' width='348.09' height='90.40' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #077183;' />
-<rect x='288.39' y='339.19' width='348.09' height='90.40' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #077183;' />
-<rect x='288.39' y='238.75' width='348.09' height='90.40' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #FE1F04;' />
-<rect x='288.39' y='138.30' width='348.09' height='90.40' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #FE1F04;' />
-<rect x='288.39' y='37.85' width='348.09' height='90.40' style='stroke-width: 1.07; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #FE1F04;' />
+<rect x='288.39' y='439.64' width='348.09' height='90.40' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #077183;' />
+<rect x='288.39' y='339.19' width='348.09' height='90.40' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #077183;' />
+<rect x='288.39' y='238.75' width='348.09' height='90.40' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #FE1F04;' />
+<rect x='288.39' y='138.30' width='348.09' height='90.40' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #FE1F04;' />
+<rect x='288.39' y='37.85' width='348.09' height='90.40' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt; stroke-linejoin: miter; fill: #FE1F04;' />
 <text x='638.42' y='488.27' style='font-size: 9.96px; font-family: sans;' textLength='19.38px' lengthAdjust='spacingAndGlyphs'>1/22</text>
 <text x='638.42' y='387.82' style='font-size: 9.96px; font-family: sans;' textLength='19.38px' lengthAdjust='spacingAndGlyphs'>1/18</text>
 <text x='638.42' y='287.37' style='font-size: 9.96px; font-family: sans;' textLength='19.38px' lengthAdjust='spacingAndGlyphs'>1/12</text>
