@@ -1,6 +1,6 @@
 ## Release Summary
 
-This release contains additional functionality to Olink Analyze 3.1.
+This release fixes a bug in Olink Analyze 3.2 where data is now written to a temporary directory.
 
 ## R CMD check results
 
