@@ -51,7 +51,7 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           working-directory: OlinkAnalyze
-          extra-packages: any::rcmdcheck, pillar, github::YuLab-SMU/ggtree
+          extra-packages: any::rcmdcheck, pillar
 
       - uses: r-lib/actions/check-r-package@v2
         with:
