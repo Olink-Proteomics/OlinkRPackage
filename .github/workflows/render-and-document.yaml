@@ -32,7 +32,7 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           working-directory: OlinkAnalyze
-          extra-packages: rmarkdown, roxygen2, devtools
+          extra-packages: rmarkdown, roxygen2, devtools, ggtree>=3.7.1
 
       - name: Render Rmarkdown files
         run: |
