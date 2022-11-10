@@ -43,7 +43,7 @@ set_plot_theme <- function(font = "Swedish Gothic Thin") {
     ) +
     ggplot2::theme(
       panel.border = ggplot2::element_blank(),
-      axis.line = ggplot2::element_line(size = 0.5)
+      axis.line = ggplot2::element_line(linewidth = 0.5)
     ) +
     ggplot2::theme(
       strip.background = ggplot2::element_rect(fill = "white"),
