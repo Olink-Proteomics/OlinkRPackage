@@ -28,7 +28,7 @@ knitr::opts_chunk$set(
 Olink® NPX datasets are normalized datasets using either plate control
 normalization or intensity normalization methods. Intensity
 normalization method assumes that all samples within a project are fully
-randomized.
+randomized. 
 
 The joint analysis of two or more Olink® NPX datasets often requires an
 additional batch correction step to remove technical variations, which
@@ -43,8 +43,8 @@ Bridging is needed if Olink® NPX datasets are:
 
 To bridge two or more Olink® NPX datasets, bridging samples are needed to calculate the assay-specific adjustment factors between datasets. Bridging samples are shared samples among datasets - that is samples that are analysed in both datasets. The recommended number
 of bridging samples are shown in the table below. Olink® 
-NPX datasets without shared samples should not be combined to perform 
-joint analysis using the bridging approach described below.
+NPX datasets without shared samples should not be combined using the bridging approach described below.
+
 
 ```{r, echo=FALSE}
 library(OlinkAnalyze)
@@ -89,7 +89,8 @@ data2 <- read_NPX("~/NPX_file2_location.xlsx")
 ```  
 
 To demonstrate how bridging works, we will use the example datasets
-(`npx_data1` and `npx_data2`) from **OlinkAnalyze** package.
+(`npx_data1` and `npx_data2`) from **Olink Analyze** package. 
+This workflow also uses functions from the dplyr, stringr, and ggplot2 packages.
 
 ## Check bridging datasets
 
@@ -112,9 +113,9 @@ npx_df <- bind_rows(npx_1, npx_2)
 npx_df %>%
   mutate(Panel = gsub("Olink ", "", Panel)) %>%
   ggplot(aes(x = NPX, fill = dataset)) +
-  geom_density(alpha = 0.7) +
+  geom_density(alpha = 0.4) +
   facet_grid(~Panel) +
-  olink_fill_discrete(coloroption = c("teal", "yellow")) +
+  olink_fill_discrete(coloroption = c("red", "darkblue")) +
   set_plot_theme() +
   ggtitle("Before bridging normalization: NPX distribution") +
   theme(axis.title.x = element_blank(),
@@ -169,8 +170,7 @@ npx_before_br <- rbind(npx_1, npx_2) %>%
 ### PCA plot
 OlinkAnalyze::olink_pca_plot(df          = npx_before_br,
                              color_g     = "datatype",
-                             byPanel     = TRUE,
-                             coloroption = c("green", "orange", "darkblue"))
+                             byPanel     = TRUE)
 
 ```
 
@@ -182,7 +182,7 @@ procedure is to first calculate **the median of the paired NPX differences** per
 assay between the bridging samples as adjustment factor then use these adjustment 
 factors to adjust NPX values between two datasets. In this process, one dataset 
 is considered the reference dataset (`df1`) and its NPX values remain unaltered.
-While the other dataset, considered the new dataset (`df2`), is adjusted to 
+The other dataset is considered the new dataset (`df2`) and is adjusted to 
 the reference dataset based on the adjustment factors.
 
 The output from `olink_normalization()` function is a NPX table with adjusted 
@@ -225,9 +225,9 @@ First, check NPX distribution in datasets after bridging normalization.
 npx_br_data %>%
   mutate(Panel = gsub("Olink ", "", Panel)) %>%
   ggplot(aes(x = NPX, fill = dataset)) +
-  geom_density(alpha = 0.7) +
+  geom_density(alpha = 0.4) +
   facet_grid(~Panel) +
-  olink_fill_discrete(coloroption = c("teal", "yellow")) +
+  olink_fill_discrete(coloroption = c("red", "darkblue")) +
   set_plot_theme() +
   ggtitle("After bridging normalization: NPX distribution") +
   theme(axis.title.x = element_blank(),
@@ -287,7 +287,6 @@ npx_after_br <- npx_br_data %>%
 ### PCA plot
 OlinkAnalyze::olink_pca_plot(df          = npx_after_br,
                              color_g     = "datatype",
-                             byPanel     = TRUE,
-                             coloroption = c("green", "orange", "darkblue"))
+                             byPanel     = TRUE)
 ```
 
