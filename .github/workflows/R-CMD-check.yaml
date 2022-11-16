@@ -35,7 +35,6 @@ jobs:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
       _R_CHECK_FORCE_SUGGESTS_: false
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-      R_BIOC_VERSION: "3.16"
 
     steps:
       - uses: actions/checkout@v2
@@ -48,6 +47,13 @@ jobs:
       - uses: r-lib/actions/setup-pandoc@v2
         with:
           pandoc-version: '2.18'      
+          
+      - name: Set BioC version
+        run: |
+          install.packages("remotes")
+          Sys.setenv(R_BIOC_VERSION = remotes::bioc_version())
+        shell: Rscript {0}
+      
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
