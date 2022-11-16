@@ -33,7 +33,7 @@ jobs:
       - name: Set BioC version
         run: |
           install.packages("remotes")
-          Sys.setenv(R_BIOC_VERSION = remotes::bioc_version())
+          Sys.setenv(R_BIOC_VERSION = as.character(remotes::bioc_version()))
         shell: Rscript {0}
           
 
