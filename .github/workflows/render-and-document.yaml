@@ -14,6 +14,8 @@ jobs:
     timeout-minutes: 30        
     env:
       GITHUB_PAT: ${{ secrets.PAT }}
+      R_BIOC_VERSION: "3.16"
+      
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2

@@ -35,6 +35,7 @@ jobs:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
       _R_CHECK_FORCE_SUGGESTS_: false
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_BIOC_VERSION: "3.16"
 
     steps:
       - uses: actions/checkout@v2
