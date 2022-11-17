@@ -72,7 +72,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: ubuntu-22.04,   r: '4.1.0'}
+          - {os: ubuntu-22.04,   r: '4.1.3'}
       
 
     runs-on: ${{ matrix.config.os }}
