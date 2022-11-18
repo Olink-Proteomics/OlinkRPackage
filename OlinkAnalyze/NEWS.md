@@ -1,3 +1,13 @@
+# Olink Analyze 3.2.2
+## Bug Fixes
+* remove www. from links in vignette to prevent rerouting of URL (@kathy-nevola, #188)
+* update set_plot_theme() to use linewidth instead of size per ggplot2 3.4
+
+# Olink Analyze 3.2.1
+## Bug Fixes
+* Change in unit test to write to temporary directory (@AskPascal, #181)
+
+
 # Olink Analyze 3.2.0
 
 ## Minor Changes
