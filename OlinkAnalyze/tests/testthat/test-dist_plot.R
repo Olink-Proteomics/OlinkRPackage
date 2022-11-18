@@ -1,3 +1,5 @@
+skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
+
 #Load data with hidden/excluded assays (all NPX=NA)
 load(file = '../data/npx_data_format221010.RData')
 

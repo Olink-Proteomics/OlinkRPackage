@@ -1,5 +1,6 @@
 skip_on_cran()
 skip_if_not_installed("clusterProfiler")
+skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
 
 set.seed(123)
 
