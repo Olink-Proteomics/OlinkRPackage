@@ -11,6 +11,25 @@
 #' @param pair_id Character value indicating which column indicates the paired sample identifier.
 #' @param ... Options to be passed to wilcox.test. See \code{?wilcox_test} for more information.
 #' @return A data frame containing the Mann-Whitney U Test results for every protein.
+#'
+#' Columns include:
+#' \itemize{
+#'  \item{Assay:} "character" Protein symbol
+#'  \item{OlinkID:} "character" Olink specific ID
+#'  \item{UniProt:} "character" Olink specific ID
+#'  \item{Panel:} "character" Name of Olink Panel
+#'  \item{estimate:} "numeric" difference in mean NPX between groups
+#'  \item{statistic:} "named numeric" the value of the test statistic with a name describing it
+#'  \item{p.value:} "numeric" p-value for the test
+#'  \item{parameter:} "named numeric" degrees of freedom for the t-statistic
+#'  \item{conf.low:} "numeric" confidence interval for the mean (lower end)
+#'  \item{conf.high:} "numeric" confidence interval for the mean (upper end)
+#'  \item{method:} "character" which wilcoxon method was used
+#'  \item{alternative:} "character" describes the alternative hypothesis
+#'  \item{Adjusted_pval:} "numeric" adjusted p-value for the test (Benjamini&Hochberg)
+#'  \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
+#' }
+#'
 #' @export
 #' @examples \donttest{
 #'
@@ -27,6 +46,7 @@
 #'    filter(Time %in% c("Baseline","Week.6")) %>%
 #'    olink_wilcox(variable = "Time", pair_id = "Subject")
 #'}
+
 #' @importFrom magrittr %>%
 #' @importFrom dplyr n group_by summarise n_distinct ungroup filter as_tibble select mutate pull all_of rename arrange do
 #' @importFrom stringr str_detect
@@ -103,33 +123,12 @@ olink_wilcox <- function(df, variable, pair_id, ...){
                 " samples that do not have a unique level for your variable. Only one level per sample is allowed."))
   }
 
-  # # Check whether it is NPX or QUANT
-  if ('NPX' %in% colnames(df)) {
-    data_type <- 'NPX'
-  } else if ('Quantified_value' %in% colnames(df)) {
-    data_type <- 'Quantified_value'
-  } else {
-    stop('The NPX or Quantified_value is not in the df.')}
-
-
-  #Not testing assays that have all NA:s or all NA:s in one level
-  all_nas <- df  %>%
-    dplyr::group_by(OlinkID) %>%
-    dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(!!rlang::ensym(data_type)))) %>%
-    dplyr::ungroup() %>%
-    dplyr::filter(n-n_na <= 1) %>%
-    dplyr::pull(OlinkID)
-
-
-  if(length(all_nas) > 0) {
-    warning(paste0('The assays ',
-                   paste(all_nas, collapse = ', '),
-                   ' have only NA:s. They will not be tested.'),
-            call. = F)
-  }
+  #Check data format
+  npxCheck <- npxCheck(df)
+  data_type <- npxCheck$data_type #Temporary fix to avoid issues with rlang::ensym downstream
 
   nas_in_level <- df  %>%
-    dplyr::filter(!(OlinkID %in% all_nas)) %>%
+    dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>%
     dplyr::group_by(OlinkID, !!rlang::ensym(variable)) %>%
     dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(!!rlang::ensym(data_type)))) %>%
     dplyr::ungroup() %>%
@@ -156,7 +155,7 @@ olink_wilcox <- function(df, variable, pair_id, ...){
 
     #check that each "pair_id' has only 2 samples
     ct_pairs <- df %>%
-      dplyr::filter(!(OlinkID %in% all_nas)) %>%
+      dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>%
       dplyr::filter(!(OlinkID %in% nas_in_level)) %>%
       dplyr::filter(!is.na(!!rlang::ensym(variable))) %>%
       dplyr::group_by(OlinkID,!!rlang::ensym(pair_id)) %>%
@@ -168,25 +167,32 @@ olink_wilcox <- function(df, variable, pair_id, ...){
 
 
     p.val <- df %>%
-      dplyr::filter(!(OlinkID %in% all_nas)) %>%
+      dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>%
       dplyr::filter(!(OlinkID %in% nas_in_level)) %>%
-      dplyr::select(all_of(c("OlinkID","UniProt","Assay","Panel",data_type,variable,pair_id))) %>%
-      tidyr::pivot_wider(names_from=all_of(variable),values_from=data_type) %>%
+      dplyr::select(all_of(c("OlinkID", "UniProt", "Assay", "Panel", data_type,
+                             variable, pair_id))) %>%
+      tidyr::pivot_wider(names_from = all_of(variable),
+                         values_from = all_of(data_type)) %>%
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
-      dplyr::do(tidy(stats::wilcox.test(x=.[[var_levels[1]]],y=.[[var_levels[2]]],paired=T, ...))) %>%
+      dplyr::do(tidy(stats::wilcox.test(x = .[[var_levels[1]]],
+                                        y = .[[var_levels[2]]],
+                                        paired = TRUE,
+                                        ...))) %>%
       dplyr::ungroup() %>%
       dplyr::mutate(Adjusted_pval = p.adjust(p.value, method = "fdr")) %>%
-      dplyr::mutate(Threshold = ifelse(Adjusted_pval < 0.05, "Significant", "Non-significant")) %>%
+      dplyr::mutate(Threshold = ifelse(Adjusted_pval < 0.05,
+                                       "Significant",
+                                       "Non-significant")) %>%
       dplyr::arrange(p.value)
 
-  }else{
+  } else {
 
 
     message(paste0('Mann-Whitney U Test is performed on ', var_levels[1], ' - ', var_levels[2], '.'))
 
 
     p.val <- df %>%
-      dplyr::filter(!(OlinkID %in% all_nas)) %>%
+      dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>%
       dplyr::filter(!(OlinkID %in% nas_in_level)) %>%
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
       dplyr::do(broom::tidy(stats::wilcox.test(!!rlang::ensym(data_type) ~ !!rlang::ensym(variable), data = ., conf.int = TRUE, ...))) %>%

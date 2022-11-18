@@ -1,6 +1,9 @@
+load(file = '../data/npx_data_format221010.RData')
+
 bridgeSamples <- olink_bridgeselector(df = npx_data1,
                                       sampleMissingFreq = .1,
                                       n = 8)
+
 
 test_that("olink_bridgeselector works", {
   expect_equal(nrow(bridgeSamples), 8)
@@ -9,4 +12,5 @@ test_that("olink_bridgeselector works", {
   expect_equal(round(bridgeSamples[order(bridgeSamples$MeanNPX, decreasing = TRUE),]$MeanNPX[5], digits = 2), 6.21)
   expect_error(olink_bridgeselector(df = npx_data1,
                                     n = 8))
+  expect_warning(olink_bridgeselector(npx_data_format221010, sampleMissingFreq = 0.1, n = 2))
 })

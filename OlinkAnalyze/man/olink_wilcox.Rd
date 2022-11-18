@@ -17,6 +17,24 @@ olink_wilcox(df, variable, pair_id, ...)
 }
 \value{
 A data frame containing the Mann-Whitney U Test results for every protein.
+
+Columns include:
+\itemize{
+ \item{Assay:} "character" Protein symbol
+ \item{OlinkID:} "character" Olink specific ID
+ \item{UniProt:} "character" Olink specific ID
+ \item{Panel:} "character" Name of Olink Panel
+ \item{estimate:} "numeric" difference in mean NPX between groups
+ \item{statistic:} "named numeric" the value of the test statistic with a name describing it
+ \item{p.value:} "numeric" p-value for the test
+ \item{parameter:} "named numeric" degrees of freedom for the t-statistic
+ \item{conf.low:} "numeric" confidence interval for the mean (lower end)
+ \item{conf.high:} "numeric" confidence interval for the mean (upper end)
+ \item{method:} "character" which wilcoxon method was used
+ \item{alternative:} "character" describes the alternative hypothesis
+ \item{Adjusted_pval:} "numeric" adjusted p-value for the test (Benjamini&Hochberg)
+ \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
+}
 }
 \description{
 Performs a Welch 2-sample Mann-Whitney U Test at confidence level 0.95 for every protein (by OlinkID)

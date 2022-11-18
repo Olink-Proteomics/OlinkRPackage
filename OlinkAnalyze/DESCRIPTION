@@ -1,7 +1,7 @@
 Type: Package
 Package: OlinkAnalyze
 Title: Facilitate Analysis of Proteomic Data from Olink
-Version: 3.1.0.9000
+Version: 3.2.2
 Authors@R: c(
     person("Kathleen", "Nevola", , "biostattools@olink.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-5183-6444", Github = "kathy-nevola")),
@@ -77,17 +77,20 @@ Imports:
 Suggests: 
     clusterProfiler,
     extrafont,
-    systemfonts,
+    FSA,
     ggplotify,
+    here,
     knitr,
     markdown,
     msigdbr,
     openssl,
-    ordinal, 
+    ordinal,
     pheatmap,
     rmarkdown,
     scales,
+    systemfonts,
     testthat (>= 3.0.0),
+    umap,
     vdiffr
 VignetteBuilder: 
     knitr
