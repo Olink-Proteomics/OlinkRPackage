@@ -4,7 +4,7 @@
 #'
 #' @param font Font family to use for text elements. Depends on extrafont package.
 #'
-#' @return No return value, used as theme for ggplots 
+#' @return No return value, used as theme for ggplots
 #' @export
 #' @importFrom ggplot2 theme element_blank element_line element_rect element_text
 #'
@@ -21,9 +21,9 @@
 #'
 #'
 set_plot_theme <- function(font = "Swedish Gothic Thin") {
-  
+
   usefont <- ""
-  
+
   if (getOption("OlinkAnalyze.allow.font.load", default = TRUE)) {
     if (requireNamespace("extrafont", quietly = TRUE)) {
       if(font %in% extrafont::fonts()){
@@ -35,15 +35,14 @@ set_plot_theme <- function(font = "Swedish Gothic Thin") {
       }
     }
   }
-  
+
   olink_theme <- ggplot2::theme_bw() +
     ggplot2::theme(
       panel.grid.major = ggplot2::element_blank(),
       panel.grid.minor = ggplot2::element_blank()
     ) +
     ggplot2::theme(
-      panel.border = ggplot2::element_blank(),
-      axis.line = ggplot2::element_line(linewidth = 0.5)
+      panel.border = ggplot2::element_blank()
     ) +
     ggplot2::theme(
       strip.background = ggplot2::element_rect(fill = "white"),
@@ -53,4 +52,18 @@ set_plot_theme <- function(font = "Swedish Gothic Thin") {
     ggplot2::theme(
       text = ggplot2::element_text(family = usefont, color = "#737373", size = 12)
     )
+
+  # Keep support for older ggplot2
+  if(utils::packageVersion("ggplot2") >= package_version("3.4.0")){
+    olink_theme <- olink_theme +
+      ggplot2::theme(
+        axis.line = ggplot2::element_line(linewidth = 0.5)
+      )
+  }else{
+    olink_theme <- olink_theme +
+      ggplot2::theme(
+        axis.line = ggplot2::element_line(size = 0.5)
+      )
+  }
+
 }
