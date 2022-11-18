@@ -90,7 +90,8 @@ jobs:
       
       - name: Install package
         run: |
-          sudo apt-get -y install libglpk-dev
+          sudo apt-get -y install libglpk-dev texlive-latex-base \
+             texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra
 
       - uses: r-lib/actions/setup-r@v2
         with:
@@ -107,7 +108,8 @@ jobs:
           
       - name: Check package
         run: |
-          check_results <- rcmdcheck::rcmdcheck(path = "OlinkAnalyze", 
+          check_results <- rcmdcheck::rcmdcheck(error_on = "error",
+                                                path = "OlinkAnalyze", 
                                                 check_dir = "check")
         shell: Rscript {0}
  
