@@ -1,3 +1,5 @@
+skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
+
 set.seed(10)
 #Load reference results
 refRes_file <- testthat::test_path('../data/refResults.RData')
