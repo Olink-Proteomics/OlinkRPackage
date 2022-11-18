@@ -105,6 +105,17 @@ jobs:
         with:
           profile: '"r413"'    
           
-      - uses: r-lib/actions/check-r-package@v2
+      - name: Check package
+        run: |
+          check_results <- rcmdcheck::rcmdcheck(path = "nexusr", 
+                                                check_dir = "check")
+        shell: Rscript {0}
+ 
+      - name: Upload check results
+        if: failure() 
+        uses: actions/upload-artifact@v3
         with:
-          working-directory: OlinkAnalyze     
+          name: ${{ runner.os }}-r${{ matrix.config.r }}-results
+          path: "check"
+ 
+ 
