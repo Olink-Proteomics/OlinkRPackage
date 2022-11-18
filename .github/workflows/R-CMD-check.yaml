@@ -107,7 +107,7 @@ jobs:
           
       - name: Check package
         run: |
-          check_results <- rcmdcheck::rcmdcheck(path = "nexusr", 
+          check_results <- rcmdcheck::rcmdcheck(path = "OlinkAnalyze", 
                                                 check_dir = "check")
         shell: Rscript {0}
  
