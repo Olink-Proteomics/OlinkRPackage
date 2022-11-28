@@ -45,14 +45,28 @@ test_that("npxProcessing_forDimRed works", {
 
 #Load data with hidden/excluded assays (all NPX=NA)
 load(file = '../data/npx_data_format221010.RData')
+load(file = '../data/npx_data_format221121.RData')
+
 npx_Check <- suppressWarnings(npxCheck(npx_data_format221010))
 
 test_that("Assays with NA are removed in NPX check", {
   na_oids<-npx_data_format221010 %>%
-    dplyr::group_by(OlinkID) %>% 
+    dplyr::group_by(OlinkID) %>%
     dplyr::filter(all(is.na(NPX))) %>%
     dplyr::select(OlinkID) %>%
     dplyr::distinct()
   expect_equal(sort(na_oids$OlinkID), sort(npx_Check$all_nas))
 })
+
+npx_Check <- suppressWarnings(npxCheck(npx_data_format221121))
+
+test_that("Assays with NA are removed in NPX check", {
+  na_oids<-npx_data_format221121 %>%
+    dplyr::group_by(OlinkID) %>%
+    dplyr::filter(all(is.na(NPX))) %>%
+    dplyr::select(OlinkID) %>%
+    dplyr::distinct()
+  expect_equal(sort(na_oids$OlinkID), sort(npx_Check$all_nas))
+})
+
 
