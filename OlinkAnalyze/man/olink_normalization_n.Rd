@@ -113,6 +113,12 @@ olink_normalization_n(norm_schema = norm_schema_bridge)
 
 #### Subset normalization
 
+# datasets
+npx_df1 <- npx_data1 |>
+  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_"))
+npx_df2 <- npx_data2 |>
+  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_"))
+
 # Find a suitable subset of samples from both projects, but exclude Olink
 # controls and samples that fail QC.
 df1_samples <- npx_df1 |>
@@ -149,6 +155,12 @@ olink_normalization_n(norm_schema = norm_schema_subset)
 
 #### Subset normalization using all samples
 
+# datasets
+npx_df1 <- npx_data1 |>
+  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_"))
+npx_df2 <- npx_data2 |>
+  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_"))
+
 # Find a suitable subset of samples from both projects, but exclude Olink
 # controls and samples that fail QC.
 df1_samples_all <- npx_df1 |>
@@ -180,6 +192,12 @@ norm_schema_subset_all <- dplyr::tibble(
 olink_normalization_n(norm_schema = norm_schema_subset_all)
 
 #### Multi-project normalization using bridge and subset samples
+
+# datasets
+npx_df1 <- npx_data1 |>
+  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_"))
+npx_df2 <- npx_data2 |>
+  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_"))
 
 ## NPX data frames to bridge
 npx_df1 <- npx_data1 |>
