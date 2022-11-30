@@ -486,9 +486,9 @@ olink_normalization_bridge <- function(project_1_df,
   # OlinkAnalyze::olink_normalization function requires so.
   project_2_df <- project_2_df |>
     dplyr::left_join(update_sampleid, by = c('SampleID' = 'SampleID_df2')) |>
-    dplyr::mutate(SampleID_df1 = dplyr::if_else(is.na(.data$SampleID_df1),
+    dplyr::mutate(SampleID_df1 = dplyr::if_else(is.na(SampleID_df1),
                                                 SampleID,
-                                                .data$SampleID_df1)) |>
+                                                SampleID_df1)) |>
     dplyr::select(-SampleID) |>
     dplyr::rename("SampleID" = "SampleID_df1")
 
