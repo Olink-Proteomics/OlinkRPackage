@@ -34,8 +34,8 @@
 #' Columns include:
 #' \itemize{
 #'  \item{Assay:} "character" Protein symbol
-#'  \item{OlinkID:} "character" Olink specific ID  
-#'  \item{UniProt:} "character" Olink specific ID  
+#'  \item{OlinkID:} "character" Olink specific ID
+#'  \item{UniProt:} "character" Olink specific ID
 #'  \item{Panel:} "character" Name of Olink Panel
 #'  \item{term:} "character" term in model
 #'  \item{sumsq:} "numeric" sum of square
@@ -47,7 +47,7 @@
 #'  \item{Adjusted_pval:} "numeric" adjusted p-value for the test (Benjamini&Hochberg)
 #'  \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
 #' }
-#'  
+#'
 #' @export
 #' @examples
 #' \donttest{
@@ -94,7 +94,7 @@ olink_lmer <- function(df,
     variable <- splt_form[-1]
     covariates <- NULL
   }
-  
+
   if(missing(df) | missing(variable) | missing(random)){
     stop('The df and variable and random arguments need to be specified.')
   }
@@ -136,23 +136,8 @@ olink_lmer <- function(df,
       df <- df[!is.na(df[[i]]),]
     }
 
-    #Not testing assays that have all NA:s
-    all_nas <- df  %>%
-      dplyr::group_by(OlinkID) %>%
-      dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(!!rlang::ensym(outcome)))) %>%
-      dplyr::ungroup() %>%
-      dplyr::filter(n == n_na) %>%
-      dplyr::pull(OlinkID)
-
-
-    if(length(all_nas) > 0) {
-
-      warning(paste0('The assays ',
-                     paste(all_nas, collapse = ', '),
-                     ' have only NA:s. They will not be tested.'),
-              call. = FALSE)
-
-    }
+    #Check data format
+    npxCheck <- npxCheck(df)
 
     ##Convert character vars to factor
     converted.vars <- NULL
@@ -185,7 +170,7 @@ olink_lmer <- function(df,
     for(effect in single_fixed_effects){
 
       current_nas <- df %>%
-        dplyr::filter(!(OlinkID %in% all_nas)) %>%
+        dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>%
         dplyr::group_by(OlinkID, !!rlang::ensym(effect)) %>%
         dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(!!rlang::ensym(outcome)))) %>%
         dplyr::ungroup() %>%
@@ -232,7 +217,7 @@ olink_lmer <- function(df,
                                  "+",
                                  paste(paste0("(1|",random,")"),collapse="+"))
       }else{
-        
+
         formula_string <- paste0(outcome, "~", paste(variable,collapse="*"),
                                  "+",
                                  paste(paste0("(1|",random,")"),collapse="+"))
@@ -240,7 +225,7 @@ olink_lmer <- function(df,
     } else if(!missing(model_formula)){
       formula_string <- model_formula
     }
-    
+
     #Get factors
     fact.vars <- sapply(variable_testers, function(x) is.factor(df[[x]]))
     fact.vars <- names(fact.vars)[fact.vars]
@@ -278,7 +263,7 @@ olink_lmer <- function(df,
 
     ##make LMM
     lmer_model<-df %>%
-      dplyr::filter(!(OlinkID %in% all_nas)) %>%
+      dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>%
       dplyr::filter(!(OlinkID %in% nas_in_var)) %>%
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
       dplyr::group_modify(~generics::tidy(stats::anova(single_lmer(data=.x, formula_string = formula_string),type="III",ddf="Satterthwaite"))) %>%
@@ -364,18 +349,18 @@ single_lmer <- function(data, formula_string){
 #' Columns include:
 #' \itemize{
 #'  \item{Assay:} "character" Protein symbol
-#'  \item{OlinkID:} "character" Olink specific ID  
-#'  \item{UniProt:} "character" Olink specific ID  
+#'  \item{OlinkID:} "character" Olink specific ID
+#'  \item{UniProt:} "character" Olink specific ID
 #'  \item{Panel:} "character" Name of Olink Panel
 #'  \item{term:} "character" term in model
 #'  \item{contrast:} "character" the groups that were compared
 #'  \item{estimate:} "numeric" difference in mean NPX between groups
 #'  \item{conf.low:} "numeric" confidence interval for the mean (lower end)
 #'  \item{conf.high:} "numeric" confidence interval for the mean (upper end)
-#'  \item{Adjusted_pval:} "numeric" adjusted p-value for the test 
+#'  \item{Adjusted_pval:} "numeric" adjusted p-value for the test
 #'  \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
 #' }
-#' 
+#'
 #' @export
 #' @examples
 #' \donttest{
@@ -398,17 +383,17 @@ single_lmer <- function(data, formula_string){
 #'                                            effect = 'Time:Treatment',
 #'                                            random = 'Subject',
 #'                                            verbose = TRUE)
-#'                                            
+#'
 #' #Estimate treated vs untreated at each timepoint
-#' 
-#' 
+#'
+#'
 #'results_lmer_posthoc <- olink_lmer_posthoc(df = npx_data1,
 #'                                            olinkid_list = assay_list,
 #'                                            model_formula = "NPX~Time*Treatment+(1|Subject)",
 #'                                            effect_formula = "pairwise~Treatment|Time",
 #'                                            verbose = TRUE)
 #' }
-#'                                                                                     
+#'
 #' @importFrom magrittr %>%
 #' @importFrom dplyr filter group_by summarise ungroup pull distinct group_modify mutate select rename arrange
 #' @importFrom lmerTest lmer
@@ -449,9 +434,9 @@ olink_lmer_posthoc <- function(df,
     variable <- splt_form[-1]
     covariates <- NULL
   }
-  
+
   if(!missing(effect_formula)){
-    
+
     if(length(effect_formula)==1){
       #Parse effect formula so the check on the effect object can continue as usual
       if(!missing(effect)) message("effect_formula overriding effect argument.")
@@ -487,6 +472,9 @@ olink_lmer_posthoc <- function(df,
         dplyr::distinct() %>%
         dplyr::pull()
     }
+
+    #Check data format
+    npxCheck <- npxCheck(df)
 
     #Allow for :/* notation in covariates
     variable <- gsub("\\*",":",variable)
@@ -539,7 +527,7 @@ olink_lmer_posthoc <- function(df,
                                  "+",
                                  paste(paste0("(1|",random,")"),collapse="+"))
       }else{
-        
+
         formula_string <- paste0(outcome, "~", paste(variable,collapse="*"),
                                  "+",
                                  paste(paste0("(1|",random,")"),collapse="+"))
@@ -547,7 +535,7 @@ olink_lmer_posthoc <- function(df,
     } else if(!missing(model_formula)){
       formula_string <- model_formula
     }
-    
+
     if(!missing(effect_formula)){
       e_form <- effect_formula
     } else if(missing(effect_formula)){
@@ -582,6 +570,7 @@ olink_lmer_posthoc <- function(df,
 
     output_df <- df %>%
       dplyr::filter(OlinkID %in% olinkid_list) %>%
+      dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>%
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
       dplyr::group_modify(~single_posthoc(data = .x,
                                    formula_string=formula_string,
@@ -609,7 +598,7 @@ olink_lmer_posthoc <- function(df,
 }
 
 single_posthoc <- function(data, formula_string, effect, mean_return, padjust_method="tukey"){
-  
+
   if(!is.character(effect)) stop("effect must be a character string.")
 
   the_model <- emmeans::emmeans(single_lmer(data, formula_string),
@@ -635,11 +624,11 @@ single_posthoc <- function(data, formula_string, effect, mean_return, padjust_me
                                         'Non-significant')) %>%
       dplyr::rename(conf.low=lower.CL,
                     conf.high=upper.CL) %>%
-      dplyr::select(-SE,-df,-t.ratio) %>% 
+      dplyr::select(-SE,-df,-t.ratio) %>%
       dplyr::arrange(Adjusted_pval)
-    
+
     if(padjust_method=="none") out_df <- out_df %>% rename(pvalue=Adjusted_pval)
-    
+
     return(out_df)
 
   }
@@ -667,7 +656,7 @@ single_posthoc <- function(data, formula_string, effect, mean_return, padjust_me
 #' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #' @param ... coloroption for color ordering
 #'
-#' @return A list of objects of class "ggplot" showing point-range plot of NPX (y-axis) over x_axis_variable for each assay (facet), colored by col_variable if provided. 
+#' @return A list of objects of class "ggplot" showing point-range plot of NPX (y-axis) over x_axis_variable for each assay (facet), colored by col_variable if provided.
 #' @export
 #' @examples
 #' \donttest{

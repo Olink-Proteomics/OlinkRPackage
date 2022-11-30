@@ -3,6 +3,8 @@ skip_on_cran()
 #Load reference results
 refRes_file <- '../data/refResults.RData'
 load(refRes_file)
+load(file = '../data/npx_data_format221010.RData')
+npx_Check <- suppressWarnings(npxCheck(npx_data_format221010))
 
 boxplot_site_2prots <- npx_data1 %>%
   na.omit() %>% # removing missing values which exists for Site
@@ -42,11 +44,17 @@ boxplot_time_site <- npx_data1 %>%
                     pull(OlinkID)})
 
 
-
 test_that("olink_boxplot works", {
   vdiffr::expect_doppelganger('boxplot site 2prots', boxplot_site_2prots)
   vdiffr::expect_doppelganger('boxplot site 10prots', boxplot_site_10prots[[2]])
   vdiffr::expect_doppelganger('boxplot time', boxplot_time)
   vdiffr::expect_doppelganger('boxplot time with coloroption', boxplot_time_coloroption)
   vdiffr::expect_doppelganger('boxplot time and site', boxplot_time_site)
+  expect_warning(npx_data_format221010 %>%
+                   olink_boxplot(variable = "treatment2",
+                                 olinkid_list = c(npx_Check$all_nas[1:5],"OID30538")))
+  
+  boxplot_npxcheck <- suppressWarnings(olink_boxplot(npx_data_format221010, variable = "treatment2",
+                                   olinkid_list = c(npx_Check$all_nas[1:5],"OID30538")))
+  expect_length(unique(boxplot_npxcheck[[1]]$data$Name_OID), 1)
 })

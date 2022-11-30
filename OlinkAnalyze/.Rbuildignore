@@ -11,3 +11,6 @@
 ^data/.*_original[.]rda
 ^LICENSE\.md$
 ^revdep$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$

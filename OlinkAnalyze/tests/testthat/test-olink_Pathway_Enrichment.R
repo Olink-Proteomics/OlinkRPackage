@@ -1,6 +1,8 @@
 skip_on_cran()
 skip_if_not_installed("clusterProfiler")
 
+load(file = '../data/npx_data_format221010.RData')
+
 npx_df <- npx_data1 %>%
   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL"))
 ttest_results <- olink_ttest(df = npx_df, variable = "Treatment")
@@ -10,12 +12,14 @@ lme_results <- olink_lmer_posthoc(npx_df, variable = "Time", random = "Site", ef
 set.seed(123)
 
 ttest_results_no_estimate <- ttest_results %>% dplyr::select(-estimate)
+ttest_na <- suppressWarnings(olink_ttest(df = npx_data_format221010, variable = "treatment1"))
 
 test_that("T-test GSEA works", {
   skip_if_not_installed("clusterProfiler")
   tt_gsea <- olink_pathway_enrichment(npx_df, test_results = ttest_results)
   set.seed(123)
   expect_equal(nrow(tt_gsea), 560)
+  expect_warning(expect_warning(olink_pathway_enrichment(npx_data_format221010, test_results = ttest_na)))
 })
 
 test_that("Reactome GSEA works", {
@@ -92,3 +96,5 @@ test_that("Estimate column must be present",{
   set.seed(123)
   expect_error(olink_pathway_enrichment(npx_df, ttest_results_no_estimate))
 })
+
+

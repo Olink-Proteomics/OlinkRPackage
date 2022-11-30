@@ -87,30 +87,9 @@ olink_one_non_parametric <- function(df,
 
     df <- df[!is.na(df[[variable_testers]]),]
 
-    # # Check whether it is NPX or QUANT
-
-    if ('NPX' %in% colnames(df)) {
-      data_type <- 'NPX'
-    } else if ('Quantified_value' %in% colnames(df)) {
-      data_type <- 'Quantified_value'
-    } else {
-      stop('The NPX or Quantified_value is not in the df.')}
-
-    #Not testing assays that have all NA:s
-    all_nas <- df  %>%
-      dplyr::group_by(OlinkID) %>%
-      dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(!!rlang::ensym(data_type)))) %>%
-      dplyr::ungroup() %>%
-      dplyr::filter(n == n_na) %>%
-      dplyr::pull(OlinkID)
-
-
-    if(length(all_nas) > 0) {
-      warning(paste0('The assays ',
-                     paste(all_nas, collapse = ', '),
-                     ' have only NA:s. They will not be tested.'),
-              call. = F)
-    }
+    #Check data format
+    npxCheck <- npxCheck(df)
+    data_type <- npxCheck$data_type #Temporary fix to avoid issues with rlang::ensym downstream
 
     ##Convert character vars to factor
     converted.vars <- NULL
@@ -134,7 +113,7 @@ olink_one_non_parametric <- function(df,
     for(effect in single_fixed_effects){
 
       current_nas <- df %>%
-        dplyr::filter(!(OlinkID %in% all_nas)) %>%
+        dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>%
         dplyr::group_by(OlinkID, !!rlang::ensym(effect)) %>%
         dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(!!rlang::ensym(data_type))),.groups="drop") %>%
         dplyr::filter(n == n_na) %>%
@@ -197,7 +176,7 @@ olink_one_non_parametric <- function(df,
       formula_string <- paste0(formula_string,"|",subject)
       # add repeat measurement groups
       df_nas_remove <- df %>%
-        dplyr::filter(!(OlinkID %in% all_nas)) %>%
+        dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>%
         dplyr::filter(!(OlinkID %in% nas_in_var))
       # remove subject without complete data
       ## number of the items in the subject
@@ -246,7 +225,7 @@ olink_one_non_parametric <- function(df,
     }else{
       if(verbose){message(paste("Kruskal model fit to each assay: "),formula_string)}
       p.val <- df %>%
-        dplyr::filter(!(OlinkID %in% all_nas)) %>%
+        dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>%
         dplyr::filter(!(OlinkID %in% nas_in_var)) %>%
         dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
         dplyr::do(broom::tidy(kruskal.test(as.formula(formula_string),
@@ -279,7 +258,7 @@ olink_one_non_parametric <- function(df,
 #' @param variable Single character value or character array.
 #' @param test Single character value indicates running the post hoc test for friedman or kruskal.
 #' @param verbose Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
-#' @return Tibble of posthoc tests for specicified effect, arranged by ascending adjusted p-values.
+#' @return Tibble of posthoc tests for specified effect, arranged by ascending adjusted p-values.
 #'
 #' Columns include:
 #' \itemize{
@@ -321,7 +300,6 @@ olink_one_non_parametric <- function(df,
 #' @importFrom dplyr filter group_by ungroup pull do select arrange mutate
 #' @importFrom stringr str_detect
 #' @importFrom rstatix wilcox_test
-#' @importFrom FSA dunnTest
 
 
 
@@ -331,8 +309,16 @@ olink_one_non_parametric_posthoc <- function(df,
                                              test = "kruskal",
                                              verbose=TRUE
                                              ){
+  if (test != "friedman"){
+    if(!requireNamespace("FSA", quietly = TRUE)){
+      stop("Kruskal test requires FSA package.
+         Please install FSA before continuing.
+
+         install.packages(\"FSA\")")
+    }
+  }
   if(missing(df) | missing(variable)){
-    stop('The df and variable and effect arguments need to be specified.')
+    stop('The df and variable arguments need to be specified.')
   }
   if (!(test %in% c("friedman","kruskal"))){
     stop('The type of the test need to be specified as kruskal or friedman')
@@ -351,13 +337,9 @@ olink_one_non_parametric_posthoc <- function(df,
         dplyr::pull()
     }
 
-    # Check whether it is NPX or QUANT
-    if ('NPX' %in% colnames(df)) {
-      data_type <- 'NPX'
-    } else if ('Quantified_value' %in% colnames(df)) {
-      data_type <- 'Quantified_value'
-    } else {
-      stop('The NPX or Quantified_value is not in the df.')}
+    #Check data format
+    npxCheck <- npxCheck(df)
+    data_type <- npxCheck$data_type #Temporary fix to avoid issues with rlang::ensym downstream
 
     variable_testers <- intersect(c(variable), names(df))
     ##Remove rows where variables or covariate is NA (cant include in analysis anyway)
@@ -401,6 +383,7 @@ olink_one_non_parametric_posthoc <- function(df,
       message("Pairwise comparisons for Friedman test using paired Wilcoxon signed-rank test were performed")
       p.hoc_val <- df %>%
         dplyr::filter(OlinkID %in% olinkid_list) %>%
+        dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>% #Exclude assays where all samples have NPX=NA
         dplyr::mutate(OlinkID = factor(OlinkID, levels = olinkid_list)) %>%
         dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
         dplyr::do(rstatix::wilcox_test(data =., as.formula(formula_string), p.adjust.method = "BH",detailed = TRUE, conf.level = 0.95,paired = T)) %>%
@@ -415,6 +398,7 @@ olink_one_non_parametric_posthoc <- function(df,
       message("Pairwise comparisons for Kruskal-Wallis test using Dunn test were performed")
       p.hoc_val <- df %>%
         dplyr::filter(OlinkID %in% olinkid_list) %>%
+        dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>% #Exclude assays where all samples have NPX=NA
         dplyr::mutate(OlinkID = factor(OlinkID, levels = olinkid_list)) %>%
         dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
         dplyr::do(FSA::dunnTest(data =., as.formula(formula_string), method = "bh")$res) %>%

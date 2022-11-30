@@ -98,9 +98,8 @@ read_NPX_explore <- function(filename) {
     # **** Extract ****
 
     # temporary directory to extract
-    tmp_unzip_dir <- paste(tools::file_path_sans_ext(filename),
-                           paste(sample(x = c(LETTERS, letters), size = 5, replace = TRUE), collapse = ""),
-                           sep = "_")
+    tmp_unzip_dir <- tempfile()
+
     zip::unzip(zipfile = filename, files = files_to_extract, exdir = tmp_unzip_dir, overwrite = TRUE)
 
     # Extracted NPX csv file

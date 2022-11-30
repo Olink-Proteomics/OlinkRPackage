@@ -32,7 +32,7 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           working-directory: OlinkAnalyze
-          extra-packages: rmarkdown, roxygen2, devtools
+          extra-packages: rmarkdown, roxygen2, devtools, github::YuLab-SMU/ggtree
 
       - name: Render Rmarkdown files
         run: |
@@ -54,6 +54,10 @@ jobs:
           git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
           git add OlinkAnalyze/man/\* OlinkAnalyze/NAMESPACE
           git commit -m 'Document' || echo "No changes to commit"
+
+      - name: Pull first
+        run: |
+          git pull
 
       - name: Push
         run: |
