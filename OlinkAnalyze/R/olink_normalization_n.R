@@ -569,7 +569,7 @@ olink_normalization_bridge <- function(project_1_df,
 #' # Normalize
 #' olink_normalization_subset(project_1_df = npx_df1,
 #'                            project_2_df = npx_df2,
-#'                            bridge_samples = subset_samples_list,
+#'                            reference_samples = subset_samples_list,
 #'                            project_1_name = "P1",
 #'                            project_2_name = "P2",
 #'                            project_ref_name = "P1")
@@ -595,7 +595,7 @@ olink_normalization_bridge <- function(project_1_df,
 #' # Normalize
 #' olink_normalization_subset(project_1_df = npx_df1,
 #'                            project_2_df = npx_df2,
-#'                            bridge_samples = subset_samples_all_list,
+#'                            reference_samples = subset_samples_all_list,
 #'                            project_1_name = "P1",
 #'                            project_2_name = "P2",
 #'                            project_ref_name = "P1")
