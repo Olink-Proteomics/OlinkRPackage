@@ -1,5 +1,7 @@
 #Load data with hidden/excluded assays (all NPX=NA)
 load(file = '../data/npx_data_format221010.RData')
+load(file = '../data/npx_data_format221121.RData')
+
 
 qc_plot <- npx_data1 %>%
   mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
@@ -14,4 +16,6 @@ test_that("olink_qc_plot works", {
   vdiffr::expect_doppelganger('QC plot with coloroption', qc_plot2)
 
   expect_warning(olink_qc_plot(npx_data_format221010)) # data with all NPX=NA for some assays
+  expect_warning(olink_qc_plot(npx_data_format221121)) # data with all NPX=NA for some assays
+  expect_warning(olink_qc_plot(npx_data_extended_format221121)) # data with all NPX=NA for some assays
 })
