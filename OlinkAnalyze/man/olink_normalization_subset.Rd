@@ -59,16 +59,19 @@ samples) from each project as a subset. \cr\cr
 
 #### Subset normalization
 
+npx_df1 <- npx_data1 |>
+  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_"))
+npx_df2 <- npx_data2 |>
+  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_"))
+
 # Find a suitable subset of samples from both projects, but exclude Olink
 # controls and samples that fail QC.
 df1_samples <- npx_df1 |>
-  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
   dplyr::filter(QC_Warning == 'Pass') |>
   dplyr::pull(SampleID) |>
   unique() |>
   sample(size = 16, replace = FALSE)
 df2_samples <- npx_df2 |>
-  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
   dplyr::filter(QC_Warning == 'Pass') |>
   dplyr::pull(SampleID) |>
   unique() |>
