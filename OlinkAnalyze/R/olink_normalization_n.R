@@ -75,8 +75,7 @@
 #'
 #' @examples
 #' \donttest{
-#'
-#' #### Bridge normalization
+#' #### Bridge normalization of two projects
 #'
 #' # prepare datasets
 #' npx_df1 <- npx_data1 |>
@@ -105,7 +104,7 @@
 #' # normalize
 #' olink_normalization_n(norm_schema = norm_schema_bridge)
 #'
-#' #### Subset normalization
+#' #### Subset normalization of two projects
 #'
 #' # datasets
 #' npx_df1 <- npx_data1 |>
@@ -147,7 +146,7 @@
 #' # Normalize
 #' olink_normalization_n(norm_schema = norm_schema_subset)
 #'
-#' #### Subset normalization using all samples
+#' #### Subset normalization  of two projects using all samples
 #'
 #' # datasets
 #' npx_df1 <- npx_data1 |>
@@ -427,7 +426,6 @@ olink_normalization_n <- function(norm_schema) {
 #'
 #' @examples
 #' \donttest{
-#'
 #' npx_df1 <- npx_data1 |>
 #'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_"))
 #' npx_df2 <- npx_data2 |>
@@ -559,7 +557,6 @@ olink_normalization_bridge <- function(project_1_df,
 #'
 #' @examples
 #' \donttest{
-#'
 #' #### Subset normalization
 #'
 #' # datasets
