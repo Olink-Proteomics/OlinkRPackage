@@ -1,3 +1,5 @@
+skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
+
 set.seed(10)
 #Load reference results
 refRes_file <- testthat::test_path('../data/refResults.RData')
@@ -5,6 +7,7 @@ load(refRes_file)
 
 #Load data with hidden/excluded assays (all NPX=NA)
 load(file = '../data/npx_data_format221010.RData')
+load(file = '../data/npx_data_format221121.RData')
 
 pca_plot <- npx_data1 %>%
   mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
@@ -53,6 +56,8 @@ test_that("olink_pca_plot works", {
   expect_equal(outliers$Panel, c("Cardiometabolic", "Inflammation", "Inflammation", "Inflammation"))
 
   expect_warning(olink_pca_plot(npx_data_format221010)) # data with all NPX=NA for some assays
+  expect_warning(olink_pca_plot(npx_data_format221121)) # data with all NPX=NA for some assays
+  expect_warning(olink_pca_plot(npx_data_extended_format221121)) # data with all NPX=NA for some assays
 
   vdiffr::expect_doppelganger('PCA plot', pca_plot[[1]])
   vdiffr::expect_doppelganger('PCA plot color by treatment', pca_plot_treatCol[[1]])
