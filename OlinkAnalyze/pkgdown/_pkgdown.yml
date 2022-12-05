@@ -7,8 +7,10 @@ template:
     fg: "#111111"
     primary: "#111111"
     base_font: "Calibri"
+home:
+  title: Home
+  
 footer:
   structure:
     left: built_with
     right: package
-    
