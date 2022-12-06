@@ -2,6 +2,8 @@ url: ~
 template:
   bootstrap: 5
   bootswatch: yeti
+  includes:
+  before_navbar: <img src="man/figures/Olink-Logotype_White (1).png" align="right" alt="Olink Logo" />
   bslib:
     bg: "#FEFEFE"
     fg: "#111111"
@@ -9,8 +11,15 @@ template:
     base_font: "Calibri"
 home:
   title: Home
-  
+  sidebar:
+    structure: [toc, links, license, citation]
+    location: left
 footer:
   structure:
     left: built_with
     right: package
+
+navbar:
+  structure:
+    left: [intro, articles, news, reference]
+    right: [search]
