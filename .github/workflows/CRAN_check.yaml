@@ -58,13 +58,13 @@ jobs:
                                      env_vars = c(NOT_CRAN = "false"))
 
           cat("::group::Errors")
-          cli_alert_danger(results$errors)
+          cli::cli_alert_danger(results$errors)
           
           cat("::group::Warnings")
-          cli_alert_warning(results$warnings)
+          cli::cli_alert_warning(results$warnings)
           
           cat("::group::Notes")
-          cli_alert_info(results$notes)
+          cli::cli_alert_info(results$notes)
         shell: Rscript {0}
 
 
