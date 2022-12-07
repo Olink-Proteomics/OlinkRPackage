@@ -13,16 +13,14 @@ name: CRAN checks
 jobs:
 
   CRAN-check:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.config.os }}
+    timeout-minutes: 120       
+  
     strategy:      
       fail-fast: false    
       matrix: 
         config:
           - {os: ubuntu-latest, r: 'release'}
-
-  
-    runs-on: ${{ matrix.config.os }}
-    timeout-minutes: 120       
 
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})
 
