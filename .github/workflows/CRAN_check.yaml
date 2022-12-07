@@ -47,15 +47,24 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           working-directory: OlinkAnalyze
-          extra-packages: any::rcmdcheck, pillar, any::devtools
+          extra-packages: any::rcmdcheck, pillar, any::devtools, any::cli
 
-      - name: Record notes
+      - name: Record check messages
         run: |
           setwd("OlinkAnalyze")
-          results <- devtools::check(error_on = "never")
-          print(results$errors)
-          print(results$warnings)
-          print(results$notes)
+          
+          # Pretend we are CRAN
+          results <- devtools::check(error_on = "never", 
+                                     env_vars = c(NOT_CRAN = "false"))
+
+          cat("::group::Errors")
+          cli_alert_danger(results$errors)
+          
+          cat("::group::Warnings")
+          cli_alert_warning(results$warnings)
+          
+          cat("::group::Notes")
+          cli_alert_info(results$notes)
         shell: Rscript {0}
 
 
