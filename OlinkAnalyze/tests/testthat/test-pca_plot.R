@@ -187,7 +187,6 @@ test_that("PCA calculation - output values", {
 })
 
 
-
 test_that("PCA basic plotting", {
   pca_input <- npx_data1 %>%
     mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
@@ -218,6 +217,18 @@ test_that("minimal PCA plot", {
 
   vdiffr::expect_doppelganger("PCA plot - label outliers", pca_plot_outliers[[1]])
 
+  #Removing Index dependence in PCA plot
+  ids <- sample(npx_data1$SampleID, 100, replace = T)
+  ids <- gsub("A|B","",ids)
+  ids <- unique(sort(as.numeric(ids)))
+  pca_rem_index <- npx_data1 %>%
+    mutate(Index = ifelse(Index %in% ids, SampleID ,Index),
+           SampleID = paste(SampleID, "_", Index, sep = "")) %>%
+    olink_pca_plot(quiet = TRUE)
+  rm(ids)
+  
+  vdiffr::expect_doppelganger('PCA plot', pca_rem_index[[1]])
+  vdiffr::expect_doppelganger('PCA plot removing Index dependence', pca_rem_index[[1]])
 })
 
 
