@@ -14,20 +14,17 @@ npxProcessing_forDimRed <- function(df,
   #### Set up plotting colors ####
   if (color_g == "QC_Warning"){
     df_temp <- df %>%
-      # dplyr::group_by(SampleID, Index) %>% # SampleID should be unique enough - AK edits
       dplyr::group_by(SampleID) %>%
       dplyr::mutate(QC_Warning = dplyr::if_else(any(QC_Warning == "Warning"|QC_Warning == "WARN" ), "Warning", "Pass")) %>%
       dplyr::ungroup()
 
     plotColors <- df_temp %>%
-      # dplyr::group_by(SampleID, Index) %>% # SampleID should be unique enough - AK edits
       dplyr::group_by(SampleID) %>%
       dplyr::summarise(colors = unique(!!rlang::ensym(color_g))) %>%
       dplyr::ungroup()
 
   } else {
     number_of_sample_w_more_than_one_color <- df %>%
-      # dplyr::group_by(SampleID, Index) %>% # SampleID should be unique enough - AK edits
       dplyr::group_by(SampleID) %>%
       dplyr::summarise(n_colors = dplyr::n_distinct(!!rlang::ensym(color_g), na.rm = TRUE)) %>%
       dplyr::ungroup() %>%
@@ -40,7 +37,6 @@ npxProcessing_forDimRed <- function(df,
       df_temp <- df
 
       plotColors <- df_temp %>%
-        # dplyr::group_by(SampleID, Index) %>% # SampleID should be unique enough - AK edits
         dplyr::group_by(SampleID) %>%
         dplyr::summarise(colors = unique(!!rlang::ensym(color_g))) %>%
         dplyr::ungroup()
@@ -157,9 +153,6 @@ npxProcessing_forDimRed <- function(df,
 
   #### Format data and wrap up results ####
   df_wide <- df_wide %>%
-    # dplyr::left_join(plotColors,
-    #                  by = c('SampleID',
-    #                         'Index')) %>% # SampleID should be unique enough - AK edits
     dplyr::left_join(plotColors, by = 'SampleID') %>%
     dplyr::select(SampleID, Index, colors, everything())
 
