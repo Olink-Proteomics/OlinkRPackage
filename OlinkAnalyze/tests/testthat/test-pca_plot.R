@@ -6,8 +6,8 @@ refRes_file <- testthat::test_path('../data/refResults.RData')
 load(refRes_file)
 
 #Load data with hidden/excluded assays (all NPX=NA)
-load(file = '../data/npx_data_format221010.RData')
-load(file = '../data/npx_data_format221121.RData')
+load(file = testthat::test_path('../data/npx_data_format221010.RData'))
+load(file = testthat::test_path('../data/npx_data_format221121.RData'))
 
 pca_plot <- npx_data1 %>%
   mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
@@ -226,9 +226,9 @@ test_that("minimal PCA plot", {
            SampleID = paste(SampleID, "_", Index, sep = "")) %>%
     olink_pca_plot(quiet = TRUE)
   rm(ids)
-  
-  vdiffr::expect_doppelganger('PCA plot', pca_rem_index[[1]])
-  vdiffr::expect_doppelganger('PCA plot removing Index dependence', pca_rem_index[[1]])
+
+  vdiffr::expect_doppelganger('PCA plot minimal no-index', pca_rem_index[[1]])
+  vdiffr::expect_doppelganger('PCA plot minimal no-index removing Index dependence', pca_rem_index[[1]])
 })
 
 

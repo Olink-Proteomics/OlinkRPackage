@@ -183,8 +183,8 @@
 <circle cx='505.94' cy='298.77' r='3.02' style='stroke-width: 0.71; stroke: #00C7E1; fill: #00C7E1;' />
 <circle cx='442.63' cy='230.14' r='3.02' style='stroke-width: 0.71; stroke: #00C7E1; fill: #00C7E1;' />
 <circle cx='525.29' cy='228.92' r='3.02' style='stroke-width: 0.71; stroke: #00C7E1; fill: #00C7E1;' />
-<circle cx='401.54' cy='276.89' r='3.02' style='stroke-width: 0.71; stroke: #00C7E1; fill: #00C7E1;' />
 <circle cx='347.56' cy='230.54' r='3.02' style='stroke-width: 0.71; stroke: #00C7E1; fill: #00C7E1;' />
+<circle cx='401.54' cy='276.89' r='3.02' style='stroke-width: 0.71; stroke: #00C7E1; fill: #00C7E1;' />
 <circle cx='375.76' cy='314.66' r='3.02' style='stroke-width: 0.71; stroke: #00C7E1; fill: #00C7E1;' />
 <circle cx='308.32' cy='230.75' r='3.02' style='stroke-width: 0.71; stroke: #00C7E1; fill: #00C7E1;' />
 </g>
@@ -221,6 +221,6 @@
 <circle cx='648.32' cy='300.68' r='3.02' style='stroke-width: 0.71; stroke: #FE1F04; fill: #FE1F04;' />
 <text x='662.93' y='286.71' style='font-size: 9.60px; fill: #737373; font-family: sans;' textLength='21.35px' lengthAdjust='spacingAndGlyphs'>Pass</text>
 <text x='662.93' y='303.99' style='font-size: 9.60px; fill: #737373; font-family: sans;' textLength='35.75px' lengthAdjust='spacingAndGlyphs'>Warning</text>
-<text x='40.44' y='15.39' style='font-size: 14.40px; fill: #737373; font-family: sans;' textLength='56.83px' lengthAdjust='spacingAndGlyphs'>PCA plot</text>
+<text x='40.44' y='15.39' style='font-size: 14.40px; fill: #737373; font-family: sans;' textLength='355.45px' lengthAdjust='spacingAndGlyphs'>PCA plot minimal no-index removing Index dependence</text>
 </g>
 </svg>
