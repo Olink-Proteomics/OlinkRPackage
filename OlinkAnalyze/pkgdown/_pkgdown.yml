@@ -3,7 +3,7 @@ template:
   bootstrap: 5
   bootswatch: yeti
   includes:
-  before_navbar: <img src="man/figures/Olink-Logotype_White (1).png" align="right" alt="Olink Logo" />
+    before_title: <img src="man/figures/Olink-Logotype_White (1).png" align="left" alt="Olink Logo" width = "88" hspace = "40" />
   bslib:
     bg: "#FEFEFE"
     fg: "#111111"
