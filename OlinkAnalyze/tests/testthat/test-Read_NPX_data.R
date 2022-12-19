@@ -69,3 +69,15 @@ test_that("data completeness check", {
   )
 
 })
+
+
+# Sample ID with # --------------------------------------------------------
+
+
+test_that("# in SampleID", {
+      input <- read_NPX(testthat::test_path("refs/mock_sampleID_hashes.csv"))
+
+      expect_equal(input$SampleID, c("Sample#1", "Sample_#31"))
+})
+
+

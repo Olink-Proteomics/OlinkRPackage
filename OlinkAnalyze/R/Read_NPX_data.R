@@ -145,7 +145,8 @@ read_NPX_explore <- function(filename) {
                     header = TRUE,
                     sep = ";",
                     stringsAsFactors = FALSE,
-                    na.strings = c("NA", ""))
+                    na.strings = c("NA", ""),
+                    comment.char = "")
 
   # if only one column in the data, try "," as delimiter
   if (is.data.frame(out) && ncol(out) == 1) {
