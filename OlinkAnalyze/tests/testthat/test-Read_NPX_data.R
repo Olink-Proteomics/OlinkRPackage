@@ -4,6 +4,7 @@ test_that("Data loads correctly with 'read_NPX()'", {
   manifest_file <- system.file("extdata", "npx_data1_meta.csv", package = "OlinkAnalyze", mustWork = TRUE)
   df_1 <- read_NPX(filename = npx_file) # load dataset 1
   manifest_1 <- read.delim(manifest_file, header = TRUE, sep = ';') # load manifest 1
+  df_2_2 <- read_NPX(system.file("extdata", "Example_NPX_Data2_1.csv", package = "OlinkAnalyze", mustWork = TRUE))
 
   #NPX read ok?
   expect(exists("df_1"), failure_message = "read_NPX failed on dataset 1")
@@ -42,6 +43,10 @@ test_that("Data loads correctly with 'read_NPX()'", {
                    c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
                      "MissingFreq", "Panel","Panel_Lot_Nr", "PlateID", "QC_Warning", "LOD",
                      "NPX", "Normalization", "Assay_Warning"))
+  expect_identical(colnames(df_2_2),
+                   c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
+                     "MissingFreq", "Panel","Panel_Lot_Nr", "PlateID", "QC_Warning", "LOD",
+                     "NPX", "Normalization"))
 
   #All samples in the manifest?
   sample_names <- df_1 %>%
