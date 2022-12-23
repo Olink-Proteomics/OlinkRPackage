@@ -226,26 +226,14 @@ test_that("minimal PCA plot", {
 
   #Removing Index dependence in PCA plot
   pca_rem_index <- npx_data1 %>%
-    filter(!str_detect(SampleID,'CONTROL')) %>%
-    mutate(Index=if_else(Panel == "Olink Cardiometabolic", Index+1L, Index)) %>%
+    mutate(SampleID = paste(SampleID, "_", Index, sep = ""),
+           Index=if_else(Panel == "Olink Cardiometabolic", Index+1L, Index)) %>%
     olink_pca_plot(quiet = TRUE)
-
-  # tmp <- npx_data1 %>% 
-  #   filter(!str_detect(SampleID, "CONTROL")) %>%
-  #   mutate(Index = if_else(OlinkID == "OID01216", .data$Index + 1L, .data$Index))
-
-  # expect_true(all(abs(sort(pca_rem_index[[1]]$data$PCX) -
-  #                       sort(pca_plot[[1]]$data$PCX)) == 0))
-  # expect_true(all(abs(sort(pca_rem_index[[1]]$data$PCY) -
-  #                       sort(pca_plot[[1]]$data$PCY)) == 0))
-
-  # pca_rem_index_plot <- npx_data1 %>%
-  #   filter(!str_detect(SampleID,'CONT')) %>%
-  #   mutate(Index=if_else(Panel=='Olink Cardiometabolic', Index+1L, Index)) %>%
-  #   olink_pca_plot(quiet = TRUE)
-
-  # vdiffr::expect_doppelganger('PCA plot removing Index dependence', pca_rem_index_plot[[1]])
-  # vdiffr::expect_doppelganger('PCA plot minimal', pca_plot[[1]])
+  
+  expect_true(all(abs(sort(pca_rem_index[[1]]$data$PCX) -
+                        sort(pca_plot[[1]]$data$PCX)) == 0))
+  expect_true(all(abs(sort(pca_rem_index[[1]]$data$PCY) -
+                        sort(pca_plot[[1]]$data$PCY)) == 0))
 })
 
 
