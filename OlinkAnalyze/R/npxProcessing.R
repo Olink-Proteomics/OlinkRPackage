@@ -53,7 +53,7 @@ npxProcessing_forDimRed <- function(df,
 
   #wide format
   df_wide <- df_temp %>%
-    dplyr::select(SampleID, Index, OlinkID, NPX) %>%
+    dplyr::select(SampleID, OlinkID, NPX) %>%
     dplyr::filter(!is.na(NPX)) %>%
     tidyr::spread(OlinkID, NPX)
 
@@ -154,10 +154,10 @@ npxProcessing_forDimRed <- function(df,
   #### Format data and wrap up results ####
   df_wide <- df_wide %>%
     dplyr::left_join(plotColors, by = 'SampleID') %>%
-    dplyr::select(SampleID, Index, colors, everything())
+    dplyr::select(SampleID, colors, everything())
 
   df_wide_matrix <- df_wide %>%
-    dplyr::select(-Index, -colors) %>%
+    dplyr::select(-colors) %>%
     tibble::column_to_rownames('SampleID') %>%
     as.matrix
 

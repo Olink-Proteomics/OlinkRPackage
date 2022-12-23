@@ -218,17 +218,27 @@ test_that("minimal PCA plot", {
   vdiffr::expect_doppelganger("PCA plot - label outliers", pca_plot_outliers[[1]])
 
   #Removing Index dependence in PCA plot
-  ids <- sample(npx_data1$SampleID, 100, replace = T)
-  ids <- gsub("A|B","",ids)
-  ids <- unique(sort(as.numeric(ids)))
   pca_rem_index <- npx_data1 %>%
-    mutate(Index = ifelse(Index %in% ids, SampleID ,Index),
-           SampleID = paste(SampleID, "_", Index, sep = "")) %>%
+    filter(!str_detect(SampleID,'CONTROL')) %>%
+    mutate(Index=if_else(Panel == "Olink Cardiometabolic", Index+1L, Index)) %>%
     olink_pca_plot(quiet = TRUE)
-  rm(ids)
 
-  vdiffr::expect_doppelganger('PCA plot minimal no-index', pca_rem_index[[1]])
-  vdiffr::expect_doppelganger('PCA plot minimal no-index removing Index dependence', pca_rem_index[[1]])
+  # tmp <- npx_data1 %>% 
+  #   filter(!str_detect(SampleID, "CONTROL")) %>%
+  #   mutate(Index = if_else(OlinkID == "OID01216", .data$Index + 1L, .data$Index))
+
+  # expect_true(all(abs(sort(pca_rem_index[[1]]$data$PCX) -
+  #                       sort(pca_plot[[1]]$data$PCX)) == 0))
+  # expect_true(all(abs(sort(pca_rem_index[[1]]$data$PCY) -
+  #                       sort(pca_plot[[1]]$data$PCY)) == 0))
+
+  # pca_rem_index_plot <- npx_data1 %>%
+  #   filter(!str_detect(SampleID,'CONT')) %>%
+  #   mutate(Index=if_else(Panel=='Olink Cardiometabolic', Index+1L, Index)) %>%
+  #   olink_pca_plot(quiet = TRUE)
+
+  # vdiffr::expect_doppelganger('PCA plot removing Index dependence', pca_rem_index_plot[[1]])
+  # vdiffr::expect_doppelganger('PCA plot minimal', pca_plot[[1]])
 })
 
 
