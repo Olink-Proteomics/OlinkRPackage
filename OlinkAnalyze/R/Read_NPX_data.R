@@ -226,6 +226,10 @@ read_NPX_target <- function(filename) {
                                   range = 'A2',
                                   col_names = FALSE,
                                   .name_repair = "minimal")
+  data_type_long <- readxl::read_excel(path = filename,
+                                  range = 'G2',
+                                  col_names = FALSE,
+                                  .name_repair = "minimal")
 
   if (grepl(pattern = 'NPX', x = data_type, fixed = TRUE)) {
 
@@ -251,267 +255,307 @@ read_NPX_target <- function(filename) {
     n_max_meta_data <- 5
     target_type     <- '48'
     BASE_INDEX      <- 45
+  } else if (grepl(pattern = "Target", data_type_long, fixed = TRUE)){
+    message("Target Data in long form detected.")
+    long_form = TRUE
   } else {
     stop("Cannot find whether the given data is NPX or concentration")
   }
-
-  # Load initial meta data (the first rows of the wide file)
-  meta_dat <-  readxl::read_excel(path = filename,
-                                  skip = 2,
-                                  n_max = n_max_meta_data,
-                                  col_names = FALSE,
-                                  .name_repair="minimal")
-  meta_dat[4,1] <- 'SampleID'
-
-  NR_DEVIATIONS <- sum(stringr::str_detect(meta_dat[2,], 'QC Deviation from median'))
-  control_index <- (stringr::str_detect(meta_dat[2,], 'Det Ctrl') |
-                      stringr::str_detect(meta_dat[2,], 'Inc Ctrl 2') |
-                      stringr::str_detect(meta_dat[2,], 'Inc Ctrl 1') |
-                      stringr::str_detect(meta_dat[2,], 'Ext Ctrl'))
-
-  meta_dat[4, control_index] <- meta_dat[2, control_index]
-  meta_dat[3, control_index] <- '-'
-
-  NR_CONTROLS <- sum(control_index)
-
-  nr_panel <- (ncol(meta_dat) - 1 - NR_DEVIATIONS - NR_CONTROLS)/(BASE_INDEX + 2)
-
-  nr_col          <- ncol(meta_dat)
-  names(meta_dat) <- as.character(1:nr_col)
-
-  meta_dat <- meta_dat %>%
-    dplyr::rename(Name = `1`)
-
-  # Load NPX or QUANT data including the last rows of meta data
-  dat <- readxl::read_excel(path = filename,
-                            skip = n_max_meta_data + 2,
-                            col_names = FALSE,
-                            .name_repair="minimal",
-                            col_types = c('text'))
-
-  nr_col     <- ncol(dat)
-  names(dat) <- as.character(1:nr_col)
-
-  dat <- dat %>%
-    dplyr::rename(Name = `1`)
-
-  # Calculate number of plates
-  plates <- dat[,nr_col - nr_panel] %>%
-    dplyr::distinct() %>%
-    stats::na.omit() %>%
-    dplyr::pull()
-  nr_plates <- length(plates)
-
-  # Extract the meta data from the last rows of data
-  missfreq <- dat %>% dplyr::filter(stringr::str_detect(Name, "Missing Data freq."))
-  norm_method <- dat %>% dplyr::filter(stringr::str_detect(Name, "Normalization"))
-  if (!is_npx_data) {
-    assay_warning <- dat %>% dplyr::filter(stringr::str_detect(Name, "Assay warning"))
-    Plate_LQL <- dat %>% dplyr::filter(stringr::str_detect(Name, "Lowest quantifiable level"))
-    LOD <- dat %>% dplyr::filter(stringr::str_detect(Name, "Plate LOD"))
-    LLOQ <- dat %>% dplyr::filter(stringr::str_detect(Name, "LLOQ"))
-    ULOQ <- dat %>% dplyr::filter(stringr::str_detect(Name, "ULOQ"))
+  
+  if (long_form == TRUE){
+    out <- readxl::read_excel(path = filename,
+                       col_names = T) %>% 
+      dplyr::filter(!is.na(SampleID)) %>%
+      dplyr::as_tibble() %>%
+      dplyr::mutate(Panel_Version = gsub(".*\\(","",Panel)) %>%
+      dplyr::mutate(Panel_Version = gsub("\\)","",Panel_Version)) %>%
+      dplyr::mutate(Panel =  gsub("\\(.*\\)","",Panel)) %>%
+      dplyr::mutate(Panel = stringr::str_to_title(Panel)) %>%
+      dplyr::mutate(Panel = gsub("Target 96", "", Panel)) %>%
+      dplyr::mutate(Panel = gsub("Olink", "", Panel)) %>%
+      dplyr::mutate(Panel = trimws(Panel, which = "left")) %>%
+      tidyr::separate(Panel, " ", into = c("Panel_Start", "Panel_End"), fill = "right") %>%
+      dplyr::mutate(Panel_End = ifelse(grepl("Ii", Panel_End), stringr::str_to_upper(Panel_End), Panel_End)) %>%
+      dplyr::mutate(Panel_End = ifelse(is.na(Panel_End), " ", Panel_End)) %>%
+      dplyr::mutate(Panel = paste("Olink", Panel_Start, Panel_End)) %>%
+      dplyr::mutate(Panel = trimws(Panel, which = "right")) %>%
+      dplyr::select(-Panel_Start, -Panel_End) %>%
+      dplyr::select(SampleID, Index, OlinkID,
+                    UniProt, Assay, MissingFreq,
+                    Panel,Panel_Version,PlateID,
+                    QC_Warning,dplyr::matches("Plate_LQL"),
+                    dplyr::matches("LOD"),
+                    dplyr::matches("Plat_LOD"),
+                    dplyr::matches("LLOQ"),
+                    dplyr::matches("ULOQ"),
+                    dplyr::matches("NPX"),
+                    dplyr::matches("Quantified_value"),
+                    dplyr::matches("Unit"),
+                    dplyr::matches("Assay_Warning"),
+                    dplyr::matches("Normalization"),
+                    dplyr::matches("*Inc Ctrl*"),
+                    dplyr::matches("*Det Ctrl*"))
   } else {
-    LOD <- dat %>% dplyr::filter(stringr::str_detect(Name, "LOD"))
-  }
-
-  # Add the new meta data to ´meta_dat´
-  meta_dat <- rbind(meta_dat,missfreq)
-  if (!is_npx_data) {
-    meta_dat <- rbind(meta_dat, LLOQ, ULOQ, assay_warning, Plate_LQL)
-  }
-  meta_dat <- rbind(meta_dat, LOD, norm_method)
-
-  # Remove the meta data from dat
-  if (is_npx_data) {
-    nbr_meta_data_rows_bottom <- 3
-  } else {
-    nbr_meta_data_rows_bottom <- 4 + 3 * nr_plates
-  }
-
-  if (nrow(norm_method) == 0) {
-    nbr_meta_data_rows_bottom <- nbr_meta_data_rows_bottom - 1
-  } else {
-    NORM_FLAG <- TRUE
-  }
-
-  dat <- dat[c(-1 * (nrow(dat) - nbr_meta_data_rows_bottom):nrow(dat)),]
-
-  # Create index vector
-  SampleID <- dat$Name
-  Index_nr <- c(1:length(SampleID))
-
-  # Initiate lists for later use
-  panel_data <- list() ##NPX values to be stored
-  QC_list <- list()    ##QC data
-  meta_data_list <- list() ## meta data
-  panel_list <- list()  ## combination of panel data and QC
-  assay_name_list <- list()
-  panel_list_long <- list()
-  deviations_list <- list()
-
-  if (NR_CONTROLS > 0) {
-    BASE_INDEX <- BASE_INDEX + NR_CONTROLS / nr_panel
-  }
-
-  # Construct a list of tibbles that match the long format
-  for (i in 1:nr_panel) {
-
-    panel_data[[i]] <- dat[,(2+((i-1)*BASE_INDEX)):((BASE_INDEX+1)+((i-1)*BASE_INDEX))]
-
-    if (NR_DEVIATIONS == 0) {
-      QC_list[[i]] <- dat[,c((2+((nr_panel)*BASE_INDEX)+(i-1)),
-                             (2+((nr_panel)*BASE_INDEX)+(i-1))+nr_panel)]
-
-      meta_data_list[[i]] <- meta_dat[,c((2+((i-1)*BASE_INDEX)):((BASE_INDEX+1)+((i-1)*BASE_INDEX)),
-                                         (2+((nr_panel)*BASE_INDEX)+(i-1)),
-                                         (2+((nr_panel)*BASE_INDEX)+(i-1))+nr_panel)]
-
-
+    # Load initial meta data (the first rows of the wide file)
+    meta_dat <-  readxl::read_excel(path = filename,
+                                    skip = 2,
+                                    n_max = n_max_meta_data,
+                                    col_names = FALSE,
+                                    .name_repair="minimal")
+    meta_dat[4,1] <- 'SampleID'
+    
+    NR_DEVIATIONS <- sum(stringr::str_detect(meta_dat[2,], 'QC Deviation from median'))
+    control_index <- (stringr::str_detect(meta_dat[2,], 'Det Ctrl') |
+                        stringr::str_detect(meta_dat[2,], 'Inc Ctrl 2') |
+                        stringr::str_detect(meta_dat[2,], 'Inc Ctrl 1') |
+                        stringr::str_detect(meta_dat[2,], 'Ext Ctrl'))
+    
+    meta_dat[4, control_index] <- meta_dat[2, control_index]
+    meta_dat[3, control_index] <- '-'
+    
+    NR_CONTROLS <- sum(control_index)
+    
+    nr_panel <- (ncol(meta_dat) - 1 - NR_DEVIATIONS - NR_CONTROLS)/(BASE_INDEX + 2)
+    
+    nr_col          <- ncol(meta_dat)
+    names(meta_dat) <- as.character(1:nr_col)
+    
+    meta_dat <- meta_dat %>%
+      dplyr::rename(Name = `1`)
+    
+    # Load NPX or QUANT data including the last rows of meta data
+    dat <- readxl::read_excel(path = filename,
+                              skip = n_max_meta_data + 2,
+                              col_names = FALSE,
+                              .name_repair="minimal",
+                              col_types = c('text'))
+    
+    nr_col     <- ncol(dat)
+    names(dat) <- as.character(1:nr_col)
+    
+    dat <- dat %>%
+      dplyr::rename(Name = `1`)
+    
+    # Calculate number of plates
+    plates <- dat[,nr_col - nr_panel] %>%
+      dplyr::distinct() %>%
+      stats::na.omit() %>%
+      dplyr::pull()
+    nr_plates <- length(plates)
+    
+    # Extract the meta data from the last rows of data
+    missfreq <- dat %>% dplyr::filter(stringr::str_detect(Name, "Missing Data freq."))
+    norm_method <- dat %>% dplyr::filter(stringr::str_detect(Name, "Normalization"))
+    if (!is_npx_data) {
+      assay_warning <- dat %>% dplyr::filter(stringr::str_detect(Name, "Assay warning"))
+      Plate_LQL <- dat %>% dplyr::filter(stringr::str_detect(Name, "Lowest quantifiable level"))
+      LOD <- dat %>% dplyr::filter(stringr::str_detect(Name, "Plate LOD"))
+      LLOQ <- dat %>% dplyr::filter(stringr::str_detect(Name, "LLOQ"))
+      ULOQ <- dat %>% dplyr::filter(stringr::str_detect(Name, "ULOQ"))
     } else {
-
-      QC_list[[i]] <- dat[,c((2+((nr_panel)*BASE_INDEX)+(i-1)),
-                             (2+((nr_panel)*BASE_INDEX)+(i-1))+nr_panel,
-                             (2+((nr_panel)*BASE_INDEX)+(i-1))+2*nr_panel+(i-1),
-                             (2+((nr_panel)*BASE_INDEX)+(i-1))+2*nr_panel+(i-1)+1)]
-
-      meta_data_list[[i]] <- meta_dat[,c((2+((i-1)*BASE_INDEX)):((BASE_INDEX+1)+((i-1)*BASE_INDEX)),
-                                         (2+((nr_panel)*BASE_INDEX)+(i-1)),
-                                         (2+((nr_panel)*BASE_INDEX)+(i-1))+nr_panel,
-                                         (2+((nr_panel)*BASE_INDEX)+(i-1))+2*nr_panel,
-                                         (2+((nr_panel)*BASE_INDEX)+(i-1))+3*nr_panel)]
-
-      meta_data_list[[i]][4,(BASE_INDEX+3)] <- "QC Deviation Inc Ctrl"
-      meta_data_list[[i]][4,(BASE_INDEX+4)] <- "QC Deviation Det Ctrl"
-
-
+      LOD <- dat %>% dplyr::filter(stringr::str_detect(Name, "LOD"))
     }
-
-    meta_data_list[[i]][4,(BASE_INDEX+1)] <- meta_data_list[[i]][2,(BASE_INDEX+1)]
-    meta_data_list[[i]][4,(BASE_INDEX+2)] <- meta_data_list[[i]][2,(BASE_INDEX+2)]
-
-
-    panel_list[[i]] <- cbind(panel_data[[i]],QC_list[[i]])
-
-    colnames(panel_list[[i]]) <- unlist(meta_data_list[[i]][4,])
-
-    panel_list[[i]][,c(-(BASE_INDEX+1),-(BASE_INDEX+2))] <-
-      lapply(panel_list[[i]][,c(-(BASE_INDEX+1),-(BASE_INDEX+2))],
-             function(x) as.numeric(stringr::str_replace_all(x,
-                                                             c('#' = '', ',' = '.',
-                                                               'No Data' = NA, '> ULOQ' = NA,
-                                                               '< LLOQ' = NA))))
-
-    # Remove the last two columns since they contain redundant meta data and
-    # will only cause warnings
-    meta_data_list[[i]] <- meta_data_list[[i]][,c(-(BASE_INDEX+1),-(BASE_INDEX+2))]
-
-    assay_name_list[[i]] <- tidyr::tibble(ID=c(t(meta_data_list[[i]][4,])),
-                                          Name=c(t(meta_data_list[[i]][2,])),
-                                          UniProt = c(t(meta_data_list[[i]][3,])),
-                                          Panel=c(t(meta_data_list[[i]][1,])))
-
+    
+    # Add the new meta data to ´meta_dat´
+    meta_dat <- rbind(meta_dat,missfreq)
+    if (!is_npx_data) {
+      meta_dat <- rbind(meta_dat, LLOQ, ULOQ, assay_warning, Plate_LQL)
+    }
+    meta_dat <- rbind(meta_dat, LOD, norm_method)
+    
+    # Remove the meta data from dat
     if (is_npx_data) {
-      assay_name_list[[i]] <- dplyr::bind_cols(assay_name_list[[i]],
-                                               MissingFreq=c(t(meta_data_list[[i]][5,])),
-                                               LOD = as.numeric(c(t(meta_data_list[[i]][6,]))))
-
-      if (NORM_FLAG == TRUE) {
-        assay_name_list[[i]] <- dplyr::bind_cols(assay_name_list[[i]],
-                                                 Normalization = c(t(meta_data_list[[i]][7,])))
-      }
-
-      panel_list_long[[i]] <- panel_list[[i]] %>%
-        dplyr::mutate(SampleID = SampleID) %>%
-        dplyr::mutate(Index = Index_nr) %>%
-        tidyr::gather(Assay, NPX, -SampleID,-`QC Warning`,
-                      -`Plate ID`,-Index,
-                      -dplyr::matches("QC Deviation Inc Ctrl"),
-                      -dplyr::matches("QC Deviation Det Ctrl")) %>%
-        dplyr::left_join(assay_name_list[[i]], by = c('Assay' = 'ID')) %>%
-        dplyr::select(SampleID, Index, Assay, UniProt, Name, MissingFreq, Panel,
-                      `Plate ID`,`QC Warning`, LOD, NPX, dplyr::matches("Assay_Warning"),
-                      dplyr::matches("Normalization"), dplyr::matches("QC Deviation Inc Ctrl"),
-                      dplyr::matches("QC Deviation Det Ctrl")) %>%
-        dplyr::rename(PlateID = `Plate ID`) %>%
-        dplyr::rename(QC_Warning = `QC Warning`) %>%
-        dplyr::rename(OlinkID = Assay, Assay = Name)
+      nbr_meta_data_rows_bottom <- 3
     } else {
-      for (j in 1:nr_plates) {
-        assay_name_by_plate <- dplyr::bind_cols(assay_name_list[[i]],
-                                                Unit=c(t(meta_data_list[[i]][5,])),
-                                                MissingFreq=c(t(meta_data_list[[i]][6,])),
-                                                LLOQ = as.numeric(c(t(meta_data_list[[i]][7,]))),
-                                                ULOQ = as.numeric(c(t(meta_data_list[[i]][8,]))),
-                                                Assay_Warning = c(t(meta_data_list[[i]][(9+(j-1)),])),
-                                                Plate_LQL = as.numeric(c(t(meta_data_list[[i]][(9+nr_plates+(j-1)),]))),
-                                                LOD = as.numeric(c(t(meta_data_list[[i]][(9+2*nr_plates+(j-1)),]))))
-        if(NORM_FLAG == TRUE) {
-          assay_name_by_plate <- dplyr::bind_cols(assay_name_by_plate,
-                                                  Normalization = c(t(meta_data_list[[i]][9+3*nr_plates,])))
+      nbr_meta_data_rows_bottom <- 4 + 3 * nr_plates
+    }
+    
+    if (nrow(norm_method) == 0) {
+      nbr_meta_data_rows_bottom <- nbr_meta_data_rows_bottom - 1
+    } else {
+      NORM_FLAG <- TRUE
+    }
+    
+    dat <- dat[c(-1 * (nrow(dat) - nbr_meta_data_rows_bottom):nrow(dat)),]
+    
+    # Create index vector
+    SampleID <- dat$Name
+    Index_nr <- c(1:length(SampleID))
+    
+    # Initiate lists for later use
+    panel_data <- list() ##NPX values to be stored
+    QC_list <- list()    ##QC data
+    meta_data_list <- list() ## meta data
+    panel_list <- list()  ## combination of panel data and QC
+    assay_name_list <- list()
+    panel_list_long <- list()
+    deviations_list <- list()
+    
+    if (NR_CONTROLS > 0) {
+      BASE_INDEX <- BASE_INDEX + NR_CONTROLS / nr_panel
+    }
+    
+    # Construct a list of tibbles that match the long format
+    for (i in 1:nr_panel) {
+      
+      panel_data[[i]] <- dat[,(2+((i-1)*BASE_INDEX)):((BASE_INDEX+1)+((i-1)*BASE_INDEX))]
+      
+      if (NR_DEVIATIONS == 0) {
+        QC_list[[i]] <- dat[,c((2+((nr_panel)*BASE_INDEX)+(i-1)),
+                               (2+((nr_panel)*BASE_INDEX)+(i-1))+nr_panel)]
+        
+        meta_data_list[[i]] <- meta_dat[,c((2+((i-1)*BASE_INDEX)):((BASE_INDEX+1)+((i-1)*BASE_INDEX)),
+                                           (2+((nr_panel)*BASE_INDEX)+(i-1)),
+                                           (2+((nr_panel)*BASE_INDEX)+(i-1))+nr_panel)]
+        
+        
+      } else {
+        
+        QC_list[[i]] <- dat[,c((2+((nr_panel)*BASE_INDEX)+(i-1)),
+                               (2+((nr_panel)*BASE_INDEX)+(i-1))+nr_panel,
+                               (2+((nr_panel)*BASE_INDEX)+(i-1))+2*nr_panel+(i-1),
+                               (2+((nr_panel)*BASE_INDEX)+(i-1))+2*nr_panel+(i-1)+1)]
+        
+        meta_data_list[[i]] <- meta_dat[,c((2+((i-1)*BASE_INDEX)):((BASE_INDEX+1)+((i-1)*BASE_INDEX)),
+                                           (2+((nr_panel)*BASE_INDEX)+(i-1)),
+                                           (2+((nr_panel)*BASE_INDEX)+(i-1))+nr_panel,
+                                           (2+((nr_panel)*BASE_INDEX)+(i-1))+2*nr_panel,
+                                           (2+((nr_panel)*BASE_INDEX)+(i-1))+3*nr_panel)]
+        
+        meta_data_list[[i]][4,(BASE_INDEX+3)] <- "QC Deviation Inc Ctrl"
+        meta_data_list[[i]][4,(BASE_INDEX+4)] <- "QC Deviation Det Ctrl"
+        
+        
+      }
+      
+      meta_data_list[[i]][4,(BASE_INDEX+1)] <- meta_data_list[[i]][2,(BASE_INDEX+1)]
+      meta_data_list[[i]][4,(BASE_INDEX+2)] <- meta_data_list[[i]][2,(BASE_INDEX+2)]
+      
+      
+      panel_list[[i]] <- cbind(panel_data[[i]],QC_list[[i]])
+      
+      colnames(panel_list[[i]]) <- unlist(meta_data_list[[i]][4,])
+      
+      panel_list[[i]][,c(-(BASE_INDEX+1),-(BASE_INDEX+2))] <-
+        lapply(panel_list[[i]][,c(-(BASE_INDEX+1),-(BASE_INDEX+2))],
+               function(x) as.numeric(stringr::str_replace_all(x,
+                                                               c('#' = '', ',' = '.',
+                                                                 'No Data' = NA, '> ULOQ' = NA,
+                                                                 '< LLOQ' = NA))))
+      
+      # Remove the last two columns since they contain redundant meta data and
+      # will only cause warnings
+      meta_data_list[[i]] <- meta_data_list[[i]][,c(-(BASE_INDEX+1),-(BASE_INDEX+2))]
+      
+      assay_name_list[[i]] <- tidyr::tibble(ID=c(t(meta_data_list[[i]][4,])),
+                                            Name=c(t(meta_data_list[[i]][2,])),
+                                            UniProt = c(t(meta_data_list[[i]][3,])),
+                                            Panel=c(t(meta_data_list[[i]][1,])))
+      
+      if (is_npx_data) {
+        assay_name_list[[i]] <- dplyr::bind_cols(assay_name_list[[i]],
+                                                 MissingFreq=c(t(meta_data_list[[i]][5,])),
+                                                 LOD = as.numeric(c(t(meta_data_list[[i]][6,]))))
+        
+        if (NORM_FLAG == TRUE) {
+          assay_name_list[[i]] <- dplyr::bind_cols(assay_name_list[[i]],
+                                                   Normalization = c(t(meta_data_list[[i]][7,])))
         }
-        panel_list_long[[(i-1)*j+j]] <- panel_list[[i]] %>%
+        
+        panel_list_long[[i]] <- panel_list[[i]] %>%
           dplyr::mutate(SampleID = SampleID) %>%
           dplyr::mutate(Index = Index_nr) %>%
-          tidyr::gather(Assay, NPX, -SampleID,-`QC Warning`,-`Plate ID`,
-                        -Index,
+          tidyr::gather(Assay, NPX, -SampleID,-`QC Warning`,
+                        -`Plate ID`,-Index,
                         -dplyr::matches("QC Deviation Inc Ctrl"),
                         -dplyr::matches("QC Deviation Det Ctrl")) %>%
-          dplyr::filter(`Plate ID` == plates[[j]]) %>%
-          dplyr::left_join(assay_name_by_plate, by = c('Assay' = 'ID')) %>%
-          dplyr::select(SampleID, Index, Assay, UniProt, Name, MissingFreq,
-                        Panel,`Plate ID`,`QC Warning`, LOD, NPX, Unit,
-                        ULOQ, LLOQ, Plate_LQL, Assay_Warning,
-                        dplyr::matches("Normalization"),
-                        dplyr::matches("QC Deviation Inc Ctrl"),
+          dplyr::left_join(assay_name_list[[i]], by = c('Assay' = 'ID')) %>%
+          dplyr::select(SampleID, Index, Assay, UniProt, Name, MissingFreq, Panel,
+                        `Plate ID`,`QC Warning`, LOD, NPX, dplyr::matches("Assay_Warning"),
+                        dplyr::matches("Normalization"), dplyr::matches("QC Deviation Inc Ctrl"),
                         dplyr::matches("QC Deviation Det Ctrl")) %>%
           dplyr::rename(PlateID = `Plate ID`) %>%
           dplyr::rename(QC_Warning = `QC Warning`) %>%
           dplyr::rename(OlinkID = Assay, Assay = Name)
+      } else {
+        for (j in 1:nr_plates) {
+          assay_name_by_plate <- dplyr::bind_cols(assay_name_list[[i]],
+                                                  Unit=c(t(meta_data_list[[i]][5,])),
+                                                  MissingFreq=c(t(meta_data_list[[i]][6,])),
+                                                  LLOQ = as.numeric(c(t(meta_data_list[[i]][7,]))),
+                                                  ULOQ = as.numeric(c(t(meta_data_list[[i]][8,]))),
+                                                  Assay_Warning = c(t(meta_data_list[[i]][(9+(j-1)),])),
+                                                  Plate_LQL = as.numeric(c(t(meta_data_list[[i]][(9+nr_plates+(j-1)),]))),
+                                                  LOD = as.numeric(c(t(meta_data_list[[i]][(9+2*nr_plates+(j-1)),]))))
+          if(NORM_FLAG == TRUE) {
+            assay_name_by_plate <- dplyr::bind_cols(assay_name_by_plate,
+                                                    Normalization = c(t(meta_data_list[[i]][9+3*nr_plates,])))
+          }
+          panel_list_long[[(i-1)*j+j]] <- panel_list[[i]] %>%
+            dplyr::mutate(SampleID = SampleID) %>%
+            dplyr::mutate(Index = Index_nr) %>%
+            tidyr::gather(Assay, NPX, -SampleID,-`QC Warning`,-`Plate ID`,
+                          -Index,
+                          -dplyr::matches("QC Deviation Inc Ctrl"),
+                          -dplyr::matches("QC Deviation Det Ctrl")) %>%
+            dplyr::filter(`Plate ID` == plates[[j]]) %>%
+            dplyr::left_join(assay_name_by_plate, by = c('Assay' = 'ID')) %>%
+            dplyr::select(SampleID, Index, Assay, UniProt, Name, MissingFreq,
+                          Panel,`Plate ID`,`QC Warning`, LOD, NPX, Unit,
+                          ULOQ, LLOQ, Plate_LQL, Assay_Warning,
+                          dplyr::matches("Normalization"),
+                          dplyr::matches("QC Deviation Inc Ctrl"),
+                          dplyr::matches("QC Deviation Det Ctrl")) %>%
+            dplyr::rename(PlateID = `Plate ID`) %>%
+            dplyr::rename(QC_Warning = `QC Warning`) %>%
+            dplyr::rename(OlinkID = Assay, Assay = Name)
+        }
       }
     }
-  }
-
-  if (!is_npx_data) {
-    for (i in 1:(nr_panel*nr_plates)) {
-      panel_list_long[[i]] <- panel_list_long[[i]] %>%
-        dplyr::rename(Plate_LOD = LOD) %>%
-        dplyr::rename(Quantified_value = NPX)
+    
+    if (!is_npx_data) {
+      for (i in 1:(nr_panel*nr_plates)) {
+        panel_list_long[[i]] <- panel_list_long[[i]] %>%
+          dplyr::rename(Plate_LOD = LOD) %>%
+          dplyr::rename(Quantified_value = NPX)
+      }
     }
-  }
+    
+    out <- dplyr::bind_rows(panel_list_long) %>%
+      dplyr::filter(!is.na(SampleID)) %>%
+      dplyr::as_tibble() %>%
+      dplyr::mutate(Panel_Version = gsub(".*\\(","",Panel)) %>%
+      dplyr::mutate(Panel_Version = gsub("\\)","",Panel_Version)) %>%
+      dplyr::mutate(Panel =  gsub("\\(.*\\)","",Panel)) %>%
+      dplyr::mutate(Panel = stringr::str_to_title(Panel)) %>%
+      dplyr::mutate(Panel = gsub("Target 96", "", Panel)) %>%
+      dplyr::mutate(Panel = gsub("Olink", "", Panel)) %>%
+      dplyr::mutate(Panel = trimws(Panel, which = "left")) %>%
+      tidyr::separate(Panel, " ", into = c("Panel_Start", "Panel_End"), fill = "right") %>%
+      dplyr::mutate(Panel_End = ifelse(grepl("Ii", Panel_End), stringr::str_to_upper(Panel_End), Panel_End)) %>%
+      dplyr::mutate(Panel_End = ifelse(is.na(Panel_End), " ", Panel_End)) %>%
+      dplyr::mutate(Panel = paste("Olink", Panel_Start, Panel_End)) %>%
+      dplyr::mutate(Panel = trimws(Panel, which = "right")) %>%
+      dplyr::select(-Panel_Start, -Panel_End) %>%
+      dplyr::select(SampleID, Index, OlinkID,
+                    UniProt, Assay, MissingFreq,
+                    Panel,Panel_Version,PlateID,
+                    QC_Warning,dplyr::matches("Plate_LQL"),
+                    dplyr::matches("LOD"),
+                    dplyr::matches("Plat_LOD"),
+                    dplyr::matches("LLOQ"),
+                    dplyr::matches("ULOQ"),
+                    dplyr::matches("NPX"),
+                    dplyr::matches("Quantified_value"),
+                    dplyr::matches("Unit"),
+                    dplyr::matches("Assay_Warning"),
+                    dplyr::matches("Normalization"),
+                    dplyr::matches("*Inc Ctrl*"),
+                    dplyr::matches("*Det Ctrl*"))
+    }
 
-  out <- dplyr::bind_rows(panel_list_long) %>%
-    dplyr::filter(!is.na(SampleID)) %>%
-    dplyr::as_tibble() %>%
-    dplyr::mutate(Panel_Version = gsub(".*\\(","",Panel)) %>%
-    dplyr::mutate(Panel_Version = gsub("\\)","",Panel_Version)) %>%
-    dplyr::mutate(Panel =  gsub("\\(.*\\)","",Panel)) %>%
-    dplyr::mutate(Panel = stringr::str_to_title(Panel)) %>%
-    dplyr::mutate(Panel = gsub("Target 96", "", Panel)) %>%
-    dplyr::mutate(Panel = gsub("Olink", "", Panel)) %>%
-    dplyr::mutate(Panel = trimws(Panel, which = "left")) %>%
-    tidyr::separate(Panel, " ", into = c("Panel_Start", "Panel_End"), fill = "right") %>%
-    dplyr::mutate(Panel_End = ifelse(grepl("Ii", Panel_End), stringr::str_to_upper(Panel_End), Panel_End)) %>%
-    dplyr::mutate(Panel_End = ifelse(is.na(Panel_End), " ", Panel_End)) %>%
-    dplyr::mutate(Panel = paste("Olink", Panel_Start, Panel_End)) %>%
-    dplyr::mutate(Panel = trimws(Panel, which = "right")) %>%
-    dplyr::select(-Panel_Start, -Panel_End) %>%
-    dplyr::select(SampleID, Index, OlinkID,
-                  UniProt, Assay, MissingFreq,
-                  Panel,Panel_Version,PlateID,
-                  QC_Warning,dplyr::matches("Plate_LQL"),
-                  dplyr::matches("LOD"),
-                  dplyr::matches("Plat_LOD"),
-                  dplyr::matches("LLOQ"),
-                  dplyr::matches("ULOQ"),
-                  dplyr::matches("NPX"),
-                  dplyr::matches("Quantified_value"),
-                  dplyr::matches("Unit"),
-                  dplyr::matches("Assay_Warning"),
-                  dplyr::matches("Normalization"),
-                  dplyr::matches("*Inc Ctrl*"),
-                  dplyr::matches("*Det Ctrl*"))
-
+  
+  
   if (is_npx_data) {
     # Check for data completeness and warn on problems
     check_data_completeness(out)
