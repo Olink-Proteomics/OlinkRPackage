@@ -296,6 +296,7 @@ read_NPX_target <- function(filename) {
                     dplyr::matches("Normalization"),
                     dplyr::matches("*Inc Ctrl*"),
                     dplyr::matches("*Det Ctrl*"))
+    is_npx_data <- ifelse(any(names(out) %in% "NPX"), TRUE, FALSE)
   } else {
     # Load initial meta data (the first rows of the wide file)
     meta_dat <-  readxl::read_excel(path = filename,
