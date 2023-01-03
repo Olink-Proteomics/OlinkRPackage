@@ -219,6 +219,7 @@ read_NPX_explore <- function(filename) {
 read_NPX_target <- function(filename) {
 
   NORM_FLAG <-  FALSE
+  long_form <- FALSE
 
   # Check if the data is npx or concentration as well as if it is T48 or T96
 
@@ -230,7 +231,7 @@ read_NPX_target <- function(filename) {
                                   range = 'G2',
                                   col_names = FALSE,
                                   .name_repair = "minimal")
-
+  
   if (grepl(pattern = 'NPX', x = data_type, fixed = TRUE)) {
 
     is_npx_data     <- TRUE
@@ -257,7 +258,7 @@ read_NPX_target <- function(filename) {
     BASE_INDEX      <- 45
   } else if (grepl(pattern = "Target", data_type_long, fixed = TRUE)){
     message("Target Data in long form detected.")
-    long_form = TRUE
+    long_form <- TRUE
   } else {
     stop("Cannot find whether the given data is NPX or concentration")
   }
