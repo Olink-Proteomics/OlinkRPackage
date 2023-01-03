@@ -272,6 +272,7 @@ read_NPX_target <- function(filename) {
       dplyr::mutate(Panel =  gsub("\\(.*\\)","",Panel)) %>%
       dplyr::mutate(Panel = stringr::str_to_title(Panel)) %>%
       dplyr::mutate(Panel = gsub("Target 96", "", Panel)) %>%
+      dplyr::mutate(Panel = gsub("Target 48", "", Panel)) %>%
       dplyr::mutate(Panel = gsub("Olink", "", Panel)) %>%
       dplyr::mutate(Panel = trimws(Panel, which = "left")) %>%
       tidyr::separate(Panel, " ", into = c("Panel_Start", "Panel_End"), fill = "right") %>%
@@ -529,6 +530,7 @@ read_NPX_target <- function(filename) {
       dplyr::mutate(Panel =  gsub("\\(.*\\)","",Panel)) %>%
       dplyr::mutate(Panel = stringr::str_to_title(Panel)) %>%
       dplyr::mutate(Panel = gsub("Target 96", "", Panel)) %>%
+      dplyr::mutate(Panel = gsub("Target 48", "", Panel)) %>%
       dplyr::mutate(Panel = gsub("Olink", "", Panel)) %>%
       dplyr::mutate(Panel = trimws(Panel, which = "left")) %>%
       tidyr::separate(Panel, " ", into = c("Panel_Start", "Panel_End"), fill = "right") %>%
