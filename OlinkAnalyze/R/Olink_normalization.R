@@ -117,11 +117,11 @@ olink_normalization <- function(df1,
     if(length(c(setdiff(names(df1), names(df2)),setdiff(names(df2), names(df1)))) != 0){ # and the column names dont match
       missing_df2 <- setdiff(names(df1), names(df2))
       if(length(missing_df2) > 0){
-        message(paste("The following columns are found in df1 but not df2: \n", paste(unlist(missing_df2), collapse = ",")))
+        warning(paste("The following columns are found in df1 but not df2: \n", paste(unlist(missing_df2), collapse = ",")))
       }
       missing_df1 <- setdiff(names(df2), names(df1))
       if(length(missing_df1) > 0){
-        message(paste("The following columns are found in df2 but not df1: \n", paste(unlist(missing_df1), collapse = ",")))
+        warning(paste("The following columns are found in df2 but not df1: \n", paste(unlist(missing_df1), collapse = ",")))
       }
       message("Adding missing columns...")
       
