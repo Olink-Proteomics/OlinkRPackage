@@ -1,9 +1,9 @@
 #' Function to read NPX data into long format
 #'
-#' Imports an NPX file exported from NPX Manager or MyData.
-#' No alterations to the output NPX Manager format is allowed.
+#' Imports an NPX file exported from Olink Software.
+#' No alterations to the output format is allowed.
 #'
-#' @param filename Path to NPX Manager or MyData output file.
+#' @param filename Path to Olink Software output file.
 #' @return A "tibble" in long format. Columns include:
 #' \itemize{
 #'    \item{SampleID:} Sample ID
