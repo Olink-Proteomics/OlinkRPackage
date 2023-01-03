@@ -169,14 +169,15 @@ read_NPX_explore <- function(filename) {
 
 
   # Check that all column names are present
-  # We have had 3 column names versions so far: 1, 1.1 and 2
+  # We have had 5 column names versions so far: 1, 1.1 and 2, 2.1, and 3
   # please add newer versions to the list chronologically
   header_standard <-    c("SampleID", "Index", "OlinkID", "UniProt", "Assay", "MissingFreq",
                           "Panel", "PlateID", "QC_Warning", "LOD", "NPX")
   header_v        <- list("header_v1"   = c(header_standard, "Panel_Version"),
                           "header_v1.1" = c(header_standard, "Panel_Version", "Normalization", "Assay_Warning"),
                           "header_v2"   = c(header_standard, "Panel_Lot_Nr", "Normalization", "Assay_Warning"),
-                          "header_v2.1" = c(header_standard, "Panel_Lot_Nr", "Normalization"))
+                          "header_v2.1" = c(header_standard, "Panel_Lot_Nr", "Normalization"),
+                          "header_v3" = c(header_standard, "Sample_Type", "Panel_Lot_Nr", "Normalization", "ExploreVersion"))
   header_match    <-  any( sapply(header_v, function(x) all(x %in% colnames(out))) ) # look for one full match
 
   if (header_match == TRUE) {
