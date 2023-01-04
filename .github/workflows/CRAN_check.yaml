@@ -47,7 +47,7 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           working-directory: OlinkAnalyze
-          extra-packages: any::rcmdcheck, pillar, any::devtools, any::cli, any::rhub, any::revdepcheck, github::r-lib/revdepcheck
+          extra-packages: any::rcmdcheck, pillar, any::devtools, any::cli, any::rhub, any::revdepcheck, github::r-lib/revdepcheck, any::spelling
 
       - name: Record check messages
         run: |
