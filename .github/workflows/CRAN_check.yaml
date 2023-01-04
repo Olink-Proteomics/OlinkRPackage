@@ -81,7 +81,7 @@ jobs:
         run: |
           setwd("OlinkAnalyze")
         
-          devtools::check(remote = T, incoming = T)
+          devtools::check(remote = T, incoming = T, env_vars = c(NOT_CRAN = "false"))
         shell: Rscript {0}
         
       - name: revdep_check
