@@ -145,7 +145,8 @@ read_NPX_explore <- function(filename) {
                     header = TRUE,
                     sep = ";",
                     stringsAsFactors = FALSE,
-                    na.strings = c("NA", ""))
+                    na.strings = c("NA", ""),
+                    comment.char = "")
 
   # if only one column in the data, try "," as delimiter
   if (is.data.frame(out) && ncol(out) == 1) {
@@ -174,7 +175,8 @@ read_NPX_explore <- function(filename) {
                           "Panel", "PlateID", "QC_Warning", "LOD", "NPX")
   header_v        <- list("header_v1"   = c(header_standard, "Panel_Version"),
                           "header_v1.1" = c(header_standard, "Panel_Version", "Normalization", "Assay_Warning"),
-                          "header_v2"   = c(header_standard, "Panel_Lot_Nr", "Normalization", "Assay_Warning"))
+                          "header_v2"   = c(header_standard, "Panel_Lot_Nr", "Normalization", "Assay_Warning"),
+                          "header_v2.1" = c(header_standard, "Panel_Lot_Nr", "Normalization"))
   header_match    <-  any( sapply(header_v, function(x) all(x %in% colnames(out))) ) # look for one full match
 
   if (header_match == TRUE) {
