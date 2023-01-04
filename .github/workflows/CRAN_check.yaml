@@ -47,7 +47,7 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           working-directory: OlinkAnalyze
-          extra-packages: any::rcmdcheck, pillar, any::devtools, any::cli
+          extra-packages: any::rcmdcheck, pillar, any::devtools, any::cli, any::rhub, any::revdepcheck, github::r-lib/revdepcheck
 
       - name: Record check messages
         run: |
@@ -67,7 +67,35 @@ jobs:
           cli::cli_alert_info(results$notes)
         shell: Rscript {0}
 
-
-
+      - name: Spellcheck
+        run: |
+          setwd("OlinkAnalyze")
+        
+          devtools::spell_check()
+        shell: Rscript {0}
+          
+      - name: rhub & win-builder checks
+        run: |
+          setwd("OlinkAnalyze")
+        
+          devtools::check_win_devel()
+          
+          rhub::validate_email(email = "biostattools@olink.com", token = "${{ secrets.RHUB_TOKEN }}")
+          devtools::check_rhub(env_vars = c(`_R_CHECK_FORCE_SUGGESTS_` = "false"), interactive = TRUE)
+        shell: Rscript {0}
+        
+      - name: R_CHECK_CRAN_INCOMING_REMOTE
+        run: |
+          setwd("OlinkAnalyze")
+        
+          devtools::check(remote = T, incoming = T)
+        shell: Rscript {0}
+        
+      - name: revdep_check
+        run: |
+          setwd("OlinkAnalyze")
+        
+          revdepcheck::revdep_check()
+        shell: Rscript {0}          
 
 
