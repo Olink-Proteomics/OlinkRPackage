@@ -232,3 +232,32 @@ test_that("df1 and df2 same normalization", {
     "df1 and df2 are not normalized with the same approach. Consider renormalizing.")
 })
 
+test_that("Different columns in dfs can be normalized",{
+  mismatch_col_norm <- suppressWarnings({olink_normalization(df1 = npx_df_test,
+                                           df2 = npx_df2,
+                                           overlapping_samples_df1 = overlap_samples2,
+                                           df1_project_nr = 'P1',
+                                           df2_project_nr = 'P2',
+                                           reference_project = 'P1')}) %>% 
+    filter(SampleID %in% sampleSubset)
+  # Columns are as expected
+  expect_equal(sort(names(mismatch_col_norm)), sort(unique(c(names(npx_df_test), names(npx_df2), "Adj_factor"))))
+  # NAs are where expected
+  col_notdf2<-stringr::str_remove(setdiff(names(mismatch_col_norm), names(npx_df2)), "Adj_factor")
+  col_notdf1<-stringr::str_remove(setdiff(names(mismatch_col_norm), names(npx_df_test)), "Adj_factor")
+  
+
+  expect_equal({mismatch_col_norm %>% 
+    filter(Project == "P2") %>% 
+    select(all_of(col_notdf2[-length(col_notdf2)])) %>% 
+    distinct() %>% 
+    pull()}, "NA")
+  
+  expect_equal({mismatch_col_norm %>% 
+      filter(Project == "P1") %>% 
+      select(all_of(col_notdf1[-length(col_notdf1)])) %>% 
+      distinct() %>% 
+      pull()}, "NA")
+  expect_equal(normalization_results.bridged$NPX, mismatch_col_norm$NPX)
+  
+})
