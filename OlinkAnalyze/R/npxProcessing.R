@@ -14,18 +14,18 @@ npxProcessing_forDimRed <- function(df,
   #### Set up plotting colors ####
   if (color_g == "QC_Warning"){
     df_temp <- df %>%
-      dplyr::group_by(SampleID, Index) %>%
+      dplyr::group_by(SampleID) %>%
       dplyr::mutate(QC_Warning = dplyr::if_else(any(QC_Warning == "Warning"|QC_Warning == "WARN" ), "Warning", "Pass")) %>%
       dplyr::ungroup()
 
     plotColors <- df_temp %>%
-      dplyr::group_by(SampleID, Index) %>%
+      dplyr::group_by(SampleID) %>%
       dplyr::summarise(colors = unique(!!rlang::ensym(color_g))) %>%
       dplyr::ungroup()
 
   } else {
     number_of_sample_w_more_than_one_color <- df %>%
-      dplyr::group_by(SampleID, Index) %>%
+      dplyr::group_by(SampleID) %>%
       dplyr::summarise(n_colors = dplyr::n_distinct(!!rlang::ensym(color_g), na.rm = TRUE)) %>%
       dplyr::ungroup() %>%
       dplyr::filter(n_colors > 1) %>%
@@ -37,7 +37,7 @@ npxProcessing_forDimRed <- function(df,
       df_temp <- df
 
       plotColors <- df_temp %>%
-        dplyr::group_by(SampleID, Index) %>%
+        dplyr::group_by(SampleID) %>%
         dplyr::summarise(colors = unique(!!rlang::ensym(color_g))) %>%
         dplyr::ungroup()
     }
@@ -53,7 +53,7 @@ npxProcessing_forDimRed <- function(df,
 
   #wide format
   df_wide <- df_temp %>%
-    dplyr::select(SampleID, Index, OlinkID, NPX) %>%
+    dplyr::select(SampleID, OlinkID, NPX) %>%
     dplyr::filter(!is.na(NPX)) %>%
     tidyr::spread(OlinkID, NPX)
 
@@ -153,13 +153,11 @@ npxProcessing_forDimRed <- function(df,
 
   #### Format data and wrap up results ####
   df_wide <- df_wide %>%
-    dplyr::left_join(plotColors,
-                     by = c('SampleID',
-                            'Index')) %>%
-    dplyr::select(SampleID, Index, colors, everything())
+    dplyr::left_join(plotColors, by = 'SampleID') %>%
+    dplyr::select(SampleID, colors, everything())
 
   df_wide_matrix <- df_wide %>%
-    dplyr::select(-Index, -colors) %>%
+    dplyr::select(-colors) %>%
     tibble::column_to_rownames('SampleID') %>%
     as.matrix
 

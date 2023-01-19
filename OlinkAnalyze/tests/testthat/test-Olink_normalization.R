@@ -13,13 +13,15 @@ overlap_samples <- intersect(npx_data1$SampleID, npx_data2$SampleID) %>%
   data.frame() %>%
   filter(!str_detect(., 'CONTROL_SAMPLE')) %>% #Remove control samples
   pull(.)
-normalization_results.bridged <- olink_normalization(df1 = npx_data1,
-                                                     df2 = npx_data2,
+
+normalization_results.bridged <- olink_normalization(df1 = { npx_data1 |> mutate(Normalization = "Intensity") }, # adding Normalization to avoid warning
+                                                     df2 = { npx_data2 |> mutate(Normalization = "Intensity") }, # adding Normalization to avoid warning
                                                      overlapping_samples_df1 = overlap_samples,
                                                      df1_project_nr = '20200001',
                                                      df2_project_nr = '20200002',
                                                      reference_project = '20200001') %>%
-  filter(SampleID %in% sampleSubset)
+  filter(SampleID %in% sampleSubset) |>
+  select(-Normalization) # removing Normalization to match instance from ref_results
 
 
 # Warning if column names arent the same but results still match
@@ -32,23 +34,25 @@ overlap_samples2 <- intersect(npx_data1$SampleID, npx_data2$SampleID) %>%
   filter(!str_detect(., 'CONTROL_SAMPLE')) %>% #Remove control samples
   pull(.)
 # Intensity normalization
-normalization_results.intensity <- olink_normalization(df1 = npx_data1,
-                                                       df2 = npx_data2,
+normalization_results.intensity <- olink_normalization(df1 = { npx_data1 |> mutate(Normalization = "Intensity") }, # adding Normalization to avoid warning
+                                                       df2 = { npx_data2 |> mutate(Normalization = "Intensity") }, # adding Normalization to avoid warning
                                                        overlapping_samples_df1 = npx_data1$SampleID,
                                                        overlapping_samples_df2 = npx_data2$SampleID) %>%
-  filter(SampleID %in% sampleSubset)
+  filter(SampleID %in% sampleSubset) |>
+  select(-Normalization) # removing Normalization to match instance from ref_results
 
 # Subset normalization
 #NOTE: this subset is just a random sample in order to test the function
 sampleSubset.adj <- c("C6", "C21","C28","C50","C19","D5", "A30","C52","D77","D3", "D16","C72","A52","D67","C77","C22","D62","D39","C34","C13")
-normalization_results.subset <- olink_normalization(df1 = npx_data1,
-                                                    df2 = npx_data2,
+normalization_results.subset <- olink_normalization(df1 = { npx_data1 |> mutate(Normalization = "Intensity") }, # adding Normalization to avoid warning
+                                                    df2 = { npx_data2 |> mutate(Normalization = "Intensity") }, # adding Normalization to avoid warning
                                                     overlapping_samples_df1 = npx_data1$SampleID,
                                                     overlapping_samples_df2 = sampleSubset.adj,
                                                     df1_project_nr = '20200001',
                                                     df2_project_nr = '20200002',
                                                     reference_project = '20200001') %>%
-  filter(SampleID %in% sampleSubset)
+  filter(SampleID %in% sampleSubset) |>
+  select(-Normalization) # removing Normalization to match instance from ref_results
 
 # Bridge normalization with excluded assays
 excludedOIDs.proj1 <-
@@ -86,10 +90,10 @@ test_that("olink_normalization works", {
   expect_equal(normalization_results.bridged, ref_results$normalization_results.bridged)
   expect_equal(normalization_results.intensity, ref_results$normalization_results.intensity)
   expect_equal(normalization_results.subset, ref_results$normalization_results.subset)
-  expect_error(olink_normalization(df1 = npx_data1,
-                                   df2 = npx_data2)) # No samples specified
-  expect_error(olink_normalization(df1 = npx_data1,
-                                   df2 = npx_data2,
+  expect_error(olink_normalization(df1 = { npx_data1 |> mutate(Normalization = "Intensity") },
+                                   df2 = { npx_data2 |> mutate(Normalization = "Intensity") })) # No samples specified
+  expect_error(olink_normalization(df1 = { npx_data1 |> mutate(Normalization = "Intensity") },
+                                   df2 = { npx_data2 |> mutate(Normalization = "Intensity") },
                                    overlapping_samples_df1 = c("B64", "B36", "A77", "B7", "A24", "A49", "B76"))) # Non overlapping samples for bridging
 
   ### Testing the excluded assay bridging ###
@@ -125,3 +129,106 @@ test_that("olink_normalization works", {
                 pull(match) %>%
                 all())
 })
+
+# Test if column "Normalize" is missing
+
+test_that("missing Normalization column", {
+  # both df1 and df2 are lacking column "Normalization"
+  expect_warning(
+    olink_normalization(df1 = npx_data1,
+                        df2 = npx_data2,
+                        overlapping_samples_df1 = {
+                          intersect(npx_data1$SampleID, npx_data2$SampleID) |>
+                            as_tibble() |>
+                            filter(!str_detect(value, 'CONTROL_SAMPLE')) |> #Remove control samples
+                            pull()
+                        },
+                        df1_project_nr = '20200001',
+                        df2_project_nr = '20200002',
+                        reference_project = '20200001'),
+    "Variable \"Normalization\" not present in df1 and df2")
+
+  # only df1 contains column "Normalization"
+  expect_warning(
+    olink_normalization(df1 = {
+      npx_data1 |>
+        mutate(Normalization = "Intensity")
+    },
+    df2 = npx_data2,
+    overlapping_samples_df1 = {
+      intersect(npx_data1$SampleID, npx_data2$SampleID) |>
+        as_tibble() |>
+        filter(!str_detect(value, 'CONTROL_SAMPLE')) |>
+        pull()
+    },
+    df1_project_nr = '20200001',
+    df2_project_nr = '20200002',
+    reference_project = '20200001'),
+    "Variable \"Normalization\" not present in df2. Removing column from df1.")
+
+  # only df2 contains column "Normalization"
+  expect_warning(
+    olink_normalization(df1 = npx_data1,
+                        df2 = {
+                          npx_data2 |>
+                            mutate(Normalization = "Intensity")
+                        },
+                        overlapping_samples_df1 = {
+                          intersect(npx_data1$SampleID, npx_data2$SampleID) |>
+                            as_tibble() |>
+                            filter(!str_detect(value, 'CONTROL_SAMPLE')) |>
+                            pull()
+                        },
+                        df1_project_nr = '20200001',
+                        df2_project_nr = '20200002',
+                        reference_project = '20200001'),
+    "Variable \"Normalization\" not present in df1. Removing column from df2.")
+})
+
+# Test that df1 and df2 are normalized similarly
+
+test_that("df1 and df2 same normalization", {
+  # different normalization with expected values in Normalization column
+  expect_warning(
+    olink_normalization(df1 = {
+      npx_data1 |>
+        mutate(Normalization = "Intensity")
+    },
+    df2 = {
+      npx_data2 |>
+        mutate(Normalization = "Plate control")
+    },
+    overlapping_samples_df1 = {
+      intersect(npx_data1$SampleID, npx_data2$SampleID) |>
+        as_tibble() |>
+        filter(!str_detect(value, 'CONTROL_SAMPLE')) |>
+        pull()
+    },
+    df1_project_nr = '20200001',
+    df2_project_nr = '20200002',
+    reference_project = '20200001'),
+    "df1 and df2 are not normalized with the same approach. Consider renormalizing.")
+
+  # different normalization with unexpected values in Normalization column
+  # currently we do not check values in this column, but in the future we might
+  expect_warning(
+    olink_normalization(df1 = {
+      npx_data1 |>
+        mutate(Normalization = "A")
+    },
+    df2 = {
+      npx_data2 |>
+        mutate(Normalization = "B")
+    },
+    overlapping_samples_df1 = {
+      intersect(npx_data1$SampleID, npx_data2$SampleID) |>
+        as_tibble() |>
+        filter(!str_detect(value, 'CONTROL_SAMPLE')) |>
+        pull()
+    },
+    df1_project_nr = '20200001',
+    df2_project_nr = '20200002',
+    reference_project = '20200001'),
+    "df1 and df2 are not normalized with the same approach. Consider renormalizing.")
+})
+

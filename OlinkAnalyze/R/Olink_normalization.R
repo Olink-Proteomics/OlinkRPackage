@@ -131,13 +131,13 @@ olink_normalization <- function(df1,
   #Filtering on valid OlinkID
   df1 <- df1 %>%
     dplyr::filter(stringr::str_detect(OlinkID,
-                               "OID[0-9]{5}"))
+                                      "OID[0-9]{5}"))
 
   if(!is.null(df2)){
 
     df2 <- df2 %>%
       dplyr::filter(stringr::str_detect(OlinkID,
-                                 "OID[0-9]{5}"))
+                                        "OID[0-9]{5}"))
   }
 
   #median of difference flag
@@ -187,8 +187,8 @@ olink_normalization <- function(df1,
           dplyr::mutate(Assay_Median=median(NPX, na.rm = TRUE)) %>%
           ungroup() %>%
           dplyr::mutate(Adj_factor = dplyr::if_else(is.na(Reference_NPX - Assay_Median),
-                                      0,
-                                      Reference_NPX - Assay_Median)) %>%
+                                                    0,
+                                                    Reference_NPX - Assay_Median)) %>%
           dplyr::select(OlinkID, Adj_factor) %>%
           dplyr::distinct()
 
@@ -234,6 +234,25 @@ olink_normalization <- function(df1,
 
   }
 
+  # check if both df1 and df2 were normalized with the same method
+  # "Intensity" or "Plate control"
+  if (!("Normalization" %in% colnames(df1)) || !("Normalization" %in% colnames(df2))) {
+    if (!("Normalization" %in% colnames(df1)) && !("Normalization" %in% colnames(df2))) {
+      warning("Variable \"Normalization\" not present in df1 and df2")
+    } else if (!("Normalization" %in% colnames(df1))) {
+      warning("Variable \"Normalization\" not present in df1. Removing column from df2.")
+      df2 <- dplyr::select(df2, -Normalization)
+    } else if (!("Normalization" %in% colnames(df2))) {
+      warning("Variable \"Normalization\" not present in df2. Removing column from df1.")
+      df1 <- dplyr::select(df1, -Normalization)
+    }
+  } else if (("Normalization" %in% colnames(df1)) && ("Normalization" %in% colnames(df2))) {
+    if ({ df1$Normalization |> unique() |> length() } != 1 ||
+        { df2$Normalization |> unique() |> length() } != 1 ||
+        unique(df1$Normalization) != unique(df2$Normalization)) {
+      warning("df1 and df2 are not normalized with the same approach. Consider renormalizing.")
+    }
+  }
 
   if(MOD_FLAG){
 
@@ -273,8 +292,8 @@ olink_normalization <- function(df1,
     adj_factor_df <- adj_factor_df %>%
       dplyr::group_by(OlinkID) %>%
       dplyr::summarise(Adj_factor = dplyr::if_else(is.na(median(Diff, na.rm = TRUE)),
-                                     0,
-                                     median(Diff, na.rm = TRUE)))
+                                                   0,
+                                                   median(Diff, na.rm = TRUE)))
 
   }else{
 
@@ -294,13 +313,13 @@ olink_normalization <- function(df1,
     if (reference_project == df1_project_nr) {
       adj_factor_df <- adj_factor_df %>%
         dplyr::mutate(Adj_factor = dplyr::if_else(is.na(!!rlang::ensym(df1_project_nr) - !!rlang::ensym(df2_project_nr)),
-                                    0,
-                                    !!rlang::ensym(df1_project_nr) - !!rlang::ensym(df2_project_nr)))
+                                                  0,
+                                                  !!rlang::ensym(df1_project_nr) - !!rlang::ensym(df2_project_nr)))
     } else {
       adj_factor_df <- adj_factor_df %>%
         dplyr::mutate(Adj_factor = dplyr::if_else(is.na(!!rlang::ensym(df2_project_nr) - !!rlang::ensym(df1_project_nr)),
-                                    0,
-                                    !!rlang::ensym(df2_project_nr) - !!rlang::ensym(df1_project_nr)))
+                                                  0,
+                                                  !!rlang::ensym(df2_project_nr) - !!rlang::ensym(df1_project_nr)))
     }
 
     adj_factor_df <- adj_factor_df %>%
