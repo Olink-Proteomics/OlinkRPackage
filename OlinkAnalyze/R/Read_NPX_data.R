@@ -177,8 +177,16 @@ read_NPX_explore <- function(filename) {
                           "header_v1.1" = c(header_standard, "Panel_Version", "Normalization", "Assay_Warning"),
                           "header_v2"   = c(header_standard, "Panel_Lot_Nr", "Normalization", "Assay_Warning"),
                           "header_v2.1" = c(header_standard, "Panel_Lot_Nr", "Normalization"),
-                          "header_v3" = c(header_standard, "Sample_Type", "Panel_Lot_Nr", "Normalization", "ExploreVersion"))
+                          "header_v3" = c(header_standard, "Sample_Type", "Panel_Lot_Nr", "Assay_Warning",
+                                          "Normalization", "ExploreVersion"))
   header_match    <-  any( sapply(header_v, function(x) all(x %in% colnames(out))) ) # look for one full match
+  if (any(names(out) %in% c("Sample_Type", "ExploreVersion" ))){
+    missing_cols<-setdiff(c("Sample_Type", "ExploreVersion" ), names(out))
+    if(length(missing_cols) != 0){
+      stop(paste0("Cannot find columns: ", paste(missing_cols, collapse = ",")))
+    }
+    
+  }
 
   if (header_match == TRUE) {
 
