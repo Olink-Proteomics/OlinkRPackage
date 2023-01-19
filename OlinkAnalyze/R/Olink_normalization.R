@@ -98,7 +98,7 @@
 #' }
 #' @importFrom magrittr %>%
 #' @importFrom stringr str_detect str_replace
-#' @importFrom dplyr filter left_join group_by mutate select distinct summarise if_else
+#' @importFrom dplyr filter left_join group_by mutate select distinct summarise if_else bind_rows
 #' @importFrom tidyr spread
 #' @importFrom rlang ensym
 
@@ -111,6 +111,23 @@ olink_normalization <- function(df1,
                                 reference_project = 'P1',
                                 reference_medians = NULL) {
 
+  # If 2 data frames are supplied, make sure they have the same column names, if not, add missing column names.
+  
+  if(!is.null(df2)){ # If df2 is provided
+    if(length(c(setdiff(names(df1), names(df2)),setdiff(names(df2), names(df1)))) != 0){ # and the column names dont match
+      missing_df2 <- setdiff(names(df1), names(df2))
+      if(length(missing_df2) > 0){
+        warning(paste("The following columns are found in df1 but not df2: \n", paste(unlist(missing_df2), collapse = ",")))
+      }
+      missing_df1 <- setdiff(names(df2), names(df1))
+      if(length(missing_df1) > 0){
+        warning(paste("The following columns are found in df2 but not df1: \n", paste(unlist(missing_df1), collapse = ",")))
+      }
+      message("Adding missing columns...")
+      
+    }
+  }
+  
   #Filtering on valid OlinkID
   df1 <- df1 %>%
     dplyr::filter(stringr::str_detect(OlinkID,
@@ -259,7 +276,7 @@ olink_normalization <- function(df1,
 
     #Calculate adjustment factors
     adj_factor_df<-df1 %>%
-      rbind(df2) %>%
+      dplyr::bind_rows(df2) %>%
       dplyr::filter(SampleID %in% overlapping_samples_df1) %>%
       dplyr::select(SampleID,OlinkID,UniProt,NPX,Project) %>%
       tidyr::spread(Project,NPX)
@@ -285,7 +302,7 @@ olink_normalization <- function(df1,
     #Calculate adjustment factors
     adj_factor_df <- df1 %>%
       dplyr::filter(SampleID %in% overlapping_samples_df1) %>%
-      rbind(df2 %>%
+      dplyr::bind_rows(df2 %>%
               dplyr::filter(SampleID %in% overlapping_samples_df2)) %>%
       dplyr::select(SampleID,OlinkID,UniProt,NPX,Project) %>%
       dplyr::group_by(Project, OlinkID) %>%
@@ -312,7 +329,7 @@ olink_normalization <- function(df1,
 
   #Apply adjustment factors
   df_adjusted_data<-df1 %>%
-    rbind(df2) %>%
+    dplyr::bind_rows(df2) %>%
     dplyr::mutate(Panel=stringr::str_replace(Panel,'\\(.+', '')) %>%
     dplyr::left_join(adj_factor_df,by='OlinkID') %>%
     dplyr::mutate(Adj_factor = dplyr::if_else(Project == reference_project,0,Adj_factor)) %>%
