@@ -7,7 +7,7 @@
 read_NPX(filename)
 }
 \arguments{
-\item{filename}{Path to NPX Manager or MyData output file.}
+\item{filename}{Path to Olink Software output file.}
 }
 \value{
 A "tibble" in long format. Columns include:
@@ -27,8 +27,8 @@ A "tibble" in long format. Columns include:
 Additional columns may be present or missing depending on the platform
 }
 \description{
-Imports an NPX file exported from NPX Manager or MyData.
-No alterations to the output NPX Manager format is allowed.
+Imports an NPX file exported from Olink Software.
+No alterations to the output format is allowed.
 }
 \examples{
 \donttest{
