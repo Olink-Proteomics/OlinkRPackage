@@ -1,6 +1,6 @@
 #' Function to read NPX data into long format
 #'
-#' Imports an NPX file exported from Olink Software.
+#' Imports an NPX or QUANT file exported from Olink Software.
 #' No alterations to the output format is allowed.
 #'
 #' @param filename Path to Olink Software output file.
