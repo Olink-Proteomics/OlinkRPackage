@@ -265,13 +265,18 @@ read_NPX_target <- function(filename) {
     target_type     <- '48'
     BASE_INDEX      <- 45
   } else if (grepl(pattern = "Target", data_type_long, fixed = TRUE)){
-    message("Target Data in long form detected.")
+    message("Target data in long form detected.")
     long_form <- TRUE
+    isTarget <- TRUE
+  } else if (grepl(pattern = "Flex", data_type_long, fixed = TRUE)){
+    message("Flex data in long form detected.")
+    long_form <- TRUE
+    isTarget <- FALSE
   } else {
     stop("Cannot find whether the given data is NPX or concentration")
   }
   
-  if (long_form == TRUE){
+  if (long_form == TRUE && isTarget == TRUE){
     out <- readxl::read_excel(path = filename,
                        col_names = T) %>% 
       dplyr::filter(!is.na(SampleID)) %>%
@@ -290,6 +295,27 @@ read_NPX_target <- function(filename) {
       dplyr::mutate(Panel = paste("Olink", Panel_Start, Panel_End)) %>%
       dplyr::mutate(Panel = trimws(Panel, which = "right")) %>%
       dplyr::select(-Panel_Start, -Panel_End) %>%
+      dplyr::select(SampleID, Index, OlinkID,
+                    UniProt, Assay, MissingFreq,
+                    Panel,Panel_Version,PlateID,
+                    QC_Warning,dplyr::matches("Plate_LQL"),
+                    dplyr::matches("LOD"),
+                    dplyr::matches("Plat_LOD"),
+                    dplyr::matches("LLOQ"),
+                    dplyr::matches("ULOQ"),
+                    dplyr::matches("NPX"),
+                    dplyr::matches("Quantified_value"),
+                    dplyr::matches("Unit"),
+                    dplyr::matches("Assay_Warning"),
+                    dplyr::matches("Normalization"),
+                    dplyr::matches("*Inc Ctrl*"),
+                    dplyr::matches("*Det Ctrl*"))
+    is_npx_data <- ifelse(any(names(out) %in% "NPX"), TRUE, FALSE)
+  } else  if (long_form == TRUE && isTarget == FALSE){
+    out <- readxl::read_excel(path = filename,
+                              col_names = T) %>% 
+      dplyr::filter(!is.na(SampleID)) %>%
+      dplyr::as_tibble() %>%
       dplyr::select(SampleID, Index, OlinkID,
                     UniProt, Assay, MissingFreq,
                     Panel,Panel_Version,PlateID,
