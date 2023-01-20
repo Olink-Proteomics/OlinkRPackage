@@ -25,10 +25,13 @@ normalization_results.bridged <- olink_normalization(df1 = { npx_data1 |> mutate
 
 
 # Warning if column names arent the same but results still match
-npx_df2 <- OlinkAnalyze::npx_data2 %>% dplyr::mutate(Project = 'P2')
+npx_df2 <- OlinkAnalyze::npx_data2 %>% 
+  dplyr::mutate(Project = 'P2') %>% 
+  mutate(Normalization = "Intensity")  # adding Normalization to avoid warning
 npx_df_test<-OlinkAnalyze::npx_data1 %>%
   dplyr::mutate(Sample_type = "Sample") %>%
-  dplyr::select(SampleID, Sample_type, Index, OlinkID, UniProt, Assay, MissingFreq, Panel_Version, PlateID, QC_Warning, LOD, NPX, Subject)
+  dplyr::select(SampleID, Sample_type, Index, OlinkID, UniProt, Assay, MissingFreq, Panel_Version, PlateID, QC_Warning, LOD, NPX, Subject) %>% 
+  mutate(Normalization = "Intensity") # adding Normalization to avoid warning
 overlap_samples2 <- intersect(npx_data1$SampleID, npx_data2$SampleID) %>%
   data.frame() %>%
   filter(!str_detect(., 'CONTROL_SAMPLE')) %>% #Remove control samples
