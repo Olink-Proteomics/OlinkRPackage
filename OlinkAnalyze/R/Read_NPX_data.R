@@ -601,6 +601,13 @@ read_NPX_target <- function(filename) {
   if (is_npx_data) {
     # Check for data completeness and warn on problems
     check_data_completeness(out)
+    out <- out %>% 
+      mutate(NPX = as.numeric(NPX))
+  }
+  if (!is_npx_data){
+    message("QUANT data detected. Some downstream functions may not be supported.")
+    out <- out %>% 
+      mutate(Quantified_value = as.numeric(Quantified_value))
   }
 
   return(out)
