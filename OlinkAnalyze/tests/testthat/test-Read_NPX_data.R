@@ -86,3 +86,16 @@ test_that("# in SampleID", {
 })
 
 
+
+# Flex long format QUANT xlsx ---------------------------------------------
+
+
+test_that("# in SampleID", {
+  expect_message(
+    input <- read_NPX(
+      testthat::test_path("refs/Flex_test_data_long_quant.xlsx")),
+    "Flex data in long form detected"
+  )
+
+  expect_equal(input$Quantified_value, c(0.19169, 336.12903))
+})

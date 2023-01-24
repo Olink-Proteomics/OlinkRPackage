@@ -98,7 +98,7 @@
 #' }
 #' @importFrom magrittr %>%
 #' @importFrom stringr str_detect str_replace
-#' @importFrom dplyr filter left_join group_by mutate select distinct summarise if_else
+#' @importFrom dplyr filter left_join group_by mutate select distinct summarise if_else bind_rows
 #' @importFrom tidyr spread
 #' @importFrom rlang ensym
 
@@ -111,16 +111,33 @@ olink_normalization <- function(df1,
                                 reference_project = 'P1',
                                 reference_medians = NULL) {
 
+  # If 2 data frames are supplied, make sure they have the same column names, if not, add missing column names.
+  
+  if(!is.null(df2)){ # If df2 is provided
+    if(length(c(setdiff(names(df1), names(df2)),setdiff(names(df2), names(df1)))) != 0){ # and the column names dont match
+      missing_df2 <- setdiff(names(df1), names(df2))
+      if(length(missing_df2) > 0){
+        warning(paste("The following columns are found in df1 but not df2: \n", paste(unlist(missing_df2), collapse = ",")))
+      }
+      missing_df1 <- setdiff(names(df2), names(df1))
+      if(length(missing_df1) > 0){
+        warning(paste("The following columns are found in df2 but not df1: \n", paste(unlist(missing_df1), collapse = ",")))
+      }
+      message("Adding missing columns...")
+      
+    }
+  }
+  
   #Filtering on valid OlinkID
   df1 <- df1 %>%
     dplyr::filter(stringr::str_detect(OlinkID,
-                               "OID[0-9]{5}"))
+                                      "OID[0-9]{5}"))
 
   if(!is.null(df2)){
 
     df2 <- df2 %>%
       dplyr::filter(stringr::str_detect(OlinkID,
-                                 "OID[0-9]{5}"))
+                                        "OID[0-9]{5}"))
   }
 
   #median of difference flag
@@ -170,8 +187,8 @@ olink_normalization <- function(df1,
           dplyr::mutate(Assay_Median=median(NPX, na.rm = TRUE)) %>%
           ungroup() %>%
           dplyr::mutate(Adj_factor = dplyr::if_else(is.na(Reference_NPX - Assay_Median),
-                                      0,
-                                      Reference_NPX - Assay_Median)) %>%
+                                                    0,
+                                                    Reference_NPX - Assay_Median)) %>%
           dplyr::select(OlinkID, Adj_factor) %>%
           dplyr::distinct()
 
@@ -217,6 +234,25 @@ olink_normalization <- function(df1,
 
   }
 
+  # check if both df1 and df2 were normalized with the same method
+  # "Intensity" or "Plate control"
+  if (!("Normalization" %in% colnames(df1)) || !("Normalization" %in% colnames(df2))) {
+    if (!("Normalization" %in% colnames(df1)) && !("Normalization" %in% colnames(df2))) {
+      warning("Variable \"Normalization\" not present in df1 and df2")
+    } else if (!("Normalization" %in% colnames(df1))) {
+      warning("Variable \"Normalization\" not present in df1. Removing column from df2.")
+      df2 <- dplyr::select(df2, -Normalization)
+    } else if (!("Normalization" %in% colnames(df2))) {
+      warning("Variable \"Normalization\" not present in df2. Removing column from df1.")
+      df1 <- dplyr::select(df1, -Normalization)
+    }
+  } else if (("Normalization" %in% colnames(df1)) && ("Normalization" %in% colnames(df2))) {
+    if ({ df1$Normalization |> unique() |> length() } != 1 ||
+        { df2$Normalization |> unique() |> length() } != 1 ||
+        unique(df1$Normalization) != unique(df2$Normalization)) {
+      warning("df1 and df2 are not normalized with the same approach. Consider renormalizing.")
+    }
+  }
 
   if(MOD_FLAG){
 
@@ -240,7 +276,7 @@ olink_normalization <- function(df1,
 
     #Calculate adjustment factors
     adj_factor_df<-df1 %>%
-      rbind(df2) %>%
+      dplyr::bind_rows(df2) %>%
       dplyr::filter(SampleID %in% overlapping_samples_df1) %>%
       dplyr::select(SampleID,OlinkID,UniProt,NPX,Project) %>%
       tidyr::spread(Project,NPX)
@@ -256,8 +292,8 @@ olink_normalization <- function(df1,
     adj_factor_df <- adj_factor_df %>%
       dplyr::group_by(OlinkID) %>%
       dplyr::summarise(Adj_factor = dplyr::if_else(is.na(median(Diff, na.rm = TRUE)),
-                                     0,
-                                     median(Diff, na.rm = TRUE)))
+                                                   0,
+                                                   median(Diff, na.rm = TRUE)))
 
   }else{
 
@@ -266,7 +302,7 @@ olink_normalization <- function(df1,
     #Calculate adjustment factors
     adj_factor_df <- df1 %>%
       dplyr::filter(SampleID %in% overlapping_samples_df1) %>%
-      rbind(df2 %>%
+      dplyr::bind_rows(df2 %>%
               dplyr::filter(SampleID %in% overlapping_samples_df2)) %>%
       dplyr::select(SampleID,OlinkID,UniProt,NPX,Project) %>%
       dplyr::group_by(Project, OlinkID) %>%
@@ -277,13 +313,13 @@ olink_normalization <- function(df1,
     if (reference_project == df1_project_nr) {
       adj_factor_df <- adj_factor_df %>%
         dplyr::mutate(Adj_factor = dplyr::if_else(is.na(!!rlang::ensym(df1_project_nr) - !!rlang::ensym(df2_project_nr)),
-                                    0,
-                                    !!rlang::ensym(df1_project_nr) - !!rlang::ensym(df2_project_nr)))
+                                                  0,
+                                                  !!rlang::ensym(df1_project_nr) - !!rlang::ensym(df2_project_nr)))
     } else {
       adj_factor_df <- adj_factor_df %>%
         dplyr::mutate(Adj_factor = dplyr::if_else(is.na(!!rlang::ensym(df2_project_nr) - !!rlang::ensym(df1_project_nr)),
-                                    0,
-                                    !!rlang::ensym(df2_project_nr) - !!rlang::ensym(df1_project_nr)))
+                                                  0,
+                                                  !!rlang::ensym(df2_project_nr) - !!rlang::ensym(df1_project_nr)))
     }
 
     adj_factor_df <- adj_factor_df %>%
@@ -293,7 +329,7 @@ olink_normalization <- function(df1,
 
   #Apply adjustment factors
   df_adjusted_data<-df1 %>%
-    rbind(df2) %>%
+    dplyr::bind_rows(df2) %>%
     dplyr::mutate(Panel=stringr::str_replace(Panel,'\\(.+', '')) %>%
     dplyr::left_join(adj_factor_df,by='OlinkID') %>%
     dplyr::mutate(Adj_factor = dplyr::if_else(Project == reference_project,0,Adj_factor)) %>%

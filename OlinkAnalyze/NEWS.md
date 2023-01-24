@@ -1,3 +1,13 @@
+# Olink Analyze 3.3.0
+## Minor Changes
+* Support for additional versions of Olink data - Read_NPX now supports a wider range of Olink data types (@AskPascal, @kathy-nevola, #207, #208, #211, #216)
+* Automatic support for normalizing 2 datasets with different column configurations - olink_normalization will now automatically add missing columns to datasets (filled NA) to allow data with different configurations to be more easily normalized together (@kathy-nevola, #212)
+* Automatic checking that datasets used the same normalization method before bridging - Datasets that were normalized with different methods (different values in normalization column) will now warn before performing normalization (@klevdiamanti, #210)
+
+## Bug Fixes
+* Data with '#' in SampleID column is now supported (@AskPascal, #208)
+* PCA can now be generated when indices are not consistent across SampleIDs (@amrita-kar, #206)
+
 # Olink Analyze 3.2.2
 ## Bug Fixes
 * remove www. from links in vignette to prevent rerouting of URL (@kathy-nevola, #188)
