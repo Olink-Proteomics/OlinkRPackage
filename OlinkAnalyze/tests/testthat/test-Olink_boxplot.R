@@ -1,4 +1,5 @@
 skip_on_cran()
+skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
 
 #Load reference results
 refRes_file <- '../data/refResults.RData'
@@ -53,7 +54,7 @@ test_that("olink_boxplot works", {
   expect_warning(npx_data_format221010 %>%
                    olink_boxplot(variable = "treatment2",
                                  olinkid_list = c(npx_Check$all_nas[1:5],"OID30538")))
-  
+
   boxplot_npxcheck <- suppressWarnings(olink_boxplot(npx_data_format221010, variable = "treatment2",
                                    olinkid_list = c(npx_Check$all_nas[1:5],"OID30538")))
   expect_length(unique(boxplot_npxcheck[[1]]$data$Name_OID), 1)

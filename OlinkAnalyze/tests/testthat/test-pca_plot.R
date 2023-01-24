@@ -1,10 +1,14 @@
+skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
+skip_on_cran()
+
 set.seed(10)
 #Load reference results
 refRes_file <- testthat::test_path('../data/refResults.RData')
 load(refRes_file)
 
 #Load data with hidden/excluded assays (all NPX=NA)
-load(file = '../data/npx_data_format221010.RData')
+load(file = testthat::test_path('../data/npx_data_format221010.RData'))
+load(file = testthat::test_path('../data/npx_data_format221121.RData'))
 
 pca_plot <- npx_data1 %>%
   mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
@@ -52,7 +56,16 @@ test_that("olink_pca_plot works", {
   expect_equal(outliers$SampleID, c("B4_83", "A14_15", "A15_16", "A19_21"))
   expect_equal(outliers$Panel, c("Cardiometabolic", "Inflammation", "Inflammation", "Inflammation"))
 
-  expect_warning(olink_pca_plot(npx_data_format221010)) # data with all NPX=NA for some assays
+  # data with all NPX=NA for some assays
+  expect_warning(
+    olink_pca_plot(npx_data_format221010, quiet = TRUE),
+    "have NPX=NA for all samples")
+  expect_warning(
+    olink_pca_plot(npx_data_format221121, quiet = TRUE),
+    "have NPX=NA for all samples")
+  expect_warning(
+    olink_pca_plot(npx_data_extended_format221121, quiet = TRUE),
+    "have NPX=NA for all samples")
 
   vdiffr::expect_doppelganger('PCA plot', pca_plot[[1]])
   vdiffr::expect_doppelganger('PCA plot color by treatment', pca_plot_treatCol[[1]])
@@ -182,7 +195,6 @@ test_that("PCA calculation - output values", {
 })
 
 
-
 test_that("PCA basic plotting", {
   pca_input <- npx_data1 %>%
     mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
@@ -213,6 +225,16 @@ test_that("minimal PCA plot", {
 
   vdiffr::expect_doppelganger("PCA plot - label outliers", pca_plot_outliers[[1]])
 
+  #Removing Index dependence in PCA plot
+  pca_rem_index <- npx_data1 %>%
+    mutate(SampleID = paste(SampleID, "_", Index, sep = ""),
+           Index=if_else(Panel == "Olink Cardiometabolic", Index+1L, Index)) %>%
+    olink_pca_plot(quiet = TRUE)
+  
+  expect_true(all(abs(sort(pca_rem_index[[1]]$data$PCX) -
+                        sort(pca_plot[[1]]$data$PCX)) == 0))
+  expect_true(all(abs(sort(pca_rem_index[[1]]$data$PCY) -
+                        sort(pca_plot[[1]]$data$PCY)) == 0))
 })
 
 
