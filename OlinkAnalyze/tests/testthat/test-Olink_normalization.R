@@ -86,9 +86,7 @@ test_that("olink_normalization works", {
                                      overlapping_samples_df1 = overlap_samples2,
                                      df1_project_nr = 'P1',
                                      df2_project_nr = 'P2',
-                                     reference_project = 'P1'))),
-                 "not present in df1 and df2"
-                 )
+                                     reference_project = 'P1'))))
   expect_equal(normalization_results.bridged, ref_results$normalization_results.bridged)
   expect_equal(normalization_results.intensity, ref_results$normalization_results.intensity)
   expect_equal(normalization_results.subset, ref_results$normalization_results.subset)
