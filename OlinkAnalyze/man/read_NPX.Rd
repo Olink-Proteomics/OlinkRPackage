@@ -27,7 +27,7 @@ A "tibble" in long format. Columns include:
 Additional columns may be present or missing depending on the platform
 }
 \description{
-Imports an NPX file exported from Olink Software.
+Imports an NPX or QUANT file exported from Olink Software.
 No alterations to the output format is allowed.
 }
 \examples{
