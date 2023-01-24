@@ -11,3 +11,4 @@
 ^data/.*_original[.]rda
 ^LICENSE\.md$
 ^revdep$
+^inst/WORDLIST
