@@ -29,7 +29,8 @@ Authors@R: c(
            comment = c(ORCID = "0000-0001-7633-403X", Github = "b_watcher")),
     person("Nicola", "Moloney", role = "ctb",
             comment = c(ORCID = "0000-0003-4967-3284")),
-    person("Britta", "Lötstedt", role = "ctb"),
+    person("Britta", "Lötstedt", role = "ctb",
+            comment = c(ORCID = "0000-0003-3545-5489")),
     person("Emmett", "Sprecher", role = "ctb",
            comment = c(ORCID = "0000-0002-7710-695X")),
     person("Jessica", "Barbagallo", role = "ctb",
@@ -42,7 +43,7 @@ Authors@R: c(
   )
 Description: A collection of functions to facilitate analysis of proteomic
     data from Olink, primarily NPX data that has been exported from Olink
-    NPX Manager or MyData. The functions also work on QUANT data from
+    Software. The functions also work on QUANT data from
     Olink by log- transforming the QUANT data. The functions are focused
     on reading data, facilitating data wrangling and quality control
     analysis, performing statistical analysis and generating figures to

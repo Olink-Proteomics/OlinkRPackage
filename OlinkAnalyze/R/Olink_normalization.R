@@ -240,11 +240,9 @@ olink_normalization <- function(df1,
     if (!("Normalization" %in% colnames(df1)) && !("Normalization" %in% colnames(df2))) {
       warning("Variable \"Normalization\" not present in df1 and df2")
     } else if (!("Normalization" %in% colnames(df1))) {
-      warning("Variable \"Normalization\" not present in df1. Removing column from df2.")
-      df2 <- dplyr::select(df2, -Normalization)
+      warning("Variable \"Normalization\" not present in df1.")
     } else if (!("Normalization" %in% colnames(df2))) {
-      warning("Variable \"Normalization\" not present in df2. Removing column from df1.")
-      df1 <- dplyr::select(df1, -Normalization)
+      warning("Variable \"Normalization\" not present in df2.")
     }
   } else if (("Normalization" %in% colnames(df1)) && ("Normalization" %in% colnames(df2))) {
     if ({ df1$Normalization |> unique() |> length() } != 1 ||
