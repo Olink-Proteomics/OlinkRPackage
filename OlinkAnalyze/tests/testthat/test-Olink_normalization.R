@@ -168,7 +168,7 @@ test_that("missing Normalization column", {
       df1_project_nr = '20200001',
       df2_project_nr = '20200002',
       reference_project = '20200001'),
-      "Variable \"Normalization\" not present in df2. Removing column from df1."),
+      "Variable \"Normalization\" not present in df2."),
     "The following columns are found in df1 but not df2"
   )
 
@@ -189,7 +189,7 @@ test_that("missing Normalization column", {
                           df1_project_nr = '20200001',
                           df2_project_nr = '20200002',
                           reference_project = '20200001'),
-      "Variable \"Normalization\" not present in df1. Removing column from df2."),
+      "Variable \"Normalization\" not present in df1."),
     "The following columns are found in df2 but not df1"
   )
 })
