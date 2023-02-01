@@ -29,15 +29,17 @@ Pathways are ordered by increasing p-value (unadjusted)
 \examples{
 \donttest{
 library(dplyr)
+# Run olink_ttest or other stats test (see documentaiton )
 npx_df <- npx_data1 \%>\% filter(!grepl('control',SampleID, ignore.case = TRUE))
 ttest_results <- olink_ttest(df=npx_df,
                              variable = 'Treatment',
                              alternative = 'two.sided')
 
 try({ # This expression might fail if dependencies are not installed
+# Run olink_pathway_enrichment (see documentation)
 gsea_results <- olink_pathway_enrichment(data = npx_data1, test_results = ttest_results)
 ora_results <- olink_pathway_enrichment(data = npx_data1,
-                                      test_results = ttest_results, method = "ORA")
+                                       test_results = ttest_results, method = "ORA")
 olink_pathway_visualization(enrich_results = gsea_results)
 olink_pathway_visualization(enrich_results = gsea_results, keyword = "immune")
 olink_pathway_visualization(enrich_results = ora_results, method = "ORA", number_of_terms = 15)

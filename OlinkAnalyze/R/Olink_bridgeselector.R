@@ -26,10 +26,12 @@
 #' @importFrom stringr str_detect
 
 olink_bridgeselector<-function(df, sampleMissingFreq, n){
-  
+  # Exclude OlinkIDs with missing NPX
+  npx_check <- npxCheck(df)
   
   #Filtering on valid OlinkID
   df <- df %>%
+    dplyr::filter(!(OlinkID %in% npx_check$all_nas)) %>% 
     dplyr::filter(stringr::str_detect(OlinkID,
                                       "OID[0-9]{5}"))
   

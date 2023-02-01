@@ -14,8 +14,8 @@
 #' Columns include:
 #' \itemize{
 #'  \item{Assay:} "character" Protein symbol
-#'  \item{OlinkID:} "character" Olink specific ID  
-#'  \item{UniProt:} "character" Olink specific ID  
+#'  \item{OlinkID:} "character" Olink specific ID
+#'  \item{UniProt:} "character" Olink specific ID
 #'  \item{Panel:} "character" Name of Olink Panel
 #'  \item{estimate:} "numeric" difference in mean NPX between groups
 #'  \item{Group 1:} "numeric" Column is named first level of variable when converted to factor, contains mean NPX for that group
@@ -30,7 +30,7 @@
 #'  \item{Adjusted_pval:} "numeric" adjusted p-value for the test (Benjamini&Hochberg)
 #'  \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
 #' }
-#' 
+#'
 #' @export
 #' @examples
 #' \donttest{
@@ -130,27 +130,11 @@ olink_ttest <- function(df, variable, pair_id, ...){
                 " samples that do not have a unique level for your variable. Only one level per sample is allowed."))
   }
 
-
-  #Not testing assays that have all NA:s or all NA:s in one level
-  all_nas <- df  %>%
-    dplyr::group_by(OlinkID) %>%
-    dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(NPX))) %>%
-    dplyr::ungroup() %>%
-    dplyr::filter(n-n_na <= 1) %>%
-    dplyr::pull(OlinkID)
-
-
-  if(length(all_nas) > 0) {
-
-    warning(paste0('The assays ',
-                   paste(all_nas, collapse = ', '),
-                   ' have too few datapoints. They will not be tested.'),
-            call. = FALSE)
-
-  }
+  #Check data format
+  npxCheck <- npxCheck(df)
 
   nas_in_level <- df  %>%
-    dplyr::filter(!(OlinkID %in% all_nas)) %>%
+    dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>%
     dplyr::group_by(OlinkID, !!rlang::ensym(variable)) %>%
     dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(NPX))) %>%
     dplyr::ungroup() %>%
@@ -166,13 +150,13 @@ olink_ttest <- function(df, variable, pair_id, ...){
             call. = FALSE)
 
   }
-  
-  
+
+
   #Filtering out non-tested assays
   df <- df %>%
-    dplyr::filter(!(OlinkID %in% all_nas)) %>%
+    dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>%
     dplyr::filter(!(OlinkID %in% nas_in_level))
-  
+
   if(nrow(df) == 0) {
     stop('No assays passing initial check. T-test will not be performed.')
   }
@@ -188,7 +172,7 @@ olink_ttest <- function(df, variable, pair_id, ...){
 
     #check that each "pair_id' has only 2 samples
     ct_pairs <- df %>%
-      dplyr::filter(!(OlinkID %in% all_nas)) %>%
+      dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>%
       dplyr::filter(!(OlinkID %in% nas_in_level)) %>%
       dplyr::filter(!is.na(!!rlang::ensym(variable))) %>%
       dplyr::group_by(OlinkID,!!rlang::ensym(pair_id)) %>%

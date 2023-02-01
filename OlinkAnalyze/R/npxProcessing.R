@@ -1,3 +1,5 @@
+#### Internal functions ####
+
 npxProcessing_forDimRed <- function(df,
                                     color_g = "QC_Warning",
                                     drop_assays = FALSE,
@@ -12,18 +14,18 @@ npxProcessing_forDimRed <- function(df,
   #### Set up plotting colors ####
   if (color_g == "QC_Warning"){
     df_temp <- df %>%
-      dplyr::group_by(SampleID, Index) %>%
+      dplyr::group_by(SampleID) %>%
       dplyr::mutate(QC_Warning = dplyr::if_else(any(QC_Warning == "Warning"|QC_Warning == "WARN" ), "Warning", "Pass")) %>%
       dplyr::ungroup()
 
     plotColors <- df_temp %>%
-      dplyr::group_by(SampleID, Index) %>%
+      dplyr::group_by(SampleID) %>%
       dplyr::summarise(colors = unique(!!rlang::ensym(color_g))) %>%
       dplyr::ungroup()
 
   } else {
     number_of_sample_w_more_than_one_color <- df %>%
-      dplyr::group_by(SampleID, Index) %>%
+      dplyr::group_by(SampleID) %>%
       dplyr::summarise(n_colors = dplyr::n_distinct(!!rlang::ensym(color_g), na.rm = TRUE)) %>%
       dplyr::ungroup() %>%
       dplyr::filter(n_colors > 1) %>%
@@ -35,7 +37,7 @@ npxProcessing_forDimRed <- function(df,
       df_temp <- df
 
       plotColors <- df_temp %>%
-        dplyr::group_by(SampleID, Index) %>%
+        dplyr::group_by(SampleID) %>%
         dplyr::summarise(colors = unique(!!rlang::ensym(color_g))) %>%
         dplyr::ungroup()
     }
@@ -51,7 +53,7 @@ npxProcessing_forDimRed <- function(df,
 
   #wide format
   df_wide <- df_temp %>%
-    dplyr::select(SampleID, Index, OlinkID, NPX) %>%
+    dplyr::select(SampleID, OlinkID, NPX) %>%
     dplyr::filter(!is.na(NPX)) %>%
     tidyr::spread(OlinkID, NPX)
 
@@ -151,13 +153,11 @@ npxProcessing_forDimRed <- function(df,
 
   #### Format data and wrap up results ####
   df_wide <- df_wide %>%
-    dplyr::left_join(plotColors,
-                     by = c('SampleID',
-                            'Index')) %>%
-    dplyr::select(SampleID, Index, colors, everything())
+    dplyr::left_join(plotColors, by = 'SampleID') %>%
+    dplyr::select(SampleID, colors, everything())
 
   df_wide_matrix <- df_wide %>%
-    dplyr::select(-Index, -colors) %>%
+    dplyr::select(-colors) %>%
     tibble::column_to_rownames('SampleID') %>%
     as.matrix
 
@@ -167,4 +167,34 @@ npxProcessing_forDimRed <- function(df,
               df_wide_matrix = df_wide_matrix,
               dropped_assays.na = dropped_assays.na,
               dropped_assays.missingness = dropped_assays.missingness))
+}
+
+#This function is called by various other functions to perform checks of NPX-data. For now, it only looks for assays which have all NPX=NA, but there are other redundant tasks that could be moved here
+npxCheck <- function(df){
+  # # Check whether df contains NPX or QUANT
+  if ('NPX' %in% colnames(df)) {
+    data_type <- 'NPX'
+  } else if ('Quantified_value' %in% colnames(df)) {
+    data_type <- 'Quantified_value'
+  } else {
+    stop('Neither NPX or Quantified_value column present in the data')}
+
+  #### Identify assays that have only NA:s ####
+  all_nas <- df  %>%
+    dplyr::group_by(OlinkID) %>%
+    dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(!!rlang::ensym(data_type)))) %>%
+    dplyr::ungroup() %>%
+    dplyr::filter(n == n_na) %>%
+    dplyr::pull(OlinkID)
+
+  if(length(all_nas) > 0) {
+
+    warning(paste0('The assays ',
+                   paste(all_nas, collapse = ', '),
+                   ' have NPX=NA for all samples. They will be excluded from the analysis'),
+            call. = FALSE)
+
+  }
+
+  return(list(all_nas = all_nas, data_type = data_type))
 }

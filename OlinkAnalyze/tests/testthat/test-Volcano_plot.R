@@ -1,6 +1,6 @@
 #Load reference results
 testthat::skip_if_not_installed("here")
-refRes_file <- here::here('tests/data/refResults.RData')
+refRes_file <- testthat::test_path('../data/refResults.RData')
 load(refRes_file)
 
 set.seed(10) #There's some randomness to how the labels are placed on the plot => failed test. Setting the seed should avoid this

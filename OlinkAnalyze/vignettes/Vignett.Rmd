@@ -96,12 +96,12 @@ The package contains two test data files named npx_data1 and npx_data2. These ar
 * **UniProt** _\<chr\>_: UniProt ID.
 * **Assay** _\<chr\>_: Common gene name for the assay.
 * **MissingFreq** _\<dbl\>_: Missing frequency for the OlinkID, i.e. frequency of samples with NPX value below limit of detection (LOD).
-* **Panel** _\<chr\>_: Olink Panel that samples ran on. Read more about Olink Panels here: [https://www.olink.com/products-services/](https://www.olink.com/products-services/).
+* **Panel** _\<chr\>_: Olink Panel that samples ran on. Read more about Olink Panels here: [https://olink.com/products-services/](https://olink.com/products-services/).
 * **Panel_Version** _\<chr\>_: Version of the panel. A new panel version might include some different or improved assays.
 * **PlateID** _\<chr\>_: Name of the plate.
-* **QC_Warning** _\<chr\>_: Indication whether the sample passed Olink QC. Read more here: [https://www.olink.com/faq/how-is-quality-control-of-the-data-performed/](https://www.olink.com/faq/how-is-quality-control-of-the-data-performed/).
+* **QC_Warning** _\<chr\>_: Indication whether the sample passed Olink QC. Read more here: [https://olink.com/faq/how-is-quality-control-of-the-data-performed/](https://olink.com/faq/how-is-quality-control-of-the-data-performed/).
 * **LOD** _\<dbl\>_: Limit of detection (LOD) is the minimum level of an individual protein that can be measured. LOD is defined as 3 times the standard deviation over background.
-* **NPX** _\<dbl\>_: Normalized Protein eXpression, is Olink®’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX here: [https://www.olink.com/faq/what-is-npx/](https://www.olink.com/faq/what-is-npx/).
+* **NPX** _\<dbl\>_: Normalized Protein eXpression, is Olink®’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX here: [https://olink.com/faq/what-is-npx/](https://olink.com/faq/what-is-npx/).
 
 **Note:** There are 5 additional variables in the sample datasets npx_data1 and npx_data2 that include clinical or other information, namely: Subject _\<chr\>_, Treatment _\<chr\>_, Site _\<chr\>_, Time _\<chr\>_, Project _\<chr\>_.
 
@@ -129,12 +129,12 @@ A tibble in long format containing:
 * UniProt: UniProt ID.
 * Assay: Common gene name for the assay.
 * MissingFreq: Missing frequency for the OlinkID, i.e. frequency of samples with NPX value below limit of detection (LOD).
-* Panel: Olink Panel that samples ran on. Read more about Olink Panels here: [https://www.olink.com/products-services/](https://www.olink.com/products-services/).
+* Panel: Olink Panel that samples ran on. Read more about Olink Panels here: [https://olink.com/products-services/](https://olink.com/products-services/).
 * Panel_Version: Version of the panel. A new panel version might include some different or improved assays.
 * PlateID: Name of the plate.
-* QC_Warning: Indication whether the sample passed Olink QC. Read more here: [https://www.olink.com/faq/how-is-quality-control-of-the-data-performed/](https://www.olink.com/faq/how-is-quality-control-of-the-data-performed/).  
+* QC_Warning: Indication whether the sample passed Olink QC. Read more here: [https://olink.com/faq/how-is-quality-control-of-the-data-performed/](https://olink.com/faq/how-is-quality-control-of-the-data-performed/).  
 * LOD: Limit of detection (LOD) is the minimum level of an individual protein that can be measured. LOD is defined as 3 times the standard deviation over background.
-* NPX: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX here: [https://www.olink.com/faq/what-is-npx/](https://www.olink.com/faq/what-is-npx/).
+* NPX: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX here: [https://olink.com/faq/what-is-npx/](https://olink.com/faq/what-is-npx/).
 
 ## Randomize samples on plate (olink_plate_randomizer)
 
@@ -248,12 +248,12 @@ A tibble of NPX data in long format containing normalized NPX values, including 
 * UniProt: UniProt ID.
 * Assay: Common gene name for the assay.
 * MissingFreq: Missing frequency for the OlinkID, i.e. frequency of samples with NPX value below limit of detection (LOD).
-* Panel: Olink Panel that samples ran on. Read more about Olink Panels here: [https://www.olink.com/products-services/](https://www.olink.com/products-services/).
+* Panel: Olink Panel that samples ran on. Read more about Olink Panels here: [https://olink.com/products-services/](https://olink.com/products-services/).
 * Panel_Version: Version of the panel. A new panel version might include some different or improved assays.
 * PlateID: Name of the plate.
-* QC_Warning: Indication whether the sample passed Olink QC. Read more here: [https://www.olink.com/faq/how-is-quality-control-of-the-data-performed/](https://www.olink.com/faq/how-is-quality-control-of-the-data-performed/). 
+* QC_Warning: Indication whether the sample passed Olink QC. Read more here: [https://olink.com/faq/how-is-quality-control-of-the-data-performed/](https://olink.com/faq/how-is-quality-control-of-the-data-performed/). 
 * LOD: Limit of detection (LOD) is the minimum level of an individual protein that can be measured. LOD is defined as 3 times the standard deviation over background.
-* NPX: Normalized Protein eXpression, is Olink®’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX here: [https://www.olink.com/faq/what-is-npx/](https://www.olink.com/faq/what-is-npx/).
+* NPX: Normalized Protein eXpression, is Olink®’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX here: [https://olink.com/faq/what-is-npx/](https://olink.com/faq/what-is-npx/).
 * Project: Name given from the dataframe of origin.
 * Adj_factor: Adjustment factor, i.e. how much was added to or subtracted from the original NPX value.
 
@@ -429,7 +429,7 @@ A tibble with the following columns:
 
 ## One way non-parametric test (olink_one_non_parametric)
 
-The olink_one_non_parametric is a wrapper function that performs either a Kruskal-Wallis test or a Friedman test for each assay using the function *kruskal.test* from the R library *stats* or the function *friedman_test* from the R library *rstatix*. The posthoc test for Friedman test is performed using the function *wilcox_test* from the R library *rstatix*,  whereas for Kruskal-Wallis test the fuction *dunnTest* from the R library *FSA* is applied. The function handles both factor and numerical variables, and/or confounding factors. 
+The olink_one_non_parametric is a wrapper function that performs either a Kruskal-Wallis test or a Friedman test for each assay using the function *kruskal.test* from the R library *stats* or the function *friedman_test* from the R library *rstatix*. The posthoc test for Friedman test is performed using the function *wilcox_test* from the R library *rstatix*,  whereas for Kruskal-Wallis test the function *dunnTest* from the R library *FSA* is applied. The function handles both factor and numerical variables, and/or confounding factors. 
 
 Samples with missing variable information or factor levels are excluded from the analysis. Character columns in the input data frame are converted to factors. The automatic handling of the data from above is announced by a message if the flag *verbose=TRUE*.
 

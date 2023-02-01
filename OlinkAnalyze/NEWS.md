@@ -1,4 +1,43 @@
-# OlinkAnalyze (development version)
+# Olink Analyze 3.3.0
+## Minor Changes
+* Support for additional versions of Olink data - Read_NPX now supports a wider range of Olink data types (@AskPascal, @kathy-nevola, #207, #208, #211, #216)
+* Automatic support for normalizing 2 datasets with different column configurations - olink_normalization will now automatically add missing columns to datasets (filled NA) to allow data with different configurations to be more easily normalized together (@kathy-nevola, #212)
+* Automatic checking that datasets used the same normalization method before bridging - Datasets that were normalized with different methods (different values in normalization column) will now warn before performing normalization (@klevdiamanti, #210)
+
+## Bug Fixes
+* Data with '#' in SampleID column is now supported (@AskPascal, #208)
+* PCA can now be generated when indices are not consistent across SampleIDs (@amrita-kar, #206)
+
+# Olink Analyze 3.2.2
+## Bug Fixes
+* remove www. from links in vignette to prevent rerouting of URL (@kathy-nevola, #188)
+* update set_plot_theme() to use linewidth instead of size per ggplot2 3.4
+
+# Olink Analyze 3.2.1
+## Bug Fixes
+* Change in unit test to write to temporary directory (@AskPascal, #181)
+
+
+# Olink Analyze 3.2.0
+
+## Minor Changes
+* Addition of functions to perform Uniform Manifold Approximation and Projection (UMAP) dimensional reduction and plots (@simfor, #139)
+* Add additional install methods to Readme (@AskPascal, #153)
+* ggrepel can now be disabled when outlier lines are present in the PCA plot (@klevdiamanti, #158)
+* Long running unit tests are now skipped on CRAN (@AskPascal, #163)
+* Internal functions were added to read_NPX to support future development (@klevdiamanti, #167)
+* CI workflows were refactored to utilize external actions (@AskPascal, #169)
+* Read_NPX will now warn the user when NAs are detected in the NPX column (@AskPascal, #170)
+* Friedman test interface and documentation was updated to be more intuitive (@boxizhang, #171)
+
+
+## Bug fixes
+* Pathway enrichment p-values are now in the correct order when plotting (@klevdiamanti, #164)
+* PCAs now behave the same with any locale (@AskPascal, #173)
+* Read_NPX now accepts either Panel_Version or Panel_Lot_Nr in input files (@klevdiamanti, #156)
+* Assays that only have NPX = NA will now be excluded from all analyses and figures (@simfor, @kathy-nevola, @AskPascal, #176)
+* Refactor code to use tidyselect::all_of() in recommended way (@AskPascal, #177)
+* vdiffr based unit tests were reactivated (@AskPascal, #172)
 
 # Olink Analyze 3.1.0
 

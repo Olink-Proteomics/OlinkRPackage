@@ -113,6 +113,9 @@ olink_pca_plot <- function (df,
   df <- df %>%
     dplyr::filter(stringr::str_detect(OlinkID,
                                       "OID[0-9]{5}"))
+  #Check data format
+  npxCheck <- npxCheck(df)
+  df <- df %>% dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) #Exclude assays that have all NA:s
 
   #Check that the user didn't specify just one of outlierDefX and outlierDefY
   if(sum(c(is.numeric(outlierDefX), is.numeric(outlierDefY))) == 1){
@@ -444,3 +447,4 @@ olink_pca_plot.internal <- function(df,
 
 
 }
+

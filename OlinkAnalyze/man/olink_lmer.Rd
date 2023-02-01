@@ -39,8 +39,8 @@ A "tibble" containing the results of fitting the linear mixed effects model to e
 Columns include:
 \itemize{
  \item{Assay:} "character" Protein symbol
- \item{OlinkID:} "character" Olink specific ID  
- \item{UniProt:} "character" Olink specific ID  
+ \item{OlinkID:} "character" Olink specific ID
+ \item{UniProt:} "character" Olink specific ID
  \item{Panel:} "character" Name of Olink Panel
  \item{term:} "character" term in model
  \item{sumsq:} "numeric" sum of square

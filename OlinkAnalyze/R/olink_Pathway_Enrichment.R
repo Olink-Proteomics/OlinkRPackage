@@ -163,6 +163,12 @@ olink_pathway_enrichment <- function(data, test_results, method = "GSEA", ontolo
 }
 
 data_prep <- function(data) {
+  # Remove NA data and filter for valid Olink IDs
+  npx_check <- npxCheck(data)
+  data <- data %>%
+    dplyr::filter(!(OlinkID %in% npx_check$all_nas)) %>% 
+    dplyr::filter(stringr::str_detect(OlinkID,
+                                      "OID[0-9]{5}"))
   # Filter highest detectibility for repeated IDs
   olink_ids <- data %>%
     dplyr::filter(!stringr::str_detect(string = SampleID, pattern = "CONTROL*.")) %>%

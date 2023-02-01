@@ -1,6 +1,6 @@
 #' Function to plot the NPX distribution by panel
 #'
-#' Generates boxplots of NPX vs. SampleID colored by QC_Warning (default) or any other grouping variable 
+#' Generates boxplots of NPX vs. SampleID colored by QC_Warning (default) or any other grouping variable
 #' and faceted by Panel using ggplot and ggplot2::geom_boxplot.
 #'
 #' @param df NPX data frame in long format. Must have columns SampleID, NPX and Panel
@@ -49,6 +49,9 @@ olink_dist_plot <- function(df, color_g = 'QC_Warning', ...) {
     dplyr::filter(stringr::str_detect(OlinkID,
                                "OID[0-9]{5}"))
 
+  #Check data format
+  npxCheck <- npxCheck(df)
+
   reorder_within <- function(x, by, within, fun = mean, sep = "___", ...) {
     new_x <- paste(x, within, sep = sep)
     stats::reorder(new_x, by, FUN = fun)
@@ -61,6 +64,7 @@ olink_dist_plot <- function(df, color_g = 'QC_Warning', ...) {
 
   #If not all are Pass, the QC_Warning is set as warning for plotting purposes
   df_OlinkID_fixed <- df_OlinkID %>%
+    dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>% #Exclude assays that have all NA:s
     dplyr::mutate(Panel = Panel %>% stringr::str_replace("Olink ", "")) %>%
     dplyr::group_by(SampleID, Index, Panel) %>%
     dplyr::mutate(QC_Warning = dplyr::if_else(all(toupper(QC_Warning) == 'PASS'),
