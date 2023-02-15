@@ -166,7 +166,7 @@ data_prep <- function(data) {
   # Remove NA data and filter for valid Olink IDs
   npx_check <- npxCheck(data)
   data <- data %>%
-    dplyr::filter(!(OlinkID %in% npx_check$all_nas)) %>% 
+    dplyr::filter(!(OlinkID %in% npx_check$all_nas)) %>%
     dplyr::filter(stringr::str_detect(OlinkID,
                                       "OID[0-9]{5}"))
   # Filter highest detectibility for repeated IDs
@@ -263,10 +263,10 @@ ora_pathwayenrichment <- function(test_results, msig_df, pvalue_cutoff = pvalue_
     dplyr::distinct(Assay) %>%
     dplyr::pull(Assay)
 
-  if(length(setdiff(names(universe), msig_df$gene_symbol) != 0)){
-    message(paste0(length(setdiff(names(universe), msig_df$gene_symbol)),
+  if(length(setdiff(universe, msig_df$gene_symbol) != 0)){
+    message(paste0(length(setdiff(universe, msig_df$gene_symbol)),
                    " assays are not found in the database. Please check the Assay names for the following assays:\n ",
-                   toString(setdiff(names(universe), msig_df$gene_symbol))))
+                   toString(setdiff(universe, msig_df$gene_symbol))))
   }
 
   ORA <- clusterProfiler::enricher(gene = sig_genes, universe = universe, TERM2GENE = msig_df, pvalueCutoff = 1)
