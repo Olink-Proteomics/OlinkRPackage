@@ -1,3 +1,10 @@
+# Olink Analyze 3.3.1
+## Bug Fixes
+* olink_pathway_enrichment now prints a message when there are non matching names when using method = "ORA" (@MasoumehSheikhi, #222)
+* olink_pca_plot will now generate PCA when data is missing from the first OlinkID (@kathy-nevola, #221)
+* read_NPX now supports csv files with Sample_Type column but not ExploreVersion column (@klevdiamanti, #220)
+
+
 # Olink Analyze 3.3.0
 ## Minor Changes
 * Support for additional versions of Olink data - Read_NPX now supports a wider range of Olink data types (@AskPascal, @kathy-nevola, #207, #208, #211, #216)
