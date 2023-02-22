@@ -226,6 +226,7 @@ read_NPX_explore <- function(filename) {
     # find missing columns
     missing_cols <- setdiff(header_v[[header_pick]], colnames(out))
     
+    
     if (length(missing_cols)  == 0) {
       # If an additional column is present
       extra_cols <- setdiff(colnames(out), header_v[[header_pick]])
