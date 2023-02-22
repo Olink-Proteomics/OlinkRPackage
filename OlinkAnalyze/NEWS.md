@@ -3,6 +3,7 @@
 * olink_pathway_enrichment now prints a message when there are non matching names when using method = "ORA" (@MasoumehSheikhi, #222)
 * olink_pca_plot will now generate PCA when data is missing from the first OlinkID (@kathy-nevola, #221)
 * read_NPX now supports csv files with Sample_Type column but not ExploreVersion column (@klevdiamanti, #220)
+* non-standard columns in input file will now result in warnings with names of non-matching columns (@kathy-nevola, #223)
 
 
 # Olink Analyze 3.3.0
