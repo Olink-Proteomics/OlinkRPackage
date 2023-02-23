@@ -135,9 +135,8 @@ test_that("# in SampleID", {
   expect_equal(input$Quantified_value, c(0.19169, 336.12903))
 })
 
-# Warning for extra column ----------------
+# No warning for extra column ----------------
 
 test_that("extra column", {
-  expect_warning(read_NPX(testthat::test_path("refs/mock_sampleID_hashes.csv")), 
-                 regexp = "Non-standard columns found in input file:" )
+  expect_no_warning(read_NPX(testthat::test_path("refs/mock_sampleID_hashes.csv")))
 })
