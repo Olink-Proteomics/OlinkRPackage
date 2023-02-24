@@ -14,18 +14,18 @@ npxProcessing_forDimRed <- function(df,
   #### Set up plotting colors ####
   if (color_g == "QC_Warning"){
     df_temp <- df %>%
-      dplyr::group_by(SampleID, Index) %>%
+      dplyr::group_by(SampleID) %>%
       dplyr::mutate(QC_Warning = dplyr::if_else(any(QC_Warning == "Warning"|QC_Warning == "WARN" ), "Warning", "Pass")) %>%
       dplyr::ungroup()
 
     plotColors <- df_temp %>%
-      dplyr::group_by(SampleID, Index) %>%
+      dplyr::group_by(SampleID) %>%
       dplyr::summarise(colors = unique(!!rlang::ensym(color_g))) %>%
       dplyr::ungroup()
 
   } else {
     number_of_sample_w_more_than_one_color <- df %>%
-      dplyr::group_by(SampleID, Index) %>%
+      dplyr::group_by(SampleID) %>%
       dplyr::summarise(n_colors = dplyr::n_distinct(!!rlang::ensym(color_g), na.rm = TRUE)) %>%
       dplyr::ungroup() %>%
       dplyr::filter(n_colors > 1) %>%
@@ -37,7 +37,7 @@ npxProcessing_forDimRed <- function(df,
       df_temp <- df
 
       plotColors <- df_temp %>%
-        dplyr::group_by(SampleID, Index) %>%
+        dplyr::group_by(SampleID) %>%
         dplyr::summarise(colors = unique(!!rlang::ensym(color_g))) %>%
         dplyr::ungroup()
     }
@@ -53,14 +53,14 @@ npxProcessing_forDimRed <- function(df,
 
   #wide format
   df_wide <- df_temp %>%
-    dplyr::select(SampleID, Index, OlinkID, NPX) %>%
+    dplyr::select(SampleID, OlinkID, NPX) %>%
     dplyr::filter(!is.na(NPX)) %>%
     tidyr::spread(OlinkID, NPX)
 
   #### If drop_assays == T, drop assays with any missing values ####
   if(drop_assays){
 
-    dropped_assays.na <- colnames(df_wide[, -c(1:2)])[apply(df_wide[, -c(1:2)], 2, anyNA)]
+    dropped_assays.na <- colnames(df_wide[, -c(1)])[apply(df_wide[, -c(1)], 2, anyNA)]
 
     df_wide <- df_wide %>%
       dplyr::select(-tidyselect::all_of(dropped_assays.na))
@@ -80,7 +80,7 @@ npxProcessing_forDimRed <- function(df,
   #### If drop_samples == T, drop samples with any missing values ####
   if(drop_samples){
 
-    dropped_samples <- apply(df_wide[, -c(1:2)], 1, anyNA)
+    dropped_samples <- apply(df_wide[, -c(1)], 1, anyNA)
     df_wide <- df_wide[!dropped_samples, ]
 
     if(verbose){
@@ -95,7 +95,7 @@ npxProcessing_forDimRed <- function(df,
 
   #### Drop assays with to many missing values ####
   #Missingness per assay
-  percent_missingness <- colSums(is.na(df_wide[, -c(1:2)]))/nrow(df_wide)
+  percent_missingness <- colSums(is.na(df_wide[, -c(1)]))/nrow(df_wide)
 
   # assays with missingness > 10% are dropped from the PCA
   PERCENT_CUTOFF <- 0.1
@@ -110,7 +110,7 @@ npxProcessing_forDimRed <- function(df,
     removed_assays_index <- which(percent_missingness > PERCENT_CUTOFF)
     percent_missingness <- percent_missingness[-removed_assays_index]
 
-    removed_assays_index <- removed_assays_index + 2
+    removed_assays_index <- removed_assays_index + 1
     dropped_assays.missingness <- colnames(df_wide)[removed_assays_index]
 
     df_wide <- df_wide[, -removed_assays_index]
@@ -133,7 +133,7 @@ npxProcessing_forDimRed <- function(df,
                                     percent_missingness > 0)
     percent_missingness <- percent_missingness[-imputed_assays_index]
 
-    imputed_assays_index <- imputed_assays_index + 2
+    imputed_assays_index <- imputed_assays_index + 1
     imputed_assays <- colnames(df_wide)[imputed_assays_index]
 
     df_wide <- df_wide %>%
@@ -147,19 +147,17 @@ npxProcessing_forDimRed <- function(df,
     }
   }
 
-  if(!all(colSums(is.na(df_wide[, -c(1:2)])) == 0)){
+  if(!all(colSums(is.na(df_wide[, -c(1)])) == 0)){
     stop('Missingness imputation failed.')
   }
 
   #### Format data and wrap up results ####
   df_wide <- df_wide %>%
-    dplyr::left_join(plotColors,
-                     by = c('SampleID',
-                            'Index')) %>%
-    dplyr::select(SampleID, Index, colors, everything())
+    dplyr::left_join(plotColors, by = 'SampleID') %>%
+    dplyr::select(SampleID, colors, everything())
 
   df_wide_matrix <- df_wide %>%
-    dplyr::select(-Index, -colors) %>%
+    dplyr::select(-colors) %>%
     tibble::column_to_rownames('SampleID') %>%
     as.matrix
 

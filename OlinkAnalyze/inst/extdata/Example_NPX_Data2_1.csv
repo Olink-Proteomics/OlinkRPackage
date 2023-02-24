@@ -1,0 +1,2 @@
+SampleID;Index;OlinkID;UniProt;Assay;MissingFreq;Panel;Panel_Lot_Nr;PlateID;QC_Warning;LOD;NPX;Normalization
+A1;1;OID01216;O00533;CHL1;0.01875;Olink CARDIOMETABOLIC;v.1201;Example_Data_1_CAM.csv;Pass;2.36846658156787;12.9561425886431;Plate control

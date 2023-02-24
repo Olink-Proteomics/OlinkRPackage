@@ -3,7 +3,7 @@
 #'Performs an Kruskal-Wallis Test for each assay (by OlinkID) in every panel using stats::kruskal.test.
 #'Performs an Friedman Test for each assay (by OlinkID) in every panel using rstatix::friedman_test.
 #'The function handles factor variable. \cr\cr
-#'Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a messsage if verbose = TRUE).
+#'Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a message if verbose = TRUE).
 #'Character columns in the input dataframe are automatically converted to factors (specified in a message if verbose = T).
 #'Numerical variables are not converted to factors.
 #'If a numerical variable is to be used as a factor, this conversion needs to be done on the dataframe before the function call. \cr\cr
@@ -249,7 +249,7 @@ olink_one_non_parametric <- function(df,
 
 #'Function which performs posthoc test per protein for the results from Friedman or Kruskal-Wallis Test.
 #'
-#'Performs a posthoc test using rstatix::wilcox_test or FSA::dennTest with Benjamini-Hochberg p-value adjustment per assay (by OlinkID) for each panel at confidence level 0.95.
+#'Performs a posthoc test using rstatix::wilcox_test or FSA::dunnTest with Benjamini-Hochberg p-value adjustment per assay (by OlinkID) for each panel at confidence level 0.95.
 #'See \code{olink_one_non_parametric} for details of input notation. \cr\cr
 #'The function handles both factor and numerical variables.
 #'
@@ -257,7 +257,7 @@ olink_one_non_parametric <- function(df,
 #' @param olinkid_list Character vector of OlinkID's on which to perform post hoc analysis. If not specified, all assays in df are used.
 #' @param variable Single character value or character array.
 #' @param test Single character value indicates running the post hoc test for friedman or kruskal.
-#' @param verbose Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
+#' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #' @return Tibble of posthoc tests for specified effect, arranged by ascending adjusted p-values.
 #'
 #' Columns include:

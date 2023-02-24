@@ -69,4 +69,17 @@ test_that("Assays with NA are removed in NPX check", {
   expect_equal(sort(na_oids$OlinkID), sort(npx_Check$all_nas))
 })
 
-
+test_that("No error if missing data from 1st OID",{
+  expect_no_error(suppressWarnings(suppressWarnings(npx_data1.uniqIDs %>% 
+    mutate(QC_Warning = ifelse(OlinkID == "OID01216" & stringr::str_detect(SampleID, "2"),
+                               "Warn", QC_Warning)) %>%
+    filter(QC_Warning == "Pass") %>% 
+    olink_pca_plot())))
+  expect_no_error(suppressWarnings(suppressWarnings(npx_data1.uniqIDs %>% 
+                                                      mutate(QC_Warning = ifelse(OlinkID == "OID01216" & stringr::str_detect(SampleID, "A"),
+                                                                                 "Warn", QC_Warning)) %>%
+                                                      filter(QC_Warning == "Pass") %>% 
+                                                      olink_pca_plot())))
+  
+  
+})
