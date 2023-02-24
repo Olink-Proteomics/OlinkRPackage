@@ -1,6 +1,6 @@
 ## Release Summary
 
-This release is contains bugfixes for Olink Analyze version 3.3.0.
+This release contains bugfixes for Olink Analyze version 3.3.0.
 
 ## R CMD check results
 
