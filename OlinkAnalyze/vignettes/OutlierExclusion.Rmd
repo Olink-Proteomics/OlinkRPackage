@@ -1,0 +1,35 @@
+---
+title: "Outlier Exclusion Vignette"
+author: "Olink DS team"
+date: "`r Sys.Date()`"
+output: 
+  html_vignette:
+    toc: true
+    toc_depth: 2
+vignette: >
+  %\VignetteIndexEntry{Outlier Exclusion Vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Introduction
+
+This vignette describes how to use Olink® Analyze to evaluate a dataset for the presence of outliers. When performing statistical analyze it is important to establish the presence of any outlier samples in the data prior to statistical analysis. There are many reasons why a sample might be an outlier, it could be due to a data entry or measurement error (i.e. labeling a control sample as a disease sample), sampling problems or unusual conditions (i.e. contamination), or natural variation. In many parametric statistics tests the mean of each group is used to determine differences between groups. Since the mean is highly sensitive to outliers, it is important to examine datasets for outliers prior to analysis as these outliers could have a large influence on the statistical results.
+
+In Olink Analyze, there are three visualization functions that can be used to identify potential outlier samples. In this vignette, you will learn how to use `olink_pca_plot()`, `olink_dist_plot()` , and `olink_qc_plot()` to identify and remove outliers from a dataset.
+
+```{r Outlier_data, include=FALSE}
+# Create Dataset with outliers
+```
+
+##  PCA Plot
+
+Overview of PCA Plot
+
+How to use PCA plot to see an outlier
+
+PCA plot by panel
+
+Labeling outliers with lines
+
+Extracting outliers names from data
