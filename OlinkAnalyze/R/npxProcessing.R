@@ -60,7 +60,7 @@ npxProcessing_forDimRed <- function(df,
   #### If drop_assays == T, drop assays with any missing values ####
   if(drop_assays){
 
-    dropped_assays.na <- colnames(df_wide[, -c(1:2)])[apply(df_wide[, -c(1:2)], 2, anyNA)]
+    dropped_assays.na <- colnames(df_wide[, -c(1)])[apply(df_wide[, -c(1)], 2, anyNA)]
 
     df_wide <- df_wide %>%
       dplyr::select(-tidyselect::all_of(dropped_assays.na))
@@ -80,7 +80,7 @@ npxProcessing_forDimRed <- function(df,
   #### If drop_samples == T, drop samples with any missing values ####
   if(drop_samples){
 
-    dropped_samples <- apply(df_wide[, -c(1:2)], 1, anyNA)
+    dropped_samples <- apply(df_wide[, -c(1)], 1, anyNA)
     df_wide <- df_wide[!dropped_samples, ]
 
     if(verbose){
@@ -95,7 +95,7 @@ npxProcessing_forDimRed <- function(df,
 
   #### Drop assays with to many missing values ####
   #Missingness per assay
-  percent_missingness <- colSums(is.na(df_wide[, -c(1:2)]))/nrow(df_wide)
+  percent_missingness <- colSums(is.na(df_wide[, -c(1)]))/nrow(df_wide)
 
   # assays with missingness > 10% are dropped from the PCA
   PERCENT_CUTOFF <- 0.1
@@ -110,7 +110,7 @@ npxProcessing_forDimRed <- function(df,
     removed_assays_index <- which(percent_missingness > PERCENT_CUTOFF)
     percent_missingness <- percent_missingness[-removed_assays_index]
 
-    removed_assays_index <- removed_assays_index + 2
+    removed_assays_index <- removed_assays_index + 1
     dropped_assays.missingness <- colnames(df_wide)[removed_assays_index]
 
     df_wide <- df_wide[, -removed_assays_index]
@@ -133,7 +133,7 @@ npxProcessing_forDimRed <- function(df,
                                     percent_missingness > 0)
     percent_missingness <- percent_missingness[-imputed_assays_index]
 
-    imputed_assays_index <- imputed_assays_index + 2
+    imputed_assays_index <- imputed_assays_index + 1
     imputed_assays <- colnames(df_wide)[imputed_assays_index]
 
     df_wide <- df_wide %>%
@@ -147,7 +147,7 @@ npxProcessing_forDimRed <- function(df,
     }
   }
 
-  if(!all(colSums(is.na(df_wide[, -c(1:2)])) == 0)){
+  if(!all(colSums(is.na(df_wide[, -c(1)])) == 0)){
     stop('Missingness imputation failed.')
   }
 
