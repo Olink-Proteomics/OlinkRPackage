@@ -98,3 +98,19 @@ test_that("Estimate column must be present",{
 })
 
 
+test_that(" ORA warns assays not found in database. ", {
+  skip_if_not_installed("clusterProfiler")
+  messages <- capture_messages(olink_pathway_enrichment(npx_data1, test_results = ttest_results, 
+                                                        method = "ORA", ontology = "MSigDb")) 
+  messages <- paste(messages, collapse = "")
+  expect_true(grepl(pattern = "assays are not found in the database.", x = messages))
+  
+})
+
+test_that(" gsea warns assays not found in database. ", {
+  skip_if_not_installed("clusterProfiler")
+  
+  messages <- capture_messages(olink_pathway_enrichment(npx_df, test_results = ttest_results))
+  messages <- paste(messages, collapse = "")
+  expect_true(grepl(pattern = "assays are not found in the database.", x = messages))
+})

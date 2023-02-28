@@ -28,7 +28,7 @@
 #' }
 #' @importFrom magrittr %>%
 #' @importFrom tools file_ext md5sum file_path_sans_ext
-#' @importFrom dplyr as_tibble distinct pull filter bind_cols mutate left_join select rename matches bind_rows
+#' @importFrom dplyr as_tibble distinct pull filter bind_cols mutate left_join select rename matches bind_rows arrange slice_head
 #' @importFrom readxl read_excel
 #' @importFrom stringr str_detect str_replace_all str_to_upper str_to_title str_replace
 #' @importFrom tidyr tibble separate gather
@@ -167,60 +167,83 @@ read_NPX_explore <- function(filename) {
     invisible(unlink(x = tmp_unzip_dir, recursive = TRUE)) # remove files
   }
 
-
   # Check that all column names are present
   # We have had 5 column names versions so far: 1, 1.1 and 2, 2.1, and 3
   # please add newer versions to the list chronologically
-  header_standard <-    c("SampleID", "Index", "OlinkID", "UniProt", "Assay", "MissingFreq",
-                          "Panel", "PlateID", "QC_Warning", "LOD", "NPX")
-  header_v        <- list("header_v1"   = c(header_standard, "Panel_Version"),
-                          "header_v1.1" = c(header_standard, "Panel_Version", "Normalization", "Assay_Warning"),
-                          "header_v2"   = c(header_standard, "Panel_Lot_Nr", "Normalization", "Assay_Warning"),
-                          "header_v2.1" = c(header_standard, "Panel_Lot_Nr", "Normalization"),
-                          "header_v3" = c(header_standard, "Sample_Type", "Panel_Lot_Nr", "Assay_Warning",
-                                          "Normalization", "ExploreVersion"))
-  header_match    <-  any( sapply(header_v, function(x) all(x %in% colnames(out))) ) # look for one full match
-  if (any(names(out) %in% c("Sample_Type", "ExploreVersion" ))){
-    missing_cols<-setdiff(c("Sample_Type", "ExploreVersion" ), names(out))
-    if(length(missing_cols) != 0){
-      stop(paste0("Cannot find columns: ", paste(missing_cols, collapse = ",")))
-    }
+  header_standard <- c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
+                       "MissingFreq", "Panel", "PlateID", "QC_Warning",
+                       "LOD", "NPX")
+  header_ext_standard <- c(header_standard, "Sample_Type", "Panel_Lot_Nr",
+                           "WellID", "Normalization", "Assay_Warning",
+                           "IntraCV", "InterCV", "Processing_StartDate",
+                           "Processing_EndDate", "AnalyzerID")
+  header_v <- list("header_npx_v1"   = c(header_standard,
+                                         "Panel_Version"),
+                   "header_npx_v1.1" = c(header_standard,
+                                         "Panel_Version", "Normalization",
+                                         "Assay_Warning"),
+                   "header_npx_v2"   = c(header_standard,
+                                         "Panel_Lot_Nr", "Normalization"),
+                   "header_npx_v2.1" = c(header_standard,
+                                         "Panel_Lot_Nr", "Normalization",
+                                         "Assay_Warning"),
+                   "header_npx_v3"   = c(header_standard,
+                                         "Sample_Type", "Panel_Lot_Nr",
+                                         "Assay_Warning", "Normalization",
+                                         "ExploreVersion"),
 
-  }
+                   "header_ext_v1"   = c(header_ext_standard,
+                                         "INC_Warning",
+                                         "AMP_Warning",
+                                         "Count_Warning"),
+                   "header_ext_v2"   = c(header_ext_standard,
+                                         "ExploreVersion"))
 
-  if (header_match == TRUE) {
+  header_match <-  header_v |>
+    sapply(function(x)
+      identical(sort(x),
+                { colnames(out) |> sort() })
+      ) |>
+    any() # look for one full match
 
-    out <- out %>%
-      dplyr::mutate(NPX         = as.numeric(NPX),
-                    LOD         = as.numeric(LOD),
-                    MissingFreq = as.numeric(MissingFreq),
-                    SampleID    = as.character(SampleID)) %>%
-      dplyr::as_tibble()
-
-    return(out)
-
-  } else {
+  if (header_match == FALSE) {
 
     # if there is a mismatch of the input data with the expected column names
     # - we pick the set of column names with the shortest distance to any of the expected ones
     # - if multiple matches occur, we pick the most recent
-    header_diff <- lapply(header_v, function(x) setdiff(x, colnames(out))) %>%
+    header_diff_1 <- lapply(header_v, function(x) setdiff(x, colnames(out))) %>%
       lapply(length)
-    header_idx  <- unlist(header_diff) %>% min
-    if(sum(header_diff == header_idx) > 1) {
-      header_pick <- header_diff[header_diff == header_idx] %>% tail(1)
-    } else {
-      header_pick <- header_diff[header_diff == header_idx]
-    }
-    header_pick <- names(header_pick)
+    header_diff_2 <- lapply(header_v, function(x) setdiff(colnames(out), x)) %>%
+      lapply(length)
+    header_pick  <- tidyr::tibble(v_name = names(header_v),
+                                  v1     = unlist(header_diff_1),
+                                  v2     = unlist(header_diff_2)) |>
+      dplyr::mutate(v = v1 + v2) |>
+      dplyr::arrange(v, v_name) |>
+      dplyr::slice_head(n = 1) |>
+      dplyr::pull(v_name)
 
     # find missing columns
     missing_cols <- setdiff(header_v[[header_pick]], colnames(out))
-
-    # If missing columns, stop and print out which are missing
-    stop(paste0("Cannot find columns: ", paste(missing_cols, collapse = ",")))
+    
+    
+    if (length(missing_cols)  != 0) {
+      #If missing columns, throw a warning and print out which ones we guessed
+      # that are missing
+      warning(paste0("Cannot find columns: ", paste(missing_cols, collapse = ",")))
+      
+    }
 
   }
+
+  out <- out %>%
+    dplyr::mutate(NPX         = as.numeric(NPX),
+                  LOD         = as.numeric(LOD),
+                  MissingFreq = as.numeric(MissingFreq),
+                  SampleID    = as.character(SampleID)) %>%
+    dplyr::as_tibble()
+
+  return(out)
 
 }
 
@@ -601,19 +624,17 @@ read_NPX_target <- function(filename) {
   if (is_npx_data) {
     # Check for data completeness and warn on problems
     check_data_completeness(out)
-    out <- out %>% 
+    out <- out %>%
       mutate(NPX = as.numeric(NPX))
   }
   if (!is_npx_data){
     message("QUANT data detected. Some downstream functions may not be supported.")
-    out <- out %>% 
+    out <- out %>%
       mutate(Quantified_value = as.numeric(Quantified_value))
   }
 
   return(out)
 }
-
-
 
 #' Check data completeness
 #'
@@ -632,7 +653,6 @@ read_NPX_target <- function(filename) {
 #'                          NPX)) %>%
 #'     OlinkAnalyze:::check_data_completeness()
 
-
 check_data_completeness <- function(df){
   NA_panel_sample <- df %>%
     group_by(SampleID, Panel) %>%
@@ -647,6 +667,3 @@ check_data_completeness <- function(df){
   }
 
 }
-
-
-
