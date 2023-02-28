@@ -25,26 +25,34 @@ knitr::opts_chunk$set(
 )
 ```
 
-Olink® NPX datasets are normalized datasets using either plate control
-normalization or intensity normalization methods. Intensity
-normalization method assumes that all samples within a project are fully
-randomized. 
+Individual Olink® NPX datasets are normalized using either plate control
+normalization or intensity normalization methods. Plate control
+normalization is generally used for single plate projects, while
+intensity normalization is used for multiplate projects. Additionally,
+intensity normalization method assumes that all samples within a project
+are fully randomized.
 
-The joint analysis of two or more Olink® NPX datasets often requires an
-additional batch correction step to remove technical variations, which
-is referred to as bridging.
+In the case where all samples within a project are not fully randomized,
+or when a study is separated into separate batches, an additional
+normalization step is needed to allow the data to be comparable, since
+NPX is a relative measurement. The joint analysis of two or more Olink®
+NPX datasets often requires an additional batch correction step to
+remove technical variations, which is referred to as bridging.
 
-Bridging is needed if Olink® NPX datasets are:
+Bridging is also needed if Olink® NPX datasets are:
 
 -   plate control normalized only and run conditions (e.g lab and
     reagent lots) have changes.
 
 -   intensity normalized but from two different sample populations.
 
-To bridge two or more Olink® NPX datasets, bridging samples are needed to calculate the assay-specific adjustment factors between datasets. Bridging samples are shared samples among datasets - that is samples that are analysed in both datasets. The recommended number
-of bridging samples are shown in the table below. Olink® 
-NPX datasets without shared samples should not be combined using the bridging approach described below.
-
+To bridge two or more Olink® NPX datasets, bridging samples are needed
+to calculate the assay-specific adjustment factors between datasets.
+Bridging samples are shared samples among datasets - that is that
+samples that are analysed in both datasets. The recommended number of
+bridging samples are shown in the table below. Olink® NPX datasets
+without shared samples should not be combined using the bridging
+approach described below.
 
 ```{r, echo=FALSE}
 library(OlinkAnalyze)
@@ -53,7 +61,6 @@ library(stringr)
 library(ggplot2)
 library(kableExtra)
 ```
-
 
 ```{r brnrtab, message=FALSE, echo=FALSE}
 data.frame(Platform = c("Target 96",
@@ -74,28 +81,29 @@ data.frame(Platform = c("Target 96",
 
 The following tutorial is designed to give you an overview of the kinds
 of data combining methods that are possible using the Olink® bridging
-procedure. Before starting bridging, it is important to check if the 
+procedure. Before starting bridging, it is important to check if the
 same sample IDs were assigned to the bridging samples.
-
 
 ## Setup bridging datasets
 
-Bridging datasets are standard Olink® NPX tables. They can be loaded using 
-`read_NPX()` function with NPX manager output file as input.
+Bridging datasets are standard Olink® NPX tables. They can be loaded
+using `read_NPX()` function with NPX manager output file as input.
 
 ```{r message=FALSE, eval=FALSE, echo = TRUE}
 data1 <- read_NPX("~/NPX_file1_location.xlsx")
 data2 <- read_NPX("~/NPX_file2_location.xlsx")
-```  
+```
 
 To demonstrate how bridging works, we will use the example datasets
-(`npx_data1` and `npx_data2`) from **Olink Analyze** package. 
-This workflow also uses functions from the dplyr, stringr, and ggplot2 packages.
+(`npx_data1` and `npx_data2`) from **Olink Analyze** package. This
+workflow also uses functions from the dplyr, stringr, and ggplot2
+packages.
 
 ## Check bridging datasets
 
-Explore and have an overview of the datasets that are going to be bridged. For 
-example, plot and compare NPX distribution between datasets.
+Explore and have an overview of the datasets that are going to be
+bridged. For example, plot and compare NPX distribution between
+datasets.
 
 ```{r check, message=FALSE}
 # Load datasets
@@ -123,9 +131,11 @@ npx_df %>%
         strip.text = element_text(size = 16),
         legend.title = element_blank(),
         legend.position = "top")
-```  
+```
 
-Use PCA plot to visualize sample-to-sample distance before bridging. Typically the project dataset accounts for most of the observed variation within the combined datasets at this point.
+Use PCA plot to visualize sample-to-sample distance before bridging.
+Typically the project dataset accounts for most of the observed
+variation within the combined datasets at this point.
 
 ```{r pca1, message=FALSE, fig.cap="PCA plot of combined datasets before bridging"}
 ## before bridging
@@ -174,23 +184,24 @@ OlinkAnalyze::olink_pca_plot(df          = npx_before_br,
 
 ```
 
-
 ## Perform bridging between two data sets
 
-We can use `olink_normalization()` function to bridge two datasets. The bridging 
-procedure is to first calculate **the median of the paired NPX differences** per
-assay between the bridging samples as adjustment factor then use these adjustment 
-factors to adjust NPX values between two datasets. In this process, one dataset 
-is considered the reference dataset (`df1`) and its NPX values remain unaltered.
-The other dataset is considered the new dataset (`df2`) and is adjusted to 
-the reference dataset based on the adjustment factors.
+We can use `olink_normalization()` function to bridge two datasets. The
+bridging procedure is to first calculate **the median of the paired NPX
+differences** per assay between the bridging samples as adjustment
+factor then use these adjustment factors to adjust NPX values between
+two datasets. In this process, one dataset is considered the reference
+dataset (`df1`) and its NPX values remain unaltered. The other dataset
+is considered the new dataset (`df2`) and is adjusted to the reference
+dataset based on the adjustment factors.
 
-The output from `olink_normalization()` function is a NPX table with adjusted 
-NPX value in the column `NPX`.
+The output from `olink_normalization()` function is a NPX table with
+adjusted NPX value in the column `NPX`.
 
-`olink_normalization()` uses the information from column `Project` to distinguish 
-between reference dataset from the other dataset. It is up to the user to define 
-which dataset is the reference dataset and specify the names of the bridge samples.
+`olink_normalization()` uses the information from column `Project` to
+distinguish between reference dataset from the other dataset. It is up
+to the user to define which dataset is the reference dataset and specify
+the names of the bridge samples.
 
 ```{r bridging, message=FALSE}
 # Find shared samples
@@ -211,7 +222,7 @@ npx_br_data <- olink_normalization(df1                     = npx_1,
                                    df1_project_nr          = "20200001",
                                    df2_project_nr          = "20200002",
                                    reference_project       = "20200001")
-glimpse(npx_br_data)
+dplyr::glimpse(npx_br_data)
 
 ```
 
@@ -224,21 +235,25 @@ First, check NPX distribution in datasets after bridging normalization.
 
 npx_br_data %>%
   mutate(Panel = gsub("Olink ", "", Panel)) %>%
-  ggplot(aes(x = NPX, fill = dataset)) +
-  geom_density(alpha = 0.4) +
-  facet_grid(~Panel) +
+  ggplot2::ggplot(ggplot2::aes(x = NPX, fill = dataset)) +
+  ggplot2::geom_density(alpha = 0.4) +
+  ggplot2::facet_grid(~Panel) +
   olink_fill_discrete(coloroption = c("red", "darkblue")) +
   set_plot_theme() +
-  ggtitle("After bridging normalization: NPX distribution") +
+  ggplot2::ggtitle("After bridging normalization: NPX distribution") +
   theme(axis.title.x = element_blank(),
         axis.title.y = element_blank(),
         strip.text = element_text(size = 16),
         legend.title = element_blank(),
         legend.position = "top")
 
-``` 
+```
 
-Then summarize number of assays that have adjustment factors in certain ranges. High adjustment factors can result from variations between projects, such as panel versions or technical modifications. Such assays can be visualized individually with violin plots and may warrant further investigation to confirm they are still comparable between projects.
+Then summarize number of assays that have adjustment factors in certain
+ranges. High adjustment factors can result from variations between
+projects, such as panel versions or technical modifications. Such assays
+can be visualized individually with violin plots and may warrant further
+investigation to confirm they are still comparable between projects.
 
 ```{r tbl_adj_fct, message=FALSE}
 breaks <- c(-Inf, -1, -0.25, 0.25, 1, Inf)
@@ -258,22 +273,46 @@ npx_br_data %>%
   tally() %>%
   tidyr::pivot_wider(names_from = group, values_from = n) %>%
   tibble::column_to_rownames(var = "Panel") %>%
-  relocate(any_of(labels)) %>%
-  kbl(booktabs = TRUE,
+  dplyr::relocate(any_of(labels)) %>%
+  kableExtra::kbl(booktabs = TRUE,
       digits = 2,
       caption = paste("Distribution of assays in different ranges of",
                       "adjustment factors")) %>%
-  kable_styling(bootstrap_options = "striped", full_width = FALSE,
+  kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE,
                 position = "center", latex_options = "HOLD_position")
 
-``` 
+```
 
+```{r voilin plot}
+# High Adjustment Factor Assays
+cutoff <- 1
 
-Finally, use PCA plot to check whether bridging normalization has effect in correcting batch effects.
-In the example below, it is clear that before bridging samples from data 1 and 2 are divided
-into separate clusters due to the batch effects, but after bridging they are shown as one cluster in the PCA plot.
-Bridging normalization has sufficiently removed the batch effects between two data sets.
+high_assay<-npx_br_data  %>% 
+ filter(Adj_factor > cutoff | Adj_factor < -cutoff) %>% 
+  select(Assay, OlinkID, Panel) %>%
+  distinct()
+npx_data1 %>%
+  mutate(Project = "20200001") %>%
+  rbind({
+    npx_data2 %>%
+      mutate(Project = "20200002")
+  }) %>%
+  filter(OlinkID %in% high_assay$OlinkID[1]) %>%
+  filter(!str_detect(SampleID, "CONTROL*.")) %>%
+  mutate(Assay_OID = paste(Assay, OlinkID, sep = "\n")) %>% 
+  ggplot2::ggplot(aes(Project, NPX)) +
+  ggplot2::geom_violin(aes(fill = Project)) +
+  theme(legend.position = "none") +
+  set_plot_theme() +
+  facet_wrap(. ~ Assay_OID, scales='free_y')
+```
 
+Finally, use PCA plot to check whether bridging normalization has effect
+in correcting batch effects. In the example below, it is clear that
+before bridging samples from data 1 and 2 are divided into separate
+clusters due to the batch effects, but after bridging they are shown as
+one cluster in the PCA plot. Bridging normalization has sufficiently
+removed the batch effects between two data sets.
 
 ```{r pca2, message=FALSE, fig.cap="PCA plot of combined datasets after bridging"}
 ## After bridging
@@ -289,4 +328,3 @@ OlinkAnalyze::olink_pca_plot(df          = npx_after_br,
                              color_g     = "datatype",
                              byPanel     = TRUE)
 ```
-
