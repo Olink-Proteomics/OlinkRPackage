@@ -84,6 +84,36 @@ of data combining methods that are possible using the Olink® bridging
 procedure. Before starting bridging, it is important to check if the
 same sample IDs were assigned to the bridging samples.
 
+## Selecting bridging samples
+
+Prior to running the second study, bridging samples must be selected
+from the reference study and be added to the second study. These samples
+can be selected using the \`olink_bridgeselector()\` function in Olink
+Analyze. The bridge selection function will select a number of bridge
+samples based on the reference data. This function selects samples with
+which passes QC and have high detectibility. To select samples across
+the range of the data, the samples are ordered by mean NPX value and
+selected across this range When running the selector, Olink recommends
+starting at sampleMissingFreq = 0.10 which represents a maximum of 10%
+data below LOD per sample. If there are not enough samples output,
+increase to 20%. For alternative matrices and specific disease types, it
+may be needed to increase the sampleMissingFreq to higher levels.
+
+In this example we will demonstrate how to select 16 bridging samples
+using \`npx_data1\` which will act as the reference data.
+
+```{r bridge_sample_selection}
+olink_bridgeselector(df = npx_data1,
+                     sampleMissingFreq = 0.1,
+                     n = 16) %>%
+  kableExtra::kbl(booktabs = TRUE,
+      digits = 2,
+      caption = "Selected Bridging Samples") %>%
+  kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE,
+                position = "center", latex_options = "HOLD_position")
+  
+```
+
 ## Setup bridging datasets
 
 Bridging datasets are standard Olink® NPX tables. They can be loaded
