@@ -90,7 +90,7 @@ Prior to running the second study, bridging samples must be selected
 from the reference study and be added to the second study. These samples
 can be selected using the `olink_bridgeselector()` function in Olink
 Analyze. The bridge selection function will select a number of bridge
-samples based on the reference data. This function selects samples with
+samples based on the reference data. This function selects samples
 which passes QC and have high detectibility. To select samples across
 the range of the data, the samples are ordered by mean NPX value and
 selected across this range. When running the selector, Olink recommends
