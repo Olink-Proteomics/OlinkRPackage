@@ -13,6 +13,7 @@ olink_heatmap_plot(
   cluster_cols = TRUE,
   show_rownames = TRUE,
   show_colnames = TRUE,
+  colnames = "both",
   annotation_legend = TRUE,
   fontsize = 10,
   na_col = "black",
