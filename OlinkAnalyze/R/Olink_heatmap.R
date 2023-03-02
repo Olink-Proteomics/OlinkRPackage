@@ -14,6 +14,7 @@
 #' @param cluster_cols Logical. Determining if columns should be clustered (default \code{TRUE}).
 #' @param show_rownames Logical. Determining if row names are shown (default \code{TRUE}).
 #' @param show_colnames Logical. Determining if column names are shown (default \code{TRUE}).
+#' @param colnames Character. Determines how to label the columns. Must be 'Assay', 'oid', or 'both' (default 'both').
 #' @param annotation_legend Logical. Determining if legend for annotations should be shown (default \code{TRUE}).
 #' @param fontsize Fontsize (default 10)
 #' @param na_col Color of cells with \code{NA} (default black)
@@ -152,6 +153,7 @@ olink_heatmap_plot <- function(df,
                        values_from = NPX) %>%
     tibble::column_to_rownames('SampleID')
 
+  # Label columns according to the colnames argument
   if(!colnames %in% c('Assay', 'oid', 'both')){
     stop('colnames has to be \'Assay\', \'oid\', or \'both\'')
   }
