@@ -68,10 +68,10 @@
     },
     "BiocManager": {
       "Package": "BiocManager",
-      "Version": "1.30.19",
+      "Version": "1.30.20",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "726b3bc83ff8e0c35c7efdb74a462b0d",
+      "Hash": "a7fca16a50b6ef7771b49d636dd54b57",
       "Requirements": []
     },
     "BiocParallel": {
