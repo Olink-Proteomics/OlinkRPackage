@@ -54,6 +54,7 @@ olink_heatmap_plot <- function(df,
                                cluster_cols      = TRUE,
                                show_rownames     = TRUE,
                                show_colnames     = TRUE,
+                               colnames          = 'both',
                                annotation_legend = TRUE,
                                fontsize          = 10,
                                na_col            = 'black',
@@ -81,16 +82,16 @@ olink_heatmap_plot <- function(df,
 
   #Save column classes
   col_classes <- sapply(df, "class")
-  
+
   # Exclude OlinkIDs with missing NPX
   npx_check <- npxCheck(df)
-  
-  
+
+
   #Filtering on valid OlinkID
   df_temp <- df %>%
     dplyr::filter(stringr::str_detect(OlinkID,
-                                      "OID[0-9]{5}")) %>% 
-    dplyr::filter(!(OlinkID %in% npx_check$all_nas)) 
+                                      "OID[0-9]{5}")) %>%
+    dplyr::filter(!(OlinkID %in% npx_check$all_nas))
 
 
   #Halt if muliple samplenames
@@ -150,6 +151,25 @@ olink_heatmap_plot <- function(df,
                        names_from = Assay_OlinkID,
                        values_from = NPX) %>%
     tibble::column_to_rownames('SampleID')
+
+  if(!colnames %in% c('Assay', 'oid', 'both')){
+    stop('colnames has to be \'Assay\', \'oid\', or \'both\'')
+  }
+  if(colnames == 'Assay'){
+    assays <- sub(pattern = '(.*)_.*', replacement = '\\1', x = colnames(npxWide)) %>%
+      as.data.frame() %>%
+      rename('Assay' = 1) %>%
+      #If there are duplicate Assays (IL6 for instance), add a number to make the names unique
+      dplyr::group_by(Assay) %>%
+      dplyr::mutate(duplicateID = dplyr::row_number()) %>%
+      dplyr::ungroup() %>%
+      dplyr::mutate(Assay = ifelse(duplicateID > 1, paste0(Assay, '_', duplicateID), Assay))
+
+    colnames(npxWide) <- assays$Assay
+  }
+  if(colnames == 'oid'){
+    colnames(npxWide) <- sub(pattern = '.*_(.*)', replacement = '\\1', x = colnames(npxWide))
+  }
 
   scale <- ifelse(center_scale, "column", "none")
 
