@@ -101,6 +101,12 @@ jobs:
       - uses: r-lib/actions/setup-pandoc@v2
         with:
           pandoc-version: '2.18'
+
+      - name: Install BiocManager
+        run: |
+          if (!require("BiocManager", quietly = TRUE))
+            install.packages("BiocManager")
+        shell: Rscript {0}
           
       - uses: r-lib/actions/setup-renv@v2
         with:
