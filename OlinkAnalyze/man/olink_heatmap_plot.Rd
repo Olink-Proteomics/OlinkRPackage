@@ -37,7 +37,7 @@ olink_heatmap_plot(
 
 \item{show_colnames}{Logical. Determining if column names are shown (default \code{TRUE}).}
 
-\item{colnames}{Character. Determines how to label the columns. Must be 'Assay', 'oid', or 'both' (default 'both').}
+\item{colnames}{Character. Determines how to label the columns. Must be 'assay', 'oid', or 'both' (default 'both').}
 
 \item{annotation_legend}{Logical. Determining if legend for annotations should be shown (default \code{TRUE}).}
 

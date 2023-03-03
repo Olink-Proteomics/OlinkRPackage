@@ -14,7 +14,7 @@
 #' @param cluster_cols Logical. Determining if columns should be clustered (default \code{TRUE}).
 #' @param show_rownames Logical. Determining if row names are shown (default \code{TRUE}).
 #' @param show_colnames Logical. Determining if column names are shown (default \code{TRUE}).
-#' @param colnames Character. Determines how to label the columns. Must be 'Assay', 'oid', or 'both' (default 'both').
+#' @param colnames Character. Determines how to label the columns. Must be 'assay', 'oid', or 'both' (default 'both').
 #' @param annotation_legend Logical. Determining if legend for annotations should be shown (default \code{TRUE}).
 #' @param fontsize Fontsize (default 10)
 #' @param na_col Color of cells with \code{NA} (default black)
@@ -154,11 +154,11 @@ olink_heatmap_plot <- function(df,
     tibble::column_to_rownames('SampleID')
 
   # Label columns according to the colnames argument
-  if(!colnames %in% c('Assay', 'oid', 'both')){
+  if(!colnames %in% c('assay', 'oid', 'both')){
     stop('colnames has to be \'Assay\', \'oid\', or \'both\'')
   }
-  if(colnames == 'Assay'){
-    assays <- sub(pattern = '(.*)_.*', replacement = '\\1', x = colnames(npxWide)) %>%
+  if(colnames == 'assay'){
+    assays <- sub(pattern = '(.*)_(OID.*)', replacement = '\\1', x = colnames(npxWide)) %>%
       as.data.frame() %>%
       dplyr::rename('Assay' = 1) %>%
       #If there are duplicate Assays (IL6 for instance), add a number to make the names unique
@@ -170,7 +170,7 @@ olink_heatmap_plot <- function(df,
     colnames(npxWide) <- assays$Assay
   }
   if(colnames == 'oid'){
-    colnames(npxWide) <- sub(pattern = '.*_(.*)', replacement = '\\1', x = colnames(npxWide))
+    colnames(npxWide) <- sub(pattern = '(.*)_(OID.*)', replacement = '\\2', x = colnames(npxWide))
   }
 
   scale <- ifelse(center_scale, "column", "none")
