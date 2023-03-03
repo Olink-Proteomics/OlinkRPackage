@@ -160,7 +160,7 @@ olink_heatmap_plot <- function(df,
   if(colnames == 'Assay'){
     assays <- sub(pattern = '(.*)_.*', replacement = '\\1', x = colnames(npxWide)) %>%
       as.data.frame() %>%
-      rename('Assay' = 1) %>%
+      dplyr::rename('Assay' = 1) %>%
       #If there are duplicate Assays (IL6 for instance), add a number to make the names unique
       dplyr::group_by(Assay) %>%
       dplyr::mutate(duplicateID = dplyr::row_number()) %>%
