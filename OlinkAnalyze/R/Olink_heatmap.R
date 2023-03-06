@@ -155,7 +155,7 @@ olink_heatmap_plot <- function(df,
 
   # Label columns according to the colnames argument
   if(!colnames %in% c('assay', 'oid', 'both')){
-    stop('colnames has to be \'Assay\', \'oid\', or \'both\'')
+    stop('colnames has to be \'assay\', \'oid\', or \'both\'')
   }
   if(colnames == 'assay'){
     assays <- sub(pattern = '(.*)_(OID.*)', replacement = '\\1', x = colnames(npxWide)) %>%
