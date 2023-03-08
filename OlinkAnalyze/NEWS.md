@@ -1,3 +1,21 @@
+# Olink Analyze 3.3.1
+## Bug Fixes
+* olink_pathway_enrichment now prints a message when there are non matching names when using method = "ORA" (@MasoumehSheikhi, #222)
+* olink_pca_plot will now generate PCA when data is missing from the first OlinkID (@kathy-nevola, #221)
+* read_NPX now supports csv files with Sample_Type column but not ExploreVersion column (@klevdiamanti, #220)
+* extra columns in input file will no longer result in a warning message (@kathy-nevola, #223)
+
+
+# Olink Analyze 3.3.0
+## Minor Changes
+* Support for additional versions of Olink data - Read_NPX now supports a wider range of Olink data types (@AskPascal, @kathy-nevola, #207, #208, #211, #216)
+* Automatic support for normalizing 2 datasets with different column configurations - olink_normalization will now automatically add missing columns to datasets (filled NA) to allow data with different configurations to be more easily normalized together (@kathy-nevola, #212)
+* Automatic checking that datasets used the same normalization method before bridging - Datasets that were normalized with different methods (different values in normalization column) will now warn before performing normalization (@klevdiamanti, #210)
+
+## Bug Fixes
+* Data with '#' in SampleID column is now supported (@AskPascal, #208)
+* PCA can now be generated when indices are not consistent across SampleIDs (@amrita-kar, #206)
+
 # Olink Analyze 3.2.2
 ## Bug Fixes
 * remove www. from links in vignette to prevent rerouting of URL (@kathy-nevola, #188)

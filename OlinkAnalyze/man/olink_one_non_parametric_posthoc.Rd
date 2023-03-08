@@ -21,7 +21,7 @@ olink_one_non_parametric_posthoc(
 
 \item{test}{Single character value indicates running the post hoc test for friedman or kruskal.}
 
-\item{verbose}{Boolean. Deafult: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
+\item{verbose}{Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
 }
 \value{
 Tibble of posthoc tests for specified effect, arranged by ascending adjusted p-values.
@@ -40,7 +40,7 @@ Columns include:
 }
 }
 \description{
-Performs a posthoc test using rstatix::wilcox_test or FSA::dennTest with Benjamini-Hochberg p-value adjustment per assay (by OlinkID) for each panel at confidence level 0.95.
+Performs a posthoc test using rstatix::wilcox_test or FSA::dunnTest with Benjamini-Hochberg p-value adjustment per assay (by OlinkID) for each panel at confidence level 0.95.
 See \code{olink_one_non_parametric} for details of input notation. \cr\cr
 The function handles both factor and numerical variables.
 }

@@ -1,6 +1,6 @@
 ## Release Summary
 
-This release fixes a bug in Olink Analyze 3.2 where data is now written to a temporary directory. URLs were updated to no longer redirect. Set_plot_theme was updated to follow ggplot2 3.4 standards.
+This release contains bugfixes for Olink Analyze version 3.3.0.
 
 ## R CMD check results
 
