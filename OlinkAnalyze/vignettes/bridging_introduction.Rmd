@@ -339,7 +339,7 @@ high_assay<-npx_br_data  |>
   distinct()
 npx_data1 |>
   mutate(Project = "20200001") |>
-  rbind({
+  bind_rows({
     npx_data2 |>
       mutate(Project = "20200002")
   }) |>
