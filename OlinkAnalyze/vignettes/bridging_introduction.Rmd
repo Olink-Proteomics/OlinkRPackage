@@ -216,7 +216,7 @@ br_2 <- npx_data2 |>
   filter(SampleID %in% overlap_samples) |>
   mutate(SampleID = paste0(dataset, PlateID, SampleID))
 
-npx_before_br <- rbind(npx_1, npx_2) |>
+npx_before_br <- bind_rows(npx_1, npx_2) |>
   mutate(datatype = ifelse(SampleID %in% c(br_1$SampleID, br_2$SampleID),
                            "bridges", dataset))
 
