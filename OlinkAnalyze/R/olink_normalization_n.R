@@ -63,7 +63,7 @@
 #'
 #' @param norm_schema A tibble with more than 1 rows and (strictly) the
 #' following columns: "order", "name", "data", "samples", "normalization_type",
-#' "normalize_to". See above for details of the structure of the data frame
+#' "normalize_to". See "Details" for the structure of the data frame
 #' (required)
 #'
 #' @return A "tibble" of NPX data in long format containing normalized NPX
@@ -186,12 +186,6 @@
 #'
 #' #### Multi-project normalization using bridge and subset samples
 #'
-#' # datasets
-#' npx_df1 <- npx_data1 |>
-#'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_"))
-#' npx_df2 <- npx_data2 |>
-#'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_"))
-#'
 #' ## NPX data frames to bridge
 #' npx_df1 <- npx_data1 |>
 #'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_"))
@@ -231,7 +225,7 @@
 #' # Samples to use for intensity normalization between npx_df4 and the
 #' # normalized dataset of npx_df1 and npx_df2
 #' overlap_samples_df12_df4 <- list("DF1" = sample(x = c(unique(npx_df1$SampleID),
-#'                                                       unique(npx_df1$SampleID)),
+#'                                                       unique(npx_df2$SampleID)),
 #'                                                 size = 100,
 #'                                                 replace = FALSE),
 #'                                  "DF2" = sample(x = unique(npx_df4$SampleID),
@@ -270,6 +264,7 @@ olink_normalization_n <- function(norm_schema) {
 
   # check that norm_schema has all the infor we need to proceed
   normalize_n_check <- olink_normalization_n_check(norm_schema = norm_schema)
+
   if (normalize_n_check != "TRUE") {
     stop(normalize_n_check)
   }
@@ -280,11 +275,11 @@ olink_normalization_n <- function(norm_schema) {
 
   # extract data for global reference project
   project_ref_global <- norm_schema |>
-    dplyr::filter(order == 1) |>
+    dplyr::filter(order == 1L) |>
     dplyr::pull(name)
 
   normalized_npx <- norm_schema |>
-    dplyr::filter(order == 1) |>
+    dplyr::filter(order == 1L) |>
     dplyr::pull(data)
   names(normalized_npx) <- project_ref_global
 
@@ -294,7 +289,7 @@ olink_normalization_n <- function(norm_schema) {
 
   # extract remaining batches
   project_remaining <- norm_schema |>
-    dplyr::filter(order != 1) |>
+    dplyr::filter(order != 1L) |>
     dplyr::pull(order)
 
   # replace original dataset with its name to save memory
@@ -330,10 +325,11 @@ olink_normalization_n <- function(norm_schema) {
       dplyr::filter(order %in% project_i_norm_to) |>
       dplyr::pull(name)
 
-    project_ref_names_combo <- paste(project_ref_names, collapse = ",")
+    project_ref_names_combo <- paste(project_ref_names,
+                                     collapse = ",")
 
     # reference NPX dataset
-    if (length(project_i_norm_to) > 1) {
+    if (length(project_i_norm_to) > 1L) {
       project_ref_npx <- normalized_npx[project_ref_names] |>
         dplyr::bind_rows()
     } else {
@@ -706,8 +702,6 @@ olink_normalization_sample_check <- function(list_samples,
     stop("\"check_mode\" should be \"bridge\" or \"subset\"")
   }
 
-  return_message <- "TRUE"
-
   if (check_mode == "bridge") {
     message_text <- "bridge_samples"
   } else if (check_mode == "subset") {
@@ -716,43 +710,77 @@ olink_normalization_sample_check <- function(list_samples,
 
   # check list_samples
   if (!is.list(list_samples)) {
-    return_message <- paste(message_text, "should be a list")
+    return(
+      paste(message_text,
+            "should be a list")
+    )
   }
+
   if (length(list_samples) != 2L) {
-    return_message <- paste("length of ", message_text, " should exactly 2",
-                            sep = "")
+    return(
+      paste("length of ",
+            message_text,
+            " should exactly 2",
+            sep = "")
+    )
   }
+
   if (!identical({ names(list_samples) |> sort() }, c("DF1", "DF2"))) {
-    return_message <- paste(message_text, " should be a named list with names",
-                            " \"DF2\" and \"DF1\" referring to the data",
-                            " frame on this row and the one to normalize to,",
-                            " respectively", sep = "")
+    return(
+      paste(message_text,
+            " should be a named list with names \"DF2\" and \"DF1\" referring",
+            " to the data frame on this row and the one to normalize to,",
+            " respectively",
+            sep = "")
+    )
   }
+
   if (!{ sapply(list_samples, is.character) |> all() }) {
-    return_message <- paste(message_text, " should contain exclusively",
-                            " character vectors", sep = "")
+    return(
+      paste(message_text,
+            " should contain exclusively character vectors",
+            sep = "")
+    )
   }
+
   if ({ list_samples |> unlist() |> is.na() |> any() }) {
-    return_message <- paste("character vectors in ", message_text, " should",
-                            " not contain NAs", sep = "")
+    return(
+      paste("character vectors in ",
+            message_text,
+            " should not contain NAs",
+            sep = "")
+    )
   }
+
   if (!all(list_samples$DF1 %in% project_1_all_samples)) {
-    return_message <- paste("not all SampleID in ", message_text, "$DF1 are",
-                            " present in \"project_1_df\"", sep = "")
+    return(
+      paste("not all SampleID in ",
+            message_text,
+            "$DF1 are present in \"project_1_df\"",
+            sep = "")
+    )
   }
+
   if (!all(list_samples$DF2 %in% project_2_all_samples)) {
-    return_message <- paste("not all SampleID in ", message_text, "$DF2 are",
-                            " present in \"project_2_df\"", sep = "")
+    return(
+      paste("not all SampleID in ",
+            message_text,
+            "$DF2 are present in \"project_2_df\"",
+            sep = "")
+    )
   }
 
   if (check_mode == "bridge") {
     if ({ sapply(list_samples, length) |> unique() |> length() } != 1L) {
-      return_message <- paste("character vectors in ", message_text, " should",
-                              " have the same length", sep = "")
+      return(
+        paste("character vectors in ",
+              message_text,
+              " should have the same length",
+              sep = ""))
     }
   }
 
-  return(return_message)
+  return("TRUE")
 }
 
 #' An internal function to perform checks on the input project names in the
@@ -776,34 +804,49 @@ olink_normalization_project_name_check <- function(project_1_name,
                      project_2_name,
                      project_ref_name)
 
-  return_message <- "TRUE"
-
   # check all project names together
   if (!is.character(project_names)) {
-    return_message <- paste("\"project_1_name\", \"project_2_name\" and",
-                            "\"project_ref_name\" should be a character vectors")
+    return(
+      paste("\"project_1_name\", \"project_2_name\" and \"project_ref_name\"",
+            " should be a character vectors",
+            sep = "")
+    )
   }
+
   if (length(project_names) != 3L) {
-    return_message <- paste("\"project_1_name\", \"project_2_name\" and",
-                            "\"project_ref_name\" should be a character vectors",
-                            "of length 1 each")
+    return(
+      paste("\"project_1_name\", \"project_2_name\" and \"project_ref_name\"",
+            " should be a character vectors of length 1 each",
+            sep = "")
+    )
   }
+
   if ({ is.na(project_names) |> any() }) {
-    return_message <- paste("\"project_1_name\", \"project_2_name\" or",
-                            "\"project_ref_name\" should not be NA")
+    return(
+      paste("\"project_1_name\", \"project_2_name\" or \"project_ref_name\"",
+            " should not be NA",
+            sep = "")
+    )
   }
 
   # sanity check for individual project names
   if (project_1_name == project_2_name) {
-    return_message <- paste("\"project_1_name\" and \"project_2_name\" should",
-                            "differ from each other")
-  }
-  if (!(project_ref_name %in% c(project_1_name, project_2_name))) {
-    return_message <- paste("\"project_ref_name\" should be one of the ",
-                            "\"project_1_name\" or \"project_2_name\"")
+    return(
+      paste("\"project_1_name\" and \"project_2_name\" should differ from each",
+            " other",
+            sep = "")
+    )
   }
 
-  return(return_message)
+  if (!(project_ref_name %in% c(project_1_name, project_2_name))) {
+    return(
+      paste("\"project_ref_name\" should be one of the \"project_1_name\" or",
+            " \"project_2_name\"",
+            sep = "")
+    )
+  }
+
+  return("TRUE")
 }
 
 #' An internal function to perform checks on the input of the function
@@ -819,59 +862,133 @@ olink_normalization_project_name_check <- function(project_1_name,
 #'
 olink_normalization_n_check <- function(norm_schema) {
 
-  return_message <- "TRUE"
+  # check input
+  input_colnames <- c("order",
+                      "name",
+                      "data",
+                      "samples",
+                      "normalization_type",
+                      "normalize_to")
+  if (!all(input_colnames %in% colnames(norm_schema))) {
+    miss_cols <- input_colnames[!input_colnames %in% colnames(norm_schema)]
+
+    if (length(miss_cols == 1)) {
+      miss_cols_print <- miss_cols
+    } else {
+      miss_cols_print <- miss_cols |>
+        head(-1) |>
+        paste(collapse = ", ") |>
+        paste("and", { miss_cols |> tail(-1) })
+    }
+
+    return(
+      paste("norm_schema input is missing columns ",
+            miss_cols_print,
+            sep = "")
+    )
+  }
 
   # Check order
   if (any(is.na(norm_schema$order)) ||
       any(is.infinite(norm_schema$order))) {
-    return_message <- "order cannot contain NA and/or infinities!"
+    return("order cannot contain NA and/or infinities!")
   }
+
   if (!is.numeric(norm_schema$order) &&
       !is.integer(norm_schema$order)) {
-    return_message <- "order has to be numeric or integer vector!"
+    return("order has to be numeric or integer vector!")
   }
+
   if (!identical(
     {
       norm_schema$order |>
         sort() |>
         as.integer()
     },
-    1:nrow(norm_schema))) {
-    return_message <- paste("order has to be a unique integer or numeric",
-                            "identifier of each row!")
+    1L:nrow(norm_schema))) {
+    return(
+      paste("order has to be a sequence of unique integer or numeric",
+            " identifiers of each row starting from 1. The sequence has to",
+            " increase by 1",
+            sep = "")
+    )
   }
 
   # Check data
   if (!is.list(norm_schema$data) ||
       !all(sapply(norm_schema$data, is.data.frame))) {
-    return_message <- "data has to be a list of NPX data frames!"
+    return("data has to be a list of NPX data frames!")
   }
-  if ({ sapply(norm_schema$data, function(x) is.na(x) |> all()) |> all() }) {
-    return_message <- "data cannot contain NA entries!"
+
+  if (any(sapply(norm_schema$data, function(x) "Project" %in% colnames(x)))) {
+    check_project <- norm_schema$data |>
+      sapply(function(x) "Project" %in% colnames(x)) |>
+      names()
+
+    if (length(check_project) == 1) {
+      check_project_print <- check_project
+    } else {
+      check_project_print <- check_project |>
+        head(-1) |>
+        paste(collapse = ", ") |>
+        paste("and", { check_project |> tail(-1) })
+    }
+
+    return(
+      paste("datsets ",
+            check_project_print,
+            " contain the column \"Project\". Please remove and rerun!",
+            sep = "")
+    )
+  }
+
+  if (any(sapply(norm_schema$data, function(x) "Adj_factor" %in% colnames(x)))) {
+    check_project <- norm_schema$data |>
+      sapply(function(x) "Adj_factor" %in% colnames(x)) |>
+      names()
+
+    if (length(check_project) == 1) {
+      check_project_print <- check_project
+    } else {
+      check_project_print <- check_project |>
+        head(-1) |>
+        paste(collapse = ", ") |>
+        paste("and", { check_project |> tail(-1) })
+    }
+
+    return(
+      paste("datsets ",
+            check_project_print,
+            " contain the column \"Adj_factor\". Please remove and rerun!",
+            sep = "")
+    )
   }
 
   # Check samples
   if (!is.list(norm_schema$samples)) {
-    return_message <- "samples has to be a list of character vectors!"
+    return("samples has to be a list of character vectors!")
   }
 
   # Check normalization_type
   if (!is.character(norm_schema$normalization_type)) {
-    return_message <- "normalization_type has to be a character vector!"
+    return("normalization_type has to be a character vector!")
   }
+
   if (!all(norm_schema$normalization_type %in% c("Subset",
                                                  "Bridge",
-                                                 NA_character_))) {
-    return_message <- "normalization_type may contain Subset, Bridge or NA!"
+                                                 NA))) {
+    return("normalization_type may contain Subset, Bridge or NA!")
   }
 
   # Check normalize_to
   if (!is.character(norm_schema$normalize_to)) {
-    return_message <- "normalize_to has to be a list of character arrays!"
+    return("normalize_to has to be a character array!")
   }
 
   if (!all({
-    strsplit(x = norm_schema$normalize_to, split = ",", fixed = T) |>
+    strsplit(x = norm_schema$normalize_to,
+             split = ",",
+             fixed = TRUE) |>
       unlist() |>
       unique() |>
       as.integer() |>
@@ -881,9 +998,48 @@ olink_normalization_n_check <- function(norm_schema) {
       sort() |>
       as.integer()
   })) {
-    return_message <- paste("all elements from normalize_to have to be a",
-                            "present in \"order\"!")
+    return("all elements from normalize_to have to be a present in \"order\"!")
   }
 
-  return(return_message)
+  order_and_norm_to <- lapply(1:nrow(norm_schema), function(i)
+  {
+    order_tmp <- norm_schema |>
+      dplyr::slice(i) |>
+      dplyr::pull(order)
+
+    norm_to_tmp <- norm_schema |>
+      dplyr::slice(i) |>
+      dplyr::pull(normalize_to) |>
+      strsplit(split = ",",
+               fixed = TRUE) |>
+      unlist()
+
+    if (order_tmp %in% norm_to_tmp) {
+      return(order_tmp)
+    } else {
+      return(NULL)
+    }
+  }) |>
+    unlist()
+  if (!is.null(order_and_norm_to) &&
+      length(order_and_norm_to) > 0) {
+    if (length(order_and_norm_to) == 1) {
+      order_and_norm_to_print <- order_and_norm_to
+    } else {
+      order_and_norm_to_print <- order_and_norm_to |>
+        head(-1) |>
+        paste(collapse = ", ") |>
+        paste("and", { order_and_norm_to |> tail(-1) })
+    }
+
+    return(
+      paste("entries with order column identifiers ",
+            order_and_norm_to_print,
+            " contain their own identifier in the normalize_to column. This",
+            " implies normalization to self. Remove self-references!",
+            sep = "")
+    )
+  }
+
+  return("TRUE")
 }
