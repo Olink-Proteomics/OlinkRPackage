@@ -52,7 +52,6 @@ shared samples are specified in bridge_samples.\cr\cr
 }
 \examples{
 \donttest{
-
 npx_df1 <- npx_data1 |>
   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_"))
 npx_df2 <- npx_data2 |>

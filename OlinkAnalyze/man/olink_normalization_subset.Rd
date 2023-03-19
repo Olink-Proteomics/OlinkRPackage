@@ -56,7 +56,6 @@ samples) from each project as a subset. \cr\cr
 }
 \examples{
 \donttest{
-
 #### Subset normalization
 
 # datasets
