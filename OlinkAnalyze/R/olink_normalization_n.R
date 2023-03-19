@@ -79,9 +79,13 @@
 #'
 #' # prepare datasets
 #' npx_df1 <- npx_data1 |>
-#'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_"))
+#'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
+#'   dplyr::select(-Project) |>
+#'   dplyr::mutate(Normalization = "Intensity")
 #' npx_df2 <- npx_data2 |>
-#'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_"))
+#'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
+#'   dplyr::select(-Project) |>
+#'   dplyr::mutate(Normalization = "Intensity")
 #'
 #' # Find overlapping samples, but exclude Olink control
 #' overlap_samples <- dplyr::intersect(unique(npx_df1$SampleID),
@@ -108,9 +112,13 @@
 #'
 #' # datasets
 #' npx_df1 <- npx_data1 |>
-#'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_"))
+#'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
+#'   dplyr::select(-Project) |>
+#'   dplyr::mutate(Normalization = "Intensity")
 #' npx_df2 <- npx_data2 |>
-#'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_"))
+#'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
+#'   dplyr::select(-Project) |>
+#'   dplyr::mutate(Normalization = "Intensity")
 #'
 #' # Find a suitable subset of samples from both projects, but exclude Olink
 #' # controls and samples that fail QC.
@@ -150,9 +158,13 @@
 #'
 #' # datasets
 #' npx_df1 <- npx_data1 |>
-#'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_"))
+#'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
+#'   dplyr::select(-Project) |>
+#'   dplyr::mutate(Normalization = "Intensity")
 #' npx_df2 <- npx_data2 |>
-#'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_"))
+#'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
+#'   dplyr::select(-Project) |>
+#'   dplyr::mutate(Normalization = "Intensity")
 #'
 #' # Find a suitable subset of samples from both projects, but exclude Olink
 #' # controls and samples that fail QC.
@@ -188,23 +200,31 @@
 #'
 #' ## NPX data frames to bridge
 #' npx_df1 <- npx_data1 |>
-#'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_"))
+#'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
+#'   dplyr::select(-Project) |>
+#'   dplyr::mutate(Normalization = "Intensity")
 #'
 #' npx_df2 <- npx_data2 |>
-#'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_"))
+#'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
+#'   dplyr::select(-Project) |>
+#'   dplyr::mutate(Normalization = "Intensity")
 #'
 #' # manipulating the sample NPX datasets to create another two random ones
 #' npx_df3 <- npx_data2 |>
 #'   dplyr::mutate(SampleID = paste(SampleID, "_mod", sep = ""),
 #'                 PlateID = paste(PlateID, "_mod", sep = ""),
 #'                 NPX = sample(x = NPX, size = dplyr::n(), replace = FALSE)) |>
-#'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_"))
+#'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
+#'   dplyr::select(-Project) |>
+#'   dplyr::mutate(Normalization = "Intensity")
 #'
 #' npx_df4 <- npx_data1 |>
 #'   dplyr::mutate(SampleID = paste(SampleID, "_mod2", sep = ""),
 #'                 PlateID = paste(PlateID, "_mod2", sep = ""),
 #'                 NPX = sample(x = NPX, size = dplyr::n(), replace = FALSE)) |>
-#'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_"))
+#'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
+#'   dplyr::select(-Project) |>
+#'   dplyr::mutate(Normalization = "Intensity")
 #'
 #' ## samples to use for normalization
 #' # Bridge samples with same identifiers between npx_df1 and npx_df2
@@ -423,9 +443,13 @@ olink_normalization_n <- function(norm_schema) {
 #' @examples
 #' \donttest{
 #' npx_df1 <- npx_data1 |>
-#'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_"))
+#'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
+#'   dplyr::select(-Project) |>
+#'   dplyr::mutate(Normalization = "Intensity")
 #' npx_df2 <- npx_data2 |>
-#'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_"))
+#'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
+#'   dplyr::select(-Project) |>
+#'   dplyr::mutate(Normalization = "Intensity")
 #'
 #' # Find overlapping samples, but exclude Olink control
 #' overlap_samples <- dplyr::intersect(unique(npx_df1$SampleID),
@@ -557,9 +581,13 @@ olink_normalization_bridge <- function(project_1_df,
 #'
 #' # datasets
 #' npx_df1 <- npx_data1 |>
-#'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_"))
+#'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
+#'   dplyr::select(-Project) |>
+#'   dplyr::mutate(Normalization = "Intensity")
 #' npx_df2 <- npx_data2 |>
-#'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_"))
+#'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
+#'   dplyr::select(-Project) |>
+#'   dplyr::mutate(Normalization = "Intensity")
 #'
 #' # Find a suitable subset of samples from both projects, but exclude Olink
 #' # controls and samples that fail QC.
@@ -593,9 +621,13 @@ olink_normalization_bridge <- function(project_1_df,
 #'
 #' # datasets
 #' npx_df1 <- npx_data1 |>
-#'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_"))
+#'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
+#'   dplyr::select(-Project) |>
+#'   dplyr::mutate(Normalization = "Intensity")
 #' npx_df2 <- npx_data2 |>
-#'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_"))
+#'   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
+#'   dplyr::select(-Project) |>
+#'   dplyr::mutate(Normalization = "Intensity")
 #'
 #' # Find a suitable subset of samples from both projects, but exclude Olink
 #' # controls and samples that fail QC.

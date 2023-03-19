@@ -52,11 +52,14 @@ shared samples are specified in bridge_samples.\cr\cr
 }
 \examples{
 \donttest{
-
 npx_df1 <- npx_data1 |>
-  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_"))
+  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
+  dplyr::select(-Project) |>
+  dplyr::mutate(Normalization = "Intensity")
 npx_df2 <- npx_data2 |>
-  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_"))
+  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
+  dplyr::select(-Project) |>
+  dplyr::mutate(Normalization = "Intensity")
 
 # Find overlapping samples, but exclude Olink control
 overlap_samples <- dplyr::intersect(unique(npx_df1$SampleID),

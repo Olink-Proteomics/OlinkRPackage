@@ -56,14 +56,17 @@ samples) from each project as a subset. \cr\cr
 }
 \examples{
 \donttest{
-
 #### Subset normalization
 
 # datasets
 npx_df1 <- npx_data1 |>
-  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_"))
+  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
+  dplyr::select(-Project) |>
+  dplyr::mutate(Normalization = "Intensity")
 npx_df2 <- npx_data2 |>
-  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_"))
+  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
+  dplyr::select(-Project) |>
+  dplyr::mutate(Normalization = "Intensity")
 
 # Find a suitable subset of samples from both projects, but exclude Olink
 # controls and samples that fail QC.
@@ -97,9 +100,13 @@ olink_normalization_subset(project_1_df = npx_df1,
 
 # datasets
 npx_df1 <- npx_data1 |>
-  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_"))
+  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
+  dplyr::select(-Project) |>
+  dplyr::mutate(Normalization = "Intensity")
 npx_df2 <- npx_data2 |>
-  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_"))
+  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
+  dplyr::select(-Project) |>
+  dplyr::mutate(Normalization = "Intensity")
 
 # Find a suitable subset of samples from both projects, but exclude Olink
 # controls and samples that fail QC.
