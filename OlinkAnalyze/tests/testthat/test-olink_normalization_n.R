@@ -287,7 +287,9 @@ normalization_results.subset_n <-
 
 # Test that function works ----
 
-test_that("olink_normalization bridge/subset standalone functions work",
+## Test bridge function ----
+
+test_that("olink_normalization bridge standalone function works",
           {
             # expect two warnings thrown:
             #   one from missing column "Sample_Type" in df2
@@ -301,23 +303,12 @@ test_that("olink_normalization bridge/subset standalone functions work",
                                            project_1_name = 'P1',
                                            project_2_name = 'P2',
                                            project_ref_name = 'P1')
-                )
               )
+            )
 
             # check that simple bridging example is replicated in the reference set
             expect_equal(normalization_results.bridged,
                          ref_results$normalization_results.bridged)
-
-            # check that intensity example is replicated in the reference set
-            expect_equal(normalization_results.intensity,
-                         ref_results$normalization_results.intensity)
-
-            # check that subset example is replicated in the reference set
-            expect_equal(normalization_results.subset,
-                         ref_results$normalization_results.subset)
-
-            expect_error(olink_normalization(df1 = { npx_data1 |> mutate(Normalization = "Intensity") },
-                                             df2 = { npx_data2 |> mutate(Normalization = "Intensity") })) # No samples specified
 
             expect_error(
               {
@@ -356,48 +347,30 @@ test_that("olink_normalization bridge/subset standalone functions work",
                 )
               }
             ) # Non overlapping samples for bridging
-
-            ### Testing the excluded assay bridging ###
-            ## With P1 as the reference
-            #Test that all excluded assays from project 1 remain NA after bridging
-            expect_true(npxBridged %>%
-                          filter(Project == 'P1' & OlinkID %in% excludedOIDs.proj1) %>%
-                          pull(NPX) %>%
-                          is.na() %>%
-                          all())
-
-            #Test that the non-excluded assays in project 2 remain unchanged
-            expect_true(npxBridged %>%
-                          filter(Project == 'P2' & OlinkID %in% setdiff(excludedOIDs.proj1, excludedOIDs.proj2)) %>%
-                          left_join(npx_data_format221010.project2, by = c('SampleID', 'OlinkID')) %>%
-                          mutate(match = NPX.x == NPX.y) %>%
-                          pull(match) %>%
-                          all())
-
-            ## With P2 as the reference
-            #Test that all excluded assays from project 1 remain NA after bridging
-            expect_true(npxBridged_proj2ref %>%
-                          filter(Project == 'P1' & OlinkID %in% excludedOIDs.proj1) %>%
-                          pull(NPX) %>%
-                          is.na() %>%
-                          all())
-
-            #Test that the non-excluded assays in project 2 remain unchanged
-            expect_true(npxBridged_proj2ref %>%
-                          filter(Project == 'P2' & OlinkID %in% setdiff(excludedOIDs.proj1, excludedOIDs.proj2)) %>%
-                          left_join(npx_data_format221010.project2, by = c('SampleID', 'OlinkID')) %>%
-                          mutate(match = NPX.x == NPX.y) %>%
-                          pull(match) %>%
-                          all())
           }
 )
+
+## Test subset/intensity function ----
+
+test_that("olink_normalization subset standalone function works",
+          {
+            # check that intensity example is replicated in the reference set
+            expect_equal(normalization_results.intensity,
+                         ref_results$normalization_results.intensity)
+
+            # check that subset example is replicated in the reference set
+            expect_equal(normalization_results.subset,
+                         ref_results$normalization_results.subset)
+          }
+)
+
+## Test multi-batch function ----
 
 test_that("olink_normalization multi-batch works",
           {
             # Errors ----
 
             ## error thrown when column is not provided ----
-
             expect_error(
               {
                 olink_normalization_n(
@@ -883,3 +856,335 @@ test_that("olink_normalization multi-batch works",
                           all())
           }
           )
+
+## Other tests ----
+
+### Test missing "Normalize" column ----
+
+test_that("missing Normalization column works", {
+
+  # Warning when both df1 and df2 are lacking column "Normalization" ----
+  expect_warning(
+    olink_normalization_bridge(project_1_df = npx_data1,
+                               project_2_df = npx_data2,
+                               bridge_samples = list("DF1" = overlap_samples,
+                                                     "DF2" = overlap_samples),
+                               project_1_name = '20200001',
+                               project_2_name = '20200002',
+                               project_ref_name = '20200001'),
+    "Variable \"Normalization\" not present in df1 and df2")
+
+  expect_warning(
+    olink_normalization_n(
+      norm_schema = dplyr::tibble(
+        order              = c(1, 2),
+        name               = c("20200001", "20200002"),
+        data               = list("20200001" =
+                                    {
+                                      npx_data1 |>
+                                        dplyr::select(-Project)
+                                    },
+                                  "20200002" =
+                                    {
+                                      npx_data2 |>
+                                        dplyr::select(-Project)
+                                    }),
+        samples            = list("20200001" = NA_character_,
+                                  "20200002" = list("DF1" = overlap_samples,
+                                                    "DF2" = overlap_samples)),
+        normalization_type = c(NA_character_, "Bridge"),
+        normalize_to       = c(NA_character_, "1")
+      )
+    ),
+    "Variable \"Normalization\" not present in df1 and df2")
+
+  # conly df1 contains column "Normalization" ----
+  expect_warning(
+    expect_warning(
+      olink_normalization_bridge(project_1_df =
+                                   {
+                                     npx_data1 |>
+                                       dplyr::mutate(Normalization = "Intensity")
+                                   },
+                                 project_2_df = npx_data2,
+                                 bridge_samples = list("DF1" = overlap_samples,
+                                                       "DF2" = overlap_samples),
+                                 project_1_name = '20200001',
+                                 project_2_name = '20200002',
+                                 project_ref_name = '20200001'),
+      "Variable \"Normalization\" not present in df2."),
+    "The following columns are found in df1 but not df2"
+  )
+
+  expect_warning(
+    expect_warning(
+      olink_normalization_n(
+        norm_schema = dplyr::tibble(
+          order              = c(1, 2),
+          name               = c("20200001", "20200002"),
+          data               = list("20200001" =
+                                      {
+                                        npx_data1 |>
+                                          dplyr::select(-Project) |>
+                                          dplyr::mutate(Normalization = "Intensity")
+                                      },
+                                    "20200002" =
+                                      {
+                                        npx_data2 |>
+                                          dplyr::select(-Project)
+                                      }),
+          samples            = list("20200001" = NA_character_,
+                                    "20200002" = list("DF1" = overlap_samples,
+                                                      "DF2" = overlap_samples)),
+          normalization_type = c(NA_character_, "Bridge"),
+          normalize_to       = c(NA_character_, "1")
+        )
+      ),
+      "Variable \"Normalization\" not present in df2."),
+    "The following columns are found in df1 but not df2"
+  )
+
+  # 2 Warnings if only df2 contains column "Normalization" ----
+  expect_warning(
+    expect_warning(
+      olink_normalization_bridge(project_1_df = npx_data1,
+                                 project_2_df =
+                                   {
+                                     npx_data2 |>
+                                       dplyr::mutate(Normalization = "Intensity")
+                                   },
+                                 bridge_samples = list("DF1" = overlap_samples,
+                                                       "DF2" = overlap_samples),
+                                 project_1_name = '20200001',
+                                 project_2_name = '20200002',
+                                 project_ref_name = '20200001'),
+      "Variable \"Normalization\" not present in df1."),
+    "The following columns are found in df2 but not df1"
+  )
+
+  expect_warning(
+    expect_warning(
+      olink_normalization_n(
+        norm_schema = dplyr::tibble(
+          order              = c(1, 2),
+          name               = c("20200001", "20200002"),
+          data               = list("20200001" =
+                                      {
+                                        npx_data1 |>
+                                          dplyr::select(-Project)
+                                      },
+                                    "20200002" =
+                                      {
+                                        npx_data2 |>
+                                          dplyr::select(-Project) |>
+                                          dplyr::mutate(Normalization = "Intensity")
+                                      }),
+          samples            = list("20200001" = NA_character_,
+                                    "20200002" = list("DF1" = overlap_samples,
+                                                      "DF2" = overlap_samples)),
+          normalization_type = c(NA_character_, "Bridge"),
+          normalize_to       = c(NA_character_, "1")
+        )
+      ),
+      "Variable \"Normalization\" not present in df1."),
+    "The following columns are found in df2 but not df1"
+  )
+}
+)
+
+### Test that df1 and df2 are normalized similarly ----
+
+test_that("df1 and df2 same normalization", {
+  # different normalization with expected values in Normalization column ----
+  expect_warning(
+    olink_normalization_bridge(project_1_df =
+                                 {
+                                   npx_data1 |>
+                                     dplyr::mutate(Normalization = "Intensity")
+                                 },
+                               project_2_df =
+                                 {
+                                   npx_data2 |>
+                                     dplyr::mutate(Normalization = "Plate control")
+                                 },
+                               bridge_samples = list("DF1" = overlap_samples,
+                                                     "DF2" = overlap_samples),
+                               project_1_name = '20200001',
+                               project_2_name = '20200002',
+                               project_ref_name = '20200001'),
+    "df1 and df2 are not normalized with the same approach. Consider renormalizing.")
+
+  expect_warning(
+    olink_normalization_n(
+      norm_schema = dplyr::tibble(
+        order              = c(1, 2),
+        name               = c("20200001", "20200002"),
+        data               = list("20200001" =
+                                    {
+                                      npx_data1 |>
+                                        dplyr::select(-Project) |>
+                                        dplyr::mutate(Normalization = "Intensity")
+                                    },
+                                  "20200002" =
+                                    {
+                                      npx_data2 |>
+                                        dplyr::select(-Project) |>
+                                        dplyr::mutate(Normalization = "Plate control")
+                                    }),
+        samples            = list("20200001" = NA_character_,
+                                  "20200002" = list("DF1" = overlap_samples,
+                                                    "DF2" = overlap_samples)),
+        normalization_type = c(NA_character_, "Bridge"),
+        normalize_to       = c(NA_character_, "1")
+      )
+    ),
+    "df1 and df2 are not normalized with the same approach. Consider renormalizing.")
+
+  # For future use ----
+  # different normalization with unexpected values in Normalization column
+  # currently we do not check values in this column, but in the future we might
+  expect_warning(
+    olink_normalization_bridge(project_1_df =
+                                 {
+                                   npx_data1 |>
+                                     dplyr::mutate(Normalization = "A")
+                                 },
+                               project_2_df =
+                                 {
+                                   npx_data2 |>
+                                     dplyr::mutate(Normalization = "B")
+                                 },
+                               bridge_samples = list("DF1" = overlap_samples,
+                                                     "DF2" = overlap_samples),
+                               project_1_name = '20200001',
+                               project_2_name = '20200002',
+                               project_ref_name = '20200001'),
+    "df1 and df2 are not normalized with the same approach. Consider renormalizing.")
+
+  expect_warning(
+    olink_normalization_n(
+      norm_schema = dplyr::tibble(
+        order              = c(1, 2),
+        name               = c("20200001", "20200002"),
+        data               = list("20200001" =
+                                    {
+                                      npx_data1 |>
+                                        dplyr::select(-Project) |>
+                                        dplyr::mutate(Normalization = "A")
+                                    },
+                                  "20200002" =
+                                    {
+                                      npx_data2 |>
+                                        dplyr::select(-Project) |>
+                                        dplyr::mutate(Normalization = "B")
+                                    }),
+        samples            = list("20200001" = NA_character_,
+                                  "20200002" = list("DF1" = overlap_samples,
+                                                    "DF2" = overlap_samples)),
+        normalization_type = c(NA_character_, "Bridge"),
+        normalize_to       = c(NA_character_, "1")
+      )
+    ),
+    "df1 and df2 are not normalized with the same approach. Consider renormalizing.")
+}
+)
+
+### Test that Different columns in dfs can be normalized ----
+
+test_that("Different columns in dfs can be normalized",{
+  # Bridge ----
+  mismatch_col_norm <- olink_normalization_bridge(project_1_df = npx_df_test,
+                             project_2_df = npx_df2,
+                             bridge_samples = list("DF1" = overlap_samples2,
+                                                   "DF2" = overlap_samples2),
+                             project_1_name = 'P1',
+                             project_2_name = 'P2',
+                             project_ref_name = 'P1') |>
+    suppressWarnings() |>
+    dplyr::filter(SampleID %in% sampleSubset)
+
+  # Columns are as expected
+  expect_equal(
+    {
+      mismatch_col_norm |>
+        colnames() |>
+        sort()
+    },
+    {
+      c(colnames(npx_df_test),
+        colnames(npx_df2),
+        "Adj_factor") |>
+        unique() |>
+        sort()
+    })
+
+  # NAs are where expected
+  col_notdf2 <- setdiff(colnames(mismatch_col_norm),
+                        colnames(npx_df2)
+                        ) |>
+    stringr::str_remove("Adj_factor")
+
+  col_notdf1 <- setdiff(colnames(mismatch_col_norm),
+                        colnames(npx_df_test)
+                        ) |>
+    stringr::str_remove("Adj_factor")
+
+  expect_equal(
+    {
+      mismatch_col_norm |>
+        dplyr::filter(Project == "P2") |>
+        dplyr::select(dplyr::all_of(col_notdf2[-length(col_notdf2)])) |>
+        dplyr::distinct() |>
+        dplyr::pull()
+      }, "NA")
+
+  expect_equal(
+    {
+      mismatch_col_norm |>
+        dplyr::filter(Project == "P1") |>
+        dplyr::select(dplyr::all_of(col_notdf1[-length(col_notdf1)])) |>
+        dplyr::distinct() |>
+        dplyr::pull()
+    }, "NA")
+
+  expect_equal(normalization_results.bridged$NPX, mismatch_col_norm$NPX)
+})
+
+### Test removed/hidden/missing assays ----
+
+test_that("olink_normalization works form missing/hidden/removed assays",
+          {
+            ### Testing the excluded assay bridging ###
+            ## With P1 as the reference
+            #Test that all excluded assays from project 1 remain NA after bridging
+            expect_true(npxBridged %>%
+                          filter(Project == 'P1' & OlinkID %in% excludedOIDs.proj1) %>%
+                          pull(NPX) %>%
+                          is.na() %>%
+                          all())
+
+            #Test that the non-excluded assays in project 2 remain unchanged
+            expect_true(npxBridged %>%
+                          filter(Project == 'P2' & OlinkID %in% setdiff(excludedOIDs.proj1, excludedOIDs.proj2)) %>%
+                          left_join(npx_data_format221010.project2, by = c('SampleID', 'OlinkID')) %>%
+                          mutate(match = NPX.x == NPX.y) %>%
+                          pull(match) %>%
+                          all())
+
+            ## With P2 as the reference
+            #Test that all excluded assays from project 1 remain NA after bridging
+            expect_true(npxBridged_proj2ref %>%
+                          filter(Project == 'P1' & OlinkID %in% excludedOIDs.proj1) %>%
+                          pull(NPX) %>%
+                          is.na() %>%
+                          all())
+
+            #Test that the non-excluded assays in project 2 remain unchanged
+            expect_true(npxBridged_proj2ref %>%
+                          filter(Project == 'P2' & OlinkID %in% setdiff(excludedOIDs.proj1, excludedOIDs.proj2)) %>%
+                          left_join(npx_data_format221010.project2, by = c('SampleID', 'OlinkID')) %>%
+                          mutate(match = NPX.x == NPX.y) %>%
+                          pull(match) %>%
+                          all())
+          }
+)
