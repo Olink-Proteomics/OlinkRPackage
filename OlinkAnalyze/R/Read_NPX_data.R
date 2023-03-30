@@ -266,6 +266,7 @@ read_NPX_target <- function(filename) {
   if (grepl(pattern = 'NPX', x = data_type, fixed = TRUE)) {
 
     is_npx_data     <- TRUE
+    isTarget <- FALSE
     n_max_meta_data <- 4
 
     # Check whether it is target 48 or 96
@@ -341,6 +342,7 @@ read_NPX_target <- function(filename) {
   } else  if (long_form == TRUE && isTarget == FALSE){
     out <- readxl::read_excel(path = filename,
                               col_names = T) %>%
+      dplyr::rename(dplyr::any_of(c("SampleID" = "SampleId"))) %>%
       dplyr::filter(!is.na(SampleID)) %>%
       dplyr::as_tibble() %>%
       dplyr::select(SampleID, Index, OlinkID,
@@ -359,7 +361,11 @@ read_NPX_target <- function(filename) {
                     dplyr::matches("*Inc Ctrl*"),
                     dplyr::matches("*Det Ctrl*"))
     is_npx_data <- ifelse(any(names(out) %in% "NPX"), TRUE, FALSE)
-  } else {
+  } else if (long_form == FALSE & isTarget == FALSE) {
+    message("Flex data detected.")
+    out <- read_npflex(filename)
+    
+  }else {
     # Load initial meta data (the first rows of the wide file)
     meta_dat <-  readxl::read_excel(path = filename,
                                     skip = 2,
