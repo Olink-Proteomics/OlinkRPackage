@@ -361,11 +361,7 @@ read_NPX_target <- function(filename) {
                     dplyr::matches("*Inc Ctrl*"),
                     dplyr::matches("*Det Ctrl*"))
     is_npx_data <- ifelse(any(names(out) %in% "NPX"), TRUE, FALSE)
-  } else if (long_form == FALSE & isTarget == FALSE) {
-    message("Flex data detected.")
-    out <- read_npflex(filename)
-    
-  }else {
+  } else {
     # Load initial meta data (the first rows of the wide file)
     meta_dat <-  readxl::read_excel(path = filename,
                                     skip = 2,
