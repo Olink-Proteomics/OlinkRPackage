@@ -342,9 +342,13 @@
 
   normalization_results.multi <-
     olink_normalization_n(norm_schema = norm_schema_npxMulti) |>
-    dplyr::mutate(SampleID_tmp = stringr::str_split_i(string = SampleID,
-                                                      pattern = "_",
-                                                      i = 1)) |>
+    dplyr::mutate(SampleID_tmp =
+                    {
+                      SampleID |>
+                        stringr::str_split(pattern = "_") |>
+                        lapply(head, 1) |>
+                        unlist()
+                    }) |>
     dplyr::filter(SampleID_tmp %in% sampleSubset) |>
     dplyr::select(-SampleID_tmp) |>
     dplyr::arrange(Project, Panel, OlinkID, SampleID)
