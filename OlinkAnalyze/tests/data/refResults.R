@@ -32,7 +32,7 @@ kruskal_posthoc_results <- olink_one_non_parametric_posthoc(npx_data1,
                                                                 filter(Threshold == 'Significant') %>%
                                                                 dplyr::select(OlinkID) %>%
                                                                 distinct() %>%
-                                                                pull()}) %>% 
+                                                                pull()}) %>%
   mutate(id = as.character(OlinkID)) %>%
   arrange(id, contrast) %>% #Just for consistency. Not actually needed in this case
   select(-id)
@@ -45,7 +45,7 @@ friedman_posthoc_results <- olink_one_non_parametric_posthoc(npx_data1,
                                                                  filter(Threshold == 'Significant') %>%
                                                                  dplyr::select(OlinkID) %>%
                                                                  distinct() %>%
-                                                                 pull()}) %>% 
+                                                                 pull()}) %>%
   mutate(id = as.character(OlinkID)) %>%
   arrange(id, contrast) %>% #Just for consistency. Not actually needed in this case
   select(-id)
@@ -53,7 +53,7 @@ friedman_posthoc_results <- olink_one_non_parametric_posthoc(npx_data1,
 #### Ordinal regression ####
 #Two-way Ordinal Regression with CLM.
 ordinalRegression_results <- olink_ordinalRegression(df = npx_data1,
-                             variable="Treatment:Time") %>% 
+                             variable="Treatment:Time") %>%
   mutate(id = as.character(OlinkID)) %>%
   arrange(id, Assay) %>% #Just for consistency. Not actually needed in this case
   select(-id)
@@ -67,7 +67,7 @@ ordinalRegression_results_posthoc_results <- olink_ordinalRegression_posthoc(npx
                                                                                  dplyr::select(OlinkID) %>%
                                                                                  distinct() %>%
                                                                                  pull()},
-                                                                             effect = "Treatment:Time") %>% 
+                                                                             effect = "Treatment:Time") %>%
   mutate(id = as.character(OlinkID)) %>%
   arrange(id, contrast) %>% #Just for consistency. Not actually needed in this case
   select(-id)
@@ -182,6 +182,104 @@ normalization_results.subset <- olink_normalization(df1 = npx_data1,
                                                     df2_project_nr = '20200002',
                                                     reference_project = '20200001') %>%
   filter(SampleID %in% sampleSubset)
+
+# Multi-batch normalization
+npx_multi_df1 <- npx_data1 |>
+  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
+  dplyr::select(-Project) |>
+  dplyr::mutate(Normalization = "Intensity")
+
+npx_multi_df2 <- npx_data2 |>
+  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
+  dplyr::select(-Project) |>
+  dplyr::mutate(Normalization = "Intensity")
+
+# manipulating the sample NPX datasets to create another two random ones
+npx_multi_df3 <- npx_data2 |>
+  dplyr::mutate(SampleID = paste(SampleID, "_mod", sep = ""),
+                PlateID = paste(PlateID, "_mod", sep = "")) |>
+  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
+  dplyr::select(-Project) |>
+  dplyr::mutate(Normalization = "Intensity")
+
+npx_multi_df4 <- npx_data1 |>
+  dplyr::mutate(SampleID = paste(SampleID, "_mod2", sep = ""),
+                PlateID = paste(PlateID, "_mod2", sep = "")) |>
+  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
+  dplyr::select(-Project) |>
+  dplyr::mutate(Normalization = "Intensity")
+
+## samples to use for normalization
+# Bridge samples with same identifiers between npx_df1 and npx_df2
+overlap_samples_df1_df2 <- list("DF1" = overlap_samples,
+                                "DF2" = overlap_samples)
+
+# Bridge samples with different identifiers between npx_df2 and npx_df3
+overlap_samples_df2_df3 <- list("DF1" =
+                                  {
+                                    npx_multi_df2 |>
+                                      dplyr::filter(stringr::str_detect(string = SampleID,
+                                                                        pattern = "^A")) |>
+                                      dplyr::pull(SampleID) |>
+                                      unique() |>
+                                      sort()
+                                  },
+                                "DF2" =
+                                  {
+                                    npx_multi_df3 |>
+                                      dplyr::filter(stringr::str_detect(string = SampleID,
+                                                                        pattern = "^C")) |>
+                                      dplyr::pull(SampleID) |>
+                                      unique() |>
+                                      sort() |>
+                                      head(10)
+                                  })
+
+# Samples to use for intensity normalization between npx_df4 and the
+# normalized dataset of npx_df1 and npx_df2
+overlap_samples_df13_df4 <- list("DF1" =
+                                   {
+                                     npx_multi_df1 |>
+                                       dplyr::bind_rows(npx_multi_df3) |>
+                                       dplyr::filter(stringr::str_detect(string = SampleID,
+                                                                         pattern = "^A")) |>
+                                       dplyr::pull(SampleID) |>
+                                       unique() |>
+                                       sort()
+                                   },
+                                 "DF2" =
+                                   {
+                                     npx_multi_df4 |>
+                                       dplyr::filter(stringr::str_detect(string = SampleID,
+                                                                         pattern = "^B")) |>
+                                       dplyr::pull(SampleID) |>
+                                       unique() |>
+                                       sort()
+                                   })
+
+# create tibble for input
+norm_schema_npxMulti <- dplyr::tibble(
+  order              = c(1, 2, 3, 4),
+  name               = c("NPX_DF1", "NPX_DF2", "NPX_DF3", "NPX_DF4"),
+  data               = list("NPX_DF1" = npx_multi_df1,
+                            "NPX_DF2" = npx_multi_df2,
+                            "NPX_DF3" = npx_multi_df3,
+                            "NPX_DF4" = npx_multi_df4),
+  samples            = list("NPX_DF1" = NA_character_,
+                            "NPX_DF2" = overlap_samples_df1_df2,
+                            "NPX_DF3" = overlap_samples_df2_df3,
+                            "NPX_DF4" = overlap_samples_df13_df4),
+  normalization_type = c(NA_character_, "Bridge", "Bridge", "Subset"),
+  normalize_to       = c(NA_character_, "1", "2", "1,3")
+)
+
+normalization_results.multi <-
+  olink_normalization_n(norm_schema = norm_schema_npxMulti) |>
+  dplyr::mutate(SampleID_tmp = stringr::str_split_i(string = SampleID,
+                                                    pattern = "_",
+                                                    i = 1)) |>
+  dplyr::filter(SampleID_tmp %in% sampleSubset) |>
+  dplyr::select(-SampleID_tmp)
 
 #### olink_plate_randomizer ####
 randomized_result1 <- olink_plate_randomizer(manifest,

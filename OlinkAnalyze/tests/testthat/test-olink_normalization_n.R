@@ -12,6 +12,9 @@ sampleSubset <- c("A6", "A38", "B47", "B22", "A43", "D75", "D79", "C66", "B43",
 load(file = '../data/npx_data_format221010.RData')
 # loads npx_data_format221010 and npx_data_format221010.project2
 
+complex_npx_file <- system.file("extdata", "complex_dataset.rds", package = "OlinkAnalyze", mustWork = TRUE)
+complex_npx_data <- readRDS(complex_npx_file)
+
 # Help vars and datasets ----
 
 # Warning if column names arent the same but results still match
@@ -25,13 +28,6 @@ npx_df_test <- OlinkAnalyze::npx_data1 |>
                 MissingFreq, Panel_Version, PlateID, QC_Warning, LOD, NPX,
                 Subject) |>
   dplyr::mutate(Normalization = "Intensity") # adding Normalization to avoid warning
-
-overlap_samples2 <- dplyr::intersect(npx_data1$SampleID,
-                                     npx_data2$SampleID) |>
-  tibble::enframe() |>
-  dplyr::filter(!str_detect(value,
-                            '^CONTROL_SAMPLE')) |> # Remove control samples
-  dplyr::pull()
 
 # Bridge normalization ----
 
@@ -285,6 +281,112 @@ normalization_results.subset_n <-
   dplyr::select(-Normalization) |> # removing Normalization to match instance from ref_results
   dplyr::select(SampleID:Time, Project, Panel, Adj_factor) # rearranging to match reference bridge
 
+## Multi-project mixed normalization ----
+
+### Simple multi-project normalization example ----
+
+npx_multi_df1 <- npx_data1 |>
+  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
+  dplyr::select(-Project) |>
+  dplyr::mutate(Normalization = "Intensity")
+
+npx_multi_df2 <- npx_data2 |>
+  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
+  dplyr::select(-Project) |>
+  dplyr::mutate(Normalization = "Intensity")
+
+# manipulating the sample NPX datasets to create another two random ones
+npx_multi_df3 <- npx_data2 |>
+  dplyr::mutate(SampleID = paste(SampleID, "_mod", sep = ""),
+                PlateID = paste(PlateID, "_mod", sep = "")) |>
+  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
+  dplyr::select(-Project) |>
+  dplyr::mutate(Normalization = "Intensity")
+
+npx_multi_df4 <- npx_data1 |>
+  dplyr::mutate(SampleID = paste(SampleID, "_mod2", sep = ""),
+                PlateID = paste(PlateID, "_mod2", sep = "")) |>
+  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
+  dplyr::select(-Project) |>
+  dplyr::mutate(Normalization = "Intensity")
+
+## samples to use for normalization
+# Bridge samples with same identifiers between npx_df1 and npx_df2
+overlap_samples_df1_df2 <- list("DF1" = overlap_samples,
+                                "DF2" = overlap_samples)
+
+# Bridge samples with different identifiers between npx_df2 and npx_df3
+overlap_samples_df2_df3 <- list("DF1" =
+                                  {
+                                    npx_multi_df2 |>
+                                      dplyr::filter(stringr::str_detect(string = SampleID,
+                                                                        pattern = "^A")) |>
+                                      dplyr::pull(SampleID) |>
+                                      unique() |>
+                                      sort()
+                                  },
+                                "DF2" =
+                                  {
+                                    npx_multi_df3 |>
+                                      dplyr::filter(stringr::str_detect(string = SampleID,
+                                                                        pattern = "^C")) |>
+                                      dplyr::pull(SampleID) |>
+                                      unique() |>
+                                      sort() |>
+                                      head(10)
+                                  })
+
+# Samples to use for intensity normalization between npx_df4 and the
+# normalized dataset of npx_df1 and npx_df2
+overlap_samples_df13_df4 <- list("DF1" =
+                                   {
+                                     npx_multi_df1 |>
+                                       dplyr::bind_rows(npx_multi_df3) |>
+                                       dplyr::filter(stringr::str_detect(string = SampleID,
+                                                                         pattern = "^A")) |>
+                                       dplyr::pull(SampleID) |>
+                                       unique() |>
+                                       sort()
+                                   },
+                                 "DF2" =
+                                   {
+                                     npx_multi_df4 |>
+                                       dplyr::filter(stringr::str_detect(string = SampleID,
+                                                                         pattern = "^B")) |>
+                                       dplyr::pull(SampleID) |>
+                                       unique() |>
+                                       sort()
+                                   })
+
+# create tibble for input
+norm_schema_npxMulti <- dplyr::tibble(
+  order              = c(1, 2, 3, 4),
+  name               = c("NPX_DF1", "NPX_DF2", "NPX_DF3", "NPX_DF4"),
+  data               = list("NPX_DF1" = npx_multi_df1,
+                            "NPX_DF2" = npx_multi_df2,
+                            "NPX_DF3" = npx_multi_df3,
+                            "NPX_DF4" = npx_multi_df4),
+  samples            = list("NPX_DF1" = NA_character_,
+                            "NPX_DF2" = overlap_samples_df1_df2,
+                            "NPX_DF3" = overlap_samples_df2_df3,
+                            "NPX_DF4" = overlap_samples_df13_df4),
+  normalization_type = c(NA_character_, "Bridge", "Bridge", "Subset"),
+  normalize_to       = c(NA_character_, "1", "2", "1,3")
+)
+
+normalization_results.multi <-
+  olink_normalization_n(norm_schema = norm_schema_npxMulti) |>
+  dplyr::mutate(SampleID_tmp = stringr::str_split_i(string = SampleID,
+                                                    pattern = "_",
+                                                    i = 1)) |>
+  dplyr::filter(SampleID_tmp %in% sampleSubset) |>
+  dplyr::select(-SampleID_tmp)
+
+### Advanced  multi-project normalization example ----
+
+normalization_results.complex_n <-
+  olink_normalization_n(norm_schema = complex_npx_data)
+
 # Test that function works ----
 
 ## Test bridge function ----
@@ -298,8 +400,8 @@ test_that("olink_normalization bridge standalone function works",
               expect_warning(
                 olink_normalization_bridge(project_1_df = npx_df_test,
                                            project_2_df = npx_df2,
-                                           bridge_samples = list("DF1" = overlap_samples2,
-                                                                 "DF2" = overlap_samples2),
+                                           bridge_samples = list("DF1" = overlap_samples,
+                                                                 "DF2" = overlap_samples),
                                            project_1_name = 'P1',
                                            project_2_name = 'P2',
                                            project_ref_name = 'P1')
@@ -820,6 +922,44 @@ test_that("olink_normalization multi-batch works",
             # check that subset example is replicated in the reference set ----
             expect_equal(normalization_results.subset_n,
                          ref_results$normalization_results.subset)
+
+            # check that multi-batch simple example is replicated in the reference set ----
+            expect_equal(normalization_results.multi,
+                         ref_results$normalization_results.multi)
+
+            # check that multi-batch advanced example works as expected ----
+            expect_equal({ normalization_results.complex_n |> nrow() },
+                         14520L)
+
+            expect_equal({ normalization_results.complex_n |> ncol() },
+                         16L)
+
+            expect_equal({ normalization_results.complex_n$Project |> unique() },
+                         c("DF1b",
+                           "DF2b",
+                           "DF3b",
+                           "DF4b",
+                           "DF5b",
+                           "DF6b",
+                           "DF1s",
+                           "DF2s",
+                           "DF3s",
+                           "DF4s",
+                           "DF5s"))
+
+            expect_equal(
+              {
+                c({ normalization_results.complex_n$Adj_factor |> min(na.rm = TRUE) },
+                  { normalization_results.complex_n$Adj_factor |> max(na.rm = TRUE) },
+                  { normalization_results.complex_n$Adj_factor |> median(na.rm = TRUE) },
+                  { normalization_results.complex_n$Adj_factor |> mean(na.rm = TRUE) },
+                  { normalization_results.complex_n$Adj_factor |> quantile(probs = 0.9, na.rm = TRUE, names = FALSE) },
+                  { normalization_results.complex_n$Adj_factor |> quantile(probs = 0.1, na.rm = TRUE, names = FALSE) },
+                  { normalization_results.complex_n$Adj_factor |> quantile(probs = 0.25, na.rm = TRUE, names = FALSE) },
+                  { normalization_results.complex_n$Adj_factor |> quantile(probs = 0.75, na.rm = TRUE, names = FALSE) })
+              },
+              c(-0.4964, 0.56055, 0, -0.007244697, 0.20235, -0.22285, -0.10125, 0.06785))
+
             # Hidden/removed assays ----
 
             ### Testing the excluded assay bridging ###
@@ -1095,8 +1235,8 @@ test_that("Different columns in dfs can be normalized",{
   # Bridge ----
   mismatch_col_norm <- olink_normalization_bridge(project_1_df = npx_df_test,
                              project_2_df = npx_df2,
-                             bridge_samples = list("DF1" = overlap_samples2,
-                                                   "DF2" = overlap_samples2),
+                             bridge_samples = list("DF1" = overlap_samples,
+                                                   "DF2" = overlap_samples),
                              project_1_name = 'P1',
                              project_2_name = 'P2',
                              project_ref_name = 'P1') |>
