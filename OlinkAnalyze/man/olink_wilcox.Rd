@@ -22,7 +22,7 @@ Columns include:
 \itemize{
  \item{Assay:} "character" Protein symbol
  \item{OlinkID:} "character" Olink specific ID
- \item{UniProt:} "character" Olink specific ID
+ \item{UniProt:} "character" UniProt ID
  \item{Panel:} "character" Name of Olink Panel
  \item{estimate:} "numeric" median of NPX differences between groups
  \item{statistic:} "named numeric" the value of the test statistic with a name describing it
