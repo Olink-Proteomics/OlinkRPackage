@@ -196,16 +196,16 @@ npx_multi_df2 <- npx_data2 |>
 
 # manipulating the sample NPX datasets to create another two random ones
 npx_multi_df3 <- npx_data2 |>
+  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
   dplyr::mutate(SampleID = paste(SampleID, "_mod", sep = ""),
                 PlateID = paste(PlateID, "_mod", sep = "")) |>
-  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
   dplyr::select(-Project) |>
   dplyr::mutate(Normalization = "Intensity")
 
 npx_multi_df4 <- npx_data1 |>
+  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
   dplyr::mutate(SampleID = paste(SampleID, "_mod2", sep = ""),
                 PlateID = paste(PlateID, "_mod2", sep = "")) |>
-  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
   dplyr::select(-Project) |>
   dplyr::mutate(Normalization = "Intensity")
 
@@ -215,47 +215,13 @@ overlap_samples_df1_df2 <- list("DF1" = overlap_samples,
                                 "DF2" = overlap_samples)
 
 # Bridge samples with different identifiers between npx_df2 and npx_df3
-overlap_samples_df2_df3 <- list("DF1" =
-                                  {
-                                    npx_multi_df2 |>
-                                      dplyr::filter(stringr::str_detect(string = SampleID,
-                                                                        pattern = "^A")) |>
-                                      dplyr::pull(SampleID) |>
-                                      unique() |>
-                                      sort()
-                                  },
-                                "DF2" =
-                                  {
-                                    npx_multi_df3 |>
-                                      dplyr::filter(stringr::str_detect(string = SampleID,
-                                                                        pattern = "^C")) |>
-                                      dplyr::pull(SampleID) |>
-                                      unique() |>
-                                      sort() |>
-                                      head(10)
-                                  })
+overlap_samples_df2_df3 <- list("DF1" = c("A13", "A29", "A30", "A36", "A45", "A46", "A52", "A63", "A71", "A73"),
+                                "DF2" = c("C1_mod", "C10_mod", "C11_mod", "C12_mod", "C13_mod", "C14_mod", "C15_mod", "C16_mod", "C17_mod", "C18_mod"))
 
 # Samples to use for intensity normalization between npx_df4 and the
 # normalized dataset of npx_df1 and npx_df2
-overlap_samples_df13_df4 <- list("DF1" =
-                                   {
-                                     npx_multi_df1 |>
-                                       dplyr::bind_rows(npx_multi_df3) |>
-                                       dplyr::filter(stringr::str_detect(string = SampleID,
-                                                                         pattern = "^A")) |>
-                                       dplyr::pull(SampleID) |>
-                                       unique() |>
-                                       sort()
-                                   },
-                                 "DF2" =
-                                   {
-                                     npx_multi_df4 |>
-                                       dplyr::filter(stringr::str_detect(string = SampleID,
-                                                                         pattern = "^B")) |>
-                                       dplyr::pull(SampleID) |>
-                                       unique() |>
-                                       sort()
-                                   })
+overlap_samples_df13_df4 <- list("DF1" = c("A1", "A10", "A11", "A12", "A13", "A13_mod", "A14", "A15", "A16", "A17", "A18", "A19", "A2", "A20", "A21", "A22", "A23", "A24", "A25", "A26", "A27", "A28", "A29", "A29_mod", "A3", "A30", "A30_mod", "A31", "A32", "A33", "A34", "A35", "A36", "A36_mod", "A37", "A38", "A39", "A4", "A40", "A41", "A42", "A43", "A44", "A45", "A45_mod", "A46", "A46_mod", "A47", "A48", "A49", "A5", "A50", "A51", "A52", "A52_mod", "A53", "A54", "A55", "A56", "A57", "A58", "A59", "A6", "A60", "A61", "A62", "A63", "A63_mod", "A64", "A65", "A66", "A67", "A68", "A69", "A7", "A70", "A71", "A71_mod", "A72", "A73", "A73_mod", "A74", "A75", "A76", "A77", "A8", "A9"),
+                                 "DF2" = c("B1_mod2", "B10_mod2", "B11_mod2", "B12_mod2", "B13_mod2", "B14_mod2", "B15_mod2", "B16_mod2", "B17_mod2", "B18_mod2", "B19_mod2", "B2_mod2", "B20_mod2", "B21_mod2", "B22_mod2", "B23_mod2", "B24_mod2", "B25_mod2", "B26_mod2", "B27_mod2", "B28_mod2", "B29_mod2", "B3_mod2", "B30_mod2", "B31_mod2", "B32_mod2", "B33_mod2", "B34_mod2", "B35_mod2", "B36_mod2", "B37_mod2", "B38_mod2", "B39_mod2", "B4_mod2", "B40_mod2", "B41_mod2", "B42_mod2", "B43_mod2", "B44_mod2", "B45_mod2", "B46_mod2", "B47_mod2", "B48_mod2", "B49_mod2", "B5_mod2", "B50_mod2", "B51_mod2", "B52_mod2", "B53_mod2", "B54_mod2", "B55_mod2", "B56_mod2", "B57_mod2", "B58_mod2", "B59_mod2", "B6_mod2", "B60_mod2", "B61_mod2", "B62_mod2", "B63_mod2", "B64_mod2", "B65_mod2", "B66_mod2", "B67_mod2", "B68_mod2", "B69_mod2", "B7_mod2", "B70_mod2", "B71_mod2", "B72_mod2", "B73_mod2", "B74_mod2", "B75_mod2", "B76_mod2", "B77_mod2", "B78_mod2", "B79_mod2", "B8_mod2", "B9_mod2"))
 
 # create tibble for input
 norm_schema_npxMulti <- dplyr::tibble(
@@ -279,7 +245,8 @@ normalization_results.multi <-
                                                     pattern = "_",
                                                     i = 1)) |>
   dplyr::filter(SampleID_tmp %in% sampleSubset) |>
-  dplyr::select(-SampleID_tmp)
+  dplyr::select(-SampleID_tmp) |>
+  dplyr::arrange(Project, Panel, OlinkID, SampleID)
 
 #### olink_plate_randomizer ####
 randomized_result1 <- olink_plate_randomizer(manifest,
@@ -334,6 +301,7 @@ ref_results <- list(t.test_results = t.test_results,
                     normalization_results.bridged = normalization_results.bridged,
                     normalization_results.intensity = normalization_results.intensity,
                     normalization_results.subset = normalization_results.subset,
+                    normalization_results.multi = normalization_results.multi,
                     randomized_result1 = randomized_result1,
                     randomized_result2 = randomized_result2,
                     procData = procData,
