@@ -13,6 +13,7 @@ olink_heatmap_plot(
   cluster_cols = TRUE,
   show_rownames = TRUE,
   show_colnames = TRUE,
+  colnames = "both",
   annotation_legend = TRUE,
   fontsize = 10,
   na_col = "black",
@@ -35,6 +36,8 @@ olink_heatmap_plot(
 \item{show_rownames}{Logical. Determining if row names are shown (default \code{TRUE}).}
 
 \item{show_colnames}{Logical. Determining if column names are shown (default \code{TRUE}).}
+
+\item{colnames}{Character. Determines how to label the columns. Must be 'assay', 'oid', or 'both' (default 'both').}
 
 \item{annotation_legend}{Logical. Determining if legend for annotations should be shown (default \code{TRUE}).}
 
