@@ -115,7 +115,7 @@ test_that("data completeness check", {
 
 
 test_that("# in SampleID", {
-      input <- read_NPX(testthat::test_path("refs/mock_sampleID_hashes.csv"))
+      input <- suppressWarnings(read_NPX(testthat::test_path("refs/mock_sampleID_hashes.csv")))
 
       expect_equal(input$SampleID, c("Sample#1", "Sample_#31"))
 })
@@ -133,4 +133,10 @@ test_that("# in SampleID", {
   )
 
   expect_equal(input$Quantified_value, c(0.19169, 336.12903))
+})
+
+# No warning for extra column ----------------
+
+test_that("extra column", {
+  expect_no_warning(read_NPX(testthat::test_path("refs/mock_sampleID_hashes.csv")))
 })

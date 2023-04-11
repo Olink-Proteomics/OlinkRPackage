@@ -225,10 +225,14 @@ read_NPX_explore <- function(filename) {
 
     # find missing columns
     missing_cols <- setdiff(header_v[[header_pick]], colnames(out))
-
-    # If missing columns, throw a warning and print out which ones we guessed
-    # that are missing
-    warning(paste0("Cannot find columns: ", paste(missing_cols, collapse = ",")))
+    
+    
+    if (length(missing_cols)  != 0) {
+      #If missing columns, throw a warning and print out which ones we guessed
+      # that are missing
+      warning(paste0("Cannot find columns: ", paste(missing_cols, collapse = ",")))
+      
+    }
 
   }
 
