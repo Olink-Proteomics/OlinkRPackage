@@ -64,8 +64,8 @@ library(kableExtra)
 
 ```{r brnrtab, message=FALSE, echo=FALSE}
 data.frame(Platform = c("Target 96",
-                         "Explore 1536",
-                        "Explore Expansion"),
+                         "Explore 384 Cardiometabolic, Inflammation, Neurology, and Oncology",
+                        "Explore 384 Cardiometabolic II, Inflammation II, Neurology II, and Oncology II"),
            BridgingSamples = c("8-16",
                                "8-16",
                               "16-24")) |>
@@ -90,9 +90,9 @@ Prior to running the second study, bridging samples must be selected
 from the reference study and be added to the second study. These samples
 can be selected using the `olink_bridgeselector()` function in Olink
 Analyze. The bridge selection function will select a number of bridge
-samples based on the reference data. This function selects samples
-which passes QC and have high detectibility. To select samples across
-the range of the data, the samples are ordered by mean NPX value and
+samples based on the reference data. This function selects samples which
+passes QC and have high detectibility. To select samples across the
+range of the data, the samples are ordered by mean NPX value and
 selected across this range. When running the selector, Olink recommends
 starting at sampleMissingFreq = 0.10 which represents a maximum of 10%
 data below LOD per sample. If there are not enough samples output,
@@ -231,19 +231,21 @@ OlinkAnalyze::olink_pca_plot(df          = npx_before_br,
 
 ## Perform bridging between two data sets
 
-We can use `olink_normalization()` function to bridge two datasets. The
-bridging procedure is to first calculate **the median of the paired NPX
-differences** per assay between the bridging samples as adjustment
-factor then use these adjustment factors to adjust NPX values between
-two datasets. In this process, one dataset is considered the reference
-dataset (`df1`) and its NPX values remain unaltered. The other dataset
-is considered the new dataset (`df2`) and is adjusted to the reference
-dataset based on the adjustment factors.
+We can use `olink_normalization_bridge()` function to bridge two
+datasets. The bridging procedure is to first calculate **the median of
+the paired NPX differences** per assay between the bridging samples as
+adjustment factor then use these adjustment factors to adjust NPX values
+between two datasets. In this process, one dataset is considered the
+reference dataset (`df1`) and its NPX values remain unaltered. The other
+dataset is considered the new dataset (`df2`) and is adjusted to the
+reference dataset based on the adjustment factors.
 
-The output from `olink_normalization()` function is a NPX table with
-adjusted NPX value in the column `NPX`.
+The output from `olink_normalization_bridge()` function is a NPX table
+with adjusted NPX value in the column `NPX`.
+`olink_normalization_bridge()` is a wrapper for and supersedes
+`olink_normalization()` .
 
-`olink_normalization()` uses the information from column `Project` to
+`olink_normalization_bridge()` creates a new column `Project` to
 distinguish between reference dataset from the other dataset. It is up
 to the user to define which dataset is the reference dataset and specify
 the names of the bridge samples. The resulting dataset will contain the
@@ -261,15 +263,33 @@ overlap_samples <-data.frame(SampleID = intersect(npx_1$SampleID, npx_2$SampleID
   filter(!str_detect(SampleID, "CONTROL_SAMPLE")) |> #Remove control samples
   pull(SampleID)
 
+overlap_samples_list <- list("DF1" = overlap_samples,
+                             "DF2" = overlap_samples)
+
 # Perform Bridging normalization
-npx_br_data <- olink_normalization(df1                     = npx_1,
-                                   df2                     = npx_2,
-                                   overlapping_samples_df1 = overlap_samples,
-                                   df1_project_nr          = "20200001",
-                                   df2_project_nr          = "20200002",
-                                   reference_project       = "20200001")
+npx_br_data <- olink_normalization_bridge(project_1_df = npx_1,
+                                          project_2_df = npx_2,
+                                          bridge_samples = overlap_samples_list,
+                                          project_1_name = "20200001",
+                                          project_2_name = "20200002",
+                                          project_ref_name = "20200001")
 dplyr::glimpse(npx_br_data)
 
+```
+
+## Perform bridging with non-matching sample names
+
+`olink_normalization_bridge()` also supports data where the shared
+samples (bridge samples) are not named the same in both projects. In
+this case the `overlap_sample_list` will contain 2 arrays of equal
+length where the index of each entry corresponds to the same sample. For
+example, if a sample had the SampleID of `Sample_1_Aliquot_1` in the
+first batch and `Sample_1_Aliquot_2` in the second batch, then the
+overlap sample list should look as the following.
+
+``` 
+overlap_sample_list <-list("DF1" = c("A1", "A2", "A3", "Sample_1_Aliquot_1"),
+                           "DF2" = c("A1", "A2", "A3", "Sample_1_Aliquot_2")) 
 ```
 
 ## Perform evaluation of bridging normalization
