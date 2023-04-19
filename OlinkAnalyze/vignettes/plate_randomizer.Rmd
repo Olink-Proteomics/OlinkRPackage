@@ -19,9 +19,13 @@ library(ggplot2)
 library(kableExtra)
 ```
 
+```{r setup, include=FALSE} 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
 ## Introduction
 
-This vignette describes how to use Olink® Analyze to randomize the samples and  plate samples with an option to keep subjects on the same plate. When a study is well randomized the experimental variables can be considered to be evenly distributed across each plate, as well as between the plates of a larger study. What variables to randomize for should be decided for each study as these vary with the study purpose. Variables to randomize for can include e.g. study groups, treatment, sampling time points or demographics. If randomization is not performed true biological variation may be missed or misidentified as e.g. technical variations. In thin vignette, you will learn how to achieve this using the `olink_plate_randomizer()` function. And on top of that, you will also learn how to use `olink_displayPlateLayout()` and `olink_displayPlateDistributions()` to evaluate the performed randomization based on a given grouping variable.
+This vignette describes how to use Olink® Analyze to randomize the samples with an option to keep subjects on the same plate. When a study is well randomized the experimental variables can be considered to be evenly distributed across each plate, even for a larger study. What variables to randomize for should be decided for each study as these vary with the study purpose. Correct sample randomization will empower your study and minimize the risk of introducing any bias that can confound downstream analyses. If at all possible, samples from the same subject that are taken at various times during a longitudinal research should all be placed on the same plate to further limit data fluctuation. In order to evenly disperse the remaining experimental variables between plates, the individuals should subsequently be distributed. If randomization is not performed true biological variation may be missed or misidentified as e.g. technical variations. In this vignette, you will learn how to achieve this using the `olink_plate_randomizer()` function. And on top of that, you will also learn how to use `olink_displayPlateLayout()` and `olink_displayPlateDistributions()` to evaluate the performed randomization based on a given grouping variable.
 
 
 ```{r Outlier_data, include=FALSE}
@@ -32,12 +36,28 @@ data(manifest)
 
 ## Sample randomization
 
+The input manifest should be a tibble/data frame in long format containing all sample ID's. Sample ID column must be named SampleID. A sample manifest is shown in Table 1. 
+
+```{r manifest, echo = F, message=FALSE}
+ manifest |> head(10)  %>% 
+  knitr::kable(format = "html",
+               booktabs = T,
+               linesep = "",
+               digits = 4,
+               longtable = T,
+               row.names = F,
+               caption = " Sample manifest.",
+               label = "manifest") %>%
+  kable_styling(latex_options =c("hold_position","repeat_header"))
+```
+
+
 ### Complete randomization
 
 The simplest way to randomize the samples is to perform complete randomization.
 
-```{r complete_randomization, message=FALSE}
-randomized.manifest_a <- olink_plate_randomizer(manifest, seed=12345)
+```{r complete_randomization, message=FALSE, warning=FALSE,results='hide'}
+randomized.manifest_a <- olink_plate_randomizer(manifest, seed=123456)
 ```
 
 
@@ -46,14 +66,14 @@ randomized.manifest_a <- olink_plate_randomizer(manifest, seed=12345)
 In the case of multiple samples per subject (e.g. in longitudinal studies), Olink recommends keeping each subject on the same plate to further reduce variation in the data. The individuals should then be distributed so that the remaining experimental variables of interest are evenly distributed across plates. This could be achieved by using the `SubjectColumn` argument. The number of samples on each plate could be specified via the `available.spots` argument. For example, the following code will lead to 78 samples on the first plate, and 30 samples on the second and the third plates. The number of iterations for fitting subjects on the same plate can be set by the `iterations` argument.
 
 
-```{r subjects_randomization, message=FALSE}
+```{r subjects_randomization, message=FALSE,results='hide'}
 randomized.manifest_b <- olink_plate_randomizer(manifest,SubjectColumn="SubjectID", 
                                                 available.spots=c(78,30,30), 
                                                 iterations = 500,
-                                                seed=12345)
+                                                seed=123456)
 ```
 
-After randomization, the output would be a "tibble" including SampleID, SubjectID etc. assigned to well positions. Columns include same columns as Manifest with additional columns:
+The output of the randomization function would be a "tibble" including SampleID, SubjectID etc. assigned to well positions. Columns include same columns as Manifest with additional columns:
 
   - plate: Plate number
 
@@ -66,26 +86,33 @@ After randomization, the output would be a "tibble" including SampleID, SubjectI
 ## Visualization
 
 To illustrate the goodness of randomization, both `olink_displayPlateLayout()` and `olink_displayPlateDistributions` functions could be used.
+
 ### Plate layouts
 
 The `olink_displayPlateLayout()` function could be used to visualize the layouts of the plate and specifying the color for the variable of interest using the `color_g` argument. The label of the colored variable could be shown in the plot via the `include.label` argument.
 
-```{r, fig.height = 6, fig.width = 6, fig.align = "center"}
+```{r, fig.height = 7, fig.width = 7, fig.align = "center"}
 olink_displayPlateLayout(randomized.manifest_b, fill.color = 'SubjectID', include.label = FALSE)
 ```
 
 The label of the colored variable could be shown in the plot via the `include.label` argument.
 
-```{r,fig.height = 6, fig.width = 6, fig.align = "center"}
+```{r,fig.height = 7, fig.width = 7, fig.align = "center"}
 olink_displayPlateLayout(randomized.manifest_b, fill.color = 'SubjectID', include.label = TRUE)
 ```
 
 ### Plate distribution
 
-The distribution of the given grouping variable on each plate could be visualized via a bar chart using function `olink_displayPlateDistributions`.
+The distribution of the given grouping variable on each plate could be visualized via a bar chart using function `olink_displayPlateDistributions`. By setting `fill.color = 'SubjectID'`, we could make sure all the samples from the same subject were put on the same plate. 
 
-```{r,fig.height = 6, fig.width = 6, fig.align = "center"}
+```{r,fig.height = 7, fig.width = 7, fig.align = "center"}
 olink_displayPlateDistributions(randomized.manifest_b, fill.color = 'SubjectID')
+```
+
+We could also check the distribution of other variables. For examples, the distribution of the variable `Site` could be visualized by setting `fill.color = 'Site'`. 
+
+```{r,fig.height = 7, fig.width = 7, fig.align = "center"}
+olink_displayPlateDistributions(randomized.manifest_b, fill.color = 'Site')
 ```
 
 In the case of the randomization is not performed well, the randomization could be performed again with different seed number and iterations number. 
