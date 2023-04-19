@@ -90,6 +90,7 @@ jobs:
       
       - name: Install package
         run: |
+          sudo apt update
           sudo apt-get -y install libglpk-dev texlive-latex-base \
              texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra
 
