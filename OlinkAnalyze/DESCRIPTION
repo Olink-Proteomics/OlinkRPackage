@@ -97,8 +97,7 @@ Suggests:
     systemfonts,
     testthat (>= 3.0.0),
     umap,
-    vdiffr,
-    kableExtra
+    vdiffr
 VignetteBuilder: 
     knitr
 Config/testthat/edition: 3
