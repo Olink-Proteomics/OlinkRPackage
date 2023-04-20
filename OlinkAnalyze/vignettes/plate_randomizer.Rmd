@@ -16,7 +16,6 @@ vignette: >
 library(OlinkAnalyze)
 library(dplyr)
 library(ggplot2)
-library(kableExtra)
 ```
 
 ```{r setup, include=FALSE} 
@@ -47,8 +46,7 @@ The input manifest should be a tibble/data frame in long format containing all s
                longtable = T,
                row.names = F,
                caption = " Sample manifest.",
-               label = "manifest") %>%
-  kable_styling(latex_options =c("hold_position","repeat_header"))
+               label = "manifest")
 ```
 
 
