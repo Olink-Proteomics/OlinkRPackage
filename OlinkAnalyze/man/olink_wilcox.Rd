@@ -22,14 +22,13 @@ Columns include:
 \itemize{
  \item{Assay:} "character" Protein symbol
  \item{OlinkID:} "character" Olink specific ID
- \item{UniProt:} "character" Olink specific ID
+ \item{UniProt:} "character" UniProt ID
  \item{Panel:} "character" Name of Olink Panel
- \item{estimate:} "numeric" difference in mean NPX between groups
+ \item{estimate:} "numeric" median of NPX differences between groups
  \item{statistic:} "named numeric" the value of the test statistic with a name describing it
  \item{p.value:} "numeric" p-value for the test
- \item{parameter:} "named numeric" degrees of freedom for the t-statistic
- \item{conf.low:} "numeric" confidence interval for the mean (lower end)
- \item{conf.high:} "numeric" confidence interval for the mean (upper end)
+ \item{conf.low:} "numeric" confidence interval for the median of differences (lower end)
+ \item{conf.high:} "numeric" confidence interval for the median of differences (upper end)
  \item{method:} "character" which wilcoxon method was used
  \item{alternative:} "character" describes the alternative hypothesis
  \item{Adjusted_pval:} "numeric" adjusted p-value for the test (Benjamini&Hochberg)
