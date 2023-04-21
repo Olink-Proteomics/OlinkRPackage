@@ -45,7 +45,7 @@ Tibble of posthoc tests for specified effect, arranged by ascending adjusted p-v
 \itemize{
  \item{Assay:} "character" Protein symbol
  \item{OlinkID:} "character" Olink specific ID
- \item{UniProt:} "character" Olink specific ID
+ \item{UniProt:} "character" UniProt ID
  \item{Panel:} "character" Name of Olink Panel
  \item{term:} "character" term in model
  \item{contrast:} "character" the groups that were compared
