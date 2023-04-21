@@ -23,6 +23,8 @@ Authors@R: c(
            comment = c(ORCID = "0000-0002-4922-8415", Github = "klevdiamanti")),
     person("Amrita", "Kar", role = "aut",
            comment = c(Github = "amrita-kar")),
+    person("Lei", "Conze", role = "aut", 
+            comment = c(Github = "leiliuC")),
     person("Kristian", "Hodén", role = "ctb",
            comment = c(ORCID = "0000-0003-0354-0662", Github = "kristianHoden")),
     person("Per", "Eriksson", role = "ctb",
