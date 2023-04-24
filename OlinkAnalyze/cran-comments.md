@@ -1,6 +1,6 @@
 ## Release Summary
 
-This release contains bugfixes for Olink Analyze version 3.3.0.
+This release contains new functionality including new normalization functions and new vignettes.
 
 ## R CMD check results
 
