@@ -88,6 +88,7 @@ Suggests:
     FSA,
     ggplotify,
     here,
+    kableExtra,
     knitr,
     markdown,
     msigdbr,
