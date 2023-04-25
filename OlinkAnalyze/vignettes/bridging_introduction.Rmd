@@ -55,8 +55,7 @@ without shared samples should not be combined using the bridging
 approach described below.
 
 ```{r, echo=FALSE}
-#library(OlinkAnalyze)
-devtools::load_all()
+library(OlinkAnalyze)
 library(dplyr)
 library(stringr)
 library(ggplot2)
