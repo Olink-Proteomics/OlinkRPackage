@@ -55,8 +55,7 @@ without shared samples should not be combined using the bridging
 approach described below.
 
 ```{r, echo=FALSE}
-#library(OlinkAnalyze)
-devtools::load_all()
+library(OlinkAnalyze)
 library(dplyr)
 library(stringr)
 library(ggplot2)
@@ -155,10 +154,8 @@ then determine the success of the bridging process post bridging.
 ```{r check, message=FALSE}
 # Load datasets
 npx_1 <- npx_data1 %>%
-  filter(!str_detect(SampleID, "CONTROL_SAMPLE")) %>% #Remove control samples
   mutate(dataset = "data1")
 npx_2 <- npx_data2 %>%
-  filter(!str_detect(SampleID, "CONTROL_SAMPLE")) %>% #Remove control samples
   mutate(dataset = "data2")
 
 npx_df <- bind_rows(npx_1, npx_2)
@@ -246,7 +243,7 @@ with adjustment factors of 0, and the newly bridged dataset.
 ```{r bridging, message=FALSE}
 # Find shared samples
 npx_1 <- npx_data1 %>%
-  mutate(dataset = "data1")
+  mutate(dataset = "data1") 
 npx_2 <- npx_data2 %>%
   mutate(dataset = "data2")
 
@@ -318,38 +315,23 @@ between projects. For example, if a violin plot exhibits a different
 range or truncated distribution, this may suggest that the assay is
 below LOD or at hook in one of the data sets. However, as long as the
 bridge samples are not at hook or below LOD, this should not impact the
-bridging quality.
+bridging quality. For projects with differing clinical phenotypes, it is
+more informative to look at the similarities between the bridging
+samples than the similarity between the datasets.
 
-For demonstration purposes we show how to look at the distribution of
-CHL1 between projects.
-
-```{r tbl_adj_fct, message=FALSE, echo = FALSE}
-breaks <- c(-Inf, -1, -0.25, 0.25, 1, Inf)
-labels <- c("[< -1]", "(-1,-0.25]", "(-0.25,0.25]", "(0.25,1]", "(>1]")
-
-# reference project defined in bridging normalization
-reference_project <- "20200001"
-npx_br_data %>%
-  mutate(Panel = gsub("Olink ", "", Panel)) %>%
-  # remove adjustment factors from reference project.
-  filter(Project != reference_project) %>%
-  mutate(group = cut(Adj_factor, breaks = breaks,
-            labels = labels)) %>%
-  select(OlinkID, Adj_factor, Panel, group) %>%
-  distinct() %>%
-  group_by(Panel, group) %>%
-  tally() %>%
-  tidyr::pivot_wider(names_from = group, values_from = n) %>%
-  tibble::column_to_rownames(var = "Panel") %>%
-  dplyr::relocate(any_of(labels)) %>%
-  kableExtra::kbl(booktabs = TRUE,
-      digits = 2,
-      caption = paste("Distribution of assays in different ranges of",
-                      "adjustment factors")) %>%
-  kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE,
-                position = "center", latex_options = "HOLD_position")
+```{r dist_adj_fct, message=FALSE, echo = FALSE}
+npx_br_data %>% 
+  dplyr::filter(Project == "20200002") %>%  # Only looking at Project 2 since project 1 is unadjusted
+  dplyr::select(OlinkID, Adj_factor) %>% 
+  dplyr::distinct() %>% 
+  ggplot2::ggplot(ggplot2::aes(x = Adj_factor)) +
+    ggplot2::geom_histogram() +
+  set_plot_theme()
 
 ```
+
+The distribution of CHL1 between projects is visualized for
+demonstration purposes.
 
 ```{r voilin plot}
 # Bridge sample data
@@ -375,6 +357,56 @@ npx_data1 %>%
   theme(legend.position = "none") +
   set_plot_theme() +
   facet_wrap(. ~ Assay_OID, scales='free_y')
+```
+
+Another way to determine if bridging decreased variability between
+projects is to calculate the CV before and after bridging the projects.
+Note that the CV calculation formula differs for [Target
+96](https://olink.com/faq/how-is-cv-calculated/) and
+[Explore](https://olink.com/faq/how-is-cv-in-the-analysis-report-calculated-for-olink-explore/)
+projects.
+
+```{r CV_calculation}
+
+explore_cv <- function(npx, na.rm = F) {
+  sqrt(exp((log(2) * sd(npx, na.rm = na.rm))^2) - 1)*100
+}
+
+t96_cv <- function(NPX, na.rm = T) {
+  100*sd(2^NPX)/mean(2^NPX)
+}
+
+tech <- "Explore"
+
+cv_before <- npx_1 %>% 
+  rbind(npx_2) %>% 
+  filter(str_detect(SampleID,"CONTROL*.")) %>%
+  filter(NPX > LOD) %>%
+  group_by(OlinkID) %>%
+  mutate(CV = ifelse(tech=='Explore',explore_cv(NPX), t96_cv(NPX))) %>%
+  ungroup() %>%
+  distinct(OlinkID,CV)
+
+
+cv_after <- npx_br_data %>%
+  filter(str_detect(SampleID, "CONTROL")) %>%
+  filter(NPX > LOD) %>%
+  group_by(OlinkID) %>%
+  mutate(CV = ifelse(tech=='Explore',explore_cv(NPX), t96_cv(NPX))) %>%
+  ungroup() %>%
+  distinct(OlinkID,CV)
+
+cv_before %>%
+  mutate(Analysis = "Before") %>%
+  rbind((cv_after %>%
+           mutate(Analysis = "After"))) %>%
+  ggplot2::ggplot(ggplot2::aes(x = CV, fill = Analysis)) +
+  ggplot2::geom_density(alpha = 0.7) +
+  set_plot_theme() +
+  olink_fill_discrete()+
+  ggplot2::theme(text = ggplot2::element_text(size = 20)) + ggplot2::xlim(-50,400)
+
+
 ```
 
 Finally, use PCA plot to check whether bridging normalization has effect
