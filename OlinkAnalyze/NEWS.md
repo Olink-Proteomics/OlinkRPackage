@@ -12,6 +12,7 @@
 ## Bug Fixes
 * Update to olink_wilcox documentation and UniProt description in documentation has been corrected (@boxizhang, #235)
 
+
 # Olink Analyze 3.3.1
 ## Bug Fixes
 * olink_pathway_enrichment now prints a message when there are non matching names when using method = "ORA" (@MasoumehSheikhi, #222)
