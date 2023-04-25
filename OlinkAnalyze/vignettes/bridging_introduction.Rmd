@@ -55,7 +55,8 @@ without shared samples should not be combined using the bridging
 approach described below.
 
 ```{r, echo=FALSE}
-library(OlinkAnalyze)
+#library(OlinkAnalyze)
+devtools::load_all()
 library(dplyr)
 library(stringr)
 library(ggplot2)
@@ -277,7 +278,7 @@ example, if a sample had the SampleID of `Sample_1_Aliquot_1` in the
 first batch and `Sample_1_Aliquot_2` in the second batch, then the
 overlap sample list should look as the following.
 
-``` 
+```         
 overlap_sample_list <-list("DF1" = c("A1", "A2", "A3", "Sample_1_Aliquot_1"),
                            "DF2" = c("A1", "A2", "A3", "Sample_1_Aliquot_2")) 
 ```
@@ -307,13 +308,20 @@ npx_br_data %>%
 
 Then, summarize number of assays that have adjustment factors in certain
 ranges. High adjustment factors can result from variations between
-projects, such as panel versions or technical modifications.  The 
-cutoff of a deviating adjustment factor is subjective and depends on a variety of 
-factors including the distribution of adjustment factors.
-Such assays can be visualized individually with violin plots and may warrant further
-investigation to confirm they are still comparable between projects. 
+projects, such as panel versions or technical modifications. The cutoff
+of a deviating adjustment factor is subjective and depends on a variety
+of factors including the distribution of adjustment factors.
 
-For demonstration purposes we have used an adjustment factor cutoff of 1 NPX difference between projects.
+Such assays can be visualized individually with violin plots and may
+warrant further investigation to confirm they are still comparable
+between projects. For example, if a violin plot exhibits a different
+range or truncated distribution, this may suggest that the assay is
+below LOD or at hook in one of the data sets. However, as long as the
+bridge samples are not at hook or below LOD, this should not impact the
+bridging quality.
+
+For demonstration purposes we show how to look at the distribution of
+CHL1 between projects.
 
 ```{r tbl_adj_fct, message=FALSE, echo = FALSE}
 breaks <- c(-Inf, -1, -0.25, 0.25, 1, Inf)
@@ -344,24 +352,26 @@ npx_br_data %>%
 ```
 
 ```{r voilin plot}
-# High Adjustment Factor Assays
-cutoff <- 1
+# Bridge sample data
+bridge_samples <- npx_1 %>%
+  rbind(npx_2) %>%
+  filter(SampleID %in% overlapping_samples) %>%
+  filter(Assay == "CHL1") %>%
+  mutate(Assay_OID = paste(Assay, OlinkID, sep = "\n"))
 
-high_assay<-npx_br_data  %>% 
- filter(Adj_factor > cutoff | Adj_factor < -cutoff) %>% 
-  select(Assay, OlinkID, Panel) %>%
-  distinct()
+# Generate violin plot for CHL1
 npx_data1 %>%
   mutate(Project = "20200001") %>%
   bind_rows({
     npx_data2 %>%
       mutate(Project = "20200002")
   }) %>%
-  filter(OlinkID %in% high_assay$OlinkID[1]) %>%
+  filter(Assay == "CHL1") %>%
   filter(!str_detect(SampleID, "CONTROL*.")) %>%
   mutate(Assay_OID = paste(Assay, OlinkID, sep = "\n")) %>% 
   ggplot2::ggplot(aes(Project, NPX)) +
   ggplot2::geom_violin(aes(fill = Project)) +
+  geom_point(data = bridge_samples, position = position_jitter(0.1)) +
   theme(legend.position = "none") +
   set_plot_theme() +
   facet_wrap(. ~ Assay_OID, scales='free_y')
@@ -393,7 +403,11 @@ OlinkAnalyze::olink_pca_plot(df          = npx_after_br,
 
 ## Export Bridged data
 
-Normalized data can be exported using write.table to export long format data. Note that 2 columns are added during the bridging process, so to have the input format match the export format the Project and Adj_factor columns will need to be removed. To export the new project, `dplyr::filter` can be used to filter by Project.
+Normalized data can be exported using write.table to export long format
+data. Note that 2 columns are added during the bridging process, so to
+have the input format match the export format the Project and Adj_factor
+columns will need to be removed. To export the new project,
+`dplyr::filter` can be used to filter by Project.
 
 ```{r, eval = FALSE}
 new_normalized_data <- npx_br_data %>% 
@@ -403,15 +417,15 @@ new_normalized_data <- npx_br_data %>%
 
 ```
 
-
 ## Contact us
 
 We are always happy to help. Email us with any questions:
 
-biostat\@olink.com for statistical services and general stats questions
+-   biostat\@olink.com for statistical services and general stats
+    questions
 
-biostattools\@olink.com for Olink Analyze and Shiny app support
+-   biostattools\@olink.com for Olink Analyze and Shiny app support
 
-support\@olink.com for Olink lab product and technical support
+-   support\@olink.com for Olink lab product and technical support
 
-info\@olink.com for more information
+-   info\@olink.com for more information
