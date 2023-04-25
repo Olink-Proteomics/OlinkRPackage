@@ -7,6 +7,7 @@
 * Plate Randomization vignette added (@boxizhang, #241)
 * Outlier Exclusion vignette added (@kathy-nevola, #229)
 * Added Lei Conze as author (@kathy-nevola, #246)
+* Addition of citation (@kathy-nevola, #246)
 
 ## Bug Fixes
 * Update to olink_wilcox documentation and UniProt description in documentation has been corrected (@boxizhang, #235)
