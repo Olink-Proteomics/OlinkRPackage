@@ -86,6 +86,7 @@ Suggests:
     FSA,
     ggplotify,
     here,
+    kableExtra,
     knitr,
     markdown,
     msigdbr,
@@ -96,10 +97,11 @@ Suggests:
     scales,
     systemfonts,
     testthat (>= 3.0.0),
-    umap,
-    vdiffr
+    vdiffr,
+    umap
 VignetteBuilder: 
-    knitr
+   kableExtra,
+  knitr
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
