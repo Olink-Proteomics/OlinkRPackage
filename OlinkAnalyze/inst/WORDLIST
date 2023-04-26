@@ -12,6 +12,7 @@ bridgeselector
 Bugfixes
 BugFixes
 byPanel
+CHL
 chr
 clusterProfiler
 clusterProfiler's
@@ -20,6 +21,7 @@ coloroption
 conf
 config
 cran
+csv
 Dai
 darkblue
 DenDF
@@ -28,9 +30,11 @@ df
 displayPlateDistributions
 displayPlateLayout
 doi
+dplyr
 dunnTest
 emmeans
 enrichmentScore
+ExploreVersion
 eXpression
 extrafont
 facetNcol
@@ -86,6 +90,7 @@ NPX
 nr
 Nr
 NumDF
+oid
 olink
 Olink's
 olinkid
@@ -103,6 +108,7 @@ OutlierLines
 pca
 PercAssaysBelowLOD
 pheatmap
+phenotypes
 PlateID
 PlateSize
 pointrange
@@ -110,6 +116,7 @@ posthoc
 Posthoc
 prcomp
 pre
+programmatically
 proteome
 proteomic
 Proteomic
@@ -132,6 +139,7 @@ sampleMissingFreq
 Satterthwaite's
 setSize
 sidak
+stringr
 SubjectColumn
 SubjectID
 sumsq

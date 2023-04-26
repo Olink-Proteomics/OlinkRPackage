@@ -35,7 +35,7 @@ data(manifest)
 
 ## Sample randomization
 
-The input manifest should be a tibble/data frame in long format containing all sample ID's. Sample ID column must be named SampleID. An exsample manifest is shown in Table 1. 
+The input manifest should be a tibble/data frame in long format containing all sample ID's. Sample ID column must be named SampleID. An example manifest is shown in Table 1. 
 
 ```{r manifest, echo = F, message=FALSE}
  manifest |> head(10)  %>% 
