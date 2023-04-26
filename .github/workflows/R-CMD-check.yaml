@@ -90,6 +90,7 @@ jobs:
       
       - name: Install package
         run: |
+          sudo apt update
           sudo apt-get -y install libglpk-dev texlive-latex-base \
              texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra
 
@@ -101,11 +102,37 @@ jobs:
       - uses: r-lib/actions/setup-pandoc@v2
         with:
           pandoc-version: '2.18'
+
+      - name: Set RENV_PATHS_ROOT
+        shell: bash
+        run: |
+          echo "RENV_PATHS_ROOT=${{ runner.temp }}/renv" >> $GITHUB_ENV
           
-      - uses: r-lib/actions/setup-renv@v2
+      - name: Install and activate renv
+        run: |
+          install.packages("remotes")
+          remotes::install_version("renv", "0.16.0")
+          renv::activate(profile = "r413")
+        shell: Rscript {0}
+
+      - name: Get R and OS version
+        id: get-version
+        run: |
+          cat("os-version=", sessionInfo()$running, "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
+          cat("r-version=", R.Version()$version.string, "\n", file = Sys.getenv("GITHUB_OUTPUT"), sep = "", append = TRUE)
+        shell: Rscript {0}
+
+      - name: Restore Renv package cache
+        uses: actions/cache@v3
         with:
-          profile: '"r413"'    
-          
+          path: ${{ env.RENV_PATHS_ROOT }}
+          key: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-${{ hashFiles('renv.lock') }}
+          restore-keys: ${{ steps.get-version.outputs.os-version }}-${{ steps.get-version.outputs.r-version }}-${{inputs.cache-version }}-
+
+      - name: Install renv dependencies
+        run: renv::restore()
+        shell: Rscript {0}
+
       - name: Check package
         run: |
           check_results <- rcmdcheck::rcmdcheck(error_on = "error",

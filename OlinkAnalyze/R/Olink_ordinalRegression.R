@@ -31,7 +31,7 @@
 #' \itemize{
 #'  \item{Assay:} "character" Protein symbol
 #'  \item{OlinkID:} "character" Olink specific ID
-#'  \item{UniProt:} "character" Olink specific ID
+#'  \item{UniProt:} "character" UniProt ID
 #'  \item{Panel:} "character" Name of Olink Panel
 #'  \item{term:} "character" term in model
 #'  \item{statistic:} "numeric" value of the statistic
@@ -287,7 +287,7 @@ olink_ordinalRegression <- function(df,
 #' \itemize{
 #'  \item{Assay:} "character" Protein symbol
 #'  \item{OlinkID:} "character" Olink specific ID
-#'  \item{UniProt:} "character" Olink specific ID
+#'  \item{UniProt:} "character" UniProt ID
 #'  \item{Panel:} "character" Name of Olink Panel
 #'  \item{term:} "character" term in model
 #'  \item{contrast:} "character" the groups that were compared

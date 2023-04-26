@@ -1,7 +1,7 @@
 Type: Package
 Package: OlinkAnalyze
 Title: Facilitate Analysis of Proteomic Data from Olink
-Version: 3.3.1
+Version: 3.4.0
 Authors@R: c(
     person("Kathleen", "Nevola", , "biostattools@olink.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-5183-6444", Github = "kathy-nevola")),
@@ -23,6 +23,8 @@ Authors@R: c(
            comment = c(ORCID = "0000-0002-4922-8415", Github = "klevdiamanti")),
     person("Amrita", "Kar", role = "aut",
            comment = c(Github = "amrita-kar")),
+    person("Lei", "Conze", role = "aut", 
+            comment = c(Github = "leiliuC")),
     person("Kristian", "Hodén", role = "ctb",
            comment = c(ORCID = "0000-0003-0354-0662", Github = "kristianHoden")),
     person("Per", "Eriksson", role = "ctb",
@@ -86,6 +88,7 @@ Suggests:
     FSA,
     ggplotify,
     here,
+    kableExtra,
     knitr,
     markdown,
     msigdbr,
@@ -99,7 +102,8 @@ Suggests:
     umap,
     vdiffr
 VignetteBuilder: 
-    knitr
+  kableExtra,
+  knitr
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true

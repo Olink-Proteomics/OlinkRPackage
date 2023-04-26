@@ -24,7 +24,7 @@
 #' \itemize{
 #'  \item{Assay:} "character" Protein symbol
 #'  \item{OlinkID:} "character" Olink specific ID
-#'  \item{UniProt:} "character" Olink specific ID
+#'  \item{UniProt:} "character" UniProt ID
 #'  \item{Panel:} "character" Name of Olink Panel
 #'  \item{term:} "character" term in model
 #'  \item{df:} "numeric" degrees of freedom
@@ -264,7 +264,7 @@ olink_one_non_parametric <- function(df,
 #' \itemize{
 #'  \item{Assay:} "character" Protein symbol
 #'  \item{OlinkID:} "character" Olink specific ID
-#'  \item{UniProt:} "character" Olink specific ID
+#'  \item{UniProt:} "character" UniProt ID
 #'  \item{Panel:} "character" Name of Olink Panel
 #'  \item{term:} "character" term in model
 #'  \item{contrast:} "character" the groups that were compared
