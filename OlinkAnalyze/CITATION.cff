@@ -4,10 +4,10 @@
 # -----------------------------------------------------------
  
 cff-version: 1.2.0
-message: 'To cite package "OlinkAnalyze" in publications use:'
+message: 'To cite package "Olink Analyze" in publications use:'
 type: software
 license: AGPL-3.0-or-later
-title: 'OlinkAnalyze: Facilitate Analysis of Proteomic Data from Olink'
+title: 'Olink Analyze: Facilitate Analysis of Proteomic Data from Olink'
 version: 3.3.1
 abstract: A collection of functions to facilitate analysis of proteomic data from
   Olink, primarily NPX data that has been exported from Olink Software. The functions

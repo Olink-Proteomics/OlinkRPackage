@@ -28,7 +28,7 @@ knitr::opts_chunk$set(
 Individual Olink® NPX datasets are normalized using either plate control
 normalization or intensity normalization methods. Plate control
 normalization is generally used for single plate projects, while
-intensity normalization is used for multiplate projects. Additionally,
+intensity normalization is used for multi-plate projects. Additionally,
 intensity normalization method assumes that all samples within a project
 are fully randomized.
 
@@ -49,7 +49,7 @@ Bridging is also needed if Olink® NPX datasets are:
 To bridge two or more Olink® NPX datasets, bridging samples are needed
 to calculate the assay-specific adjustment factors between datasets.
 Bridging samples are shared samples among datasets - that is that
-samples that are analysed in both datasets. The recommended number of
+samples that are analyzed in both datasets. The recommended number of
 bridging samples are shown in the table below. Olink® NPX datasets
 without shared samples should not be combined using the bridging
 approach described below.
@@ -91,7 +91,7 @@ from the reference study and be added to the second study. These samples
 can be selected using the `olink_bridgeselector()` function in Olink
 Analyze. The bridge selection function will select a number of bridge
 samples based on the reference data. This function selects samples which
-passes QC and have high detectibility. To select samples across the
+passes QC and have high detectability. To select samples across the
 range of the data, the samples are ordered by mean NPX value and
 selected across this range. When running the selector, Olink recommends
 starting at sampleMissingFreq = 0.10 which represents a maximum of 10%

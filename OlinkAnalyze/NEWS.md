@@ -2,7 +2,7 @@
 ## Minor Changes
 * User can now specify label for proteins in olink_heatmap_plot() (@simfor, #228)
 * Updates to unit test and CI based on dependency changes (@AskPascal, #231, #236, #240)
-* Addition of normalization functions to simplify bridge, subset, and multibatch normalization (@klevdiamanti, #201)
+* Addition of normalization functions to simplify bridge, subset, and multi-batch normalization (@klevdiamanti, #201)
 * Introduction to bridging vignette added (@leiliuC, @kathy-nevola, #174)
 * Plate Randomization vignette added (@boxizhang, #241)
 * Outlier Exclusion vignette added (@kathy-nevola, #229)

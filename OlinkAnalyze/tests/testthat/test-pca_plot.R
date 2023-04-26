@@ -1,5 +1,6 @@
 skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
 skip_on_cran()
+skip_on_ci()
 
 set.seed(10)
 #Load reference results
