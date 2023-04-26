@@ -99,10 +99,10 @@ Suggests:
     scales,
     systemfonts,
     testthat (>= 3.0.0),
-    vdiffr,
-    umap
+    umap,
+    vdiffr
 VignetteBuilder: 
-   kableExtra,
+  kableExtra,
   knitr
 Config/testthat/edition: 3
 Encoding: UTF-8
