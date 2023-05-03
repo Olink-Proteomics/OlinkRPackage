@@ -1246,8 +1246,9 @@ test_that("Different columns in dfs can be normalized",{
         dplyr::filter(Project == "P2") |>
         dplyr::select(dplyr::all_of(col_notdf2[-length(col_notdf2)])) |>
         dplyr::distinct() |>
-        dplyr::pull()
-      }, "NA")
+        dplyr::pull() |>
+        as.logical()
+      }, NA)
 
   expect_equal(
     {
@@ -1255,8 +1256,9 @@ test_that("Different columns in dfs can be normalized",{
         dplyr::filter(Project == "P1") |>
         dplyr::select(dplyr::all_of(col_notdf1[-length(col_notdf1)])) |>
         dplyr::distinct() |>
-        dplyr::pull()
-    }, "NA")
+        dplyr::pull() |>
+        as.logical()
+    }, NA)
 
   expect_equal(normalization_results.bridged$NPX, mismatch_col_norm$NPX)
 })
