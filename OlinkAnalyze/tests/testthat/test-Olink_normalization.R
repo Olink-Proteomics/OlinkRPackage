@@ -260,13 +260,13 @@ test_that("Different columns in dfs can be normalized",{
     filter(Project == "P2") %>%
     select(all_of(col_notdf2[-length(col_notdf2)])) %>%
     distinct() %>%
-    pull()}, "NA")
+    pull()}, NA)
 
   expect_equal({mismatch_col_norm %>%
       filter(Project == "P1") %>%
       select(all_of(col_notdf1[-length(col_notdf1)])) %>%
       distinct() %>%
-      pull()}, "NA")
+      pull()}, NA)
   expect_equal(normalization_results.bridged$NPX, mismatch_col_norm$NPX)
 
 })
