@@ -1,3 +1,9 @@
+# Olink Analyze 3.4.1
+## Bug Fixes
+* Skip PCA snapshot tests in R version > 4.2.3 (@AskPascal, #254)
+* Bridge selector will now return all samples when requesting max number of samples based on missing frequency (@klevdiamanti, #252)
+* Fixed unit tests to expect NA as logical instead of "NA" as character (@MasoumehSheikhi, #250)
+
 # Olink Analyze 3.4.0
 ## Minor Changes
 * User can now specify label for proteins in olink_heatmap_plot() (@simfor, #228)

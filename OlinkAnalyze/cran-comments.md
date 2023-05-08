@@ -1,6 +1,6 @@
 ## Release Summary
 
-This release contains new functionality including new normalization functions and new vignettes.
+This release contains bug fixes to version 3.4.0 to fix unit test errors and edge cases.
 
 ## R CMD check results
 
