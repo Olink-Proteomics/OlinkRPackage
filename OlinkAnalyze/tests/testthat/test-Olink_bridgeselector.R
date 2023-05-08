@@ -14,3 +14,14 @@ test_that("olink_bridgeselector works", {
                                     n = 8))
   expect_warning(olink_bridgeselector(npx_data_format221010, sampleMissingFreq = 0.1, n = 2))
 })
+
+test_that("olink_bridgeselector max num of samples works", {
+  expect_equal(
+    {
+      olink_bridgeselector(df = npx_data1,
+                           sampleMissingFreq = 0.1,
+                           n = 150) |>
+        nrow()
+    },
+    150)
+})
