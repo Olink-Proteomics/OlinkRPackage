@@ -250,63 +250,102 @@ read_NPX_explore <- function(filename) {
 read_NPX_target <- function(filename) {
 
   NORM_FLAG <-  FALSE
-  long_form <- FALSE
+  long_form <- NULL
+  isTarget96 <- NULL
+  isTarget48 <- NULL
+  isFlex <- NULL
+  is_npx_data <- NULL
 
-  # Check if the data is npx or concentration as well as if it is T48 or T96
+  # Check if the data is npx or concentration 
 
   data_type <- readxl::read_excel(path = filename,
                                   range = 'A2',
                                   col_names = FALSE,
                                   .name_repair = "minimal")
   data_type_long <- readxl::read_excel(path = filename,
-                                  range = 'G2',
+                                  range = 'L1:O1',
                                   col_names = FALSE,
                                   .name_repair = "minimal")
 
+
+    
   if (grepl(pattern = 'NPX', x = data_type, fixed = TRUE)) {
 
     is_npx_data     <- TRUE
-    isTarget <- FALSE
-    n_max_meta_data <- 4
-
-    # Check whether it is target 48 or 96
-    panel_name <- readxl::read_excel(path = filename,
-                                     range = 'B3',
-                                     col_names = FALSE,
-                                     .name_repair="minimal")
-
-    if (grepl(pattern = 'Target 48', x = panel_name, fixed = TRUE)) {
-      target_type <- '48'
-      BASE_INDEX  <- 45
-    } else {
-      target_type <- '96'
-      BASE_INDEX  <- 92
-    }
-  } else if (grepl(pattern = 'Quantified', x = data_type, fixed = TRUE)) {
-    # Quant data given, which also means it is target 48
-    is_npx_data     <- FALSE
-    n_max_meta_data <- 5
-    target_type     <- '48'
-    BASE_INDEX      <- 45
-  } else if (grepl(pattern = "Target", data_type_long, fixed = TRUE)){
-    message("Target data in long form detected.")
+    long_form <- FALSE
+  
+  } else if (any(grepl(pattern = 'NPX', x = data_type_long, fixed = TRUE))){
+    
+    is_npx_data <- TRUE
     long_form <- TRUE
-    isTarget <- TRUE
-  } else if (
-      grepl(pattern = "Flex", data_type_long, fixed = TRUE) |
-      grepl(pattern = "F[A-Z]{3}-[A-Z]{4}",
-            data_type_long, fixed = FALSE)
-      ) {
-    message("Flex data in long form detected.")
+      
+  }  else if (grepl(pattern = 'Quantified', x = data_type, fixed = TRUE)){
+    
+    is_npx_data <- FALSE
+    long_form <- FALSE
+    
+  } else if (any(grepl(pattern = 'Quantified', x = data_type_long, fixed = TRUE))){
+    
+    is_npx_data <- FALSE
     long_form <- TRUE
-    isTarget <- FALSE
+    
   } else {
+    
     stop("Cannot find whether the given data is NPX or concentration")
+    
   }
-
-  if (long_form == TRUE && isTarget == TRUE){
+  
+  
+  # Determine if Target 96, 48, or flex
+  
+  panel_name <- readxl::read_excel(path = filename,
+                                   range = 'B3',
+                                   col_names = FALSE,
+                                   .name_repair="minimal")
+  
+  panel_name_long <- readxl::read_excel(path = filename,
+                                       range = 'G2',
+                                       col_names = FALSE,
+                                       .name_repair = "minimal")
+  
+  if (any(stringr::str_detect(c(panel_name, panel_name_long), pattern = "Target 48"))){
+    
+    isTarget48 <- TRUE
+    isTarget96 <- FALSE
+    isFlex <- FALSE
+    
+  } else if (any(stringr::str_detect(c(panel_name, panel_name_long), pattern = "Target 96"))){
+    
+    isTarget48 <- FALSE
+    isTarget96 <- TRUE
+    isFlex <- FALSE    
+    
+  } else if (any(stringr::str_detect(c(panel_name, panel_name_long), pattern = "[A-Z]{4}-[A-Z]{4} || Flex"))){
+    
+    isTarget48 <- FALSE
+    isTarget96 <- FALSE
+    isFlex <- TRUE   
+    
+  } else {
+    
+    stop("Cannot detect if Target or Flex.")
+    
+  }
+  
+  # Message of data detection
+  
+  platform <- ifelse(isTarget48, "Target 48",
+                     ifelse(isTarget96, "Target 96",
+                            ifelse(isFlex, "Flex", 
+                                   "Olink")))
+  wide_or_long <- ifelse(long_form, "long", "wide")
+  message(paste(platform, "data in", wide_or_long, "form detected.", sep = " "))
+  
+  
+  # Long form
+  if (long_form){
     out <- readxl::read_excel(path = filename,
-                       col_names = T) %>%
+                              col_names = T) %>%
       dplyr::filter(!is.na(SampleID)) %>%
       dplyr::as_tibble() %>%
       dplyr::mutate(Panel_Version = gsub(".*\\(","",Panel)) %>%
@@ -318,7 +357,9 @@ read_NPX_target <- function(filename) {
       dplyr::mutate(Panel = gsub("Olink", "", Panel)) %>%
       dplyr::mutate(Panel = trimws(Panel, which = "left")) %>%
       tidyr::separate(Panel, " ", into = c("Panel_Start", "Panel_End"), fill = "right") %>%
-      dplyr::mutate(Panel_End = ifelse(grepl("Ii", Panel_End), stringr::str_to_upper(Panel_End), Panel_End)) %>%
+      dplyr::mutate(Panel_End = ifelse(grepl("Ii", Panel_End), 
+                                       stringr::str_to_upper(Panel_End), 
+                                       Panel_End)) %>%
       dplyr::mutate(Panel_End = ifelse(is.na(Panel_End), " ", Panel_End)) %>%
       dplyr::mutate(Panel = paste("Olink", Panel_Start, Panel_End)) %>%
       dplyr::mutate(Panel = trimws(Panel, which = "right")) %>%
@@ -338,77 +379,58 @@ read_NPX_target <- function(filename) {
                     dplyr::matches("Normalization"),
                     dplyr::matches("*Inc Ctrl*"),
                     dplyr::matches("*Det Ctrl*"))
-    is_npx_data <- ifelse(any(names(out) %in% "NPX"), TRUE, FALSE)
-  } else  if (long_form == TRUE && isTarget == FALSE){
-    out <- readxl::read_excel(path = filename,
-                              col_names = T) %>%
-      dplyr::rename(dplyr::any_of(c("SampleID" = "SampleId"))) %>%
-      dplyr::filter(!is.na(SampleID)) %>%
-      dplyr::as_tibble() %>%
-      dplyr::select(SampleID, Index, OlinkID,
-                    UniProt, Assay, MissingFreq,
-                    Panel,Panel_Version,PlateID,
-                    QC_Warning,dplyr::matches("Plate_LQL"),
-                    dplyr::matches("LOD"),
-                    dplyr::matches("Plat_LOD"),
-                    dplyr::matches("LLOQ"),
-                    dplyr::matches("ULOQ"),
-                    dplyr::matches("NPX"),
-                    dplyr::matches("Quantified_value"),
-                    dplyr::matches("Unit"),
-                    dplyr::matches("Assay_Warning"),
-                    dplyr::matches("Normalization"),
-                    dplyr::matches("*Inc Ctrl*"),
-                    dplyr::matches("*Det Ctrl*"))
-    is_npx_data <- ifelse(any(names(out) %in% "NPX"), TRUE, FALSE)
+    } else if (isFlex){
+    out <- read_flex(filename)
   } else {
-    # Load initial meta data (the first rows of the wide file)
+    target_type <- ifelse(isTarget48, "48", "96")
+    BASE_INDEX <- ifelse(isTarget48, 45, 92)
+    n_max_meta_data <- ifelse(is_npx_data, 4, 5)
     meta_dat <-  readxl::read_excel(path = filename,
                                     skip = 2,
                                     n_max = n_max_meta_data,
                                     col_names = FALSE,
                                     .name_repair="minimal")
     meta_dat[4,1] <- 'SampleID'
-
+    
     NR_DEVIATIONS <- sum(stringr::str_detect(meta_dat[2,], 'QC Deviation from median'))
     control_index <- (stringr::str_detect(meta_dat[2,], 'Det Ctrl') |
                         stringr::str_detect(meta_dat[2,], 'Inc Ctrl 2') |
                         stringr::str_detect(meta_dat[2,], 'Inc Ctrl 1') |
                         stringr::str_detect(meta_dat[2,], 'Ext Ctrl'))
-
+    
     meta_dat[4, control_index] <- meta_dat[2, control_index]
     meta_dat[3, control_index] <- '-'
-
+    
     NR_CONTROLS <- sum(control_index)
-
+    
     nr_panel <- (ncol(meta_dat) - 1 - NR_DEVIATIONS - NR_CONTROLS)/(BASE_INDEX + 2)
-
+    
     nr_col          <- ncol(meta_dat)
     names(meta_dat) <- as.character(1:nr_col)
-
+    
     meta_dat <- meta_dat %>%
       dplyr::rename(Name = `1`)
-
+    
     # Load NPX or QUANT data including the last rows of meta data
     dat <- readxl::read_excel(path = filename,
                               skip = n_max_meta_data + 2,
                               col_names = FALSE,
                               .name_repair="minimal",
                               col_types = c('text'))
-
+    
     nr_col     <- ncol(dat)
     names(dat) <- as.character(1:nr_col)
-
+    
     dat <- dat %>%
       dplyr::rename(Name = `1`)
-
+    
     # Calculate number of plates
     plates <- dat[,nr_col - nr_panel] %>%
       dplyr::distinct() %>%
       stats::na.omit() %>%
       dplyr::pull()
     nr_plates <- length(plates)
-
+    
     # Extract the meta data from the last rows of data
     missfreq <- dat %>% dplyr::filter(stringr::str_detect(Name, "Missing Data freq."))
     norm_method <- dat %>% dplyr::filter(stringr::str_detect(Name, "Normalization"))
@@ -421,33 +443,33 @@ read_NPX_target <- function(filename) {
     } else {
       LOD <- dat %>% dplyr::filter(stringr::str_detect(Name, "LOD"))
     }
-
+    
     # Add the new meta data to ´meta_dat´
     meta_dat <- rbind(meta_dat,missfreq)
     if (!is_npx_data) {
       meta_dat <- rbind(meta_dat, LLOQ, ULOQ, assay_warning, Plate_LQL)
     }
     meta_dat <- rbind(meta_dat, LOD, norm_method)
-
+    
     # Remove the meta data from dat
     if (is_npx_data) {
       nbr_meta_data_rows_bottom <- 3
     } else {
       nbr_meta_data_rows_bottom <- 4 + 3 * nr_plates
     }
-
+    
     if (nrow(norm_method) == 0) {
       nbr_meta_data_rows_bottom <- nbr_meta_data_rows_bottom - 1
     } else {
       NORM_FLAG <- TRUE
     }
-
+    
     dat <- dat[c(-1 * (nrow(dat) - nbr_meta_data_rows_bottom):nrow(dat)),]
-
+    
     # Create index vector
     SampleID <- dat$Name
     Index_nr <- c(1:length(SampleID))
-
+    
     # Initiate lists for later use
     panel_data <- list() ##NPX values to be stored
     QC_list <- list()    ##QC data
@@ -456,78 +478,78 @@ read_NPX_target <- function(filename) {
     assay_name_list <- list()
     panel_list_long <- list()
     deviations_list <- list()
-
+    
     if (NR_CONTROLS > 0) {
       BASE_INDEX <- BASE_INDEX + NR_CONTROLS / nr_panel
     }
-
+    
     # Construct a list of tibbles that match the long format
     for (i in 1:nr_panel) {
-
+      
       panel_data[[i]] <- dat[,(2+((i-1)*BASE_INDEX)):((BASE_INDEX+1)+((i-1)*BASE_INDEX))]
-
+      
       if (NR_DEVIATIONS == 0) {
         QC_list[[i]] <- dat[,c((2+((nr_panel)*BASE_INDEX)+(i-1)),
                                (2+((nr_panel)*BASE_INDEX)+(i-1))+nr_panel)]
-
+        
         meta_data_list[[i]] <- meta_dat[,c((2+((i-1)*BASE_INDEX)):((BASE_INDEX+1)+((i-1)*BASE_INDEX)),
                                            (2+((nr_panel)*BASE_INDEX)+(i-1)),
                                            (2+((nr_panel)*BASE_INDEX)+(i-1))+nr_panel)]
-
-
+        
+        
       } else {
-
+        
         QC_list[[i]] <- dat[,c((2+((nr_panel)*BASE_INDEX)+(i-1)),
                                (2+((nr_panel)*BASE_INDEX)+(i-1))+nr_panel,
                                (2+((nr_panel)*BASE_INDEX)+(i-1))+2*nr_panel+(i-1),
                                (2+((nr_panel)*BASE_INDEX)+(i-1))+2*nr_panel+(i-1)+1)]
-
+        
         meta_data_list[[i]] <- meta_dat[,c((2+((i-1)*BASE_INDEX)):((BASE_INDEX+1)+((i-1)*BASE_INDEX)),
                                            (2+((nr_panel)*BASE_INDEX)+(i-1)),
                                            (2+((nr_panel)*BASE_INDEX)+(i-1))+nr_panel,
                                            (2+((nr_panel)*BASE_INDEX)+(i-1))+2*nr_panel,
                                            (2+((nr_panel)*BASE_INDEX)+(i-1))+3*nr_panel)]
-
+        
         meta_data_list[[i]][4,(BASE_INDEX+3)] <- "QC Deviation Inc Ctrl"
         meta_data_list[[i]][4,(BASE_INDEX+4)] <- "QC Deviation Det Ctrl"
-
-
+        
+        
       }
-
+      
       meta_data_list[[i]][4,(BASE_INDEX+1)] <- meta_data_list[[i]][2,(BASE_INDEX+1)]
       meta_data_list[[i]][4,(BASE_INDEX+2)] <- meta_data_list[[i]][2,(BASE_INDEX+2)]
-
-
+      
+      
       panel_list[[i]] <- cbind(panel_data[[i]],QC_list[[i]])
-
+      
       colnames(panel_list[[i]]) <- unlist(meta_data_list[[i]][4,])
-
+      
       panel_list[[i]][,c(-(BASE_INDEX+1),-(BASE_INDEX+2))] <-
         lapply(panel_list[[i]][,c(-(BASE_INDEX+1),-(BASE_INDEX+2))],
                function(x) as.numeric(stringr::str_replace_all(x,
                                                                c('#' = '', ',' = '.',
                                                                  'No Data' = NA, '> ULOQ' = NA,
                                                                  '< LLOQ' = NA))))
-
+      
       # Remove the last two columns since they contain redundant meta data and
       # will only cause warnings
       meta_data_list[[i]] <- meta_data_list[[i]][,c(-(BASE_INDEX+1),-(BASE_INDEX+2))]
-
+      
       assay_name_list[[i]] <- tidyr::tibble(ID=c(t(meta_data_list[[i]][4,])),
                                             Name=c(t(meta_data_list[[i]][2,])),
                                             UniProt = c(t(meta_data_list[[i]][3,])),
                                             Panel=c(t(meta_data_list[[i]][1,])))
-
+      
       if (is_npx_data) {
         assay_name_list[[i]] <- dplyr::bind_cols(assay_name_list[[i]],
                                                  MissingFreq=c(t(meta_data_list[[i]][5,])),
                                                  LOD = as.numeric(c(t(meta_data_list[[i]][6,]))))
-
+        
         if (NORM_FLAG == TRUE) {
           assay_name_list[[i]] <- dplyr::bind_cols(assay_name_list[[i]],
                                                    Normalization = c(t(meta_data_list[[i]][7,])))
         }
-
+        
         panel_list_long[[i]] <- panel_list[[i]] %>%
           dplyr::mutate(SampleID = SampleID) %>%
           dplyr::mutate(Index = Index_nr) %>%
@@ -578,7 +600,7 @@ read_NPX_target <- function(filename) {
         }
       }
     }
-
+    
     if (!is_npx_data) {
       for (i in 1:(nr_panel*nr_plates)) {
         panel_list_long[[i]] <- panel_list_long[[i]] %>%
@@ -586,7 +608,7 @@ read_NPX_target <- function(filename) {
           dplyr::rename(Quantified_value = NPX)
       }
     }
-
+    
     out <- dplyr::bind_rows(panel_list_long) %>%
       dplyr::filter(!is.na(SampleID)) %>%
       dplyr::as_tibble() %>%
@@ -619,10 +641,9 @@ read_NPX_target <- function(filename) {
                     dplyr::matches("Normalization"),
                     dplyr::matches("*Inc Ctrl*"),
                     dplyr::matches("*Det Ctrl*"))
-    }
-
-
-
+  }
+  
+  is_npx_data <- ifelse(any(names(out) %in% "NPX"), TRUE, FALSE)
   if (is_npx_data) {
     # Check for data completeness and warn on problems
     check_data_completeness(out)
@@ -634,10 +655,10 @@ read_NPX_target <- function(filename) {
     out <- out %>%
       mutate(Quantified_value = as.numeric(Quantified_value))
   }
-
+  
   return(out)
-}
-
+  }
+  
 #' Check data completeness
 #'
 #' Throw informative warnings if a dataset appears to have problems
