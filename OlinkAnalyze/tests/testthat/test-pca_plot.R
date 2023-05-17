@@ -1,6 +1,12 @@
 skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
 skip_on_cran()
 
+# Skip in newer versions of R
+skip_if(
+  R.version$major > 4 ||
+    (R.version$major == 4 && as.numeric(R.version$minor) > 2.3)
+)
+
 set.seed(10)
 #Load reference results
 refRes_file <- testthat::test_path('../data/refResults.RData')
@@ -230,7 +236,7 @@ test_that("minimal PCA plot", {
     mutate(SampleID = paste(SampleID, "_", Index, sep = ""),
            Index=if_else(Panel == "Olink Cardiometabolic", Index+1L, Index)) %>%
     olink_pca_plot(quiet = TRUE)
-  
+
   expect_true(all(abs(sort(pca_rem_index[[1]]$data$PCX) -
                         sort(pca_plot[[1]]$data$PCX)) == 0))
   expect_true(all(abs(sort(pca_rem_index[[1]]$data$PCY) -

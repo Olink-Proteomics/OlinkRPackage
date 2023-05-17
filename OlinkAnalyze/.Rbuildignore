@@ -12,3 +12,4 @@
 ^LICENSE\.md$
 ^revdep$
 ^inst/WORDLIST
+^CITATION\.cff$
