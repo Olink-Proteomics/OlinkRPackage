@@ -26,7 +26,6 @@
 #' file <- system.file("extdata", "Example_NPX_Data.csv", package = "OlinkAnalyze")
 #' read_NPX(file)
 #' }
-#' @importFrom magrittr |>
 #' @importFrom tools file_ext md5sum file_path_sans_ext
 #' @importFrom dplyr as_tibble distinct pull filter bind_cols mutate left_join select rename matches bind_rows arrange slice_head
 #' @importFrom readxl read_excel
