@@ -7,19 +7,9 @@
 #' @return tibble of data
 read_flex <- function(filename) {
 
-  project <- readxl::read_excel(path = filename,
-                                range = "A1",
-                                col_names = F,
-                                .name_repair = "minimal")
-  
-  version <- readxl::read_excel(path = filename,
-                               range = "B1",
-                               col_names = F,
-                               .name_repair = "minimal")
-  
   data_type <- readxl::read_excel(path = filename,
                                   range = "A2",
-                                  col_names = F,
+                                  col_names = FALSE,
                                   .name_repair = "minimal")
   
   is_npx_data <- ifelse(grepl(pattern = "NPX", x = data_type, fixed = TRUE), TRUE, FALSE) 
@@ -28,7 +18,7 @@ read_flex <- function(filename) {
   panel_name <-  unlist(as.vector(readxl::read_excel(path = filename,
                                     skip = 2,
                                     n_max = 1,
-                                    col_names = F,
+                                    col_names = FALSE,
                                     .name_repair = "minimal") ))
   panel_number <- data.frame(Panel = panel_name) |> 
     dplyr::filter(Panel != "Panel" ) |> 
@@ -51,11 +41,6 @@ read_flex <- function(filename) {
     dplyr::mutate(OlinkID = ifelse(stringr::str_detect(Assay, "Ctrl"), paste0("OID_",Assay), OlinkID)) |> 
     dplyr::filter(!is.na(OlinkID))
   
-  # Define number of proteins per panel
-  assays_per_panel <- metadata |> 
-    dplyr::select(Panel) |> 
-    table() |> 
-    as.data.frame()
   
   # Is QC Deviation data present 
   qc_dev_cols <- readxl::read_excel(path = filename, 
@@ -148,6 +133,7 @@ read_flex <- function(filename) {
     meta_data_per_assay <- dplyr::left_join(missfreq,norm_method, by = "OlinkID") |> 
       dplyr::left_join(assay_warning, by = "OlinkID", multiple ="all") |>
       dplyr::left_join(LLOQ, by = c("OlinkID")) |> 
+      dplyr::left_join(ULOQ, by = c("OlinkID")) |> 
       dplyr::left_join(Plate_LQL, by = c("OlinkID", "PlateID1")) |> 
       dplyr::left_join(LOD, by = c("OlinkID", "PlateID1")) 
   } else {
