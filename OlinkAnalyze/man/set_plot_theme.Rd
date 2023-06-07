@@ -26,5 +26,4 @@ ggplot(mtcars, aes(x = wt, y = mpg, color = as.factor(cyl))) +
   geom_point(size = 4) +
   set_plot_theme(font = "")
 
-
 }

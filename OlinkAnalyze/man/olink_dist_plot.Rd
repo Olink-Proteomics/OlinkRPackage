@@ -21,6 +21,8 @@ Generates boxplots of NPX vs. SampleID colored by QC_Warning (default) or any ot
 and faceted by Panel using ggplot and ggplot2::geom_boxplot.
 }
 \examples{
-\donttest{olink_dist_plot(npx_data1, color_g = "QC_Warning")}
+\donttest{
+olink_dist_plot(npx_data1, color_g = "QC_Warning")
+}
 }
 \keyword{NPX}

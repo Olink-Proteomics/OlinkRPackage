@@ -47,15 +47,17 @@ The resulting Mann-Whitney U Test table is arranged by ascending p-values.
 
 library(dplyr)
 
-npx_df <- npx_data1 \%>\% filter(!grepl('control',SampleID, ignore.case = TRUE))
+npx_df <- npx_data1 \%>\% filter(!grepl("control", SampleID, ignore.case = TRUE))
 
-wilcox_results <- olink_wilcox(df = npx_df,
-                               variable = 'Treatment',
-                               alternative = 'two.sided')
+wilcox_results <- olink_wilcox(
+  df = npx_df,
+  variable = "Treatment",
+  alternative = "two.sided"
+)
 
-#Paired Mann-Whitney U Test
+# Paired Mann-Whitney U Test
 npx_df \%>\%
-   filter(Time \%in\% c("Baseline","Week.6")) \%>\%
-   olink_wilcox(variable = "Time", pair_id = "Subject")
+  filter(Time \%in\% c("Baseline", "Week.6")) \%>\%
+  olink_wilcox(variable = "Time", pair_id = "Subject")
 }
 }

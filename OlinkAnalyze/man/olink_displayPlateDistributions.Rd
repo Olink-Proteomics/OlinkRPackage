@@ -18,8 +18,12 @@ An object of class "ggplot" showing the percent distribution of fill.color in ea
 Displays a bar chart for each plate representing the distribution of the given grouping variable on each plate using ggplot2::ggplot and ggplot2::geom_bar.
 }
 \examples{
-\donttest{randomized.manifest <- olink_plate_randomizer(manifest)}
-\donttest{olink_displayPlateDistributions(data=randomized.manifest,fill.color="Site")}
+\donttest{
+randomized.manifest <- olink_plate_randomizer(manifest)
+}
+\donttest{
+olink_displayPlateDistributions(data = randomized.manifest, fill.color = "Site")
+}
 }
 \seealso{
 \itemize{

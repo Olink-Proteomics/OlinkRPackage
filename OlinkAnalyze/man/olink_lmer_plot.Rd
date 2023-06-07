@@ -56,22 +56,27 @@ See \code{olink_lmer} for details of input notation.
 
 library(dplyr)
 
-lmer_results <- olink_lmer(df = npx_data1,
-                           variable=c("Time", 'Treatment'),
-                           random = c('Subject'))
+lmer_results <- olink_lmer(
+  df = npx_data1,
+  variable = c("Time", "Treatment"),
+  random = c("Subject")
+)
 
 assay_list <- lmer_results \%>\%
-    filter(Threshold == 'Significant' & term == 'Time:Treatment') \%>\%
-    select(OlinkID) \%>\%
-    distinct() \%>\%
-    pull()
+  filter(Threshold == "Significant" & term == "Time:Treatment") \%>\%
+  select(OlinkID) \%>\%
+  distinct() \%>\%
+  pull()
 
-list_of_pointrange_plots <- olink_lmer_plot(df = npx_data1,
-                                            variable=c("Time", 'Treatment'),
-                                            random = c('Subject'),
-                                            x_axis_variable = 'Time',
-                                            col_variable = 'Treatment',
-                                            verbose=TRUE,
-                                            olinkid_list = assay_list,
-                                            number_of_proteins_per_plot = 10)}
+list_of_pointrange_plots <- olink_lmer_plot(
+  df = npx_data1,
+  variable = c("Time", "Treatment"),
+  random = c("Subject"),
+  x_axis_variable = "Time",
+  col_variable = "Treatment",
+  verbose = TRUE,
+  olinkid_list = assay_list,
+  number_of_proteins_per_plot = 10
+)
+}
 }

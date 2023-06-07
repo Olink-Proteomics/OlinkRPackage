@@ -64,23 +64,29 @@ mean ordinal NPX at mean(numerical variable) versus mean NPX at mean(numerical v
 \examples{
 \donttest{
 library(dplyr)
-#Two-way Ordinal Regression.
-#Results in model NPX~Treatment*Time.
-ordinalRegression_results <- olink_ordinalRegression(df = npx_data1,
-                              variable="Treatment:Time")
+# Two-way Ordinal Regression.
+# Results in model NPX~Treatment*Time.
+ordinalRegression_results <- olink_ordinalRegression(
+  df = npx_data1,
+  variable = "Treatment:Time"
+)
 
-#Posthoc test for the model NPX~Treatment*Time,
-#on the interaction effect Treatment:Time.
+# Posthoc test for the model NPX~Treatment*Time,
+# on the interaction effect Treatment:Time.
 
-#Posthoc
+# Posthoc
 ordinalRegression_results_posthoc_results <- olink_ordinalRegression_posthoc(npx_data1,
-                                                   variable=c("Treatment:Time"),
-                                                   covariates="Site",
-                                                   olinkid_list = {ordinalRegression_results \%>\%
-                                                   filter(term == 'Treatment:Time') \%>\%
-                                                   filter(Threshold == 'Significant') \%>\%
-                                                                 dplyr::select(OlinkID) \%>\%
-                                                                 distinct() \%>\%
-                                                                 pull()},
-                                                                 effect = "Treatment:Time")}
+  variable = c("Treatment:Time"),
+  covariates = "Site",
+  olinkid_list = {
+    ordinalRegression_results \%>\%
+      filter(term == "Treatment:Time") \%>\%
+      filter(Threshold == "Significant") \%>\%
+      dplyr::select(OlinkID) \%>\%
+      distinct() \%>\%
+      pull()
+  },
+  effect = "Treatment:Time"
+)
+}
 }

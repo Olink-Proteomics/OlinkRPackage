@@ -75,21 +75,26 @@ The threshold is determined by logic evaluation of Adjusted_pval < 0.05. Covaria
 
 library(dplyr)
 
-npx_df <- npx_data1 \%>\% filter(!grepl('control',SampleID, ignore.case = TRUE))
+npx_df <- npx_data1 \%>\% filter(!grepl("control", SampleID, ignore.case = TRUE))
 
-#One-way ANOVA, no covariates.
-#Results in a model NPX~Time
+# One-way ANOVA, no covariates.
+# Results in a model NPX~Time
 anova_results <- olink_anova(df = npx_df, variable = "Time")
 
-#Two-way ANOVA, one main effect covariate.
-#Results in model NPX~Treatment*Time+Site.
-anova_results <- olink_anova(df = npx_df,
-                             variable=c("Treatment:Time"),
-                             covariates="Site")
+# Two-way ANOVA, one main effect covariate.
+# Results in model NPX~Treatment*Time+Site.
+anova_results <- olink_anova(
+  df = npx_df,
+  variable = c("Treatment:Time"),
+  covariates = "Site"
+)
 
-#One-way ANOVA, interaction effect covariate.
-#Results in model NPX~Treatment+Site:Time+Site+Time.
-anova_results <- olink_anova(df = npx_df,
-                             variable="Treatment",
-                             covariates="Site:Time")}
+# One-way ANOVA, interaction effect covariate.
+# Results in model NPX~Treatment+Site:Time+Site+Time.
+anova_results <- olink_anova(
+  df = npx_df,
+  variable = "Treatment",
+  covariates = "Site:Time"
+)
+}
 }

@@ -46,12 +46,14 @@ library(dplyr)
 
 anova_results <- olink_anova(npx_data1, variable = "Site")
 significant_assays <- anova_results \%>\%
-    filter(Threshold == 'Significant') \%>\%
-    pull(OlinkID)
+  filter(Threshold == "Significant") \%>\%
+  pull(OlinkID)
 olink_boxplot(npx_data1,
-              variable = "Site",
-              olinkid_list = significant_assays,
-              verbose = TRUE,
-              number_of_proteins_per_plot = 3)}
+  variable = "Site",
+  olinkid_list = significant_assays,
+  verbose = TRUE,
+  number_of_proteins_per_plot = 3
+)
+}
 
 }

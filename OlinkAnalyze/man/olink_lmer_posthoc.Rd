@@ -78,31 +78,37 @@ The output tibble is arranged by ascending Tukey adjusted p-values.
 
 library(dplyr)
 
-lmer_results <- olink_lmer(df = npx_data1,
-                           variable=c("Time", 'Treatment'),
-                           random = c('Subject'))
+lmer_results <- olink_lmer(
+  df = npx_data1,
+  variable = c("Time", "Treatment"),
+  random = c("Subject")
+)
 
 assay_list <- lmer_results \%>\%
-    filter(Threshold == 'Significant' & term == 'Time:Treatment') \%>\%
-    select(OlinkID) \%>\%
-    distinct() \%>\%
-    pull()
+  filter(Threshold == "Significant" & term == "Time:Treatment") \%>\%
+  select(OlinkID) \%>\%
+  distinct() \%>\%
+  pull()
 
-results_lmer_posthoc <- olink_lmer_posthoc(df = npx_data1,
-                                           olinkid_list = assay_list,
-                                           variable=c("Time", 'Treatment'),
-                                           effect = 'Time:Treatment',
-                                           random = 'Subject',
-                                           verbose = TRUE)
+results_lmer_posthoc <- olink_lmer_posthoc(
+  df = npx_data1,
+  olinkid_list = assay_list,
+  variable = c("Time", "Treatment"),
+  effect = "Time:Treatment",
+  random = "Subject",
+  verbose = TRUE
+)
 
-#Estimate treated vs untreated at each timepoint
+# Estimate treated vs untreated at each timepoint
 
 
-results_lmer_posthoc <- olink_lmer_posthoc(df = npx_data1,
-                                           olinkid_list = assay_list,
-                                           model_formula = "NPX~Time*Treatment+(1|Subject)",
-                                           effect_formula = "pairwise~Treatment|Time",
-                                           verbose = TRUE)
+results_lmer_posthoc <- olink_lmer_posthoc(
+  df = npx_data1,
+  olinkid_list = assay_list,
+  model_formula = "NPX~Time*Treatment+(1|Subject)",
+  effect_formula = "pairwise~Treatment|Time",
+  verbose = TRUE
+)
 }
 
 }

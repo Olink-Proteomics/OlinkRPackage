@@ -53,10 +53,10 @@ library(dplyr)
 
 olink_qc_plot(npx_data1, color_g = "QC_Warning")
 
-#Change the outlier threshold to +-4SD
+# Change the outlier threshold to +-4SD
 olink_qc_plot(npx_data1, color_g = "QC_Warning", IQR_outlierDef = 4, median_outlierDef = 4)
 
-#Identify the outliers
+# Identify the outliers
 qc <- olink_qc_plot(npx_data1, color_g = "QC_Warning", IQR_outlierDef = 4, median_outlierDef = 4)
 outliers <- qc$data \%>\% filter(Outlier == 1)
 }

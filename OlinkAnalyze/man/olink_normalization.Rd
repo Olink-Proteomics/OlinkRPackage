@@ -59,66 +59,78 @@ df1, overlapping_samples_df1 and reference_medians need to be specified. Adjustm
 
 library(dplyr)
 
-npx_df1 <- npx_data1 \%>\% dplyr::mutate(Project = 'P1')
-npx_df2 <- npx_data2 \%>\% dplyr::mutate(Project = 'P2')
+npx_df1 <- npx_data1 \%>\% dplyr::mutate(Project = "P1")
+npx_df2 <- npx_data2 \%>\% dplyr::mutate(Project = "P2")
 
-#Bridging normalization:
+# Bridging normalization:
 # Find overlapping samples, but exclude Olink control
-overlap_samples <- intersect((npx_df1 \%>\%
-                               dplyr::filter(!grepl("control", SampleID,
-                                                     ignore.case=TRUE)))$SampleID,
-                             (npx_df2 \%>\%
-                               dplyr::filter(!grepl("control", SampleID,
-                                                     ignore.case=TRUE)))$SampleID)
+overlap_samples <- intersect(
+  (npx_df1 \%>\%
+    dplyr::filter(!grepl("control", SampleID,
+      ignore.case = TRUE
+    )))$SampleID,
+  (npx_df2 \%>\%
+    dplyr::filter(!grepl("control", SampleID,
+      ignore.case = TRUE
+    )))$SampleID
+)
 # Normalize
-olink_normalization(df1 = npx_df1,
-                    df2 = npx_df2,
-                    overlapping_samples_df1 = overlap_samples,
-                    df1_project_nr = 'P1',
-                    df2_project_nr = 'P2',
-                    reference_project = 'P1')
+olink_normalization(
+  df1 = npx_df1,
+  df2 = npx_df2,
+  overlapping_samples_df1 = overlap_samples,
+  df1_project_nr = "P1",
+  df2_project_nr = "P2",
+  reference_project = "P1"
+)
 
-#Subset normalization:
+# Subset normalization:
 # Find a suitable subset of samples from both projects, but exclude Olink controls
 # and samples which do not pass QC.
 df1_sampleIDs <- npx_df1 \%>\%
-    dplyr::filter(QC_Warning == 'Pass') \%>\%
-    dplyr::filter(!stringr::str_detect(SampleID, 'CONTROL_SAMPLE')) \%>\%
-    dplyr::select(SampleID) \%>\%
-    unique() \%>\%
-    dplyr::pull(SampleID)
+  dplyr::filter(QC_Warning == "Pass") \%>\%
+  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_SAMPLE")) \%>\%
+  dplyr::select(SampleID) \%>\%
+  unique() \%>\%
+  dplyr::pull(SampleID)
 df2_sampleIDs <- npx_df2 \%>\%
-    dplyr::filter(QC_Warning == 'Pass') \%>\%
-    dplyr::filter(!stringr::str_detect(SampleID, 'CONTROL_SAMPLE')) \%>\%
-    dplyr::select(SampleID) \%>\%
-    unique() \%>\%
-    dplyr::pull(SampleID)
+  dplyr::filter(QC_Warning == "Pass") \%>\%
+  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_SAMPLE")) \%>\%
+  dplyr::select(SampleID) \%>\%
+  unique() \%>\%
+  dplyr::pull(SampleID)
 some_samples_df1 <- sample(df1_sampleIDs, 16)
 some_samples_df2 <- sample(df2_sampleIDs, 16)
 
-olink_normalization(df1 = npx_df1,
-                    df2 = npx_df2,
-                    overlapping_samples_df1 = some_samples_df1,
-                    overlapping_samples_df2 = some_samples_df2)
+olink_normalization(
+  df1 = npx_df1,
+  df2 = npx_df2,
+  overlapping_samples_df1 = some_samples_df1,
+  overlapping_samples_df2 = some_samples_df2
+)
 
 
 ## Special case of subset normalization when using all samples.
-olink_normalization(df1 = npx_df1,
-                    df2 = npx_df2,
-                    overlapping_samples_df1 = df1_sampleIDs,
-                    overlapping_samples_df2 = df2_sampleIDs)
+olink_normalization(
+  df1 = npx_df1,
+  df2 = npx_df2,
+  overlapping_samples_df1 = df1_sampleIDs,
+  overlapping_samples_df2 = df2_sampleIDs
+)
 
 
-#Reference median normalization:
+# Reference median normalization:
 # For the sake of this example, set the reference median to 1
 ref_median_df <- npx_df1 \%>\%
-    dplyr::select(OlinkID) \%>\%
-    dplyr::distinct() \%>\%
-    dplyr::mutate(Reference_NPX = 1)
+  dplyr::select(OlinkID) \%>\%
+  dplyr::distinct() \%>\%
+  dplyr::mutate(Reference_NPX = 1)
 # Normalize
-olink_normalization(df1 = npx_df1,
-                    overlapping_samples_df1 = some_samples_df1,
-                    reference_medians = ref_median_df)
+olink_normalization(
+  df1 = npx_df1,
+  overlapping_samples_df1 = some_samples_df1,
+  reference_medians = ref_median_df
+)
 }
 }
 \keyword{Normalization}

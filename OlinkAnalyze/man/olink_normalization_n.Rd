@@ -94,21 +94,29 @@ npx_df2 <- npx_data2 |>
   dplyr::mutate(Normalization = "Intensity")
 
 # Find overlapping samples, but exclude Olink control
-overlap_samples <- dplyr::intersect(unique(npx_df1$SampleID),
-                                    unique(npx_df2$SampleID))
-overlap_samples_list <- list("DF1" = overlap_samples,
-                             "DF2" = overlap_samples)
+overlap_samples <- dplyr::intersect(
+  unique(npx_df1$SampleID),
+  unique(npx_df2$SampleID)
+)
+overlap_samples_list <- list(
+  "DF1" = overlap_samples,
+  "DF2" = overlap_samples
+)
 
 # create tibble for input
 norm_schema_bridge <- dplyr::tibble(
-  order              = c(1, 2),
-  name               = c("NPX_DF1", "NPX_DF2"),
-  data               = list("NPX_DF1" = npx_df1,
-                            "NPX_DF2" = npx_df2),
-  samples            = list("NPX_DF1" = NA_character_,
-                            "NPX_DF2" = overlap_samples_list),
+  order = c(1, 2),
+  name = c("NPX_DF1", "NPX_DF2"),
+  data = list(
+    "NPX_DF1" = npx_df1,
+    "NPX_DF2" = npx_df2
+  ),
+  samples = list(
+    "NPX_DF1" = NA_character_,
+    "NPX_DF2" = overlap_samples_list
+  ),
   normalization_type = c(NA_character_, "Bridge"),
-  normalize_to       = c(NA_character_, "1")
+  normalize_to = c(NA_character_, "1")
 )
 
 # normalize
@@ -130,31 +138,37 @@ npx_df2 <- npx_data2 |>
 # controls and samples that fail QC.
 df1_samples <- npx_df1 |>
   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
-  dplyr::filter(QC_Warning == 'Pass') |>
+  dplyr::filter(QC_Warning == "Pass") |>
   dplyr::pull(SampleID) |>
   unique() |>
   sample(size = 16, replace = FALSE)
 df2_samples <- npx_df2 |>
   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
-  dplyr::filter(QC_Warning == 'Pass') |>
+  dplyr::filter(QC_Warning == "Pass") |>
   dplyr::pull(SampleID) |>
   unique() |>
   sample(size = 16, replace = FALSE)
 
 # create named list
-subset_samples_list <- list("DF1" = df1_samples,
-                            "DF2" = df2_samples)
+subset_samples_list <- list(
+  "DF1" = df1_samples,
+  "DF2" = df2_samples
+)
 
 # create tibble for input
 norm_schema_subset <- dplyr::tibble(
-  order              = c(1, 2),
-  name               = c("NPX_DF1", "NPX_DF2"),
-  data               = list("NPX_DF1" = npx_df1,
-                            "NPX_DF2" = npx_df2),
-  samples            = list("NPX_DF1" = NA_character_,
-                            "NPX_DF2" = subset_samples_list),
+  order = c(1, 2),
+  name = c("NPX_DF1", "NPX_DF2"),
+  data = list(
+    "NPX_DF1" = npx_df1,
+    "NPX_DF2" = npx_df2
+  ),
+  samples = list(
+    "NPX_DF1" = NA_character_,
+    "NPX_DF2" = subset_samples_list
+  ),
   normalization_type = c(NA_character_, "Subset"),
-  normalize_to       = c(NA_character_, "1")
+  normalize_to = c(NA_character_, "1")
 )
 
 # Normalize
@@ -184,19 +198,25 @@ df2_samples_all <- npx_df2 |>
   unique()
 
 # create named list
-subset_samples_all_list <- list("DF1" = df1_samples_all,
-                                "DF2" = df2_samples_all)
+subset_samples_all_list <- list(
+  "DF1" = df1_samples_all,
+  "DF2" = df2_samples_all
+)
 
 # create tibble for input
 norm_schema_subset_all <- dplyr::tibble(
-  order              = c(1, 2),
-  name               = c("NPX_DF1", "NPX_DF2"),
-  data               = list("NPX_DF1" = npx_df1,
-                            "NPX_DF2" = npx_df2),
-  samples            = list("NPX_DF1" = NA_character_,
-                            "NPX_DF2" = subset_samples_all_list),
- normalization_type = c(NA_character_, "Subset"),
- normalize_to       = c(NA_character_, "1")
+  order = c(1, 2),
+  name = c("NPX_DF1", "NPX_DF2"),
+  data = list(
+    "NPX_DF1" = npx_df1,
+    "NPX_DF2" = npx_df2
+  ),
+  samples = list(
+    "NPX_DF1" = NA_character_,
+    "NPX_DF2" = subset_samples_all_list
+  ),
+  normalization_type = c(NA_character_, "Subset"),
+  normalize_to = c(NA_character_, "1")
 )
 
 # Normalize
@@ -217,65 +237,90 @@ npx_df2 <- npx_data2 |>
 
 # manipulating the sample NPX datasets to create another two random ones
 npx_df3 <- npx_data2 |>
-  dplyr::mutate(SampleID = paste(SampleID, "_mod", sep = ""),
-                PlateID = paste(PlateID, "_mod", sep = ""),
-                NPX = sample(x = NPX, size = dplyr::n(), replace = FALSE)) |>
+  dplyr::mutate(
+    SampleID = paste(SampleID, "_mod", sep = ""),
+    PlateID = paste(PlateID, "_mod", sep = ""),
+    NPX = sample(x = NPX, size = dplyr::n(), replace = FALSE)
+  ) |>
   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
   dplyr::select(-Project) |>
   dplyr::mutate(Normalization = "Intensity")
 
 npx_df4 <- npx_data1 |>
-  dplyr::mutate(SampleID = paste(SampleID, "_mod2", sep = ""),
-                PlateID = paste(PlateID, "_mod2", sep = ""),
-                NPX = sample(x = NPX, size = dplyr::n(), replace = FALSE)) |>
+  dplyr::mutate(
+    SampleID = paste(SampleID, "_mod2", sep = ""),
+    PlateID = paste(PlateID, "_mod2", sep = ""),
+    NPX = sample(x = NPX, size = dplyr::n(), replace = FALSE)
+  ) |>
   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
   dplyr::select(-Project) |>
   dplyr::mutate(Normalization = "Intensity")
 
 ## samples to use for normalization
 # Bridge samples with same identifiers between npx_df1 and npx_df2
-overlap_samples <- dplyr::intersect(unique(npx_df1$SampleID),
-                                    unique(npx_df2$SampleID))
-overlap_samples_df1_df2 <- list("DF1" = overlap_samples,
-                                "DF2" = overlap_samples)
+overlap_samples <- dplyr::intersect(
+  unique(npx_df1$SampleID),
+  unique(npx_df2$SampleID)
+)
+overlap_samples_df1_df2 <- list(
+  "DF1" = overlap_samples,
+  "DF2" = overlap_samples
+)
 rm(overlap_samples)
 
 # Bridge samples with different identifiers between npx_df2 and npx_df3
-overlap_samples_df2_df3 <- list("DF1" = sample(x = unique(npx_df2$SampleID),
-                                               size = 10,
-                                               replace = FALSE),
-                                "DF2" = sample(x = unique(npx_df3$SampleID),
-                                               size = 10,
-                                               replace = FALSE))
+overlap_samples_df2_df3 <- list(
+  "DF1" = sample(
+    x = unique(npx_df2$SampleID),
+    size = 10,
+    replace = FALSE
+  ),
+  "DF2" = sample(
+    x = unique(npx_df3$SampleID),
+    size = 10,
+    replace = FALSE
+  )
+)
 
 # Samples to use for intensity normalization between npx_df4 and the
 # normalized dataset of npx_df1 and npx_df2
-overlap_samples_df12_df4 <- list("DF1" = sample(x = c(unique(npx_df1$SampleID),
-                                                      unique(npx_df2$SampleID)),
-                                                size = 100,
-                                                replace = FALSE),
-                                 "DF2" = sample(x = unique(npx_df4$SampleID),
-                                                size = 40,
-                                                replace = FALSE))
+overlap_samples_df12_df4 <- list(
+  "DF1" = sample(
+    x = c(
+      unique(npx_df1$SampleID),
+      unique(npx_df2$SampleID)
+    ),
+    size = 100,
+    replace = FALSE
+  ),
+  "DF2" = sample(
+    x = unique(npx_df4$SampleID),
+    size = 40,
+    replace = FALSE
+  )
+)
 
 # create tibble for input
 norm_schema_n <- dplyr::tibble(
-  order              = c(1, 2, 3, 4),
-  name               = c("NPX_DF1", "NPX_DF2", "NPX_DF3", "NPX_DF4"),
-  data               = list("NPX_DF1" = npx_df1,
-                            "NPX_DF2" = npx_df2,
-                            "NPX_DF3" = npx_df3,
-                            "NPX_DF4" = npx_df4),
-  samples            = list("NPX_DF1" = NA_character_,
-                            "NPX_DF2" = overlap_samples_df1_df2,
-                            "NPX_DF3" = overlap_samples_df2_df3,
-                            "NPX_DF4" = overlap_samples_df12_df4),
+  order = c(1, 2, 3, 4),
+  name = c("NPX_DF1", "NPX_DF2", "NPX_DF3", "NPX_DF4"),
+  data = list(
+    "NPX_DF1" = npx_df1,
+    "NPX_DF2" = npx_df2,
+    "NPX_DF3" = npx_df3,
+    "NPX_DF4" = npx_df4
+  ),
+  samples = list(
+    "NPX_DF1" = NA_character_,
+    "NPX_DF2" = overlap_samples_df1_df2,
+    "NPX_DF3" = overlap_samples_df2_df3,
+    "NPX_DF4" = overlap_samples_df12_df4
+  ),
   normalization_type = c(NA_character_, "Bridge", "Bridge", "Subset"),
-  normalize_to       = c(NA_character_, "1", "2", "1,2")
+  normalize_to = c(NA_character_, "1", "2", "1,2")
 )
 
 olink_normalization_n(norm_schema = norm_schema_n)
-
 }
 
 }

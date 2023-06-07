@@ -49,15 +49,17 @@ The resulting t-test table is arranged by ascending p-values.
 
 library(dplyr)
 
-npx_df <- npx_data1 \%>\% filter(!grepl('control',SampleID, ignore.case = TRUE))
+npx_df <- npx_data1 \%>\% filter(!grepl("control", SampleID, ignore.case = TRUE))
 
-ttest_results <- olink_ttest(df=npx_df,
-                             variable = 'Treatment',
-                             alternative = 'two.sided')
+ttest_results <- olink_ttest(
+  df = npx_df,
+  variable = "Treatment",
+  alternative = "two.sided"
+)
 
-#Paired t-test
+# Paired t-test
 npx_df \%>\%
-   filter(Time \%in\% c("Baseline","Week.6")) \%>\%
-   olink_ttest(variable = "Time", pair_id = "Subject")
+  filter(Time \%in\% c("Baseline", "Week.6")) \%>\%
+  olink_ttest(variable = "Time", pair_id = "Subject")
 }
 }

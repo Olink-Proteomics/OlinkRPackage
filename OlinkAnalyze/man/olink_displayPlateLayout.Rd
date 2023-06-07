@@ -27,8 +27,12 @@ An object of class "ggplot" showing each plate in a facet with the cells colored
 Displays each plate in a facet with cells colored by the given variable using ggplot and ggplot2::geom_tile.
 }
 \examples{
-\donttest{randomized.manifest <- olink_plate_randomizer(manifest)}
-\donttest{olink_displayPlateLayout(data = randomized.manifest, fill.color="Site")}
+\donttest{
+randomized.manifest <- olink_plate_randomizer(manifest)
+}
+\donttest{
+olink_displayPlateLayout(data = randomized.manifest, fill.color = "Site")
+}
 
 }
 \seealso{

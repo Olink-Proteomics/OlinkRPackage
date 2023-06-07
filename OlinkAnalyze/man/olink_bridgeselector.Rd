@@ -30,5 +30,7 @@ data below LOD per sample. If there are not enough samples output, increase to 2
 The function accepts NPX Excel files with data < LOD replaced.
 }
 \examples{
-\donttest{bridge_samples <- olink_bridgeselector(npx_data1, sampleMissingFreq = 0.1, n = 20)}
+\donttest{
+bridge_samples <- olink_bridgeselector(npx_data1, sampleMissingFreq = 0.1, n = 20)
+}
 }

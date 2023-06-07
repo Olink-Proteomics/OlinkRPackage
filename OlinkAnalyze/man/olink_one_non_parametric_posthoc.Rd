@@ -49,23 +49,31 @@ The function handles both factor and numerical variables.
 library(dplyr)
 
 # One-way Kruskal-Wallis Test
-kruskal_results <- olink_one_non_parametric(df = npx_data1,
-                                            variable = "Site")
+kruskal_results <- olink_one_non_parametric(
+  df = npx_data1,
+  variable = "Site"
+)
 
-#Friedman Test
-friedman_results <- olink_one_non_parametric(df = npx_data1,
-                                            variable = "Time",
-                                            subject = "Subject",
-                                            dependence = TRUE)
+# Friedman Test
+friedman_results <- olink_one_non_parametric(
+  df = npx_data1,
+  variable = "Time",
+  subject = "Subject",
+  dependence = TRUE
+)
 
-#Posthoc test for the results from Friedman Test
+# Posthoc test for the results from Friedman Test
 friedman_posthoc_results <- olink_one_non_parametric_posthoc(npx_data1,
-                                                            variable = "Time",
-                                                            test = "friedman",
-                                                            olinkid_list = {friedman_results \%>\%
-                                                              filter(Threshold == 'Significant') \%>\%
-                                                              dplyr::select(OlinkID) \%>\%
-                                                              distinct() \%>\%
-                                                              pull()})}
+  variable = "Time",
+  test = "friedman",
+  olinkid_list = {
+    friedman_results \%>\%
+      filter(Threshold == "Significant") \%>\%
+      dplyr::select(OlinkID) \%>\%
+      distinct() \%>\%
+      pull()
+  }
+)
+}
 
 }

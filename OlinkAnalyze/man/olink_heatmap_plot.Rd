@@ -62,17 +62,16 @@ Unique sample names are required.
 \donttest{
 library(dplyr)
 npx_data <- npx_data1 \%>\%
-      filter(!stringr::str_detect(SampleID,'CONT'))
+  filter(!stringr::str_detect(SampleID, "CONT"))
 
-#Heatmap
-olink_heatmap_plot(df=npx_data)
+# Heatmap
+olink_heatmap_plot(df = npx_data)
 
-#Heatmap with annotation
-olink_heatmap_plot(df=npx_data, variable_row_list = c('Time','Site'))
+# Heatmap with annotation
+olink_heatmap_plot(df = npx_data, variable_row_list = c("Time", "Site"))
 
-#Heatmap with calls from pheatmap
-olink_heatmap_plot(df=npx_data, cutree_rows = 3)
-
+# Heatmap with calls from pheatmap
+olink_heatmap_plot(df = npx_data, cutree_rows = 3)
 }
 
 }

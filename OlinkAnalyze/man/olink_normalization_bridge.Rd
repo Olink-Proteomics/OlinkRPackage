@@ -62,18 +62,24 @@ npx_df2 <- npx_data2 |>
   dplyr::mutate(Normalization = "Intensity")
 
 # Find overlapping samples, but exclude Olink control
-overlap_samples <- dplyr::intersect(unique(npx_df1$SampleID),
-                                    unique(npx_df2$SampleID))
-overlap_samples_list <- list("DF1" = overlap_samples,
-                             "DF2" = overlap_samples)
+overlap_samples <- dplyr::intersect(
+  unique(npx_df1$SampleID),
+  unique(npx_df2$SampleID)
+)
+overlap_samples_list <- list(
+  "DF1" = overlap_samples,
+  "DF2" = overlap_samples
+)
 
 # Normalize
-olink_normalization_bridge(project_1_df = npx_df1,
-                           project_2_df = npx_df2,
-                           bridge_samples = overlap_samples_list,
-                           project_1_name = "P1",
-                           project_2_name = "P2",
-                           project_ref_name = "P1")
+olink_normalization_bridge(
+  project_1_df = npx_df1,
+  project_2_df = npx_df2,
+  bridge_samples = overlap_samples_list,
+  project_1_name = "P1",
+  project_2_name = "P2",
+  project_ref_name = "P1"
+)
 }
 
 }

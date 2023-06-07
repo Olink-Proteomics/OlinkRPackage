@@ -73,27 +73,35 @@ NOTE: UMAP is a non-linear data transformation that might not accurately preserv
 \donttest{
 library(dplyr)
 npx_data <- npx_data1 \%>\%
-    mutate(SampleID = paste(SampleID, "_", Index, sep = ""))
+  mutate(SampleID = paste(SampleID, "_", Index, sep = ""))
 
-#UMAP using all the data
-olink_umap_plot(df=npx_data, color_g = "QC_Warning")
+# UMAP using all the data
+olink_umap_plot(df = npx_data, color_g = "QC_Warning")
 
-#UMAP per panel
-g <- olink_umap_plot(df=npx_data, color_g = "QC_Warning", byPanel = TRUE)
-g$Inflammation #Plot only the Inflammation panel
+# UMAP per panel
+g <- olink_umap_plot(df = npx_data, color_g = "QC_Warning", byPanel = TRUE)
+g$Inflammation # Plot only the Inflammation panel
 
-#Label outliers
-olink_umap_plot(df=npx_data, color_g = "QC_Warning",
-               outlierDefX = 2, outlierDefY = 4) #All data
-olink_umap_plot(df=npx_data, color_g = "QC_Warning",
-               outlierDefX = 3, outlierDefY = 2, byPanel = TRUE) #Per panel
+# Label outliers
+olink_umap_plot(
+  df = npx_data, color_g = "QC_Warning",
+  outlierDefX = 2, outlierDefY = 4
+) # All data
+olink_umap_plot(
+  df = npx_data, color_g = "QC_Warning",
+  outlierDefX = 3, outlierDefY = 2, byPanel = TRUE
+) # Per panel
 
-#Retrieve the outliers
-g <- olink_umap_plot(df=npx_data, color_g = "QC_Warning",
-                    outlierDefX = 3, outlierDefY = 2, byPanel = TRUE)
-outliers <- lapply(g, function(x){x$data}) \%>\%
-    bind_rows() \%>\%
-    filter(Outlier == 1)
+# Retrieve the outliers
+g <- olink_umap_plot(
+  df = npx_data, color_g = "QC_Warning",
+  outlierDefX = 3, outlierDefY = 2, byPanel = TRUE
+)
+outliers <- lapply(g, function(x) {
+  x$data
+}) \%>\%
+  bind_rows() \%>\%
+  filter(Outlier == 1)
 }
 }
 \keyword{NPX}

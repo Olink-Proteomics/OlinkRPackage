@@ -25,11 +25,11 @@ Olink fill scale for discrete ggplots
 library(ggplot2)
 
 dsub <- subset(diamonds, x > 5 & x < 6 & y > 5 & y < 6)
-dsub$diff <- with(dsub, sqrt(abs(x-y))* sign(x-y))
+dsub$diff <- with(dsub, sqrt(abs(x - y)) * sign(x - y))
 
-ggplot(dsub, aes(x, y, colour=diff)) +
-geom_point() +
- theme_bw() +
- olink_fill_discrete()
+ggplot(dsub, aes(x, y, colour = diff)) +
+  geom_point() +
+  theme_bw() +
+  olink_fill_discrete()
 
 }

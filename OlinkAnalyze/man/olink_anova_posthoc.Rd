@@ -72,38 +72,40 @@ mean NPX at mean(numerical variable) versus mean NPX at mean(numerical variable)
 
 library(dplyr)
 
-npx_df <- npx_data1 \%>\% filter(!grepl('control',SampleID, ignore.case = TRUE))
+npx_df <- npx_data1 \%>\% filter(!grepl("control", SampleID, ignore.case = TRUE))
 
-#Two-way ANOVA, one main effect (Site) covariate.
-#Results in model NPX~Treatment*Time+Site.
-anova_results <- olink_anova(df = npx_df,
-                             variable=c("Treatment:Time"),
-                             covariates="Site")
+# Two-way ANOVA, one main effect (Site) covariate.
+# Results in model NPX~Treatment*Time+Site.
+anova_results <- olink_anova(
+  df = npx_df,
+  variable = c("Treatment:Time"),
+  covariates = "Site"
+)
 
-#Posthoc test for the model NPX~Treatment*Time+Site,
-#on the interaction effect Treatment:Time with covariate Site.
+# Posthoc test for the model NPX~Treatment*Time+Site,
+# on the interaction effect Treatment:Time with covariate Site.
 
-#Filtering out significant and relevant results.
+# Filtering out significant and relevant results.
 significant_assays <- anova_results \%>\%
-filter(Threshold == 'Significant' & term == 'Treatment:Time') \%>\%
-select(OlinkID) \%>\%
-distinct() \%>\%
-pull()
+  filter(Threshold == "Significant" & term == "Treatment:Time") \%>\%
+  select(OlinkID) \%>\%
+  distinct() \%>\%
+  pull()
 
-#Posthoc, all pairwise comparisons
+# Posthoc, all pairwise comparisons
 anova_posthoc_results <- olink_anova_posthoc(npx_df,
-variable=c("Treatment:Time"),
-covariates="Site",
-olinkid_list = significant_assays,
-effect = "Treatment:Time")
+  variable = c("Treatment:Time"),
+  covariates = "Site",
+  olinkid_list = significant_assays,
+  effect = "Treatment:Time"
+)
 
 
-#Posthoc, treated vs untreated at each timepoint, adjusted for Site effect
+# Posthoc, treated vs untreated at each timepoint, adjusted for Site effect
 anova_posthoc_results <- olink_anova_posthoc(npx_df,
-model_formula = "NPX~Treatment*Time+Site",
-olinkid_list = significant_assays,
-effect_formula = "pairwise~Treatment|Time")
-
-
+  model_formula = "NPX~Treatment*Time+Site",
+  olinkid_list = significant_assays,
+  effect_formula = "pairwise~Treatment|Time"
+)
 }
 }

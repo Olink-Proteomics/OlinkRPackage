@@ -18,9 +18,10 @@ Throw informative warnings if a dataset appears to have problems
 \examples{
 
 npx_data1 \%>\%
-    dplyr::mutate(NPX = dplyr::if_else(
-                         SampleID == "A1" & Panel == "Olink Cardiometabolic",
-                         NA_real_,
-                         NPX)) \%>\%
-    OlinkAnalyze:::check_data_completeness()
+  dplyr::mutate(NPX = dplyr::if_else(
+    SampleID == "A1" & Panel == "Olink Cardiometabolic",
+    NA_real_,
+    NPX
+  )) \%>\%
+  OlinkAnalyze:::check_data_completeness()
 }
