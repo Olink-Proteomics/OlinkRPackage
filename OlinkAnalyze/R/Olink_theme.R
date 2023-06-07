@@ -19,15 +19,13 @@
 #'   geom_point(size = 4) +
 #'   set_plot_theme(font = "")
 #'
-#'
 set_plot_theme <- function(font = "Swedish Gothic Thin") {
-
   usefont <- ""
 
   if (getOption("OlinkAnalyze.allow.font.load", default = TRUE)) {
     if (requireNamespace("extrafont", quietly = TRUE)) {
-      if(font %in% extrafont::fonts()){
-        if(.Platform$OS.type == "windows"){
+      if (font %in% extrafont::fonts()) {
+        if (.Platform$OS.type == "windows") {
           extrafont::loadfonts(quiet = TRUE, device = "win")
         }
         extrafont::loadfonts(quiet = TRUE, device = "pdf")
@@ -54,16 +52,15 @@ set_plot_theme <- function(font = "Swedish Gothic Thin") {
     )
 
   # Keep support for older ggplot2
-  if(utils::packageVersion("ggplot2") >= package_version("3.4.0")){
+  if (utils::packageVersion("ggplot2") >= package_version("3.4.0")) {
     olink_theme <- olink_theme +
       ggplot2::theme(
         axis.line = ggplot2::element_line(linewidth = 0.5)
       )
-  }else{
+  } else {
     olink_theme <- olink_theme +
       ggplot2::theme(
         axis.line = ggplot2::element_line(size = 0.5)
       )
   }
-
 }

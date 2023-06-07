@@ -9,7 +9,9 @@
 #' @return An object of class "ggplot" which displays NPX distribution for each sample per panel
 #' @keywords NPX
 #' @export
-#' @examples \donttest{olink_dist_plot(npx_data1, color_g = "QC_Warning")}
+#' @examples \donttest{
+#' olink_dist_plot(npx_data1, color_g = "QC_Warning")
+#' }
 #' @importFrom dplyr filter mutate group_by ungroup if_else
 #' @importFrom stats reorder
 #' @importFrom ggplot2 ggplot aes scale_x_discrete geom_boxplot xlab facet_wrap
@@ -17,39 +19,38 @@
 #' @importFrom magrittr %>%
 #' @importFrom rlang ensym
 
-olink_dist_plot <- function(df, color_g = 'QC_Warning', ...) {
-
-  #checking ellipsis
-  if(length(list(...)) > 0){
-
+olink_dist_plot <- function(df, color_g = "QC_Warning", ...) {
+  # checking ellipsis
+  if (length(list(...)) > 0) {
     ellipsis_variables <- names(list(...))
 
-    if(length(ellipsis_variables) == 1){
-
-      if(!(ellipsis_variables == 'coloroption')){
-
-        stop(paste0('The ... option only takes the coloroption argument. ... currently contains the variable ',
-                    ellipsis_variables,
-                    '.'))
-
+    if (length(ellipsis_variables) == 1) {
+      if (!(ellipsis_variables == "coloroption")) {
+        stop(paste0(
+          "The ... option only takes the coloroption argument. ... currently contains the variable ",
+          ellipsis_variables,
+          "."
+        ))
       }
-
-    }else{
-
-      stop(paste0('The ... option only takes one argument. ... currently contains the variables ',
-                  paste(ellipsis_variables, collapse = ', '),
-                  '.'))
+    } else {
+      stop(paste0(
+        "The ... option only takes one argument. ... currently contains the variables ",
+        paste(ellipsis_variables, collapse = ", "),
+        "."
+      ))
     }
   }
 
 
 
-  #Filtering on valid OlinkID
+  # Filtering on valid OlinkID
   df_OlinkID <- df %>%
-    dplyr::filter(stringr::str_detect(OlinkID,
-                               "OID[0-9]{5}"))
+    dplyr::filter(stringr::str_detect(
+      OlinkID,
+      "OID[0-9]{5}"
+    ))
 
-  #Check data format
+  # Check data format
   npxCheck <- npxCheck(df)
 
   reorder_within <- function(x, by, within, fun = mean, sep = "___", ...) {
@@ -62,23 +63,24 @@ olink_dist_plot <- function(df, color_g = 'QC_Warning', ...) {
     ggplot2::scale_x_discrete(labels = function(x) gsub(reg, "", x), ...)
   }
 
-  #If not all are Pass, the QC_Warning is set as warning for plotting purposes
+  # If not all are Pass, the QC_Warning is set as warning for plotting purposes
   df_OlinkID_fixed <- df_OlinkID %>%
-    dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>% #Exclude assays that have all NA:s
+    dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>% # Exclude assays that have all NA:s
     dplyr::mutate(Panel = Panel %>% stringr::str_replace("Olink ", "")) %>%
     dplyr::group_by(SampleID, Index, Panel) %>%
-    dplyr::mutate(QC_Warning = dplyr::if_else(all(toupper(QC_Warning) == 'PASS'),
-                                              'Pass',
-                                              'Warning')) %>%
+    dplyr::mutate(QC_Warning = dplyr::if_else(all(toupper(QC_Warning) == "PASS"),
+      "Pass",
+      "Warning"
+    )) %>%
     dplyr::ungroup()
 
   df_OlinkID_fixed %>%
     dplyr::filter(!(is.na(NPX))) %>%
-    ggplot2::ggplot(., ggplot2::aes(x = reorder_within(factor(SampleID), NPX, Panel, median), y = NPX, fill=!!rlang::ensym(color_g)))+
-    ggplot2::geom_boxplot()+
-    scale_x_reordered()+
-    ggplot2::xlab("Samples")+
-    ggplot2::facet_wrap(~Panel,  scale="free")+
+    ggplot2::ggplot(., ggplot2::aes(x = reorder_within(factor(SampleID), NPX, Panel, median), y = NPX, fill = !!rlang::ensym(color_g))) +
+    ggplot2::geom_boxplot() +
+    scale_x_reordered() +
+    ggplot2::xlab("Samples") +
+    ggplot2::facet_wrap(~Panel, scale = "free") +
     OlinkAnalyze::set_plot_theme() +
     OlinkAnalyze::olink_fill_discrete(...)
 }

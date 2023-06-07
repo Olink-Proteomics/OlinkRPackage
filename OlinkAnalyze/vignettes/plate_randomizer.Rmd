@@ -19,7 +19,7 @@ library(ggplot2)
 ```
 
 ```{r setup, include=FALSE} 
-knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 ```
 
 ## Introduction
@@ -38,15 +38,18 @@ data(manifest)
 The input manifest should be a tibble/data frame in long format containing all sample ID's. Sample ID column must be named SampleID. An example manifest is shown in Table 1. 
 
 ```{r manifest, echo = F, message=FALSE}
- manifest |> head(10)  %>% 
-  knitr::kable(format = "html",
-               booktabs = T,
-               linesep = "",
-               digits = 4,
-               longtable = T,
-               row.names = F,
-               caption = " Sample manifest.",
-               label = "manifest")
+manifest |>
+  head(10) %>%
+  knitr::kable(
+    format = "html",
+    booktabs = T,
+    linesep = "",
+    digits = 4,
+    longtable = T,
+    row.names = F,
+    caption = " Sample manifest.",
+    label = "manifest"
+  )
 ```
 
 
@@ -55,7 +58,7 @@ The input manifest should be a tibble/data frame in long format containing all s
 The simplest way to randomize the samples is to perform complete randomization.
 
 ```{r complete_randomization, message=FALSE, warning=FALSE,results='hide'}
-randomized.manifest_a <- olink_plate_randomizer(manifest, seed=123456)
+randomized.manifest_a <- olink_plate_randomizer(manifest, seed = 123456)
 ```
 
 
@@ -65,10 +68,12 @@ In the case of multiple samples per subject (e.g. in longitudinal studies), Olin
 
 
 ```{r subjects_randomization, message=FALSE,results='hide'}
-randomized.manifest_b <- olink_plate_randomizer(manifest,SubjectColumn="SubjectID", 
-                                                available.spots=c(48,48,42), 
-                                                iterations = 500,
-                                                seed=123456)
+randomized.manifest_b <- olink_plate_randomizer(manifest,
+  SubjectColumn = "SubjectID",
+  available.spots = c(48, 48, 42),
+  iterations = 500,
+  seed = 123456
+)
 ```
 
 ## Visualization
@@ -80,13 +85,13 @@ To illustrate the goodness of randomization, both `olink_displayPlateLayout()` a
 The `olink_displayPlateLayout()` function could be used to visualize the layouts of the plate and specifying the color for the variable of interest using the `color_g` argument. The label of the colored variable could be shown in the plot via the `include.label` argument.
 
 ```{r, fig.height = 8, fig.width = 8, fig.align = "center"}
-olink_displayPlateLayout(randomized.manifest_b, fill.color = 'SubjectID', include.label = FALSE)
+olink_displayPlateLayout(randomized.manifest_b, fill.color = "SubjectID", include.label = FALSE)
 ```
 
 The label of the colored variable could be shown in the plot via the `include.label` argument.
 
 ```{r,fig.height = 8, fig.width = 8, fig.align = "center"}
-olink_displayPlateLayout(randomized.manifest_b, fill.color = 'SubjectID', include.label = TRUE)
+olink_displayPlateLayout(randomized.manifest_b, fill.color = "SubjectID", include.label = TRUE)
 ```
 
 ### Plate distribution
@@ -94,13 +99,13 @@ olink_displayPlateLayout(randomized.manifest_b, fill.color = 'SubjectID', includ
 The distribution of the given grouping variable on each plate could be visualized via a bar chart using function `olink_displayPlateDistributions`. By setting `fill.color = 'SubjectID'`, we could make sure all the samples from the same subject were put on the same plate. 
 
 ```{r,fig.height = 8, fig.width = 8, fig.align = "center"}
-olink_displayPlateDistributions(randomized.manifest_b, fill.color = 'SubjectID')
+olink_displayPlateDistributions(randomized.manifest_b, fill.color = "SubjectID")
 ```
 
 We could also check the distribution of other variables. For examples, the distribution of the variable `Site` could be visualized by setting `fill.color = 'Site'`. 
 
 ```{r,fig.height = 8, fig.width = 8, fig.align = "center"}
-olink_displayPlateDistributions(randomized.manifest_b, fill.color = 'Site')
+olink_displayPlateDistributions(randomized.manifest_b, fill.color = "Site")
 ```
 
 In the case of the randomization is not performed well, the randomization could be performed again with different seed number and iterations number. 
@@ -121,7 +126,7 @@ The randomized manifest could be outputted as an Excel file using the `write_xls
 
 ```{r, eval = FALSE}
 library(writexl)
-write_xlsx(randomized.manifest_b,"randomized.manifest_b.xlsx")
+write_xlsx(randomized.manifest_b, "randomized.manifest_b.xlsx")
 ```
 
 

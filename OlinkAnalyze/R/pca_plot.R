@@ -33,27 +33,35 @@
 #' \donttest{
 #' library(dplyr)
 #' npx_data <- npx_data1 %>%
-#'     mutate(SampleID = paste(SampleID, "_", Index, sep = ""))
+#'   mutate(SampleID = paste(SampleID, "_", Index, sep = ""))
 #'
-#' #PCA using all the data
-#' olink_pca_plot(df=npx_data, color_g = "QC_Warning")
+#' # PCA using all the data
+#' olink_pca_plot(df = npx_data, color_g = "QC_Warning")
 #'
-#' #PCA per panel
-#' g <- olink_pca_plot(df=npx_data, color_g = "QC_Warning", byPanel = TRUE)
-#' g[[2]] #Plot only the second panel
+#' # PCA per panel
+#' g <- olink_pca_plot(df = npx_data, color_g = "QC_Warning", byPanel = TRUE)
+#' g[[2]] # Plot only the second panel
 #'
-#' #Label outliers
-#' olink_pca_plot(df=npx_data, color_g = "QC_Warning",
-#'                outlierDefX = 2, outlierDefY = 4) #All data
-#' olink_pca_plot(df=npx_data, color_g = "QC_Warning",
-#'                outlierDefX = 2.5, outlierDefY = 4, byPanel = TRUE) #Per panel
+#' # Label outliers
+#' olink_pca_plot(
+#'   df = npx_data, color_g = "QC_Warning",
+#'   outlierDefX = 2, outlierDefY = 4
+#' ) # All data
+#' olink_pca_plot(
+#'   df = npx_data, color_g = "QC_Warning",
+#'   outlierDefX = 2.5, outlierDefY = 4, byPanel = TRUE
+#' ) # Per panel
 #'
-#' #Retrieve the outliers
-#' g <- olink_pca_plot(df=npx_data, color_g = "QC_Warning",
-#'                     outlierDefX = 2.5, outlierDefY = 4, byPanel = TRUE)
-#' outliers <- lapply(g, function(x){x$data}) %>%
-#'     bind_rows() %>%
-#'     filter(Outlier == 1)
+#' # Retrieve the outliers
+#' g <- olink_pca_plot(
+#'   df = npx_data, color_g = "QC_Warning",
+#'   outlierDefX = 2.5, outlierDefY = 4, byPanel = TRUE
+#' )
+#' outliers <- lapply(g, function(x) {
+#'   x$data
+#' }) %>%
+#'   bind_rows() %>%
+#'   filter(Outlier == 1)
 #' }
 #' @importFrom magrittr %>%
 #' @importFrom dplyr filter select group_by ungroup mutate mutate_at if_else n_distinct summarise left_join arrange distinct
@@ -68,122 +76,124 @@
 #' @importFrom utils head
 #' @importFrom grid unit
 
-olink_pca_plot <- function (df,
-                            color_g = "QC_Warning",
-                            x_val = 1,
-                            y_val = 2,
-                            label_samples = FALSE,
-                            drop_assays = FALSE,
-                            drop_samples = FALSE,
-                            n_loadings = 0,
-                            loadings_list = NULL,
-                            byPanel = FALSE,
-                            outlierDefX = NA,
-                            outlierDefY = NA,
-                            outlierLines = FALSE,
-                            label_outliers = TRUE,
-                            quiet = FALSE,
-                            verbose = TRUE,
-                            ...){
-
-  #checking ellipsis
-  if(length(list(...)) > 0){
-
+olink_pca_plot <- function(df,
+                           color_g = "QC_Warning",
+                           x_val = 1,
+                           y_val = 2,
+                           label_samples = FALSE,
+                           drop_assays = FALSE,
+                           drop_samples = FALSE,
+                           n_loadings = 0,
+                           loadings_list = NULL,
+                           byPanel = FALSE,
+                           outlierDefX = NA,
+                           outlierDefY = NA,
+                           outlierLines = FALSE,
+                           label_outliers = TRUE,
+                           quiet = FALSE,
+                           verbose = TRUE,
+                           ...) {
+  # checking ellipsis
+  if (length(list(...)) > 0) {
     ellipsis_variables <- names(list(...))
 
-    if(length(ellipsis_variables) == 1){
-
-      if(!(ellipsis_variables == 'coloroption')){
-
-        stop(paste0('The ... option only takes the coloroption argument. ... currently contains the variable ',
-                    ellipsis_variables,
-                    '.'))
-
+    if (length(ellipsis_variables) == 1) {
+      if (!(ellipsis_variables == "coloroption")) {
+        stop(paste0(
+          "The ... option only takes the coloroption argument. ... currently contains the variable ",
+          ellipsis_variables,
+          "."
+        ))
       }
-
-    }else{
-
-      stop(paste0('The ... option only takes one argument. ... currently contains the variables ',
-                  paste(ellipsis_variables, collapse = ', '),
-                  '.'))
+    } else {
+      stop(paste0(
+        "The ... option only takes one argument. ... currently contains the variables ",
+        paste(ellipsis_variables, collapse = ", "),
+        "."
+      ))
     }
   }
 
-  #Filtering on valid OlinkID
+  # Filtering on valid OlinkID
   df <- df %>%
-    dplyr::filter(stringr::str_detect(OlinkID,
-                                      "OID[0-9]{5}"))
-  #Check data format
+    dplyr::filter(stringr::str_detect(
+      OlinkID,
+      "OID[0-9]{5}"
+    ))
+  # Check data format
   npxCheck <- npxCheck(df)
-  df <- df %>% dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) #Exclude assays that have all NA:s
+  df <- df %>% dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) # Exclude assays that have all NA:s
 
-  #Check that the user didn't specify just one of outlierDefX and outlierDefY
-  if(sum(c(is.numeric(outlierDefX), is.numeric(outlierDefY))) == 1){
-    stop('To label outliers, both outlierDefX and outlierDefY have to be specified as numerical values')
+  # Check that the user didn't specify just one of outlierDefX and outlierDefY
+  if (sum(c(is.numeric(outlierDefX), is.numeric(outlierDefY))) == 1) {
+    stop("To label outliers, both outlierDefX and outlierDefY have to be specified as numerical values")
   }
 
-  #If outlierLines == TRUE, both outlierDefX and outlierDefY have to be specified
-  if(outlierLines){
-    if(!all(is.numeric(outlierDefX), is.numeric(outlierDefY))){
-      stop('outlierLines requested but boundaries not specified. To draw lines, both outlierDefX and outlierDefY have to be specified as numerical values')
+  # If outlierLines == TRUE, both outlierDefX and outlierDefY have to be specified
+  if (outlierLines) {
+    if (!all(is.numeric(outlierDefX), is.numeric(outlierDefY))) {
+      stop("outlierLines requested but boundaries not specified. To draw lines, both outlierDefX and outlierDefY have to be specified as numerical values")
     }
   }
 
-  if(byPanel){
+  if (byPanel) {
     # Convert color_g variable to factor
-    if(!is.factor(df[[paste(color_g)]])){
+    if (!is.factor(df[[paste(color_g)]])) {
       df[[paste(color_g)]] <- as.factor(df[[paste(color_g)]])
     }
     df <- df %>%
-      dplyr::mutate(Panel = Panel  %>% stringr::str_replace("Olink ", "")) #Strip "Olink" from the panel names
+      dplyr::mutate(Panel = Panel %>% stringr::str_replace("Olink ", "")) # Strip "Olink" from the panel names
 
     plotList <- lapply(unique(df$Panel), function(x) {
       g <- df %>%
         dplyr::filter(Panel == x) %>%
-        olink_pca_plot.internal(df = .,
-                                color_g = color_g,
-                                x_val = x_val,
-                                y_val = y_val,
-                                label_samples = label_samples,
-                                drop_assays = drop_assays,
-                                drop_samples = drop_samples,
-                                n_loadings = n_loadings,
-                                loadings_list = loadings_list,
-                                outlierDefX = outlierDefX,
-                                outlierDefY = outlierDefY,
-                                outlierLines = outlierLines,
-                                label_outliers = label_outliers,
-                                verbose = verbose,
-                                ...) +
+        olink_pca_plot.internal(
+          df = .,
+          color_g = color_g,
+          x_val = x_val,
+          y_val = y_val,
+          label_samples = label_samples,
+          drop_assays = drop_assays,
+          drop_samples = drop_samples,
+          n_loadings = n_loadings,
+          loadings_list = loadings_list,
+          outlierDefX = outlierDefX,
+          outlierDefY = outlierDefY,
+          outlierLines = outlierLines,
+          label_outliers = label_outliers,
+          verbose = verbose,
+          ...
+        ) +
         ggplot2::labs(title = x)
 
-      #Add Panel info inside the ggplot object
+      # Add Panel info inside the ggplot object
       g$data <- g$data %>%
         dplyr::mutate(Panel = x)
 
       g
     })
     names(plotList) <- unique(df$Panel)
-    if(!quiet) print(ggpubr::ggarrange(plotlist = plotList, common.legend = TRUE))
-
-  } else{
-    pca_plot <- olink_pca_plot.internal(df = df,
-                                        color_g = color_g,
-                                        x_val = x_val,
-                                        y_val = y_val,
-                                        label_samples = label_samples,
-                                        drop_assays = drop_assays,
-                                        drop_samples = drop_samples,
-                                        n_loadings = n_loadings,
-                                        loadings_list = loadings_list,
-                                        outlierDefX = outlierDefX,
-                                        outlierDefY = outlierDefY,
-                                        outlierLines = outlierLines,
-                                        label_outliers = label_outliers,
-                                        verbose = verbose,
-                                        ...)
-    if(!quiet) print(pca_plot)
-    plotList <- list(pca_plot) #For consistency, return a list even when there's just one plot
+    if (!quiet) print(ggpubr::ggarrange(plotlist = plotList, common.legend = TRUE))
+  } else {
+    pca_plot <- olink_pca_plot.internal(
+      df = df,
+      color_g = color_g,
+      x_val = x_val,
+      y_val = y_val,
+      label_samples = label_samples,
+      drop_assays = drop_assays,
+      drop_samples = drop_samples,
+      n_loadings = n_loadings,
+      loadings_list = loadings_list,
+      outlierDefX = outlierDefX,
+      outlierDefY = outlierDefY,
+      outlierLines = outlierLines,
+      label_outliers = label_outliers,
+      verbose = verbose,
+      ...
+    )
+    if (!quiet) print(pca_plot)
+    plotList <- list(pca_plot) # For consistency, return a list even when there's just one plot
   }
 
   return(invisible(plotList))
@@ -195,12 +205,12 @@ olink_calculate_pca <- function(procData,
                                 y_val = 2,
                                 outlierDefX = NA,
                                 outlierDefY = NA) {
-
   #### PCA ####
   pca_fit <- stats::prcomp(procData$df_wide_matrix,
-                           scale. = TRUE, center = TRUE)
+    scale. = TRUE, center = TRUE
+  )
 
-  #Standardizing and selecting components
+  # Standardizing and selecting components
   scaling_factor_lambda <- pca_fit$sdev * sqrt(nrow(procData$df_wide_matrix))
 
   PCX <- pca_fit$x[, x_val] / scaling_factor_lambda[x_val]
@@ -231,30 +241,35 @@ olink_calculate_pca <- function(procData,
 
   loadings_scaling_factor <- 0.8 / max(range_LX / range_PX, range_LY / range_PY)
 
-  #Identify outliers
+  # Identify outliers
   if (!is.na(outlierDefX) && !is.na(outlierDefY)) {
     scores <- scores %>%
       tibble::rownames_to_column(var = "SampleID") %>%
-      dplyr::mutate(PCX_low = mean(PCX, na.rm = TRUE) -
-                      outlierDefX * sd(PCX, na.rm = TRUE),
-                    PCX_high = mean(PCX, na.rm = TRUE) +
-                      outlierDefX * sd(PCX, na.rm = TRUE),
-                    PCY_low = mean(PCY, na.rm = TRUE) -
-                      outlierDefY * sd(PCY, na.rm = TRUE),
-                    PCY_high = mean(PCY, na.rm = TRUE) +
-                      outlierDefY * sd(PCY, na.rm = TRUE)) %>%
+      dplyr::mutate(
+        PCX_low = mean(PCX, na.rm = TRUE) -
+          outlierDefX * sd(PCX, na.rm = TRUE),
+        PCX_high = mean(PCX, na.rm = TRUE) +
+          outlierDefX * sd(PCX, na.rm = TRUE),
+        PCY_low = mean(PCY, na.rm = TRUE) -
+          outlierDefY * sd(PCY, na.rm = TRUE),
+        PCY_high = mean(PCY, na.rm = TRUE) +
+          outlierDefY * sd(PCY, na.rm = TRUE)
+      ) %>%
       dplyr::mutate(Outlier = dplyr::if_else(PCX < PCX_high &
-                                               PCX > PCX_low &
-                                               PCY > PCY_low &
-                                               PCY < PCY_high,
-                                             0, 1))
+        PCX > PCX_low &
+        PCY > PCY_low &
+        PCY < PCY_high,
+      0, 1
+      ))
   }
 
 
-  return(list(scores = scores,
-              loading = loadings,
-              loadings_scaling_factor = loadings_scaling_factor,
-              PoV = PoV))
+  return(list(
+    scores = scores,
+    loading = loadings,
+    loadings_scaling_factor = loadings_scaling_factor,
+    PoV = PoV
+  ))
 }
 
 
@@ -273,46 +288,55 @@ olink_pca_plot.internal <- function(df,
                                     label_outliers,
                                     verbose = TRUE,
                                     ...) {
+  # Data pre-processing
+  procData <- npxProcessing_forDimRed(
+    df = df,
+    color_g = color_g,
+    drop_assays = drop_assays,
+    drop_samples = drop_samples,
+    verbose = verbose
+  )
 
-  #Data pre-processing
-  procData <- npxProcessing_forDimRed(df = df,
-                                      color_g = color_g,
-                                      drop_assays = drop_assays,
-                                      drop_samples = drop_samples,
-                                      verbose = verbose)
+  # Did we drop any of the of the assays specified in the loadings_list?
+  if (!is.null(loadings_list)) {
+    # Dropped because of NAs
+    dropped_loadings <- intersect(
+      procData$dropped_assays.na,
+      loadings_list
+    )
 
-  #Did we drop any of the of the assays specified in the loadings_list?
-  if(!is.null(loadings_list)){
-    #Dropped because of NAs
-    dropped_loadings <- intersect(procData$dropped_assays.na,
-                                  loadings_list)
-
-    if(length(dropped_loadings) > 0){
-      if(verbose){
-        warning(paste0("The loading(s) ",
-                       paste0(dropped_loadings, collapse=", "),
-                       " from the loadings_list contain NA and are dropped . "))
+    if (length(dropped_loadings) > 0) {
+      if (verbose) {
+        warning(paste0(
+          "The loading(s) ",
+          paste0(dropped_loadings, collapse = ", "),
+          " from the loadings_list contain NA and are dropped . "
+        ))
       }
 
       loadings_list <- setdiff(loadings_list, dropped_loadings)
     }
 
 
-    #Dropped because of to high missingness
-    dropped_loadings <- intersect(procData$dropped_assays.missingness,
-                                  loadings_list)
+    # Dropped because of to high missingness
+    dropped_loadings <- intersect(
+      procData$dropped_assays.missingness,
+      loadings_list
+    )
 
-    if(length(dropped_loadings) > 0){
-      if(verbose){
-        warning(paste0("The loading(s) ",
-                       paste0(dropped_loadings, collapse=", "),
-                       " from the loadings_list are dropped due to high missingness. "))
+    if (length(dropped_loadings) > 0) {
+      if (verbose) {
+        warning(paste0(
+          "The loading(s) ",
+          paste0(dropped_loadings, collapse = ", "),
+          " from the loadings_list are dropped due to high missingness. "
+        ))
       }
 
       loadings_list <- setdiff(loadings_list, dropped_loadings)
     }
 
-    if(length(loadings_list) == 0){
+    if (length(loadings_list) == 0) {
       loadings_list <- NULL
     }
   }
@@ -322,55 +346,52 @@ olink_pca_plot.internal <- function(df,
   observation_colors <- procData$df_wide$colors
 
   #### PCA ####
-  pca_results <- olink_calculate_pca(procData = procData,
-                                     x_val = x_val,
-                                     y_val = y_val,
-                                     outlierDefX = outlierDefX,
-                                     outlierDefY = outlierDefY)
+  pca_results <- olink_calculate_pca(
+    procData = procData,
+    x_val = x_val,
+    y_val = y_val,
+    outlierDefX = outlierDefX,
+    outlierDefY = outlierDefY
+  )
 
   scores <- pca_results$scores
   loadings <- pca_results$loading
   loadings_scaling_factor <- pca_results$loadings_scaling_factor
   PoV <- pca_results$PoV
 
-  #Plotting
+  # Plotting
   pca_plot <- ggplot2::ggplot(scores, ggplot2::aes(x = PCX, y = PCY)) +
-    ggplot2::xlab(paste0("PC", x_val,  " (", round(PoV[x_val]*100, digits = 2), "%)")) +
-    ggplot2::ylab(paste0("PC", y_val, " (", round(PoV[y_val]*100, digits = 2), "%)"))
+    ggplot2::xlab(paste0("PC", x_val, " (", round(PoV[x_val] * 100, digits = 2), "%)")) +
+    ggplot2::ylab(paste0("PC", y_val, " (", round(PoV[y_val] * 100, digits = 2), "%)"))
 
 
-  #Drawing scores
+  # Drawing scores
 
-  if(label_samples){
-
+  if (label_samples) {
     pca_plot <- pca_plot +
       ggplot2::geom_text(ggplot2::aes(label = observation_names, color = observation_colors), size = 3) +
       ggplot2::labs(color = color_g) +
       ggplot2::guides(size = "none")
-
-  }else{
-
+  } else {
     pca_plot <- pca_plot +
       ggplot2::geom_point(ggplot2::aes(color = observation_colors), size = 2.5) +
       ggplot2::labs(color = color_g) +
       ggplot2::guides(size = "none")
-
   }
 
 
-  #Drawing loadings
+  # Drawing loadings
 
-  if(n_loadings > 0 | !is.null(loadings_list)) {
-
+  if (n_loadings > 0 | !is.null(loadings_list)) {
     N_loadings <- data.frame(matrix(vector(), 0, ncol(loadings)),
-                             stringsAsFactors=FALSE)
+      stringsAsFactors = FALSE
+    )
     colnames(N_loadings) <- colnames(loadings)
 
     L_loadings <- N_loadings
 
-    if(n_loadings > 0){
-
-      #Largest loadings based on Pythagoras
+    if (n_loadings > 0) {
+      # Largest loadings based on Pythagoras
 
       N_loadings <- loadings %>%
         dplyr::mutate(abs_loading = sqrt(LX^2 + LY^2)) %>%
@@ -379,72 +400,86 @@ olink_pca_plot.internal <- function(df,
         dplyr::select(-abs_loading)
     }
 
-    if(!is.null(loadings_list)){
-
-      #Selected loadings
+    if (!is.null(loadings_list)) {
+      # Selected loadings
 
       L_loadings <- loadings %>%
         dplyr::filter(variables %in% loadings_list)
     }
 
-    loadings <- rbind(N_loadings,
-                      L_loadings) %>%
+    loadings <- rbind(
+      N_loadings,
+      L_loadings
+    ) %>%
       dplyr::distinct()
 
     pca_plot <- pca_plot +
-      ggplot2::geom_segment(data = loadings,
-                            ggplot2::aes(x = 0,
-                                         y = 0,
-                                         xend = LX*loadings_scaling_factor,
-                                         yend = LY*loadings_scaling_factor),
-                            arrow = ggplot2::arrow(length = grid::unit(1/2, "picas")),
-                            color = "black") +
-      ggrepel::geom_label_repel(data = loadings,
-                                ggplot2::aes(x = LX*loadings_scaling_factor,
-                                             y = LY*loadings_scaling_factor,
-                                             label = variables),
-                                box.padding = 1,
-                                show.legend = FALSE,
-                                segment.colour = 'gray')
+      ggplot2::geom_segment(
+        data = loadings,
+        ggplot2::aes(
+          x = 0,
+          y = 0,
+          xend = LX * loadings_scaling_factor,
+          yend = LY * loadings_scaling_factor
+        ),
+        arrow = ggplot2::arrow(length = grid::unit(1 / 2, "picas")),
+        color = "black"
+      ) +
+      ggrepel::geom_label_repel(
+        data = loadings,
+        ggplot2::aes(
+          x = LX * loadings_scaling_factor,
+          y = LY * loadings_scaling_factor,
+          label = variables
+        ),
+        box.padding = 1,
+        show.legend = FALSE,
+        segment.colour = "gray"
+      )
   }
 
-  #Label outliers in figure
-  if(!is.na(outlierDefX) & !is.na(outlierDefY) & label_outliers){
+  # Label outliers in figure
+  if (!is.na(outlierDefX) & !is.na(outlierDefY) & label_outliers) {
     pca_plot <- pca_plot +
-      ggrepel::geom_label_repel(data = . %>% dplyr::mutate(SampleIDPlot = dplyr::case_when(Outlier == 1 ~ SampleID,
-                                                                                           TRUE ~ "")),
-                                ggplot2::aes(label=SampleIDPlot),
-                                box.padding = 0.5,
-                                min.segment.length = 0.1,
-                                show.legend=FALSE,
-                                size = 3)
+      ggrepel::geom_label_repel(
+        data = . %>% dplyr::mutate(SampleIDPlot = dplyr::case_when(
+          Outlier == 1 ~ SampleID,
+          TRUE ~ ""
+        )),
+        ggplot2::aes(label = SampleIDPlot),
+        box.padding = 0.5,
+        min.segment.length = 0.1,
+        show.legend = FALSE,
+        size = 3
+      )
   }
 
-  #Add outlier lines
-  if(outlierLines){
+  # Add outlier lines
+  if (outlierLines) {
     pca_plot <- pca_plot +
-      ggplot2::geom_hline(ggplot2::aes(yintercept=PCY_low),
-                          linetype = 'dashed',
-                          color = 'grey') +
-      ggplot2::geom_hline(ggplot2::aes(yintercept=PCY_high),
-                          linetype = 'dashed',
-                          color = 'grey') +
+      ggplot2::geom_hline(ggplot2::aes(yintercept = PCY_low),
+        linetype = "dashed",
+        color = "grey"
+      ) +
+      ggplot2::geom_hline(ggplot2::aes(yintercept = PCY_high),
+        linetype = "dashed",
+        color = "grey"
+      ) +
       ggplot2::geom_vline(ggplot2::aes(xintercept = PCX_low),
-                          linetype = 'dashed',
-                          color = 'grey') +
+        linetype = "dashed",
+        color = "grey"
+      ) +
       ggplot2::geom_vline(ggplot2::aes(xintercept = PCX_high),
-                          linetype = 'dashed',
-                          color = 'grey')
+        linetype = "dashed",
+        color = "grey"
+      )
   }
 
 
 
   pca_plot <- pca_plot +
     OlinkAnalyze::set_plot_theme() +
-    OlinkAnalyze::olink_color_discrete(...,drop=FALSE)
+    OlinkAnalyze::olink_color_discrete(..., drop = FALSE)
 
   return(pca_plot)
-
-
 }
-

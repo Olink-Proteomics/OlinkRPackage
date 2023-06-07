@@ -8,7 +8,6 @@
 #'
 #' OlinkAnalyze:::print_and_capture(npx_data1)
 #'
-print_and_capture <- function(x)
-{
+print_and_capture <- function(x) {
   paste(utils::capture.output(print(x)), collapse = "\n")
 }

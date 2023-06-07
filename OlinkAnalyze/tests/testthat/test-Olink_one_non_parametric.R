@@ -1,48 +1,58 @@
-#Load reference results
-refRes_file <- '../data/refResults.RData'
+# Load reference results
+refRes_file <- "../data/refResults.RData"
 load(refRes_file)
 
-#Load data with hidden/excluded assays (all NPX=NA)
-load(file = '../data/npx_data_format221010.RData')
+# Load data with hidden/excluded assays (all NPX=NA)
+load(file = "../data/npx_data_format221010.RData")
 
 # One-way Kruskal-Wallis Test
-kruskal_results <- olink_one_non_parametric(df = npx_data1,
-                                            variable = "Site")
+kruskal_results <- olink_one_non_parametric(
+  df = npx_data1,
+  variable = "Site"
+)
 # One-way Friedman Test
-friedman_results <- olink_one_non_parametric(df = npx_data1,
-                                             variable = "Time",
-                                             subject = "Subject",
-                                             dependence = TRUE)
+friedman_results <- olink_one_non_parametric(
+  df = npx_data1,
+  variable = "Time",
+  subject = "Subject",
+  dependence = TRUE
+)
 
-#Posthoc test for the results from Kruskal-Wallis Test
+# Posthoc test for the results from Kruskal-Wallis Test
 kruskal_posthoc_results <- olink_one_non_parametric_posthoc(npx_data1,
-                                                            variable = "Site",
-                                                            test = "kruskal",
-                                                            olinkid_list = {kruskal_results %>%
-                                                              filter(Threshold == 'Significant') %>%
-                                                              dplyr::select(OlinkID) %>%
-                                                              distinct() %>%
-                                                              pull()}) %>%
+  variable = "Site",
+  test = "kruskal",
+  olinkid_list = {
+    kruskal_results %>%
+      filter(Threshold == "Significant") %>%
+      dplyr::select(OlinkID) %>%
+      distinct() %>%
+      pull()
+  }
+) %>%
   mutate(id = as.character(OlinkID)) %>%
-  arrange(id, contrast) %>% #Just for consistency. Not actually needed in this case
+  arrange(id, contrast) %>% # Just for consistency. Not actually needed in this case
   select(-id)
 
-#Posthoc test for the results from Friedman Test
+# Posthoc test for the results from Friedman Test
 friedman_posthoc_results <- olink_one_non_parametric_posthoc(npx_data1,
-                                                             variable = "Time",
-                                                             test = "friedman",
-                                                             olinkid_list = {friedman_results %>%
-                                                               filter(Threshold == 'Significant') %>%
-                                                               dplyr::select(OlinkID) %>%
-                                                               distinct() %>%
-                                                               pull()}) %>%
+  variable = "Time",
+  test = "friedman",
+  olinkid_list = {
+    friedman_results %>%
+      filter(Threshold == "Significant") %>%
+      dplyr::select(OlinkID) %>%
+      distinct() %>%
+      pull()
+  }
+) %>%
   mutate(id = as.character(OlinkID)) %>%
-  arrange(id, contrast) %>% #Just for consistency. Not actually needed in this case
+  arrange(id, contrast) %>% # Just for consistency. Not actually needed in this case
   select(-id)
 
 test_that("olink_one_non_parametric function works", {
-  expect_equal(kruskal_results, ref_results$kruskal_results)  ##result equal to testfile
-  expect_equal(friedman_results, ref_results$friedman_results)  ##result equal to testfile
+  expect_equal(kruskal_results, ref_results$kruskal_results) ## result equal to testfile
+  expect_equal(friedman_results, ref_results$friedman_results) ## result equal to testfile
 
   expect_equal(nrow(kruskal_results), 184)
   expect_equal(ncol(kruskal_results), 11)
@@ -50,9 +60,9 @@ test_that("olink_one_non_parametric function works", {
   expect_equal(nrow(friedman_results), 184)
   expect_equal(ncol(friedman_results), 11)
 
-  expect_error(olink_one_non_parametric(npx_data1,)) ##no input data
+  expect_error(olink_one_non_parametric(npx_data1, )) ## no input data
 
-  expect_warning(olink_one_non_parametric(npx_data_format221010, 'treatment2')) # data with all NPX=NA for some assays
+  expect_warning(olink_one_non_parametric(npx_data_format221010, "treatment2")) # data with all NPX=NA for some assays
 })
 
 test_that("olink_one_non_parametric_posthoc function works", {
@@ -62,16 +72,15 @@ test_that("olink_one_non_parametric_posthoc function works", {
   expect_equal(nrow(kruskal_posthoc_results), 190) ## check nr of rows
   expect_equal(nrow(friedman_posthoc_results), 3) ## check nr of rows
 
-  expect_error(olink_one_non_parametric_posthoc(npx_data1, 'Site')) ##no olinkid list
+  expect_error(olink_one_non_parametric_posthoc(npx_data1, "Site")) ## no olinkid list
   expect_equal(friedman_posthoc_results %>%
-                 dplyr::select(contrast) %>%
-                 unique() %>%
-                 nrow(),3)
+    dplyr::select(contrast) %>%
+    unique() %>%
+    nrow(), 3)
   expect_equal(kruskal_posthoc_results %>%
-                 dplyr::select(contrast) %>%
-                 unique() %>%
-                 nrow(),10)
+    dplyr::select(contrast) %>%
+    unique() %>%
+    nrow(), 10)
 
-  expect_warning(olink_one_non_parametric_posthoc(npx_data_format221010, variable = 'treatment2')) # data with all NPX=NA for some assays
+  expect_warning(olink_one_non_parametric_posthoc(npx_data_format221010, variable = "treatment2")) # data with all NPX=NA for some assays
 })
-

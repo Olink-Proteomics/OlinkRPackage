@@ -1,9 +1,9 @@
 test_that("Data loads correctly with 'read_NPX()'", {
-  #Read data
+  # Read data
   npx_file <- system.file("extdata", "npx_data1.xlsx", package = "OlinkAnalyze", mustWork = TRUE)
   manifest_file <- system.file("extdata", "npx_data1_meta.csv", package = "OlinkAnalyze", mustWork = TRUE)
   df_1 <- read_NPX(filename = npx_file) # load dataset 1
-  manifest_1 <- read.delim(manifest_file, header = TRUE, sep = ';') # load manifest 1
+  manifest_1 <- read.delim(manifest_file, header = TRUE, sep = ";") # load manifest 1
   df_2_2 <- read_NPX(system.file("extdata", "Example_NPX_Data2_1.csv", package = "OlinkAnalyze", mustWork = TRUE))
   npx_file_v3 <- system.file("extdata", "npx_data_v3.zip", package = "OlinkAnalyze", mustWork = TRUE)
   df_v3 <- read_NPX(filename = npx_file_v3)
@@ -12,14 +12,14 @@ test_that("Data loads correctly with 'read_NPX()'", {
   npx_file_ext_v2 <- system.file("extdata", "npx_data_ext_v2.zip", package = "OlinkAnalyze", mustWork = TRUE)
   df_ext_v2 <- read_NPX(filename = npx_file_ext_v2)
 
-  #NPX read ok?
+  # NPX read ok?
   expect(exists("df_1"), failure_message = "read_NPX failed on dataset 1")
   expect_s3_class(df_1, class = "tbl_df")
   expect(exists("df_v3"), failure_message = "read_NPX failed on dataset v3")
   expect(exists("df_ext_v1"), failure_message = "read_NPX failed on extended dataset v1")
   expect(exists("df_ext_v2"), failure_message = "read_NPX failed on extended dataset v2")
 
-  #NPX zip read ok?
+  # NPX zip read ok?
   zip_npx_file_fail_1 <- system.file("extdata", "Example_NPX_Data_zip.zip", package = "OlinkAnalyze", mustWork = TRUE)
   expect_error(read_NPX(filename = zip_npx_file_fail_1), "Checksum of NPX file does not match the one from \"MD5_checksum.txt\"! Loss of data?")
 
@@ -33,11 +33,11 @@ test_that("Data loads correctly with 'read_NPX()'", {
   expect_snapshot(read_NPX(filename = zip_npx_file_success_sha))
 
 
-  #Manifest read ok?
+  # Manifest read ok?
   expect(exists("manifest_1"), failure_message = "Failed to read manifest_1.")
   expect_s3_class(manifest_1, class = "data.frame")
 
-  #Correct number of cols and rows?
+  # Correct number of cols and rows?
   expect_equal(nrow(df_1), 29440)
   expect_equal(ncol(df_1), 12)
   expect_equal(nrow(df_2), 11772)
@@ -49,41 +49,65 @@ test_that("Data loads correctly with 'read_NPX()'", {
   expect_equal(nrow(df_ext_v2), 1000)
   expect_equal(ncol(df_ext_v2), 22)
 
-  #Correct col names?
-  expect_identical(colnames(df_1),
-                   c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
-                     "MissingFreq", "Panel","Panel_Version", "PlateID", "QC_Warning", "LOD",
-                     "NPX"))
-  expect_identical(colnames(df_2),
-                   c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
-                     "MissingFreq", "Panel","Panel_Lot_Nr", "PlateID", "QC_Warning", "LOD",
-                     "NPX", "Normalization", "Assay_Warning"))
-  expect_identical(colnames(df_2_2),
-                   c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
-                     "MissingFreq", "Panel","Panel_Lot_Nr", "PlateID", "QC_Warning", "LOD",
-                     "NPX", "Normalization"))
-  expect_identical(colnames(df_v3),
-                   c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
-                     "MissingFreq", "Panel", "Panel_Lot_Nr", "PlateID",
-                     "QC_Warning", "LOD", "NPX", "Normalization",
-                     "Assay_Warning", "Sample_Type", "ExploreVersion"))
-  expect_identical(colnames(df_ext_v1),
-                   c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
-                     "MissingFreq", "Panel", "Panel_Lot_Nr", "PlateID",
-                     "QC_Warning", "LOD", "NPX", "Normalization",
-                     "Assay_Warning", "Sample_Type", "WellID", "IntraCV",
-                     "InterCV", "Processing_StartDate", "Processing_EndDate",
-                     "AnalyzerID", "INC_Warning", "AMP_Warning",
-                     "Count_Warning"))
-  expect_identical(colnames(df_ext_v2),
-                   c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
-                     "MissingFreq", "Panel", "Panel_Lot_Nr", "PlateID",
-                     "QC_Warning", "LOD", "NPX", "Normalization",
-                     "Assay_Warning", "Sample_Type", "ExploreVersion", "WellID",
-                     "IntraCV", "InterCV", "Processing_StartDate",
-                     "Processing_EndDate", "AnalyzerID"))
+  # Correct col names?
+  expect_identical(
+    colnames(df_1),
+    c(
+      "SampleID", "Index", "OlinkID", "UniProt", "Assay",
+      "MissingFreq", "Panel", "Panel_Version", "PlateID", "QC_Warning", "LOD",
+      "NPX"
+    )
+  )
+  expect_identical(
+    colnames(df_2),
+    c(
+      "SampleID", "Index", "OlinkID", "UniProt", "Assay",
+      "MissingFreq", "Panel", "Panel_Lot_Nr", "PlateID", "QC_Warning", "LOD",
+      "NPX", "Normalization", "Assay_Warning"
+    )
+  )
+  expect_identical(
+    colnames(df_2_2),
+    c(
+      "SampleID", "Index", "OlinkID", "UniProt", "Assay",
+      "MissingFreq", "Panel", "Panel_Lot_Nr", "PlateID", "QC_Warning", "LOD",
+      "NPX", "Normalization"
+    )
+  )
+  expect_identical(
+    colnames(df_v3),
+    c(
+      "SampleID", "Index", "OlinkID", "UniProt", "Assay",
+      "MissingFreq", "Panel", "Panel_Lot_Nr", "PlateID",
+      "QC_Warning", "LOD", "NPX", "Normalization",
+      "Assay_Warning", "Sample_Type", "ExploreVersion"
+    )
+  )
+  expect_identical(
+    colnames(df_ext_v1),
+    c(
+      "SampleID", "Index", "OlinkID", "UniProt", "Assay",
+      "MissingFreq", "Panel", "Panel_Lot_Nr", "PlateID",
+      "QC_Warning", "LOD", "NPX", "Normalization",
+      "Assay_Warning", "Sample_Type", "WellID", "IntraCV",
+      "InterCV", "Processing_StartDate", "Processing_EndDate",
+      "AnalyzerID", "INC_Warning", "AMP_Warning",
+      "Count_Warning"
+    )
+  )
+  expect_identical(
+    colnames(df_ext_v2),
+    c(
+      "SampleID", "Index", "OlinkID", "UniProt", "Assay",
+      "MissingFreq", "Panel", "Panel_Lot_Nr", "PlateID",
+      "QC_Warning", "LOD", "NPX", "Normalization",
+      "Assay_Warning", "Sample_Type", "ExploreVersion", "WellID",
+      "IntraCV", "InterCV", "Processing_StartDate",
+      "Processing_EndDate", "AnalyzerID"
+    )
+  )
 
-  #All samples in the manifest?
+  # All samples in the manifest?
   sample_names <- df_1 %>%
     dplyr::filter(!stringr::str_detect(SampleID, "CONTROL*.")) %>%
     dplyr::distinct(SampleID)
@@ -95,10 +119,11 @@ test_that("Data loads correctly with 'read_NPX()'", {
 test_that("data completeness check", {
   expect_warning(
     npx_data1 %>%
-       mutate(NPX = if_else(SampleID == "A1" & Panel == "Olink Cardiometabolic",
-                            NA_real_,
-                            NPX)) %>%
-       check_data_completeness(),
+      mutate(NPX = if_else(SampleID == "A1" & Panel == "Olink Cardiometabolic",
+        NA_real_,
+        NPX
+      )) %>%
+      check_data_completeness(),
     "The following samples have NA NPX values for the following panels"
   )
 
@@ -107,7 +132,6 @@ test_that("data completeness check", {
       check_data_completeness(),
     NA
   )
-
 })
 
 
@@ -115,9 +139,9 @@ test_that("data completeness check", {
 
 
 test_that("# in SampleID", {
-      input <- suppressWarnings(read_NPX(testthat::test_path("refs/mock_sampleID_hashes.csv")))
+  input <- suppressWarnings(read_NPX(testthat::test_path("refs/mock_sampleID_hashes.csv")))
 
-      expect_equal(input$SampleID, c("Sample#1", "Sample_#31"))
+  expect_equal(input$SampleID, c("Sample#1", "Sample_#31"))
 })
 
 
@@ -128,7 +152,8 @@ test_that("# in SampleID", {
 test_that("# in SampleID", {
   expect_message(
     input <- read_NPX(
-      testthat::test_path("refs/Flex_test_data_long_quant.xlsx")),
+      testthat::test_path("refs/Flex_test_data_long_quant.xlsx")
+    ),
     "Flex data in long form detected"
   )
 

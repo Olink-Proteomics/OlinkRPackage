@@ -1,7 +1,7 @@
 skip_on_cran()
 skip_if_not_installed("clusterProfiler")
 
-load(file = '../data/npx_data_format221010.RData')
+load(file = "../data/npx_data_format221010.RData")
 
 npx_df <- npx_data1 %>%
   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL"))
@@ -79,19 +79,19 @@ test_that("Error if more than 1 contrast", {
   expect_error(olink_pathway_enrichment(npx_df, anova_posthoc_results))
 })
 
-test_that("Nonsense method errors",{
+test_that("Nonsense method errors", {
   skip_if_not_installed("clusterProfiler")
   set.seed(123)
   expect_error(olink_pathway_enrichment(npx_df, anova_posthoc_results, method = "IRA"))
 })
 
-test_that("Unsupported databases flag",{
+test_that("Unsupported databases flag", {
   skip_if_not_installed("clusterProfiler")
   set.seed(123)
   expect_error(olink_pathway_enrichment(npx_df, anova_posthoc_results, ontology = "WikiPathways"))
 })
 
-test_that("Estimate column must be present",{
+test_that("Estimate column must be present", {
   skip_if_not_installed("clusterProfiler")
   set.seed(123)
   expect_error(olink_pathway_enrichment(npx_df, ttest_results_no_estimate))
@@ -100,16 +100,17 @@ test_that("Estimate column must be present",{
 
 test_that(" ORA warns assays not found in database. ", {
   skip_if_not_installed("clusterProfiler")
-  messages <- capture_messages(olink_pathway_enrichment(npx_data1, test_results = ttest_results, 
-                                                        method = "ORA", ontology = "MSigDb")) 
+  messages <- capture_messages(olink_pathway_enrichment(npx_data1,
+    test_results = ttest_results,
+    method = "ORA", ontology = "MSigDb"
+  ))
   messages <- paste(messages, collapse = "")
   expect_true(grepl(pattern = "assays are not found in the database.", x = messages))
-  
 })
 
 test_that(" gsea warns assays not found in database. ", {
   skip_if_not_installed("clusterProfiler")
-  
+
   messages <- capture_messages(olink_pathway_enrichment(npx_df, test_results = ttest_results))
   messages <- paste(messages, collapse = "")
   expect_true(grepl(pattern = "assays are not found in the database.", x = messages))
