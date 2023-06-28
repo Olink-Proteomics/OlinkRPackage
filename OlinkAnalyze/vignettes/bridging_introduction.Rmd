@@ -102,6 +102,12 @@ may be needed to increase the sampleMissingFreq to higher levels.
 In this example we will demonstrate how to select 16 bridging samples
 using `npx_data1` which will act as the reference data.
 
+```{r bridge_sample_selection_example, echo=T, eval=F}
+olink_bridgeselector(df = npx_data1,
+                     sampleMissingFreq = 0.1,
+                     n = 16)
+```
+
 ```{r bridge_sample_selection, echo=FALSE}
 olink_bridgeselector(df = npx_data1,
                      sampleMissingFreq = 0.1,
