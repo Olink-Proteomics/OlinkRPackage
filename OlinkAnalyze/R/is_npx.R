@@ -9,7 +9,7 @@
 #   \item{non_conforming_OID}{A character vector of non-conforming OIDs.}
 #   \item{all_nas}{A character vector of assays with NA values for all samples.}
 #   \item{sample_all_nas}{A character vector of samples with NA values for all assays.}
-#   \item{duplicated_samples}{A character vector of duplicated sample IDs.}
+#   \item{duplicate_samples}{A character vector of duplicate sample IDs.}
 #
 # @export
 #
@@ -46,18 +46,18 @@ npxCheck <- function(df) {
   }
 
   # Check for duplicates in SampleID ----
-  duplicated_ids <- df |>
+  duplicate_ids <- df |>
     dplyr::select(SampleID,
                   OlinkID) |>
     duplicated()
 
   # Check if any duplicates are found
-  duplicated_samples <- character(0)
-  if (any(duplicated_ids)) {
-    duplicated_samples <- unique(df$SampleID[duplicated_ids])
+  duplicate_samples <- character(0)
+  if (any(duplicate_ids)) {
+    duplicate_samples <- unique(df$SampleID[duplicate_ids])
     warning(
       "Duplicate sampleIDs found:\n ",
-      paste(duplicated_samples, collapse = "\n "),
+      paste(duplicate_samples, collapse = "\n "),
       call. = FALSE
     )
   }
@@ -135,7 +135,7 @@ npxCheck <- function(df) {
       non_conforming_OID = non_conforming_OID,
       all_nas = all_nas,
       sample_all_nas = sample_all_nas,
-      duplicated_samples = duplicated_samples
+      duplicate_samples = duplicate_samples
     )
   )
 }
