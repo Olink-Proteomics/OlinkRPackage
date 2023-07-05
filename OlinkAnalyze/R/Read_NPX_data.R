@@ -43,6 +43,8 @@ read_NPX <- function(filename) {
     read_NPX_explore(filename = filename)
   } else if (tools::file_ext(filename) %in% c("xls", "xlsx")) { # otherwise we assume T48 or T96
     read_NPX_target(filename = filename)
+  } else if (tools::file_ext(filename) %in% c("parquet", "PARQUET")) { #otherwise we check for parquest
+    read_NPX_parquet(filename = filename)
   } else {
     stop("Unrecognized input file extension!")
   }
@@ -666,4 +668,33 @@ check_data_completeness <- function(df){
             print_and_capture(NA_panel_sample))
   }
 
+}
+
+#' For reading parquet files
+read_NPX_parquet <- function(filename){
+  if(!requireNamespace("arrow", quietly = TRUE) ) {
+    stop("Reading parquet files requires the arrow package.
+         Please install arrow before continuing.
+         
+         install.packages(\"arrow\")")
+  }
+
+  df <- arrow::read_parquet(file = filename)
+  data_type <- df |> 
+    dplyr::select(Panel) |> 
+    dplyr::distinct() |> 
+    dplyr::pull() 
+  
+  message(paste("The following data was detected:",
+                paste(data_type, collapse = ", ")))
+  
+  # Check that required columns are present
+  required_cols <- c("SampleID", "OlinkID", "UniProt", "Assay", "Panel", 
+                     "PlateID", "SampleQC", "NPX")
+  missing_cols <- setdiff(required_cols, names(df))
+  if(length(missing_cols != 0)){
+    stop(paste("The following columns are missing: ", 
+               paste(missing_cols, collapse = ", ")))
+  }
+  return(df)
 }
