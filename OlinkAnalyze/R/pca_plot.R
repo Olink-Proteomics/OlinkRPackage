@@ -33,7 +33,7 @@
 #' \donttest{
 #' library(dplyr)
 #' npx_data <- npx_data1 %>%
-#'     mutate(SampleID = paste(SampleID, "_", Index, sep = ""))
+#'     mutate(SampleID = paste(SampleID, sep = ""))
 #'
 #' #PCA using all the data
 #' olink_pca_plot(df=npx_data, color_g = "QC_Warning")

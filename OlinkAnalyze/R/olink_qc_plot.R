@@ -4,7 +4,7 @@
 #' Horizontal dashed lines indicate +/-IQR_outlierDef standard deviations from the mean IQR (default 3).
 #' Vertical dashed lines indicate +/-median_outlierDef standard deviations from the mean sample median (default 3).
 #'
-#' @param df NPX data frame in long format. Must have columns SampleID, Index, NPX and Panel
+#' @param df NPX data frame in long format. Must have columns SampleID, NPX and Panel
 #' @param color_g Character value indicating which column to use as fill color (default QC_Warning)
 #' @param plot_index Boolean. If FALSE (default), a point will be plotted for a sample. If TRUE,
 #' a sample's unique index number is displayed.
