@@ -76,28 +76,36 @@ The arguments outlierDefX and outlierDefY can be used to identify outliers in th
 \examples{
 \donttest{
 library(dplyr)
-npx_data <- npx_data1 \%>\%
-    mutate(SampleID = paste(SampleID, "_", Index, sep = ""))
+npx_data <- npx_data1 |>
+  mutate(SampleID = paste(SampleID, "_", Index, sep = ""))
 
-#PCA using all the data
-olink_pca_plot(df=npx_data, color_g = "QC_Warning")
+# PCA using all the data
+olink_pca_plot(df = npx_data, color_g = "QC_Warning")
 
-#PCA per panel
-g <- olink_pca_plot(df=npx_data, color_g = "QC_Warning", byPanel = TRUE)
-g[[2]] #Plot only the second panel
+# PCA per panel
+g <- olink_pca_plot(df = npx_data, color_g = "QC_Warning", byPanel = TRUE)
+g[[2]] # Plot only the second panel
 
-#Label outliers
-olink_pca_plot(df=npx_data, color_g = "QC_Warning",
-               outlierDefX = 2, outlierDefY = 4) #All data
-olink_pca_plot(df=npx_data, color_g = "QC_Warning",
-               outlierDefX = 2.5, outlierDefY = 4, byPanel = TRUE) #Per panel
+# Label outliers
+olink_pca_plot(
+  df = npx_data, color_g = "QC_Warning",
+  outlierDefX = 2, outlierDefY = 4
+) # All data
+olink_pca_plot(
+  df = npx_data, color_g = "QC_Warning",
+  outlierDefX = 2.5, outlierDefY = 4, byPanel = TRUE
+) # Per panel
 
-#Retrieve the outliers
-g <- olink_pca_plot(df=npx_data, color_g = "QC_Warning",
-                    outlierDefX = 2.5, outlierDefY = 4, byPanel = TRUE)
-outliers <- lapply(g, function(x){x$data}) \%>\%
-    bind_rows() \%>\%
-    filter(Outlier == 1)
+# Retrieve the outliers
+g <- olink_pca_plot(
+  df = npx_data, color_g = "QC_Warning",
+  outlierDefX = 2.5, outlierDefY = 4, byPanel = TRUE
+)
+outliers <- lapply(g, function(x) {
+  x$data
+}) |>
+  bind_rows() |>
+  filter(Outlier == 1)
 }
 }
 \keyword{NPX}
