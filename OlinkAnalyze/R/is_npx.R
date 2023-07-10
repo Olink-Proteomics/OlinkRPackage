@@ -55,10 +55,10 @@ npxCheck <- function(df) {
   duplicate_samples <- character(0)
   if (any(duplicate_ids)) {
     duplicate_samples <- unique(df$SampleID[duplicate_ids])
-    warning(
+    message(
       "Duplicate sampleIDs found:\n ",
-      paste(duplicate_samples, collapse = "\n "),
-      call. = FALSE
+      paste(duplicate_samples, collapse = "\n ")
+
     )
   }
 
@@ -108,8 +108,7 @@ npxCheck <- function(df) {
     npx_colnames$Assay_Warning[npx_colnames$Assay_Warning %in% df_colnames]
 
   if (length(assay_warning) == 0) {
-    warning("Assay QC warning column not found.",
-            call. = FALSE)
+    message("Assay QC warning column not found.")
   } else {
     assays_with_warning <- df |>
       dplyr::select(OlinkID,
@@ -118,14 +117,10 @@ npxCheck <- function(df) {
                           !!rlang::ensym(assay_warning))) |>
       dplyr::distinct(OlinkID) |>
       dplyr::pull()
-    warning(
-      paste0(
-        "Following assays have ",
-        assay_warning,
-        " with WARN status: ",
-        paste(assays_with_warning, collapse = ", ")
-      ),
-      call. = FALSE
+    message(
+      paste(length(assays_with_warning),
+        " assay(s) exhibited assay QC warning. For more information see ",
+        assay_warning," column.", sep = "")
     )
   }
 
@@ -157,11 +152,11 @@ npx_colnames <-
     Count = c("Count"),
     NPX = c("NPX"),
     Normalization = c("Normalization"),
-    QC_Warning = c("QC_Warning"),
+    QC_Warning = c("QC_Warning", "SampleQC"),
     SampleBlockQCWarn = c("SampleBlockQCWarn"),
     SampleBlockQCFail = c("SampleBlockQCFail"),
     BlockQCFail = c("BlockQCFail"),
-    Assay_Warning = c("Assay_Warning", "AssayQcWarn"),
+    Assay_Warning = c("Assay_Warning", "AssayQcWarn", "AssayQC"),
     Panel_Lot_Nr = c("Panel_Lot_Nr", "Panel_Version"),
     ExploreVersion = c("ExploreVersion"),
     LOD = c("LOD"),
