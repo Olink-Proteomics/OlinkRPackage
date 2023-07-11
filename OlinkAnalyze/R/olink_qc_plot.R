@@ -84,17 +84,23 @@ olink_qc_plot <- function(df,
   if(!all(is.numeric(IQR_outlierDef), is.numeric(median_outlierDef))){
     stop('IQR_outlierDef and median_outlierDef have to be numerical values')
   }
-
-  npx_df_qr <- npx_df %>%
-    dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>% #Exclude assays that have all NA:s
-    dplyr::group_by(Panel, SampleID, Index) %>%
-    dplyr::mutate(QC_Warning = dplyr::if_else(all(toupper(QC_Warning) == 'PASS'),
-                                              'Pass',
-                                              'Warning')) %>%
+  if("QC_Warning" %in% names(npx_df)){
+    npx_df_qr <- npx_df %>%
+      dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>% #Exclude assays that have all NA:s
+      dplyr::group_by(Panel, SampleID) %>%
+      dplyr::mutate(QC_Warning = dplyr::if_else(all(toupper(QC_Warning) == 'PASS'),
+                                                'Pass',
+                                                'Warning'))
+  }else{
+    npx_df_qr <- npx_df %>%
+      dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>% #Exclude assays that have all NA:s
+      dplyr::group_by(Panel, SampleID) 
+    }
+  npx_df_qr <- npx_df_qr %>%
     dplyr::mutate(IQR = IQR(NPX, na.rm = TRUE),
                   sample_median = median(NPX, na.rm = TRUE)) %>%
     dplyr::ungroup() %>%
-    dplyr::select(SampleID, Index, Panel, IQR, sample_median, !!rlang::ensym(color_g)) %>%
+    dplyr::select(SampleID, Panel, IQR, sample_median, !!rlang::ensym(color_g)) %>%
     dplyr::distinct() %>%
     dplyr::group_by(Panel) %>%
     dplyr::mutate(median_low = mean(sample_median, na.rm = TRUE) - median_outlierDef*sd(sample_median, na.rm = TRUE),

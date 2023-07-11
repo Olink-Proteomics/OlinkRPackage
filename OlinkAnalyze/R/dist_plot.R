@@ -65,13 +65,17 @@ olink_dist_plot <- function(df, color_g = 'QC_Warning', ...) {
   #If not all are Pass, the QC_Warning is set as warning for plotting purposes
   df_OlinkID_fixed <- df_OlinkID %>%
     dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>% #Exclude assays that have all NA:s
-    dplyr::mutate(Panel = Panel %>% stringr::str_replace("Olink ", "")) %>%
-    dplyr::group_by(SampleID, Index, Panel) %>%
-    dplyr::mutate(QC_Warning = dplyr::if_else(all(toupper(QC_Warning) == 'PASS'),
-                                              'Pass',
-                                              'Warning')) %>%
-    dplyr::ungroup()
-
+    dplyr::mutate(Panel = Panel %>% stringr::str_replace("Olink ", "")) 
+  if("QC_Warning" %in% names(df_OlinkID_fixed)){
+    df_OlinkID_fixed <- df_OlinkID_fixed %>%
+    dplyr::group_by(SampleID, Panel) %>%
+      dplyr::mutate(QC_Warning = dplyr::if_else(all(toupper(QC_Warning) == 'PASS'),
+                                                'Pass',
+                                                'Warning')) %>%
+      dplyr::ungroup()
+    
+  }
+  
   df_OlinkID_fixed %>%
     dplyr::filter(!(is.na(NPX))) %>%
     ggplot2::ggplot(., ggplot2::aes(x = reorder_within(factor(SampleID), NPX, Panel, median), y = NPX, fill=!!rlang::ensym(color_g)))+
