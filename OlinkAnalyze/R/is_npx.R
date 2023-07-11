@@ -9,7 +9,7 @@
 #   \item{non_conforming_OID}{A character vector of non-conforming OIDs.}
 #   \item{all_nas}{A character vector of assays with NA values for all samples.}
 #   \item{sample_all_nas}{A character vector of samples with NA values for all assays.}
-#   \item{duplicated_samples}{A character vector of duplicated sample IDs.}
+#   \item{duplicate_samples}{A character vector of duplicate sample IDs.}
 #
 # @export
 #
@@ -46,19 +46,19 @@ npxCheck <- function(df) {
   }
 
   # Check for duplicates in SampleID ----
-  duplicated_ids <- df |>
+  duplicate_ids <- df |>
     dplyr::select(SampleID,
                   OlinkID) |>
     duplicated()
 
   # Check if any duplicates are found
-  duplicated_samples <- character(0)
-  if (any(duplicated_ids)) {
-    duplicated_samples <- unique(df$SampleID[duplicated_ids])
-    warning(
+  duplicate_samples <- character(0)
+  if (any(duplicate_ids)) {
+    duplicate_samples <- unique(df$SampleID[duplicate_ids])
+    message(
       "Duplicate sampleIDs found:\n ",
-      paste(duplicated_samples, collapse = "\n "),
-      call. = FALSE
+      paste(duplicate_samples, collapse = "\n ")
+
     )
   }
 
@@ -108,8 +108,7 @@ npxCheck <- function(df) {
     npx_colnames$Assay_Warning[npx_colnames$Assay_Warning %in% df_colnames]
 
   if (length(assay_warning) == 0) {
-    warning("Assay QC warning column not found.",
-            call. = FALSE)
+    message("Assay QC warning column not found.")
   } else {
     assays_with_warning <- df |>
       dplyr::select(OlinkID,
@@ -118,14 +117,10 @@ npxCheck <- function(df) {
                           !!rlang::ensym(assay_warning))) |>
       dplyr::distinct(OlinkID) |>
       dplyr::pull()
-    warning(
-      paste0(
-        "Following assays have ",
-        assay_warning,
-        " with WARN status: ",
-        paste(assays_with_warning, collapse = ", ")
-      ),
-      call. = FALSE
+    message(
+      paste(length(assays_with_warning),
+        " assay(s) exhibited assay QC warning. For more information see ",
+        assay_warning," column.", sep = "")
     )
   }
 
@@ -135,7 +130,7 @@ npxCheck <- function(df) {
       non_conforming_OID = non_conforming_OID,
       all_nas = all_nas,
       sample_all_nas = sample_all_nas,
-      duplicated_samples = duplicated_samples
+      duplicate_samples = duplicate_samples
     )
   )
 }
@@ -157,11 +152,11 @@ npx_colnames <-
     Count = c("Count"),
     NPX = c("NPX"),
     Normalization = c("Normalization"),
-    QC_Warning = c("QC_Warning"),
+    QC_Warning = c("QC_Warning", "SampleQC"),
     SampleBlockQCWarn = c("SampleBlockQCWarn"),
     SampleBlockQCFail = c("SampleBlockQCFail"),
     BlockQCFail = c("BlockQCFail"),
-    Assay_Warning = c("Assay_Warning", "AssayQcWarn"),
+    Assay_Warning = c("Assay_Warning", "AssayQcWarn", "AssayQC"),
     Panel_Lot_Nr = c("Panel_Lot_Nr", "Panel_Version"),
     ExploreVersion = c("ExploreVersion"),
     LOD = c("LOD"),
