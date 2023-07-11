@@ -685,6 +685,7 @@ read_NPX_parquet <- function(filename){
     dplyr::distinct() |> 
     dplyr::pull() 
   
+  
   message(paste("The following data was detected:",
                 paste(data_type, collapse = ", ")))
   
