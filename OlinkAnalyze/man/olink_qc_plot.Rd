@@ -18,7 +18,7 @@ olink_qc_plot(
 )
 }
 \arguments{
-\item{df}{NPX data frame in long format. Must have columns SampleID, Index, NPX and Panel}
+\item{df}{NPX data frame in long format. Must have columns SampleID, NPX and Panel}
 
 \item{color_g}{Character value indicating which column to use as fill color (default QC_Warning)}
 
