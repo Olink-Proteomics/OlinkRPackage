@@ -50,7 +50,7 @@ npxProcessing_forDimRed <- function(df,
   df_wide <- df_temp |>
     dplyr::select(SampleID, OlinkID, NPX) |>
     dplyr::filter(!is.na(NPX)) |>
-    tidyr::pivot_wider(names_from = OlinkID, values_from = NPX)
+    tidyr::spread(OlinkID, NPX)
 
   #### If drop_assays == T, drop assays with any missing values ####
   if (drop_assays) {
