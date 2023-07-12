@@ -150,7 +150,13 @@ read_NPX_explore <- function(filename) {
                           "Index",
                           "MissingFreq",
                           "LOD",
-                          "ExploreVersion")
+                          "ExploreVersion"),
+    "header_parquet" = c("SampleID", "WellID","PlateID", "OlinkID",
+                         "UniProt", "Assay", "Panel", "NPX", 
+                         "Normalization", "ExploreVersion", "Block",
+                         "AssayType", "Count", "ExtNPX", 
+                         "PCNormalizedNPX", "SampleType", 
+                         "DataAnalysisRefID", "AssayQC", "SampleQC")
   )
 
   header_match <-  header_v %>%
