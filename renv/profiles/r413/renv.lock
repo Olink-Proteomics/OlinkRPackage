@@ -21,7 +21,7 @@
       "RemotePkgPlatform": "source",
       "RemoteSha": "12.0.1",
       "Requirements": []
-    }
+    },
     "AnnotationDbi": {
       "Package": "AnnotationDbi",
       "Version": "1.56.2",
