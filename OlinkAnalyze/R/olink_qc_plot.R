@@ -84,6 +84,12 @@ olink_qc_plot <- function(df,
   if(!all(is.numeric(IQR_outlierDef), is.numeric(median_outlierDef))){
     stop('IQR_outlierDef and median_outlierDef have to be numerical values')
   }
+  
+  if(plot_index == TRUE & !("Index" %in% names(npx_df))){
+    warning("Index not available. Setting plot_index to FALSE.")
+    plot_index <- FALSE
+  }
+  
   if("QC_Warning" %in% names(npx_df)){
     npx_df_qr <- npx_df %>%
       dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>% #Exclude assays that have all NA:s
