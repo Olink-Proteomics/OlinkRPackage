@@ -194,14 +194,14 @@ overlapping_samples <-  data.frame(SampleID = intersect(npx_1$SampleID, npx_2$Sa
 npx_before_br <- npx_data1 %>%
   dplyr::filter(!str_detect(SampleID, "CONTROL_SAMPLE")) %>% #Remove control samples
   dplyr::mutate(Type = if_else(SampleID %in% overlapping_samples,
-                        paste0("20200001 Bridge"),
-                        paste0("20200001 Sample"))) %>%
+                        paste0("Project_1 Bridge"),
+                        paste0("Project_1 Sample"))) %>%
   rbind({
     npx_data2 %>%
       filter(!str_detect(SampleID, "CONTROL_SAMPLE")) %>% #Remove control samples %>% 
       mutate(Type = if_else(SampleID %in% overlapping_samples,
-                            paste0("20200002 Bridge"),
-                            paste0("20200002 Sample"))) %>%
+                            paste0("Project_2 Bridge"),
+                            paste0("Project_2 Sample"))) %>%
       mutate(SampleID = if_else(SampleID %in% overlapping_samples,
                                 paste0(SampleID, "_new"),
                                 SampleID))
@@ -258,9 +258,9 @@ overlap_samples_list <- list("DF1" = overlap_samples,
 npx_br_data <- olink_normalization_bridge(project_1_df = npx_1,
                                           project_2_df = npx_2,
                                           bridge_samples = overlap_samples_list,
-                                          project_1_name = "20200001",
-                                          project_2_name = "20200002",
-                                          project_ref_name = "20200001")
+                                          project_1_name = "Project_1",
+                                          project_2_name = "Project_2",
+                                          project_ref_name = "Project_1")
 dplyr::glimpse(npx_br_data)
 
 ```
@@ -321,7 +321,7 @@ samples than the similarity between the datasets.
 
 ```{r dist_adj_fct, message=FALSE, echo = FALSE}
 npx_br_data %>% 
-  dplyr::filter(Project == "20200002") %>%  # Only looking at Project 2 since project 1 is unadjusted
+  dplyr::filter(Project == "Project_2") %>%  # Only looking at Project 2 since project 1 is unadjusted
   dplyr::select(OlinkID, Adj_factor) %>% 
   dplyr::distinct() %>% 
   ggplot2::ggplot(ggplot2::aes(x = Adj_factor)) +
@@ -343,10 +343,10 @@ bridge_samples <- npx_1 %>%
 
 # Generate violin plot for CHL1
 npx_data1 %>%
-  mutate(Project = "20200001") %>%
+  mutate(Project = "Project_1") %>%
   bind_rows({
     npx_data2 %>%
-      mutate(Project = "20200002")
+      mutate(Project = "Project_2")
   }) %>%
   filter(Assay == "CHL1") %>%
   filter(!str_detect(SampleID, "CONTROL*.")) %>%
@@ -443,7 +443,7 @@ columns will need to be removed. To export the new project,
 
 ```{r, eval = FALSE}
 new_normalized_data <- npx_br_data %>% 
-  dplyr::filter(Project == "20200002") %>% 
+  dplyr::filter(Project == "Project_2") %>% 
   dplyr::select(-Project, -Adj_factor) %>% 
   write.table(, file = "New_Normalized_NPX_data.csv", sep = ";")
 

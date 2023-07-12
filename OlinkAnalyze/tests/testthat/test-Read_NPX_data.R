@@ -2,8 +2,12 @@ test_that("Data loads correctly with 'read_NPX()'", {
   #Read data
   npx_file <- system.file("extdata", "npx_data1.xlsx", package = "OlinkAnalyze", mustWork = TRUE)
   manifest_file <- system.file("extdata", "npx_data1_meta.csv", package = "OlinkAnalyze", mustWork = TRUE)
+  parquet_file <- system.file("extdata", "npx_data_ext.parquet",
+                              package = "OlinkAnalyze", mustWork = TRUE)
   df_1 <- read_NPX(filename = npx_file) # load dataset 1
-  manifest_1 <- read.delim(manifest_file, header = TRUE, sep = ';') # load manifest 1
+  manifest_1 <- read.delim(manifest_file, header = TRUE, sep = ';')
+
+  # load manifest 1
   df_2_2 <- read_NPX(system.file("extdata", "Example_NPX_Data2_1.csv", package = "OlinkAnalyze", mustWork = TRUE))
   npx_file_v3 <- system.file("extdata", "npx_data_v3.zip", package = "OlinkAnalyze", mustWork = TRUE)
   df_v3 <- read_NPX(filename = npx_file_v3)
@@ -11,6 +15,7 @@ test_that("Data loads correctly with 'read_NPX()'", {
   df_ext_v1 <- read_NPX(filename = npx_file_ext_v1)
   npx_file_ext_v2 <- system.file("extdata", "npx_data_ext_v2.zip", package = "OlinkAnalyze", mustWork = TRUE)
   df_ext_v2 <- read_NPX(filename = npx_file_ext_v2)
+  df_parquet <- read_NPX(filename = parquet_file)
 
   #NPX read ok?
   expect(exists("df_1"), failure_message = "read_NPX failed on dataset 1")
@@ -18,6 +23,7 @@ test_that("Data loads correctly with 'read_NPX()'", {
   expect(exists("df_v3"), failure_message = "read_NPX failed on dataset v3")
   expect(exists("df_ext_v1"), failure_message = "read_NPX failed on extended dataset v1")
   expect(exists("df_ext_v2"), failure_message = "read_NPX failed on extended dataset v2")
+  expect(exists("df_parquet"), failure_message = "read_NPX failed on parquet dataset")
 
   #NPX zip read ok?
   zip_npx_file_fail_1 <- system.file("extdata", "Example_NPX_Data_zip.zip", package = "OlinkAnalyze", mustWork = TRUE)
@@ -48,6 +54,8 @@ test_that("Data loads correctly with 'read_NPX()'", {
   expect_equal(ncol(df_ext_v1), 24)
   expect_equal(nrow(df_ext_v2), 1000)
   expect_equal(ncol(df_ext_v2), 22)
+  expect_equal(nrow(df_parquet), 1)
+  expect_equal(ncol(df_parquet),19)
 
   #Correct col names?
   expect_identical(colnames(df_1),
@@ -82,6 +90,13 @@ test_that("Data loads correctly with 'read_NPX()'", {
                      "Assay_Warning", "Sample_Type", "ExploreVersion", "WellID",
                      "IntraCV", "InterCV", "Processing_StartDate",
                      "Processing_EndDate", "AnalyzerID"))
+  expect_identical(colnames(df_parquet),
+                   c("SampleID", "WellID","PlateID", "OlinkID",
+                     "UniProt", "Assay", "Panel", "NPX", 
+                     "Normalization", "ExploreVersion", "Block",
+                     "AssayType", "Count", "ExtNPX", 
+                     "PCNormalizedNPX", "SampleType", 
+                     "DataAnalysisRefID", "AssayQC", "SampleQC"))
 
   #All samples in the manifest?
   sample_names <- df_1 %>%
