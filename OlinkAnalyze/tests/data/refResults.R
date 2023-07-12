@@ -259,6 +259,15 @@ randomized_result2 <- olink_plate_randomizer(manifest,
                                              SubjectColumn="SubjectID",
                                              available.spots=c(88,88),
                                              seed=12345)
+randomized_result3 <- olink_plate_randomizer({manifest |> dplyr::mutate(
+  study = ifelse(Site == "Site1", "study1", "study2"))},
+  SubjectColumn="SubjectID",
+  available.spots=c(88,88),
+  seed=12345)
+randomized_result4 <- olink_plate_randomizer({manifest |> dplyr::mutate(
+  study = ifelse(Site == "Site1", "study1", "study2")) |> dplyr::select(-SubjectID)},
+  available.spots=c(88,88),
+  seed=12345)
 
 #### npxProcessing_forDimRed ####
 npx_data1.uniqIDs <- npx_data1 %>%
@@ -310,5 +319,7 @@ ref_results <- list(t.test_results = t.test_results,
                     randomized_result2 = randomized_result2,
                     procData = procData,
                     procData_missingData = procData_missingData)
-save(ref_results, file = 'tests/data/refResults.RData')
+ref_results$randomized_result3 <- randomized_result3
+ref_results$randomized_result4 <- randomized_result4
 
+save(ref_results, file = 'tests/data/refResults.RData')
