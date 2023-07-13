@@ -28,13 +28,14 @@
 #'
 
 read_npx_parquet <- function (filename) {
+
   if(!requireNamespace("arrow", quietly = TRUE) ) {
     stop("Reading parquet files requires the arrow package.
          Please install arrow before continuing.
-         
+
          install.packages(\"arrow\")")
   }
-  
+
   # pointer to parquet file
   parquet_file <- arrow::open_dataset(
     sources = filename
@@ -45,19 +46,28 @@ read_npx_parquet <- function (filename) {
   # them to this array
   olink_platforms <- c("ExploreHT")
   if (!(parquet_file$metadata$ProductType %in% olink_platforms)) {
-    stop("Only \"Olink Explore HT\" parquet files are supported at this time.")
+    stop("Only \"Olink Explore HT\" parquet files are currently supported.")
   }
-  
+
 
   # Check if it is an NPX file
   olink_files <- c("NPX File")
   if (parquet_file$metadata$DataFileType %in% olink_files) {
-    
+
     # Check that required columns are present
-    required_cols <- c("SampleID", "OlinkID", "UniProt", "Assay", "Panel", "PlateID", "SampleQC", "NPX")
-    missing_cols <- setdiff(required_cols, names(parquet_file))
-    if(length(missing_cols != 0)){
-      stop(paste("The following columns are missing: ", 
+    required_cols <- c("SampleID",
+                       "OlinkID",
+                       "UniProt",
+                       "Assay",
+                       "Panel",
+                       "PlateID",
+                       "SampleQC",
+                       "NPX")
+    missing_cols <- setdiff(required_cols,
+                            names(parquet_file))
+
+    if(length(missing_cols != 0)) {
+      stop(paste("The following columns are missing: ",
                  paste(missing_cols, collapse = ", ")))
     }
 
@@ -95,7 +105,9 @@ read_npx_parquet <- function (filename) {
       )
 
   } else {
-    stop("Only \"NPX\" parquet files are supported at this time.")
+
+    stop("Only \"NPX\" parquet files are currently supported.")
+
   }
 
   df_npx <- parquet_file %>%
