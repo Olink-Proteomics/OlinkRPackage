@@ -63,12 +63,15 @@ read_npx_parquet <- function (filename) {
                        "PlateID",
                        "SampleQC",
                        "NPX")
+
     missing_cols <- setdiff(required_cols,
                             names(parquet_file))
 
-    if(length(missing_cols != 0)) {
-      stop(paste("The following columns are missing: ",
+    if(length(missing_cols) != 0) {
+
+      stop(paste("The following columns are missing:",
                  paste(missing_cols, collapse = ", ")))
+
     }
 
     # NPX and EXTENDED NPX files share a large fraction of columns
