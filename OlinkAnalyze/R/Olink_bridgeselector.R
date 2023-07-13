@@ -59,6 +59,36 @@ olink_bridgeselector<-function(df, sampleMissingFreq, n){
                                       IQR < iqr_high,
                                     0, 1)) %>%
     dplyr::select(SampleID, Index, Panel, Outlier)
+  
+  
+  # Alternative LODs for when LOD is not present
+  if(!("LOD" %in% names(df))){
+    if("Max LOD" %in% names(df)){
+      df <- df |> 
+        dplyr::mutate(LOD = `Max LOD`)
+      message("Using Max LOD as filter criteria...")  
+    } else if ("Plate LOD" %in% names(df)){
+      df <- df |> 
+        dplyr::mutate(LOD = `Plate LOD`)
+      
+      message("Using Plate LOD as filter criteria...")
+    } else if ("Plate_LOD" %in% names(df)){
+      df <- df |> 
+        dplyr::mutate(LOD = Plate_LOD)
+      
+      message("Using Plate_LOD as filter criteria...")
+    } else {
+      df <- df |> 
+        dplyr::mutate(LOD = -Inf)
+      
+      message("LOD not available. No filtering by LOD...")
+    }
+  }
+  
+  if("SampleQC" %in% names(df)){
+    df <- df |> 
+      dplyr::mutate(QC_Warning = SampleQC)
+  }
 
   df_1 <- df %>%
     dplyr::left_join(qc_outliers, by = c('SampleID', 'Index', 'Panel')) %>%
