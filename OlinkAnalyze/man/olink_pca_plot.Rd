@@ -77,7 +77,7 @@ The arguments outlierDefX and outlierDefY can be used to identify outliers in th
 \donttest{
 library(dplyr)
 npx_data <- npx_data1 \%>\%
-    mutate(SampleID = paste(SampleID, sep = ""))
+    filter(!grepl('CONTROL', SampleID))
 
 #PCA using all the data
 olink_pca_plot(df=npx_data, color_g = "QC_Warning")
