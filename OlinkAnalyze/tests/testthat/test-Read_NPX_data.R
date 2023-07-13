@@ -91,12 +91,11 @@ test_that("Data loads correctly with 'read_NPX()'", {
                      "IntraCV", "InterCV", "Processing_StartDate",
                      "Processing_EndDate", "AnalyzerID"))
   expect_identical(colnames(df_parquet),
-                   c("SampleID", "WellID","PlateID", "OlinkID",
-                     "UniProt", "Assay", "Panel", "NPX", 
-                     "Normalization", "ExploreVersion", "Block",
-                     "AssayType", "Count", "ExtNPX", 
-                     "PCNormalizedNPX", "SampleType", 
-                     "DataAnalysisRefID", "AssayQC", "SampleQC"))
+                   c("SampleID", "SampleType", "WellID", "PlateID",
+                     "DataAnalysisRefID", "OlinkID", "UniProt", "Assay",
+                     "AssayType", "Panel", "Block", "Count", "ExtNPX", "NPX",
+                     "Normalization", "PCNormalizedNPX", "AssayQC", "SampleQC",
+                     "ExploreVersion"))
 
   #All samples in the manifest?
   sample_names <- df_1 %>%
