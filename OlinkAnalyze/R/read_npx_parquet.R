@@ -74,39 +74,6 @@ read_npx_parquet <- function (filename) {
 
     }
 
-    # NPX and EXTENDED NPX files share a large fraction of columns
-    parquet_file <- parquet_file %>%
-      dplyr::select(
-        # same as E3072
-        SampleID,
-        WellID,
-        PlateID,
-        OlinkID,
-        UniProt,
-        Assay,
-        Panel,
-        NPX,
-        Normalization,
-        ExploreVersion,
-
-        # New entry
-        Block,
-        AssayType,
-        Count,
-        ExtNPX,
-        PCNormalizedNPX,
-
-        # It was Sample_Type in EXTNDED NPX E3072
-        # Not used in OA, so we keep it as is
-        SampleType,
-        # Corresponds to Panel_Lot_Nr
-        DataAnalysisRefID,
-        # Corresponds to Assay_Warning
-        AssayQC,
-        # Corresponds to QC_Warning
-        SampleQC
-      )
-
   } else {
 
     stop("Only \"NPX\" parquet files are currently supported.")
