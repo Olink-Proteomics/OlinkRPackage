@@ -9,6 +9,19 @@
     ]
   },
   "Packages": {
+    "arrow": {
+      "Package": "arrow",
+      "Version": "12.0.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "RemoteType": "standard",
+      "RemotePkgRef": "arrow",
+      "RemoteRef": "arrow",
+      "RemoteRepos": "https://cran.rstudio.com",
+      "RemotePkgPlatform": "source",
+      "RemoteSha": "12.0.1",
+      "Requirements": []
+    },
     "AnnotationDbi": {
       "Package": "AnnotationDbi",
       "Version": "1.56.2",
