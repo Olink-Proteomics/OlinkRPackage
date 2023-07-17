@@ -102,8 +102,8 @@ may be needed to increase the sampleMissingFreq to higher levels.
 In this example we will demonstrate how to select 16 bridging samples
 using `npx_data1` which will act as the reference data.
 
-```{r bridge_sample_selection_example, echo=T, eval=F}
-olink_bridgeselector(df = npx_data1,
+```{r bridge_sample_selection_example, echo=T, eval=T}
+bridge_Samples<-olink_bridgeselector(df = npx_data1,
                      sampleMissingFreq = 0.1,
                      n = 16)
 ```
@@ -118,6 +118,16 @@ olink_bridgeselector(df = npx_data1,
   kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE,
                 position = "center", latex_options = "HOLD_position")
   
+```
+
+It's important to make sure that the select bridge samples are representative of the overall samples. This can be done with the following code and make sure that the bridge samples are clustered with the remaining samples. 
+
+```{r bridge_sample_selection_example_pca, echo=T, eval=T}
+npx_data1 %>% 
+  filter(!str_detect(SampleID, 'CONT')) %>%
+  mutate(Bridge = ifelse(SampleID %in% bridge_Samples$SampleID, "Bridge", "Sample")) %>% 
+  olink_pca_plot(color_g = "Bridge")
+
 ```
 
 ## Setup bridging datasets
