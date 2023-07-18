@@ -1,9 +1,21 @@
+product_to_platesize <- function(Product){
+  olink_products <-c("Target 96", "Target 48", "Explore 384","Explore 3072","Explore HT")
+  if(!(Product %in% olink_products)){
+    stop(paste0("Product must be one of the following: ", paste(olink_products, sep = " ", collapse = ", ")))
+  }
+  PlateSize<- ifelse(Product == "Target 48",
+                     48,
+                     96)
+  return(PlateSize)
+}
+
 #' Plot all plates colored by a variable
 #'
 #' Displays each plate in a facet with cells colored by the given variable using ggplot and ggplot2::geom_tile.
 #' @param data tibble/data frame in long format returned from the olink_plate_randomizer function.
 #' @param fill.color Column name to be used as coloring variable for wells.
 #' @param PlateSize Integer. Either 96 or 48. 96 is default.
+#' @param Product String. Name of Olink product used to set PlateSize if not provided. Optional. 
 #' @param include.label Should the variable group be shown in the plot.
 #' @keywords randomized plates ggplot
 #' @return An object of class "ggplot" showing each plate in a facet with the cells colored by values in column fill.color in input \code{data}.
@@ -21,7 +33,10 @@
 #' @importFrom dplyr n filter select mutate
 #' @importFrom ggplot2 ggplot geom_tile facet_wrap scale_fill_manual labs scale_x_discrete geom_text
 
-olink_displayPlateLayout <- function(data, fill.color, PlateSize = 96, include.label=FALSE){
+olink_displayPlateLayout <- function(data, fill.color, PlateSize = 96, Product, include.label=FALSE){
+  if(!missing(Product)){
+    PlateSize <- product_to_platesize(Product)
+  }
 
   if(!PlateSize %in% c(48,96)){
     stop('Plate size needs to be either 48 or 96.')
@@ -196,6 +211,7 @@ generatePlateHolder <- function(n.plates,n.spots,n.samples, PlateSize, num_ctrl,
 #' Variables of interest should if possible be randomized across plates to avoid confounding with potential plate effects. In the case of multiple samples per subject (e.g. in longitudinal studies), Olink recommends keeping each subject on the same plate. This can be achieved using the SubjectColumn argument.
 #' @param Manifest tibble/data frame in long format containing all sample ID's. Sample ID column must be named SampleID.
 #' @param PlateSize Integer. Either 96 or 48. 96 is default.
+#' @param Product String. Name of Olink product used to set PlateSize if not provided. Optional. 
 #' @param SubjectColumn (Optional) Column name of the subject ID column. Cannot contain missings. If provided, subjects are kept on the same plate.
 #' @param iterations Number of iterations for fitting subjects on the same plate.
 #' @param available.spots Numeric. Number of wells available on each plate. Maximum 40 for T48 and 88 for T96. Takes a vector equal to the number of plates to be used indicating the number of wells available on each plate.
@@ -243,11 +259,15 @@ generatePlateHolder <- function(n.plates,n.spots,n.samples, PlateSize, num_ctrl,
 #' @importFrom tibble is_tibble
 
 #Main randomization function
-olink_plate_randomizer <- function(Manifest, PlateSize = 96, SubjectColumn, iterations=500, available.spots, num_ctrl = 8, rand_ctrl = FALSE, seed){
+olink_plate_randomizer <- function(Manifest, PlateSize = 96, Product, SubjectColumn, iterations=500, available.spots, num_ctrl = 8, rand_ctrl = FALSE, seed){
   
   #Check if SampleID column is present in manifest
   if(!"SampleID" %in% colnames(Manifest)) {
     stop("SampleID not found! Be sure the column of samples ID's is named 'SampleID'")
+  }
+  
+  if(!missing(Product)){
+    PlateSize <- product_to_platesize(Product)
   }
   
   # Check if there are any duplicated Sample IDs in manifest
