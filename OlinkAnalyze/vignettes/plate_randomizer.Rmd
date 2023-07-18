@@ -61,7 +61,7 @@ randomized.manifest_a <- olink_plate_randomizer(manifest, seed=123456)
 
 ### Generate randomization scheme that keeps subjects on the same plate
 
-In the case of multiple samples per subject (e.g. in longitudinal studies), Olink recommends keeping each subject on the same plate to further reduce variation in the data. The individuals should then be distributed so that the remaining experimental variables of interest are evenly distributed across plates. This could be achieved by using the `SubjectColumn` argument. However, if there are to many samples per subject (>8), complete randomization is recommended. The number of samples on each plate could be specified via the `available.spots` argument. For example, the following code will lead to 78 samples on the first plate, and 30 samples on the second and the third plates. The number of iterations for fitting subjects on the same plate can be set by the `iterations` argument.
+In the case of multiple samples per subject (e.g. in longitudinal studies), Olink recommends keeping each subject on the same plate to further reduce variation in the data. The individuals should then be distributed so that the remaining experimental variables of interest are evenly distributed across plates. This could be achieved by using the `SubjectColumn` argument. However, if there are to many samples per subject (>8), complete randomization is recommended. The number of samples on each plate could be specified via the `available.spots` argument. For example, the following code will lead to 78 samples on the first plate, and 30 samples on the second and the third plates. The number of iterations for fitting subjects on the same plate can be set by the `iterations` argument. 
 
 
 ```{r subjects_randomization, message=FALSE,results='hide'}
@@ -70,6 +70,19 @@ randomized.manifest_b <- olink_plate_randomizer(manifest,SubjectColumn="SubjectI
                                                 iterations = 500,
                                                 seed=123456)
 ```
+
+The plate size can be either directly set to 48 or 96 using the `PlateSize` argument or can be inferred by setting the `Product` argument to "Target 96", "Target 48", "Explore 384","Explore 3072",or "Explore HT." The number of controls can be set using the `num_ctrl` argument, which defaults to 8 controls. The controls can also be set to be randomized throughout the plate using the `rand_ctrl` argument.
+
+```{r randomize_controls, message=FALSE}
+randomized_manifest <- olink_plate_randomizer(manifest, 
+                                              Product = "Explore HT",
+                                              SubjectColumn = "SampleID",
+                                              num_ctrl = 10, 
+                                              rand_ctrl = TRUE)
+
+randomized_manifest |> dplyr::glimpse()
+```
+
 
 ## Visualization
 
