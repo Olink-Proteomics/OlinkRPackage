@@ -131,7 +131,7 @@ olink_one_non_parametric <- function(df,
       }
 
       number_of_samples_w_more_than_one_level <- df %>%
-        dplyr::group_by(SampleID, Index) %>%
+        dplyr::group_by(SampleID) %>%
         dplyr::summarise(n_levels = dplyr::n_distinct(!!rlang::ensym(effect), na.rm = T),.groups = "drop") %>%
         dplyr::filter(n_levels > 1) %>%
         nrow(.)

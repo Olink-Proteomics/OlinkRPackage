@@ -163,7 +163,7 @@ read_flex <- function(filename) {
                         names_to = "OlinkID",
                         values_to = ifelse(is_npx_data, "NPX", "Quantified_value")) |> 
     dplyr::left_join(metadata, by = c("OlinkID")) |> 
-    dplyr::left_join(meta_data_per_assay, multiple = "all") |> 
+    dplyr::left_join(meta_data_per_assay, by = "OlinkID", multiple = "all") |> 
     dplyr::mutate(PlateID = PlateID1) |> 
     dplyr::mutate(QC_Warning = QC_Warning1) |> 
     dplyr::select(SampleID, OlinkID,
