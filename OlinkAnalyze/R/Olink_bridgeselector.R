@@ -41,11 +41,11 @@ olink_bridgeselector<-function(df, sampleMissingFreq, n){
 
   #Outlier calculation as in qc_plot for filtering
   qc_outliers <- df %>%
-    dplyr::group_by(Panel, SampleID, Index) %>%
+    dplyr::group_by(Panel, SampleID) %>%
     dplyr::mutate(IQR = IQR(NPX, na.rm = TRUE),
                   sample_median = median(NPX, na.rm = TRUE)) %>%
     dplyr::ungroup() %>%
-    dplyr::select(SampleID, Index, Panel, IQR, sample_median) %>%
+    dplyr::select(SampleID, Panel, IQR, sample_median) %>%
     dplyr::distinct() %>%
     dplyr::group_by(Panel) %>%
     dplyr::mutate(median_low = mean(sample_median, na.rm = TRUE) - 3*sd(sample_median, na.rm = TRUE),
@@ -58,10 +58,10 @@ olink_bridgeselector<-function(df, sampleMissingFreq, n){
                                       IQR > iqr_low &
                                       IQR < iqr_high,
                                     0, 1)) %>%
-    dplyr::select(SampleID, Index, Panel, Outlier)
+    dplyr::select(SampleID, Panel, Outlier)
 
   df_1 <- df %>%
-    dplyr::left_join(qc_outliers, by = c('SampleID', 'Index', 'Panel')) %>%
+    dplyr::left_join(qc_outliers, by = c('SampleID', 'Panel')) %>%
     dplyr::mutate(NPX = ifelse(NPX <= LOD, NA, NPX)) %>%
     dplyr::group_by(SampleID) %>%
     dplyr::mutate(QC_Warning = dplyr::if_else(all(toupper(QC_Warning) == 'PASS'),

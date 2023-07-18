@@ -55,7 +55,7 @@ Description: A collection of functions to facilitate analysis of proteomic
 License: AGPL (>= 3)
 Depends: 
     R (>= 4.1.0)
-Imports: 
+Imports:
     broom,
     car,
     dplyr,
@@ -83,6 +83,7 @@ Imports:
     utils,
     zip
 Suggests: 
+    arrow,
     clusterProfiler,
     extrafont,
     FSA,
