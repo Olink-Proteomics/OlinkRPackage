@@ -29,11 +29,11 @@ olink_plate_randomizer(
 
 \item{available.spots}{Numeric. Number of wells available on each plate. Maximum 40 for T48 and 88 for T96. Takes a vector equal to the number of plates to be used indicating the number of wells available on each plate.}
 
+\item{num_ctrl}{Numeric. Number of controls on each plate (default = 8)}
+
+\item{rand_ctrl}{Logical. Whether controls are added to be randomized across the plate (default = FALSE)}
+
 \item{seed}{Seed to set. Highly recommend setting this for reproducibility.}
-
-\item{num_ctrls}{Numeric. Number of controls on each plate (default = 8)}
-
-\item{rand_ctrls}{Logical. Whether controls are added to be randomized across the plate (default = FALSE)}
 }
 \value{
 A "tibble" including SampleID, SubjectID etc. assigned to well positions.

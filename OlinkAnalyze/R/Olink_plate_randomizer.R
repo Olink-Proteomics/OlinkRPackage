@@ -215,8 +215,8 @@ generatePlateHolder <- function(n.plates,n.spots,n.samples, PlateSize, num_ctrl,
 #' @param SubjectColumn (Optional) Column name of the subject ID column. Cannot contain missings. If provided, subjects are kept on the same plate.
 #' @param iterations Number of iterations for fitting subjects on the same plate.
 #' @param available.spots Numeric. Number of wells available on each plate. Maximum 40 for T48 and 88 for T96. Takes a vector equal to the number of plates to be used indicating the number of wells available on each plate.
-#' @param num_ctrls Numeric. Number of controls on each plate (default = 8)
-#' @param rand_ctrls Logical. Whether controls are added to be randomized across the plate (default = FALSE)
+#' @param num_ctrl Numeric. Number of controls on each plate (default = 8)
+#' @param rand_ctrl Logical. Whether controls are added to be randomized across the plate (default = FALSE)
 #' @param seed Seed to set. Highly recommend setting this for reproducibility.
 #' @return A "tibble" including SampleID, SubjectID etc. assigned to well positions.
 #' Columns include same columns as Manifest with additional columns:
