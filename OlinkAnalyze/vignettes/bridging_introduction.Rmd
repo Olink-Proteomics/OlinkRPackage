@@ -120,7 +120,7 @@ olink_bridgeselector(df = npx_data1,
   
 ```
 
-It's important to make sure that the select bridge samples are representative of the overall samples. This can be done with the following code and make sure that the bridge samples are clustered with the remaining samples. 
+It's important to make sure that the select bridge samples are representative of the overall samples. This can be done with the following code and make sure that the bridge samples are evenly dispersed among the other samples. 
 
 ```{r bridge_sample_selection_example_pca, echo=T, eval=T}
 npx_data1 %>% 
