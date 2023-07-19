@@ -12,8 +12,11 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
-```{r, echo=FALSE,message=FALSE}
+```{r, echo=FALSE,message=FALSE, eval=FALSE}
 library(OlinkAnalyze)
+```
+
+```{r, echo=FALSE,message=FALSE}
 library(dplyr)
 library(ggplot2)
 ```
