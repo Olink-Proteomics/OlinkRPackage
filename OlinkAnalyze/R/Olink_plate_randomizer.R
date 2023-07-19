@@ -180,7 +180,7 @@ generatePlateHolder <- function(n.plates,n.spots,n.samples, PlateSize, num_ctrl,
   full.row.col <- expand.grid(column=paste0("Column ",1:(number_of_cols_per_plate)),
                               row=LETTERS[1:8],
                               stringsAsFactors = TRUE) %>% # String as factor needed so Column 10 doesnt come before column 2 in ordering
-    dplyr::arrange(column, row) |> #row is unnecessary here but its fine
+    dplyr::arrange(column, row) %>% #row is unnecessary here but its fine
     dplyr::slice_head(n = PlateSize - num_ctrl*!rand_ctrl)
   
   # Instead we could generate entire plate and then filter out the end of the plate (last column, end of rows, would need to make sure order is correct) for the controls if they are not randomized throughout the plate
@@ -341,23 +341,23 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, Product, SubjectCol
     # bind manifest to randomized plate layout, add wellID, reorder back to standard plate
     # This doesnt work as well if # rows in manifest != # rows of all plates (could get duplicate samples) - which is what we filtered for above
     
-    ctrl_locations <- all.plates |> 
-      dplyr::group_by(plate) |> 
-      dplyr::slice_sample(n = num_ctrl*rand_ctrl) |>  # Select random locations from each plate when randomizing controls
-      dplyr::mutate(ID = paste0(plate,column,row)) |> 
+    ctrl_locations <- all.plates %>% 
+      dplyr::group_by(plate) %>% 
+      dplyr::slice_sample(n = num_ctrl*rand_ctrl) %>%  # Select random locations from each plate when randomizing controls
+      dplyr::mutate(ID = paste0(plate,column,row)) %>% 
       dplyr::mutate(SampleID = "CONTROL_SAMPLE")
     
     # Remove ctrl locations from list of possible locations
-    all.plates <- all.plates |> 
-      dplyr::mutate(ID = paste0(plate,column,row)) |> 
+    all.plates <- all.plates %>% 
+      dplyr::mutate(ID = paste0(plate,column,row)) %>% 
       filter(!(ID %in% ctrl_locations$ID))
     
     
     out.manifest <- dplyr::as_tibble(cbind(Manifest,all.plates)) %>%
-      dplyr::bind_rows(ctrl_locations) |> 
+      dplyr::bind_rows(ctrl_locations) %>% 
       dplyr::mutate(well=paste0(row,gsub("Column ","",as.character(column)))) %>%
       dplyr::mutate(well=factor(well,levels=paste0(rep(LETTERS[1:8],each=number_of_cols_per_plate),rep(1:number_of_cols_per_plate,times=8)))) %>% # This could use the row column in all.plates instead of regenerating it. 
-      dplyr::arrange(plate, column, row) |> 
+      dplyr::arrange(plate, column, row) %>% 
       select(-ID)
     cat("Random assignment of SAMPLES to plates\n")
     class(out.manifest) <- c("randomizedManifest",class(out.manifest))
@@ -377,15 +377,15 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, Product, SubjectCol
       all.plates$SampleID <- NA
       
       # When randomizing controls
-      ctrl_locations <- all.plates |> 
-        dplyr::group_by(plate) |> 
-        dplyr::slice_sample(n = num_ctrl*rand_ctrl) |>  # Select random locations from each plate when randomizing controls
-        dplyr::mutate(ID = paste0(plate,column,row)) |> 
+      ctrl_locations <- all.plates %>% 
+        dplyr::group_by(plate) %>% 
+        dplyr::slice_sample(n = num_ctrl*rand_ctrl) %>%  # Select random locations from each plate when randomizing controls
+        dplyr::mutate(ID = paste0(plate,column,row)) %>% 
         dplyr::mutate(SampleID = "CONTROL_SAMPLE")
       
       # Remove ctrl locations from list of possible locations when randomizing controls
-      all.plates <- all.plates |> 
-        dplyr::mutate(ID = paste0(plate,column,row)) |> 
+      all.plates <- all.plates %>% 
+        dplyr::mutate(ID = paste0(plate,column,row)) %>% 
         filter(!(ID %in% ctrl_locations$ID))
       
       # randomize subject order
@@ -428,10 +428,10 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, Product, SubjectCol
     if(passed){
       # Arrange updated manifest in order  
       out.manifest <- out.manifest %>%
-        dplyr::bind_rows(ctrl_locations) |> 
+        dplyr::bind_rows(ctrl_locations) %>% 
         dplyr::mutate(well=paste0(row,gsub("Column ","",as.character(column)))) %>%
         dplyr::mutate(well=factor(well,levels=paste0(rep(LETTERS[1:8],each=number_of_cols_per_plate),rep(1:number_of_cols_per_plate,times=8)))) %>%
-        dplyr::arrange(plate, column, row) |> 
+        dplyr::arrange(plate, column, row) %>% 
         dplyr::select(-ID)
       
       class(out.manifest) <- c("randomizedManifest",class(out.manifest))
@@ -447,15 +447,15 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, Product, SubjectCol
     cat("Assigning subjects to plates. 'study' column detected so keeping studies together during randomization. \n")
     all.plates$SampleID <- NA
     # When randomizing controls
-    ctrl_locations <- all.plates |> 
-      dplyr::group_by(plate) |> 
-      dplyr::slice_sample(n = num_ctrl*rand_ctrl) |>  # Select random locations from each plate when randomizing controls
-      dplyr::mutate(ID = paste0(plate,column,row)) |> 
+    ctrl_locations <- all.plates %>% 
+      dplyr::group_by(plate) %>% 
+      dplyr::slice_sample(n = num_ctrl*rand_ctrl) %>%  # Select random locations from each plate when randomizing controls
+      dplyr::mutate(ID = paste0(plate,column,row)) %>% 
       dplyr::mutate(SampleID = "CONTROL_SAMPLE")
     
     # Remove ctrl locations from list of possible locations when randomizing controls
-    all.plates <- all.plates |> 
-      dplyr::mutate(ID = paste0(plate,column,row)) |> 
+    all.plates <- all.plates %>% 
+      dplyr::mutate(ID = paste0(plate,column,row)) %>% 
       filter(!(ID %in% ctrl_locations$ID))
     
     out.manifest <- matrix(nrow = 0,ncol = ncol(Manifest))
@@ -558,7 +558,7 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, Product, SubjectCol
       cat(paste("Totally included", j_tot, "empty well(s) in first and/or intermediate plate(s) to accomplish the randomization.\n"))
       cat(paste("Please try another seed or increase the number of iterations if there are indications that another randomization might leave fewer empty wells.\n"))      
       out.manifest <- out.manifest %>%
-        dplyr::bind_rows(ctrl_locations) |> 
+        dplyr::bind_rows(ctrl_locations) %>% 
         dplyr::mutate(well=paste0(row,gsub("Column ","",as.character(column)))) %>%
         dplyr::mutate(well=factor(well,levels=paste0(rep(LETTERS[1:8],each=number_of_cols_per_plate),rep(1:number_of_cols_per_plate,times=8))),
                       SubjectID = SubjectID_old) %>%
@@ -578,15 +578,15 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, Product, SubjectCol
     out.manifest <- matrix(nrow = 0,ncol = ncol(Manifest))
     
     # When randomizing controls
-    ctrl_locations <- all.plates |> 
-      dplyr::group_by(plate) |> 
-      dplyr::slice_sample(n = num_ctrl*rand_ctrl) |>  # Select random locations from each plate when randomizing controls
-      dplyr::mutate(ID = paste0(plate,column,row)) |> 
+    ctrl_locations <- all.plates %>% 
+      dplyr::group_by(plate) %>% 
+      dplyr::slice_sample(n = num_ctrl*rand_ctrl) %>%  # Select random locations from each plate when randomizing controls
+      dplyr::mutate(ID = paste0(plate,column,row)) %>% 
       dplyr::mutate(SampleID = "CONTROL_SAMPLE")
     
     # Remove ctrl locations from list of possible locations when randomizing controls
-    all.plates <- all.plates |> 
-      dplyr::mutate(ID = paste0(plate,column,row)) |> 
+    all.plates <- all.plates %>% 
+      dplyr::mutate(ID = paste0(plate,column,row)) %>% 
       filter(!(ID %in% ctrl_locations$ID))
     
     Manifest <- Manifest %>% dplyr::arrange(study) 
@@ -599,7 +599,7 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, Product, SubjectCol
       all.plates_study <- all.plates_study[sample(1:nrow(ManifestStudy)),]
       
       out.manifestStudy <- dplyr::as_tibble(cbind(ManifestStudy,all.plates_study)) %>%
-        dplyr::bind_rows(ctrl_locations) |> 
+        dplyr::bind_rows(ctrl_locations) %>% 
         dplyr::mutate(well=paste0(row,gsub("Column ","",as.character(column)))) %>%
         dplyr::mutate(well=factor(well,levels=paste0(rep(LETTERS[1:8],
                                                          each=number_of_cols_per_plate),
