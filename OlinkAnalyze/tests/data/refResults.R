@@ -265,7 +265,7 @@ randomized_result3 <- olink_plate_randomizer({manifest |> dplyr::mutate(
   available.spots=c(88,88),
   seed=12345)
 randomized_result4 <- olink_plate_randomizer({manifest |> dplyr::mutate(
-  study = ifelse(Site == "Site1", "study1", "study2")) |> dplyr::select(-SubjectID)},
+  study = ifelse(Site == "Site1", "study1", "study2"))},
   available.spots=c(88,88),
   seed=12345)
 
