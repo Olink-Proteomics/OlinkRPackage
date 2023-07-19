@@ -4,7 +4,7 @@
 #' Horizontal dashed lines indicate +/-IQR_outlierDef standard deviations from the mean IQR (default 3).
 #' Vertical dashed lines indicate +/-median_outlierDef standard deviations from the mean sample median (default 3).
 #'
-#' @param df NPX data frame in long format. Must have columns SampleID, Index, NPX and Panel
+#' @param df NPX data frame in long format. Must have columns SampleID, NPX and Panel
 #' @param color_g Character value indicating which column to use as fill color (default QC_Warning)
 #' @param plot_index Boolean. If FALSE (default), a point will be plotted for a sample. If TRUE,
 #' a sample's unique index number is displayed.
@@ -84,17 +84,29 @@ olink_qc_plot <- function(df,
   if(!all(is.numeric(IQR_outlierDef), is.numeric(median_outlierDef))){
     stop('IQR_outlierDef and median_outlierDef have to be numerical values')
   }
-
-  npx_df_qr <- npx_df %>%
-    dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>% #Exclude assays that have all NA:s
-    dplyr::group_by(Panel, SampleID, Index) %>%
-    dplyr::mutate(QC_Warning = dplyr::if_else(all(toupper(QC_Warning) == 'PASS'),
-                                              'Pass',
-                                              'Warning')) %>%
+  
+  if(plot_index == TRUE & !("Index" %in% names(npx_df))){
+    warning("Index not available. Setting plot_index to FALSE.")
+    plot_index <- FALSE
+  }
+  
+  if("QC_Warning" %in% names(npx_df)){
+    npx_df_qr <- npx_df %>%
+      dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>% #Exclude assays that have all NA:s
+      dplyr::group_by(Panel, SampleID) %>%
+      dplyr::mutate(QC_Warning = dplyr::if_else(all(toupper(QC_Warning) == 'PASS'),
+                                                'Pass',
+                                                'Warning'))
+  }else{
+    npx_df_qr <- npx_df %>%
+      dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>% #Exclude assays that have all NA:s
+      dplyr::group_by(Panel, SampleID) 
+    }
+  npx_df_qr <- npx_df_qr %>%
     dplyr::mutate(IQR = IQR(NPX, na.rm = TRUE),
                   sample_median = median(NPX, na.rm = TRUE)) %>%
     dplyr::ungroup() %>%
-    dplyr::select(SampleID, Index, Panel, IQR, sample_median, !!rlang::ensym(color_g)) %>%
+    dplyr::select(SampleID, Panel, IQR, sample_median, !!rlang::ensym(color_g)) %>%
     dplyr::distinct() %>%
     dplyr::group_by(Panel) %>%
     dplyr::mutate(median_low = mean(sample_median, na.rm = TRUE) - median_outlierDef*sd(sample_median, na.rm = TRUE),
