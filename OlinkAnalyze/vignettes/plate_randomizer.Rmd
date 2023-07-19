@@ -41,7 +41,7 @@ data(manifest)
 The input manifest should be a tibble/data frame in long format containing all sample ID's. Sample ID column must be named SampleID. An example manifest is shown in Table 1. 
 
 ```{r manifest, echo = F, message=FALSE}
- manifest |> head(10)  %>% 
+ manifest %>% head(10)  %>% 
   knitr::kable(format = "html",
                booktabs = T,
                linesep = "",
@@ -83,7 +83,7 @@ randomized_manifest <- olink_plate_randomizer(manifest,
                                               num_ctrl = 10, 
                                               rand_ctrl = TRUE)
 
-randomized_manifest |> dplyr::glimpse()
+randomized_manifest %>% dplyr::glimpse()
 ```
 
 
