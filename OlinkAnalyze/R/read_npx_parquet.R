@@ -41,12 +41,30 @@ read_npx_parquet <- function (filename) {
     sources = filename
   )
 
+  # Check that parquet metadat is in place
+  olink_parquet_metadata <- c("DataFileType",
+                              "ProductType")
+  if (!all(olink_parquet_metadata %in% names(parquet_file$metadata))) {
+
+    stop(
+      paste("Missing required fileds",
+            paste(
+              paste0("\"", olink_parquet_metadata, "\""),
+              collapse = " and "),
+            "in parquet file's metadata."
+            )
+      )
+
+  }
+
   # We allow only Olink Explore HT parquet files for now
   # If other platforms are to be reported as parquet too, we have to add
   # them to this array
   olink_platforms <- c("ExploreHT")
   if (!(parquet_file$metadata$ProductType %in% olink_platforms)) {
+
     stop("Only \"Olink Explore HT\" parquet files are currently supported.")
+
   }
 
 
