@@ -450,18 +450,26 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, Product, SubjectCol
   ##Keep subjects together and keep studies together
   if(!missing(SubjectColumn) & suppressWarnings(!is.null(Manifest$study))){
     cat("Assigning subjects to plates. 'study' column detected so keeping studies together during randomization. \n")
-    all.plates$SampleID <- NA
     # When randomizing controls
-    ctrl_locations <- all.plates %>% 
-      dplyr::group_by(plate) %>% 
-      dplyr::slice_sample(n = num_ctrl*rand_ctrl) %>%  # Select random locations from each plate when randomizing controls
-      dplyr::mutate(ID = paste0(plate,column,row)) %>% 
-      dplyr::mutate(SampleID = "CONTROL_SAMPLE")
+    all.plates$SampleID <- NA_character_
+    ctrl_locations <- all.plates |> 
+      dplyr::slice(0) |> 
+      dplyr::mutate(ID = NA_character_)
+    # When randomizing controls
+    if(rand_ctrl){
+      ctrl_locations <- all.plates %>% 
+        dplyr::group_by(plate) %>% 
+        dplyr::slice_sample(n = num_ctrl*rand_ctrl) %>%  # Select random locations from each plate when randomizing controls
+        dplyr::mutate(ID = paste0(plate,column,row)) %>% 
+        dplyr::mutate(SampleID = "CONTROL_SAMPLE")
+    }
+    
     
     # Remove ctrl locations from list of possible locations when randomizing controls
     all.plates <- all.plates %>% 
       dplyr::mutate(ID = paste0(plate,column,row)) %>% 
       filter(!(ID %in% ctrl_locations$ID))
+    
     
     out.manifest <- matrix(nrow = 0,ncol = ncol(Manifest))
     
@@ -582,12 +590,19 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, Product, SubjectCol
     
     out.manifest <- matrix(nrow = 0,ncol = ncol(Manifest))
     
+    all.plates$SampleID <- NA_character_
+    ctrl_locations <- all.plates |> 
+      dplyr::slice(0) |> 
+      dplyr::mutate(ID = NA_character_)
     # When randomizing controls
-    ctrl_locations <- all.plates %>% 
-      dplyr::group_by(plate) %>% 
-      dplyr::slice_sample(n = num_ctrl*rand_ctrl) %>%  # Select random locations from each plate when randomizing controls
-      dplyr::mutate(ID = paste0(plate,column,row)) %>% 
-      dplyr::mutate(SampleID = "CONTROL_SAMPLE")
+    if(rand_ctrl){
+      ctrl_locations <- all.plates %>% 
+        dplyr::group_by(plate) %>% 
+        dplyr::slice_sample(n = num_ctrl*rand_ctrl) %>%  # Select random locations from each plate when randomizing controls
+        dplyr::mutate(ID = paste0(plate,column,row)) %>% 
+        dplyr::mutate(SampleID = "CONTROL_SAMPLE")
+    }
+    
     
     # Remove ctrl locations from list of possible locations when randomizing controls
     all.plates <- all.plates %>% 
