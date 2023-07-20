@@ -8,6 +8,8 @@ olink_displayPlateLayout(
   data,
   fill.color,
   PlateSize = 96,
+  num_ctrl = 8,
+  rand_ctrl = FALSE,
   Product,
   include.label = FALSE
 )
@@ -18,6 +20,10 @@ olink_displayPlateLayout(
 \item{fill.color}{Column name to be used as coloring variable for wells.}
 
 \item{PlateSize}{Integer. Either 96 or 48. 96 is default.}
+
+\item{num_ctrl}{Numeric. Number of controls on each plate (default = 8)}
+
+\item{rand_ctrl}{Logical. Whether controls are added to be randomized across the plate (default = FALSE)}
 
 \item{Product}{String. Name of Olink product used to set PlateSize if not provided. Optional.}
 
