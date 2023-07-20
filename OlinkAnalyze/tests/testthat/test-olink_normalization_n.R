@@ -1,7 +1,7 @@
   # Load data for tests ----
 
   # load reference results
-  refRes_file <- '../data/refResults.RData'
+  refRes_file <- testthat::test_path("../data/refResults.RData")
   load(refRes_file)
 
   # sample subset used to reduce file size of the ref results
@@ -9,10 +9,11 @@
                     "B70", "D52", "A58", "B71", "A50", "D1", "B8")
 
   # load data with hidden/excluded assays (all NPX = NA for specific assays)
-  load(file = '../data/npx_data_format221010.RData')
+  load(file = testthat::test_path("../data/npx_data_format221010.RData"))
   # loads npx_data_format221010 and npx_data_format221010.project2
 
-  complex_npx_file <- system.file("extdata", "complex_dataset.rds", package = "OlinkAnalyze", mustWork = TRUE)
+  complex_npx_file <- system.file("extdata", "complex_dataset.rds",
+                                  package = "OlinkAnalyze", mustWork = TRUE)
   complex_npx_data <- readRDS(complex_npx_file)
 
   # Help vars and datasets ----
@@ -1246,8 +1247,9 @@ test_that("Different columns in dfs can be normalized",{
         dplyr::filter(Project == "P2") |>
         dplyr::select(dplyr::all_of(col_notdf2[-length(col_notdf2)])) |>
         dplyr::distinct() |>
-        dplyr::pull()
-      }, "NA")
+        dplyr::pull() |>
+        as.logical()
+      }, NA)
 
   expect_equal(
     {
@@ -1255,8 +1257,9 @@ test_that("Different columns in dfs can be normalized",{
         dplyr::filter(Project == "P1") |>
         dplyr::select(dplyr::all_of(col_notdf1[-length(col_notdf1)])) |>
         dplyr::distinct() |>
-        dplyr::pull()
-    }, "NA")
+        dplyr::pull() |>
+        as.logical()
+    }, NA)
 
   expect_equal(normalization_results.bridged$NPX, mismatch_col_norm$NPX)
 })

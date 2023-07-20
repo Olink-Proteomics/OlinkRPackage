@@ -11,7 +11,7 @@
 #' @param n Number of bridge samples to be selected.
 #'
 #' @return A "tibble" with sample IDs and mean NPX for a defined number of bridging samples. Columns include:
-#' 
+#'
 #' \itemize{
 #'   \item{SampleID:} Sample ID
 #'   \item{PercAssaysBelowLOD:} Percent of Assays that are below LOD for the sample
@@ -28,17 +28,17 @@
 olink_bridgeselector<-function(df, sampleMissingFreq, n){
   # Exclude OlinkIDs with missing NPX
   npx_check <- npxCheck(df)
-  
+
   #Filtering on valid OlinkID
   df <- df %>%
-    dplyr::filter(!(OlinkID %in% npx_check$all_nas)) %>% 
+    dplyr::filter(!(OlinkID %in% npx_check$all_nas)) %>%
     dplyr::filter(stringr::str_detect(OlinkID,
                                       "OID[0-9]{5}"))
-  
+
   #Filtering out control samples
   df <- df %>%
     dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_SAMPLE*"))
-  
+
   #Outlier calculation as in qc_plot for filtering
   qc_outliers <- df %>%
     dplyr::group_by(Panel, SampleID, Index) %>%
@@ -59,7 +59,7 @@ olink_bridgeselector<-function(df, sampleMissingFreq, n){
                                       IQR < iqr_high,
                                     0, 1)) %>%
     dplyr::select(SampleID, Index, Panel, Outlier)
-  
+
   df_1 <- df %>%
     dplyr::left_join(qc_outliers, by = c('SampleID', 'Index', 'Panel')) %>%
     dplyr::mutate(NPX = ifelse(NPX <= LOD, NA, NPX)) %>%
@@ -74,29 +74,33 @@ olink_bridgeselector<-function(df, sampleMissingFreq, n){
     dplyr::mutate(MeanNPX = mean(NPX, na.rm = TRUE)) %>%
     dplyr::ungroup() %>%
     dplyr::filter(PercAssaysBelowLOD < sampleMissingFreq)
-  
-  
+
+
   df_2 <- df_1 %>%
     dplyr::select(SampleID, PercAssaysBelowLOD, MeanNPX) %>%
-    dplyr::distinct() 
-  
+    dplyr::distinct()
+
   if(nrow(df_2) < n){
-    stop(paste0('With the current settings only ', 
-                nrow(df_2), 
+    stop(paste0('With the current settings only ',
+                nrow(df_2),
                 ' samples can be selected. Please increase sampleMissingFreq and/or decrease n.'))
-    
+
+  } else if (nrow(df_2) == n) {
+    # if samples satisfying the criteria equal the number of requested samples
+    # return all of them
+    SelectedBridges <- df_2
+  } else { #
+    df_2  <- df_2  %>%
+      dplyr::arrange(desc(MeanNPX)) %>%
+      dplyr::mutate(Order = c(1:nrow(.)))
+
+    Bridgesamples <- floor(seq(1,nrow(df_2),length.out = n+2)[c(-1, -(n+2))])
+
+    SelectedBridges <- df_2 %>%
+      dplyr::filter(Order %in% Bridgesamples) %>%
+      dplyr::slice_sample(n = nrow(.)) %>%
+      dplyr::select(-Order)
   }
-  
-  df_2  <- df_2  %>%
-    dplyr::arrange(desc(MeanNPX)) %>%
-    dplyr::mutate(Order = c(1:nrow(.)))
-  
-  Bridgesamples <- floor(seq(1,nrow(df_2),length.out = n+2)[c(-1, -(n+2))])
-  
-  SelectedBridges <- df_2 %>%
-    dplyr::filter(Order %in% Bridgesamples) %>%
-    dplyr::slice_sample(n = nrow(.)) %>%
-    dplyr::select(-Order)
-  
+
   return(SelectedBridges)
 }

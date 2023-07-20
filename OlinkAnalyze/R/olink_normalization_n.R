@@ -22,7 +22,7 @@
 #' }
 #'
 #' The function can also handle a mixed schema of bridge and subset
-#' normalizations.
+#' normalization.
 #'
 #' Specifications of the normalization schema data frame:
 #' \itemize{

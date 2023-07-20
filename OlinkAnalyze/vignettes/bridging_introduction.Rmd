@@ -50,7 +50,7 @@ Bridging is also needed if Olink® NPX datasets are:
 To bridge two or more Olink® NPX datasets, bridging samples are needed
 to calculate the assay-specific adjustment factors between datasets.
 Bridging samples are shared samples among datasets - that is that
-samples that are analysed in both datasets. The recommended number of
+samples that are analyzed in both datasets. The recommended number of
 bridging samples are shown in the table below. Olink® NPX datasets
 without shared samples should not be combined using the bridging
 approach described below.
@@ -95,6 +95,7 @@ samples based on the reference data. This function selects samples which
 passes QC and have high detectibility. In the case of where detectibility cannot be calculated from the test data set (ex: Explore HT data), the function will only select samples which pass QC. External controls are not selected as bridge samples as they are not necessarily representative of the study and therefore may not cover the dynamic range of assays that would be expressed within the samples.
 
 To select samples across the range of the data, the samples are ordered by mean NPX value and selected across this range. When running the selector, Olink recommends starting at sampleMissingFreq = 0.10 which represents a maximum of 10% data below LOD per sample. If there are not enough samples output,increase to 20%. For alternative matrices and specific disease types, it may be needed to increase the sampleMissingFreq to higher levels.
+
 
 In this example we will demonstrate how to select 16 bridging samples
 using `npx_data1` which will act as the reference data. The selected bridge samples are displayed in Table 2.
@@ -230,7 +231,7 @@ overlapping_samples <-  data.frame(SampleID = intersect(npx_1$SampleID, npx_2$Sa
 
 npx_before_br <- npx_data1 %>%
   dplyr::filter(!str_detect(SampleID, "CONTROL_SAMPLE")) %>% #Remove control samples
-  dplyr::mutate(Type = if_else(SampleID %in% overlapping_samples,
+  dplyr::mutate(Type = if_else(SampleID %in% overlapping_samples,=
                         paste0("data1 Bridge"),
                         paste0("data1 Sample"))) %>%
   rbind({
@@ -298,6 +299,7 @@ npx_br_data <- olink_normalization_bridge(project_1_df = npx_1,
                                           project_1_name = "data1",
                                           project_2_name = "data2",
                                           project_ref_name = "data1")
+
 
 ```
 
@@ -491,6 +493,7 @@ columns will need to be removed. To export the new project,
 
 ```{r, eval = FALSE}
 new_normalized_data <- npx_br_data %>% 
+<<<<<<< HEAD
   dplyr::filter(Project == "data2") %>% 
   dplyr::select(-Project, -Adj_factor) %>% 
   write.table(, file = "New_Normalized_NPX_data.csv", sep = ";")

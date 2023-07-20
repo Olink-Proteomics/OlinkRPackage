@@ -1,6 +1,6 @@
 ## Release Summary
 
-This release contains bugfixes for Olink Analyze version 3.3.0.
+This release contains bug fixes to version 3.4.0 to fix unit test errors and edge cases.
 
 ## R CMD check results
 

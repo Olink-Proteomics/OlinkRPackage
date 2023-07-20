@@ -1,3 +1,24 @@
+# Olink Analyze 3.4.1
+## Bug Fixes
+* Skip PCA snapshot tests in R version > 4.2.3 (@AskPascal, #254)
+* Bridge selector will now return all samples when requesting max number of samples based on missing frequency (@klevdiamanti, #252)
+* Fixed unit tests to expect NA as logical instead of "NA" as character (@MasoumehSheikhi, #250)
+
+# Olink Analyze 3.4.0
+## Minor Changes
+* User can now specify label for proteins in olink_heatmap_plot() (@simfor, #228)
+* Updates to unit test and CI based on dependency changes (@AskPascal, #231, #236, #240)
+* Addition of normalization functions to simplify bridge, subset, and multi-batch normalization (@klevdiamanti, #201)
+* Introduction to bridging vignette added (@leiliuC, @kathy-nevola, #174)
+* Plate Randomization vignette added (@boxizhang, #241)
+* Outlier Exclusion vignette added (@kathy-nevola, #229)
+* Added Lei Conze as author (@kathy-nevola, #246)
+* Addition of citation (@kathy-nevola, #246)
+
+## Bug Fixes
+* Update to olink_wilcox documentation and UniProt description in documentation has been corrected (@boxizhang, #235)
+
+
 # Olink Analyze 3.3.1
 ## Bug Fixes
 * olink_pathway_enrichment now prints a message when there are non matching names when using method = "ORA" (@MasoumehSheikhi, #222)
