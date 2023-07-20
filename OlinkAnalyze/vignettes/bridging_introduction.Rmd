@@ -338,7 +338,7 @@ First, check NPX distribution in datasets after bridging normalization, as shown
 
 npx_br_data %>%
   mutate(Panel = gsub("Olink ", "", Panel)) %>%
-  ggplot2::ggplot(ggplot2::aes(x = NPX, fill = dataset)) +
+  ggplot2::ggplot(ggplot2::aes(x = NPX, fill = Project)) +
   ggplot2::geom_density(alpha = 0.4) +
   ggplot2::facet_grid(~Panel) +
   olink_fill_discrete(coloroption = c("red", "darkblue")) +
