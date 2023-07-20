@@ -305,12 +305,13 @@ npx_br_data <- olink_normalization_bridge(project_1_df = npx_1,
 
 ```{r norm_data_table , echo = FALSE}
 npx_br_data %>% 
+  head(10) %>% 
   kableExtra::kbl(booktabs = TRUE,
       digits = 1,
-      caption = "Table 4. Combined datasets after bridging.") %>%
+      caption = "Table 4. First 10 rows of combined datasets after bridging.") %>%
   kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE, font_size = 10, 
                 position = "center", latex_options = "HOLD_position") %>% 
-  kableExtra::scroll_box(width = "100%", height = "100%")
+  kableExtra::scroll_box(width = "100%")
 ```
 
 
