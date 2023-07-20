@@ -41,7 +41,7 @@ read_npx_parquet <- function (filename) {
     sources = filename
   )
 
-  # Check that parquet metadata is in place
+  # Check that all required parquet metadata is in place
   olink_parquet_metadata <- c("DataFileType",
                               "ProductType")
   if (!all(olink_parquet_metadata %in% names(parquet_file$metadata))) {
