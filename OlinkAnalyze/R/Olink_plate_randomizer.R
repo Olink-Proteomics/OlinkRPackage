@@ -16,6 +16,8 @@ product_to_platesize <- function(Product){
 #' @param fill.color Column name to be used as coloring variable for wells.
 #' @param PlateSize Integer. Either 96 or 48. 96 is default.
 #' @param Product String. Name of Olink product used to set PlateSize if not provided. Optional. 
+#' @param num_ctrl Numeric. Number of controls on each plate (default = 8)
+#' @param rand_ctrl Logical. Whether controls are added to be randomized across the plate (default = FALSE)
 #' @param include.label Should the variable group be shown in the plot.
 #' @keywords randomized plates ggplot
 #' @return An object of class "ggplot" showing each plate in a facet with the cells colored by values in column fill.color in input \code{data}.
@@ -33,7 +35,7 @@ product_to_platesize <- function(Product){
 #' @importFrom dplyr n filter select mutate
 #' @importFrom ggplot2 ggplot geom_tile facet_wrap scale_fill_manual labs scale_x_discrete geom_text
 
-olink_displayPlateLayout <- function(data, fill.color, PlateSize = 96, Product, include.label=FALSE){
+olink_displayPlateLayout <- function(data, fill.color, PlateSize = 96, num_ctrl = 8, rand_ctrl = FALSE, Product, include.label=FALSE){
   if(!missing(Product)){
     PlateSize <- product_to_platesize(Product)
   }
@@ -42,12 +44,12 @@ olink_displayPlateLayout <- function(data, fill.color, PlateSize = 96, Product, 
     stop('Plate size needs to be either 48 or 96.')
   }
 
-  spots_per_plate <- PlateSize - 8
+  spots_per_plate <- PlateSize - num_ctrl*!rand_ctrl
   number_of_cols_per_plate <- PlateSize/8
 
   missing.spots <- expand.grid(plate=unique(data$plate),
                                row=LETTERS[1:8],
-                               column=paste("Column",1:(number_of_cols_per_plate-1)),fill.color="Empty")
+                               column=paste("Column",1:(number_of_cols_per_plate)),fill.color="Empty")
   missing.spots$unique.id <- paste(missing.spots$plate,missing.spots$row,missing.spots$column)
   missing.spots <- missing.spots %>%
     dplyr::filter(!unique.id %in% paste(data$plate,data$row,data$column)) %>%
@@ -56,11 +58,13 @@ olink_displayPlateLayout <- function(data, fill.color, PlateSize = 96, Product, 
   if(missing(fill.color)) fill.color <- "plate"
 
   data$fill.color <- data[[fill.color]]
+  data <- data %>% 
+    dplyr::mutate(fill.color = ifelse(SampleID == "CONTROL_SAMPLE", "CONTROL", fill.color))
   data <- data %>%
     dplyr::select(fill.color,plate,row,column,fill.color) %>%
     rbind(missing.spots) %>%
     dplyr::mutate(row=factor(row,levels=LETTERS[8:1]),
-                  column=factor(column,levels=paste("Column",1:(number_of_cols_per_plate-1))),
+                  column=factor(column,levels=paste("Column",1:(number_of_cols_per_plate))),
                   fill.color=factor(fill.color))
 
   fill.levels <- levels(data$fill.color)
@@ -80,7 +84,7 @@ olink_displayPlateLayout <- function(data, fill.color, PlateSize = 96, Product, 
     OlinkAnalyze::set_plot_theme()+
     ggplot2::scale_fill_manual(values=fills)+
     ggplot2::labs(x="",y="",fill=fill.color)+
-    ggplot2::scale_x_discrete(labels=paste0("Col",1:(number_of_cols_per_plate-1)))
+    ggplot2::scale_x_discrete(labels=paste0("Col",1:(number_of_cols_per_plate)))
 
   if(include.label){
     return(p+ggplot2::geom_text(ggplot2::aes(label=fill.color),color="black"))
