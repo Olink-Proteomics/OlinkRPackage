@@ -48,7 +48,7 @@ The input manifest should be a tibble/data frame in long format containing all s
                digits = 4,
                longtable = T,
                row.names = F,
-               caption = " Sample manifest.",
+               caption = "Table 1. Example of Sample manifest",
                label = "manifest")
 ```
 
@@ -57,8 +57,9 @@ The input manifest should be a tibble/data frame in long format containing all s
 
 The simplest way to randomize the samples is to perform complete randomization.
 
+
 ```{r complete_randomization, message=FALSE, warning=FALSE,results='hide'}
-randomized.manifest_a <- olink_plate_randomizer(manifest, seed=123456)
+randomized.manifest <- olink_plate_randomizer(manifest, seed=123456)
 ```
 
 
@@ -68,24 +69,42 @@ In the case of multiple samples per subject (e.g. in longitudinal studies), Olin
 
 
 ```{r subjects_randomization, message=FALSE,results='hide'}
-randomized.manifest_b <- olink_plate_randomizer(manifest,SubjectColumn="SubjectID", 
+randomized.manifest <- olink_plate_randomizer(manifest,
+                                                SubjectColumn="SubjectID", 
                                                 available.spots=c(48,48,42), 
                                                 iterations = 500,
                                                 seed=123456)
 ```
 
-The plate size can be either directly set to 48 or 96 using the `PlateSize` argument or can be inferred by setting the `Product` argument to "Target 96", "Target 48", "Explore 384","Explore 3072",or "Explore HT." The number of controls can be set using the `num_ctrl` argument, which defaults to 8 controls. The controls can also be set to be randomized throughout the plate using the `rand_ctrl` argument.
+The plate size can be either directly set to 48 or 96 using the `PlateSize` argument or can be inferred by setting the `Product` argument to "Target 96", "Target 48", "Explore 384","Explore 3072", or "Explore HT." The number of Olink external controls can be set using the `num_ctrl` argument, which defaults to 8 controls. The Olink external controls can also be set to be randomized throughout the plate using the `rand_ctrl` argument.
 
-```{r randomize_controls, message=FALSE}
+```{r randomize_controls, message=FALSE, eval = FALSE}
 randomized_manifest <- olink_plate_randomizer(manifest, 
                                               Product = "Explore HT",
                                               SubjectColumn = "SampleID",
                                               num_ctrl = 10, 
                                               rand_ctrl = TRUE)
-
-randomized_manifest %>% dplyr::glimpse()
 ```
 
+```{r randomized_controls_table, echo=FALSE, message=FALSE, warning=FALSE}
+
+randomized_manifest <- olink_plate_randomizer(manifest, 
+                                              Product = "Explore HT",
+                                              SubjectColumn = "SampleID",
+                                              num_ctrl = 10, 
+                                              rand_ctrl = TRUE)
+randomized_manifest %>% 
+  head(10)  %>% 
+  knitr::kable(format = "html",
+               booktabs = T,
+               linesep = "",
+               digits = 4,
+               longtable = T,
+               row.names = F,
+               caption = "Table 2. Example of Randomized Sample manifest",
+               label = "manifest")
+
+```
 
 ## Visualization
 
@@ -94,29 +113,38 @@ To illustrate the goodness of randomization, both `olink_displayPlateLayout()` a
 ### Plate layouts
 
 The `olink_displayPlateLayout()` function could be used to visualize the layouts of the plate and specifying the color for the variable of interest using the `color_g` argument. The label of the colored variable could be shown in the plot via the `include.label` argument.
+```{r figure_captions, message=FALSE, echo=FALSE}
+fcap1 <- "Figure 1. Randomized samples in 96 well plate format, colored by Subject ID."
+fcap2 <- "Figure 2. Randomized samples in 96 well plate format with labeled wells."
+fcap3 <- "Figure 3. Distribution of Subject ID across randomized plates."
+fcap4 <- "Figure 4. Distribution of Site across randomized plates."
 
-```{r, fig.height = 8, fig.width = 8, fig.align = "center"}
-olink_displayPlateLayout(randomized.manifest_b, fill.color = 'SubjectID', include.label = FALSE)
+```
+
+
+
+```{r, fig.height = 8, fig.width = 8, fig.align = "center", fig.cap= fcap1}
+olink_displayPlateLayout(randomized.manifest, fill.color = 'SubjectID', include.label = FALSE)
 ```
 
 The label of the colored variable could be shown in the plot via the `include.label` argument.
 
-```{r,fig.height = 8, fig.width = 8, fig.align = "center"}
-olink_displayPlateLayout(randomized.manifest_b, fill.color = 'SubjectID', include.label = TRUE)
+```{r,fig.height = 8, fig.width = 8, fig.align = "center", fig.cap= fcap2}
+olink_displayPlateLayout(randomized.manifest, fill.color = 'SubjectID', include.label = TRUE)
 ```
 
 ### Plate distribution
 
 The distribution of the given grouping variable on each plate could be visualized via a bar chart using function `olink_displayPlateDistributions`. By setting `fill.color = 'SubjectID'`, we could make sure all the samples from the same subject were put on the same plate. 
 
-```{r,fig.height = 8, fig.width = 8, fig.align = "center"}
-olink_displayPlateDistributions(randomized.manifest_b, fill.color = 'SubjectID')
+```{r,fig.height = 8, fig.width = 8, fig.align = "center", fig.cap=fcap3}
+olink_displayPlateDistributions(randomized.manifest, fill.color = 'SubjectID')
 ```
 
 We could also check the distribution of other variables. For examples, the distribution of the variable `Site` could be visualized by setting `fill.color = 'Site'`. 
 
-```{r,fig.height = 8, fig.width = 8, fig.align = "center"}
-olink_displayPlateDistributions(randomized.manifest_b, fill.color = 'Site')
+```{r,fig.height = 8, fig.width = 8, fig.align = "center", fig.cap= fcap4}
+olink_displayPlateDistributions(randomized.manifest, fill.color = 'Site')
 ```
 
 In the case of the randomization is not performed well, the randomization could be performed again with different seed number and iterations number. 
@@ -137,7 +165,7 @@ The randomized manifest could be outputted as an Excel file using the `write_xls
 
 ```{r, eval = FALSE}
 library(writexl)
-write_xlsx(randomized.manifest_b,"randomized.manifest_b.xlsx")
+write_xlsx(randomized.manifest,"randomized.manifest.xlsx")
 ```
 
 
