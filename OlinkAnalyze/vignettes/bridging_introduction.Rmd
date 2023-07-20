@@ -231,7 +231,7 @@ overlapping_samples <-  data.frame(SampleID = intersect(npx_1$SampleID, npx_2$Sa
 
 npx_before_br <- npx_data1 %>%
   dplyr::filter(!str_detect(SampleID, "CONTROL_SAMPLE")) %>% #Remove control samples
-  dplyr::mutate(Type = if_else(SampleID %in% overlapping_samples,=
+  dplyr::mutate(Type = if_else(SampleID %in% overlapping_samples,
                         paste0("data1 Bridge"),
                         paste0("data1 Sample"))) %>%
   rbind({
