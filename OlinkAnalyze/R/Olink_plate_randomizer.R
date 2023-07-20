@@ -264,6 +264,9 @@ generatePlateHolder <- function(n.plates,n.spots,n.samples, PlateSize, num_ctrl,
 
 #Main randomization function
 olink_plate_randomizer <- function(Manifest, PlateSize = 96, Product, SubjectColumn, iterations=500, available.spots, num_ctrl = 8, rand_ctrl = FALSE, seed){
+  if(num_ctrl < 1 | num_ctrl != as.integer(num_ctrl)){
+    stop("`num_ctrl` must be a positive integer.")
+  }
   
   #Check if SampleID column is present in manifest
   if(!"SampleID" %in% colnames(Manifest)) {
