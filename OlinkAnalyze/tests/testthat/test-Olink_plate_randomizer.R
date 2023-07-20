@@ -38,5 +38,6 @@ test_that("olink_plate_randomizer works", {
                  dplyr::select(n) %>% 
                  unique() %>% 
                  dplyr::pull(), 10)
-  vdiffr::expect_doppelganger("Randomized_Data",olink_displayPlateLayout(randomized_result3, "Visit"))
+  vdiffr::expect_doppelganger("Randomized_Data",olink_displayPlateLayout(randomized_result3, num_ctrl = 10,
+                                                                        rand_ctrl = TRUE, fill.color = "Visit"))
 })
