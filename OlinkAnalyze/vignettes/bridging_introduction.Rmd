@@ -410,7 +410,7 @@ npx_data1 %>%
 ```
 
 Another way to determine if bridging decreased variability between
-projects is to calculate the CV of the control samples before and after bridging the projects, as shown in Figure 7. The CV after normalization is expected to be smaller than the CV prior to normalization, as shown in Figure 7. 
+projects is to calculate the CV of the control samples across both projects before and after bridging, as shown in Figure 7. The CV after normalization is expected to be smaller than the CV prior to normalization, as shown in Figure 7. 
 
 Note that the CV calculation formula differs for [Target
 96](https://olink.com/faq/how-is-cv-calculated/) and
@@ -463,8 +463,8 @@ cv_before %>%
 Finally, use PCA plot to check whether bridging normalization has effect
 in correcting batch effects (Figure 8). In the example below, it is clear that
 before bridging samples from data 1 and 2 are divided into separate
-clusters due to the batch effects, but after bridging they are shown as
-one cluster in the PCA plot. Bridging normalization has sufficiently
+clusters due to the batch effects (Figure 3), but after bridging they are shown as
+one cluster in the PCA plot (Figure 8). Bridging normalization has sufficiently
 removed the batch effects between two data sets.
 
 ```{r pca2, message=FALSE, fig.cap= f8}
