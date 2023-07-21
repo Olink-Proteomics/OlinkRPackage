@@ -340,7 +340,7 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, Product, SubjectCol
     
   }
   
-  #Complete randomization if subjectID not given
+  #### Complete randomization if subjectID not given ####
   if(missing(SubjectColumn) & suppressWarnings(is.null(Manifest$study))){
     # randomly order the first X rows (x being number of samples) from plate layout to assign samples to
     all.plates <- all.plates[sample(1:(nrow(Manifest)+num_ctrl*rand_ctrl*PlatesNeeded)),]
@@ -357,7 +357,7 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, Product, SubjectCol
     # Remove ctrl locations from list of possible locations
     all.plates <- all.plates %>% 
       dplyr::mutate(ID = paste0(plate,column,row)) %>% 
-      filter(!(ID %in% ctrl_locations$ID))
+      dplyr::filter(!(ID %in% ctrl_locations$ID))
     
     
     out.manifest <- dplyr::as_tibble(cbind(Manifest,all.plates)) %>%
@@ -373,7 +373,7 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, Product, SubjectCol
   }
   
   
-  ##Keep subjects together
+  #### Keep subjects together ####
   if(!missing(SubjectColumn) & suppressWarnings(is.null(Manifest$study))){
     message("Assigning subjects to plates\n")
     for(i in 1:iterations){
@@ -398,7 +398,7 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, Product, SubjectCol
       # Remove ctrl locations from list of possible locations when randomizing controls
       all.plates <- all.plates %>% 
         dplyr::mutate(ID = paste0(plate,column,row)) %>% 
-        filter(!(ID %in% ctrl_locations$ID))
+        dplyr::filter(!(ID %in% ctrl_locations$ID))
       
       # randomize subject order
       rand.subjects <- sample(unique(Manifest$SubjectID))
@@ -454,7 +454,7 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, Product, SubjectCol
     
   }
   
-  ##Keep subjects together and keep studies together
+  #### Keep subjects together and keep studies together ####
   if(!missing(SubjectColumn) & suppressWarnings(!is.null(Manifest$study))){
     message("Assigning subjects to plates. 'study' column detected so keeping studies together during randomization. \n")
     # When randomizing controls
@@ -475,10 +475,10 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, Product, SubjectCol
     # Remove ctrl locations from list of possible locations when randomizing controls
     all.plates <- all.plates %>% 
       dplyr::mutate(ID = paste0(plate,column,row)) %>% 
-      filter(!(ID %in% ctrl_locations$ID))
+      dplyr::filter(!(ID %in% ctrl_locations$ID)) 
     
     
-    out.manifest <- matrix(nrow = 0,ncol = ncol(Manifest))
+    out.manifest <- NULL
     
     #Randomize on SubjectID_study in case SubjectID is duplicated over studies
     Manifest <- Manifest %>% dplyr::mutate(
@@ -517,9 +517,11 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, Product, SubjectCol
                                                   rep(spots_per_plate,
                                                       times=PlatesNeeded),
                                                   n.samples=length(Manifest$SampleID)+(num_ctrl*rand_ctrl*PlatesNeeded)+j_tot+j,
+                                                  num_ctrl = num_ctrl, 
+                                                  rand_ctrl = rand_ctrl,
                                                   PlateSize = PlateSize)
           }else{
-            all.plates.New <- generatePlateHolder(length(available.spots),available.spots,n.samples=length(Manifest$SampleID)+j_tot+j, PlateSize = PlateSize)
+            all.plates.New <- generatePlateHolder(length(available.spots),available.spots,n.samples=length(Manifest$SampleID)+j_tot+j,  num_ctrl = num_ctrl, rand_ctrl = rand_ctrl, PlateSize = PlateSize)
           }
           all.plates.New$SampleID <- rep(NA,nrow(all.plates.New)) 
           all.plates <- all.plates.New
@@ -557,7 +559,7 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, Product, SubjectCol
               dplyr::select(-scramble) %>% 
               dplyr::arrange(plate, column, row)
             message(paste(studyNo,"successful! \n"))
-            out.manifest <- rbind(out.manifest, out.manifestStudy)
+            out.manifest <- dplyr::bind_rows(out.manifest,out.manifestStudy)
             ManifestStudy2 <- ManifestStudy %>%
               dplyr::left_join(all.plates,"SampleID") %>%
               dplyr::group_by(plate) %>%
@@ -582,7 +584,7 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, Product, SubjectCol
         dplyr::mutate(well=paste0(row,gsub("Column ","",as.character(column)))) %>%
         dplyr::mutate(well=factor(well,levels=paste0(rep(LETTERS[1:8],each=number_of_cols_per_plate),rep(1:number_of_cols_per_plate,times=8))),
                       SubjectID = SubjectID_old) %>%
-        dplyr::select(-SubjectID_old) %>% 
+        dplyr::select(-SubjectID_old, -ID) %>% 
         dplyr::arrange(plate, column, row)
       class(out.manifest) <- c("randomizedManifest",class(out.manifest))
       return(out.manifest)
@@ -591,7 +593,7 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, Product, SubjectCol
     }
   }
   
-  #Complete randomization within studies when subjectID is not given
+  #### Complete randomization within studies when subjectID is not given ####
   if(missing(SubjectColumn) & suppressWarnings(!is.null(Manifest$study))){
     message("Assigning subjects to plates. 'study' column detected so keeping studies together during randomization. \n")
     
@@ -614,7 +616,7 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, Product, SubjectCol
     # Remove ctrl locations from list of possible locations when randomizing controls
     all.plates <- all.plates %>% 
       dplyr::mutate(ID = paste0(plate,column,row)) %>% 
-      filter(!(ID %in% ctrl_locations$ID))
+      dplyr::filter(!(ID %in% ctrl_locations$ID))
     
     Manifest <- Manifest %>% dplyr::arrange(study) 
     for (studyNo in unique(Manifest$study)){
@@ -623,7 +625,8 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, Product, SubjectCol
       ManifestStudy <- Manifest[studyInterval,]
       all.plates_study <- all.plates[studyInterval,]
       
-      all.plates_study <- all.plates_study[sample(1:nrow(ManifestStudy)),]
+      all.plates_study <- all.plates_study[sample(1:nrow(ManifestStudy)),] %>% 
+        select(-SampleID)
       
       out.manifestStudy <- dplyr::as_tibble(cbind(ManifestStudy,all.plates_study)) %>%
         dplyr::bind_rows(ctrl_locations) %>% 
@@ -631,10 +634,12 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, Product, SubjectCol
         dplyr::mutate(well=factor(well,levels=paste0(rep(LETTERS[1:8],
                                                          each=number_of_cols_per_plate),
                                                      rep(1:number_of_cols_per_plate,times=8)))) %>%
-        dplyr::arrange(plate, column, row)
+        dplyr::arrange(plate, column, row) %>% 
+        dplyr::select(-ID)
       out.manifest <- rbind(out.manifest, out.manifestStudy)
       
     }
+    
     message("Random assignment of SAMPLES to plates by study\n")
     class(out.manifest) <- c("randomizedManifest",class(out.manifest))
     return(out.manifest)
