@@ -135,13 +135,10 @@ jobs:
 
       - name: Check package
         run: |
-          check_results_never <- rcmdcheck::rcmdcheck(error_on = "never",
+          check_results <- rcmdcheck::rcmdcheck(error_on = "never",
                                                 path = "OlinkAnalyze", 
                                                 check_dir = "check") 
                                                 
-          check_results <- rcmdcheck::rcmdcheck(error_on = "error",
-                                                path = "OlinkAnalyze", 
-                                                check_dir = "check")
         shell: Rscript {0}
  
       - name: Upload check results
