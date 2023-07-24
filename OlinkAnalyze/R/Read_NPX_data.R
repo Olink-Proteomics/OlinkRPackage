@@ -196,6 +196,24 @@ read_NPX_explore <- function(filename) {
     }
 
   }
+  # Remove Target formatting in case of incidental csv
+  if(any(grepl("Target", out$Panel))){
+    warning("Target csv is not fully supported. Consider Target xlsx format instead.")
+    # Replicate read_npx_target formatting.
+    out <- out %>% 
+      dplyr::mutate(Panel =  gsub("\\(.*\\)","",Panel)) %>%
+      dplyr::mutate(Panel = stringr::str_to_title(Panel)) %>%
+      dplyr::mutate(Panel = gsub("Target 96", "", Panel)) %>%
+      dplyr::mutate(Panel = gsub("Target 48", "", Panel)) %>%
+      dplyr::mutate(Panel = gsub("Olink", "", Panel)) %>%
+      dplyr::mutate(Panel = trimws(Panel, which = "left")) %>%
+      tidyr::separate(Panel, " ", into = c("Panel_Start", "Panel_End"), fill = "right") %>%
+      dplyr::mutate(Panel_End = ifelse(grepl("Ii", Panel_End), stringr::str_to_upper(Panel_End), Panel_End)) %>%
+      dplyr::mutate(Panel_End = ifelse(is.na(Panel_End), " ", Panel_End)) %>%
+      dplyr::mutate(Panel = paste("Olink", Panel_Start, Panel_End)) %>%
+      dplyr::mutate(Panel = trimws(Panel, which = "right")) %>%
+      dplyr::select(-Panel_Start, -Panel_End) 
+  }
 
   return(out)
 
