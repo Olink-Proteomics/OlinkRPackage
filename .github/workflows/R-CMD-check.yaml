@@ -134,11 +134,7 @@ jobs:
         shell: Rscript {0}
 
       - name: Check package
-        run: |
-          check_results_never <- rcmdcheck::rcmdcheck(error_on = "never",
-                                                path = "OlinkAnalyze", 
-                                                check_dir = "check") 
-                                                
+        run: |                             
           check_results <- rcmdcheck::rcmdcheck(error_on = "error",
                                                 path = "OlinkAnalyze", 
                                                 check_dir = "check")
