@@ -350,10 +350,11 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, Product, SubjectCol
 
 
     # Create new column sampleID
-    all.plates$SampleID <- NA_character_
-    ctrl_locations <- all.plates |>
-      dplyr::slice(0) |>
-      dplyr::mutate(ID = NA_character_)
+    ctrl_locations <- all.plates %>%
+      dplyr::group_by(plate) %>%
+      dplyr::slice(0) %>%
+      dplyr::mutate(ID = paste0(plate,column,row)) %>%
+      dplyr::mutate(SampleID = "CONTROL_SAMPLE")
     # When randomizing controls
     if(rand_ctrl){
       ctrl_locations <- all.plates %>%
