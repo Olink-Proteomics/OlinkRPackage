@@ -1,0 +1,20 @@
+FROM rocker/tidyverse:4.1.3
+
+# System libs
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  && apt-get install -y libglpk40 \
+  && rm -rf /var/lib/apt/lists/*
+
+# R packages
+RUN install2.r --error \
+  --deps TRUE \
+  --skipinstalled \
+  pak \
+  devtools \
+  && rm -rf /tmp/downloaded_packages
+
+COPY OlinkAnalyze /OlinkAnalyze
+
+RUN R -e "pak::local_install(root = '/OlinkAnalyze', dependencies = TRUE)"
+
+ENTRYPOINT ["R", "--vanilla"]
