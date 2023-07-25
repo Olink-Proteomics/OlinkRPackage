@@ -94,7 +94,7 @@ Analyze. The bridge selection function will select a number of bridge
 samples based on the reference data. This function selects samples which
 passes QC and have high detectibility. In the case of where detectibility cannot be calculated from the test data set (ex: Explore HT data), the function will only select samples which pass QC. External controls are not selected as bridge samples as they are not necessarily representative of the study and therefore may not cover the dynamic range of assays that would be expressed within the samples.
 
-To select samples across the range of the data, the samples are ordered by mean NPX value and selected across this range. When running the selector, Olink recommends starting at sampleMissingFreq = 0.10 which represents a maximum of 10% data below LOD per sample. If there are not enough samples output,increase to 20%. For alternative matrices and specific disease types, it may be needed to increase the sampleMissingFreq to higher levels.
+To select samples across the range of the data, the samples are ordered by mean NPX value and selected across this range. When running the selector, Olink recommends starting at sampleMissingFreq = 0.10 which represents a maximum of 10% data below LOD per sample. If there are not enough samples output, increase to 20%. For alternative matrices and specific disease types, it may be needed to increase the sampleMissingFreq to higher levels.
 
 
 In this example we will demonstrate how to select 16 bridging samples
@@ -187,7 +187,7 @@ data.frame(SampleID = intersect(npx_data1$SampleID, npx_data2$SampleID)) %>%
 Then, gain an overview of the datasets that are going to be bridged. For
 example, plot and compare NPX distribution between datasets, as shown in Figure 2. By having a
 sense of how the studies compared to each other before bridging, we can
-then determine the success of the bridging process post bridging. Figure 2 shows a large overlap between data1 and data2, however there are still some differences as indicated by the bly and red areas on the edge of the distribution.
+then determine the success of the bridging process post bridging. Figure 2 shows a large overlap between data1 and data2, however there are still some differences as indicated by the blue and red areas on the edge of the distribution.
 
 ```{r check, message=FALSE, fig.cap= f2}
 # Load datasets
@@ -220,14 +220,11 @@ Typically the project dataset accounts for most of the observed
 variation within the combined datasets at this point. Control samples are removed from the PCA plot because they are not expected to be representative of the rest of the dataset, and therefore the variation between sample and control samples could skew the PCA, making it more challenging to see differences between projects. Additional, the PCA function does not support multiple samples with the same SampleID, which is also why the bridging samples in the second project are appended with "_new". In Figure 3, data1 and data2 separate along PC1, indicating batch differences between the two datasets.
 
 ```{r pca1, message=FALSE, fig.cap=f3}
-## before bridging
-
 #### Extract bridging samples
 
 overlapping_samples <-  data.frame(SampleID = intersect(npx_1$SampleID, npx_2$SampleID)) %>%  
   filter(!str_detect(SampleID, "CONTROL_SAMPLE")) %>% #Remove control samples
   pull(SampleID)
-
 
 npx_before_br <- npx_data1 %>%
   dplyr::filter(!str_detect(SampleID, "CONTROL_SAMPLE")) %>% #Remove control samples
@@ -245,14 +242,10 @@ npx_before_br <- npx_data1 %>%
                                 SampleID))
   })
 
-
-
-
 ### PCA plot
 OlinkAnalyze::olink_pca_plot(df          = npx_before_br,
                              color_g     = "Type",
                              byPanel     = TRUE)
-
 ```
 
 ## Perform bridging between two data sets
@@ -494,7 +487,6 @@ columns will need to be removed. To export the new project,
 
 ```{r, eval = FALSE}
 new_normalized_data <- npx_br_data %>% 
-<<<<<<< HEAD
   dplyr::filter(Project == "data2") %>% 
   dplyr::select(-Project, -Adj_factor) %>% 
   write.table(, file = "New_Normalized_NPX_data.csv", sep = ";")
