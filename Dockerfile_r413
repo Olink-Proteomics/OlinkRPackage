@@ -1,8 +1,9 @@
 FROM rocker/tidyverse:4.1.3
 
 # System libs
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update \
   && apt-get install -y libglpk40 \
+    libxt6 \
   && rm -rf /var/lib/apt/lists/*
 
 # R packages
@@ -10,7 +11,7 @@ RUN install2.r --error \
   --deps TRUE \
   --skipinstalled \
   pak \
-  devtools \
+  rcmdcheck \
   && rm -rf /tmp/downloaded_packages
 
 COPY OlinkAnalyze /OlinkAnalyze

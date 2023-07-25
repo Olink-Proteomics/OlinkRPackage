@@ -66,7 +66,12 @@ jobs:
           working-directory: OlinkAnalyze     
 
   R-CMD-check-docker:
-    runs:
-      using: 'docker'
-      image: 'Dockerfile_r413'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build docker container
+        run : |
+          docker build -f Dockerfile_r413 . -t oa:latest
+      - name: Run rcmdcheck
+        run: |
+          echo "rcmdcheck::rcmdcheck('OlinkAnalyze')" | docker run -i oa:latest
 
