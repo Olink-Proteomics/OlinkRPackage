@@ -13,5 +13,8 @@ utils::globalVariables(unique(c(
   "GeneRatio", "NES", "Pathway", "geneList", "Sum","gene_symbol", "gs_name", "gs_subcat", ".y.", "SE", "df", "group1",
   "group2", "method", "p", "p.adj", "parameter", "t.ratio", "Assay_OlinkID", "C1", "C2", "N", "NrNA", "Star",
   "SumNA", "c.sort", "colors", "id", "maxNPX", "pvalue","rangeNPX", "rowNum", "tmp", "x.m", "x.vals", "y.anchor",
-  "SubjectID", "study", "SubjectID_old", "Friedman_remove", "P.adj", "Comparison", "Z", "number of NA values", "umapX_high", "umapX_low", "umapY_high", "umapY_low", "LX", "LY", "PCX", "PCY", "rowname", "Normalization", "Quantified_value", "v1", "v2", "v", "v_name", "duplicateID", "SampleID_df1", "name", "data", "normalize_to", "PlateID1", "QC_Warning1", "V1", "V2", "cols", "AssayQC", "AssayType", "Block", "DataAnalysisRefID", "ExploreVersion", "ExtNPX", "PCNormalizedNPX", "SampleQC", "SampleType", "WellID"
+  "SubjectID", "study", "SubjectID_old", "Friedman_remove", "P.adj", "Comparison", "Z", "number of NA values", "umapX_high", 
+  "umapX_low", "umapY_high", "umapY_low", "LX", "LY", "PCX", "PCY", "rowname", "Normalization", "Quantified_value", "v1", 
+  "v2", "v", "v_name", "duplicateID", "SampleID_df1", "name", "data", "normalize_to", "PlateID1", "QC_Warning1", "V1", "V2",
+  "cols", "ID", "AssayQC", "AssayType", "Block", "DataAnalysisRefID", "ExploreVersion", "ExtNPX", "PCNormalizedNPX", "SampleQC", "SampleType", "WellID"
 )))
