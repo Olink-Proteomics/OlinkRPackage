@@ -187,7 +187,7 @@ data.frame(SampleID = intersect(npx_data1$SampleID, npx_data2$SampleID)) %>%
 Then, gain an overview of the datasets that are going to be bridged. For
 example, plot and compare NPX distribution between datasets, as shown in Figure 2. By having a
 sense of how the studies compared to each other before bridging, we can
-then determine the success of the bridging process post bridging. Figure 2 shows a large overlap between data1 and data2, however there are still some differences as indicated by the bly and red areas on the edge of the distribution.
+then determine the success of the bridging process post bridging. Figure 2 shows a large overlap between data1 and data2, however there are still some differences as indicated by the blue and red areas on the edge of the distribution.
 
 ```{r check, message=FALSE, fig.cap= f2}
 # Load datasets
