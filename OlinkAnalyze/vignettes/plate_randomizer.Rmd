@@ -78,7 +78,15 @@ randomized.manifest <- olink_plate_randomizer(manifest,
 
 The plate size can be either directly set to 48 or 96 using the `PlateSize` argument or can be inferred by setting the `Product` argument to "Target 96", "Target 48", "Explore 384","Explore 3072", or "Explore HT." The number of Olink external controls can be set using the `num_ctrl` argument, which defaults to 8 controls. The Olink external controls can also be set to be randomized throughout the plate using the `rand_ctrl` argument.
 
-```{r randomize_controls, message=FALSE, eval = FALSE}
+```{r randomize_controls, message = FALSE, eval = FALSE}
+randomized_manifest <- olink_plate_randomizer(manifest, 
+                                              Product = "Explore HT",
+                                              SubjectColumn = "SampleID",
+                                              num_ctrl = 10, 
+                                              rand_ctrl = TRUE)
+```
+
+```{r, rand_ctrl_code, echo=FALSE, results='hide', message=FALSE, warning=FALSE}
 randomized_manifest <- olink_plate_randomizer(manifest, 
                                               Product = "Explore HT",
                                               SubjectColumn = "SampleID",
@@ -87,12 +95,6 @@ randomized_manifest <- olink_plate_randomizer(manifest,
 ```
 
 ```{r randomized_controls_table, echo=FALSE, message=FALSE, warning=FALSE}
-
-randomized_manifest <- olink_plate_randomizer(manifest, 
-                                              Product = "Explore HT",
-                                              SubjectColumn = "SampleID",
-                                              num_ctrl = 10, 
-                                              rand_ctrl = TRUE)
 randomized_manifest %>% 
   head(10)  %>% 
   knitr::kable(format = "html",
