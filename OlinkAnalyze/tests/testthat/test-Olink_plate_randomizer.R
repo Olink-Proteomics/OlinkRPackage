@@ -20,9 +20,9 @@ randomized_result4 <- olink_plate_randomizer({manifest |> dplyr::mutate(
   available.spots=c(88,88),
   seed=12345)
 
-randomized_result5 <- olink_plate_randomizer(manifest, 
+randomized_result5 <- olink_plate_randomizer(manifest,
                                              SubjectColumn = "SubjectID",
-                                             num_ctrl = 10, 
+                                             num_ctrl = 10,
                                              rand_ctrl = TRUE,
                                              seed = 12345)
 randomized_result6 <- olink_plate_randomizer(manifest,
@@ -48,13 +48,14 @@ test_that("olink_plate_randomizer works", {
   expect_equal(droplevels(randomized_result4), droplevels(ref_results$randomized_result4))
   expect_equal(randomized_result1, randomized_result6)
   expect_error(olink_plate_randomizer(manifest, SubjectColumn = "SubjectID", Product = "Olink"))
-  expect_equal(randomized_result5 %>% 
-                 dplyr::filter(SampleID == "CONTROL_SAMPLE") %>% 
-                 dplyr::group_by(plate) %>% 
-                 dplyr::tally() %>% 
-                 dplyr::select(n) %>% 
-                 unique() %>% 
+  expect_equal(randomized_result5 %>%
+                 dplyr::filter(SampleID == "CONTROL_SAMPLE") %>%
+                 dplyr::group_by(plate) %>%
+                 dplyr::tally() %>%
+                 dplyr::select(n) %>%
+                 unique() %>%
                  dplyr::pull(), 10)
+  skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
   vdiffr::expect_doppelganger("Randomized_Data",olink_displayPlateLayout(randomized_result5, num_ctrl = 10,
                                                                         rand_ctrl = TRUE, fill.color = "Visit"))
 })
