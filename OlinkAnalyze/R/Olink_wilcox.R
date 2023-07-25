@@ -176,6 +176,7 @@ olink_wilcox <- function(df, variable, pair_id, ...){
       dplyr::do(tidy(stats::wilcox.test(x = .[[var_levels[1]]],
                                         y = .[[var_levels[2]]],
                                         paired = TRUE,
+                                        conf.int = TRUE,
                                         ...))) %>%
       dplyr::ungroup() %>%
       dplyr::mutate(Adjusted_pval = p.adjust(p.value, method = "fdr")) %>%
