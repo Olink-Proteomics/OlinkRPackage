@@ -68,6 +68,8 @@ jobs:
   R-CMD-check-docker:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Build docker container
         run : |
           docker build -f Dockerfile_r413 . -t oa:latest
