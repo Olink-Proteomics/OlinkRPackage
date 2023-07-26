@@ -1,3 +1,20 @@
+# Olink Analyze 3.5.0
+## Minor Changes
+* read_NPX will now detect and import Flex excel files in wide format (@kathy-nevola, #234)
+* Add example of bridge samples selector and minor updates for clarity to Intro to bridging vignette (@Orbmac, @kathy-nevola, #260)
+* Increase plate randomizer unit test coverage (@amrita-kar, #264)
+* Add support for parquet files in read_NPX (@kathy-nevola, #265, @klevdiamanti, #270)
+* Add support for alternative forms of LOD including Max and Plate LOD (@kathy-nevola, #267)
+* Add support for SampleQC column (alternative to QC_Warning) (@kathy-nevola, #267, @MasoumehSheikhi, @268)
+* Add support for plate randomization with variable control numbers (@kathy-nevola, @AskPascal, #269)
+* Controls can now be randomized across the plate with olink_plate_randomizer (@kathy-nevola, @AskPascal, #269)
+* Minor updates for clarity to Plate Randomization vignette (@kathy-nevola, @AskPascal, #269)
+* Change formatting for long format Target CSVs to match excel (@kathy-nevola, #273)
+
+## Bug Fixes
+* Project name is now consistent and generic throughout bridging vignette (@kathy-nevola, #257)
+* Estimate is now included in output when Paired Mann-Whitney U test is performed (@boxizhang, #259)
+
 # Olink Analyze 3.4.1
 ## Bug Fixes
 * Skip PCA snapshot tests in R version > 4.2.3 (@AskPascal, #254)

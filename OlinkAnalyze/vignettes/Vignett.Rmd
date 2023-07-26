@@ -14,8 +14,11 @@ vignette: >
   
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
-collapse = TRUE,
-comment = "#>")
+  fig.width = 6,
+  fig.height = 3,
+  fig.align = "center",
+  collapse = TRUE,
+  comment = "#>")
 options(tibble.print_min = 4L, tibble.print_max = 4L)
 ```
 
@@ -818,7 +821,7 @@ The arguments outlierDefX and outlierDefY can be used to identify outliers in th
 * quiet: Logical. Default: False. If TRUE, the resulting plot is not printed.
 
 
-```{r message=FALSE, fig.width=8, fig.height=4}
+```{r message=FALSE}
 npx_data1 %>% 
   filter(!str_detect(SampleID, 'CONTROL_SAMPLE')) %>% 
   olink_pca_plot(df = .,
@@ -867,7 +870,7 @@ The arguments outlierDefX and outlierDefY can be used to identify outliers in th
 * quiet: Logical. Default: False. If TRUE, the resulting plot is not printed.
 
 
-```{r message=FALSE, fig.width=8, fig.height=4}
+```{r message=FALSE}
 npx_data1 %>% 
   filter(!str_detect(SampleID, 'CONTROL_SAMPLE')) %>% 
   olink_umap_plot(df = .,
@@ -895,7 +898,7 @@ The olink_boxplot function is used to generate boxplots of NPX values stratified
 * verbose: Logical. Default: False. Flag indicating if plots shall be printed additionally to assigned to a list variable.
 * number_of_proteins_per_plot: Number of boxplots to include in the facets plot. Default 6.
 
-```{r message=FALSE, fig.width=8, fig.height=4}
+```{r message=FALSE}
 plot <- npx_data1 %>%
   na.omit() %>% # removing missing values which exists for Site
   olink_boxplot(variable = "Site", 
@@ -934,7 +937,7 @@ The olink_dist_plot function generates boxplots of NPX values for each sample, f
 * df: NPX data frame in long format should minimally contain SampleID, NPX and Panel.
 * color_g: Character value indicating the column name that should be used as fill color. Default: QC_Warning.
 
-```{r message=FALSE, fig.width=8, fig.height=4}
+```{r message=FALSE}
 npx_data1 %>% 
   filter(Panel == 'Olink Cardiometabolic') %>% # For this example only plotting one panel.
   olink_dist_plot() +
@@ -961,7 +964,7 @@ The function olink_lmer_plot generates a point-range plot for a given list of pr
 * number_of_proteins_per_plot: Number plots to include in the list of point-range plots. Defaults to 6 plots per figure.
 * verbose: Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 
-```{r message=FALSE, fig.width=8, fig.height=4}
+```{r message=FALSE, fig.width= 8}
 plot <- olink_lmer_plot(df = npx_data1, 
                         olinkid_list = c("OID01216", "OID01217"), 
                         variable = c('Site', 'Treatment'), 
@@ -990,13 +993,13 @@ The olink_pathway_heatmap function generates a heatmap of proteins related to pa
 * number_of_terms: number of terms to display, default is 20
 
 
-```{r  message=FALSE, fig.width=8, fig.height=4}
+```{r  message=FALSE, fig.height=4, fig.width=8}
 # GSEA Heatmap from t-test results
 try({ # This expression might fail if dependencies are not installed
 olink_pathway_heatmap(enrich_results = gsea_results, test_results = ttest_results)
 })
 ```
-```{r message = FALSE, fig.width=8, fig.height=4}
+```{r message = FALSE, fig.height=4, fig.width=8}
 # ORA Heatmap from t-test results with cell keyword
 try({ # This expression might fail if dependencies are not installed
 olink_pathway_heatmap(enrich_results = ora_results, test_results = ttest_results,
@@ -1037,7 +1040,7 @@ The olink_qc_plot function generates a facet plot per Panel using ggplot and ggp
 * facetNcol: Integer. The number of columns that the panels are arranged on.
 
 
-```{r message=FALSE, fig.width=8, fig.height=4}
+```{r message=FALSE}
 npx_data1 %>% 
   filter(!str_detect(SampleID, 'CONTROL_SAMPLE'),
          Panel == 'Olink Inflammation') %>% 
@@ -1074,7 +1077,7 @@ Group variable can be annotated and colored in the left side of the heatmap.
 * na_col. Default: Black. Color of the cells with NA.
 
 
-```{r message=FALSE, fig.width=8, fig.height=4}
+```{r message=FALSE, fig.height=4}
 first10 <- npx_data1 %>%
   pull(OlinkID) %>% 
   unique() %>% 
@@ -1106,7 +1109,7 @@ The olink_volcano_plot function generates a volcano plot using results from the 
 * x_lab: Optional. Character value to use as the x-axis label.
 * olinkid_list: Optional. Character vector of proteins (OlinkID) to label in the plot. If not provided, by default the function will label all significant proteins.
 
-```{r message=FALSE, fig.width=8, fig.height=4}
+```{r message=FALSE}
 # perform t-test
 ttest_results <- olink_ttest(df = npx_data1,
                              variable = 'Treatment')
@@ -1128,7 +1131,7 @@ An object of class *ggplot*.
 
 This function sets a coherent plot theme for plots by adding it to a ggplot object. It is mainly used for aesthetic reasons.
 
-```{r message=FALSE, fig.width=8, fig.height=4}
+```{r message=FALSE}
 npx_data1 %>% 
   filter(OlinkID == 'OID01216') %>% 
   ggplot(aes(x = Treatment, y = NPX, fill = Treatment)) +
@@ -1140,7 +1143,7 @@ npx_data1 %>%
 
 These functions sets a coherent coloring theme for the plots by adding it to a ggplot object. It is mainly used for aesthetic reasons.
 
-```{r message=FALSE, fig.width=8, fig.height=4}
+```{r message=FALSE}
 npx_data1 %>% 
   filter(OlinkID == 'OID01216') %>% 
   ggplot(aes(x = Treatment, y = NPX, fill = Treatment)) +

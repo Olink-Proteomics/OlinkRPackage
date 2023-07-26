@@ -131,6 +131,48 @@ test_that("olink_normalization works", {
                 mutate(match = NPX.x == NPX.y) %>%
                 pull(match) %>%
                 all())
+  
+  npx_data_LOD <- npx_data2 %>%
+    dplyr::mutate(`Max LOD` = LOD) %>%
+    dplyr::mutate(`Plate LOD` = LOD) %>%
+    dplyr::mutate(Plate_LOD = LOD) %>%
+    dplyr::mutate(Project = 'P1')  %>%
+    dplyr::mutate(Normalization = "Intensity")
+  
+  npx_df2 <- npx_data1 %>% 
+    dplyr::mutate(`Max LOD` = LOD) %>%
+    dplyr::mutate(`Plate LOD` = LOD) %>%
+    dplyr::mutate(Plate_LOD = LOD) %>%
+    dplyr::mutate(Project = 'P2') %>%
+    dplyr::mutate(Normalization = "Intensity")
+  
+  #Bridging normalization:
+  # Find overlapping samples, but exclude Olink control
+  overlap_samples <- intersect((npx_data_LOD %>%
+                                  dplyr::filter(!grepl("control", SampleID,
+                                                       ignore.case=TRUE)))$SampleID,
+                               (npx_df2 %>%
+                                  dplyr::filter(!grepl("control", SampleID,
+                                                       ignore.case=TRUE)))$SampleID)
+  # Normalize
+  norm_data <- olink_normalization(df1 = npx_data_LOD,
+                                   df2 = npx_df2,
+                                   overlapping_samples_df1 = overlap_samples,
+                                   df1_project_nr = 'P1',
+                                   df2_project_nr = 'P2',
+                                   reference_project = 'P1')
+  norm_data_p1 <- norm_data |> 
+    dplyr::filter(Project == "P1")
+  
+  norm_data_p2 <- norm_data |> 
+    dplyr::filter(Project == "P2")
+  
+  expect_true(all(npx_df2$LOD + norm_data_p2$Adj_factor == norm_data_p2$LOD))
+  expect_true(all(npx_df2$`Max LOD` + norm_data_p2$Adj_factor == norm_data_p2$`Max LOD`))
+  expect_true(all(npx_df2$`Plate LOD` + norm_data_p2$Adj_factor == norm_data_p2$`Plate LOD`))
+  expect_true(all(npx_df2$Plate_LOD + norm_data_p2$Adj_factor == norm_data_p2$Plate_LOD))
+  
+  
 })
 
 # Test if column "Normalize" is missing

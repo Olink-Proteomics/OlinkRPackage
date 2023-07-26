@@ -12,10 +12,29 @@ npxProcessing_forDimRed <- function(df,
   Sys.setlocale("LC_COLLATE", "C")
 
   #### Set up plotting colors ####
+  # check whether QC_Warning warning column exists
+  if ((color_g == 'QC_Warning') &
+      (!"QC_Warning" %in% names(df)) &
+      ("SampleQC" %in% names(df))) {
+    stop("In color_g = \"QC_Warning\", QC_Warning was not found. Did you mean color_g = \"SampleQC\"?",
+         call. = FALSE)
+  }
+
   if (color_g == "QC_Warning"){
     df_temp <- df %>%
       dplyr::group_by(SampleID) %>%
       dplyr::mutate(QC_Warning = dplyr::if_else(any(QC_Warning == "Warning"|QC_Warning == "WARN" ), "Warning", "Pass")) %>%
+      dplyr::ungroup()
+
+    plotColors <- df_temp %>%
+      dplyr::group_by(SampleID) %>%
+      dplyr::summarise(colors = unique(!!rlang::ensym(color_g))) %>%
+      dplyr::ungroup()
+
+  } else if (color_g == "SampleQC") {
+    df_temp <- df %>%
+      dplyr::group_by(SampleID) %>%
+      dplyr::mutate(SampleQC = dplyr::if_else(any(SampleQC == "Warning"|SampleQC == "WARN" ), "Warning", "Pass")) %>%
       dplyr::ungroup()
 
     plotColors <- df_temp %>%
