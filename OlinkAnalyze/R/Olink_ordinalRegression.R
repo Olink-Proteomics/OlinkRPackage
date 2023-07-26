@@ -165,7 +165,7 @@ olink_ordinalRegression <- function(df,
       }
 
       number_of_samples_w_more_than_one_level <- df %>%
-        dplyr::group_by(SampleID, Index) %>%
+        dplyr::group_by(SampleID) %>%
         dplyr::summarise(n_levels = n_distinct(!!rlang::ensym(effect), na.rm = T)) %>%
         dplyr::ungroup() %>%
         dplyr::filter(n_levels > 1) %>%

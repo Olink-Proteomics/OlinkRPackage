@@ -196,8 +196,27 @@ olink_normalization <- function(df1,
         df_adjusted_data <- df1 %>%
           dplyr::mutate(Panel=stringr::str_replace(Panel,'\\(.+', '')) %>%
           dplyr::left_join(adj_factor_df,by='OlinkID') %>%
-          dplyr::mutate(NPX = NPX + Adj_factor) %>%
-          dplyr::mutate(LOD = LOD + Adj_factor)
+          dplyr::mutate(NPX = NPX + Adj_factor) 
+        
+        if("LOD" %in% names(df_adjusted_data)){
+          df_adjusted_data <- df_adjusted_data %>%
+            dplyr::mutate(LOD = LOD + Adj_factor)
+        }
+        
+        if("Max LOD" %in% names(df_adjusted_data)){
+          df_adjusted_data <- df_adjusted_data %>%
+            dplyr::mutate(`Max LOD` = `Max LOD` + Adj_factor)
+        }
+        
+        if("Plate LOD" %in% names(df_adjusted_data)){
+          df_adjusted_data <- df_adjusted_data %>%
+            dplyr::mutate(`Plate LOD` = `Plate LOD` + Adj_factor)
+        }
+        
+        if("Plate_LOD" %in% names(df_adjusted_data)){
+          df_adjusted_data <- df_adjusted_data %>%
+            dplyr::mutate(Plate_LOD = Plate_LOD + Adj_factor)
+        }
 
         return(df_adjusted_data)
 
@@ -331,8 +350,27 @@ olink_normalization <- function(df1,
     dplyr::mutate(Panel=stringr::str_replace(Panel,'\\(.+', '')) %>%
     dplyr::left_join(adj_factor_df,by='OlinkID') %>%
     dplyr::mutate(Adj_factor = dplyr::if_else(Project == reference_project,0,Adj_factor)) %>%
-    dplyr::mutate(NPX = NPX + Adj_factor) %>%
-    dplyr::mutate(LOD = LOD + Adj_factor)
+    dplyr::mutate(NPX = NPX + Adj_factor) 
+  
+  if("LOD" %in% names(df_adjusted_data)){
+    df_adjusted_data <- df_adjusted_data %>%
+      dplyr::mutate(LOD = LOD + Adj_factor)
+  }
+  
+  if("Max LOD" %in% names(df_adjusted_data)){
+    df_adjusted_data <- df_adjusted_data %>%
+      dplyr::mutate(`Max LOD` = `Max LOD` + Adj_factor)
+  }
+  
+  if("Plate LOD" %in% names(df_adjusted_data)){
+    df_adjusted_data <- df_adjusted_data %>%
+      dplyr::mutate(`Plate LOD` = `Plate LOD` + Adj_factor)
+  }
+  
+  if("Plate_LOD" %in% names(df_adjusted_data)){
+    df_adjusted_data <- df_adjusted_data %>%
+      dplyr::mutate(Plate_LOD = Plate_LOD + Adj_factor)
+  }
 
 
   return(df_adjusted_data)

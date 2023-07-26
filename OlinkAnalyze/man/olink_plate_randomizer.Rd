@@ -7,9 +7,12 @@
 olink_plate_randomizer(
   Manifest,
   PlateSize = 96,
+  Product,
   SubjectColumn,
   iterations = 500,
   available.spots,
+  num_ctrl = 8,
+  rand_ctrl = FALSE,
   seed
 )
 }
@@ -18,11 +21,17 @@ olink_plate_randomizer(
 
 \item{PlateSize}{Integer. Either 96 or 48. 96 is default.}
 
+\item{Product}{String. Name of Olink product used to set PlateSize if not provided. Optional.}
+
 \item{SubjectColumn}{(Optional) Column name of the subject ID column. Cannot contain missings. If provided, subjects are kept on the same plate.}
 
 \item{iterations}{Number of iterations for fitting subjects on the same plate.}
 
 \item{available.spots}{Numeric. Number of wells available on each plate. Maximum 40 for T48 and 88 for T96. Takes a vector equal to the number of plates to be used indicating the number of wells available on each plate.}
+
+\item{num_ctrl}{Numeric. Number of controls on each plate (default = 8)}
+
+\item{rand_ctrl}{Logical. Whether controls are added to be randomized across the plate (default = FALSE)}
 
 \item{seed}{Seed to set. Highly recommend setting this for reproducibility.}
 }
