@@ -16,5 +16,6 @@ utils::globalVariables(unique(c(
   "SubjectID", "study", "SubjectID_old", "Friedman_remove", "P.adj", "Comparison", "Z", "number of NA values", "umapX_high", 
   "umapX_low", "umapY_high", "umapY_low", "LX", "LY", "PCX", "PCY", "rowname", "Normalization", "Quantified_value", "v1", 
   "v2", "v", "v_name", "duplicateID", "SampleID_df1", "name", "data", "normalize_to", "PlateID1", "QC_Warning1", "V1", "V2",
-  "cols", "ID", "AssayQC", "AssayType", "Block", "DataAnalysisRefID", "ExploreVersion", "ExtNPX", "PCNormalizedNPX", "SampleQC", "SampleType", "WellID"
+  "cols", "ID", "AssayQC", "AssayType", "Block", "DataAnalysisRefID", "ExploreVersion", "ExtNPX", "PCNormalizedNPX", "SampleQC", "SampleType", "WellID", 
+  "Max LOD", "Plate LOD", "Plate_LOD"
 )))
