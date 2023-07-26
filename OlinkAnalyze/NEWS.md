@@ -1,5 +1,6 @@
 # Olink Analyze 3.5.0
 ## Minor Changes
+* read_NPX will now detect and import Flex excel files in wide format (@kathy-nevola, #234)
 * Add example of bridge samples selector and minor updates for clarity to Intro to bridging vignette (@Orbmac, @kathy-nevola, #260)
 * Increase plate randomizer unit test coverage (@amrita-kar, #264)
 * Add support for parquet files in read_NPX (@kathy-nevola, #265, @klevdiamanti, #270)
