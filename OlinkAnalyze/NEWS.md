@@ -5,7 +5,9 @@
 * Add support for parquet files in read_NPX (@kathy-nevola, #265, @klevdiamanti, #270)
 * Add support for alternative forms of LOD including Max and Plate LOD (@kathy-nevola, #267)
 * Add support for SampleQC column (alternative to QC_Warning) (@kathy-nevola, #267, @MasoumehSheikhi, @268)
-* Randomization with and of variable control numbers (@kathy-nevola, @AskPascal, #269)
+* Add support for plate randomization with variable control numbers (@kathy-nevola, @AskPascal, #269)
+* Controls can now be randomized across the plate with olink_plate_randomizer (@kathy-nevola, @AskPascal, #269)
+* Minor updates for clarity to Plate Randomization vignette (@kathy-nevola, @AskPascal, #269)
 * Change formatting for long format Target CSVs to match excel (@kathy-nevola, #273)
 
 ## Bug Fixes
