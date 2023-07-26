@@ -22,7 +22,10 @@ library(ggplot2)
 ```
 
 ```{r setup, include=FALSE} 
-knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+knitr::opts_chunk$set(warning = FALSE,
+                      fig.height=3,
+                      fig.width=6,
+                      message = FALSE) 
 ```
 
 ## Introduction
@@ -125,13 +128,13 @@ fcap4 <- "Figure 4. Distribution of Site across randomized plates."
 
 
 
-```{r, fig.height = 8, fig.width = 8, fig.align = "center", fig.cap= fcap1}
+```{r, fig.height = 6, fig.width = 7.5, fig.align = "center", fig.cap= fcap1}
 olink_displayPlateLayout(randomized.manifest, fill.color = 'SubjectID', include.label = FALSE)
 ```
 
 The label of the colored variable could be shown in the plot via the `include.label` argument.
 
-```{r,fig.height = 8, fig.width = 8, fig.align = "center", fig.cap= fcap2}
+```{r, fig.height = 6, fig.width = 7.5, fig.align = "center", fig.cap= fcap2}
 olink_displayPlateLayout(randomized.manifest, fill.color = 'SubjectID', include.label = TRUE)
 ```
 
@@ -139,13 +142,13 @@ olink_displayPlateLayout(randomized.manifest, fill.color = 'SubjectID', include.
 
 The distribution of the given grouping variable on each plate could be visualized via a bar chart using function `olink_displayPlateDistributions`. By setting `fill.color = 'SubjectID'`, we could make sure all the samples from the same subject were put on the same plate. 
 
-```{r,fig.height = 8, fig.width = 8, fig.align = "center", fig.cap=fcap3}
+```{r, fig.align = "center", fig.cap=fcap3}
 olink_displayPlateDistributions(randomized.manifest, fill.color = 'SubjectID')
 ```
 
 We could also check the distribution of other variables. For examples, the distribution of the variable `Site` could be visualized by setting `fill.color = 'Site'`. 
 
-```{r,fig.height = 8, fig.width = 8, fig.align = "center", fig.cap= fcap4}
+```{r, fig.align = "center", fig.cap= fcap4}
 olink_displayPlateDistributions(randomized.manifest, fill.color = 'Site')
 ```
 
