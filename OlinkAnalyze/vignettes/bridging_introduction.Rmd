@@ -1,6 +1,9 @@
 ---
 title: "Introduction to bridging Olink® NPX datasets"
-output: rmarkdown::html_vignette
+output: 
+  html_vignette:
+    toc: true
+    toc_depth: 3
 vignette: >
   %\VignetteIndexEntry{Introduction to bridging Olink® NPX datasets}
   %\VignetteEncoding{UTF-8}
@@ -17,11 +20,11 @@ knitr::opts_chunk$set(
   comment = "#>",
   tidy = FALSE,
   tidy.opts = list(width.cutoff = 95),
-  fig.width = 10,
+  fig.width = 6,
+  fig.height = 3,
   message = FALSE,
   warning = FALSE,
   time_it = TRUE,
-  fig.width = 7,
   fig.align = "center"
 )
 ```
