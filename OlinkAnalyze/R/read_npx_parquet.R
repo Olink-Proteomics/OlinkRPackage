@@ -72,7 +72,8 @@ read_npx_parquet <- function (filename) {
   olink_files <- c("NPX File",
                    "Extended NPX File",
                    "CLI Data Export File",
-                   "Internal CLI Data Export File")
+                   "Internal CLI Data Export File",
+                   "R Package Export File")
   if (parquet_file$metadata$DataFileType %in% olink_files) {
 
     # Check that required columns are present
