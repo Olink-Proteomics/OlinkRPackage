@@ -43,7 +43,7 @@ read_npx_parquet <- function (filename) {
 
   # Check that all required parquet metadata is in place
   olink_parquet_metadata <- c("DataFileType",
-                              "ProductType")
+                              "Product")
   if (!all(olink_parquet_metadata %in% names(parquet_file$metadata))) {
 
     stop(
@@ -61,7 +61,7 @@ read_npx_parquet <- function (filename) {
   # If other platforms are to be reported as parquet too, we have to add
   # them to this array
   olink_platforms <- c("ExploreHT")
-  if (!(parquet_file$metadata$ProductType %in% olink_platforms)) {
+  if (!(parquet_file$metadata$Product %in% olink_platforms)) {
 
     stop("Only \"Olink Explore HT\" parquet files are currently supported.")
 
@@ -69,7 +69,11 @@ read_npx_parquet <- function (filename) {
 
 
   # Check if it is an NPX file
-  olink_files <- c("NPX File")
+  olink_files <- c("NPX File",
+                   "Extended NPX File",
+                   "CLI Data Export File",
+                   "Internal CLI Data Export File",
+                   "R Package Export File")
   if (parquet_file$metadata$DataFileType %in% olink_files) {
 
     # Check that required columns are present
