@@ -1,3 +1,7 @@
+# Olink Analyze 3.5.1
+## Bug Fixes
+* read_NPX will now support additional formats of parquet files
+
 # Olink Analyze 3.5.0
 ## Minor Changes
 * read_NPX will now detect and import Flex excel files in wide format (@kathy-nevola, #234)
