@@ -1,0 +1,303 @@
+---
+title: "A Guide to Comparative Analysis of Two Groups with Olink Data"
+author: "Olink DS team"
+date: "`r Sys.Date()`"
+output: 
+  html_vignette:
+    toc: true
+    toc_depth: 2
+vignette: >
+  %\VignetteIndexEntry{Olink® Analyze Vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+--- 
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+collapse = TRUE,
+comment = "#>")
+options(tibble.print_min = 4L, tibble.print_max = 4L)
+library(tidyverse)
+library(OlinkAnalyze)
+
+
+df <- OlinkAnalyze::npx_data1 %>% 
+  filter(!str_detect(SampleID, 'CONTROL'))
+
+
+```
+
+# Introduction  
+
+This vignette is designed to assist users working with two distinct groups. This guide aims to provide you with a comprehensive overview of the steps involved in analyzing and comparing data from two groups in Olink data using the Olink R package.  These two groups can encompass a variety of categories, such as healthy and diseased individuals, two different types of a condition, male and female subjects, when the objective is to identify the differing proteins between them.
+
+By following this guide, you will gain a solid understanding of how to effectively compare and contrast two groups, detect differences, and ultimately derive valuable conclusions from your data. Example code will be shown in this vignette, however it is still recommended to read upon each function as not all options will be covered here. This can be done with the _help_ command (help("functionName")).
+
+If you have more that two groups in your data, or a longitidual study see our other Study design vingettes. 
+
+# Installation 
+
+You can install Olink® Analyze from CRAN which is needed for the following walkthrough.
+
+```{r, eval=FALSE}
+install.packages("OlinkAnalyze")
+```
+
+The package needs to be loaded. The Tidyverse package are also used thought this vignette and loaded.
+
+```{r, eval=FALSE}
+library(OlinkAnalyze)
+library(tidyverse)
+```
+
+# Study overview
+
+This vignette will help you if you have Olink data and are unsure on how to compare your two groups. The Olink data file shouldn't be tempered with before loading it into R as that might break the read_NPX function. Using the read_NPX function will always give you your data in a long format, where each row represent one sample and one protein. To load in your data in R use the following code:
+
+```{r message=FALSE, eval=FALSE}
+data <- read_NPX("~/NPX_file_location.csv")
+# Argument should be the location of your NPX data. Data are usually in csv, xlsx or zip format. 
+```  
+
+An example of the first five row can be seen below. 
+
+```{r message=FALSE, eval=T, echo=FALSE}
+ df  %>% 
+  select(SampleID, OlinkID, UniProt, Assay, MissingFreq, QC_Warning, NPX, LOD) %>% 
+  head(5) %>% 
+  knitr::kable(format = "html",
+               booktabs = T,
+               linesep = "",
+               digits = 4,
+               longtable = T,
+               row.names = F,
+               caption = " Data read in with read_NPX. Some coloumns have been left out due to space.",
+               label = "manifest")
+```  
+
+A sample manifest is also needed for the analysis. The sample manifest should included minimum a column with the sample name and a group information column. An example of a sample manifest first 5 rows can be seen below: 
+
+```{r message=FALSE, eval=T, echo=FALSE}
+df |> 
+  select(SampleID, Treatment) %>% 
+  head(5)  %>% 
+  knitr::kable(format = "html",
+               booktabs = T,
+               linesep = "",
+               digits = 4,
+               longtable = T,
+               row.names = F,
+               caption = " Sample manifest.",
+               label = "manifest")
+```  
+
+When your manifest is created (usually before in excel or similar program) you can import it via the _Import dataset_ button in R studio or using the read in function. 
+
+```{r message=FALSE, eval=FALSE}
+manifest <- readxl::read_excel("~/Manifest_file_location.xlsx")
+```  
+
+When both Olink NPX data and sample manifest are imported into R the can be combine using the following code:
+
+```{r message=FALSE, eval=FALSE}
+df <- data %>% 
+  left_join(manifest, 
+            by = SubjectID) %>% 
+   filter(!str_detect(SampleID, 'CONTROL')) #removing Olinks control samples for downstream analysis
+```  
+
+
+# Quality control 
+
+Before doing any test on the data it is good to inspect the data and remove potential outliers. Outliers can skew the results greatly and unless there is a reason to belive that they represent valid data points, it's generally best to handle them to avoid misleading conclusions. This can be done looking at the sample distribution and a dimension reduction technique such as principal component analysis (PCA). Samples which appears to be outliers should be removed from downstream analysis. 
+
+### Sample distribution
+
+Looking at the sample distribution can be done using OlinkAnalyze *olink_dist_plot*. In the example below (where only the Cardiometabolic panel is plotted) all samples seem to have the same distribution. We see that one sample don't pass Olink internal QC control. Had any samples a completely different distribution, such as much lower/higher mean and/or much smaller/larger standard deviation, it would be an argument to remove that samples from downstream analysis.  
+
+```{r message=FALSE,fig.height = 4, fig.width = 8, fig.align = "center"}
+df %>% 
+  filter(Panel == 'Olink Cardiometabolic') %>% # for illustration purpose we only plot one panel
+  olink_dist_plot() +
+  theme(axis.text.x=element_text(angle = 90, vjust = 0.5, size = 5)) # when having multiple samples it can help to rotated the sample name for readability
+```  
+
+### Principal component analysis
+
+Looking at the PCA also gives an overview of the data. The PCA of the data can be seen using OlinkAnalyze *olink_pca_plot*. Any samples which deviates a lot from the other samples could be considered outliers. 
+
+```{r message=FALSE,fig.height = 6, fig.width = 6, fig.align = "center"}
+df %>% 
+   olink_pca_plot()
+# the olink_pca_plot can show outliers by setting outlierDefX, outlierDefY 
+```  
+
+After looking at the sample distribution, removing outliers and samples which don't pass Olinks internal QC control are recommended. This can be done with the following code.
+
+```{r message=FALSE, eval=FALSE}
+df <- df %>% 
+  filter(QC_Warning == 'Pass') %>% # only included samples which pass QC. This is standard for Olink but if samples are few or paired there can be an argument to still included them. 
+  filter(!(SampleID %in% c(NA))) # swap NA to the samples which was outliers, 
+  # for example c('A1','A16') to remove sample with the name A1 and A16.
+
+```  
+
+Sometime including outlier or samples which don't pass QC can still be reasonable, especially in cases with very few samples or when samples are paired. 
+
+# Analysis 
+
+When comparing two group the most straightforward way are to perform a Welch 2-sample t-test to see if there is any difference between the groups. This test allows us to determine if there is a statistically significant difference between the means of the two groups.
+
+Looking at the example data two groups are found in the Treatment variable. Two distinct groups, Treated and Untreated exisit in this data. 
+
+```{r message=FALSE, eval=T}
+df %>% 
+  select(SampleID,Treatment) %>% 
+  unique() %>% 
+  select(Treatment) %>% 
+  table()
+
+```  
+
+The t-test assesses the null hypothesis that there is no difference between the means of the two groups. If the p-value associated with the test is below a predetermined significance level (commonly 0.05), we reject the null hypothesis and conclude that there is a significant difference between the groups. On the other hand, if the p-value is above the significance level, we fail to reject the null hypothesis, indicating that there is insufficient evidence to suggest a significant difference.
+
+Furthermore, it is crucial to address the issue of multiple testing when performing a t-test on multiple proteins simultaneously. Conducting multiple tests without appropriate adjustments can lead to an increased likelihood of false positive results. The tests in OlinkAnalyze always adjust for each protein tested. 
+
+To perform the t-test use the OlinkAnalyze function *olink_ttest*. If the adjusted p-value are below 0.05 the function will also write that out as a significant. So for example in this case, for the assay TRAIL, UniProt P50591, there is a significant difference in proteins levels between treated and untreated samples. 
+
+```{r message=FALSE, eval=T}
+t_test_results <- olink_ttest(df = df, # specify your data
+            variable = 'Treatment') # specify your variable 
+
+```  
+
+```{r message=FALSE, eval=T, echo=FALSE}
+t_test_results %>% head(5)  %>% 
+  select(Assay, OlinkID, UniProt, Panel, estimate, p.value, Adjusted_pval, Threshold) %>% 
+  knitr::kable(format = "html",
+               booktabs = T,
+               linesep = "",
+               digits = 4,
+               longtable = T,
+               row.names = F,
+               caption = " T-test results of the 5 most significant proteins. Some coloumns have been left out due to space.",
+               label = "manifest")
+```  
+
+## Plots
+
+Two common ways to illustrate the results from a t-test are with box plots and a volcano plot. These visualizations provide valuable insights into the differences between the two groups and help in understanding the significance and effect sizes of the observed effects.
+
+The volcano plot is a powerful visualization that combines both statistical significance and effect size information in a single plot. In a volcano plot, each data point represents a variable or feature being tested (e.g. proteins). The x-axis represents the effect size (e.g., difference in means), while the y-axis represents the statistical significance (e.g., -log10(p-value)) associated with the t-test. 
+
+### Boxplots
+
+To illustrate the boxplots the *olink_boxplot* function can be used. The thick black horizontal line represents the median, the colored area - the interquartile range, the ends
+of the vertical middle line represent the minimum and the maximum values except for the black dots which
+are potential assay outliers. In the example below only the top 6 significant proteins are plotted. 
+
+```{r message=FALSE, eval=T, fig.height = 4, fig.width = 8, fig.align = "center"}
+top6Significant<-t_test_results %>% 
+  filter(Threshold == 'Significant') %>% # only filter out the significant proteins
+  head(6) %>%   # just the top 6 for visualization
+  pull(OlinkID) # pull out the OlinkID which is needed in olink_boxplot
+
+boxplot_top6<-olink_boxplot(df = df,
+              variable = 'Treatment',
+              olinkid_list = top6Significant)
+
+boxplot_top6
+``` 
+
+### Volcanoplot
+
+To perform the volcano plot the following code can be used. X-axis
+shows the mean difference between the two groups, and y-axis shows the -log10(p-value). As standard all significant proteins are plotted in red. The assays above the dashed line have a non adjusted p-value below 0.05. 
+
+```{r message=FALSE, eval=T, fig.height = 4, fig.width = 8, fig.align = "center"}
+olink_volcano_plot(t_test_results)
+``` 
+
+If specific proteins want to be labeled use the olinkid_list argument. Below are an example when only proteins with an adjusted p-value of below 0.005 and 2 other proteins are included (IL4 and IL6). 
+
+```{r message=FALSE, eval=F, fig.height = 4, fig.width = 8, fig.align = "center"}
+
+assays_to_included_byPvalue <- t_test_results %>%
+  filter(Adjusted_pval < 0.005) %>% 
+  pull(OlinkID)
+
+assays_to_included_CustomSelected <- t_test_results %>%
+  filter(Assay %in% c('IL4','IL6')) %>%
+  pull(OlinkID)
+
+assay_to_included <- c(assays_to_included_byPvalue,
+                       assays_to_included_CustomSelected)
+
+olink_volcano_plot(t_test_results, olinkid_list = assay_to_included)
+``` 
+
+# Saving results
+
+Having the results saved in csv files (or other format) and the plots in pdf (or other format) can making the results easier to work with, especially if the result should be sent to other people without access to R. 
+
+Saving the results in excel file can be done with the following code.
+
+```{r message=FALSE, eval=F}
+
+write.table(x = t_test_results,
+            file = paste0('TtestResults.csv'),
+            sep=';',
+            row.names = F, 
+            quote = F)
+
+```  
+
+Saving every boxplot in a separate folder can be done with the following code.
+
+```{r message=FALSE, eval=F}
+
+
+for (i in ttest_results %>% 
+     filter(Threshold == 'Significant') %>%
+     pull(OlinkID)) {
+  
+  temp_name<- df_norm %>% 
+    filter(OlinkID == i) %>% 
+    pull(Assay) %>% 
+    unique()
+    
+  if(str_detect(temp_name,'/')){
+    temp_name <-str_replace(temp_name,pattern = '/',replacement = '-')
+  }
+  
+  temp_boxplot<-olink_boxplot(df = df_norm_trim %>% 
+                                 filter(!is.na(Status)) , 
+                               olinkid_list = i, 
+                               variable = 'Status' , 
+                               number_of_proteins_per_plot = 12)
+  
+  ggsave(paste0("TtestBoxplot/",i,"_",temp_name,".pdf"),
+         temp_boxplot[[1]],
+         width = 8,
+         height = 6)
+  
+}
+
+
+``` 
+
+ 
+# Contact Us!
+
+We are always happy to help. Email us with any questions:
+
+-   biostat\@olink.com for statistical services and general stats questions
+
+-   biostattools\@olink.com for Olink Analyze and Shiny app support
+
+-   support\@olink.com for Olink lab product and technical support
+
+-   info\@olink.com for more information
+
+
+
