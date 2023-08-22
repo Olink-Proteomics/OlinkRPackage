@@ -33,7 +33,7 @@ This vignette is designed to assist users working with two distinct groups. This
 
 By following this guide, you will gain a solid understanding of how to effectively compare and contrast two groups, detect differences, and ultimately derive valuable conclusions from your data. Example code will be shown in this vignette, however it is still recommended to read upon each function as not all options will be covered here. This can be done with the _help_ command (help("functionName")).
 
-If you have more that two groups in your data, or a longitidual study see our other Study design vingettes. 
+If you have more that two groups in your data, or a longitudinal study see our other Study design vignettes. 
 
 # Installation 
 
@@ -109,7 +109,7 @@ df <- data %>%
 
 # Quality control 
 
-Before doing any test on the data it is good to inspect the data and remove potential outliers. Outliers can skew the results greatly and unless there is a reason to belive that they represent valid data points, it's generally best to handle them to avoid misleading conclusions. This can be done looking at the sample distribution and a dimension reduction technique such as principal component analysis (PCA). Samples which appears to be outliers should be removed from downstream analysis. 
+Before doing any test on the data it is good to inspect the data and remove potential outliers. Outliers can skew the results greatly and unless there is a reason to believe that they represent valid data points, it's generally best to handle them to avoid misleading conclusions. This can be done looking at the sample distribution and a dimension reduction technique such as principal component analysis (PCA). Samples which appears to be outliers should be removed from downstream analysis. 
 
 ### Sample distribution
 
@@ -148,7 +148,7 @@ Sometime including outlier or samples which don't pass QC can still be reasonabl
 
 When comparing two group the most straightforward way are to perform a Welch 2-sample t-test to see if there is any difference between the groups. This test allows us to determine if there is a statistically significant difference between the means of the two groups.
 
-Looking at the example data two groups are found in the Treatment variable. Two distinct groups, Treated and Untreated exisit in this data. 
+Looking at the example data two groups are found in the Treatment variable. Two distinct groups, Treated and Untreated exist in this data. 
 
 ```{r message=FALSE, eval=T}
 df %>% 
