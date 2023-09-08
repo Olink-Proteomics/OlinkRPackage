@@ -50,7 +50,7 @@ outliers <- lapply(pca_plot_byPanel_outliers, function(x){x$data}) %>%
 
 test_that("olink_pca_plot works", {
 
-  # Two Warnings thrown: for dropped assays and droppes samples
+  # Two Warnings thrown: for dropped assays and dropped samples
   expect_warning(
     expect_warning(
       pca_plot_drop <- npx_data1 %>%

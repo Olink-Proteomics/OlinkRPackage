@@ -96,3 +96,9 @@ w2 <- testthat::capture_error(
 test_that("npxProcessing_forDimRed does not recognize QC_Warning", {
   expect_equal(w2, simpleError("In color_g = \"QC_Warning\", QC_Warning was not found. Did you mean color_g = \"SampleQC\"?"))
 })
+
+# test that npxCheck detects duplicate sample IDs
+npx_Check <- suppressMessages(npxCheck(npx_data1))
+
+test_that("npxCheck detects duplicate sample IDs.",
+         {expect_equal(npx_Check$duplicate_samples, c("CONTROL_SAMPLE_AS 1", "CONTROL_SAMPLE_AS 2"))})
