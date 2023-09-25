@@ -97,7 +97,7 @@
 #'                     reference_medians = ref_median_df)
 #' }
 #' @importFrom magrittr %>%
-#' @importFrom stringr str_detect str_replace str_flatten_comma
+#' @importFrom stringr str_detect str_replace
 #' @importFrom dplyr filter left_join group_by mutate select distinct summarise if_else bind_rows
 #' @importFrom tidyr spread
 #' @importFrom rlang ensym
@@ -253,6 +253,13 @@ olink_normalization <- function(df1,
 
   }
 
+  # cols_excluded_assay <- c("QC_Warning", "Normalization", "Assay_Warning")
+  # if (any(df1$QC_Warning == "EXCLUDED")) {
+  #   stop("df1 contains excluded assays (QC_Warning == \"EXCLUDED\"). Please remove them to proceed!")
+  # } else if (any(df2$QC_Warning == "EXCLUDED")) {
+  #   stop("df2 contains excluded assays (QC_Warning == \"EXCLUDED\"). Please remove them to proceed!")
+  # }
+
   # check if both df1 and df2 were normalized with the same method
   # "Intensity" or "Plate control"
   if (!("Normalization" %in% colnames(df1)) || !("Normalization" %in% colnames(df2))) {
@@ -265,9 +272,13 @@ olink_normalization <- function(df1,
     }
   } else if (("Normalization" %in% colnames(df1)) && ("Normalization" %in% colnames(df2))) {
     df1_norm <- df1 |>
+      # ignore excluded assays
+      dplyr::filter(Normalization != "EXCLUDED") |>
       dplyr::select(OlinkID, Normalization_df1 = Normalization) |>
       dplyr::distinct()
     df2_norm <- df2 |>
+      # ignore excluded assays
+      dplyr::filter(Normalization != "EXCLUDED") |>
       dplyr::select(OlinkID, Normalization_df2 = Normalization) |>
       dplyr::distinct()
     df_norm_diff <- df1_norm |>
@@ -277,11 +288,22 @@ olink_normalization <- function(df1,
     rm(df1_norm, df2_norm)
 
     if (nrow(df_norm_diff) > 0 && nrow(df_norm_diff) <= 10) {
-      warning(paste("Assay(s)",
-                    stringr::str_flatten_comma(string = dplyr::pull(df_norm_diff, OlinkID),
-                                               last = " and ",
-                                               na.rm = FALSE),
-                    "is/are not normalized with the same approach. Consider renormalizing."))
+      if (length(df_norm_diff$OlinkID) == 1) {
+        warn_msg <- paste("Assay",
+              df_norm_diff$OlinkID,
+              "is not normalized with the same approach. Consider renormalizing.")
+      } else if (length(df_norm_diff$OlinkID) == 2) {
+        warn_msg <- paste("Assays",
+                          paste(df_norm_diff$OlinkID, collapse = " and "),
+                          "are not normalized with the same approach. Consider renormalizing.")
+      } else {
+        warn_msg <- paste("Assays",
+                          paste(head(df_norm_diff$OlinkID, -1), collapse = ", "),
+                          "and",
+                          tail(df_norm_diff$OlinkID, 1),
+                          "are not normalized with the same approach. Consider renormalizing.")
+      }
+      warning(warn_msg)
     } else if (nrow(df_norm_diff) > 10) {
       warning(paste("There are",
                     nrow(df_norm_diff),

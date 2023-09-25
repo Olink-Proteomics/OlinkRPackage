@@ -307,7 +307,7 @@ test_that("df1 and df2 same normalization", {
     df1_project_nr = '20200001',
     df2_project_nr = '20200002',
     reference_project = '20200001'),
-    "Assay\\(s\\) OID01216 and OID01217 is/are not normalized with the same approach.")
+    "Assays OID01216 and OID01217 are not normalized with the same approach.")
 
   # test that assays have identical Normalization column between the two
   # datasets
@@ -362,6 +362,37 @@ test_that("df1 and df2 same normalization", {
     df1_project_nr = '20200001',
     df2_project_nr = '20200002',
     reference_project = '20200001')
+  )
+
+  # check that EXCLUDED assays are ignored
+  expect_no_warning(
+    expect_no_warning(
+      olink_normalization(df1 = {
+        npx_data1 |>
+          dplyr::mutate(
+            Normalization = dplyr::if_else(OlinkID %in% c("OID01216", "OID01217"),
+                                           "EXCLUDED",
+                                           "Intensity")
+          )
+      },
+      df2 = {
+        npx_data2 |>
+          dplyr::mutate(
+            Normalization = dplyr::if_else(OlinkID %in% c("OID01216", "OID01217"),
+                                           "Plate control",
+                                           "Intensity")
+          )
+      },
+      overlapping_samples_df1 = {
+        intersect(npx_data1$SampleID, npx_data2$SampleID) |>
+          as_tibble() |>
+          filter(!str_detect(value, 'CONTROL_SAMPLE')) |>
+          pull()
+      },
+      df1_project_nr = '20200001',
+      df2_project_nr = '20200002',
+      reference_project = '20200001')
+    )
   )
 })
 

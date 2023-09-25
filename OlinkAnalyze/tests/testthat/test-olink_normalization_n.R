@@ -1229,7 +1229,7 @@ test_that("df1 and df2 same normalization", {
         normalize_to       = c(NA_character_, "1")
       )
     ),
-    "Assay\\(s\\) OID01216 and OID01217 is/are not normalized with the same approach.")
+    "Assays OID01216 and OID01217 are not normalized with the same approach.")
 
   # test that assays have identical Normalization column between the two
   # datasets
@@ -1294,6 +1294,43 @@ test_that("df1 and df2 same normalization", {
                                                     "DF2" = overlap_samples)),
         normalization_type = c(NA_character_, "Bridge"),
         normalize_to       = c(NA_character_, "1")
+      )
+    )
+  )
+
+  # check that EXCLUDED assays are ignored
+  expect_no_warning(
+    expect_no_error(
+      olink_normalization_n(
+        norm_schema = dplyr::tibble(
+          order              = c(1, 2),
+          name               = c("20200001", "20200002"),
+          data               = list("20200001" =
+                                      {
+                                        npx_data1 |>
+                                          dplyr::select(-Project) |>
+                                          dplyr::mutate(
+                                            Normalization = dplyr::if_else(OlinkID %in% c("OID01216", "OID01217"),
+                                                                           "EXCLUDED",
+                                                                           "Intensity")
+                                          )
+                                      },
+                                    "20200002" =
+                                      {
+                                        npx_data2 |>
+                                          dplyr::select(-Project) |>
+                                          dplyr::mutate(
+                                            Normalization = dplyr::if_else(OlinkID %in% c("OID01216", "OID01217"),
+                                                                           "Plate control",
+                                                                           "Intensity")
+                                          )
+                                      }),
+          samples            = list("20200001" = NA_character_,
+                                    "20200002" = list("DF1" = overlap_samples,
+                                                      "DF2" = overlap_samples)),
+          normalization_type = c(NA_character_, "Bridge"),
+          normalize_to       = c(NA_character_, "1")
+        )
       )
     )
   )
