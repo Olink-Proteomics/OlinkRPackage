@@ -112,7 +112,7 @@ olink_normalization <- function(df1,
                                 reference_medians = NULL) {
 
   # If 2 data frames are supplied, make sure they have the same column names, if not, add missing column names.
-  
+
   if(!is.null(df2)){ # If df2 is provided
     if(length(c(setdiff(names(df1), names(df2)),setdiff(names(df2), names(df1)))) != 0){ # and the column names dont match
       missing_df2 <- setdiff(names(df1), names(df2))
@@ -124,10 +124,10 @@ olink_normalization <- function(df1,
         warning(paste("The following columns are found in df2 but not df1: \n", paste(unlist(missing_df1), collapse = ",")))
       }
       message("Adding missing columns...")
-      
+
     }
   }
-  
+
   #Filtering on valid OlinkID
   df1 <- df1 %>%
     dplyr::filter(stringr::str_detect(OlinkID,
@@ -196,23 +196,23 @@ olink_normalization <- function(df1,
         df_adjusted_data <- df1 %>%
           dplyr::mutate(Panel=stringr::str_replace(Panel,'\\(.+', '')) %>%
           dplyr::left_join(adj_factor_df,by='OlinkID') %>%
-          dplyr::mutate(NPX = NPX + Adj_factor) 
-        
+          dplyr::mutate(NPX = NPX + Adj_factor)
+
         if("LOD" %in% names(df_adjusted_data)){
           df_adjusted_data <- df_adjusted_data %>%
             dplyr::mutate(LOD = LOD + Adj_factor)
         }
-        
+
         if("Max LOD" %in% names(df_adjusted_data)){
           df_adjusted_data <- df_adjusted_data %>%
             dplyr::mutate(`Max LOD` = `Max LOD` + Adj_factor)
         }
-        
+
         if("Plate LOD" %in% names(df_adjusted_data)){
           df_adjusted_data <- df_adjusted_data %>%
             dplyr::mutate(`Plate LOD` = `Plate LOD` + Adj_factor)
         }
-        
+
         if("Plate_LOD" %in% names(df_adjusted_data)){
           df_adjusted_data <- df_adjusted_data %>%
             dplyr::mutate(Plate_LOD = Plate_LOD + Adj_factor)
@@ -264,10 +264,21 @@ olink_normalization <- function(df1,
       warning("Variable \"Normalization\" not present in df2.")
     }
   } else if (("Normalization" %in% colnames(df1)) && ("Normalization" %in% colnames(df2))) {
-    if ({ df1$Normalization |> unique() |> length() } != 1 ||
-        { df2$Normalization |> unique() |> length() } != 1 ||
-        unique(df1$Normalization) != unique(df2$Normalization)) {
-      warning("df1 and df2 are not normalized with the same approach. Consider renormalizing.")
+    olink_in_both <- intersect(df1$OlinkID, df2$OlinkID)
+    compare_norm <- df1 %>%
+      dplyr::filter(OlinkID %in% olink_in_both) %>%
+      dplyr::select(OlinkID, Normalization) %>%
+      dplyr::distinct() %>%
+      dplyr::left_join({df2 %>%
+          dplyr::filter(OlinkID %in% olink_in_both) %>%
+          dplyr::select(OlinkID, Normalization) %>%
+          dplyr::distinct()}, by = "OlinkID") %>%
+      dplyr::mutate(same_norm = Normalization.x == Normalization.y) %>%
+      dplyr::filter(same_norm == FALSE)
+
+
+    if(nrow(compare_norm)!= 0){
+      warning(paste(nrow(compare_norm),"OlinkIDs were found to have differing normalization methods between projects. \nConsider renormalizing."))
     }
   }
 
@@ -350,23 +361,23 @@ olink_normalization <- function(df1,
     dplyr::mutate(Panel=stringr::str_replace(Panel,'\\(.+', '')) %>%
     dplyr::left_join(adj_factor_df,by='OlinkID') %>%
     dplyr::mutate(Adj_factor = dplyr::if_else(Project == reference_project,0,Adj_factor)) %>%
-    dplyr::mutate(NPX = NPX + Adj_factor) 
-  
+    dplyr::mutate(NPX = NPX + Adj_factor)
+
   if("LOD" %in% names(df_adjusted_data)){
     df_adjusted_data <- df_adjusted_data %>%
       dplyr::mutate(LOD = LOD + Adj_factor)
   }
-  
+
   if("Max LOD" %in% names(df_adjusted_data)){
     df_adjusted_data <- df_adjusted_data %>%
       dplyr::mutate(`Max LOD` = `Max LOD` + Adj_factor)
   }
-  
+
   if("Plate LOD" %in% names(df_adjusted_data)){
     df_adjusted_data <- df_adjusted_data %>%
       dplyr::mutate(`Plate LOD` = `Plate LOD` + Adj_factor)
   }
-  
+
   if("Plate_LOD" %in% names(df_adjusted_data)){
     df_adjusted_data <- df_adjusted_data %>%
       dplyr::mutate(Plate_LOD = Plate_LOD + Adj_factor)
