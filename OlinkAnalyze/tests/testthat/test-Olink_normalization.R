@@ -131,21 +131,21 @@ test_that("olink_normalization works", {
                 mutate(match = NPX.x == NPX.y) %>%
                 pull(match) %>%
                 all())
-  
+
   npx_data_LOD <- npx_data2 %>%
     dplyr::mutate(`Max LOD` = LOD) %>%
     dplyr::mutate(`Plate LOD` = LOD) %>%
     dplyr::mutate(Plate_LOD = LOD) %>%
     dplyr::mutate(Project = 'P1')  %>%
     dplyr::mutate(Normalization = "Intensity")
-  
-  npx_df2 <- npx_data1 %>% 
+
+  npx_df2 <- npx_data1 %>%
     dplyr::mutate(`Max LOD` = LOD) %>%
     dplyr::mutate(`Plate LOD` = LOD) %>%
     dplyr::mutate(Plate_LOD = LOD) %>%
     dplyr::mutate(Project = 'P2') %>%
     dplyr::mutate(Normalization = "Intensity")
-  
+
   #Bridging normalization:
   # Find overlapping samples, but exclude Olink control
   overlap_samples <- intersect((npx_data_LOD %>%
@@ -161,18 +161,18 @@ test_that("olink_normalization works", {
                                    df1_project_nr = 'P1',
                                    df2_project_nr = 'P2',
                                    reference_project = 'P1')
-  norm_data_p1 <- norm_data |> 
+  norm_data_p1 <- norm_data |>
     dplyr::filter(Project == "P1")
-  
-  norm_data_p2 <- norm_data |> 
+
+  norm_data_p2 <- norm_data |>
     dplyr::filter(Project == "P2")
-  
+
   expect_true(all(npx_df2$LOD + norm_data_p2$Adj_factor == norm_data_p2$LOD))
   expect_true(all(npx_df2$`Max LOD` + norm_data_p2$Adj_factor == norm_data_p2$`Max LOD`))
   expect_true(all(npx_df2$`Plate LOD` + norm_data_p2$Adj_factor == norm_data_p2$`Plate LOD`))
   expect_true(all(npx_df2$Plate_LOD + norm_data_p2$Adj_factor == norm_data_p2$Plate_LOD))
-  
-  
+
+
 })
 
 # Test if column "Normalize" is missing
@@ -258,7 +258,7 @@ test_that("df1 and df2 same normalization", {
     df1_project_nr = '20200001',
     df2_project_nr = '20200002',
     reference_project = '20200001'),
-    "df1 and df2 are not normalized with the same approach. Consider renormalizing.")
+    "184 OlinkIDs were found to have differing normalization methods between projects. \nConsider renormalizing.")
 
   # different normalization with unexpected values in Normalization column
   # currently we do not check values in this column, but in the future we might
@@ -280,7 +280,7 @@ test_that("df1 and df2 same normalization", {
     df1_project_nr = '20200001',
     df2_project_nr = '20200002',
     reference_project = '20200001'),
-    "df1 and df2 are not normalized with the same approach. Consider renormalizing.")
+    "184 OlinkIDs were found to have differing normalization methods between projects. \nConsider renormalizing.")
 })
 
 test_that("Different columns in dfs can be normalized",{
