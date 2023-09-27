@@ -1124,7 +1124,7 @@ test_that("df1 and df2 same normalization", {
                                project_1_name = '20200001',
                                project_2_name = '20200002',
                                project_ref_name = '20200001'),
-    "df1 and df2 are not normalized with the same approach. Consider renormalizing.")
+    "184 OlinkIDs were found to have differing normalization methods between projects. \nConsider renormalizing.")
 
   expect_warning(
     olink_normalization_n(
@@ -1150,7 +1150,7 @@ test_that("df1 and df2 same normalization", {
         normalize_to       = c(NA_character_, "1")
       )
     ),
-    "df1 and df2 are not normalized with the same approach. Consider renormalizing.")
+    "184 OlinkIDs were found to have differing normalization methods between projects. \nConsider renormalizing.")
 
   # For future use ----
   # different normalization with unexpected values in Normalization column
@@ -1171,7 +1171,7 @@ test_that("df1 and df2 same normalization", {
                                project_1_name = '20200001',
                                project_2_name = '20200002',
                                project_ref_name = '20200001'),
-    "df1 and df2 are not normalized with the same approach. Consider renormalizing.")
+    "184 OlinkIDs were found to have differing normalization methods between projects. \nConsider renormalizing.")
 
   expect_warning(
     olink_normalization_n(
@@ -1197,7 +1197,7 @@ test_that("df1 and df2 same normalization", {
         normalize_to       = c(NA_character_, "1")
       )
     ),
-    "df1 and df2 are not normalized with the same approach. Consider renormalizing.")
+    "184 OlinkIDs were found to have differing normalization methods between projects. \nConsider renormalizing.")
 }
 )
 
