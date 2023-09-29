@@ -4,6 +4,7 @@ author: "Olink DS team"
 date: "`r Sys.Date()`"
 output: 
   html_vignette:
+    latex_engine: xelatex
     toc: true
     toc_depth: 2
 vignette: >
@@ -24,15 +25,21 @@ library(OlinkAnalyze)
 
 df <- OlinkAnalyze::npx_data1 %>% 
   filter(!str_detect(SampleID, 'CONTROL'))
+df_QC <- OlinkAnalyze::npx_data1 %>% 
+  filter(!str_detect(SampleID, 'CONTROL'))
 
 
 ```
 
 # Introduction  
 
-This vignette is designed to assist users working with two distinct groups. This guide aims to provide you with a comprehensive overview of the steps involved in analyzing and comparing data from two groups in Olink data using the Olink R package.  These two groups can encompass a variety of categories, such as healthy and diseased individuals, two different types of a condition, or male and female subjects. The objective of the analysis is to identify the differing proteins between the two groups.
+This vignette is designed to assist users working with two distinct groups using t-test. This guide aims to provide you with a comprehensive overview of the steps involved in analyzing and comparing data from two groups in Olink data using the Olink R package. These two groups can encompass a variety of categories, such as healthy and diseased individuals, two different types of a condition, or male and female subjects. The objective of the analysis is to identify the differing proteins between the two groups.
 
-By following this guide, you will gain a solid understanding of how to effectively compare and contrast two groups, detect differences, and ultimately derive valuable conclusions from your data. Example code will be shown in this vignette, however it is still recommended to read the documentation for each function as not all options will be covered here. This can be done with the _help_ command (help("functionName")).
+By following this guide, you will gain a solid understanding of how to effectively compare and contrast two groups, detect differences, and ultimately derive valuable conclusions from your data. Example code will be shown in this vignette, however it is still recommended to read the documentation for each function as not all options will be covered here. This can be done with the _help_ command.
+
+```{r, eval=FALSE}
+help("functionName")
+```
 
 If you have more that two groups in your data, or a longitudinal study see our other study design vignettes. 
 
@@ -60,20 +67,23 @@ data <- read_NPX("~/NPX_file_location.csv")
 # Argument should be the location of your NPX data. Data are usually in parquet, csv, xlsx or zip format depending on the product.
 ```  
 
-An example of the first five row can be seen below in **Table 1**. Note that not all NPX files contain all of the selected columns shown below.
+An example of the first five rows can be seen below in **Table 1**. Note that not all NPX files contain all of the selected columns shown below.
 
-```{r message=FALSE, eval=T, echo=FALSE}
- df  %>% 
+```{r message=FALSE, eval=T, echo=FALSE, warning=F}
+df_subset <- df  %>% 
   select(SampleID, OlinkID, UniProt, Assay, MissingFreq, QC_Warning, NPX, LOD) %>% 
-  head(5) %>% 
-  knitr::kable(format = "html",
+  head(5) 
+
+  knitr::kable(df_subset,
+               format = "html",
                booktabs = T,
                linesep = "",
                digits = 4,
                longtable = T,
                row.names = F,
                caption = "**Table 1.** Example of data after being read in with read_NPX. Some columns have been left out due to space.",
-               label = "ex_data")
+               label = "exampleNPX",
+               escape = F)
 ```  
 
 A sample manifest is also needed for the analysis. The sample manifest should included at least 2 columns, one with the sample name (matching the SampleID column in the NPX file) and a second column with the group information for each sample as shown in **Table 2**.
@@ -101,7 +111,7 @@ manifest <- readxl::read_excel("~/Manifest_file_location.xlsx")
 Once both Olink NPX data and sample manifest are imported into R, they can be combined using the following code:
 
 ```{r message=FALSE, eval=FALSE}
-df <- data %>% 
+df_QC <- data %>% 
   left_join(manifest, 
             by = SubjectID) %>% 
    filter(!str_detect(SampleID, 'CONTROL')) #removing Olink control samples for downstream analysis
@@ -120,11 +130,15 @@ Looking at the sample distribution can be done using Olink Analyze `olink_dist_p
 
 If any samples have a completely different distribution, such as much lower/higher mean and/or much smaller/larger standard deviation, it may be necessary to remove that sample from downstream analysis.  
 ```{r, echo = F}
-fcap <- "**Figure 1.** Box and Whisker Plot of Sample Distributions, colored by QC Warning."
+fcap1 <- "**Figure 1.** Box and Whisker Plot of Sample Distributions, colored by QC Warning."
+fcap2 <- "**Figure 2.** Principal component analysis of samples, colored by QC Warning."
+fcap3 <- "**Figure 3.** Boxplots of the top 6 significant proteins."
+fcap4 <- "**Figure 4.** Volcano plot illustrating the p-value and estimate relationship."
+fcap5 <- "**Figure 5.** Volcano plot illustrating the p-value and estimate relationship. Handful of proteins labeled selected."
 ```
 
-```{r, dist_plot, fig.cap=fcap, message=FALSE,fig.height = 4, fig.width = 8, fig.align = "center"}
-df %>% 
+```{r, dist_plot, fig.cap=fcap1, message=FALSE,fig.height = 4, fig.width = 8, fig.align = "center"}
+df_QC %>% 
   filter(Panel == 'Olink Cardiometabolic') %>% # for illustration purpose we only plot one panel
   olink_dist_plot() +
   theme(axis.text.x=element_text(angle = 90, vjust = 0.5, size = 5)) # when having multiple samples it can help to rotated the sample name for readability
@@ -132,10 +146,11 @@ df %>%
 
 ### Principal component analysis
 
-Global differences between samples can also be viewed using a PCA plot. A PCA plot of the data can be generated using Olink Analyze `olink_pca_plot`. Any samples which deviates a lot from the other samples could be considered outliers. 
+Global differences between samples can also be viewed using a PCA plot. A PCA plot of the data can be generated using Olink Analyze `olink_pca_plot` can be seen in **Figure 2**. Any samples which deviates a lot from the other samples could be considered outliers. 
 
-```{r message=FALSE,fig.height = 6, fig.width = 6, fig.align = "center"}
-df %>% 
+
+```{r message=FALSE,fig.cap=fcap2, fig.height = 6, fig.width = 6, fig.align = "center"}
+df_QC %>% 
    olink_pca_plot()
 # the olink_pca_plot can show outliers by setting outlierDefX, outlierDefY 
 ```  
@@ -143,8 +158,8 @@ df %>%
 These plots can be used to determine whether there are any outlier and if it is right to remove these potential outliers and samples which don't pass Olinks internal QC control. These samples can be removed with the following code.
 
 ```{r message=FALSE, eval=FALSE}
-df <- df %>% 
-  filter(QC_Warning == 'Pass') %>% # only included samples which pass QC. This is standard for Olink but if samples are few or paired there can be an argument to still included them. 
+df <- df_QC %>% 
+  filter(QC_Warning == 'Pass') %>% # only included samples which pass QC. This is standard for Olink but if samples are few or paired there can be an argument to still included them.
   filter(!(SampleID %in% c(NA))) # change NA to the samples which was outliers, 
   # for example c('A1','A16') to remove sample with the name A1 and A16.
 
@@ -153,6 +168,7 @@ df <- df %>%
 Sometimes including outlier or samples which don't pass QC can still be reasonable, especially in cases with very few samples or when samples are paired. 
 
 # Analysis 
+## T-test 
 
 When comparing two groups, the most straightforward way is to perform a Welch's 2-sample t-test to see if there are any differences between the groups. This test allows us to use statistics to determine if there are any assays where the mean NPX value in 1 group is significant different from the mean NPX value in the other group.
 
@@ -193,21 +209,49 @@ t_test_results %>% head(5)  %>%
                label = "ttest_results")
 ```  
 
-## Visualization of Results
+## Paired t-test
+
+When dealing with paired samples, such as samples collected from the same individual at different time points, the paired t-test becomes a suitable choice. This statistical test takes into consideration that the measurements are related because they come from the same patient at different times. This consideration enhances the statistical power of the test.
+
+To utilize the paired t-test, an additional column is required in the sample manifest, which signifies the pairing of the samples. An illustrative example is provided in **Table 4**.
+
+```{r message=FALSE, eval=T, echo=FALSE}
+
+df %>%
+  filter(Time %in% c("Baseline","Week.6")) %>%
+  select(SampleID, Time, Subject) %>% 
+  head(6)  %>% 
+  knitr::kable(format = "html",
+               booktabs = T,
+               linesep = "",
+               digits = 4,
+               longtable = T,
+               row.names = F,
+               caption = "**Table 4.** Sample manifest for when data is paired.",
+               label = "manifest")
+```
+
+The procedure for performing a paired t-test follows a structure similar to that of a standard t-test. The olink_ttest function from Olink Analyze is employed in the same manner. In cases where the adjusted p-value (available in the Adjusted_pval column) falls below 0.05, the assay is marked as "Significant" in the Threshold column.
+
+```{r message=FALSE, eval=F}
+# Performing the paired t-test
+paried_t_test_results <- olink_ttest(df = df, # specify your data
+            variable = 'Time', # specify your variable 
+            pair_id = 'Subject') # indicates the paired sample identifier
+
+```  
+
+### Visualization of Results
 
 Two common ways to illustrate the results from a t-test are with boxplots and a volcano plot. These visualizations provide valuable insights into the differences between the two groups and help in understanding the significance and effect sizes of the observed effects.
 
 The volcano plot is a powerful visualization that combines both statistical significance and effect size information in a single plot. In a volcano plot, each data point represents a variable or feature being tested (e.g. proteins). The x-axis represents the effect size (e.g., difference in means), while the y-axis represents the statistical significance (e.g., -log10(p-value)) associated with the t-test. 
 
-### Boxplots
+#### Boxplots
 
-To generate boxplots the `olink_boxplot` function can be used. The thick black  horizontal line within each box indicates the median, the colored area - the interquartile range, the ends
-of the vertical middle line represent the minimum and the maximum values, and the black dots indicate potential assay outliers (beyond the minumum or maximum valuses). Boxplots of the top 6 significant proteins are plotted in **Figure 2**. 
-``` {r echo = FALSE }
+To generate boxplots the `olink_boxplot` function can be used. The thick black  horizontal line within each box indicates the median, the colored area - the interquartile range, the ends of the vertical middle line represent the minimum and the maximum values, and the black dots indicate potential assay outliers (beyond the minumum or maximum valuses). Boxplots of the top 6 significant proteins are plotted in **Figure 3**. 
 
-fcap <- "**Figure 2.** Boxplots of the top 6 significant proteins"
-```
-```{r boxplots, fcap = fcap, message=FALSE, eval=T, fig.height = 4, fig.width = 8, fig.align = "center"}
+```{r boxplots, message=FALSE, eval=T}
 top6Significant<-t_test_results %>% 
   filter(Threshold == 'Significant') %>% # only filter out the significant proteins
   head(6) %>%   # just the top 6 for visualization
@@ -217,21 +261,24 @@ boxplot_top6<-olink_boxplot(df = df,
               variable = 'Treatment',
               olinkid_list = top6Significant)
 
-boxplot_top6
 ``` 
 
-### Volcano Plot
+```{r fig.cap = fcap3,  echo = T, message=T, eval=T, fig.height = 4, fig.width = 8,fig.align = "center" }
+boxplot_top6[[1]]
+```
 
-The following code can be used to generate a volcano plot. The x-axis
+#### Volcano Plot
+
+The following code can be used to generate a volcano plot, seen in **Figure 4**. The x-axis
 shows the mean difference between the two groups, and y-axis shows the -log10(p-value) using the nominal (unadjusted) p-value. By default, all significant proteins (after multiple testing adjustment) are plotted in red. The assays above the dashed line have a nominal p-value below 0.05. 
 
-```{r message=FALSE, eval=T, fig.height = 4, fig.width = 8, fig.align = "center"}
+```{r fig.cap = fcap4, message=FALSE, eval=T, fig.height = 4, fig.width = 8, fig.align = "center"}
 olink_volcano_plot(t_test_results)
 ``` 
 
-The `olinkid_list` argument can be used to label specific assays. Below are an example when only proteins with an adjusted p-value of below 0.005 and 2 other proteins are included (IL4 and IL6). 
+The `olinkid_list` argument can be used to label specific assays. Below in **Figure 5** are an example when only proteins with an adjusted p-value of below 0.005 and 2 other proteins are included (IL4 and IL6). 
 
-```{r message=FALSE, eval=F, fig.height = 4, fig.width = 8, fig.align = "center"}
+```{r fig.cap = fcap5, message=FALSE, eval=T, fig.height = 4, fig.width = 8, fig.align = "center"}
 
 assays_to_included_byPvalue <- t_test_results %>%
   filter(Adjusted_pval < 0.005) %>% 
@@ -263,31 +310,31 @@ write.table(x = t_test_results,
 
 ```  
 
-The following code can be used to save every boxplot in a separate folder (in this case TtestBoxplot).
+The following code can be used to save every boxplot in a separate folder (in this case a in a folder called TtestBoxplot).
 
 ```{r message=FALSE, eval=F}
 
+dir.create('TtestBoxplot') # create a folder 
 
 for (i in ttest_results %>% 
-     filter(Threshold == 'Significant') %>%
+     filter(Threshold == 'Significant') %>% # only saving the significant proteins
      pull(OlinkID)) {
   
-  temp_name<- df_norm %>% 
+  temp_name<- df_norm %>% # Saving the assay name for convenience
     filter(OlinkID == i) %>% 
     pull(Assay) %>% 
     unique()
     
-  if(str_detect(temp_name,'/')){
+  if(str_detect(temp_name,'/')){ # Replacing / with - in the assay name
     temp_name <-str_replace(temp_name,pattern = '/',replacement = '-')
   }
   
-  temp_boxplot<-olink_boxplot(df = df_norm_trim %>% 
-                                 filter(!is.na(Status)) , 
+  temp_boxplot<-olink_boxplot(df = df , 
                                olinkid_list = i, 
-                               variable = 'Status' , 
-                               number_of_proteins_per_plot = 12)
+                               variable = 'Status')
   
-  ggsave(paste0("TtestBoxplot/",i,"_",temp_name,".pdf"),
+  # saving the assay and olinkID name as the plotname
+  ggsave(paste0("TtestBoxplot/",i,"_",temp_name,".pdf"), 
          temp_boxplot[[1]],
          width = 8,
          height = 6)
@@ -309,6 +356,4 @@ We are always happy to help. Email us with any questions:
 -   support\@olink.com for Olink lab product and technical support
 
 -   info\@olink.com for more information
-
-
 

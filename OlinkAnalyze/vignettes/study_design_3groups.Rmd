@@ -1,0 +1,352 @@
+---
+title: "A Guide to Comparative Analysis of Muliple Groups with Olink Data"
+author: "Olink DS team"
+date: "`r Sys.Date()`"
+output: 
+  html_vignette:
+    latex_engine: xelatex
+    toc: true
+    toc_depth: 2
+vignette: >
+  %\VignetteIndexEntry{A Guide to Comparative Analysis of Muliple Groups with Olink Data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+--- 
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+collapse = TRUE,
+comment = "#>")
+options(tibble.print_min = 4L, tibble.print_max = 4L)
+library(tidyverse)
+library(dplyr)
+library(stringr)
+library(ggplot2)
+library(OlinkAnalyze)
+
+
+df <- OlinkAnalyze::npx_data1 %>% 
+  filter(!str_detect(SampleID, 'CONTROL'))
+df_QC <- OlinkAnalyze::npx_data1 %>% 
+  filter(!str_detect(SampleID, 'CONTROL'))
+
+```
+
+# Introduction  
+
+This vignette is designed to assist users working with 3 or more distinct groups using ANOVA. This guide aims to provide you with a comprehensive overview of the steps involved in analyzing and comparing data from multiple groups in Olink data using the Olink R package.  These groups can encompass a variety of categories, such as disease subtypes, treatment regimens,or genetic variations. The objective of the analysis is to identify for which proteins the groups differ from at least one another. 
+
+By following this guide, you will gain a solid understanding of how to effectively compare and contrast groups, detect differences, and ultimately derive valuable conclusions from your data. Example code will be shown in this vignette, however it is still recommended to read the documentation for each function as not all options will be covered here. This can be done with the _help_ command.
+
+```{r, eval=FALSE}
+help("functionName")
+```
+
+If you have more that only two groups in your data, or a longitudinal study see our other study design vignettes. 
+
+# Installation 
+
+You can install Olink® Analyze from CRAN which is needed for the following walkthrough.
+
+```{r, eval=FALSE}
+install.packages("OlinkAnalyze")
+```
+
+After installing the package, the package needs to be loaded. Several packages from the tidyverse suite of packages are also used throughout this vignette, such as dplyr and stringr. Each individual package can be loaded using the _library_ function (`library("package")`) or the entire tidyverse suite of packages can be loaded as shown below.
+
+```{r, eval=FALSE}
+library(OlinkAnalyze)
+library(tidyverse)
+```
+
+# Study overview
+
+This vignette will help you if you have Olink data and are unsure on how to compare your groups. The Olink data file shouldn't be tempered with before loading it into R, as that may cause the data to not be recognized and loaded by the `read_NPX` function. Using the read_NPX function will always give you your data in a long format, where each row represent one sample and one protein. To load in your data in R use the following code:
+
+```{r message=FALSE, eval=FALSE}
+data <- read_NPX("~/NPX_file_location.csv")
+# Argument should be the location of your NPX data. Data are usually in parquet, csv, xlsx or zip format depending on the product.
+```  
+
+An example of the first five row can be seen below in **Table 1**. Note that not all NPX files contain all of the selected columns shown below.
+
+```{r message=FALSE, eval=T, echo=FALSE}
+ df  %>% 
+  select(SampleID, OlinkID, UniProt, Assay, MissingFreq, QC_Warning, NPX, LOD) %>% 
+  head(5) %>% 
+  kableExtra::kbl(format = "html",
+               booktabs = T,
+               linesep = "",
+               digits = 4,
+               longtable = T,
+               row.names = F,
+               caption = "**Table 1.** Example of data after being read in with read_NPX. Some columns have been left out due to space.",
+               label = "manifest")
+``` 
+
+A sample manifest is also needed for the analysis. The sample manifest should included at least 2 columns, one with the sample name (matching the SampleID column in the NPX file) and a second column with the group information for each sample as shown in **Table 2**.
+
+```{r message=FALSE, eval=T, echo=FALSE}
+df |> 
+  select(SampleID, Site) %>% 
+  head(5)  %>% 
+  knitr::kable(format = "html",
+               booktabs = T,
+               linesep = "",
+               digits = 4,
+               longtable = T,
+               row.names = F,
+               caption = "**Table 2.** Sample manifest.",
+               label = "manifest")
+```  
+
+When your manifest is created (usually before in excel or similar program) you can import it via the _Import dataset_ button in Rstudio or using a function like `read_excel` to import the file. 
+
+```{r message=FALSE, eval=FALSE}
+manifest <- readxl::read_excel("~/Manifest_file_location.xlsx")
+```  
+
+When both Olink NPX data and sample manifest are imported into R the can be combine using the following code:
+
+```{r message=FALSE, eval=FALSE}
+df_QC <- data %>% 
+  left_join(manifest, by = SubjectID) %>% 
+   filter(!str_detect(SampleID, 'CONTROL')) #removing Olinks control samples for downstream analysis
+```  
+
+
+# Quality control 
+
+Before performing any statistical test on the data, it is good to inspect the data for potential outliers. Outliers can skew the results greatly and unless there is a reason to believe that they represent valid data points, it's generally best to handle them to avoid misleading conclusions. In this vignette, we will provide a brief overview of how to assess the data for outliers. For a more in depth view of outliers, check out our [Outlier Exclusion Vignette](https://cran.r-project.org/web/packages/OlinkAnalyze/vignettes/OutlierExclusion.html). 
+
+Outliers can be spotted by graphing an overview of the entire dataset. This can be done looking at the sample distribution or a dimension reduction technique such as principal component analysis (PCA). Samples which appears to be outliers should be further assessed and may need to be removed from the downstream analysis. 
+
+
+### Sample distribution
+
+Looking at the sample distribution can be done using Olink Analyze `olink_dist_plot`. In **Figure 1**, all samples seem to have the same distribution. We see that one sample didn't pass Olink's Internal QC control. QC warnings do not necessarily need to be removed, but it can be good to take a closer look at these samples. 
+
+If any samples have a completely different distribution, such as much lower/higher mean and/or much smaller/larger standard deviation, it may be necessary to remove that sample from downstream analysis.  
+
+```{r, echo = F}
+fcap1 <- "**Figure 1.** Box and Whisker Plot of Sample Distributions, colored by QC Warning."
+fcap2 <- "**Figure 2.** Principal component analysis of samples, colored by QC Warning."
+fcap3 <- "**Figure 3.** Boxplots of the top 6 significant proteins."
+```
+
+```{r message=FALSE,fig.cap=fcap1,fig.height = 4, fig.width = 8, fig.align = "center"}
+df_QC %>% 
+  filter(Panel == 'Olink Cardiometabolic') %>% # for illustration purpose we only plot one panel
+  olink_dist_plot() +
+  theme(axis.text.x=element_text(angle = 90, vjust = 0.5, size = 5)) # when having multiple samples it can help to rotated them for readability
+```  
+
+### Principal component analysis
+
+Global differences between samples can also be viewed using a PCA plot. A PCA plot of the data can be generated using Olink Analyze `olink_pca_plot` can be seen in **Figure 2**. Any samples which deviates a lot from the other samples could be considered outliers. 
+
+
+```{r message=FALSE,fig.cap=fcap2, fig.height = 6, fig.width = 6, fig.align = "center"}
+df_QC %>% 
+   olink_pca_plot()
+# the olink_pca_plot can show outliers by setting outlierDefX, outlierDefY 
+```  
+
+These plots can be used to determine whether there are any outlier and if it is right to remove these potential outliers and samples which don't pass Olinks internal QC control. These samples can be removed with the following code.
+
+```{r message=FALSE, eval=FALSE}
+df <- df_QC %>% 
+  filter(QC_Warning == 'Pass') %>% # only included samples which pass QC. This is standard for Olink but if samples are few or paired there can be an argument to still included them. 
+  filter(!(SampleID %in% c(NA))) # swap NA to the samples which was outliers, for example c('A1','A16') to remove sample with the name A1 and A16.
+
+```  
+
+Sometime including outlier or samples which don't pass QC can still be reasonable, especially in cases with very few samples.
+
+# Analysis 
+## ANOVA
+
+When working with multiple groups, Analysis of variance (ANOVA) is an method that compares multiple groups to determine if at least one group differs from the others. A significant result indicates that at least one groups differ from at least one other group. To better understand which groups differ from one another this test is usually followed up with a post hoc test to precisely identify which groups differ from one another.
+
+Looking at the example data five groups are found in the Site variable. Five distinct groups, Site_A, Site_B, Site_C, Site_D and Site_E exist in this data. 
+
+Here we will use the example data provided within Olink Analyze to assess differences between groups using the Site variable. Five distinct groups, Site_A, Site_B, Site_C, Site_D and Site_E exist in this data, as shown below. 
+
+```{r message=FALSE, eval=T}
+df %>% 
+  select(SampleID,Site) %>% 
+  unique() %>% 
+  select(Site) %>% 
+  table()
+
+```  
+
+ANOVA assesses the null hypothesis that no difference exists between the means of the groups. If the p-value associated with the test is lower than a predetermined significance level (typically 0.05), we can reject the null hypothesis and infer a significant difference between at least two groups. Conversely, if the p-value exceeds the significance level, we do not have enough evidence to reject the null hypothesis, suggesting an absence of a significant difference.
+
+Furthermore, it is crucial to address the issue of multiple testing when performing a ANOVA on multiple proteins simultaneously. Conducting multiple tests without appropriate adjustments can lead to an increased likelihood of false positive results. The tests in OlinkAnalyze always adjust for each protein tested. 
+
+To perform a ANOVA, use the OlinkAnalyze function `olink_anova`. If the adjusted p-value (listed in the column `Adjusted_pval`) is below 0.05, then the assay will also be listed as "Significant" in the `Threshold` column. For example, for the assay TRAIL (UniProt P50591) there is a significant result from the ANOVA (**Table 3**). However just from the ANOVA test we can't conduct which of the multiple groups that differ. To conduct which groups differ from which groups a post hoc test is needed. 
+
+```{r message=FALSE, eval=T}
+anova_results <- olink_anova(df = df, # specify your data
+            variable = 'Site') # specify your variable 
+
+```  
+
+```{r message=FALSE, eval=T, echo=FALSE}
+anova_results %>% head(5)  %>% 
+  select(Assay, OlinkID, UniProt, Panel, term, p.value, Adjusted_pval, Threshold) %>% 
+  knitr::kable(format = "html",
+               booktabs = T,
+               linesep = "",
+               digits = 4,
+               longtable = T,
+               row.names = F,
+               caption = "**Table 3.** ANOVA results of the 5 most significant proteins. Some coloumns have been left out due to space.",
+               label = "manifest")
+```  
+
+## Post hoc ANOVA test
+
+Following a ANOVA test, a post hoc test is performed on proteins that show a significant result in the ANOVA. The post hoc test compares all groups against all other groups, showing which group differ from another. Each comparison will have a estimate and a adjusted p-value. 
+
+```{r message=FALSE, eval=T}
+#the post hoc test should only be performed on proteins which have a significant result in the ANOVA
+significant_proteins <- anova_results %>% 
+  filter(Threshold == 'Significant') %>% 
+  pull(OlinkID)
+
+
+anova_posthoc_results<-olink_anova_posthoc(df,
+                    olinkid_list = significant_proteins, #selecting significant proteins
+                    variable = 'Site',
+                    effect = 'Site')
+
+```  
+
+The `olink_anova_posthoc` function arrange the results based on adjusted p-value and in this example on the first row the assay CCL18 have a significant difference between Site_B and Site_C of 5.6 NPX. 
+
+```{r message=FALSE, eval=T, echo=FALSE}
+anova_posthoc_results %>% head(5)  %>% 
+  select(Assay, OlinkID, UniProt, Panel, contrast ,estimate, Adjusted_pval, Threshold) %>% 
+  knitr::kable(format = "html",
+               booktabs = T,
+               linesep = "",
+               digits = 4,
+               longtable = T,
+               row.names = F,
+               caption = "**Table 4.** ANOVA post hoc results of the 5 most significant contrasts and proteins. Some coloumns have been left out due to space.",
+               label = "manifest")
+```  
+
+
+## Plots
+
+To illustrate the results from a ANOVA boxplots are a very effective way. These visualizations provide valuable insights into the differences between the groups groups and help in understanding the significance and effect sizes of the observed effects.
+
+To generate boxplots the `olink_boxplot` function can be used. The thick black horizontal line within each box indicates the median, the colored area - the interquartile range, the ends of the vertical middle line represent the minimum and the maximum values, and the black dots indicate potential assay outliers (beyond the minumum or maximum valuses). Boxplots of the top 6 significant proteins are plotted in **Figure 3**. 
+
+```{r message=FALSE, eval=T, fig.height = 4, fig.width = 8, fig.align = "center"}
+top6Significant<-anova_results %>% 
+  filter(Threshold == 'Significant') %>% # only filter out the significant proteins
+  head(6) %>%   # just the top 6 for visualization
+  pull(OlinkID) # pull out the OlinkID which is needed in olink_boxplot
+
+boxplot_top6<-olink_boxplot(df = df,
+              variable = 'Site',
+              olinkid_list = top6Significant,
+              posthoc_results = anova_posthoc_results) # to illustrate the significant difference between each group the posthoc result can be added as an argument
+
+``` 
+
+```{r fig.cap = fcap3,  echo = T, message=T, eval=T, fig.height = 4, fig.width = 8,fig.align = "center" }
+boxplot_top6[[1]]
+```
+
+# Saving results
+
+Having the results saved in csv files (or other format) and the plots in pdf (or other format) can making the results easier to work with, especially if the result should be sent to other people without access to R. 
+
+The following code can be used to save the results as a csv file.
+
+```{r message=FALSE, eval=F}
+
+write.table(anova_results,
+            paste0('ANOVAResults.csv'),
+            sep=';',row.names = F, quote = F)
+
+write.table(anova_posthoc_results,
+            paste0('ANOVA_PostHoc_Results.csv'),
+            sep=';',row.names = F, quote = F)
+
+```  
+
+The following code can be used to save every boxplot in a separate folder (in this case a in a folder called ANOVABoxplot).
+
+```{r message=FALSE, eval=F}
+
+dir.create('ANOVABoxplot') # create a folder 
+
+for (i in anova_results %>% 
+     filter(Threshold == 'Significant') %>% # only saving the significant proteins
+     pull(OlinkID)) {
+  
+  temp_name<- df_norm %>% # Saving the assay name for convenience
+    filter(OlinkID == i) %>% 
+    pull(Assay) %>% 
+    unique()
+    
+  if(str_detect(temp_name,'/')){ # Replacing / with - in the assay name
+    temp_name <-str_replace(temp_name,pattern = '/',replacement = '-')
+  }
+  
+  temp_boxplot<-olink_boxplot(df = df, 
+                               olinkid_list = i, 
+                               variable = 'Site')
+  
+  # saving the assay and olinkID name as the plotname
+  ggsave(paste0("ANOVABoxplot/",i,"_",temp_name,".pdf"), 
+         temp_boxplot[[1]],
+         width = 8,
+         height = 6)
+  
+}
+
+
+``` 
+
+ 
+# Contact Us!
+
+We are always happy to help. Email us with any questions:
+
+-   biostat\@olink.com for statistical services and general stats questions
+
+-   biostattools\@olink.com for Olink Analyze and Shiny app support
+
+-   support\@olink.com for Olink lab product and technical support
+
+-   info\@olink.com for more information
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
