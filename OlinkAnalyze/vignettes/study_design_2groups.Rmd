@@ -305,7 +305,7 @@ The following code can be used to save the results as a csv file.
 ```{r message=FALSE, eval=F}
 
 write.table(x = t_test_results,
-            file = paste0('TtestResults.csv'),
+            file = 'TtestResults.csv',
             sep=';',
             row.names = F, 
             quote = F)
@@ -358,4 +358,3 @@ We are always happy to help. Email us with any questions:
 -   support\@olink.com for Olink lab product and technical support
 
 -   info\@olink.com for more information
-
