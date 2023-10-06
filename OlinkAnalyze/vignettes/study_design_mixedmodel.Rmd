@@ -242,7 +242,7 @@ lmer_posthoc_results_Time %>%
                digits = 4,
                longtable = T,
                row.names = F,
-               caption = "**Table 4.** ANOVA post hoc results of the 5 most significant contrasts and proteins. Some coloumns have been left out due to space.",
+               caption = "**Table 4.** ANOVA post hoc results of the 5 most significant contrasts and proteins. Some columns have been left out due to space.",
                label = "manifest")
 ```  
 
