@@ -1,5 +1,5 @@
 ---
-title: "A Guide to Comparative Analysis of logitudinal data across muliple groups"
+title: "A Guide to Comparative Analysis of longitudinal data across multiple groups"
 author: "Olink DS team"
 date: "`r Sys.Date()`"
 output: 
