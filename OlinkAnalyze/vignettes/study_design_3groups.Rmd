@@ -33,7 +33,7 @@ df_QC <- OlinkAnalyze::npx_data1 %>%
 
 # Introduction  
 
-This vignette is designed to assist users working with 3 or more distinct groups using ANOVA. This guide aims to provide you with a comprehensive overview of the steps involved in analyzing and comparing data from multiple groups in Olink data using the Olink R package.  These groups can encompass a variety of categories, such as disease subtypes, treatment regimens,or genetic variations. The objective of the analysis is to identify for which proteins the groups differ from at least one another. 
+This vignette is designed to assist users working with 3 or more distinct groups using ANOVA. This guide aims to provide you with a comprehensive overview of the steps involved in analyzing and comparing data from multiple groups in Olink data using Olink's R package, Olink Analyze.  These groups can encompass a variety of categories, such as disease subtypes, treatment regimens, or genetic variations. The objective of the analysis is to identify proteins whose expressions differ between at least 2 of the groups. 
 
 By following this guide, you will gain a solid understanding of how to effectively compare and contrast groups, detect differences, and ultimately derive valuable conclusions from your data. Example code will be shown in this vignette, however it is still recommended to read the documentation for each function as not all options will be covered here. This can be done with the _help_ command.
 
