@@ -33,7 +33,7 @@ df_QC <- OlinkAnalyze::npx_data1 %>%
 
 # Introduction  
 
-This vignette is designed to assist users working with longitudinal samples divided across multiple groups using linear mixed models. This guide aims to provide you with a comprehensive overview of the steps involved in analyzing Olink data when the samples are measured over time in different groups using the Olink R package. An example can be samples measured over time where half the subjects have been revived a treatment and the other half have not. 
+This vignette is designed to assist users working with longitudinal samples divided across multiple groups using linear mixed models. This guide aims to provide you with a comprehensive overview of the steps involved in analyzing Olink data when the samples are measured over time in different groups using Olink's R package, Olink Analyze. An example can be samples measured over time where half the subjects have been revived a treatment and the other half have not. 
 
 By following this guide, you will gain a solid understanding of how to effectively compare and contrast groups, detect differences, and ultimately derive valuable conclusions from your data. Example code will be shown in this vignette, however it is still recommended to read the documentation for each function as not all options will be covered here. This can be done with the _help_ command.
 
