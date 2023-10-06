@@ -243,7 +243,7 @@ anova_posthoc_results %>% head(5)  %>%
 
 ## Plots
 
-To illustrate the results from a ANOVA boxplots are a very effective way. These visualizations provide valuable insights into the differences between the groups groups and help in understanding the significance and effect sizes of the observed effects.
+Boxplots are a very effective way to illustrate the results from an ANOVA. These visualizations provide valuable insights into the differences between the groups and help in understanding the significance and effect sizes of the observed effects.
 
 To generate boxplots the `olink_boxplot` function can be used. The thick black horizontal line within each box indicates the median, the colored area - the interquartile range, the ends of the vertical middle line represent the minimum and the maximum values, and the black dots indicate potential assay outliers (beyond the minumum or maximum valuses). Boxplots of the top 6 significant proteins are plotted in **Figure 3**. 
 
