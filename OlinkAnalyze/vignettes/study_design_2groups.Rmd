@@ -60,7 +60,7 @@ library(tidyverse)
 
 # Study overview
 
-This vignette will help you if you have Olink data and are unsure on how to compare your two groups. The Olink data file shouldn't be tempered with before loading it into R, as that may cause the data to not be recognized and loaded by the `read_NPX` function. Using the read_NPX function will always give you your data in a long format, where each row represent one sample and one protein. To load in your data in R use the following code:
+This vignette will help you if you have Olink data and are unsure on how to compare your two groups. The Olink data file shouldn't be tempered with before loading it into R, as that may cause the data to not be recognized and loaded by the `read_NPX` function. Using the read_NPX function will always give you your data in a long format, where each row represent one sample and one protein. To load in your data in R, use the following code:
 
 ```{r message=FALSE, eval=FALSE}
 data <- read_NPX("~/NPX_file_location.csv")
