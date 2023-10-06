@@ -249,7 +249,7 @@ lmer_posthoc_results_Time %>%
 
 ## Plots
 
-To illustrate the results from a LMM a point range plot are a common way. These visualizations provide valuable insights into the differences between the groups and help in understanding the significance and effect sizes of the observed effects.
+A point range plot is a common way to illustrate the results from an LMM. These visualizations provide valuable insights into the differences between the groups and help in understanding the significance and effect sizes of the observed effects.
 
 To illustrate the point range plot the *olink_lmer_plot* function can be used. In the example below only the top 6 significant proteins are plotted. 
 
