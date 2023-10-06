@@ -41,7 +41,7 @@ By following this guide, you will gain a solid understanding of how to effective
 help("functionName")
 ```
 
-If you have more that two groups in your data, or a longitudinal study see our other study design vignettes. 
+If you have more that two groups in your data, or a longitudinal study, see our other study design vignettes. 
 
 # Installation 
 
