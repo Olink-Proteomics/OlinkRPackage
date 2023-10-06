@@ -8,7 +8,7 @@ output:
     toc: true
     toc_depth: 2
 vignette: >
-  %\VignetteIndexEntry{Olink® Analyze Vignette}
+  %\VignetteIndexEntry{A Guide to Comparative Analysis of longitudinal data across multiple groups}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 --- 
