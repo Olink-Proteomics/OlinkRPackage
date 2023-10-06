@@ -33,7 +33,7 @@ df_QC <- OlinkAnalyze::npx_data1 %>%
 
 # Introduction  
 
-This vignette is designed to assist users working with two distinct groups using t-test. This guide aims to provide you with a comprehensive overview of the steps involved in analyzing and comparing data from two groups in Olink data using the Olink R package. These two groups can encompass a variety of categories, such as healthy and diseased individuals, two different types of a condition, or male and female subjects. The objective of the analysis is to identify the differing proteins between the two groups.
+This vignette is designed to assist users working with two distinct groups using t-test. This guide aims to provide you with a comprehensive overview of the steps involved in analyzing and comparing data from two groups in Olink data using Olink's R package, Olink Analyze. These two groups can encompass a variety of categories, such as healthy and diseased individuals, two different types of a condition, or male and female subjects. The objective of the analysis is to identify the differing proteins between the two groups.
 
 By following this guide, you will gain a solid understanding of how to effectively compare and contrast two groups, detect differences, and ultimately derive valuable conclusions from your data. Example code will be shown in this vignette, however it is still recommended to read the documentation for each function as not all options will be covered here. This can be done with the _help_ command.
 
