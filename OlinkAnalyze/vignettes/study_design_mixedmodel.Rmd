@@ -64,7 +64,9 @@ This vignette will help you if you have Olink data and are unsure on how to comp
 
 ```{r message=FALSE, eval=FALSE}
 data <- read_NPX("~/NPX_file_location.csv")
-# Argument should be the location of your NPX data. Data are usually in parquet, csv, xlsx or zip format depending on the product.
+# Argument should be the location of your NPX data. 
+# Data are usually in parquet, csv, xlsx or zip format.
+# Data file format depends on the product.
 ```  
 
 An example of the first five row can be seen below in **Table 1**. Note that not all NPX files contain all of the selected columns shown below.
