@@ -1,5 +1,5 @@
 ---
-title: "A Guide to Comparative Analysis of Muliple Groups with Olink Data"
+title: "A Guide to Comparative Analysis of Multiple Groups with Olink Data"
 author: "Olink DS team"
 date: "`r Sys.Date()`"
 output: 
