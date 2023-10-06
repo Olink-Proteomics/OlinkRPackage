@@ -245,7 +245,7 @@ anova_posthoc_results %>% head(5)  %>%
 
 Boxplots are a very effective way to illustrate the results from an ANOVA. These visualizations provide valuable insights into the differences between the groups and help in understanding the significance and effect sizes of the observed effects.
 
-To generate boxplots the `olink_boxplot` function can be used. The thick black horizontal line within each box indicates the median, the colored area - the interquartile range, the ends of the vertical middle line represent the minimum and the maximum values, and the black dots indicate potential assay outliers (beyond the minumum or maximum valuses). Boxplots of the top 6 significant proteins are plotted in **Figure 3**. 
+To generate boxplots, the `olink_boxplot` function can be used. The thick black horizontal line within each box indicates the median, the colored area - the interquartile range, the ends of the vertical middle line represent the minimum and the maximum values, and the black dots indicate potential assay outliers (beyond the minumum or maximum valuses). Boxplots of the top 6 significant proteins are plotted in **Figure 3**. 
 
 ```{r message=FALSE, eval=T, fig.height = 4, fig.width = 8, fig.align = "center"}
 top6Significant<-anova_results %>% 
