@@ -112,7 +112,7 @@ olink_normalization <- function(df1,
                                 reference_medians = NULL) {
 
   # If 2 data frames are supplied, make sure they have the same column names, if not, add missing column names.
-  
+
   if(!is.null(df2)){ # If df2 is provided
     if(length(c(setdiff(names(df1), names(df2)),setdiff(names(df2), names(df1)))) != 0){ # and the column names dont match
       missing_df2 <- setdiff(names(df1), names(df2))
@@ -124,10 +124,10 @@ olink_normalization <- function(df1,
         warning(paste("The following columns are found in df2 but not df1: \n", paste(unlist(missing_df1), collapse = ",")))
       }
       message("Adding missing columns...")
-      
+
     }
   }
-  
+
   #Filtering on valid OlinkID
   df1 <- df1 %>%
     dplyr::filter(stringr::str_detect(OlinkID,
@@ -196,23 +196,23 @@ olink_normalization <- function(df1,
         df_adjusted_data <- df1 %>%
           dplyr::mutate(Panel=stringr::str_replace(Panel,'\\(.+', '')) %>%
           dplyr::left_join(adj_factor_df,by='OlinkID') %>%
-          dplyr::mutate(NPX = NPX + Adj_factor) 
-        
+          dplyr::mutate(NPX = NPX + Adj_factor)
+
         if("LOD" %in% names(df_adjusted_data)){
           df_adjusted_data <- df_adjusted_data %>%
             dplyr::mutate(LOD = LOD + Adj_factor)
         }
-        
+
         if("Max LOD" %in% names(df_adjusted_data)){
           df_adjusted_data <- df_adjusted_data %>%
             dplyr::mutate(`Max LOD` = `Max LOD` + Adj_factor)
         }
-        
+
         if("Plate LOD" %in% names(df_adjusted_data)){
           df_adjusted_data <- df_adjusted_data %>%
             dplyr::mutate(`Plate LOD` = `Plate LOD` + Adj_factor)
         }
-        
+
         if("Plate_LOD" %in% names(df_adjusted_data)){
           df_adjusted_data <- df_adjusted_data %>%
             dplyr::mutate(Plate_LOD = Plate_LOD + Adj_factor)
@@ -253,6 +253,13 @@ olink_normalization <- function(df1,
 
   }
 
+  # cols_excluded_assay <- c("QC_Warning", "Normalization", "Assay_Warning")
+  # if (any(df1$QC_Warning == "EXCLUDED")) {
+  #   stop("df1 contains excluded assays (QC_Warning == \"EXCLUDED\"). Please remove them to proceed!")
+  # } else if (any(df2$QC_Warning == "EXCLUDED")) {
+  #   stop("df2 contains excluded assays (QC_Warning == \"EXCLUDED\"). Please remove them to proceed!")
+  # }
+
   # check if both df1 and df2 were normalized with the same method
   # "Intensity" or "Plate control"
   if (!("Normalization" %in% colnames(df1)) || !("Normalization" %in% colnames(df2))) {
@@ -264,11 +271,45 @@ olink_normalization <- function(df1,
       warning("Variable \"Normalization\" not present in df2.")
     }
   } else if (("Normalization" %in% colnames(df1)) && ("Normalization" %in% colnames(df2))) {
-    if ({ df1$Normalization |> unique() |> length() } != 1 ||
-        { df2$Normalization |> unique() |> length() } != 1 ||
-        unique(df1$Normalization) != unique(df2$Normalization)) {
-      warning("df1 and df2 are not normalized with the same approach. Consider renormalizing.")
+    df1_norm <- df1 |>
+      # ignore excluded assays
+      dplyr::filter(Normalization != "EXCLUDED") |>
+      dplyr::select(OlinkID, Normalization_df1 = Normalization) |>
+      dplyr::distinct()
+    df2_norm <- df2 |>
+      # ignore excluded assays
+      dplyr::filter(Normalization != "EXCLUDED") |>
+      dplyr::select(OlinkID, Normalization_df2 = Normalization) |>
+      dplyr::distinct()
+    df_norm_diff <- df1_norm |>
+      dplyr::inner_join(df2_norm,
+                        by = 'OlinkID') |>
+      dplyr::filter(Normalization_df1 != Normalization_df2)
+    rm(df1_norm, df2_norm)
+
+    if (nrow(df_norm_diff) > 0 && nrow(df_norm_diff) <= 10) {
+      if (length(df_norm_diff$OlinkID) == 1) {
+        warn_msg <- paste("Assay",
+              df_norm_diff$OlinkID,
+              "is not normalized with the same approach. Consider renormalizing.")
+      } else if (length(df_norm_diff$OlinkID) == 2) {
+        warn_msg <- paste("Assays",
+                          paste(df_norm_diff$OlinkID, collapse = " and "),
+                          "are not normalized with the same approach. Consider renormalizing.")
+      } else {
+        warn_msg <- paste("Assays",
+                          paste(head(df_norm_diff$OlinkID, -1), collapse = ", "),
+                          "and",
+                          tail(df_norm_diff$OlinkID, 1),
+                          "are not normalized with the same approach. Consider renormalizing.")
+      }
+      warning(warn_msg)
+    } else if (nrow(df_norm_diff) > 10) {
+      warning(paste("There are",
+                    nrow(df_norm_diff),
+                    "assays not normalized with the same approach. Consider renormalizing."))
     }
+    rm(df_norm_diff)
   }
 
   if(MOD_FLAG){
@@ -350,23 +391,23 @@ olink_normalization <- function(df1,
     dplyr::mutate(Panel=stringr::str_replace(Panel,'\\(.+', '')) %>%
     dplyr::left_join(adj_factor_df,by='OlinkID') %>%
     dplyr::mutate(Adj_factor = dplyr::if_else(Project == reference_project,0,Adj_factor)) %>%
-    dplyr::mutate(NPX = NPX + Adj_factor) 
-  
+    dplyr::mutate(NPX = NPX + Adj_factor)
+
   if("LOD" %in% names(df_adjusted_data)){
     df_adjusted_data <- df_adjusted_data %>%
       dplyr::mutate(LOD = LOD + Adj_factor)
   }
-  
+
   if("Max LOD" %in% names(df_adjusted_data)){
     df_adjusted_data <- df_adjusted_data %>%
       dplyr::mutate(`Max LOD` = `Max LOD` + Adj_factor)
   }
-  
+
   if("Plate LOD" %in% names(df_adjusted_data)){
     df_adjusted_data <- df_adjusted_data %>%
       dplyr::mutate(`Plate LOD` = `Plate LOD` + Adj_factor)
   }
-  
+
   if("Plate_LOD" %in% names(df_adjusted_data)){
     df_adjusted_data <- df_adjusted_data %>%
       dplyr::mutate(Plate_LOD = Plate_LOD + Adj_factor)
