@@ -109,13 +109,20 @@ olink_pca_plot <- function (df,
     }
   }
 
-  #Filtering on valid OlinkID
-  df <- df %>%
-    dplyr::filter(stringr::str_detect(OlinkID,
-                                      "OID[0-9]{5}"))
   #Check data format
   npxCheck <- npxCheck(df)
-  df <- df %>% dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) #Exclude assays that have all NA:s
+
+  # Stop if duplicate sample ID's detected
+  if (length(npxCheck$duplicate_samples) > 0) {
+    stop("Duplicate SampleID(s) detected: ", paste(npxCheck$duplicate_samples, collapse = ", "),". Each sample ID must be unique. Please check your data and ensure that each sample has a unique identifier.")
+  }
+
+  df <- df |> dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) #Exclude assays that have all NA:s
+
+  #Filtering on valid OlinkID
+  # df <- df |> dplyr::filter(!(OlinkID %in% npx_Check$non_conforming_OID)) # Exclude non-recognized OlinkIDs
+  df <- df |> dplyr::filter(stringr::str_detect(OlinkID,
+                                                "OID[0-9]{5}"))
 
   #Check that the user didn't specify just one of outlierDefX and outlierDefY
   if(sum(c(is.numeric(outlierDefX), is.numeric(outlierDefY))) == 1){
@@ -134,8 +141,8 @@ olink_pca_plot <- function (df,
     if(!is.factor(df[[paste(color_g)]])){
       df[[paste(color_g)]] <- as.factor(df[[paste(color_g)]])
     }
-    df <- df %>%
-      dplyr::mutate(Panel = Panel  %>% stringr::str_replace("Olink ", "")) #Strip "Olink" from the panel names
+    df <- df |>
+      dplyr::mutate(Panel = Panel |> stringr::str_replace("Olink ", "")) #Strip "Olink" from the panel names
 
     plotList <- lapply(unique(df$Panel), function(x) {
       g <- df %>%
@@ -158,7 +165,7 @@ olink_pca_plot <- function (df,
         ggplot2::labs(title = x)
 
       #Add Panel info inside the ggplot object
-      g$data <- g$data %>%
+      g$data <- g$data  |>
         dplyr::mutate(Panel = x)
 
       g
@@ -215,9 +222,9 @@ olink_calculate_pca <- function(procData,
   old_collate <- Sys.getlocale("LC_COLLATE")
   Sys.setlocale("LC_COLLATE", "C")
 
-  scores <- data.frame(cbind(PCX, PCY)) %>%
-    tibble::rownames_to_column() %>%
-    dplyr::arrange(rowname, .locale = "C") %>%
+  scores <- data.frame(cbind(PCX, PCY))  |>
+    tibble::rownames_to_column()  |>
+    dplyr::arrange(rowname, .locale = "C")  |>
     tibble::column_to_rownames()
   loadings <- data.frame(variables = rownames(pca_fit$rotation), LX, LY)
 
@@ -234,7 +241,7 @@ olink_calculate_pca <- function(procData,
   #Identify outliers
   if (!is.na(outlierDefX) && !is.na(outlierDefY)) {
     scores <- scores %>%
-      tibble::rownames_to_column(var = "SampleID") %>%
+      tibble::rownames_to_column(var = "SampleID")  |>
       dplyr::mutate(PCX_low = mean(PCX, na.rm = TRUE) -
                       outlierDefX * sd(PCX, na.rm = TRUE),
                     PCX_high = mean(PCX, na.rm = TRUE) +
@@ -242,7 +249,7 @@ olink_calculate_pca <- function(procData,
                     PCY_low = mean(PCY, na.rm = TRUE) -
                       outlierDefY * sd(PCY, na.rm = TRUE),
                     PCY_high = mean(PCY, na.rm = TRUE) +
-                      outlierDefY * sd(PCY, na.rm = TRUE)) %>%
+                      outlierDefY * sd(PCY, na.rm = TRUE))  |>
       dplyr::mutate(Outlier = dplyr::if_else(PCX < PCX_high &
                                                PCX > PCX_low &
                                                PCY > PCY_low &
@@ -317,10 +324,6 @@ olink_pca_plot.internal <- function(df,
     }
   }
 
-
-  observation_names <- procData$df_wide$SampleID
-  observation_colors <- procData$df_wide$colors
-
   #### PCA ####
   pca_results <- olink_calculate_pca(procData = procData,
                                      x_val = x_val,
@@ -329,6 +332,23 @@ olink_pca_plot.internal <- function(df,
                                      outlierDefY = outlierDefY)
 
   scores <- pca_results$scores
+
+  if (! "SampleID" %in% colnames(scores)) {
+    scores <- scores |>
+      dplyr::mutate(SampleID = rownames(scores))
+  }
+
+  if (is.numeric(scores$SampleID)) {
+    message("SampleID converted to character.")
+    scores$SampleID <- as.character(scores$SampleID)
+  }
+  if (is.numeric(procData$df_wide$SampleID)) {
+    message("SampleID converted to character.")
+    procData$df_wide$SampleID <- as.character(procData$df_wide$SampleID)
+  }
+
+  scores <- scores |> dplyr::left_join(procData$df_wide[,c("SampleID", "colors")], by = c("SampleID"))
+
   loadings <- pca_results$loading
   loadings_scaling_factor <- pca_results$loadings_scaling_factor
   PoV <- pca_results$PoV
@@ -344,14 +364,14 @@ olink_pca_plot.internal <- function(df,
   if(label_samples){
 
     pca_plot <- pca_plot +
-      ggplot2::geom_text(ggplot2::aes(label = observation_names, color = observation_colors), size = 3) +
+      ggplot2::geom_text(ggplot2::aes(label = SampleID, color = colors), size = 3) +
       ggplot2::labs(color = color_g) +
       ggplot2::guides(size = "none")
 
   }else{
 
     pca_plot <- pca_plot +
-      ggplot2::geom_point(ggplot2::aes(color = observation_colors), size = 2.5) +
+      ggplot2::geom_point(ggplot2::aes(color = colors), size = 2.5) +
       ggplot2::labs(color = color_g) +
       ggplot2::guides(size = "none")
 
@@ -372,10 +392,10 @@ olink_pca_plot.internal <- function(df,
 
       #Largest loadings based on Pythagoras
 
-      N_loadings <- loadings %>%
-        dplyr::mutate(abs_loading = sqrt(LX^2 + LY^2)) %>%
-        dplyr::arrange(desc(abs_loading)) %>%
-        utils::head(n_loadings) %>%
+      N_loadings <- loadings  |>
+        dplyr::mutate(abs_loading = sqrt(LX^2 + LY^2))  |>
+        dplyr::arrange(desc(abs_loading))  |>
+        utils::head(n_loadings)  |>
         dplyr::select(-abs_loading)
     }
 
@@ -383,12 +403,12 @@ olink_pca_plot.internal <- function(df,
 
       #Selected loadings
 
-      L_loadings <- loadings %>%
+      L_loadings <- loadings  |>
         dplyr::filter(variables %in% loadings_list)
     }
 
     loadings <- rbind(N_loadings,
-                      L_loadings) %>%
+                      L_loadings)  |>
       dplyr::distinct()
 
     pca_plot <- pca_plot +

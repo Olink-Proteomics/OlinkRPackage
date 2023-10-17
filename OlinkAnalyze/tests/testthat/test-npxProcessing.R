@@ -96,3 +96,24 @@ w2 <- testthat::capture_error(
 test_that("npxProcessing_forDimRed does not recognize QC_Warning", {
   expect_equal(w2, simpleError("In color_g = \"QC_Warning\", QC_Warning was not found. Did you mean color_g = \"SampleQC\"?"))
 })
+
+# test that npxCheck detects duplicate sample IDs
+npx_Check <- suppressMessages(npxCheck(npx_data1))
+
+test_that("npxCheck detects duplicate sample IDs.",
+         {expect_equal(npx_Check$duplicate_samples, c("CONTROL_SAMPLE_AS 1", "CONTROL_SAMPLE_AS 2"))})
+
+
+# npxProcessing_forDimRed snapshot ----------------------------------------
+
+test_that("npxProcessing_forDimRed snapshot", {
+  oids_to_use <- sort(unique(npx_data1$OlinkID))[1:10]
+  sids_to_use <- sort(unique(npx_data1$SampleID))[1:10]
+
+  df <- npx_data1 %>%
+    filter(SampleID %in% sids_to_use & OlinkID %in% oids_to_use) %>%
+    mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
+    npxProcessing_forDimRed()
+
+  expect_snapshot_value(df, style = "deparse")
+})
