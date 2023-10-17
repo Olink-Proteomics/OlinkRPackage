@@ -67,7 +67,8 @@ npxProcessing_forDimRed <- function(df,
     dplyr::mutate(assay_var = var(NPX, na.rm = TRUE)) |>
     dplyr::ungroup() |>
     dplyr::filter(!(assay_var == 0 | is.na(assay_var))) |>
-    dplyr::select(-assay_var)
+    dplyr::select(-assay_var) |>
+    dplyr::arrange(SampleID)
 
   #wide format
   df_wide <- df_temp |>
