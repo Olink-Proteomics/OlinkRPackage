@@ -60,11 +60,11 @@ read_npx_csv <- function(filename) {
 
   }
 
-  df_npx <- df_npx %>%
+  df_npx <- df_npx |>
     dplyr::mutate(NPX         = as.numeric(NPX),
                   LOD         = as.numeric(LOD),
                   MissingFreq = as.numeric(MissingFreq),
-                  SampleID    = as.character(SampleID)) %>%
+                  SampleID    = as.character(SampleID)) |>
     dplyr::as_tibble()
 
   return(df_npx)
