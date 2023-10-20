@@ -26,7 +26,6 @@
 #' read_NPX(file)
 #' }
 #'
-#' @importFrom magrittr %>%
 #' @importFrom tools file_ext md5sum file_path_sans_ext
 #' @importFrom dplyr pull filter
 #' @importFrom stringr str_detect str_replace
@@ -40,8 +39,8 @@ read_npx_zip <- function(filename) {
   # check contents of the compressed file
   # keep all files but the README.txt
   compressed_file_contents <- utils::unzip(zipfile = filename,
-                                           list = TRUE) %>%
-    dplyr::filter(Name != "README.txt") %>%
+                                           list = TRUE) |>
+    dplyr::filter(Name != "README.txt") |>
     dplyr::pull(Name)
 
   # Check if checksum file (MD5 or SHA256) exists and prepare list of files to unzip
@@ -101,12 +100,12 @@ read_npx_zip <- function(filename) {
 
     if (stringr::str_detect(chksm_string, "md5")) {
 
-      chksm <- tools::md5sum(extracted_file_csv) %>%
+      chksm <- tools::md5sum(extracted_file_csv) |>
         unname()
 
     } else if(stringr::str_detect(chksm_string, "sha256")) {
 
-      chksm <- openssl::sha256(file(extracted_file_csv)) %>%
+      chksm <- openssl::sha256(file(extracted_file_csv)) |>
         stringr::str_replace(pattern = ":",
                              replacement = "")
 
