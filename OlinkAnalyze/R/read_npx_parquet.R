@@ -1,106 +1,96 @@
-#' Helper function to read in Olink Explore parquet output files
+#' Helper function to read in Olink Explore parquet files
 #'
-#' @param filename Path to Olink Software parquet output file.
+#' @param file Path to Olink Software parquet output file.
 #'
-#' @return A "tibble" in long format. Some of the columns are:
-#' \itemize{
-#'    \item{SampleID:} Sample ID
-#'    \item{OlinkID:} Olink ID
-#'    \item{UniProt:} UniProt ID
-#'    \item{Assay:} Protein symbol
-#'    \item{PlateID:} Plate ID
-#'    \item{Count:} Counts from sequences
-#'    \item{ExtNPX:} External control normalized counts
-#'    \item{NPX:} Normalized Protein Expression
-#' }
-#' Additional columns may be present or missing depending on the platform
+#' @return An R6 class ArrowObject.
 #'
 #' @keywords NPX
 #'
 #' @examples
 #' \donttest{
-#' file <- system.file("extdata", "Example_NPX_Data.csv", package = "OlinkAnalyze")
-#' read_NPX(file)
+#' file <- system.file("extdata", "npx_data_ext.parquet",
+#' package = "OlinkAnalyze")
+#' read_npx_parquet(file)
 #' }
-#'
-#' @importFrom magrittr %>%
-#' @importFrom dplyr as_tibble select
-#'
+read_npx_parquet <- function(file) {
 
-read_npx_parquet <- function (filename) {
+  # Read parquet file ----
 
-  if(!requireNamespace("arrow", quietly = TRUE) ) {
-    stop("Reading parquet files requires the arrow package.
-         Please install arrow before continuing.
+  parquet_npx <- arrow::open_dataset(
+    sources = file
+  )
 
-         install.packages(\"arrow\")")
-  }
+  # Check metadata ----
 
-  # pointer to parquet file
-  parquet_file <- arrow::open_dataset(
-    sources = filename
+  olink_parquet_metadata <- list(
+    file_version = "FileVersion",
+    project_name = "ProjectName",
+    sample_matrix = "SampleMatrix",
+    product = "Product",
+    data_file_type = "DataFileType"
   )
 
   # Check that all required parquet metadata is in place
-  olink_parquet_metadata <- c("DataFileType",
-                              "ProductType")
-  if (!all(olink_parquet_metadata %in% names(parquet_file$metadata))) {
+  if (!all(unlist(olink_parquet_metadata) %in% names(parquet_npx$metadata))) {
+    missing_fields <- unlist(olink_parquet_metadata)[ # nolint object_usage_linter
+      !(unlist(olink_parquet_metadata) %in% names(parquet_npx$metadata))
+    ]
 
-    stop(
-      paste("Missing required fileds",
-            paste(
-              paste0("\"", olink_parquet_metadata, "\""),
-              collapse = " and "),
-            "in parquet file's metadata."
-            )
-      )
-
-  }
-
-  # We allow only Olink Explore HT parquet files for now
-  # If other platforms are to be reported as parquet too, we have to add
-  # them to this array
-  olink_platforms <- c("ExploreHT")
-  if (!(parquet_file$metadata$ProductType %in% olink_platforms)) {
-
-    stop("Only \"Olink Explore HT\" parquet files are currently supported.")
+    cli::cli_abort(
+      c(
+        "x" = "Missing required field {?s} in metadata:
+        {missing_fields}"
+      ),
+      call = NULL,
+      wrap = FALSE
+    )
 
   }
 
+  # Check specific fields of metadata ----
 
-  # Check if it is an NPX file
-  olink_files <- c("NPX File")
-  if (parquet_file$metadata$DataFileType %in% olink_files) {
+  # We allow only Olink Explore HT parquet files for now.
+  # If other platforms are to be reported in parquet format, we need to add
+  # them to this array.
+  olink_parquet_platforms <- c("ExploreHT")
 
-    # Check that required columns are present
-    required_cols <- c("SampleID",
-                       "OlinkID",
-                       "UniProt",
-                       "Assay",
-                       "Panel",
-                       "PlateID",
-                       "SampleQC",
-                       "NPX")
+  if (!(parquet_npx$metadata[[olink_parquet_metadata$product]] %in% olink_parquet_platforms)) { # nolint object_usage_linter
 
-    missing_cols <- setdiff(required_cols,
-                            names(parquet_file))
-
-    if(length(missing_cols) != 0) {
-
-      stop(paste("The following columns are missing:",
-                 paste(missing_cols, collapse = ", ")))
-
-    }
-
-  } else {
-
-    stop("Only \"NPX\" parquet files are currently supported.")
+    cli::cli_abort(
+      c(
+        "x" = "Unsupported platform:
+        {.val {parquet_npx$metadata[[olink_parquet_metadata$product]]}}",
+        "i" =
+          "Metadata field {.val {olink_parquet_metadata$product}} expects:
+        {olink_parquet_platforms}"
+      ),
+      call = NULL,
+      wrap = FALSE
+    )
 
   }
 
-  df_npx <- parquet_file %>%
-    dplyr::collect() %>%
-    dplyr::as_tibble()
+  # We allow only  NPX file for now.
+  # If other files are to be accepted, we need to add them to this array.
+  olink_parquet_files <- c("NPX File")
 
-  return(df_npx)
+  if (!(parquet_npx$metadata[[olink_parquet_metadata$data_file_type]] %in% olink_parquet_files)) { # nolint object_usage_linter
+
+    cli::cli_abort(
+      c(
+        "x" = "Unsupported file:
+        {.val {parquet_npx$metadata[[olink_parquet_metadata$data_file_type]]}}",
+        "i" =
+          "Metadata field {.val {olink_parquet_metadata$data_file_type}}
+          expects: {olink_parquet_files}"
+      ),
+      call = NULL,
+      wrap = FALSE
+    )
+
+  }
+
+  # Return the ArrowObject ----
+
+  return(parquet_npx)
 }

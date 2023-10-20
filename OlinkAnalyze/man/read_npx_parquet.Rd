@@ -2,35 +2,24 @@
 % Please edit documentation in R/read_npx_parquet.R
 \name{read_npx_parquet}
 \alias{read_npx_parquet}
-\title{Helper function to read in Olink Explore parquet output files}
+\title{Helper function to read in Olink Explore parquet files}
 \usage{
-read_npx_parquet(filename)
+read_npx_parquet(file)
 }
 \arguments{
-\item{filename}{Path to Olink Software parquet output file.}
+\item{file}{Path to Olink Software parquet output file.}
 }
 \value{
-A "tibble" in long format. Some of the columns are:
-\itemize{
-   \item{SampleID:} Sample ID
-   \item{OlinkID:} Olink ID
-   \item{UniProt:} UniProt ID
-   \item{Assay:} Protein symbol
-   \item{PlateID:} Plate ID
-   \item{Count:} Counts from sequences
-   \item{ExtNPX:} External control normalized counts
-   \item{NPX:} Normalized Protein Expression
-}
-Additional columns may be present or missing depending on the platform
+An R6 class ArrowObject.
 }
 \description{
-Helper function to read in Olink Explore parquet output files
+Helper function to read in Olink Explore parquet files
 }
 \examples{
 \donttest{
-file <- system.file("extdata", "Example_NPX_Data.csv", package = "OlinkAnalyze")
-read_NPX(file)
+file <- system.file("extdata", "npx_data_ext.parquet",
+package = "OlinkAnalyze")
+read_npx_parquet(file)
 }
-
 }
 \keyword{NPX}
