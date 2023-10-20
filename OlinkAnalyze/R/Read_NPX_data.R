@@ -27,15 +27,6 @@
 #' read_NPX(file)
 #' }
 #' @importFrom magrittr %>%
-#' @importFrom tools file_ext md5sum file_path_sans_ext
-#' @importFrom dplyr as_tibble distinct pull filter bind_cols mutate left_join select rename matches bind_rows arrange slice_head
-#' @importFrom readxl read_excel
-#' @importFrom stringr str_detect str_replace_all str_to_upper str_to_title str_replace
-#' @importFrom tidyr tibble separate gather
-#' @importFrom utils tail
-#' @importFrom zip unzip
-#' @importFrom stats na.omit
-#' @importFrom utils tail
 
 read_NPX <- function(filename) {
   # If the file is csv or txt read_NPX assumes Explore NPX data in long format
@@ -65,7 +56,7 @@ read_NPX_explore <- function(filename) {
 
   } else if (tools::file_ext(filename) == "parquet") {
 
-    out <- read_npx_parquet(filename = filename)
+    out <- read_npx_parquet(file = filename)
 
   } else if (tools::file_ext(filename) %in% c("csv", "txt")) {
 
@@ -151,6 +142,7 @@ read_NPX_explore <- function(filename) {
                           "MissingFreq",
                           "LOD",
                           "ExploreVersion"),
+
     "header_parquet" = c("SampleID", "WellID","PlateID", "OlinkID",
                          "UniProt", "Assay", "Panel", "NPX",
                          "Normalization", "ExploreVersion", "Block",
@@ -159,31 +151,34 @@ read_NPX_explore <- function(filename) {
                          "DataAnalysisRefID", "AssayQC", "SampleQC")
   )
 
-  header_match <-  header_v %>%
+  header_match <- header_v |>
     sapply(function(x)
-      identical(sort(x),
-                { colnames(out) %>% sort() })
-      ) %>%
+      identical(
+        sort(x),
+        { colnames(out) |> sort() }
+      )
+    ) |>
     any() # look for one full match
 
   if (header_match == FALSE) {
 
-    # if there is a mismatch of the input data with the expected column names
-    # - we pick the set of column names with the shortest distance to any of the expected ones
-    # - if multiple matches occur, we pick the most recent
-    header_diff_1 <- lapply(header_v, function(x) setdiff(x, colnames(out))) %>%
+    # if there is a mismatch of the input data with the expected column names:
+    # - we pick the set of column names with the shortest distance to any of
+    #   the expected ones.
+    # - if multiple matches occur, we pick the most recent.
+    header_diff_1 <- lapply(header_v, function(x) setdiff(x, colnames(out))) |>
       lapply(length)
 
-    header_diff_2 <- lapply(header_v, function(x) setdiff(colnames(out), x)) %>%
+    header_diff_2 <- lapply(header_v, function(x) setdiff(colnames(out), x)) |>
       lapply(length)
 
-    header_pick  <- tidyr::tibble(v_name = names(header_v),
-                                  v1     = unlist(header_diff_1),
-                                  v2     = unlist(header_diff_2)) %>%
-      dplyr::mutate(v = v1 + v2) %>%
-      dplyr::arrange(v, v_name) %>%
-      dplyr::slice_head(n = 1) %>%
-      dplyr::pull(v_name)
+    header_pick <- data.frame(v_name = names(header_v),
+                              v1     = unlist(header_diff_1),
+                              v2     = unlist(header_diff_2)) |>
+      dplyr::mutate(v = .data[["v1"]] + .data[["v2"]]) |>
+      dplyr::arrange(.data[["v"]], .data[["v_name"]]) |>
+      dplyr::slice_head(n = 1) |>
+      dplyr::pull(.data[["v_name"]])
 
     # find missing columns
     missing_cols <- setdiff(header_v[[header_pick]], colnames(out))
@@ -620,12 +615,12 @@ read_NPX_target <- function(filename) {
     # Check for data completeness and warn on problems
     check_data_completeness(out)
     out <- out %>%
-      mutate(NPX = as.numeric(NPX))
+      dplyr::mutate(NPX = as.numeric(NPX))
   }
   if (!is_npx_data){
     message("QUANT data detected. Some downstream functions may not be supported.")
     out <- out %>%
-      mutate(Quantified_value = as.numeric(Quantified_value))
+      dplyr::mutate(Quantified_value = as.numeric(Quantified_value))
   }
 
   return(out)

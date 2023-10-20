@@ -15,7 +15,7 @@ test_that("Data loads correctly with 'read_NPX()'", {
   df_ext_v1 <- read_NPX(filename = npx_file_ext_v1)
   npx_file_ext_v2 <- system.file("extdata", "npx_data_ext_v2.zip", package = "OlinkAnalyze", mustWork = TRUE)
   df_ext_v2 <- read_NPX(filename = npx_file_ext_v2)
-  df_parquet <- read_NPX(filename = parquet_file)
+  df_parquet <- read_NPX(filename = parquet_file) |> dplyr::as_tibble()
 
   #NPX read ok?
   expect(exists("df_1"), failure_message = "read_NPX failed on dataset 1")
@@ -109,7 +109,7 @@ test_that("Data loads correctly with 'read_NPX()'", {
 test_that("data completeness check", {
   expect_warning(
     npx_data1 %>%
-       mutate(NPX = dplyr::if_else(SampleID == "A1" & Panel == "Olink Cardiometabolic",
+       dplyr::mutate(NPX = dplyr::if_else(SampleID == "A1" & Panel == "Olink Cardiometabolic",
                             NA_real_,
                             NPX)) %>%
        check_data_completeness(),
