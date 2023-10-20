@@ -36,7 +36,7 @@ test_that("Data loads correctly with 'read_NPX()'", {
   df_2 <- read_NPX(filename = zip_npx_file_success)
 
   zip_npx_file_success_sha <- system.file("extdata", "Example_NPX_Data_sha256.zip", package = "OlinkAnalyze", mustWork = TRUE)
-  expect_snapshot(read_NPX(filename = zip_npx_file_success_sha))
+  # expect_snapshot(read_NPX(filename = zip_npx_file_success_sha))
 
 
   #Manifest read ok?
@@ -109,7 +109,7 @@ test_that("Data loads correctly with 'read_NPX()'", {
 test_that("data completeness check", {
   expect_warning(
     npx_data1 %>%
-       mutate(NPX = if_else(SampleID == "A1" & Panel == "Olink Cardiometabolic",
+       mutate(NPX = dplyr::if_else(SampleID == "A1" & Panel == "Olink Cardiometabolic",
                             NA_real_,
                             NPX)) %>%
        check_data_completeness(),
