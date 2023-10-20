@@ -10,8 +10,9 @@
 #' \donttest{
 #' file <- system.file("extdata", "npx_data_ext.parquet",
 #' package = "OlinkAnalyze")
-#' read_npx_parquet(file)
+#' read_NPX(file)
 #' }
+#'
 read_npx_parquet <- function(file) {
 
   # Read parquet file ----

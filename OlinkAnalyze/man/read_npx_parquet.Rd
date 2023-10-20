@@ -19,7 +19,8 @@ Helper function to read in Olink Explore parquet files
 \donttest{
 file <- system.file("extdata", "npx_data_ext.parquet",
 package = "OlinkAnalyze")
-read_npx_parquet(file)
+read_NPX(file)
 }
+
 }
 \keyword{NPX}
