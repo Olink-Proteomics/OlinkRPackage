@@ -152,10 +152,10 @@ read_NPX_explore <- function(filename) {
                           "LOD",
                           "ExploreVersion"),
     "header_parquet" = c("SampleID", "WellID","PlateID", "OlinkID",
-                         "UniProt", "Assay", "Panel", "NPX", 
+                         "UniProt", "Assay", "Panel", "NPX",
                          "Normalization", "ExploreVersion", "Block",
-                         "AssayType", "Count", "ExtNPX", 
-                         "PCNormalizedNPX", "SampleType", 
+                         "AssayType", "Count", "ExtNPX",
+                         "PCNormalizedNPX", "SampleType",
                          "DataAnalysisRefID", "AssayQC", "SampleQC")
   )
 
@@ -200,7 +200,7 @@ read_NPX_explore <- function(filename) {
   if(any(grepl("Target", out$Panel))){
     warning("Target csv is not fully supported. Consider Target xlsx format instead.")
     # Replicate read_npx_target formatting.
-    out <- out %>% 
+    out <- out %>%
       dplyr::mutate(Panel =  gsub("\\(.*\\)","",Panel)) %>%
       dplyr::mutate(Panel = stringr::str_to_title(Panel)) %>%
       dplyr::mutate(Panel = gsub("Target 96", "", Panel)) %>%
@@ -212,7 +212,7 @@ read_NPX_explore <- function(filename) {
       dplyr::mutate(Panel_End = ifelse(is.na(Panel_End), " ", Panel_End)) %>%
       dplyr::mutate(Panel = paste("Olink", Panel_Start, Panel_End)) %>%
       dplyr::mutate(Panel = trimws(Panel, which = "right")) %>%
-      dplyr::select(-Panel_Start, -Panel_End) 
+      dplyr::select(-Panel_Start, -Panel_End)
   }
 
   return(out)
@@ -641,24 +641,23 @@ read_NPX_target <- function(filename) {
 #'
 #' @examples
 #'
-#' npx_data1 %>%
+#' npx_data1 |>
 #'     dplyr::mutate(NPX = dplyr::if_else(
 #'                          SampleID == "A1" & Panel == "Olink Cardiometabolic",
 #'                          NA_real_,
-#'                          NPX)) %>%
+#'                          NPX)) |>
 #'     OlinkAnalyze:::check_data_completeness()
 
 check_data_completeness <- function(df){
-  NA_panel_sample <- df %>%
-    group_by(SampleID, Panel) %>%
-    summarize(`number of NA values` = sum(is.na(NPX)),
-              .groups = "drop") %>%
-    filter(`number of NA values` > 0) %>%
+  NA_panel_sample <- df |>
+    dplyr::group_by(SampleID, Panel) |>
+    dplyr::summarize(`number of NA values` = sum(is.na(NPX)),
+              .groups = "drop") |>
+    dplyr::filter(`number of NA values` > 0) |>
     as.data.frame()
 
   if (dim(NA_panel_sample)[1] > 0) {
-    warning("The following samples have NA NPX values for the following panels.\n\n",
-            print_and_capture(NA_panel_sample))
+    warning("The following samples have NA NPX values for the following panels.\n\n")
   }
 
 }
