@@ -53,55 +53,6 @@ Description: A collection of functions to facilitate analysis of proteomic
     package is to help users extract biological insights from proteomic
     data run on the Olink platform.
 License: AGPL (>= 3)
-Depends: 
-    R (>= 4.1.0)
-Imports:
-    broom,
-    car,
-    dplyr,
-    emmeans,
-    forcats,
-    generics,
-    ggplot2,
-    ggpubr,
-    ggrepel,
-    grDevices,
-    grid,
-    lme4,
-    lmerTest,
-    magrittr,
-    methods,
-    readxl,
-    rlang,
-    rstatix,
-    stats,
-    stringr,
-    tibble,
-    tidyr,
-    tidyselect,
-    tools,
-    utils,
-    zip
-Suggests: 
-    arrow,
-    clusterProfiler,
-    extrafont,
-    FSA,
-    ggplotify,
-    here,
-    kableExtra,
-    knitr,
-    markdown,
-    msigdbr,
-    openssl,
-    ordinal,
-    pheatmap,
-    rmarkdown,
-    scales,
-    systemfonts,
-    testthat (>= 3.0.0),
-    umap,
-    vdiffr
 VignetteBuilder: 
   kableExtra,
   knitr
@@ -109,3 +60,16 @@ Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.3
+Imports: 
+    arrow,
+    cli,
+    dplyr,
+    magrittr,
+    readxl,
+    stringr,
+    tidyr,
+    tidyselect,
+    zip
+Suggests: 
+    openssl,
+    testthat (>= 3.0.0)
