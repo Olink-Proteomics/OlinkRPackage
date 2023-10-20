@@ -29,7 +29,7 @@
 
 read_npx_csv <- function(filename) {
 
-  df_npx <- read.table(
+  df_npx <- utils::read.table(
     file = filename,
     header = TRUE,
     sep = ";",
@@ -42,7 +42,7 @@ read_npx_csv <- function(filename) {
   if (is.data.frame(df_npx) &&
       ncol(df_npx) == 1L) {
 
-    df_npx <- read.table(
+    df_npx <- utils::read.table(
       file = filename,
       header = TRUE,
       sep = ",",
