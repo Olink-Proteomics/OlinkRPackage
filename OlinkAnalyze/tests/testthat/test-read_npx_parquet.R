@@ -1,7 +1,3 @@
-# original raw parquet file
-parquet_file <- system.file("extdata", "npx_data_ext.parquet",
-                            package = "OlinkAnalyze", mustWork = TRUE)
-
 # this function is used to write NPX parquet files for testing purposes
 write_npx_parquet <-
   function(df,
@@ -47,9 +43,11 @@ test_that(
     # random product name for testing
     tmp_metadata_remove <- c("Product", "DataFileType")
 
-
     write_npx_parquet(
-      df = read_NPX(parquet_file) |>
+      df = system.file("extdata", "npx_data_ext.parquet",
+                       package = "OlinkAnalyze",
+                       mustWork = TRUE) |>
+        read_npx_parquet() |>
         dplyr::as_tibble() |>
         dplyr::collect(),
       npx_parquet_file = parquetfile_metadata,
@@ -64,7 +62,7 @@ test_that(
 
     # check that relevant error is thrown
     expect_error(
-      read_NPX(parquetfile_metadata),
+      read_npx_parquet(file = parquetfile_metadata),
       regexp = paste0("Missing required field s in metadata: ")
     )
 
@@ -89,7 +87,10 @@ test_that(
     tmp_product_name <- "Unknown_Product"
 
     write_npx_parquet(
-      df = read_NPX(parquet_file) |>
+      df = system.file("extdata", "npx_data_ext.parquet",
+                       package = "OlinkAnalyze",
+                       mustWork = TRUE) |>
+        read_npx_parquet() |>
         dplyr::as_tibble() |>
         dplyr::collect(),
       npx_parquet_file = parquetfile_product,
@@ -104,7 +105,7 @@ test_that(
 
     # check that relevant error is thrown
     expect_error(
-      read_NPX(parquetfile_product),
+      read_npx_parquet(file = parquetfile_product),
       regexp = paste0("Unsupported platform: \"", tmp_product_name, "\"")
     )
 
@@ -129,7 +130,10 @@ test_that(
     tmp_datafiletype_name <- "Unknown File"
 
     write_npx_parquet(
-      df = read_NPX(parquet_file) |>
+      df = system.file("extdata", "npx_data_ext.parquet",
+                       package = "OlinkAnalyze",
+                       mustWork = TRUE) |>
+        read_npx_parquet() |>
         dplyr::as_tibble() |>
         dplyr::collect(),
       npx_parquet_file = parquetfile_datafiletype,
@@ -144,7 +148,7 @@ test_that(
 
     # check that relevant error is thrown
     expect_error(
-      read_NPX(parquetfile_datafiletype),
+      read_npx_parquet(file = parquetfile_datafiletype),
       regexp = paste0("Unsupported file: \"", tmp_datafiletype_name, "\"")
     )
 
