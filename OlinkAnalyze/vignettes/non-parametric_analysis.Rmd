@@ -7,7 +7,7 @@ output:
     toc: true
     toc_depth: 2
 vignette: >
-  %\VignetteIndexEntry{Olink® Analyze Vignette}
+  %\VignetteIndexEntry{Olink® non-parametric analysis}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -32,7 +32,7 @@ library(kableExtra)
 
 ## Introduction
 
-When particular population distribution or data characteristic assumptions are not met, a non-parametric test could be considered to analyze the data. Unlike parametric tests, which assume that the data follows a specific distribution (usually the normal distribution) and have specific parameters, non-parametric tests do not make these strict assumptions and are often referred to as distribution-free tests. Non-parametric tests are useful when dealing with ordinal, nominal, or skewed data or when the sample size is small.
+When particular assumptions about population distribution or data characteristic are not met, a non-parametric test could be considered to analyze the data. Unlike parametric tests, which assume that the data follows a specific distribution (usually the normal distribution) and have specific parameters, non-parametric tests do not make these strict assumptions and are often referred to as distribution-free tests. Non-parametric tests are useful when dealing with ordinal, nominal, or skewed data or when the sample size is small.
 
 Here are some key characteristics and applications of non-parametric tests:
 
@@ -46,16 +46,16 @@ Ranking Data: Many non-parametric tests are based on the concept of ranking data
 
 Here are some common non-parametric tests:
 
-Mann-Whitney U Test (Wilcoxon Rank-Sum Test): Used to compare two independent groups to determine if there is a significant difference between them.
+Mann-Whitney U Test (Wilcoxon Rank-Sum Test): This test is used to compare two independent groups to determine if there is a significant difference between them.
 
-Wilcoxon Signed-Rank Test: Used to compare two related (paired) samples to determine if there is a significant difference between them.
+Wilcoxon Signed-Rank Test: When dealing with two related (paired) samples, this test is used to determine if there is a significant difference between them.
 
-Kruskal-Wallis Test: An extension of the Mann-Whitney U test used for comparing three or more independent groups.
+Kruskal-Wallis Test: An extension of the Mann-Whitney U test used for comparing three or more independent groups. 
 
 Friedman Test: An extension of the Wilcoxon Signed-Rank Test used for comparing three or more related (paired) samples.
 
 
-In this example we will demonstrate how to perform different non-parametric tests using `npx_data1` which will act as the reference data. 
+In the following examples, we will demonstrate how to perform different non-parametric tests using the dataset `npx_data1` which will act as the reference data. 
 
 First we remove the sample controls from the dataset.
 
@@ -76,7 +76,7 @@ wilcox_results %>%
   head(10) %>% 
   kableExtra::kbl(booktabs = TRUE,
       digits = 1,
-      caption = "Table 4. First 10 rows of Mann-Whitney U Test results.") %>%
+      caption = "Table 1. First 10 rows of Mann-Whitney U Test results.") %>%
   kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE, font_size = 10, 
                 position = "center", latex_options = "HOLD_position") %>% 
   kableExtra::scroll_box(width = "100%")
@@ -95,6 +95,7 @@ The Wilcoxon Signed-Rank Test could be performed using the `olink_wilcox` functi
 
 ```{r Wilcoxon_Signed-Rank_Test, echo=T, eval=T, message=FALSE}
 wilcox_results_paired <- olink_wilcox(df = npx_df_paired,
+                                      pair_id = "Subject",
                                       variable = 'Treatment')
 
 #The first 10 rows of the results from Wilcoxon Signed-Rank Test are shown:
@@ -102,7 +103,7 @@ wilcox_results_paired %>%
   head(10) %>% 
   kableExtra::kbl(booktabs = TRUE,
       digits = 1,
-      caption = "Table 4. First 10 rows of Wilcoxon Signed-Rank Test results.") %>%
+      caption = "Table 2. First 10 rows of Wilcoxon Signed-Rank Test results.") %>%
   kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE, font_size = 10, 
                 position = "center", latex_options = "HOLD_position") %>% 
   kableExtra::scroll_box(width = "100%")
@@ -122,7 +123,7 @@ kruskal_results %>%
   head(10) %>% 
   kableExtra::kbl(booktabs = TRUE,
       digits = 1,
-      caption = "Table 4. First 10 rows of kruskal_results results.") %>%
+      caption = "Table 3. First 10 rows of kruskal_results results.") %>%
   kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE, font_size = 10, 
                 position = "center", latex_options = "HOLD_position") %>% 
   kableExtra::scroll_box(width = "100%")
@@ -179,12 +180,11 @@ friedman_posthoc_results <- olink_one_non_parametric_posthoc(npx_df,
                                                             test = "friedman",
                                                             olinkid_list = significant_assays)
 
-# The first 10 rows of the results from Kruskal-Wallis post hoc test are shown:
+# The results from Kruskal-Wallis post hoc test are shown:
 friedman_posthoc_results %>% 
-  head(10) %>% 
   kableExtra::kbl(booktabs = TRUE,
       digits = 1,
-      caption = "Table 4. First 10 rows of kruskal_posthoc_results.") %>%
+      caption = "Table 5. First 10 rows of kruskal_posthoc_results.") %>%
   kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE, font_size = 10, 
                 position = "center", latex_options = "HOLD_position") %>% 
   kableExtra::scroll_box(width = "100%")
