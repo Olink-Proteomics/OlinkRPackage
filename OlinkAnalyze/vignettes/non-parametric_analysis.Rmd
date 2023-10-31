@@ -36,7 +36,7 @@ When particular assumptions about population distribution or data characteristic
 
 Here are some key characteristics and applications of non-parametric tests:
 
-No Assumptions about Data Distribution: Non-parametric tests do not assume that the data follows a specific probability distribution. This makes them robust in situations where the data's distribution is unknown or does not meet the assumptions of parametric tests.
+No Assumptions about Data Distribution: Non-parametric tests do not assume that the data follows a specific probability distribution. This makes them robust in situations where the data’s distribution is unknown or does not meet the assumptions of parametric tests.
 
 Ordinal or Nominal Data: Non-parametric tests are well-suited for analyzing data that is categorical or ordinal, where the data points are not measured on a continuous scale. Examples include Likert scale ratings, survey responses, and categorical variables.
 
@@ -46,16 +46,15 @@ Ranking Data: Many non-parametric tests are based on the concept of ranking data
 
 Here are some common non-parametric tests:
 
-Mann-Whitney U Test (Wilcoxon Rank-Sum Test): This test is used to compare two independent groups to determine if there is a significant difference between them.
+Mann-Whitney U Test (Wilcoxon Rank-Sum Test): This method is used to compare two independent groups to determine if there is a significant difference between them.
 
-Wilcoxon Signed-Rank Test: When dealing with two related (paired) samples, this test is used to determine if there is a significant difference between them.
+Wilcoxon Signed-Rank Test: When dealing with two related (paired) samples to determine if there is a significant difference between them.
 
-Kruskal-Wallis Test: An extension of the Mann-Whitney U test used for comparing three or more independent groups. 
+Kruskal-Wallis Test: An extension of the Mann-Whitney U test used for comparing three or more independent groups.
 
 Friedman Test: An extension of the Wilcoxon Signed-Rank Test used for comparing three or more related (paired) samples.
 
-
-In the following examples, we will demonstrate how to perform different non-parametric tests using the dataset `npx_data1` which will act as the reference data. 
+In the following examples, we will demonstrate how to perform different non-parametric tests using the dataset `npx_data1` as the reference data.
 
 First we remove the sample controls from the dataset.
 
@@ -96,7 +95,7 @@ The Wilcoxon Signed-Rank Test could be performed using the `olink_wilcox` functi
 ```{r Wilcoxon_Signed-Rank_Test, echo=T, eval=T, message=FALSE}
 wilcox_results_paired <- olink_wilcox(df = npx_df_paired,
                                       pair_id = "Subject",
-                                      variable = 'Treatment')
+                                      variable = 'Time')
 
 #The first 10 rows of the results from Wilcoxon Signed-Rank Test are shown:
 wilcox_results_paired %>% 
@@ -192,7 +191,29 @@ friedman_posthoc_results %>%
 
 ## When should we consider using non-parametric tests
 
-It's important to note that while non-parametric tests are more robust to certain data conditions, they may have less statistical power than their parametric counterparts when the assumptions of parametric tests are met. Therefore, it's crucial to choose the appropriate test based on the nature of your data and your research questions.
+Non-parametric tests should be considered in the following situations:
+
+Data Distribution: When your data does not meet the assumptions of normality. Parametric tests like t-tests and ANOVA assume that the data follows a normal distribution, and if this assumption is violated, non-parametric tests may be more appropriate.
+
+Ordinal Data: When your data is measured on an ordinal scale (i.e., data that can be ranked but not necessarily measured with equal intervals), non-parametric tests are often a better choice. Examples include Likert scale responses or survey ratings.
+
+Small Sample Sizes: When you have a small sample size, parametric tests may not perform well, especially if the data distribution is unknown. Non-parametric tests are less sensitive to sample size and distribution assumptions.
+
+Outliers: When your data contains outliers that could significantly impact the results of parametric tests, non-parametric tests are more robust and less influenced by extreme values.
+
+Non-Numeric Data: When you’re dealing with categorical or nominal data that cannot be easily transformed into numeric values, non-parametric tests are necessary. Examples include comparing two groups with a chi-squared test.
+
+Assumption Violations: When you’ve tested the assumptions of parametric tests (e.g., homogeneity of variances, normality) and found that they are violated, it’s a good indication that non-parametric tests should be considered instead.
+
+Data Skewness: When your data is highly skewed, non-parametric tests can be more appropriate because they don’t rely on assumptions about the shape of the data distribution.
+
+Comparing Medians: If you’re interested in comparing the medians of two or more groups rather than means, non-parametric tests like the Mann-Whitney U test or Kruskal-Wallis test are suitable.
+
+Lack of Access to Raw Data: In some cases, you may not have access to the raw data but only summary statistics or ranks. Non-parametric tests can be used in such situations.
+
+Research Design: Sometimes, the research design itself may dictate the use of non-parametric tests. For example, if you’re conducting a randomized block design where subjects are matched in pairs, you might use the Wilcoxon signed-rank test.
+
+It’s important to note that while non-parametric tests are more robust to certain data conditions, they may have less statistical power than their parametric counterparts when the assumptions of parametric tests are met. Therefore, it’s crucial to choose the appropriate test based on the nature of your data and your research questions.
 
 
 ## Contact Us!
