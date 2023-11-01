@@ -1,0 +1,230 @@
+---
+title: "Olink® non-parametric analysis"
+author: "Olink DS team"
+date: "`r Sys.Date()`"
+output: 
+  html_vignette:
+    toc: true
+    toc_depth: 2
+vignette: >
+  %\VignetteIndexEntry{Olink® non-parametric analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.height = 3,
+  fig.align = "center",
+  collapse = TRUE,
+  comment = "#>")
+options(tibble.print_min = 4L, tibble.print_max = 4L)
+```
+
+```{r, echo=FALSE, message=FALSE}
+library(OlinkAnalyze)
+library(dplyr)
+library(stringr)
+library(ggplot2)
+library(kableExtra)
+```
+
+## Introduction
+
+When particular assumptions about population distribution or data characteristic are not met, a non-parametric test could be considered to analyze the data. Unlike parametric tests, which assume that the data follows a specific distribution (usually the normal distribution) and have specific parameters, non-parametric tests do not make these strict assumptions and are often referred to as distribution-free tests. Non-parametric tests are useful when dealing with ordinal, nominal, or skewed data or when the sample size is small.
+
+Here are some key characteristics and applications of non-parametric tests:
+
+No Assumptions about Data Distribution: Non-parametric tests do not assume that the data follows a specific probability distribution. This makes them robust in situations where the data’s distribution is unknown or does not meet the assumptions of parametric tests.
+
+Ordinal or Nominal Data: Non-parametric tests are well-suited for analyzing data that is categorical or ordinal, where the data points are not measured on a continuous scale. Examples include Likert scale ratings, survey responses, and categorical variables.
+
+Small Sample Sizes: Non-parametric tests are often preferred when dealing with small sample sizes because they require fewer assumptions and are less sensitive to outliers.
+
+Ranking Data: Many non-parametric tests are based on the concept of ranking data points rather than directly comparing their values. This can be particularly useful when the data is not normally distributed.
+
+Here are some common non-parametric tests:
+
+Mann-Whitney U Test (Wilcoxon Rank-Sum Test): This method is used to compare two independent groups to determine if there is a significant difference between them.
+
+Wilcoxon Signed-Rank Test: When dealing with two related (paired) samples to determine if there is a significant difference between them.
+
+Kruskal-Wallis Test: An extension of the Mann-Whitney U test used for comparing three or more independent groups.
+
+Friedman Test: An extension of the Wilcoxon Signed-Rank Test used for comparing three or more related (paired) samples.
+
+In the following examples, we will demonstrate how to perform different non-parametric tests using the dataset `npx_data1` as the reference data.
+
+First we remove the sample controls from the dataset.
+
+```{r message=FALSE, eval=T, echo = TRUE}
+npx_df <- npx_data1 %>% filter(!grepl('control',SampleID, ignore.case = TRUE))
+```
+
+## Mann-Whitney U Test
+
+Mann-Whitney U Test could be performed using the following script and specifying which column should be used as the grouping variable using the `variable` argument
+
+```{r Mann-Whitney_U_Test, echo=T, eval=T, message=FALSE}
+wilcox_results <- olink_wilcox(df = npx_df,
+                               variable = 'Treatment')
+
+# The first 10 rows of the results from Mann-Whitney U Test are shown:
+wilcox_results %>% 
+  head(10) %>% 
+  kableExtra::kbl(booktabs = TRUE,
+      digits = 1,
+      caption = "Table 1. First 10 rows of Mann-Whitney U Test results.") %>%
+  kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE, font_size = 10, 
+                position = "center", latex_options = "HOLD_position") %>% 
+  kableExtra::scroll_box(width = "100%")
+```
+
+
+## Wilcoxon Signed-Rank Test
+
+We keep samples from `Baseline` and `Week.6` and use it as paired comparison. 
+
+```{r Wilcoxon_Signed-Rank_Test_data, echo=T, eval=T, message=FALSE}
+npx_df_paired <- npx_df %>% filter(Time %in% c("Week.6","Week.12"))
+```
+
+The Wilcoxon Signed-Rank Test could be performed using the `olink_wilcox` function. In addition to the `variable` argument, the `pair_id` argument is used as the paired sample identifier.
+
+```{r Wilcoxon_Signed-Rank_Test, echo=T, eval=T, message=FALSE}
+wilcox_results_paired <- olink_wilcox(df = npx_df_paired,
+                                      pair_id = "Subject",
+                                      variable = 'Time')
+
+#The first 10 rows of the results from Wilcoxon Signed-Rank Test are shown:
+wilcox_results_paired %>% 
+  head(10) %>% 
+  kableExtra::kbl(booktabs = TRUE,
+      digits = 1,
+      caption = "Table 2. First 10 rows of Wilcoxon Signed-Rank Test results.") %>%
+  kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE, font_size = 10, 
+                position = "center", latex_options = "HOLD_position") %>% 
+  kableExtra::scroll_box(width = "100%")
+```
+
+
+## Kruskal-Wallis Test
+
+The Kruskal-Wallis Test could be performed using the `olink_one_non_parametric` function。
+
+```{r Kruskal-Wallis_Test, echo=T, eval=T, message=FALSE}
+kruskal_results <- olink_one_non_parametric(df = npx_df,
+                                            variable = "Site")
+
+#The first 10 rows of the results from Kruskal-Wallis Test are shown:
+kruskal_results %>% 
+  head(10) %>% 
+  kableExtra::kbl(booktabs = TRUE,
+      digits = 1,
+      caption = "Table 3. First 10 rows of kruskal_results results.") %>%
+  kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE, font_size = 10, 
+                position = "center", latex_options = "HOLD_position") %>% 
+  kableExtra::scroll_box(width = "100%")
+```
+
+If the Kruskal-Wallis Test shows significant differences among groups, you may perform post hoc tests (Dunn's test) to determine which specific groups differ from each other. The `test` argument is used to specify whether the post hoc test is from a Kruskal test or Friedman test. 
+
+```{r Kruskal-Wallis_Test_post, echo=T, eval=T, message=FALSE}
+# Find out the significant assays from the Kruskal-Wallis Test
+significant_assays <- kruskal_results %>% 
+  filter(Threshold == 'Significant') %>%
+  dplyr::select(OlinkID) %>%
+  distinct() %>%
+  pull()
+
+# Perform the post hoc test
+kruskal_posthoc_results <- olink_one_non_parametric_posthoc(npx_df,
+                                                            variable = "Site",
+                                                            test = "kruskal",
+                                                            olinkid_list = significant_assays)
+
+# The first 10 rows of the results from Kruskal-Wallis post hoc test are shown:
+kruskal_posthoc_results %>% 
+  head(10) %>% 
+  kableExtra::kbl(booktabs = TRUE,
+      digits = 1,
+      caption = "Table 4. First 10 rows of kruskal_posthoc_results.") %>%
+  kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE, font_size = 10, 
+                position = "center", latex_options = "HOLD_position") %>% 
+  kableExtra::scroll_box(width = "100%")
+```
+
+## Friedman Test
+While using the `olink_one_non_parametric` funciton, if the `subject` is assigned a variable to indicate the paired samples, the Friedman Test will be performed instead of Kruskal-Wallis Test.
+
+```{r Friedman_Test, echo=T, eval=T, message=FALSE}
+friedman_results <- olink_one_non_parametric(df = npx_df_paired,
+                                             variable = "Time",
+                                             subject = "Subject",
+                                             dependence = TRUE)
+```
+
+```{r Friedman_Test_post, echo=T, eval=T, message=FALSE}
+# Find out the significant assays from the Kruskal-Wallis Test
+significant_assays <- friedman_results %>% 
+  filter(Threshold == 'Significant') %>%
+  dplyr::select(OlinkID) %>%
+  distinct() %>%
+  pull()
+
+# Perform the post hoc test
+friedman_posthoc_results <- olink_one_non_parametric_posthoc(npx_df,
+                                                            variable = "Time",
+                                                            test = "friedman",
+                                                            olinkid_list = significant_assays)
+
+# The results from Kruskal-Wallis post hoc test are shown:
+friedman_posthoc_results %>% 
+  kableExtra::kbl(booktabs = TRUE,
+      digits = 1,
+      caption = "Table 5. First 10 rows of kruskal_posthoc_results.") %>%
+  kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE, font_size = 10, 
+                position = "center", latex_options = "HOLD_position") %>% 
+  kableExtra::scroll_box(width = "100%")
+```
+
+## When should we consider using non-parametric tests
+
+Non-parametric tests should be considered in the following situations:
+
+Data Distribution: When your data does not meet the assumptions of normality. Parametric tests like t-tests and ANOVA assume that the data follows a normal distribution, and if this assumption is violated, non-parametric tests may be more appropriate.
+
+Ordinal Data: When your data is measured on an ordinal scale (i.e., data that can be ranked but not necessarily measured with equal intervals), non-parametric tests are often a better choice. Examples include Likert scale responses or survey ratings.
+
+Small Sample Sizes: When you have a small sample size, parametric tests may not perform well, especially if the data distribution is unknown. Non-parametric tests are less sensitive to sample size and distribution assumptions.
+
+Outliers: When your data contains outliers that could significantly impact the results of parametric tests, non-parametric tests are more robust and less influenced by extreme values.
+
+Non-Numeric Data: When you’re dealing with categorical or nominal data that cannot be easily transformed into numeric values, non-parametric tests are necessary. Examples include comparing two groups with a chi-squared test.
+
+Assumption Violations: When you’ve tested the assumptions of parametric tests (e.g., homogeneity of variances, normality) and found that they are violated, it’s a good indication that non-parametric tests should be considered instead.
+
+Data Skewness: When your data is highly skewed, non-parametric tests can be more appropriate because they don’t rely on assumptions about the shape of the data distribution.
+
+Comparing Medians: If you’re interested in comparing the medians of two or more groups rather than means, non-parametric tests like the Mann-Whitney U test or Kruskal-Wallis test are suitable.
+
+Lack of Access to Raw Data: In some cases, you may not have access to the raw data but only summary statistics or ranks. Non-parametric tests can be used in such situations.
+
+Research Design: Sometimes, the research design itself may dictate the use of non-parametric tests. For example, if you’re conducting a randomized block design where subjects are matched in pairs, you might use the Wilcoxon signed-rank test.
+
+It’s important to note that while non-parametric tests are more robust to certain data conditions, they may have less statistical power than their parametric counterparts when the assumptions of parametric tests are met. Therefore, it’s crucial to choose the appropriate test based on the nature of your data and your research questions.
+
+
+## Contact Us!
+
+We are always happy to help. Email us with any questions:
+
+-   biostat\@olink.com for statistical services and general stats questions
+
+-   biostattools\@olink.com for Olink Analyze and Shiny app support
+
+-   support\@olink.com for Olink lab product and technical support
+
+-   info\@olink.com for more information
+
