@@ -232,9 +232,10 @@ olink_ordinalRegression <- function(df,
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
       dplyr::mutate(!!data_type := rank(!!rlang::ensym(data_type))) %>%
       rstatix::convert_as_factor(!!rlang::ensym(data_type))%>%
-      dplyr::do(generics::tidy(car::Anova(ordinal::clm(as.formula(formula_string),
+      dplyr::do(generics::tidy(anova(ordinal::clm(as.formula(formula_string),
                                                        data=.,
-                                                       threshold = "symmetric"),type=2))) %>%
+                                                       threshold = "flexible"
+                                                  ),type=3))) %>%
       dplyr::ungroup() %>%
       dplyr::filter(!term %in% c('(Intercept)','Residuals')) %>%
       dplyr::mutate(covariates = term %in% covariate_filter_string) %>%
@@ -394,6 +395,13 @@ olink_ordinalRegression_posthoc <- function(df,
     for(i in variable_testers){
       removed.sampleids <- unique(c(removed.sampleids,df$SampleID[is.na(df[[i]])]))
       df <- df[!is.na(df[[i]]),]
+    }
+    
+    ## Convert outcome to factor
+    if (data_type == 'NPX') {
+      df$NPX <- factor(df$NPX, ordered = TRUE)
+    } else if (data_type == 'Quantified_value') {
+      df$Quantified_value <- factor(df$Quantified_value, ordered = TRUE)
     }
 
     ##Convert character vars to factor
