@@ -79,6 +79,9 @@ read_NPX_explore <- function(filename) {
   header_standard <- c("SampleID", "OlinkID", "UniProt", "Assay",
                        "Panel", "PlateID", "QC_Warning", "NPX")
 
+  header_quant_standard <- c("SampleID", "OlinkID", "UniProt", "Assay",
+                       "Panel", "PlateID", "QC_Warning")
+
   header_ext_standard <- c(header_standard, "Sample_Type", "Panel_Lot_Nr",
                            "WellID", "Normalization", "Assay_Warning",
                            "IntraCV", "InterCV", "Processing_StartDate",
@@ -152,11 +155,43 @@ read_NPX_explore <- function(filename) {
                           "LOD",
                           "ExploreVersion"),
     "header_parquet" = c("SampleID", "WellID","PlateID", "OlinkID",
-                         "UniProt", "Assay", "Panel", "NPX", 
+                         "UniProt", "Assay", "Panel", "NPX",
                          "Normalization", "ExploreVersion", "Block",
-                         "AssayType", "Count", "ExtNPX", 
-                         "PCNormalizedNPX", "SampleType", 
-                         "DataAnalysisRefID", "AssayQC", "SampleQC")
+                         "AssayType", "Count", "ExtNPX",
+                         "PCNormalizedNPX", "SampleType",
+                         "DataAnalysisRefID", "AssayQC", "SampleQC"),
+    "header_npx_npxs1.8" = c(header_standard, "Plate_LOD",
+                             "QC.Deviation.Inc.Ctrl", "QC.Deviation.Det.Ctrl",
+                             "Olink.NPX.Signature.Version"),
+    "header_quant_npxs1.8" = c(header_quant_standard, "Plate_LQL", "Plate_LOD",
+                               "LLOQ", "ULOQ", "Quantified_value", "Unit",
+                               "QC.Deviation.Inc.Ctrl", "QC.Deviation.Det.Ctrl",
+                               "Olink.NPX.Signature.Version"),
+    "header_T96_npxs1.8" = c(header_standard, "Max_LOD",
+                             "Plate_LOD",
+                             "QC.Deviation.Inc.Ctrl",
+                             "QC.Deviation.Det.Ctrl",
+                             "Olink.NPX.Signature.Version"),
+    "header_npx_npxs1.9" = c(header_standard, "PlateLOD",
+                             "QC.Deviation.Inc.Ctrl",
+                             "QC.Deviation.Det.Ctrl",
+                             "Olink.NPX.Signature.Version"),
+    "header_quant_npxs1.9" = c(header_quant_standard, "PlateLQL",
+                               "PlateLOD",
+                               "LLOQ",
+                               "ULOQ",
+                               "Quantified_value",
+                               "Unit",
+                               "QC.Deviation.Inc.Ctrl",
+                               "QC.Deviation.Det.Ctrl",
+                               "Olink.NPX.Signature.Version"),
+    "header_T96_npxs1.9" = c(header_standard,
+                             "MaxLOD",
+                             "PlateLOD",
+                             "QC.Deviation.Inc.Ctrl",
+                             "QC.Deviation.Det.Ctrl",
+                             "Olink.NPX.Signature.Version")
+
   )
 
   header_match <-  header_v %>%
@@ -198,9 +233,8 @@ read_NPX_explore <- function(filename) {
   }
   # Remove Target formatting in case of incidental csv
   if(any(grepl("Target", out$Panel))){
-    warning("Target csv is not fully supported. Consider Target xlsx format instead.")
     # Replicate read_npx_target formatting.
-    out <- out %>% 
+    out <- out %>%
       dplyr::mutate(Panel =  gsub("\\(.*\\)","",Panel)) %>%
       dplyr::mutate(Panel = stringr::str_to_title(Panel)) %>%
       dplyr::mutate(Panel = gsub("Target 96", "", Panel)) %>%
@@ -212,7 +246,7 @@ read_NPX_explore <- function(filename) {
       dplyr::mutate(Panel_End = ifelse(is.na(Panel_End), " ", Panel_End)) %>%
       dplyr::mutate(Panel = paste("Olink", Panel_Start, Panel_End)) %>%
       dplyr::mutate(Panel = trimws(Panel, which = "right")) %>%
-      dplyr::select(-Panel_Start, -Panel_End) 
+      dplyr::select(-Panel_Start, -Panel_End)
   }
 
   return(out)
@@ -341,7 +375,10 @@ read_NPX_target <- function(filename) {
                     Panel,Panel_Version,PlateID,
                     QC_Warning,dplyr::matches("Plate_LQL"),
                     dplyr::matches("LOD"),
-                    dplyr::matches("Plat_LOD"),
+                    dplyr::matches("Plate_LOD"),
+                    dplyr::matches("PlateLOD"),
+                    dplyr::matches("Max_LOD"),
+                    dplyr::matches("MaxLOD"),
                     dplyr::matches("LLOQ"),
                     dplyr::matches("ULOQ"),
                     dplyr::matches("NPX"),
