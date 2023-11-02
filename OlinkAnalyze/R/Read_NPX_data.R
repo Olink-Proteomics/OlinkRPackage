@@ -233,7 +233,6 @@ read_NPX_explore <- function(filename) {
   }
   # Remove Target formatting in case of incidental csv
   if(any(grepl("Target", out$Panel))){
-    warning("Target csv is not fully supported. Consider Target xlsx format instead.")
     # Replicate read_npx_target formatting.
     out <- out %>%
       dplyr::mutate(Panel =  gsub("\\(.*\\)","",Panel)) %>%
