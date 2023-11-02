@@ -1,3 +1,14 @@
+# Olink Analyze 3.6.0
+## Minor Changes
+* Plate LOD will be chosen over Max LOD when both are present (#288, @kathy-nevola)
+* Data from NPX Signature 1.8+ is now supported by read_NPX when in long format csv (#293, @Orbmac, @kathy-nevola)
+* olink_pca_plot will now be faster (#289, @MasoumehSheikh)
+
+## Bug Fixes
+* olink_normalization and related function will now compare normalization strategy by assay (#291, klevdiamanti)
+* Excluded assays will not cause warnings in olink_normalization (#291, klevdiamanti)
+* olink_pca_plot will now show the same label and text for point when SampleID is numeric (#289, @MasoumehSheikh)
+
 # Olink Analyze 3.5.1
 ## Bug Fixes
 * read_NPX will now support additional formats of parquet files
