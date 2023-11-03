@@ -1,6 +1,6 @@
 ## Release Summary
 
-This release contains new features to version 3.4.1 including support for new data types and additional information in vignettes.
+This release contains new features to version 3.5.1 including support for new data types and minor bug fixes.
 
 ## R CMD check results
 
