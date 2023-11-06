@@ -26,7 +26,7 @@ get_npx_file_from_zip <-
     if (sum(df_files$files_extension %in% accepted_npx_files) != 1) {
       cli::cli_abort(
         c(
-          "x" = "No expected NPX files!",
+          "x" = "Unknown NPX files!",
           "i" = "The input *.zip file should contain {.strong only} one NPX
           file with extsnsion: { glue::glue_collapse(x = accepted_npx_files,
                                                      sep = \", \",
@@ -38,7 +38,7 @@ get_npx_file_from_zip <-
     }
 
     # get the NPX file
-    npx_file <- files[files %in% accepted_npx_files]
+    npx_file <- files_no_checksum[files_no_checksum %in% accepted_npx_files]
 
     # return
     return(npx_file)
