@@ -23,10 +23,10 @@ get_npx_file_from_zip <-
       )
 
     # check: no file with the accepted suffix
-    if (sum(df_files$files_extension %in% accepted_npx_files) != 1) {
+    if (sum(df_files$files_extension %in% accepted_npx_files) != 1L) {
       cli::cli_abort(
         c(
-          "x" = "Unknown NPX files!",
+          "x" = "Unknown NPX file!",
           "i" = "The input *.zip file should contain {.strong only} one NPX
           file with extsnsion: { glue::glue_collapse(x = accepted_npx_files,
                                                      sep = \", \",
@@ -38,7 +38,10 @@ get_npx_file_from_zip <-
     }
 
     # get the NPX file
-    npx_file <- files_no_checksum[files_no_checksum %in% accepted_npx_files]
+    npx_file <- df_files |>
+      dplyr::filter(.data[["files_extension"]] %in% accepted_npx_files) |>
+      dplyr::slice_head(n = 1L) |>
+      dplyr::pull(.data[["files"]])
 
     # return
     return(npx_file)
