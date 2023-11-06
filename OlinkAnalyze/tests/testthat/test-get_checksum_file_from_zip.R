@@ -1,5 +1,5 @@
 test_that(
-  "get checksum file works",
+  "get checksum file from zip works",
   {
     # realistic scenario with checksum_sha256.txt
     expect_equal(
