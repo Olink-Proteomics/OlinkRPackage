@@ -68,6 +68,7 @@ Imports:
     knitr,
     magrittr,
     readxl,
+    rlang,
     stringr,
     tidyr,
     tidyselect,

@@ -26,11 +26,7 @@
 #' read_NPX(file)
 #' }
 #'
-#' @importFrom tools file_ext md5sum file_path_sans_ext
-#' @importFrom dplyr pull filter
-#' @importFrom stringr str_detect str_replace
-#' @importFrom zip unzip
-#'
+#' @importFrom rlang .data
 
 read_npx_zip <- function(filename) {
 
@@ -38,12 +34,15 @@ read_npx_zip <- function(filename) {
 
   # check contents of the compressed file
   # keep all files but the README.txt
-  compressed_file_contents <- utils::unzip(zipfile = filename,
-                                           list = TRUE) |>
-    dplyr::filter(Name != "README.txt") |>
-    dplyr::pull(Name)
+  compressed_file_contents <- utils::unzip(
+    zipfile = filename,
+    list = TRUE
+  ) |>
+    dplyr::filter(.data[["Name"]] != "README.txt") |>
+    dplyr::pull(.data[["Name"]])
 
-  # Check if checksum file (MD5 or SHA256) exists and prepare list of files to unzip
+  # Check if checksum file (MD5 or SHA256) exists and prepare list of files
+  # to unzip
   if ("MD5_checksum.txt" %in% compressed_file_contents) {
 
     compressed_file_chksm <- compressed_file_contents[compressed_file_contents == "MD5_checksum.txt"] # md5 txt file
