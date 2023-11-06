@@ -1,6 +1,7 @@
 #' Helper function to get the name of the checksum file from a zip NPX.
 #'
 #' @param files A vector of file names without any path prefix.
+#' @param accepted_checksum_files Vector of accepted checksum file names.
 #'
 #' @return The name of checksum file or NA if the file is not present.
 #'
