@@ -19,7 +19,7 @@ get_checksum_file_from_zip <-
     if (sum(files %in% accepted_checksum_files) > 1) {
       cli::cli_abort(
         c(
-          "x" = "Too many checksum file!",
+          "x" = "The compressed file contains too many checksum files!",
           "i" = "The input *.zip file should contain {.strong only} one checksum
           file: { glue::glue_collapse(x = accepted_checksum_files,
                                       sep = \", \",
