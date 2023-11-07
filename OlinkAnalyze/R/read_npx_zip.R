@@ -13,12 +13,33 @@ read_npx_zip <-
 
     # **** Prep ****
 
+    # tryCatch in case reading the file fails
+    tryCatch(
+      {
+
+        compressed_file_contents <- utils::unzip(
+          zipfile = file,
+          list = TRUE
+        )
+
+      }, error = function(msg) {
+
+        cli::cli_abort(
+          c(
+            "x" = "Unable to open zip file: {file}",
+            "i" = "Check the file is in zip format and potential file
+          corruption."
+          ),
+          call = NULL,
+          wrap = FALSE
+        )
+
+      }
+    )
+
     # check contents of the compressed file
     # keep all files but the README.txt
-    compressed_file_contents <- utils::unzip(
-      zipfile = file,
-      list = TRUE
-    ) |>
+    compressed_file_contents <- compressed_file_contents |>
       dplyr::filter(!(.data[["Name"]] %in% .env[[".ignore_files"]])) |>
       dplyr::pull(.data[["Name"]])
 
