@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_checksum_file_from_zip.R
 \name{get_checksum_file_from_zip}
 \alias{get_checksum_file_from_zip}
-\title{Helper function to get the name of the checksum file from a zip NPX.}
+\title{Help function to get the name of the checksum file from a zip NPX.}
 \usage{
 get_checksum_file_from_zip(
   files,
@@ -18,5 +18,10 @@ get_checksum_file_from_zip(
 The name of checksum file or NA if the file is not present.
 }
 \description{
-Helper function to get the name of the checksum file from a zip NPX.
+Help function to get the name of the checksum file from a zip NPX.
 }
+\keyword{MD5}
+\keyword{NPX}
+\keyword{SHA256}
+\keyword{checksum}
+\keyword{zip}
