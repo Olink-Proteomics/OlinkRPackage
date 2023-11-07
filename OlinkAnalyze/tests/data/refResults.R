@@ -61,13 +61,12 @@ ordinalRegression_results <- olink_ordinalRegression(df = npx_data1,
 #Posthoc
 ordinalRegression_results_posthoc_results <- olink_ordinalRegression_posthoc(npx_data1,
                                                                              variable=c("Treatment:Time"),
-                                                                             covariates="Site",
                                                                              olinkid_list = {ordinalRegression_results %>%
-                                                                                 filter(Threshold == 'Significant' & term == 'Treatment:Time') %>%
+                                                                                 filter(Threshold == 'Significant' & term == 'Time') %>%
                                                                                  dplyr::select(OlinkID) %>%
                                                                                  distinct() %>%
                                                                                  pull()},
-                                                                             effect = "Treatment:Time") %>%
+                                                                             effect = "Time") %>%
   mutate(id = as.character(OlinkID)) %>%
   arrange(id, contrast) %>% #Just for consistency. Not actually needed in this case
   select(-id)

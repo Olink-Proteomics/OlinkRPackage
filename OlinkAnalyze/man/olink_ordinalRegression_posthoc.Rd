@@ -68,7 +68,7 @@ library(dplyr)
 #Results in model NPX~Treatment*Time.
 ordinalRegression_results <- olink_ordinalRegression(df = npx_data1,
                               variable="Treatment:Time")
-                              
+
 #Filtering out significant and relevant results.
 significant_assays <- ordinalRegression_results \%>\%
   filter(Threshold == 'Significant' & term == 'Time') \%>\%

@@ -247,7 +247,7 @@ olink_ordinalRegression <- function(df,
       dplyr::ungroup()%>%
       dplyr::select(-covariates) %>%
       dplyr::select(Assay,OlinkID,UniProt,Panel,term,df,statistic,p.value,Adjusted_pval,Threshold) %>%
-      dplyr::arrange(Adjusted_pval)
+      dplyr::arrange(p.value)
 
     if(return.covariates){
       return(p.val)
@@ -304,7 +304,7 @@ olink_ordinalRegression <- function(df,
 #' #Results in model NPX~Treatment*Time.
 #' ordinalRegression_results <- olink_ordinalRegression(df = npx_data1,
 #'                               variable="Treatment:Time")
-#'                               
+#'
 #' #Filtering out significant and relevant results.
 #' significant_assays <- ordinalRegression_results %>%
 #'   filter(Threshold == 'Significant' & term == 'Time') %>%
@@ -397,7 +397,7 @@ olink_ordinalRegression_posthoc <- function(df,
       removed.sampleids <- unique(c(removed.sampleids,df$SampleID[is.na(df[[i]])]))
       df <- df[!is.na(df[[i]]),]
     }
-    
+
     ## Convert outcome to factor
     if (data_type == 'NPX') {
       df$NPX <- factor(df$NPX, ordered = TRUE)
