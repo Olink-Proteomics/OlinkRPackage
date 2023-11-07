@@ -2,7 +2,7 @@
 % Please edit documentation in R/read_npx_parquet.R
 \name{read_npx_parquet}
 \alias{read_npx_parquet}
-\title{Helper function to read in Olink Explore parquet files}
+\title{Help function to read Olink parquet files.}
 \usage{
 read_npx_parquet(file)
 }
@@ -13,14 +13,7 @@ read_npx_parquet(file)
 An R6 class ArrowObject.
 }
 \description{
-Helper function to read in Olink Explore parquet files
-}
-\examples{
-\donttest{
-file <- system.file("extdata", "npx_data_ext.parquet",
-package = "OlinkAnalyze")
-read_NPX(file)
-}
-
+Help function to read Olink parquet files.
 }
 \keyword{NPX}
+\keyword{parquet}
