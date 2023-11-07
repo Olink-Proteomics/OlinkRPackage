@@ -1,24 +1,36 @@
-#' Helper function to read in Olink Explore parquet files
+#' Help function to read Olink parquet files.
 #'
 #' @param file Path to Olink Software parquet output file.
 #'
 #' @return An R6 class ArrowObject.
 #'
-#' @keywords NPX
-#'
-#' @examples
-#' \donttest{
-#' file <- system.file("extdata", "npx_data_ext.parquet",
-#' package = "OlinkAnalyze")
-#' read_NPX(file)
-#' }
+#' @keywords NPX parquet
 #'
 read_npx_parquet <- function(file) {
 
   # Read parquet file ----
 
-  parquet_npx <- arrow::open_dataset(
-    sources = file
+  # tryCatch in case reading the file fails
+  tryCatch(
+    {
+
+      parquet_npx <- arrow::open_dataset(
+        sources = file
+      )
+
+    }, error = function(msg) {
+
+      cli::cli_abort(
+        c(
+          "x" = "Unable to read parquet file: {file}",
+          "i" = "Check the file is in parquet format and potential file
+          corruption."
+        ),
+        call = NULL,
+        wrap = FALSE
+      )
+
+    }
   )
 
   # Check metadata ----
