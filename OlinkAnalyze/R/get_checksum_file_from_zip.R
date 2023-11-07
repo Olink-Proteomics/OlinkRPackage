@@ -18,7 +18,7 @@ get_checksum_file_from_zip <-
     }
 
     # if more than one files are in the accepted file names
-    if (sum(files %in% accepted_checksum_files) > 1) {
+    if (sum(files %in% accepted_checksum_files) > 1L) {
       cli::cli_abort(
         c(
           "x" = "The compressed file contains too many checksum files!",
