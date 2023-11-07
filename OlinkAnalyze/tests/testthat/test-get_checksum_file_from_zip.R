@@ -40,7 +40,7 @@ test_that(
       get_checksum_file_from_zip(
         files = c("MD5_checksum.txt", "MD5_checksum.txt")
       ),
-      regexp = "The compressed file contains an unknown NPX file!"
+      regexp = "The compressed file contains too many checksum files!"
     )
   }
 )
@@ -52,14 +52,14 @@ test_that(
       get_checksum_file_from_zip(
         files = c("checksum_sha256.txt", "checksum_sha256.txt")
       ),
-      regexp = "The compressed file contains an unknown NPX file!"
+      regexp = "The compressed file contains too many checksum files!"
     )
 
     expect_error(
       get_checksum_file_from_zip(
         files = c("MD5_checksum.txt", "checksum_sha256.txt")
       ),
-      regexp = "The compressed file contains an unknown NPX file!"
+      regexp = "The compressed file contains too many checksum files!"
     )
   }
 )
@@ -71,7 +71,7 @@ test_that(
       get_checksum_file_from_zip(
         files = c("MD5_checksum.txt", "checksum_sha256.txt")
       ),
-      regexp = "The compressed file contains an unknown NPX file!"
+      regexp = "The compressed file contains too many checksum files!"
     )
   }
 )
