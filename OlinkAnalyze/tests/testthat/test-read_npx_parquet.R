@@ -47,7 +47,7 @@ test_that(
         # check that the parquet file was created
         expect(
           file.exists(txtfile_p),
-          failure_message = "Parquet file was not created!"
+          failure_message = "Text file was not created!"
         )
 
         # check that relevant error is thrown
@@ -81,7 +81,7 @@ test_that(
         # check that the parquet file was created
         expect(
           file.exists(txtfile_pcorrupt),
-          failure_message = "Parquet file was not created!"
+          failure_message = "Corrupt parquet file was not created!"
         )
 
         # check that relevant error is thrown
