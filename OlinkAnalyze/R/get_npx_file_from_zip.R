@@ -1,9 +1,11 @@
-#' Helper function to get the name of the NPX file from a zip NPX.
+#' Help function to get the name of the NPX file from a zip NPX.
 #'
 #' @param files A vector of file names without any path prefix.
 #' @param accepted_npx_files Vector of accepted extensions of NPX files.
 #'
 #' @return The name of the NPX file.
+#'
+#' @keywords zip NPX
 #'
 get_npx_file_from_zip <-
   function(files,
@@ -26,7 +28,7 @@ get_npx_file_from_zip <-
     if (sum(df_files$files_extension %in% accepted_npx_files) != 1L) {
       cli::cli_abort(
         c(
-          "x" = "The compressed file contains an unknown NPX file!",
+          "x" = "The compressed file contains an unknown or no NPX file!",
           "i" = "The input *.zip file should contain {.strong only} one NPX
           file with extsnsion: { glue::glue_collapse(x = accepted_npx_files,
                                                      sep = \", \",
@@ -39,7 +41,9 @@ get_npx_file_from_zip <-
 
     # get the NPX file
     npx_file <- df_files |>
-      dplyr::filter(.data[["files_extension"]] %in% accepted_npx_files) |>
+      dplyr::filter(
+        .data[["files_extension"]] %in% .env[["accepted_npx_files"]]
+      ) |>
       dplyr::slice_head(n = 1L) |>
       dplyr::pull(.data[["files"]])
 
