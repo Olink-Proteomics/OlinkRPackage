@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_npx_file_from_zip.R
 \name{get_npx_file_from_zip}
 \alias{get_npx_file_from_zip}
-\title{Helper function to get the name of the NPX file from a zip NPX.}
+\title{Help function to get the name of the NPX file from a zip NPX.}
 \usage{
 get_npx_file_from_zip(
   files,
@@ -18,5 +18,7 @@ get_npx_file_from_zip(
 The name of the NPX file.
 }
 \description{
-Helper function to get the name of the NPX file from a zip NPX.
+Help function to get the name of the NPX file from a zip NPX.
 }
+\keyword{NPX}
+\keyword{zip}
