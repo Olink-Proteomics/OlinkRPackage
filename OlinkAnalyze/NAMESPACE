@@ -2,4 +2,4 @@
 
 export(read_NPX)
 importFrom(magrittr,"%>%")
-importFrom(rlang,.data)
+importFrom(utils,zip)
