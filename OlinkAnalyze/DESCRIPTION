@@ -71,8 +71,7 @@ Imports:
     rlang,
     stringr,
     tidyr,
-    tidyselect,
-    utils
+    tidyselect
 Suggests: 
     glue,
     openssl,
