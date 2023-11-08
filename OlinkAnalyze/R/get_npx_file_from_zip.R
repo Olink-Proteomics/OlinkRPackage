@@ -28,9 +28,9 @@ get_npx_file_from_zip <-
     if (sum(df_files$files_extension %in% accepted_npx_files) != 1L) {
 
       if (sum(df_files$files_extension %in% accepted_npx_files) == 0L) {
-        err_msg <- "no"
+        err_msg <- "no" # nolint object_usage_linter
       } else if (sum(df_files$files_extension %in% accepted_npx_files) > 1L) {
-        err_msg <- "multiple"
+        err_msg <- "multiple" # nolint object_usage_linter
       }
 
       cli::cli_abort(
