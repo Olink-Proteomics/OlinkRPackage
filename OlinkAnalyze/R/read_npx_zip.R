@@ -18,6 +18,9 @@ read_npx_zip <-
         "zip")
     )
 
+    # check if file exists
+    check_file_exists(file = file)
+
     # **** Prep ****
 
     # tryCatch in case reading the zip file fails

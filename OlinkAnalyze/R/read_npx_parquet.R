@@ -10,6 +10,9 @@ read_npx_parquet <- function(file) {
 
   # Read parquet file ----
 
+  # check if file exists
+  check_file_exists(file = file)
+
   # tryCatch in case reading the file fails
   tryCatch(
     {
