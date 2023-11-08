@@ -10,5 +10,5 @@ check_file_exists(file)
 \item{file}{Path to the file.}
 }
 \description{
-Help function checking if file exists.
+Only one file at a time!
 }
