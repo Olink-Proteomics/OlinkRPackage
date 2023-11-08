@@ -77,7 +77,7 @@ test_that(
       get_npx_file_from_zip(
         files = c("MD5_checksum.txt")
       ),
-      regexp = "The compressed file contains an unknown NPX file!"
+      regexp = "The compressed file contains no NPX files!"
     )
 
     # two MD5
@@ -85,7 +85,7 @@ test_that(
       get_npx_file_from_zip(
         files = c("MD5_checksum.txt", "MD5_checksum.txt")
       ),
-      regexp = "The compressed file contains an unknown NPX file!"
+      regexp = "The compressed file contains no NPX files!"
     )
 
     # one SHA256 only
@@ -93,7 +93,7 @@ test_that(
       get_npx_file_from_zip(
         files = c("checksum_sha256.txt")
       ),
-      regexp = "The compressed file contains an unknown NPX file!"
+      regexp = "The compressed file contains no NPX files!"
     )
 
     # two SHA256
@@ -101,7 +101,7 @@ test_that(
       get_npx_file_from_zip(
         files = c("checksum_sha256.txt", "checksum_sha256.txt")
       ),
-      regexp = "The compressed file contains an unknown NPX file!"
+      regexp = "The compressed file contains no NPX files!"
     )
   }
 )
@@ -115,7 +115,7 @@ test_that(
       get_npx_file_from_zip(
         files = c("test.xml")
       ),
-      regexp = "The compressed file contains an unknown NPX file!"
+      regexp = "The compressed file contains no NPX files!"
     )
 
     # two unknown files
@@ -123,7 +123,7 @@ test_that(
       get_npx_file_from_zip(
         files = c("test.xml", "test.yaml")
       ),
-      regexp = "The compressed file contains an unknown NPX file!"
+      regexp = "The compressed file contains no NPX files!"
     )
   }
 )
@@ -137,7 +137,7 @@ test_that(
       get_npx_file_from_zip(
         files = c("test.txt", "test.csv")
       ),
-      regexp = "The compressed file contains an unknown NPX file!"
+      regexp = "The compressed file contains multiple NPX files!"
     )
 
     # A parquet and a csv file
@@ -145,7 +145,7 @@ test_that(
       get_npx_file_from_zip(
         files = c("test.parquet", "test.csv")
       ),
-      regexp = "The compressed file contains an unknown NPX file!"
+      regexp = "The compressed file contains multiple NPX files!"
     )
 
     # An xlsx and a csv file
@@ -153,7 +153,7 @@ test_that(
       get_npx_file_from_zip(
         files = c("test.xlsx", "test.csv")
       ),
-      regexp = "The compressed file contains an unknown NPX file!"
+      regexp = "The compressed file contains multiple NPX files!"
     )
 
     # misAn xls and a csv file
@@ -161,7 +161,7 @@ test_that(
       get_npx_file_from_zip(
         files = c("test.xls", "test.csv")
       ),
-      regexp = "The compressed file contains an unknown NPX file!"
+      regexp = "The compressed file contains multiple NPX files!"
     )
   }
 )
