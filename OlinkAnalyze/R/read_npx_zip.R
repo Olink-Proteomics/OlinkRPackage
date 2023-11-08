@@ -13,7 +13,7 @@ read_npx_zip <-
 
     # **** Prep ****
 
-    # tryCatch in case reading the file fails
+    # tryCatch in case reading the zip file fails
     tryCatch(
       {
 
@@ -93,6 +93,7 @@ read_npx_zip <-
       # Extracted checksum file
       extracted_file_chksm <- file.path(tmp_unzip_dir, compressed_file_checksum)
 
+      # confirm that the checksum file is available
       checksum_check <- check_checksum_matches(
         checksum_file = extracted_file_chksm,
         npx_file = extracted_file_npx
@@ -119,7 +120,7 @@ read_npx_zip <-
     }
 
     # read the NPX file
-    df_npx <- read_npx_csv(filename = extracted_file_npx)
+    df_npx <- read_npx_parquet(file = extracted_file_npx)
 
     # cleanup temporary directory with extracted files
     invisible(unlink(x = tmp_unzip_dir, recursive = TRUE))
