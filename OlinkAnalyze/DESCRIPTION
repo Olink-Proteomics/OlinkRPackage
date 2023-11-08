@@ -72,7 +72,9 @@ Imports:
     stringr,
     tidyr,
     tidyselect,
-    zip
+    utils
 Suggests: 
+    glue,
     openssl,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    zip
