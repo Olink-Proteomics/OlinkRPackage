@@ -2,6 +2,10 @@
 #'
 #' @param file Path to the file.
 #'
+#' @description
+#' Only one file at a time!
+#'
+#'
 check_file_exists <- function(file) {
 
   if (is.null(file)) {
@@ -26,13 +30,22 @@ check_file_exists <- function(file) {
       wrap = FALSE
     )
 
-  } else if (any(!file.exists(file))) {
-
-    missing_files <- file[!file.exists(file)]
+  } else if (length(file) != 1) {
 
     cli::cli_abort(
       c(
-        "x" = "Unable to locate file{?s}: {missing_files}",
+        "x" = "Only one file is allowed!",
+        "i" = "Provided: {file}"
+      ),
+      call = NULL,
+      wrap = FALSE
+    )
+
+  } else if (!file.exists(file)) {
+
+    cli::cli_abort(
+      c(
+        "x" = "Unable to locate file: {file}",
         "i" = "Missing?"
       ),
       call = NULL,

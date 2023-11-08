@@ -36,7 +36,24 @@ test_that(
   }
 )
 
-# Test that relevant error is thrown when file(s) is/are missing
+# Test that relevant error is thrown when file is missing
+test_that(
+  "check file exists works - file missing", {
+
+    missing_file <- file.path(tempdir(),
+                              "I_Am_A_MissinG_FilE")
+
+    expect_error(
+      object = check_file_exists(
+        file = missing_file
+      ),
+      regexp = "Unable to locate file"
+    )
+
+  }
+)
+
+# Test that relevant error is thrown when multiple files provided
 test_that(
   "check file exists works - file NA or NULL", {
 
@@ -53,23 +70,16 @@ test_that(
 
     expect_error(
       object = check_file_exists(
-        file = missing_file_1
-      ),
-      regexp = "Unable to locate file"
-    )
-
-    expect_error(
-      object = check_file_exists(
         file = c(missing_file_1, missing_file_2)
       ),
-      regexp = "Unable to locate files"
+      regexp = "Only one file is allowed!"
     )
 
     expect_error(
       object = check_file_exists(
         file = c(missing_file_1, missing_file_2, parquet_file)
       ),
-      regexp = "Unable to locate files"
+      regexp = "Only one file is allowed!"
     )
 
   }
