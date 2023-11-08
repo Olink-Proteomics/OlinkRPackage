@@ -30,6 +30,7 @@ write_npx_parquet <-
     )
   }
 
+# Test that a relevant error is thrown when a txt file was provided as parquet.
 test_that(
   "Non-parquet input is handled - random file",
   {
@@ -64,6 +65,8 @@ test_that(
   }
 )
 
+# Test that a relevant error is thrown when a text file with th extsnsion
+# parquet was provided as input.
 test_that(
   "Non-parquet input is handled - corrupt parquet file",
   {
@@ -98,6 +101,8 @@ test_that(
   }
 )
 
+# Test that a relevant error is thrown when required metadata fieleds are
+# missing.
 test_that(
   "All metadata fields are in place",
   {
@@ -142,6 +147,8 @@ test_that(
   }
 )
 
+# Test that a relevant error is thrown when the required metadata filed Product
+# contains unexpected entries.
 test_that(
   "Product field is correct",
   {
@@ -186,6 +193,8 @@ test_that(
   }
 )
 
+# Test that a relevant error is thrown when the required metadata filed
+# DataFileType contains unexpected entries.
 test_that(
   "DataFileType field is correct",
   {
