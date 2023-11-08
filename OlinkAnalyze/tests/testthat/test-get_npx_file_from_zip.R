@@ -42,7 +42,7 @@ rm(test_accepted_checksum_files,
 # test all realistic scenario of NPX files input only ----
 
 # Test get_npx_file_from_zip for slightly different inputs. Specifically,
-# checking for all combos of checksum file and NPX file
+# checking for all NPX files.
 test_npx_input <- function(n_file) {
   test_that(
     paste("Testing get NPX file from zip with:", n_file), {
@@ -68,49 +68,35 @@ rm(test_accepted_npx_files,
 
 # Test edge cases ----
 
+# Test that relevant error is thrown when only checksum files are provided.
 test_that(
-  "get NPX file from zip - 1 MD5 checksum",
+  "get NPX file from zip - only checksums",
   {
-    # missing checksum file
+    # one MD5 only
     expect_error(
       get_npx_file_from_zip(
         files = c("MD5_checksum.txt")
       ),
       regexp = "The compressed file contains an unknown NPX file!"
     )
-  }
-)
 
-test_that(
-  "get NPX file from zip - 2 MD5 checksums",
-  {
-    # missing checksum file
+    # two MD5
     expect_error(
       get_npx_file_from_zip(
         files = c("MD5_checksum.txt", "MD5_checksum.txt")
       ),
       regexp = "The compressed file contains an unknown NPX file!"
     )
-  }
-)
 
-test_that(
-  "get NPX file from zip - 1 sha256 checksum",
-  {
-    # missing checksum file
+    # one SHA256 only
     expect_error(
       get_npx_file_from_zip(
         files = c("checksum_sha256.txt")
       ),
       regexp = "The compressed file contains an unknown NPX file!"
     )
-  }
-)
 
-test_that(
-  "get NPX file from zip - 2 sha256 checksums",
-  {
-    # missing checksum file
+    # two SHA256
     expect_error(
       get_npx_file_from_zip(
         files = c("checksum_sha256.txt", "checksum_sha256.txt")
@@ -120,23 +106,19 @@ test_that(
   }
 )
 
+# Test that relevant error is thrown when unknown files are provided.
 test_that(
   "get NPX file from zip - no known file",
   {
-    # missing checksum file
+    # one unknown file
     expect_error(
       get_npx_file_from_zip(
         files = c("test.xml")
       ),
       regexp = "The compressed file contains an unknown NPX file!"
     )
-  }
-)
 
-test_that(
-  "get NPX file from zip - no known files",
-  {
-    # missing checksum file
+    # two unknown files
     expect_error(
       get_npx_file_from_zip(
         files = c("test.xml", "test.yaml")
@@ -146,49 +128,35 @@ test_that(
   }
 )
 
+# Test that relevant error is thrown when 2 acceptable files are provided.
 test_that(
   "get NPX file from zip - many known files v1",
   {
-    # missing checksum file
+    # A txt and a csv file
     expect_error(
       get_npx_file_from_zip(
         files = c("test.txt", "test.csv")
       ),
       regexp = "The compressed file contains an unknown NPX file!"
     )
-  }
-)
 
-test_that(
-  "get NPX file from zip - many known files v2",
-  {
-    # missing checksum file
+    # A parquet and a csv file
     expect_error(
       get_npx_file_from_zip(
         files = c("test.parquet", "test.csv")
       ),
       regexp = "The compressed file contains an unknown NPX file!"
     )
-  }
-)
 
-test_that(
-  "get NPX file from zip - many known files v3",
-  {
-    # missing checksum file
+    # An xlsx and a csv file
     expect_error(
       get_npx_file_from_zip(
         files = c("test.xlsx", "test.csv")
       ),
       regexp = "The compressed file contains an unknown NPX file!"
     )
-  }
-)
 
-test_that(
-  "get NPX file from zip - many known files v4",
-  {
-    # missing checksum file
+    # misAn xls and a csv file
     expect_error(
       get_npx_file_from_zip(
         files = c("test.xls", "test.csv")
