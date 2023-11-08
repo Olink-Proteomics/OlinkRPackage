@@ -11,6 +11,13 @@ read_npx_zip <-
   function(file,
            .ignore_files = c("README.txt")) {
 
+    # Check if all required libraries for this function are installed
+    check_library_installed(
+      c("openssl",
+        "glue",
+        "zip")
+    )
+
     # **** Prep ****
 
     # tryCatch in case reading the zip file fails
