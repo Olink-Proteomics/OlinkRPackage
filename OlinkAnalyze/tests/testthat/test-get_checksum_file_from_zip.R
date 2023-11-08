@@ -1,3 +1,4 @@
+# Test that the function returns the correct checksum file
 test_that(
   "get checksum file from zip works",
   {
@@ -16,9 +17,19 @@ test_that(
       ),
       "MD5_checksum.txt"
     )
+
+    # future scenario with a different file name - test accepted_checksum_files
+    expect_equal(
+      get_checksum_file_from_zip(
+        files = c("checksum_md5.txt", "test.csv"),
+        accepted_checksum_files = c("checksum_md5.txt")
+      ),
+      "checksum_md5.txt"
+    )
   }
 )
 
+# Test that NA is returned when there is no acceptable checksum file name
 test_that(
   "get checksum file from zip - No checksum file",
   {
@@ -32,8 +43,10 @@ test_that(
   }
 )
 
+# Test that a relevant error messahe os thrown when 2 acceptable checksum files
+# are provided.
 test_that(
-  "get checksum file from zip - 2 MD5 checksums",
+  "get checksum file from zip - 2 checksums",
   {
     # multiple checksum files
     expect_error(
@@ -42,12 +55,7 @@ test_that(
       ),
       regexp = "The compressed file contains too many checksum files!"
     )
-  }
-)
 
-test_that(
-  "get checksum file from zip - 2 sha256 checksums",
-  {
     expect_error(
       get_checksum_file_from_zip(
         files = c("checksum_sha256.txt", "checksum_sha256.txt")
@@ -55,18 +63,6 @@ test_that(
       regexp = "The compressed file contains too many checksum files!"
     )
 
-    expect_error(
-      get_checksum_file_from_zip(
-        files = c("MD5_checksum.txt", "checksum_sha256.txt")
-      ),
-      regexp = "The compressed file contains too many checksum files!"
-    )
-  }
-)
-
-test_that(
-  "get checksum file from zip - 1 sha256 and 1 MD5 checksum",
-  {
     expect_error(
       get_checksum_file_from_zip(
         files = c("MD5_checksum.txt", "checksum_sha256.txt")
