@@ -30,8 +30,8 @@ get_npx_file_from_zip <-
         c(
           "x" = "The compressed file contains unknown, none or multiple NPX
           files!",
-          "i" = "The input *.zip file should contain {.strong only} one NPX
-          file with extsnsion: { glue::glue_collapse(x = accepted_npx_files,
+          "i" = "The compressed input file should contain {.strong only} one NPX
+          file with extension: { glue::glue_collapse(x = accepted_npx_files,
                                                      sep = \", \",
                                                      last = \" or \") }."
         ),

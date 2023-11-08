@@ -22,10 +22,10 @@ get_checksum_file_from_zip <-
       cli::cli_abort(
         c(
           "x" = "The compressed file contains too many checksum files!",
-          "i" = "The input *.zip file should contain {.strong only} one checksum
-          file: { glue::glue_collapse(x = accepted_checksum_files,
-                                      sep = \", \",
-                                      last = \" or \") }."
+          "i" = "The compressed input file should contain {.strong only} one
+          checksum file: { glue::glue_collapse(x = accepted_checksum_files,
+                                               sep = \", \",
+                                               last = \" or \") }."
         ),
         call = NULL,
         wrap = FALSE

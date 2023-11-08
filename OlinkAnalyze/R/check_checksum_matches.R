@@ -54,7 +54,7 @@ check_checksum_matches <- function(checksum_file,
     # the temporary directory in the read_npx_zip.
     return(
       paste("The checksum of the NPX file does not match the one included",
-            "in the zip file")
+            "in the compressed file")
     )
 
   } else {
