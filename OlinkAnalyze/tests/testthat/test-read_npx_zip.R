@@ -23,7 +23,7 @@ test_that(
         # check that relevant error is thrown
         expect_error(
           read_npx_zip(file = txtfile_z),
-          regexp = "Unable to open zip file: "
+          regexp = "Unable to open compressed file: "
         )
 
         textfile_zip <<- txtfile_z
@@ -60,7 +60,7 @@ test_that(
         # check that relevant error is thrown
         expect_error(
           read_npx_zip(file = txtfile_zcorrupt),
-          regexp = "Unable to open zip file: "
+          regexp = "Unable to open compressed file: "
         )
 
         txtfile_zipcorrupt <<- txtfile_zcorrupt
