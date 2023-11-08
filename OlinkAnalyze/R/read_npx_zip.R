@@ -26,8 +26,8 @@ read_npx_zip <-
 
         cli::cli_abort(
           c(
-            "x" = "Unable to open zip file: {file}",
-            "i" = "Check the file is in zip format and potential file
+            "x" = "Unable to open compressed file: {file}",
+            "i" = "Check if the file is a zip and or potential file
           corruption."
           ),
           call = NULL,
@@ -48,7 +48,7 @@ read_npx_zip <-
 
       cli::cli_abort(
         c(
-          "x" = "The compressed file does not contain checksum or NPX files!"
+          "x" = "No NPX and checksum file in the compressed file: {file}"
         ),
         call = NULL,
         wrap = FALSE
@@ -108,7 +108,7 @@ read_npx_zip <-
         # error message
         cli::cli_abort(
           c(
-            "x" = paste0(checksum_check, ": {file}"),
+            "x" = "{checksum_check}: {file}",
             "i" = "Potential loss of data or corrupt file."
           ),
           call = NULL,

@@ -100,7 +100,7 @@ test_that(
 
         expect_error(
           read_npx_zip(file = zip_test),
-          regexp = "The compressed file does not contain checksum or NPX files!"
+          regexp = "No NPX and checksum file in the compressed file"
         )
 
         zip_file <<- zip_test
