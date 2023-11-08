@@ -21,31 +21,56 @@ check_checksum_matches <- function(checksum_file,
     tolower()
 
   # Get checksum from NPX file
-  if (grepl("md5", checksum_file_stripped)) {
+  if (file.exists(npx_file)) {
 
-    # MD5 checksum on the NPX file
-    npx_file_checksum <- tools::md5sum(npx_file) |>
-      unname()
+    if (grepl("md5", checksum_file_stripped)) {
 
-  } else if(grepl("sha256", checksum_file_stripped)) {
+      # MD5 checksum on the NPX file
+      npx_file_checksum <- tools::md5sum(npx_file) |>
+        unname()
 
-    # SHA256 checksum on the NPX file
-    npx_file_checksum <- openssl::sha256(file(npx_file)) |>
-      stringr::str_replace(pattern = ":",
-                           replacement = "")
+    } else if (grepl("sha256", checksum_file_stripped)) {
+
+      # SHA256 checksum on the NPX file
+      npx_file_checksum <- openssl::sha256(file(npx_file)) |>
+        stringr::str_replace(pattern = ":",
+                             replacement = "")
+
+    }
+
+  } else {
+
+    return(
+      paste("The NPX file",
+            basename(npx_file),
+            "has not been extracted from the zip file")
+    )
 
   }
 
-  # check that checksum matches NPX csv file
-  checksum_file_read_con <- file(checksum_file, "r")
 
-  # read in the checksum extracted from the compressed file
-  checksum_file_content <- readLines(con = checksum_file_read_con,
-                                     n = 1L,
-                                     warn = FALSE)
+  if (file.exists(checksum_file)) {
 
-  # clean up files
-  close(checksum_file_read_con)
+    # check that checksum matches NPX csv file
+    checksum_file_read_con <- file(checksum_file, "r")
+
+    # read in the checksum extracted from the compressed file
+    checksum_file_content <- readLines(con = checksum_file_read_con,
+                                       n = 1L,
+                                       warn = FALSE)
+
+    # clean up files
+    close(checksum_file_read_con)
+
+  } else {
+
+    return(
+      paste("The checksum file",
+            basename(checksum_file),
+            "has not been extracted from the zip file")
+    )
+
+  }
 
   # check if checksums match
   if (checksum_file_content != npx_file_checksum) {
