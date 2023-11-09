@@ -18,11 +18,11 @@ get_npx_file <- function(files) {
     )
 
   # check: no file with the accepted suffix
-  if (sum(df_files$files_extension %in% accepted_npx_files) != 1L) {
+  if (sum(df_files$files_extension %in% accepted_npx_file_ext) != 1L) {
 
-    if (sum(df_files$files_extension %in% accepted_npx_files) == 0L) {
+    if (sum(df_files$files_extension %in% accepted_npx_file_ext) == 0L) {
       err_msg <- "no" # nolint object_usage_linter
-    } else if (sum(df_files$files_extension %in% accepted_npx_files) > 1L) {
+    } else if (sum(df_files$files_extension %in% accepted_npx_file_ext) > 1L) {
       err_msg <- "multiple" # nolint object_usage_linter
     }
 
@@ -30,7 +30,7 @@ get_npx_file <- function(files) {
       c(
         "x" = "The compressed file contains {err_msg} NPX files!",
         "i" = "The compressed input file should contain {.strong only} one NPX
-          file with extension: { glue::glue_collapse(x = accepted_npx_files,
+          file with extension: { glue::glue_collapse(x = accepted_npx_file_ext,
                                                      sep = \", \",
                                                      last = \" or \") }."
       ),
@@ -42,7 +42,7 @@ get_npx_file <- function(files) {
   # get the NPX file
   npx_file <- df_files |>
     dplyr::filter(
-      .data[["files_extension"]] %in% .env[["accepted_npx_files"]]
+      .data[["files_extension"]] %in% .env[["accepted_npx_file_ext"]]
     ) |>
     dplyr::slice_head(n = 1L) |>
     dplyr::pull(.data[["files"]])
