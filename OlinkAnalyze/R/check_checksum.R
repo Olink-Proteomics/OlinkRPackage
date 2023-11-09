@@ -4,7 +4,6 @@
 #' @param checksum_file The plain file that contains the checksum output from
 #' Olink software. The file should contain "MD5" or "SHA256" in the file name.
 #' @param npx_file The NPX file accompanying the checksum file.
-#'
 #' @return A string or NA. If the function return NA then everything worked
 #' fine, otherwise there was some sort of error.
 #'
@@ -40,10 +39,14 @@ check_checksum <- function(checksum_file,
 
   } else {
 
-    return(
-      paste("The NPX file",
-            basename(npx_file),
-            "has not been extracted from the zip file")
+    # error message
+    cli::cli_abort(
+      c(
+        "x" = "Unable to open NPX file: {basename(npx_file)}",
+        "i" = "Was it extracted from the compressed file?"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
     )
 
   }
@@ -64,10 +67,14 @@ check_checksum <- function(checksum_file,
 
   } else {
 
-    return(
-      paste("The checksum file",
-            basename(checksum_file),
-            "has not been extracted from the zip file")
+    # error message
+    cli::cli_abort(
+      c(
+        "x" = "Unable to open checksum file: {basename(checksum_file)}",
+        "i" = "Was it extracted from the compressed file?"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
     )
 
   }
@@ -75,16 +82,16 @@ check_checksum <- function(checksum_file,
   # check if checksums match
   if (checksum_file_content != npx_file_checksum) {
 
-    # not throwing the error directly from here because we have to clean up
-    # the temporary directory in the read_npx_zip.
-    return(
-      paste("The checksum of the NPX file does not match the one included",
-            "in the compressed file")
+    # error message
+    cli::cli_abort(
+      c(
+        "x" = "The checksum of the NPX file does not match the one included in
+        the compressed file",
+        "i" = "Potential loss of data or corrupt file."
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
     )
-
-  } else {
-
-    return(NA_character_)
 
   }
 

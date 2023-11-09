@@ -103,29 +103,33 @@ read_npx_zip <-
       # Extracted checksum file
       extracted_file_chksm <- file.path(tmp_unzip_dir, compressed_file_checksum)
 
-      # confirm that the checksum file is available
-      checksum_matches <- check_checksum(
-        checksum_file = extracted_file_chksm,
-        npx_file = extracted_file_npx
+      # tryCatch in case of errors from the check_checksum
+      tryCatch(
+        {
+
+          # confirm that the checksum file is available
+          check_checksum(
+            checksum_file = extracted_file_chksm,
+            npx_file = extracted_file_npx
+          )
+
+        }, error = function(msg) {
+
+          # cleanup temporary directory with extracted files
+          invisible(unlink(x = tmp_unzip_dir, recursive = TRUE))
+
+          # throw the error message from the helper function
+          cli::cli_abort(
+            c(
+              "x" = "{msg$message[1]}",
+              "i" = "{msg$body[1]}"
+            ),
+            call = NULL,
+            wrap = FALSE
+          )
+
+        }
       )
-
-      # print error message if checksum did not work
-      if (!is.na(checksum_matches)) {
-
-        # cleanup temporary directory with extracted files
-        invisible(unlink(x = tmp_unzip_dir, recursive = TRUE))
-
-        # error message
-        cli::cli_abort(
-          c(
-            "x" = "{checksum_matches}: {file}",
-            "i" = "Potential loss of data or corrupt file."
-          ),
-          call = NULL,
-          wrap = FALSE
-        )
-
-      }
 
     }
 

@@ -26,10 +26,9 @@ test_that(
         expect_true(file.exists(MD5_check))
 
         # check that relevant error is thrown
-        expect_identical(
+        expect_no_condition(
           check_checksum(checksum_file = MD5_check,
-                         npx_file = parquet_file),
-          NA_character_
+                         npx_file = parquet_file)
         )
 
         checksum_tmp_file <<- MD5_check
@@ -69,10 +68,9 @@ test_that(
         expect_true(file.exists(SHA256_check))
 
         # check that relevant error is thrown
-        expect_identical(
+        expect_no_condition(
           check_checksum(checksum_file = SHA256_check,
-                         npx_file = parquet_file),
-          NA_character_
+                         npx_file = parquet_file)
         )
 
         checksum_tmp_file <<- SHA256_check
@@ -112,11 +110,10 @@ test_that(
             expect_true(file.exists(SHA256_check))
 
             # check that relevant string is returned
-            expect_match(
+            expect_error(
               check_checksum(checksum_file = SHA256_check,
                              npx_file = nfile_test),
-              regexp = paste("The NPX file", basename(nfile_test)),
-              fixed = TRUE
+              regexp = "Unable to open NPX file"
             )
 
             checksum_tmp_file <<- SHA256_check
@@ -152,11 +149,10 @@ test_that(
         expect_false(file.exists(SHA256_check))
 
         # check that relevant string is returned
-        expect_match(
+        expect_error(
           check_checksum(checksum_file = SHA256_check,
                          npx_file = parquet_file),
-          regexp = paste("The checksum file", basename(SHA256_check)),
-          fixed = TRUE
+          regexp = "Unable to open checksum file"
         )
 
         checksum_tmp_file <<- SHA256_check
@@ -191,11 +187,10 @@ test_that(
         expect_true(file.exists(SHA256_check))
 
         # check that relevant string is returned
-        expect_match(
+        expect_error(
           check_checksum(checksum_file = SHA256_check,
                          npx_file = parquet_file),
-          regexp = "The checksum of the NPX file does not match the one",
-          fixed = TRUE
+          regexp = "The checksum of the NPX file does not match the one"
         )
 
         checksum_tmp_file <<- SHA256_check
