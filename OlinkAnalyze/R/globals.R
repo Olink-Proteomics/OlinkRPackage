@@ -12,4 +12,5 @@ accepted_npx_file_ext <- c("xls",
                            "xlsx",
                            "csv",
                            "txt",
-                           "parquet")
+                           "parquet",
+                           "zip")

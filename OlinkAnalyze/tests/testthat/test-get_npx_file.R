@@ -18,7 +18,7 @@ invisible(
     accepted_checksum_files,
     function(checksum_file) {
       sapply(
-        paste("test", accepted_npx_file_ext, sep = "."),
+        paste0("test.", accepted_npx_file_ext[accepted_npx_file_ext != "zip"]),
         function(npx_file) {
           test_checksum_npx_combo(c_file = checksum_file, n_file = npx_file)
         }
@@ -46,7 +46,7 @@ test_npx_input <- function(n_file) {
 
 invisible(
   sapply(
-    paste("test", accepted_npx_file_ext, sep = "."),
+    paste0("test.", accepted_npx_file_ext[accepted_npx_file_ext != "zip"]),
     function(npx_file) {
       test_npx_input(n_file = npx_file)
     }

@@ -1,4 +1,4 @@
-#' Help function to get the name of the NPX file from a zip NPX.
+#' Help function to get the name of the NPX file from a compresseed NPX.
 #'
 #' @param files A vector of file names without any path prefix.
 #'
@@ -26,11 +26,15 @@ get_npx_file <- function(files) {
       err_msg <- "multiple" # nolint object_usage_linter
     }
 
+    # we should not allow the zip extension in this case as the NPX file is
+    # already part of the zip we are checking
+    npx_ext_no_zip <- accepted_npx_file_ext[!(accepted_npx_file_ext == "zip")] # nolint object_usage_linter
+
     cli::cli_abort(
       c(
         "x" = "The compressed file contains {err_msg} NPX files!",
         "i" = "The compressed input file should contain {.strong only} one NPX
-          file with extension: { glue::glue_collapse(x = accepted_npx_file_ext,
+          file with extension: { glue::glue_collapse(x = npx_ext_no_zip,
                                                      sep = \", \",
                                                      last = \" or \") }."
       ),
