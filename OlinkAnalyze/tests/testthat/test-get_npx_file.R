@@ -79,7 +79,7 @@ test_that(
 
     # one SHA256 only
     expect_error(
-      get_npx_file_from_zip(
+      get_npx_file(
         files = c("checksum_sha256.txt")
       ),
       regexp = "The compressed file contains no NPX files!"
@@ -101,7 +101,7 @@ test_that(
   {
     # one unknown file
     expect_error(
-      get_npx_file_from_zip(
+      get_npx_file(
         files = c("test.xml")
       ),
       regexp = "The compressed file contains no NPX files!"
