@@ -2,9 +2,12 @@
 % Please edit documentation in R/read_npx_delim.R
 \name{read_npx_delim}
 \alias{read_npx_delim}
+\alias{read_npx_csv}
 \title{Help function to read in Olink data from comma or semicolon delimited files}
 \usage{
 read_npx_delim(file, sep = NULL)
+
+read_npx_csv(file, sep = NULL)
 }
 \arguments{
 \item{file}{Path to Olink software output in txt or csv.}

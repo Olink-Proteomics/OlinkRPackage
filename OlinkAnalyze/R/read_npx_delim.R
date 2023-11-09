@@ -71,6 +71,6 @@ read_npx_delim <- function(file,
   return(df_npx)
 }
 
-#' @rdname summarise_all
+#' @rdname read_npx_delim
 read_npx_csv <- read_npx_delim
-#' @rdname summarise_all
+#' @rdname read_npx_delim
