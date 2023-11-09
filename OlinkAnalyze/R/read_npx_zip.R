@@ -67,7 +67,7 @@ read_npx_zip <-
     }
 
     # Get the name of the checksum file, if available
-    compressed_file_checksum <- get_checksum_file_from_zip(
+    compressed_file_checksum <- get_checksum_file(
       files = compressed_file_contents
     )
 
