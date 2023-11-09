@@ -3,6 +3,7 @@
 test_that(
   "check file exists works - file present", {
 
+    # path to the sample parquet file
     parquet_file <- system.file("extdata",
                                 "npx_data_ext.parquet",
                                 package = "OlinkAnalyze",
@@ -20,6 +21,7 @@ test_that(
 test_that(
   "check file exists works - file NA or NULL", {
 
+    # NULL
     expect_error(
       object = check_file_exists(
         file = NULL
@@ -27,6 +29,7 @@ test_that(
       regexp = "File cannot be NULL"
     )
 
+    # NA
     expect_error(
       object = check_file_exists(
         file = NA
@@ -57,12 +60,14 @@ test_that(
 test_that(
   "check file exists works - file NA or NULL", {
 
+    # Random file names. Files are not created; path to non-existing files
     missing_file_1 <- file.path(tempdir(),
                                 "I_Am_A_MissinG_FilE_1")
 
     missing_file_2 <- file.path(tempdir(),
                                 "I_Am_A_MissinG_FilE_2")
 
+    # path to the sample parquet file
     parquet_file <- system.file("extdata",
                                 "npx_data_ext.parquet",
                                 package = "OlinkAnalyze",

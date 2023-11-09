@@ -10,6 +10,7 @@ check_file_exists <- function(file) {
 
   if (is.null(file)) {
 
+    # error if the file variable is NULL
     cli::cli_abort(
       c(
         "x" = "Unable to locate file: {file}",
@@ -21,6 +22,7 @@ check_file_exists <- function(file) {
 
   } else if (any(is.na(file))) {
 
+    # error if the file variable is NA
     cli::cli_abort(
       c(
         "x" = "Unable to locate file: {file}",
@@ -32,6 +34,7 @@ check_file_exists <- function(file) {
 
   } else if (length(file) != 1) {
 
+    # error if the file variable is not of length 1L
     cli::cli_abort(
       c(
         "x" = "Only one file is allowed!",
@@ -43,6 +46,7 @@ check_file_exists <- function(file) {
 
   } else if (!file.exists(file)) {
 
+    # error if the file does not exist
     cli::cli_abort(
       c(
         "x" = "Unable to locate file: {file}",
