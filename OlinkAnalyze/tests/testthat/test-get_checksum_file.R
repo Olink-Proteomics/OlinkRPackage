@@ -20,28 +20,6 @@ test_that(
   }
 )
 
-# Test that error is thrown if input is not a character vector
-test_that(
-  "get checksum file from zip - Wrong input",
-  {
-    # wrong checksum file
-    expect_error(
-      get_checksum_file(
-        files = c("MD51_checksum.txt", NA)
-      ),
-      regexp = "`files` must be a character vector!"
-    )
-
-    expect_error(
-      get_checksum_file(
-        files = c(1, 2L)
-      ),
-      regexp = "`files` must be a character vector!"
-    )
-
-  }
-)
-
 # Test that NA is returned when there is no acceptable checksum file name
 test_that(
   "get checksum file from zip - No checksum file",

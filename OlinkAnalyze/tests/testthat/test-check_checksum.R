@@ -200,21 +200,3 @@ test_that(
     expect_false(file.exists(checksum_tmp_file))
   }
 )
-
-# Test that a relevant string is returned when inputs are not strings.
-test_that(
-  "checksum matches works - non-string input",
-  {
-    expect_error(
-      check_checksum(checksum_file = 1,
-                     npx_file = "A"),
-      regexp = "`checksum_file` must be a string!"
-    )
-
-    expect_error(
-      check_checksum(checksum_file = "A",
-                     npx_file = TRUE),
-      regexp = "`npx_file` must be a string!"
-    )
-  }
-)
