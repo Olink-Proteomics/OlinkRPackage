@@ -6,7 +6,7 @@
 #'
 #' @keywords zip NPX checksum MD5 SHA256
 #'
-get_checksum_file_from_zip <- function(files) {
+get_checksum_file <- function(files) {
 
   # if none of the files matches the accepted file names
   if (!any(files %in% accepted_checksum_files)) {
