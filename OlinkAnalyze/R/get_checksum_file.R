@@ -8,6 +8,9 @@
 #'
 get_checksum_file <- function(files) {
 
+  # check that the input is a character vector
+  check_is_character(string = files)
+
   # if none of the files matches the accepted file names
   if (!any(files %in% accepted_checksum_files)) {
 
