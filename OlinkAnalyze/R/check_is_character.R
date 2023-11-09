@@ -12,7 +12,7 @@ check_is_character <- function(string) {
 
     cli::cli_abort(
       c(
-        "x" = "{.arg {rlang::caller_arg(string)}} must be a string!"
+        "x" = "{.arg {rlang::caller_arg(string)}} must be a character vector!"
       ),
       call = rlang::caller_env(),
       wrap = FALSE
