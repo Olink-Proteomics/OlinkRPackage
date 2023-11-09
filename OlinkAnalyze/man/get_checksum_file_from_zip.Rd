@@ -4,15 +4,10 @@
 \alias{get_checksum_file_from_zip}
 \title{Help function to get the name of the checksum file from a zip NPX.}
 \usage{
-get_checksum_file_from_zip(
-  files,
-  accepted_checksum_files = c("MD5_checksum.txt", "checksum_sha256.txt")
-)
+get_checksum_file_from_zip(files)
 }
 \arguments{
 \item{files}{A vector of file names without any path prefix.}
-
-\item{accepted_checksum_files}{Vector of accepted checksum file names.}
 }
 \value{
 The name of checksum file or NA if the file is not present.

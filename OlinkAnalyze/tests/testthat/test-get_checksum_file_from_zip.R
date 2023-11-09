@@ -17,15 +17,6 @@ test_that(
       ),
       "MD5_checksum.txt"
     )
-
-    # future scenario with a different file name - test accepted_checksum_files
-    expect_equal(
-      get_checksum_file_from_zip(
-        files = c("checksum_md5.txt", "test.csv"),
-        accepted_checksum_files = c("checksum_md5.txt")
-      ),
-      "checksum_md5.txt"
-    )
   }
 )
 
@@ -33,7 +24,7 @@ test_that(
 test_that(
   "get checksum file from zip - No checksum file",
   {
-    # missing checksum file
+    # wrong checksum file
     expect_identical(
       get_checksum_file_from_zip(
         files = c("MD51_checksum.txt", "test.csv")
