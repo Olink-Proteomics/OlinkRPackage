@@ -72,7 +72,7 @@ read_npx_zip <-
     )
 
     # Get the name of the NPX files
-    compressed_file_npx <- get_npx_file_from_zip(
+    compressed_file_npx <- get_npx_file(
       files = compressed_file_contents
     )
 

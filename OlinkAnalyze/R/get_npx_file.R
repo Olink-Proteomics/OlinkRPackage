@@ -6,7 +6,7 @@
 #'
 #' @keywords zip NPX
 #'
-get_npx_file_from_zip <- function(files) {
+get_npx_file <- function(files) {
 
   # remove (if any) checksum files
   files_no_checksum <- files[!(files %in% accepted_checksum_files)]
