@@ -8,8 +8,8 @@
 #'
 check_file_exists <- function(file) {
 
-  # check if file is a string
-  check_is_string(string = file)
+  # check if input is character vector of length 1
+  check_is_scalar_character(string = file)
 
   if (!file.exists(file)) {
 

@@ -13,8 +13,9 @@ check_checksum <- function(checksum_file,
   # We should make it here only if MD5_checksum.txt or checksum_sha256.txt are
   # present in the zip file.
 
-  check_is_string(string = checksum_file)
-  check_is_string(string = npx_file)
+  # check if input is character vectors of length 1
+  check_is_scalar_character(string = checksum_file)
+  check_is_scalar_character(string = npx_file)
 
   # make the checksum filename easier to parse
   checksum_file_stripped <- checksum_file |>
