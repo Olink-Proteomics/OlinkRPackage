@@ -8,6 +8,9 @@
 #'
 check_file_exists <- function(file) {
 
+  # check if file is a string
+  check_is_string(string = file)
+
   if (!file.exists(file)) {
 
     # error if the file does not exist

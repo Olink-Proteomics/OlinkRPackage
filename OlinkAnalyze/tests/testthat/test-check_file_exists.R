@@ -33,3 +33,17 @@ test_that(
 
   }
 )
+
+# Test that relevant error is thrown when file is not a string
+test_that(
+  "check file exists works - file not a string", {
+
+    expect_error(
+      check_file_exists(
+        file = TRUE
+      ),
+      regexp = "`file` must be a string!"
+    )
+
+  }
+)
