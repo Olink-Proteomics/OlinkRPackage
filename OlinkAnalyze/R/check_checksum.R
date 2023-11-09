@@ -8,8 +8,8 @@
 #' @return A string or NA. If the function return NA then everything worked
 #' fine, otherwise there was some sort of error.
 #'
-check_checksum_matches <- function(checksum_file,
-                                   npx_file) {
+check_checksum <- function(checksum_file,
+                           npx_file) {
 
   # We should make it here only if MD5_checksum.txt or checksum_sha256.txt are
   # present in the zip file.

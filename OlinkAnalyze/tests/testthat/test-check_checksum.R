@@ -27,8 +27,8 @@ test_that(
 
         # check that relevant error is thrown
         expect_identical(
-          check_checksum_matches(checksum_file = MD5_check,
-                                 npx_file = parquet_file),
+          check_checksum(checksum_file = MD5_check,
+                         npx_file = parquet_file),
           NA_character_
         )
 
@@ -70,8 +70,8 @@ test_that(
 
         # check that relevant error is thrown
         expect_identical(
-          check_checksum_matches(checksum_file = SHA256_check,
-                                 npx_file = parquet_file),
+          check_checksum(checksum_file = SHA256_check,
+                         npx_file = parquet_file),
           NA_character_
         )
 
@@ -113,8 +113,8 @@ test_that(
 
             # check that relevant string is returned
             expect_match(
-              check_checksum_matches(checksum_file = SHA256_check,
-                                     npx_file = nfile_test),
+              check_checksum(checksum_file = SHA256_check,
+                             npx_file = nfile_test),
               regexp = paste("The NPX file", basename(nfile_test)),
               fixed = TRUE
             )
@@ -153,8 +153,8 @@ test_that(
 
         # check that relevant string is returned
         expect_match(
-          check_checksum_matches(checksum_file = SHA256_check,
-                                 npx_file = parquet_file),
+          check_checksum(checksum_file = SHA256_check,
+                         npx_file = parquet_file),
           regexp = paste("The checksum file", basename(SHA256_check)),
           fixed = TRUE
         )
@@ -192,8 +192,8 @@ test_that(
 
         # check that relevant string is returned
         expect_match(
-          check_checksum_matches(checksum_file = SHA256_check,
-                                 npx_file = parquet_file),
+          check_checksum(checksum_file = SHA256_check,
+                         npx_file = parquet_file),
           regexp = "The checksum of the NPX file does not match the one",
           fixed = TRUE
         )
