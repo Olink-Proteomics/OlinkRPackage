@@ -1,4 +1,4 @@
-#' Help function to check is suggested libraries are installed when required.
+#' Help function to check if suggested libraries are installed when required.
 #'
 #' @param libraries A character vector of R libraries.
 #'

@@ -2,7 +2,7 @@
 % Please edit documentation in R/check_library_installed.R
 \name{check_library_installed}
 \alias{check_library_installed}
-\title{Help function to check is suggested libraries are installed when required.}
+\title{Help function to check if suggested libraries are installed when required.}
 \usage{
 check_library_installed(libraries)
 }
@@ -13,5 +13,5 @@ check_library_installed(libraries)
 An error if one of the libraries is missing.
 }
 \description{
-Help function to check is suggested libraries are installed when required.
+Help function to check if suggested libraries are installed when required.
 }
