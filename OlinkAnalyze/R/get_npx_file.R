@@ -44,6 +44,7 @@ get_npx_file <- function(files) {
     dplyr::filter(
       .data[["files_extension"]] %in% .env[["accepted_npx_file_ext"]]
     ) |>
+    # we can safely assume that there is only one file here
     dplyr::slice_head(n = 1L) |>
     dplyr::pull(.data[["files"]])
 
