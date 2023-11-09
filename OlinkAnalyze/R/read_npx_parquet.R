@@ -29,7 +29,7 @@ read_npx_parquet <- function(file) {
           "i" = "Check the file is in parquet format and potential file
           corruption."
         ),
-        call = NULL,
+        call = rlang::caller_env(),
         wrap = FALSE
       )
 
@@ -57,7 +57,7 @@ read_npx_parquet <- function(file) {
         "x" = "Missing required field {?s} in metadata:
         {missing_fields}"
       ),
-      call = NULL,
+      call = rlang::caller_env(),
       wrap = FALSE
     )
 
@@ -80,7 +80,7 @@ read_npx_parquet <- function(file) {
           "Metadata field {.val {olink_parquet_metadata$product}} expects:
         {olink_parquet_platforms}"
       ),
-      call = NULL,
+      call = rlang::caller_env(),
       wrap = FALSE
     )
 
@@ -100,7 +100,7 @@ read_npx_parquet <- function(file) {
           "Metadata field {.val {olink_parquet_metadata$data_file_type}}
           expects: {olink_parquet_files}"
       ),
-      call = NULL,
+      call = rlang::caller_env(),
       wrap = FALSE
     )
 

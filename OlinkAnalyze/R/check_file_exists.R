@@ -16,7 +16,7 @@ check_file_exists <- function(file) {
         "x" = "Unable to locate file: {file}",
         "i" = "File cannot be NULL!"
       ),
-      call = NULL,
+      call = rlang::caller_env(),
       wrap = FALSE
     )
 
@@ -28,7 +28,7 @@ check_file_exists <- function(file) {
         "x" = "Unable to locate file: {file}",
         "i" = "File cannot be NA!"
       ),
-      call = NULL,
+      call = rlang::caller_env(),
       wrap = FALSE
     )
 
@@ -40,7 +40,7 @@ check_file_exists <- function(file) {
         "x" = "Only one file is allowed!",
         "i" = "Provided: {file}"
       ),
-      call = NULL,
+      call = rlang::caller_env(),
       wrap = FALSE
     )
 
@@ -52,7 +52,7 @@ check_file_exists <- function(file) {
         "x" = "Unable to locate file: {file}",
         "i" = "Missing?"
       ),
-      call = NULL,
+      call = rlang::caller_env(),
       wrap = FALSE
     )
 

@@ -45,7 +45,7 @@ get_field_separator <- function(file) {
         "x" = "Unable to identify the separator of the file: {file}",
         "i" = "Both semicolon (;) and comma (,) are present in header line."
       ),
-      call = NULL,
+      call = rlang::caller_env(),
       wrap = FALSE
     )
 
@@ -56,7 +56,7 @@ get_field_separator <- function(file) {
         "x" = "Unable to identify the separator of the file: {file}",
         "i" = "Expecting semicolon (;) or comma (,)!"
       ),
-      call = NULL,
+      call = rlang::caller_env(),
       wrap = FALSE
     )
 

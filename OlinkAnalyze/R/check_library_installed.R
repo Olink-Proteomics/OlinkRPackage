@@ -14,7 +14,7 @@ check_library_installed <- function(libraries) {
         "x" = "One or more missing libraries: {libraries}",
         "i" = "Please install the required R libraries!"
       ),
-      call = NULL,
+      call = rlang::caller_env(),
       wrap = FALSE
     )
 

@@ -40,7 +40,7 @@ read_npx_zip <-
             "i" = "Check if the file is a zip and or potential file
           corruption."
           ),
-          call = NULL,
+          call = rlang::caller_env(),
           wrap = FALSE
         )
 
@@ -60,7 +60,7 @@ read_npx_zip <-
         c(
           "x" = "No NPX and checksum file in the compressed file: {file}"
         ),
-        call = NULL,
+        call = rlang::caller_env(),
         wrap = FALSE
       )
 
@@ -124,7 +124,7 @@ read_npx_zip <-
               "x" = "{msg$message[1]}",
               "i" = "{msg$body[1]}"
             ),
-            call = NULL,
+            call = rlang::caller_env(),
             wrap = FALSE
           )
 

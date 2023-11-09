@@ -26,7 +26,7 @@ get_checksum_file <- function(files) {
                                                sep = \", \",
                                                last = \" or \") }."
       ),
-      call = NULL,
+      call = rlang::caller_env(),
       wrap = FALSE
     )
 
