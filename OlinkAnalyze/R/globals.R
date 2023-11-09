@@ -14,3 +14,7 @@ accepted_npx_file_ext <- c("xls",
                            "txt",
                            "parquet",
                            "zip")
+
+# the separators of the Olink long files
+accepted_field_sep <- c(";",
+                        ",")
