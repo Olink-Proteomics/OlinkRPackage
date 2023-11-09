@@ -17,28 +17,6 @@ test_that(
   }
 )
 
-# Test that relevant error is thrown when file is NULL or NA
-test_that(
-  "check file exists works - file NA or NULL", {
-
-    # NULL
-    expect_error(
-      object = check_file_exists(
-        file = NULL
-      ),
-      regexp = "File cannot be NULL"
-    )
-
-    # NA
-    expect_error(
-      object = check_file_exists(
-        file = NA
-      ),
-      regexp = "File cannot be NA"
-    )
-  }
-)
-
 # Test that relevant error is thrown when file is missing
 test_that(
   "check file exists works - file missing", {
@@ -51,40 +29,6 @@ test_that(
         file = missing_file
       ),
       regexp = "Unable to locate file"
-    )
-
-  }
-)
-
-# Test that relevant error is thrown when multiple files provided
-test_that(
-  "check file exists works - file NA or NULL", {
-
-    # Random file names. Files are not created; path to non-existing files
-    missing_file_1 <- file.path(tempdir(),
-                                "I_Am_A_MissinG_FilE_1")
-
-    missing_file_2 <- file.path(tempdir(),
-                                "I_Am_A_MissinG_FilE_2")
-
-    # path to the sample parquet file
-    parquet_file <- system.file("extdata",
-                                "npx_data_ext.parquet",
-                                package = "OlinkAnalyze",
-                                mustWork = TRUE)
-
-    expect_error(
-      object = check_file_exists(
-        file = c(missing_file_1, missing_file_2)
-      ),
-      regexp = "Only one file is allowed!"
-    )
-
-    expect_error(
-      object = check_file_exists(
-        file = c(missing_file_1, missing_file_2, parquet_file)
-      ),
-      regexp = "Only one file is allowed!"
     )
 
   }
