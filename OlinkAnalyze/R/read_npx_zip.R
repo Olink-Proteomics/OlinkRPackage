@@ -18,6 +18,12 @@ read_npx_zip <-
         "zip")
     )
 
+    # check that .ignore_files is a character vector
+    check_is_character(string = .ignore_files)
+
+    # check if file is a string
+    check_is_scalar_character(string = file)
+
     # check if file exists
     check_file_exists(file = file)
 

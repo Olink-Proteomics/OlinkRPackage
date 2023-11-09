@@ -8,6 +8,9 @@
 #'
 get_npx_file <- function(files) {
 
+  # check that the input is a character vector
+  check_is_character(string = files)
+
   # remove (if any) checksum files
   files_no_checksum <- files[!(files %in% accepted_checksum_files)]
 
