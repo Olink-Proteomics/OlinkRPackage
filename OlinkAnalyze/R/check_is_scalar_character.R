@@ -6,7 +6,7 @@
 #'
 check_is_scalar_character <- function(string) {
 
-  # check that required libraries are installed
+  # check that the input is a character vector of length 1
   if (!rlang::is_scalar_character(string)
       || rlang::is_na(string)) {
 
