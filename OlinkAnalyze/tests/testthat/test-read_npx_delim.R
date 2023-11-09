@@ -65,26 +65,26 @@ test_that(
 
         expect_error(
           read_npx_delim(file = cfile_test,
-                       sep = c(",", ";")),
+                         sep = c(",", ";")),
           regexp = "\"sep\" should be a string!"
         )
 
         expect_error(
           read_npx_delim(file = cfile_test,
-                       sep = character()),
+                         sep = character()),
           regexp = "\"sep\" should be a string!"
         )
 
         expect_error(
           read_npx_delim(file = cfile_test,
-                       sep = 1),
+                         sep = 1),
           regexp = "\"sep\" should be a string!"
         )
 
 
         expect_error(
           read_npx_delim(file = cfile_test,
-                       sep = TRUE),
+                         sep = TRUE),
           regexp = "\"sep\" should be a string!"
         )
 
@@ -108,29 +108,27 @@ test_that(
 
     expect_error(
       read_npx_delim(file = npx_csv_file,
-                   sep = "I_Am_Unaccepted"),
+                     sep = "I_Am_Unaccepted"),
       regexp = "Unexpected separator:"
     )
 
     expect_error(
       read_npx_delim(file = npx_csv_file,
-                   sep = "A"),
+                     sep = "A"),
       regexp = "Unexpected separator:"
     )
 
     expect_error(
       read_npx_delim(file = npx_csv_file,
-                   sep = "#"),
+                     sep = "#"),
       regexp = "Unexpected separator:"
     )
 
 
     expect_error(
       read_npx_delim(file = npx_csv_file,
-                   sep = "|"),
+                     sep = "|"),
       regexp = "Unexpected separator:"
     )
   }
 )
-
-
