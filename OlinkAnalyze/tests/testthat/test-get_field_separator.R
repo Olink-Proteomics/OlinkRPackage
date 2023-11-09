@@ -1,7 +1,7 @@
 # Test that the function returns a semicolon when the file is separated by
 # semicolon.
 test_that(
-  "check get_file_separator works - semicolon",
+  "check get_field_separator works - semicolon",
   {
 
     textfile_semicolon <- character()
@@ -20,7 +20,7 @@ test_that(
 
         # check that relevant error is thrown
         expect_identical(
-          get_file_separator(file = tfile_semicolon),
+          get_field_separator(file = tfile_semicolon),
           ";"
         )
 
@@ -35,7 +35,7 @@ test_that(
 
 # Test that the function returns a comma when the file is separated by comma.
 test_that(
-  "check get_file_separator works - comma",
+  "check get_field_separator works - comma",
   {
 
     textfile_comma <- character()
@@ -54,7 +54,7 @@ test_that(
 
         # check that relevant error is thrown
         expect_identical(
-          get_file_separator(file = tfile_comma),
+          get_field_separator(file = tfile_comma),
           ","
         )
 
@@ -69,7 +69,7 @@ test_that(
 
 # Test that the relevant error is thrown when unexpected separator in file.
 test_that(
-  "check get_file_separator works - hashtag",
+  "check get_field_separator works - hashtag",
   {
 
     textfile_hashtag <- character()
@@ -88,7 +88,7 @@ test_that(
 
         # check that relevant error is thrown
         expect_error(
-          get_file_separator(file = tfile_hashtag),
+          get_field_separator(file = tfile_hashtag),
           regexp = "Expecting semicolon.*.or comma.*.!"
         )
 
@@ -103,7 +103,7 @@ test_that(
 
 # Test that the relevant error is thrown when unexpected separator in file.
 test_that(
-  "check get_file_separator works - both comma and semicolon",
+  "check get_field_separator works - both comma and semicolon",
   {
 
     textfile_mixed <- character()
@@ -122,7 +122,7 @@ test_that(
 
         # check that relevant error is thrown
         expect_error(
-          get_file_separator(file = tfile_mixed),
+          get_field_separator(file = tfile_mixed),
           regexp = "Both semicolon.*.and comma.*.are present in header line."
         )
 

@@ -2,9 +2,15 @@
 #'
 #' @param file Path to Olink software output in txt or csv.
 #'
+#' @description
+#' This function uses the first line of the provided file to determine the
+#' separator of the file.
+#' _Note_ that the function will not accept the presence of commas and
+#' semicolons on the same line.
+#'
 #' @return The file separator comma (;) or semicolon (;)
 #'
-get_file_separator <- function(file) {
+get_field_separator <- function(file) {
 
   # check if file exists
   check_file_exists(file = file)
@@ -17,6 +23,7 @@ get_file_separator <- function(file) {
     file = textConnection(file_line_1),
     sep = ";"
   )
+
   # count fileds for comma
   num_fields_comma <- utils::count.fields(
     file = textConnection(file_line_1),
