@@ -10,11 +10,14 @@ get_checksum_file_from_zip <- function(files) {
 
   # if none of the files matches the accepted file names
   if (!any(files %in% accepted_checksum_files)) {
+
     return(NA_character_)
+
   }
 
   # if more than one files are in the accepted file names
   if (sum(files %in% accepted_checksum_files) > 1L) {
+
     cli::cli_abort(
       c(
         "x" = "The compressed file contains too many checksum files!",
@@ -26,6 +29,7 @@ get_checksum_file_from_zip <- function(files) {
       call = NULL,
       wrap = FALSE
     )
+
   }
 
   # get the checksum file
