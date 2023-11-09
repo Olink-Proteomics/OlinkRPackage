@@ -6,6 +6,9 @@
 #'
 check_library_installed <- function(libraries) {
 
+  # check that the input is a character vector
+  check_is_character(string = libraries)
+
   # check that required libraries are installed
   if (!rlang::is_installed(libraries)) {
 
