@@ -55,7 +55,7 @@ read_npx_parquet <- function(file) {
 
     cli::cli_abort(
       c(
-        "x" = "Missing required field {?s} in metadata:
+        "x" = "Missing required field{?s} in metadata:
         {missing_fields}"
       ),
       call = rlang::caller_env(),
