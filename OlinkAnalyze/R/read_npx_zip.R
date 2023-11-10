@@ -13,19 +13,19 @@ read_npx_zip <-
 
     # Check if all required libraries for this function are installed
     check_library_installed(
-      c("openssl",
-        "glue",
-        "zip")
+      libraries = c("openssl",
+                    "glue",
+                    "zip"),
+      error = TRUE
     )
 
     # check that .ignore_files is a character vector
-    check_is_character(string = .ignore_files)
-
-    # check if file is a string
-    check_is_scalar_character(string = file)
+    check_is_character(string = .ignore_files,
+                       error = TRUE)
 
     # check if file exists
-    check_file_exists(file = file)
+    check_file_exists(file = file,
+                      error = TRUE)
 
     # **** Prep ****
 

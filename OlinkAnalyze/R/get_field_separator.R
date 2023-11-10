@@ -13,16 +13,18 @@
 get_field_separator <- function(file) {
 
   # check input is a string
-  check_is_scalar_character(string = file)
+  check_is_scalar_character(string = file,
+                            error = TRUE)
 
   # check if file exists
-  check_file_exists(file = file)
+  check_file_exists(file = file,
+                    error = TRUE)
 
   # get the first line of the file
   file_line_1 <- readLines(file, n = 1L)
 
   # throw an error if line 1 is empty or the file is empty
-  if (!rlang::is_string(file_line_1)) {
+  if (!check_is_scalar_character(string = file_line_1, error = FALSE)) {
 
     cli::cli_abort(
       c(

@@ -11,19 +11,16 @@
 read_npx_delim <- function(file,
                            sep = NULL) {
 
-  # check if file is a string
-  check_is_scalar_character(string = file)
-
   # check if file exists
-  check_file_exists(file = file)
+  check_file_exists(file = file,
+                    error = TRUE)
 
   # check separator
   if (is.null(sep)) {
 
     sep <- get_field_separator(file = file)
 
-  } else if (!rlang::is_string(sep)
-             || rlang::is_na(sep)) {
+  } else if (!check_is_scalar_character(string = sep, error = FALSE)) {
 
     cli::cli_abort(
       c(
