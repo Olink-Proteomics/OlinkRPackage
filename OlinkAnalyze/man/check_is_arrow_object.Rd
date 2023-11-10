@@ -4,10 +4,12 @@
 \alias{check_is_arrow_object}
 \title{Help function to check if a variable is an R6 ArrowObject.}
 \usage{
-check_is_arrow_object(var)
+check_is_arrow_object(var, error = FALSE)
 }
 \arguments{
 \item{var}{Variable to check.}
+
+\item{error}{Boolean to return error or a boolean (default).}
 }
 \value{
 An error if the variable is not an R6 ArrowObject.
