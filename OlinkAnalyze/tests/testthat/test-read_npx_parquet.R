@@ -34,7 +34,6 @@ write_npx_parquet <-
 test_that(
   "Non-parquet input is handled - random file",
   {
-    textfile_parquet <- character()
 
     withr::with_tempfile(
       new = "txtfile_p",
@@ -46,22 +45,17 @@ test_that(
         writeLines("foo", txtfile_p)
 
         # check that the parquet file was created
-        expect(
-          file.exists(txtfile_p),
-          failure_message = "Text file was not created!"
-        )
+        expect_true(file.exists(txtfile_p))
 
         # check that relevant error is thrown
         expect_error(
           read_npx_parquet(file = txtfile_p),
-          regexp = paste0("Unable to read parquet file: ")
+          regexp = "Unable to read parquet file: "
         )
 
-        textfile_parquet <<- txtfile_p
       }
     )
 
-    expect_false(file.exists(textfile_parquet))
   }
 )
 
@@ -70,7 +64,6 @@ test_that(
 test_that(
   "Non-parquet input is handled - corrupt parquet file",
   {
-    txtfile_parquetcorrupt <- character()
 
     withr::with_tempfile(
       new = "txtfile_pcorrupt",
@@ -82,22 +75,17 @@ test_that(
         writeLines("foo", txtfile_pcorrupt)
 
         # check that the parquet file was created
-        expect(
-          file.exists(txtfile_pcorrupt),
-          failure_message = "Corrupt parquet file was not created!"
-        )
+        expect_true(file.exists(txtfile_pcorrupt))
 
         # check that relevant error is thrown
         expect_error(
           read_npx_parquet(file = txtfile_pcorrupt),
-          regexp = paste0("Unable to read parquet file: ")
+          regexp = "Unable to read parquet file: "
         )
 
-        txtfile_parquetcorrupt <<- txtfile_pcorrupt
       }
     )
 
-    expect_false(file.exists(txtfile_parquetcorrupt))
   }
 )
 
@@ -106,44 +94,41 @@ test_that(
 test_that(
   "All metadata fields are in place",
   {
-    parquetfile_metadata <- character()
 
     withr::with_tempfile(
       new = "pfile_metadata",
       pattern = "parquet-file_alt-product-type",
       fileext = ".parquet",
       code = {
+
+        # random data frame
+        df <- dplyr::tibble("A" = c(1, 2.2, 3.14),
+                            "B" = c("a", "b", "c"),
+                            "C" = c(TRUE, TRUE, FALSE),
+                            "D" = c("NA", "B", NA_character_),
+                            "E" = c(1L, 2L, 3L))
+
         # random product name for testing
         tmp_metadata_remove <- c("Product", "DataFileType")
 
         write_npx_parquet(
-          df = system.file("extdata", "npx_data_ext.parquet",
-                           package = "OlinkAnalyze",
-                           mustWork = TRUE) |>
-            read_npx_parquet() |>
-            dplyr::as_tibble() |>
-            dplyr::collect(),
+          df = df,
           npx_parquet_file = pfile_metadata,
           remove_fields = tmp_metadata_remove
         )
 
         # check that the parquet file was created
-        expect(
-          file.exists(pfile_metadata),
-          failure_message = "Parquet file was not created!"
-        )
+        expect_true(file.exists(pfile_metadata))
 
         # check that relevant error is thrown
         expect_error(
           read_npx_parquet(file = pfile_metadata),
-          regexp = paste0("Missing required field s in metadata: ")
+          regexp = "Missing required fields in metadata: "
         )
 
-        parquetfile_metadata <<- pfile_metadata
       }
     )
 
-    expect_false(file.exists(parquetfile_metadata))
   }
 )
 
@@ -152,32 +137,31 @@ test_that(
 test_that(
   "Product field is correct",
   {
-    parquetfile_product <- character()
 
     withr::with_tempfile(
       new = "pfile_product",
       pattern = "parquet-file_alt-product-type",
       fileext = ".parquet",
       code = {
+
+        # random data frame
+        df <- dplyr::tibble("A" = c(1, 2.2, 3.14),
+                            "B" = c("a", "b", "c"),
+                            "C" = c(TRUE, TRUE, FALSE),
+                            "D" = c("NA", "B", NA_character_),
+                            "E" = c(1L, 2L, 3L))
+
         # random product name for testing
         tmp_product_name <- "Unknown_Product"
 
         write_npx_parquet(
-          df = system.file("extdata", "npx_data_ext.parquet",
-                           package = "OlinkAnalyze",
-                           mustWork = TRUE) |>
-            read_npx_parquet() |>
-            dplyr::as_tibble() |>
-            dplyr::collect(),
+          df = df,
           npx_parquet_file = pfile_product,
           product = tmp_product_name
         )
 
         # check that the parquet file was created
-        expect(
-          file.exists(pfile_product),
-          failure_message = "Parquet file was not created!"
-        )
+        expect_true(file.exists(pfile_product))
 
         # check that relevant error is thrown
         expect_error(
@@ -185,11 +169,9 @@ test_that(
           regexp = paste0("Unsupported platform: \"", tmp_product_name, "\"")
         )
 
-        parquetfile_product <<- pfile_product
       }
     )
 
-    expect_false(file.exists(parquetfile_product))
   }
 )
 
@@ -198,32 +180,30 @@ test_that(
 test_that(
   "DataFileType field is correct",
   {
-    parquetfile_datafiletype <- character()
-
     withr::with_tempfile(
       new = "pfile_datafiletype",
       pattern = "parquet-file_alt-product-type",
       fileext = ".parquet",
       code = {
+
+        # random data frame
+        df <- dplyr::tibble("A" = c(1, 2.2, 3.14),
+                            "B" = c("a", "b", "c"),
+                            "C" = c(TRUE, TRUE, FALSE),
+                            "D" = c("NA", "B", NA_character_),
+                            "E" = c(1L, 2L, 3L))
+
         # random product name for testing
         tmp_datafiletype_name <- "Unknown File"
 
         write_npx_parquet(
-          df = system.file("extdata", "npx_data_ext.parquet",
-                           package = "OlinkAnalyze",
-                           mustWork = TRUE) |>
-            read_npx_parquet() |>
-            dplyr::as_tibble() |>
-            dplyr::collect(),
+          df = df,
           npx_parquet_file = pfile_datafiletype,
           data_file_type = tmp_datafiletype_name
         )
 
         # check that the parquet file was created
-        expect(
-          file.exists(pfile_datafiletype),
-          failure_message = "Parquet file was not created!"
-        )
+        expect_true(file.exists(pfile_datafiletype))
 
         # check that relevant error is thrown
         expect_error(
@@ -231,10 +211,53 @@ test_that(
           regexp = paste0("Unsupported file: \"", tmp_datafiletype_name, "\"")
         )
 
-        parquetfile_datafiletype <<- pfile_datafiletype
       }
     )
 
-    expect_false(file.exists(parquetfile_datafiletype))
+  }
+)
+
+# Test that a relevant error is thrown when the required metadata filed
+# DataFileType contains unexpected entries.
+test_that(
+  "Function returns arrowobject",
+  {
+    withr::with_tempfile(
+      new = "pfile_test",
+      pattern = "parquet-file_test",
+      fileext = ".parquet",
+      code = {
+
+        # random data frame
+        df <- dplyr::tibble("A" = c(1, 2.2, 3.14),
+                            "B" = c("a", "b", "c"),
+                            "C" = c(TRUE, TRUE, FALSE),
+                            "D" = c("NA", "B", NA_character_),
+                            "E" = c(1L, 2L, 3L)) |>
+          arrow::as_arrow_table()
+
+        # modify metadata ----
+        df$metadata$FileVersion <- "NA"
+        df$metadata$ProjectName <- "NA"
+        df$metadata$SampleMatrix <- "NA"
+        df$metadata$DataFileType <- "NPX File"
+        df$metadata$Product <- "ExploreHT"
+
+        # write the parquet file
+        arrow::write_parquet(x = df,
+                             sink = pfile_test,
+                             compression = "gzip")
+
+        # check that the semicolon delimited file exists
+        expect_true(file.exists(pfile_test))
+
+        # check that relevant error is thrown
+        expect_no_condition(
+          read_npx_parquet(file = pfile_test)
+        )
+
+      }
+    )
+
   }
 )
