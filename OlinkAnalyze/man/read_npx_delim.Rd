@@ -16,7 +16,7 @@ read_npx_csv(file, sep = NULL)
 semicolon (;).}
 }
 \value{
-A data frame
+An R6 ArrowObject data frame
 }
 \description{
 Help function to read in Olink data from comma or semicolon delimited files
