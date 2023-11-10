@@ -1,53 +1,128 @@
 test_that(
-  "check is scalar character works",
+  "check is scalar character works - TRUE",
   {
-    expect_no_condition(
-      check_is_scalar_character(string = "I_Shall_Pass")
+    expect_true(
+      check_is_scalar_character(string = "I_Shall_Pass",
+                                error = TRUE)
     )
 
-    expect_no_condition(
-      check_is_scalar_character(string = c("I_Shall_Pass"))
+    expect_true(
+      check_is_scalar_character(string = "I_Shall_Pass",
+                                error = FALSE)
     )
 
-    expect_no_condition(
+    expect_true(
+      check_is_scalar_character(string = c("I_Shall_Pass"),
+                                error = TRUE)
+    )
+
+    expect_true(
+      check_is_scalar_character(string = c("I_Shall_Pass"),
+                                error = FALSE)
+    )
+
+    expect_true(
       check_is_scalar_character(string = c("I_Shall_Pass",
-                                           NULL))
+                                           NULL),
+                                error = TRUE)
+    )
+
+    expect_true(
+      check_is_scalar_character(string = c("I_Shall_Pass",
+                                           NULL),
+                                error = FALSE)
+    )
+
+  }
+)
+
+test_that(
+  "check is scalar character works - FALSE",
+  {
+    expect_false(
+      check_is_scalar_character(string = c("I_Shall_Pass",
+                                           "I_Shall_Not_Pass"),
+                                error = FALSE)
+    )
+
+    expect_false(
+      check_is_scalar_character(string = c("I_Shall_Pass",
+                                           NA_character_),
+                                error = FALSE)
+    )
+
+    expect_false(
+      check_is_scalar_character(string = NA_character_,
+                                error = FALSE)
+    )
+
+    expect_false(
+      check_is_scalar_character(string = NULL,
+                                error = FALSE)
+    )
+
+    expect_false(
+      check_is_scalar_character(string = 1,
+                                error = FALSE)
+    )
+
+    expect_false(
+      check_is_scalar_character(string = 1L,
+                                error = FALSE)
+    )
+
+    expect_false(
+      check_is_scalar_character(string = TRUE,
+                                error = FALSE)
+    )
+
+  }
+)
+
+test_that(
+  "check is scalar character works - ERROR",
+  {
+    expect_error(
+      check_is_scalar_character(string = c("I_Shall_Pass",
+                                           "I_Shall_Not_Pass"),
+                                error = TRUE),
+      regexp = "must be a string!"
     )
 
     expect_error(
       check_is_scalar_character(string = c("I_Shall_Pass",
-                                           "I_Shall_Not_Pass")),
+                                           NA_character_),
+                                error = TRUE),
       regexp = "must be a string!"
     )
 
     expect_error(
-      check_is_scalar_character(string = c("I_Shall_Pass",
-                                           NA_character_)),
+      check_is_scalar_character(string = NA_character_,
+                                error = TRUE),
       regexp = "must be a string!"
     )
 
     expect_error(
-      check_is_scalar_character(string = NA_character_),
+      check_is_scalar_character(string = NULL,
+                                error = TRUE),
       regexp = "must be a string!"
     )
 
     expect_error(
-      check_is_scalar_character(string = NULL),
+      check_is_scalar_character(string = 1,
+                                error = TRUE),
       regexp = "must be a string!"
     )
 
     expect_error(
-      check_is_scalar_character(string = 1),
+      check_is_scalar_character(string = 1L,
+                                error = TRUE),
       regexp = "must be a string!"
     )
 
     expect_error(
-      check_is_scalar_character(string = 1L),
-      regexp = "must be a string!"
-    )
-
-    expect_error(
-      check_is_scalar_character(string = TRUE),
+      check_is_scalar_character(string = TRUE,
+                                error = TRUE),
       regexp = "must be a string!"
     )
 
