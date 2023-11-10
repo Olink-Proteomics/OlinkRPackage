@@ -4,6 +4,8 @@
 #' @param sep The separator of the file: NULL (autodetect), comma (,) or
 #' semicolon (;).
 #'
+#' @return An R6 ArrowObject data frame
+#'
 #' @keywords NPX csv txt delim sep
 #'
 read_npx_delim <- function(file,
@@ -48,11 +50,12 @@ read_npx_delim <- function(file,
   tryCatch(
     {
 
-      df_npx <- arrow::read_delim_arrow(
-        file = file,
+      df_npx <- arrow::open_delim_dataset(
+        sources = file,
         delim = sep,
-        na = c("NA", ""),
-        col_names = TRUE
+        quote = "\"",
+        col_names = TRUE,
+        na = c("","NA")
       )
 
     }, error = function(msg) {

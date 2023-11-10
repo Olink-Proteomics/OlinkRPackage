@@ -15,6 +15,9 @@ read_npx_csv(file, sep = NULL)
 \item{sep}{The separator of the file: NULL (autodetect), comma (,) or
 semicolon (;).}
 }
+\value{
+A data frame
+}
 \description{
 Help function to read in Olink data from comma or semicolon delimited files
 }
