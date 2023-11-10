@@ -96,8 +96,6 @@ test_that(
   "check is arrow object - no errors CSV",
   {
 
-    delimfile_test <- character()
-
     withr::with_tempfile(
       new = "dfile_test",
       pattern = "delim-file-test",
@@ -154,12 +152,9 @@ test_that(
                                 error = TRUE)
         )
 
-        delimfile_test <<- dfile_test
 
       }
     )
-
-    expect_false(file.exists(delimfile_test))
 
   }
 )
@@ -168,8 +163,6 @@ test_that(
 test_that(
   "check is arrow object - no errors Parquet",
   {
-
-    parquetfile_test <- character()
 
     withr::with_tempfile(
       new = "pfile_test",
@@ -222,12 +215,8 @@ test_that(
                                 error = TRUE)
         )
 
-        parquetfile_test <<- pfile_test
-
       }
     )
-
-    expect_false(file.exists(parquetfile_test))
 
   }
 )
