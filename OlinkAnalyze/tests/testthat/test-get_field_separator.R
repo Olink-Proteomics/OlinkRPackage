@@ -1,3 +1,37 @@
+# Test that the header line of the file is not empty or the file is empty
+test_that(
+  "check get_field_separator works - check empty haeder or file",
+  {
+
+    textfile_empty <- character()
+
+    withr::with_tempfile(
+      new = "tfile_empty",
+      pattern = "txt-file_semicolon",
+      fileext = ".txt",
+      code = {
+
+        # write some text in a txt file
+        writeLines(character(), tfile_empty)
+
+        # check that the file was created
+        expect_true(file.exists(tfile_empty))
+
+        # check that relevant error is thrown
+        expect_error(
+          get_field_separator(file = tfile_empty),
+          regexp = "Unable to read header line from"
+        )
+
+        textfile_empty <<- tfile_empty
+      }
+    )
+
+    expect_false(file.exists(textfile_empty))
+
+  }
+)
+
 # Test that the function returns a semicolon when the file is separated by
 # semicolon.
 test_that(

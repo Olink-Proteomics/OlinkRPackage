@@ -21,6 +21,20 @@ get_field_separator <- function(file) {
   # get the first line of the file
   file_line_1 <- readLines(file, n = 1L)
 
+  # throw an error if line 1 is empty or the file is empty
+  if (!rlang::is_string(file_line_1)) {
+
+    cli::cli_abort(
+      c(
+        "x" = "Unable to read header line from {file}",
+        "i" = "Empty header or empty file?"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
+  }
+
   # count fileds for semicolon
   num_fields_semicolon <- utils::count.fields(
     file = textConnection(file_line_1),
