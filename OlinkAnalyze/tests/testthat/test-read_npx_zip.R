@@ -3,8 +3,6 @@
 test_that(
   "Non-zip input is handled - random file",
   {
-    textfile_zip <- character()
-
     withr::with_tempfile(
       new = "txtfile_z",
       pattern = "txt-file_as_zip-file",
@@ -26,11 +24,9 @@ test_that(
           regexp = "Unable to open compressed file: "
         )
 
-        textfile_zip <<- txtfile_z
       }
     )
 
-    expect_false(file.exists(textfile_zip))
   }
 )
 
@@ -40,8 +36,6 @@ test_that(
 test_that(
   "Non-zip input is handled - corrupt zip file",
   {
-    txtfile_zipcorrupt <- character()
-
     withr::with_tempfile(
       new = "txtfile_zcorrupt",
       pattern = "txt-file_as_corrupt-zip-file",
@@ -63,11 +57,9 @@ test_that(
           regexp = "Unable to open compressed file: "
         )
 
-        txtfile_zipcorrupt <<- txtfile_zcorrupt
       }
     )
 
-    expect_false(file.exists(txtfile_zipcorrupt))
   }
 )
 
@@ -80,12 +72,8 @@ test_that(
   {
     readme_file <- file.path(tempdir(),
                              "README.txt")
-
     writeLines("foo", readme_file)
-
     expect_true(file.exists(readme_file))
-
-    zip_file <- character()
 
     withr::with_tempfile(
       new = "zip_test",
@@ -103,13 +91,10 @@ test_that(
           regexp = "No NPX and checksum file in the compressed file"
         )
 
-        zip_file <<- zip_test
+        file.remove(readme_file)
       }
     )
 
-    file.remove(readme_file)
-
-    expect_false(file.exists(zip_file))
     expect_false(file.exists(readme_file))
   }
 )
@@ -119,9 +104,6 @@ test_that(
 test_that(
   "read NPX zip - NPX file only",
   {
-    npxfile_test <- character()
-    zipfile_test <- character()
-
     withr::with_tempfile(
       new = "nfile_test",
       pattern = "npx",
@@ -156,16 +138,12 @@ test_that(
             # check that this works
             expect_no_condition(read_npx_zip(file = zfile_test))
 
-            zipfile_test <<- zfile_test
           }
         )
 
-        npxfile_test <<- nfile_test
       }
     )
 
-    expect_false(file.exists(npxfile_test))
-    expect_false(file.exists(zipfile_test))
   }
 )
 
@@ -178,9 +156,6 @@ test_that(
                                  "README.txt")
     writeLines("foo", readmefile_test)
     expect_true(file.exists(readmefile_test))
-
-    npxfile_test <- character()
-    zipfile_test <- character()
 
     withr::with_tempfile(
       new = "nfile_test",
@@ -215,20 +190,14 @@ test_that(
 
             # check that this works
             expect_no_condition(read_npx_zip(file = zfile_test))
-
-            zipfile_test <<- zfile_test
           }
         )
 
         file.remove(readmefile_test)
-
-        npxfile_test <<- nfile_test
       }
     )
 
     expect_false(file.exists(readmefile_test))
-    expect_false(file.exists(npxfile_test))
-    expect_false(file.exists(zipfile_test))
   }
 )
 
@@ -244,10 +213,6 @@ test_that(
                                  "README.txt")
     writeLines("foo", readmefile_test)
     expect_true(file.exists(readmefile_test))
-
-    npxfile_test <- character()
-    zipfile_test <- character()
-    randomfile_test <- character()
 
     withr::with_tempfile(
       new = "nfile_test",
@@ -293,24 +258,19 @@ test_that(
                 # check that this works
                 expect_no_condition(read_npx_zip(file = zfile_test))
 
-                randomfile_test <<- rfile_test
               }
             )
 
-            zipfile_test <<- zfile_test
           }
         )
 
         file.remove(readmefile_test)
 
-        npxfile_test <<- nfile_test
       }
     )
 
     expect_false(file.exists(readmefile_test))
-    expect_false(file.exists(npxfile_test))
-    expect_false(file.exists(zipfile_test))
-    expect_false(file.exists(randomfile_test))
+
   }
 )
 
@@ -325,10 +285,6 @@ test_that(
                                  "README.txt")
     writeLines("foo", readmefile_test)
     expect_true(file.exists(readmefile_test))
-
-    npxfile_test <- character()
-    zipfile_test <- character()
-    randomfile_test <- character()
 
     withr::with_tempfile(
       new = "nfile_test",
@@ -380,24 +336,19 @@ test_that(
                   )
                 )
 
-                randomfile_test <<- rfile_test
               }
             )
 
-            zipfile_test <<- zfile_test
           }
         )
 
         file.remove(readmefile_test)
 
-        npxfile_test <<- nfile_test
       }
     )
 
     expect_false(file.exists(readmefile_test))
-    expect_false(file.exists(npxfile_test))
-    expect_false(file.exists(zipfile_test))
-    expect_false(file.exists(randomfile_test))
+
   }
 )
 
@@ -412,10 +363,6 @@ test_that(
                                  "README.txt")
     writeLines("foo", readmefile_test)
     expect_true(file.exists(readmefile_test))
-
-    npxfile_test <- character()
-    zipfile_test <- character()
-    randomfile_test <- character()
 
     withr::with_tempfile(
       new = "nfile_test",
@@ -466,25 +413,19 @@ test_that(
                                       basename(rfile_test))
                   )
                 )
-
-                randomfile_test <<- rfile_test
               }
             )
 
-            zipfile_test <<- zfile_test
           }
         )
 
         file.remove(readmefile_test)
 
-        npxfile_test <<- nfile_test
       }
     )
 
     expect_false(file.exists(readmefile_test))
-    expect_false(file.exists(npxfile_test))
-    expect_false(file.exists(zipfile_test))
-    expect_false(file.exists(randomfile_test))
+
   }
 )
 
@@ -501,9 +442,6 @@ test_that(
     checksumfile_test <- file.path(tempdir(),
                                    "MD5_checksum.txt")
 
-    npxfile_test <- character()
-    zipfile_test <- character()
-
     withr::with_tempfile(
       new = "nfile_test",
       pattern = "npx",
@@ -548,20 +486,16 @@ test_that(
             # check that this works
             expect_no_condition(read_npx_zip(file = zfile_test))
 
-            zipfile_test <<- zfile_test
           }
         )
 
         file.remove(readmefile_test)
         file.remove(checksumfile_test)
 
-        npxfile_test <<- nfile_test
       }
     )
 
     expect_false(file.exists(readmefile_test))
-    expect_false(file.exists(npxfile_test))
-    expect_false(file.exists(zipfile_test))
     expect_false(file.exists(checksumfile_test))
   }
 )
@@ -573,9 +507,6 @@ test_that(
   {
     checksumfile_test <- file.path(tempdir(),
                                    "MD5_checksum.txt")
-
-    npxfile_test <- character()
-    zipfile_test <- character()
 
     withr::with_tempfile(
       new = "nfile_test",
@@ -619,20 +550,16 @@ test_that(
 
             # check that this works
             expect_no_condition(read_npx_zip(file = zfile_test))
-
-            zipfile_test <<- zfile_test
           }
         )
 
         file.remove(checksumfile_test)
 
-        npxfile_test <<- nfile_test
       }
     )
 
-    expect_false(file.exists(npxfile_test))
-    expect_false(file.exists(zipfile_test))
     expect_false(file.exists(checksumfile_test))
+
   }
 )
 
@@ -649,9 +576,6 @@ test_that(
     checksumfile_test <- file.path(tempdir(),
                                    "checksum_sha256.txt")
 
-    npxfile_test <- character()
-    zipfile_test <- character()
-
     withr::with_tempfile(
       new = "nfile_test",
       pattern = "npx",
@@ -696,22 +620,18 @@ test_that(
 
             # check that this works
             expect_no_condition(read_npx_zip(file = zfile_test))
-
-            zipfile_test <<- zfile_test
           }
         )
 
         file.remove(readmefile_test)
         file.remove(checksumfile_test)
 
-        npxfile_test <<- nfile_test
       }
     )
 
     expect_false(file.exists(readmefile_test))
-    expect_false(file.exists(npxfile_test))
-    expect_false(file.exists(zipfile_test))
     expect_false(file.exists(checksumfile_test))
+
   }
 )
 
@@ -722,9 +642,6 @@ test_that(
   {
     checksumfile_test <- file.path(tempdir(),
                                    "checksum_sha256.txt")
-
-    npxfile_test <- character()
-    zipfile_test <- character()
 
     withr::with_tempfile(
       new = "nfile_test",
@@ -770,19 +687,16 @@ test_that(
             # check that this works
             expect_no_condition(read_npx_zip(file = zfile_test))
 
-            zipfile_test <<- zfile_test
           }
         )
 
         file.remove(checksumfile_test)
 
-        npxfile_test <<- nfile_test
       }
     )
 
-    expect_false(file.exists(npxfile_test))
-    expect_false(file.exists(zipfile_test))
     expect_false(file.exists(checksumfile_test))
+
   }
 )
 
@@ -800,9 +714,6 @@ test_that(
     checksumfile_test <- file.path(tempdir(),
                                    "checksum_sha256.txt")
 
-    npxfile_test <- character()
-    zipfile_test <- character()
-
     withr::with_tempfile(
       new = "nfile_test",
       pattern = "npx",
@@ -849,21 +760,18 @@ test_that(
               regexp = "The checksum of the NPX file does not match the one"
             )
 
-            zipfile_test <<- zfile_test
           }
         )
 
         file.remove(readmefile_test)
         file.remove(checksumfile_test)
 
-        npxfile_test <<- nfile_test
       }
     )
 
     expect_false(file.exists(readmefile_test))
-    expect_false(file.exists(npxfile_test))
-    expect_false(file.exists(zipfile_test))
     expect_false(file.exists(checksumfile_test))
+
   }
 )
 
@@ -875,9 +783,6 @@ test_that(
   {
     checksumfile_test <- file.path(tempdir(),
                                    "checksum_sha256.txt")
-
-    npxfile_test <- character()
-    zipfile_test <- character()
 
     withr::with_tempfile(
       new = "nfile_test",
@@ -924,18 +829,15 @@ test_that(
               regexp = "The checksum of the NPX file does not match the one"
             )
 
-            zipfile_test <<- zfile_test
           }
         )
 
         file.remove(checksumfile_test)
 
-        npxfile_test <<- nfile_test
       }
     )
 
-    expect_false(file.exists(npxfile_test))
-    expect_false(file.exists(zipfile_test))
     expect_false(file.exists(checksumfile_test))
+
   }
 )
