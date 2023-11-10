@@ -101,7 +101,7 @@ test_that(
   }
 )
 
-# Test read delim works when sep is NULL
+# Test read delim works when sep is NULL - comma-delimited
 test_that(
   "read NPX delim works - sep is NULL",
   {
@@ -179,13 +179,60 @@ test_that(
   }
 )
 
-# Test read delim throws an error when sep is NULL
+# Test read delim throws an error when file is not delimited
 test_that(
-  "read NPX delim works - sep is NULL",
+  "read NPX delim error - file not delimited",
   {
 
     withr::with_tempfile(
-      new = c("cdfile_test", "scdfile_test"),
+      new = "pfile_test",
+      pattern = "parquet-file_test",
+      fileext = ".parquet",
+      code = {
+
+        # random data frame
+        df <- dplyr::tibble("A" = c(1, 2.2, 3.14),
+                            "B" = c("a", "b", "c"),
+                            "C" = c(TRUE, TRUE, FALSE),
+                            "D" = c("NA", "B", NA_character_),
+                            "E" = c(1L, 2L, 3L)) |>
+          arrow::as_arrow_table()
+
+        # modify metadata ----
+        df$metadata$FileVersion <- "NA"
+        df$metadata$ProjectName <- "NA"
+        df$metadata$SampleMatrix <- "NA"
+        df$metadata$DataFileType <- "NPX File"
+        df$metadata$Product <- "ExploreHT"
+
+        # write the parquet file
+        arrow::write_parquet(x = df,
+                             sink = pfile_test,
+                             compression = "gzip")
+
+        # check that the semicolon delimited file exists
+        expect_true(file.exists(pfile_test))
+
+        # check that relevant error is thrown
+        expect_error(
+          read_npx_delim(file = pfile_test,
+                         sep = ","),
+          regexp = "Unable to open delimited file:"
+        )
+
+      }
+    )
+
+  }
+)
+
+# Test read delim throws warning when wrong separator
+test_that(
+  "read NPX delim works - wrong sep",
+  {
+
+    withr::with_tempfile(
+      new = "cdfile_test",
       pattern = "delim-file-test",
       fileext = ".txt",
       code = {
@@ -213,42 +260,10 @@ test_that(
         expect_true(file.exists(cdfile_test))
 
         # chech that reading the file works
-        expect_no_condition(
-          coma_df <- read_npx_delim(file = cdfile_test,
-                                    sep = NULL)
-        )
-
-        # check that variable exists
-        expect_true(exists("coma_df"))
-
-        # write the semicolon-delimited file
-        utils::write.table(x = df,
-                           file = scdfile_test,
-                           append = FALSE,
-                           quote = FALSE,
-                           sep = ";",
-                           eol = "\n",
-                           na = "",
-                           dec = ".",
-                           row.names = FALSE,
-                           col.names = TRUE)
-
-        # check that the semicolon delimited file exists
-        expect_true(file.exists(scdfile_test))
-
-        # chech that reading the file works
-        expect_no_condition(
-          semicolon_df <- read_npx_delim(file = scdfile_test,
-                                         sep = NULL)
-        )
-
-        # check that variable exists
-        expect_true(exists("semicolon_df"))
-
-        # check that the two dataframes are identical
-        expect_equal(
-          object = dplyr::as_tibble(coma_df),
-          expected = dplyr::as_tibble(semicolon_df)
+        expect_warning(
+          read_npx_delim(file = cdfile_test,
+                         sep = ";"),
+          regexp = "Wrong input sep \";\"?"
         )
 
       }

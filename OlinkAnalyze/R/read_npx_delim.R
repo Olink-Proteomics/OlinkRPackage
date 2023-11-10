@@ -52,7 +52,7 @@ read_npx_delim <- function(file,
         delim = sep,
         quote = "\"",
         col_names = TRUE,
-        na = c("","NA")
+        na = c("", "NA")
       )
 
     }, error = function(msg) {
@@ -68,6 +68,17 @@ read_npx_delim <- function(file,
 
     }
   )
+
+  if (length(names(df_npx)) == 1L) {
+
+    cli::cli_warn(
+      message = "The delimited file {file} has only one column. Wrong input sep
+      \"{sep}\"?",
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
+  }
 
   return(df_npx)
 }
