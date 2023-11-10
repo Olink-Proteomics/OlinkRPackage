@@ -1,19 +1,38 @@
-# Test that the function throws no errors, warning or messages when the file
-# exists
+# Test that the function returns TRUE when the file exists
 test_that(
   "check file exists works - file present", {
 
-    # path to the sample parquet file
-    parquet_file <- system.file("extdata",
-                                "npx_data_ext.parquet",
-                                package = "OlinkAnalyze",
-                                mustWork = TRUE)
+    withr::with_tempfile(
+      new = "tfile_test",
+      pattern = "text-file-test",
+      fileext = ".csv",
+      code = {
 
-    expect_no_condition(
-      object = check_file_exists(
-        file = parquet_file
-      )
+        # write soemthing to file
+        writeLines("foo", tfile_test)
+
+        # check if file exists
+        expect_true(file.exists(tfile_test))
+
+        # expect TRUE to return
+        expect_true(
+          object = check_file_exists(
+            file = tfile_test,
+            error = FALSE
+          )
+        )
+
+        # expect TRUE to return
+        expect_true(
+          object = check_file_exists(
+            file = tfile_test,
+            error = TRUE
+          )
+        )
+
+      }
     )
+
   }
 )
 
@@ -21,14 +40,33 @@ test_that(
 test_that(
   "check file exists works - file missing", {
 
-    missing_file <- file.path(tempdir(),
-                              "I_Am_A_MissinG_FilE")
+    withr::with_tempfile(
+      new = "tfile_test",
+      pattern = "text-file-test",
+      fileext = ".csv",
+      code = {
 
-    expect_error(
-      object = check_file_exists(
-        file = missing_file
-      ),
-      regexp = "Unable to locate file"
+        # check if file exists
+        expect_false(file.exists(tfile_test))
+
+        # expect TRUE to return
+        expect_false(
+          object = check_file_exists(
+            file = tfile_test,
+            error = FALSE
+          )
+        )
+
+        # expect TRUE to return
+        expect_error(
+          object = check_file_exists(
+            file = tfile_test,
+            error = TRUE
+          ),
+          regexp = "Unable to locate file"
+        )
+
+      }
     )
 
   }

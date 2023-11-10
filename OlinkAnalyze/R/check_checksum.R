@@ -24,7 +24,7 @@ check_checksum <- function(checksum_file,
     tolower()
 
   # Get checksum from NPX file
-  if (file.exists(npx_file)) {
+  if (check_file_exists(file = npx_file, error = FALSE)) {
 
     if (grepl("md5", checksum_file_stripped)) {
 
@@ -56,7 +56,7 @@ check_checksum <- function(checksum_file,
   }
 
 
-  if (file.exists(checksum_file)) {
+  if (check_file_exists(file = checksum_file, error = FALSE)) {
 
     # check that checksum matches NPX csv file
     checksum_file_read_con <- file(checksum_file, "r")

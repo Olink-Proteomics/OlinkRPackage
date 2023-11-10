@@ -4,10 +4,12 @@
 \alias{check_file_exists}
 \title{Help function checking if file exists.}
 \usage{
-check_file_exists(file)
+check_file_exists(file, error = FALSE)
 }
 \arguments{
 \item{file}{Path to the file.}
+
+\item{error}{Boolean to return error or a boolean (default).}
 }
 \description{
 Only one file at a time!
