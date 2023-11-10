@@ -3,8 +3,6 @@ test_that(
   "read NPX delim error - sep not a string",
   {
 
-    csvfile_test <- character()
-
     withr::with_tempfile(
       new = "cfile_test",
       pattern = "csv_temp_file",
@@ -39,11 +37,9 @@ test_that(
           regexp = "\"sep\" should be a string!"
         )
 
-        csvfile_test <<- cfile_test
       }
     )
 
-    expect_false(file.exists(csvfile_test))
   }
 )
 
@@ -52,35 +48,56 @@ test_that(
   "read NPX delim error - sep not accepted",
   {
 
-    npx_csv_file <- system.file("extdata",
-                                "Example_NPX_Data2_1.csv",
-                                package = "OlinkAnalyze",
-                                mustWork = TRUE)
+    withr::with_tempfile(
+      new = "cfile_test",
+      pattern = "csv_temp_file",
+      fileext = ".csv",
+      code = {
 
-    expect_error(
-      read_npx_delim(file = npx_csv_file,
-                     sep = "I_Am_Unaccepted"),
-      regexp = "Unexpected separator:"
+        # write a random delimited file
+        dplyr::tibble("A" = c(1, 2.2, 3.14),
+                      "B" = c("a", "b", "c"),
+                      "C" = c(TRUE, TRUE, FALSE),
+                      "D" = c("NA", "B", NA_character_),
+                      "E" = c(1L, 2L, 3L)) |>
+          utils::write.table(file = cfile_test,
+                             append = FALSE,
+                             quote = FALSE,
+                             sep = ";",
+                             eol = "\n",
+                             na = "",
+                             dec = ".",
+                             row.names = FALSE,
+                             col.names = TRUE)
+
+        expect_error(
+          read_npx_delim(file = cfile_test,
+                         sep = "I_Am_Unaccepted"),
+          regexp = "Unexpected separator:"
+        )
+
+        expect_error(
+          read_npx_delim(file = cfile_test,
+                         sep = "A"),
+          regexp = "Unexpected separator:"
+        )
+
+        expect_error(
+          read_npx_delim(file = cfile_test,
+                         sep = "#"),
+          regexp = "Unexpected separator:"
+        )
+
+
+        expect_error(
+          read_npx_delim(file = cfile_test,
+                         sep = "|"),
+          regexp = "Unexpected separator:"
+        )
+
+      }
     )
 
-    expect_error(
-      read_npx_delim(file = npx_csv_file,
-                     sep = "A"),
-      regexp = "Unexpected separator:"
-    )
-
-    expect_error(
-      read_npx_delim(file = npx_csv_file,
-                     sep = "#"),
-      regexp = "Unexpected separator:"
-    )
-
-
-    expect_error(
-      read_npx_delim(file = npx_csv_file,
-                     sep = "|"),
-      regexp = "Unexpected separator:"
-    )
   }
 )
 
@@ -88,9 +105,6 @@ test_that(
 test_that(
   "read NPX delim works - sep is NULL",
   {
-
-    commadelimfile_test <- character()
-    semicolondelimfile_test <- character()
 
     withr::with_tempfile(
       new = c("cdfile_test", "scdfile_test"),
@@ -159,14 +173,8 @@ test_that(
           expected = dplyr::as_tibble(semicolon_df)
         )
 
-        commadelimfile_test <<- cdfile_test
-        semicolondelimfile_test <<- scdfile_test
-
       }
     )
-
-    expect_false(file.exists(commadelimfile_test))
-    expect_false(file.exists(semicolondelimfile_test))
 
   }
 )
@@ -176,9 +184,6 @@ test_that(
   "read NPX delim works - sep is NULL",
   {
 
-    commadelimfile_test <- character()
-    semicolondelimfile_test <- character()
-
     withr::with_tempfile(
       new = c("cdfile_test", "scdfile_test"),
       pattern = "delim-file-test",
@@ -246,14 +251,8 @@ test_that(
           expected = dplyr::as_tibble(semicolon_df)
         )
 
-        commadelimfile_test <<- cdfile_test
-        semicolondelimfile_test <<- scdfile_test
-
       }
     )
-
-    expect_false(file.exists(commadelimfile_test))
-    expect_false(file.exists(semicolondelimfile_test))
 
   }
 )

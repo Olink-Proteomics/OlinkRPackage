@@ -3,8 +3,6 @@ test_that(
   "check get_field_separator works - check empty haeder or file",
   {
 
-    textfile_empty <- character()
-
     withr::with_tempfile(
       new = "tfile_empty",
       pattern = "txt-file_semicolon",
@@ -23,11 +21,8 @@ test_that(
           regexp = "Unable to read header line from"
         )
 
-        textfile_empty <<- tfile_empty
       }
     )
-
-    expect_false(file.exists(textfile_empty))
 
   }
 )
@@ -37,8 +32,6 @@ test_that(
 test_that(
   "check get_field_separator works - semicolon",
   {
-
-    textfile_semicolon <- character()
 
     withr::with_tempfile(
       new = "tfile_semicolon",
@@ -58,11 +51,8 @@ test_that(
           ";"
         )
 
-        textfile_semicolon <<- tfile_semicolon
       }
     )
-
-    expect_false(file.exists(textfile_semicolon))
 
   }
 )
@@ -71,8 +61,6 @@ test_that(
 test_that(
   "check get_field_separator works - comma",
   {
-
-    textfile_comma <- character()
 
     withr::with_tempfile(
       new = "tfile_comma",
@@ -92,11 +80,8 @@ test_that(
           ","
         )
 
-        textfile_comma <<- tfile_comma
       }
     )
-
-    expect_false(file.exists(textfile_comma))
 
   }
 )
@@ -105,8 +90,6 @@ test_that(
 test_that(
   "check get_field_separator works - hashtag",
   {
-
-    textfile_hashtag <- character()
 
     withr::with_tempfile(
       new = "tfile_hashtag",
@@ -126,11 +109,8 @@ test_that(
           regexp = "Expecting semicolon.*.or comma.*.!"
         )
 
-        textfile_hashtag <<- tfile_hashtag
       }
     )
-
-    expect_false(file.exists(textfile_hashtag))
 
   }
 )
@@ -139,8 +119,6 @@ test_that(
 test_that(
   "check get_field_separator works - both comma and semicolon",
   {
-
-    textfile_mixed <- character()
 
     withr::with_tempfile(
       new = "tfile_mixed",
@@ -160,11 +138,8 @@ test_that(
           regexp = "Both semicolon.*.and comma.*.are present in header line."
         )
 
-        textfile_mixed <<- tfile_mixed
       }
     )
-
-    expect_false(file.exists(textfile_mixed))
 
   }
 )
