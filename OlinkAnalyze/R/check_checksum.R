@@ -14,8 +14,10 @@ check_checksum <- function(checksum_file,
   # present in the zip file.
 
   # check if input is character vectors of length 1
-  check_is_scalar_character(string = checksum_file)
-  check_is_scalar_character(string = npx_file)
+  check_is_scalar_character(string = checksum_file,
+                            error = TRUE)
+  check_is_scalar_character(string = npx_file,
+                            error = TRUE)
 
   # make the checksum filename easier to parse
   checksum_file_stripped <- checksum_file |>

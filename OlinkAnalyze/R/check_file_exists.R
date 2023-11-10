@@ -11,7 +11,8 @@ check_file_exists <- function(file,
                               error = FALSE) {
 
   # check if input is character vector of length 1
-  check_is_scalar_character(string = file)
+  check_is_scalar_character(string = file,
+                            error = TRUE)
 
   if (!file.exists(file)) {
 
