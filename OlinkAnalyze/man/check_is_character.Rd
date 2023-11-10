@@ -4,10 +4,12 @@
 \alias{check_is_character}
 \title{Help function checking if a variable is a character vector.}
 \usage{
-check_is_character(string)
+check_is_character(string, error = FALSE)
 }
 \arguments{
 \item{string}{Input to check.}
+
+\item{error}{Boolean to return error or a boolean (default).}
 }
 \value{
 An error if the input is not a character vector.
