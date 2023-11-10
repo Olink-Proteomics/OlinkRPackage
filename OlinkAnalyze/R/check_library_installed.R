@@ -1,25 +1,40 @@
 #' Help function to check if suggested libraries are installed when required.
 #'
 #' @param libraries A character vector of R libraries.
+#' @param error Boolean to return error or a boolean (default).
 #'
 #' @return An error if one of the libraries is missing.
 #'
-check_library_installed <- function(libraries) {
+check_library_installed <- function(libraries,
+                                    error = FALSE) {
 
   # check that the input is a character vector
-  check_is_character(string = libraries)
+  check_is_character(string = libraries,
+                     error = TRUE)
 
   # check that required libraries are installed
   if (!rlang::is_installed(libraries)) {
 
-    cli::cli_abort(
-      c(
-        "x" = "One or more missing libraries: {libraries}",
-        "i" = "Please install the required R libraries!"
-      ),
-      call = rlang::caller_env(),
-      wrap = FALSE
-    )
+    if (error == TRUE) {
+
+      cli::cli_abort(
+        c(
+          "x" = "One or more missing libraries: {libraries}",
+          "i" = "Please install the required R libraries!"
+        ),
+        call = rlang::caller_env(),
+        wrap = FALSE
+      )
+
+    } else {
+
+      return(FALSE)
+
+    }
+
+  } else {
+
+    return(TRUE)
 
   }
 

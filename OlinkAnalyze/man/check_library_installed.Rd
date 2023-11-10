@@ -4,10 +4,12 @@
 \alias{check_library_installed}
 \title{Help function to check if suggested libraries are installed when required.}
 \usage{
-check_library_installed(libraries)
+check_library_installed(libraries, error = FALSE)
 }
 \arguments{
 \item{libraries}{A character vector of R libraries.}
+
+\item{error}{Boolean to return error or a boolean (default).}
 }
 \value{
 An error if one of the libraries is missing.
