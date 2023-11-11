@@ -86,31 +86,31 @@ test_that(
 
     expect_error(
       check_is_boolean(bool = "I_Shall_Pass",
-                       error = FALSE),
+                       error = TRUE),
       regexp = "must be a boolean vector!"
     )
 
     expect_error(
       check_is_boolean(bool = NA_character_,
-                       error = FALSE),
+                       error = TRUE),
       regexp = "must be a boolean vector!"
     )
 
     expect_error(
       check_is_boolean(bool = NULL,
-                       error = FALSE),
+                       error = TRUE),
       regexp = "must be a boolean vector!"
     )
 
     expect_error(
       check_is_boolean(bool = 1L,
-                       error = FALSE),
+                       error = TRUE),
       regexp = "must be a boolean vector!"
     )
 
     expect_error(
       check_is_boolean(bool = 1,
-                       error = FALSE),
+                       error = TRUE),
       regexp = "must be a boolean vector!"
     )
 
