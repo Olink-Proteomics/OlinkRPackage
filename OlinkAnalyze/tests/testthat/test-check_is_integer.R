@@ -81,7 +81,7 @@ test_that(
 )
 
 test_that(
-  "check is integer works - FALSE",
+  "check is integer works - ERROR",
   {
 
     expect_error(
