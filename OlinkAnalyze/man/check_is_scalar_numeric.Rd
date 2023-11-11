@@ -12,7 +12,7 @@ check_is_scalar_numeric(num, error = FALSE)
 \item{error}{Boolean to return error or a boolean (default).}
 }
 \value{
-An error if the input is not a character vector of length 1
+An error if the input is not a numeric vector of length 1
 }
 \description{
 Help function checking if a variable is a numeric vector of length 1.

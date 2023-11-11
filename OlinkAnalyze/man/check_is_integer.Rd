@@ -2,7 +2,7 @@
 % Please edit documentation in R/check_is_integer.R
 \name{check_is_integer}
 \alias{check_is_integer}
-\title{Help function checking if a variable is a integer vector.}
+\title{Help function checking if a variable is an integer vector.}
 \usage{
 check_is_integer(int, error = FALSE)
 }
@@ -15,5 +15,5 @@ check_is_integer(int, error = FALSE)
 An error if the input is not a character vector.
 }
 \description{
-Help function checking if a variable is a integer vector.
+Help function checking if a variable is an integer vector.
 }

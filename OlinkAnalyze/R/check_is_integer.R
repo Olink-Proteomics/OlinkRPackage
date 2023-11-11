@@ -1,4 +1,4 @@
-#' Help function checking if a variable is a integer vector.
+#' Help function checking if a variable is an integer vector.
 #'
 #' @param int Input to check.
 #' @param error Boolean to return error or a boolean (default).
