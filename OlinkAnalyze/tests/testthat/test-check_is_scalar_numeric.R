@@ -79,7 +79,7 @@ test_that(
     )
 
     expect_false(
-      check_is_scalar_numeric(num = c("3.14",
+      check_is_scalar_numeric(num = c(3.14,
                                       NA_character_),
                               error = FALSE)
     )
