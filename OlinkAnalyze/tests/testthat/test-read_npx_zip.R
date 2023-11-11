@@ -110,13 +110,21 @@ test_that(
       fileext = ".parquet",
       code = {
 
-        parquet_file <- system.file("extdata",
-                                    "npx_data_ext.parquet",
-                                    package = "OlinkAnalyze",
-                                    mustWork = TRUE)
-
-        # copy the sample parquet file to a temp file
-        file.copy(parquet_file, nfile_test)
+        # write the coma-delimited file
+        dplyr::tibble("A" = c(1, 2.2, 3.14),
+                      "B" = c("a", "b", "c"),
+                      "C" = c(TRUE, TRUE, FALSE),
+                      "D" = c("NA", "B", NA_character_),
+                      "E" = c(1L, 2L, 3L)) |>
+          utils::write.table(file = nfile_test,
+                             append = FALSE,
+                             quote = FALSE,
+                             sep = ";",
+                             eol = "\n",
+                             na = "",
+                             dec = ".",
+                             row.names = FALSE,
+                             col.names = TRUE)
 
         # check that the parquet file was created
         expect_true(file.exists(nfile_test))
@@ -163,13 +171,21 @@ test_that(
       fileext = ".parquet",
       code = {
 
-        parquet_file <- system.file("extdata",
-                                    "npx_data_ext.parquet",
-                                    package = "OlinkAnalyze",
-                                    mustWork = TRUE)
-
-        # copy the sample parquet file to a temp file
-        file.copy(parquet_file, nfile_test)
+        # write the coma-delimited file
+        dplyr::tibble("A" = c(1, 2.2, 3.14),
+                      "B" = c("a", "b", "c"),
+                      "C" = c(TRUE, TRUE, FALSE),
+                      "D" = c("NA", "B", NA_character_),
+                      "E" = c(1L, 2L, 3L)) |>
+          utils::write.table(file = nfile_test,
+                             append = FALSE,
+                             quote = FALSE,
+                             sep = ";",
+                             eol = "\n",
+                             na = "",
+                             dec = ".",
+                             row.names = FALSE,
+                             col.names = TRUE)
 
         # check that the parquet file was created
         expect_true(file.exists(nfile_test))
@@ -220,13 +236,21 @@ test_that(
       fileext = ".parquet",
       code = {
 
-        parquet_file <- system.file("extdata",
-                                    "npx_data_ext.parquet",
-                                    package = "OlinkAnalyze",
-                                    mustWork = TRUE)
-
-        # copy the sample parquet file to a temp file
-        file.copy(parquet_file, nfile_test)
+        # write the coma-delimited file
+        dplyr::tibble("A" = c(1, 2.2, 3.14),
+                      "B" = c("a", "b", "c"),
+                      "C" = c(TRUE, TRUE, FALSE),
+                      "D" = c("NA", "B", NA_character_),
+                      "E" = c(1L, 2L, 3L)) |>
+          utils::write.table(file = nfile_test,
+                             append = FALSE,
+                             quote = FALSE,
+                             sep = ";",
+                             eol = "\n",
+                             na = "",
+                             dec = ".",
+                             row.names = FALSE,
+                             col.names = TRUE)
 
         # check that the parquet file was created
         expect_true(file.exists(nfile_test))
@@ -292,13 +316,21 @@ test_that(
       fileext = ".parquet",
       code = {
 
-        parquet_file <- system.file("extdata",
-                                    "npx_data_ext.parquet",
-                                    package = "OlinkAnalyze",
-                                    mustWork = TRUE)
-
-        # copy the sample parquet file to a temp file
-        file.copy(parquet_file, nfile_test)
+        # write the coma-delimited file
+        dplyr::tibble("A" = c(1, 2.2, 3.14),
+                      "B" = c("a", "b", "c"),
+                      "C" = c(TRUE, TRUE, FALSE),
+                      "D" = c("NA", "B", NA_character_),
+                      "E" = c(1L, 2L, 3L)) |>
+          utils::write.table(file = nfile_test,
+                             append = FALSE,
+                             quote = FALSE,
+                             sep = ";",
+                             eol = "\n",
+                             na = "",
+                             dec = ".",
+                             row.names = FALSE,
+                             col.names = TRUE)
 
         # check that the parquet file was created
         expect_true(file.exists(nfile_test))
@@ -370,13 +402,21 @@ test_that(
       fileext = ".parquet",
       code = {
 
-        parquet_file <- system.file("extdata",
-                                    "npx_data_ext.parquet",
-                                    package = "OlinkAnalyze",
-                                    mustWork = TRUE)
-
-        # copy the sample parquet file to a temp file
-        file.copy(parquet_file, nfile_test)
+        # write the coma-delimited file
+        dplyr::tibble("A" = c(1, 2.2, 3.14),
+                      "B" = c("a", "b", "c"),
+                      "C" = c(TRUE, TRUE, FALSE),
+                      "D" = c("NA", "B", NA_character_),
+                      "E" = c(1L, 2L, 3L)) |>
+          utils::write.table(file = nfile_test,
+                             append = FALSE,
+                             quote = FALSE,
+                             sep = ";",
+                             eol = "\n",
+                             na = "",
+                             dec = ".",
+                             row.names = FALSE,
+                             col.names = TRUE)
 
         # check that the parquet file was created
         expect_true(file.exists(nfile_test))
@@ -448,13 +488,21 @@ test_that(
       fileext = ".parquet",
       code = {
 
-        parquet_file <- system.file("extdata",
-                                    "npx_data_ext.parquet",
-                                    package = "OlinkAnalyze",
-                                    mustWork = TRUE)
-
-        # copy the sample parquet file to a temp file
-        file.copy(parquet_file, nfile_test)
+        # write the coma-delimited file
+        dplyr::tibble("A" = c(1, 2.2, 3.14),
+                      "B" = c("a", "b", "c"),
+                      "C" = c(TRUE, TRUE, FALSE),
+                      "D" = c("NA", "B", NA_character_),
+                      "E" = c(1L, 2L, 3L)) |>
+          utils::write.table(file = nfile_test,
+                             append = FALSE,
+                             quote = FALSE,
+                             sep = ";",
+                             eol = "\n",
+                             na = "",
+                             dec = ".",
+                             row.names = FALSE,
+                             col.names = TRUE)
 
         # check that the parquet file was created
         expect_true(file.exists(nfile_test))
@@ -514,13 +562,21 @@ test_that(
       fileext = ".parquet",
       code = {
 
-        parquet_file <- system.file("extdata",
-                                    "npx_data_ext.parquet",
-                                    package = "OlinkAnalyze",
-                                    mustWork = TRUE)
-
-        # copy the sample parquet file to a temp file
-        file.copy(parquet_file, nfile_test)
+        # write the coma-delimited file
+        dplyr::tibble("A" = c(1, 2.2, 3.14),
+                      "B" = c("a", "b", "c"),
+                      "C" = c(TRUE, TRUE, FALSE),
+                      "D" = c("NA", "B", NA_character_),
+                      "E" = c(1L, 2L, 3L)) |>
+          utils::write.table(file = nfile_test,
+                             append = FALSE,
+                             quote = FALSE,
+                             sep = ";",
+                             eol = "\n",
+                             na = "",
+                             dec = ".",
+                             row.names = FALSE,
+                             col.names = TRUE)
 
         # check that the parquet file was created
         expect_true(file.exists(nfile_test))
@@ -582,13 +638,21 @@ test_that(
       fileext = ".parquet",
       code = {
 
-        parquet_file <- system.file("extdata",
-                                    "npx_data_ext.parquet",
-                                    package = "OlinkAnalyze",
-                                    mustWork = TRUE)
-
-        # copy the sample parquet file to a temp file
-        file.copy(parquet_file, nfile_test)
+        # write the coma-delimited file
+        dplyr::tibble("A" = c(1, 2.2, 3.14),
+                      "B" = c("a", "b", "c"),
+                      "C" = c(TRUE, TRUE, FALSE),
+                      "D" = c("NA", "B", NA_character_),
+                      "E" = c(1L, 2L, 3L)) |>
+          utils::write.table(file = nfile_test,
+                             append = FALSE,
+                             quote = FALSE,
+                             sep = ";",
+                             eol = "\n",
+                             na = "",
+                             dec = ".",
+                             row.names = FALSE,
+                             col.names = TRUE)
 
         # check that the parquet file was created
         expect_true(file.exists(nfile_test))
@@ -649,13 +713,21 @@ test_that(
       fileext = ".parquet",
       code = {
 
-        parquet_file <- system.file("extdata",
-                                    "npx_data_ext.parquet",
-                                    package = "OlinkAnalyze",
-                                    mustWork = TRUE)
-
-        # copy the sample parquet file to a temp file
-        file.copy(parquet_file, nfile_test)
+        # write the coma-delimited file
+        dplyr::tibble("A" = c(1, 2.2, 3.14),
+                      "B" = c("a", "b", "c"),
+                      "C" = c(TRUE, TRUE, FALSE),
+                      "D" = c("NA", "B", NA_character_),
+                      "E" = c(1L, 2L, 3L)) |>
+          utils::write.table(file = nfile_test,
+                             append = FALSE,
+                             quote = FALSE,
+                             sep = ";",
+                             eol = "\n",
+                             na = "",
+                             dec = ".",
+                             row.names = FALSE,
+                             col.names = TRUE)
 
         # check that the parquet file was created
         expect_true(file.exists(nfile_test))
@@ -720,13 +792,21 @@ test_that(
       fileext = ".parquet",
       code = {
 
-        parquet_file <- system.file("extdata",
-                                    "npx_data_ext.parquet",
-                                    package = "OlinkAnalyze",
-                                    mustWork = TRUE)
-
-        # copy the sample parquet file to a temp file
-        file.copy(parquet_file, nfile_test)
+        # write the coma-delimited file
+        dplyr::tibble("A" = c(1, 2.2, 3.14),
+                      "B" = c("a", "b", "c"),
+                      "C" = c(TRUE, TRUE, FALSE),
+                      "D" = c("NA", "B", NA_character_),
+                      "E" = c(1L, 2L, 3L)) |>
+          utils::write.table(file = nfile_test,
+                             append = FALSE,
+                             quote = FALSE,
+                             sep = ";",
+                             eol = "\n",
+                             na = "",
+                             dec = ".",
+                             row.names = FALSE,
+                             col.names = TRUE)
 
         # check that the parquet file was created
         expect_true(file.exists(nfile_test))
@@ -790,13 +870,21 @@ test_that(
       fileext = ".parquet",
       code = {
 
-        parquet_file <- system.file("extdata",
-                                    "npx_data_ext.parquet",
-                                    package = "OlinkAnalyze",
-                                    mustWork = TRUE)
-
-        # copy the sample parquet file to a temp file
-        file.copy(parquet_file, nfile_test)
+        # write the coma-delimited file
+        dplyr::tibble("A" = c(1, 2.2, 3.14),
+                      "B" = c("a", "b", "c"),
+                      "C" = c(TRUE, TRUE, FALSE),
+                      "D" = c("NA", "B", NA_character_),
+                      "E" = c(1L, 2L, 3L)) |>
+          utils::write.table(file = nfile_test,
+                             append = FALSE,
+                             quote = FALSE,
+                             sep = ";",
+                             eol = "\n",
+                             na = "",
+                             dec = ".",
+                             row.names = FALSE,
+                             col.names = TRUE)
 
         # check that the parquet file was created
         expect_true(file.exists(nfile_test))

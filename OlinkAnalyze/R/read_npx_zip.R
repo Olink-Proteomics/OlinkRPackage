@@ -139,7 +139,7 @@ read_npx_zip <-
     }
 
     # read the NPX file
-    df_npx <- read_npx_parquet(file = extracted_file_npx)
+    df_npx <- read_npx_delim(file = extracted_file_npx)
 
     # cleanup temporary directory with extracted files
     invisible(unlink(x = tmp_unzip_dir, recursive = TRUE))
