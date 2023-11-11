@@ -3,12 +3,12 @@
 #' @param int Input to check.
 #' @param error Boolean to return error or a boolean (default).
 #'
-#' @return An error if the input is not a character vector.
+#' @return An error if the input is not an integer vector.
 #'
 check_is_integer <- function(int,
                              error = FALSE) {
 
-  # check that the input is a character vector
+  # check that the input is an integer vector
   if (!rlang::is_integer(int)
       || any(rlang::are_na(int))) {
 

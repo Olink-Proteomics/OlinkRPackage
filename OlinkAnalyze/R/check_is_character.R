@@ -3,12 +3,12 @@
 #' @param string Input to check.
 #' @param error Boolean to return error or a boolean (default).
 #'
-#' @return An error if the input is not a character vector.
+#' @return An error if the input is not a numeric vector.
 #'
 check_is_character <- function(string,
                                error = FALSE) {
 
-  # check that the input is a character vector
+  # check that the input is a numeric vector
   if (!rlang::is_character(string)
       || any(rlang::are_na(string))) {
 
