@@ -73,7 +73,6 @@ Imports:
     tidyr,
     tidyselect
 Suggests: 
-    glue,
     openssl,
     testthat (>= 3.0.0),
     zip

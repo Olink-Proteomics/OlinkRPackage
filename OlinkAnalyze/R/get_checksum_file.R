@@ -26,9 +26,8 @@ get_checksum_file <- function(files) {
       c(
         "x" = "The compressed file contains too many checksum files!",
         "i" = "The compressed input file should contain {.strong only} one
-          checksum file: { glue::glue_collapse(x = accepted_checksum_files,
-                                               sep = \", \",
-                                               last = \" or \") }."
+          checksum file: { cli::ansi_collapse(x = accepted_checksum_files,
+                                              last = \", or \") }."
       ),
       call = rlang::caller_env(),
       wrap = FALSE
