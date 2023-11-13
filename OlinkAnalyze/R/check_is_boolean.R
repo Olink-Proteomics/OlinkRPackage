@@ -9,10 +9,6 @@
 check_is_boolean <- function(bool,
                              error = FALSE) {
 
-  # check if input error is boolean vector of length 1
-  check_is_scalar_boolean(bool = error,
-                          error = TRUE)
-
   # check that the input is a boolean vector
   if (!rlang::is_logical(bool)
       || any(rlang::are_na(bool))) {
