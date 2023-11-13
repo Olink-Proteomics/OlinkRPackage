@@ -8,6 +8,10 @@
 check_is_arrow_object <- function(var,
                                   error = FALSE) {
 
+  # check if input error is boolean vector of length 1
+  check_is_scalar_boolean(bool = error,
+                          error = TRUE)
+
   if (!all(c("ArrowObject", "R6") %in% class(var))) {
 
     if (error == TRUE) {

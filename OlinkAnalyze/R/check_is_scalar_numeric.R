@@ -8,6 +8,10 @@
 check_is_scalar_numeric <- function(num,
                                     error = FALSE) {
 
+  # check if input error is boolean vector of length 1
+  check_is_scalar_boolean(bool = error,
+                          error = TRUE)
+
   # check that the input is a character vector of length 1
   if ((!rlang::is_scalar_double(num) && !rlang::is_scalar_integer(num))
       || rlang::is_na(num)) {

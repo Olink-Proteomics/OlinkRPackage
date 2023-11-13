@@ -8,6 +8,10 @@
 check_is_character <- function(string,
                                error = FALSE) {
 
+  # check if input error is boolean vector of length 1
+  check_is_scalar_boolean(bool = error,
+                          error = TRUE)
+
   # check that the input is a numeric vector
   if (!rlang::is_character(string)
       || any(rlang::are_na(string))) {

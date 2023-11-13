@@ -8,6 +8,10 @@
 check_is_integer <- function(int,
                              error = FALSE) {
 
+  # check if input error is boolean vector of length 1
+  check_is_scalar_boolean(bool = error,
+                          error = TRUE)
+
   # check that the input is an integer vector
   if (!rlang::is_integer(int)
       || any(rlang::are_na(int))) {

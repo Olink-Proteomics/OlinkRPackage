@@ -12,6 +12,10 @@ check_library_installed <- function(libraries,
   check_is_character(string = libraries,
                      error = TRUE)
 
+  # check if input error is boolean vector of length 1
+  check_is_scalar_boolean(bool = error,
+                          error = TRUE)
+
   # check that required libraries are installed
   if (!rlang::is_installed(libraries)) {
 

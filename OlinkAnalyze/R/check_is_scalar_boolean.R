@@ -8,6 +8,10 @@
 check_is_scalar_boolean <- function(bool,
                                     error = FALSE) {
 
+  # check if input error is boolean vector of length 1
+  check_is_scalar_boolean(bool = error,
+                          error = TRUE)
+
   # check that the input is a character vector of length 1
   if (!rlang::is_scalar_logical(bool)
       || rlang::is_na(bool)) {
