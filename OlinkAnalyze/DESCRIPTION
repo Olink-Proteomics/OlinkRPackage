@@ -76,4 +76,5 @@ Suggests:
     openssl,
     testthat (>= 3.0.0),
     withr,
+    writexl,
     zip
