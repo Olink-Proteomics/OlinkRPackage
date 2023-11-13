@@ -12,7 +12,8 @@ check_is_arrow_object(var, error = FALSE)
 \item{error}{Boolean to return error or a boolean (default).}
 }
 \value{
-An error if the variable is not an R6 ArrowObject.
+Boolean if the file is an R6 ArrowObject or not, and an error if
+`error = TRUE`.
 }
 \description{
 Help function to check if a variable is an R6 ArrowObject.

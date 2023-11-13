@@ -4,6 +4,7 @@
 #' @param checksum_file The plain file that contains the checksum output from
 #' Olink software. The file should contain "MD5" or "SHA256" in the file name.
 #' @param npx_file The NPX file accompanying the checksum file.
+#'
 #' @return A string or NA. If the function return NA then everything worked
 #' fine, otherwise there was some sort of error.
 #'

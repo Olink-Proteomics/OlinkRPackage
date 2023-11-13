@@ -3,7 +3,8 @@
 #' @param int Input to check.
 #' @param error Boolean to return error or a boolean (default).
 #'
-#' @return An error if the input is not an integer vector.
+#' @return Boolean if the variable is an integer vector or not, and an error if
+#' `error = TRUE`.or.
 #'
 check_is_integer <- function(int,
                              error = FALSE) {

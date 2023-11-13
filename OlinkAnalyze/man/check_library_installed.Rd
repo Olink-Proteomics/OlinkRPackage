@@ -12,7 +12,8 @@ check_library_installed(libraries, error = FALSE)
 \item{error}{Boolean to return error or a boolean (default).}
 }
 \value{
-An error if one of the libraries is missing.
+Boolean if the library is installed or not, and an error if
+`error = TRUE`.
 }
 \description{
 Help function to check if suggested libraries are installed when required.

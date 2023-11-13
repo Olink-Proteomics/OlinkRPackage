@@ -3,7 +3,8 @@
 #' @param num Input to check.
 #' @param error Boolean to return error or a boolean (default).
 #'
-#' @return An error if the input is not a numeric vector of length 1
+#' @return Boolean if the variable is a numeric vector of length 1 or not, and
+#' an error if `error = TRUE`.
 #'
 check_is_scalar_numeric <- function(num,
                                     error = FALSE) {

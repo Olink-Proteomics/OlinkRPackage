@@ -12,7 +12,8 @@ check_is_scalar_boolean(bool, error = FALSE)
 \item{error}{Boolean to return error or a boolean (default).}
 }
 \value{
-An error if the input is not a boolean vector of length 1
+Boolean if the variable is a boolean vector of length 1 or not, and
+an error if `error = TRUE`.
 }
 \description{
 Help function checking if a variable is a boolean vector of length 1.

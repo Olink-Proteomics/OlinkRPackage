@@ -3,7 +3,8 @@
 #' @param string Input to check.
 #' @param error Boolean to return error or a boolean (default).
 #'
-#' @return An error if the input is not a numeric vector.
+#' @return Boolean if the variable is a character vector or not, and an error if
+#' `error = TRUE`.
 #'
 check_is_character <- function(string,
                                error = FALSE) {

@@ -12,7 +12,8 @@ check_is_character(string, error = FALSE)
 \item{error}{Boolean to return error or a boolean (default).}
 }
 \value{
-An error if the input is not a numeric vector.
+Boolean if the variable is a character vector or not, and an error if
+`error = TRUE`.
 }
 \description{
 Help function checking if a variable is a character vector.

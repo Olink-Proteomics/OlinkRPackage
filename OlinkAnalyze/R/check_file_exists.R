@@ -6,6 +6,7 @@
 #' @description
 #' Only one file at a time!
 #'
+#' @return Boolean if the file exists or not, and an error if `error = TRUE`.
 #'
 check_file_exists <- function(file,
                               error = FALSE) {

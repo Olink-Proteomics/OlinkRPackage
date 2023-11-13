@@ -12,7 +12,8 @@ check_is_scalar_integer(int, error = FALSE)
 \item{error}{Boolean to return error or a boolean (default).}
 }
 \value{
-An error if the input is not an integer vector of length 1
+Boolean if the variable is an integer vector of length 1 or not, and
+an error if `error = TRUE`.
 }
 \description{
 Help function checking if a variable is an integer vector of length 1.

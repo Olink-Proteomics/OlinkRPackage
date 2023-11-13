@@ -3,7 +3,8 @@
 #' @param var Variable to check.
 #' @param error Boolean to return error or a boolean (default).
 #'
-#' @return An error if the variable is not an R6 ArrowObject.
+#' @return Boolean if the file is an R6 ArrowObject or not, and an error if
+#' `error = TRUE`.
 #'
 check_is_arrow_object <- function(var,
                                   error = FALSE) {

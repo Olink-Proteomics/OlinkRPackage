@@ -11,6 +11,9 @@ check_file_exists(file, error = FALSE)
 
 \item{error}{Boolean to return error or a boolean (default).}
 }
+\value{
+Boolean if the file exists or not, and an error if `error = TRUE`.
+}
 \description{
 Only one file at a time!
 }

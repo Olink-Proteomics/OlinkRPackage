@@ -3,7 +3,8 @@
 #' @param libraries A character vector of R libraries.
 #' @param error Boolean to return error or a boolean (default).
 #'
-#' @return An error if one of the libraries is missing.
+#' @return Boolean if the library is installed or not, and an error if
+#' `error = TRUE`.
 #'
 check_library_installed <- function(libraries,
                                     error = FALSE) {

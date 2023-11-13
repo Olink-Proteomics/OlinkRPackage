@@ -12,7 +12,8 @@ check_is_integer(int, error = FALSE)
 \item{error}{Boolean to return error or a boolean (default).}
 }
 \value{
-An error if the input is not an integer vector.
+Boolean if the variable is an integer vector or not, and an error if
+`error = TRUE`.or.
 }
 \description{
 Help function checking if a variable is an integer vector.

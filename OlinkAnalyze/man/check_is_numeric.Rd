@@ -12,7 +12,8 @@ check_is_numeric(num, error = FALSE)
 \item{error}{Boolean to return error or a boolean (default).}
 }
 \value{
-An error if the input is not a character vector.
+Boolean if the variable is a numeric vector or not, and an error if
+`error = TRUE`.
 }
 \description{
 Help function checking if a variable is a numeric vector.
