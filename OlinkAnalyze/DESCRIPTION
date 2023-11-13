@@ -75,4 +75,5 @@ Imports:
 Suggests: 
     openssl,
     testthat (>= 3.0.0),
+    withr,
     zip
