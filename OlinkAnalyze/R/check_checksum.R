@@ -14,6 +14,11 @@ check_checksum <- function(checksum_file,
   # We should make it here only if MD5_checksum.txt or checksum_sha256.txt are
   # present in the zip file.
 
+  check_library_installed(
+    libraries = c("openssl"),
+    error = TRUE
+  )
+
   # check if input is character vectors of length 1
   check_is_scalar_character(string = checksum_file,
                             error = TRUE)
