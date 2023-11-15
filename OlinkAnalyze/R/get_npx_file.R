@@ -38,9 +38,8 @@ get_npx_file <- function(files) {
       c(
         "x" = "The compressed file contains {err_msg} NPX files!",
         "i" = "The compressed input file should contain {.strong only} one NPX
-          file with extension: { glue::glue_collapse(x = npx_ext_no_zip,
-                                                     sep = \", \",
-                                                     last = \" or \") }."
+          file with extension: { cli::ansi_collapse(x = npx_ext_no_zip,
+                                                    last = \", or \") }."
       ),
       call = rlang::caller_env(),
       wrap = FALSE
