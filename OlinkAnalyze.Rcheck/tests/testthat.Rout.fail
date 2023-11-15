@@ -1,0 +1,84 @@
+
+R version 4.2.0 (2022-04-22) -- "Vigorous Calisthenics"
+Copyright (C) 2022 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> # This file is part of the standard setup for testthat.
+> # It is recommended that you do not modify it.
+> #
+> # Where should you do additional test configuration?
+> # Learn more about the roles of various files in:
+> # * https://r-pkgs.org/testing-design.html#sec-tests-files-overview
+> # * https://testthat.r-lib.org/articles/special-files.html
+> 
+> library(testthat)
+> library(OlinkAnalyze)
+> 
+> test_check("OlinkAnalyze")
+[ FAIL 5 | WARN 0 | SKIP 0 | PASS 386 ]
+
+══ Failed tests ════════════════════════════════════════════════════════════════
+── Error ('test-Read_NPX_data.R:7:3'): Data loads correctly with 'read_NPX()' ──
+Error in `read_NPX(filename = npx_file)`: Unrecognized input file extension!
+Backtrace:
+    ▆
+ 1. └─OlinkAnalyze::read_NPX(filename = npx_file) at test-Read_NPX_data.R:7:2
+── Error ('test-Read_NPX_data.R:110:3'): data completeness check ───────────────
+Error in `check_data_completeness(.)`: could not find function "check_data_completeness"
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_warning(...) at test-Read_NPX_data.R:110:2
+ 2. │ └─testthat:::expect_condition_matching(...)
+ 3. │   └─testthat:::quasi_capture(...)
+ 4. │     ├─testthat (local) .capture(...)
+ 5. │     │ └─base::withCallingHandlers(...)
+ 6. │     └─rlang::eval_bare(quo_get_expr(.quo), quo_get_env(.quo))
+ 7. └─... %>% check_data_completeness()
+── Error ('test-Read_NPX_data.R:132:7'): # in SampleID ─────────────────────────
+Error in `read_npx_csv(filename = filename)`: unused argument (filename = filename)
+Backtrace:
+    ▆
+ 1. ├─base::suppressWarnings(read_NPX(testthat::test_path("refs/mock_sampleID_hashes.csv"))) at test-Read_NPX_data.R:132:6
+ 2. │ └─base::withCallingHandlers(...)
+ 3. └─OlinkAnalyze::read_NPX(testthat::test_path("refs/mock_sampleID_hashes.csv"))
+ 4.   └─OlinkAnalyze:::read_NPX_explore(filename = filename)
+── Error ('test-Read_NPX_data.R:143:3'): # in SampleID ─────────────────────────
+Error in `read_NPX(testthat::test_path("refs/Flex_test_data_long_quant.xlsx"))`: Unrecognized input file extension!
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_message(...) at test-Read_NPX_data.R:143:2
+ 2. │ └─testthat:::expect_condition_matching(...)
+ 3. │   └─testthat:::quasi_capture(...)
+ 4. │     ├─testthat (local) .capture(...)
+ 5. │     │ └─base::withCallingHandlers(...)
+ 6. │     └─rlang::eval_bare(quo_get_expr(.quo), quo_get_env(.quo))
+ 7. └─OlinkAnalyze::read_NPX(testthat::test_path("refs/Flex_test_data_long_quant.xlsx"))
+── Error ('test-Read_NPX_data.R:155:3'): extra column ──────────────────────────
+Error in `read_npx_csv(filename = filename)`: unused argument (filename = filename)
+Backtrace:
+    ▆
+ 1. ├─testthat::expect_no_warning(read_NPX(testthat::test_path("refs/mock_sampleID_hashes.csv"))) at test-Read_NPX_data.R:155:2
+ 2. │ └─testthat:::expect_no_(...)
+ 3. │   └─testthat:::quasi_capture(enquo(object), NULL, capture)
+ 4. │     ├─testthat (local) .capture(...)
+ 5. │     │ └─rlang::try_fetch(...)
+ 6. │     │   └─base::withCallingHandlers(...)
+ 7. │     └─rlang::eval_bare(quo_get_expr(.quo), quo_get_env(.quo))
+ 8. └─OlinkAnalyze::read_NPX(testthat::test_path("refs/mock_sampleID_hashes.csv"))
+ 9.   └─OlinkAnalyze:::read_NPX_explore(filename = filename)
+
+[ FAIL 5 | WARN 0 | SKIP 0 | PASS 386 ]
+Error: Test failures
+Execution halted

@@ -1,0 +1,115 @@
+* using log directory ‘/home/Olink.local/klev.diamanti/OlinkRPackage/OlinkAnalyze.Rcheck’
+* using R version 4.2.0 (2022-04-22)
+* using platform: x86_64-pc-linux-gnu (64-bit)
+* using session charset: UTF-8
+* using options ‘--no-manual --as-cran’
+* checking for file ‘OlinkAnalyze/DESCRIPTION’ ... OK
+* checking extension type ... Package
+* this is package ‘OlinkAnalyze’ version ‘3.4.1’
+* package encoding: UTF-8
+* checking package namespace information ... OK
+* checking package dependencies ... OK
+* checking if this is a source package ... OK
+* checking if there is a namespace ... OK
+* checking for executable files ... OK
+* checking for hidden files and directories ... OK
+* checking for portable file names ... OK
+* checking for sufficient/correct file permissions ... OK
+* checking whether package ‘OlinkAnalyze’ can be installed ... WARNING
+Found the following significant warnings:
+  Note: possible error in 'read_npx_zip(filename = filename)': unused argument (filename = filename) 
+  Note: possible error in 'read_npx_csv(filename = filename)': unused argument (filename = filename) 
+See ‘/home/Olink.local/klev.diamanti/OlinkRPackage/OlinkAnalyze.Rcheck/00install.out’ for details.
+Information on the location(s) of code generating the ‘Note’s can be
+obtained by re-running with environment variable R_KEEP_PKG_SOURCE set
+to ‘yes’.
+* checking installed package size ... OK
+* checking package directory ... OK
+* checking for future file timestamps ... OK
+* checking DESCRIPTION meta-information ... OK
+* checking top-level files ... OK
+* checking for left-over files ... OK
+* checking index information ... OK
+* checking package subdirectories ... OK
+* checking R files for non-ASCII characters ... OK
+* checking R files for syntax errors ... OK
+* checking whether the package can be loaded ... OK
+* checking whether the package can be loaded with stated dependencies ... OK
+* checking whether the package can be unloaded cleanly ... OK
+* checking whether the namespace can be loaded with stated dependencies ... OK
+* checking whether the namespace can be unloaded cleanly ... OK
+* checking loading without being on the library search path ... OK
+* checking dependencies in R code ... NOTE
+Namespaces in Imports field not imported from:
+  ‘kableExtra’ ‘knitr’ ‘readxl’ ‘tidyselect’
+  All declared Imports should be used.
+* checking S3 generic/method consistency ... OK
+* checking replacement functions ... OK
+* checking foreign function calls ... OK
+* checking R code for possible problems ... NOTE
+read_NPX_explore: possible error in read_npx_zip(filename = filename):
+  unused argument (filename = filename)
+read_NPX_explore: possible error in read_npx_csv(filename = filename):
+  unused argument (filename = filename)
+read_NPX_explore: no visible binding for global variable ‘Panel’
+read_NPX_explore: no visible binding for global variable ‘Panel_End’
+read_NPX_explore: no visible binding for global variable ‘Panel_Start’
+Undefined global functions or variables:
+  Panel Panel_End Panel_Start
+* checking Rd files ... OK
+* checking Rd metadata ... OK
+* checking Rd line widths ... OK
+* checking Rd cross-references ... OK
+* checking for missing documentation entries ... OK
+* checking for code/documentation mismatches ... OK
+* checking Rd \usage sections ... OK
+* checking Rd contents ... OK
+* checking for unstated dependencies in examples ... OK
+* checking contents of ‘data’ directory ... OK
+* checking data for non-ASCII characters ... OK
+* checking LazyData ... OK
+* checking data for ASCII and uncompressed saves ... OK
+* checking examples ... OK
+* checking examples with --run-donttest ... ERROR
+Running examples in ‘OlinkAnalyze-Ex.R’ failed
+The error most likely occurred in:
+
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: read_NPX
+> ### Title: Function to read NPX data into long format
+> ### Aliases: read_NPX
+> ### Keywords: NPX
+> 
+> ### ** Examples
+> 
+> ## No test: 
+> file <- system.file("extdata", "Example_NPX_Data.csv", package = "OlinkAnalyze")
+> read_NPX(file)
+Error in read_npx_csv(filename = filename) : 
+  unused argument (filename = filename)
+Calls: read_NPX -> read_NPX_explore
+Execution halted
+* checking for unstated dependencies in ‘tests’ ... OK
+* checking tests ... ERROR
+  Running ‘testthat.R’
+Running the tests in ‘tests/testthat.R’ failed.
+Last 13 lines of output:
+  Backtrace:
+      ▆
+   1. ├─testthat::expect_no_warning(read_NPX(testthat::test_path("refs/mock_sampleID_hashes.csv"))) at test-Read_NPX_data.R:155:2
+   2. │ └─testthat:::expect_no_(...)
+   3. │   └─testthat:::quasi_capture(enquo(object), NULL, capture)
+   4. │     ├─testthat (local) .capture(...)
+   5. │     │ └─rlang::try_fetch(...)
+   6. │     │   └─base::withCallingHandlers(...)
+   7. │     └─rlang::eval_bare(quo_get_expr(.quo), quo_get_env(.quo))
+   8. └─OlinkAnalyze::read_NPX(testthat::test_path("refs/mock_sampleID_hashes.csv"))
+   9.   └─OlinkAnalyze:::read_NPX_explore(filename = filename)
+  
+  [ FAIL 5 | WARN 0 | SKIP 0 | PASS 386 ]
+  Error: Test failures
+  Execution halted
+* checking for non-standard things in the check directory ... OK
+* checking for detritus in the temp directory ... OK
+* DONE
+Status: 2 ERRORs, 1 WARNING, 2 NOTEs
