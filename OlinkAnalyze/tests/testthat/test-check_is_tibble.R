@@ -248,3 +248,35 @@ test_that(
 
   }
 )
+
+# Test that no errors are thrown when a data.frame is converted to tibble
+test_that(
+  "check is tibble - data.frame - TRUE",
+  {
+
+    # random data frame
+    df <- dplyr::tibble(
+      "A" = c(1, 2.2, 3.14),
+      "B" = c("a", "b", "c"),
+      "C" = c(TRUE, TRUE, FALSE),
+      "D" = c("NA", "B", NA_character_),
+      "E" = c(1L, 2L, 3L)
+    )
+
+    # check that variable exists
+    expect_true(exists("df"))
+
+    # check if check_is_tibble returns TRUE
+    expect_true(
+      check_is_tibble(df = df,
+                      error = FALSE)
+    )
+
+    # check if check_is_tibble returns TRUE
+    expect_true(
+      check_is_tibble(df = df,
+                      error = TRUE)
+    )
+
+  }
+)
