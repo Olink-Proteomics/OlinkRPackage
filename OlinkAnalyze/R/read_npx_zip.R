@@ -13,8 +13,7 @@ read_npx_zip <-
 
     # Check if all required libraries for this function are installed
     check_library_installed(
-      libraries = c("openssl",
-                    "zip"),
+      libraries = c("zip"),
       error = TRUE
     )
 
