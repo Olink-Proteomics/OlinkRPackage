@@ -2,12 +2,12 @@
 % Please edit documentation in R/check_is_arrow_object.R
 \name{check_is_arrow_object}
 \alias{check_is_arrow_object}
-\title{Help function to check if a variable is an R6 ArrowObject.}
+\title{Help function to check if a data frame is an R6 ArrowObject.}
 \usage{
-check_is_arrow_object(var, error = FALSE)
+check_is_arrow_object(df, error = FALSE)
 }
 \arguments{
-\item{var}{Variable to check.}
+\item{df}{Data frame to check.}
 
 \item{error}{Boolean to return error or a boolean (default).}
 }
@@ -16,5 +16,5 @@ Boolean if the file is an R6 ArrowObject or not, and an error if
 `error = TRUE`.
 }
 \description{
-Help function to check if a variable is an R6 ArrowObject.
+Help function to check if a data frame is an R6 ArrowObject.
 }

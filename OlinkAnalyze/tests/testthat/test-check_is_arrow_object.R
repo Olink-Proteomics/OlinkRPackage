@@ -1,42 +1,72 @@
 # Test that relevant errors are thrown when non-ArrowObjects are checked
 test_that(
-  "check is arrow object - relevant errors",
+  "check is arrow object - ERROR",
   {
+
     expect_error(
-      check_is_arrow_object(var = c("I_Shall_Pass",
-                                    NA_character_),
-                            error = TRUE),
-      regexp = "is not an R6 ArrowObject!"
+      object = check_is_arrow_object(df = c("I_Shall_Pass",
+                                            NA_character_),
+                                     error = TRUE),
+      regexp = gsub(pattern = " ",
+                    replacement = "([[:space:]].*|\\n.*)?",
+                    x = "is not an R6 ArrowObject!",
+                    fixed = TRUE)
     )
 
     expect_error(
-      check_is_arrow_object(var = NA_character_,
-                            error = TRUE),
-      regexp = "is not an R6 ArrowObject!"
+      object = check_is_arrow_object(df = NA_character_,
+                                     error = TRUE),
+      regexp = gsub(pattern = " ",
+                    replacement = "([[:space:]].*|\\n.*)?",
+                    x = "is not an R6 ArrowObject!",
+                    fixed = TRUE)
     )
 
     expect_error(
-      check_is_arrow_object(var = NULL,
-                            error = TRUE),
-      regexp = "is not an R6 ArrowObject!"
+      object = check_is_arrow_object(df = NULL,
+                                     error = TRUE),
+      regexp = gsub(pattern = " ",
+                    replacement = "([[:space:]].*|\\n.*)?",
+                    x = "is not an R6 ArrowObject!",
+                    fixed = TRUE)
     )
 
     expect_error(
-      check_is_arrow_object(var = 1,
-                            error = TRUE),
-      regexp = "is not an R6 ArrowObject!"
+      object = check_is_arrow_object(df = 1,
+                                     error = TRUE),
+      regexp = gsub(pattern = " ",
+                    replacement = "([[:space:]].*|\\n.*)?",
+                    x = "is not an R6 ArrowObject!",
+                    fixed = TRUE)
     )
 
     expect_error(
-      check_is_arrow_object(var = 1L,
-                            error = TRUE),
-      regexp = "is not an R6 ArrowObject!"
+      object = check_is_arrow_object(df = 1L,
+                                     error = TRUE),
+      regexp = gsub(pattern = " ",
+                    replacement = "([[:space:]].*|\\n.*)?",
+                    x = "is not an R6 ArrowObject!",
+                    fixed = TRUE)
     )
 
     expect_error(
-      check_is_arrow_object(var = TRUE,
-                            error = TRUE),
-      regexp = "is not an R6 ArrowObject!"
+      object = check_is_arrow_object(df = TRUE,
+                                     error = TRUE),
+      regexp = gsub(pattern = " ",
+                    replacement = "([[:space:]].*|\\n.*)?",
+                    x = "is not an R6 ArrowObject!",
+                    fixed = TRUE)
+    )
+
+    expect_error(
+      object = check_is_arrow_object(df = data.frame(a = c(1, 2),
+                                                     b = c("a", "b"),
+                                                     c = c(TRUE, FALSE)),
+                                     error = TRUE),
+      regexp = gsub(pattern = " ",
+                    replacement = "([[:space:]].*|\\n.*)?",
+                    x = "is not an R6 ArrowObject!",
+                    fixed = TRUE)
     )
 
   }
@@ -44,47 +74,44 @@ test_that(
 
 # Test that FALSE is returned when a non-ArrowObject
 test_that(
-  "check is arrow object - return FALSE",
+  "check is arrow object - FALSE",
   {
+
     expect_false(
-      check_is_arrow_object(var = c("I_Shall_Pass",
-                                    NA_character_),
+      check_is_arrow_object(df = c("I_Shall_Pass",
+                                   NA_character_),
                             error = FALSE)
     )
 
     expect_false(
-      check_is_arrow_object(var = NA_character_,
+      check_is_arrow_object(df = NA_character_,
                             error = FALSE)
     )
 
     expect_false(
-      check_is_arrow_object(var = NULL,
+      check_is_arrow_object(df = NULL,
                             error = FALSE)
     )
 
     expect_false(
-      check_is_arrow_object(var = 1,
+      check_is_arrow_object(df = 1,
                             error = FALSE)
     )
 
     expect_false(
-      check_is_arrow_object(var = 1L,
+      check_is_arrow_object(df = 1L,
                             error = FALSE)
     )
 
     expect_false(
-      check_is_arrow_object(var = TRUE,
+      check_is_arrow_object(df = TRUE,
                             error = FALSE)
     )
 
-    # random data frame
-    df <- dplyr::tibble("A" = c(1, 2.2, 3.14),
-                        "B" = c("a", "b", "c"),
-                        "C" = c(TRUE, TRUE, FALSE),
-                        "D" = c("NA", "B", NA_character_),
-                        "E" = c(1L, 2L, 3L))
     expect_false(
-      check_is_arrow_object(var = df,
+      check_is_arrow_object(df = data.frame(a = c(1, 2),
+                                            b = c("a", "b"),
+                                            c = c(TRUE, FALSE)),
                             error = FALSE)
     )
 
@@ -93,7 +120,7 @@ test_that(
 
 # Test that no errors are thrown when csv file is read by arrow
 test_that(
-  "check is arrow object - no errors CSV",
+  "check is arrow object - csv - TRUE",
   {
 
     withr::with_tempfile(
@@ -103,38 +130,43 @@ test_that(
       code = {
 
         # random data frame
-        df <- dplyr::tibble("A" = c(1, 2.2, 3.14),
-                            "B" = c("a", "b", "c"),
-                            "C" = c(TRUE, TRUE, FALSE),
-                            "D" = c("NA", "B", NA_character_),
-                            "E" = c(1L, 2L, 3L))
+        df <- dplyr::tibble(
+          "A" = c(1, 2.2, 3.14),
+          "B" = c("a", "b", "c"),
+          "C" = c(TRUE, TRUE, FALSE),
+          "D" = c("NA", "B", NA_character_),
+          "E" = c(1L, 2L, 3L)
+        )
 
         sep_arrow <- ","
 
         # write the coma-delimited file
-        utils::write.table(x = df,
-                           file = dfile_test,
-                           append = FALSE,
-                           quote = FALSE,
-                           sep = sep_arrow,
-                           eol = "\n",
-                           na = "",
-                           dec = ".",
-                           row.names = FALSE,
-                           col.names = TRUE)
+        utils::write.table(
+          x = df,
+          file = dfile_test,
+          append = FALSE,
+          quote = FALSE,
+          sep = sep_arrow,
+          eol = "\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = TRUE
+        )
 
         # check that the comma delimited file exists
         expect_true(file.exists(dfile_test))
 
         # check that reading the file works
         expect_no_condition(
-          df_arrow <- arrow::open_delim_dataset(
-            sources = dfile_test,
-            delim = sep_arrow,
-            quote = "\"",
-            col_names = TRUE,
-            na = c("", "NA")
-          )
+          df_arrow <- utils::read.delim(
+            file = dfile_test,
+            header = TRUE,
+            sep = sep_arrow,
+            na.strings = c("NA", ""),
+            stringsAsFactors = FALSE
+          ) |>
+            arrow::as_arrow_table()
         )
 
         # check that variable exists
@@ -142,16 +174,15 @@ test_that(
 
         # check if return from check_is_arrow_object is TRUE
         expect_true(
-          check_is_arrow_object(var = df_arrow,
+          check_is_arrow_object(df = df_arrow,
                                 error = FALSE)
         )
 
         # check if return from check_is_arrow_object is TRUE
         expect_true(
-          check_is_arrow_object(var = df_arrow,
+          check_is_arrow_object(df = df_arrow,
                                 error = TRUE)
         )
-
 
       }
     )
@@ -161,7 +192,7 @@ test_that(
 
 # Test that no errors are thrown when csv file is read by arrow
 test_that(
-  "check is arrow object - no errors Parquet",
+  "check is arrow object - parquet - TRUE",
   {
 
     withr::with_tempfile(
@@ -171,24 +202,20 @@ test_that(
       code = {
 
         # random data frame
-        df <- dplyr::tibble("A" = c(1, 2.2, 3.14),
-                            "B" = c("a", "b", "c"),
-                            "C" = c(TRUE, TRUE, FALSE),
-                            "D" = c("NA", "B", NA_character_),
-                            "E" = c(1L, 2L, 3L)) |>
-          arrow::as_arrow_table()
-
-        # modify metadata ----
-        df$metadata$FileVersion <- "NA"
-        df$metadata$ProjectName <- "NA"
-        df$metadata$SampleMatrix <- "NA"
-        df$metadata$DataFileType <- "NPX File"
-        df$metadata$Product <- "ExploreHT"
+        df <- dplyr::tibble(
+          "A" = c(1, 2.2, 3.14),
+          "B" = c("a", "b", "c"),
+          "C" = c(TRUE, TRUE, FALSE),
+          "D" = c("NA", "B", NA_character_),
+          "E" = c(1L, 2L, 3L)
+        )
 
         # write the parquet file
-        arrow::write_parquet(x = df,
-                             sink = pfile_test,
-                             compression = "gzip")
+        arrow::write_parquet(
+          x = df,
+          sink = pfile_test,
+          compression = "gzip"
+        )
 
         # check that the semicolon delimited file exists
         expect_true(file.exists(pfile_test))
@@ -205,17 +232,48 @@ test_that(
 
         # check if check_is_arrow_object returns TRUE
         expect_true(
-          check_is_arrow_object(var = df_arrow,
+          check_is_arrow_object(df = df_arrow,
                                 error = FALSE)
         )
 
         # check if check_is_arrow_object returns TRUE
         expect_true(
-          check_is_arrow_object(var = df_arrow,
+          check_is_arrow_object(df = df_arrow,
                                 error = TRUE)
         )
 
       }
+    )
+
+  }
+)
+
+# Test that no errors are thrown when a data.frame is converted to an arrow
+# table
+test_that(
+  "check is arrow object - data.frame - TRUE",
+  {
+
+    # random data frame
+    df <- dplyr::tibble(
+      "A" = c(1, 2.2, 3.14),
+      "B" = c("a", "b", "c"),
+      "C" = c(TRUE, TRUE, FALSE),
+      "D" = c("NA", "B", NA_character_),
+      "E" = c(1L, 2L, 3L)
+    ) |>
+      arrow::as_arrow_table()
+
+    # check if check_is_arrow_object returns TRUE
+    expect_true(
+      check_is_arrow_object(df = df,
+                            error = FALSE)
+    )
+
+    # check if check_is_arrow_object returns TRUE
+    expect_true(
+      check_is_arrow_object(df = df,
+                            error = TRUE)
     )
 
   }
