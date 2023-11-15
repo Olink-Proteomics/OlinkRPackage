@@ -9,6 +9,10 @@
 check_is_tibble <- function(df,
                             error = FALSE) {
 
+  # check if input error is boolean vector of length 1
+  check_is_scalar_boolean(bool = error,
+                          error = TRUE)
+
   if (!inherits(x = df,
                 what = "tbl_df")) {
 
