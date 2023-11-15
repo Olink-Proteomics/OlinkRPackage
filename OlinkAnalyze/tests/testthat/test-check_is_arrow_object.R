@@ -78,41 +78,41 @@ test_that(
   {
 
     expect_false(
-      check_is_arrow_object(df = c("I_Shall_Pass",
-                                   NA_character_),
-                            error = FALSE)
+      object = check_is_arrow_object(df = c("I_Shall_Pass",
+                                            NA_character_),
+                                     error = FALSE)
     )
 
     expect_false(
-      check_is_arrow_object(df = NA_character_,
-                            error = FALSE)
+      object = check_is_arrow_object(df = NA_character_,
+                                     error = FALSE)
     )
 
     expect_false(
-      check_is_arrow_object(df = NULL,
-                            error = FALSE)
+      object = check_is_arrow_object(df = NULL,
+                                     error = FALSE)
     )
 
     expect_false(
-      check_is_arrow_object(df = 1,
-                            error = FALSE)
+      object = check_is_arrow_object(df = 1,
+                                     error = FALSE)
     )
 
     expect_false(
-      check_is_arrow_object(df = 1L,
-                            error = FALSE)
+      object = check_is_arrow_object(df = 1L,
+                                     error = FALSE)
     )
 
     expect_false(
-      check_is_arrow_object(df = TRUE,
-                            error = FALSE)
+      object = check_is_arrow_object(df = TRUE,
+                                     error = FALSE)
     )
 
     expect_false(
-      check_is_arrow_object(df = data.frame(a = c(1, 2),
-                                            b = c("a", "b"),
-                                            c = c(TRUE, FALSE)),
-                            error = FALSE)
+      object = check_is_arrow_object(df = data.frame(a = c(1, 2),
+                                                     b = c("a", "b"),
+                                                     c = c(TRUE, FALSE)),
+                                     error = FALSE)
     )
 
   }
@@ -155,11 +155,11 @@ test_that(
         )
 
         # check that the comma delimited file exists
-        expect_true(file.exists(dfile_test))
+        expect_true(object = file.exists(dfile_test))
 
         # check that reading the file works
         expect_no_condition(
-          df_arrow <- utils::read.delim(
+          object = df_arrow <- utils::read.delim(
             file = dfile_test,
             header = TRUE,
             sep = sep_arrow,
@@ -170,18 +170,18 @@ test_that(
         )
 
         # check that variable exists
-        expect_true(exists("df_arrow"))
+        expect_true(object = exists("df_arrow"))
 
         # check if return from check_is_arrow_object is TRUE
         expect_true(
-          check_is_arrow_object(df = df_arrow,
-                                error = FALSE)
+          object = check_is_arrow_object(df = df_arrow,
+                                         error = FALSE)
         )
 
         # check if return from check_is_arrow_object is TRUE
         expect_true(
-          check_is_arrow_object(df = df_arrow,
-                                error = TRUE)
+          object = check_is_arrow_object(df = df_arrow,
+                                         error = TRUE)
         )
 
       }
@@ -218,28 +218,28 @@ test_that(
         )
 
         # check that the semicolon delimited file exists
-        expect_true(file.exists(pfile_test))
+        expect_true(object = file.exists(pfile_test))
 
         # check that reading the file works
         expect_no_condition(
-          df_arrow <- arrow::open_dataset(
+          object = df_arrow <- arrow::open_dataset(
             sources = pfile_test
           )
         )
 
         # check that variable exists
-        expect_true(exists("df_arrow"))
+        expect_true(object = exists("df_arrow"))
 
         # check if check_is_arrow_object returns TRUE
         expect_true(
-          check_is_arrow_object(df = df_arrow,
-                                error = FALSE)
+          object = check_is_arrow_object(df = df_arrow,
+                                         error = FALSE)
         )
 
         # check if check_is_arrow_object returns TRUE
         expect_true(
-          check_is_arrow_object(df = df_arrow,
-                                error = TRUE)
+          object = check_is_arrow_object(df = df_arrow,
+                                         error = TRUE)
         )
 
       }
@@ -264,16 +264,19 @@ test_that(
     ) |>
       arrow::as_arrow_table()
 
+    # check if object exists
+    expect_true(object = exists("df"))
+
     # check if check_is_arrow_object returns TRUE
     expect_true(
-      check_is_arrow_object(df = df,
-                            error = FALSE)
+      object = check_is_arrow_object(df = df,
+                                     error = FALSE)
     )
 
     # check if check_is_arrow_object returns TRUE
     expect_true(
-      check_is_arrow_object(df = df,
-                            error = TRUE)
+      object = check_is_arrow_object(df = df,
+                                     error = TRUE)
     )
 
   }

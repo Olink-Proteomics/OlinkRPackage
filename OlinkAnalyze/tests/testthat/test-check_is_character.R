@@ -1,48 +1,49 @@
 test_that(
   "check is character works - TRUE",
   {
+
     expect_true(
-      check_is_character(string = "I_Shall_Pass",
-                         error = FALSE)
+      object = check_is_character(string = "I_Shall_Pass",
+                                  error = FALSE)
     )
 
     expect_true(
-      check_is_character(string = "I_Shall_Pass",
-                         error = TRUE)
+      object = check_is_character(string = "I_Shall_Pass",
+                                  error = TRUE)
     )
 
     expect_true(
-      check_is_character(string = c("I_Shall_Pass"),
-                         error = FALSE)
+      object = check_is_character(string = c("I_Shall_Pass"),
+                                  error = FALSE)
     )
 
     expect_true(
-      check_is_character(string = c("I_Shall_Pass"),
-                         error = TRUE)
+      object = check_is_character(string = c("I_Shall_Pass"),
+                                  error = TRUE)
     )
 
     expect_true(
-      check_is_character(string = c("I_Shall_Pass",
-                                    NULL),
-                         error = FALSE)
+      object = check_is_character(string = c("I_Shall_Pass",
+                                             NULL),
+                                  error = FALSE)
     )
 
     expect_true(
-      check_is_character(string = c("I_Shall_Pass",
-                                    NULL),
-                         error = TRUE)
+      object = check_is_character(string = c("I_Shall_Pass",
+                                             NULL),
+                                  error = TRUE)
     )
 
     expect_true(
-      check_is_character(string = c("I_Shall_Pass",
-                                    "I_Shall_Not_Pass"),
-                         error = TRUE)
+      object = check_is_character(string = c("I_Shall_Pass",
+                                             "I_Shall_Not_Pass"),
+                                  error = TRUE)
     )
 
     expect_true(
-      check_is_character(string = c("I_Shall_Pass",
-                                    "I_Shall_Not_Pass"),
-                         error = FALSE)
+      object = check_is_character(string = c("I_Shall_Pass",
+                                             "I_Shall_Not_Pass"),
+                                  error = FALSE)
     )
 
   }
@@ -53,34 +54,34 @@ test_that(
   {
 
     expect_false(
-      check_is_character(string = c("I_Shall_Pass",
-                                    NA_character_),
-                         error = FALSE)
+      object = check_is_character(string = c("I_Shall_Pass",
+                                             NA_character_),
+                                  error = FALSE)
     )
 
     expect_false(
-      check_is_character(string = NA_character_,
-                         error = FALSE)
+      object = check_is_character(string = NA_character_,
+                                  error = FALSE)
     )
 
     expect_false(
-      check_is_character(string = NULL,
-                         error = FALSE)
+      object = check_is_character(string = NULL,
+                                  error = FALSE)
     )
 
     expect_false(
-      check_is_character(string = 1,
-                         error = FALSE)
+      object = check_is_character(string = 1,
+                                  error = FALSE)
     )
 
     expect_false(
-      check_is_character(string = 1L,
-                         error = FALSE)
+      object = check_is_character(string = 1L,
+                                  error = FALSE)
     )
 
     expect_false(
-      check_is_character(string = TRUE,
-                         error = FALSE)
+      object = check_is_character(string = TRUE,
+                                  error = FALSE)
     )
 
   }
@@ -91,40 +92,58 @@ test_that(
   {
 
     expect_error(
-      check_is_character(string = c("I_Shall_Pass",
-                                    NA_character_),
-                         error = TRUE),
-      regexp = "must be a character vector!"
+      object = check_is_character(string = c("I_Shall_Pass",
+                                             NA_character_),
+                                  error = TRUE),
+      regexp = gsub(pattern = " ",
+                    replacement = "([[:space:]].*|\\n.*)?",
+                    x = "must be a character vector!",
+                    fixed = TRUE)
     )
 
     expect_error(
-      check_is_character(string = NA_character_,
-                         error = TRUE),
-      regexp = "must be a character vector!"
+      object = check_is_character(string = NA_character_,
+                                  error = TRUE),
+      regexp = gsub(pattern = " ",
+                    replacement = "([[:space:]].*|\\n.*)?",
+                    x = "must be a character vector!",
+                    fixed = TRUE)
     )
 
     expect_error(
-      check_is_character(string = NULL,
-                         error = TRUE),
-      regexp = "must be a character vector!"
+      object = check_is_character(string = NULL,
+                                  error = TRUE),
+      regexp = gsub(pattern = " ",
+                    replacement = "([[:space:]].*|\\n.*)?",
+                    x = "must be a character vector!",
+                    fixed = TRUE)
     )
 
     expect_error(
-      check_is_character(string = 1,
-                         error = TRUE),
-      regexp = "must be a character vector!"
+      object = check_is_character(string = 1,
+                                  error = TRUE),
+      regexp = gsub(pattern = " ",
+                    replacement = "([[:space:]].*|\\n.*)?",
+                    x = "must be a character vector!",
+                    fixed = TRUE)
     )
 
     expect_error(
-      check_is_character(string = 1L,
-                         error = TRUE),
-      regexp = "must be a character vector!"
+      object = check_is_character(string = 1L,
+                                  error = TRUE),
+      regexp = gsub(pattern = " ",
+                    replacement = "([[:space:]].*|\\n.*)?",
+                    x = "must be a character vector!",
+                    fixed = TRUE)
     )
 
     expect_error(
-      check_is_character(string = TRUE,
-                         error = TRUE),
-      regexp = "must be a character vector!"
+      object = check_is_character(string = TRUE,
+                                  error = TRUE),
+      regexp = gsub(pattern = " ",
+                    replacement = "([[:space:]].*|\\n.*)?",
+                    x = "must be a character vector!",
+                    fixed = TRUE)
     )
 
   }

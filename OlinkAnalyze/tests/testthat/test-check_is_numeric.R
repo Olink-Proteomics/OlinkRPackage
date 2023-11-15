@@ -2,71 +2,71 @@ test_that(
   "check is numeric works - TRUE",
   {
     expect_true(
-      check_is_numeric(num = 3.14,
-                       error = FALSE)
+      object = check_is_numeric(num = 3.14,
+                                error = FALSE)
     )
 
     expect_true(
-      check_is_numeric(num = 3.14,
-                       error = TRUE)
+      object = check_is_numeric(num = 3.14,
+                                error = TRUE)
     )
 
     expect_true(
-      check_is_numeric(num = c(3.14),
-                       error = FALSE)
+      object = check_is_numeric(num = c(3.14),
+                                error = FALSE)
     )
 
     expect_true(
-      check_is_numeric(num = c(3.14),
-                       error = TRUE)
+      object = check_is_numeric(num = c(3.14),
+                                error = TRUE)
     )
 
     expect_true(
-      check_is_numeric(num = c(3.14,
-                               NULL),
-                       error = FALSE)
+      object = check_is_numeric(num = c(3.14,
+                                        NULL),
+                                error = FALSE)
     )
 
     expect_true(
-      check_is_numeric(num = c(3.14,
-                               NULL),
-                       error = TRUE)
+      object = check_is_numeric(num = c(3.14,
+                                        NULL),
+                                error = TRUE)
     )
 
     expect_true(
-      check_is_numeric(num = c(3.14,
-                               1),
-                       error = TRUE)
+      object = check_is_numeric(num = c(3.14,
+                                        1),
+                                error = TRUE)
     )
 
     expect_true(
-      check_is_numeric(num = c(3.14,
-                               1),
-                       error = FALSE)
+      object = check_is_numeric(num = c(3.14,
+                                        1),
+                                error = FALSE)
     )
 
     expect_true(
-      check_is_numeric(num = c(3.14,
-                               1L),
-                       error = TRUE)
+      object = check_is_numeric(num = c(3.14,
+                                        1L),
+                                error = TRUE)
     )
 
     expect_true(
-      check_is_numeric(num = c(3.14,
-                               1L),
-                       error = FALSE)
+      object = check_is_numeric(num = c(3.14,
+                                        1L),
+                                error = FALSE)
     )
 
     expect_true(
-      check_is_numeric(num = c(3L,
-                               1L),
-                       error = TRUE)
+      object = check_is_numeric(num = c(3L,
+                                        1L),
+                                error = TRUE)
     )
 
     expect_true(
-      check_is_numeric(num = c(3L,
-                               1L),
-                       error = FALSE)
+      object = check_is_numeric(num = c(3L,
+                                        1L),
+                                error = FALSE)
     )
 
   }
@@ -77,24 +77,24 @@ test_that(
   {
 
     expect_false(
-      check_is_numeric(num = c("I_Shall_Pass",
-                               NA_character_),
-                       error = FALSE)
+      object = check_is_numeric(num = c("I_Shall_Pass",
+                                        NA_character_),
+                                error = FALSE)
     )
 
     expect_false(
-      check_is_numeric(num = NA_character_,
-                       error = FALSE)
+      object = check_is_numeric(num = NA_character_,
+                                error = FALSE)
     )
 
     expect_false(
-      check_is_numeric(num = NULL,
-                       error = FALSE)
+      object = check_is_numeric(num = NULL,
+                                error = FALSE)
     )
 
     expect_false(
-      check_is_numeric(num = TRUE,
-                       error = FALSE)
+      object = check_is_numeric(num = TRUE,
+                                error = FALSE)
     )
 
   }
@@ -105,28 +105,40 @@ test_that(
   {
 
     expect_error(
-      check_is_numeric(num = c("I_Shall_Pass",
-                               NA_character_),
-                       error = TRUE),
-      regexp = "must be a number vector!"
+      object = check_is_numeric(num = c("I_Shall_Pass",
+                                        NA_character_),
+                                error = TRUE),
+      regexp = gsub(pattern = " ",
+                    replacement = "([[:space:]].*|\\n.*)?",
+                    x = "must be a number vector!",
+                    fixed = TRUE)
     )
 
     expect_error(
-      check_is_numeric(num = NA_character_,
-                       error = TRUE),
-      regexp = "must be a number vector!"
+      object = check_is_numeric(num = NA_character_,
+                                error = TRUE),
+      regexp = gsub(pattern = " ",
+                    replacement = "([[:space:]].*|\\n.*)?",
+                    x = "must be a number vector!",
+                    fixed = TRUE)
     )
 
     expect_error(
-      check_is_numeric(num = NULL,
-                       error = TRUE),
-      regexp = "must be a number vector!"
+      object = check_is_numeric(num = NULL,
+                                error = TRUE),
+      regexp = gsub(pattern = " ",
+                    replacement = "([[:space:]].*|\\n.*)?",
+                    x = "must be a number vector!",
+                    fixed = TRUE)
     )
 
     expect_error(
-      check_is_numeric(num = TRUE,
-                       error = TRUE),
-      regexp = "must be a number vector!"
+      object = check_is_numeric(num = TRUE,
+                                error = TRUE),
+      regexp = gsub(pattern = " ",
+                    replacement = "([[:space:]].*|\\n.*)?",
+                    x = "must be a number vector!",
+                    fixed = TRUE)
     )
 
   }

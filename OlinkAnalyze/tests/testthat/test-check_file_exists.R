@@ -12,7 +12,7 @@ test_that(
         writeLines("foo", tfile_test)
 
         # check if file exists
-        expect_true(file.exists(tfile_test))
+        expect_true(object = file.exists(tfile_test))
 
         # expect TRUE to return
         expect_true(
@@ -47,7 +47,7 @@ test_that(
       code = {
 
         # check if file exists
-        expect_false(file.exists(tfile_test))
+        expect_false(object = file.exists(tfile_test))
 
         # expect TRUE to return
         expect_false(

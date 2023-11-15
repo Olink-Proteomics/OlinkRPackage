@@ -13,14 +13,11 @@ test_that(
         writeLines("foo", txtfile_z)
 
         # check that the parquet file was created
-        expect(
-          file.exists(txtfile_z),
-          failure_message = "Text file was not created!"
-        )
+        expect_true(object = file.exists(txtfile_z))
 
         # check that relevant error is thrown
         expect_error(
-          read_npx_zip(file = txtfile_z),
+          object = read_npx_zip(file = txtfile_z),
           regexp = "Unable to open compressed file: "
         )
 
@@ -46,14 +43,11 @@ test_that(
         writeLines("foo", txtfile_zcorrupt)
 
         # check that the parquet file was created
-        expect(
-          file.exists(txtfile_zcorrupt),
-          failure_message = "Corrupt zip file was not created!"
-        )
+        expect_true(object = file.exists(txtfile_zcorrupt))
 
         # check that relevant error is thrown
         expect_error(
-          read_npx_zip(file = txtfile_zcorrupt),
+          object = read_npx_zip(file = txtfile_zcorrupt),
           regexp = "Unable to open compressed file: "
         )
 
@@ -73,21 +67,24 @@ test_that(
     readme_file <- file.path(tempdir(),
                              "README.txt")
     writeLines("foo", readme_file)
-    expect_true(file.exists(readme_file))
+    expect_true(object = file.exists(readme_file))
 
     withr::with_tempfile(
       new = "zip_test",
       pattern = "zip_test",
       fileext = ".zip",
       code = {
-        utils::zip(zipfile = zip_test,
-                   files = c(readme_file),
-                   flags = "-jq")
 
-        expect_true(file.exists(zip_test))
+        utils::zip(
+          zipfile = zip_test,
+          files = c(readme_file),
+          flags = "-jq"
+        )
+
+        expect_true(object = file.exists(zip_test))
 
         expect_error(
-          read_npx_zip(file = zip_test),
+          object = read_npx_zip(file = zip_test),
           regexp = "No NPX and checksum file in the compressed file"
         )
 
@@ -95,7 +92,7 @@ test_that(
       }
     )
 
-    expect_false(file.exists(readme_file))
+    expect_false(object = file.exists(readme_file))
   }
 )
 
@@ -111,23 +108,27 @@ test_that(
       code = {
 
         # write the coma-delimited file
-        dplyr::tibble("A" = c(1, 2.2, 3.14),
-                      "B" = c("a", "b", "c"),
-                      "C" = c(TRUE, TRUE, FALSE),
-                      "D" = c("NA", "B", NA_character_),
-                      "E" = c(1L, 2L, 3L)) |>
-          utils::write.table(file = nfile_test,
-                             append = FALSE,
-                             quote = FALSE,
-                             sep = ";",
-                             eol = "\n",
-                             na = "",
-                             dec = ".",
-                             row.names = FALSE,
-                             col.names = TRUE)
+        dplyr::tibble(
+          "A" = c(1, 2.2, 3.14),
+          "B" = c("a", "b", "c"),
+          "C" = c(TRUE, TRUE, FALSE),
+          "D" = c("NA", "B", NA_character_),
+          "E" = c(1L, 2L, 3L)
+        ) |>
+          utils::write.table(
+            file = nfile_test,
+            append = FALSE,
+            quote = FALSE,
+            sep = ";",
+            eol = "\n",
+            na = "",
+            dec = ".",
+            row.names = FALSE,
+            col.names = TRUE
+          )
 
         # check that the parquet file was created
-        expect_true(file.exists(nfile_test))
+        expect_true(object = file.exists(nfile_test))
 
         withr::with_tempfile(
           new = "zfile_test",
@@ -136,15 +137,19 @@ test_that(
           code = {
 
             # write zip file
-            utils::zip(zipfile = zfile_test,
-                       files = c(nfile_test),
-                       flags = "-jq")
+            utils::zip(
+              zipfile = zfile_test,
+              files = c(nfile_test),
+              flags = "-jq"
+            )
 
             # check that the zip file was created
-            expect_true(file.exists(zfile_test))
+            expect_true(object = file.exists(zfile_test))
 
             # check that this works
-            expect_no_condition(read_npx_zip(file = zfile_test))
+            expect_no_condition(
+              object = read_npx_zip(file = zfile_test)
+            )
 
           }
         )
@@ -163,7 +168,7 @@ test_that(
     readmefile_test <- file.path(tempdir(),
                                  "README.txt")
     writeLines("foo", readmefile_test)
-    expect_true(file.exists(readmefile_test))
+    expect_true(object = file.exists(readmefile_test))
 
     withr::with_tempfile(
       new = "nfile_test",
@@ -172,23 +177,27 @@ test_that(
       code = {
 
         # write the coma-delimited file
-        dplyr::tibble("A" = c(1, 2.2, 3.14),
-                      "B" = c("a", "b", "c"),
-                      "C" = c(TRUE, TRUE, FALSE),
-                      "D" = c("NA", "B", NA_character_),
-                      "E" = c(1L, 2L, 3L)) |>
-          utils::write.table(file = nfile_test,
-                             append = FALSE,
-                             quote = FALSE,
-                             sep = ";",
-                             eol = "\n",
-                             na = "",
-                             dec = ".",
-                             row.names = FALSE,
-                             col.names = TRUE)
+        dplyr::tibble(
+          "A" = c(1, 2.2, 3.14),
+          "B" = c("a", "b", "c"),
+          "C" = c(TRUE, TRUE, FALSE),
+          "D" = c("NA", "B", NA_character_),
+          "E" = c(1L, 2L, 3L)
+        ) |>
+          utils::write.table(
+            file = nfile_test,
+            append = FALSE,
+            quote = FALSE,
+            sep = ";",
+            eol = "\n",
+            na = "",
+            dec = ".",
+            row.names = FALSE,
+            col.names = TRUE
+          )
 
         # check that the parquet file was created
-        expect_true(file.exists(nfile_test))
+        expect_true(object = file.exists(nfile_test))
 
         withr::with_tempfile(
           new = "zfile_test",
@@ -197,15 +206,19 @@ test_that(
           code = {
 
             # write zip file
-            utils::zip(zipfile = zfile_test,
-                       files = c(readmefile_test, nfile_test),
-                       flags = "-jq")
+            utils::zip(
+              zipfile = zfile_test,
+              files = c(readmefile_test, nfile_test),
+              flags = "-jq"
+            )
 
             # check that the zip file was created
-            expect_true(file.exists(zfile_test))
+            expect_true(object = file.exists(zfile_test))
 
             # check that this works
-            expect_no_condition(read_npx_zip(file = zfile_test))
+            expect_no_condition(
+              object = read_npx_zip(file = zfile_test)
+            )
           }
         )
 
@@ -213,7 +226,7 @@ test_that(
       }
     )
 
-    expect_false(file.exists(readmefile_test))
+    expect_false(object = file.exists(readmefile_test))
   }
 )
 
@@ -228,7 +241,7 @@ test_that(
     readmefile_test <- file.path(tempdir(),
                                  "README.txt")
     writeLines("foo", readmefile_test)
-    expect_true(file.exists(readmefile_test))
+    expect_true(object = file.exists(readmefile_test))
 
     withr::with_tempfile(
       new = "nfile_test",
@@ -237,23 +250,27 @@ test_that(
       code = {
 
         # write the coma-delimited file
-        dplyr::tibble("A" = c(1, 2.2, 3.14),
-                      "B" = c("a", "b", "c"),
-                      "C" = c(TRUE, TRUE, FALSE),
-                      "D" = c("NA", "B", NA_character_),
-                      "E" = c(1L, 2L, 3L)) |>
-          utils::write.table(file = nfile_test,
-                             append = FALSE,
-                             quote = FALSE,
-                             sep = ";",
-                             eol = "\n",
-                             na = "",
-                             dec = ".",
-                             row.names = FALSE,
-                             col.names = TRUE)
+        dplyr::tibble(
+          "A" = c(1, 2.2, 3.14),
+          "B" = c("a", "b", "c"),
+          "C" = c(TRUE, TRUE, FALSE),
+          "D" = c("NA", "B", NA_character_),
+          "E" = c(1L, 2L, 3L)
+        ) |>
+          utils::write.table(
+            file = nfile_test,
+            append = FALSE,
+            quote = FALSE,
+            sep = ";",
+            eol = "\n",
+            na = "",
+            dec = ".",
+            row.names = FALSE,
+            col.names = TRUE
+          )
 
         # check that the parquet file was created
-        expect_true(file.exists(nfile_test))
+        expect_true(object = file.exists(nfile_test))
 
         withr::with_tempfile(
           new = "zfile_test",
@@ -269,18 +286,22 @@ test_that(
 
                 # create random file
                 writeLines("foo", rfile_test)
-                expect_true(file.exists(rfile_test))
+                expect_true(object = file.exists(rfile_test))
 
                 # write zip file
-                utils::zip(zipfile = zfile_test,
-                           files = c(readmefile_test, nfile_test, rfile_test),
-                           flags = "-jq")
+                utils::zip(
+                  zipfile = zfile_test,
+                  files = c(readmefile_test, nfile_test, rfile_test),
+                  flags = "-jq"
+                )
 
                 # check that the zip file was created
-                expect_true(file.exists(zfile_test))
+                expect_true(object = file.exists(zfile_test))
 
                 # check that this works
-                expect_no_condition(read_npx_zip(file = zfile_test))
+                expect_no_condition(
+                  object = read_npx_zip(file = zfile_test)
+                )
 
               }
             )
@@ -293,7 +314,7 @@ test_that(
       }
     )
 
-    expect_false(file.exists(readmefile_test))
+    expect_false(object = file.exists(readmefile_test))
 
   }
 )
@@ -308,7 +329,7 @@ test_that(
     readmefile_test <- file.path(tempdir(),
                                  "README.txt")
     writeLines("foo", readmefile_test)
-    expect_true(file.exists(readmefile_test))
+    expect_true(object = file.exists(readmefile_test))
 
     withr::with_tempfile(
       new = "nfile_test",
@@ -317,23 +338,27 @@ test_that(
       code = {
 
         # write the coma-delimited file
-        dplyr::tibble("A" = c(1, 2.2, 3.14),
-                      "B" = c("a", "b", "c"),
-                      "C" = c(TRUE, TRUE, FALSE),
-                      "D" = c("NA", "B", NA_character_),
-                      "E" = c(1L, 2L, 3L)) |>
-          utils::write.table(file = nfile_test,
-                             append = FALSE,
-                             quote = FALSE,
-                             sep = ";",
-                             eol = "\n",
-                             na = "",
-                             dec = ".",
-                             row.names = FALSE,
-                             col.names = TRUE)
+        dplyr::tibble(
+          "A" = c(1, 2.2, 3.14),
+          "B" = c("a", "b", "c"),
+          "C" = c(TRUE, TRUE, FALSE),
+          "D" = c("NA", "B", NA_character_),
+          "E" = c(1L, 2L, 3L)
+        ) |>
+          utils::write.table(
+            file = nfile_test,
+            append = FALSE,
+            quote = FALSE,
+            sep = ";",
+            eol = "\n",
+            na = "",
+            dec = ".",
+            row.names = FALSE,
+            col.names = TRUE
+          )
 
         # check that the parquet file was created
-        expect_true(file.exists(nfile_test))
+        expect_true(object = file.exists(nfile_test))
 
         withr::with_tempfile(
           new = "zfile_test",
@@ -349,19 +374,21 @@ test_that(
 
                 # create random file
                 writeLines("foo", rfile_test)
-                expect_true(file.exists(rfile_test))
+                expect_true(object = file.exists(rfile_test))
 
                 # write zip file
-                utils::zip(zipfile = zfile_test,
-                           files = c(readmefile_test, nfile_test, rfile_test),
-                           flags = "-jq")
+                utils::zip(
+                  zipfile = zfile_test,
+                  files = c(readmefile_test, nfile_test, rfile_test),
+                  flags = "-jq"
+                )
 
                 # check that the zip file was created
-                expect_true(file.exists(zfile_test))
+                expect_true(object = file.exists(zfile_test))
 
                 # check that this works
                 expect_no_condition(
-                  read_npx_zip(
+                  object = read_npx_zip(
                     file = zfile_test,
                     .ignore_files = c(basename(readmefile_test),
                                       basename(rfile_test))
@@ -379,7 +406,7 @@ test_that(
       }
     )
 
-    expect_false(file.exists(readmefile_test))
+    expect_false(object = file.exists(readmefile_test))
 
   }
 )
@@ -394,7 +421,7 @@ test_that(
     readmefile_test <- file.path(tempdir(),
                                  "README.txt")
     writeLines("foo", readmefile_test)
-    expect_true(file.exists(readmefile_test))
+    expect_true(object = file.exists(readmefile_test))
 
     withr::with_tempfile(
       new = "nfile_test",
@@ -403,23 +430,27 @@ test_that(
       code = {
 
         # write the coma-delimited file
-        dplyr::tibble("A" = c(1, 2.2, 3.14),
-                      "B" = c("a", "b", "c"),
-                      "C" = c(TRUE, TRUE, FALSE),
-                      "D" = c("NA", "B", NA_character_),
-                      "E" = c(1L, 2L, 3L)) |>
-          utils::write.table(file = nfile_test,
-                             append = FALSE,
-                             quote = FALSE,
-                             sep = ";",
-                             eol = "\n",
-                             na = "",
-                             dec = ".",
-                             row.names = FALSE,
-                             col.names = TRUE)
+        dplyr::tibble(
+          "A" = c(1, 2.2, 3.14),
+          "B" = c("a", "b", "c"),
+          "C" = c(TRUE, TRUE, FALSE),
+          "D" = c("NA", "B", NA_character_),
+          "E" = c(1L, 2L, 3L)
+        ) |>
+          utils::write.table(
+            file = nfile_test,
+            append = FALSE,
+            quote = FALSE,
+            sep = ";",
+            eol = "\n",
+            na = "",
+            dec = ".",
+            row.names = FALSE,
+            col.names = TRUE
+          )
 
         # check that the parquet file was created
-        expect_true(file.exists(nfile_test))
+        expect_true(object = file.exists(nfile_test))
 
         withr::with_tempfile(
           new = "zfile_test",
@@ -435,19 +466,21 @@ test_that(
 
                 # create random file
                 writeLines("foo", rfile_test)
-                expect_true(file.exists(rfile_test))
+                expect_true(object = file.exists(rfile_test))
 
                 # write zip file
-                utils::zip(zipfile = zfile_test,
-                           files = c(readmefile_test, nfile_test, rfile_test),
-                           flags = "-jq")
+                utils::zip(
+                  zipfile = zfile_test,
+                  files = c(readmefile_test, nfile_test, rfile_test),
+                  flags = "-jq"
+                )
 
                 # check that the zip file was created
-                expect_true(file.exists(zfile_test))
+                expect_true(object = file.exists(zfile_test))
 
                 # check that this works
                 expect_no_condition(
-                  read_npx_zip(
+                  object = read_npx_zip(
                     file = zfile_test,
                     .ignore_files = c(basename(readmefile_test),
                                       basename(rfile_test))
@@ -464,7 +497,7 @@ test_that(
       }
     )
 
-    expect_false(file.exists(readmefile_test))
+    expect_false(object = file.exists(readmefile_test))
 
   }
 )
@@ -477,7 +510,7 @@ test_that(
     readmefile_test <- file.path(tempdir(),
                                  "README.txt")
     writeLines("foo", readmefile_test)
-    expect_true(file.exists(readmefile_test))
+    expect_true(object = file.exists(readmefile_test))
 
     checksumfile_test <- file.path(tempdir(),
                                    "MD5_checksum.txt")
@@ -489,23 +522,27 @@ test_that(
       code = {
 
         # write the coma-delimited file
-        dplyr::tibble("A" = c(1, 2.2, 3.14),
-                      "B" = c("a", "b", "c"),
-                      "C" = c(TRUE, TRUE, FALSE),
-                      "D" = c("NA", "B", NA_character_),
-                      "E" = c(1L, 2L, 3L)) |>
-          utils::write.table(file = nfile_test,
-                             append = FALSE,
-                             quote = FALSE,
-                             sep = ";",
-                             eol = "\n",
-                             na = "",
-                             dec = ".",
-                             row.names = FALSE,
-                             col.names = TRUE)
+        dplyr::tibble(
+          "A" = c(1, 2.2, 3.14),
+          "B" = c("a", "b", "c"),
+          "C" = c(TRUE, TRUE, FALSE),
+          "D" = c("NA", "B", NA_character_),
+          "E" = c(1L, 2L, 3L)
+        ) |>
+          utils::write.table(
+            file = nfile_test,
+            append = FALSE,
+            quote = FALSE,
+            sep = ";",
+            eol = "\n",
+            na = "",
+            dec = ".",
+            row.names = FALSE,
+            col.names = TRUE
+          )
 
         # check that the parquet file was created
-        expect_true(file.exists(nfile_test))
+        expect_true(object = file.exists(nfile_test))
 
         # compute MD5 checksum
         tools::md5sum(nfile_test) |>
@@ -513,7 +550,7 @@ test_that(
           writeLines(checksumfile_test)
 
         # check that the checksum file was created
-        expect_true(file.exists(checksumfile_test))
+        expect_true(object = file.exists(checksumfile_test))
 
         withr::with_tempfile(
           new = "zfile_test",
@@ -522,17 +559,21 @@ test_that(
           code = {
 
             # write zip file
-            utils::zip(zipfile = zfile_test,
-                       files = c(readmefile_test,
-                                 nfile_test,
-                                 checksumfile_test),
-                       flags = "-jq")
+            utils::zip(
+              zipfile = zfile_test,
+              files = c(readmefile_test,
+                        nfile_test,
+                        checksumfile_test),
+              flags = "-jq"
+            )
 
             # check that the zip file was created
-            expect_true(file.exists(zfile_test))
+            expect_true(object = file.exists(zfile_test))
 
             # check that this works
-            expect_no_condition(read_npx_zip(file = zfile_test))
+            expect_no_condition(
+              object = read_npx_zip(file = zfile_test)
+            )
 
           }
         )
@@ -543,8 +584,8 @@ test_that(
       }
     )
 
-    expect_false(file.exists(readmefile_test))
-    expect_false(file.exists(checksumfile_test))
+    expect_false(object = file.exists(readmefile_test))
+    expect_false(object = file.exists(checksumfile_test))
   }
 )
 
@@ -563,23 +604,27 @@ test_that(
       code = {
 
         # write the coma-delimited file
-        dplyr::tibble("A" = c(1, 2.2, 3.14),
-                      "B" = c("a", "b", "c"),
-                      "C" = c(TRUE, TRUE, FALSE),
-                      "D" = c("NA", "B", NA_character_),
-                      "E" = c(1L, 2L, 3L)) |>
-          utils::write.table(file = nfile_test,
-                             append = FALSE,
-                             quote = FALSE,
-                             sep = ";",
-                             eol = "\n",
-                             na = "",
-                             dec = ".",
-                             row.names = FALSE,
-                             col.names = TRUE)
+        dplyr::tibble(
+          "A" = c(1, 2.2, 3.14),
+          "B" = c("a", "b", "c"),
+          "C" = c(TRUE, TRUE, FALSE),
+          "D" = c("NA", "B", NA_character_),
+          "E" = c(1L, 2L, 3L)
+        ) |>
+          utils::write.table(
+            file = nfile_test,
+            append = FALSE,
+            quote = FALSE,
+            sep = ";",
+            eol = "\n",
+            na = "",
+            dec = ".",
+            row.names = FALSE,
+            col.names = TRUE
+          )
 
         # check that the parquet file was created
-        expect_true(file.exists(nfile_test))
+        expect_true(object = file.exists(nfile_test))
 
         # compute MD5 checksum
         tools::md5sum(nfile_test) |>
@@ -587,7 +632,7 @@ test_that(
           writeLines(checksumfile_test)
 
         # check that the checksum file was created
-        expect_true(file.exists(checksumfile_test))
+        expect_true(object = file.exists(checksumfile_test))
 
         withr::with_tempfile(
           new = "zfile_test",
@@ -596,16 +641,20 @@ test_that(
           code = {
 
             # write zip file
-            utils::zip(zipfile = zfile_test,
-                       files = c(nfile_test,
-                                 checksumfile_test),
-                       flags = "-jq")
+            utils::zip(
+              zipfile = zfile_test,
+              files = c(nfile_test,
+                        checksumfile_test),
+              flags = "-jq"
+            )
 
             # check that the zip file was created
-            expect_true(file.exists(zfile_test))
+            expect_true(object = file.exists(zfile_test))
 
             # check that this works
-            expect_no_condition(read_npx_zip(file = zfile_test))
+            expect_no_condition(
+              object = read_npx_zip(file = zfile_test)
+            )
           }
         )
 
@@ -614,7 +663,7 @@ test_that(
       }
     )
 
-    expect_false(file.exists(checksumfile_test))
+    expect_false(object = file.exists(checksumfile_test))
 
   }
 )
@@ -627,7 +676,7 @@ test_that(
     readmefile_test <- file.path(tempdir(),
                                  "README.txt")
     writeLines("foo", readmefile_test)
-    expect_true(file.exists(readmefile_test))
+    expect_true(object = file.exists(readmefile_test))
 
     checksumfile_test <- file.path(tempdir(),
                                    "checksum_sha256.txt")
@@ -639,23 +688,27 @@ test_that(
       code = {
 
         # write the coma-delimited file
-        dplyr::tibble("A" = c(1, 2.2, 3.14),
-                      "B" = c("a", "b", "c"),
-                      "C" = c(TRUE, TRUE, FALSE),
-                      "D" = c("NA", "B", NA_character_),
-                      "E" = c(1L, 2L, 3L)) |>
-          utils::write.table(file = nfile_test,
-                             append = FALSE,
-                             quote = FALSE,
-                             sep = ";",
-                             eol = "\n",
-                             na = "",
-                             dec = ".",
-                             row.names = FALSE,
-                             col.names = TRUE)
+        dplyr::tibble(
+          "A" = c(1, 2.2, 3.14),
+          "B" = c("a", "b", "c"),
+          "C" = c(TRUE, TRUE, FALSE),
+          "D" = c("NA", "B", NA_character_),
+          "E" = c(1L, 2L, 3L)
+        ) |>
+          utils::write.table(
+            file = nfile_test,
+            append = FALSE,
+            quote = FALSE,
+            sep = ";",
+            eol = "\n",
+            na = "",
+            dec = ".",
+            row.names = FALSE,
+            col.names = TRUE
+          )
 
         # check that the parquet file was created
-        expect_true(file.exists(nfile_test))
+        expect_true(object = file.exists(nfile_test))
 
         # compute SHA256 checksum
         openssl::sha256(file(nfile_test)) |>
@@ -664,7 +717,7 @@ test_that(
           writeLines(checksumfile_test)
 
         # check that the checksum file was created
-        expect_true(file.exists(checksumfile_test))
+        expect_true(object = file.exists(checksumfile_test))
 
         withr::with_tempfile(
           new = "zfile_test",
@@ -673,17 +726,21 @@ test_that(
           code = {
 
             # write zip file
-            utils::zip(zipfile = zfile_test,
-                       files = c(readmefile_test,
-                                 nfile_test,
-                                 checksumfile_test),
-                       flags = "-jq")
+            utils::zip(
+              zipfile = zfile_test,
+              files = c(readmefile_test,
+                        nfile_test,
+                        checksumfile_test),
+              flags = "-jq"
+            )
 
             # check that the zip file was created
-            expect_true(file.exists(zfile_test))
+            expect_true(object = file.exists(zfile_test))
 
             # check that this works
-            expect_no_condition(read_npx_zip(file = zfile_test))
+            expect_no_condition(
+              object = read_npx_zip(file = zfile_test)
+            )
           }
         )
 
@@ -693,8 +750,8 @@ test_that(
       }
     )
 
-    expect_false(file.exists(readmefile_test))
-    expect_false(file.exists(checksumfile_test))
+    expect_false(object = file.exists(readmefile_test))
+    expect_false(object = file.exists(checksumfile_test))
 
   }
 )
@@ -714,23 +771,27 @@ test_that(
       code = {
 
         # write the coma-delimited file
-        dplyr::tibble("A" = c(1, 2.2, 3.14),
-                      "B" = c("a", "b", "c"),
-                      "C" = c(TRUE, TRUE, FALSE),
-                      "D" = c("NA", "B", NA_character_),
-                      "E" = c(1L, 2L, 3L)) |>
-          utils::write.table(file = nfile_test,
-                             append = FALSE,
-                             quote = FALSE,
-                             sep = ";",
-                             eol = "\n",
-                             na = "",
-                             dec = ".",
-                             row.names = FALSE,
-                             col.names = TRUE)
+        dplyr::tibble(
+          "A" = c(1, 2.2, 3.14),
+          "B" = c("a", "b", "c"),
+          "C" = c(TRUE, TRUE, FALSE),
+          "D" = c("NA", "B", NA_character_),
+          "E" = c(1L, 2L, 3L)
+        ) |>
+          utils::write.table(
+            file = nfile_test,
+            append = FALSE,
+            quote = FALSE,
+            sep = ";",
+            eol = "\n",
+            na = "",
+            dec = ".",
+            row.names = FALSE,
+            col.names = TRUE
+          )
 
         # check that the parquet file was created
-        expect_true(file.exists(nfile_test))
+        expect_true(object = file.exists(nfile_test))
 
         # compute SHA256 checksum
         openssl::sha256(file(nfile_test)) |>
@@ -739,7 +800,7 @@ test_that(
           writeLines(checksumfile_test)
 
         # check that the checksum file was created
-        expect_true(file.exists(checksumfile_test))
+        expect_true(object = file.exists(checksumfile_test))
 
         withr::with_tempfile(
           new = "zfile_test",
@@ -748,16 +809,20 @@ test_that(
           code = {
 
             # write zip file
-            utils::zip(zipfile = zfile_test,
-                       files = c(nfile_test,
-                                 checksumfile_test),
-                       flags = "-jq")
+            utils::zip(
+              zipfile = zfile_test,
+              files = c(nfile_test,
+                        checksumfile_test),
+              flags = "-jq"
+            )
 
             # check that the zip file was created
-            expect_true(file.exists(zfile_test))
+            expect_true(object = file.exists(zfile_test))
 
             # check that this works
-            expect_no_condition(read_npx_zip(file = zfile_test))
+            expect_no_condition(
+              object = read_npx_zip(file = zfile_test)
+            )
 
           }
         )
@@ -767,7 +832,7 @@ test_that(
       }
     )
 
-    expect_false(file.exists(checksumfile_test))
+    expect_false(object = file.exists(checksumfile_test))
 
   }
 )
@@ -781,7 +846,7 @@ test_that(
     readmefile_test <- file.path(tempdir(),
                                  "README.txt")
     writeLines("foo", readmefile_test)
-    expect_true(file.exists(readmefile_test))
+    expect_true(object = file.exists(readmefile_test))
 
     checksumfile_test <- file.path(tempdir(),
                                    "checksum_sha256.txt")
@@ -809,13 +874,13 @@ test_that(
                              col.names = TRUE)
 
         # check that the parquet file was created
-        expect_true(file.exists(nfile_test))
+        expect_true(object = file.exists(nfile_test))
 
         # write something random in checksum
         writeLines("foo", checksumfile_test)
 
         # check that the checksum file was created
-        expect_true(file.exists(checksumfile_test))
+        expect_true(object = file.exists(checksumfile_test))
 
         withr::with_tempfile(
           new = "zfile_test",
@@ -824,14 +889,16 @@ test_that(
           code = {
 
             # write zip file
-            utils::zip(zipfile = zfile_test,
-                       files = c(readmefile_test,
-                                 nfile_test,
-                                 checksumfile_test),
-                       flags = "-jq")
+            utils::zip(
+              zipfile = zfile_test,
+              files = c(readmefile_test,
+                        nfile_test,
+                        checksumfile_test),
+              flags = "-jq"
+            )
 
             # check that the zip file was created
-            expect_true(file.exists(zfile_test))
+            expect_true(object = file.exists(zfile_test))
 
             # check that this throws an error. It expexts a sha256 checksum
             # but it gets something else
@@ -849,8 +916,8 @@ test_that(
       }
     )
 
-    expect_false(file.exists(readmefile_test))
-    expect_false(file.exists(checksumfile_test))
+    expect_false(object = file.exists(readmefile_test))
+    expect_false(object = file.exists(checksumfile_test))
 
   }
 )
@@ -871,29 +938,33 @@ test_that(
       code = {
 
         # write the coma-delimited file
-        dplyr::tibble("A" = c(1, 2.2, 3.14),
-                      "B" = c("a", "b", "c"),
-                      "C" = c(TRUE, TRUE, FALSE),
-                      "D" = c("NA", "B", NA_character_),
-                      "E" = c(1L, 2L, 3L)) |>
-          utils::write.table(file = nfile_test,
-                             append = FALSE,
-                             quote = FALSE,
-                             sep = ";",
-                             eol = "\n",
-                             na = "",
-                             dec = ".",
-                             row.names = FALSE,
-                             col.names = TRUE)
+        dplyr::tibble(
+          "A" = c(1, 2.2, 3.14),
+          "B" = c("a", "b", "c"),
+          "C" = c(TRUE, TRUE, FALSE),
+          "D" = c("NA", "B", NA_character_),
+          "E" = c(1L, 2L, 3L)
+        ) |>
+          utils::write.table(
+            file = nfile_test,
+            append = FALSE,
+            quote = FALSE,
+            sep = ";",
+            eol = "\n",
+            na = "",
+            dec = ".",
+            row.names = FALSE,
+            col.names = TRUE
+          )
 
         # check that the parquet file was created
-        expect_true(file.exists(nfile_test))
+        expect_true(object = file.exists(nfile_test))
 
         # write something random in checksum
         writeLines("foo", checksumfile_test)
 
         # check that the checksum file was created
-        expect_true(file.exists(checksumfile_test))
+        expect_true(object = file.exists(checksumfile_test))
 
         withr::with_tempfile(
           new = "zfile_test",
@@ -902,13 +973,15 @@ test_that(
           code = {
 
             # write zip file
-            utils::zip(zipfile = zfile_test,
-                       files = c(nfile_test,
-                                 checksumfile_test),
-                       flags = "-jq")
+            utils::zip(
+              zipfile = zfile_test,
+              files = c(nfile_test,
+                        checksumfile_test),
+              flags = "-jq"
+            )
 
             # check that the zip file was created
-            expect_true(file.exists(zfile_test))
+            expect_true(object = file.exists(zfile_test))
 
             # check that this throws an error. It expexts a sha256 checksum
             # but it gets something else
@@ -925,7 +998,7 @@ test_that(
       }
     )
 
-    expect_false(file.exists(checksumfile_test))
+    expect_false(object = file.exists(checksumfile_test))
 
   }
 )

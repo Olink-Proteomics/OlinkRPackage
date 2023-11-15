@@ -26,7 +26,7 @@ test_that(
                              col.names = TRUE)
 
         # check that the comma delimited file exists
-        expect_true(file.exists(text_file_test))
+        expect_true(object = file.exists(text_file_test))
 
         # MD5 checksum on the NPX file
         text_file_checksum <- tools::md5sum(text_file_test) |>
@@ -36,12 +36,12 @@ test_that(
         writeLines(text_file_checksum, MD5_check)
 
         # check that the parquet file was created
-        expect_true(file.exists(MD5_check))
+        expect_true(object = file.exists(MD5_check))
 
         # check that relevant error is thrown
         expect_no_condition(
-          check_checksum(checksum_file = MD5_check,
-                         npx_file = text_file_test)
+          object = check_checksum(checksum_file = MD5_check,
+                                  npx_file = text_file_test)
         )
 
       }
@@ -78,7 +78,7 @@ test_that(
                              col.names = TRUE)
 
         # check that the comma delimited file exists
-        expect_true(file.exists(text_file_test))
+        expect_true(object = file.exists(text_file_test))
 
         # SHA256 checksum on the NPX file
         text_file_checksum <- openssl::sha256(file(text_file_test)) |>
@@ -89,12 +89,12 @@ test_that(
         writeLines(text_file_checksum, SHA256_check)
 
         # check that the parquet file was created
-        expect_true(file.exists(SHA256_check))
+        expect_true(object = file.exists(SHA256_check))
 
         # check that relevant error is thrown
         expect_no_condition(
-          check_checksum(checksum_file = SHA256_check,
-                         npx_file = text_file_test)
+          object = check_checksum(checksum_file = SHA256_check,
+                                  npx_file = text_file_test)
         )
 
       }
@@ -114,7 +114,7 @@ test_that(
       code = {
 
         # check that the parquet file was created
-        expect_false(file.exists(nfile_test))
+        expect_false(object = file.exists(nfile_test))
 
         withr::with_tempfile(
           new = "SHA256_check",
@@ -126,12 +126,12 @@ test_that(
             writeLines("I_AM_A_R4ND0M_ChEcKuP", SHA256_check)
 
             # check that the parquet file was created
-            expect_true(file.exists(SHA256_check))
+            expect_true(object = file.exists(SHA256_check))
 
             # check that relevant string is returned
             expect_error(
-              check_checksum(checksum_file = SHA256_check,
-                             npx_file = nfile_test),
+              object = check_checksum(checksum_file = SHA256_check,
+                                      npx_file = nfile_test),
               regexp = "Unable to open NPX file"
             )
 
@@ -171,15 +171,15 @@ test_that(
                              col.names = TRUE)
 
         # check that the comma delimited file exists
-        expect_true(file.exists(text_file_test))
+        expect_true(object = file.exists(text_file_test))
 
         # check that the parquet file was created
-        expect_false(file.exists(SHA256_check))
+        expect_false(object = file.exists(SHA256_check))
 
         # check that relevant string is returned
         expect_error(
-          check_checksum(checksum_file = SHA256_check,
-                         npx_file = text_file_test),
+          object = check_checksum(checksum_file = SHA256_check,
+                                  npx_file = text_file_test),
           regexp = "Unable to open checksum file"
         )
 
@@ -217,18 +217,18 @@ test_that(
                              col.names = TRUE)
 
         # check that the comma delimited file exists
-        expect_true(file.exists(text_file_test))
+        expect_true(object = file.exists(text_file_test))
 
         # write some text in a txt file
         writeLines("I_AM_A_R4ND0M_ChEcKuP", SHA256_check)
 
         # check that the parquet file was created
-        expect_true(file.exists(SHA256_check))
+        expect_true(object = file.exists(SHA256_check))
 
         # check that relevant string is returned
         expect_error(
-          check_checksum(checksum_file = SHA256_check,
-                         npx_file = text_file_test),
+          object = check_checksum(checksum_file = SHA256_check,
+                                  npx_file = text_file_test),
           regexp = "The checksum of the NPX file does not match the one"
         )
 

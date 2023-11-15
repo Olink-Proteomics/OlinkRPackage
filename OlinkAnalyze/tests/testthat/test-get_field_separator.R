@@ -13,11 +13,11 @@ test_that(
         writeLines(character(), tfile_empty)
 
         # check that the file was created
-        expect_true(file.exists(tfile_empty))
+        expect_true(object = file.exists(tfile_empty))
 
         # check that relevant error is thrown
         expect_error(
-          get_field_separator(file = tfile_empty),
+          object = get_field_separator(file = tfile_empty),
           regexp = "Unable to read header line from"
         )
 
@@ -43,12 +43,12 @@ test_that(
         writeLines("1;2;3;4;5", tfile_semicolon)
 
         # check that the file was created
-        expect_true(file.exists(tfile_semicolon))
+        expect_true(object = file.exists(tfile_semicolon))
 
         # check that relevant error is thrown
         expect_identical(
-          get_field_separator(file = tfile_semicolon),
-          ";"
+          object = get_field_separator(file = tfile_semicolon),
+          expected = ";"
         )
 
       }
@@ -72,12 +72,12 @@ test_that(
         writeLines("1,2,3,4,5", tfile_comma)
 
         # check that the file was created
-        expect_true(file.exists(tfile_comma))
+        expect_true(object = file.exists(tfile_comma))
 
         # check that relevant error is thrown
         expect_identical(
-          get_field_separator(file = tfile_comma),
-          ","
+          object = get_field_separator(file = tfile_comma),
+          expected = ","
         )
 
       }
@@ -101,11 +101,11 @@ test_that(
         writeLines("1#2#3#4#5", tfile_hashtag)
 
         # check that the file was created
-        expect_true(file.exists(tfile_hashtag))
+        expect_true(object = file.exists(tfile_hashtag))
 
         # check that relevant error is thrown
         expect_error(
-          get_field_separator(file = tfile_hashtag),
+          object = get_field_separator(file = tfile_hashtag),
           regexp = "Expecting semicolon.*.or comma.*.!"
         )
 
@@ -130,11 +130,11 @@ test_that(
         writeLines("1,2;3,4;5", tfile_mixed)
 
         # check that the file was created
-        expect_true(file.exists(tfile_mixed))
+        expect_true(object = file.exists(tfile_mixed))
 
         # check that relevant error is thrown
         expect_error(
-          get_field_separator(file = tfile_mixed),
+          object = get_field_separator(file = tfile_mixed),
           regexp = "Both semicolon.*.and comma.*.are present in header line."
         )
 

@@ -4,18 +4,18 @@ test_that(
   {
     # realistic scenario with checksum_sha256.txt
     expect_equal(
-      get_checksum_file(
+      object = get_checksum_file(
         files = c("checksum_sha256.txt", "test.csv")
       ),
-      "checksum_sha256.txt"
+      expected = "checksum_sha256.txt"
     )
 
     # realistic scenario with MD5_checksum.txt
     expect_equal(
-      get_checksum_file(
+      object = get_checksum_file(
         files = c("MD5_checksum.txt", "test.csv")
       ),
-      "MD5_checksum.txt"
+      expected = "MD5_checksum.txt"
     )
   }
 )
@@ -26,10 +26,10 @@ test_that(
   {
     # wrong checksum file
     expect_identical(
-      get_checksum_file(
+      object = get_checksum_file(
         files = c("MD51_checksum.txt", "test.csv")
       ),
-      NA_character_
+      expected = NA_character_
     )
   }
 )
@@ -41,21 +41,21 @@ test_that(
   {
     # multiple checksum files
     expect_error(
-      get_checksum_file(
+      object = get_checksum_file(
         files = c("MD5_checksum.txt", "MD5_checksum.txt")
       ),
       regexp = "The compressed file contains too many checksum files!"
     )
 
     expect_error(
-      get_checksum_file(
+      object = get_checksum_file(
         files = c("checksum_sha256.txt", "checksum_sha256.txt")
       ),
       regexp = "The compressed file contains too many checksum files!"
     )
 
     expect_error(
-      get_checksum_file(
+      object = get_checksum_file(
         files = c("MD5_checksum.txt", "checksum_sha256.txt")
       ),
       regexp = "The compressed file contains too many checksum files!"

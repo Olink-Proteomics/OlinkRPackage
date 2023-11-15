@@ -154,11 +154,11 @@ test_that(
         )
 
         # check that the comma delimited file exists
-        expect_true(file.exists(dfile_test))
+        expect_true(object = file.exists(dfile_test))
 
         # check that reading the file works
         expect_no_condition(
-          df_read <- utils::read.delim(
+          object = df_read <- utils::read.delim(
             file = dfile_test,
             header = TRUE,
             sep = sep_arrow,
@@ -169,18 +169,18 @@ test_that(
         )
 
         # check that variable exists
-        expect_true(exists("df_read"))
+        expect_true(object = exists("df_read"))
 
         # check if return from check_is_tibble is TRUE
         expect_true(
-          check_is_tibble(df = df_read,
-                          error = FALSE)
+          object = check_is_tibble(df = df_read,
+                                   error = FALSE)
         )
 
         # check if return from check_is_tibble is TRUE
         expect_true(
-          check_is_tibble(df = df_read,
-                          error = TRUE)
+          object = check_is_tibble(df = df_read,
+                                   error = TRUE)
         )
 
       }
@@ -218,29 +218,29 @@ test_that(
         )
 
         # check that the semicolon delimited file exists
-        expect_true(file.exists(pfile_test))
+        expect_true(object = file.exists(pfile_test))
 
         # check that reading the file works
         expect_no_condition(
-          df_read <- arrow::open_dataset(
+          object = df_read <- arrow::open_dataset(
             sources = pfile_test
           ) |>
             dplyr::collect()
         )
 
         # check that variable exists
-        expect_true(exists("df_read"))
+        expect_true(object = exists("df_read"))
 
         # check if check_is_tibble returns TRUE
         expect_true(
-          check_is_tibble(df = df_read,
-                          error = FALSE)
+          object = check_is_tibble(df = df_read,
+                                   error = FALSE)
         )
 
         # check if check_is_tibble returns TRUE
         expect_true(
-          check_is_tibble(df = df_read,
-                          error = TRUE)
+          object = check_is_tibble(df = df_read,
+                                   error = TRUE)
         )
 
       }
@@ -264,18 +264,18 @@ test_that(
     )
 
     # check that variable exists
-    expect_true(exists("df"))
+    expect_true(object = exists("df"))
 
     # check if check_is_tibble returns TRUE
     expect_true(
-      check_is_tibble(df = df,
-                      error = FALSE)
+      object = check_is_tibble(df = df,
+                               error = FALSE)
     )
 
     # check if check_is_tibble returns TRUE
     expect_true(
-      check_is_tibble(df = df,
-                      error = TRUE)
+      object = check_is_tibble(df = df,
+                               error = TRUE)
     )
 
   }
