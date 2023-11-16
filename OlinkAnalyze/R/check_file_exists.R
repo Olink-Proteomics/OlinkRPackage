@@ -1,5 +1,7 @@
 #' Help function checking if file exists.
 #'
+#' @author Klev Diamanti
+#'
 #' @param file Path to the file.
 #' @param error Boolean to return error or a boolean (default).
 #'

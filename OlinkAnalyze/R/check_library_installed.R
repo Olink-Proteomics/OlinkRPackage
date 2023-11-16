@@ -1,5 +1,7 @@
 #' Help function to check if suggested libraries are installed when required.
 #'
+#' @author Klev Diamanti
+#'
 #' @param libraries A character vector of R libraries.
 #' @param error Boolean to return error or a boolean (default).
 #'

@@ -17,3 +17,6 @@ Boolean if the file exists or not, and an error if `error = TRUE`.
 \description{
 Only one file at a time!
 }
+\author{
+Klev Diamanti
+}

@@ -1,6 +1,8 @@
 #' Help function comparing the checksum reported by Olink software to the
 #' checksum of the delivered NPX file.
 #'
+#' @author Klev Diamanti
+#'
 #' @param checksum_file The plain file that contains the checksum output from
 #' Olink software. The file should contain "MD5" or "SHA256" in the file name.
 #' @param npx_file The NPX file accompanying the checksum file.

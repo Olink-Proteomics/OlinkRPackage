@@ -18,3 +18,6 @@ Boolean if the library is installed or not, and an error if
 \description{
 Help function to check if suggested libraries are installed when required.
 }
+\author{
+Klev Diamanti
+}

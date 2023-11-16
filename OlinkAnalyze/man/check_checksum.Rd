@@ -21,3 +21,6 @@ fine, otherwise there was some sort of error.
 Help function comparing the checksum reported by Olink software to the
 checksum of the delivered NPX file.
 }
+\author{
+Klev Diamanti
+}
