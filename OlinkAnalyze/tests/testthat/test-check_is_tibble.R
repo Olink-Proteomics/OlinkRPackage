@@ -148,20 +148,17 @@ test_that(
       fileext = ".csv",
       code = {
 
-        # random data frame
-        df <- dplyr::tibble(
+        sep_arrow <- ","
+
+        # write the coma-delimited file from a random data frame
+        dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
           "B" = c("a", "b", "c"),
           "C" = c(TRUE, TRUE, FALSE),
           "D" = c("NA", "B", NA_character_),
           "E" = c(1L, 2L, 3L)
-        )
-
-        sep_arrow <- ","
-
-        # write the coma-delimited file
+        ) |>
         utils::write.table(
-          x = df,
           file = dfile_test,
           append = FALSE,
           quote = FALSE,
@@ -221,18 +218,15 @@ test_that(
       fileext = ".parquet",
       code = {
 
-        # random data frame
+        # write the parquet file from a random data frame
         df <- dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
           "B" = c("a", "b", "c"),
           "C" = c(TRUE, TRUE, FALSE),
           "D" = c("NA", "B", NA_character_),
           "E" = c(1L, 2L, 3L)
-        )
-
-        # write the parquet file
+        ) |>
         arrow::write_parquet(
-          x = df,
           sink = pfile_test,
           compression = "gzip"
         )
