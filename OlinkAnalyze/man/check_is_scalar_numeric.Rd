@@ -18,3 +18,11 @@ an error if `error = TRUE`.
 \description{
 Help function checking if a variable is a numeric vector of length 1.
 }
+\seealso{
+[check_is_scalar_boolean()]
+  [check_is_scalar_character()]
+  [check_is_scalar_integer()]
+}
+\author{
+Klev Diamanti
+}

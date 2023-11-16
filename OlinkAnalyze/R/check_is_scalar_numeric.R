@@ -1,10 +1,17 @@
 #' Help function checking if a variable is a numeric vector of length 1.
 #'
+#' @author Klev Diamanti
+#'
 #' @param num Input to check.
 #' @param error Boolean to return error or a boolean (default).
 #'
 #' @return Boolean if the variable is a numeric vector of length 1 or not, and
 #' an error if `error = TRUE`.
+#'
+#' @seealso
+#'   [check_is_scalar_boolean()]
+#'   [check_is_scalar_character()]
+#'   [check_is_scalar_integer()]
 #'
 check_is_scalar_numeric <- function(num,
                                     error = FALSE) {

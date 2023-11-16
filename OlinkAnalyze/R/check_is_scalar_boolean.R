@@ -1,10 +1,17 @@
 #' Help function checking if a variable is a boolean vector of length 1.
 #'
+#' @author Klev Diamanti
+#'
 #' @param bool Input to check.
 #' @param error Boolean to return error or a boolean (default).
 #'
 #' @return Boolean if the variable is a boolean vector of length 1 or not, and
 #' an error if `error = TRUE`.
+#'
+#' @seealso
+#'   [check_is_scalar_character()]
+#'   [check_is_scalar_integer()]
+#'   [check_is_scalar_numeric()]
 #'
 check_is_scalar_boolean <- function(bool,
                                     error = FALSE) {
