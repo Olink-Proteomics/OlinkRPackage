@@ -1,10 +1,16 @@
 #' Help function to get the name of the NPX file from a compresseed NPX.
 #'
+#' @author Klev Diamanti
+#'
 #' @param files A vector of file names without any path prefix.
 #'
 #' @return The name of the NPX file.
 #'
 #' @keywords zip NPX
+#'
+#' @seealso
+#'   [check_checksum()]
+#'   [get_checksum_file()]
 #'
 get_npx_file <- function(files) {
 

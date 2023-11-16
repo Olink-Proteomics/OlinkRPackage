@@ -1,10 +1,16 @@
 #' Help function to get the name of the checksum file from a zip NPX.
 #'
+#' @author Klev Diamanti
+#'
 #' @param files A vector of file names without any path prefix.
 #'
 #' @return The name of checksum file or NA if the file is not present.
 #'
 #' @keywords zip NPX checksum MD5 SHA256
+#'
+#' @seealso
+#'   [check_checksum()]
+#'   [get_npx_file()]
 #'
 get_checksum_file <- function(files) {
 

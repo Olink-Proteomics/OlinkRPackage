@@ -18,3 +18,10 @@ separator of the file.
 _Note_ that the function will not accept the presence of commas and
 semicolons on the same line.
 }
+\seealso{
+[read_npx_delim()]
+  [read_npx_csv()]
+}
+\author{
+Klev Diamanti
+}

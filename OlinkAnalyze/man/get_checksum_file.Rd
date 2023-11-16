@@ -15,6 +15,13 @@ The name of checksum file or NA if the file is not present.
 \description{
 Help function to get the name of the checksum file from a zip NPX.
 }
+\seealso{
+[check_checksum()]
+  [get_npx_file()]
+}
+\author{
+Klev Diamanti
+}
 \keyword{MD5}
 \keyword{NPX}
 \keyword{SHA256}

@@ -15,5 +15,12 @@ The name of the NPX file.
 \description{
 Help function to get the name of the NPX file from a compresseed NPX.
 }
+\seealso{
+[check_checksum()]
+  [get_checksum_file()]
+}
+\author{
+Klev Diamanti
+}
 \keyword{NPX}
 \keyword{zip}

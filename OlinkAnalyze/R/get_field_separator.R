@@ -1,5 +1,7 @@
 #' Help function to get the file separator.
 #'
+#' @author Klev Diamanti
+#'
 #' @param file Path to Olink software output in txt or csv.
 #'
 #' @description
@@ -9,6 +11,10 @@
 #' semicolons on the same line.
 #'
 #' @return The file separator comma (;) or semicolon (;)
+#'
+#' @seealso
+#'   [read_npx_delim()]
+#'   [read_npx_csv()]
 #'
 get_field_separator <- function(file) {
 
