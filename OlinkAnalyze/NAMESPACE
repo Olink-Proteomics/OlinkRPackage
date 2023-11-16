@@ -2,4 +2,3 @@
 
 export(read_NPX)
 importFrom(magrittr,"%>%")
-importFrom(utils,zip)
