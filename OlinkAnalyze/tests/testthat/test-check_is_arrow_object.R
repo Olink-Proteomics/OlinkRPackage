@@ -127,7 +127,7 @@ test_that(
                                      error = FALSE)
     )
 
-    expect_error(
+    expect_false(
       object = check_is_arrow_object(df = data.frame(a = c(1, 2),
                                                      b = c("a", "b"),
                                                      c = c(TRUE, FALSE)) |>
