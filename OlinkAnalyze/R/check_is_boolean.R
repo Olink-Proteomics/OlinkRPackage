@@ -1,10 +1,17 @@
 #' Help function checking if a variable is a boolean vector.
 #'
+#' @author Klev Diamanti
+#'
 #' @param bool Input to check.
 #' @param error Boolean to return error or a boolean (default).
 #'
 #' @return Boolean if the variable is a boolean vector or not, and an error if
 #' `error = TRUE`.
+#'
+#' @seealso
+#'   [check_is_character()]
+#'   [check_is_integer()]
+#'   [check_is_numeric()]
 #'
 check_is_boolean <- function(bool,
                              error = FALSE) {

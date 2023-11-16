@@ -1,10 +1,17 @@
 #' Help function checking if a variable is an integer vector.
 #'
+#' @author Klev Diamanti
+#'
 #' @param int Input to check.
 #' @param error Boolean to return error or a boolean (default).
 #'
 #' @return Boolean if the variable is an integer vector or not, and an error if
 #' `error = TRUE`.or.
+#'
+#' @seealso
+#'   [check_is_boolean()]
+#'   [check_is_character()]
+#'   [check_is_numeric()]
 #'
 check_is_integer <- function(int,
                              error = FALSE) {

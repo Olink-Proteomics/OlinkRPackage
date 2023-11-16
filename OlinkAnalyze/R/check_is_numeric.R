@@ -1,10 +1,17 @@
 #' Help function checking if a variable is a numeric vector.
 #'
+#' @author Klev Diamanti
+#'
 #' @param num Input to check.
 #' @param error Boolean to return error or a boolean (default).
 #'
 #' @return Boolean if the variable is a numeric vector or not, and an error if
 #' `error = TRUE`.
+#'
+#' @seealso
+#'   [check_is_boolean()]
+#'   [check_is_character()]
+#'   [check_is_integer()]
 #'
 check_is_numeric <- function(num,
                              error = FALSE) {

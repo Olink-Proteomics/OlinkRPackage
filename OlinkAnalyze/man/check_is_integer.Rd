@@ -18,3 +18,11 @@ Boolean if the variable is an integer vector or not, and an error if
 \description{
 Help function checking if a variable is an integer vector.
 }
+\seealso{
+[check_is_boolean()]
+  [check_is_character()]
+  [check_is_numeric()]
+}
+\author{
+Klev Diamanti
+}

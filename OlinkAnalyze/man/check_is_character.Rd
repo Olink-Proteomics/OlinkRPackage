@@ -18,3 +18,11 @@ Boolean if the variable is a character vector or not, and an error if
 \description{
 Help function checking if a variable is a character vector.
 }
+\seealso{
+[check_is_boolean()]
+  [check_is_integer()]
+  [check_is_numeric()]
+}
+\author{
+Klev Diamanti
+}

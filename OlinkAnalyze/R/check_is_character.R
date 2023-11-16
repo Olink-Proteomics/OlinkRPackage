@@ -1,10 +1,17 @@
 #' Help function checking if a variable is a character vector.
 #'
+#' @author Klev Diamanti
+#'
 #' @param string Input to check.
 #' @param error Boolean to return error or a boolean (default).
 #'
 #' @return Boolean if the variable is a character vector or not, and an error if
 #' `error = TRUE`.
+#'
+#' @seealso
+#'   [check_is_boolean()]
+#'   [check_is_integer()]
+#'   [check_is_numeric()]
 #'
 check_is_character <- function(string,
                                error = FALSE) {

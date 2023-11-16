@@ -18,3 +18,11 @@ Boolean if the variable is a boolean vector or not, and an error if
 \description{
 Help function checking if a variable is a boolean vector.
 }
+\seealso{
+[check_is_character()]
+  [check_is_integer()]
+  [check_is_numeric()]
+}
+\author{
+Klev Diamanti
+}
