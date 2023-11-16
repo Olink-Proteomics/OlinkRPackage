@@ -68,6 +68,18 @@ test_that(
                     fixed = TRUE)
     )
 
+    expect_error(
+      object = check_is_tibble(df = data.frame(a = c(1, 2),
+                                                   b = c("a", "b"),
+                                                   c = c(TRUE, FALSE)) |>
+                                     arrow::as_arrow_table(),
+                                   error = TRUE),
+      regexp = gsub(pattern = " ",
+                    replacement = "([[:space:]].*|\\n.*)?",
+                    x = "is not a tibble data frame!",
+                    fixed = TRUE)
+    )
+
   }
 )
 
@@ -111,6 +123,14 @@ test_that(
       object = check_is_tibble(df = data.frame(a = c(1, 2),
                                                b = c("a", "b"),
                                                c = c(TRUE, FALSE)),
+                               error = FALSE)
+    )
+
+    expect_error(
+      object = check_is_tibble(df = data.frame(a = c(1, 2),
+                                               b = c("a", "b"),
+                                               c = c(TRUE, FALSE)) |>
+                                 arrow::as_arrow_table(),
                                error = FALSE)
     )
 

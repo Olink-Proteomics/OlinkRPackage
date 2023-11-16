@@ -69,6 +69,18 @@ test_that(
                     fixed = TRUE)
     )
 
+    expect_error(
+      object = check_is_arrow_object(df = data.frame(a = c(1, 2),
+                                                     b = c("a", "b"),
+                                                     c = c(TRUE, FALSE)) |>
+                                       dplyr::as_tibble(),
+                                     error = TRUE),
+      regexp = gsub(pattern = " ",
+                    replacement = "([[:space:]].*|\\n.*)?",
+                    x = "is not an R6 ArrowObject!",
+                    fixed = TRUE)
+    )
+
   }
 )
 
@@ -112,6 +124,14 @@ test_that(
       object = check_is_arrow_object(df = data.frame(a = c(1, 2),
                                                      b = c("a", "b"),
                                                      c = c(TRUE, FALSE)),
+                                     error = FALSE)
+    )
+
+    expect_error(
+      object = check_is_arrow_object(df = data.frame(a = c(1, 2),
+                                                     b = c("a", "b"),
+                                                     c = c(TRUE, FALSE)) |>
+                                       dplyr::as_tibble(),
                                      error = FALSE)
     )
 
