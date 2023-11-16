@@ -18,3 +18,10 @@ Boolean if the object is a data frame or not, and an error if
 \description{
 Help function to check if the variable is a data frame.
 }
+\seealso{
+[check_is_tibble()]
+  [check_is_arrow_object()]
+}
+\author{
+Klev Diamanti
+}

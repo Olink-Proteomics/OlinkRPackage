@@ -18,3 +18,10 @@ Boolean if the file is an R6 ArrowObject or not, and an error if
 \description{
 Help function to check if a data frame is an R6 ArrowObject.
 }
+\seealso{
+[check_is_tibble()]
+  [check_is_data_frame()]
+}
+\author{
+Klev Diamanti
+}

@@ -18,3 +18,10 @@ Boolean if the object is a tibble or not, and an error if
 \description{
 Help function to check if a data frame is a tibble data frame.
 }
+\seealso{
+[check_is_arrow_object()]
+  [check_is_data_frame()]
+}
+\author{
+Klev Diamanti
+}

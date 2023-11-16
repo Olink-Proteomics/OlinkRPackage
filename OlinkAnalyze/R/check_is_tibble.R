@@ -1,10 +1,16 @@
 #' Help function to check if a data frame is a tibble data frame.
 #'
+#' @author Klev Diamanti
+#'
 #' @param df Data frame to check.
 #' @param error Boolean to return error or a boolean (default).
 #'
 #' @return Boolean if the object is a tibble or not, and an error if
 #' `error = TRUE`.
+#'
+#' @seealso
+#'   [check_is_arrow_object()]
+#'   [check_is_data_frame()]
 #'
 check_is_tibble <- function(df,
                             error = FALSE) {

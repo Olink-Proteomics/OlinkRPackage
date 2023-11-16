@@ -1,10 +1,16 @@
 #' Help function to check if a data frame is an R6 ArrowObject.
 #'
+#' @author Klev Diamanti
+#'
 #' @param df Data frame to check.
 #' @param error Boolean to return error or a boolean (default).
 #'
 #' @return Boolean if the file is an R6 ArrowObject or not, and an error if
 #' `error = TRUE`.
+#'
+#' @seealso
+#'   [check_is_tibble()]
+#'   [check_is_data_frame()]
 #'
 check_is_arrow_object <- function(df,
                                   error = FALSE) {
