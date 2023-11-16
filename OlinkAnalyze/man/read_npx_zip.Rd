@@ -12,8 +12,24 @@ read_npx_zip(file, .ignore_files = c("README.txt"))
 \item{.ignore_files}{Vector of files to ignore.}
 }
 \value{
-A "tibble" in long format.
+An R6 class ArrowObject.
 }
 \description{
 Helper function to read NPX zip-compressed files with checksum.
 }
+\seealso{
+[read_npx()]
+  [read_npx_delim()]
+  [read_npx_parquet()]
+}
+\author{
+Klev Diamanti;
+  Kathleen Nevola;
+  Pascal Pucholt
+}
+\keyword{NPX}
+\keyword{csv}
+\keyword{delim}
+\keyword{parquet}
+\keyword{sep}
+\keyword{txt}

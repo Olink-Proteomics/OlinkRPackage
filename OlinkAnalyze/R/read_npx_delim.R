@@ -1,12 +1,22 @@
-#' Help function to read in Olink data from comma or semicolon delimited files
+#' Help function to read in Olink data from comma or semicolon delimited files.
+#'
+#' @author
+#'   Klev Diamanti;
+#'   Christoffer Cambronero;
+#'   Kathleen Nevola
 #'
 #' @param file Path to Olink software output in txt or csv.
 #' @param sep The separator of the file: NULL (autodetect), comma (,) or
 #' semicolon (;).
 #'
-#' @return An R6 ArrowObject data frame
+#' @return An R6 class ArrowObject.
 #'
 #' @keywords NPX csv txt delim sep
+#'
+#' @seealso
+#'   [read_npx()]
+#'   [read_npx_parquet()]
+#'   [read_npx_zip()]
 #'
 read_npx_delim <- function(file,
                            sep = NULL) {

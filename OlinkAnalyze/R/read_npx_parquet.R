@@ -1,10 +1,20 @@
 #' Help function to read Olink parquet files.
 #'
+#' @author
+#'   Klev Diamanti;
+#'   Kathleen Nevola;
+#'   Pascal Pucholt
+#'
 #' @param file Path to Olink Software parquet output file.
 #'
 #' @return An R6 class ArrowObject.
 #'
 #' @keywords NPX parquet
+#'
+#' @seealso
+#'   [read_npx()]
+#'   [read_npx_delim()]
+#'   [read_npx_zip()]
 #'
 read_npx_parquet <- function(file) {
 

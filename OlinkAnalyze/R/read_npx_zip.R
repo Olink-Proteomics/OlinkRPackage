@@ -1,11 +1,21 @@
 #' Helper function to read NPX zip-compressed files with checksum.
 #'
+#' @author
+#'   Klev Diamanti;
+#'   Kathleen Nevola;
+#'   Pascal Pucholt
+#'
 #' @param file Path to Olink Software output zip file.
 #' @param .ignore_files Vector of files to ignore.
 #'
-#' @return A "tibble" in long format.
+#' @return An R6 class ArrowObject.
 #'
-#' @importFrom utils zip
+#' @keywords NPX csv txt delim sep parquet
+#'
+#' @seealso
+#'   [read_npx()]
+#'   [read_npx_delim()]
+#'   [read_npx_parquet()]
 #'
 read_npx_zip <-
   function(file,

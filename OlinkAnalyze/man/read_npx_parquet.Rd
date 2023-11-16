@@ -15,5 +15,15 @@ An R6 class ArrowObject.
 \description{
 Help function to read Olink parquet files.
 }
+\seealso{
+[read_npx()]
+  [read_npx_delim()]
+  [read_npx_zip()]
+}
+\author{
+Klev Diamanti;
+  Kathleen Nevola;
+  Pascal Pucholt
+}
 \keyword{NPX}
 \keyword{parquet}

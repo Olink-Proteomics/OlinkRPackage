@@ -3,7 +3,7 @@
 \name{read_npx_delim}
 \alias{read_npx_delim}
 \alias{read_npx_csv}
-\title{Help function to read in Olink data from comma or semicolon delimited files}
+\title{Help function to read in Olink data from comma or semicolon delimited files.}
 \usage{
 read_npx_delim(file, sep = NULL)
 
@@ -16,10 +16,20 @@ read_npx_csv(file, sep = NULL)
 semicolon (;).}
 }
 \value{
-An R6 ArrowObject data frame
+An R6 class ArrowObject.
 }
 \description{
-Help function to read in Olink data from comma or semicolon delimited files
+Help function to read in Olink data from comma or semicolon delimited files.
+}
+\seealso{
+[read_npx()]
+  [read_npx_parquet()]
+  [read_npx_zip()]
+}
+\author{
+Klev Diamanti;
+  Christoffer Cambronero;
+  Kathleen Nevola
 }
 \keyword{NPX}
 \keyword{csv}
