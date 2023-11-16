@@ -1,35 +1,3 @@
-# this function is used to write NPX parquet files for testing purposes
-write_npx_parquet <-
-  function(df,
-           npx_parquet_file,
-           file_version = "NA",
-           project_name = "NA",
-           sample_matrix = "NA",
-           data_file_type = "NPX File",
-           product = "ExploreHT",
-           remove_fields = NA) {
-    # convert to arrow table ----
-    df <- arrow::as_arrow_table(df)
-
-    # modify metadata ----
-    df$metadata$FileVersion <- file_version
-    df$metadata$ProjectName <- project_name
-    df$metadata$SampleMatrix <- sample_matrix
-    df$metadata$DataFileType <- data_file_type
-    df$metadata$Product <- product
-
-    if (length(remove_fields) > 0) {
-      df$metadata[remove_fields] <- NULL
-    }
-
-    # write file ----
-    arrow::write_parquet(
-      x = df,
-      sink = npx_parquet_file,
-      compression = "gzip"
-    )
-  }
-
 # Test that a relevant error is thrown when a txt file was provided as parquet.
 test_that(
   "Non-parquet input is handled - random file",
@@ -59,7 +27,7 @@ test_that(
   }
 )
 
-# Test that a relevant error is thrown when a text file with th extsnsion
+# Test that a relevant error is thrown when a text file with the extension
 # parquet was provided as input.
 test_that(
   "Non-parquet input is handled - corrupt parquet file",
@@ -102,17 +70,26 @@ test_that(
       code = {
 
         # random data frame
-        dplyr::tibble(
+        df <- dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
           "B" = c("a", "b", "c"),
           "C" = c(TRUE, TRUE, FALSE),
           "D" = c("NA", "B", NA_character_),
           "E" = c(1L, 2L, 3L)
         ) |>
-          write_npx_parquet(
-            npx_parquet_file = pfile_metadata,
-            remove_fields = c("Product", "DataFileType")
-          )
+          arrow::as_arrow_table(df)
+
+        # modify metadata
+        df$metadata$FileVersion <- "NA"
+        df$metadata$ProjectName <- "NA"
+        df$metadata$SampleMatrix <- "NA"
+
+        # write parquet
+        arrow::write_parquet(
+          x = df,
+          sink = pfile_metadata,
+          compression = "gzip"
+        )
 
         # check that the parquet file was created
         expect_true(object = file.exists(pfile_metadata))
@@ -144,15 +121,28 @@ test_that(
         tmp_product_name <- "Unknown_Product"
 
         # random data frame
-        dplyr::tibble("A" = c(1, 2.2, 3.14),
+        df <- dplyr::tibble(
+          "A" = c(1, 2.2, 3.14),
                       "B" = c("a", "b", "c"),
                       "C" = c(TRUE, TRUE, FALSE),
                       "D" = c("NA", "B", NA_character_),
-                      "E" = c(1L, 2L, 3L)) |>
-          write_npx_parquet(
-            npx_parquet_file = pfile_product,
-            product = tmp_product_name
-          )
+                      "E" = c(1L, 2L, 3L)
+          ) |>
+          arrow::as_arrow_table()
+
+        # modify metadata
+        df$metadata$FileVersion <- "NA"
+        df$metadata$ProjectName <- "NA"
+        df$metadata$SampleMatrix <- "NA"
+        df$metadata$DataFileType <- "NPX File"
+        df$metadata$Product <- tmp_product_name
+
+        # write parquet
+        arrow::write_parquet(
+          x = df,
+          sink = pfile_product,
+          compression = "gzip"
+        )
 
         # check that the parquet file was created
         expect_true(object = file.exists(pfile_product))
@@ -184,17 +174,28 @@ test_that(
         tmp_datafiletype_name <- "Unknown File"
 
         # random data frame
-        dplyr::tibble(
+        df <- dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
           "B" = c("a", "b", "c"),
           "C" = c(TRUE, TRUE, FALSE),
           "D" = c("NA", "B", NA_character_),
           "E" = c(1L, 2L, 3L)
         ) |>
-          write_npx_parquet(
-            npx_parquet_file = pfile_datafiletype,
-            data_file_type = tmp_datafiletype_name
-          )
+          arrow::as_arrow_table()
+
+        # modify metadata
+        df$metadata$FileVersion <- "NA"
+        df$metadata$ProjectName <- "NA"
+        df$metadata$SampleMatrix <- "NA"
+        df$metadata$DataFileType <- tmp_datafiletype_name
+        df$metadata$Product <- "ExploreHT"
+
+        # write parquet
+        arrow::write_parquet(
+          x = df,
+          sink = pfile_datafiletype,
+          compression = "gzip"
+        )
 
         # check that the parquet file was created
         expect_true(object = file.exists(pfile_datafiletype))
@@ -214,7 +215,7 @@ test_that(
 # Test that a relevant error is thrown when the required metadata filed
 # DataFileType contains unexpected entries.
 test_that(
-  "Function returns arrowobject",
+  "Function returns arrowobject - DataFileType = \"NPX File\" ",
   {
 
     withr::with_tempfile(
