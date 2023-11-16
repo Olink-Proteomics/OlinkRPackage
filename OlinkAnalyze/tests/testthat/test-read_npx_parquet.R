@@ -109,7 +109,7 @@ test_that(
 # Test that a relevant error is thrown when the required metadata filed Product
 # contains unexpected entries.
 test_that(
-  "Product field is correct",
+  "Product field is incorrect",
   {
 
     withr::with_tempfile(
@@ -162,7 +162,7 @@ test_that(
 # Test that a relevant error is thrown when the required metadata filed
 # DataFileType contains unexpected entries.
 test_that(
-  "DataFileType field is correct",
+  "DataFileType field is incorrect",
   {
     withr::with_tempfile(
       new = "pfile_datafiletype",
@@ -212,11 +212,12 @@ test_that(
   }
 )
 
-# Test that a relevant error is thrown when the required metadata filed
-# DataFileType contains unexpected entries.
+# Test that a teh funcction works if DataFileType is one of the accepted values.
 test_that(
-  "Function returns arrowobject - DataFileType = \"NPX File\" ",
+  "Function returns arrowobject - all DataFileType",
   {
+
+    # DataFileType == "NPX File" ----
 
     withr::with_tempfile(
       new = "pfile_test",
@@ -239,6 +240,178 @@ test_that(
         df$metadata$ProjectName <- "NA"
         df$metadata$SampleMatrix <- "NA"
         df$metadata$DataFileType <- "NPX File"
+        df$metadata$Product <- "ExploreHT"
+
+        # write the parquet file
+        arrow::write_parquet(
+          x = df,
+          sink = pfile_test,
+          compression = "gzip"
+        )
+
+        # check that the semicolon delimited file exists
+        expect_true(object = file.exists(pfile_test))
+
+        # check that relevant error is thrown
+        expect_no_condition(
+          object = read_npx_parquet(file = pfile_test)
+        )
+
+      }
+    )
+
+    # DataFileType == "Extended NPX File" ----
+
+    withr::with_tempfile(
+      new = "pfile_test",
+      pattern = "parquet-file_test",
+      fileext = ".parquet",
+      code = {
+
+        # random data frame
+        df <- dplyr::tibble(
+          "A" = c(1, 2.2, 3.14),
+          "B" = c("a", "b", "c"),
+          "C" = c(TRUE, TRUE, FALSE),
+          "D" = c("NA", "B", NA_character_),
+          "E" = c(1L, 2L, 3L)
+        ) |>
+          arrow::as_arrow_table()
+
+        # modify metadata ----
+        df$metadata$FileVersion <- "NA"
+        df$metadata$ProjectName <- "NA"
+        df$metadata$SampleMatrix <- "NA"
+        df$metadata$DataFileType <- "Extended NPX File"
+        df$metadata$Product <- "ExploreHT"
+
+        # write the parquet file
+        arrow::write_parquet(
+          x = df,
+          sink = pfile_test,
+          compression = "gzip"
+        )
+
+        # check that the semicolon delimited file exists
+        expect_true(object = file.exists(pfile_test))
+
+        # check that relevant error is thrown
+        expect_no_condition(
+          object = read_npx_parquet(file = pfile_test)
+        )
+
+      }
+    )
+
+    # DataFileType == "CLI Data Export File" ----
+
+    withr::with_tempfile(
+      new = "pfile_test",
+      pattern = "parquet-file_test",
+      fileext = ".parquet",
+      code = {
+
+        # random data frame
+        df <- dplyr::tibble(
+          "A" = c(1, 2.2, 3.14),
+          "B" = c("a", "b", "c"),
+          "C" = c(TRUE, TRUE, FALSE),
+          "D" = c("NA", "B", NA_character_),
+          "E" = c(1L, 2L, 3L)
+        ) |>
+          arrow::as_arrow_table()
+
+        # modify metadata ----
+        df$metadata$FileVersion <- "NA"
+        df$metadata$ProjectName <- "NA"
+        df$metadata$SampleMatrix <- "NA"
+        df$metadata$DataFileType <- "CLI Data Export File"
+        df$metadata$Product <- "ExploreHT"
+
+        # write the parquet file
+        arrow::write_parquet(
+          x = df,
+          sink = pfile_test,
+          compression = "gzip"
+        )
+
+        # check that the semicolon delimited file exists
+        expect_true(object = file.exists(pfile_test))
+
+        # check that relevant error is thrown
+        expect_no_condition(
+          object = read_npx_parquet(file = pfile_test)
+        )
+
+      }
+    )
+
+    # DataFileType == "Internal CLI Data Export File" ----
+
+    withr::with_tempfile(
+      new = "pfile_test",
+      pattern = "parquet-file_test",
+      fileext = ".parquet",
+      code = {
+
+        # random data frame
+        df <- dplyr::tibble(
+          "A" = c(1, 2.2, 3.14),
+          "B" = c("a", "b", "c"),
+          "C" = c(TRUE, TRUE, FALSE),
+          "D" = c("NA", "B", NA_character_),
+          "E" = c(1L, 2L, 3L)
+        ) |>
+          arrow::as_arrow_table()
+
+        # modify metadata ----
+        df$metadata$FileVersion <- "NA"
+        df$metadata$ProjectName <- "NA"
+        df$metadata$SampleMatrix <- "NA"
+        df$metadata$DataFileType <- "Internal CLI Data Export File"
+        df$metadata$Product <- "ExploreHT"
+
+        # write the parquet file
+        arrow::write_parquet(
+          x = df,
+          sink = pfile_test,
+          compression = "gzip"
+        )
+
+        # check that the semicolon delimited file exists
+        expect_true(object = file.exists(pfile_test))
+
+        # check that relevant error is thrown
+        expect_no_condition(
+          object = read_npx_parquet(file = pfile_test)
+        )
+
+      }
+    )
+
+    # DataFileType == "R Package Export File" ----
+
+    withr::with_tempfile(
+      new = "pfile_test",
+      pattern = "parquet-file_test",
+      fileext = ".parquet",
+      code = {
+
+        # random data frame
+        df <- dplyr::tibble(
+          "A" = c(1, 2.2, 3.14),
+          "B" = c("a", "b", "c"),
+          "C" = c(TRUE, TRUE, FALSE),
+          "D" = c("NA", "B", NA_character_),
+          "E" = c(1L, 2L, 3L)
+        ) |>
+          arrow::as_arrow_table()
+
+        # modify metadata ----
+        df$metadata$FileVersion <- "NA"
+        df$metadata$ProjectName <- "NA"
+        df$metadata$SampleMatrix <- "NA"
+        df$metadata$DataFileType <- "R Package Export File"
         df$metadata$Product <- "ExploreHT"
 
         # write the parquet file

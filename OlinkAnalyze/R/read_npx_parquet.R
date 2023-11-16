@@ -99,7 +99,11 @@ read_npx_parquet <- function(file) {
 
   # We allow only  NPX file for now.
   # If other files are to be accepted, we need to add them to this array.
-  olink_parquet_files <- c("NPX File")
+  olink_parquet_files <- c("NPX File",
+                           "Extended NPX File",
+                           "CLI Data Export File",
+                           "Internal CLI Data Export File",
+                           "R Package Export File")
 
   if (!(parquet_npx$metadata[[olink_parquet_metadata$data_file_type]] %in% olink_parquet_files)) { # nolint object_usage_linter
 
