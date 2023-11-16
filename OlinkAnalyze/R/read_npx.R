@@ -16,15 +16,31 @@
 #'
 #' @return A "tibble" in long format.
 #'
-#' @keywords NPX parquet csv zip xlsx Olink Explore Target96 Target48 Flex HT
-#' 1536 3072 3k
+#' @keywords
+#'   NPX;
+#'   parquet;
+#'   csv;
+#'   zip;
+#'   xlsx;
+#'   Olink;
+#'   Olink Explore;
+#'   Olink Explore 1536;
+#'   Olink Explore 3072;
+#'   Olink Explore HT;
+#'   Olink Target 96;
+#'   Olink Target 48;
+#'   Olink Flex;
 #'
 #' @export
 #'
 #' @examples
 #' \donttest{
-#' file <- system.file("extdata", "Example_NPX_Data.csv", package = "OlinkAnalyze")
+#'
+#' file <- system.file("extdata",
+#'                     "Example_NPX_Data.csv",
+#'                     package = "OlinkAnalyze")
 #' read_NPX(file)
+#'
 #' }
 #'
 

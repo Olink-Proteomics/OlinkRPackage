@@ -21,8 +21,12 @@ No alterations to the output format is allowed.
 }
 \examples{
 \donttest{
-file <- system.file("extdata", "Example_NPX_Data.csv", package = "OlinkAnalyze")
+
+file <- system.file("extdata",
+                    "Example_NPX_Data.csv",
+                    package = "OlinkAnalyze")
 read_NPX(file)
+
 }
 
 }
@@ -35,17 +39,19 @@ Klev Diamanti;
   Olof Mansson;
   Marianne Sandin
 }
-\keyword{1536}
-\keyword{3072}
-\keyword{3k}
+\keyword{1536;}
+\keyword{3072;}
+\keyword{48;}
+\keyword{96;}
 \keyword{Explore}
-\keyword{Flex}
-\keyword{HT}
-\keyword{NPX}
+\keyword{Explore;}
+\keyword{Flex;}
+\keyword{HT;}
+\keyword{NPX;}
 \keyword{Olink}
-\keyword{Target48}
-\keyword{Target96}
-\keyword{csv}
-\keyword{parquet}
-\keyword{xlsx}
-\keyword{zip}
+\keyword{Olink;}
+\keyword{Target}
+\keyword{csv;}
+\keyword{parquet;}
+\keyword{xlsx;}
+\keyword{zip;}
