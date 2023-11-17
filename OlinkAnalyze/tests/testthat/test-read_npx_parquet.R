@@ -258,6 +258,8 @@ test_that(
                                               out_df = "arrow")
         )
 
+        expect_true(object = exists("df_out"))
+
         expect_true(inherits(x = df_out, what = "ArrowObject"))
 
         expect_true(

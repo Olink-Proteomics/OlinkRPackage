@@ -577,6 +577,8 @@ test_that(
                                               sep = NULL)
             )
 
+            expect_true(exists("df_out"))
+
             expect_true(inherits(x = df_out, what = "ArrowObject"))
 
             expect_true(
@@ -754,6 +756,8 @@ test_that(
                                               out_df = "arrow",
                                               sep = NULL)
             )
+
+            expect_true(exists("df_out"))
 
             expect_true(inherits(x = df_out, what = "ArrowObject"))
 
