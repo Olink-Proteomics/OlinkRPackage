@@ -254,7 +254,16 @@ test_that(
 
         # check that relevant error is thrown
         expect_no_condition(
-          object = read_npx_parquet(file = pfile_test)
+          object = df_out <- read_npx_parquet(file = pfile_test,
+                                              out_df = "arrow")
+        )
+
+        expect_true(inherits(x = df_out, what = "ArrowObject"))
+
+        expect_true(
+          object = read_npx_parquet(file = pfile_test,
+                                    out_df = "tibble") |>
+            inherits(what = "tbl_df")
         )
 
       }

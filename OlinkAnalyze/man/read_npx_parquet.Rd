@@ -4,10 +4,13 @@
 \alias{read_npx_parquet}
 \title{Help function to read Olink parquet files.}
 \usage{
-read_npx_parquet(file)
+read_npx_parquet(file, out_df = "arrow")
 }
 \arguments{
 \item{file}{Path to Olink Software parquet output file.}
+
+\item{out_df}{The class of output data frame to be returned. Accepted values
+are "tibble" and "arrow" (default).}
 }
 \value{
 An R6 class ArrowObject.
