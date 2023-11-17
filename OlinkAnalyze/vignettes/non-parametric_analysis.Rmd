@@ -385,7 +385,7 @@ Non-Numeric Data: When you’re dealing with categorical or nominal data that ca
 
 Assumption Violations: When you’ve tested the assumptions of parametric tests (e.g., homogeneity of variances, normality) and found that they are violated, it’s a good indication that non-parametric tests should be considered instead.
 
-Data Skewness: When your data is highly skewed, non-parametric tests can be more appropriate because they don’t rely on assumptions about the shape of the data distribution.
+Data Skewness: When your data is highly skewed, non-parametric tests can be more appropriate because they don't rely on assumptions about the shape of the data distribution.
 
 Comparing Medians: If you’re interested in comparing the medians of two or more groups rather than means, non-parametric tests like the Mann-Whitney U test or Kruskal-Wallis test are suitable.
 
