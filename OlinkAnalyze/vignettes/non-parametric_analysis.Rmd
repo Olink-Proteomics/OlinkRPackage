@@ -22,14 +22,6 @@ knitr::opts_chunk$set(
 options(tibble.print_min = 4L, tibble.print_max = 4L)
 ```
 
-```{r, echo=FALSE, message=FALSE}
-library(OlinkAnalyze)
-library(dplyr)
-library(stringr)
-library(ggplot2)
-library(kableExtra)
-```
-
 ## Introduction
 
 When particular assumptions about population distribution or data characteristic are not met, a non-parametric test could be considered to analyze the data. Unlike parametric tests, which assume that the data follows a specific distribution (usually the normal distribution) and have specific parameters, non-parametric tests do not make these strict assumptions and are often referred to as distribution-free tests. Non-parametric tests are useful when dealing with ordinal, nominal, or skewed data or when the sample size is small.
@@ -54,6 +46,8 @@ Kruskal-Wallis Test: An extension of the Mann-Whitney U test used for comparing 
 
 Friedman Test: An extension of the Wilcoxon Signed-Rank Test used for comparing three or more related (paired) samples.
 
+Cumulative Link Models (CLM): A method to analyze ordinal data. Models can be applied to simple or more complex designs. 
+
 In the following examples, we will demonstrate how to perform different non-parametric tests using the dataset `npx_data1` as the reference data.
 
 First we remove the sample controls from the dataset.
@@ -66,7 +60,16 @@ npx_df <- npx_data1 %>% filter(!grepl('control',SampleID, ignore.case = TRUE))
 
 Mann-Whitney U Test could be performed using the following script and specifying which column should be used as the grouping variable using the `variable` argument
 
-```{r Mann-Whitney_U_Test, echo=T, eval=T, message=FALSE}
+```{r Mann-Whitney_U_Test_show, echo=T, eval=F, message=FALSE}
+wilcox_results <- olink_wilcox(df = npx_df,
+                               variable = 'Treatment')
+
+# The first 10 rows of the results from Mann-Whitney U Test are shown:
+wilcox_results %>% 
+  head(10)
+```
+
+```{r Mann-Whitney_U_Test, echo=F, eval=T, message=FALSE}
 wilcox_results <- olink_wilcox(df = npx_df,
                                variable = 'Treatment')
 
@@ -82,6 +85,7 @@ wilcox_results %>%
 ```
 
 
+
 ## Wilcoxon Signed-Rank Test
 
 We keep samples from `Baseline` and `Week.6` and use it as paired comparison. 
@@ -92,7 +96,17 @@ npx_df_paired <- npx_df %>% filter(Time %in% c("Week.6","Week.12"))
 
 The Wilcoxon Signed-Rank Test could be performed using the `olink_wilcox` function. In addition to the `variable` argument, the `pair_id` argument is used as the paired sample identifier.
 
-```{r Wilcoxon_Signed-Rank_Test, echo=T, eval=T, message=FALSE}
+```{r Wilcoxon_Signed-Rank_Test_show, echo=T, eval=F, message=FALSE}
+wilcox_results_paired <- olink_wilcox(df = npx_df_paired,
+                                      pair_id = "Subject",
+                                      variable = 'Time')
+
+#The first 10 rows of the results from Wilcoxon Signed-Rank Test are shown:
+wilcox_results_paired %>% 
+  head(10)
+```
+
+```{r Wilcoxon_Signed-Rank_Test, echo=F, eval=T, message=FALSE}
 wilcox_results_paired <- olink_wilcox(df = npx_df_paired,
                                       pair_id = "Subject",
                                       variable = 'Time')
@@ -111,9 +125,18 @@ wilcox_results_paired %>%
 
 ## Kruskal-Wallis Test
 
-The Kruskal-Wallis Test could be performed using the `olink_one_non_parametric` function。
+The Kruskal-Wallis Test could be performed using the `olink_one_non_parametric` function.
 
-```{r Kruskal-Wallis_Test, echo=T, eval=T, message=FALSE}
+```{r Kruskal-Wallis_Test_show, echo=T, eval=F, message=FALSE}
+kruskal_results <- olink_one_non_parametric(df = npx_df,
+                                            variable = "Site")
+
+#The first 10 rows of the results from Kruskal-Wallis Test are shown:
+kruskal_results %>% 
+  head(10)
+```
+
+```{r Kruskal-Wallis_Test, echo=F, eval=T, message=FALSE}
 kruskal_results <- olink_one_non_parametric(df = npx_df,
                                             variable = "Site")
 
@@ -130,7 +153,26 @@ kruskal_results %>%
 
 If the Kruskal-Wallis Test shows significant differences among groups, you may perform post hoc tests (Dunn's test) to determine which specific groups differ from each other. The `test` argument is used to specify whether the post hoc test is from a Kruskal test or Friedman test. 
 
-```{r Kruskal-Wallis_Test_post, echo=T, eval=T, message=FALSE}
+```{r Kruskal-Wallis_Test_post_show, echo=T, eval=F, message=FALSE}
+# Find out the significant assays from the Kruskal-Wallis Test
+significant_assays <- kruskal_results %>% 
+  filter(Threshold == 'Significant') %>%
+  dplyr::select(OlinkID) %>%
+  distinct() %>%
+  pull()
+
+# Perform the post hoc test
+kruskal_posthoc_results <- olink_one_non_parametric_posthoc(npx_df,
+                                                            variable = "Site",
+                                                            test = "kruskal",
+                                                            olinkid_list = significant_assays)
+
+# The first 10 rows of the results from Kruskal-Wallis post hoc test are shown:
+kruskal_posthoc_results %>% 
+  head(10)
+```
+
+```{r Kruskal-Wallis_Test_post, echo=F, eval=T, message=FALSE}
 # Find out the significant assays from the Kruskal-Wallis Test
 significant_assays <- kruskal_results %>% 
   filter(Threshold == 'Significant') %>%
@@ -156,7 +198,7 @@ kruskal_posthoc_results %>%
 ```
 
 ## Friedman Test
-While using the `olink_one_non_parametric` funciton, if the `subject` is assigned a variable to indicate the paired samples, the Friedman Test will be performed instead of Kruskal-Wallis Test.
+While using the `olink_one_non_parametric` function, if the `subject` is assigned a variable to indicate the paired samples, the Friedman Test will be performed instead of Kruskal-Wallis Test.
 
 ```{r Friedman_Test, echo=T, eval=T, message=FALSE}
 friedman_results <- olink_one_non_parametric(df = npx_df_paired,
@@ -165,7 +207,27 @@ friedman_results <- olink_one_non_parametric(df = npx_df_paired,
                                              dependence = TRUE)
 ```
 
-```{r Friedman_Test_post, echo=T, eval=T, message=FALSE}
+If the Friedman Test reveals a significant difference between the groups, to find out which particular groups differ from one another, you can do post hoc tests (paired Wilcoxon test). To conduct the post hoc test for the Friedman test, set the `test` argument to `friedman`.
+
+```{r Friedman_Test_post_show, echo=T, eval=F, message=FALSE}
+# Find out the significant assays from the Kruskal-Wallis Test
+significant_assays <- friedman_results %>% 
+  filter(Threshold == 'Significant') %>%
+  dplyr::select(OlinkID) %>%
+  distinct() %>%
+  pull()
+
+# Perform the post hoc test
+friedman_posthoc_results <- olink_one_non_parametric_posthoc(npx_df,
+                                                            variable = "Time",
+                                                            test = "friedman",
+                                                            olinkid_list = significant_assays)
+
+# The results from Kruskal-Wallis post hoc test are shown:
+friedman_posthoc_results
+```
+
+```{r Friedman_Test_post, echo=F, eval=T, message=FALSE}
 # Find out the significant assays from the Kruskal-Wallis Test
 significant_assays <- friedman_results %>% 
   filter(Threshold == 'Significant') %>%
@@ -183,11 +245,129 @@ friedman_posthoc_results <- olink_one_non_parametric_posthoc(npx_df,
 friedman_posthoc_results %>% 
   kableExtra::kbl(booktabs = TRUE,
       digits = 1,
-      caption = "Table 5. First 10 rows of kruskal_posthoc_results.") %>%
+      caption = "Table 5. The output of kruskal_posthoc_results.") %>%
   kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE, font_size = 10, 
                 position = "center", latex_options = "HOLD_position") %>% 
   kableExtra::scroll_box(width = "100%")
 ```
+
+## CLM for ordinal regression
+For ordinal data, the CLM could be performed using the `olink_ordinaRegression` function, while using this function, the `NPX` column from the dataset will be transferred to ordinal factors. 
+
+```{r oredinal_regression, echo=T, eval=T, message=FALSE}
+ordinalRegression_results <- olink_ordinalRegression(df = npx_df,
+                                                     variable = "Site",
+                                                     covariates = "Time")
+```
+
+The `olink_ordinalRegression_posthoc` could then be used to find out which particular groups differ from one another for the significant assays.
+
+```{r oredinal_regression_post_show, echo=T, eval=F, message=FALSE}
+# Find out the significant assays from the ordinal regression model
+significant_assays <- ordinalRegression_results %>% 
+  filter(Threshold == 'Significant') %>%
+  dplyr::select(OlinkID) %>%
+  distinct() %>%
+  pull()
+
+# Perform the post hoc test
+ordinalRegression_posthoc_results <- olink_ordinalRegression_posthoc(npx_df,
+                                                                     variable=c("Site"),
+                                                                     covariates="Time",
+                                                                     olinkid_list = significant_assays,
+                                                                     effect = "Site")
+
+# The results from ordinal regression post hoc test are shown:
+ordinalRegression_posthoc_results %>% 
+  head(10)
+```
+
+```{r oredinal_regression_post, echo=F, eval=T, message=FALSE}
+# Find out the significant assays from the ordinal regression model
+significant_assays <- ordinalRegression_results %>% 
+  filter(Threshold == 'Significant') %>%
+  dplyr::select(OlinkID) %>%
+  distinct() %>%
+  pull()
+
+# Perform the post hoc test
+ordinalRegression_posthoc_results <- olink_ordinalRegression_posthoc(npx_df,
+                                                                     variable=c("Site"),
+                                                                     covariates="Time",
+                                                                     olinkid_list = significant_assays,
+                                                                     effect = "Site")
+
+# The results from ordinal regression post hoc test are shown:
+ordinalRegression_posthoc_results %>% 
+  head(10) %>% 
+  kableExtra::kbl(booktabs = TRUE,
+                  digits = 1,
+                  caption = "Table 5. First 10 rows of ordinalRegression_results_posthoc_results.") %>%
+  kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE, font_size = 10, 
+                            position = "center", latex_options = "HOLD_position") %>% 
+  kableExtra::scroll_box(width = "100%")
+```
+
+While using the `olink_ordinalRegression` function, sometimes it is not good to just convert a continuous variable to a ordinal variable. For example, directly convert the `NPX` values to a ordinal variable. Instead, a categorical variable could be obtained from `NPX` values. If the relationship between `NPX` values and independent variable is not linear, but rather u-shaped, then fitting a regression line is more difficult. Then we could try to cut the `NPX` values in to categories and entered into a regression model. For example:
+
+```{r ordinal_regression_10_show, echo=T, eval=F, message=FALSE}
+# Cut the NPX values to 10 breaks
+npx_df10 <- npx_df |> group_by(OlinkID) |>  mutate(NPX = cut(NPX, breaks = 10))
+
+
+# Perform the ordinal regression
+ordinalRegression_results <- olink_ordinalRegression(df = npx_df10,
+                                                     variable="Treatment:Time")
+
+# Find out the significant assays from the ordinal regression model
+significant_assays <- ordinalRegression_results %>% 
+  filter(Threshold == 'Significant') %>%
+  dplyr::select(OlinkID) %>%
+  distinct() %>%
+  pull()
+
+# Perform the post hoc test
+ordinalRegression_posthoc_results <- olink_ordinalRegression_posthoc(npx_df10,
+                                                                     variable=c("Treatment:Time"),
+                                                                     olinkid_list = significant_assays,
+                                                                     effect = "Time")
+
+# The results from ordinal regression post hoc test are shown:
+ordinalRegression_posthoc_results
+```
+
+```{r ordinal_regression_10, echo=F, eval=T, message=FALSE}
+# Cut the NPX values to 10 breaks
+npx_df10 <- npx_df |> group_by(OlinkID) |>  mutate(NPX = cut(NPX, breaks = 10))
+
+
+# Perform the ordinal regression
+ordinalRegression_results <- olink_ordinalRegression(df = npx_df10,
+                                                     variable="Treatment:Time")
+
+# Find out the significant assays from the ordinal regression model
+significant_assays <- ordinalRegression_results %>% 
+  filter(Threshold == 'Significant') %>%
+  dplyr::select(OlinkID) %>%
+  distinct() %>%
+  pull()
+
+# Perform the post hoc test
+ordinalRegression_posthoc_results <- olink_ordinalRegression_posthoc(npx_df10,
+                                                                     variable=c("Treatment:Time"),
+                                                                     olinkid_list = significant_assays,
+                                                                     effect = "Time")
+
+# The results from ordinal regression post hoc test are shown:
+ordinalRegression_posthoc_results %>% 
+  kableExtra::kbl(booktabs = TRUE,
+                  digits = 1,
+                  caption = "Table 5. The output of ordinalRegression_results_posthoc_results.") %>%
+  kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE, font_size = 10, 
+                            position = "center", latex_options = "HOLD_position") %>% 
+  kableExtra::scroll_box(width = "100%")
+```
+
 
 ## When should we consider using non-parametric tests
 

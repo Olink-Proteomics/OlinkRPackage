@@ -1,6 +1,6 @@
 #'Function which A two-way ordinal analysis of variance can address an experimental design with two independent variables, each of which is a factor variable.  The main effect of each independent variable can be tested, as well as the effect of the interaction of the two factors.
 #'
-#'Performs an ANOVA F-test for each assay (by OlinkID) in every panel using car::Anova and Type II sum of squares.
+#'Performs an ANOVA F-test for each assay (by OlinkID) in every panel using stats::Anova and Type III sum of squares. Dependent variable will be treated as ordered factor.
 #'The function handles only factor and/or covariates. \cr\cr
 #'Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a message if verbose = T).
 #'Character columns in the input dataframe are automatically converted to factors (specified in a message if verbose = T).
@@ -232,7 +232,7 @@ olink_ordinalRegression <- function(df,
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
       dplyr::mutate(!!data_type := rank(!!rlang::ensym(data_type))) %>%
       rstatix::convert_as_factor(!!rlang::ensym(data_type))%>%
-      dplyr::do(generics::tidy(anova(ordinal::clm(as.formula(formula_string),
+      dplyr::do(generics::tidy(stats::anova(ordinal::clm(as.formula(formula_string),
                                                        data=.,
                                                        threshold = "flexible"
                                                   ),type=3))) %>%
