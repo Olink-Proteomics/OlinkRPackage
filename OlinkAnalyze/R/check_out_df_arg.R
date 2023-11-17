@@ -13,6 +13,7 @@
 #'   [read_npx_delim()]
 #'   [read_npx_zip()]
 #'   [read_npx_parquet()]
+#'   [convert_read_npx_output()]
 #'
 check_out_df_arg <- function(out_df) {
 

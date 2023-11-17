@@ -23,6 +23,7 @@ functions is acceptable.
   [read_npx_delim()]
   [read_npx_zip()]
   [read_npx_parquet()]
+  [convert_read_npx_output()]
 }
 \author{
 Klev Diamanti
