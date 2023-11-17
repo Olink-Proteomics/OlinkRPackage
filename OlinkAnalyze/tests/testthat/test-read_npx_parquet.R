@@ -60,7 +60,7 @@ test_that(
 # Test that a relevant error is thrown when required metadata fieleds are
 # missing.
 test_that(
-  "All metadata fields are in place",
+  "Required metadata fields are missing",
   {
 
     withr::with_tempfile(
