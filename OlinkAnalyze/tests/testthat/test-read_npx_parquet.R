@@ -123,11 +123,11 @@ test_that(
         # random data frame
         df <- dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
-                      "B" = c("a", "b", "c"),
-                      "C" = c(TRUE, TRUE, FALSE),
-                      "D" = c("NA", "B", NA_character_),
-                      "E" = c(1L, 2L, 3L)
-          ) |>
+          "B" = c("a", "b", "c"),
+          "C" = c(TRUE, TRUE, FALSE),
+          "D" = c("NA", "B", NA_character_),
+          "E" = c(1L, 2L, 3L)
+        ) |>
           arrow::as_arrow_table()
 
         # modify metadata

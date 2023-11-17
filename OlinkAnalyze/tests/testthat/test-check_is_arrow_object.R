@@ -226,10 +226,10 @@ test_that(
           "D" = c("NA", "B", NA_character_),
           "E" = c(1L, 2L, 3L)
         ) |>
-        arrow::write_parquet(
-          sink = pfile_test,
-          compression = "gzip"
-        )
+          arrow::write_parquet(
+            sink = pfile_test,
+            compression = "gzip"
+          )
 
         # check that the semicolon delimited file exists
         expect_true(object = file.exists(pfile_test))

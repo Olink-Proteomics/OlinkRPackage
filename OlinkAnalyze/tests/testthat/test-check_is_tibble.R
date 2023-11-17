@@ -70,10 +70,10 @@ test_that(
 
     expect_error(
       object = check_is_tibble(df = data.frame(a = c(1, 2),
-                                                   b = c("a", "b"),
-                                                   c = c(TRUE, FALSE)) |>
-                                     arrow::as_arrow_table(),
-                                   error = TRUE),
+                                               b = c("a", "b"),
+                                               c = c(TRUE, FALSE)) |>
+                                 arrow::as_arrow_table(),
+                               error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
                     x = "is not a tibble data frame!",
@@ -158,17 +158,17 @@ test_that(
           "D" = c("NA", "B", NA_character_),
           "E" = c(1L, 2L, 3L)
         ) |>
-        utils::write.table(
-          file = dfile_test,
-          append = FALSE,
-          quote = FALSE,
-          sep = sep_arrow,
-          eol = "\n",
-          na = "",
-          dec = ".",
-          row.names = FALSE,
-          col.names = TRUE
-        )
+          utils::write.table(
+            file = dfile_test,
+            append = FALSE,
+            quote = FALSE,
+            sep = sep_arrow,
+            eol = "\n",
+            na = "",
+            dec = ".",
+            row.names = FALSE,
+            col.names = TRUE
+          )
 
         # check that the comma delimited file exists
         expect_true(object = file.exists(dfile_test))
@@ -226,10 +226,10 @@ test_that(
           "D" = c("NA", "B", NA_character_),
           "E" = c(1L, 2L, 3L)
         ) |>
-        arrow::write_parquet(
-          sink = pfile_test,
-          compression = "gzip"
-        )
+          arrow::write_parquet(
+            sink = pfile_test,
+            compression = "gzip"
+          )
 
         # check that the semicolon delimited file exists
         expect_true(object = file.exists(pfile_test))
