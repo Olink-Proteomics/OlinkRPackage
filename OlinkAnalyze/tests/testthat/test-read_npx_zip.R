@@ -104,7 +104,7 @@ test_that(
     withr::with_tempfile(
       new = "nfile_test",
       pattern = "npx",
-      fileext = ".parquet",
+      fileext = ".csv",
       code = {
 
         # write the coma-delimited file
@@ -173,7 +173,7 @@ test_that(
     withr::with_tempfile(
       new = "nfile_test",
       pattern = "npx",
-      fileext = ".parquet",
+      fileext = ".csv",
       code = {
 
         # write the coma-delimited file
@@ -246,7 +246,7 @@ test_that(
     withr::with_tempfile(
       new = "nfile_test",
       pattern = "npx",
-      fileext = ".parquet",
+      fileext = ".csv",
       code = {
 
         # write the coma-delimited file
@@ -334,7 +334,7 @@ test_that(
     withr::with_tempfile(
       new = "nfile_test",
       pattern = "npx",
-      fileext = ".parquet",
+      fileext = ".csv",
       code = {
 
         # write the coma-delimited file
@@ -426,7 +426,7 @@ test_that(
     withr::with_tempfile(
       new = "nfile_test",
       pattern = "npx",
-      fileext = ".parquet",
+      fileext = ".csv",
       code = {
 
         # write the coma-delimited file
@@ -518,7 +518,7 @@ test_that(
     withr::with_tempfile(
       new = "nfile_test",
       pattern = "npx",
-      fileext = ".parquet",
+      fileext = ".csv",
       code = {
 
         # write the coma-delimited file
@@ -572,7 +572,18 @@ test_that(
 
             # check that this works
             expect_no_condition(
-              object = read_npx_zip(file = zfile_test)
+              object = df_out <- read_npx_zip(file = zfile_test,
+                                              out_df = "arrow",
+                                              sep = NULL)
+            )
+
+            expect_true(inherits(x = df_out, what = "ArrowObject"))
+
+            expect_true(
+              read_npx_zip(file = zfile_test,
+                           out_df = "tibble",
+                           sep = NULL) |>
+                inherits(what = "tbl_df")
             )
 
           }
@@ -600,7 +611,7 @@ test_that(
     withr::with_tempfile(
       new = "nfile_test",
       pattern = "npx",
-      fileext = ".parquet",
+      fileext = ".csv",
       code = {
 
         # write the coma-delimited file
@@ -684,7 +695,7 @@ test_that(
     withr::with_tempfile(
       new = "nfile_test",
       pattern = "npx",
-      fileext = ".parquet",
+      fileext = ".csv",
       code = {
 
         # write the coma-delimited file
@@ -739,7 +750,18 @@ test_that(
 
             # check that this works
             expect_no_condition(
-              object = read_npx_zip(file = zfile_test)
+              object = df_out <- read_npx_zip(file = zfile_test,
+                                              out_df = "arrow",
+                                              sep = NULL)
+            )
+
+            expect_true(inherits(x = df_out, what = "ArrowObject"))
+
+            expect_true(
+              read_npx_zip(file = zfile_test,
+                           out_df = "tibble",
+                           sep = NULL) |>
+                inherits(what = "tbl_df")
             )
           }
         )
@@ -767,7 +789,7 @@ test_that(
     withr::with_tempfile(
       new = "nfile_test",
       pattern = "npx",
-      fileext = ".parquet",
+      fileext = ".csv",
       code = {
 
         # write the coma-delimited file
@@ -854,7 +876,7 @@ test_that(
     withr::with_tempfile(
       new = "nfile_test",
       pattern = "npx",
-      fileext = ".parquet",
+      fileext = ".csv",
       code = {
 
         # write the coma-delimited file
@@ -934,7 +956,7 @@ test_that(
     withr::with_tempfile(
       new = "nfile_test",
       pattern = "npx",
-      fileext = ".parquet",
+      fileext = ".csv",
       code = {
 
         # write the coma-delimited file

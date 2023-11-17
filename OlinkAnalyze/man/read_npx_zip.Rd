@@ -4,10 +4,21 @@
 \alias{read_npx_zip}
 \title{Helper function to read NPX zip-compressed files with checksum.}
 \usage{
-read_npx_zip(file, .ignore_files = c("README.txt"))
+read_npx_zip(
+  file,
+  out_df = "arrow",
+  sep = NULL,
+  .ignore_files = c("README.txt")
+)
 }
 \arguments{
 \item{file}{Path to Olink Software output zip file.}
+
+\item{out_df}{The class of output data frame to be returned. Accepted values
+are "tibble" and "arrow" (default).}
+
+\item{sep}{The separator of the delimited file: NULL (autodetect), comma (,)
+or semicolon (;). Used only for delimited Olink software output files.}
 
 \item{.ignore_files}{Vector of files to ignore.}
 }

@@ -6,6 +6,10 @@
 #'   Pascal Pucholt
 #'
 #' @param file Path to Olink Software output zip file.
+#' @param out_df The class of output data frame to be returned. Accepted values
+#' are "tibble" and "arrow" (default).
+#' @param sep The separator of the delimited file: NULL (autodetect), comma (,)
+#' or semicolon (;). Used only for delimited Olink software output files.
 #' @param .ignore_files Vector of files to ignore.
 #'
 #' @return An R6 class ArrowObject.
@@ -19,6 +23,8 @@
 #'
 read_npx_zip <-
   function(file,
+           out_df = "arrow",
+           sep = NULL,
            .ignore_files = c("README.txt")) {
 
     # Check if all required libraries for this function are installed
@@ -27,13 +33,16 @@ read_npx_zip <-
       error = TRUE
     )
 
-    # check that .ignore_files is a character vector
-    check_is_character(string = .ignore_files,
-                       error = TRUE)
-
     # check if file exists
     check_file_exists(file = file,
                       error = TRUE)
+
+    # check that the requested putput df is ok
+    check_out_df_arg(out_df = out_df)
+
+    # check that .ignore_files is a character vector
+    check_is_character(string = .ignore_files,
+                       error = TRUE)
 
     # **** Prep ****
 
@@ -148,10 +157,18 @@ read_npx_zip <-
     }
 
     # read the NPX file
-    df_npx <- read_npx_delim(file = extracted_file_npx)
+    df_olink <- read_npx(
+      filename = extracted_file_npx,
+      out_df = out_df,
+      sep = sep
+    )
 
     # cleanup temporary directory with extracted files
     invisible(unlink(x = tmp_unzip_dir, recursive = TRUE))
 
-    return(df_npx)
+    # if needed convert the object to the requested output
+    df_olink <- convert_read_npx_output(df = df_olink,
+                                        out_df = out_df)
+
+    return(df_olink)
   }
