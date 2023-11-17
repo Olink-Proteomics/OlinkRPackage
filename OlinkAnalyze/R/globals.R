@@ -8,13 +8,15 @@ utils::globalVariables(
 
 # Global variables ----
 
-# the checksum files we accept
+## Acceptable checksum file names ----
+
 accepted_checksum_files <- c(
   "MD5_checksum.txt",
   "checksum_sha256.txt"
 )
 
-# the extensions of NPX files that we accept
+## Acceptable extensions of NPX files ----
+
 accepted_npx_file_ext <- c(
   wide_1       = "xls",
   wide_2       = "xlsx",
@@ -24,13 +26,15 @@ accepted_npx_file_ext <- c(
   compressed_1 = "zip"
 )
 
-# the separators of the Olink long files
+## Acceptable separators for Olink software files in long format ----
+
 accepted_field_sep <- c(
   ";",
   ","
 )
 
-# the classes of the data frames that any of the read_npx* functions may output
+## Acceptable classes of data frames that read_npx* functions may output ----
+
 read_npx_df_output <- c(
   "tibble",
   "arrow"
