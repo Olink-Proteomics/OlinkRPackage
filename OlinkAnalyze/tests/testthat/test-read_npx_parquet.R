@@ -212,7 +212,7 @@ test_that(
   }
 )
 
-# Test that a teh funcction works if DataFileType is one of the accepted values.
+# Test that a the function works if DataFileType is one of the accepted values.
 test_that(
   "Function returns arrowobject - all DataFileType",
   {
@@ -438,6 +438,69 @@ test_that(
         # check that relevant error is thrown
         expect_no_condition(
           object = read_npx_parquet(file = pfile_test)
+        )
+
+      }
+    )
+
+  }
+)
+
+# Test that a the function returns the same df as its input.
+test_that(
+  "Function returns tibble - matches input",
+  {
+
+    withr::with_tempfile(
+      new = "pfile_test",
+      pattern = "parquet-file_test",
+      fileext = ".parquet",
+      code = {
+
+        # random data frame
+        df <- dplyr::tibble(
+          "A" = c(1, 2.2, NA_real_),
+          "B" = c("a", NA_character_, "c"),
+          "C" = c(NA, TRUE, FALSE),
+          "D" = c("A#1", "B", NA_character_),
+          "E" = c(1L, 2L, NA_integer_)
+        ) |>
+          arrow::as_arrow_table()
+
+        # modify metadata ----
+        df$metadata$FileVersion <- "NA"
+        df$metadata$ProjectName <- "NA"
+        df$metadata$SampleMatrix <- "NA"
+        df$metadata$DataFileType <- "NPX File"
+        df$metadata$Product <- "ExploreHT"
+
+        # write the parquet file
+        arrow::write_parquet(
+          x = df,
+          sink = pfile_test,
+          compression = "gzip"
+        )
+
+        # check that the semicolon delimited file exists
+        expect_true(object = file.exists(pfile_test))
+
+        # check that relevant error is thrown
+        expect_no_condition(
+          object = df_out <- read_npx_parquet(file = pfile_test,
+                                              out_df = "tibble")
+        )
+
+        expect_true(object = exists("df_out"))
+
+        # convert df which is an ArrowObject to a tibble
+        # so that the test below works
+        df <- df |>
+          dplyr::as_tibble()
+
+        # check that the two dataframes are identical
+        expect_equal(
+          object = df_out,
+          expected = df
         )
 
       }
