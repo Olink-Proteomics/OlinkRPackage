@@ -22,6 +22,14 @@ knitr::opts_chunk$set(
 options(tibble.print_min = 4L, tibble.print_max = 4L)
 ```
 
+```{r, echo=FALSE, message=FALSE}
+library(OlinkAnalyze)
+library(dplyr)
+library(stringr)
+library(ggplot2)
+library(kableExtra)
+```
+
 ## Introduction
 
 When particular assumptions about population distribution or data characteristic are not met, a non-parametric test could be considered to analyze the data. Unlike parametric tests, which assume that the data follows a specific distribution (usually the normal distribution) and have specific parameters, non-parametric tests do not make these strict assumptions and are often referred to as distribution-free tests. Non-parametric tests are useful when dealing with ordinal, nominal, or skewed data or when the sample size is small.
