@@ -63,13 +63,14 @@ read_npx_delim <- function(file,
   tryCatch(
     {
 
-      df_olink <- arrow::open_delim_dataset(
-        sources = file,
+      df_olink <- arrow::read_delim_arrow(
+        file = file,
         delim = sep,
-        quote = "\"",
         col_names = TRUE,
+        quoted_na = TRUE,
         na = c("", "NA")
-      )
+      ) |>
+        arrow::as_arrow_table()
 
     }, error = function(msg) {
 
