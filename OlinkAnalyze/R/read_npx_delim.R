@@ -6,6 +6,8 @@
 #'   Kathleen Nevola
 #'
 #' @param file Path to Olink software output in txt or csv.
+#' @param out_df The class of output data frame to be returned. Accepted values
+#' are "tibble" and "arrow" (default).
 #' @param sep The separator of the file: NULL (autodetect), comma (,) or
 #' semicolon (;).
 #'
@@ -19,11 +21,15 @@
 #'   [read_npx_zip()]
 #'
 read_npx_delim <- function(file,
+                           out_df = "arrow",
                            sep = NULL) {
 
   # check if file exists
   check_file_exists(file = file,
                     error = TRUE)
+
+  # check that the requested output df is ok
+  check_out_df_arg(out_df = out_df)
 
   # check separator
   if (is.null(sep)) {
@@ -57,7 +63,7 @@ read_npx_delim <- function(file,
   tryCatch(
     {
 
-      df_npx <- arrow::open_delim_dataset(
+      df_olink <- arrow::open_delim_dataset(
         sources = file,
         delim = sep,
         quote = "\"",
@@ -79,7 +85,7 @@ read_npx_delim <- function(file,
     }
   )
 
-  if (length(names(df_npx)) == 1L) {
+  if (length(names(df_olink)) == 1L) {
 
     cli::cli_warn(
       message = "The delimited file {file} has only one column. Wrong input sep
@@ -90,7 +96,11 @@ read_npx_delim <- function(file,
 
   }
 
-  return(df_npx)
+  # if needed convert the object to the requested output
+  df_olink <- convert_read_npx_output(df = df_olink,
+                                      out_df = out_df)
+
+  return(df_olink)
 }
 
 #' @rdname read_npx_delim

@@ -141,11 +141,21 @@ test_that(
         # chech that reading the file works
         expect_no_condition(
           object = coma_df <- read_npx_delim(file = cdfile_test,
+                                             out_df = "arrow",
                                              sep = NULL)
         )
 
         # check that variable exists
         expect_true(object = exists("coma_df"))
+
+        expect_true(inherits(x = coma_df, what = "ArrowObject"))
+
+        expect_true(
+          object = read_npx_delim(file = cdfile_test,
+                                  out_df = "tibble",
+                                  sep = NULL) |>
+            inherits(what = "tbl_df")
+        )
 
         # write the semicolon-delimited file
         utils::write.table(
@@ -167,11 +177,21 @@ test_that(
         # chech that reading the file works
         expect_no_condition(
           object = semicolon_df <- read_npx_delim(file = scdfile_test,
+                                                  out_df = "arrow",
                                                   sep = NULL)
         )
 
         # check that variable exists
         expect_true(object = exists("semicolon_df"))
+
+        expect_true(inherits(x = semicolon_df, what = "ArrowObject"))
+
+        expect_true(
+          object = read_npx_delim(file = scdfile_test,
+                                  out_df = "tibble",
+                                  sep = NULL) |>
+            inherits(what = "tbl_df")
+        )
 
         # check that the two dataframes are identical
         expect_equal(

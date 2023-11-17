@@ -5,12 +5,15 @@
 \alias{read_npx_csv}
 \title{Help function to read in Olink data from comma or semicolon delimited files.}
 \usage{
-read_npx_delim(file, sep = NULL)
+read_npx_delim(file, out_df = "arrow", sep = NULL)
 
-read_npx_csv(file, sep = NULL)
+read_npx_csv(file, out_df = "arrow", sep = NULL)
 }
 \arguments{
 \item{file}{Path to Olink software output in txt or csv.}
+
+\item{out_df}{The class of output data frame to be returned. Accepted values
+are "tibble" and "arrow" (default).}
 
 \item{sep}{The separator of the file: NULL (autodetect), comma (,) or
 semicolon (;).}
