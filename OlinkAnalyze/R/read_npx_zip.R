@@ -37,7 +37,7 @@ read_npx_zip <-
     check_file_exists(file = file,
                       error = TRUE)
 
-    # check that the requested putput df is ok
+    # check that the requested output df is ok
     check_out_df_arg(out_df = out_df)
 
     # check that .ignore_files is a character vector
