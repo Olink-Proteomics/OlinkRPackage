@@ -12,7 +12,7 @@ check_out_df_arg(out_df)
 are "tibble" and "arrow".}
 }
 \value{
-`TRUE` if the argument is as expected, and an error otherwise.
+An error if the argument is not as expected.
 }
 \description{
 Help function checking that the requested output class of the read_npx*

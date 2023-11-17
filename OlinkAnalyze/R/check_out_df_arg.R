@@ -6,7 +6,7 @@
 #' @param out_df The class of output data frame to be returned. Accepted values
 #' are "tibble" and "arrow".
 #'
-#' @return `TRUE` if the argument is as expected, and an error otherwise.
+#' @return An error if the argument is not as expected.
 #'
 #' @seealso
 #'   [read_npx()]
@@ -21,11 +21,7 @@ check_out_df_arg <- function(out_df) {
   check_is_scalar_character(string = out_df,
                             error = TRUE)
 
-  if (out_df %in% read_npx_df_output) {
-
-    return(TRUE)
-
-  } else {
+  if (!(out_df %in% read_npx_df_output)) {
 
     cli::cli_abort(
       message = c(

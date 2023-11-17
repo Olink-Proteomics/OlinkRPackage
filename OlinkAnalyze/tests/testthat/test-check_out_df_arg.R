@@ -1,11 +1,11 @@
 test_that(
   "check out df arg works - TRUE",
   {
-    expect_true(
+    expect_no_condition(
       object = check_out_df_arg(out_df = "tibble")
     )
 
-    expect_true(
+    expect_no_condition(
       object = check_out_df_arg(out_df = "arrow")
     )
 
