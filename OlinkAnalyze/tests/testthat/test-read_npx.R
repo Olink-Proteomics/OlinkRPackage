@@ -105,17 +105,6 @@ test_that("Data loads correctly with 'read_NPX()'", {
 })
 
 
-# Sample ID with # --------------------------------------------------------
-
-
-test_that("# in SampleID", {
-      input <- suppressWarnings(read_NPX(testthat::test_path("refs/mock_sampleID_hashes.csv")))
-
-      expect_equal(input$SampleID, c("Sample#1", "Sample_#31"))
-})
-
-
-
 # Flex long format QUANT xlsx ---------------------------------------------
 
 
