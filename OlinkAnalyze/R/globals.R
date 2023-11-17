@@ -29,3 +29,9 @@ accepted_field_sep <- c(
   ";",
   ","
 )
+
+# the classes of the data frames that any of the read_npx* functions may output
+read_npx_df_output <- c(
+  "tibble",
+  "arrow"
+)
