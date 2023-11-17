@@ -18,8 +18,10 @@ A string or NA. If the function return NA then everything worked
 fine, otherwise there was some sort of error.
 }
 \description{
-Help function comparing the checksum reported by Olink software to the
-checksum of the delivered NPX file.
+We should make it here only if MD5_checksum.txt or checksum_sha256.txt are
+present in the zip file.
+
+This function does not check whether checksum_file is in acceptable format.
 }
 \author{
 Klev Diamanti

@@ -1,6 +1,12 @@
 #' Help function comparing the checksum reported by Olink software to the
 #' checksum of the delivered NPX file.
 #'
+#' @description
+#' We should make it here only if MD5_checksum.txt or checksum_sha256.txt are
+#' present in the zip file.
+#'
+#' This function does not check whether checksum_file is in acceptable format.
+#'
 #' @author Klev Diamanti
 #'
 #' @param checksum_file The plain file that contains the checksum output from
@@ -13,9 +19,7 @@
 check_checksum <- function(checksum_file,
                            npx_file) {
 
-  # We should make it here only if MD5_checksum.txt or checksum_sha256.txt are
-  # present in the zip file.
-
+  # check installed libraries
   check_library_installed(
     libraries = c("openssl"),
     error = TRUE
