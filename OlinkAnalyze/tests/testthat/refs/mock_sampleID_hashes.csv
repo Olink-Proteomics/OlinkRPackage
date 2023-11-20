@@ -1,3 +1,0 @@
-"";"SampleID";"Index";"OlinkID";"UniProt";"Assay";"MissingFreq";"Panel";"Panel_Lot_Nr";"PlateID";"QC_Warning";"LOD";"NPX";"Normalization";"Assay_Warning"
-"1";"Sample#1";1;"OID31158";"Q96KB5";"PBK";"0.1";"Oncology_II";"B22604";"Project_test_hash";"PASS";-1;1;"Plate control";"WARN"
-"2";"Sample_#31";2;"OID31158";"Q96KB5";"PBK";"0.1";"Oncology_II";"B22604";"Project_test_hash";"PASS";-1;11;"Plate control";"WARN"
