@@ -3,30 +3,54 @@
 \name{read_npx}
 \alias{read_npx}
 \alias{read_NPX}
-\title{Function to read NPX data into long format}
+\title{Function to read NPX data into R in long format.}
 \usage{
-read_npx(filename)
+read_npx(
+  filename,
+  out_df = "tibble",
+  sep = NULL,
+  .ignore_files = c("README.txt")
+)
 
-read_NPX(filename)
+read_NPX(
+  filename,
+  out_df = "tibble",
+  sep = NULL,
+  .ignore_files = c("README.txt")
+)
 }
 \arguments{
-\item{filename}{Path to Olink Software output file.}
+\item{filename}{Path to Olink software output file.}
+
+\item{out_df}{The class of output data frame to be returned. Accepted values
+are "tibble" (default) and "arrow".}
+
+\item{sep}{The separator of the delimited file: NULL (autodetect), comma (,)
+or semicolon (;). Used only for delimited Olink software output files.}
+
+\item{.ignore_files}{Files to ignore in the zip-compressed Olink software
+output files. Used only for zip-compressed Olink software output files.}
 }
 \value{
 A "tibble" in long format.
 }
 \description{
-Imports an NPX or QUANT file exported from Olink Software.
-No alterations to the output format is allowed.
+Imports an NPX or QUANT file exported from Olink software.
+
+__Note__ Please do not alter the Olink software output file prior to
+importing is using `read_NPX()` as it might fail.
 }
 \examples{
 \donttest{
-
 file <- system.file("extdata",
                     "Example_NPX_Data.csv",
                     package = "OlinkAnalyze")
-read_NPX(file)
 
+read_NPX(filename = file,
+         sep = NULL)
+
+read_NPX(filename = file,
+         sep = ";")
 }
 
 }
