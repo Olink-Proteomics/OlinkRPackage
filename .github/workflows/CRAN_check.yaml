@@ -49,6 +49,11 @@ jobs:
           working-directory: OlinkAnalyze
           extra-packages: any::rcmdcheck, pillar, any::devtools, any::cli, any::rhub, any::revdepcheck, github::r-lib/revdepcheck, any::spelling
 
+      - name: Install Matrix from source
+        run: |
+          install.packages("Matrix", type="source", repos='http://cran.us.r-project.org')
+        shell: Rscript {0}
+
       - name: Record check messages
         if: success() || failure()
         run: |
