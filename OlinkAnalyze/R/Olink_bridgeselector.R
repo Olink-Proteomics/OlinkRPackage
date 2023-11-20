@@ -41,11 +41,11 @@ olink_bridgeselector<-function(df, sampleMissingFreq, n){
 
   #Outlier calculation as in qc_plot for filtering
   qc_outliers <- df %>%
-    dplyr::group_by(Panel, SampleID, Index) %>%
+    dplyr::group_by(Panel, SampleID) %>%
     dplyr::mutate(IQR = IQR(NPX, na.rm = TRUE),
                   sample_median = median(NPX, na.rm = TRUE)) %>%
     dplyr::ungroup() %>%
-    dplyr::select(SampleID, Index, Panel, IQR, sample_median) %>%
+    dplyr::select(SampleID, Panel, IQR, sample_median) %>%
     dplyr::distinct() %>%
     dplyr::group_by(Panel) %>%
     dplyr::mutate(median_low = mean(sample_median, na.rm = TRUE) - 3*sd(sample_median, na.rm = TRUE),
@@ -58,10 +58,57 @@ olink_bridgeselector<-function(df, sampleMissingFreq, n){
                                       IQR > iqr_low &
                                       IQR < iqr_high,
                                     0, 1)) %>%
-    dplyr::select(SampleID, Index, Panel, Outlier)
+
+    dplyr::select(SampleID, Panel, Outlier)
+
+
+  # Alternative LODs for when LOD is not present
+  if(!("LOD" %in% names(df))){
+    if("Plate LOD" %in% names(df)){
+      df <- df |>
+        dplyr::mutate(LOD = `Plate LOD`)
+      message("Using Plate LOD as filter criteria...")
+    } else if ("Plate_LOD" %in% names(df)){
+      df <- df |>
+        dplyr::mutate(LOD = Plate_LOD)
+
+      message("Using Plate_LOD as filter criteria...")
+    } else if ("plateLOD" %in% names(df)){
+      df <- df |>
+        dplyr::mutate(LOD = plateLOD)
+
+      message("Using plateLOD as filter criteria...")
+    } else if ("Max LOD" %in% names(df)){
+      df <- df |>
+        dplyr::mutate(LOD = `Max LOD`)
+
+      message("Using Max LOD as filter criteria...")
+    } else if ("Max_LOD" %in% names(df)){
+      df <- df |>
+        dplyr::mutate(LOD = Max_LOD)
+
+      message("Using Max_LOD as filter criteria...")
+    } else if ("maxLOD" %in% names(df)){
+      df <- df |>
+        dplyr::mutate(LOD = maxLOD)
+
+      message("Using maxLOD as filter criteria...")
+    } else {
+      df <- df |>
+        dplyr::mutate(LOD = -Inf)
+
+      message("LOD not available. No filtering by LOD...")
+    }
+  }
+
+  if("SampleQC" %in% names(df)){
+    df <- df |>
+      dplyr::mutate(QC_Warning = SampleQC)
+  }
+
 
   df_1 <- df %>%
-    dplyr::left_join(qc_outliers, by = c('SampleID', 'Index', 'Panel')) %>%
+    dplyr::left_join(qc_outliers, by = c('SampleID', 'Panel')) %>%
     dplyr::mutate(NPX = ifelse(NPX <= LOD, NA, NPX)) %>%
     dplyr::group_by(SampleID) %>%
     dplyr::mutate(QC_Warning = dplyr::if_else(all(toupper(QC_Warning) == 'PASS'),

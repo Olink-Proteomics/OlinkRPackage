@@ -2,5 +2,5 @@ inst/doc
 /doc/
 /Meta/
 /revdep/
-
+.DS_Store
 **/_snaps/**/*.new.*

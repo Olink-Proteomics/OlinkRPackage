@@ -111,7 +111,7 @@ olink_wilcox <- function(df, variable, pair_id, ...){
 
   #Every sample needs to have a unique level of the factor
   number_of_samples_w_more_than_one_level <- df %>%
-    dplyr::group_by(SampleID, Index) %>%
+    dplyr::group_by(SampleID) %>%
     dplyr::summarise(n_levels = dplyr::n_distinct(!!rlang::ensym(variable), na.rm = T)) %>%
     dplyr::ungroup() %>%
     dplyr::filter(n_levels > 1) %>%
@@ -176,6 +176,7 @@ olink_wilcox <- function(df, variable, pair_id, ...){
       dplyr::do(tidy(stats::wilcox.test(x = .[[var_levels[1]]],
                                         y = .[[var_levels[2]]],
                                         paired = TRUE,
+                                        conf.int = TRUE,
                                         ...))) %>%
       dplyr::ungroup() %>%
       dplyr::mutate(Adjusted_pval = p.adjust(p.value, method = "fdr")) %>%

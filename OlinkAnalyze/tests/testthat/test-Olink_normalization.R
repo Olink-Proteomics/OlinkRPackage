@@ -1,9 +1,10 @@
 #Load reference results
-refRes_file <- '../data/refResults.RData'
+refRes_file <- testthat::test_path("../data/refResults.RData")
 load(refRes_file)
 
 #Load data with hidden/excluded assays (all NPX=NA)
-load(file = '../data/npx_data_format221010.RData')
+load(file = testthat::test_path("../data/npx_data_format221010.RData"))
+# loads npx_data_format221010 and npx_data_format221010.project2
 
 # Sample subset used to reduce file size of the ref results
 sampleSubset <- c("A6", "A38","B47","B22","A43","D75","D79","C66","B43","B70","D52","A58","B71","A50","D1", "B8")
@@ -131,6 +132,48 @@ test_that("olink_normalization works", {
                 mutate(match = NPX.x == NPX.y) %>%
                 pull(match) %>%
                 all())
+
+  npx_data_LOD <- npx_data2 %>%
+    dplyr::mutate(`Max LOD` = LOD) %>%
+    dplyr::mutate(`Plate LOD` = LOD) %>%
+    dplyr::mutate(Plate_LOD = LOD) %>%
+    dplyr::mutate(Project = 'P1')  %>%
+    dplyr::mutate(Normalization = "Intensity")
+
+  npx_df2 <- npx_data1 %>%
+    dplyr::mutate(`Max LOD` = LOD) %>%
+    dplyr::mutate(`Plate LOD` = LOD) %>%
+    dplyr::mutate(Plate_LOD = LOD) %>%
+    dplyr::mutate(Project = 'P2') %>%
+    dplyr::mutate(Normalization = "Intensity")
+
+  #Bridging normalization:
+  # Find overlapping samples, but exclude Olink control
+  overlap_samples <- intersect((npx_data_LOD %>%
+                                  dplyr::filter(!grepl("control", SampleID,
+                                                       ignore.case=TRUE)))$SampleID,
+                               (npx_df2 %>%
+                                  dplyr::filter(!grepl("control", SampleID,
+                                                       ignore.case=TRUE)))$SampleID)
+  # Normalize
+  norm_data <- olink_normalization(df1 = npx_data_LOD,
+                                   df2 = npx_df2,
+                                   overlapping_samples_df1 = overlap_samples,
+                                   df1_project_nr = 'P1',
+                                   df2_project_nr = 'P2',
+                                   reference_project = 'P1')
+  norm_data_p1 <- norm_data |>
+    dplyr::filter(Project == "P1")
+
+  norm_data_p2 <- norm_data |>
+    dplyr::filter(Project == "P2")
+
+  expect_true(all(npx_df2$LOD + norm_data_p2$Adj_factor == norm_data_p2$LOD))
+  expect_true(all(npx_df2$`Max LOD` + norm_data_p2$Adj_factor == norm_data_p2$`Max LOD`))
+  expect_true(all(npx_df2$`Plate LOD` + norm_data_p2$Adj_factor == norm_data_p2$`Plate LOD`))
+  expect_true(all(npx_df2$Plate_LOD + norm_data_p2$Adj_factor == norm_data_p2$Plate_LOD))
+
+
 })
 
 # Test if column "Normalize" is missing
@@ -216,7 +259,7 @@ test_that("df1 and df2 same normalization", {
     df1_project_nr = '20200001',
     df2_project_nr = '20200002',
     reference_project = '20200001'),
-    "df1 and df2 are not normalized with the same approach. Consider renormalizing.")
+    "There are 184 assays not normalized with the same approach. Consider renormalizing.")
 
   # different normalization with unexpected values in Normalization column
   # currently we do not check values in this column, but in the future we might
@@ -238,7 +281,119 @@ test_that("df1 and df2 same normalization", {
     df1_project_nr = '20200001',
     df2_project_nr = '20200002',
     reference_project = '20200001'),
-    "df1 and df2 are not normalized with the same approach. Consider renormalizing.")
+    "There are 184 assays not normalized with the same approach. Consider renormalizing.")
+
+  # test that assays have identical Normalization column between the two
+  # datasets
+  expect_warning(
+    olink_normalization(df1 = {
+      npx_data1 |>
+        dplyr::mutate(
+          Normalization = dplyr::if_else(OlinkID %in% c("OID01216", "OID01217"),
+                                         "Plate control",
+                                         "Intensity")
+        )
+    },
+    df2 = {
+      npx_data2 |>
+        mutate(Normalization = "Intensity")
+    },
+    overlapping_samples_df1 = {
+      intersect(npx_data1$SampleID, npx_data2$SampleID) |>
+        as_tibble() |>
+        filter(!str_detect(value, 'CONTROL_SAMPLE')) |>
+        pull()
+    },
+    df1_project_nr = '20200001',
+    df2_project_nr = '20200002',
+    reference_project = '20200001'),
+    "Assays OID01216 and OID01217 are not normalized with the same approach.")
+
+  # test that assays have identical Normalization column between the two
+  # datasets
+  expect_warning(
+    olink_normalization(df1 = {
+      npx_data1 |>
+        dplyr::mutate(
+          Normalization = dplyr::if_else(OlinkID %in% { npx_data1$OlinkID |> unique() |> head(11) },
+                                         "Plate control",
+                                         "Intensity")
+        )
+    },
+    df2 = {
+      npx_data2 |>
+        mutate(Normalization = "Intensity")
+    },
+    overlapping_samples_df1 = {
+      intersect(npx_data1$SampleID, npx_data2$SampleID) |>
+        as_tibble() |>
+        filter(!str_detect(value, 'CONTROL_SAMPLE')) |>
+        pull()
+    },
+    df1_project_nr = '20200001',
+    df2_project_nr = '20200002',
+    reference_project = '20200001'),
+    "There are 11 assays not normalized with the same approach. Consider renormalizing.")
+
+  # it should work if all assays are normalized the same way
+  expect_no_warning(
+    olink_normalization(df1 = {
+      npx_data1 |>
+        dplyr::mutate(
+          Normalization = dplyr::if_else(OlinkID %in% c("OID01216", "OID01217"),
+                                         "Plate control",
+                                         "Intensity")
+        )
+    },
+    df2 = {
+      npx_data2 |>
+        dplyr::mutate(
+          Normalization = dplyr::if_else(OlinkID %in% c("OID01216", "OID01217"),
+                                         "Plate control",
+                                         "Intensity")
+        )
+    },
+    overlapping_samples_df1 = {
+      intersect(npx_data1$SampleID, npx_data2$SampleID) |>
+        as_tibble() |>
+        filter(!str_detect(value, 'CONTROL_SAMPLE')) |>
+        pull()
+    },
+    df1_project_nr = '20200001',
+    df2_project_nr = '20200002',
+    reference_project = '20200001')
+  )
+
+  # check that EXCLUDED assays are ignored
+  expect_no_warning(
+    expect_no_warning(
+      olink_normalization(df1 = {
+        npx_data1 |>
+          dplyr::mutate(
+            Normalization = dplyr::if_else(OlinkID %in% c("OID01216", "OID01217"),
+                                           "EXCLUDED",
+                                           "Intensity")
+          )
+      },
+      df2 = {
+        npx_data2 |>
+          dplyr::mutate(
+            Normalization = dplyr::if_else(OlinkID %in% c("OID01216", "OID01217"),
+                                           "Plate control",
+                                           "Intensity")
+          )
+      },
+      overlapping_samples_df1 = {
+        intersect(npx_data1$SampleID, npx_data2$SampleID) |>
+          as_tibble() |>
+          filter(!str_detect(value, 'CONTROL_SAMPLE')) |>
+          pull()
+      },
+      df1_project_nr = '20200001',
+      df2_project_nr = '20200002',
+      reference_project = '20200001')
+    )
+  )
 })
 
 test_that("Different columns in dfs can be normalized",{

@@ -64,7 +64,6 @@ jobs:
       - name: Install Matrix from source
         run: |
           install.packages("Matrix", type="source", repos='http://cran.us.r-project.org')
-          remotes::install_deps(dependencies = TRUE)
         shell: Rscript {0}
 
       - uses: r-lib/actions/check-r-package@v2
@@ -140,7 +139,7 @@ jobs:
         shell: Rscript {0}
 
       - name: Check package
-        run: |
+        run: |                             
           check_results <- rcmdcheck::rcmdcheck(error_on = "error",
                                                 path = "OlinkAnalyze", 
                                                 check_dir = "check")
