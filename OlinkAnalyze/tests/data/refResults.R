@@ -652,47 +652,47 @@ rm(
   preproc_npx_data1_missing_data
 )
 
-#### Wrap up the results ####
+# Wrap up the results ----
 
 reference_results <- list(
-  t.test_results = t_test,
-  t.test_results_paired = t_test_paired,
+  t_test = t_test,
+  t_test_paired = t_test_paired,
 
-  wilcox.test_results = wilcox_test,
-  wilcox.test_results_paired = wilcox_test_paired,
+  wilcox_test = wilcox_test,
+  wilcox_test_paired = wilcox_test_paired,
 
-  kruskal_results = kruskal,
-  kruskal_posthoc_results = kruskal_posthoc,
+  kruskal = kruskal,
+  kruskal_posthoc = kruskal_posthoc,
 
-  friedman_results = friedman,
-  friedman_posthoc_results = friedman_posthoc,
+  friedman = friedman,
+  friedman_posthoc = friedman_posthoc,
 
-  ordinalRegression_results = ordinal_regression,
-  ordinalRegression_results_posthoc_results = ordinal_regression_posthoc,
+  ordinal_regression = ordinal_regression,
+  ordinal_regression_posthoc = ordinal_regression_posthoc,
 
-  anova_results_1_site = anova_site,
-  anova_posthoc_1_site = anova_site_posthoc,
+  anova_site = anova_site,
+  anova_site_posthoc = anova_site_posthoc,
 
-  anova_results_1_time = anova_time,
-  anova_posthoc_1_time = anova_time_posthoc,
+  anova_time = anova_time,
+  anova_time_posthoc = anova_time_posthoc,
 
-  anova_results_1_siteTime = anova_site_time,
+  anova_site_time = anova_site_time,
 
-  lmer_results_1 = lmer,
-  lmer_results_1_posthoc = lmer_posthoc,
+  lmer = lmer,
+  lmer_posthoc = lmer_posthoc,
 
-  normalization_results.bridged = normalization_bridge,
-  normalization_results.intensity = normalization_intensity,
-  normalization_results.subset = normalization_subset,
-  normalization_results.multi = normalization_multibatch,
+  normalization_bridge = normalization_bridge,
+  normalization_intensity = normalization_intensity,
+  normalization_subset = normalization_subset,
+  normalization_multibatch = normalization_multibatch,
 
-  randomized_result1 = randomized_samples,
-  randomized_result2 = randomized_subjects,
-  randomized_result3 = randomized_subjects_spots,
-  randomized_result4 = randomized_samples_spots,
+  randomized_samples = randomized_samples,
+  randomized_subjects = randomized_subjects,
+  randomized_subjects_spots = randomized_subjects_spots,
+  randomized_samples_spots = randomized_samples_spots,
 
-  procData = preprocessing_dim_red,
-  procData_missingData = preprocessing_dim_red_miss
+  preprocessing_dim_red = preprocessing_dim_red,
+  preprocessing_dim_red_miss = preprocessing_dim_red_miss
 )
 
 save(
