@@ -278,27 +278,6 @@ anova_site_time <- OlinkAnalyze::olink_anova(
     -dplyr::all_of("id")
   )
 
-######### Posthoc ANOVA ------
-
-anova_posthoc_1_site <- olink_anova_posthoc(npx_data1,
-                                            variable = 'Site',
-                                            olinkid_list =  {anova_results_1_site %>%
-                                                head(10)%>%
-                                                dplyr::pull(OlinkID)},
-                                            effect = 'Site') %>%
-  mutate(id = as.character(OlinkID)) %>%
-  arrange(id, contrast) %>% #Since OlinkID is not unique here (=> ties), contrast is used to break the ties
-  select(-id)
-anova_posthoc_1_time <- olink_anova_posthoc(npx_data1,
-                                            variable = 'Time',
-                                            {anova_results_1_time %>%
-                                                head(10) %>%
-                                                dplyr::pull(OlinkID)},
-                                            effect = 'Time') %>%
-  mutate(id = as.character(OlinkID)) %>%
-  arrange(id, contrast) %>% #Just for consistency. Not actually needed in this case
-  select(-id)
-
 # LMER ----
 
 # lmer
