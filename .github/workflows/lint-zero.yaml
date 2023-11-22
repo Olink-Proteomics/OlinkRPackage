@@ -28,7 +28,7 @@ jobs:
 
       - name: Lint current commit
         run: |
-          pkgload::load_all()
+          pkgload::load_all(path = "OlinkAnalyze")
           ll <- lintr::lint_package()
           print(paste("Number of detected lints:", length(ll)))
           print(ll)
