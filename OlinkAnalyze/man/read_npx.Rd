@@ -43,7 +43,7 @@ importing is using `read_NPX()` as it might fail.
 \examples{
 \donttest{
 file <- system.file("extdata",
-                    "Example_NPX_Data.csv",
+                    "Example_NPX_Data2_1.csv",
                     package = "OlinkAnalyze")
 
 read_NPX(filename = file,
