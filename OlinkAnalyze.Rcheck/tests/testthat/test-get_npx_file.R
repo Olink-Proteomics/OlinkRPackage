@@ -1,0 +1,156 @@
+# test all realistic scenario combos of checksum files and NPX files ----
+
+# Test get_npx_file for slightly different inputs. Specifically,
+# checking for all combos of checksum file and NPX file
+test_checksum_npx_combo <- function(c_file, n_file) {
+  test_that(
+    paste("Testing get NPX file from zip with:", c_file, "and", n_file), {
+      expect_equal(
+        object = get_npx_file(files = c(c_file, n_file)),
+        expected = n_file
+      )
+    }
+  )
+}
+
+invisible(
+  sapply(
+    accepted_checksum_files,
+    function(checksum_file) {
+      sapply(
+        paste0("test.", accepted_npx_file_ext[accepted_npx_file_ext != "zip"]),
+        function(npx_file) {
+          test_checksum_npx_combo(c_file = checksum_file, n_file = npx_file)
+        }
+      )
+    }
+  )
+)
+
+rm(test_checksum_npx_combo)
+
+# test all realistic scenario of NPX files input only ----
+
+# Test get_npx_file for slightly different inputs. Specifically,
+# checking for all NPX files.
+test_npx_input <- function(n_file) {
+  test_that(
+    paste("Testing get NPX file from zip with:", n_file), {
+      expect_equal(
+        object = get_npx_file(files = n_file),
+        expected = n_file
+      )
+    }
+  )
+}
+
+invisible(
+  sapply(
+    paste0("test.", accepted_npx_file_ext[accepted_npx_file_ext != "zip"]),
+    function(npx_file) {
+      test_npx_input(n_file = npx_file)
+    }
+  )
+)
+
+rm(test_npx_input)
+
+# Test edge cases ----
+
+# Test that relevant error is thrown when only checksum files are provided.
+test_that(
+  "get NPX file from zip - only checksums",
+  {
+    # one MD5 only
+    expect_error(
+      object = get_npx_file(
+        files = c("MD5_checksum.txt")
+      ),
+      regexp = "The compressed file contains no NPX files!"
+    )
+
+    # two MD5
+    expect_error(
+      object = get_npx_file(
+        files = c("MD5_checksum.txt", "MD5_checksum.txt")
+      ),
+      regexp = "The compressed file contains no NPX files!"
+    )
+
+    # one SHA256 only
+    expect_error(
+      object = get_npx_file(
+        files = c("checksum_sha256.txt")
+      ),
+      regexp = "The compressed file contains no NPX files!"
+    )
+
+    # two SHA256
+    expect_error(
+      object = get_npx_file(
+        files = c("checksum_sha256.txt", "checksum_sha256.txt")
+      ),
+      regexp = "The compressed file contains no NPX files!"
+    )
+  }
+)
+
+# Test that relevant error is thrown when unknown files are provided.
+test_that(
+  "get NPX file from zip - no known file",
+  {
+    # one unknown file
+    expect_error(
+      object = get_npx_file(
+        files = c("test.xml")
+      ),
+      regexp = "The compressed file contains no NPX files!"
+    )
+
+    # two unknown files
+    expect_error(
+      object = get_npx_file(
+        files = c("test.xml", "test.yaml")
+      ),
+      regexp = "The compressed file contains no NPX files!"
+    )
+  }
+)
+
+# Test that relevant error is thrown when 2 acceptable files are provided.
+test_that(
+  "get NPX file from zip - many known files v1",
+  {
+    # A txt and a csv file
+    expect_error(
+      object = get_npx_file(
+        files = c("test.txt", "test.csv")
+      ),
+      regexp = "The compressed file contains multiple NPX files!"
+    )
+
+    # A parquet and a csv file
+    expect_error(
+      object = get_npx_file(
+        files = c("test.parquet", "test.csv")
+      ),
+      regexp = "The compressed file contains multiple NPX files!"
+    )
+
+    # An xlsx and a csv file
+    expect_error(
+      object = get_npx_file(
+        files = c("test.xlsx", "test.csv")
+      ),
+      regexp = "The compressed file contains multiple NPX files!"
+    )
+
+    # misAn xls and a csv file
+    expect_error(
+      object = get_npx_file(
+        files = c("test.xls", "test.csv")
+      ),
+      regexp = "The compressed file contains multiple NPX files!"
+    )
+  }
+)

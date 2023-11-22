@@ -1,0 +1,93 @@
+Type: Package
+Package: OlinkAnalyze
+Title: Facilitate Analysis of Proteomic Data from Olink
+Version: 3.4.1
+Authors@R: c(
+    person("Kathleen", "Nevola", , "biostattools@olink.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-5183-6444", Github = "kathy-nevola")),
+    person("Marianne", "Sandin", role = "aut",
+           comment = c(ORCID = "0000-0001-6186-963X", Github = "marisand")),
+    person("Jamey", "Guess", role = "aut",
+           comment = c(ORCID = "0000-0002-4017-0923", Github = "jrguess")),
+    person("Simon", "Forsberg", role = "aut",
+           comment = c(ORCID = "0000-0002-7451-9222", Github = "simfor")),
+    person("Christoffer", "Cambronero", role = "aut",
+           comment = c(Github = "Orbmac")),
+    person("Pascal", "Pucholt", role = "aut",
+           comment = c(ORCID = "0000-0003-3342-1373", Github = "AskPascal")),
+    person("Boxi", "Zhang", role = "aut",
+           comment = c(ORCID = "0000-0001-7758-6204", Github = "boxizhang")),
+    person("Masoumeh", "Sheikhi", role = "aut",
+           comment = c(Github = "MasoumehSheikhi")),
+    person("Klev", "Diamanti", role = "aut",
+           comment = c(ORCID = "0000-0002-4922-8415", Github = "klevdiamanti")),
+    person("Amrita", "Kar", role = "aut",
+           comment = c(Github = "amrita-kar")),
+    person("Lei", "Conze", role = "aut", 
+            comment = c(Github = "leiliuC")),
+    person("Kristian", "Hodén", role = "ctb",
+           comment = c(ORCID = "0000-0003-0354-0662", Github = "kristianHoden")),
+    person("Per", "Eriksson", role = "ctb",
+           comment = c(ORCID = "0000-0001-7633-403X", Github = "b_watcher")),
+    person("Nicola", "Moloney", role = "ctb",
+            comment = c(ORCID = "0000-0003-4967-3284")),
+    person("Britta", "Lötstedt", role = "ctb",
+            comment = c(ORCID = "0000-0003-3545-5489")),
+    person("Emmett", "Sprecher", role = "ctb",
+           comment = c(ORCID = "0000-0002-7710-695X")),
+    person("Jessica", "Barbagallo", role = "ctb",
+           comment = c(Github = "jbarbagallo")),
+    person("Olof", "Mansson", role = "ctr",
+           comment = c(Github = "olofmansson")),
+    person("Ola", "Caster", role = "ctb",
+           comment = c(Github = "OlaCaster")),
+    person("Olink", role = c("cph", "fnd"))
+  )
+Description: A collection of functions to facilitate analysis of proteomic
+    data from Olink, primarily NPX data that has been exported from Olink
+    Software. The functions also work on QUANT data from
+    Olink by log- transforming the QUANT data. The functions are focused
+    on reading data, facilitating data wrangling and quality control
+    analysis, performing statistical analysis and generating figures to
+    visualize the results of the statistical analysis. The goal of this
+    package is to help users extract biological insights from proteomic
+    data run on the Olink platform.
+License: AGPL (>= 3)
+VignetteBuilder: kableExtra, knitr
+Config/testthat/edition: 3
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.2.3
+Imports: arrow, cli, dplyr, kableExtra, knitr, readxl, rlang, stringr,
+        tidyr, tidyselect
+Suggests: openssl, testthat (>= 3.0.0), withr, writexl, zip
+NeedsCompilation: no
+Packaged: 2023-11-22 09:02:21 UTC; klev.diamanti
+Author: Kathleen Nevola [aut, cre] (<https://orcid.org/0000-0002-5183-6444>,
+    kathy-nevola),
+  Marianne Sandin [aut] (<https://orcid.org/0000-0001-6186-963X>,
+    marisand),
+  Jamey Guess [aut] (<https://orcid.org/0000-0002-4017-0923>, jrguess),
+  Simon Forsberg [aut] (<https://orcid.org/0000-0002-7451-9222>, simfor),
+  Christoffer Cambronero [aut] (Orbmac),
+  Pascal Pucholt [aut] (<https://orcid.org/0000-0003-3342-1373>,
+    AskPascal),
+  Boxi Zhang [aut] (<https://orcid.org/0000-0001-7758-6204>, boxizhang),
+  Masoumeh Sheikhi [aut] (MasoumehSheikhi),
+  Klev Diamanti [aut] (<https://orcid.org/0000-0002-4922-8415>,
+    klevdiamanti),
+  Amrita Kar [aut] (amrita-kar),
+  Lei Conze [aut] (leiliuC),
+  Kristian Hodén [ctb] (<https://orcid.org/0000-0003-0354-0662>,
+    kristianHoden),
+  Per Eriksson [ctb] (<https://orcid.org/0000-0001-7633-403X>, b_watcher),
+  Nicola Moloney [ctb] (<https://orcid.org/0000-0003-4967-3284>),
+  Britta Lötstedt [ctb] (<https://orcid.org/0000-0003-3545-5489>),
+  Emmett Sprecher [ctb] (<https://orcid.org/0000-0002-7710-695X>),
+  Jessica Barbagallo [ctb] (jbarbagallo),
+  Olof Mansson [ctr] (olofmansson),
+  Ola Caster [ctb] (OlaCaster),
+  Olink [cph, fnd]
+Maintainer: Kathleen Nevola <biostattools@olink.com>
+Depends: R (>= 3.5.0)
+Built: R 4.2.0; ; 2023-11-22 09:02:30 UTC; unix

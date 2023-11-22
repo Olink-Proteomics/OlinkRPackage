@@ -1,0 +1,110 @@
+* using log directory ‘/home/Olink.local/klev.diamanti/OlinkRPackage/OlinkAnalyze.Rcheck’
+* using R version 4.2.0 (2022-04-22)
+* using platform: x86_64-pc-linux-gnu (64-bit)
+* using session charset: UTF-8
+* using options ‘--no-manual --as-cran’
+* checking for file ‘OlinkAnalyze/DESCRIPTION’ ... OK
+* checking extension type ... Package
+* this is package ‘OlinkAnalyze’ version ‘3.4.1’
+* package encoding: UTF-8
+* checking package namespace information ... OK
+* checking package dependencies ... OK
+* checking if this is a source package ... OK
+* checking if there is a namespace ... OK
+* checking for executable files ... OK
+* checking for hidden files and directories ... OK
+* checking for portable file names ... OK
+* checking for sufficient/correct file permissions ... OK
+* checking whether package ‘OlinkAnalyze’ can be installed ... OK
+* checking installed package size ... OK
+* checking package directory ... OK
+* checking for future file timestamps ... OK
+* checking DESCRIPTION meta-information ... OK
+* checking top-level files ... OK
+* checking for left-over files ... OK
+* checking index information ... OK
+* checking package subdirectories ... OK
+* checking R files for non-ASCII characters ... OK
+* checking R files for syntax errors ... OK
+* checking whether the package can be loaded ... OK
+* checking whether the package can be loaded with stated dependencies ... OK
+* checking whether the package can be unloaded cleanly ... OK
+* checking whether the namespace can be loaded with stated dependencies ... OK
+* checking whether the namespace can be unloaded cleanly ... OK
+* checking loading without being on the library search path ... OK
+* checking dependencies in R code ... NOTE
+Namespaces in Imports field not imported from:
+  ‘kableExtra’ ‘knitr’ ‘readxl’ ‘tidyr’ ‘tidyselect’
+  All declared Imports should be used.
+* checking S3 generic/method consistency ... OK
+* checking replacement functions ... OK
+* checking foreign function calls ... OK
+* checking R code for possible problems ... OK
+* checking Rd files ... OK
+* checking Rd metadata ... OK
+* checking Rd line widths ... OK
+* checking Rd cross-references ... OK
+* checking for missing documentation entries ... OK
+* checking for code/documentation mismatches ... OK
+* checking Rd \usage sections ... OK
+* checking Rd contents ... OK
+* checking for unstated dependencies in examples ... OK
+* checking contents of ‘data’ directory ... OK
+* checking data for non-ASCII characters ... OK
+* checking LazyData ... OK
+* checking data for ASCII and uncompressed saves ... OK
+* checking examples ... OK
+* checking examples with --run-donttest ... ERROR
+Running examples in ‘OlinkAnalyze-Ex.R’ failed
+The error most likely occurred in:
+
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: read_npx
+> ### Title: Function to read NPX data into R in long format.
+> ### Aliases: read_npx read_NPX
+> ### Keywords: 1536; 3072; 48; 96; Explore Explore; Flex; HT; NPX; Olink
+> ###   Olink; Target csv; parquet; xlsx; zip;
+> 
+> ### ** Examples
+> 
+> ## No test: 
+> file <- system.file("extdata",
++                     "Example_NPX_Data.csv",
++                     package = "OlinkAnalyze")
+> 
+> read_NPX(filename = file,
++          sep = NULL)
+Error in `as_tibble()`:
+! Column 1 must be named.
+Use `.name_repair` to specify repair.
+Caused by error in `repaired_names()`:
+! Names can't be empty.
+✖ Empty name found at location 1.
+Backtrace:
+     ▆
+  1. └─OlinkAnalyze::read_NPX(filename = file, sep = NULL)
+  2.   └─OlinkAnalyze:::convert_read_npx_output(df = df_olink, out_df = out_df)
+  3.     ├─dplyr::as_tibble(df)
+  4.     └─tibble:::as_tibble.default(df)
+  5.       ├─tibble::as_tibble(...)
+  6.       └─tibble:::as_tibble.data.frame(as.data.frame(value, stringsAsFactors = FALSE), ...)
+  7.         └─tibble:::lst_to_tibble(unclass(x), .rows, .name_repair)
+  8.           └─tibble:::set_repaired_names(...)
+  9.             └─tibble:::repaired_names(...)
+ 10.               ├─tibble:::subclass_name_repair_errors(...)
+ 11.               │ └─base::withCallingHandlers(...)
+ 12.               └─vctrs::vec_as_names(...)
+ 13.                 └─vctrs (local) `<fn>`()
+ 14.                   └─vctrs:::validate_unique(names = names, arg = arg, call = call)
+ 15.                     └─vctrs:::stop_names_cannot_be_empty(names, call = call)
+ 16.                       └─vctrs:::stop_names(...)
+ 17.                         └─vctrs:::stop_vctrs(...)
+ 18.                           └─rlang::abort(message, class = c(class, "vctrs_error"), ..., call = call)
+Execution halted
+* checking for unstated dependencies in ‘tests’ ... OK
+* checking tests ... OK
+  Running ‘testthat.R’
+* checking for non-standard things in the check directory ... OK
+* checking for detritus in the temp directory ... OK
+* DONE
+Status: 1 ERROR, 1 NOTE
