@@ -66,11 +66,8 @@ Imports:
     dplyr,
     kableExtra,
     knitr,
-    readxl,
     rlang,
-    stringr,
-    tidyr,
-    tidyselect
+    stringr
 Suggests: 
     openssl,
     testthat (>= 3.0.0),
