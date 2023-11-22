@@ -27,6 +27,6 @@
    {
       "os": "ubuntu-20.04",
       "r": "4.1.3",
-      "runOn": "pull_request"
+      "runOn": "always"
    }
 ]
