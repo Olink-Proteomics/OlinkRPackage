@@ -1,3 +1,7 @@
+# OlinkAnalyze 3.6.1
+## Minor Changes
+* Install package Matrix from source in CI. (#299 @klevdiamanti, @AskPascal)
+
 # Olink Analyze 3.6.0
 ## Minor Changes
 * Plate LOD will be chosen over Max LOD when both are present (#288, @kathy-nevola)
