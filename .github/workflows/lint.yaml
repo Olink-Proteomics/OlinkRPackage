@@ -1,17 +1,23 @@
-# Workflow derived from https://github.com/r-lib/actions/tree/master/examples
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
     branches:
+      - main
+      - optimization
       - optimization_develop
-      - optimization_develop_clean
+  pull_request:
+    branches:
+      - main
+      - optimization
+      - optimization_develop
 
-name: lint-zero
+name: lint
 
 jobs:
   lint:
     runs-on: ubuntu-latest
-
+    
     steps:
       - uses: actions/checkout@v3
         with:
@@ -26,11 +32,10 @@ jobs:
           working-directory: OlinkAnalyze
           extra-packages: lintr
 
-      - name: Lint current commit
+      - name: Lint
         run: |
           pkgload::load_all(path = "OlinkAnalyze")
-          ll <- lintr::lint_package()
-          print(paste("Number of detected lints:", length(ll)))
-          print(ll)
-          stopifnot(length(ll) == 0)
+          lintr::lint_package()
         shell: Rscript {0}
+        env:
+          LINTR_ERROR_ON_LINT: true
