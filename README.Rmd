@@ -12,6 +12,7 @@ knitr::opts_chunk$set(
 )
 ```
 [![R-CMD-check](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/R-CMD-check.yaml)
+[![lint](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/lint.yaml/badge.svg)](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/lint.yaml)
 
 # Olink® Analyze
 
