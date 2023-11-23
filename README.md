@@ -1,7 +1,11 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+<!-- badges: start -->
 
 [![R-CMD-check](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/R-CMD-check.yaml)
+
+[![test-coverage](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/test-coverage.yaml)
+<!-- badges: end -->
 
 # Olink® Analyze
 
@@ -52,7 +56,10 @@ olink_dist_plot(npx_data1 %>% filter(Panel == 'Olink CARDIOMETABOLIC')) +
   scale_fill_manual(values = c('turquoise3', 'red'))
 ```
 
-![dist_plot_example](figures/example_distplot.png)
+<figure>
+<img src="figures/example_distplot.png" alt="dist_plot_example" />
+<figcaption aria-hidden="true">dist_plot_example</figcaption>
+</figure>
 
 ``` r
 # visualize potential outliers by IQR vs. sample median per panel, example for one panel
@@ -60,7 +67,10 @@ olink_qc_plot(npx_data1 %>% filter(Panel == 'Olink CARDIOMETABOLIC')) +
   scale_color_manual(values = c('turquoise3', 'red'))
 ```
 
-![qc_plot_example](figures/example_qcplot.png)
+<figure>
+<img src="figures/example_qcplot.png" alt="qc_plot_example" />
+<figcaption aria-hidden="true">qc_plot_example</figcaption>
+</figure>
 
 ### Normalization
 
@@ -106,7 +116,10 @@ olink_volcano_plot(p.val_tbl = ttest_results_NPX1,
   scale_color_manual(values = c('turquoise3', 'red'))
 ```
 
-![volcano_plot_example](figures/example_volcanoplot.png)
+<figure>
+<img src="figures/example_volcanoplot.png" alt="volcano_plot_example" />
+<figcaption aria-hidden="true">volcano_plot_example</figcaption>
+</figure>
 
 ## Learn more
 
