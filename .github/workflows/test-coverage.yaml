@@ -3,6 +3,13 @@
 on:
   push:
     branches:
+      - main
+      - optimization
+      - optimization_develop
+  pull_request:
+    branches:
+      - main
+      - optimization
       - optimization_develop
 
 name: test-coverage
