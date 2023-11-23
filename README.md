@@ -55,10 +55,7 @@ olink_dist_plot(npx_data1 %>% filter(Panel == 'Olink CARDIOMETABOLIC')) +
   scale_fill_manual(values = c('turquoise3', 'red'))
 ```
 
-<figure>
-<img src="figures/example_distplot.png" alt="dist_plot_example" />
-<figcaption aria-hidden="true">dist_plot_example</figcaption>
-</figure>
+![dist_plot_example](figures/example_distplot.png)
 
 ``` r
 # visualize potential outliers by IQR vs. sample median per panel, example for one panel
@@ -66,10 +63,7 @@ olink_qc_plot(npx_data1 %>% filter(Panel == 'Olink CARDIOMETABOLIC')) +
   scale_color_manual(values = c('turquoise3', 'red'))
 ```
 
-<figure>
-<img src="figures/example_qcplot.png" alt="qc_plot_example" />
-<figcaption aria-hidden="true">qc_plot_example</figcaption>
-</figure>
+![qc_plot_example](figures/example_qcplot.png)
 
 ### Normalization
 
@@ -115,10 +109,7 @@ olink_volcano_plot(p.val_tbl = ttest_results_NPX1,
   scale_color_manual(values = c('turquoise3', 'red'))
 ```
 
-<figure>
-<img src="figures/example_volcanoplot.png" alt="volcano_plot_example" />
-<figcaption aria-hidden="true">volcano_plot_example</figcaption>
-</figure>
+![volcano_plot_example](figures/example_volcanoplot.png)
 
 ## Learn more
 
