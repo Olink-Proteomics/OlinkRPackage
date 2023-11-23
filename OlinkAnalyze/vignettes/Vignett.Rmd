@@ -220,17 +220,41 @@ olink_normalization(df1 = npx_data1,
                     reference_project = '20200001')
 
 # Example of using all samples for normalization
-subset_df1 <- npx_data1 %>% 
+fullsubset_df1 <- npx_data1 %>% 
   filter(QC_Warning == 'Pass') %>% 
   filter(!str_detect(SampleID, 'CONTROL_SAMPLE')) %>%
   pull(SampleID) %>% 
   unique()
 
-subset_df2 <- npx_data2 %>% 
+fullsubset_df2 <- npx_data2 %>% 
   filter(QC_Warning == 'Pass') %>% 
   filter(!str_detect(SampleID, 'CONTROL_SAMPLE')) %>%
   pull(SampleID) %>% 
   unique()
+
+olink_normalization(df1 = npx_data1, 
+                    df2 = npx_data2, 
+                    overlapping_samples_df1 = fullsubset_df1,
+                    overlapping_samples_df2 = fullsubset_df2,
+                    df1_project_nr = '20200001',
+                    df2_project_nr = '20200002',
+                    reference_project = '20200001')
+
+# Example of using a subset samples for normalization
+
+subset_df1 <- npx_data1 %>% 
+  filter(QC_Warning == 'Pass') %>% 
+  filter(!str_detect(SampleID, 'CONTROL_SAMPLE')) %>%
+  pull(SampleID) %>% 
+  unique() %>% 
+  sample(16)
+
+subset_df2 <- npx_data2 %>% 
+  filter(QC_Warning == 'Pass') %>% 
+  filter(!str_detect(SampleID, 'CONTROL_SAMPLE')) %>%
+  pull(SampleID) %>% 
+  unique() %>% 
+  sample(16)
 
 olink_normalization(df1 = npx_data1, 
                     df2 = npx_data2, 
@@ -239,9 +263,144 @@ olink_normalization(df1 = npx_data1,
                     df1_project_nr = '20200001',
                     df2_project_nr = '20200002',
                     reference_project = '20200001')
+
+# Example of using a reference median for normalization
+
+ref_df <- npx_df2 %>%
+  group_by(OlinkID) %>%
+  summarise(Reference_NPX = median(NPX)) 
+
+olink_normalization(df1 = npx_df1,
+                    overlapping_samples_df1 = subset_df1,
+                    reference_medians = ref_df)
 ```  
 
 ### Function output
+
+A tibble of NPX data in long format containing normalized NPX values, including adjustment factors:
+
+* SampleID: Sample names or IDs.
+* Index: Unique number for each SampleID. It is used to make up for non unique sample IDs. 
+* OlinkID: Unique ID for each assay assigned by Olink®. In case the assay is included in more than one panels it  will have a different OlinkID in each one. 
+* UniProt: UniProt ID.
+* Assay: Common gene name for the assay.
+* MissingFreq: Missing frequency for the OlinkID, i.e. frequency of samples with NPX value below limit of detection (LOD).
+* Panel: Olink Panel that samples ran on. Read more about Olink Panels here: [https://olink.com/products-services/](https://olink.com/products-services/).
+* Panel_Version: Version of the panel. A new panel version might include some different or improved assays.
+* PlateID: Name of the plate.
+* QC_Warning: Indication whether the sample passed Olink QC. Read more here: [https://olink.com/faq/how-is-quality-control-of-the-data-performed/](https://olink.com/faq/how-is-quality-control-of-the-data-performed/). 
+* LOD: Limit of detection (LOD) is the minimum level of an individual protein that can be measured. LOD is defined as 3 times the standard deviation over background.
+* NPX: Normalized Protein eXpression, is Olink®’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX here: [https://olink.com/faq/what-is-npx/](https://olink.com/faq/what-is-npx/).
+* Project: Name given from the dataframe of origin.
+* Adj_factor: Adjustment factor, i.e. how much was added to or subtracted from the original NPX value.
+
+## Normalizing muliple NPX data (olink_normalization_n)  
+
+The olink_normalization_n is a function used to normalize NPX values between multiple different dataframes/projects which have been ran at different times all at the same time. This function is mainly used if the number of projects are three or more, otherwise please see the olink_normalization function. Commonly, there is a shift in (mean) NPX values between runs, however, the spread of the data remains the same. This is why normalization between dataframes/projects is required. For each dataframe/project another dataframe/project will be used asa reference to normalize to. The function handles two different types of normalization, Bridge and Subset, which are explained in the olink_normalization section.
+
+
+The input of this function is a tibble that contains all the necessary information to normalize multiple NPX projects. This tibble is called the normalization schema. The basic idea is that every row of the data frame is a separate project to be normalized. It is assume that there is always one baseline project that does not normalize to any other. All other project normalize to one or more projects. The function handles projects that are normalized in a chain, for example:
+
+- project 2 normalizes to project 1, and project 3 normalizes to project 2.
+
+- project 2 normalizes to project 1, and project 3 normalizes to the combined data frame of projects 1 and 2 (that is already normalized).
+
+
+### Function arguments
+
+* norm_schema: A tibble with more than 1 rows and (strictly) the following columns: "order", "name", "data", "samples", "normalization_type", "normalize_to". See "Details" for the structure of the data frame (required)
+
+Specifications of the normalization schema data frame:
+
+- order: should strictly be a numeric or integer array with unique identifiers for each project. It is necessary that this array starts from 1 and that it contains no NAs.
+
+- name: should strictly be a character array with unique identifiers for each project. Each entry should represent the name of the project located in the same row. No NAs are allowed.
+
+- data: a named list of NPX data frames representing the projects to be normalized. Names of the items of the list should be identical to "names". No NAs are allowed.
+
+- samples: a two-level nested named list of sample identifiers from each NPX project from "data". Names of the first level of the nested list should be identical to "names" and to the names of the list from "data". Projects that will be used only as reference should have their corresponding element in the list as NA, while all other projects should contain a named list of 2 arrays containing identifiers of samples to be used for the calculation of adjustment factor. The names of the two arrays should be DF1 and DF2 corresponding to the reference project and the project in the current row, respectively. For bridge normalization arrays should be of equal length and the index of each entry should correspond to the same sample. For subset normalization arrays do not need to be of equal length and the order the samples appear in does not matter. DF1 might contain sample identifiers from more than one project as long as the project in the current row is to be normalized to multiple other projects.
+
+- normalization_type: a character array containing the flags "Bridge" or "Subset". Projects that will be used only as reference should have their corresponding element in the array as NA, while all other projects should contain a flag. For the time being the flag "Median" is not supported.
+
+- normalize_to: a character array pointing to the project this project is to be normalized to. Elements of the array should be exclusively from the "order" column. Elements of the array may be comma-separated if the project is to be normalized to multiple projects.
+
+```{r message=FALSE, eval=FALSE}
+
+# Creating NPX data frames to bridge 
+npx_df1 <- npx_data1 %>% 
+  filter(!stringr::str_detect(SampleID, "CONTROL_")) %>%
+  select(-Project) %>%
+  mutate(Normalization = "Intensity")
+
+npx_df2 <- npx_data2 %>%
+  filter(!stringr::str_detect(SampleID, "CONTROL_")) %>%
+  select(-Project) %>%
+  mutate(Normalization = "Intensity")
+
+# manipulating the sample NPX datasets to create another two random data frames
+npx_df3 <- npx_data2 %>%
+  mutate(SampleID = paste0(SampleID, "_mod"),
+                PlateID = paste0(PlateID, "_mod"),
+                NPX = sample(x = NPX, size = n(), replace = FALSE)) %>%
+  filter(!stringr::str_detect(SampleID, "CONTROL_")) %>%
+  select(-Project) %>%
+  mutate(Normalization = "Intensity")
+
+npx_df4 <- npx_data1 %>%
+  mutate(SampleID = paste0(SampleID, "_mod2"),
+                PlateID = paste0(PlateID, "_mod2"),
+                NPX = sample(x = NPX, size = n(), replace = FALSE)) %>%
+  filter(!stringr::str_detect(SampleID, "CONTROL_")) %>%
+  select(-Project) %>%
+  mutate(Normalization = "Intensity")
+
+# Samples to use for normalization
+## Bridge samples with same identifiers between npx_df1 and npx_df2
+overlap_samples <- intersect(unique(npx_df1$SampleID),
+                                    unique(npx_df2$SampleID))
+overlap_samples_df1_df2 <- list("DF1" = overlap_samples,
+                                "DF2" = overlap_samples)
+
+## Bridge samples with different identifiers between npx_df2 and npx_df3
+overlap_samples_df2_df3 <- list("DF1" = sample(x = unique(npx_df2$SampleID),
+                                               size = 10,
+                                               replace = FALSE),
+                                "DF2" = sample(x = unique(npx_df3$SampleID),
+                                               size = 10,
+                                               replace = FALSE))
+
+## Samples to use for subset normalization between npx_df4 and the
+## normalized dataset of npx_df1 and npx_df2
+overlap_samples_df12_df4 <- list("DF1" = sample(x = c(unique(npx_df1$SampleID),
+                                                      unique(npx_df2$SampleID)),
+                                                size = 100,
+                                                replace = FALSE),
+                                 "DF2" = sample(x = unique(npx_df4$SampleID),
+                                                size = 40,
+                                                replace = FALSE))
+
+# create tibble for input
+norm_schema_n <- tibble(
+  order              = c(1, 2, 3, 4),
+  name               = c("NPX_DF1", "NPX_DF2", "NPX_DF3", "NPX_DF4"),
+  data               = list("NPX_DF1" = npx_df1,
+                            "NPX_DF2" = npx_df2,
+                            "NPX_DF3" = npx_df3,
+                            "NPX_DF4" = npx_df4),
+  samples            = list("NPX_DF1" = NA_character_,
+                            "NPX_DF2" = overlap_samples_df1_df2,
+                            "NPX_DF3" = overlap_samples_df2_df3,
+                            "NPX_DF4" = overlap_samples_df12_df4),
+  normalization_type = c(NA_character_, "Bridge", "Bridge", "Subset"),
+  normalize_to       = c(NA_character_, "1", "2", "1,2")
+)
+
+olink_normalization_n(norm_schema = norm_schema_n)
+
+```  
+
+### Function output
+
 
 A tibble of NPX data in long format containing normalized NPX values, including adjustment factors:
 
