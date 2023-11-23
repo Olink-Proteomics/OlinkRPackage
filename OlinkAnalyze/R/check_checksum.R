@@ -43,8 +43,7 @@ check_checksum <- function(checksum_file,
     if (grepl("md5", checksum_file_stripped)) {
 
       # MD5 checksum on the NPX file
-      npx_file_checksum <- tools::md5sum(npx_file) |>
-        unname()
+      npx_file_checksum <- cli::hash_file_md5(paths = npx_file)
 
     } else if (grepl("sha256", checksum_file_stripped)) {
 

@@ -545,8 +545,7 @@ test_that(
         expect_true(object = file.exists(nfile_test))
 
         # compute MD5 checksum
-        tools::md5sum(nfile_test) |>
-          unname() |>
+        cli::hash_file_md5(paths = nfile_test) |>
           writeLines(checksumfile_test)
 
         # check that the checksum file was created
@@ -640,8 +639,7 @@ test_that(
         expect_true(object = file.exists(nfile_test))
 
         # compute MD5 checksum
-        tools::md5sum(nfile_test) |>
-          unname() |>
+        cli::hash_file_md5(paths = nfile_test) |>
           writeLines(checksumfile_test)
 
         # check that the checksum file was created

@@ -29,8 +29,7 @@ test_that(
         expect_true(object = file.exists(text_file_test))
 
         # MD5 checksum on the NPX file
-        text_file_checksum <- tools::md5sum(text_file_test) |>
-          unname()
+        text_file_checksum <- cli::hash_file_md5(paths = text_file_test)
 
         # write some text in a txt file
         writeLines(text_file_checksum, MD5_check)
