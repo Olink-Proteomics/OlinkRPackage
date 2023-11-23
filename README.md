@@ -4,7 +4,7 @@
 
 [![R-CMD-check](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/R-CMD-check.yaml)
 [![lint](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/lint.yaml/badge.svg)](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/lint.yaml)
-[![test-coverage](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/test-coverage.yaml)
+[![codecov.io](https://codecov.io/gh/r-lib/lintr/branch/main/graphs/badge.svg)](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/test-coverage.yaml)
 <!-- badges: end -->
 
 # Olink® Analyze
