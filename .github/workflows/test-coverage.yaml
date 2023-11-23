@@ -36,7 +36,7 @@ jobs:
       - name: Test coverage
         run: |
           covr::codecov(
-            path = "OlinkAnalyze"
+            path = "OlinkAnalyze",
             quiet = FALSE,
             clean = FALSE,
             install_path = file.path(normalizePath(Sys.getenv("RUNNER_TEMP"), winslash = "/"), "package")
