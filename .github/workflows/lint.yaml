@@ -30,11 +30,12 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           working-directory: OlinkAnalyze
-          extra-packages: any::lintr, local::.
-          needs: lint
+          extra-packages: lintr
 
       - name: Lint
-        run: lintr::lint_package(path = "OlinkAnalyze")
+        run: |
+          pkgload::load_all(path = "OlinkAnalyze")
+          lintr::lint_package()
         shell: Rscript {0}
         env:
           LINTR_ERROR_ON_LINT: true
