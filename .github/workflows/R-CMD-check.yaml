@@ -60,6 +60,16 @@ jobs:
         with:
           working-directory: OlinkAnalyze
           extra-packages: any::rcmdcheck, pillar
+          
+      - name: Install tzdb from source
+        run: |
+          install.packages("tzdb", type="source", repos='http://cran.us.r-project.org')
+        shell: Rscript {0}
+        
+      - name: Install arrow from source
+        run: |
+          install.packages("arrow", type="source", repos='http://cran.us.r-project.org')
+        shell: Rscript {0}
 
       - uses: r-lib/actions/check-r-package@v2
         with:
