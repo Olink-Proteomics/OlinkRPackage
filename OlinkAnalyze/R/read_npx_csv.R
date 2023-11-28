@@ -61,11 +61,26 @@ read_npx_csv <- function(filename) {
   }
 
   df_npx <- df_npx %>%
-    dplyr::mutate(NPX         = as.numeric(NPX),
-                  LOD         = as.numeric(LOD),
-                  MissingFreq = as.numeric(MissingFreq),
-                  SampleID    = as.character(SampleID)) %>%
+    dplyr::mutate(SampleID    = as.character(SampleID)) %>%
+    dplyr::mutate(dplyr::across(dplyr::ends_with("LOD"), as.numeric))%>%
     dplyr::as_tibble()
+
+  if ("NPX" %in% colnames(df_npx)) {
+    df_npx <- df_npx %>%
+      mutate(NPX = as.numeric(NPX))
+  }
+
+  if ("Quantified_value" %in% colnames(df_npx)) {
+    df_npx <- df_npx %>%
+      mutate(Quantified_value = as.numeric(Quantified_value))
+  }
+
+  if ("MissingFreq" %in% colnames(df_npx)) {
+    if (any(grepl("%", df_npx$MissingFreq))) {
+    df_npx <- df_npx %>%
+      mutate(MissingFreq = as.numeric(gsub("%", "", MissingFreq)) / 100)
+    }
+  }
 
   return(df_npx)
 }
