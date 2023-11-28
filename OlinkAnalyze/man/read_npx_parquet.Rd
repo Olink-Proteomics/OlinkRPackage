@@ -22,6 +22,7 @@ Help function to read Olink parquet files.
 [read_npx()]
   [read_npx_delim()]
   [read_npx_zip()]
+  [read_npx_excel()]
 }
 \author{
 Klev Diamanti;
