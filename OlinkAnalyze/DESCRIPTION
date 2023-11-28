@@ -67,9 +67,9 @@ Imports:
     kableExtra,
     knitr,
     rlang,
-    stringr
+    stringr,
+    tidyr
 Suggests: 
-    openssl,
     testthat (>= 3.0.0),
     withr,
     writexl,
