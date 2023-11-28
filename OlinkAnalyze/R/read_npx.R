@@ -20,8 +20,16 @@
 #' are "tibble" (default) and "arrow".
 #' @param sep The separator of the delimited file: NULL (autodetect), comma (,)
 #' or semicolon (;). Used only for delimited Olink software output files.
+#' @param long_format Boolean marking if input file is in long (TRUE) or wide
+#' (FALSE) format. Ignored for non-excel input files.
+#' @param olink_platform The Olink platform used to generate the input file.
+#' Expecting "Target 96", "Target 48" or "Flex". Ignored for non-excel input
+#' files.
+#' @param data_type The quantification in which the data comes in, Expecting on
+#' of NPX, Quantified or Ct. Ignored for non-excel input files.
 #' @param .ignore_files Files to ignore in the zip-compressed Olink software
 #' output files. Used only for zip-compressed Olink software output files.
+#' @param quiet Print a confirmation message after reading in the input file.
 #'
 #' @return A "tibble" in long format.
 #'
@@ -59,7 +67,11 @@
 read_npx <- function(filename,
                      out_df = "tibble",
                      sep = NULL,
-                     .ignore_files = c("README.txt")) {
+                     long_format = NULL,
+                     olink_platform = NULL,
+                     data_type = NULL,
+                     .ignore_files = c("README.txt"),
+                     quiet = FALSE) {
 
   # check if the input file exists
   check_file_exists(file = filename,
@@ -82,9 +94,15 @@ read_npx <- function(filename,
   # be a scalar character
   if (check_is_scalar_character(string = f_label, error = FALSE)) {
 
-    if (grepl("wide", f_label)) {
+    if (grepl("excel", f_label)) {
 
-      # here goes the code for reading wide NPX files
+      # Input is an excel file
+      df_olink <- read_npx_excel(file = filename,
+                     out_df = out_df,
+                     long_format = long_format,
+                     olink_platform = olink_platform,
+                     data_type = data_type,
+                     quiet = quiet)
 
     } else if (grepl("delim", f_label)) {
 
@@ -104,7 +122,11 @@ read_npx <- function(filename,
         file = filename,
         out_df = out_df,
         sep = sep,
-        .ignore_files = .ignore_files
+        long_format = long_format,
+        olink_platform = olink_platform,
+        data_type = data_type,
+        .ignore_files = .ignore_files,
+        quiet = quiet
       )
 
     }
