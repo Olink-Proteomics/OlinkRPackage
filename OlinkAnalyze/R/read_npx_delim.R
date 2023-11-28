@@ -19,6 +19,7 @@
 #'   [read_npx()]
 #'   [read_npx_parquet()]
 #'   [read_npx_zip()]
+#'   [read_npx_excel()]
 #'
 read_npx_delim <- function(file,
                            out_df = "arrow",

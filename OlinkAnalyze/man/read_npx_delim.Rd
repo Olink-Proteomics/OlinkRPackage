@@ -28,6 +28,7 @@ Help function to read in Olink data from comma or semicolon delimited files.
 [read_npx()]
   [read_npx_parquet()]
   [read_npx_zip()]
+  [read_npx_excel()]
 }
 \author{
 Klev Diamanti;
