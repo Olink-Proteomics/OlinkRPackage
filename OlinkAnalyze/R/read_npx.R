@@ -25,7 +25,7 @@
 #' @param olink_platform The Olink platform used to generate the input file.
 #' Expecting "Target 96", "Target 48" or "Flex". Ignored for non-excel input
 #' files.
-#' @param data_type The quantification in which the data comes in, Expecting on
+#' @param data_type The quantification in which the data comes in. Expecting one
 #' of NPX, Quantified or Ct. Ignored for non-excel input files.
 #' @param .ignore_files Files to ignore in the zip-compressed Olink software
 #' output files. Used only for zip-compressed Olink software output files.

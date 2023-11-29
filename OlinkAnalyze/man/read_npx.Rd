@@ -43,7 +43,7 @@ or semicolon (;). Used only for delimited Olink software output files.}
 Expecting "Target 96", "Target 48" or "Flex". Ignored for non-excel input
 files.}
 
-\item{data_type}{The quantification in which the data comes in, Expecting on
+\item{data_type}{The quantification in which the data comes in. Expecting one
 of NPX, Quantified or Ct. Ignored for non-excel input files.}
 
 \item{.ignore_files}{Files to ignore in the zip-compressed Olink software
