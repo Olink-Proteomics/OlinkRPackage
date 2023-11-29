@@ -98,11 +98,11 @@ read_npx <- function(filename,
 
       # Input is an excel file
       df_olink <- read_npx_excel(file = filename,
-                     out_df = out_df,
-                     long_format = long_format,
-                     olink_platform = olink_platform,
-                     data_type = data_type,
-                     quiet = quiet)
+                                 out_df = out_df,
+                                 long_format = long_format,
+                                 olink_platform = olink_platform,
+                                 data_type = data_type,
+                                 quiet = quiet)
 
     } else if (grepl("delim", f_label)) {
 
