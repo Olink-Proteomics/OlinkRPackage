@@ -56,7 +56,7 @@ accepted_olink_platforms <- dplyr::tibble(
     NA_character_
   ),
   quant_method = list(
-    c("NPX", "Quantified"),
+    c("NPX", "Quantified", "Ct"),
     c("NPX", "Quantified"),
     c("NPX", "Ct"),
     c("NPX"),
