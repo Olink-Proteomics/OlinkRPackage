@@ -40,8 +40,8 @@ or semicolon (;). Used only for delimited Olink software output files.}
 (FALSE) format. Ignored for non-excel input files.}
 
 \item{olink_platform}{The Olink platform used to generate the input file.
-Expecting "Target 96", "Target 48" or "Flex". Ignored for non-excel input
-files.}
+Expecting "Target 96", "Target 48", "Flex" or "Focus". Ignored for non-excel
+input files.}
 
 \item{data_type}{The quantification in which the data comes in. Expecting one
 of NPX, Quantified or Ct. Ignored for non-excel input files.}
@@ -90,6 +90,7 @@ Klev Diamanti;
 \keyword{Explore}
 \keyword{Explore;}
 \keyword{Flex;}
+\keyword{Focus}
 \keyword{HT;}
 \keyword{NPX;}
 \keyword{Olink}

@@ -23,8 +23,8 @@
 #' @param long_format Boolean marking if input file is in long (TRUE) or wide
 #' (FALSE) format. Ignored for non-excel input files.
 #' @param olink_platform The Olink platform used to generate the input file.
-#' Expecting "Target 96", "Target 48" or "Flex". Ignored for non-excel input
-#' files.
+#' Expecting "Target 96", "Target 48", "Flex" or "Focus". Ignored for non-excel
+#' input files.
 #' @param data_type The quantification in which the data comes in. Expecting one
 #' of NPX, Quantified or Ct. Ignored for non-excel input files.
 #' @param .ignore_files Files to ignore in the zip-compressed Olink software
@@ -47,6 +47,7 @@
 #'   Olink Target 96;
 #'   Olink Target 48;
 #'   Olink Flex;
+#'   Olink Focus
 #'
 #' @export
 #'

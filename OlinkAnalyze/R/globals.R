@@ -18,40 +18,46 @@ accepted_olink_platforms <- dplyr::tibble(
     "Olink Flex",
     "Olink Target 96",
     "Olink Explore 3072",
-    "Olink Explore HT"
+    "Olink Explore HT",
+    "Olink Focus"
   ),
   name = c(
     "Target 48",
     "Flex",
     "Target 96",
     "Explore 3072",
-    "Explore HT"
+    "Explore HT",
+    "Focus"
   ),
   code_friendly_name = c(
     "Target_48",
     "Flex",
     "Target_96",
     "Explore_3072",
-    "Explore_HT"
+    "Explore_HT",
+    "Focus"
   ),
   short_name = c(
     "T48",
     "Flex",
     "T96",
     "3k",
-    "HT"
+    "HT",
+    "Focus"
   ),
   broader_platform = c(
-    "Target",
-    "Target",
-    "Target",
-    "Explore",
-    "Explore"
+    "qPCR",
+    "qPCR",
+    "qPCR",
+    "NGS",
+    "NGS",
+    "qPCR"
   ),
   regexp = c(
     "Target 48",
     "[A-Z]{4}-[A-Z]{4}|Flex",
     "Target 96",
+    NA_character_,
     NA_character_,
     NA_character_
   ),
@@ -60,7 +66,8 @@ accepted_olink_platforms <- dplyr::tibble(
     c("NPX", "Quantified"),
     c("NPX", "Ct"),
     c("NPX"),
-    c("NPX")
+    c("NPX"),
+    c("NPX", "Quantified")
   )
 )
 
