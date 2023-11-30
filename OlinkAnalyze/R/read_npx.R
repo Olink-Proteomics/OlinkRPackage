@@ -4,7 +4,7 @@
 #' Imports an NPX or QUANT file exported from Olink software.
 #'
 #' __Note__ Please do not alter the Olink software output file prior to
-#' importing is using `read_NPX()` as it might fail.
+#' importing it using `read_NPX()` as it might fail.
 #'
 #' @author
 #'   Klev Diamanti;
@@ -31,7 +31,7 @@
 #' output files. Used only for zip-compressed Olink software output files.
 #' @param quiet Print a confirmation message after reading in the input file.
 #'
-#' @return A "tibble" in long format.
+#' @return A tibble in long format or an ArrowObject.
 #'
 #' @keywords
 #'   NPX;

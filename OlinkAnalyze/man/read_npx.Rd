@@ -52,13 +52,13 @@ output files. Used only for zip-compressed Olink software output files.}
 \item{quiet}{Print a confirmation message after reading in the input file.}
 }
 \value{
-A "tibble" in long format.
+A tibble in long format or an ArrowObject.
 }
 \description{
 Imports an NPX or QUANT file exported from Olink software.
 
 __Note__ Please do not alter the Olink software output file prior to
-importing is using `read_NPX()` as it might fail.
+importing it using `read_NPX()` as it might fail.
 }
 \examples{
 \donttest{
