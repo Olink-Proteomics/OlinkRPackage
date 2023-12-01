@@ -66,6 +66,7 @@ Imports:
     dplyr,
     kableExtra,
     knitr,
+    readxl,
     rlang,
     stringr,
     tidyr
