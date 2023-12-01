@@ -724,9 +724,7 @@ test_that(
         expect_true(object = file.exists(nfile_test))
 
         # compute SHA256 checksum
-        openssl::sha256(file(nfile_test)) |>
-          stringr::str_replace(pattern = ":",
-                               replacement = "") |>
+        cli::hash_file_sha256(paths = nfile_test) |>
           writeLines(checksumfile_test)
 
         # check that the checksum file was created
@@ -820,9 +818,7 @@ test_that(
         expect_true(object = file.exists(nfile_test))
 
         # compute SHA256 checksum
-        openssl::sha256(file(nfile_test)) |>
-          stringr::str_replace(pattern = ":",
-                               replacement = "") |>
+        cli::hash_file_sha256(paths = nfile_test) |>
           writeLines(checksumfile_test)
 
         # check that the checksum file was created
@@ -1112,13 +1108,9 @@ test_that(
         # check that the comma delimited file exists
         expect_true(object = file.exists(text_file_test))
 
-        # SHA256 checksum on the NPX file
-        text_file_checksum <- openssl::sha256(file(text_file_test)) |>
-          stringr::str_replace(pattern = ":",
-                               replacement = "")
-
-        # write some text in a txt file
-        writeLines(text_file_checksum, SHA256_check)
+        # write sha256 in the txt file
+        cli::hash_file_sha256(paths = text_file_test) |>
+          writeLines(SHA256_check)
 
         # check that the parquet file was created
         expect_true(object = file.exists(SHA256_check))
@@ -1339,7 +1331,7 @@ test_that(
 
 # Test get_npx_file ----
 
-# test all realistic scenario combos of checksum files and NPX files ----
+## test all realistic scenario combos of checksum files and NPX files ----
 
 # Test get_npx_file for slightly different inputs. Specifically,
 # checking for all combos of checksum file and NPX file
@@ -1370,7 +1362,7 @@ invisible(
 
 rm(test_checksum_npx_combo)
 
-# test all realistic scenario of NPX files input only ----
+## test all realistic scenario of NPX files input only ----
 
 # Test get_npx_file for slightly different inputs. Specifically,
 # checking for all NPX files.
