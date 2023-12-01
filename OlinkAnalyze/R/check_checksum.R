@@ -19,12 +19,6 @@
 check_checksum <- function(checksum_file,
                            npx_file) {
 
-  # check installed libraries
-  check_library_installed(
-    libraries = c("openssl"),
-    error = TRUE
-  )
-
   # check if input is character vectors of length 1
   check_is_scalar_character(string = checksum_file,
                             error = TRUE)
@@ -48,9 +42,7 @@ check_checksum <- function(checksum_file,
     } else if (grepl("sha256", checksum_file_stripped)) {
 
       # SHA256 checksum on the NPX file
-      npx_file_checksum <- openssl::sha256(file(npx_file)) |>
-        stringr::str_replace(pattern = ":",
-                             replacement = "")
+      npx_file_checksum <- cli::hash_file_sha256(paths = npx_file)
 
     }
 
