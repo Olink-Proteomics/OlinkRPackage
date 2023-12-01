@@ -9,11 +9,11 @@ read_npx_excel_format(file, long_format = NULL, quant_methods_excel)
 \arguments{
 \item{file}{The input excel file.}
 
+\item{long_format}{Boolean marking if input file is in long (TRUE) or wide
+(FALSE) format.}
+
 \item{quant_methods_excel}{Character vector with the Olink protein
 quantification methods.}
-
-\item{in_long_format}{Boolean marking if input file is in long (TRUE) or wide
-(FALSE) format.}
 }
 \value{
 A list of two variables: is_long_format and data_cells The first one

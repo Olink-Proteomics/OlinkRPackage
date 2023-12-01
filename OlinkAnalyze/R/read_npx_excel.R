@@ -161,7 +161,7 @@ read_npx_excel <- function(file,
 #' @author Klev Diamanti
 #'
 #' @param file The input excel file.
-#' @param in_long_format Boolean marking if input file is in long (TRUE) or wide
+#' @param long_format Boolean marking if input file is in long (TRUE) or wide
 #' (FALSE) format.
 #' @param quant_methods_excel Character vector with the Olink protein
 #' quantification methods.
