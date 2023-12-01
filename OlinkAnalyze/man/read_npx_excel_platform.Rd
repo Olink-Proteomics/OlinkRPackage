@@ -30,3 +30,6 @@ user.
 \description{
 Help function to determine the Olink platform from the excel file.
 }
+\author{
+Klev Diamanti
+}

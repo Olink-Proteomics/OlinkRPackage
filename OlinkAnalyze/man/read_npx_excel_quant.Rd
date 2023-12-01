@@ -32,3 +32,6 @@ An error is returned if the format cannot be determined.
 Help function to determine the the type of the quantification of the data in
 the excel file.
 }
+\author{
+Klev Diamanti
+}

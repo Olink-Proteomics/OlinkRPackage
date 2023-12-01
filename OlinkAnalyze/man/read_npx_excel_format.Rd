@@ -25,3 +25,6 @@ defined the file format from the input.
 \description{
 Help function to determine the wide/long excel file format.
 }
+\author{
+Klev Diamanti
+}
