@@ -8,7 +8,11 @@ read_npx_zip(
   file,
   out_df = "arrow",
   sep = NULL,
-  .ignore_files = c("README.txt")
+  long_format = NULL,
+  olink_platform = NULL,
+  data_type = NULL,
+  .ignore_files = c("README.txt"),
+  quiet = FALSE
 )
 }
 \arguments{
@@ -20,7 +24,19 @@ are "tibble" and "arrow" (default).}
 \item{sep}{The separator of the delimited file: NULL (autodetect), comma (,)
 or semicolon (;). Used only for delimited Olink software output files.}
 
+\item{long_format}{Boolean marking if input file is in long (TRUE) or wide
+(FALSE) format. Ignored for non-excel input files.}
+
+\item{olink_platform}{The Olink platform used to generate the input file.
+Expecting "Target 96", "Target 48" or "Flex". Ignored for non-excel input
+files.}
+
+\item{data_type}{The quantification in which the data comes in, Expecting on
+of NPX, Quantified or Ct. Ignored for non-excel input files.}
+
 \item{.ignore_files}{Vector of files to ignore.}
+
+\item{quiet}{Print a confirmation message after reading in the input file.}
 }
 \value{
 An R6 class ArrowObject.
@@ -32,6 +48,7 @@ Helper function to read NPX zip-compressed files with checksum.
 [read_npx()]
   [read_npx_delim()]
   [read_npx_parquet()]
+  [read_npx_excel()]
 }
 \author{
 Klev Diamanti;

@@ -10,7 +10,15 @@
 #' are "tibble" and "arrow" (default).
 #' @param sep The separator of the delimited file: NULL (autodetect), comma (,)
 #' or semicolon (;). Used only for delimited Olink software output files.
+#' @param long_format Boolean marking if input file is in long (TRUE) or wide
+#' (FALSE) format. Ignored for non-excel input files.
+#' @param olink_platform The Olink platform used to generate the input file.
+#' Expecting "Target 96", "Target 48" or "Flex". Ignored for non-excel input
+#' files.
+#' @param data_type The quantification in which the data comes in, Expecting on
+#' of NPX, Quantified or Ct. Ignored for non-excel input files.
 #' @param .ignore_files Vector of files to ignore.
+#' @param quiet Print a confirmation message after reading in the input file.
 #'
 #' @return An R6 class ArrowObject.
 #'
@@ -20,11 +28,16 @@
 #'   [read_npx()]
 #'   [read_npx_delim()]
 #'   [read_npx_parquet()]
+#'   [read_npx_excel()]
 #'
 read_npx_zip <- function(file,
                          out_df = "arrow",
                          sep = NULL,
-                         .ignore_files = c("README.txt")) {
+                         long_format = NULL,
+                         olink_platform = NULL,
+                         data_type = NULL,
+                         .ignore_files = c("README.txt"),
+                         quiet = FALSE) {
 
   # Check if all required libraries for this function are installed
   check_library_installed(
@@ -35,7 +48,7 @@ read_npx_zip <- function(file,
   # check if file exists
   check_file_exists(file = file,
                     error = TRUE)
-
+					
   # check that the requested output df is ok
   check_out_df_arg(out_df = out_df)
 
@@ -156,11 +169,16 @@ read_npx_zip <- function(file,
   }
 
   # read the NPX file
-  df_olink <- read_npx(
-    filename = extracted_file_npx,
-    out_df = out_df,
-    sep = sep
-  )
+    df_olink <- read_npx(
+      filename = extracted_file_npx,
+      out_df = out_df,
+      sep = sep,
+      long_format = long_format,
+      olink_platform = olink_platform,
+      data_type = data_type,
+      .ignore_files = .ignore_files,
+      quiet = quiet
+    )
 
   # cleanup temporary directory with extracted files
   invisible(unlink(x = tmp_unzip_dir, recursive = TRUE))

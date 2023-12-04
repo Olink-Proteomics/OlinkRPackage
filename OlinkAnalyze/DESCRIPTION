@@ -66,8 +66,10 @@ Imports:
     dplyr,
     kableExtra,
     knitr,
+    readxl,
     rlang,
-    stringr
+    stringr,
+    tidyr
 Suggests: 
     testthat (>= 3.0.0),
     withr,
