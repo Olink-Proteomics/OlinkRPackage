@@ -174,15 +174,13 @@ test_that(
 
         # check that reading the file works
         expect_no_condition(
-          object = df_arrow <- utils::read.delim(
-            file = dfile_test,
-            header = TRUE,
-            sep = ",",
-            na.strings = c("NA", ""),
-            stringsAsFactors = FALSE
-          ) |>
-            dplyr::as_tibble() |>
-            arrow::as_arrow_table()
+          object = df_arrow <- arrow::open_delim_dataset(
+            sources = dfile_test,
+            delim = ",",
+            col_names = TRUE,
+            quoted_na = TRUE,
+            na = c("", "NA")
+          )
         )
 
         # check that variable exists
