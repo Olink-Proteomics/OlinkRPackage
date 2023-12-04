@@ -149,8 +149,6 @@ test_that(
       fileext = ".csv",
       code = {
 
-        sep_arrow <- ","
-
         # write the coma-delimited file from random data frame
         dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -163,7 +161,7 @@ test_that(
             file = dfile_test,
             append = FALSE,
             quote = FALSE,
-            sep = sep_arrow,
+            sep = ",",
             eol = "\n",
             na = "",
             dec = ".",
@@ -176,14 +174,13 @@ test_that(
 
         # check that reading the file works
         expect_no_condition(
-          object = df_arrow <- utils::read.delim(
-            file = dfile_test,
-            header = TRUE,
-            sep = sep_arrow,
-            na.strings = c("NA", ""),
-            stringsAsFactors = FALSE
-          ) |>
-            arrow::as_arrow_table()
+          object = df_arrow <- arrow::open_delim_dataset(
+            sources = dfile_test,
+            delim = ",",
+            col_names = TRUE,
+            quoted_na = TRUE,
+            na = c("", "NA")
+          )
         )
 
         # check that variable exists

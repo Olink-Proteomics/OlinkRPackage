@@ -14,14 +14,14 @@ read_npx_excel_platform(
 \arguments{
 \item{file}{The input excel file.}
 
+\item{olink_platform}{The Olink platform used to generate the input file.
+Expecting "Target 96", "Target 48", "Flex" or "Focus".}
+
 \item{is_long_format}{Boolean marking if input file is in long (TRUE) or wide
 (FALSE) format.}
 
 \item{olink_platforms_excel}{Data frame from the global variable
 accepted_olink_platforms.}
-
-\item{in_olink_platform}{The Olink platform used to generate the input file.
-Expecting "Target 96", "Target 48", "Flex" or "Focus".}
 }
 \value{
 The name of the Olink platform detected automatically or set by the

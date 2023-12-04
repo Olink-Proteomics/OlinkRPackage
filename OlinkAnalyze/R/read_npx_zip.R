@@ -48,6 +48,9 @@ read_npx_zip <- function(file,
   # check if file exists
   check_file_exists(file = file,
                     error = TRUE)
+					
+  # check that the requested output df is ok
+  check_out_df_arg(out_df = out_df)
 
   # check that .ignore_files is a character vector
   check_is_character(string = .ignore_files,
@@ -166,16 +169,16 @@ read_npx_zip <- function(file,
   }
 
   # read the NPX file
-  df_olink <- read_npx(
-    filename = extracted_file_npx,
-    out_df = out_df,
-    sep = sep,
-    long_format = long_format,
-    olink_platform = olink_platform,
-    data_type = data_type,
-    .ignore_files = .ignore_files,
-    quiet = quiet
-  )
+    df_olink <- read_npx(
+      filename = extracted_file_npx,
+      out_df = out_df,
+      sep = sep,
+      long_format = long_format,
+      olink_platform = olink_platform,
+      data_type = data_type,
+      .ignore_files = .ignore_files,
+      quiet = quiet
+    )
 
   # cleanup temporary directory with extracted files
   invisible(unlink(x = tmp_unzip_dir, recursive = TRUE))
@@ -185,4 +188,231 @@ read_npx_zip <- function(file,
                                       out_df = out_df)
 
   return(df_olink)
+}
+
+#' Help function to get the name of the checksum file from a zip NPX.
+#'
+#' @author Klev Diamanti
+#'
+#' @param files A vector of file names without any path prefix.
+#'
+#' @return The name of checksum file or NA if the file is not present.
+#'
+#' @keywords zip NPX checksum MD5 SHA256
+#'
+#' @seealso
+#'   [check_checksum()]
+#'   [get_npx_file()]
+#'
+get_checksum_file <- function(files) {
+
+  # check that the input is a character vector
+  check_is_character(string = files,
+                     error = TRUE)
+
+  # if none of the files matches the accepted file names
+  if (!any(files %in% accepted_checksum_files)) {
+
+    return(NA_character_)
+
+  }
+
+  # if more than one files are in the accepted file names
+  if (sum(files %in% accepted_checksum_files) > 1L) {
+
+    cli::cli_abort(
+      c(
+        "x" = "The compressed file contains too many checksum files!",
+        "i" = "The compressed input file should contain {.strong only} one
+          checksum file: { cli::ansi_collapse(x = accepted_checksum_files,
+                                              last = \", or \") }."
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
+  }
+
+  # get the checksum file
+  checksum_file <- files[files %in% accepted_checksum_files]
+
+  # return
+  return(checksum_file)
+}
+
+
+#' Help function to get the name of the NPX file from a compresseed NPX.
+#'
+#' @author Klev Diamanti
+#'
+#' @param files A vector of file names without any path prefix.
+#'
+#' @return The name of the NPX file.
+#'
+#' @keywords zip NPX
+#'
+#' @seealso
+#'   [check_checksum()]
+#'   [get_checksum_file()]
+#'
+get_npx_file <- function(files) {
+
+  # check that the input is a character vector
+  check_is_character(string = files,
+                     error = TRUE)
+
+  # remove (if any) checksum files
+  files_no_checksum <- files[!(files %in% accepted_checksum_files)]
+
+  # get file extension(s)
+  df_files <- dplyr::tibble(files = files_no_checksum) |>
+    dplyr::mutate(
+      files_extension = tools::file_ext(.data[["files"]])
+    )
+
+  # check: no file with the accepted suffix
+  if (sum(df_files$files_extension %in% accepted_npx_file_ext) != 1L) {
+
+    if (sum(df_files$files_extension %in% accepted_npx_file_ext) == 0L) {
+      err_msg <- "no" # nolint object_usage_linter
+    } else if (sum(df_files$files_extension %in% accepted_npx_file_ext) > 1L) {
+      err_msg <- "multiple" # nolint object_usage_linter
+    }
+
+    # we should not allow the zip extension in this case as the NPX file is
+    # already part of the zip we are checking
+    npx_ext_no_zip <- accepted_npx_file_ext[!(accepted_npx_file_ext == "zip")] # nolint object_usage_linter
+
+    cli::cli_abort(
+      c(
+        "x" = "The compressed file contains {err_msg} NPX files!",
+        "i" = "The compressed input file should contain {.strong only} one NPX
+          file with extension: { cli::ansi_collapse(x = npx_ext_no_zip,
+                                                    last = \", or \") }."
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+  }
+
+  # get the NPX file
+  npx_file <- df_files |>
+    dplyr::filter(
+      .data[["files_extension"]] %in% .env[["accepted_npx_file_ext"]]
+    ) |>
+    # we can safely assume that there is only one file here
+    dplyr::slice_head(n = 1L) |>
+    dplyr::pull(.data[["files"]])
+
+  # return
+  return(npx_file)
+}
+
+
+#' Help function comparing the checksum reported by Olink software to the
+#' checksum of the delivered NPX file.
+#'
+#' @description
+#' We should make it here only if MD5_checksum.txt or checksum_sha256.txt are
+#' present in the zip file.
+#'
+#' This function does not check whether checksum_file is in acceptable format.
+#'
+#' @author Klev Diamanti
+#'
+#' @param checksum_file The plain file that contains the checksum output from
+#' Olink software. The file should contain "MD5" or "SHA256" in the file name.
+#' @param npx_file The NPX file accompanying the checksum file.
+#'
+#' @return A string or NA. If the function return NA then everything worked
+#' fine, otherwise there was some sort of error.
+#'
+check_checksum <- function(checksum_file,
+                           npx_file) {
+
+  # check if input is character vectors of length 1
+  check_is_scalar_character(string = checksum_file,
+                            error = TRUE)
+  check_is_scalar_character(string = npx_file,
+                            error = TRUE)
+
+  # make the checksum filename easier to parse
+  checksum_file_stripped <- checksum_file |>
+    basename() |>
+    tools::file_path_sans_ext() |>
+    tolower()
+
+  # Get checksum from NPX file
+  if (check_file_exists(file = npx_file, error = FALSE)) {
+
+    if (grepl("md5", checksum_file_stripped)) {
+
+      # MD5 checksum on the NPX file
+      npx_file_checksum <- cli::hash_file_md5(paths = npx_file)
+
+    } else if (grepl("sha256", checksum_file_stripped)) {
+
+      # SHA256 checksum on the NPX file
+      npx_file_checksum <- cli::hash_file_sha256(paths = npx_file)
+
+    }
+
+  } else {
+
+    # error message
+    cli::cli_abort(
+      c(
+        "x" = "Unable to open NPX file: {basename(npx_file)}",
+        "i" = "Was it extracted from the compressed file?"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
+  }
+
+
+  if (check_file_exists(file = checksum_file, error = FALSE)) {
+
+    # check that checksum matches NPX csv file
+    checksum_file_read_con <- file(checksum_file, "r")
+
+    # read in the checksum extracted from the compressed file
+    checksum_file_content <- readLines(con = checksum_file_read_con,
+                                       n = 1L,
+                                       warn = FALSE)
+
+    # clean up files
+    close(checksum_file_read_con)
+
+  } else {
+
+    # error message
+    cli::cli_abort(
+      c(
+        "x" = "Unable to open checksum file: {basename(checksum_file)}",
+        "i" = "Was it extracted from the compressed file?"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
+  }
+
+  # check if checksums match
+  if (checksum_file_content != npx_file_checksum) {
+
+    # error message
+    cli::cli_abort(
+      c(
+        "x" = "The checksum of the NPX file does not match the one included in
+        the compressed file",
+        "i" = "Potential loss of data or corrupt file."
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
+  }
+
 }

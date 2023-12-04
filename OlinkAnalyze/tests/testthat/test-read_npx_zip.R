@@ -1,3 +1,5 @@
+# Test read_npx_zip ----
+
 # Test that if the input file has been misidentified as zip compressed but it is
 # not (e.g. .txt), then a relevant error is thrown
 test_that(
@@ -722,9 +724,7 @@ test_that(
         expect_true(object = file.exists(nfile_test))
 
         # compute SHA256 checksum
-        openssl::sha256(file(nfile_test)) |>
-          stringr::str_replace(pattern = ":",
-                               replacement = "") |>
+        cli::hash_file_sha256(paths = nfile_test) |>
           writeLines(checksumfile_test)
 
         # check that the checksum file was created
@@ -818,9 +818,7 @@ test_that(
         expect_true(object = file.exists(nfile_test))
 
         # compute SHA256 checksum
-        openssl::sha256(file(nfile_test)) |>
-          stringr::str_replace(pattern = ":",
-                               replacement = "") |>
+        cli::hash_file_sha256(paths = nfile_test) |>
           writeLines(checksumfile_test)
 
         # check that the checksum file was created
@@ -1024,5 +1022,468 @@ test_that(
 
     expect_false(object = file.exists(checksumfile_test))
 
+  }
+)
+
+# Test check_checksum ----
+
+# Test that when the MD5 checksum of the file matches the reported MD5 checksum,
+# then the function works -> returns NULL
+test_that(
+  "checksum matches works - MD5",
+  {
+    withr::with_tempfile(
+      new = c("text_file_test", "MD5_check"),
+      pattern = "MD5",
+      fileext = ".txt",
+      code = {
+
+        # write a random data frame to file
+        dplyr::tibble("A" = c(1, 2.2, 3.14),
+                      "B" = c("a", "b", "c"),
+                      "C" = c(TRUE, TRUE, FALSE),
+                      "D" = c("NA", "B", NA_character_),
+                      "E" = c(1L, 2L, 3L)) |>
+          utils::write.table(file = text_file_test,
+                             append = FALSE,
+                             quote = FALSE,
+                             sep = ";",
+                             eol = "\n",
+                             na = "",
+                             dec = ".",
+                             row.names = FALSE,
+                             col.names = TRUE)
+
+        # check that the comma delimited file exists
+        expect_true(object = file.exists(text_file_test))
+
+        # MD5 checksum on the NPX file
+        text_file_checksum <- cli::hash_file_md5(paths = text_file_test)
+
+        # write some text in a txt file
+        writeLines(text_file_checksum, MD5_check)
+
+        # check that the parquet file was created
+        expect_true(object = file.exists(MD5_check))
+
+        # check that relevant error is thrown
+        expect_no_condition(
+          object = check_checksum(checksum_file = MD5_check,
+                                  npx_file = text_file_test)
+        )
+
+      }
+    )
+
+  }
+)
+
+# Test that when the SHA256 checksum of the file matches the reported SHA256
+# checksum, then the function works -> returns NULL
+test_that(
+  "checksum matches works - SHA256",
+  {
+    withr::with_tempfile(
+      new = c("text_file_test", "SHA256_check"),
+      pattern = "SHA256",
+      fileext = ".txt",
+      code = {
+
+        # write a random data frame to file
+        dplyr::tibble("A" = c(1, 2.2, 3.14),
+                      "B" = c("a", "b", "c"),
+                      "C" = c(TRUE, TRUE, FALSE),
+                      "D" = c("NA", "B", NA_character_),
+                      "E" = c(1L, 2L, 3L)) |>
+          utils::write.table(file = text_file_test,
+                             append = FALSE,
+                             quote = FALSE,
+                             sep = ";",
+                             eol = "\n",
+                             na = "",
+                             dec = ".",
+                             row.names = FALSE,
+                             col.names = TRUE)
+
+        # check that the comma delimited file exists
+        expect_true(object = file.exists(text_file_test))
+
+        # write sha256 in the txt file
+        cli::hash_file_sha256(paths = text_file_test) |>
+          writeLines(SHA256_check)
+
+        # check that the parquet file was created
+        expect_true(object = file.exists(SHA256_check))
+
+        # check that relevant error is thrown
+        expect_no_condition(
+          object = check_checksum(checksum_file = SHA256_check,
+                                  npx_file = text_file_test)
+        )
+
+      }
+    )
+
+  }
+)
+
+# Test that a relevant error is thrown when the NPX file does not exist.
+test_that(
+  "checksum matches works - missing NPX file",
+  {
+    withr::with_tempfile(
+      new = "nfile_test",
+      pattern = "npx",
+      fileext = ".parquet",
+      code = {
+
+        # check that the parquet file was created
+        expect_false(object = file.exists(nfile_test))
+
+        withr::with_tempfile(
+          new = "SHA256_check",
+          pattern = "SHA256",
+          fileext = ".txt",
+          code = {
+
+            # write in the checksum file
+            writeLines("I_AM_A_R4ND0M_ChEcKuP", SHA256_check)
+
+            # check that the parquet file was created
+            expect_true(object = file.exists(SHA256_check))
+
+            # check that relevant string is returned
+            expect_error(
+              object = check_checksum(checksum_file = SHA256_check,
+                                      npx_file = nfile_test),
+              regexp = "Unable to open NPX file"
+            )
+
+          }
+        )
+
+      }
+    )
+
+  }
+)
+
+# Test that a relevant error is thrown when the checksum file does not exist.
+test_that(
+  "checksum matches works - missing checksum file",
+  {
+    withr::with_tempfile(
+      new = c("text_file_test", "SHA256_check"),
+      pattern = "SHA256",
+      fileext = ".txt",
+      code = {
+
+        # write a random data frame to file
+        dplyr::tibble("A" = c(1, 2.2, 3.14),
+                      "B" = c("a", "b", "c"),
+                      "C" = c(TRUE, TRUE, FALSE),
+                      "D" = c("NA", "B", NA_character_),
+                      "E" = c(1L, 2L, 3L)) |>
+          utils::write.table(file = text_file_test,
+                             append = FALSE,
+                             quote = FALSE,
+                             sep = ";",
+                             eol = "\n",
+                             na = "",
+                             dec = ".",
+                             row.names = FALSE,
+                             col.names = TRUE)
+
+        # check that the comma delimited file exists
+        expect_true(object = file.exists(text_file_test))
+
+        # check that the parquet file was created
+        expect_false(object = file.exists(SHA256_check))
+
+        # check that relevant string is returned
+        expect_error(
+          object = check_checksum(checksum_file = SHA256_check,
+                                  npx_file = text_file_test),
+          regexp = "Unable to open checksum file"
+        )
+
+      }
+    )
+
+  }
+)
+
+# Test that a relevant error is thrown when the checksum of the file does not
+# match the one reported.
+test_that(
+  "checksum matches works - not matching checksum",
+  {
+    withr::with_tempfile(
+      new = c("text_file_test", "SHA256_check"),
+      pattern = "SHA256",
+      fileext = ".txt",
+      code = {
+
+        # write a random data frame to file
+        dplyr::tibble("A" = c(1, 2.2, 3.14),
+                      "B" = c("a", "b", "c"),
+                      "C" = c(TRUE, TRUE, FALSE),
+                      "D" = c("NA", "B", NA_character_),
+                      "E" = c(1L, 2L, 3L)) |>
+          utils::write.table(file = text_file_test,
+                             append = FALSE,
+                             quote = FALSE,
+                             sep = ";",
+                             eol = "\n",
+                             na = "",
+                             dec = ".",
+                             row.names = FALSE,
+                             col.names = TRUE)
+
+        # check that the comma delimited file exists
+        expect_true(object = file.exists(text_file_test))
+
+        # write some text in a txt file
+        writeLines("I_AM_A_R4ND0M_ChEcKuP", SHA256_check)
+
+        # check that the parquet file was created
+        expect_true(object = file.exists(SHA256_check))
+
+        # check that relevant string is returned
+        expect_error(
+          object = check_checksum(checksum_file = SHA256_check,
+                                  npx_file = text_file_test),
+          regexp = "The checksum of the NPX file does not match the one"
+        )
+
+      }
+    )
+
+  }
+)
+
+# Test get_checksum_file ----
+
+# Test that the function returns the correct checksum file
+test_that(
+  "get checksum file from zip works",
+  {
+    # realistic scenario with checksum_sha256.txt
+    expect_equal(
+      object = get_checksum_file(
+        files = c("checksum_sha256.txt", "test.csv")
+      ),
+      expected = "checksum_sha256.txt"
+    )
+
+    # realistic scenario with MD5_checksum.txt
+    expect_equal(
+      object = get_checksum_file(
+        files = c("MD5_checksum.txt", "test.csv")
+      ),
+      expected = "MD5_checksum.txt"
+    )
+  }
+)
+
+# Test that NA is returned when there is no acceptable checksum file name
+test_that(
+  "get checksum file from zip - No checksum file",
+  {
+    # wrong checksum file
+    expect_identical(
+      object = get_checksum_file(
+        files = c("MD51_checksum.txt", "test.csv")
+      ),
+      expected = NA_character_
+    )
+  }
+)
+
+# Test that a relevant error messahe os thrown when 2 acceptable checksum files
+# are provided.
+test_that(
+  "get checksum file from zip - 2 checksums",
+  {
+    # multiple checksum files
+    expect_error(
+      object = get_checksum_file(
+        files = c("MD5_checksum.txt", "MD5_checksum.txt")
+      ),
+      regexp = "The compressed file contains too many checksum files!"
+    )
+
+    expect_error(
+      object = get_checksum_file(
+        files = c("checksum_sha256.txt", "checksum_sha256.txt")
+      ),
+      regexp = "The compressed file contains too many checksum files!"
+    )
+
+    expect_error(
+      object = get_checksum_file(
+        files = c("MD5_checksum.txt", "checksum_sha256.txt")
+      ),
+      regexp = "The compressed file contains too many checksum files!"
+    )
+  }
+)
+
+# Test get_npx_file ----
+
+## test all realistic scenario combos of checksum files and NPX files ----
+
+# Test get_npx_file for slightly different inputs. Specifically,
+# checking for all combos of checksum file and NPX file
+test_checksum_npx_combo <- function(c_file, n_file) {
+  test_that(
+    paste("Testing get NPX file from zip with:", c_file, "and", n_file), {
+      expect_equal(
+        object = get_npx_file(files = c(c_file, n_file)),
+        expected = n_file
+      )
+    }
+  )
+}
+
+invisible(
+  sapply(
+    accepted_checksum_files,
+    function(checksum_file) {
+      sapply(
+        paste0("test.", accepted_npx_file_ext[accepted_npx_file_ext != "zip"]),
+        function(npx_file) {
+          test_checksum_npx_combo(c_file = checksum_file, n_file = npx_file)
+        }
+      )
+    }
+  )
+)
+
+rm(test_checksum_npx_combo)
+
+## test all realistic scenario of NPX files input only ----
+
+# Test get_npx_file for slightly different inputs. Specifically,
+# checking for all NPX files.
+test_npx_input <- function(n_file) {
+  test_that(
+    paste("Testing get NPX file from zip with:", n_file), {
+      expect_equal(
+        object = get_npx_file(files = n_file),
+        expected = n_file
+      )
+    }
+  )
+}
+
+invisible(
+  sapply(
+    paste0("test.", accepted_npx_file_ext[accepted_npx_file_ext != "zip"]),
+    function(npx_file) {
+      test_npx_input(n_file = npx_file)
+    }
+  )
+)
+
+rm(test_npx_input)
+
+## Test edge cases ----
+
+# Test that relevant error is thrown when only checksum files are provided.
+test_that(
+  "get NPX file from zip - only checksums",
+  {
+    # one MD5 only
+    expect_error(
+      object = get_npx_file(
+        files = c("MD5_checksum.txt")
+      ),
+      regexp = "The compressed file contains no NPX files!"
+    )
+
+    # two MD5
+    expect_error(
+      object = get_npx_file(
+        files = c("MD5_checksum.txt", "MD5_checksum.txt")
+      ),
+      regexp = "The compressed file contains no NPX files!"
+    )
+
+    # one SHA256 only
+    expect_error(
+      object = get_npx_file(
+        files = c("checksum_sha256.txt")
+      ),
+      regexp = "The compressed file contains no NPX files!"
+    )
+
+    # two SHA256
+    expect_error(
+      object = get_npx_file(
+        files = c("checksum_sha256.txt", "checksum_sha256.txt")
+      ),
+      regexp = "The compressed file contains no NPX files!"
+    )
+  }
+)
+
+# Test that relevant error is thrown when unknown files are provided.
+test_that(
+  "get NPX file from zip - no known file",
+  {
+    # one unknown file
+    expect_error(
+      object = get_npx_file(
+        files = c("test.xml")
+      ),
+      regexp = "The compressed file contains no NPX files!"
+    )
+
+    # two unknown files
+    expect_error(
+      object = get_npx_file(
+        files = c("test.xml", "test.yaml")
+      ),
+      regexp = "The compressed file contains no NPX files!"
+    )
+  }
+)
+
+# Test that relevant error is thrown when 2 acceptable files are provided.
+test_that(
+  "get NPX file from zip - many known files v1",
+  {
+    # A txt and a csv file
+    expect_error(
+      object = get_npx_file(
+        files = c("test.txt", "test.csv")
+      ),
+      regexp = "The compressed file contains multiple NPX files!"
+    )
+
+    # A parquet and a csv file
+    expect_error(
+      object = get_npx_file(
+        files = c("test.parquet", "test.csv")
+      ),
+      regexp = "The compressed file contains multiple NPX files!"
+    )
+
+    # An xlsx and a csv file
+    expect_error(
+      object = get_npx_file(
+        files = c("test.xlsx", "test.csv")
+      ),
+      regexp = "The compressed file contains multiple NPX files!"
+    )
+
+    # misAn xls and a csv file
+    expect_error(
+      object = get_npx_file(
+        files = c("test.xls", "test.csv")
+      ),
+      regexp = "The compressed file contains multiple NPX files!"
+    )
   }
 )
