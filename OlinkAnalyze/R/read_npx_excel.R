@@ -327,7 +327,7 @@ read_npx_excel_format <- function(file,
 #' @author Klev Diamanti
 #'
 #' @param file The input excel file.
-#' @param in_olink_platform The Olink platform used to generate the input file.
+#' @param olink_platform The Olink platform used to generate the input file.
 #' Expecting "Target 96", "Target 48", "Flex" or "Focus".
 #' @param is_long_format Boolean marking if input file is in long (TRUE) or wide
 #' (FALSE) format.
