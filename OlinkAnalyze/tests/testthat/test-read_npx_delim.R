@@ -15,26 +15,26 @@ test_that(
         expect_error(
           object = read_npx_delim(file = cfile_test,
                                   sep = c(",", ";")),
-          regexp = "\"sep\" should be a string!"
+          regexp = "`sep` should be a string!"
         )
 
         expect_error(
           object = read_npx_delim(file = cfile_test,
                                   sep = character()),
-          regexp = "\"sep\" should be a string!"
+          regexp = "`sep` should be a string!"
         )
 
         expect_error(
           object = read_npx_delim(file = cfile_test,
                                   sep = 1),
-          regexp = "\"sep\" should be a string!"
+          regexp = "`sep` should be a string!"
         )
 
 
         expect_error(
           object = read_npx_delim(file = cfile_test,
                                   sep = TRUE),
-          regexp = "\"sep\" should be a string!"
+          regexp = "`sep` should be a string!"
         )
 
       }
@@ -440,7 +440,7 @@ test_that(
         expect_warning(
           object = read_npx_delim(file = cdfile_test,
                                   sep = ";"),
-          regexp = "Wrong input sep \";\"?"
+          regexp = "Wrong input `sep` = \";\"?"
         )
 
       }

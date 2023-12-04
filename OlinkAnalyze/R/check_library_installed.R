@@ -19,15 +19,20 @@ check_library_installed <- function(libraries,
   check_is_scalar_boolean(bool = error,
                           error = TRUE)
 
+  # check for missing libraries
+  missing_libraries <- sapply(libraries, rlang::is_installed) |>
+    (\(x) x[x == FALSE])() |>
+    names()
+
   # check that required libraries are installed
-  if (!rlang::is_installed(libraries)) {
+  if (length(missing_libraries) > 0) {
 
     if (error == TRUE) {
 
       cli::cli_abort(
         c(
-          "x" = "One or more missing libraries: {libraries}",
-          "i" = "Please install the required R libraries!"
+          "x" = "Missing librar{?y/ies}: {.pkg {missing_libraries}}",
+          "i" = "Please install!"
         ),
         call = rlang::caller_env(),
         wrap = FALSE

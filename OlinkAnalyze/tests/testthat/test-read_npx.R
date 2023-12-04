@@ -366,7 +366,7 @@ test_that(
         # check that data can be loaded
         expect_error(
           object = read_NPX(filename = tmp_unknown_file),
-          regexp = "Unable to recognize the input file from its extension!"
+          regexp = "Unable to recognize format from file extension!"
         )
 
       }
