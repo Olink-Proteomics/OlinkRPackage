@@ -34,8 +34,8 @@ get_field_separator <- function(file) {
 
     cli::cli_abort(
       c(
-        "x" = "Unable to read header line from {file}",
-        "i" = "Empty header or empty file?"
+        "x" = "Unable to read header line from {.file {file}}",
+        "i" = "Empty header or empty {.arg file}?"
       ),
       call = rlang::caller_env(),
       wrap = FALSE
@@ -67,7 +67,7 @@ get_field_separator <- function(file) {
 
     cli::cli_abort(
       c(
-        "x" = "Unable to identify the separator of the file: {file}",
+        "x" = "Unable to identify the separator of the file: {.file {file}}",
         "i" = "Both semicolon (;) and comma (,) are present in header line."
       ),
       call = rlang::caller_env(),
@@ -78,7 +78,7 @@ get_field_separator <- function(file) {
 
     cli::cli_abort(
       c(
-        "x" = "Unable to identify the separator of the file: {file}",
+        "x" = "Unable to identify the separator of the file: {.file {file}}",
         "i" = "Expecting semicolon (;) or comma (,)!"
       ),
       call = rlang::caller_env(),

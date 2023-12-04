@@ -48,7 +48,7 @@ read_npx_zip <- function(file,
   # check if file exists
   check_file_exists(file = file,
                     error = TRUE)
-					
+
   # check that the requested output df is ok
   check_out_df_arg(out_df = out_df)
 
@@ -71,8 +71,8 @@ read_npx_zip <- function(file,
 
       cli::cli_abort(
         c(
-          "x" = "Unable to open compressed file: {file}",
-          "i" = "Check if the file is a zip and or potential file
+          "x" = "Unable to open compressed file: {.file {file}}",
+          "i" = "Check if the file is a zip and/or potential file
           corruption."
         ),
         call = rlang::caller_env(),
@@ -93,7 +93,7 @@ read_npx_zip <- function(file,
 
     cli::cli_abort(
       c(
-        "x" = "No NPX and checksum file in the compressed file: {file}"
+        "x" = "No NPX and checksum file in the compressed file: {.file {file}}"
       ),
       call = rlang::caller_env(),
       wrap = FALSE
@@ -169,16 +169,16 @@ read_npx_zip <- function(file,
   }
 
   # read the NPX file
-    df_olink <- read_npx(
-      filename = extracted_file_npx,
-      out_df = out_df,
-      sep = sep,
-      long_format = long_format,
-      olink_platform = olink_platform,
-      data_type = data_type,
-      .ignore_files = .ignore_files,
-      quiet = quiet
-    )
+  df_olink <- read_npx(
+    filename = extracted_file_npx,
+    out_df = out_df,
+    sep = sep,
+    long_format = long_format,
+    olink_platform = olink_platform,
+    data_type = data_type,
+    .ignore_files = .ignore_files,
+    quiet = quiet
+  )
 
   # cleanup temporary directory with extracted files
   invisible(unlink(x = tmp_unzip_dir, recursive = TRUE))
@@ -362,7 +362,7 @@ check_checksum <- function(checksum_file,
     # error message
     cli::cli_abort(
       c(
-        "x" = "Unable to open NPX file: {basename(npx_file)}",
+        "x" = "Unable to open NPX file: {.file {basename(npx_file)}}",
         "i" = "Was it extracted from the compressed file?"
       ),
       call = rlang::caller_env(),
@@ -390,7 +390,7 @@ check_checksum <- function(checksum_file,
     # error message
     cli::cli_abort(
       c(
-        "x" = "Unable to open checksum file: {basename(checksum_file)}",
+        "x" = "Unable to open checksum file: {.file {basename(checksum_file)}}",
         "i" = "Was it extracted from the compressed file?"
       ),
       call = rlang::caller_env(),

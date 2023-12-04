@@ -61,7 +61,7 @@ test_that(
         libraries = c("MissingLibraryOne"),
         error = TRUE
       ),
-      regexp = "One or more missing libraries"
+      regexp = "Missing library:"
     )
 
     expect_error(
@@ -71,7 +71,7 @@ test_that(
                       "MissingLibraryThree"),
         error = TRUE
       ),
-      regexp = "One or more missing libraries"
+      regexp = "Missing libraries:"
     )
 
     expect_error(
@@ -80,7 +80,7 @@ test_that(
                       "tools"),
         error = TRUE
       ),
-      regexp = "One or more missing libraries"
+      regexp = "Missing library:"
     )
 
   }

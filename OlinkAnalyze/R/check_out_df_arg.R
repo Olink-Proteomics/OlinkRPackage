@@ -26,7 +26,8 @@ check_out_df_arg <- function(out_df) {
     cli::cli_abort(
       message = c(
         "x" = "Unknown output argument {.arg {rlang::caller_arg(out_df)}}!",
-        "i" = "Acceptable output types: {read_npx_df_output}"
+        "i" = "Acceptable {.arg {rlang::caller_arg(out_df)}}:
+        {read_npx_df_output}"
       ),
       call = rlang::caller_env(),
       wrap = FALSE

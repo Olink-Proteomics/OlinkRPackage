@@ -136,7 +136,7 @@ read_npx <- function(filename,
 
     cli::cli_abort(
       message = c(
-        "x" = "Unable to recognize the input file from its extension!",
+        "x" = "Unable to recognize format from file extension!",
         "i" = "Acceptable file extensions: {accepted_npx_file_ext}"
       ),
       call = NULL,

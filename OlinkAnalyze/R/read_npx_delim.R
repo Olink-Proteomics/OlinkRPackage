@@ -41,7 +41,7 @@ read_npx_delim <- function(file,
 
     cli::cli_abort(
       c(
-        "x" = "{.val sep} should be a string!"
+        "x" = "{.arg sep} should be a string!"
       ),
       call = rlang::caller_env(),
       wrap = FALSE
@@ -76,8 +76,8 @@ read_npx_delim <- function(file,
 
       cli::cli_abort(
         c(
-          "x" = "Unable to open delimited file: {file}",
-          "i" = "Check if the input file is a delimiter-separated file."
+          "x" = "Unable to open delimited file: {.file {file}}",
+          "i" = "Check if the input {.arg file} is a delimiter-separated file."
         ),
         call = rlang::caller_env(),
         wrap = FALSE
@@ -89,8 +89,10 @@ read_npx_delim <- function(file,
   if (length(names(df_olink)) == 1L) {
 
     cli::cli_warn(
-      message = "The delimited file {file} has only one column. Wrong input sep
-      \"{sep}\"?",
+      message = c(
+        "The delimited file {.file {file}} has only one column.",
+        "i" = "Wrong input {.arg sep} = {.val {sep}}?"
+      ),
       call = rlang::caller_env(),
       wrap = FALSE
     )
