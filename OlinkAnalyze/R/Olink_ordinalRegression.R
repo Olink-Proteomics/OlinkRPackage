@@ -125,7 +125,7 @@ olink_ordinalRegression <- function(df,
         df[[i]] <- factor(df[[i]])
         converted.vars <- c(converted.vars,i)
       }else if(is.numeric(df[[i]])){
-        warning(paste0('The variable ',i,' should not be as numeric'))
+        num.vars <- c(num.vars,i)
       }
     }
 
