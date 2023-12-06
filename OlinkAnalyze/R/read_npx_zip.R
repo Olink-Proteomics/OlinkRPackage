@@ -283,7 +283,7 @@ get_npx_file <- function(files,
     )
 
   } else if (nrow(df_files) == 1L
-             & df_files$files_extension %in% compressed_file_ext) {
+             && df_files$files_extension %in% compressed_file_ext) {
 
     cli::cli_abort(
       c(
