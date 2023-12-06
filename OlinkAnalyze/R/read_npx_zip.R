@@ -276,26 +276,18 @@ get_npx_file <- function(files) {
   # check: no file with the accepted suffix
   if (nrow(df_files) != 1L) {
 
-    if (nrow(df_files) == 0L) {
-
-      err_msg <- "no" # nolint object_usage_linter
-
-    } else if (nrow(df_files) > 1L) {
-
-      err_msg <- "multiple" # nolint object_usage_linter
-
-    }
-
     # we should not allow the zip extension in this case as the NPX file is
     # already part of the zip we are checking
-    npx_ext_no_zip <- accepted_npx_file_ext[!(accepted_npx_file_ext == "zip")] # nolint object_usage_linter
-
     cli::cli_abort(
       c(
-        "x" = "The compressed file contains {err_msg} NPX files!",
+        "x" = "The compressed file contains
+        {ifelse(nrow(df_files) == 0L, \"no\", \"multiple\")} NPX files!",
         "i" = "The compressed input file should contain {.strong only} one NPX
-          file with extension: { cli::ansi_collapse(x = npx_ext_no_zip,
-                                                    last = \", or \") }."
+          file with extension:
+          {cli::ansi_collapse(
+             x = accepted_npx_file_ext[!(accepted_npx_file_ext == \"zip\")],
+             last = \", or \"
+           )}."
       ),
       call = rlang::caller_env(),
       wrap = FALSE
