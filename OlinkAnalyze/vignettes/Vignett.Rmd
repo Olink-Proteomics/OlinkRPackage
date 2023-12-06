@@ -296,8 +296,7 @@ A tibble of NPX data in long format containing normalized NPX values, including 
 
 ## Normalizing muliple NPX data (olink_normalization_n)  
 
-The olink_normalization_n is a function used to normalize NPX values between multiple different dataframes/projects which have been ran at different times all at the same time. This function is mainly used if the number of projects are three or more, otherwise please see the olink_normalization function. Commonly, there is a shift in (mean) NPX values between runs, however, the spread of the data remains the same. This is why normalization between dataframes/projects is required. For each dataframe/project another dataframe/project will be used asa reference to normalize to. The function handles two different types of normalization, Bridge and Subset, which are explained in the olink_normalization section.
-
+The olink_normalization_n is a function used to remove batch effect from multiple runs. This function is mainly used if the number of projects are three or more, otherwise please see the olink_normalization function. Commonly, there is a shift in NPX values between runs, however, the spread of the data remains the same. This is why normalization between dataframes/projects is required. For each dataframe/project another dataframe/project will be used as a reference to normalize to. The function handles two different types of normalization, Bridge and Subset, which are explained in the olink_normalization section.
 
 The input of this function is a tibble that contains all the necessary information to normalize multiple NPX projects. This tibble is called the normalization schema. The basic idea is that every row of the data frame is a separate project to be normalized. It is assume that there is always one baseline project that does not normalize to any other. All other project normalize to one or more projects. The function handles projects that are normalized in a chain, for example:
 
