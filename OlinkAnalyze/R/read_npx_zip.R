@@ -264,19 +264,26 @@ get_npx_file <- function(files) {
   # remove (if any) checksum files
   files_no_checksum <- files[!(files %in% accepted_checksum_files)]
 
-  # get file extension(s)
+  # get file extension(s) and keep only those matching the accepted ones
   df_files <- dplyr::tibble(files = files_no_checksum) |>
     dplyr::mutate(
       files_extension = tools::file_ext(.data[["files"]])
+    ) |>
+    dplyr::filter(
+      .data[["files_extension"]] %in% .env[["accepted_npx_file_ext"]]
     )
 
   # check: no file with the accepted suffix
-  if (sum(df_files$files_extension %in% accepted_npx_file_ext) != 1L) {
+  if (nrow(df_files) != 1L) {
 
-    if (sum(df_files$files_extension %in% accepted_npx_file_ext) == 0L) {
+    if (nrow(df_files) == 0L) {
+
       err_msg <- "no" # nolint object_usage_linter
-    } else if (sum(df_files$files_extension %in% accepted_npx_file_ext) > 1L) {
+
+    } else if (nrow(df_files) > 1L) {
+
       err_msg <- "multiple" # nolint object_usage_linter
+
     }
 
     # we should not allow the zip extension in this case as the NPX file is
@@ -293,13 +300,11 @@ get_npx_file <- function(files) {
       call = rlang::caller_env(),
       wrap = FALSE
     )
+
   }
 
   # get the NPX file
   npx_file <- df_files |>
-    dplyr::filter(
-      .data[["files_extension"]] %in% .env[["accepted_npx_file_ext"]]
-    ) |>
     # we can safely assume that there is only one file here
     dplyr::slice_head(n = 1L) |>
     dplyr::pull(.data[["files"]])
