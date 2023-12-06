@@ -4,10 +4,13 @@
 \alias{get_npx_file}
 \title{Help function to get the name of the NPX file from a compresseed NPX.}
 \usage{
-get_npx_file(files)
+get_npx_file(files, compressed_file_ext = c("zip"))
 }
 \arguments{
 \item{files}{A vector of file names without any path prefix.}
+
+\item{compressed_file_ext}{Character vector of file extensions for
+compressed files.}
 }
 \value{
 The name of the NPX file.

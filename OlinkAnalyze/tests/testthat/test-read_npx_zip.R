@@ -1025,6 +1025,204 @@ test_that(
   }
 )
 
+# Test that the function cleans up tempfiles when function has a successful exit
+test_that(
+  "read NPX zip - successful run - tempfiles clean up",
+  {
+
+    readmefile_test <- file.path(tempdir(),
+                                 "README.txt")
+    writeLines("foo", readmefile_test)
+    expect_true(object = file.exists(readmefile_test))
+
+    checksumfile_test <- file.path(tempdir(),
+                                   "checksum_sha256.txt")
+
+    withr::with_tempfile(
+      new = "nfile_test",
+      pattern = "npx",
+      fileext = ".csv",
+      code = {
+
+        # write the coma-delimited file
+        dplyr::tibble(
+          "A" = c(1, 2.2, 3.14),
+          "B" = c("a", "b", "c"),
+          "C" = c(TRUE, TRUE, FALSE),
+          "D" = c("NA", "B", NA_character_),
+          "E" = c(1L, 2L, 3L)
+        ) |>
+          utils::write.table(
+            file = nfile_test,
+            append = FALSE,
+            quote = FALSE,
+            sep = ";",
+            eol = "\n",
+            na = "",
+            dec = ".",
+            row.names = FALSE,
+            col.names = TRUE
+          )
+
+        # check that the parquet file was created
+        expect_true(object = file.exists(nfile_test))
+
+        # compute SHA256 checksum
+        cli::hash_file_sha256(paths = nfile_test) |>
+          writeLines(checksumfile_test)
+
+        # check that the checksum file was created
+        expect_true(object = file.exists(checksumfile_test))
+
+        withr::with_tempfile(
+          new = "zfile_test",
+          pattern = "npx",
+          fileext = ".zip",
+          code = {
+
+            # replacing the tempfile from base to this one so that we can test
+            # whether the function read_npx_zip cleaned up tempfiles after
+            # exiting
+            local_mocked_bindings(
+              tempfile = function() file.path(tempdir(), "I_am_4_TeMpFiLe"),
+              .package = "base"
+            )
+
+            # write zip file
+            utils::zip(
+              zipfile = zfile_test,
+              files = c(readmefile_test,
+                        nfile_test,
+                        checksumfile_test),
+              flags = "-jq"
+            )
+
+            # check that the zip file was created
+            expect_true(object = file.exists(zfile_test))
+
+            # check that this works
+            expect_no_condition(
+              object = df_out <- read_npx_zip(file = zfile_test,
+                                              out_df = "tibble")
+            )
+
+            expect_true(exists("df_out"))
+
+            expect_true(inherits(x = df_out, what = "tbl_df"))
+
+            expect_false(dir.exists(tempfile()))
+            expect_false(file.exists(tempfile()))
+          }
+        )
+
+        file.remove(readmefile_test)
+        file.remove(checksumfile_test)
+
+      }
+    )
+
+    expect_false(object = file.exists(readmefile_test))
+    expect_false(object = file.exists(checksumfile_test))
+
+  }
+)
+
+# Test that the function cleans up tempfiles when function throws an error
+test_that(
+  "read NPX zip - successful run - tempfiles clean up",
+  {
+
+    readmefile_test <- file.path(tempdir(),
+                                 "README.txt")
+    writeLines("foo", readmefile_test)
+    expect_true(object = file.exists(readmefile_test))
+
+    checksumfile_test <- file.path(tempdir(),
+                                   "checksum_sha256.txt")
+    writeLines("foo", checksumfile_test)
+
+    withr::with_tempfile(
+      new = "nfile_test",
+      pattern = "npx",
+      fileext = ".csv",
+      code = {
+
+        # write the coma-delimited file
+        dplyr::tibble(
+          "A" = c(1, 2.2, 3.14),
+          "B" = c("a", "b", "c"),
+          "C" = c(TRUE, TRUE, FALSE),
+          "D" = c("NA", "B", NA_character_),
+          "E" = c(1L, 2L, 3L)
+        ) |>
+          utils::write.table(
+            file = nfile_test,
+            append = FALSE,
+            quote = FALSE,
+            sep = ";",
+            eol = "\n",
+            na = "",
+            dec = ".",
+            row.names = FALSE,
+            col.names = TRUE
+          )
+
+        # check that the parquet file was created
+        expect_true(object = file.exists(nfile_test))
+
+        # check that the checksum file was created
+        expect_true(object = file.exists(checksumfile_test))
+
+        withr::with_tempfile(
+          new = "zfile_test",
+          pattern = "npx",
+          fileext = ".zip",
+          code = {
+
+            # replacing the tempfile from base to this one so that we can test
+            # whether the function read_npx_zip cleaned up tempfiles after
+            # exiting
+            local_mocked_bindings(
+              tempfile = function() file.path(tempdir(), "I_am_4_TeMpFiLe"),
+              .package = "base"
+            )
+
+            # write zip file
+            utils::zip(
+              zipfile = zfile_test,
+              files = c(readmefile_test,
+                        nfile_test,
+                        checksumfile_test),
+              flags = "-jq"
+            )
+
+            # check that the zip file was created
+            expect_true(object = file.exists(zfile_test))
+
+            # check that this works
+            expect_error(
+              object = read_npx_zip(file = zfile_test,
+                                    out_df = "tibble"),
+              regexp = "The checksum of the NPX file does not match the one"
+            )
+
+            expect_false(dir.exists(tempfile()))
+            expect_false(file.exists(tempfile()))
+          }
+        )
+
+        file.remove(readmefile_test)
+        file.remove(checksumfile_test)
+
+      }
+    )
+
+    expect_false(object = file.exists(readmefile_test))
+    expect_false(object = file.exists(checksumfile_test))
+
+  }
+)
+
 # Test check_checksum ----
 
 # Test that when the MD5 checksum of the file matches the reported MD5 checksum,
@@ -1399,7 +1597,7 @@ test_that(
       object = get_npx_file(
         files = c("MD5_checksum.txt")
       ),
-      regexp = "The compressed file contains no NPX files!"
+      regexp = "The compressed file contains no acceptable files!"
     )
 
     # two MD5
@@ -1407,7 +1605,7 @@ test_that(
       object = get_npx_file(
         files = c("MD5_checksum.txt", "MD5_checksum.txt")
       ),
-      regexp = "The compressed file contains no NPX files!"
+      regexp = "The compressed file contains no acceptable files!"
     )
 
     # one SHA256 only
@@ -1415,7 +1613,7 @@ test_that(
       object = get_npx_file(
         files = c("checksum_sha256.txt")
       ),
-      regexp = "The compressed file contains no NPX files!"
+      regexp = "The compressed file contains no acceptable files!"
     )
 
     # two SHA256
@@ -1423,7 +1621,7 @@ test_that(
       object = get_npx_file(
         files = c("checksum_sha256.txt", "checksum_sha256.txt")
       ),
-      regexp = "The compressed file contains no NPX files!"
+      regexp = "The compressed file contains no acceptable files!"
     )
   }
 )
@@ -1437,7 +1635,7 @@ test_that(
       object = get_npx_file(
         files = c("test.xml")
       ),
-      regexp = "The compressed file contains no NPX files!"
+      regexp = "The compressed file contains no acceptable files!"
     )
 
     # two unknown files
@@ -1445,7 +1643,7 @@ test_that(
       object = get_npx_file(
         files = c("test.xml", "test.yaml")
       ),
-      regexp = "The compressed file contains no NPX files!"
+      regexp = "The compressed file contains no acceptable files!"
     )
   }
 )
@@ -1459,7 +1657,7 @@ test_that(
       object = get_npx_file(
         files = c("test.txt", "test.csv")
       ),
-      regexp = "The compressed file contains multiple NPX files!"
+      regexp = "The compressed file contains multiple acceptable files!"
     )
 
     # A parquet and a csv file
@@ -1467,7 +1665,7 @@ test_that(
       object = get_npx_file(
         files = c("test.parquet", "test.csv")
       ),
-      regexp = "The compressed file contains multiple NPX files!"
+      regexp = "The compressed file contains multiple acceptable files!"
     )
 
     # An xlsx and a csv file
@@ -1475,15 +1673,38 @@ test_that(
       object = get_npx_file(
         files = c("test.xlsx", "test.csv")
       ),
-      regexp = "The compressed file contains multiple NPX files!"
+      regexp = "The compressed file contains multiple acceptable files!"
     )
 
-    # misAn xls and a csv file
+    # An xls and a csv file
     expect_error(
       object = get_npx_file(
         files = c("test.xls", "test.csv")
       ),
-      regexp = "The compressed file contains multiple NPX files!"
+      regexp = "The compressed file contains multiple acceptable files!"
     )
+
+    # An zip and a csv file
+    expect_error(
+      object = get_npx_file(
+        files = c("test.zip", "test.csv")
+      ),
+      regexp = "The compressed file contains multiple acceptable files!"
+    )
+  }
+)
+
+test_that(
+  "get NPX file from zip - nested compressed file",
+  {
+
+    # A zip file only
+    expect_error(
+      object = get_npx_file(
+        files = c("test.zip")
+      ),
+      regexp = "The compressed file contains another compressed file:"
+    )
+
   }
 )

@@ -48,13 +48,17 @@ read_npx_zip <- function(file,
   # check if file exists
   check_file_exists(file = file,
                     error = TRUE)
-					
+
   # check that the requested output df is ok
   check_out_df_arg(out_df = out_df)
 
   # check that .ignore_files is a character vector
   check_is_character(string = .ignore_files,
                      error = TRUE)
+
+  # **** Help vars ----
+
+  compressed_file_ext <- c("zip")
 
   # **** Prep ****
 
@@ -71,8 +75,8 @@ read_npx_zip <- function(file,
 
       cli::cli_abort(
         c(
-          "x" = "Unable to open compressed file: {file}",
-          "i" = "Check if the file is a zip and or potential file
+          "x" = "Unable to open compressed file: {.file {file}}",
+          "i" = "Check if the file is a zip and/or potential file
           corruption."
         ),
         call = rlang::caller_env(),
@@ -93,7 +97,7 @@ read_npx_zip <- function(file,
 
     cli::cli_abort(
       c(
-        "x" = "No NPX and checksum file in the compressed file: {file}"
+        "x" = "No NPX and checksum file in the compressed file: {.file {file}}"
       ),
       call = rlang::caller_env(),
       wrap = FALSE
@@ -108,14 +112,15 @@ read_npx_zip <- function(file,
 
   # Get the name of the NPX files
   compressed_file_npx <- get_npx_file(
-    files = compressed_file_contents
+    files = compressed_file_contents,
+    compressed_file_ext = compressed_file_ext
   )
 
   # Array of files to extract
   files_to_extract <- c(compressed_file_checksum,
-                        compressed_file_npx)
-  # Remove NA strings (if NA was returned from checksum function)
-  files_to_extract <- files_to_extract[!is.na(files_to_extract)]
+                        compressed_file_npx) |>
+    # Remove NA strings (if NA was returned from checksum function)
+    (\(x) x[!is.na(x)])()
 
   # **** Extract ****
 
@@ -130,6 +135,12 @@ read_npx_zip <- function(file,
   # Extracted NPX csv file
   extracted_file_npx <- file.path(tmp_unzip_dir, compressed_file_npx)
 
+  # cleanup temporary directory with extracted files after exiting the function
+  on.exit(
+    expr = invisible(unlink(x = tmp_unzip_dir, recursive = TRUE)),
+    add = TRUE
+  )
+
   # **** Checksum ****
 
   # Checksum of the NPX file
@@ -138,50 +149,25 @@ read_npx_zip <- function(file,
     # Extracted checksum file
     extracted_file_chksm <- file.path(tmp_unzip_dir, compressed_file_checksum)
 
-    # tryCatch in case of errors from the check_checksum
-    tryCatch(
-      {
-
-        # confirm that the checksum file is available
-        check_checksum(
-          checksum_file = extracted_file_chksm,
-          npx_file = extracted_file_npx
-        )
-
-      }, error = function(msg) {
-
-        # cleanup temporary directory with extracted files
-        invisible(unlink(x = tmp_unzip_dir, recursive = TRUE))
-
-        # throw the error message from the helper function
-        cli::cli_abort(
-          c(
-            "x" = "{msg$message[1]}",
-            "i" = "{msg$body[1]}"
-          ),
-          call = rlang::caller_env(),
-          wrap = FALSE
-        )
-
-      }
+    # confirm that the checksum file is available
+    check_checksum(
+      checksum_file = extracted_file_chksm,
+      npx_file = extracted_file_npx
     )
 
   }
 
   # read the NPX file
-    df_olink <- read_npx(
-      filename = extracted_file_npx,
-      out_df = out_df,
-      sep = sep,
-      long_format = long_format,
-      olink_platform = olink_platform,
-      data_type = data_type,
-      .ignore_files = .ignore_files,
-      quiet = quiet
-    )
-
-  # cleanup temporary directory with extracted files
-  invisible(unlink(x = tmp_unzip_dir, recursive = TRUE))
+  df_olink <- read_npx(
+    filename = extracted_file_npx,
+    out_df = out_df,
+    sep = sep,
+    long_format = long_format,
+    olink_platform = olink_platform,
+    data_type = data_type,
+    .ignore_files = .ignore_files,
+    quiet = quiet
+  )
 
   # if needed convert the object to the requested output
   df_olink <- convert_read_npx_output(df = df_olink,
@@ -246,6 +232,8 @@ get_checksum_file <- function(files) {
 #' @author Klev Diamanti
 #'
 #' @param files A vector of file names without any path prefix.
+#' @param compressed_file_ext Character vector of file extensions for
+#' compressed files.
 #'
 #' @return The name of the NPX file.
 #'
@@ -255,7 +243,8 @@ get_checksum_file <- function(files) {
 #'   [check_checksum()]
 #'   [get_checksum_file()]
 #'
-get_npx_file <- function(files) {
+get_npx_file <- function(files,
+                         compressed_file_ext = c("zip")) {
 
   # check that the input is a character vector
   check_is_character(string = files,
@@ -264,42 +253,52 @@ get_npx_file <- function(files) {
   # remove (if any) checksum files
   files_no_checksum <- files[!(files %in% accepted_checksum_files)]
 
-  # get file extension(s)
+  # get file extension(s) and keep only those matching the accepted ones
   df_files <- dplyr::tibble(files = files_no_checksum) |>
     dplyr::mutate(
       files_extension = tools::file_ext(.data[["files"]])
+    ) |>
+    dplyr::filter(
+      .data[["files_extension"]] %in% .env[["accepted_npx_file_ext"]]
     )
 
   # check: no file with the accepted suffix
-  if (sum(df_files$files_extension %in% accepted_npx_file_ext) != 1L) {
-
-    if (sum(df_files$files_extension %in% accepted_npx_file_ext) == 0L) {
-      err_msg <- "no" # nolint object_usage_linter
-    } else if (sum(df_files$files_extension %in% accepted_npx_file_ext) > 1L) {
-      err_msg <- "multiple" # nolint object_usage_linter
-    }
+  if (nrow(df_files) != 1L) {
 
     # we should not allow the zip extension in this case as the NPX file is
     # already part of the zip we are checking
-    npx_ext_no_zip <- accepted_npx_file_ext[!(accepted_npx_file_ext == "zip")] # nolint object_usage_linter
-
     cli::cli_abort(
       c(
-        "x" = "The compressed file contains {err_msg} NPX files!",
-        "i" = "The compressed input file should contain {.strong only} one NPX
-          file with extension: { cli::ansi_collapse(x = npx_ext_no_zip,
-                                                    last = \", or \") }."
+        "x" = "The compressed file contains
+        {ifelse(nrow(df_files) == 0L, \"no\", \"multiple\")}
+        acceptable  files!",
+        "i" = "The compressed input file should contain {.strong only} one
+        file with extension:
+        {cli::ansi_collapse(x =
+      accepted_npx_file_ext[!(accepted_npx_file_ext %in% compressed_file_ext)],
+        last = \", or \")}."
       ),
       call = rlang::caller_env(),
       wrap = FALSE
     )
+
+  } else if (nrow(df_files) == 1L
+             && df_files$files_extension %in% compressed_file_ext) {
+
+    cli::cli_abort(
+      c(
+        "x" = "The compressed file contains another compressed file:
+        {df_files$files}!",
+        "i" = "Nested compressed files are not allowed to avoid infinite loops"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
   }
 
   # get the NPX file
   npx_file <- df_files |>
-    dplyr::filter(
-      .data[["files_extension"]] %in% .env[["accepted_npx_file_ext"]]
-    ) |>
     # we can safely assume that there is only one file here
     dplyr::slice_head(n = 1L) |>
     dplyr::pull(.data[["files"]])
@@ -362,7 +361,7 @@ check_checksum <- function(checksum_file,
     # error message
     cli::cli_abort(
       c(
-        "x" = "Unable to open NPX file: {basename(npx_file)}",
+        "x" = "Unable to open NPX file: {.file {basename(npx_file)}}",
         "i" = "Was it extracted from the compressed file?"
       ),
       call = rlang::caller_env(),
@@ -390,7 +389,7 @@ check_checksum <- function(checksum_file,
     # error message
     cli::cli_abort(
       c(
-        "x" = "Unable to open checksum file: {basename(checksum_file)}",
+        "x" = "Unable to open checksum file: {.file {basename(checksum_file)}}",
         "i" = "Was it extracted from the compressed file?"
       ),
       call = rlang::caller_env(),

@@ -43,7 +43,7 @@ read_npx_parquet <- function(file,
 
       cli::cli_abort(
         c(
-          "x" = "Unable to read parquet file: {file}",
+          "x" = "Unable to read parquet file: {.file {file}}",
           "i" = "Check the file is in parquet format and potential file
           corruption."
         ),

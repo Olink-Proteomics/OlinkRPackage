@@ -48,7 +48,7 @@ test_that(
           regexp = "Detected \"NPX\" data from \"Olink Target 96\" in lo"
         )
 
-        # check that read_npx_excel works olink_platform = T96
+        # check that read_npx_excel works olink_platform T96
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -59,7 +59,7 @@ test_that(
           regexp = "Detected \"NPX\" data from \"Olink Target 96\" in lo"
         )
 
-        # check that read_npx_excel works long_format = TRUE
+        # check that read_npx_excel works long_format TRUE
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -70,7 +70,7 @@ test_that(
           regexp = "Detected \"NPX\" data from \"Olink Target 96\" in lo"
         )
 
-        # check that read_npx_excel works data_type = NPX
+        # check that read_npx_excel works data_type NPX
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -81,8 +81,8 @@ test_that(
           regexp = "Detected \"NPX\" data from \"Olink Target 96\" in lo"
         )
 
-        # check that read_npx_excel works long_format = TRUE
-        # and olink_platform = T96
+        # check that read_npx_excel works long_format TRUE
+        # and olink_platform T96
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -93,8 +93,8 @@ test_that(
           regexp = "Detected \"NPX\" data from \"Olink Target 96\" in lo"
         )
 
-        # check that read_npx_excel works long_format = TRUE
-        # and data_type = NPX
+        # check that read_npx_excel works long_format TRUE
+        # and data_type NPX
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -105,8 +105,8 @@ test_that(
           regexp = "Detected \"NPX\" data from \"Olink Target 96\" in lo"
         )
 
-        # check that read_npx_excel works olink_platform = T96
-        # and data_type = NPX
+        # check that read_npx_excel works olink_platform T96
+        # and data_type NPX
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -117,8 +117,8 @@ test_that(
           regexp = "Detected \"NPX\" data from \"Olink Target 96\" in lo"
         )
 
-        # check that read_npx_excel works olink_platform = T96
-        # and data_type = NPX
+        # check that read_npx_excel works olink_platform T96
+        # and data_type NPX
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -175,7 +175,7 @@ test_that(
           regexp = "Detected \"Ct\" data from \"Olink Target 96\" in lo"
         )
 
-        # check that read_npx_excel works with long_format = TRUE
+        # check that read_npx_excel works with long_format TRUE
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -186,7 +186,7 @@ test_that(
           regexp = "Detected \"Ct\" data from \"Olink Target 96\" in lo"
         )
 
-        # check that read_npx_excel works with olink_platform = T96
+        # check that read_npx_excel works with olink_platform T96
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -197,7 +197,7 @@ test_that(
           regexp = "Detected \"Ct\" data from \"Olink Target 96\" in lo"
         )
 
-        # check that read_npx_excel works with data_type = Ct
+        # check that read_npx_excel works with data_type Ct
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -208,8 +208,8 @@ test_that(
           regexp = "Detected \"Ct\" data from \"Olink Target 96\" in lo"
         )
 
-        # check that read_npx_excel works with long_format = TRUE and
-        # olink_platform = T96
+        # check that read_npx_excel works with long_format TRUE and
+        # olink_platform T96
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -220,8 +220,8 @@ test_that(
           regexp = "Detected \"Ct\" data from \"Olink Target 96\" in lo"
         )
 
-        # check that read_npx_excel works with long_format = TRUE and
-        # data_type = Ct
+        # check that read_npx_excel works with long_format TRUE and
+        # data_type Ct
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -232,8 +232,8 @@ test_that(
           regexp = "Detected \"Ct\" data from \"Olink Target 96\" in lo"
         )
 
-        # check that read_npx_excel works with olink_platform = T96 and
-        # data_type = Ct
+        # check that read_npx_excel works with olink_platform T96 and
+        # data_type Ct
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -244,8 +244,8 @@ test_that(
           regexp = "Detected \"Ct\" data from \"Olink Target 96\" in lo"
         )
 
-        # check that read_npx_excel works with long_format = NULL and
-        # olink_platform = T96 and data_type = Ct
+        # check that read_npx_excel works with long_format NULL and
+        # olink_platform T96 and data_type Ct
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -304,7 +304,7 @@ test_that(
           regexp = "Detected \"NPX\" data from \"Olink Target 48\" in lo"
         )
 
-        # check that read_npx_excel works olink_platform = T48
+        # check that read_npx_excel works olink_platform T48
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -315,7 +315,7 @@ test_that(
           regexp = "Detected \"NPX\" data from \"Olink Target 48\" in lo"
         )
 
-        # check that read_npx_excel works long_format = TRUE
+        # check that read_npx_excel works long_format TRUE
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -326,7 +326,7 @@ test_that(
           regexp = "Detected \"NPX\" data from \"Olink Target 48\" in lo"
         )
 
-        # check that read_npx_excel works data_type = NPX
+        # check that read_npx_excel works data_type NPX
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -337,8 +337,8 @@ test_that(
           regexp = "Detected \"NPX\" data from \"Olink Target 48\" in lo"
         )
 
-        # check that read_npx_excel works long_format = TRUE
-        # and olink_platform = T48
+        # check that read_npx_excel works long_format TRUE
+        # and olink_platform T48
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -349,8 +349,8 @@ test_that(
           regexp = "Detected \"NPX\" data from \"Olink Target 48\" in lo"
         )
 
-        # check that read_npx_excel works long_format = TRUE
-        # and data_type = NPX
+        # check that read_npx_excel works long_format TRUE
+        # and data_type NPX
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -361,8 +361,8 @@ test_that(
           regexp = "Detected \"NPX\" data from \"Olink Target 48\" in lo"
         )
 
-        # check that read_npx_excel works olink_platform = T48
-        # and data_type = NPX
+        # check that read_npx_excel works olink_platform T48
+        # and data_type NPX
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -373,8 +373,8 @@ test_that(
           regexp = "Detected \"NPX\" data from \"Olink Target 48\" in lo"
         )
 
-        # check that read_npx_excel works olink_platform = T48
-        # and data_type = NPX
+        # check that read_npx_excel works olink_platform T48
+        # and data_type NPX
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -431,7 +431,7 @@ test_that(
           regexp = "Detected \"Ct\" data from \"Olink Target 48\" in lo"
         )
 
-        # check that read_npx_excel works with long_format = TRUE
+        # check that read_npx_excel works with long_format TRUE
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -442,7 +442,7 @@ test_that(
           regexp = "Detected \"Ct\" data from \"Olink Target 48\" in lo"
         )
 
-        # check that read_npx_excel works with olink_platform = T48
+        # check that read_npx_excel works with olink_platform T48
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -453,7 +453,7 @@ test_that(
           regexp = "Detected \"Ct\" data from \"Olink Target 48\" in lo"
         )
 
-        # check that read_npx_excel works with data_type = Ct
+        # check that read_npx_excel works with data_type Ct
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -464,8 +464,8 @@ test_that(
           regexp = "Detected \"Ct\" data from \"Olink Target 48\" in lo"
         )
 
-        # check that read_npx_excel works with long_format = TRUE and
-        # olink_platform = T48
+        # check that read_npx_excel works with long_format TRUE and
+        # olink_platform T48
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -476,8 +476,8 @@ test_that(
           regexp = "Detected \"Ct\" data from \"Olink Target 48\" in lo"
         )
 
-        # check that read_npx_excel works with long_format = TRUE and
-        # data_type = Ct
+        # check that read_npx_excel works with long_format TRUE and
+        # data_type Ct
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -488,8 +488,8 @@ test_that(
           regexp = "Detected \"Ct\" data from \"Olink Target 48\" in lo"
         )
 
-        # check that read_npx_excel works with olink_platform = T48 and
-        # data_type = Ct
+        # check that read_npx_excel works with olink_platform T48 and
+        # data_type Ct
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -500,8 +500,8 @@ test_that(
           regexp = "Detected \"Ct\" data from \"Olink Target 48\" in lo"
         )
 
-        # check that read_npx_excel works with long_format = NULL and
-        # olink_platform = T48 and data_type = Ct
+        # check that read_npx_excel works with long_format NULL and
+        # olink_platform T48 and data_type Ct
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -558,7 +558,7 @@ test_that(
           regexp = "Detected \"Quantified\" data from \"Olink Target 48\" in lo"
         )
 
-        # check that read_npx_excel works with long_format = TRUE
+        # check that read_npx_excel works with long_format TRUE
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -569,7 +569,7 @@ test_that(
           regexp = "Detected \"Quantified\" data from \"Olink Target 48\" in lo"
         )
 
-        # check that read_npx_excel works with olink_platform = T48
+        # check that read_npx_excel works with olink_platform T48
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -580,7 +580,7 @@ test_that(
           regexp = "Detected \"Quantified\" data from \"Olink Target 48\" in lo"
         )
 
-        # check that read_npx_excel works with data_type = Quantified
+        # check that read_npx_excel works with data_type Quantified
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -591,8 +591,8 @@ test_that(
           regexp = "Detected \"Quantified\" data from \"Olink Target 48\" in lo"
         )
 
-        # check that read_npx_excel works with long_format = TRUE and
-        # olink_platform = T48
+        # check that read_npx_excel works with long_format TRUE and
+        # olink_platform T48
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -603,8 +603,8 @@ test_that(
           regexp = "Detected \"Quantified\" data from \"Olink Target 48\" in lo"
         )
 
-        # check that read_npx_excel works with long_format = TRUE and
-        # data_type = Quantified
+        # check that read_npx_excel works with long_format TRUE and
+        # data_type Quantified
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -615,8 +615,8 @@ test_that(
           regexp = "Detected \"Quantified\" data from \"Olink Target 48\" in lo"
         )
 
-        # check that read_npx_excel works with olink_platform = T48 and
-        # data_type = Quantified
+        # check that read_npx_excel works with olink_platform T48 and
+        # data_type Quantified
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -627,8 +627,8 @@ test_that(
           regexp = "Detected \"Quantified\" data from \"Olink Target 48\" in lo"
         )
 
-        # check that read_npx_excel works with long_format = NULL and
-        # olink_platform = T48 and data_type = Quantified
+        # check that read_npx_excel works with long_format NULL and
+        # olink_platform T48 and data_type Quantified
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -687,7 +687,7 @@ test_that(
           regexp = "Detected \"NPX\" data from \"Olink Flex\" in lo"
         )
 
-        # check that read_npx_excel works olink_platform = Flex
+        # check that read_npx_excel works olink_platform Flex
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -698,7 +698,7 @@ test_that(
           regexp = "Detected \"NPX\" data from \"Olink Flex\" in lo"
         )
 
-        # check that read_npx_excel works long_format = TRUE
+        # check that read_npx_excel works long_format TRUE
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -709,7 +709,7 @@ test_that(
           regexp = "Detected \"NPX\" data from \"Olink Flex\" in lo"
         )
 
-        # check that read_npx_excel works data_type = NPX
+        # check that read_npx_excel works data_type NPX
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -720,8 +720,8 @@ test_that(
           regexp = "Detected \"NPX\" data from \"Olink Flex\" in lo"
         )
 
-        # check that read_npx_excel works long_format = TRUE
-        # and olink_platform = Flex
+        # check that read_npx_excel works long_format TRUE
+        # and olink_platform Flex
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -732,8 +732,8 @@ test_that(
           regexp = "Detected \"NPX\" data from \"Olink Flex\" in lo"
         )
 
-        # check that read_npx_excel works long_format = TRUE
-        # and data_type = NPX
+        # check that read_npx_excel works long_format TRUE
+        # and data_type NPX
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -744,8 +744,8 @@ test_that(
           regexp = "Detected \"NPX\" data from \"Olink Flex\" in lo"
         )
 
-        # check that read_npx_excel works olink_platform = Flex
-        # and data_type = NPX
+        # check that read_npx_excel works olink_platform Flex
+        # and data_type NPX
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -756,8 +756,8 @@ test_that(
           regexp = "Detected \"NPX\" data from \"Olink Flex\" in lo"
         )
 
-        # check that read_npx_excel works olink_platform = Flex
-        # and data_type = NPX
+        # check that read_npx_excel works olink_platform Flex
+        # and data_type NPX
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -814,7 +814,7 @@ test_that(
           regexp = "Detected \"Quantified\" data from \"Olink Flex\" in lo"
         )
 
-        # check that read_npx_excel works with long_format = TRUE
+        # check that read_npx_excel works with long_format TRUE
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -825,7 +825,7 @@ test_that(
           regexp = "Detected \"Quantified\" data from \"Olink Flex\" in lo"
         )
 
-        # check that read_npx_excel works with olink_platform = Flex
+        # check that read_npx_excel works with olink_platform Flex
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -836,7 +836,7 @@ test_that(
           regexp = "Detected \"Quantified\" data from \"Olink Flex\" in lo"
         )
 
-        # check that read_npx_excel works with data_type = Quantified
+        # check that read_npx_excel works with data_type Quantified
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -847,8 +847,8 @@ test_that(
           regexp = "Detected \"Quantified\" data from \"Olink Flex\" in lo"
         )
 
-        # check that read_npx_excel works with long_format = TRUE and
-        # olink_platform = Flex
+        # check that read_npx_excel works with long_format TRUE and
+        # olink_platform Flex
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -859,8 +859,8 @@ test_that(
           regexp = "Detected \"Quantified\" data from \"Olink Flex\" in lo"
         )
 
-        # check that read_npx_excel works with long_format = TRUE and
-        # data_type = Quantified
+        # check that read_npx_excel works with long_format TRUE and
+        # data_type Quantified
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -871,8 +871,8 @@ test_that(
           regexp = "Detected \"Quantified\" data from \"Olink Flex\" in lo"
         )
 
-        # check that read_npx_excel works with olink_platform = Flex and
-        # data_type = Quantified
+        # check that read_npx_excel works with olink_platform Flex and
+        # data_type Quantified
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -883,8 +883,8 @@ test_that(
           regexp = "Detected \"Quantified\" data from \"Olink Flex\" in lo"
         )
 
-        # check that read_npx_excel works with long_format = NULL and
-        # olink_platform = Flex and data_type = Quantified
+        # check that read_npx_excel works with long_format NULL and
+        # olink_platform Flex and data_type Quantified
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -943,7 +943,7 @@ test_that(
           regexp = "Detected \"NPX\" data from \"Olink Flex\" in lo"
         )
 
-        # check that read_npx_excel works olink_platform = Flex
+        # check that read_npx_excel works olink_platform Flex
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -954,7 +954,7 @@ test_that(
           regexp = "Detected \"NPX\" data from \"Olink Flex\" in lo"
         )
 
-        # check that read_npx_excel works long_format = TRUE
+        # check that read_npx_excel works long_format TRUE
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -965,7 +965,7 @@ test_that(
           regexp = "Detected \"NPX\" data from \"Olink Flex\" in lo"
         )
 
-        # check that read_npx_excel works data_type = NPX
+        # check that read_npx_excel works data_type NPX
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -976,8 +976,8 @@ test_that(
           regexp = "Detected \"NPX\" data from \"Olink Flex\" in lo"
         )
 
-        # check that read_npx_excel works long_format = TRUE
-        # and olink_platform = Flex
+        # check that read_npx_excel works long_format TRUE
+        # and olink_platform Flex
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -988,8 +988,8 @@ test_that(
           regexp = "Detected \"NPX\" data from \"Olink Flex\" in lo"
         )
 
-        # check that read_npx_excel works long_format = TRUE
-        # and data_type = NPX
+        # check that read_npx_excel works long_format TRUE
+        # and data_type NPX
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -1000,8 +1000,8 @@ test_that(
           regexp = "Detected \"NPX\" data from \"Olink Flex\" in lo"
         )
 
-        # check that read_npx_excel works olink_platform = Flex
-        # and data_type = NPX
+        # check that read_npx_excel works olink_platform Flex
+        # and data_type NPX
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -1012,8 +1012,8 @@ test_that(
           regexp = "Detected \"NPX\" data from \"Olink Flex\" in lo"
         )
 
-        # check that read_npx_excel works olink_platform = Flex
-        # and data_type = NPX
+        # check that read_npx_excel works olink_platform Flex
+        # and data_type NPX
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -1070,7 +1070,7 @@ test_that(
           regexp = "Detected \"Quantified\" data from \"Olink Flex\" in lo"
         )
 
-        # check that read_npx_excel works with long_format = TRUE
+        # check that read_npx_excel works with long_format TRUE
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -1081,7 +1081,7 @@ test_that(
           regexp = "Detected \"Quantified\" data from \"Olink Flex\" in lo"
         )
 
-        # check that read_npx_excel works with olink_platform = Flex
+        # check that read_npx_excel works with olink_platform Flex
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -1092,7 +1092,7 @@ test_that(
           regexp = "Detected \"Quantified\" data from \"Olink Flex\" in lo"
         )
 
-        # check that read_npx_excel works with data_type = Quantified
+        # check that read_npx_excel works with data_type Quantified
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -1103,8 +1103,8 @@ test_that(
           regexp = "Detected \"Quantified\" data from \"Olink Flex\" in lo"
         )
 
-        # check that read_npx_excel works with long_format = TRUE and
-        # olink_platform = Flex
+        # check that read_npx_excel works with long_format TRUE and
+        # olink_platform Flex
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -1115,8 +1115,8 @@ test_that(
           regexp = "Detected \"Quantified\" data from \"Olink Flex\" in lo"
         )
 
-        # check that read_npx_excel works with long_format = TRUE and
-        # data_type = Quantified
+        # check that read_npx_excel works with long_format TRUE and
+        # data_type Quantified
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -1127,8 +1127,8 @@ test_that(
           regexp = "Detected \"Quantified\" data from \"Olink Flex\" in lo"
         )
 
-        # check that read_npx_excel works with olink_platform = Flex and
-        # data_type = Quantified
+        # check that read_npx_excel works with olink_platform Flex and
+        # data_type Quantified
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -1139,8 +1139,8 @@ test_that(
           regexp = "Detected \"Quantified\" data from \"Olink Flex\" in lo"
         )
 
-        # check that read_npx_excel works with long_format = NULL and
-        # olink_platform = Flex and data_type = Quantified
+        # check that read_npx_excel works with long_format NULL and
+        # olink_platform Flex and data_type Quantified
         expect_message(
           object = read_npx_excel(
             file = excel_long,
@@ -1195,7 +1195,7 @@ test_that(
           regexp = "Detected \"NPX\" data from \"Olink Target 96\" in wi"
         )
 
-        # check that read_npx_excel works olink_platform = T96
+        # check that read_npx_excel works olink_platform T96
         expect_message(
           object = read_npx_excel(
             file = excel_wide,
@@ -1206,7 +1206,7 @@ test_that(
           regexp = "Detected \"NPX\" data from \"Olink Target 96\" in wi"
         )
 
-        # check that read_npx_excel works long_format = FALSE
+        # check that read_npx_excel works long_format FALSE
         expect_message(
           object = read_npx_excel(
             file = excel_wide,
@@ -1217,7 +1217,7 @@ test_that(
           regexp = "Detected \"NPX\" data from \"Olink Target 96\" in wi"
         )
 
-        # check that read_npx_excel works data_type = NPX
+        # check that read_npx_excel works data_type NPX
         expect_message(
           object = read_npx_excel(
             file = excel_wide,
@@ -1228,8 +1228,8 @@ test_that(
           regexp = "Detected \"NPX\" data from \"Olink Target 96\" in wi"
         )
 
-        # check that read_npx_excel works long_format = FALSE
-        # and olink_platform = T96
+        # check that read_npx_excel works long_format FALSE
+        # and olink_platform T96
         expect_message(
           object = read_npx_excel(
             file = excel_wide,
@@ -1240,8 +1240,8 @@ test_that(
           regexp = "Detected \"NPX\" data from \"Olink Target 96\" in wi"
         )
 
-        # check that read_npx_excel works long_format = FALSE
-        # and data_type = NPX
+        # check that read_npx_excel works long_format FALSE
+        # and data_type NPX
         expect_message(
           object = read_npx_excel(
             file = excel_wide,
@@ -2893,11 +2893,12 @@ test_that(
 
         # check that the output string is conatins data from df_in
         expect_equal(
-          object = df_npx_false$data_cells,
+          object = df_npx_false$data_cells |>
+            as.numeric(),
           expected = df_in |>
             dplyr::slice(1L) |>
-            dplyr::pull(.data[["A"]]) |>
-            as.character()
+            dplyr::pull(.data[["A"]]),
+          tolerance = 1e-8
         )
 
       }
@@ -3134,11 +3135,12 @@ test_that(
 
         # check that the output string is NULL
         expect_equal(
-          object = df_npx_false$data_cells,
+          object = df_npx_false$data_cells |>
+            as.numeric(),
           expected = df_in |>
             dplyr::slice(1L) |>
-            dplyr::pull(.data[["A"]]) |>
-            as.character()
+            dplyr::pull(.data[["A"]]),
+          tolerance = 1e-8
         )
 
       }
