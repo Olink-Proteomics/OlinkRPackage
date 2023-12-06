@@ -1478,12 +1478,35 @@ test_that(
       regexp = "The compressed file contains multiple acceptable files!"
     )
 
-    # misAn xls and a csv file
+    # An xls and a csv file
     expect_error(
       object = get_npx_file(
         files = c("test.xls", "test.csv")
       ),
       regexp = "The compressed file contains multiple acceptable files!"
     )
+
+    # An zip and a csv file
+    expect_error(
+      object = get_npx_file(
+        files = c("test.zip", "test.csv")
+      ),
+      regexp = "The compressed file contains multiple acceptable files!"
+    )
+  }
+)
+
+test_that(
+  "get NPX file from zip - nested compressed file",
+  {
+
+    # A zip file only
+    expect_error(
+      object = get_npx_file(
+        files = c("test.zip")
+      ),
+      regexp = "The compressed file contains another compressed file:"
+    )
+
   }
 )

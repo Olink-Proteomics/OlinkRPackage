@@ -301,6 +301,19 @@ get_npx_file <- function(files,
       wrap = FALSE
     )
 
+  } else if (nrow(df_files) == 1L
+             & df_files$files_extension %in% compressed_file_ext) {
+
+    cli::cli_abort(
+      c(
+        "x" = "The compressed file contains another compressed file:
+        {df_files$files}!",
+        "i" = "Nested compressed files are not allowed to avoid infinite loops"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
   }
 
   # get the NPX file
