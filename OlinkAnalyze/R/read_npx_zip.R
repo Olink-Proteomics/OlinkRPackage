@@ -135,6 +135,12 @@ read_npx_zip <- function(file,
   # Extracted NPX csv file
   extracted_file_npx <- file.path(tmp_unzip_dir, compressed_file_npx)
 
+  # cleanup temporary directory with extracted files after exiting the function
+  on.exit(
+    expr = invisible(unlink(x = tmp_unzip_dir, recursive = TRUE)),
+    add = TRUE
+  )
+
   # **** Checksum ****
 
   # Checksum of the NPX file
@@ -143,32 +149,10 @@ read_npx_zip <- function(file,
     # Extracted checksum file
     extracted_file_chksm <- file.path(tmp_unzip_dir, compressed_file_checksum)
 
-    # tryCatch in case of errors from the check_checksum
-    tryCatch(
-      {
-
-        # confirm that the checksum file is available
-        check_checksum(
-          checksum_file = extracted_file_chksm,
-          npx_file = extracted_file_npx
-        )
-
-      }, error = function(msg) {
-
-        # cleanup temporary directory with extracted files
-        invisible(unlink(x = tmp_unzip_dir, recursive = TRUE))
-
-        # throw the error message from the helper function
-        cli::cli_abort(
-          c(
-            "x" = "{msg$message[1]}",
-            "i" = "{msg$body[1]}"
-          ),
-          call = rlang::caller_env(),
-          wrap = FALSE
-        )
-
-      }
+    # confirm that the checksum file is available
+    check_checksum(
+      checksum_file = extracted_file_chksm,
+      npx_file = extracted_file_npx
     )
 
   }
@@ -184,9 +168,6 @@ read_npx_zip <- function(file,
     .ignore_files = .ignore_files,
     quiet = quiet
   )
-
-  # cleanup temporary directory with extracted files
-  invisible(unlink(x = tmp_unzip_dir, recursive = TRUE))
 
   # if needed convert the object to the requested output
   df_olink <- convert_read_npx_output(df = df_olink,
