@@ -1399,7 +1399,7 @@ test_that(
       object = get_npx_file(
         files = c("MD5_checksum.txt")
       ),
-      regexp = "The compressed file contains no NPX files!"
+      regexp = "The compressed file contains no acceptable files!"
     )
 
     # two MD5
@@ -1407,7 +1407,7 @@ test_that(
       object = get_npx_file(
         files = c("MD5_checksum.txt", "MD5_checksum.txt")
       ),
-      regexp = "The compressed file contains no NPX files!"
+      regexp = "The compressed file contains no acceptable files!"
     )
 
     # one SHA256 only
@@ -1415,7 +1415,7 @@ test_that(
       object = get_npx_file(
         files = c("checksum_sha256.txt")
       ),
-      regexp = "The compressed file contains no NPX files!"
+      regexp = "The compressed file contains no acceptable files!"
     )
 
     # two SHA256
@@ -1423,7 +1423,7 @@ test_that(
       object = get_npx_file(
         files = c("checksum_sha256.txt", "checksum_sha256.txt")
       ),
-      regexp = "The compressed file contains no NPX files!"
+      regexp = "The compressed file contains no acceptable files!"
     )
   }
 )
@@ -1437,7 +1437,7 @@ test_that(
       object = get_npx_file(
         files = c("test.xml")
       ),
-      regexp = "The compressed file contains no NPX files!"
+      regexp = "The compressed file contains no acceptable files!"
     )
 
     # two unknown files
@@ -1445,7 +1445,7 @@ test_that(
       object = get_npx_file(
         files = c("test.xml", "test.yaml")
       ),
-      regexp = "The compressed file contains no NPX files!"
+      regexp = "The compressed file contains no acceptable files!"
     )
   }
 )
@@ -1459,7 +1459,7 @@ test_that(
       object = get_npx_file(
         files = c("test.txt", "test.csv")
       ),
-      regexp = "The compressed file contains multiple NPX files!"
+      regexp = "The compressed file contains multiple acceptable files!"
     )
 
     # A parquet and a csv file
@@ -1467,7 +1467,7 @@ test_that(
       object = get_npx_file(
         files = c("test.parquet", "test.csv")
       ),
-      regexp = "The compressed file contains multiple NPX files!"
+      regexp = "The compressed file contains multiple acceptable files!"
     )
 
     # An xlsx and a csv file
@@ -1475,7 +1475,7 @@ test_that(
       object = get_npx_file(
         files = c("test.xlsx", "test.csv")
       ),
-      regexp = "The compressed file contains multiple NPX files!"
+      regexp = "The compressed file contains multiple acceptable files!"
     )
 
     # misAn xls and a csv file
@@ -1483,7 +1483,7 @@ test_that(
       object = get_npx_file(
         files = c("test.xls", "test.csv")
       ),
-      regexp = "The compressed file contains multiple NPX files!"
+      regexp = "The compressed file contains multiple acceptable files!"
     )
   }
 )

@@ -56,6 +56,10 @@ read_npx_zip <- function(file,
   check_is_character(string = .ignore_files,
                      error = TRUE)
 
+  # **** Help vars ----
+
+  compressed_file_ext <- c("zip")
+
   # **** Prep ****
 
   # tryCatch in case reading the zip file fails
@@ -108,7 +112,8 @@ read_npx_zip <- function(file,
 
   # Get the name of the NPX files
   compressed_file_npx <- get_npx_file(
-    files = compressed_file_contents
+    files = compressed_file_contents,
+    compressed_file_ext = compressed_file_ext
   )
 
   # Array of files to extract
@@ -246,6 +251,8 @@ get_checksum_file <- function(files) {
 #' @author Klev Diamanti
 #'
 #' @param files A vector of file names without any path prefix.
+#' @param compressed_file_ext Character vector of file extensions for
+#' compressed files.
 #'
 #' @return The name of the NPX file.
 #'
@@ -255,7 +262,8 @@ get_checksum_file <- function(files) {
 #'   [check_checksum()]
 #'   [get_checksum_file()]
 #'
-get_npx_file <- function(files) {
+get_npx_file <- function(files,
+                         compressed_file_ext = c("zip")) {
 
   # check that the input is a character vector
   check_is_character(string = files,
@@ -281,13 +289,13 @@ get_npx_file <- function(files) {
     cli::cli_abort(
       c(
         "x" = "The compressed file contains
-        {ifelse(nrow(df_files) == 0L, \"no\", \"multiple\")} NPX files!",
-        "i" = "The compressed input file should contain {.strong only} one NPX
-          file with extension:
-          {cli::ansi_collapse(
-             x = accepted_npx_file_ext[!(accepted_npx_file_ext == \"zip\")],
-             last = \", or \"
-           )}."
+        {ifelse(nrow(df_files) == 0L, \"no\", \"multiple\")}
+        acceptable  files!",
+        "i" = "The compressed input file should contain {.strong only} one
+        file with extension:
+        {cli::ansi_collapse(x =
+      accepted_npx_file_ext[!(accepted_npx_file_ext %in% compressed_file_ext)],
+        last = \", or \")}."
       ),
       call = rlang::caller_env(),
       wrap = FALSE
