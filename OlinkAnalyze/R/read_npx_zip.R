@@ -113,9 +113,9 @@ read_npx_zip <- function(file,
 
   # Array of files to extract
   files_to_extract <- c(compressed_file_checksum,
-                        compressed_file_npx)
-  # Remove NA strings (if NA was returned from checksum function)
-  files_to_extract <- files_to_extract[!is.na(files_to_extract)]
+                        compressed_file_npx) |>
+    # Remove NA strings (if NA was returned from checksum function)
+    (\(x) x[!is.na(x)])()
 
   # **** Extract ****
 
