@@ -154,6 +154,24 @@ read_npx_excel <- function(file,
 
   }
 
+  # Read data in ----
+
+  if (file_format_check$is_long_format == TRUE) {
+    # if data is in long format
+
+    df_olink <- readxl::read_excel(path = file,
+                                   col_names = TRUE)
+
+  } else if (file_format_check$is_long_format == FALSE
+             && file_olink_platform == "Flex") {
+    # if data is in wide format and platform is Olink Flex
+
+
+
+  }
+
+  return(df_olink)
+
 }
 
 #' Help function to determine the wide/long excel file format.
