@@ -40,6 +40,21 @@ group_data <- npx_data1 |>
  
 ```
 
+For demonstration purposes two outlier datasets have been generated to demonstrate large outlier effects by adjusting the NPX values for specific Samples or groups.
+```{r dataset_generation, eval = FALSE, message=FALSE, warning=FALSE}
+# Create Datasets with outliers
+outlier_data <- npx_data1 |> 
+  dplyr::mutate(NPX = ifelse(SampleID == "A25", NPX + 4, NPX)) |> 
+  dplyr::mutate(NPX = ifelse(SampleID == "A52", NPX - 4, NPX)) |> 
+  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL"))
+
+group_data <- npx_data1 |> 
+  dplyr::mutate(NPX = ifelse(Site == "Site_D", NPX + 3, NPX)) |> 
+  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL"))
+
+```
+
+
 ## PCA Plot
 
 ### Overview of PCA Plot
