@@ -68,7 +68,9 @@ randomized.manifest <- olink_plate_randomizer(manifest, seed=123456)
 
 ### Generate randomization scheme that keeps subjects on the same plate
 
-In the case of multiple samples per subject (e.g. in longitudinal studies), Olink recommends keeping each subject on the same plate to further reduce variation in the data. The individuals should then be distributed so that the remaining experimental variables of interest are evenly distributed across plates. This could be achieved by using the `SubjectColumn` argument. However, if there are to many samples per subject (>8), complete randomization is recommended. The number of samples on each plate could be specified via the `available.spots` argument. For example, the following code will lead to 78 samples on the first plate, and 30 samples on the second and the third plates. The number of iterations for fitting subjects on the same plate can be set by the `iterations` argument. 
+In the case of multiple samples per subject (e.g. in longitudinal studies), Olink recommends keeping each subject on the same plate to further reduce variation in the data. The individuals should then be distributed so that the remaining experimental variables of interest are evenly distributed across plates. This could be achieved by using the `SubjectColumn` argument. The `SubjectColumn` argument must correspond to a column within the manifest and cannot be SampleID. If `SubjectColumn` is specified, every SampleID must have a value in the subject column, even if there is only 1 sample for that subject. 
+
+However, if there are to many samples per subject (>8), complete randomization is recommended. The number of samples on each plate could be specified via the `available.spots` argument. For example, the following code will lead to 78 samples on the first plate, and 30 samples on the second and the third plates. The number of iterations for fitting subjects on the same plate can be set by the `iterations` argument. 
 
 
 ```{r subjects_randomization, message=FALSE,results='hide'}

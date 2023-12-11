@@ -147,14 +147,14 @@ The olink_plate_randomizer function randomly assigns samples to a plate well wit
 
 + Manifest: tibble/data frame in long format containing all sample ID's. Sample ID column should be named SampleID.
 + PlateSize: Integer, either 96 or 48. 96 is default and should be used for Olink® Target 96 and Olink® Explore projects. For Olink® Target 48 projects, use 48.
-+ SubjectColumn: (Optional) Column name of the subject ID column. Cannot contain missing values. If provided, subjects are kept on the same plate.
++ SubjectColumn: (Optional) Column name of the subject ID column. Cannot contain missing values. If provided, subjects are kept on the same plate. This argument is used for longitudinal studies and must be a separate column from the SampleID column.
 + iterations: Number of iterations for fitting subjects on the same plate.
 + available.spots: (Optional) Integer. Number of wells available on each plate. Maximum 40 for Olink® Target 48 and 88 for Olink® Target 96/Explore. Can also take a vector equal to the number of plates to be used indicating the number of wells available on each plate.
 + seed: Seed to set. Highly recommend setting it for reproducibility.
 
 ```{r message=FALSE, eval=FALSE}
 olink_plate_randomizer(manifest, 
-                       SubjectColumn ="SampleID",
+                       SubjectColumn ="SubjectID",
                        seed=111)
 ```  
 
