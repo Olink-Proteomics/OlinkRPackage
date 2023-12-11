@@ -23,7 +23,7 @@ olink_plate_randomizer(
 
 \item{Product}{String. Name of Olink product used to set PlateSize if not provided. Optional.}
 
-\item{SubjectColumn}{(Optional) Column name of the subject ID column. Cannot contain missings. If provided, subjects are kept on the same plate.}
+\item{SubjectColumn}{(Optional) Column name of the subject ID column. Cannot contain missing values. If provided, subjects are kept on the same plate. This argument is used for longitudinal studies and must be a separate column from the SampleID column.}
 
 \item{iterations}{Number of iterations for fitting subjects on the same plate.}
 
@@ -56,7 +56,7 @@ Variables of interest should if possible be randomized across plates to avoid co
 #Generate randomization scheme using complete randomization
 randomized.manifest_a <- olink_plate_randomizer(manifest, seed=12345)
 
-#Generate randomization scheme that keeps subjects on the same plate
+#Generate randomization scheme that keeps subjects on the same plate (for longitudinal studies)
 randomized.manifest_b <- olink_plate_randomizer(manifest,SubjectColumn="SubjectID",
                                                         available.spots=c(88,88), seed=12345)
 
