@@ -69,18 +69,19 @@ library(dplyr)
 ordinalRegression_results <- olink_ordinalRegression(df = npx_data1,
                               variable="Treatment:Time")
 
+#Filtering out significant and relevant results.
+significant_assays <- ordinalRegression_results \%>\%
+  filter(Threshold == 'Significant' & term == 'Time') \%>\%
+  select(OlinkID) \%>\%
+  distinct() \%>\%
+  pull()
+
 #Posthoc test for the model NPX~Treatment*Time,
-#on the interaction effect Treatment:Time.
+#on the effect Time.
 
 #Posthoc
 ordinalRegression_results_posthoc_results <- olink_ordinalRegression_posthoc(npx_data1,
                                                    variable=c("Treatment:Time"),
-                                                   covariates="Site",
-                                                   olinkid_list = {ordinalRegression_results \%>\%
-                                                   filter(term == 'Treatment:Time') \%>\%
-                                                   filter(Threshold == 'Significant') \%>\%
-                                                                 dplyr::select(OlinkID) \%>\%
-                                                                 distinct() \%>\%
-                                                                 pull()},
-                                                                 effect = "Treatment:Time")}
+                                                   olinkid_list = significant_assays,
+                                                   effect = "Time")}
 }

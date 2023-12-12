@@ -1,6 +1,6 @@
 #'Function which A two-way ordinal analysis of variance can address an experimental design with two independent variables, each of which is a factor variable.  The main effect of each independent variable can be tested, as well as the effect of the interaction of the two factors.
 #'
-#'Performs an ANOVA F-test for each assay (by OlinkID) in every panel using car::Anova and Type II sum of squares.
+#'Performs an ANOVA F-test for each assay (by OlinkID) in every panel using stats::Anova and Type III sum of squares. Dependent variable will be treated as ordered factor.
 #'The function handles only factor and/or covariates. \cr\cr
 #'Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a message if verbose = T).
 #'Character columns in the input dataframe are automatically converted to factors (specified in a message if verbose = T).
@@ -125,7 +125,7 @@ olink_ordinalRegression <- function(df,
         df[[i]] <- factor(df[[i]])
         converted.vars <- c(converted.vars,i)
       }else if(is.numeric(df[[i]])){
-        warning(paste0('The variable ',i,' should not be as numeric'))
+        num.vars <- c(num.vars,i)
       }
     }
 
@@ -232,9 +232,10 @@ olink_ordinalRegression <- function(df,
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
       dplyr::mutate(!!data_type := rank(!!rlang::ensym(data_type))) %>%
       rstatix::convert_as_factor(!!rlang::ensym(data_type))%>%
-      dplyr::do(generics::tidy(car::Anova(ordinal::clm(as.formula(formula_string),
+      dplyr::do(generics::tidy(stats::anova(ordinal::clm(as.formula(formula_string),
                                                        data=.,
-                                                       threshold = "symmetric"),type=2))) %>%
+                                                       threshold = "flexible"
+                                                  ),type=3))) %>%
       dplyr::ungroup() %>%
       dplyr::filter(!term %in% c('(Intercept)','Residuals')) %>%
       dplyr::mutate(covariates = term %in% covariate_filter_string) %>%
@@ -246,7 +247,7 @@ olink_ordinalRegression <- function(df,
       dplyr::ungroup()%>%
       dplyr::select(-covariates) %>%
       dplyr::select(Assay,OlinkID,UniProt,Panel,term,df,statistic,p.value,Adjusted_pval,Threshold) %>%
-      dplyr::arrange(Adjusted_pval)
+      dplyr::arrange(p.value)
 
     if(return.covariates){
       return(p.val)
@@ -304,20 +305,21 @@ olink_ordinalRegression <- function(df,
 #' ordinalRegression_results <- olink_ordinalRegression(df = npx_data1,
 #'                               variable="Treatment:Time")
 #'
+#' #Filtering out significant and relevant results.
+#' significant_assays <- ordinalRegression_results %>%
+#'   filter(Threshold == 'Significant' & term == 'Time') %>%
+#'   select(OlinkID) %>%
+#'   distinct() %>%
+#'   pull()
+#'
 #' #Posthoc test for the model NPX~Treatment*Time,
-#' #on the interaction effect Treatment:Time.
+#' #on the effect Time.
 #'
 #' #Posthoc
 #' ordinalRegression_results_posthoc_results <- olink_ordinalRegression_posthoc(npx_data1,
 #'                                                    variable=c("Treatment:Time"),
-#'                                                    covariates="Site",
-#'                                                    olinkid_list = {ordinalRegression_results %>%
-#'                                                    filter(term == 'Treatment:Time') %>%
-#'                                                    filter(Threshold == 'Significant') %>%
-#'                                                                  dplyr::select(OlinkID) %>%
-#'                                                                  distinct() %>%
-#'                                                                  pull()},
-#'                                                                  effect = "Treatment:Time")}
+#'                                                    olinkid_list = significant_assays,
+#'                                                    effect = "Time")}
 #' @importFrom dplyr filter group_by ungroup pull do select arrange mutate
 #' @importFrom stringr str_detect
 #' @importFrom rstatix convert_as_factor
@@ -394,6 +396,13 @@ olink_ordinalRegression_posthoc <- function(df,
     for(i in variable_testers){
       removed.sampleids <- unique(c(removed.sampleids,df$SampleID[is.na(df[[i]])]))
       df <- df[!is.na(df[[i]]),]
+    }
+
+    ## Convert outcome to factor
+    if (data_type == 'NPX') {
+      df$NPX <- factor(df$NPX, ordered = TRUE)
+    } else if (data_type == 'Quantified_value') {
+      df$Quantified_value <- factor(df$Quantified_value, ordered = TRUE)
     }
 
     ##Convert character vars to factor
