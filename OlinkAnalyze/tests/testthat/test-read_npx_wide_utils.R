@@ -32,7 +32,9 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = assay_nrow <-
-            read_npx_wide_assay_nrow(file = wide_excel)
+            read_npx_wide_assay_nrow(file = wide_excel,
+                                     olink_platform = "Target 48",
+                                     data_type = "NPX")
         )
 
         # check that assay_nrow exists
@@ -76,7 +78,9 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = assay_nrow <-
-            read_npx_wide_assay_nrow(file = wide_excel)
+            read_npx_wide_assay_nrow(file = wide_excel,
+                                     olink_platform = "Target 48",
+                                     data_type = "Ct")
         )
 
         # check that assay_nrow exists
@@ -120,7 +124,9 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = assay_nrow <-
-            read_npx_wide_assay_nrow(file = wide_excel)
+            read_npx_wide_assay_nrow(file = wide_excel,
+                                     olink_platform = "Target 48",
+                                     data_type = "Quantified")
         )
 
         # check that assay_nrow exists
@@ -169,7 +175,9 @@ test_that(
 
         # check that function runs
         expect_error(
-          object = read_npx_wide_assay_nrow(file = wide_excel),
+          object = read_npx_wide_assay_nrow(file = wide_excel,
+                                            olink_platform = "Target 48",
+                                            data_type = "NPX"),
           regexp = "We identified 3 rows containing data about assays in file"
         )
 
@@ -205,7 +213,9 @@ test_that(
 
         # check that function runs
         expect_error(
-          object = read_npx_wide_assay_nrow(file = wide_excel),
+          object = read_npx_wide_assay_nrow(file = wide_excel,
+                                            olink_platform = "Target 48",
+                                            data_type = "Quantified"),
           regexp = "We identified 6 rows containing data about assays in file"
         )
 
@@ -247,7 +257,9 @@ test_that(
 
         # check that function runs
         expect_error(
-          object = read_npx_wide_assay_nrow(file = wide_excel),
+          object = read_npx_wide_assay_nrow(file = wide_excel,
+                                            olink_platform = "Target 48",
+                                            data_type = "Quantified"),
           regexp = "while we expected 5"
         )
 
@@ -282,7 +294,9 @@ test_that(
 
         # check that function runs
         expect_error(
-          object = read_npx_wide_assay_nrow(file = wide_excel),
+          object = read_npx_wide_assay_nrow(file = wide_excel,
+                                            olink_platform = "Target 48",
+                                            data_type = "Quantified"),
           regexp = "while we expected 5"
         )
 

@@ -5,10 +5,16 @@
 \title{Help function to determine the number of rows with assay information in Olink
 excel long or wide format files.}
 \usage{
-read_npx_wide_assay_nrow(file)
+read_npx_wide_assay_nrow(file, olink_platform = NULL, data_type = NULL)
 }
 \arguments{
 \item{file}{The input excel file.}
+
+\item{olink_platform}{The Olink platform used to generate the input file.
+Expecting "Target 96", "Target 48", "Flex" or "Focus".}
+
+\item{data_type}{The quantification in which the data comes in. Expecting one
+of NPX, Quantified or Ct.}
 }
 \value{
 Integer number of rows containing info about assays in Olink excel

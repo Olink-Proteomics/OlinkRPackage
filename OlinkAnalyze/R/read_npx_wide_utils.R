@@ -5,46 +5,21 @@
 #'   Klev Diamanti
 #'
 #' @param file The input excel file.
+#' @param olink_platform The Olink platform used to generate the input file.
+#' Expecting "Target 96", "Target 48", "Flex" or "Focus".
+#' @param data_type The quantification in which the data comes in. Expecting one
+#' of NPX, Quantified or Ct.
 #'
 #' @return Integer number of rows containing info about assays in Olink excel
 #' wide files.
 #'
-read_npx_wide_assay_nrow <- function(file) {
+read_npx_wide_assay_nrow <- function(file,
+                                     olink_platform = NULL,
+                                     data_type = NULL) {
 
   # initial checks ----
   check_file_exists(file = file,
                     error = TRUE)
-
-  # get some basic info from the file ----
-  olink_platforms_excel <- accepted_olink_platforms |>
-    dplyr::filter(.data[["broader_platform"]] == "qPCR")
-
-  olink_format <- read_npx_excel_format(
-    file = file,
-    long_format = NULL,
-    quant_methods_excel = olink_platforms_excel |>
-      dplyr::pull(.data[["quant_method"]]) |>
-      unlist() |>
-      unique()
-  )
-
-  olink_platform <- read_npx_excel_platform( # nolint object_usage_linter
-    file = file,
-    olink_platform = NULL,
-    is_long_format = olink_format$is_long_format,
-    olink_platforms_excel = olink_platforms_excel
-  )
-
-  data_type <- read_npx_excel_quant( # nolint object_usage_linter
-    file = file,
-    data_type = NULL,
-    data_cells = olink_format$data_cells,
-    quant_methods_expected = olink_platforms_excel |>
-      dplyr::filter(.data[["name"]] == .env[["olink_platform"]]) |>
-      dplyr::pull(.data[["quant_method"]]) |>
-      unlist()
-  )
-  rm(olink_platforms_excel, olink_format)
 
   # expected number of assay rows ----
 
