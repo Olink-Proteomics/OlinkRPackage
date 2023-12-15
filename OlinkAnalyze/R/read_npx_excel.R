@@ -162,9 +162,8 @@ read_npx_excel <- function(file,
     df_olink <- readxl::read_excel(path = file,
                                    col_names = TRUE)
 
-  } else if (file_format_check$is_long_format == FALSE
-             && file_olink_platform == "Flex") {
-    # if data is in wide format and platform is Olink Flex
+  } else if (file_format_check$is_long_format == FALSE) {
+    # if data is in wide format
 
 
 
