@@ -68,6 +68,14 @@ accepted_olink_platforms <- dplyr::tibble(
     c("NPX"),
     c("NPX"),
     c("NPX", "Quantified")
+  ),
+  quant_type = list(
+    c("relative", "absolute", "relative"),
+    c("relative", "absolute"),
+    c("relative", "relative"),
+    c("relative"),
+    c("relative"),
+    c("relative", "absolute")
   )
 )
 
