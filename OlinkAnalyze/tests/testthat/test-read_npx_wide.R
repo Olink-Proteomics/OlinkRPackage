@@ -1027,7 +1027,8 @@ test_that(
             2L:dplyr::n()
           ) |>
           dplyr::mutate(
-            col_index = dplyr::row_number() + 1L
+            col_index = dplyr::row_number() + 1L,
+            col_index = paste0("V", .data[["col_index"]])
           )
 
         ## separate df ----
@@ -1127,7 +1128,8 @@ test_that(
             2L:dplyr::n()
           ) |>
           dplyr::mutate(
-            col_index = dplyr::row_number() + 1L
+            col_index = dplyr::row_number() + 1L,
+            col_index = paste0("V", .data[["col_index"]])
           )
 
         ## separate df ----
@@ -1243,7 +1245,8 @@ test_that(
             2L:dplyr::n()
           ) |>
           dplyr::mutate(
-            col_index = dplyr::row_number() + 1L
+            col_index = dplyr::row_number() + 1L,
+            col_index = paste0("V", .data[["col_index"]])
           )
 
         ## separate df ----
@@ -1360,7 +1363,8 @@ test_that(
             2L:dplyr::n()
           ) |>
           dplyr::mutate(
-            col_index = dplyr::row_number() + 1L
+            col_index = dplyr::row_number() + 1L,
+            col_index = paste0("V", .data[["col_index"]])
           )
 
         ## separate df ----
@@ -1464,7 +1468,8 @@ test_that(
             2L:dplyr::n()
           ) |>
           dplyr::mutate(
-            col_index = dplyr::row_number() + 1L
+            col_index = dplyr::row_number() + 1L,
+            col_index = paste0("V", .data[["col_index"]])
           )
 
         ## separate df ----
@@ -1576,7 +1581,8 @@ test_that(
             2L:dplyr::n()
           ) |>
           dplyr::mutate(
-            col_index = dplyr::row_number() + 1L
+            col_index = dplyr::row_number() + 1L,
+            col_index = paste0("V", .data[["col_index"]])
           )
 
         ## separate df ----
@@ -1687,7 +1693,8 @@ test_that(
             2L:dplyr::n()
           ) |>
           dplyr::mutate(
-            col_index = dplyr::row_number() + 1L
+            col_index = dplyr::row_number() + 1L,
+            col_index = paste0("V", .data[["col_index"]])
           )
 
         ## separate df ----
@@ -1787,7 +1794,8 @@ test_that(
             2L:dplyr::n()
           ) |>
           dplyr::mutate(
-            col_index = dplyr::row_number() + 1L
+            col_index = dplyr::row_number() + 1L,
+            col_index = paste0("V", .data[["col_index"]])
           )
 
         ## separate df ----
@@ -1901,7 +1909,8 @@ test_that(
             2L:dplyr::n()
           ) |>
           dplyr::mutate(
-            col_index = dplyr::row_number() + 1L
+            col_index = dplyr::row_number() + 1L,
+            col_index = paste0("V", .data[["col_index"]])
           )
 
         ## separate df ----
@@ -2005,7 +2014,8 @@ test_that(
             2L:dplyr::n()
           ) |>
           dplyr::mutate(
-            col_index = dplyr::row_number() + 1L
+            col_index = dplyr::row_number() + 1L,
+            col_index = paste0("V", .data[["col_index"]])
           )
 
         ## separate df ----
@@ -2113,7 +2123,8 @@ test_that(
             2L:dplyr::n()
           ) |>
           dplyr::mutate(
-            col_index = dplyr::row_number() + 1L
+            col_index = dplyr::row_number() + 1L,
+            col_index = paste0("V", .data[["col_index"]])
           )
 
         ## separate df ----
@@ -2213,7 +2224,8 @@ test_that(
             2L:dplyr::n()
           ) |>
           dplyr::mutate(
-            col_index = dplyr::row_number() + 1L
+            col_index = dplyr::row_number() + 1L,
+            col_index = paste0("V", .data[["col_index"]])
           )
 
         ## separate df ----
@@ -2329,7 +2341,8 @@ test_that(
             2L:dplyr::n()
           ) |>
           dplyr::mutate(
-            col_index = dplyr::row_number() + 1L
+            col_index = dplyr::row_number() + 1L,
+            col_index = paste0("V", .data[["col_index"]])
           )
 
         ## separate df ----
@@ -2446,7 +2459,8 @@ test_that(
             2L:dplyr::n()
           ) |>
           dplyr::mutate(
-            col_index = dplyr::row_number() + 1L
+            col_index = dplyr::row_number() + 1L,
+            col_index = paste0("V", .data[["col_index"]])
           )
 
         ## separate df ----
@@ -2550,7 +2564,8 @@ test_that(
             2L:dplyr::n()
           ) |>
           dplyr::mutate(
-            col_index = dplyr::row_number() + 1L
+            col_index = dplyr::row_number() + 1L,
+            col_index = paste0("V", .data[["col_index"]])
           )
 
         ## separate df ----
@@ -2662,7 +2677,8 @@ test_that(
             2L:dplyr::n()
           ) |>
           dplyr::mutate(
-            col_index = dplyr::row_number() + 1L
+            col_index = dplyr::row_number() + 1L,
+            col_index = paste0("V", .data[["col_index"]])
           )
 
         ## separate df ----

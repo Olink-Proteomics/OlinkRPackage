@@ -34,6 +34,15 @@ read_npx_wide <- function(file,
 
   col_index_split
 
+  # split top df ----
+
+  df_top_list <- read_npx_wide_top_split(df = df_split$df_top,
+                                         file = file,
+                                         data_type = data_type,
+                                         olink_platform = olink_platform)
+
+  df_top_list
+
   # if (data_type != "Ct"
   #     & length(df_split) == 3L) {
   #
@@ -448,7 +457,8 @@ read_npx_wide_top_split <- function(df,
     ) |>
     dplyr::mutate(
       # column 1 became colnames of df_t
-      col_index = dplyr::row_number() + 1L
+      col_index = dplyr::row_number() + 1L,
+      col_index = paste0("V", .data[["col_index"]])
     )
 
   # check columns of df
@@ -514,9 +524,8 @@ read_npx_wide_top_split <- function(df,
 
     cli::cli_abort(
       message = c(
-        "x" = "Detected {sum(is.na(df_oid))} empty cells in columns
-        {min(df_oid$col_index)}-{max(df_oid$col_index)} in file {.file {file}}.
-        Expected no empty cells!",
+        "x" = "Detected {sum(is.na(df_oid))} empty cells in columns of file
+        {.file {file}}. Expected no empty cells!",
         "i" = "Has the excel file been modified manually?"
       ),
       call = rlang::caller_env(),
