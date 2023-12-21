@@ -76,6 +76,14 @@ accepted_olink_platforms <- dplyr::tibble(
     c("relative"),
     c("relative"),
     c("relative", "absolute")
+  ),
+  base_index = c(
+    45L,
+    NA_integer_,
+    92L,
+    NA_integer_,
+    NA_integer_,
+    NA_integer_
   )
 )
 
