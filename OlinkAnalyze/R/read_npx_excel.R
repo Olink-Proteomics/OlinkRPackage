@@ -165,7 +165,7 @@ read_npx_excel <- function(file,
   } else if (file_format_check$is_long_format == FALSE) {
     # if data is in wide format
 
-
+    df_olink <- "This is an temporary output"
 
   }
 
