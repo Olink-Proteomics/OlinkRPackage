@@ -2223,78 +2223,6 @@ test_that(
   }
 )
 
-test_that(
-  "read_npx_excel - incorrect input - unexpected platform",
-  {
-
-    withr::with_tempfile(
-      new = "excel_wide",
-      pattern = "test_excel_wide",
-      fileext = ".xlsx",
-      code = {
-
-        # write a simple excel file with Olink Target 96 in cell B3
-        dplyr::tibble(
-          "A" = c("Project_Name", "NPX data", "Panel"),
-          "B" = c("NPX_Manager", NA_character_, "Olink Target 96")
-        ) |>
-          writexl::write_xlsx(
-            path = excel_wide,
-            col_names = FALSE,
-            format_headers = FALSE
-          )
-
-        #check that file exists
-        expect_true(object = file.exists(excel_wide))
-
-        # check that read_npx_excel_platform works for olink_platform = NULL
-        expect_error(
-          object = read_npx_excel(
-            file = excel_wide,
-            long_format = NULL,
-            olink_platform = "Olink Uknown",
-            data_type = NULL
-          ),
-          regexp = "Unexpected value for `olink_platform`!"
-        )
-
-      }
-    )
-  }
-)
-
-test_that(
-  "read_npx_excel - incorrect input - unexpected data type",
-  {
-
-    withr::with_tempfile(
-      new = "excel_wide",
-      pattern = "test_excel_wide",
-      fileext = ".xlsx",
-      code = {
-
-        # writing something to the file
-        writeLines("foo", excel_wide)
-
-        # check that file exists
-        expect_true(object = file.exists(excel_wide))
-
-        # check that read_npx_excel_quant works for data_type = Unknown
-        expect_error(
-          object = read_npx_excel(
-            file = excel_wide,
-            long_format = NULL,
-            olink_platform = NULL,
-            data_type = "MPX"
-          ),
-          regexp = "Unexpected value for `data_type`!"
-        )
-
-      }
-    )
-  }
-)
-
 # Test check excel format (wide/long) ----
 
 test_that(
@@ -4161,47 +4089,6 @@ test_that(
   }
 )
 
-test_that(
-  "read_npx_excel_platform - incorrect input - unexpected platform",
-  {
-
-    withr::with_tempfile(
-      new = "excel_wide",
-      pattern = "test_excel_wide",
-      fileext = ".xlsx",
-      code = {
-
-        # write a simple excel file with Olink Target 96 in cell B3
-        dplyr::tibble(
-          "A" = c("Project_Name", "NPX data", "Panel"),
-          "B" = c("NPX_Manager", NA_character_, "Olink Target 96")
-        ) |>
-          writexl::write_xlsx(
-            path = excel_wide,
-            col_names = FALSE,
-            format_headers = FALSE
-          )
-
-        #check that file exists
-        expect_true(object = file.exists(excel_wide))
-
-        # check that read_npx_excel_platform works for olink_platform = NULL
-        expect_error(
-          object = read_npx_excel_platform(
-            file = excel_wide,
-            olink_platform = "Olink Uknown",
-            is_long_format = FALSE,
-            olink_platforms_excel =  accepted_olink_platforms |>
-              dplyr::filter(.data[["broader_platform"]] == "qPCR")
-          ),
-          regexp = "Unexpected value for `olink_platform`!"
-        )
-
-      }
-    )
-  }
-)
-
 # Test check excel quantification method (NPX, Ct, Quantified) ----
 
 test_that(
@@ -4875,37 +4762,5 @@ test_that(
       }
     )
 
-  }
-)
-
-test_that(
-  "read_npx_excel_quant - incorrect input - unexpected data type",
-  {
-
-    withr::with_tempfile(
-      new = "excel_wide",
-      pattern = "test_excel_wide",
-      fileext = ".xlsx",
-      code = {
-
-        # writing something to the file
-        writeLines("foo", excel_wide)
-
-        # check that file exists
-        expect_true(object = file.exists(excel_wide))
-
-        # check that read_npx_excel_quant works for data_type = Unknown
-        expect_error(
-          object = read_npx_excel_quant(
-            file = excel_wide,
-            data_type = "Olink Unknown",
-            data_cells = "NPX",
-            quant_methods_expected = c("NPX", "Ct", "Quantified")
-          ),
-          regexp = "Unexpected value for `data_type`!"
-        )
-
-      }
-    )
   }
 )

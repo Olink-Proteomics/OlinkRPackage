@@ -29,6 +29,18 @@ read_npx_excel <- function(file,
                            data_type = NULL,
                            quiet = FALSE) {
 
+  # default variables ----
+
+  olink_broader_platform <- "qPCR"
+
+  # filter the global variable accepted_olink_platforms to have a collection
+  # of platforms and quant methods available.
+  # Note that only Target platforms can report data in excel.
+  olink_platforms_excel <- accepted_olink_platforms |>
+    dplyr::filter(
+      .data[["broader_platform"]] == .env[["olink_broader_platform"]]
+    )
+
   # Check input ----
 
   # check if the input file exists
@@ -38,71 +50,22 @@ read_npx_excel <- function(file,
   # check that the requested putput df is ok
   check_out_df_arg(out_df = out_df)
 
-  ## prep input ----
-
-  # filter the global variable accepted_olink_platforms to have a collection
-  # of platforms and quant methods available.
-  # Note that only Target platforms can report data in excel.
-  olink_platforms_excel <- accepted_olink_platforms |>
-    dplyr::filter(.data[["broader_platform"]] == "qPCR")
-
-  # extract quantification methods for Target data
-  quant_methods_excel <- olink_platforms_excel$quant_method |>
-    unlist() |>
-    unique()
-
-  ## check that input data specifics are correct ----
-
   # check long format input
   if (!is.null(long_format)) {
-
     check_is_scalar_boolean(bool = long_format,
                             error = TRUE)
-
   }
 
-  # check olink platform
+  # check olink_platform
   if (!is.null(olink_platform)) {
-
-    check_is_scalar_character(string = olink_platform,
-                              error = TRUE)
-
-    # Throw an error if unexpected platform
-    if (!(olink_platform %in% olink_platforms_excel$name)) {
-
-      cli::cli_abort(
-        message = c(
-          "x" = "Unexpected value for {.arg olink_platform}!",
-          "i" = "Should be one of: {olink_platforms_excel$name}"
-        ),
-        call = rlang::caller_env(),
-        wrap = FALSE
-      )
-
-    }
-
+    check_olink_platform(x = olink_platform,
+                         broader_platform = olink_broader_platform)
   }
 
   # check data type
   if (!is.null(data_type)) {
-
-    check_is_scalar_character(string = data_type,
-                              error = TRUE)
-
-    # Throw an error if unexpected quantification method
-    if (!(data_type %in% quant_methods_excel)) {
-
-      cli::cli_abort(
-        message = c(
-          "x" = "Unexpected value for {.arg data_type}!",
-          "i" = "Should be one of: {quant_methods_excel}"
-        ),
-        call = rlang::caller_env(),
-        wrap = FALSE
-      )
-
-    }
-
+    check_olink_data_type(x = data_type,
+                          broader_platform = olink_broader_platform)
   }
 
   # Determine data format, Olink platform and quant method from excel file ----
@@ -112,7 +75,9 @@ read_npx_excel <- function(file,
   file_format_check <- read_npx_excel_format(
     file = file,
     long_format = long_format,
-    quant_methods_excel = quant_methods_excel
+    quant_methods_excel = olink_platforms_excel$quant_method |>
+      unlist() |>
+      unique()
   )
 
   ## Determine Olink platform ----
@@ -200,10 +165,8 @@ read_npx_excel_format <- function(file,
 
   # check long format input
   if (!is.null(long_format)) {
-
     check_is_scalar_boolean(bool = long_format,
                             error = TRUE)
-
   }
 
   # Read in cells to determine format ----
@@ -367,24 +330,8 @@ read_npx_excel_platform <- function(file,
 
   # check olink platform
   if (!is.null(olink_platform)) {
-
-    check_is_scalar_character(string = olink_platform,
-                              error = TRUE)
-
-    # Throw an error if unexpected platform
-    if (!(olink_platform %in% olink_platforms_excel$name)) {
-
-      cli::cli_abort(
-        message = c(
-          "x" = "Unexpected value for {.arg olink_platform}!",
-          "i" = "Should be one of: {olink_platforms_excel$name}"
-        ),
-        call = rlang::caller_env(),
-        wrap = FALSE
-      )
-
-    }
-
+    check_olink_platform(x = olink_platform,
+                         broader_platform = "qPCR")
   }
 
   # Determine olink platform from input file ----
@@ -535,24 +482,8 @@ read_npx_excel_quant <- function(file,
 
   # check data type
   if (!is.null(data_type)) {
-
-    check_is_scalar_character(string = data_type,
-                              error = TRUE)
-
-    # Throw an error if unexpected quantification method
-    if (!(data_type %in% quant_methods_expected)) {
-
-      cli::cli_abort(
-        message = c(
-          "x" = "Unexpected value for {.arg data_type}!",
-          "i" = "Should be one of: {quant_methods_expected}"
-        ),
-        call = rlang::caller_env(),
-        wrap = FALSE
-      )
-
-    }
-
+    check_olink_data_type(x = data_type,
+                          broader_platform = "qPCR")
   }
 
   # Determine quantification method from excel file ----
