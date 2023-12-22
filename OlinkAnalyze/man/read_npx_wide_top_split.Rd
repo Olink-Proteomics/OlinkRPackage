@@ -2,7 +2,8 @@
 % Please edit documentation in R/read_npx_wide.R
 \name{read_npx_wide_top_split}
 \alias{read_npx_wide_top_split}
-\title{Help function that splits df_top from a Olink wide excel file into 3 data}
+\title{Help function that splits df_top from a Olink wide excel file into 3 data
+frames.}
 \usage{
 read_npx_wide_top_split(df, file, data_type, olink_platform)
 }
@@ -23,4 +24,5 @@ is split on.
 }
 \description{
 Help function that splits df_top from a Olink wide excel file into 3 data
+frames.
 }
