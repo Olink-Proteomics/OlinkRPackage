@@ -3661,3 +3661,166 @@ test_that(
 
   }
 )
+
+test_that(
+  "read_npx_wide_top_split - internal controls within customer assays",
+  {
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df_top ----
+        o_platform <- "Target 48"
+        n_panels <- 1L
+        n_assay <- 45L
+        n_qc_warn <- n_panels
+        n_plates <- n_panels
+        int_ctrl <- c("Inc Ctrl", "Amp Ctrl", "Ext Ctrl")
+
+        df <- dplyr::tibble(
+          "V1" = c("Panel",
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = n_assay),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_plates),
+                         seq_len(n_plates)),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_qc_warn),
+                         seq_len(n_qc_warn)),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = length(int_ctrl))),
+          "V2" = c("Assay",
+                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
+                          seq_len(n_panels * n_assay)),
+                   rep(x = "Plate ID", times = n_plates),
+                   rep(x = "QC Warning", times = n_qc_warn),
+                   rep(x = "QC Deviation from median",
+                       times = (length(int_ctrl) * n_panels))),
+          "V3" = c("Uniprot ID",
+                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = int_ctrl, times = n_panels)),
+          "V4" = c("OlinkID",
+                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = NA_character_,
+                       times = (length(int_ctrl) * n_panels)))
+        )
+
+        # shuffle rows to mix internal controls with customer assays
+
+        df_shuffle <- df |>
+          dplyr::slice(
+            2L:dplyr::n()
+          ) |>
+          dplyr::filter(
+            !(.data[["V2"]] %in% c("Plate ID", "QC Warning"))
+          ) |>
+          dplyr::sample_n(
+            size = dplyr::n(),
+            replace = FALSE
+          ) |>
+          # add "Plate ID" and "QC Warning"
+          dplyr::bind_rows(
+            df |>
+              dplyr::filter(
+                .data[["V2"]] %in% c("Plate ID", "QC Warning")
+              )
+          )
+
+        df <- df |>
+          dplyr::slice(
+            1L
+          ) |>
+          dplyr::bind_rows(
+            df_shuffle
+          )
+
+        # proceed with matrix transformation
+        df_t <- t(df)
+        colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
+        rownames(df_t) <- NULL
+        df_t <- dplyr::as_tibble(df_t)
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # run function ----
+
+        expect_no_condition(
+          object =
+            list_top <- read_npx_wide_top_split(df = df_t,
+                                                file = wide_excel,
+                                                data_type = "NPX",
+                                                olink_platform = o_platform)
+        )
+
+        # modify df so that we can test output ----
+
+        colnames(df) <- dplyr::slice_head(df, n = 1L)
+        df <- df |>
+          dplyr::slice(
+            2L:dplyr::n()
+          ) |>
+          dplyr::mutate(
+            col_index = dplyr::row_number() + 1L,
+            col_index = paste0("V", .data[["col_index"]])
+          )
+
+        ## separate df ----
+
+        df_tmp_oid <- df |>
+          dplyr::filter(
+            !is.na(.data[["OlinkID"]])
+          )
+
+        df_tmp_meta <- df |>
+          dplyr::filter(
+            is.na(.data[["OlinkID"]])
+            & .data[["Assay"]] %in% c("Plate ID", "QC Warning")
+          ) |>
+          dplyr::select(
+            -dplyr::all_of(c("Uniprot ID", "OlinkID"))
+          ) |>
+          dplyr::rename(
+            "Var" = "Assay"
+          )
+
+        df_tmp_qc_dev <- df |>
+          dplyr::filter(
+            is.na(.data[["OlinkID"]])
+            & (.data[["Assay"]] == "QC Deviation from median"
+               | grepl("ctrl", .data[["Assay"]], ignore.case = TRUE))
+          ) |>
+          dplyr::select(
+            -dplyr::all_of(c("OlinkID"))
+          )
+
+        # check that tmp df are identical to function output ----
+
+        expect_identical(
+          object = list_top$df_oid,
+          expected = df_tmp_oid
+        )
+
+        expect_identical(
+          object = list_top$df_meta,
+          expected = df_tmp_meta
+        )
+
+        expect_identical(
+          object = list_top$df_qc_dev,
+          expected = df_tmp_qc_dev
+        )
+      }
+    )
+  }
+)
