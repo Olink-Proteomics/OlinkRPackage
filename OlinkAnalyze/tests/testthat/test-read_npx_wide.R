@@ -779,7 +779,7 @@ test_that(
           object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
                                            data_type = "NPX"),
-          regexp = "Column 1 of assay metadata in file"
+          regexp = "Column 1 of of the top matrix with assay metadata in file"
         )
 
       }
@@ -817,7 +817,7 @@ test_that(
           object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
                                            data_type = "Quantified"),
-          regexp = "Column 1 of assay metadata in file"
+          regexp = "Column 1 of of the top matrix with assay metadata in file"
         )
 
       }
@@ -3822,5 +3822,3720 @@ test_that(
         )
       }
     )
+  }
+)
+
+# Test read_npx_wide_bottom_t ----
+
+test_that(
+  "read_npx_wide_top_split - T48 - works single panel file",
+  {
+    ## NPX ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df_bottom ----
+        n_plates <- 1L
+        n_panel <- 1L
+        n_assay <- 45L
+        data_t <- "NPX"
+        last_v <- paste0("V", n_assay * n_panel + 2)
+
+        if (data_t == "NPX") {
+          # df_dt ----
+          df_dt <- matrix(
+            data = rnorm(n = (n_panel * n_assay)),
+            nrow = 1L,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              "LOD",
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::mutate(dplyr::across(dplyr::everything(),
+                                        ~ as.character(.x)))
+        } else if (data_t == "Quantified") {
+          # df_rep("Assay warning","Lowest quantifiable level","Plate LOD") ----
+          df_rep <- matrix(
+            data = sample(x = c("Pass", "Warn"),
+                          size = (n_plates * n_panel * n_assay),
+                          replace = TRUE),
+            nrow = n_plates,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              rep(x = "Assay warning", times = n_plates),
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::mutate({{last_v}} := paste("Plate", seq_len(n_plates))) |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_plates * n_panel * n_assay)),
+                nrow = n_plates,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  rep(x = "Lowest quantifiable level", times = n_plates),
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1") |>
+                dplyr::mutate({{last_v}} := paste("Plate",
+                                                  seq_len(n_plates))) |>
+                dplyr::mutate(dplyr::across(dplyr::everything(),
+                                            ~ as.character(.x)))
+            ) |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_plates * n_panel * n_assay)),
+                nrow = n_plates,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  rep(x = "Plate LOD", times = n_plates),
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1") |>
+                dplyr::mutate({{last_v}} := paste("Plate",
+                                                  seq_len(n_plates))) |>
+                dplyr::mutate(dplyr::across(dplyr::everything(),
+                                            ~ as.character(.x)))
+            )
+
+          # df_spec ("LLOQ", "ULOQ")----
+          df_spec <- matrix(
+            data = rnorm(n = (n_panel * n_assay)),
+            nrow = 1L,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              "LLOQ",
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_panel * n_assay)),
+                nrow = 1L,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  "ULOQ",
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1")
+            ) |>
+            dplyr::mutate(dplyr::across(dplyr::everything(),
+                                        ~ as.character(.x)))
+
+          # df_df ----
+
+          df_dt <- dplyr::bind_rows(df_rep, df_spec)
+
+        }
+
+        # df shared ("Missing Data freq.", "Normalization") ----
+        df_shared <- matrix(
+          data = rnorm(n = (n_panel * n_assay)),
+          nrow = 1L,
+          ncol = (n_assay * n_panel),
+          dimnames = list(
+            "Missing Data freq.",
+            paste0("V", 2L:((n_assay * n_panel) + 1L))
+          )
+        ) |>
+          dplyr::as_tibble(rownames = "V1") |>
+          dplyr::mutate(dplyr::across(dplyr::everything(),
+                                      ~ as.character(.x))) |>
+          dplyr::bind_rows(
+            matrix(
+              data = rep(x = "Intensity", times = (n_panel * n_assay)),
+              nrow = 1L,
+              ncol = (n_assay * n_panel),
+              dimnames = list(
+                "Normalization",
+                paste0("V", 2L:((n_assay * n_panel) + 1L))
+              )
+            ) |>
+              dplyr::as_tibble(rownames = "V1")
+          )
+
+        # df ----
+
+        df <- dplyr::bind_rows(df_dt, df_shared)
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # run function ----
+
+        expect_no_condition(
+          object = df_b <- read_npx_wide_bottom_t(df = df,
+                                                  file = wide_excel,
+                                                  data_type = data_t,
+                                                  col_split = last_v)
+        )
+
+        # modify df so that we can test output ----
+
+        # df with plates
+        if (last_v %in% colnames(df) && data_t == "Quantified") {
+          # if it is Quantified data
+          df_q <- df |>
+            # keep only rows to be pivoted
+            dplyr::filter(
+              !is.na(.data[[last_v]])
+            )
+
+          # for each variable in V1 and do a pivot_longer
+          df_q <- lapply(unique(df_q$V1),
+                         function(x) {
+                           df_q |>
+                             dplyr::filter(
+                               .data[["V1"]] == .env[["x"]]
+                             ) |>
+                             dplyr::select(
+                               -dplyr::all_of("V1")
+                             ) |>
+                             tidyr::pivot_longer(
+                               -dplyr::all_of(last_v),
+                               names_to = "col_index",
+                               values_to = x
+                             ) |>
+                             dplyr::rename(
+                               "Plate ID" = dplyr::all_of(last_v)
+                             )
+                         })
+          # left join all data frames from the list
+          df_q <- Reduce(f = function(df_1, df_2) {
+            dplyr::left_join(x = df_1,
+                             y = df_2,
+                             by = c("Plate ID", "col_index"),
+                             relationship = "one-to-one")
+          },
+          x = df_q)
+
+          df <- df |>
+            dplyr::filter(
+              is.na(.data[[last_v]])
+            ) |>
+            dplyr::select(
+              -dplyr::all_of(last_v)
+            )
+
+        }
+
+        # df without plates
+        df_t <- t(df)
+        colnames(df_t) <- df_t[1L, ]
+        df_t <- df_t |>
+          dplyr::as_tibble(rownames = "col_index") |>
+          dplyr::mutate(
+            col_index = dplyr::if_else(.data[["col_index"]] == "V1",
+                                       "col_index", .data[["col_index"]])
+          ) |>
+          dplyr::slice(
+            2L:dplyr::n()
+          )
+
+        # merge if needed
+        if (exists("df_q")) {
+          df_t <- dplyr::left_join(
+            x = df_t,
+            y = df_q,
+            by = "col_index",
+            relationship = "one-to-many"
+          )
+        }
+
+        df_t <- df_t |>
+          dplyr::select(
+            order(colnames(df_t))
+          )
+
+        # order columns on df_b
+        df_b <- df_b |>
+          dplyr::select(
+            order(colnames(df_b))
+          )
+
+        # check that dfs are identical to function output ----
+
+        expect_identical(
+          object = df_b,
+          expected = df_t
+        )
+
+      }
+    )
+
+    ## Quantified ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df_bottom ----
+        n_plates <- 1L
+        n_panel <- 1L
+        n_assay <- 45L
+        data_t <- "Quantified"
+        last_v <- paste0("V", n_assay * n_panel + 2)
+
+        if (data_t == "NPX") {
+          # df_dt ----
+          df_dt <- matrix(
+            data = rnorm(n = (n_panel * n_assay)),
+            nrow = 1L,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              "LOD",
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::mutate(dplyr::across(dplyr::everything(),
+                                        ~ as.character(.x)))
+        } else if (data_t == "Quantified") {
+          # df_rep("Assay warning","Lowest quantifiable level","Plate LOD") ----
+          df_rep <- matrix(
+            data = sample(x = c("Pass", "Warn"),
+                          size = (n_plates * n_panel * n_assay),
+                          replace = TRUE),
+            nrow = n_plates,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              rep(x = "Assay warning", times = n_plates),
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::mutate({{last_v}} := paste("Plate", seq_len(n_plates))) |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_plates * n_panel * n_assay)),
+                nrow = n_plates,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  rep(x = "Lowest quantifiable level", times = n_plates),
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1") |>
+                dplyr::mutate({{last_v}} := paste("Plate",
+                                                  seq_len(n_plates))) |>
+                dplyr::mutate(dplyr::across(dplyr::everything(),
+                                            ~ as.character(.x)))
+            ) |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_plates * n_panel * n_assay)),
+                nrow = n_plates,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  rep(x = "Plate LOD", times = n_plates),
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1") |>
+                dplyr::mutate({{last_v}} := paste("Plate",
+                                                  seq_len(n_plates))) |>
+                dplyr::mutate(dplyr::across(dplyr::everything(),
+                                            ~ as.character(.x)))
+            )
+
+          # df_spec ("LLOQ", "ULOQ")----
+          df_spec <- matrix(
+            data = rnorm(n = (n_panel * n_assay)),
+            nrow = 1L,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              "LLOQ",
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_panel * n_assay)),
+                nrow = 1L,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  "ULOQ",
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1")
+            ) |>
+            dplyr::mutate(dplyr::across(dplyr::everything(),
+                                        ~ as.character(.x)))
+
+          # df_df ----
+
+          df_dt <- dplyr::bind_rows(df_rep, df_spec)
+
+        }
+
+        # df shared ("Missing Data freq.", "Normalization") ----
+        df_shared <- matrix(
+          data = rnorm(n = (n_panel * n_assay)),
+          nrow = 1L,
+          ncol = (n_assay * n_panel),
+          dimnames = list(
+            "Missing Data freq.",
+            paste0("V", 2L:((n_assay * n_panel) + 1L))
+          )
+        ) |>
+          dplyr::as_tibble(rownames = "V1") |>
+          dplyr::mutate(dplyr::across(dplyr::everything(),
+                                      ~ as.character(.x))) |>
+          dplyr::bind_rows(
+            matrix(
+              data = rep(x = "Intensity", times = (n_panel * n_assay)),
+              nrow = 1L,
+              ncol = (n_assay * n_panel),
+              dimnames = list(
+                "Normalization",
+                paste0("V", 2L:((n_assay * n_panel) + 1L))
+              )
+            ) |>
+              dplyr::as_tibble(rownames = "V1")
+          )
+
+        # df ----
+
+        df <- dplyr::bind_rows(df_dt, df_shared)
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # run function ----
+
+        expect_no_condition(
+          object = df_b <- read_npx_wide_bottom_t(df = df,
+                                                  file = wide_excel,
+                                                  data_type = data_t,
+                                                  col_split = last_v)
+        )
+
+        # modify df so that we can test output ----
+
+        # df with plates
+        if (last_v %in% colnames(df) && data_t == "Quantified") {
+          # if it is Quantified data
+          df_q <- df |>
+            # keep only rows to be pivoted
+            dplyr::filter(
+              !is.na(.data[[last_v]])
+            )
+
+          # for each variable in V1 and do a pivot_longer
+          df_q <- lapply(unique(df_q$V1),
+                         function(x) {
+                           df_q |>
+                             dplyr::filter(
+                               .data[["V1"]] == .env[["x"]]
+                             ) |>
+                             dplyr::select(
+                               -dplyr::all_of("V1")
+                             ) |>
+                             tidyr::pivot_longer(
+                               -dplyr::all_of(last_v),
+                               names_to = "col_index",
+                               values_to = x
+                             ) |>
+                             dplyr::rename(
+                               "Plate ID" = dplyr::all_of(last_v)
+                             )
+                         })
+
+          # left join all data frames from the list
+          df_q <- Reduce(function(df_1, df_2) {
+            dplyr::left_join(x = df_1,
+                             y = df_2,
+                             by = c("Plate ID", "col_index"),
+                             relationship = "one-to-one")
+          },
+          x = df_q)
+
+          df <- df |>
+            dplyr::filter(
+              is.na(.data[[last_v]])
+            ) |>
+            dplyr::select(
+              -dplyr::all_of(last_v)
+            )
+
+        }
+
+        # df without plates
+        df_t <- t(df)
+        colnames(df_t) <- df_t[1L, ]
+        df_t <- df_t |>
+          dplyr::as_tibble(rownames = "col_index") |>
+          dplyr::mutate(
+            col_index = dplyr::if_else(.data[["col_index"]] == "V1",
+                                       "col_index", .data[["col_index"]])
+          ) |>
+          dplyr::slice(
+            2L:dplyr::n()
+          )
+
+        # merge if needed
+        if (exists("df_q")) {
+          df_t <- dplyr::left_join(
+            x = df_t,
+            y = df_q,
+            by = "col_index",
+            relationship = "one-to-many"
+          )
+        }
+
+        df_t <- df_t |>
+          dplyr::select(
+            order(colnames(df_t))
+          )
+
+        # order columns on df_b
+        df_b <- df_b |>
+          dplyr::select(
+            order(colnames(df_b))
+          )
+
+        # check that dfs are identical to function output ----
+
+        expect_identical(
+          object = df_b,
+          expected = df_t
+        )
+
+      }
+    )
+
+  }
+)
+
+test_that(
+  "read_npx_wide_top_split - T48 - works multi panel and multi plate file",
+  {
+    ## NPX ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df_bottom ----
+        n_plates <- 2L
+        n_panel <- 4L
+        n_assay <- 45L
+        data_t <- "NPX"
+        last_v <- paste0("V", n_assay * n_panel + 2)
+
+        if (data_t == "NPX") {
+          # df_dt ----
+          df_dt <- matrix(
+            data = rnorm(n = (n_panel * n_assay)),
+            nrow = 1L,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              "LOD",
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::mutate(dplyr::across(dplyr::everything(),
+                                        ~ as.character(.x)))
+        } else if (data_t == "Quantified") {
+          # df_rep("Assay warning","Lowest quantifiable level","Plate LOD") ----
+          df_rep <- matrix(
+            data = sample(x = c("Pass", "Warn"),
+                          size = (n_plates * n_panel * n_assay),
+                          replace = TRUE),
+            nrow = n_plates,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              rep(x = "Assay warning", times = n_plates),
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::mutate({{last_v}} := paste("Plate", seq_len(n_plates))) |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_plates * n_panel * n_assay)),
+                nrow = n_plates,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  rep(x = "Lowest quantifiable level", times = n_plates),
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1") |>
+                dplyr::mutate({{last_v}} := paste("Plate",
+                                                  seq_len(n_plates))) |>
+                dplyr::mutate(dplyr::across(dplyr::everything(),
+                                            ~ as.character(.x)))
+            ) |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_plates * n_panel * n_assay)),
+                nrow = n_plates,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  rep(x = "Plate LOD", times = n_plates),
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1") |>
+                dplyr::mutate({{last_v}} := paste("Plate",
+                                                  seq_len(n_plates))) |>
+                dplyr::mutate(dplyr::across(dplyr::everything(),
+                                            ~ as.character(.x)))
+            )
+
+          # df_spec ("LLOQ", "ULOQ")----
+          df_spec <- matrix(
+            data = rnorm(n = (n_panel * n_assay)),
+            nrow = 1L,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              "LLOQ",
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_panel * n_assay)),
+                nrow = 1L,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  "ULOQ",
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1")
+            ) |>
+            dplyr::mutate(dplyr::across(dplyr::everything(),
+                                        ~ as.character(.x)))
+
+          # df_df ----
+
+          df_dt <- dplyr::bind_rows(df_rep, df_spec)
+
+        }
+
+        # df shared ("Missing Data freq.", "Normalization") ----
+        df_shared <- matrix(
+          data = rnorm(n = (n_panel * n_assay)),
+          nrow = 1L,
+          ncol = (n_assay * n_panel),
+          dimnames = list(
+            "Missing Data freq.",
+            paste0("V", 2L:((n_assay * n_panel) + 1L))
+          )
+        ) |>
+          dplyr::as_tibble(rownames = "V1") |>
+          dplyr::mutate(dplyr::across(dplyr::everything(),
+                                      ~ as.character(.x))) |>
+          dplyr::bind_rows(
+            matrix(
+              data = rep(x = "Intensity", times = (n_panel * n_assay)),
+              nrow = 1L,
+              ncol = (n_assay * n_panel),
+              dimnames = list(
+                "Normalization",
+                paste0("V", 2L:((n_assay * n_panel) + 1L))
+              )
+            ) |>
+              dplyr::as_tibble(rownames = "V1")
+          )
+
+        # df ----
+
+        df <- dplyr::bind_rows(df_dt, df_shared)
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # run function ----
+
+        expect_no_condition(
+          object = df_b <- read_npx_wide_bottom_t(df = df,
+                                                  file = wide_excel,
+                                                  data_type = data_t,
+                                                  col_split = last_v)
+        )
+
+        # modify df so that we can test output ----
+
+        # df with plates
+        if (last_v %in% colnames(df) && data_t == "Quantified") {
+          # if it is Quantified data
+          df_q <- df |>
+            # keep only rows to be pivoted
+            dplyr::filter(
+              !is.na(.data[[last_v]])
+            )
+
+          # for each variable in V1 and do a pivot_longer
+          df_q <- lapply(unique(df_q$V1),
+                         function(x) {
+                           df_q |>
+                             dplyr::filter(
+                               .data[["V1"]] == .env[["x"]]
+                             ) |>
+                             dplyr::select(
+                               -dplyr::all_of("V1")
+                             ) |>
+                             tidyr::pivot_longer(
+                               -dplyr::all_of(last_v),
+                               names_to = "col_index",
+                               values_to = x
+                             ) |>
+                             dplyr::rename(
+                               "Plate ID" = dplyr::all_of(last_v)
+                             )
+                         })
+
+          # left join all data frames from the list
+          df_q <- Reduce(function(df_1, df_2) {
+            dplyr::left_join(x = df_1,
+                             y = df_2,
+                             by = c("Plate ID", "col_index"),
+                             relationship = "one-to-one")
+          },
+          x = df_q)
+
+          df <- df |>
+            dplyr::filter(
+              is.na(.data[[last_v]])
+            ) |>
+            dplyr::select(
+              -dplyr::all_of(last_v)
+            )
+
+        }
+
+        # df without plates
+        df_t <- t(df)
+        colnames(df_t) <- df_t[1L, ]
+        df_t <- df_t |>
+          dplyr::as_tibble(rownames = "col_index") |>
+          dplyr::mutate(
+            col_index = dplyr::if_else(.data[["col_index"]] == "V1",
+                                       "col_index", .data[["col_index"]])
+          ) |>
+          dplyr::slice(
+            2L:dplyr::n()
+          )
+
+        # merge if needed
+        if (exists("df_q")) {
+          df_t <- dplyr::left_join(
+            x = df_t,
+            y = df_q,
+            by = "col_index",
+            relationship = "one-to-many"
+          )
+        }
+
+        df_t <- df_t |>
+          dplyr::select(
+            order(colnames(df_t))
+          )
+
+        # order columns on df_b
+        df_b <- df_b |>
+          dplyr::select(
+            order(colnames(df_b))
+          )
+
+        # check that dfs are identical to function output ----
+
+        expect_identical(
+          object = df_b,
+          expected = df_t
+        )
+
+      }
+    )
+
+    ## Quantified ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df_bottom ----
+        n_plates <- 2L
+        n_panel <- 4L
+        n_assay <- 45L
+        data_t <- "Quantified"
+        last_v <- paste0("V", n_assay * n_panel + 2)
+
+        if (data_t == "NPX") {
+          # df_dt ----
+          df_dt <- matrix(
+            data = rnorm(n = (n_panel * n_assay)),
+            nrow = 1L,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              "LOD",
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::mutate(dplyr::across(dplyr::everything(),
+                                        ~ as.character(.x)))
+        } else if (data_t == "Quantified") {
+          # df_rep("Assay warning","Lowest quantifiable level","Plate LOD") ----
+          df_rep <- matrix(
+            data = sample(x = c("Pass", "Warn"),
+                          size = (n_plates * n_panel * n_assay),
+                          replace = TRUE),
+            nrow = n_plates,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              rep(x = "Assay warning", times = n_plates),
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::mutate({{last_v}} := paste("Plate", seq_len(n_plates))) |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_plates * n_panel * n_assay)),
+                nrow = n_plates,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  rep(x = "Lowest quantifiable level", times = n_plates),
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1") |>
+                dplyr::mutate({{last_v}} := paste("Plate",
+                                                  seq_len(n_plates))) |>
+                dplyr::mutate(dplyr::across(dplyr::everything(),
+                                            ~ as.character(.x)))
+            ) |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_plates * n_panel * n_assay)),
+                nrow = n_plates,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  rep(x = "Plate LOD", times = n_plates),
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1") |>
+                dplyr::mutate({{last_v}} := paste("Plate",
+                                                  seq_len(n_plates))) |>
+                dplyr::mutate(dplyr::across(dplyr::everything(),
+                                            ~ as.character(.x)))
+            )
+
+          # df_spec ("LLOQ", "ULOQ")----
+          df_spec <- matrix(
+            data = rnorm(n = (n_panel * n_assay)),
+            nrow = 1L,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              "LLOQ",
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_panel * n_assay)),
+                nrow = 1L,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  "ULOQ",
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1")
+            ) |>
+            dplyr::mutate(dplyr::across(dplyr::everything(),
+                                        ~ as.character(.x)))
+
+          # df_df ----
+
+          df_dt <- dplyr::bind_rows(df_rep, df_spec)
+
+        }
+
+        # df shared ("Missing Data freq.", "Normalization") ----
+        df_shared <- matrix(
+          data = rnorm(n = (n_panel * n_assay)),
+          nrow = 1L,
+          ncol = (n_assay * n_panel),
+          dimnames = list(
+            "Missing Data freq.",
+            paste0("V", 2L:((n_assay * n_panel) + 1L))
+          )
+        ) |>
+          dplyr::as_tibble(rownames = "V1") |>
+          dplyr::mutate(dplyr::across(dplyr::everything(),
+                                      ~ as.character(.x))) |>
+          dplyr::bind_rows(
+            matrix(
+              data = rep(x = "Intensity", times = (n_panel * n_assay)),
+              nrow = 1L,
+              ncol = (n_assay * n_panel),
+              dimnames = list(
+                "Normalization",
+                paste0("V", 2L:((n_assay * n_panel) + 1L))
+              )
+            ) |>
+              dplyr::as_tibble(rownames = "V1")
+          )
+
+        # df ----
+
+        df <- dplyr::bind_rows(df_dt, df_shared)
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # run function ----
+
+        expect_no_condition(
+          object = df_b <- read_npx_wide_bottom_t(df = df,
+                                                  file = wide_excel,
+                                                  data_type = data_t,
+                                                  col_split = last_v)
+        )
+
+        # modify df so that we can test output ----
+
+        # df with plates
+        if (last_v %in% colnames(df) && data_t == "Quantified") {
+          # if it is Quantified data
+          df_q <- df |>
+            # keep only rows to be pivoted
+            dplyr::filter(
+              !is.na(.data[[last_v]])
+            )
+
+          # for each variable in V1 and do a pivot_longer
+          df_q <- lapply(unique(df_q$V1),
+                         function(x) {
+                           df_q |>
+                             dplyr::filter(
+                               .data[["V1"]] == .env[["x"]]
+                             ) |>
+                             dplyr::select(
+                               -dplyr::all_of("V1")
+                             ) |>
+                             tidyr::pivot_longer(
+                               -dplyr::all_of(last_v),
+                               names_to = "col_index",
+                               values_to = x
+                             ) |>
+                             dplyr::rename(
+                               "Plate ID" = dplyr::all_of(last_v)
+                             )
+                         })
+
+          # left join all data frames from the list
+          df_q <- Reduce(function(df_1, df_2) {
+            dplyr::left_join(x = df_1,
+                             y = df_2,
+                             by = c("Plate ID", "col_index"),
+                             relationship = "one-to-one")
+          },
+          x = df_q)
+
+          df <- df |>
+            dplyr::filter(
+              is.na(.data[[last_v]])
+            ) |>
+            dplyr::select(
+              -dplyr::all_of(last_v)
+            )
+
+        }
+
+        # df without plates
+        df_t <- t(df)
+        colnames(df_t) <- df_t[1L, ]
+        df_t <- df_t |>
+          dplyr::as_tibble(rownames = "col_index") |>
+          dplyr::mutate(
+            col_index = dplyr::if_else(.data[["col_index"]] == "V1",
+                                       "col_index", .data[["col_index"]])
+          ) |>
+          dplyr::slice(
+            2L:dplyr::n()
+          )
+
+        # merge if needed
+        if (exists("df_q")) {
+          df_t <- dplyr::left_join(
+            x = df_t,
+            y = df_q,
+            by = "col_index",
+            relationship = "one-to-many"
+          )
+        }
+
+        df_t <- df_t |>
+          dplyr::select(
+            order(colnames(df_t))
+          )
+
+        # order columns on df_b
+        df_b <- df_b |>
+          dplyr::select(
+            order(colnames(df_b))
+          )
+
+        # check that dfs are identical to function output ----
+
+        expect_identical(
+          object = df_b,
+          expected = df_t
+        )
+
+      }
+    )
+
+  }
+)
+
+test_that(
+  "read_npx_wide_top_split - T96 - works single panel file",
+  {
+    ## NPX ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df_bottom ----
+        n_plates <- 1L
+        n_panel <- 1L
+        n_assay <- 92L
+        data_t <- "NPX"
+        last_v <- paste0("V", n_assay * n_panel + 2)
+
+        if (data_t == "NPX") {
+          # df_dt ----
+          df_dt <- matrix(
+            data = rnorm(n = (n_panel * n_assay)),
+            nrow = 1L,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              "LOD",
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::mutate(dplyr::across(dplyr::everything(),
+                                        ~ as.character(.x)))
+        } else if (data_t == "Quantified") {
+          # df_rep("Assay warning","Lowest quantifiable level","Plate LOD") ----
+          df_rep <- matrix(
+            data = sample(x = c("Pass", "Warn"),
+                          size = (n_plates * n_panel * n_assay),
+                          replace = TRUE),
+            nrow = n_plates,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              rep(x = "Assay warning", times = n_plates),
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::mutate({{last_v}} := paste("Plate", seq_len(n_plates))) |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_plates * n_panel * n_assay)),
+                nrow = n_plates,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  rep(x = "Lowest quantifiable level", times = n_plates),
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1") |>
+                dplyr::mutate({{last_v}} := paste("Plate",
+                                                  seq_len(n_plates))) |>
+                dplyr::mutate(dplyr::across(dplyr::everything(),
+                                            ~ as.character(.x)))
+            ) |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_plates * n_panel * n_assay)),
+                nrow = n_plates,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  rep(x = "Plate LOD", times = n_plates),
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1") |>
+                dplyr::mutate({{last_v}} := paste("Plate",
+                                                  seq_len(n_plates))) |>
+                dplyr::mutate(dplyr::across(dplyr::everything(),
+                                            ~ as.character(.x)))
+            )
+
+          # df_spec ("LLOQ", "ULOQ")----
+          df_spec <- matrix(
+            data = rnorm(n = (n_panel * n_assay)),
+            nrow = 1L,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              "LLOQ",
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_panel * n_assay)),
+                nrow = 1L,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  "ULOQ",
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1")
+            ) |>
+            dplyr::mutate(dplyr::across(dplyr::everything(),
+                                        ~ as.character(.x)))
+
+          # df_df ----
+
+          df_dt <- dplyr::bind_rows(df_rep, df_spec)
+
+        }
+
+        # df shared ("Missing Data freq.", "Normalization") ----
+        df_shared <- matrix(
+          data = rnorm(n = (n_panel * n_assay)),
+          nrow = 1L,
+          ncol = (n_assay * n_panel),
+          dimnames = list(
+            "Missing Data freq.",
+            paste0("V", 2L:((n_assay * n_panel) + 1L))
+          )
+        ) |>
+          dplyr::as_tibble(rownames = "V1") |>
+          dplyr::mutate(dplyr::across(dplyr::everything(),
+                                      ~ as.character(.x))) |>
+          dplyr::bind_rows(
+            matrix(
+              data = rep(x = "Intensity", times = (n_panel * n_assay)),
+              nrow = 1L,
+              ncol = (n_assay * n_panel),
+              dimnames = list(
+                "Normalization",
+                paste0("V", 2L:((n_assay * n_panel) + 1L))
+              )
+            ) |>
+              dplyr::as_tibble(rownames = "V1")
+          )
+
+        # df ----
+
+        df <- dplyr::bind_rows(df_dt, df_shared)
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # run function ----
+
+        expect_no_condition(
+          object = df_b <- read_npx_wide_bottom_t(df = df,
+                                                  file = wide_excel,
+                                                  data_type = data_t,
+                                                  col_split = last_v)
+        )
+
+        # modify df so that we can test output ----
+
+        # df with plates
+        if (last_v %in% colnames(df) && data_t == "Quantified") {
+          # if it is Quantified data
+          df_q <- df |>
+            # keep only rows to be pivoted
+            dplyr::filter(
+              !is.na(.data[[last_v]])
+            )
+
+          # for each variable in V1 and do a pivot_longer
+          df_q <- lapply(unique(df_q$V1),
+                         function(x) {
+                           df_q |>
+                             dplyr::filter(
+                               .data[["V1"]] == .env[["x"]]
+                             ) |>
+                             dplyr::select(
+                               -dplyr::all_of("V1")
+                             ) |>
+                             tidyr::pivot_longer(
+                               -dplyr::all_of(last_v),
+                               names_to = "col_index",
+                               values_to = x
+                             ) |>
+                             dplyr::rename(
+                               "Plate ID" = dplyr::all_of(last_v)
+                             )
+                         })
+
+          # left join all data frames from the list
+          df_q <- Reduce(function(df_1, df_2) {
+            dplyr::left_join(x = df_1,
+                             y = df_2,
+                             by = c("Plate ID", "col_index"),
+                             relationship = "one-to-one")
+          },
+          x = df_q)
+
+          df <- df |>
+            dplyr::filter(
+              is.na(.data[[last_v]])
+            ) |>
+            dplyr::select(
+              -dplyr::all_of(last_v)
+            )
+
+        }
+
+        # df without plates
+        df_t <- t(df)
+        colnames(df_t) <- df_t[1L, ]
+        df_t <- df_t |>
+          dplyr::as_tibble(rownames = "col_index") |>
+          dplyr::mutate(
+            col_index = dplyr::if_else(.data[["col_index"]] == "V1",
+                                       "col_index", .data[["col_index"]])
+          ) |>
+          dplyr::slice(
+            2L:dplyr::n()
+          )
+
+        # merge if needed
+        if (exists("df_q")) {
+          df_t <- dplyr::left_join(
+            x = df_t,
+            y = df_q,
+            by = "col_index",
+            relationship = "one-to-many"
+          )
+        }
+
+        df_t <- df_t |>
+          dplyr::select(
+            order(colnames(df_t))
+          )
+
+        # order columns on df_b
+        df_b <- df_b |>
+          dplyr::select(
+            order(colnames(df_b))
+          )
+
+        # check that dfs are identical to function output ----
+
+        expect_identical(
+          object = df_b,
+          expected = df_t
+        )
+
+      }
+    )
+
+  }
+)
+
+test_that(
+  "read_npx_wide_top_split - T48 - works multi panel and multi plate file",
+  {
+    ## NPX ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df_bottom ----
+        n_plates <- 2L
+        n_panel <- 4L
+        n_assay <- 92L
+        data_t <- "NPX"
+        last_v <- paste0("V", n_assay * n_panel + 2)
+
+        if (data_t == "NPX") {
+          # df_dt ----
+          df_dt <- matrix(
+            data = rnorm(n = (n_panel * n_assay)),
+            nrow = 1L,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              "LOD",
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::mutate(dplyr::across(dplyr::everything(),
+                                        ~ as.character(.x)))
+        } else if (data_t == "Quantified") {
+          # df_rep("Assay warning","Lowest quantifiable level","Plate LOD") ----
+          df_rep <- matrix(
+            data = sample(x = c("Pass", "Warn"),
+                          size = (n_plates * n_panel * n_assay),
+                          replace = TRUE),
+            nrow = n_plates,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              rep(x = "Assay warning", times = n_plates),
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::mutate({{last_v}} := paste("Plate", seq_len(n_plates))) |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_plates * n_panel * n_assay)),
+                nrow = n_plates,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  rep(x = "Lowest quantifiable level", times = n_plates),
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1") |>
+                dplyr::mutate({{last_v}} := paste("Plate",
+                                                  seq_len(n_plates))) |>
+                dplyr::mutate(dplyr::across(dplyr::everything(),
+                                            ~ as.character(.x)))
+            ) |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_plates * n_panel * n_assay)),
+                nrow = n_plates,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  rep(x = "Plate LOD", times = n_plates),
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1") |>
+                dplyr::mutate({{last_v}} := paste("Plate",
+                                                  seq_len(n_plates))) |>
+                dplyr::mutate(dplyr::across(dplyr::everything(),
+                                            ~ as.character(.x)))
+            )
+
+          # df_spec ("LLOQ", "ULOQ")----
+          df_spec <- matrix(
+            data = rnorm(n = (n_panel * n_assay)),
+            nrow = 1L,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              "LLOQ",
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_panel * n_assay)),
+                nrow = 1L,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  "ULOQ",
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1")
+            ) |>
+            dplyr::mutate(dplyr::across(dplyr::everything(),
+                                        ~ as.character(.x)))
+
+          # df_df ----
+
+          df_dt <- dplyr::bind_rows(df_rep, df_spec)
+
+        }
+
+        # df shared ("Missing Data freq.", "Normalization") ----
+        df_shared <- matrix(
+          data = rnorm(n = (n_panel * n_assay)),
+          nrow = 1L,
+          ncol = (n_assay * n_panel),
+          dimnames = list(
+            "Missing Data freq.",
+            paste0("V", 2L:((n_assay * n_panel) + 1L))
+          )
+        ) |>
+          dplyr::as_tibble(rownames = "V1") |>
+          dplyr::mutate(dplyr::across(dplyr::everything(),
+                                      ~ as.character(.x))) |>
+          dplyr::bind_rows(
+            matrix(
+              data = rep(x = "Intensity", times = (n_panel * n_assay)),
+              nrow = 1L,
+              ncol = (n_assay * n_panel),
+              dimnames = list(
+                "Normalization",
+                paste0("V", 2L:((n_assay * n_panel) + 1L))
+              )
+            ) |>
+              dplyr::as_tibble(rownames = "V1")
+          )
+
+        # df ----
+
+        df <- dplyr::bind_rows(df_dt, df_shared)
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # run function ----
+
+        expect_no_condition(
+          object = df_b <- read_npx_wide_bottom_t(df = df,
+                                                  file = wide_excel,
+                                                  data_type = data_t,
+                                                  col_split = last_v)
+        )
+
+        # modify df so that we can test output ----
+
+        # df with plates
+        if (last_v %in% colnames(df) && data_t == "Quantified") {
+          # if it is Quantified data
+          df_q <- df |>
+            # keep only rows to be pivoted
+            dplyr::filter(
+              !is.na(.data[[last_v]])
+            )
+
+          # for each variable in V1 and do a pivot_longer
+          df_q <- lapply(unique(df_q$V1),
+                         function(x) {
+                           df_q |>
+                             dplyr::filter(
+                               .data[["V1"]] == .env[["x"]]
+                             ) |>
+                             dplyr::select(
+                               -dplyr::all_of("V1")
+                             ) |>
+                             tidyr::pivot_longer(
+                               -dplyr::all_of(last_v),
+                               names_to = "col_index",
+                               values_to = x
+                             ) |>
+                             dplyr::rename(
+                               "Plate ID" = dplyr::all_of(last_v)
+                             )
+                         })
+
+          # left join all data frames from the list
+          df_q <- Reduce(function(df_1, df_2) {
+            dplyr::left_join(x = df_1,
+                             y = df_2,
+                             by = c("Plate ID", "col_index"),
+                             relationship = "one-to-one")
+          },
+          x = df_q)
+
+          df <- df |>
+            dplyr::filter(
+              is.na(.data[[last_v]])
+            ) |>
+            dplyr::select(
+              -dplyr::all_of(last_v)
+            )
+
+        }
+
+        # df without plates
+        df_t <- t(df)
+        colnames(df_t) <- df_t[1L, ]
+        df_t <- df_t |>
+          dplyr::as_tibble(rownames = "col_index") |>
+          dplyr::mutate(
+            col_index = dplyr::if_else(.data[["col_index"]] == "V1",
+                                       "col_index", .data[["col_index"]])
+          ) |>
+          dplyr::slice(
+            2L:dplyr::n()
+          )
+
+        # merge if needed
+        if (exists("df_q")) {
+          df_t <- dplyr::left_join(
+            x = df_t,
+            y = df_q,
+            by = "col_index",
+            relationship = "one-to-many"
+          )
+        }
+
+        df_t <- df_t |>
+          dplyr::select(
+            order(colnames(df_t))
+          )
+
+        # order columns on df_b
+        df_b <- df_b |>
+          dplyr::select(
+            order(colnames(df_b))
+          )
+
+        # check that dfs are identical to function output ----
+
+        expect_identical(
+          object = df_b,
+          expected = df_t
+        )
+
+      }
+    )
+
+  }
+)
+
+test_that(
+  "read_npx_wide_top_split - Flex/Focus - works single panel file",
+  {
+    ## NPX ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df_bottom ----
+        n_plates <- 1L
+        n_panel <- 1L
+        n_assay <- 33L
+        data_t <- "NPX"
+        last_v <- paste0("V", n_assay * n_panel + 2)
+
+        if (data_t == "NPX") {
+          # df_dt ----
+          df_dt <- matrix(
+            data = rnorm(n = (n_panel * n_assay)),
+            nrow = 1L,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              "LOD",
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::mutate(dplyr::across(dplyr::everything(),
+                                        ~ as.character(.x)))
+        } else if (data_t == "Quantified") {
+          # df_rep("Assay warning","Lowest quantifiable level","Plate LOD") ----
+          df_rep <- matrix(
+            data = sample(x = c("Pass", "Warn"),
+                          size = (n_plates * n_panel * n_assay),
+                          replace = TRUE),
+            nrow = n_plates,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              rep(x = "Assay warning", times = n_plates),
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::mutate({{last_v}} := paste("Plate", seq_len(n_plates))) |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_plates * n_panel * n_assay)),
+                nrow = n_plates,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  rep(x = "Lowest quantifiable level", times = n_plates),
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1") |>
+                dplyr::mutate({{last_v}} := paste("Plate",
+                                                  seq_len(n_plates))) |>
+                dplyr::mutate(dplyr::across(dplyr::everything(),
+                                            ~ as.character(.x)))
+            ) |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_plates * n_panel * n_assay)),
+                nrow = n_plates,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  rep(x = "Plate LOD", times = n_plates),
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1") |>
+                dplyr::mutate({{last_v}} := paste("Plate",
+                                                  seq_len(n_plates))) |>
+                dplyr::mutate(dplyr::across(dplyr::everything(),
+                                            ~ as.character(.x)))
+            )
+
+          # df_spec ("LLOQ", "ULOQ")----
+          df_spec <- matrix(
+            data = rnorm(n = (n_panel * n_assay)),
+            nrow = 1L,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              "LLOQ",
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_panel * n_assay)),
+                nrow = 1L,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  "ULOQ",
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1")
+            ) |>
+            dplyr::mutate(dplyr::across(dplyr::everything(),
+                                        ~ as.character(.x)))
+
+          # df_df ----
+
+          df_dt <- dplyr::bind_rows(df_rep, df_spec)
+
+        }
+
+        # df shared ("Missing Data freq.", "Normalization") ----
+        df_shared <- matrix(
+          data = rnorm(n = (n_panel * n_assay)),
+          nrow = 1L,
+          ncol = (n_assay * n_panel),
+          dimnames = list(
+            "Missing Data freq.",
+            paste0("V", 2L:((n_assay * n_panel) + 1L))
+          )
+        ) |>
+          dplyr::as_tibble(rownames = "V1") |>
+          dplyr::mutate(dplyr::across(dplyr::everything(),
+                                      ~ as.character(.x))) |>
+          dplyr::bind_rows(
+            matrix(
+              data = rep(x = "Intensity", times = (n_panel * n_assay)),
+              nrow = 1L,
+              ncol = (n_assay * n_panel),
+              dimnames = list(
+                "Normalization",
+                paste0("V", 2L:((n_assay * n_panel) + 1L))
+              )
+            ) |>
+              dplyr::as_tibble(rownames = "V1")
+          )
+
+        # df ----
+
+        df <- dplyr::bind_rows(df_dt, df_shared)
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # run function ----
+
+        expect_no_condition(
+          object = df_b <- read_npx_wide_bottom_t(df = df,
+                                                  file = wide_excel,
+                                                  data_type = data_t,
+                                                  col_split = last_v)
+        )
+
+        # modify df so that we can test output ----
+
+        # df with plates
+        if (last_v %in% colnames(df) && data_t == "Quantified") {
+          # if it is Quantified data
+          df_q <- df |>
+            # keep only rows to be pivoted
+            dplyr::filter(
+              !is.na(.data[[last_v]])
+            )
+
+          # for each variable in V1 and do a pivot_longer
+          df_q <- lapply(unique(df_q$V1),
+                         function(x) {
+                           df_q |>
+                             dplyr::filter(
+                               .data[["V1"]] == .env[["x"]]
+                             ) |>
+                             dplyr::select(
+                               -dplyr::all_of("V1")
+                             ) |>
+                             tidyr::pivot_longer(
+                               -dplyr::all_of(last_v),
+                               names_to = "col_index",
+                               values_to = x
+                             ) |>
+                             dplyr::rename(
+                               "Plate ID" = dplyr::all_of(last_v)
+                             )
+                         })
+
+          # left join all data frames from the list
+          df_q <- Reduce(function(df_1, df_2) {
+            dplyr::left_join(x = df_1,
+                             y = df_2,
+                             by = c("Plate ID", "col_index"),
+                             relationship = "one-to-one")
+          },
+          x = df_q)
+
+          df <- df |>
+            dplyr::filter(
+              is.na(.data[[last_v]])
+            ) |>
+            dplyr::select(
+              -dplyr::all_of(last_v)
+            )
+
+        }
+
+        # df without plates
+        df_t <- t(df)
+        colnames(df_t) <- df_t[1L, ]
+        df_t <- df_t |>
+          dplyr::as_tibble(rownames = "col_index") |>
+          dplyr::mutate(
+            col_index = dplyr::if_else(.data[["col_index"]] == "V1",
+                                       "col_index", .data[["col_index"]])
+          ) |>
+          dplyr::slice(
+            2L:dplyr::n()
+          )
+
+        # merge if needed
+        if (exists("df_q")) {
+          df_t <- dplyr::left_join(
+            x = df_t,
+            y = df_q,
+            by = "col_index",
+            relationship = "one-to-many"
+          )
+        }
+
+        df_t <- df_t |>
+          dplyr::select(
+            order(colnames(df_t))
+          )
+
+        # order columns on df_b
+        df_b <- df_b |>
+          dplyr::select(
+            order(colnames(df_b))
+          )
+
+        # check that dfs are identical to function output ----
+
+        expect_identical(
+          object = df_b,
+          expected = df_t
+        )
+
+      }
+    )
+
+    ## Quantified ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df_bottom ----
+        n_plates <- 1L
+        n_panel <- 1L
+        n_assay <- 33L
+        data_t <- "Quantified"
+        last_v <- paste0("V", n_assay * n_panel + 2)
+
+        if (data_t == "NPX") {
+          # df_dt ----
+          df_dt <- matrix(
+            data = rnorm(n = (n_panel * n_assay)),
+            nrow = 1L,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              "LOD",
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::mutate(dplyr::across(dplyr::everything(),
+                                        ~ as.character(.x)))
+        } else if (data_t == "Quantified") {
+          # df_rep("Assay warning","Lowest quantifiable level","Plate LOD") ----
+          df_rep <- matrix(
+            data = sample(x = c("Pass", "Warn"),
+                          size = (n_plates * n_panel * n_assay),
+                          replace = TRUE),
+            nrow = n_plates,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              rep(x = "Assay warning", times = n_plates),
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::mutate({{last_v}} := paste("Plate", seq_len(n_plates))) |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_plates * n_panel * n_assay)),
+                nrow = n_plates,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  rep(x = "Lowest quantifiable level", times = n_plates),
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1") |>
+                dplyr::mutate({{last_v}} := paste("Plate",
+                                                  seq_len(n_plates))) |>
+                dplyr::mutate(dplyr::across(dplyr::everything(),
+                                            ~ as.character(.x)))
+            ) |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_plates * n_panel * n_assay)),
+                nrow = n_plates,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  rep(x = "Plate LOD", times = n_plates),
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1") |>
+                dplyr::mutate({{last_v}} := paste("Plate",
+                                                  seq_len(n_plates))) |>
+                dplyr::mutate(dplyr::across(dplyr::everything(),
+                                            ~ as.character(.x)))
+            )
+
+          # df_spec ("LLOQ", "ULOQ")----
+          df_spec <- matrix(
+            data = rnorm(n = (n_panel * n_assay)),
+            nrow = 1L,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              "LLOQ",
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_panel * n_assay)),
+                nrow = 1L,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  "ULOQ",
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1")
+            ) |>
+            dplyr::mutate(dplyr::across(dplyr::everything(),
+                                        ~ as.character(.x)))
+
+          # df_df ----
+
+          df_dt <- dplyr::bind_rows(df_rep, df_spec)
+
+        }
+
+        # df shared ("Missing Data freq.", "Normalization") ----
+        df_shared <- matrix(
+          data = rnorm(n = (n_panel * n_assay)),
+          nrow = 1L,
+          ncol = (n_assay * n_panel),
+          dimnames = list(
+            "Missing Data freq.",
+            paste0("V", 2L:((n_assay * n_panel) + 1L))
+          )
+        ) |>
+          dplyr::as_tibble(rownames = "V1") |>
+          dplyr::mutate(dplyr::across(dplyr::everything(),
+                                      ~ as.character(.x))) |>
+          dplyr::bind_rows(
+            matrix(
+              data = rep(x = "Intensity", times = (n_panel * n_assay)),
+              nrow = 1L,
+              ncol = (n_assay * n_panel),
+              dimnames = list(
+                "Normalization",
+                paste0("V", 2L:((n_assay * n_panel) + 1L))
+              )
+            ) |>
+              dplyr::as_tibble(rownames = "V1")
+          )
+
+        # df ----
+
+        df <- dplyr::bind_rows(df_dt, df_shared)
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # run function ----
+
+        expect_no_condition(
+          object = df_b <- read_npx_wide_bottom_t(df = df,
+                                                  file = wide_excel,
+                                                  data_type = data_t,
+                                                  col_split = last_v)
+        )
+
+        # modify df so that we can test output ----
+
+        # df with plates
+        if (last_v %in% colnames(df) && data_t == "Quantified") {
+          # if it is Quantified data
+          df_q <- df |>
+            # keep only rows to be pivoted
+            dplyr::filter(
+              !is.na(.data[[last_v]])
+            )
+
+          # for each variable in V1 and do a pivot_longer
+          df_q <- lapply(unique(df_q$V1),
+                         function(x) {
+                           df_q |>
+                             dplyr::filter(
+                               .data[["V1"]] == .env[["x"]]
+                             ) |>
+                             dplyr::select(
+                               -dplyr::all_of("V1")
+                             ) |>
+                             tidyr::pivot_longer(
+                               -dplyr::all_of(last_v),
+                               names_to = "col_index",
+                               values_to = x
+                             ) |>
+                             dplyr::rename(
+                               "Plate ID" = dplyr::all_of(last_v)
+                             )
+                         })
+
+          # left join all data frames from the list
+          df_q <- Reduce(function(df_1, df_2) {
+            dplyr::left_join(x = df_1,
+                             y = df_2,
+                             by = c("Plate ID", "col_index"),
+                             relationship = "one-to-one")
+          },
+          x = df_q)
+
+          df <- df |>
+            dplyr::filter(
+              is.na(.data[[last_v]])
+            ) |>
+            dplyr::select(
+              -dplyr::all_of(last_v)
+            )
+
+        }
+
+        # df without plates
+        df_t <- t(df)
+        colnames(df_t) <- df_t[1L, ]
+        df_t <- df_t |>
+          dplyr::as_tibble(rownames = "col_index") |>
+          dplyr::mutate(
+            col_index = dplyr::if_else(.data[["col_index"]] == "V1",
+                                       "col_index", .data[["col_index"]])
+          ) |>
+          dplyr::slice(
+            2L:dplyr::n()
+          )
+
+        # merge if needed
+        if (exists("df_q")) {
+          df_t <- dplyr::left_join(
+            x = df_t,
+            y = df_q,
+            by = "col_index",
+            relationship = "one-to-many"
+          )
+        }
+
+        df_t <- df_t |>
+          dplyr::select(
+            order(colnames(df_t))
+          )
+
+        # order columns on df_b
+        df_b <- df_b |>
+          dplyr::select(
+            order(colnames(df_b))
+          )
+
+        # check that dfs are identical to function output ----
+
+        expect_identical(
+          object = df_b,
+          expected = df_t
+        )
+
+      }
+    )
+
+  }
+)
+
+test_that(
+  "read_npx_wide_top_split - Flex/Focus - works multi panel & multi plate file",
+  {
+    ## NPX ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df_bottom ----
+        n_plates <- 2L
+        n_panel <- 4L
+        n_assay <- 21L
+        data_t <- "NPX"
+        last_v <- paste0("V", n_assay * n_panel + 2)
+
+        if (data_t == "NPX") {
+          # df_dt ----
+          df_dt <- matrix(
+            data = rnorm(n = (n_panel * n_assay)),
+            nrow = 1L,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              "LOD",
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::mutate(dplyr::across(dplyr::everything(),
+                                        ~ as.character(.x)))
+        } else if (data_t == "Quantified") {
+          # df_rep("Assay warning","Lowest quantifiable level","Plate LOD") ----
+          df_rep <- matrix(
+            data = sample(x = c("Pass", "Warn"),
+                          size = (n_plates * n_panel * n_assay),
+                          replace = TRUE),
+            nrow = n_plates,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              rep(x = "Assay warning", times = n_plates),
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::mutate({{last_v}} := paste("Plate", seq_len(n_plates))) |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_plates * n_panel * n_assay)),
+                nrow = n_plates,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  rep(x = "Lowest quantifiable level", times = n_plates),
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1") |>
+                dplyr::mutate({{last_v}} := paste("Plate",
+                                                  seq_len(n_plates))) |>
+                dplyr::mutate(dplyr::across(dplyr::everything(),
+                                            ~ as.character(.x)))
+            ) |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_plates * n_panel * n_assay)),
+                nrow = n_plates,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  rep(x = "Plate LOD", times = n_plates),
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1") |>
+                dplyr::mutate({{last_v}} := paste("Plate",
+                                                  seq_len(n_plates))) |>
+                dplyr::mutate(dplyr::across(dplyr::everything(),
+                                            ~ as.character(.x)))
+            )
+
+          # df_spec ("LLOQ", "ULOQ")----
+          df_spec <- matrix(
+            data = rnorm(n = (n_panel * n_assay)),
+            nrow = 1L,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              "LLOQ",
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_panel * n_assay)),
+                nrow = 1L,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  "ULOQ",
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1")
+            ) |>
+            dplyr::mutate(dplyr::across(dplyr::everything(),
+                                        ~ as.character(.x)))
+
+          # df_df ----
+
+          df_dt <- dplyr::bind_rows(df_rep, df_spec)
+
+        }
+
+        # df shared ("Missing Data freq.", "Normalization") ----
+        df_shared <- matrix(
+          data = rnorm(n = (n_panel * n_assay)),
+          nrow = 1L,
+          ncol = (n_assay * n_panel),
+          dimnames = list(
+            "Missing Data freq.",
+            paste0("V", 2L:((n_assay * n_panel) + 1L))
+          )
+        ) |>
+          dplyr::as_tibble(rownames = "V1") |>
+          dplyr::mutate(dplyr::across(dplyr::everything(),
+                                      ~ as.character(.x))) |>
+          dplyr::bind_rows(
+            matrix(
+              data = rep(x = "Intensity", times = (n_panel * n_assay)),
+              nrow = 1L,
+              ncol = (n_assay * n_panel),
+              dimnames = list(
+                "Normalization",
+                paste0("V", 2L:((n_assay * n_panel) + 1L))
+              )
+            ) |>
+              dplyr::as_tibble(rownames = "V1")
+          )
+
+        # df ----
+
+        df <- dplyr::bind_rows(df_dt, df_shared)
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # run function ----
+
+        expect_no_condition(
+          object = df_b <- read_npx_wide_bottom_t(df = df,
+                                                  file = wide_excel,
+                                                  data_type = data_t,
+                                                  col_split = last_v)
+        )
+
+        # modify df so that we can test output ----
+
+        # df with plates
+        if (last_v %in% colnames(df) && data_t == "Quantified") {
+          # if it is Quantified data
+          df_q <- df |>
+            # keep only rows to be pivoted
+            dplyr::filter(
+              !is.na(.data[[last_v]])
+            )
+
+          # for each variable in V1 and do a pivot_longer
+          df_q <- lapply(unique(df_q$V1),
+                         function(x) {
+                           df_q |>
+                             dplyr::filter(
+                               .data[["V1"]] == .env[["x"]]
+                             ) |>
+                             dplyr::select(
+                               -dplyr::all_of("V1")
+                             ) |>
+                             tidyr::pivot_longer(
+                               -dplyr::all_of(last_v),
+                               names_to = "col_index",
+                               values_to = x
+                             ) |>
+                             dplyr::rename(
+                               "Plate ID" = dplyr::all_of(last_v)
+                             )
+                         })
+
+          # left join all data frames from the list
+          df_q <- Reduce(function(df_1, df_2) {
+            dplyr::left_join(x = df_1,
+                             y = df_2,
+                             by = c("Plate ID", "col_index"),
+                             relationship = "one-to-one")
+          },
+          x = df_q)
+
+          df <- df |>
+            dplyr::filter(
+              is.na(.data[[last_v]])
+            ) |>
+            dplyr::select(
+              -dplyr::all_of(last_v)
+            )
+
+        }
+
+        # df without plates
+        df_t <- t(df)
+        colnames(df_t) <- df_t[1L, ]
+        df_t <- df_t |>
+          dplyr::as_tibble(rownames = "col_index") |>
+          dplyr::mutate(
+            col_index = dplyr::if_else(.data[["col_index"]] == "V1",
+                                       "col_index", .data[["col_index"]])
+          ) |>
+          dplyr::slice(
+            2L:dplyr::n()
+          )
+
+        # merge if needed
+        if (exists("df_q")) {
+          df_t <- dplyr::left_join(
+            x = df_t,
+            y = df_q,
+            by = "col_index",
+            relationship = "one-to-many"
+          )
+        }
+
+        df_t <- df_t |>
+          dplyr::select(
+            order(colnames(df_t))
+          )
+
+        # order columns on df_b
+        df_b <- df_b |>
+          dplyr::select(
+            order(colnames(df_b))
+          )
+
+        # check that dfs are identical to function output ----
+
+        expect_identical(
+          object = df_b,
+          expected = df_t
+        )
+
+      }
+    )
+
+    ## Quantified ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df_bottom ----
+        n_plates <- 2L
+        n_panel <- 4L
+        n_assay <- 21L
+        data_t <- "Quantified"
+        last_v <- paste0("V", n_assay * n_panel + 2)
+
+        if (data_t == "NPX") {
+          # df_dt ----
+          df_dt <- matrix(
+            data = rnorm(n = (n_panel * n_assay)),
+            nrow = 1L,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              "LOD",
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::mutate(dplyr::across(dplyr::everything(),
+                                        ~ as.character(.x)))
+        } else if (data_t == "Quantified") {
+          # df_rep("Assay warning","Lowest quantifiable level","Plate LOD") ----
+          df_rep <- matrix(
+            data = sample(x = c("Pass", "Warn"),
+                          size = (n_plates * n_panel * n_assay),
+                          replace = TRUE),
+            nrow = n_plates,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              rep(x = "Assay warning", times = n_plates),
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::mutate({{last_v}} := paste("Plate", seq_len(n_plates))) |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_plates * n_panel * n_assay)),
+                nrow = n_plates,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  rep(x = "Lowest quantifiable level", times = n_plates),
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1") |>
+                dplyr::mutate({{last_v}} := paste("Plate",
+                                                  seq_len(n_plates))) |>
+                dplyr::mutate(dplyr::across(dplyr::everything(),
+                                            ~ as.character(.x)))
+            ) |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_plates * n_panel * n_assay)),
+                nrow = n_plates,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  rep(x = "Plate LOD", times = n_plates),
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1") |>
+                dplyr::mutate({{last_v}} := paste("Plate",
+                                                  seq_len(n_plates))) |>
+                dplyr::mutate(dplyr::across(dplyr::everything(),
+                                            ~ as.character(.x)))
+            )
+
+          # df_spec ("LLOQ", "ULOQ")----
+          df_spec <- matrix(
+            data = rnorm(n = (n_panel * n_assay)),
+            nrow = 1L,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              "LLOQ",
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_panel * n_assay)),
+                nrow = 1L,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  "ULOQ",
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1")
+            ) |>
+            dplyr::mutate(dplyr::across(dplyr::everything(),
+                                        ~ as.character(.x)))
+
+          # df_df ----
+
+          df_dt <- dplyr::bind_rows(df_rep, df_spec)
+
+        }
+
+        # df shared ("Missing Data freq.", "Normalization") ----
+        df_shared <- matrix(
+          data = rnorm(n = (n_panel * n_assay)),
+          nrow = 1L,
+          ncol = (n_assay * n_panel),
+          dimnames = list(
+            "Missing Data freq.",
+            paste0("V", 2L:((n_assay * n_panel) + 1L))
+          )
+        ) |>
+          dplyr::as_tibble(rownames = "V1") |>
+          dplyr::mutate(dplyr::across(dplyr::everything(),
+                                      ~ as.character(.x))) |>
+          dplyr::bind_rows(
+            matrix(
+              data = rep(x = "Intensity", times = (n_panel * n_assay)),
+              nrow = 1L,
+              ncol = (n_assay * n_panel),
+              dimnames = list(
+                "Normalization",
+                paste0("V", 2L:((n_assay * n_panel) + 1L))
+              )
+            ) |>
+              dplyr::as_tibble(rownames = "V1")
+          )
+
+        # df ----
+
+        df <- dplyr::bind_rows(df_dt, df_shared)
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # run function ----
+
+        expect_no_condition(
+          object = df_b <- read_npx_wide_bottom_t(df = df,
+                                                  file = wide_excel,
+                                                  data_type = data_t,
+                                                  col_split = last_v)
+        )
+
+        # modify df so that we can test output ----
+
+        # df with plates
+        if (last_v %in% colnames(df) && data_t == "Quantified") {
+          # if it is Quantified data
+          df_q <- df |>
+            # keep only rows to be pivoted
+            dplyr::filter(
+              !is.na(.data[[last_v]])
+            )
+
+          # for each variable in V1 and do a pivot_longer
+          df_q <- lapply(unique(df_q$V1),
+                         function(x) {
+                           df_q |>
+                             dplyr::filter(
+                               .data[["V1"]] == .env[["x"]]
+                             ) |>
+                             dplyr::select(
+                               -dplyr::all_of("V1")
+                             ) |>
+                             tidyr::pivot_longer(
+                               -dplyr::all_of(last_v),
+                               names_to = "col_index",
+                               values_to = x
+                             ) |>
+                             dplyr::rename(
+                               "Plate ID" = dplyr::all_of(last_v)
+                             )
+                         })
+
+          # left join all data frames from the list
+          df_q <- Reduce(function(df_1, df_2) {
+            dplyr::left_join(x = df_1,
+                             y = df_2,
+                             by = c("Plate ID", "col_index"),
+                             relationship = "one-to-one")
+          },
+          x = df_q)
+
+          df <- df |>
+            dplyr::filter(
+              is.na(.data[[last_v]])
+            ) |>
+            dplyr::select(
+              -dplyr::all_of(last_v)
+            )
+
+        }
+
+        # df without plates
+        df_t <- t(df)
+        colnames(df_t) <- df_t[1L, ]
+        df_t <- df_t |>
+          dplyr::as_tibble(rownames = "col_index") |>
+          dplyr::mutate(
+            col_index = dplyr::if_else(.data[["col_index"]] == "V1",
+                                       "col_index", .data[["col_index"]])
+          ) |>
+          dplyr::slice(
+            2L:dplyr::n()
+          )
+
+        # merge if needed
+        if (exists("df_q")) {
+          df_t <- dplyr::left_join(
+            x = df_t,
+            y = df_q,
+            by = "col_index",
+            relationship = "one-to-many"
+          )
+        }
+
+        df_t <- df_t |>
+          dplyr::select(
+            order(colnames(df_t))
+          )
+
+        # order columns on df_b
+        df_b <- df_b |>
+          dplyr::select(
+            order(colnames(df_b))
+          )
+
+        # check that dfs are identical to function output ----
+
+        expect_identical(
+          object = df_b,
+          expected = df_t
+        )
+
+      }
+    )
+
+  }
+)
+
+test_that(
+  "read_npx_wide_top_split - T48 - error for Ct",
+  {
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df_bottom ----
+        n_plates <- 1L
+        n_panel <- 1L
+        n_assay <- 45L
+        data_t <- "NPX"
+        last_v <- paste0("V", n_assay * n_panel + 2)
+
+        if (data_t == "NPX") {
+          # df_dt ----
+          df_dt <- matrix(
+            data = rnorm(n = (n_panel * n_assay)),
+            nrow = 1L,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              "LOD",
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::mutate(dplyr::across(dplyr::everything(),
+                                        ~ as.character(.x)))
+        } else if (data_t == "Quantified") {
+          # df_rep("Assay warning","Lowest quantifiable level","Plate LOD") ----
+          df_rep <- matrix(
+            data = sample(x = c("Pass", "Warn"),
+                          size = (n_plates * n_panel * n_assay),
+                          replace = TRUE),
+            nrow = n_plates,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              rep(x = "Assay warning", times = n_plates),
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::mutate({{last_v}} := paste("Plate", seq_len(n_plates))) |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_plates * n_panel * n_assay)),
+                nrow = n_plates,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  rep(x = "Lowest quantifiable level", times = n_plates),
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1") |>
+                dplyr::mutate({{last_v}} := paste("Plate",
+                                                  seq_len(n_plates))) |>
+                dplyr::mutate(dplyr::across(dplyr::everything(),
+                                            ~ as.character(.x)))
+            ) |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_plates * n_panel * n_assay)),
+                nrow = n_plates,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  rep(x = "Plate LOD", times = n_plates),
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1") |>
+                dplyr::mutate({{last_v}} := paste("Plate",
+                                                  seq_len(n_plates))) |>
+                dplyr::mutate(dplyr::across(dplyr::everything(),
+                                            ~ as.character(.x)))
+            )
+
+          # df_spec ("LLOQ", "ULOQ")----
+          df_spec <- matrix(
+            data = rnorm(n = (n_panel * n_assay)),
+            nrow = 1L,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              "LLOQ",
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_panel * n_assay)),
+                nrow = 1L,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  "ULOQ",
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1")
+            ) |>
+            dplyr::mutate(dplyr::across(dplyr::everything(),
+                                        ~ as.character(.x)))
+
+          # df_df ----
+
+          df_dt <- dplyr::bind_rows(df_rep, df_spec)
+
+        }
+
+        # df shared ("Missing Data freq.", "Normalization") ----
+        df_shared <- matrix(
+          data = rnorm(n = (n_panel * n_assay)),
+          nrow = 1L,
+          ncol = (n_assay * n_panel),
+          dimnames = list(
+            "Missing Data freq.",
+            paste0("V", 2L:((n_assay * n_panel) + 1L))
+          )
+        ) |>
+          dplyr::as_tibble(rownames = "V1") |>
+          dplyr::mutate(dplyr::across(dplyr::everything(),
+                                      ~ as.character(.x))) |>
+          dplyr::bind_rows(
+            matrix(
+              data = rep(x = "Intensity", times = (n_panel * n_assay)),
+              nrow = 1L,
+              ncol = (n_assay * n_panel),
+              dimnames = list(
+                "Normalization",
+                paste0("V", 2L:((n_assay * n_panel) + 1L))
+              )
+            ) |>
+              dplyr::as_tibble(rownames = "V1")
+          )
+
+        # df ----
+
+        df <- dplyr::bind_rows(df_dt, df_shared)
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # run function ----
+
+        expect_error(
+          object = read_npx_wide_bottom_t(df = df,
+                                          file = wide_excel,
+                                          data_type = "Ct",
+                                          col_split = last_v),
+          regexp = "contains a bottom matrix. Files with"
+        )
+
+      }
+    )
+
+  }
+)
+
+test_that(
+  "read_npx_wide_top_split - T48 - error for unexpected values in V1",
+  {
+    ## NPX ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df_bottom ----
+        n_plates <- 1L
+        n_panel <- 1L
+        n_assay <- 45L
+        data_t <- "NPX"
+        last_v <- paste0("V", n_assay * n_panel + 2)
+
+        if (data_t == "NPX") {
+          # df_dt ----
+          df_dt <- matrix(
+            data = rnorm(n = (n_panel * n_assay)),
+            nrow = 1L,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              "LOD2",
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::mutate(dplyr::across(dplyr::everything(),
+                                        ~ as.character(.x)))
+        } else if (data_t == "Quantified") {
+          # df_rep("Assay warning","Lowest quantifiable level","Plate LOD") ----
+          df_rep <- matrix(
+            data = sample(x = c("Pass", "Warn"),
+                          size = (n_plates * n_panel * n_assay),
+                          replace = TRUE),
+            nrow = n_plates,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              rep(x = "Assay warning", times = n_plates),
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::mutate({{last_v}} := paste("Plate", seq_len(n_plates))) |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_plates * n_panel * n_assay)),
+                nrow = n_plates,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  rep(x = "Lowest quantifiable level", times = n_plates),
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1") |>
+                dplyr::mutate({{last_v}} := paste("Plate",
+                                                  seq_len(n_plates))) |>
+                dplyr::mutate(dplyr::across(dplyr::everything(),
+                                            ~ as.character(.x)))
+            ) |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_plates * n_panel * n_assay)),
+                nrow = n_plates,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  rep(x = "Plate LOD", times = n_plates),
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1") |>
+                dplyr::mutate({{last_v}} := paste("Plate",
+                                                  seq_len(n_plates))) |>
+                dplyr::mutate(dplyr::across(dplyr::everything(),
+                                            ~ as.character(.x)))
+            )
+
+          # df_spec ("LLOQ", "ULOQ")----
+          df_spec <- matrix(
+            data = rnorm(n = (n_panel * n_assay)),
+            nrow = 1L,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              "LLOQ",
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_panel * n_assay)),
+                nrow = 1L,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  "ULOQ",
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1")
+            ) |>
+            dplyr::mutate(dplyr::across(dplyr::everything(),
+                                        ~ as.character(.x)))
+
+          # df_df ----
+
+          df_dt <- dplyr::bind_rows(df_rep, df_spec)
+
+        }
+
+        # df shared ("Missing Data freq.", "Normalization") ----
+        df_shared <- matrix(
+          data = rnorm(n = (n_panel * n_assay)),
+          nrow = 1L,
+          ncol = (n_assay * n_panel),
+          dimnames = list(
+            "Missing Data freq.",
+            paste0("V", 2L:((n_assay * n_panel) + 1L))
+          )
+        ) |>
+          dplyr::as_tibble(rownames = "V1") |>
+          dplyr::mutate(dplyr::across(dplyr::everything(),
+                                      ~ as.character(.x))) |>
+          dplyr::bind_rows(
+            matrix(
+              data = rep(x = "Intensity", times = (n_panel * n_assay)),
+              nrow = 1L,
+              ncol = (n_assay * n_panel),
+              dimnames = list(
+                "Normalization",
+                paste0("V", 2L:((n_assay * n_panel) + 1L))
+              )
+            ) |>
+              dplyr::as_tibble(rownames = "V1")
+          )
+
+        # df ----
+
+        df <- dplyr::bind_rows(df_dt, df_shared)
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # run function ----
+
+        expect_error(
+          object = read_npx_wide_bottom_t(df = df,
+                                          file = wide_excel,
+                                          data_type = data_t,
+                                          col_split = last_v),
+          regexp = "Column 1 of the bottom matrix with assay metadata in file"
+        )
+
+      }
+    )
+
+    ## Quantified ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df_bottom ----
+        n_plates <- 1L
+        n_panel <- 1L
+        n_assay <- 45L
+        data_t <- "Quantified"
+        last_v <- paste0("V", n_assay * n_panel + 2)
+
+        if (data_t == "NPX") {
+          # df_dt ----
+          df_dt <- matrix(
+            data = rnorm(n = (n_panel * n_assay)),
+            nrow = 1L,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              "LOD",
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::mutate(dplyr::across(dplyr::everything(),
+                                        ~ as.character(.x)))
+        } else if (data_t == "Quantified") {
+          # df_rep("Assay warning","Lowest quantifiable level","Plate LOD") ----
+          df_rep <- matrix(
+            data = sample(x = c("Pass", "Warn"),
+                          size = (n_plates * n_panel * n_assay),
+                          replace = TRUE),
+            nrow = n_plates,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              rep(x = "Assay warning", times = n_plates),
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::mutate({{last_v}} := paste("Plate", seq_len(n_plates))) |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_plates * n_panel * n_assay)),
+                nrow = n_plates,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  rep(x = "Lowest quantifiable level", times = n_plates),
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1") |>
+                dplyr::mutate({{last_v}} := paste("Plate",
+                                                  seq_len(n_plates))) |>
+                dplyr::mutate(dplyr::across(dplyr::everything(),
+                                            ~ as.character(.x)))
+            ) |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_plates * n_panel * n_assay)),
+                nrow = n_plates,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  rep(x = "Plate LOD", times = n_plates),
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1") |>
+                dplyr::mutate({{last_v}} := paste("Plate",
+                                                  seq_len(n_plates))) |>
+                dplyr::mutate(dplyr::across(dplyr::everything(),
+                                            ~ as.character(.x)))
+            )
+
+          # df_spec ("LLOQ", "ULOQ")----
+          df_spec <- matrix(
+            data = rnorm(n = (n_panel * n_assay)),
+            nrow = 1L,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              "LLOQ",
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_panel * n_assay)),
+                nrow = 1L,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  "ULOQ",
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1")
+            ) |>
+            dplyr::mutate(dplyr::across(dplyr::everything(),
+                                        ~ as.character(.x)))
+
+          # df_df ----
+
+          df_dt <- dplyr::bind_rows(df_rep, df_spec)
+
+        }
+
+        # df shared ("Missing Data freq.", "Normalization") ----
+        df_shared <- matrix(
+          data = rnorm(n = (n_panel * n_assay)),
+          nrow = 1L,
+          ncol = (n_assay * n_panel),
+          dimnames = list(
+            "I_am_Unexpected",
+            paste0("V", 2L:((n_assay * n_panel) + 1L))
+          )
+        ) |>
+          dplyr::as_tibble(rownames = "V1") |>
+          dplyr::mutate(dplyr::across(dplyr::everything(),
+                                      ~ as.character(.x))) |>
+          dplyr::bind_rows(
+            matrix(
+              data = rep(x = "Intensity", times = (n_panel * n_assay)),
+              nrow = 1L,
+              ncol = (n_assay * n_panel),
+              dimnames = list(
+                "Normalization",
+                paste0("V", 2L:((n_assay * n_panel) + 1L))
+              )
+            ) |>
+              dplyr::as_tibble(rownames = "V1")
+          )
+
+        # df ----
+
+        df <- dplyr::bind_rows(df_dt, df_shared)
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # run function ----
+
+        expect_error(
+          object = read_npx_wide_bottom_t(df = df,
+                                          file = wide_excel,
+                                          data_type = data_t,
+                                          col_split = last_v),
+          regexp = "Column 1 of the bottom matrix with assay metadata in file"
+        )
+
+      }
+    )
+
+  }
+)
+
+test_that(
+  "read_npx_wide_top_split - T48 - error unexpected number of columns",
+  {
+    ## NPX ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df_bottom ----
+        n_plates <- 1L
+        n_panel <- 1L
+        n_assay <- 45L
+        data_t <- "NPX"
+        last_v <- paste0("V", n_assay * n_panel + 2)
+
+        if (data_t == "NPX") {
+          # df_dt ----
+          df_dt <- matrix(
+            data = rnorm(n = (n_panel * n_assay)),
+            nrow = 1L,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              "LOD",
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::mutate(dplyr::across(dplyr::everything(),
+                                        ~ as.character(.x)))
+        } else if (data_t == "Quantified") {
+          # df_rep("Assay warning","Lowest quantifiable level","Plate LOD") ----
+          df_rep <- matrix(
+            data = sample(x = c("Pass", "Warn"),
+                          size = (n_plates * n_panel * n_assay),
+                          replace = TRUE),
+            nrow = n_plates,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              rep(x = "Assay warning", times = n_plates),
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::mutate({{last_v}} := paste("Plate", seq_len(n_plates))) |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_plates * n_panel * n_assay)),
+                nrow = n_plates,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  rep(x = "Lowest quantifiable level", times = n_plates),
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1") |>
+                dplyr::mutate({{last_v}} := paste("Plate",
+                                                  seq_len(n_plates))) |>
+                dplyr::mutate(dplyr::across(dplyr::everything(),
+                                            ~ as.character(.x)))
+            ) |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_plates * n_panel * n_assay)),
+                nrow = n_plates,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  rep(x = "Plate LOD", times = n_plates),
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1") |>
+                dplyr::mutate({{last_v}} := paste("Plate",
+                                                  seq_len(n_plates))) |>
+                dplyr::mutate(dplyr::across(dplyr::everything(),
+                                            ~ as.character(.x)))
+            )
+
+          # df_spec ("LLOQ", "ULOQ")----
+          df_spec <- matrix(
+            data = rnorm(n = (n_panel * n_assay)),
+            nrow = 1L,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              "LLOQ",
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_panel * n_assay)),
+                nrow = 1L,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  "ULOQ",
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1")
+            ) |>
+            dplyr::mutate(dplyr::across(dplyr::everything(),
+                                        ~ as.character(.x)))
+
+          # df_df ----
+
+          df_dt <- dplyr::bind_rows(df_rep, df_spec)
+
+        }
+
+        # df shared ("Missing Data freq.", "Normalization") ----
+        df_shared <- matrix(
+          data = rnorm(n = (n_panel * n_assay)),
+          nrow = 1L,
+          ncol = (n_assay * n_panel),
+          dimnames = list(
+            "Missing Data freq.",
+            paste0("V", 2L:((n_assay * n_panel) + 1L))
+          )
+        ) |>
+          dplyr::as_tibble(rownames = "V1") |>
+          dplyr::mutate(dplyr::across(dplyr::everything(),
+                                      ~ as.character(.x))) |>
+          dplyr::bind_rows(
+            matrix(
+              data = rep(x = "Intensity", times = (n_panel * n_assay)),
+              nrow = 1L,
+              ncol = (n_assay * n_panel),
+              dimnames = list(
+                "Normalization",
+                paste0("V", 2L:((n_assay * n_panel) + 1L))
+              )
+            ) |>
+              dplyr::as_tibble(rownames = "V1")
+          )
+
+        # df ----
+
+        df <- dplyr::bind_rows(df_dt, df_shared) |>
+          dplyr::mutate(
+            {{last_v}} := rep(x = "A", times = (nrow(df_dt) + nrow(df_shared)))
+          )
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # run function ----
+
+        expect_error(
+          object = read_npx_wide_bottom_t(df = df,
+                                          file = wide_excel,
+                                          data_type = data_t,
+                                          col_split = last_v),
+          regexp = "does not contain plate information"
+        )
+
+      }
+    )
+
+    ## Quantified ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df_bottom ----
+        n_plates <- 1L
+        n_panel <- 1L
+        n_assay <- 45L
+        data_t <- "Quantified"
+        last_v <- paste0("V", n_assay * n_panel + 2)
+
+        if (data_t == "NPX") {
+          # df_dt ----
+          df_dt <- matrix(
+            data = rnorm(n = (n_panel * n_assay)),
+            nrow = 1L,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              "LOD",
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::mutate(dplyr::across(dplyr::everything(),
+                                        ~ as.character(.x)))
+        } else if (data_t == "Quantified") {
+          # df_rep("Assay warning","Lowest quantifiable level","Plate LOD") ----
+          df_rep <- matrix(
+            data = sample(x = c("Pass", "Warn"),
+                          size = (n_plates * n_panel * n_assay),
+                          replace = TRUE),
+            nrow = n_plates,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              rep(x = "Assay warning", times = n_plates),
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::mutate({{last_v}} := paste("Plate", seq_len(n_plates))) |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_plates * n_panel * n_assay)),
+                nrow = n_plates,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  rep(x = "Lowest quantifiable level", times = n_plates),
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1") |>
+                dplyr::mutate({{last_v}} := paste("Plate",
+                                                  seq_len(n_plates))) |>
+                dplyr::mutate(dplyr::across(dplyr::everything(),
+                                            ~ as.character(.x)))
+            ) |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_plates * n_panel * n_assay)),
+                nrow = n_plates,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  rep(x = "Plate LOD", times = n_plates),
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1") |>
+                dplyr::mutate({{last_v}} := paste("Plate",
+                                                  seq_len(n_plates))) |>
+                dplyr::mutate(dplyr::across(dplyr::everything(),
+                                            ~ as.character(.x)))
+            )
+
+          # df_spec ("LLOQ", "ULOQ")----
+          df_spec <- matrix(
+            data = rnorm(n = (n_panel * n_assay)),
+            nrow = 1L,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              "LLOQ",
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_panel * n_assay)),
+                nrow = 1L,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  "ULOQ",
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1")
+            ) |>
+            dplyr::mutate(dplyr::across(dplyr::everything(),
+                                        ~ as.character(.x)))
+
+          # df_df ----
+
+          df_dt <- dplyr::bind_rows(df_rep, df_spec)
+
+        }
+
+        # df shared ("Missing Data freq.", "Normalization") ----
+        df_shared <- matrix(
+          data = rnorm(n = (n_panel * n_assay)),
+          nrow = 1L,
+          ncol = (n_assay * n_panel),
+          dimnames = list(
+            "Missing Data freq.",
+            paste0("V", 2L:((n_assay * n_panel) + 1L))
+          )
+        ) |>
+          dplyr::as_tibble(rownames = "V1") |>
+          dplyr::mutate(dplyr::across(dplyr::everything(),
+                                      ~ as.character(.x))) |>
+          dplyr::bind_rows(
+            matrix(
+              data = rep(x = "Intensity", times = (n_panel * n_assay)),
+              nrow = 1L,
+              ncol = (n_assay * n_panel),
+              dimnames = list(
+                "Normalization",
+                paste0("V", 2L:((n_assay * n_panel) + 1L))
+              )
+            ) |>
+              dplyr::as_tibble(rownames = "V1")
+          )
+
+        # df ----
+
+        df <- dplyr::bind_rows(df_dt, df_shared) |>
+          dplyr::select(
+            -dplyr::all_of(last_v)
+          )
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # run function ----
+
+        expect_error(
+          object = read_npx_wide_bottom_t(df = df,
+                                          file = wide_excel,
+                                          data_type = data_t,
+                                          col_split = last_v),
+          regexp = "does not contain plate information"
+        )
+
+      }
+    )
+
+  }
+)
+
+test_that(
+  "read_npx_wide_top_split - T48 - works with additonal all NA col",
+  {
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df_bottom ----
+        n_plates <- 1L
+        n_panel <- 1L
+        n_assay <- 45L
+        data_t <- "NPX"
+        last_v <- paste0("V", n_assay * n_panel + 2)
+
+        if (data_t == "NPX") {
+          # df_dt ----
+          df_dt <- matrix(
+            data = rnorm(n = (n_panel * n_assay)),
+            nrow = 1L,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              "LOD",
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::mutate(dplyr::across(dplyr::everything(),
+                                        ~ as.character(.x)))
+        } else if (data_t == "Quantified") {
+          # df_rep("Assay warning","Lowest quantifiable level","Plate LOD") ----
+          df_rep <- matrix(
+            data = sample(x = c("Pass", "Warn"),
+                          size = (n_plates * n_panel * n_assay),
+                          replace = TRUE),
+            nrow = n_plates,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              rep(x = "Assay warning", times = n_plates),
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::mutate({{last_v}} := paste("Plate", seq_len(n_plates))) |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_plates * n_panel * n_assay)),
+                nrow = n_plates,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  rep(x = "Lowest quantifiable level", times = n_plates),
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1") |>
+                dplyr::mutate({{last_v}} := paste("Plate",
+                                                  seq_len(n_plates))) |>
+                dplyr::mutate(dplyr::across(dplyr::everything(),
+                                            as.character(.x)))
+            ) |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_plates * n_panel * n_assay)),
+                nrow = n_plates,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  rep(x = "Plate LOD", times = n_plates),
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1") |>
+                dplyr::mutate({{last_v}} := paste("Plate",
+                                                  seq_len(n_plates))) |>
+                dplyr::mutate(dplyr::across(dplyr::everything(),
+                                            ~ as.character(.x)))
+            )
+
+          # df_spec ("LLOQ", "ULOQ")----
+          df_spec <- matrix(
+            data = rnorm(n = (n_panel * n_assay)),
+            nrow = 1L,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              "LLOQ",
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_panel * n_assay)),
+                nrow = 1L,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  "ULOQ",
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1")
+            ) |>
+            dplyr::mutate(dplyr::across(dplyr::everything(),
+                                        ~ as.character(.x)))
+
+          # df_df ----
+
+          df_dt <- dplyr::bind_rows(df_rep, df_spec)
+
+        }
+
+        # df shared ("Missing Data freq.", "Normalization") ----
+        df_shared <- matrix(
+          data = rnorm(n = (n_panel * n_assay)),
+          nrow = 1L,
+          ncol = (n_assay * n_panel),
+          dimnames = list(
+            "Missing Data freq.",
+            paste0("V", 2L:((n_assay * n_panel) + 1L))
+          )
+        ) |>
+          dplyr::as_tibble(rownames = "V1") |>
+          dplyr::mutate(dplyr::across(dplyr::everything(),
+                                      ~ as.character(.x))) |>
+          dplyr::bind_rows(
+            matrix(
+              data = rep(x = "Intensity", times = (n_panel * n_assay)),
+              nrow = 1L,
+              ncol = (n_assay * n_panel),
+              dimnames = list(
+                "Normalization",
+                paste0("V", 2L:((n_assay * n_panel) + 1L))
+              )
+            ) |>
+              dplyr::as_tibble(rownames = "V1")
+          )
+
+        # df ----
+
+        df <- dplyr::bind_rows(df_dt, df_shared) |>
+          dplyr::mutate(
+            {{last_v}} := rep(x = NA_character_,
+                              times = (nrow(df_dt) + nrow(df_shared)))
+          )
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # run function ----
+
+        expect_no_condition(
+          object = df_b <- read_npx_wide_bottom_t(df = df,
+                                                  file = wide_excel,
+                                                  data_type = data_t,
+                                                  col_split = last_v)
+        )
+
+        # modify df so that we can test output ----
+
+        # remove all NA columns
+        na_cols <- sapply(df, \(x) sum(is.na(x)) == nrow(df))
+        na_cols <- na_cols[na_cols == TRUE]
+        na_cols <- names(na_cols)
+
+        if (length(na_cols) > 0L) {
+          df <- df |>
+            dplyr::select(
+              -dplyr::all_of(na_cols)
+            )
+        }
+
+        # df with plates
+        if (last_v %in% colnames(df) && data_t == "Quantified") {
+          # if it is Quantified data
+          df_q <- df |>
+            # keep only rows to be pivoted
+            dplyr::filter(
+              !is.na(.data[[last_v]])
+            )
+
+          # for each variable in V1 and do a pivot_longer
+          df_q <- lapply(unique(df_q$V1),
+                         function(x) {
+                           df_q |>
+                             dplyr::filter(
+                               .data[["V1"]] == .env[["x"]]
+                             ) |>
+                             dplyr::select(
+                               -dplyr::all_of("V1")
+                             ) |>
+                             tidyr::pivot_longer(
+                               -dplyr::all_of(last_v),
+                               names_to = "col_index",
+                               values_to = x
+                             ) |>
+                             dplyr::rename(
+                               "Plate ID" = dplyr::all_of(last_v)
+                             )
+                         })
+
+          # left join all data frames from the list
+          df_q <- Reduce(function(df_1, df_2) {
+            dplyr::left_join(x = df_1,
+                             y = df_2,
+                             by = c("Plate ID", "col_index"),
+                             relationship = "one-to-one")
+          },
+          x = df_q)
+
+          df <- df |>
+            dplyr::filter(
+              is.na(.data[[last_v]])
+            ) |>
+            dplyr::select(
+              -dplyr::all_of(last_v)
+            )
+
+        }
+
+        # df without plates
+        df_t <- t(df)
+        colnames(df_t) <- df_t[1L, ]
+        df_t <- df_t |>
+          dplyr::as_tibble(rownames = "col_index") |>
+          dplyr::mutate(
+            col_index = dplyr::if_else(.data[["col_index"]] == "V1",
+                                       "col_index", .data[["col_index"]])
+          ) |>
+          dplyr::slice(
+            2L:dplyr::n()
+          )
+
+        # merge if needed
+        if (exists("df_q")) {
+          df_t <- dplyr::left_join(
+            x = df_t,
+            y = df_q,
+            by = "col_index",
+            relationship = "one-to-many"
+          )
+        }
+
+        df_t <- df_t |>
+          dplyr::select(
+            order(colnames(df_t))
+          )
+
+        # order columns on df_b
+        df_b <- df_b |>
+          dplyr::select(
+            order(colnames(df_b))
+          )
+
+        # check that dfs are identical to function output ----
+
+        expect_identical(
+          object = df_b,
+          expected = df_t
+        )
+
+      }
+    )
+
+  }
+)
+
+test_that(
+  "read_npx_wide_top_split - T48 - uneven number of columns for sub-matrices",
+  {
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df_bottom ----
+        n_plates <- 1L
+        n_panel <- 1L
+        n_assay <- 45L
+        data_t <- "Quantified"
+        last_v <- paste0("V", n_assay * n_panel + 2)
+
+        if (data_t == "NPX") {
+          # df_dt ----
+          df_dt <- matrix(
+            data = rnorm(n = (n_panel * n_assay)),
+            nrow = 1L,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              "LOD",
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::mutate(dplyr::across(dplyr::everything(),
+                                        ~ as.character(.x)))
+        } else if (data_t == "Quantified") {
+          # df_rep("Assay warning","Lowest quantifiable level","Plate LOD") ----
+          df_rep <- matrix(
+            data = sample(x = c("Pass", "Warn"),
+                          size = (n_plates * n_panel * n_assay),
+                          replace = TRUE),
+            nrow = n_plates,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              rep(x = "Assay warning", times = n_plates),
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::mutate({{last_v}} := paste("Plate", seq_len(n_plates))) |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_plates * n_panel * n_assay)),
+                nrow = n_plates,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  rep(x = "Lowest quantifiable level", times = n_plates),
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1") |>
+                dplyr::mutate({{last_v}} := paste("Plate",
+                                                  seq_len(n_plates))) |>
+                dplyr::mutate(dplyr::across(dplyr::everything(),
+                                            ~ as.character(.x)))
+            ) |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_plates * n_panel * n_assay)),
+                nrow = n_plates,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  rep(x = "Plate LOD", times = n_plates),
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1") |>
+                dplyr::mutate({{last_v}} := paste("Plate",
+                                                  seq_len(n_plates))) |>
+                dplyr::mutate(dplyr::across(dplyr::everything(),
+                                            ~ as.character(.x)))
+            )
+
+          # df_spec ("LLOQ", "ULOQ")----
+          df_spec <- matrix(
+            data = rnorm(n = (n_panel * n_assay)),
+            nrow = 1L,
+            ncol = (n_assay * n_panel),
+            dimnames = list(
+              "LLOQ",
+              paste0("V", 2L:((n_assay * n_panel) + 1L))
+            )
+          ) |>
+            dplyr::as_tibble(rownames = "V1") |>
+            dplyr::bind_rows(
+              matrix(
+                data = rnorm(n = (n_panel * n_assay)),
+                nrow = 1L,
+                ncol = (n_assay * n_panel),
+                dimnames = list(
+                  "ULOQ",
+                  paste0("V", 2L:((n_assay * n_panel) + 1L))
+                )
+              ) |>
+                dplyr::as_tibble(rownames = "V1")
+            ) |>
+            dplyr::mutate(dplyr::across(dplyr::everything(),
+                                        ~ as.character(.x)))
+
+          # df_df ----
+
+          df_dt <- dplyr::bind_rows(df_rep, df_spec)
+
+        }
+
+        # df shared ("Missing Data freq.", "Normalization") ----
+        df_shared <- matrix(
+          data = rnorm(n = (n_panel * n_assay)),
+          nrow = 1L,
+          ncol = (n_assay * n_panel),
+          dimnames = list(
+            "Missing Data freq.",
+            paste0("V", 2L:((n_assay * n_panel) + 1L))
+          )
+        ) |>
+          dplyr::as_tibble(rownames = "V1") |>
+          dplyr::mutate(dplyr::across(dplyr::everything(),
+                                      ~ as.character(.x))) |>
+          dplyr::bind_rows(
+            matrix(
+              data = rep(x = "Intensity", times = (n_panel * n_assay)),
+              nrow = 1L,
+              ncol = (n_assay * n_panel),
+              dimnames = list(
+                "Normalization",
+                paste0("V", 2L:((n_assay * n_panel) + 1L))
+              )
+            ) |>
+              dplyr::as_tibble(rownames = "V1")
+          )
+
+        # df ----
+
+        df <- dplyr::bind_rows(df_dt, df_shared) |>
+          dplyr::mutate(
+            V2 = dplyr::if_else(.data[["V1"]] %in% c("LLOQ", "ULOQ",
+                                                     "Missing Data freq.",
+                                                     "Normalization"),
+                                NA_character_,
+                                .data[["V2"]])
+          )
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # run function ----
+
+        expect_error(
+          object = read_npx_wide_bottom_t(df = df,
+                                          file = wide_excel,
+                                          data_type = data_t,
+                                          col_split = last_v),
+          regexp = "Some full columns in the bottom matrix with assay metadata"
+        )
+
+      }
+    )
+
   }
 )

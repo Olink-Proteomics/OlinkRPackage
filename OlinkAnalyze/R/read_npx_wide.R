@@ -32,8 +32,6 @@ read_npx_wide <- function(file,
 
   col_index_split <- read_npx_wide_split_col(df = df_split$df_top, file = file)
 
-  col_index_split
-
   # split top df ----
 
   df_top_list <- read_npx_wide_top_split(df = df_split$df_top,
@@ -42,6 +40,13 @@ read_npx_wide <- function(file,
                                          olink_platform = olink_platform)
 
   df_top_list
+
+  # bottom df to long ----
+
+  read_npx_wide_bottom_t(df = df_split$df_bottom,
+                         file = file,
+                         data_type = data_type,
+                         col_split = paste0("V", col_index_split))
 
   # if (data_type != "Ct"
   #     & length(df_split) == 3L) {
@@ -52,9 +57,7 @@ read_npx_wide <- function(file,
 
   # function vector of SampleID
   # function vector of OlinkID
-  # function check_bottom
   # function df_mid meta
-  # function bottom df
 
 }
 
@@ -330,8 +333,9 @@ read_npx_wide_check_top <- function(df,
 
     cli::cli_abort(
       message = c(
-        "x" = "Column 1 of assay metadata in file {.file {file}} does not
-        contain the expected values: {accepted_vals_v1}",
+        "x" = "Column 1 of of the top matrix with assay metadata in file
+        {.file {file}} does not contain the expected values:
+        {accepted_vals_v1}",
         "i" = "Has the excel file been modified manually?"
       ),
       call = rlang::caller_env(),
@@ -416,6 +420,7 @@ read_npx_wide_split_col <- function(df,
 }
 
 #' Help function that splits df_top from a Olink wide excel file into 3 data
+#' frames.
 #'
 #' @param df The top data frame from a split Olink wide excel file.
 #' @param file The input excel file.
@@ -601,5 +606,210 @@ read_npx_wide_top_split <- function(df,
       df_qc_dev = df_qc_dev
     )
   )
+
+}
+
+#' Help function that converts df_bottom into long format.
+#'
+#' @param df The bottom data frame from a split Olink wide excel file.
+#' @param file The input excel file.
+#' @param data_type The quantification in which the data comes in. Expecting one
+#' of NPX or Quantified.
+#' @param col_split The column the splits the Olink wide excel file into left
+#' and right.
+#'
+#' @return The bottom matrix in long format.
+#'
+read_npx_wide_bottom_t <- function(df,
+                                   file,
+                                   data_type,
+                                   col_split) {
+  # check input ----
+
+  check_is_data_frame(df = df,
+                      error = TRUE)
+
+  check_file_exists(file = file,
+                    error = TRUE)
+
+  check_olink_data_type(x = data_type,
+                        broader_platform = "qPCR")
+
+  check_is_scalar_character(string = col_split,
+                            error = TRUE)
+
+  # check if Ct ----
+
+  if (data_type == "Ct") {
+
+    cli::cli_abort(
+      message = c(
+        "x" = "The Olink wide excel file {.file {file}} contains a bottom
+        matrix. Files with {.arg data_type} = {.val {data_type}} should not have
+        one!",
+        "i" = "Has the excel file been modified manually?"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
+  }
+
+  # check first column ----
+
+  accepted_vals_v1 <- c("Missing Data freq.", "Normalization")
+  if (data_type == "NPX") {
+    accepted_vals_q <- character(0)
+    accepted_vals_v1 <- c(accepted_vals_v1, "LOD")
+  } else {
+    accepted_vals_q <- c("Assay warning", "Lowest quantifiable level",
+                         "Plate LOD", "LLOQ", "ULOQ")
+    accepted_vals_v1 <- c(accepted_vals_v1,
+                          accepted_vals_q)
+  }
+
+  if (!identical(dplyr::pull(df, 1L) |> unique() |> sort(),
+                 accepted_vals_v1 |> sort())) {
+
+    cli::cli_abort(
+      message = c(
+        "x" = "Column 1 of the bottom matrix with assay metadata in file
+        {.file {file}} contains unexpected values. Expected:
+        {accepted_vals_v1}",
+        "i" = "Has the excel file been modified manually?"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
+  }
+
+  # remove all NA columns ----
+
+  df <- remove_all_na_cols(df = df)
+
+  # per-plate metrics ----
+
+  if (xor(col_split %in% colnames(df),
+          data_type == "Quantified")) {
+    # if only one of the above is true then throw and error as we expect either
+    # both to be true or both to be false.
+
+    cli::cli_abort(
+      message = c(
+        "x" = "The bottom matrix with the assays metrics in file {.file {file}}
+        does not contain plate information!",
+        "i" = "Has the excel file been modified manually?"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
+  } else if (col_split %in% colnames(df)
+             && data_type == "Quantified") {
+    # if it is Quantified data
+    df_q <- df |>
+      # keep only rows to be pivoted
+      dplyr::filter(
+        .data[["V1"]] %in% .env[["accepted_vals_q"]]
+        & !is.na(.data[[col_split]])
+      )
+
+    # for each variable in V1 and do a pivot_longer
+    df_q <- lapply(unique(df_q$V1),
+                   function(x) {
+                     df_q |>
+                       dplyr::filter(
+                         .data[["V1"]] == .env[["x"]]
+                       ) |>
+                       dplyr::select(
+                         -dplyr::all_of("V1")
+                       ) |>
+                       tidyr::pivot_longer(
+                         -dplyr::all_of(col_split),
+                         names_to = "col_index",
+                         values_to = x
+                       ) |>
+                       dplyr::rename(
+                         "Plate ID" = dplyr::all_of(col_split)
+                       )
+                   })
+
+    # left join all data frames from the list
+    df_q <- Reduce(f = function(df_1, df_2) {
+      dplyr::left_join(x = df_1,
+                       y = df_2,
+                       by = c("Plate ID", "col_index"),
+                       relationship = "one-to-one")
+    },
+    x = df_q)
+
+  }
+
+  # across plates metrics ----
+
+  # remove rows processed earlier
+  # these rows are now columns df_q
+  if (exists("df_q")) {
+
+    df <- df |>
+      dplyr::filter(
+        !(.data[["V1"]] %in% colnames(df_q))
+      ) |>
+      dplyr::select(
+        -dplyr::all_of(col_split)
+      )
+
+  }
+
+  # remove all NA columns
+  df <- remove_all_na_cols(df = df)
+
+  df_t <- t(df)
+  colnames(df_t) <- df_t[1, ]
+  df_t <- df_t |>
+    dplyr::as_tibble(
+      rownames = "col_index"
+    ) |>
+    dplyr::slice(
+      2L:dplyr::n()
+    )
+
+  # checks ----
+
+  ## rows of df_t and df_q match ----
+
+  if (exists("df_q")) {
+
+    if ((nrow(df_q) %% nrow(df_t)) != 0L) {
+
+      cli::cli_abort(
+        message = c(
+          "x" = "Some full columns in the bottom matrix with assay metadata in
+        file {.file {file}} do not contain any values!",
+          "i" = "Has the excel file been modified manually?"
+        ),
+        call = rlang::caller_env(),
+        wrap = FALSE
+      )
+
+    }
+
+  }
+
+  # return ----
+
+  if (exists("df_q")) {
+
+    df_t <- df_t |>
+      dplyr::full_join(
+        y = df_q,
+        by = "col_index",
+        relationship = "one-to-many"
+      )
+
+  }
+
+  return(df_t)
 
 }
