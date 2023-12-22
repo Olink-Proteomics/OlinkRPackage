@@ -982,24 +982,47 @@ test_that(
       code = {
 
         # random df_top ----
-        n_times <- 45L
-        n_times_add <- 1L
+        o_platform <- "Target 48"
+        n_panels <- 1L
+        n_assay <- 45L
+        n_qc_warn <- n_panels
+        n_plates <- n_panels
+        int_ctrl <- character(0)
+
         df <- dplyr::tibble(
           "V1" = c("Panel",
-                   rep(x = "Olink Target 48 Panel 1", times = n_times),
-                   "Olink Target 48 Panel 1", "Olink Target 48 Panel 1"),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = n_assay),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_plates),
+                         seq_len(n_plates)),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_qc_warn),
+                         seq_len(n_qc_warn)),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = length(int_ctrl))),
           "V2" = c("Assay",
-                   paste0(rep(x = "Assay", time = n_times), seq_len(n_times)),
-                   rep(x = "Plate ID", times = n_times_add),
-                   rep(x = "QC Warning", times = n_times_add)),
+                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
+                          seq_len(n_panels * n_assay)),
+                   rep(x = "Plate ID", times = n_plates),
+                   rep(x = "QC Warning", times = n_qc_warn),
+                   rep(x = "QC Deviation from median",
+                       times = (length(int_ctrl) * n_panels))),
           "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add)),
+                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = int_ctrl, times = n_panels)),
           "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add))
+                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = NA_character_,
+                       times = (length(int_ctrl) * n_panels)))
         )
         df_t <- t(df)
         colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
@@ -1016,7 +1039,7 @@ test_that(
             list_top <- read_npx_wide_top_split(df = df_t,
                                                 file = wide_excel,
                                                 data_type = "NPX",
-                                                olink_platform = "Target 48")
+                                                olink_platform = o_platform)
         )
 
         # modify df so that we can test output ----
@@ -1085,22 +1108,47 @@ test_that(
       code = {
 
         # random df_top ----
+        o_platform <- "Target 48"
+        n_panels <- 1L
+        n_assay <- 45L
+        n_qc_warn <- 0L
+        n_plates <- n_panels
+        int_ctrl <- character(0)
 
-        n_times <- 45L
-        n_times_add <- 1L
         df <- dplyr::tibble(
           "V1" = c("Panel",
-                   rep(x = "Olink Target 48 Panel 1", times = n_times),
-                   "Olink Target 48 Panel 1"),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = n_assay),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_plates),
+                         seq_len(n_plates)),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_qc_warn),
+                         seq_len(n_qc_warn)),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = length(int_ctrl))),
           "V2" = c("Assay",
-                   paste0(rep(x = "Assay", time = n_times), seq_len(n_times)),
-                   rep(x = "Plate ID", times = n_times_add)),
+                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
+                          seq_len(n_panels * n_assay)),
+                   rep(x = "Plate ID", times = n_plates),
+                   rep(x = "QC Warning", times = n_qc_warn),
+                   rep(x = "QC Deviation from median",
+                       times = (length(int_ctrl) * n_panels))),
           "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add)),
+                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = int_ctrl, times = n_panels)),
           "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add))
+                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = NA_character_,
+                       times = (length(int_ctrl) * n_panels)))
         )
         df_t <- t(df)
         colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
@@ -1117,7 +1165,7 @@ test_that(
             list_top <- read_npx_wide_top_split(df = df_t,
                                                 file = wide_excel,
                                                 data_type = "Ct",
-                                                olink_platform = "Target 48")
+                                                olink_platform = o_platform)
         )
 
         # modify df so that we can test output ----
@@ -1186,38 +1234,47 @@ test_that(
       code = {
 
         # random df_top ----
+        o_platform <- "Target 48"
+        n_panels <- 1L
+        n_assay <- 45L
+        n_qc_warn <- n_panels
+        n_plates <- n_panels
+        int_ctrl <- c("Inc Ctrl", "Amp Ctrl", "Ext Ctrl")
 
-        n_times <- 45L
-        n_times_add <- 1L
         df <- dplyr::tibble(
           "V1" = c("Panel",
-                   rep(x = "Olink Target 48 Panel 1", times = n_times),
-                   "Olink Target 48 Panel 1", "Olink Target 48 Panel 1",
-                   "Olink Target 48 Panel 1", "Olink Target 48 Panel 1"),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = n_assay),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_plates),
+                         seq_len(n_plates)),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_qc_warn),
+                         seq_len(n_qc_warn)),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = length(int_ctrl))),
           "V2" = c("Assay",
-                   paste0(rep(x = "Assay", time = n_times), seq_len(n_times)),
-                   rep(x = "Plate ID", times = n_times_add),
-                   rep(x = "QC Warning", times = n_times_add),
-                   rep(x = "QC Deviation from median", times = n_times_add),
-                   rep(x = "QC Deviation from median", times = n_times_add)),
+                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
+                          seq_len(n_panels * n_assay)),
+                   rep(x = "Plate ID", times = n_plates),
+                   rep(x = "QC Warning", times = n_qc_warn),
+                   rep(x = "QC Deviation from median",
+                       times = (length(int_ctrl) * n_panels))),
           "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = "Inc Ctrl", times = n_times_add),
-                   rep(x = "Ext Ctrl", times = n_times_add)),
+                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = int_ctrl, times = n_panels)),
           "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add)),
-          "V5" = c("Unit",
-                   rep(x = "Olink Target 48 Panel 1", times = n_times),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add))
+                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = NA_character_,
+                       times = (length(int_ctrl) * n_panels)))
         )
         df_t <- t(df)
         colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
@@ -1312,30 +1369,47 @@ test_that(
       code = {
 
         # random df_top ----
+        o_platform <- "Target 48"
+        n_panels <- 2L
+        n_assay <- 45L
+        n_qc_warn <- n_panels
+        n_plates <- n_panels
+        int_ctrl <- character(0L)
 
-        n_times <- 45L
-        n_times_add <- 2L
         df <- dplyr::tibble(
           "V1" = c("Panel",
-                   rep(x = "Olink Target 48 Panel 1", times = n_times),
-                   rep(x = "Olink Target 48 Panel 2", times = n_times),
-                   "Olink Target 48 Panel 1", "Olink Target 48 Panel 2",
-                   "Olink Target 48 Panel 1", "Olink Target 48 Panel 2"),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = n_assay),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_plates),
+                         seq_len(n_plates)),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_qc_warn),
+                         seq_len(n_qc_warn)),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = length(int_ctrl))),
           "V2" = c("Assay",
-                   paste0(rep(x = "Assay", time = n_times), seq_len(n_times)),
-                   paste0(rep(x = "Assay", time = n_times), seq_len(n_times)),
-                   rep(x = "Plate ID", times = n_times_add),
-                   rep(x = "QC Warning", times = n_times_add)),
+                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
+                          seq_len(n_panels * n_assay)),
+                   rep(x = "Plate ID", times = n_plates),
+                   rep(x = "QC Warning", times = n_qc_warn),
+                   rep(x = "QC Deviation from median",
+                       times = (length(int_ctrl) * n_panels))),
           "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", time = n_times), seq_len(n_times)),
-                   paste0(rep(x = "Uniprot", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add)),
+                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = int_ctrl, times = n_panels)),
           "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", time = n_times), seq_len(n_times)),
-                   paste0(rep(x = "OID", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add))
+                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = NA_character_,
+                       times = (length(int_ctrl) * n_panels)))
         )
         df_t <- t(df)
         colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
@@ -1352,7 +1426,7 @@ test_that(
             list_top <- read_npx_wide_top_split(df = df_t,
                                                 file = wide_excel,
                                                 data_type = "NPX",
-                                                olink_platform = "Target 48")
+                                                olink_platform = o_platform)
         )
 
         # modify df so that we can test output ----
@@ -1421,26 +1495,47 @@ test_that(
       code = {
 
         # random df_top ----
+        o_platform <- "Target 48"
+        n_panels <- 2L
+        n_assay <- 45L
+        n_qc_warn <- 0L
+        n_plates <- n_panels
+        int_ctrl <- character(0L)
 
-        n_times <- 45L
-        n_times_add <- 2L
         df <- dplyr::tibble(
           "V1" = c("Panel",
-                   rep(x = "Olink Target 48 Panel 1", times = n_times),
-                   rep(x = "Olink Target 48 Panel 2", times = n_times),
-                   "Olink Target 48 Panel 1", "Olink Target 48 Panel 2"),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = n_assay),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_plates),
+                         seq_len(n_plates)),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_qc_warn),
+                         seq_len(n_qc_warn)),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = length(int_ctrl))),
           "V2" = c("Assay",
-                   paste0(rep(x = "Assay", time = n_times), seq_len(n_times)),
-                   paste0(rep(x = "Assay", time = n_times), seq_len(n_times)),
-                   rep(x = "Plate ID", times = n_times_add)),
+                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
+                          seq_len(n_panels * n_assay)),
+                   rep(x = "Plate ID", times = n_plates),
+                   rep(x = "QC Warning", times = n_qc_warn),
+                   rep(x = "QC Deviation from median",
+                       times = (length(int_ctrl) * n_panels))),
           "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", time = n_times), seq_len(n_times)),
-                   paste0(rep(x = "Uniprot", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add)),
+                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = int_ctrl, times = n_panels)),
           "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", time = n_times), seq_len(n_times)),
-                   paste0(rep(x = "OID", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add))
+                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = NA_character_,
+                       times = (length(int_ctrl) * n_panels)))
         )
         df_t <- t(df)
         colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
@@ -1457,7 +1552,7 @@ test_that(
             list_top <- read_npx_wide_top_split(df = df_t,
                                                 file = wide_excel,
                                                 data_type = "Ct",
-                                                olink_platform = "Target 48")
+                                                olink_platform = o_platform)
         )
 
         # modify df so that we can test output ----
@@ -1526,34 +1621,47 @@ test_that(
       code = {
 
         # random df_top ----
+        o_platform <- "Target 48"
+        n_panels <- 2L
+        n_assay <- 45L
+        n_qc_warn <- n_panels
+        n_plates <- n_panels
+        int_ctrl <- c("Inc Ctrl", "Amp Ctrl", "Ext Ctrl")
 
-        n_times <- 45L
-        n_times_add <- 2L
-        n_ctrl <- 2L
         df <- dplyr::tibble(
           "V1" = c("Panel",
-                   rep(x = "Olink Target 48 Panel 1", times = n_times),
-                   rep(x = "Olink Target 48 Panel 2", times = n_times),
-                   rep(x = c("Olink Target 48 Panel 1",
-                             "Olink Target 48 Panel 2"),
-                       times = n_times_add * n_ctrl)),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = n_assay),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_plates),
+                         seq_len(n_plates)),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_qc_warn),
+                         seq_len(n_qc_warn)),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = length(int_ctrl))),
           "V2" = c("Assay",
-                   paste0(rep(x = "Assay", time = n_times * n_times_add),
-                          seq_len(n_times * n_times_add)),
-                   rep(x = "Plate ID", times = n_times_add),
-                   rep(x = "QC Warning", times = n_times_add),
+                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
+                          seq_len(n_panels * n_assay)),
+                   rep(x = "Plate ID", times = n_plates),
+                   rep(x = "QC Warning", times = n_qc_warn),
                    rep(x = "QC Deviation from median",
-                       times = n_times_add * n_ctrl)),
+                       times = (length(int_ctrl) * n_panels))),
           "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", time = n_times * n_times_add),
-                          seq_len(n_times * n_times_add)),
-                   rep(x = NA_character_, times = n_times_add * n_times_add),
-                   rep(x = c("Inc Ctrl", "Amp Ctrl"), times = n_times_add)),
+                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = int_ctrl, times = n_panels)),
           "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", time = n_times * n_times_add),
-                          seq_len(n_times * n_times_add)),
+                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
                    rep(x = NA_character_,
-                       times = n_times_add * n_times_add * n_ctrl))
+                       times = (length(int_ctrl) * n_panels)))
         )
         df_t <- t(df)
         colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
@@ -1570,7 +1678,7 @@ test_that(
             list_top <- read_npx_wide_top_split(df = df_t,
                                                 file = wide_excel,
                                                 data_type = "Quantified",
-                                                olink_platform = "Target 48")
+                                                olink_platform = o_platform)
         )
 
         # modify df so that we can test output ----
@@ -1648,24 +1756,47 @@ test_that(
       code = {
 
         # random df_top ----
-        n_times <- 92L
-        n_times_add <- 1L
+        o_platform <- "Target 96"
+        n_panels <- 1L
+        n_assay <- 92L
+        n_qc_warn <- n_panels
+        n_plates <- n_panels
+        int_ctrl <- character(0)
+
         df <- dplyr::tibble(
           "V1" = c("Panel",
-                   rep(x = "Olink Target 96 Panel 1", times = n_times),
-                   "Olink Target 96 Panel 1", "Olink Target 96 Panel 1"),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = n_assay),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_plates),
+                         seq_len(n_plates)),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_qc_warn),
+                         seq_len(n_qc_warn)),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = length(int_ctrl))),
           "V2" = c("Assay",
-                   paste0(rep(x = "Assay", time = n_times), seq_len(n_times)),
-                   rep(x = "Plate ID", times = n_times_add),
-                   rep(x = "QC Warning", times = n_times_add)),
+                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
+                          seq_len(n_panels * n_assay)),
+                   rep(x = "Plate ID", times = n_plates),
+                   rep(x = "QC Warning", times = n_qc_warn),
+                   rep(x = "QC Deviation from median",
+                       times = (length(int_ctrl) * n_panels))),
           "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add)),
+                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = int_ctrl, times = n_panels)),
           "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add))
+                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = NA_character_,
+                       times = (length(int_ctrl) * n_panels)))
         )
         df_t <- t(df)
         colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
@@ -1682,7 +1813,7 @@ test_that(
             list_top <- read_npx_wide_top_split(df = df_t,
                                                 file = wide_excel,
                                                 data_type = "NPX",
-                                                olink_platform = "Target 96")
+                                                olink_platform = o_platform)
         )
 
         # modify df so that we can test output ----
@@ -1751,22 +1882,47 @@ test_that(
       code = {
 
         # random df_top ----
+        o_platform <- "Target 96"
+        n_panels <- 1L
+        n_assay <- 92L
+        n_qc_warn <- 0L
+        n_plates <- n_panels
+        int_ctrl <- character(0)
 
-        n_times <- 92L
-        n_times_add <- 1L
         df <- dplyr::tibble(
           "V1" = c("Panel",
-                   rep(x = "Olink Target 96 Panel 1", times = n_times),
-                   "Olink Target 96 Panel 1"),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = n_assay),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_plates),
+                         seq_len(n_plates)),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_qc_warn),
+                         seq_len(n_qc_warn)),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = length(int_ctrl))),
           "V2" = c("Assay",
-                   paste0(rep(x = "Assay", time = n_times), seq_len(n_times)),
-                   rep(x = "Plate ID", times = n_times_add)),
+                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
+                          seq_len(n_panels * n_assay)),
+                   rep(x = "Plate ID", times = n_plates),
+                   rep(x = "QC Warning", times = n_qc_warn),
+                   rep(x = "QC Deviation from median",
+                       times = (length(int_ctrl) * n_panels))),
           "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add)),
+                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = int_ctrl, times = n_panels)),
           "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add))
+                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = NA_character_,
+                       times = (length(int_ctrl) * n_panels)))
         )
         df_t <- t(df)
         colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
@@ -1783,7 +1939,7 @@ test_that(
             list_top <- read_npx_wide_top_split(df = df_t,
                                                 file = wide_excel,
                                                 data_type = "Ct",
-                                                olink_platform = "Target 96")
+                                                olink_platform = o_platform)
         )
 
         # modify df so that we can test output ----
@@ -1858,30 +2014,47 @@ test_that(
       code = {
 
         # random df_top ----
+        o_platform <- "Target 96"
+        n_panels <- 2L
+        n_assay <- 92L
+        n_qc_warn <- n_panels
+        n_plates <- n_panels
+        int_ctrl <- character(0L)
 
-        n_times <- 92L
-        n_times_add <- 2L
         df <- dplyr::tibble(
           "V1" = c("Panel",
-                   rep(x = "Olink Target 96 Panel 1", times = n_times),
-                   rep(x = "Olink Target 96 Panel 2", times = n_times),
-                   "Olink Target 96 Panel 1", "Olink Target 96 Panel 2",
-                   "Olink Target 96 Panel 1", "Olink Target 96 Panel 2"),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = n_assay),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_plates),
+                         seq_len(n_plates)),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_qc_warn),
+                         seq_len(n_qc_warn)),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = length(int_ctrl))),
           "V2" = c("Assay",
-                   paste0(rep(x = "Assay", time = n_times), seq_len(n_times)),
-                   paste0(rep(x = "Assay", time = n_times), seq_len(n_times)),
-                   rep(x = "Plate ID", times = n_times_add),
-                   rep(x = "QC Warning", times = n_times_add)),
+                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
+                          seq_len(n_panels * n_assay)),
+                   rep(x = "Plate ID", times = n_plates),
+                   rep(x = "QC Warning", times = n_qc_warn),
+                   rep(x = "QC Deviation from median",
+                       times = (length(int_ctrl) * n_panels))),
           "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", time = n_times), seq_len(n_times)),
-                   paste0(rep(x = "Uniprot", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add)),
+                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = int_ctrl, times = n_panels)),
           "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", time = n_times), seq_len(n_times)),
-                   paste0(rep(x = "OID", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add))
+                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = NA_character_,
+                       times = (length(int_ctrl) * n_panels)))
         )
         df_t <- t(df)
         colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
@@ -1898,7 +2071,7 @@ test_that(
             list_top <- read_npx_wide_top_split(df = df_t,
                                                 file = wide_excel,
                                                 data_type = "NPX",
-                                                olink_platform = "Target 96")
+                                                olink_platform = o_platform)
         )
 
         # modify df so that we can test output ----
@@ -1967,26 +2140,47 @@ test_that(
       code = {
 
         # random df_top ----
+        o_platform <- "Target 96"
+        n_panels <- 2L
+        n_assay <- 92L
+        n_qc_warn <- 0L
+        n_plates <- n_panels
+        int_ctrl <- character(0L)
 
-        n_times <- 92L
-        n_times_add <- 2L
         df <- dplyr::tibble(
           "V1" = c("Panel",
-                   rep(x = "Olink Target 96 Panel 1", times = n_times),
-                   rep(x = "Olink Target 96 Panel 2", times = n_times),
-                   "Olink Target 96 Panel 1", "Olink Target 96 Panel 2"),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = n_assay),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_plates),
+                         seq_len(n_plates)),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_qc_warn),
+                         seq_len(n_qc_warn)),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = length(int_ctrl))),
           "V2" = c("Assay",
-                   paste0(rep(x = "Assay", time = n_times), seq_len(n_times)),
-                   paste0(rep(x = "Assay", time = n_times), seq_len(n_times)),
-                   rep(x = "Plate ID", times = n_times_add)),
+                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
+                          seq_len(n_panels * n_assay)),
+                   rep(x = "Plate ID", times = n_plates),
+                   rep(x = "QC Warning", times = n_qc_warn),
+                   rep(x = "QC Deviation from median",
+                       times = (length(int_ctrl) * n_panels))),
           "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", time = n_times), seq_len(n_times)),
-                   paste0(rep(x = "Uniprot", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add)),
+                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = int_ctrl, times = n_panels)),
           "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", time = n_times), seq_len(n_times)),
-                   paste0(rep(x = "OID", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add))
+                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = NA_character_,
+                       times = (length(int_ctrl) * n_panels)))
         )
         df_t <- t(df)
         colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
@@ -2003,7 +2197,7 @@ test_that(
             list_top <- read_npx_wide_top_split(df = df_t,
                                                 file = wide_excel,
                                                 data_type = "Ct",
-                                                olink_platform = "Target 96")
+                                                olink_platform = o_platform)
         )
 
         # modify df so that we can test output ----
@@ -2078,24 +2272,47 @@ test_that(
       code = {
 
         # random df_top ----
-        n_times <- 33L
-        n_times_add <- 1L
+        o_platform <- "Flex"
+        n_panels <- 1L
+        n_assay <- 33L
+        n_qc_warn <- n_panels
+        n_plates <- n_panels
+        int_ctrl <- character(0)
+
         df <- dplyr::tibble(
           "V1" = c("Panel",
-                   rep(x = "Olink Flex Panel 1", times = n_times),
-                   "Olink Flex Panel 1", "Olink Flex Panel 1"),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = n_assay),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_plates),
+                         seq_len(n_plates)),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_qc_warn),
+                         seq_len(n_qc_warn)),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = length(int_ctrl))),
           "V2" = c("Assay",
-                   paste0(rep(x = "Assay", time = n_times), seq_len(n_times)),
-                   rep(x = "Plate ID", times = n_times_add),
-                   rep(x = "QC Warning", times = n_times_add)),
+                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
+                          seq_len(n_panels * n_assay)),
+                   rep(x = "Plate ID", times = n_plates),
+                   rep(x = "QC Warning", times = n_qc_warn),
+                   rep(x = "QC Deviation from median",
+                       times = (length(int_ctrl) * n_panels))),
           "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add)),
+                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = int_ctrl, times = n_panels)),
           "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add))
+                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = NA_character_,
+                       times = (length(int_ctrl) * n_panels)))
         )
         df_t <- t(df)
         colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
@@ -2112,7 +2329,7 @@ test_that(
             list_top <- read_npx_wide_top_split(df = df_t,
                                                 file = wide_excel,
                                                 data_type = "NPX",
-                                                olink_platform = "Flex")
+                                                olink_platform = o_platform)
         )
 
         # modify df so that we can test output ----
@@ -2181,22 +2398,47 @@ test_that(
       code = {
 
         # random df_top ----
+        o_platform <- "Flex"
+        n_panels <- 1L
+        n_assay <- 33L
+        n_qc_warn <- 0L
+        n_plates <- n_panels
+        int_ctrl <- character(0)
 
-        n_times <- 33L
-        n_times_add <- 1L
         df <- dplyr::tibble(
           "V1" = c("Panel",
-                   rep(x = "Olink Flex Panel 1", times = n_times),
-                   "Olink Flex Panel 1"),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = n_assay),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_plates),
+                         seq_len(n_plates)),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_qc_warn),
+                         seq_len(n_qc_warn)),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = length(int_ctrl))),
           "V2" = c("Assay",
-                   paste0(rep(x = "Assay", time = n_times), seq_len(n_times)),
-                   rep(x = "Plate ID", times = n_times_add)),
+                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
+                          seq_len(n_panels * n_assay)),
+                   rep(x = "Plate ID", times = n_plates),
+                   rep(x = "QC Warning", times = n_qc_warn),
+                   rep(x = "QC Deviation from median",
+                       times = (length(int_ctrl) * n_panels))),
           "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add)),
+                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = int_ctrl, times = n_panels)),
           "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add))
+                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = NA_character_,
+                       times = (length(int_ctrl) * n_panels)))
         )
         df_t <- t(df)
         colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
@@ -2213,7 +2455,7 @@ test_that(
             list_top <- read_npx_wide_top_split(df = df_t,
                                                 file = wide_excel,
                                                 data_type = "Ct",
-                                                olink_platform = "Flex")
+                                                olink_platform = o_platform)
         )
 
         # modify df so that we can test output ----
@@ -2282,38 +2524,47 @@ test_that(
       code = {
 
         # random df_top ----
+        o_platform <- "Flex"
+        n_panels <- 1L
+        n_assay <- 33L
+        n_qc_warn <- n_panels
+        n_plates <- n_panels
+        int_ctrl <- c("Inc Ctrl", "Amp Ctrl", "Ext Ctrl")
 
-        n_times <- 33
-        n_times_add <- 1L
         df <- dplyr::tibble(
           "V1" = c("Panel",
-                   rep(x = "Olink Flex Panel 1", times = n_times),
-                   "Olink Flex Panel 1", "Olink Flex Panel 1",
-                   "Olink Flex Panel 1", "Olink Flex Panel 1"),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = n_assay),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_plates),
+                         seq_len(n_plates)),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_qc_warn),
+                         seq_len(n_qc_warn)),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = length(int_ctrl))),
           "V2" = c("Assay",
-                   paste0(rep(x = "Assay", time = n_times), seq_len(n_times)),
-                   rep(x = "Plate ID", times = n_times_add),
-                   rep(x = "QC Warning", times = n_times_add),
-                   rep(x = "QC Deviation from median", times = n_times_add),
-                   rep(x = "QC Deviation from median", times = n_times_add)),
+                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
+                          seq_len(n_panels * n_assay)),
+                   rep(x = "Plate ID", times = n_plates),
+                   rep(x = "QC Warning", times = n_qc_warn),
+                   rep(x = "QC Deviation from median",
+                       times = (length(int_ctrl) * n_panels))),
           "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = "Inc Ctrl", times = n_times_add),
-                   rep(x = "Ext Ctrl", times = n_times_add)),
+                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = int_ctrl, times = n_panels)),
           "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add)),
-          "V5" = c("Unit",
-                   rep(x = "Olink Target 48 Panel 1", times = n_times),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add))
+                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = NA_character_,
+                       times = (length(int_ctrl) * n_panels)))
         )
         df_t <- t(df)
         colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
@@ -2330,7 +2581,7 @@ test_that(
             list_top <- read_npx_wide_top_split(df = df_t,
                                                 file = wide_excel,
                                                 data_type = "Quantified",
-                                                olink_platform = "Flex")
+                                                olink_platform = o_platform)
         )
 
         # modify df so that we can test output ----
@@ -2408,30 +2659,47 @@ test_that(
       code = {
 
         # random df_top ----
+        o_platform <- "Focus"
+        n_panels <- 2L
+        n_assay <- 33L
+        n_qc_warn <- n_panels
+        n_plates <- n_panels
+        int_ctrl <- character(0L)
 
-        n_times <- 33L
-        n_times_add <- 2L
         df <- dplyr::tibble(
           "V1" = c("Panel",
-                   rep(x = "Olink Focus Panel 1", times = n_times),
-                   rep(x = "Olink Focus Panel 2", times = n_times),
-                   "Olink Focus Panel 1", "Olink Focus Panel 2",
-                   "Olink Focus Panel 1", "Olink Focus Panel 2"),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = n_assay),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_plates),
+                         seq_len(n_plates)),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_qc_warn),
+                         seq_len(n_qc_warn)),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = length(int_ctrl))),
           "V2" = c("Assay",
-                   paste0(rep(x = "Assay", time = n_times), seq_len(n_times)),
-                   paste0(rep(x = "Assay", time = n_times), seq_len(n_times)),
-                   rep(x = "Plate ID", times = n_times_add),
-                   rep(x = "QC Warning", times = n_times_add)),
+                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
+                          seq_len(n_panels * n_assay)),
+                   rep(x = "Plate ID", times = n_plates),
+                   rep(x = "QC Warning", times = n_qc_warn),
+                   rep(x = "QC Deviation from median",
+                       times = (length(int_ctrl) * n_panels))),
           "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", time = n_times), seq_len(n_times)),
-                   paste0(rep(x = "Uniprot", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add)),
+                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = int_ctrl, times = n_panels)),
           "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", time = n_times), seq_len(n_times)),
-                   paste0(rep(x = "OID", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add))
+                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = NA_character_,
+                       times = (length(int_ctrl) * n_panels)))
         )
         df_t <- t(df)
         colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
@@ -2448,7 +2716,7 @@ test_that(
             list_top <- read_npx_wide_top_split(df = df_t,
                                                 file = wide_excel,
                                                 data_type = "NPX",
-                                                olink_platform = "Focus")
+                                                olink_platform = o_platform)
         )
 
         # modify df so that we can test output ----
@@ -2517,26 +2785,47 @@ test_that(
       code = {
 
         # random df_top ----
+        o_platform <- "Focus"
+        n_panels <- 2L
+        n_assay <- 33L
+        n_qc_warn <- 0L
+        n_plates <- n_panels
+        int_ctrl <- character(0L)
 
-        n_times <- 33L
-        n_times_add <- 2L
         df <- dplyr::tibble(
           "V1" = c("Panel",
-                   rep(x = "Olink Focus Panel 1", times = n_times),
-                   rep(x = "Olink Focus Panel 2", times = n_times),
-                   "Olink Focus Panel 1", "Olink Focus Panel 2"),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = n_assay),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_plates),
+                         seq_len(n_plates)),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_qc_warn),
+                         seq_len(n_qc_warn)),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = length(int_ctrl))),
           "V2" = c("Assay",
-                   paste0(rep(x = "Assay", time = n_times), seq_len(n_times)),
-                   paste0(rep(x = "Assay", time = n_times), seq_len(n_times)),
-                   rep(x = "Plate ID", times = n_times_add)),
+                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
+                          seq_len(n_panels * n_assay)),
+                   rep(x = "Plate ID", times = n_plates),
+                   rep(x = "QC Warning", times = n_qc_warn),
+                   rep(x = "QC Deviation from median",
+                       times = (length(int_ctrl) * n_panels))),
           "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", time = n_times), seq_len(n_times)),
-                   paste0(rep(x = "Uniprot", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add)),
+                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = int_ctrl, times = n_panels)),
           "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", time = n_times), seq_len(n_times)),
-                   paste0(rep(x = "OID", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add))
+                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = NA_character_,
+                       times = (length(int_ctrl) * n_panels)))
         )
         df_t <- t(df)
         colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
@@ -2553,7 +2842,7 @@ test_that(
             list_top <- read_npx_wide_top_split(df = df_t,
                                                 file = wide_excel,
                                                 data_type = "Ct",
-                                                olink_platform = "Focus")
+                                                olink_platform = o_platform)
         )
 
         # modify df so that we can test output ----
@@ -2622,34 +2911,47 @@ test_that(
       code = {
 
         # random df_top ----
+        o_platform <- "Focus"
+        n_panels <- 2L
+        n_assay <- 33L
+        n_qc_warn <- n_panels
+        n_plates <- n_panels
+        int_ctrl <- c("Inc Ctrl", "Amp Ctrl", "Ext Ctrl")
 
-        n_times <- 33L
-        n_times_add <- 2L
-        n_ctrl <- 2L
         df <- dplyr::tibble(
           "V1" = c("Panel",
-                   rep(x = "Olink Focus Panel 1", times = n_times),
-                   rep(x = "Olink Focus Panel 2", times = n_times),
-                   rep(x = c("Olink Focus Panel 1",
-                             "Olink Focus Panel 2"),
-                       times = n_times_add * n_ctrl)),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = n_assay),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_plates),
+                         seq_len(n_plates)),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_qc_warn),
+                         seq_len(n_qc_warn)),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = length(int_ctrl))),
           "V2" = c("Assay",
-                   paste0(rep(x = "Assay", time = n_times * n_times_add),
-                          seq_len(n_times * n_times_add)),
-                   rep(x = "Plate ID", times = n_times_add),
-                   rep(x = "QC Warning", times = n_times_add),
+                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
+                          seq_len(n_panels * n_assay)),
+                   rep(x = "Plate ID", times = n_plates),
+                   rep(x = "QC Warning", times = n_qc_warn),
                    rep(x = "QC Deviation from median",
-                       times = n_times_add * n_ctrl)),
+                       times = (length(int_ctrl) * n_panels))),
           "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", time = n_times * n_times_add),
-                          seq_len(n_times * n_times_add)),
-                   rep(x = NA_character_, times = n_times_add * n_times_add),
-                   rep(x = c("Inc Ctrl", "Amp Ctrl"), times = n_times_add)),
+                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = int_ctrl, times = n_panels)),
           "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", time = n_times * n_times_add),
-                          seq_len(n_times * n_times_add)),
+                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
                    rep(x = NA_character_,
-                       times = n_times_add * n_times_add * n_ctrl))
+                       times = (length(int_ctrl) * n_panels)))
         )
         df_t <- t(df)
         colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
@@ -2666,7 +2968,7 @@ test_that(
             list_top <- read_npx_wide_top_split(df = df_t,
                                                 file = wide_excel,
                                                 data_type = "Quantified",
-                                                olink_platform = "Focus")
+                                                olink_platform = o_platform)
         )
 
         # modify df so that we can test output ----
@@ -2743,28 +3045,53 @@ test_that(
       code = {
 
         # random df_top ----
-        n_times <- 45L
-        n_times_add <- 1L
+        o_platform <- "Target 48"
+        n_panels <- 1L
+        n_assay <- 45L
+        n_qc_warn <- n_panels
+        n_plates <- n_panels
+        int_ctrl <- character(0)
+
         df <- dplyr::tibble(
           "V1" = c("Panel",
-                   rep(x = "Olink Target 48 Panel 1", times = n_times),
-                   "Olink Target 48 Panel 1", "Olink Target 48 Panel 1",
-                   "Olink Target 48 Panel 1"),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = n_assay),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_plates),
+                         seq_len(n_plates)),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_qc_warn),
+                         seq_len(n_qc_warn)),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = length(int_ctrl)),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = 1L),
+                         seq_len(1L))),
           "V2" = c("Assay",
-                   paste0(rep(x = "Assay", time = n_times), seq_len(n_times)),
-                   rep(x = "Plate ID", times = n_times_add),
-                   rep(x = "QC Warning", times = n_times_add),
-                   rep(x = "Unknown", times = n_times_add)),
+                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
+                          seq_len(n_panels * n_assay)),
+                   rep(x = "Plate ID", times = n_plates),
+                   rep(x = "QC Warning", times = n_qc_warn),
+                   rep(x = "QC Deviation from median",
+                       times = (length(int_ctrl) * n_panels)),
+                   rep(x = "Unknown", times = 1L)),
           "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add)),
+                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = int_ctrl, times = n_panels),
+                   rep(x = NA_character_, times = 1L)),
           "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add))
+                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = NA_character_,
+                       times = (length(int_ctrl) * n_panels)),
+                   rep(x = NA_character_, times = 1L))
         )
         df_t <- t(df)
         colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
@@ -2780,7 +3107,7 @@ test_that(
           object = read_npx_wide_top_split(df = df_t,
                                            file = wide_excel,
                                            data_type = "NPX",
-                                           olink_platform = "Target 48"),
+                                           olink_platform = o_platform),
           regexp = "The top matrix with the assays metadata in file"
         )
 
@@ -2793,7 +3120,6 @@ test_that(
 test_that(
   "read_npx_wide_top_split - NAs in OlinkID/Uniprot/Assay",
   {
-
     ## OlinkID = NA 1 instance ----
 
     withr::with_tempfile(
@@ -2803,30 +3129,53 @@ test_that(
       code = {
 
         # random df_top ----
-        n_times <- 45L
-        n_times_add <- 1L
+        o_platform <- "Target 48"
+        n_panels <- 1L
+        n_assay <- 45L
+        n_qc_warn <- n_panels
+        n_plates <- n_panels
+        int_ctrl <- character(0)
+
         df <- dplyr::tibble(
           "V1" = c("Panel",
-                   rep(x = "Olink Target 48 Panel 1", times = n_times),
-                   "Olink Target 48 Panel 1", "Olink Target 48 Panel 1"),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = n_assay),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_plates),
+                         seq_len(n_plates)),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_qc_warn),
+                         seq_len(n_qc_warn)),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = length(int_ctrl))),
           "V2" = c("Assay",
-                   paste0(rep(x = "Assay", time = n_times), seq_len(n_times)),
-                   rep(x = "Plate ID", times = n_times_add),
-                   rep(x = "QC Warning", times = n_times_add)),
+                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
+                          seq_len(n_panels * n_assay)),
+                   rep(x = "Plate ID", times = n_plates),
+                   rep(x = "QC Warning", times = n_qc_warn),
+                   rep(x = "QC Deviation from median",
+                       times = (length(int_ctrl) * n_panels))),
           "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add)),
+                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = int_ctrl, times = n_panels)),
           "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add))
+                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = NA_character_,
+                       times = (length(int_ctrl) * n_panels)))
         )
 
         # introduce NAs
         df <- df |>
           dplyr::mutate(
-            V3 = dplyr::if_else(.data[["V3"]] == "Uniprot1",
+            V3 = dplyr::if_else(.data[["V3"]] %in% "Uniprot1",
                                 NA_character_,
                                 .data[["V3"]])
           )
@@ -2845,7 +3194,7 @@ test_that(
           object = read_npx_wide_top_split(df = df_t,
                                            file = wide_excel,
                                            data_type = "NPX",
-                                           olink_platform = "Target 48"),
+                                           olink_platform = o_platform),
           regexp = "Detected 1 empty cells in columns"
         )
 
@@ -2861,24 +3210,47 @@ test_that(
       code = {
 
         # random df_top ----
-        n_times <- 45L
-        n_times_add <- 1L
+        o_platform <- "Target 48"
+        n_panels <- 1L
+        n_assay <- 45L
+        n_qc_warn <- n_panels
+        n_plates <- n_panels
+        int_ctrl <- character(0)
+
         df <- dplyr::tibble(
           "V1" = c("Panel",
-                   rep(x = "Olink Target 48 Panel 1", times = n_times),
-                   "Olink Target 48 Panel 1", "Olink Target 48 Panel 1"),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = n_assay),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_plates),
+                         seq_len(n_plates)),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_qc_warn),
+                         seq_len(n_qc_warn)),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = length(int_ctrl))),
           "V2" = c("Assay",
-                   paste0(rep(x = "Assay", time = n_times), seq_len(n_times)),
-                   rep(x = "Plate ID", times = n_times_add),
-                   rep(x = "QC Warning", times = n_times_add)),
+                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
+                          seq_len(n_panels * n_assay)),
+                   rep(x = "Plate ID", times = n_plates),
+                   rep(x = "QC Warning", times = n_qc_warn),
+                   rep(x = "QC Deviation from median",
+                       times = (length(int_ctrl) * n_panels))),
           "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add)),
+                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = int_ctrl, times = n_panels)),
           "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add))
+                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = NA_character_,
+                       times = (length(int_ctrl) * n_panels)))
         )
 
         # introduce NAs
@@ -2910,7 +3282,7 @@ test_that(
           object = read_npx_wide_top_split(df = df_t,
                                            file = wide_excel,
                                            data_type = "NPX",
-                                           olink_platform = "Target 48"),
+                                           olink_platform = o_platform),
           regexp = "Detected 5 empty cells in columns"
         )
 
@@ -2923,7 +3295,6 @@ test_that(
 test_that(
   "read_npx_wide_top_split - wrong number of assays",
   {
-
     ## T48 1 panel ----
 
     withr::with_tempfile(
@@ -2933,24 +3304,47 @@ test_that(
       code = {
 
         # random df_top ----
-        n_times <- 40L
-        n_times_add <- 1L
+        o_platform <- "Target 48"
+        n_panels <- 1L
+        n_assay <- 40L
+        n_qc_warn <- n_panels
+        n_plates <- n_panels
+        int_ctrl <- character(0)
+
         df <- dplyr::tibble(
           "V1" = c("Panel",
-                   rep(x = "Olink Target 48 Panel 1", times = n_times),
-                   "Olink Target 48 Panel 1", "Olink Target 48 Panel 1"),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = n_assay),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_plates),
+                         seq_len(n_plates)),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_qc_warn),
+                         seq_len(n_qc_warn)),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = length(int_ctrl))),
           "V2" = c("Assay",
-                   paste0(rep(x = "Assay", time = n_times), seq_len(n_times)),
-                   rep(x = "Plate ID", times = n_times_add),
-                   rep(x = "QC Warning", times = n_times_add)),
+                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
+                          seq_len(n_panels * n_assay)),
+                   rep(x = "Plate ID", times = n_plates),
+                   rep(x = "QC Warning", times = n_qc_warn),
+                   rep(x = "QC Deviation from median",
+                       times = (length(int_ctrl) * n_panels))),
           "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add)),
+                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = int_ctrl, times = n_panels)),
           "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add))
+                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = NA_character_,
+                       times = (length(int_ctrl) * n_panels)))
         )
         df_t <- t(df)
         colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
@@ -2966,7 +3360,7 @@ test_that(
           object = read_npx_wide_top_split(df = df_t,
                                            file = wide_excel,
                                            data_type = "NPX",
-                                           olink_platform = "Target 48"),
+                                           olink_platform = o_platform),
           regexp = "Detected 40 assays in 1 panels in file"
         )
 
@@ -2982,30 +3376,47 @@ test_that(
       code = {
 
         # random df_top ----
+        o_platform <- "Target 48"
+        n_panels <- 2L
+        n_assay <- 32L
+        n_qc_warn <- n_panels
+        n_plates <- n_panels
+        int_ctrl <- character(0L)
 
-        n_times <- 32L
-        n_times_add <- 2L
         df <- dplyr::tibble(
           "V1" = c("Panel",
-                   rep(x = "Olink Target 48 Panel 1", times = n_times),
-                   rep(x = "Olink Target 48 Panel 2", times = n_times),
-                   "Olink Target 48 Panel 1", "Olink Target 48 Panel 2",
-                   "Olink Target 48 Panel 1", "Olink Target 48 Panel 2"),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = n_assay),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_plates),
+                         seq_len(n_plates)),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_qc_warn),
+                         seq_len(n_qc_warn)),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = length(int_ctrl))),
           "V2" = c("Assay",
-                   paste0(rep(x = "Assay", time = n_times), seq_len(n_times)),
-                   paste0(rep(x = "Assay", time = n_times), seq_len(n_times)),
-                   rep(x = "Plate ID", times = n_times_add),
-                   rep(x = "QC Warning", times = n_times_add)),
+                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
+                          seq_len(n_panels * n_assay)),
+                   rep(x = "Plate ID", times = n_plates),
+                   rep(x = "QC Warning", times = n_qc_warn),
+                   rep(x = "QC Deviation from median",
+                       times = (length(int_ctrl) * n_panels))),
           "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", time = n_times), seq_len(n_times)),
-                   paste0(rep(x = "Uniprot", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add)),
+                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = int_ctrl, times = n_panels)),
           "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", time = n_times), seq_len(n_times)),
-                   paste0(rep(x = "OID", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add))
+                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = NA_character_,
+                       times = (length(int_ctrl) * n_panels)))
         )
         df_t <- t(df)
         colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
@@ -3021,7 +3432,7 @@ test_that(
           object = read_npx_wide_top_split(df = df_t,
                                            file = wide_excel,
                                            data_type = "NPX",
-                                           olink_platform = "Target 48"),
+                                           olink_platform = o_platform),
           regexp = "Detected 64 assays in 2 panels in file"
         )
       }
@@ -3036,24 +3447,47 @@ test_that(
       code = {
 
         # random df_top ----
-        n_times <- 67L
-        n_times_add <- 1L
+        o_platform <- "Target 96"
+        n_panels <- 1L
+        n_assay <- 67L
+        n_qc_warn <- n_panels
+        n_plates <- n_panels
+        int_ctrl <- character(0)
+
         df <- dplyr::tibble(
           "V1" = c("Panel",
-                   rep(x = "Olink Target 96 Panel 1", times = n_times),
-                   "Olink Target 96 Panel 1", "Olink Target 96 Panel 1"),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = n_assay),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_plates),
+                         seq_len(n_plates)),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_qc_warn),
+                         seq_len(n_qc_warn)),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = length(int_ctrl))),
           "V2" = c("Assay",
-                   paste0(rep(x = "Assay", time = n_times), seq_len(n_times)),
-                   rep(x = "Plate ID", times = n_times_add),
-                   rep(x = "QC Warning", times = n_times_add)),
+                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
+                          seq_len(n_panels * n_assay)),
+                   rep(x = "Plate ID", times = n_plates),
+                   rep(x = "QC Warning", times = n_qc_warn),
+                   rep(x = "QC Deviation from median",
+                       times = (length(int_ctrl) * n_panels))),
           "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add)),
+                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = int_ctrl, times = n_panels)),
           "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add))
+                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = NA_character_,
+                       times = (length(int_ctrl) * n_panels)))
         )
         df_t <- t(df)
         colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
@@ -3069,7 +3503,7 @@ test_that(
           object = read_npx_wide_top_split(df = df_t,
                                            file = wide_excel,
                                            data_type = "NPX",
-                                           olink_platform = "Target 96"),
+                                           olink_platform = o_platform),
           regexp = "Detected 67 assays in 1 panels in file"
         )
 
@@ -3085,30 +3519,47 @@ test_that(
       code = {
 
         # random df_top ----
+        o_platform <- "Target 96"
+        n_panels <- 2L
+        n_assay <- 78L
+        n_qc_warn <- n_panels
+        n_plates <- n_panels
+        int_ctrl <- character(0L)
 
-        n_times <- 78L
-        n_times_add <- 2L
         df <- dplyr::tibble(
           "V1" = c("Panel",
-                   rep(x = "Olink Target 96 Panel 1", times = n_times),
-                   rep(x = "Olink Target 96 Panel 2", times = n_times),
-                   "Olink Target 96 Panel 1", "Olink Target 96 Panel 2",
-                   "Olink Target 96 Panel 1", "Olink Target 96 Panel 2"),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = n_assay),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_plates),
+                         seq_len(n_plates)),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_qc_warn),
+                         seq_len(n_qc_warn)),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = length(int_ctrl))),
           "V2" = c("Assay",
-                   paste0(rep(x = "Assay", time = n_times), seq_len(n_times)),
-                   paste0(rep(x = "Assay", time = n_times), seq_len(n_times)),
-                   rep(x = "Plate ID", times = n_times_add),
-                   rep(x = "QC Warning", times = n_times_add)),
+                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
+                          seq_len(n_panels * n_assay)),
+                   rep(x = "Plate ID", times = n_plates),
+                   rep(x = "QC Warning", times = n_qc_warn),
+                   rep(x = "QC Deviation from median",
+                       times = (length(int_ctrl) * n_panels))),
           "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", time = n_times), seq_len(n_times)),
-                   paste0(rep(x = "Uniprot", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add)),
+                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = int_ctrl, times = n_panels)),
           "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", time = n_times), seq_len(n_times)),
-                   paste0(rep(x = "OID", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add))
+                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = NA_character_,
+                       times = (length(int_ctrl) * n_panels)))
         )
         df_t <- t(df)
         colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
@@ -3124,7 +3575,7 @@ test_that(
           object = read_npx_wide_top_split(df = df_t,
                                            file = wide_excel,
                                            data_type = "NPX",
-                                           olink_platform = "Target 96"),
+                                           olink_platform = o_platform),
           regexp = "Detected 156 assays in 2 panels in file"
         )
       }
@@ -3145,24 +3596,47 @@ test_that(
       code = {
 
         # random df_top ----
-        n_times <- 45L
-        n_times_add <- 1L
+        o_platform <- "Target 48"
+        n_panels <- 1L
+        n_assay <- 45L
+        n_qc_warn <- n_panels
+        n_plates <- n_panels
+        int_ctrl <- character(0)
+
         df <- dplyr::tibble(
           "V1" = c("Panel",
-                   rep(x = "Olink Target 48 Panel 1", times = n_times),
-                   "Olink Target 48 Panel 1", "Olink Target 48 Panel 1"),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = n_assay),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_plates),
+                         seq_len(n_plates)),
+                   paste(rep(paste("Olink ", o_platform, " Panel"),
+                             times = n_qc_warn),
+                         seq_len(n_qc_warn)),
+                   rep(x = paste("Olink ", o_platform,
+                                 " Panel", seq_len(n_panels)),
+                       each = length(int_ctrl))),
           "V2" = c("Assay",
-                   paste0(rep(x = "Assay", time = n_times), seq_len(n_times)),
-                   rep(x = "Plate ID", times = n_times_add),
-                   rep(x = "QC Warning", times = n_times_add)),
+                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
+                          seq_len(n_panels * n_assay)),
+                   rep(x = "Plate ID", times = n_plates),
+                   rep(x = "QC Warning", times = n_qc_warn),
+                   rep(x = "QC Deviation from median",
+                       times = (length(int_ctrl) * n_panels))),
           "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add)),
+                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = int_ctrl, times = n_panels)),
           "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", time = n_times), seq_len(n_times)),
-                   rep(x = NA_character_, times = n_times_add),
-                   rep(x = NA_character_, times = n_times_add))
+                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
+                          seq_len((n_panels * n_assay))),
+                   rep(x = NA_character_, times = n_plates),
+                   rep(x = NA_character_, times = n_qc_warn),
+                   rep(x = NA_character_,
+                       times = (length(int_ctrl) * n_panels)))
         )
         df_t <- t(df)
         colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
@@ -3178,7 +3652,7 @@ test_that(
           object = read_npx_wide_top_split(df = df_t,
                                            file = wide_excel,
                                            data_type = "Ct",
-                                           olink_platform = "Target 48"),
+                                           olink_platform = o_platform),
           regexp = "in the right-hand side of the top matrix in file"
         )
 
