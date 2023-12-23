@@ -1,3 +1,492 @@
+# Help functions ----
+
+## Top matrix ----
+
+npx_wide_top <- function(olink_platform,
+                         n_panels,
+                         n_assays,
+                         data_type,
+                         show_int_ctrl = TRUE,
+                         loc_int_ctrl = "V3",
+                         shuffle_assays = FALSE) {
+
+  n_plates <- n_panels
+
+  # number of QC Warnings and Internal controls based on data_type
+  if (data_type == "Ct") {
+    n_qc_warns <- 0L
+    int_ctrl <- character(0)
+  } else {
+    n_qc_warns <- n_panels
+    if (data_type == "NPX") {
+      int_ctrl <- character(0)
+    } else if (data_type == "Quantified") {
+      if (show_int_ctrl == TRUE) {
+        int_ctrl <- c("Inc Ctrl", "Amp Ctrl", "Ext Ctrl")
+      } else {
+        int_ctrl <- character(0)
+      }
+    }
+  }
+
+  # random df
+  df <- dplyr::tibble(
+    "V1" = c("Panel",
+             rep(x = paste("Olink ", olink_platform,
+                           " Panel", seq_len(n_panels)),
+                 each = n_assays),
+             paste(rep(paste("Olink ", olink_platform, " Panel"),
+                       times = n_plates),
+                   seq_len(n_plates)),
+             paste(rep(paste("Olink ", olink_platform, " Panel"),
+                       times = n_qc_warns),
+                   seq_len(n_qc_warns)),
+             rep(x = paste("Olink ", olink_platform,
+                           " Panel", seq_len(n_panels)),
+                 each = length(int_ctrl))),
+    "V2" = c("Assay",
+             paste0(rep(x = "Assay", times = (n_panels * n_assays)),
+                    seq_len(n_panels * n_assays)),
+             rep(x = "Plate ID", times = n_plates),
+             rep(x = "QC Warning", times = n_qc_warns),
+             rep(x = "QC Deviation from median",
+                 times = (length(int_ctrl) * n_panels))),
+    "V3" = c("Uniprot ID",
+             paste0(rep(x = "Uniprot", times = (n_panels * n_assays)),
+                    seq_len((n_panels * n_assays))),
+             rep(x = NA_character_, times = n_plates),
+             rep(x = NA_character_, times = n_qc_warns),
+             rep(x = int_ctrl, times = n_panels)),
+    "V4" = c("OlinkID",
+             paste0(rep(x = "OID", times = (n_panels * n_assays)),
+                    seq_len((n_panels * n_assays))),
+             rep(x = NA_character_, times = n_plates),
+             rep(x = NA_character_, times = n_qc_warns),
+             rep(x = NA_character_,
+                 times = (length(int_ctrl) * n_panels)))
+  )
+
+  # if data_type is Quantified then add column "Unit"
+  if (data_type == "Quantified") {
+    df <- df |>
+      dplyr::mutate(
+        "V5" = c("Unit",
+                 rep(x = "pg/mL", times = (n_panels * n_assays)),
+                 rep(x = NA_character_, times = n_plates),
+                 rep(x = NA_character_, times = n_qc_warns),
+                 rep(x = NA_character_,
+                     times = (length(int_ctrl) * n_panels)))
+      )
+  }
+
+  # if the internal controls should be in column 2 instead of column 3
+  if (loc_int_ctrl == "V2"
+      && data_type == "Quantified"
+      && show_int_ctrl == TRUE) {
+    df <- df |>
+      dplyr::mutate(
+        V2 = dplyr::if_else(.data[["V2"]] == "QC Deviation from median",
+                            .data[["V3"]],
+                            .data[["V2"]]),
+        V3 = dplyr::if_else(.data[["V2"]] %in% .env[["int_ctrl"]],
+                            NA_character_,
+                            .data[["V3"]])
+      )
+  }
+
+  # if internal controls and customer assays should be shuffled
+  if (shuffle_assays == TRUE) {
+
+    df <- df |>
+      # keep first row as is
+      dplyr::slice_head(n = 1L) |>
+      # shuffle rows with customer assays and internal controls
+      dplyr::bind_rows(
+        df |>
+          dplyr::filter(
+            grepl("^OID", .data[["V4"]])
+            | .data[["V2"]] %in% .env[["int_ctrl"]]
+            | .data[["V3"]] %in% .env[["int_ctrl"]]
+          ) |>
+          dplyr::slice_sample(prop = 1)
+      ) |>
+      # append rows with "Plate ID" or "QC Warning" in "V2"
+      dplyr::bind_rows(
+        df |>
+          dplyr::filter(
+            .data[["V2"]] %in% c("Plate ID", "QC Warning")
+          )
+      )
+
+  }
+
+  # transpose df ----
+
+  df_t <- t(df)
+  colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
+  rownames(df_t) <- NULL
+  df_t <- dplyr::as_tibble(df_t)
+
+  # return ----
+
+  return(
+    list(
+      df = df,
+      df_t = df_t
+    )
+  )
+
+}
+
+# This function modifies the output of npx_wide_top to help with tests
+npx_wide_top_test <- function(df) {
+
+  # modify df ----
+
+  colnames(df) <- dplyr::slice_head(df, n = 1L)
+  df <- df |>
+    dplyr::slice(
+      2L:dplyr::n()
+    ) |>
+    dplyr::mutate(
+      col_index = dplyr::row_number() + 1L,
+      col_index = paste0("V", .data[["col_index"]])
+    )
+
+  # separate df ----
+
+  df_oid <- df |>
+    dplyr::filter(
+      !is.na(.data[["OlinkID"]])
+    )
+
+  df_meta <- df |>
+    dplyr::filter(
+      is.na(.data[["OlinkID"]])
+      & .data[["Assay"]] %in% c("Plate ID", "QC Warning")
+    ) |>
+    dplyr::select(
+      -dplyr::all_of(c("Uniprot ID", "OlinkID"))
+    ) |>
+    dplyr::rename(
+      "Var" = "Assay"
+    )
+
+  df_qc_dev <- df |>
+    dplyr::filter(
+      is.na(.data[["OlinkID"]])
+      & (.data[["Assay"]] == "QC Deviation from median"
+         | grepl("ctrl", .data[["Assay"]], ignore.case = TRUE))
+    ) |>
+    dplyr::select(
+      -dplyr::all_of(c("OlinkID"))
+    )
+
+  # return ----
+
+  return(
+    list(
+      df_oid = df_oid,
+      df_meta = df_meta,
+      df_qc_dev = df_qc_dev
+    )
+  )
+
+}
+
+## Bottom matrix ----
+
+npx_wide_bottom <- function(n_plates,
+                            n_panels,
+                            n_assays,
+                            data_type) {
+  # this is the last column of the bottom matrix.
+  # commonly it contains data when data is Quantified, and not
+  # when it is NPX.
+  last_v <- paste0("V", n_assays * n_panels + 2)
+
+  # create matrix data that are specific to the data type
+  if (data_type == "NPX") {
+
+    # df_dt ----
+
+    df_dt <- matrix(
+      data = rnorm(n = (n_panels * n_assays)),
+      nrow = 1L,
+      ncol = (n_assays * n_panels),
+      dimnames = list(
+        "LOD",
+        paste0("V", 2L:((n_assays * n_panels) + 1L))
+      )
+    ) |>
+      dplyr::as_tibble(
+        rownames = "V1"
+      ) |>
+      dplyr::mutate(
+        dplyr::across(
+          dplyr::everything(),
+          ~ as.character(.x)
+        )
+      )
+
+  } else if (data_type == "Quantified") {
+
+    # df_rep ("Assay warning", "Lowest quantifiable level", "Plate LOD") ----
+
+    df_rep <- matrix(
+      data = sample(x = c("Pass", "Warn"),
+                    size = (n_plates * n_panels * n_assays),
+                    replace = TRUE),
+      nrow = n_plates,
+      ncol = (n_assays * n_panels),
+      dimnames = list(
+        rep(x = "Assay warning", times = n_plates),
+        paste0("V", 2L:((n_assays * n_panels) + 1L))
+      )
+    ) |>
+      dplyr::as_tibble(
+        rownames = "V1"
+      ) |>
+      dplyr::mutate(
+        {{last_v}} := paste("Plate", seq_len(n_plates)) # nolint object_usage_linter
+      ) |>
+      dplyr::bind_rows(
+        matrix(
+          data = rnorm(n = (n_plates * n_panels * n_assays)),
+          nrow = n_plates,
+          ncol = (n_assays * n_panels),
+          dimnames = list(
+            rep(x = "Lowest quantifiable level", times = n_plates),
+            paste0("V", 2L:((n_assays * n_panels) + 1L))
+          )
+        ) |>
+          dplyr::as_tibble(
+            rownames = "V1"
+          ) |>
+          dplyr::mutate(
+            {{last_v}} := paste("Plate", seq_len(n_plates)) # nolint object_usage_linter
+          ) |>
+          dplyr::mutate(
+            dplyr::across(
+              dplyr::everything(), ~ as.character(.x)
+            )
+          )
+      ) |>
+      dplyr::bind_rows(
+        matrix(
+          data = rnorm(n = (n_plates * n_panels * n_assays)),
+          nrow = n_plates,
+          ncol = (n_assays * n_panels),
+          dimnames = list(
+            rep(x = "Plate LOD", times = n_plates),
+            paste0("V", 2L:((n_assays * n_panels) + 1L))
+          )
+        ) |>
+          dplyr::as_tibble(
+            rownames = "V1"
+          ) |>
+          dplyr::mutate(
+            {{last_v}} := paste("Plate", seq_len(n_plates)) # nolint object_usage_linter
+          ) |>
+          dplyr::mutate(
+            dplyr::across(
+              dplyr::everything(),
+              ~ as.character(.x)
+            )
+          )
+      )
+
+    # df_spec ("LLOQ", "ULOQ")----
+    df_spec <- matrix(
+      data = rnorm(n = (n_panels * n_assays)),
+      nrow = 1L,
+      ncol = (n_assays * n_panels),
+      dimnames = list(
+        "LLOQ",
+        paste0("V", 2L:((n_assays * n_panels) + 1L))
+      )
+    ) |>
+      dplyr::as_tibble(
+        rownames = "V1"
+      ) |>
+      dplyr::bind_rows(
+        matrix(
+          data = rnorm(n = (n_panels * n_assays)),
+          nrow = 1L,
+          ncol = (n_assays * n_panels),
+          dimnames = list(
+            "ULOQ",
+            paste0("V", 2L:((n_assays * n_panels) + 1L))
+          )
+        ) |>
+          dplyr::as_tibble(
+            rownames = "V1"
+          )
+      ) |>
+      dplyr::mutate(
+        dplyr::across(
+          dplyr::everything(), ~ as.character(.x)
+        )
+      )
+
+    # df_dt ----
+
+    df_dt <- dplyr::bind_rows(df_rep, df_spec)
+
+  }
+
+  # df shared ("Missing Data freq.", "Normalization") ----
+
+  df_shared <- matrix(
+    data = rnorm(n = (n_panels * n_assays)),
+    nrow = 1L,
+    ncol = (n_assays * n_panels),
+    dimnames = list(
+      "Missing Data freq.",
+      paste0("V", 2L:((n_assays * n_panels) + 1L))
+    )
+  ) |>
+    dplyr::as_tibble(
+      rownames = "V1"
+    ) |>
+    dplyr::mutate(
+      dplyr::across(
+        dplyr::everything(), ~ as.character(.x)
+      )
+    ) |>
+    dplyr::bind_rows(
+      matrix(
+        data = rep(x = "Intensity", times = (n_panels * n_assays)),
+        nrow = 1L,
+        ncol = (n_assays * n_panels),
+        dimnames = list(
+          "Normalization",
+          paste0("V", 2L:((n_assays * n_panels) + 1L))
+        )
+      ) |>
+        dplyr::as_tibble(
+          rownames = "V1"
+        )
+    )
+
+  # df ----
+
+  df <- dplyr::bind_rows(df_dt, df_shared)
+
+  # return ----
+
+  return(df)
+
+}
+
+npx_wide_bottom_test <- function(df,
+                                 data_type,
+                                 col_split) {
+
+  # remove all NA columns ----
+
+  df <- remove_all_na_cols(df = df)
+
+  # df bottom matrix with plate-specific data ----
+
+  # This is done for Quantified data only
+  if (col_split %in% colnames(df)
+      && data_type == "Quantified") {
+
+    df_q <- df |>
+      # keep only rows to be pivoted
+      dplyr::filter(
+        !is.na(.data[[col_split]])
+      )
+
+    # for each variable in V1 and do a pivot_longer
+    df_q <- lapply(unique(df_q$V1), function(x) {
+      df_q |>
+        dplyr::filter(
+          .data[["V1"]] == .env[["x"]]
+        ) |>
+        dplyr::select(
+          -dplyr::all_of("V1")
+        ) |>
+        tidyr::pivot_longer(
+          -dplyr::all_of(col_split),
+          names_to = "col_index",
+          values_to = x
+        ) |>
+        dplyr::rename(
+          "Plate ID" = dplyr::all_of(col_split)
+        )
+    })
+
+    # left join all data frames from the list
+    df_q <- Reduce(f = function(df_1, df_2) {
+      dplyr::left_join(x = df_1,
+                       y = df_2,
+                       by = c("Plate ID", "col_index"),
+                       relationship = "one-to-one")
+    },
+    x = df_q)
+
+    # remove the rows with plate-specific data and the col_split column
+    df <- df |>
+      dplyr::filter(
+        is.na(.data[[col_split]])
+      ) |>
+      dplyr::select(
+        -dplyr::all_of(col_split)
+      )
+
+  }
+
+  # df without plate-specific info ----
+
+  # transpose and add column names
+  df_t <- t(df)
+  colnames(df_t) <- df_t[1L, ]
+
+  # fix column names and remove extra rows
+  df_t <- df_t |>
+    dplyr::as_tibble(
+      rownames = "col_index"
+    ) |>
+    dplyr::mutate(
+      col_index = dplyr::if_else(
+        .data[["col_index"]] == "V1",
+        "col_index",
+        .data[["col_index"]]
+      )
+    ) |>
+    dplyr::slice(
+      2L:dplyr::n()
+    )
+
+  # join df_q and df_t if needed ----
+
+  if (exists("df_q")) {
+
+    df_t <- dplyr::left_join(
+      x = df_t,
+      y = df_q,
+      by = "col_index",
+      relationship = "one-to-many"
+    )
+
+  }
+
+  # finalize df_t  ----
+
+  # sort columns of df_t
+  df_t <- df_t |>
+    dplyr::select(
+      order(colnames(df_t))
+    )
+
+  # return ----
+
+  return(df_t)
+
+}
+
 # Test read_npx_wide_split_row ----
 
 test_that(
@@ -492,7 +981,7 @@ test_that(
 test_that(
   "read_npx_wide_check_top - works as expecetd",
   {
-    ## NPX or Ct ----
+    ## NPX ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -500,43 +989,40 @@ test_that(
       fileext = ".xlsx",
       code = {
 
-        # random df
-        df <- dplyr::tibble(
-          "V1" = c("Panel", "Assay", "Uniprot ID", "OlinkID"),
-          "V2" = c("Olink Target 48", "Assay1", "Uniprot1", "OID1"),
-          "V3" = c("Olink Target 48", "Assay2", "Uniprot2", "OID2"),
-          "V4" = c("Olink Target 48", "Assay3", "Uniprot3", "OID3")
-        )
+        # random df ----
+
+        o_platform <- "Target 48"
+        n_panel <- 3L
+        n_assay <- 45L
+        data_t <- "NPX"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df_t <- l_df$df_t
 
         # write file
-        writexl::write_xlsx(
-          x = df,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        writeLines("foo", wide_excel)
 
         # check that file exists
         expect_true(object = file.exists(wide_excel))
 
         # check that function runs for NPX
         expect_no_condition(
-          object = read_npx_wide_check_top(df = df,
+          object = read_npx_wide_check_top(df = df_t,
                                            file = wide_excel,
-                                           data_type = "NPX")
-        )
-
-        # check that function runs for Ct
-        expect_no_condition(
-          object = read_npx_wide_check_top(df = df,
-                                           file = wide_excel,
-                                           data_type = "Ct")
+                                           data_type = data_t)
         )
 
       }
     )
 
-    ## Quantified ----
+    ## Ct ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -544,30 +1030,239 @@ test_that(
       fileext = ".xlsx",
       code = {
 
-        # random df
-        df <- dplyr::tibble(
-          "V1" = c("Panel", "Assay", "Uniprot ID", "OlinkID", "Unit"),
-          "V2" = c("Olink Target 48", "Assay1", "Uniprot1", "OID1", "pg/mL"),
-          "V3" = c("Olink Target 48", "Assay2", "Uniprot2", "OID2", "pg/mL"),
-          "V4" = c("Olink Target 48", "Assay3", "Uniprot3", "OID3", "pg/mL")
-        )
+        # random df ----
+
+        o_platform <- "Target 48"
+        n_panel <- 3L
+        n_assay <- 45L
+        data_t <- "Ct"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df_t <- l_df$df_t
 
         # write file
-        writexl::write_xlsx(
-          x = df,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs for NPX
+        expect_no_condition(
+          object = read_npx_wide_check_top(df = df_t,
+                                           file = wide_excel,
+                                           data_type = data_t)
         )
+
+      }
+    )
+
+    ## Quantified wo int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df ----
+
+        o_platform <- "Target 48"
+        n_panel <- 3L
+        n_assay <- 45L
+        data_t <- "Quantified"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df_t <- l_df$df_t
+
+        # write file
+        writeLines("foo", wide_excel)
 
         # check that file exists
         expect_true(object = file.exists(wide_excel))
 
         # check that function runs
         expect_no_condition(
-          object = read_npx_wide_check_top(df = df,
+          object = read_npx_wide_check_top(df = df_t,
                                            file = wide_excel,
-                                           data_type = "Quantified")
+                                           data_type = data_t)
+        )
+
+      }
+    )
+
+    ## Quantified w int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df ----
+
+        o_platform <- "Target 48"
+        n_panel <- 3L
+        n_assay <- 45L
+        data_t <- "Quantified"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = TRUE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df_t <- l_df$df_t
+
+        # write file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = read_npx_wide_check_top(df = df_t,
+                                           file = wide_excel,
+                                           data_type = data_t)
+        )
+
+      }
+    )
+
+    ## Quantified w int ctrl shuffled ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df ----
+
+        o_platform <- "Target 48"
+        n_panel <- 3L
+        n_assay <- 45L
+        data_t <- "Quantified"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = TRUE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = TRUE)
+
+        df_t <- l_df$df_t
+
+        # write file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = read_npx_wide_check_top(df = df_t,
+                                           file = wide_excel,
+                                           data_type = data_t)
+        )
+
+      }
+    )
+
+    ## Quantified w int ctrl in V2 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df ----
+
+        o_platform <- "Target 48"
+        n_panel <- 3L
+        n_assay <- 45L
+        data_t <- "Quantified"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = TRUE,
+                             loc_int_ctrl = "V2",
+                             shuffle_assays = FALSE)
+
+        df_t <- l_df$df_t
+
+        # write file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = read_npx_wide_check_top(df = df_t,
+                                           file = wide_excel,
+                                           data_type = data_t)
+        )
+
+      }
+    )
+
+    ## Quantified w int ctrl shuffled and in V2 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df ----
+
+        o_platform <- "Target 48"
+        n_panel <- 3L
+        n_assay <- 45L
+        data_t <- "Quantified"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = TRUE,
+                             loc_int_ctrl = "V2",
+                             shuffle_assays = TRUE)
+
+        df_t <- l_df$df_t
+
+        # write file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = read_npx_wide_check_top(df = df_t,
+                                           file = wide_excel,
+                                           data_type = data_t)
         )
 
       }
@@ -587,30 +1282,37 @@ test_that(
       fileext = ".xlsx",
       code = {
 
-        # random df
-        df <- dplyr::tibble(
-          "V1" = c("Panel", "Assay", "Uniprot ID"),
-          "V2" = c("Olink Target 48", "Assay1", "Uniprot1"),
-          "V3" = c("Olink Target 48", "Assay2", "Uniprot2"),
-          "V4" = c("Olink Target 48", "Assay3", "Uniprot3")
-        )
+        # random df ----
+
+        o_platform <- "Target 48"
+        n_panel <- 3L
+        n_assay <- 45L
+        data_t <- "NPX"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df_t <- l_df$df_t |>
+          dplyr::filter(
+            .data[["V1"]] != "OlinkID"
+          )
 
         # write file
-        writexl::write_xlsx(
-          x = df,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        writeLines("foo", wide_excel)
 
         # check that file exists
         expect_true(object = file.exists(wide_excel))
 
         # check that function runs
         expect_error(
-          object = read_npx_wide_check_top(df = df,
+          object = read_npx_wide_check_top(df = df_t,
                                            file = wide_excel,
-                                           data_type = "NPX"),
+                                           data_type = data_t),
           regexp = "We identified 3 rows containing data about assays in file"
         )
 
@@ -625,34 +1327,49 @@ test_that(
       fileext = ".xlsx",
       code = {
 
-        # random df
-        df <- dplyr::tibble(
-          "V1" = c("Panel", "Assay", "Uniprot ID", "OlinkID", "Unit",
-                   "ExtraCol"),
-          "V2" = c("Olink Target 48", "Assay1", "Uniprot1", "OID1", "pg/mL",
-                   "A"),
-          "V3" = c("Olink Target 48", "Assay2", "Uniprot2", "OID2", "pg/mL",
-                   "B"),
-          "V4" = c("Olink Target 48", "Assay3", "Uniprot3", "OID3", "pg/mL",
-                   "C")
-        )
+        # random df ----
+
+        o_platform <- "Target 48"
+        n_panel <- 3L
+        n_assay <- 45L
+        data_t <- "Quantified"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = TRUE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        add_row <- dplyr::tibble(
+          "X" = c("Extra_Row",
+                  rep(x = "A", times = n_panel * n_assay),
+                  rep(x = NA_character_, times = n_panel),
+                  rep(x = NA_character_, times = n_panel),
+                  rep(x = NA_character_, times = 3L * n_panel))
+        ) |>
+          t()
+        rownames(add_row) <- NULL
+        colnames(add_row) <- paste0("V", seq_len(ncol(l_df$df_t)))
+        add_row <- dplyr::as_tibble(add_row)
+
+        df_t <- l_df$df_t |>
+          dplyr::bind_rows(
+            add_row
+          )
 
         # write file
-        writexl::write_xlsx(
-          x = df,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        writeLines("foo", wide_excel)
 
         # check that file exists
         expect_true(object = file.exists(wide_excel))
 
         # check that function runs
         expect_error(
-          object = read_npx_wide_check_top(df = df,
+          object = read_npx_wide_check_top(df = df_t,
                                            file = wide_excel,
-                                           data_type = "Quantified"),
+                                           data_type = data_t),
           regexp = "We identified 6 rows containing data about assays in file"
         )
 
@@ -673,28 +1390,32 @@ test_that(
       fileext = ".xlsx",
       code = {
 
-        # random df
-        df <- dplyr::tibble(
-          "V1" = c("Panel", "Assay", "Uniprot ID", "OlinkID"),
-          "V2" = c("Olink Target 48", "Assay1", "Uniprot1", "OID1"),
-          "V3" = c("Olink Target 48", "Assay2", "Uniprot2", "OID2"),
-          "V4" = c("Olink Target 48", "Assay3", "Uniprot3", "OID3")
-        )
+        # random df ----
+
+        o_platform <- "Target 48"
+        n_panel <- 3L
+        n_assay <- 45L
+        data_t <- "NPX"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df_t <- l_df$df_t
 
         # write file
-        writexl::write_xlsx(
-          x = df,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        writeLines("foo", wide_excel)
 
         # check that file exists
         expect_true(object = file.exists(wide_excel))
 
         # check that function runs
         expect_error(
-          object = read_npx_wide_check_top(df = df,
+          object = read_npx_wide_check_top(df = df_t,
                                            file = wide_excel,
                                            data_type = "Quantified"),
           regexp = "while we expected 5"
@@ -711,30 +1432,37 @@ test_that(
       fileext = ".xlsx",
       code = {
 
-        # random df
-        df <- dplyr::tibble(
-          "V1" = c("Panel", "Assay", "Uniprot ID", "Unit"),
-          "V2" = c("Olink Target 48", "Assay1", "Uniprot1", "pg/mL"),
-          "V3" = c("Olink Target 48", "Assay2", "Uniprot2", "pg/mL"),
-          "V4" = c("Olink Target 48", "Assay3", "Uniprot3", "pg/mL")
-        )
+        # random df ----
+
+        o_platform <- "Target 48"
+        n_panel <- 3L
+        n_assay <- 45L
+        data_t <- "Quantified"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df_t <- l_df$df_t |>
+          dplyr::filter(
+            .data[["V1"]] != "OlinkID"
+          )
 
         # write file
-        writexl::write_xlsx(
-          x = df,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        writeLines("foo", wide_excel)
 
         # check that file exists
         expect_true(object = file.exists(wide_excel))
 
         # check that function runs
         expect_error(
-          object = read_npx_wide_check_top(df = df,
+          object = read_npx_wide_check_top(df = df_t,
                                            file = wide_excel,
-                                           data_type = "Quantified"),
+                                           data_type = data_t),
           regexp = "while we expected 5"
         )
 
@@ -755,30 +1483,39 @@ test_that(
       fileext = ".xlsx",
       code = {
 
-        # random df
-        df <- dplyr::tibble(
-          "V1" = c("Panel", "Assay", "Uniprot ID", "OlinkID2"),
-          "V2" = c("Olink Target 48", "Assay1", "Uniprot1", "OID1"),
-          "V3" = c("Olink Target 48", "Assay2", "Uniprot2", "OID2"),
-          "V4" = c("Olink Target 48", "Assay3", "Uniprot3", "OID3")
-        )
+        # random df ----
+
+        o_platform <- "Target 48"
+        n_panel <- 3L
+        n_assay <- 45L
+        data_t <- "NPX"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df_t <- l_df$df_t |>
+          dplyr::mutate(
+            V1 = dplyr::if_else(.data[["V1"]] == "OlinkID",
+                                "OlinkID_2",
+                                .data[["V1"]])
+          )
 
         # write file
-        writexl::write_xlsx(
-          x = df,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        writeLines("foo", wide_excel)
 
         # check that file exists
         expect_true(object = file.exists(wide_excel))
 
         # check that function runs
         expect_error(
-          object = read_npx_wide_check_top(df = df,
+          object = read_npx_wide_check_top(df = df_t,
                                            file = wide_excel,
-                                           data_type = "NPX"),
+                                           data_type = data_t),
           regexp = "Column 1 of of the top matrix with assay metadata in file"
         )
 
@@ -793,30 +1530,39 @@ test_that(
       fileext = ".xlsx",
       code = {
 
-        # random df
-        df <- dplyr::tibble(
-          "V1" = c("Panel", "Assay", "Uniprot ID", "OlinkID", "Unit2"),
-          "V2" = c("Olink Target 48", "Assay1", "Uniprot1", "OID1", "pg/mL"),
-          "V3" = c("Olink Target 48", "Assay2", "Uniprot2", "OID2", "pg/mL"),
-          "V4" = c("Olink Target 48", "Assay3", "Uniprot3", "OID3", "pg/mL")
-        )
+        # random df ----
+
+        o_platform <- "Target 48"
+        n_panel <- 3L
+        n_assay <- 45L
+        data_t <- "Quantified"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df_t <- l_df$df_t |>
+          dplyr::mutate(
+            V1 = dplyr::if_else(.data[["V1"]] == "Unit",
+                                "Unit_2",
+                                .data[["V1"]])
+          )
 
         # write file
-        writexl::write_xlsx(
-          x = df,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        writeLines("foo", wide_excel)
 
         # check that file exists
         expect_true(object = file.exists(wide_excel))
 
         # check that function runs
         expect_error(
-          object = read_npx_wide_check_top(df = df,
+          object = read_npx_wide_check_top(df = df_t,
                                            file = wide_excel,
-                                           data_type = "Quantified"),
+                                           data_type = data_t),
           regexp = "Column 1 of of the top matrix with assay metadata in file"
         )
 
@@ -829,9 +1575,9 @@ test_that(
 # Test read_npx_wide_split_col ----
 
 test_that(
-  "read_npx_wide_split_col - works",
+  "read_npx_wide_split_col - NPX - works",
   {
-    ## NPX ----
+    ## T48 ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -839,21 +1585,22 @@ test_that(
       fileext = ".xlsx",
       code = {
 
-        # random df
-        df <- dplyr::tibble(
-          "V1" = c("Panel", "Assay", "Uniprot ID", "OlinkID"),
-          "V2" = c("Olink Target 48", "Assay1", "Uniprot1", "OID1"),
-          "V3" = c("Olink Target 48", "Assay2", "Uniprot2", "OID2"),
-          "V4" = c("Olink Target 48", "Assay3", "Uniprot3", "OID3"),
-          "V5" = c("Olink Target 48", "Plate ID",
-                   NA_character_, NA_character_),
-          "V6" = c("Olink Target 48", "QC Warning",
-                   NA_character_, NA_character_),
-          "V7" = c("Olink Target 48", "QC Deviation from median",
-                   "Inc Ctrl", NA_character_),
-          "V8" = c("Olink Target 48", "QC Deviation from median",
-                   "Det Ctrl", NA_character_)
-        )
+        # random df----
+
+        o_platform <- "Target 48"
+        n_panel <- 1L
+        n_assay <- 45L
+        data_t <- "NPX"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df_t <- l_df$df_t
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -863,7 +1610,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df,
+          object = x_index <- read_npx_wide_split_col(df = df_t,
                                                       file = wide_excel)
         )
 
@@ -873,13 +1620,13 @@ test_that(
         # check that df_top works
         expect_identical(
           object = x_index,
-          expected = 5L
+          expected = (n_assay * n_panel) + 2L
         )
 
       }
     )
 
-    ## Quantified ----
+    ## T48 shuffled ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -887,24 +1634,22 @@ test_that(
       fileext = ".xlsx",
       code = {
 
-        # random df
-        df <- dplyr::tibble(
-          "V1" = c("Panel", "Assay", "Uniprot ID", "OlinkID", "Unit"),
-          "V2" = c("Olink Target 48", "Assay1", "Uniprot1", "OID1", "pg/mL"),
-          "V3" = c("Olink Target 48", "Assay2", "Uniprot2", "OID2", "pg/mL"),
-          "V4" = c("Olink Target 48", "Assay3", "Uniprot3", "OID3", "pg/mL"),
-          "V5" = c("Olink Target 48", "Assay4", "Uniprot4", "OID4", "pg/mL"),
-          "V6" = c("Olink Target 48", "Assay5", "Uniprot5", "OID5", "pg/mL"),
-          "V7" = c("Olink Target 48", "Assay6", "Uniprot6", "OID6", "pg/mL"),
-          "V8" = c("Olink Target 48", "Plate ID",
-                   NA_character_, NA_character_, NA_character_),
-          "V9" = c("Olink Target 48", "QC Warning",
-                   NA_character_, NA_character_, NA_character_),
-          "V10" = c("Olink Target 48", "QC Deviation from median",
-                    "Inc Ctrl", NA_character_, NA_character_),
-          "V11" = c("Olink Target 48", "QC Deviation from median",
-                    "Det Ctrl", NA_character_, NA_character_)
-        )
+        # random df----
+
+        o_platform <- "Target 48"
+        n_panel <- 1L
+        n_assay <- 45L
+        data_t <- "NPX"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = TRUE)
+
+        df_t <- l_df$df_t
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -914,7 +1659,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df,
+          object = x_index <- read_npx_wide_split_col(df = df_t,
                                                       file = wide_excel)
         )
 
@@ -924,7 +1669,1699 @@ test_that(
         # check that df_top works
         expect_identical(
           object = x_index,
-          expected = 8L
+          expected = (n_assay * n_panel) + 2L
+        )
+
+      }
+    )
+
+    ## T48 multi-plate shuffled ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df----
+
+        o_platform <- "Target 48"
+        n_panel <- 4L
+        n_assay <- 45L
+        data_t <- "NPX"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = TRUE)
+
+        df_t <- l_df$df_t
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = x_index <- read_npx_wide_split_col(df = df_t,
+                                                      file = wide_excel)
+        )
+
+        # check that output exists
+        expect_true(object = exists("x_index"))
+
+        # check that df_top works
+        expect_identical(
+          object = x_index,
+          expected = (n_assay * n_panel) + 2L
+        )
+
+      }
+    )
+
+    ## T48 multi-plate shuffled fewer assays ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df----
+
+        o_platform <- "Target 48"
+        n_panel <- 4L
+        n_assay <- 45L
+        data_t <- "NPX"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = TRUE)
+
+        n_select <- 100L
+        random_assays <- sample(
+          x = paste0("V",
+                     tail(x = seq_len((n_panel * n_assay) + 1L), n = -1L)),
+          size = n_select,
+          replace = FALSE
+        )
+
+        df_t <- l_df$df_t |>
+          dplyr::select(
+            -dplyr::all_of(random_assays)
+          )
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = x_index <- read_npx_wide_split_col(df = df_t,
+                                                      file = wide_excel)
+        )
+
+        # check that output exists
+        expect_true(object = exists("x_index"))
+
+        # check that df_top works
+        expect_identical(
+          object = x_index,
+          expected = ((n_assay * n_panel) + 2L) - n_select
+        )
+
+      }
+    )
+
+    ## T96 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df----
+
+        o_platform <- "Target 96"
+        n_panel <- 1L
+        n_assay <- 92L
+        data_t <- "NPX"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df_t <- l_df$df_t
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = x_index <- read_npx_wide_split_col(df = df_t,
+                                                      file = wide_excel)
+        )
+
+        # check that output exists
+        expect_true(object = exists("x_index"))
+
+        # check that df_top works
+        expect_identical(
+          object = x_index,
+          expected = (n_assay * n_panel) + 2L
+        )
+
+      }
+    )
+
+    ## T96 shuffled ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df----
+
+        o_platform <- "Target 96"
+        n_panel <- 1L
+        n_assay <- 92L
+        data_t <- "NPX"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = TRUE)
+
+        df_t <- l_df$df_t
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = x_index <- read_npx_wide_split_col(df = df_t,
+                                                      file = wide_excel)
+        )
+
+        # check that output exists
+        expect_true(object = exists("x_index"))
+
+        # check that df_top works
+        expect_identical(
+          object = x_index,
+          expected = (n_assay * n_panel) + 2L
+        )
+
+      }
+    )
+
+    ## T96 multi-plate shuffled ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df----
+
+        o_platform <- "Target 96"
+        n_panel <- 4L
+        n_assay <- 92L
+        data_t <- "NPX"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = TRUE)
+
+        df_t <- l_df$df_t
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = x_index <- read_npx_wide_split_col(df = df_t,
+                                                      file = wide_excel)
+        )
+
+        # check that output exists
+        expect_true(object = exists("x_index"))
+
+        # check that df_top works
+        expect_identical(
+          object = x_index,
+          expected = (n_assay * n_panel) + 2L
+        )
+
+      }
+    )
+
+    ## T96 multi-plate shuffled fewer assays ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df----
+
+        o_platform <- "Target 96"
+        n_panel <- 4L
+        n_assay <- 92L
+        data_t <- "NPX"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = TRUE)
+
+        n_select <- 100L
+        random_assays <- sample(
+          x = paste0("V",
+                     tail(x = seq_len((n_panel * n_assay) + 1L), n = -1L)),
+          size = n_select,
+          replace = FALSE
+        )
+
+        df_t <- l_df$df_t |>
+          dplyr::select(
+            -dplyr::all_of(random_assays)
+          )
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = x_index <- read_npx_wide_split_col(df = df_t,
+                                                      file = wide_excel)
+        )
+
+        # check that output exists
+        expect_true(object = exists("x_index"))
+
+        # check that df_top works
+        expect_identical(
+          object = x_index,
+          expected = ((n_assay * n_panel) + 2L) - n_select
+        )
+
+      }
+    )
+
+    ## Flex/Focus ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df----
+
+        o_platform <- "Focus"
+        n_panel <- 1L
+        n_assay <- 21L
+        data_t <- "NPX"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df_t <- l_df$df_t
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = x_index <- read_npx_wide_split_col(df = df_t,
+                                                      file = wide_excel)
+        )
+
+        # check that output exists
+        expect_true(object = exists("x_index"))
+
+        # check that df_top works
+        expect_identical(
+          object = x_index,
+          expected = (n_assay * n_panel) + 2L
+        )
+
+      }
+    )
+
+    ## Flex/Focus shuffled ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df----
+
+        o_platform <- "Focus"
+        n_panel <- 1L
+        n_assay <- 21L
+        data_t <- "NPX"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = TRUE)
+
+        df_t <- l_df$df_t
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = x_index <- read_npx_wide_split_col(df = df_t,
+                                                      file = wide_excel)
+        )
+
+        # check that output exists
+        expect_true(object = exists("x_index"))
+
+        # check that df_top works
+        expect_identical(
+          object = x_index,
+          expected = (n_assay * n_panel) + 2L
+        )
+
+      }
+    )
+
+    ## Flex/Focus multi-plate shuffled ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df----
+
+        o_platform <- "Focus"
+        n_panel <- 4L
+        n_assay <- 21L
+        data_t <- "NPX"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = TRUE)
+
+        df_t <- l_df$df_t
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = x_index <- read_npx_wide_split_col(df = df_t,
+                                                      file = wide_excel)
+        )
+
+        # check that output exists
+        expect_true(object = exists("x_index"))
+
+        # check that df_top works
+        expect_identical(
+          object = x_index,
+          expected = (n_assay * n_panel) + 2L
+        )
+
+      }
+    )
+
+    ## Flex/Focus multi-plate shuffled fewer assays ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df----
+
+        o_platform <- "Focus"
+        n_panel <- 4L
+        n_assay <- 21L
+        data_t <- "NPX"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = TRUE)
+
+        n_select <- 50L
+        random_assays <- sample(
+          x = paste0("V",
+                     tail(x = seq_len((n_panel * n_assay) + 1L), n = -1L)),
+          size = n_select,
+          replace = FALSE
+        )
+
+        df_t <- l_df$df_t |>
+          dplyr::select(
+            -dplyr::all_of(random_assays)
+          )
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = x_index <- read_npx_wide_split_col(df = df_t,
+                                                      file = wide_excel)
+        )
+
+        # check that output exists
+        expect_true(object = exists("x_index"))
+
+        # check that df_top works
+        expect_identical(
+          object = x_index,
+          expected = ((n_assay * n_panel) + 2L) - n_select
+        )
+
+      }
+    )
+
+
+  }
+)
+
+test_that(
+  "read_npx_wide_split_col - Ct - works",
+  {
+    ## T48 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df----
+
+        o_platform <- "Target 48"
+        n_panel <- 1L
+        n_assay <- 45L
+        data_t <- "Ct"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df_t <- l_df$df_t
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = x_index <- read_npx_wide_split_col(df = df_t,
+                                                      file = wide_excel)
+        )
+
+        # check that output exists
+        expect_true(object = exists("x_index"))
+
+        # check that df_top works
+        expect_identical(
+          object = x_index,
+          expected = (n_assay * n_panel) + 2L
+        )
+
+      }
+    )
+
+    ## T48 shuffled ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df----
+
+        o_platform <- "Target 48"
+        n_panel <- 1L
+        n_assay <- 45L
+        data_t <- "Ct"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = TRUE)
+
+        df_t <- l_df$df_t
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = x_index <- read_npx_wide_split_col(df = df_t,
+                                                      file = wide_excel)
+        )
+
+        # check that output exists
+        expect_true(object = exists("x_index"))
+
+        # check that df_top works
+        expect_identical(
+          object = x_index,
+          expected = (n_assay * n_panel) + 2L
+        )
+
+      }
+    )
+
+    ## T48 multi-plate shuffled ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df----
+
+        o_platform <- "Target 48"
+        n_panel <- 4L
+        n_assay <- 45L
+        data_t <- "Ct"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = TRUE)
+
+        df_t <- l_df$df_t
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = x_index <- read_npx_wide_split_col(df = df_t,
+                                                      file = wide_excel)
+        )
+
+        # check that output exists
+        expect_true(object = exists("x_index"))
+
+        # check that df_top works
+        expect_identical(
+          object = x_index,
+          expected = (n_assay * n_panel) + 2L
+        )
+
+      }
+    )
+
+    ## T48 multi-plate shuffled fewer assays ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df----
+
+        o_platform <- "Target 48"
+        n_panel <- 4L
+        n_assay <- 45L
+        data_t <- "Ct"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = TRUE)
+
+        n_select <- 100L
+        random_assays <- sample(
+          x = paste0("V",
+                     tail(x = seq_len((n_panel * n_assay) + 1L), n = -1L)),
+          size = n_select,
+          replace = FALSE
+        )
+
+        df_t <- l_df$df_t |>
+          dplyr::select(
+            -dplyr::all_of(random_assays)
+          )
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = x_index <- read_npx_wide_split_col(df = df_t,
+                                                      file = wide_excel)
+        )
+
+        # check that output exists
+        expect_true(object = exists("x_index"))
+
+        # check that df_top works
+        expect_identical(
+          object = x_index,
+          expected = ((n_assay * n_panel) + 2L) - n_select
+        )
+
+      }
+    )
+
+    ## T96 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df----
+
+        o_platform <- "Target 96"
+        n_panel <- 1L
+        n_assay <- 92L
+        data_t <- "Ct"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df_t <- l_df$df_t
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = x_index <- read_npx_wide_split_col(df = df_t,
+                                                      file = wide_excel)
+        )
+
+        # check that output exists
+        expect_true(object = exists("x_index"))
+
+        # check that df_top works
+        expect_identical(
+          object = x_index,
+          expected = (n_assay * n_panel) + 2L
+        )
+
+      }
+    )
+
+    ## T96 shuffled ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df----
+
+        o_platform <- "Target 96"
+        n_panel <- 1L
+        n_assay <- 92L
+        data_t <- "Ct"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = TRUE)
+
+        df_t <- l_df$df_t
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = x_index <- read_npx_wide_split_col(df = df_t,
+                                                      file = wide_excel)
+        )
+
+        # check that output exists
+        expect_true(object = exists("x_index"))
+
+        # check that df_top works
+        expect_identical(
+          object = x_index,
+          expected = (n_assay * n_panel) + 2L
+        )
+
+      }
+    )
+
+    ## T96 multi-plate shuffled ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df----
+
+        o_platform <- "Target 96"
+        n_panel <- 4L
+        n_assay <- 92L
+        data_t <- "Ct"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = TRUE)
+
+        df_t <- l_df$df_t
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = x_index <- read_npx_wide_split_col(df = df_t,
+                                                      file = wide_excel)
+        )
+
+        # check that output exists
+        expect_true(object = exists("x_index"))
+
+        # check that df_top works
+        expect_identical(
+          object = x_index,
+          expected = (n_assay * n_panel) + 2L
+        )
+
+      }
+    )
+
+    ## T96 multi-plate shuffled fewer assays ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df----
+
+        o_platform <- "Target 96"
+        n_panel <- 4L
+        n_assay <- 92L
+        data_t <- "Ct"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = TRUE)
+
+        n_select <- 100L
+        random_assays <- sample(
+          x = paste0("V",
+                     tail(x = seq_len((n_panel * n_assay) + 1L), n = -1L)),
+          size = n_select,
+          replace = FALSE
+        )
+
+        df_t <- l_df$df_t |>
+          dplyr::select(
+            -dplyr::all_of(random_assays)
+          )
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = x_index <- read_npx_wide_split_col(df = df_t,
+                                                      file = wide_excel)
+        )
+
+        # check that output exists
+        expect_true(object = exists("x_index"))
+
+        # check that df_top works
+        expect_identical(
+          object = x_index,
+          expected = ((n_assay * n_panel) + 2L) - n_select
+        )
+
+      }
+    )
+
+    ## Flex/Focus ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df----
+
+        o_platform <- "Focus"
+        n_panel <- 1L
+        n_assay <- 21L
+        data_t <- "Ct"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df_t <- l_df$df_t
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = x_index <- read_npx_wide_split_col(df = df_t,
+                                                      file = wide_excel)
+        )
+
+        # check that output exists
+        expect_true(object = exists("x_index"))
+
+        # check that df_top works
+        expect_identical(
+          object = x_index,
+          expected = (n_assay * n_panel) + 2L
+        )
+
+      }
+    )
+
+    ## Flex/Focus shuffled ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df----
+
+        o_platform <- "Focus"
+        n_panel <- 1L
+        n_assay <- 21L
+        data_t <- "Ct"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = TRUE)
+
+        df_t <- l_df$df_t
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = x_index <- read_npx_wide_split_col(df = df_t,
+                                                      file = wide_excel)
+        )
+
+        # check that output exists
+        expect_true(object = exists("x_index"))
+
+        # check that df_top works
+        expect_identical(
+          object = x_index,
+          expected = (n_assay * n_panel) + 2L
+        )
+
+      }
+    )
+
+    ## Flex/Focus multi-plate shuffled ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df----
+
+        o_platform <- "Focus"
+        n_panel <- 4L
+        n_assay <- 21L
+        data_t <- "Ct"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = TRUE)
+
+        df_t <- l_df$df_t
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = x_index <- read_npx_wide_split_col(df = df_t,
+                                                      file = wide_excel)
+        )
+
+        # check that output exists
+        expect_true(object = exists("x_index"))
+
+        # check that df_top works
+        expect_identical(
+          object = x_index,
+          expected = (n_assay * n_panel) + 2L
+        )
+
+      }
+    )
+
+    ## Flex/Focus multi-plate shuffled fewer assays ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df----
+
+        o_platform <- "Focus"
+        n_panel <- 4L
+        n_assay <- 21L
+        data_t <- "Ct"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = TRUE)
+
+        n_select <- 50L
+        random_assays <- sample(
+          x = paste0("V",
+                     tail(x = seq_len((n_panel * n_assay) + 1L), n = -1L)),
+          size = n_select,
+          replace = FALSE
+        )
+
+        df_t <- l_df$df_t |>
+          dplyr::select(
+            -dplyr::all_of(random_assays)
+          )
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = x_index <- read_npx_wide_split_col(df = df_t,
+                                                      file = wide_excel)
+        )
+
+        # check that output exists
+        expect_true(object = exists("x_index"))
+
+        # check that df_top works
+        expect_identical(
+          object = x_index,
+          expected = ((n_assay * n_panel) + 2L) - n_select
+        )
+
+      }
+    )
+
+
+  }
+)
+
+test_that(
+  "read_npx_wide_split_col - Quantified - works",
+  {
+    ## T48 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df----
+
+        o_platform <- "Target 48"
+        n_panel <- 1L
+        n_assay <- 45L
+        data_t <- "Quantified"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = TRUE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df_t <- l_df$df_t
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = x_index <- read_npx_wide_split_col(df = df_t,
+                                                      file = wide_excel)
+        )
+
+        # check that output exists
+        expect_true(object = exists("x_index"))
+
+        # check that df_top works
+        expect_identical(
+          object = x_index,
+          expected = (n_assay * n_panel) + 2L
+        )
+
+      }
+    )
+
+    ## T48 shuffled ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df----
+
+        o_platform <- "Target 48"
+        n_panel <- 1L
+        n_assay <- 45L
+        data_t <- "Quantified"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = TRUE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = TRUE)
+
+        df_t <- l_df$df_t
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = x_index <- read_npx_wide_split_col(df = df_t,
+                                                      file = wide_excel)
+        )
+
+        # check that output exists
+        expect_true(object = exists("x_index"))
+
+        # check that df_top works
+        expect_identical(
+          object = x_index,
+          expected = (n_assay * n_panel) + 2L + (3L * n_panel)
+        )
+
+      }
+    )
+
+    ## T48 multi-plate shuffled ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df----
+
+        o_platform <- "Target 48"
+        n_panel <- 4L
+        n_assay <- 45L
+        data_t <- "Quantified"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = TRUE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = TRUE)
+
+        df_t <- l_df$df_t
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = x_index <- read_npx_wide_split_col(df = df_t,
+                                                      file = wide_excel)
+        )
+
+        # check that output exists
+        expect_true(object = exists("x_index"))
+
+        # check that df_top works
+        expect_identical(
+          object = x_index,
+          expected = (n_assay * n_panel) + 2L + (3L * n_panel)
+        )
+
+      }
+    )
+
+    ## T48 multi-plate shuffled fewer assays ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df----
+
+        o_platform <- "Target 48"
+        n_panel <- 4L
+        n_assay <- 45L
+        data_t <- "Quantified"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = TRUE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = TRUE)
+
+        n_select <- 100L
+        random_assays <- sample(
+          x = paste0("V",
+                     tail(x = seq_len((n_panel * n_assay) + 1L), n = -1L)),
+          size = n_select,
+          replace = FALSE
+        )
+
+        df_t <- l_df$df_t |>
+          dplyr::select(
+            -dplyr::all_of(random_assays)
+          )
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = x_index <- read_npx_wide_split_col(df = df_t,
+                                                      file = wide_excel)
+        )
+
+        # check that output exists
+        expect_true(object = exists("x_index"))
+
+        # check that df_top works
+        expect_identical(
+          object = x_index,
+          expected = ((n_assay * n_panel) + 2L) - n_select + (3L * n_panel)
+        )
+
+      }
+    )
+
+    ## T48 multi-plate shuffled fewer assays int ctrl in V2 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df----
+
+        o_platform <- "Target 48"
+        n_panel <- 4L
+        n_assay <- 45L
+        data_t <- "Quantified"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = TRUE,
+                             loc_int_ctrl = "V2",
+                             shuffle_assays = TRUE)
+
+        n_select <- 100L
+        random_assays <- sample(
+          x = paste0("V",
+                     tail(x = seq_len((n_panel * n_assay) + 1L), n = -1L)),
+          size = n_select,
+          replace = FALSE
+        )
+
+        df_t <- l_df$df_t |>
+          dplyr::select(
+            -dplyr::all_of(random_assays)
+          )
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = x_index <- read_npx_wide_split_col(df = df_t,
+                                                      file = wide_excel)
+        )
+
+        # check that output exists
+        expect_true(object = exists("x_index"))
+
+        # check that df_top works
+        expect_identical(
+          object = x_index,
+          expected = ((n_assay * n_panel) + 2L) - n_select + (3L * n_panel)
+        )
+
+      }
+    )
+
+    ## Flex/Focus ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df----
+
+        o_platform <- "Focus"
+        n_panel <- 1L
+        n_assay <- 21L
+        data_t <- "Quantified"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = TRUE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df_t <- l_df$df_t
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = x_index <- read_npx_wide_split_col(df = df_t,
+                                                      file = wide_excel)
+        )
+
+        # check that output exists
+        expect_true(object = exists("x_index"))
+
+        # check that df_top works
+        expect_identical(
+          object = x_index,
+          expected = (n_assay * n_panel) + 2L
+        )
+
+      }
+    )
+
+    ## Flex/Focus shuffled ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df----
+
+        o_platform <- "Focus"
+        n_panel <- 1L
+        n_assay <- 21L
+        data_t <- "Quantified"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = TRUE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = TRUE)
+
+        df_t <- l_df$df_t
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = x_index <- read_npx_wide_split_col(df = df_t,
+                                                      file = wide_excel)
+        )
+
+        # check that output exists
+        expect_true(object = exists("x_index"))
+
+        # check that df_top works
+        expect_identical(
+          object = x_index,
+          expected = (n_assay * n_panel) + 2L + (3L * n_panel)
+        )
+
+      }
+    )
+
+    ## Flex/Focus multi-plate shuffled ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df----
+
+        o_platform <- "Focus"
+        n_panel <- 4L
+        n_assay <- 21L
+        data_t <- "Quantified"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = TRUE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = TRUE)
+
+        df_t <- l_df$df_t
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = x_index <- read_npx_wide_split_col(df = df_t,
+                                                      file = wide_excel)
+        )
+
+        # check that output exists
+        expect_true(object = exists("x_index"))
+
+        # check that df_top works
+        expect_identical(
+          object = x_index,
+          expected = (n_assay * n_panel) + 2L + (3L * n_panel)
+        )
+
+      }
+    )
+
+    ## Flex/Focus multi-plate shuffled fewer assays ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df----
+
+        o_platform <- "Focus"
+        n_panel <- 4L
+        n_assay <- 21L
+        data_t <- "Quantified"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = TRUE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = TRUE)
+
+        n_select <- 50L
+        random_assays <- sample(
+          x = paste0("V",
+                     tail(x = seq_len((n_panel * n_assay) + 1L), n = -1L)),
+          size = n_select,
+          replace = FALSE
+        )
+
+        df_t <- l_df$df_t |>
+          dplyr::select(
+            -dplyr::all_of(random_assays)
+          )
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = x_index <- read_npx_wide_split_col(df = df_t,
+                                                      file = wide_excel)
+        )
+
+        # check that output exists
+        expect_true(object = exists("x_index"))
+
+        # check that df_top works
+        expect_identical(
+          object = x_index,
+          expected = ((n_assay * n_panel) + 2L) - n_select + (3L * n_panel)
+        )
+
+      }
+    )
+
+    ## Flex/Focus multi-plate shuffled fewer assays int ctrl in V2 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df----
+
+        o_platform <- "Focus"
+        n_panel <- 4L
+        n_assay <- 21L
+        data_t <- "Quantified"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = TRUE,
+                             loc_int_ctrl = "V2",
+                             shuffle_assays = TRUE)
+
+        n_select <- 50L
+        random_assays <- sample(
+          x = paste0("V",
+                     tail(x = seq_len((n_panel * n_assay) + 1L), n = -1L)),
+          size = n_select,
+          replace = FALSE
+        )
+
+        df_t <- l_df$df_t |>
+          dplyr::select(
+            -dplyr::all_of(random_assays)
+          )
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_no_condition(
+          object = x_index <- read_npx_wide_split_col(df = df_t,
+                                                      file = wide_excel)
+        )
+
+        # check that output exists
+        expect_true(object = exists("x_index"))
+
+        # check that df_top works
+        expect_identical(
+          object = x_index,
+          expected = ((n_assay * n_panel) + 2L) - n_select + (3L * n_panel)
         )
 
       }
@@ -942,12 +3379,25 @@ test_that(
       fileext = ".xlsx",
       code = {
 
-        # random df
-        df <- dplyr::tibble(
-          "V1" = c("Panel", "Assay", "Uniprot ID", "OlinkID"),
-          "V2" = c("Olink Target 48", "Assay1", "Uniprot1", "OID1"),
-          "V3" = c("Olink Target 48", "Assay2", "Uniprot2", "OID2")
-        )
+        # random df ----
+
+        o_platform <- "Target 48"
+        n_panel <- 1L
+        n_assay <- 45L
+        data_t <- "NPX"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df_t <- l_df$df_t |>
+          dplyr::select(
+            -dplyr::all_of("V47")
+          )
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -957,7 +3407,7 @@ test_that(
 
         # check that function runs
         expect_error(
-          object = read_npx_wide_split_col(df = df,
+          object = read_npx_wide_split_col(df = df_t,
                                            file = wide_excel),
           regexp = "Unexpected format of the top metadata in file"
         )
@@ -982,52 +3432,22 @@ test_that(
       code = {
 
         # random df_top ----
-        o_platform <- "Target 48"
-        n_panels <- 1L
-        n_assay <- 45L
-        n_qc_warn <- n_panels
-        n_plates <- n_panels
-        int_ctrl <- character(0)
 
-        df <- dplyr::tibble(
-          "V1" = c("Panel",
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = n_assay),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_plates),
-                         seq_len(n_plates)),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_qc_warn),
-                         seq_len(n_qc_warn)),
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = length(int_ctrl))),
-          "V2" = c("Assay",
-                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
-                          seq_len(n_panels * n_assay)),
-                   rep(x = "Plate ID", times = n_plates),
-                   rep(x = "QC Warning", times = n_qc_warn),
-                   rep(x = "QC Deviation from median",
-                       times = (length(int_ctrl) * n_panels))),
-          "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = int_ctrl, times = n_panels)),
-          "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = NA_character_,
-                       times = (length(int_ctrl) * n_panels)))
-        )
-        df_t <- t(df)
-        colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
-        rownames(df_t) <- NULL
-        df_t <- dplyr::as_tibble(df_t)
+        o_platform <- "Target 48"
+        n_panel <- 1L
+        n_assay <- 45L
+        data_t <- "NPX"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df <- l_df$df
+        df_t <- l_df$df_t
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -1035,67 +3455,30 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object =
-            list_top <- read_npx_wide_top_split(df = df_t,
-                                                file = wide_excel,
-                                                data_type = "NPX",
-                                                olink_platform = o_platform)
+          object = l_obj <- read_npx_wide_top_split(df = df_t,
+                                                    file = wide_excel,
+                                                    data_type = data_t,
+                                                    olink_platform = o_platform)
         )
 
         # modify df so that we can test output ----
 
-        colnames(df) <- dplyr::slice_head(df, n = 1L)
-        df <- df |>
-          dplyr::slice(
-            2L:dplyr::n()
-          ) |>
-          dplyr::mutate(
-            col_index = dplyr::row_number() + 1L,
-            col_index = paste0("V", .data[["col_index"]])
-          )
-
-        ## separate df ----
-
-        df_tmp_oid <- df |>
-          dplyr::filter(
-            !is.na(.data[["OlinkID"]])
-          )
-
-        df_tmp_meta <- df |>
-          dplyr::filter(
-            is.na(.data[["OlinkID"]])
-            & .data[["Assay"]] %in% c("Plate ID", "QC Warning")
-          ) |>
-          dplyr::select(
-            -dplyr::all_of(c("Uniprot ID", "OlinkID"))
-          ) |>
-          dplyr::rename(
-            "Var" = "Assay"
-          )
-
-        df_tmp_qc_dev <- df |>
-          dplyr::filter(
-            is.na(.data[["OlinkID"]])
-            & (.data[["Assay"]] == "QC Deviation from median"
-               | grepl("ctrl", .data[["Assay"]], ignore.case = TRUE))
-          ) |>
-          dplyr::select(
-            -dplyr::all_of(c("OlinkID"))
-          )
+        l_exp <- npx_wide_top_test(df = df)
 
         # check that tmp df are identical to function output ----
 
         expect_identical(
-          object = list_top$df_oid,
-          expected = df_tmp_oid
+          object = l_obj$df_oid,
+          expected = l_exp$df_oid
         )
 
         expect_identical(
-          object = list_top$df_meta,
-          expected = df_tmp_meta
+          object = l_obj$df_meta,
+          expected = l_exp$df_meta
         )
 
-        expect_true(object = is.null(list_top$df_qc_dev))
+        expect_true(object = is.null(l_obj$df_qc_dev))
+
       }
     )
 
@@ -1108,52 +3491,22 @@ test_that(
       code = {
 
         # random df_top ----
-        o_platform <- "Target 48"
-        n_panels <- 1L
-        n_assay <- 45L
-        n_qc_warn <- 0L
-        n_plates <- n_panels
-        int_ctrl <- character(0)
 
-        df <- dplyr::tibble(
-          "V1" = c("Panel",
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = n_assay),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_plates),
-                         seq_len(n_plates)),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_qc_warn),
-                         seq_len(n_qc_warn)),
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = length(int_ctrl))),
-          "V2" = c("Assay",
-                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
-                          seq_len(n_panels * n_assay)),
-                   rep(x = "Plate ID", times = n_plates),
-                   rep(x = "QC Warning", times = n_qc_warn),
-                   rep(x = "QC Deviation from median",
-                       times = (length(int_ctrl) * n_panels))),
-          "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = int_ctrl, times = n_panels)),
-          "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = NA_character_,
-                       times = (length(int_ctrl) * n_panels)))
-        )
-        df_t <- t(df)
-        colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
-        rownames(df_t) <- NULL
-        df_t <- dplyr::as_tibble(df_t)
+        o_platform <- "Target 48"
+        n_panel <- 1L
+        n_assay <- 45L
+        data_t <- "Ct"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df <- l_df$df
+        df_t <- l_df$df_t
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -1161,71 +3514,34 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object =
-            list_top <- read_npx_wide_top_split(df = df_t,
-                                                file = wide_excel,
-                                                data_type = "Ct",
-                                                olink_platform = o_platform)
+          object = l_obj <- read_npx_wide_top_split(df = df_t,
+                                                    file = wide_excel,
+                                                    data_type = data_t,
+                                                    olink_platform = o_platform)
         )
 
         # modify df so that we can test output ----
 
-        colnames(df) <- dplyr::slice_head(df, n = 1L)
-        df <- df |>
-          dplyr::slice(
-            2L:dplyr::n()
-          ) |>
-          dplyr::mutate(
-            col_index = dplyr::row_number() + 1L,
-            col_index = paste0("V", .data[["col_index"]])
-          )
-
-        ## separate df ----
-
-        df_tmp_oid <- df |>
-          dplyr::filter(
-            !is.na(.data[["OlinkID"]])
-          )
-
-        df_tmp_meta <- df |>
-          dplyr::filter(
-            is.na(.data[["OlinkID"]])
-            & .data[["Assay"]] %in% c("Plate ID", "QC Warning")
-          ) |>
-          dplyr::select(
-            -dplyr::all_of(c("Uniprot ID", "OlinkID"))
-          ) |>
-          dplyr::rename(
-            "Var" = "Assay"
-          )
-
-        df_tmp_qc_dev <- df |>
-          dplyr::filter(
-            is.na(.data[["OlinkID"]])
-            & (.data[["Assay"]] == "QC Deviation from median"
-               | grepl("ctrl", .data[["Assay"]], ignore.case = TRUE))
-          ) |>
-          dplyr::select(
-            -dplyr::all_of(c("OlinkID"))
-          )
+        l_exp <- npx_wide_top_test(df = df)
 
         # check that tmp df are identical to function output ----
 
         expect_identical(
-          object = list_top$df_oid,
-          expected = df_tmp_oid
+          object = l_obj$df_oid,
+          expected = l_exp$df_oid
         )
 
         expect_identical(
-          object = list_top$df_meta,
-          expected = df_tmp_meta
+          object = l_obj$df_meta,
+          expected = l_exp$df_meta
         )
 
-        expect_true(object = is.null(list_top$df_qc_dev))
+        expect_true(object = is.null(l_obj$df_qc_dev))
+
       }
     )
 
-    ## Quantified ----
+    ## Quantified w int ctrl ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -1234,52 +3550,22 @@ test_that(
       code = {
 
         # random df_top ----
-        o_platform <- "Target 48"
-        n_panels <- 1L
-        n_assay <- 45L
-        n_qc_warn <- n_panels
-        n_plates <- n_panels
-        int_ctrl <- c("Inc Ctrl", "Amp Ctrl", "Ext Ctrl")
 
-        df <- dplyr::tibble(
-          "V1" = c("Panel",
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = n_assay),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_plates),
-                         seq_len(n_plates)),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_qc_warn),
-                         seq_len(n_qc_warn)),
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = length(int_ctrl))),
-          "V2" = c("Assay",
-                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
-                          seq_len(n_panels * n_assay)),
-                   rep(x = "Plate ID", times = n_plates),
-                   rep(x = "QC Warning", times = n_qc_warn),
-                   rep(x = "QC Deviation from median",
-                       times = (length(int_ctrl) * n_panels))),
-          "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = int_ctrl, times = n_panels)),
-          "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = NA_character_,
-                       times = (length(int_ctrl) * n_panels)))
-        )
-        df_t <- t(df)
-        colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
-        rownames(df_t) <- NULL
-        df_t <- dplyr::as_tibble(df_t)
+        o_platform <- "Target 48"
+        n_panel <- 1L
+        n_assay <- 45L
+        data_t <- "Quantified"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = TRUE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df <- l_df$df
+        df_t <- l_df$df_t
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -1287,70 +3573,92 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object =
-            list_top <- read_npx_wide_top_split(df = df_t,
-                                                file = wide_excel,
-                                                data_type = "Quantified",
-                                                olink_platform = "Target 48")
+          object = l_obj <- read_npx_wide_top_split(df = df_t,
+                                                    file = wide_excel,
+                                                    data_type = data_t,
+                                                    olink_platform = o_platform)
         )
 
         # modify df so that we can test output ----
 
-        colnames(df) <- dplyr::slice_head(df, n = 1L)
-        df <- df |>
-          dplyr::slice(
-            2L:dplyr::n()
-          ) |>
-          dplyr::mutate(
-            col_index = dplyr::row_number() + 1L,
-            col_index = paste0("V", .data[["col_index"]])
-          )
-
-        ## separate df ----
-
-        df_tmp_oid <- df |>
-          dplyr::filter(
-            !is.na(.data[["OlinkID"]])
-          )
-
-        df_tmp_meta <- df |>
-          dplyr::filter(
-            is.na(.data[["OlinkID"]])
-            & .data[["Assay"]] %in% c("Plate ID", "QC Warning")
-          ) |>
-          dplyr::select(
-            -dplyr::all_of(c("Uniprot ID", "OlinkID"))
-          ) |>
-          dplyr::rename(
-            "Var" = "Assay"
-          )
-
-        df_tmp_qc_dev <- df |>
-          dplyr::filter(
-            is.na(.data[["OlinkID"]])
-            & (.data[["Assay"]] == "QC Deviation from median"
-               | grepl("ctrl", .data[["Assay"]], ignore.case = TRUE))
-          ) |>
-          dplyr::select(
-            -dplyr::all_of(c("OlinkID"))
-          )
+        l_exp <- npx_wide_top_test(df = df)
 
         # check that tmp df are identical to function output ----
 
         expect_identical(
-          object = list_top$df_oid,
-          expected = df_tmp_oid
+          object = l_obj$df_oid,
+          expected = l_exp$df_oid
         )
 
         expect_identical(
-          object = list_top$df_meta,
-          expected = df_tmp_meta
+          object = l_obj$df_meta,
+          expected = l_exp$df_meta
         )
 
         expect_identical(
-          object = list_top$df_qc_dev,
-          expected = df_tmp_qc_dev
+          object = l_obj$df_qc_dev,
+          expected = l_exp$df_qc_dev
         )
+
+      }
+    )
+
+    ## Quantified wo int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df_top ----
+
+        o_platform <- "Target 48"
+        n_panel <- 1L
+        n_assay <- 45L
+        data_t <- "Quantified"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df <- l_df$df
+        df_t <- l_df$df_t
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # run function ----
+
+        expect_no_condition(
+          object = l_obj <- read_npx_wide_top_split(df = df_t,
+                                                    file = wide_excel,
+                                                    data_type = data_t,
+                                                    olink_platform = o_platform)
+        )
+
+        # modify df so that we can test output ----
+
+        l_exp <- npx_wide_top_test(df = df)
+
+        # check that tmp df are identical to function output ----
+
+        expect_identical(
+          object = l_obj$df_oid,
+          expected = l_exp$df_oid
+        )
+
+        expect_identical(
+          object = l_obj$df_meta,
+          expected = l_exp$df_meta
+        )
+
+        expect_true(object = is.null(l_obj$df_qc_dev))
+
       }
     )
 
@@ -1369,52 +3677,22 @@ test_that(
       code = {
 
         # random df_top ----
-        o_platform <- "Target 48"
-        n_panels <- 2L
-        n_assay <- 45L
-        n_qc_warn <- n_panels
-        n_plates <- n_panels
-        int_ctrl <- character(0L)
 
-        df <- dplyr::tibble(
-          "V1" = c("Panel",
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = n_assay),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_plates),
-                         seq_len(n_plates)),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_qc_warn),
-                         seq_len(n_qc_warn)),
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = length(int_ctrl))),
-          "V2" = c("Assay",
-                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
-                          seq_len(n_panels * n_assay)),
-                   rep(x = "Plate ID", times = n_plates),
-                   rep(x = "QC Warning", times = n_qc_warn),
-                   rep(x = "QC Deviation from median",
-                       times = (length(int_ctrl) * n_panels))),
-          "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = int_ctrl, times = n_panels)),
-          "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = NA_character_,
-                       times = (length(int_ctrl) * n_panels)))
-        )
-        df_t <- t(df)
-        colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
-        rownames(df_t) <- NULL
-        df_t <- dplyr::as_tibble(df_t)
+        o_platform <- "Target 48"
+        n_panel <- 3L
+        n_assay <- 45L
+        data_t <- "NPX"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df <- l_df$df
+        df_t <- l_df$df_t
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -1422,67 +3700,30 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object =
-            list_top <- read_npx_wide_top_split(df = df_t,
-                                                file = wide_excel,
-                                                data_type = "NPX",
-                                                olink_platform = o_platform)
+          object = l_obj <- read_npx_wide_top_split(df = df_t,
+                                                    file = wide_excel,
+                                                    data_type = data_t,
+                                                    olink_platform = o_platform)
         )
 
         # modify df so that we can test output ----
 
-        colnames(df) <- dplyr::slice_head(df, n = 1L)
-        df <- df |>
-          dplyr::slice(
-            2L:dplyr::n()
-          ) |>
-          dplyr::mutate(
-            col_index = dplyr::row_number() + 1L,
-            col_index = paste0("V", .data[["col_index"]])
-          )
-
-        ## separate df ----
-
-        df_tmp_oid <- df |>
-          dplyr::filter(
-            !is.na(.data[["OlinkID"]])
-          )
-
-        df_tmp_meta <- df |>
-          dplyr::filter(
-            is.na(.data[["OlinkID"]])
-            & .data[["Assay"]] %in% c("Plate ID", "QC Warning")
-          ) |>
-          dplyr::select(
-            -dplyr::all_of(c("Uniprot ID", "OlinkID"))
-          ) |>
-          dplyr::rename(
-            "Var" = "Assay"
-          )
-
-        df_tmp_qc_dev <- df |>
-          dplyr::filter(
-            is.na(.data[["OlinkID"]])
-            & (.data[["Assay"]] == "QC Deviation from median"
-               | grepl("ctrl", .data[["Assay"]], ignore.case = TRUE))
-          ) |>
-          dplyr::select(
-            -dplyr::all_of(c("OlinkID"))
-          )
+        l_exp <- npx_wide_top_test(df = df)
 
         # check that tmp df are identical to function output ----
 
         expect_identical(
-          object = list_top$df_oid,
-          expected = df_tmp_oid
+          object = l_obj$df_oid,
+          expected = l_exp$df_oid
         )
 
         expect_identical(
-          object = list_top$df_meta,
-          expected = df_tmp_meta
+          object = l_obj$df_meta,
+          expected = l_exp$df_meta
         )
 
-        expect_true(object = is.null(list_top$df_qc_dev))
+        expect_true(object = is.null(l_obj$df_qc_dev))
+
       }
     )
 
@@ -1495,52 +3736,22 @@ test_that(
       code = {
 
         # random df_top ----
-        o_platform <- "Target 48"
-        n_panels <- 2L
-        n_assay <- 45L
-        n_qc_warn <- 0L
-        n_plates <- n_panels
-        int_ctrl <- character(0L)
 
-        df <- dplyr::tibble(
-          "V1" = c("Panel",
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = n_assay),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_plates),
-                         seq_len(n_plates)),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_qc_warn),
-                         seq_len(n_qc_warn)),
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = length(int_ctrl))),
-          "V2" = c("Assay",
-                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
-                          seq_len(n_panels * n_assay)),
-                   rep(x = "Plate ID", times = n_plates),
-                   rep(x = "QC Warning", times = n_qc_warn),
-                   rep(x = "QC Deviation from median",
-                       times = (length(int_ctrl) * n_panels))),
-          "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = int_ctrl, times = n_panels)),
-          "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = NA_character_,
-                       times = (length(int_ctrl) * n_panels)))
-        )
-        df_t <- t(df)
-        colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
-        rownames(df_t) <- NULL
-        df_t <- dplyr::as_tibble(df_t)
+        o_platform <- "Target 48"
+        n_panel <- 3L
+        n_assay <- 45L
+        data_t <- "Ct"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df <- l_df$df
+        df_t <- l_df$df_t
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -1548,71 +3759,34 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object =
-            list_top <- read_npx_wide_top_split(df = df_t,
-                                                file = wide_excel,
-                                                data_type = "Ct",
-                                                olink_platform = o_platform)
+          object = l_obj <- read_npx_wide_top_split(df = df_t,
+                                                    file = wide_excel,
+                                                    data_type = data_t,
+                                                    olink_platform = o_platform)
         )
 
         # modify df so that we can test output ----
 
-        colnames(df) <- dplyr::slice_head(df, n = 1L)
-        df <- df |>
-          dplyr::slice(
-            2L:dplyr::n()
-          ) |>
-          dplyr::mutate(
-            col_index = dplyr::row_number() + 1L,
-            col_index = paste0("V", .data[["col_index"]])
-          )
-
-        ## separate df ----
-
-        df_tmp_oid <- df |>
-          dplyr::filter(
-            !is.na(.data[["OlinkID"]])
-          )
-
-        df_tmp_meta <- df |>
-          dplyr::filter(
-            is.na(.data[["OlinkID"]])
-            & .data[["Assay"]] %in% c("Plate ID", "QC Warning")
-          ) |>
-          dplyr::select(
-            -dplyr::all_of(c("Uniprot ID", "OlinkID"))
-          ) |>
-          dplyr::rename(
-            "Var" = "Assay"
-          )
-
-        df_tmp_qc_dev <- df |>
-          dplyr::filter(
-            is.na(.data[["OlinkID"]])
-            & (.data[["Assay"]] == "QC Deviation from median"
-               | grepl("ctrl", .data[["Assay"]], ignore.case = TRUE))
-          ) |>
-          dplyr::select(
-            -dplyr::all_of(c("OlinkID"))
-          )
+        l_exp <- npx_wide_top_test(df = df)
 
         # check that tmp df are identical to function output ----
 
         expect_identical(
-          object = list_top$df_oid,
-          expected = df_tmp_oid
+          object = l_obj$df_oid,
+          expected = l_exp$df_oid
         )
 
         expect_identical(
-          object = list_top$df_meta,
-          expected = df_tmp_meta
+          object = l_obj$df_meta,
+          expected = l_exp$df_meta
         )
 
-        expect_true(object = is.null(list_top$df_qc_dev))
+        expect_true(object = is.null(l_obj$df_qc_dev))
+
       }
     )
 
-    ## Quantified ----
+    ## Quantified w int ctrl ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -1621,52 +3795,22 @@ test_that(
       code = {
 
         # random df_top ----
-        o_platform <- "Target 48"
-        n_panels <- 2L
-        n_assay <- 45L
-        n_qc_warn <- n_panels
-        n_plates <- n_panels
-        int_ctrl <- c("Inc Ctrl", "Amp Ctrl", "Ext Ctrl")
 
-        df <- dplyr::tibble(
-          "V1" = c("Panel",
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = n_assay),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_plates),
-                         seq_len(n_plates)),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_qc_warn),
-                         seq_len(n_qc_warn)),
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = length(int_ctrl))),
-          "V2" = c("Assay",
-                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
-                          seq_len(n_panels * n_assay)),
-                   rep(x = "Plate ID", times = n_plates),
-                   rep(x = "QC Warning", times = n_qc_warn),
-                   rep(x = "QC Deviation from median",
-                       times = (length(int_ctrl) * n_panels))),
-          "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = int_ctrl, times = n_panels)),
-          "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = NA_character_,
-                       times = (length(int_ctrl) * n_panels)))
-        )
-        df_t <- t(df)
-        colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
-        rownames(df_t) <- NULL
-        df_t <- dplyr::as_tibble(df_t)
+        o_platform <- "Target 48"
+        n_panel <- 3L
+        n_assay <- 45L
+        data_t <- "Quantified"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = TRUE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df <- l_df$df
+        df_t <- l_df$df_t
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -1674,70 +3818,92 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object =
-            list_top <- read_npx_wide_top_split(df = df_t,
-                                                file = wide_excel,
-                                                data_type = "Quantified",
-                                                olink_platform = o_platform)
+          object = l_obj <- read_npx_wide_top_split(df = df_t,
+                                                    file = wide_excel,
+                                                    data_type = data_t,
+                                                    olink_platform = o_platform)
         )
 
         # modify df so that we can test output ----
 
-        colnames(df) <- dplyr::slice_head(df, n = 1L)
-        df <- df |>
-          dplyr::slice(
-            2L:dplyr::n()
-          ) |>
-          dplyr::mutate(
-            col_index = dplyr::row_number() + 1L,
-            col_index = paste0("V", .data[["col_index"]])
-          )
-
-        ## separate df ----
-
-        df_tmp_oid <- df |>
-          dplyr::filter(
-            !is.na(.data[["OlinkID"]])
-          )
-
-        df_tmp_meta <- df |>
-          dplyr::filter(
-            is.na(.data[["OlinkID"]])
-            & .data[["Assay"]] %in% c("Plate ID", "QC Warning")
-          ) |>
-          dplyr::select(
-            -dplyr::all_of(c("Uniprot ID", "OlinkID"))
-          ) |>
-          dplyr::rename(
-            "Var" = "Assay"
-          )
-
-        df_tmp_qc_dev <- df |>
-          dplyr::filter(
-            is.na(.data[["OlinkID"]])
-            & (.data[["Assay"]] == "QC Deviation from median"
-               | grepl("ctrl", .data[["Assay"]], ignore.case = TRUE))
-          ) |>
-          dplyr::select(
-            -dplyr::all_of(c("OlinkID"))
-          )
+        l_exp <- npx_wide_top_test(df = df)
 
         # check that tmp df are identical to function output ----
 
         expect_identical(
-          object = list_top$df_oid,
-          expected = df_tmp_oid
+          object = l_obj$df_oid,
+          expected = l_exp$df_oid
         )
 
         expect_identical(
-          object = list_top$df_meta,
-          expected = df_tmp_meta
+          object = l_obj$df_meta,
+          expected = l_exp$df_meta
         )
 
         expect_identical(
-          object = list_top$df_qc_dev,
-          expected = df_tmp_qc_dev
+          object = l_obj$df_qc_dev,
+          expected = l_exp$df_qc_dev
         )
+
+      }
+    )
+
+    ## Quantified wo int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df_top ----
+
+        o_platform <- "Target 48"
+        n_panel <- 3L
+        n_assay <- 45L
+        data_t <- "Quantified"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df <- l_df$df
+        df_t <- l_df$df_t
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # run function ----
+
+        expect_no_condition(
+          object = l_obj <- read_npx_wide_top_split(df = df_t,
+                                                    file = wide_excel,
+                                                    data_type = data_t,
+                                                    olink_platform = o_platform)
+        )
+
+        # modify df so that we can test output ----
+
+        l_exp <- npx_wide_top_test(df = df)
+
+        # check that tmp df are identical to function output ----
+
+        expect_identical(
+          object = l_obj$df_oid,
+          expected = l_exp$df_oid
+        )
+
+        expect_identical(
+          object = l_obj$df_meta,
+          expected = l_exp$df_meta
+        )
+
+        expect_true(object = is.null(l_obj$df_qc_dev))
+
       }
     )
 
@@ -1756,52 +3922,22 @@ test_that(
       code = {
 
         # random df_top ----
-        o_platform <- "Target 96"
-        n_panels <- 1L
-        n_assay <- 92L
-        n_qc_warn <- n_panels
-        n_plates <- n_panels
-        int_ctrl <- character(0)
 
-        df <- dplyr::tibble(
-          "V1" = c("Panel",
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = n_assay),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_plates),
-                         seq_len(n_plates)),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_qc_warn),
-                         seq_len(n_qc_warn)),
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = length(int_ctrl))),
-          "V2" = c("Assay",
-                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
-                          seq_len(n_panels * n_assay)),
-                   rep(x = "Plate ID", times = n_plates),
-                   rep(x = "QC Warning", times = n_qc_warn),
-                   rep(x = "QC Deviation from median",
-                       times = (length(int_ctrl) * n_panels))),
-          "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = int_ctrl, times = n_panels)),
-          "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = NA_character_,
-                       times = (length(int_ctrl) * n_panels)))
-        )
-        df_t <- t(df)
-        colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
-        rownames(df_t) <- NULL
-        df_t <- dplyr::as_tibble(df_t)
+        o_platform <- "Target 96"
+        n_panel <- 1L
+        n_assay <- 92L
+        data_t <- "NPX"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df <- l_df$df
+        df_t <- l_df$df_t
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -1809,67 +3945,30 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object =
-            list_top <- read_npx_wide_top_split(df = df_t,
-                                                file = wide_excel,
-                                                data_type = "NPX",
-                                                olink_platform = o_platform)
+          object = l_obj <- read_npx_wide_top_split(df = df_t,
+                                                    file = wide_excel,
+                                                    data_type = data_t,
+                                                    olink_platform = o_platform)
         )
 
         # modify df so that we can test output ----
 
-        colnames(df) <- dplyr::slice_head(df, n = 1L)
-        df <- df |>
-          dplyr::slice(
-            2L:dplyr::n()
-          ) |>
-          dplyr::mutate(
-            col_index = dplyr::row_number() + 1L,
-            col_index = paste0("V", .data[["col_index"]])
-          )
-
-        ## separate df ----
-
-        df_tmp_oid <- df |>
-          dplyr::filter(
-            !is.na(.data[["OlinkID"]])
-          )
-
-        df_tmp_meta <- df |>
-          dplyr::filter(
-            is.na(.data[["OlinkID"]])
-            & .data[["Assay"]] %in% c("Plate ID", "QC Warning")
-          ) |>
-          dplyr::select(
-            -dplyr::all_of(c("Uniprot ID", "OlinkID"))
-          ) |>
-          dplyr::rename(
-            "Var" = "Assay"
-          )
-
-        df_tmp_qc_dev <- df |>
-          dplyr::filter(
-            is.na(.data[["OlinkID"]])
-            & (.data[["Assay"]] == "QC Deviation from median"
-               | grepl("ctrl", .data[["Assay"]], ignore.case = TRUE))
-          ) |>
-          dplyr::select(
-            -dplyr::all_of(c("OlinkID"))
-          )
+        l_exp <- npx_wide_top_test(df = df)
 
         # check that tmp df are identical to function output ----
 
         expect_identical(
-          object = list_top$df_oid,
-          expected = df_tmp_oid
+          object = l_obj$df_oid,
+          expected = l_exp$df_oid
         )
 
         expect_identical(
-          object = list_top$df_meta,
-          expected = df_tmp_meta
+          object = l_obj$df_meta,
+          expected = l_exp$df_meta
         )
 
-        expect_true(object = is.null(list_top$df_qc_dev))
+        expect_true(object = is.null(l_obj$df_qc_dev))
+
       }
     )
 
@@ -1882,52 +3981,22 @@ test_that(
       code = {
 
         # random df_top ----
-        o_platform <- "Target 96"
-        n_panels <- 1L
-        n_assay <- 92L
-        n_qc_warn <- 0L
-        n_plates <- n_panels
-        int_ctrl <- character(0)
 
-        df <- dplyr::tibble(
-          "V1" = c("Panel",
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = n_assay),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_plates),
-                         seq_len(n_plates)),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_qc_warn),
-                         seq_len(n_qc_warn)),
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = length(int_ctrl))),
-          "V2" = c("Assay",
-                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
-                          seq_len(n_panels * n_assay)),
-                   rep(x = "Plate ID", times = n_plates),
-                   rep(x = "QC Warning", times = n_qc_warn),
-                   rep(x = "QC Deviation from median",
-                       times = (length(int_ctrl) * n_panels))),
-          "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = int_ctrl, times = n_panels)),
-          "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = NA_character_,
-                       times = (length(int_ctrl) * n_panels)))
-        )
-        df_t <- t(df)
-        colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
-        rownames(df_t) <- NULL
-        df_t <- dplyr::as_tibble(df_t)
+        o_platform <- "Target 96"
+        n_panel <- 1L
+        n_assay <- 92L
+        data_t <- "Ct"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df <- l_df$df
+        df_t <- l_df$df_t
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -1935,67 +4004,30 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object =
-            list_top <- read_npx_wide_top_split(df = df_t,
-                                                file = wide_excel,
-                                                data_type = "Ct",
-                                                olink_platform = o_platform)
+          object = l_obj <- read_npx_wide_top_split(df = df_t,
+                                                    file = wide_excel,
+                                                    data_type = data_t,
+                                                    olink_platform = o_platform)
         )
 
         # modify df so that we can test output ----
 
-        colnames(df) <- dplyr::slice_head(df, n = 1L)
-        df <- df |>
-          dplyr::slice(
-            2L:dplyr::n()
-          ) |>
-          dplyr::mutate(
-            col_index = dplyr::row_number() + 1L,
-            col_index = paste0("V", .data[["col_index"]])
-          )
-
-        ## separate df ----
-
-        df_tmp_oid <- df |>
-          dplyr::filter(
-            !is.na(.data[["OlinkID"]])
-          )
-
-        df_tmp_meta <- df |>
-          dplyr::filter(
-            is.na(.data[["OlinkID"]])
-            & .data[["Assay"]] %in% c("Plate ID", "QC Warning")
-          ) |>
-          dplyr::select(
-            -dplyr::all_of(c("Uniprot ID", "OlinkID"))
-          ) |>
-          dplyr::rename(
-            "Var" = "Assay"
-          )
-
-        df_tmp_qc_dev <- df |>
-          dplyr::filter(
-            is.na(.data[["OlinkID"]])
-            & (.data[["Assay"]] == "QC Deviation from median"
-               | grepl("ctrl", .data[["Assay"]], ignore.case = TRUE))
-          ) |>
-          dplyr::select(
-            -dplyr::all_of(c("OlinkID"))
-          )
+        l_exp <- npx_wide_top_test(df = df)
 
         # check that tmp df are identical to function output ----
 
         expect_identical(
-          object = list_top$df_oid,
-          expected = df_tmp_oid
+          object = l_obj$df_oid,
+          expected = l_exp$df_oid
         )
 
         expect_identical(
-          object = list_top$df_meta,
-          expected = df_tmp_meta
+          object = l_obj$df_meta,
+          expected = l_exp$df_meta
         )
 
-        expect_true(object = is.null(list_top$df_qc_dev))
+        expect_true(object = is.null(l_obj$df_qc_dev))
+
       }
     )
 
@@ -2014,52 +4046,22 @@ test_that(
       code = {
 
         # random df_top ----
-        o_platform <- "Target 96"
-        n_panels <- 2L
-        n_assay <- 92L
-        n_qc_warn <- n_panels
-        n_plates <- n_panels
-        int_ctrl <- character(0L)
 
-        df <- dplyr::tibble(
-          "V1" = c("Panel",
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = n_assay),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_plates),
-                         seq_len(n_plates)),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_qc_warn),
-                         seq_len(n_qc_warn)),
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = length(int_ctrl))),
-          "V2" = c("Assay",
-                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
-                          seq_len(n_panels * n_assay)),
-                   rep(x = "Plate ID", times = n_plates),
-                   rep(x = "QC Warning", times = n_qc_warn),
-                   rep(x = "QC Deviation from median",
-                       times = (length(int_ctrl) * n_panels))),
-          "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = int_ctrl, times = n_panels)),
-          "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = NA_character_,
-                       times = (length(int_ctrl) * n_panels)))
-        )
-        df_t <- t(df)
-        colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
-        rownames(df_t) <- NULL
-        df_t <- dplyr::as_tibble(df_t)
+        o_platform <- "Target 96"
+        n_panel <- 3L
+        n_assay <- 92L
+        data_t <- "NPX"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df <- l_df$df
+        df_t <- l_df$df_t
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -2067,67 +4069,30 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object =
-            list_top <- read_npx_wide_top_split(df = df_t,
-                                                file = wide_excel,
-                                                data_type = "NPX",
-                                                olink_platform = o_platform)
+          object = l_obj <- read_npx_wide_top_split(df = df_t,
+                                                    file = wide_excel,
+                                                    data_type = data_t,
+                                                    olink_platform = o_platform)
         )
 
         # modify df so that we can test output ----
 
-        colnames(df) <- dplyr::slice_head(df, n = 1L)
-        df <- df |>
-          dplyr::slice(
-            2L:dplyr::n()
-          ) |>
-          dplyr::mutate(
-            col_index = dplyr::row_number() + 1L,
-            col_index = paste0("V", .data[["col_index"]])
-          )
-
-        ## separate df ----
-
-        df_tmp_oid <- df |>
-          dplyr::filter(
-            !is.na(.data[["OlinkID"]])
-          )
-
-        df_tmp_meta <- df |>
-          dplyr::filter(
-            is.na(.data[["OlinkID"]])
-            & .data[["Assay"]] %in% c("Plate ID", "QC Warning")
-          ) |>
-          dplyr::select(
-            -dplyr::all_of(c("Uniprot ID", "OlinkID"))
-          ) |>
-          dplyr::rename(
-            "Var" = "Assay"
-          )
-
-        df_tmp_qc_dev <- df |>
-          dplyr::filter(
-            is.na(.data[["OlinkID"]])
-            & (.data[["Assay"]] == "QC Deviation from median"
-               | grepl("ctrl", .data[["Assay"]], ignore.case = TRUE))
-          ) |>
-          dplyr::select(
-            -dplyr::all_of(c("OlinkID"))
-          )
+        l_exp <- npx_wide_top_test(df = df)
 
         # check that tmp df are identical to function output ----
 
         expect_identical(
-          object = list_top$df_oid,
-          expected = df_tmp_oid
+          object = l_obj$df_oid,
+          expected = l_exp$df_oid
         )
 
         expect_identical(
-          object = list_top$df_meta,
-          expected = df_tmp_meta
+          object = l_obj$df_meta,
+          expected = l_exp$df_meta
         )
 
-        expect_true(object = is.null(list_top$df_qc_dev))
+        expect_true(object = is.null(l_obj$df_qc_dev))
+
       }
     )
 
@@ -2140,52 +4105,22 @@ test_that(
       code = {
 
         # random df_top ----
-        o_platform <- "Target 96"
-        n_panels <- 2L
-        n_assay <- 92L
-        n_qc_warn <- 0L
-        n_plates <- n_panels
-        int_ctrl <- character(0L)
 
-        df <- dplyr::tibble(
-          "V1" = c("Panel",
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = n_assay),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_plates),
-                         seq_len(n_plates)),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_qc_warn),
-                         seq_len(n_qc_warn)),
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = length(int_ctrl))),
-          "V2" = c("Assay",
-                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
-                          seq_len(n_panels * n_assay)),
-                   rep(x = "Plate ID", times = n_plates),
-                   rep(x = "QC Warning", times = n_qc_warn),
-                   rep(x = "QC Deviation from median",
-                       times = (length(int_ctrl) * n_panels))),
-          "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = int_ctrl, times = n_panels)),
-          "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = NA_character_,
-                       times = (length(int_ctrl) * n_panels)))
-        )
-        df_t <- t(df)
-        colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
-        rownames(df_t) <- NULL
-        df_t <- dplyr::as_tibble(df_t)
+        o_platform <- "Target 96"
+        n_panel <- 3L
+        n_assay <- 92L
+        data_t <- "Ct"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df <- l_df$df
+        df_t <- l_df$df_t
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -2193,67 +4128,30 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object =
-            list_top <- read_npx_wide_top_split(df = df_t,
-                                                file = wide_excel,
-                                                data_type = "Ct",
-                                                olink_platform = o_platform)
+          object = l_obj <- read_npx_wide_top_split(df = df_t,
+                                                    file = wide_excel,
+                                                    data_type = data_t,
+                                                    olink_platform = o_platform)
         )
 
         # modify df so that we can test output ----
 
-        colnames(df) <- dplyr::slice_head(df, n = 1L)
-        df <- df |>
-          dplyr::slice(
-            2L:dplyr::n()
-          ) |>
-          dplyr::mutate(
-            col_index = dplyr::row_number() + 1L,
-            col_index = paste0("V", .data[["col_index"]])
-          )
-
-        ## separate df ----
-
-        df_tmp_oid <- df |>
-          dplyr::filter(
-            !is.na(.data[["OlinkID"]])
-          )
-
-        df_tmp_meta <- df |>
-          dplyr::filter(
-            is.na(.data[["OlinkID"]])
-            & .data[["Assay"]] %in% c("Plate ID", "QC Warning")
-          ) |>
-          dplyr::select(
-            -dplyr::all_of(c("Uniprot ID", "OlinkID"))
-          ) |>
-          dplyr::rename(
-            "Var" = "Assay"
-          )
-
-        df_tmp_qc_dev <- df |>
-          dplyr::filter(
-            is.na(.data[["OlinkID"]])
-            & (.data[["Assay"]] == "QC Deviation from median"
-               | grepl("ctrl", .data[["Assay"]], ignore.case = TRUE))
-          ) |>
-          dplyr::select(
-            -dplyr::all_of(c("OlinkID"))
-          )
+        l_exp <- npx_wide_top_test(df = df)
 
         # check that tmp df are identical to function output ----
 
         expect_identical(
-          object = list_top$df_oid,
-          expected = df_tmp_oid
+          object = l_obj$df_oid,
+          expected = l_exp$df_oid
         )
 
         expect_identical(
-          object = list_top$df_meta,
-          expected = df_tmp_meta
+          object = l_obj$df_meta,
+          expected = l_exp$df_meta
         )
 
-        expect_true(object = is.null(list_top$df_qc_dev))
+        expect_true(object = is.null(l_obj$df_qc_dev))
+
       }
     )
 
@@ -2272,52 +4170,22 @@ test_that(
       code = {
 
         # random df_top ----
-        o_platform <- "Flex"
-        n_panels <- 1L
-        n_assay <- 33L
-        n_qc_warn <- n_panels
-        n_plates <- n_panels
-        int_ctrl <- character(0)
 
-        df <- dplyr::tibble(
-          "V1" = c("Panel",
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = n_assay),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_plates),
-                         seq_len(n_plates)),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_qc_warn),
-                         seq_len(n_qc_warn)),
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = length(int_ctrl))),
-          "V2" = c("Assay",
-                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
-                          seq_len(n_panels * n_assay)),
-                   rep(x = "Plate ID", times = n_plates),
-                   rep(x = "QC Warning", times = n_qc_warn),
-                   rep(x = "QC Deviation from median",
-                       times = (length(int_ctrl) * n_panels))),
-          "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = int_ctrl, times = n_panels)),
-          "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = NA_character_,
-                       times = (length(int_ctrl) * n_panels)))
-        )
-        df_t <- t(df)
-        colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
-        rownames(df_t) <- NULL
-        df_t <- dplyr::as_tibble(df_t)
+        o_platform <- "Flex"
+        n_panel <- 1L
+        n_assay <- 33L
+        data_t <- "NPX"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df <- l_df$df
+        df_t <- l_df$df_t
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -2325,67 +4193,30 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object =
-            list_top <- read_npx_wide_top_split(df = df_t,
-                                                file = wide_excel,
-                                                data_type = "NPX",
-                                                olink_platform = o_platform)
+          object = l_obj <- read_npx_wide_top_split(df = df_t,
+                                                    file = wide_excel,
+                                                    data_type = data_t,
+                                                    olink_platform = o_platform)
         )
 
         # modify df so that we can test output ----
 
-        colnames(df) <- dplyr::slice_head(df, n = 1L)
-        df <- df |>
-          dplyr::slice(
-            2L:dplyr::n()
-          ) |>
-          dplyr::mutate(
-            col_index = dplyr::row_number() + 1L,
-            col_index = paste0("V", .data[["col_index"]])
-          )
-
-        ## separate df ----
-
-        df_tmp_oid <- df |>
-          dplyr::filter(
-            !is.na(.data[["OlinkID"]])
-          )
-
-        df_tmp_meta <- df |>
-          dplyr::filter(
-            is.na(.data[["OlinkID"]])
-            & .data[["Assay"]] %in% c("Plate ID", "QC Warning")
-          ) |>
-          dplyr::select(
-            -dplyr::all_of(c("Uniprot ID", "OlinkID"))
-          ) |>
-          dplyr::rename(
-            "Var" = "Assay"
-          )
-
-        df_tmp_qc_dev <- df |>
-          dplyr::filter(
-            is.na(.data[["OlinkID"]])
-            & (.data[["Assay"]] == "QC Deviation from median"
-               | grepl("ctrl", .data[["Assay"]], ignore.case = TRUE))
-          ) |>
-          dplyr::select(
-            -dplyr::all_of(c("OlinkID"))
-          )
+        l_exp <- npx_wide_top_test(df = df)
 
         # check that tmp df are identical to function output ----
 
         expect_identical(
-          object = list_top$df_oid,
-          expected = df_tmp_oid
+          object = l_obj$df_oid,
+          expected = l_exp$df_oid
         )
 
         expect_identical(
-          object = list_top$df_meta,
-          expected = df_tmp_meta
+          object = l_obj$df_meta,
+          expected = l_exp$df_meta
         )
 
-        expect_true(object = is.null(list_top$df_qc_dev))
+        expect_true(object = is.null(l_obj$df_qc_dev))
+
       }
     )
 
@@ -2398,52 +4229,22 @@ test_that(
       code = {
 
         # random df_top ----
-        o_platform <- "Flex"
-        n_panels <- 1L
-        n_assay <- 33L
-        n_qc_warn <- 0L
-        n_plates <- n_panels
-        int_ctrl <- character(0)
 
-        df <- dplyr::tibble(
-          "V1" = c("Panel",
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = n_assay),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_plates),
-                         seq_len(n_plates)),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_qc_warn),
-                         seq_len(n_qc_warn)),
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = length(int_ctrl))),
-          "V2" = c("Assay",
-                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
-                          seq_len(n_panels * n_assay)),
-                   rep(x = "Plate ID", times = n_plates),
-                   rep(x = "QC Warning", times = n_qc_warn),
-                   rep(x = "QC Deviation from median",
-                       times = (length(int_ctrl) * n_panels))),
-          "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = int_ctrl, times = n_panels)),
-          "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = NA_character_,
-                       times = (length(int_ctrl) * n_panels)))
-        )
-        df_t <- t(df)
-        colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
-        rownames(df_t) <- NULL
-        df_t <- dplyr::as_tibble(df_t)
+        o_platform <- "Flex"
+        n_panel <- 1L
+        n_assay <- 33L
+        data_t <- "Ct"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df <- l_df$df
+        df_t <- l_df$df_t
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -2451,71 +4252,34 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object =
-            list_top <- read_npx_wide_top_split(df = df_t,
-                                                file = wide_excel,
-                                                data_type = "Ct",
-                                                olink_platform = o_platform)
+          object = l_obj <- read_npx_wide_top_split(df = df_t,
+                                                    file = wide_excel,
+                                                    data_type = data_t,
+                                                    olink_platform = o_platform)
         )
 
         # modify df so that we can test output ----
 
-        colnames(df) <- dplyr::slice_head(df, n = 1L)
-        df <- df |>
-          dplyr::slice(
-            2L:dplyr::n()
-          ) |>
-          dplyr::mutate(
-            col_index = dplyr::row_number() + 1L,
-            col_index = paste0("V", .data[["col_index"]])
-          )
-
-        ## separate df ----
-
-        df_tmp_oid <- df |>
-          dplyr::filter(
-            !is.na(.data[["OlinkID"]])
-          )
-
-        df_tmp_meta <- df |>
-          dplyr::filter(
-            is.na(.data[["OlinkID"]])
-            & .data[["Assay"]] %in% c("Plate ID", "QC Warning")
-          ) |>
-          dplyr::select(
-            -dplyr::all_of(c("Uniprot ID", "OlinkID"))
-          ) |>
-          dplyr::rename(
-            "Var" = "Assay"
-          )
-
-        df_tmp_qc_dev <- df |>
-          dplyr::filter(
-            is.na(.data[["OlinkID"]])
-            & (.data[["Assay"]] == "QC Deviation from median"
-               | grepl("ctrl", .data[["Assay"]], ignore.case = TRUE))
-          ) |>
-          dplyr::select(
-            -dplyr::all_of(c("OlinkID"))
-          )
+        l_exp <- npx_wide_top_test(df = df)
 
         # check that tmp df are identical to function output ----
 
         expect_identical(
-          object = list_top$df_oid,
-          expected = df_tmp_oid
+          object = l_obj$df_oid,
+          expected = l_exp$df_oid
         )
 
         expect_identical(
-          object = list_top$df_meta,
-          expected = df_tmp_meta
+          object = l_obj$df_meta,
+          expected = l_exp$df_meta
         )
 
-        expect_true(object = is.null(list_top$df_qc_dev))
+        expect_true(object = is.null(l_obj$df_qc_dev))
+
       }
     )
 
-    ## Quantified ----
+    ## Quantified w int ctrl ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -2524,52 +4288,22 @@ test_that(
       code = {
 
         # random df_top ----
-        o_platform <- "Flex"
-        n_panels <- 1L
-        n_assay <- 33L
-        n_qc_warn <- n_panels
-        n_plates <- n_panels
-        int_ctrl <- c("Inc Ctrl", "Amp Ctrl", "Ext Ctrl")
 
-        df <- dplyr::tibble(
-          "V1" = c("Panel",
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = n_assay),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_plates),
-                         seq_len(n_plates)),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_qc_warn),
-                         seq_len(n_qc_warn)),
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = length(int_ctrl))),
-          "V2" = c("Assay",
-                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
-                          seq_len(n_panels * n_assay)),
-                   rep(x = "Plate ID", times = n_plates),
-                   rep(x = "QC Warning", times = n_qc_warn),
-                   rep(x = "QC Deviation from median",
-                       times = (length(int_ctrl) * n_panels))),
-          "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = int_ctrl, times = n_panels)),
-          "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = NA_character_,
-                       times = (length(int_ctrl) * n_panels)))
-        )
-        df_t <- t(df)
-        colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
-        rownames(df_t) <- NULL
-        df_t <- dplyr::as_tibble(df_t)
+        o_platform <- "Flex"
+        n_panel <- 1L
+        n_assay <- 33L
+        data_t <- "Quantified"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = TRUE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df <- l_df$df
+        df_t <- l_df$df_t
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -2577,70 +4311,92 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object =
-            list_top <- read_npx_wide_top_split(df = df_t,
-                                                file = wide_excel,
-                                                data_type = "Quantified",
-                                                olink_platform = o_platform)
+          object = l_obj <- read_npx_wide_top_split(df = df_t,
+                                                    file = wide_excel,
+                                                    data_type = data_t,
+                                                    olink_platform = o_platform)
         )
 
         # modify df so that we can test output ----
 
-        colnames(df) <- dplyr::slice_head(df, n = 1L)
-        df <- df |>
-          dplyr::slice(
-            2L:dplyr::n()
-          ) |>
-          dplyr::mutate(
-            col_index = dplyr::row_number() + 1L,
-            col_index = paste0("V", .data[["col_index"]])
-          )
-
-        ## separate df ----
-
-        df_tmp_oid <- df |>
-          dplyr::filter(
-            !is.na(.data[["OlinkID"]])
-          )
-
-        df_tmp_meta <- df |>
-          dplyr::filter(
-            is.na(.data[["OlinkID"]])
-            & .data[["Assay"]] %in% c("Plate ID", "QC Warning")
-          ) |>
-          dplyr::select(
-            -dplyr::all_of(c("Uniprot ID", "OlinkID"))
-          ) |>
-          dplyr::rename(
-            "Var" = "Assay"
-          )
-
-        df_tmp_qc_dev <- df |>
-          dplyr::filter(
-            is.na(.data[["OlinkID"]])
-            & (.data[["Assay"]] == "QC Deviation from median"
-               | grepl("ctrl", .data[["Assay"]], ignore.case = TRUE))
-          ) |>
-          dplyr::select(
-            -dplyr::all_of(c("OlinkID"))
-          )
+        l_exp <- npx_wide_top_test(df = df)
 
         # check that tmp df are identical to function output ----
 
         expect_identical(
-          object = list_top$df_oid,
-          expected = df_tmp_oid
+          object = l_obj$df_oid,
+          expected = l_exp$df_oid
         )
 
         expect_identical(
-          object = list_top$df_meta,
-          expected = df_tmp_meta
+          object = l_obj$df_meta,
+          expected = l_exp$df_meta
         )
 
         expect_identical(
-          object = list_top$df_qc_dev,
-          expected = df_tmp_qc_dev
+          object = l_obj$df_qc_dev,
+          expected = l_exp$df_qc_dev
         )
+
+      }
+    )
+
+    ## Quantified wo int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df_top ----
+
+        o_platform <- "Flex"
+        n_panel <- 1L
+        n_assay <- 33L
+        data_t <- "Quantified"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df <- l_df$df
+        df_t <- l_df$df_t
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # run function ----
+
+        expect_no_condition(
+          object = l_obj <- read_npx_wide_top_split(df = df_t,
+                                                    file = wide_excel,
+                                                    data_type = data_t,
+                                                    olink_platform = o_platform)
+        )
+
+        # modify df so that we can test output ----
+
+        l_exp <- npx_wide_top_test(df = df)
+
+        # check that tmp df are identical to function output ----
+
+        expect_identical(
+          object = l_obj$df_oid,
+          expected = l_exp$df_oid
+        )
+
+        expect_identical(
+          object = l_obj$df_meta,
+          expected = l_exp$df_meta
+        )
+
+        expect_true(object = is.null(l_obj$df_qc_dev))
+
       }
     )
 
@@ -2659,52 +4415,22 @@ test_that(
       code = {
 
         # random df_top ----
-        o_platform <- "Focus"
-        n_panels <- 2L
-        n_assay <- 33L
-        n_qc_warn <- n_panels
-        n_plates <- n_panels
-        int_ctrl <- character(0L)
 
-        df <- dplyr::tibble(
-          "V1" = c("Panel",
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = n_assay),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_plates),
-                         seq_len(n_plates)),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_qc_warn),
-                         seq_len(n_qc_warn)),
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = length(int_ctrl))),
-          "V2" = c("Assay",
-                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
-                          seq_len(n_panels * n_assay)),
-                   rep(x = "Plate ID", times = n_plates),
-                   rep(x = "QC Warning", times = n_qc_warn),
-                   rep(x = "QC Deviation from median",
-                       times = (length(int_ctrl) * n_panels))),
-          "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = int_ctrl, times = n_panels)),
-          "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = NA_character_,
-                       times = (length(int_ctrl) * n_panels)))
-        )
-        df_t <- t(df)
-        colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
-        rownames(df_t) <- NULL
-        df_t <- dplyr::as_tibble(df_t)
+        o_platform <- "Focus"
+        n_panel <- 3L
+        n_assay <- 21L
+        data_t <- "NPX"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df <- l_df$df
+        df_t <- l_df$df_t
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -2712,67 +4438,30 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object =
-            list_top <- read_npx_wide_top_split(df = df_t,
-                                                file = wide_excel,
-                                                data_type = "NPX",
-                                                olink_platform = o_platform)
+          object = l_obj <- read_npx_wide_top_split(df = df_t,
+                                                    file = wide_excel,
+                                                    data_type = data_t,
+                                                    olink_platform = o_platform)
         )
 
         # modify df so that we can test output ----
 
-        colnames(df) <- dplyr::slice_head(df, n = 1L)
-        df <- df |>
-          dplyr::slice(
-            2L:dplyr::n()
-          ) |>
-          dplyr::mutate(
-            col_index = dplyr::row_number() + 1L,
-            col_index = paste0("V", .data[["col_index"]])
-          )
-
-        ## separate df ----
-
-        df_tmp_oid <- df |>
-          dplyr::filter(
-            !is.na(.data[["OlinkID"]])
-          )
-
-        df_tmp_meta <- df |>
-          dplyr::filter(
-            is.na(.data[["OlinkID"]])
-            & .data[["Assay"]] %in% c("Plate ID", "QC Warning")
-          ) |>
-          dplyr::select(
-            -dplyr::all_of(c("Uniprot ID", "OlinkID"))
-          ) |>
-          dplyr::rename(
-            "Var" = "Assay"
-          )
-
-        df_tmp_qc_dev <- df |>
-          dplyr::filter(
-            is.na(.data[["OlinkID"]])
-            & (.data[["Assay"]] == "QC Deviation from median"
-               | grepl("ctrl", .data[["Assay"]], ignore.case = TRUE))
-          ) |>
-          dplyr::select(
-            -dplyr::all_of(c("OlinkID"))
-          )
+        l_exp <- npx_wide_top_test(df = df)
 
         # check that tmp df are identical to function output ----
 
         expect_identical(
-          object = list_top$df_oid,
-          expected = df_tmp_oid
+          object = l_obj$df_oid,
+          expected = l_exp$df_oid
         )
 
         expect_identical(
-          object = list_top$df_meta,
-          expected = df_tmp_meta
+          object = l_obj$df_meta,
+          expected = l_exp$df_meta
         )
 
-        expect_true(object = is.null(list_top$df_qc_dev))
+        expect_true(object = is.null(l_obj$df_qc_dev))
+
       }
     )
 
@@ -2785,52 +4474,22 @@ test_that(
       code = {
 
         # random df_top ----
-        o_platform <- "Focus"
-        n_panels <- 2L
-        n_assay <- 33L
-        n_qc_warn <- 0L
-        n_plates <- n_panels
-        int_ctrl <- character(0L)
 
-        df <- dplyr::tibble(
-          "V1" = c("Panel",
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = n_assay),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_plates),
-                         seq_len(n_plates)),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_qc_warn),
-                         seq_len(n_qc_warn)),
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = length(int_ctrl))),
-          "V2" = c("Assay",
-                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
-                          seq_len(n_panels * n_assay)),
-                   rep(x = "Plate ID", times = n_plates),
-                   rep(x = "QC Warning", times = n_qc_warn),
-                   rep(x = "QC Deviation from median",
-                       times = (length(int_ctrl) * n_panels))),
-          "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = int_ctrl, times = n_panels)),
-          "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = NA_character_,
-                       times = (length(int_ctrl) * n_panels)))
-        )
-        df_t <- t(df)
-        colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
-        rownames(df_t) <- NULL
-        df_t <- dplyr::as_tibble(df_t)
+        o_platform <- "Focus"
+        n_panel <- 3L
+        n_assay <- 21L
+        data_t <- "Ct"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df <- l_df$df
+        df_t <- l_df$df_t
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -2838,71 +4497,34 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object =
-            list_top <- read_npx_wide_top_split(df = df_t,
-                                                file = wide_excel,
-                                                data_type = "Ct",
-                                                olink_platform = o_platform)
+          object = l_obj <- read_npx_wide_top_split(df = df_t,
+                                                    file = wide_excel,
+                                                    data_type = data_t,
+                                                    olink_platform = o_platform)
         )
 
         # modify df so that we can test output ----
 
-        colnames(df) <- dplyr::slice_head(df, n = 1L)
-        df <- df |>
-          dplyr::slice(
-            2L:dplyr::n()
-          ) |>
-          dplyr::mutate(
-            col_index = dplyr::row_number() + 1L,
-            col_index = paste0("V", .data[["col_index"]])
-          )
-
-        ## separate df ----
-
-        df_tmp_oid <- df |>
-          dplyr::filter(
-            !is.na(.data[["OlinkID"]])
-          )
-
-        df_tmp_meta <- df |>
-          dplyr::filter(
-            is.na(.data[["OlinkID"]])
-            & .data[["Assay"]] %in% c("Plate ID", "QC Warning")
-          ) |>
-          dplyr::select(
-            -dplyr::all_of(c("Uniprot ID", "OlinkID"))
-          ) |>
-          dplyr::rename(
-            "Var" = "Assay"
-          )
-
-        df_tmp_qc_dev <- df |>
-          dplyr::filter(
-            is.na(.data[["OlinkID"]])
-            & (.data[["Assay"]] == "QC Deviation from median"
-               | grepl("ctrl", .data[["Assay"]], ignore.case = TRUE))
-          ) |>
-          dplyr::select(
-            -dplyr::all_of(c("OlinkID"))
-          )
+        l_exp <- npx_wide_top_test(df = df)
 
         # check that tmp df are identical to function output ----
 
         expect_identical(
-          object = list_top$df_oid,
-          expected = df_tmp_oid
+          object = l_obj$df_oid,
+          expected = l_exp$df_oid
         )
 
         expect_identical(
-          object = list_top$df_meta,
-          expected = df_tmp_meta
+          object = l_obj$df_meta,
+          expected = l_exp$df_meta
         )
 
-        expect_true(object = is.null(list_top$df_qc_dev))
+        expect_true(object = is.null(l_obj$df_qc_dev))
+
       }
     )
 
-    ## Quantified ----
+    ## Quantified w int ctrl ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -2911,52 +4533,22 @@ test_that(
       code = {
 
         # random df_top ----
-        o_platform <- "Focus"
-        n_panels <- 2L
-        n_assay <- 33L
-        n_qc_warn <- n_panels
-        n_plates <- n_panels
-        int_ctrl <- c("Inc Ctrl", "Amp Ctrl", "Ext Ctrl")
 
-        df <- dplyr::tibble(
-          "V1" = c("Panel",
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = n_assay),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_plates),
-                         seq_len(n_plates)),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_qc_warn),
-                         seq_len(n_qc_warn)),
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = length(int_ctrl))),
-          "V2" = c("Assay",
-                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
-                          seq_len(n_panels * n_assay)),
-                   rep(x = "Plate ID", times = n_plates),
-                   rep(x = "QC Warning", times = n_qc_warn),
-                   rep(x = "QC Deviation from median",
-                       times = (length(int_ctrl) * n_panels))),
-          "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = int_ctrl, times = n_panels)),
-          "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = NA_character_,
-                       times = (length(int_ctrl) * n_panels)))
-        )
-        df_t <- t(df)
-        colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
-        rownames(df_t) <- NULL
-        df_t <- dplyr::as_tibble(df_t)
+        o_platform <- "Focus"
+        n_panel <- 3L
+        n_assay <- 21L
+        data_t <- "Quantified"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = TRUE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df <- l_df$df
+        df_t <- l_df$df_t
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -2964,70 +4556,92 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object =
-            list_top <- read_npx_wide_top_split(df = df_t,
-                                                file = wide_excel,
-                                                data_type = "Quantified",
-                                                olink_platform = o_platform)
+          object = l_obj <- read_npx_wide_top_split(df = df_t,
+                                                    file = wide_excel,
+                                                    data_type = data_t,
+                                                    olink_platform = o_platform)
         )
 
         # modify df so that we can test output ----
 
-        colnames(df) <- dplyr::slice_head(df, n = 1L)
-        df <- df |>
-          dplyr::slice(
-            2L:dplyr::n()
-          ) |>
-          dplyr::mutate(
-            col_index = dplyr::row_number() + 1L,
-            col_index = paste0("V", .data[["col_index"]])
-          )
-
-        ## separate df ----
-
-        df_tmp_oid <- df |>
-          dplyr::filter(
-            !is.na(.data[["OlinkID"]])
-          )
-
-        df_tmp_meta <- df |>
-          dplyr::filter(
-            is.na(.data[["OlinkID"]])
-            & .data[["Assay"]] %in% c("Plate ID", "QC Warning")
-          ) |>
-          dplyr::select(
-            -dplyr::all_of(c("Uniprot ID", "OlinkID"))
-          ) |>
-          dplyr::rename(
-            "Var" = "Assay"
-          )
-
-        df_tmp_qc_dev <- df |>
-          dplyr::filter(
-            is.na(.data[["OlinkID"]])
-            & (.data[["Assay"]] == "QC Deviation from median"
-               | grepl("ctrl", .data[["Assay"]], ignore.case = TRUE))
-          ) |>
-          dplyr::select(
-            -dplyr::all_of(c("OlinkID"))
-          )
+        l_exp <- npx_wide_top_test(df = df)
 
         # check that tmp df are identical to function output ----
 
         expect_identical(
-          object = list_top$df_oid,
-          expected = df_tmp_oid
+          object = l_obj$df_oid,
+          expected = l_exp$df_oid
         )
 
         expect_identical(
-          object = list_top$df_meta,
-          expected = df_tmp_meta
+          object = l_obj$df_meta,
+          expected = l_exp$df_meta
         )
 
         expect_identical(
-          object = list_top$df_qc_dev,
-          expected = df_tmp_qc_dev
+          object = l_obj$df_qc_dev,
+          expected = l_exp$df_qc_dev
         )
+
+      }
+    )
+
+    ## Quantified wo int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df_top ----
+
+        o_platform <- "Focus"
+        n_panel <- 3L
+        n_assay <- 21L
+        data_t <- "Quantified"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df <- l_df$df
+        df_t <- l_df$df_t
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # run function ----
+
+        expect_no_condition(
+          object = l_obj <- read_npx_wide_top_split(df = df_t,
+                                                    file = wide_excel,
+                                                    data_type = data_t,
+                                                    olink_platform = o_platform)
+        )
+
+        # modify df so that we can test output ----
+
+        l_exp <- npx_wide_top_test(df = df)
+
+        # check that tmp df are identical to function output ----
+
+        expect_identical(
+          object = l_obj$df_oid,
+          expected = l_exp$df_oid
+        )
+
+        expect_identical(
+          object = l_obj$df_meta,
+          expected = l_exp$df_meta
+        )
+
+        expect_true(object = is.null(l_obj$df_qc_dev))
+
       }
     )
 
@@ -3045,58 +4659,39 @@ test_that(
       code = {
 
         # random df_top ----
-        o_platform <- "Target 48"
-        n_panels <- 1L
-        n_assay <- 45L
-        n_qc_warn <- n_panels
-        n_plates <- n_panels
-        int_ctrl <- character(0)
 
-        df <- dplyr::tibble(
-          "V1" = c("Panel",
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = n_assay),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_plates),
-                         seq_len(n_plates)),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_qc_warn),
-                         seq_len(n_qc_warn)),
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = length(int_ctrl)),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = 1L),
-                         seq_len(1L))),
-          "V2" = c("Assay",
-                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
-                          seq_len(n_panels * n_assay)),
-                   rep(x = "Plate ID", times = n_plates),
-                   rep(x = "QC Warning", times = n_qc_warn),
-                   rep(x = "QC Deviation from median",
-                       times = (length(int_ctrl) * n_panels)),
-                   rep(x = "Unknown", times = 1L)),
-          "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = int_ctrl, times = n_panels),
-                   rep(x = NA_character_, times = 1L)),
-          "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = NA_character_,
-                       times = (length(int_ctrl) * n_panels)),
-                   rep(x = NA_character_, times = 1L))
-        )
-        df_t <- t(df)
-        colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
-        rownames(df_t) <- NULL
-        df_t <- dplyr::as_tibble(df_t)
+        o_platform <- "Target 48"
+        n_panel <- 1L
+        n_assay <- 45L
+        data_t <- "NPX"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        # modify df and df_t to add new row/column with unknown label
+        df <- l_df$df |>
+          dplyr::bind_rows(
+            l_df$df |>
+              dplyr::slice_tail(
+                n = 1L
+              ) |>
+              dplyr::mutate(
+                V2 = "Unknown"
+              )
+          )
+        tmp_cname <- paste0("V", nrow(df))
+        df_t <- l_df$df_t |>
+          dplyr::mutate(
+            {{tmp_cname}} := df |>
+              dplyr::slice_tail(n = 1L) |>
+              t() |>
+              as.character()
+          )
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -3106,7 +4701,7 @@ test_that(
         expect_error(
           object = read_npx_wide_top_split(df = df_t,
                                            file = wide_excel,
-                                           data_type = "NPX",
+                                           data_type = data_t,
                                            olink_platform = o_platform),
           regexp = "The top matrix with the assays metadata in file"
         )
@@ -3129,61 +4724,33 @@ test_that(
       code = {
 
         # random df_top ----
+
         o_platform <- "Target 48"
-        n_panels <- 1L
+        n_panel <- 1L
         n_assay <- 45L
-        n_qc_warn <- n_panels
-        n_plates <- n_panels
-        int_ctrl <- character(0)
+        data_t <- "NPX"
 
-        df <- dplyr::tibble(
-          "V1" = c("Panel",
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = n_assay),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_plates),
-                         seq_len(n_plates)),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_qc_warn),
-                         seq_len(n_qc_warn)),
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = length(int_ctrl))),
-          "V2" = c("Assay",
-                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
-                          seq_len(n_panels * n_assay)),
-                   rep(x = "Plate ID", times = n_plates),
-                   rep(x = "QC Warning", times = n_qc_warn),
-                   rep(x = "QC Deviation from median",
-                       times = (length(int_ctrl) * n_panels))),
-          "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = int_ctrl, times = n_panels)),
-          "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = NA_character_,
-                       times = (length(int_ctrl) * n_panels)))
-        )
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
 
-        # introduce NAs
-        df <- df |>
+        # modify df and df_t to intrduce NA cells
+        df <- l_df$df |>
           dplyr::mutate(
             V3 = dplyr::if_else(.data[["V3"]] %in% "Uniprot1",
                                 NA_character_,
                                 .data[["V3"]])
           )
-
-        df_t <- t(df)
-        colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
-        rownames(df_t) <- NULL
-        df_t <- dplyr::as_tibble(df_t)
+        df_t <- l_df$df_t |>
+          dplyr::mutate(
+            V2 = dplyr::if_else(.data[["V2"]] %in% "Uniprot1",
+                                NA_character_,
+                                .data[["V2"]])
+          )
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -3193,7 +4760,7 @@ test_that(
         expect_error(
           object = read_npx_wide_top_split(df = df_t,
                                            file = wide_excel,
-                                           data_type = "NPX",
+                                           data_type = data_t,
                                            olink_platform = o_platform),
           regexp = "Detected 1 empty cells in columns"
         )
@@ -3201,7 +4768,7 @@ test_that(
       }
     )
 
-    ## OlinkID = NA 5 instances ----
+    ## OlinkID = NA 4 instances ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -3210,68 +4777,47 @@ test_that(
       code = {
 
         # random df_top ----
+
         o_platform <- "Target 48"
-        n_panels <- 1L
+        n_panel <- 1L
         n_assay <- 45L
-        n_qc_warn <- n_panels
-        n_plates <- n_panels
-        int_ctrl <- character(0)
+        data_t <- "NPX"
 
-        df <- dplyr::tibble(
-          "V1" = c("Panel",
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = n_assay),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_plates),
-                         seq_len(n_plates)),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_qc_warn),
-                         seq_len(n_qc_warn)),
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = length(int_ctrl))),
-          "V2" = c("Assay",
-                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
-                          seq_len(n_panels * n_assay)),
-                   rep(x = "Plate ID", times = n_plates),
-                   rep(x = "QC Warning", times = n_qc_warn),
-                   rep(x = "QC Deviation from median",
-                       times = (length(int_ctrl) * n_panels))),
-          "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = int_ctrl, times = n_panels)),
-          "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = NA_character_,
-                       times = (length(int_ctrl) * n_panels)))
-        )
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
 
-        # introduce NAs
-        df <- df |>
+        # modify df and df_t to intrduce NA cells
+        df <- l_df$df |>
           dplyr::mutate(
+            V2 = dplyr::if_else(
+              .data[["V2"]] %in% paste0("Assay", seq_len(2L)),
+              NA_character_,
+              .data[["V2"]]
+            ),
             V3 = dplyr::if_else(
               .data[["V3"]] %in% paste0("Uniprot", seq_len(2L)),
               NA_character_,
               .data[["V3"]]
-            ),
-            V2 = dplyr::if_else(
-              .data[["V2"]] %in% paste0("Assay", seq_len(3L)),
-              NA_character_,
-              .data[["V2"]]
             )
           )
-
-        df_t <- t(df)
-        colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
-        rownames(df_t) <- NULL
-        df_t <- dplyr::as_tibble(df_t)
+        df_t <- l_df$df_t |>
+          dplyr::mutate(
+            V2 = dplyr::if_else(
+              .data[["V2"]] %in% paste0(c("Assay", "Uniprot"), 1L),
+              NA_character_,
+              .data[["V2"]]
+            ),
+            V3 = dplyr::if_else(
+              .data[["V3"]] %in% paste0(c("Assay", "Uniprot"), 2L),
+              NA_character_,
+              .data[["V3"]]
+            )
+          )
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -3281,9 +4827,9 @@ test_that(
         expect_error(
           object = read_npx_wide_top_split(df = df_t,
                                            file = wide_excel,
-                                           data_type = "NPX",
+                                           data_type = data_t,
                                            olink_platform = o_platform),
-          regexp = "Detected 5 empty cells in columns"
+          regexp = "Detected 4 empty cells in columns"
         )
 
       }
@@ -3304,52 +4850,22 @@ test_that(
       code = {
 
         # random df_top ----
-        o_platform <- "Target 48"
-        n_panels <- 1L
-        n_assay <- 40L
-        n_qc_warn <- n_panels
-        n_plates <- n_panels
-        int_ctrl <- character(0)
 
-        df <- dplyr::tibble(
-          "V1" = c("Panel",
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = n_assay),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_plates),
-                         seq_len(n_plates)),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_qc_warn),
-                         seq_len(n_qc_warn)),
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = length(int_ctrl))),
-          "V2" = c("Assay",
-                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
-                          seq_len(n_panels * n_assay)),
-                   rep(x = "Plate ID", times = n_plates),
-                   rep(x = "QC Warning", times = n_qc_warn),
-                   rep(x = "QC Deviation from median",
-                       times = (length(int_ctrl) * n_panels))),
-          "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = int_ctrl, times = n_panels)),
-          "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = NA_character_,
-                       times = (length(int_ctrl) * n_panels)))
-        )
-        df_t <- t(df)
-        colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
-        rownames(df_t) <- NULL
-        df_t <- dplyr::as_tibble(df_t)
+        o_platform <- "Target 48"
+        n_panel <- 1L
+        n_assay <- 40L
+        data_t <- "NPX"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df <- l_df$df
+        df_t <- l_df$df_t
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -3359,7 +4875,7 @@ test_that(
         expect_error(
           object = read_npx_wide_top_split(df = df_t,
                                            file = wide_excel,
-                                           data_type = "NPX",
+                                           data_type = data_t,
                                            olink_platform = o_platform),
           regexp = "Detected 40 assays in 1 panels in file"
         )
@@ -3376,52 +4892,22 @@ test_that(
       code = {
 
         # random df_top ----
-        o_platform <- "Target 48"
-        n_panels <- 2L
-        n_assay <- 32L
-        n_qc_warn <- n_panels
-        n_plates <- n_panels
-        int_ctrl <- character(0L)
 
-        df <- dplyr::tibble(
-          "V1" = c("Panel",
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = n_assay),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_plates),
-                         seq_len(n_plates)),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_qc_warn),
-                         seq_len(n_qc_warn)),
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = length(int_ctrl))),
-          "V2" = c("Assay",
-                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
-                          seq_len(n_panels * n_assay)),
-                   rep(x = "Plate ID", times = n_plates),
-                   rep(x = "QC Warning", times = n_qc_warn),
-                   rep(x = "QC Deviation from median",
-                       times = (length(int_ctrl) * n_panels))),
-          "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = int_ctrl, times = n_panels)),
-          "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = NA_character_,
-                       times = (length(int_ctrl) * n_panels)))
-        )
-        df_t <- t(df)
-        colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
-        rownames(df_t) <- NULL
-        df_t <- dplyr::as_tibble(df_t)
+        o_platform <- "Target 48"
+        n_panel <- 2L
+        n_assay <- 32L
+        data_t <- "NPX"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df <- l_df$df
+        df_t <- l_df$df_t
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -3431,7 +4917,7 @@ test_that(
         expect_error(
           object = read_npx_wide_top_split(df = df_t,
                                            file = wide_excel,
-                                           data_type = "NPX",
+                                           data_type = data_t,
                                            olink_platform = o_platform),
           regexp = "Detected 64 assays in 2 panels in file"
         )
@@ -3447,52 +4933,22 @@ test_that(
       code = {
 
         # random df_top ----
-        o_platform <- "Target 96"
-        n_panels <- 1L
-        n_assay <- 67L
-        n_qc_warn <- n_panels
-        n_plates <- n_panels
-        int_ctrl <- character(0)
 
-        df <- dplyr::tibble(
-          "V1" = c("Panel",
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = n_assay),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_plates),
-                         seq_len(n_plates)),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_qc_warn),
-                         seq_len(n_qc_warn)),
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = length(int_ctrl))),
-          "V2" = c("Assay",
-                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
-                          seq_len(n_panels * n_assay)),
-                   rep(x = "Plate ID", times = n_plates),
-                   rep(x = "QC Warning", times = n_qc_warn),
-                   rep(x = "QC Deviation from median",
-                       times = (length(int_ctrl) * n_panels))),
-          "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = int_ctrl, times = n_panels)),
-          "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = NA_character_,
-                       times = (length(int_ctrl) * n_panels)))
-        )
-        df_t <- t(df)
-        colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
-        rownames(df_t) <- NULL
-        df_t <- dplyr::as_tibble(df_t)
+        o_platform <- "Target 96"
+        n_panel <- 1L
+        n_assay <- 67L
+        data_t <- "NPX"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df <- l_df$df
+        df_t <- l_df$df_t
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -3502,7 +4958,7 @@ test_that(
         expect_error(
           object = read_npx_wide_top_split(df = df_t,
                                            file = wide_excel,
-                                           data_type = "NPX",
+                                           data_type = data_t,
                                            olink_platform = o_platform),
           regexp = "Detected 67 assays in 1 panels in file"
         )
@@ -3519,52 +4975,22 @@ test_that(
       code = {
 
         # random df_top ----
-        o_platform <- "Target 96"
-        n_panels <- 2L
-        n_assay <- 78L
-        n_qc_warn <- n_panels
-        n_plates <- n_panels
-        int_ctrl <- character(0L)
 
-        df <- dplyr::tibble(
-          "V1" = c("Panel",
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = n_assay),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_plates),
-                         seq_len(n_plates)),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_qc_warn),
-                         seq_len(n_qc_warn)),
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = length(int_ctrl))),
-          "V2" = c("Assay",
-                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
-                          seq_len(n_panels * n_assay)),
-                   rep(x = "Plate ID", times = n_plates),
-                   rep(x = "QC Warning", times = n_qc_warn),
-                   rep(x = "QC Deviation from median",
-                       times = (length(int_ctrl) * n_panels))),
-          "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = int_ctrl, times = n_panels)),
-          "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = NA_character_,
-                       times = (length(int_ctrl) * n_panels)))
-        )
-        df_t <- t(df)
-        colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
-        rownames(df_t) <- NULL
-        df_t <- dplyr::as_tibble(df_t)
+        o_platform <- "Target 96"
+        n_panel <- 2L
+        n_assay <- 78L
+        data_t <- "NPX"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df <- l_df$df
+        df_t <- l_df$df_t
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -3574,7 +5000,7 @@ test_that(
         expect_error(
           object = read_npx_wide_top_split(df = df_t,
                                            file = wide_excel,
-                                           data_type = "NPX",
+                                           data_type = data_t,
                                            olink_platform = o_platform),
           regexp = "Detected 156 assays in 2 panels in file"
         )
@@ -3588,7 +5014,6 @@ test_that(
 test_that(
   "read_npx_wide_top_split - QC_Warning on Ct data",
   {
-
     withr::with_tempfile(
       new = "wide_excel",
       pattern = "test-excel-wide",
@@ -3596,52 +5021,22 @@ test_that(
       code = {
 
         # random df_top ----
-        o_platform <- "Target 48"
-        n_panels <- 1L
-        n_assay <- 45L
-        n_qc_warn <- n_panels
-        n_plates <- n_panels
-        int_ctrl <- character(0)
 
-        df <- dplyr::tibble(
-          "V1" = c("Panel",
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = n_assay),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_plates),
-                         seq_len(n_plates)),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_qc_warn),
-                         seq_len(n_qc_warn)),
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = length(int_ctrl))),
-          "V2" = c("Assay",
-                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
-                          seq_len(n_panels * n_assay)),
-                   rep(x = "Plate ID", times = n_plates),
-                   rep(x = "QC Warning", times = n_qc_warn),
-                   rep(x = "QC Deviation from median",
-                       times = (length(int_ctrl) * n_panels))),
-          "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = int_ctrl, times = n_panels)),
-          "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = NA_character_,
-                       times = (length(int_ctrl) * n_panels)))
-        )
-        df_t <- t(df)
-        colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
-        rownames(df_t) <- NULL
-        df_t <- dplyr::as_tibble(df_t)
+        o_platform <- "Target 48"
+        n_panel <- 1L
+        n_assay <- 45L
+        data_t <- "NPX"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = FALSE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = FALSE)
+
+        df <- l_df$df
+        df_t <- l_df$df_t
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -3665,6 +5060,8 @@ test_that(
 test_that(
   "read_npx_wide_top_split - internal controls within customer assays",
   {
+    ## Int Ctrl shuffled with customer assays ----
+
     withr::with_tempfile(
       new = "wide_excel",
       pattern = "test-excel-wide",
@@ -3672,83 +5069,22 @@ test_that(
       code = {
 
         # random df_top ----
+
         o_platform <- "Target 48"
-        n_panels <- 1L
+        n_panel <- 1L
         n_assay <- 45L
-        n_qc_warn <- n_panels
-        n_plates <- n_panels
-        int_ctrl <- c("Inc Ctrl", "Amp Ctrl", "Ext Ctrl")
+        data_t <- "Quantified"
 
-        df <- dplyr::tibble(
-          "V1" = c("Panel",
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = n_assay),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_plates),
-                         seq_len(n_plates)),
-                   paste(rep(paste("Olink ", o_platform, " Panel"),
-                             times = n_qc_warn),
-                         seq_len(n_qc_warn)),
-                   rep(x = paste("Olink ", o_platform,
-                                 " Panel", seq_len(n_panels)),
-                       each = length(int_ctrl))),
-          "V2" = c("Assay",
-                   paste0(rep(x = "Assay", times = (n_panels * n_assay)),
-                          seq_len(n_panels * n_assay)),
-                   rep(x = "Plate ID", times = n_plates),
-                   rep(x = "QC Warning", times = n_qc_warn),
-                   rep(x = "QC Deviation from median",
-                       times = (length(int_ctrl) * n_panels))),
-          "V3" = c("Uniprot ID",
-                   paste0(rep(x = "Uniprot", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = int_ctrl, times = n_panels)),
-          "V4" = c("OlinkID",
-                   paste0(rep(x = "OID", times = (n_panels * n_assay)),
-                          seq_len((n_panels * n_assay))),
-                   rep(x = NA_character_, times = n_plates),
-                   rep(x = NA_character_, times = n_qc_warn),
-                   rep(x = NA_character_,
-                       times = (length(int_ctrl) * n_panels)))
-        )
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = TRUE,
+                             loc_int_ctrl = "V3",
+                             shuffle_assays = TRUE)
 
-        # shuffle rows to mix internal controls with customer assays
-
-        df_shuffle <- df |>
-          dplyr::slice(
-            2L:dplyr::n()
-          ) |>
-          dplyr::filter(
-            !(.data[["V2"]] %in% c("Plate ID", "QC Warning"))
-          ) |>
-          dplyr::sample_n(
-            size = dplyr::n(),
-            replace = FALSE
-          ) |>
-          # add "Plate ID" and "QC Warning"
-          dplyr::bind_rows(
-            df |>
-              dplyr::filter(
-                .data[["V2"]] %in% c("Plate ID", "QC Warning")
-              )
-          )
-
-        df <- df |>
-          dplyr::slice(
-            1L
-          ) |>
-          dplyr::bind_rows(
-            df_shuffle
-          )
-
-        # proceed with matrix transformation
-        df_t <- t(df)
-        colnames(df_t) <- paste0("V", seq_len(ncol(df_t)))
-        rownames(df_t) <- NULL
-        df_t <- dplyr::as_tibble(df_t)
+        df <- l_df$df
+        df_t <- l_df$df_t
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -3756,366 +5092,102 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object =
-            list_top <- read_npx_wide_top_split(df = df_t,
-                                                file = wide_excel,
-                                                data_type = "NPX",
-                                                olink_platform = o_platform)
+          object = l_obj <- read_npx_wide_top_split(df = df_t,
+                                                    file = wide_excel,
+                                                    data_type = data_t,
+                                                    olink_platform = o_platform)
         )
 
         # modify df so that we can test output ----
 
-        colnames(df) <- dplyr::slice_head(df, n = 1L)
-        df <- df |>
-          dplyr::slice(
-            2L:dplyr::n()
-          ) |>
-          dplyr::mutate(
-            col_index = dplyr::row_number() + 1L,
-            col_index = paste0("V", .data[["col_index"]])
-          )
-
-        ## separate df ----
-
-        df_tmp_oid <- df |>
-          dplyr::filter(
-            !is.na(.data[["OlinkID"]])
-          )
-
-        df_tmp_meta <- df |>
-          dplyr::filter(
-            is.na(.data[["OlinkID"]])
-            & .data[["Assay"]] %in% c("Plate ID", "QC Warning")
-          ) |>
-          dplyr::select(
-            -dplyr::all_of(c("Uniprot ID", "OlinkID"))
-          ) |>
-          dplyr::rename(
-            "Var" = "Assay"
-          )
-
-        df_tmp_qc_dev <- df |>
-          dplyr::filter(
-            is.na(.data[["OlinkID"]])
-            & (.data[["Assay"]] == "QC Deviation from median"
-               | grepl("ctrl", .data[["Assay"]], ignore.case = TRUE))
-          ) |>
-          dplyr::select(
-            -dplyr::all_of(c("OlinkID"))
-          )
+        l_exp <- npx_wide_top_test(df = df)
 
         # check that tmp df are identical to function output ----
 
         expect_identical(
-          object = list_top$df_oid,
-          expected = df_tmp_oid
+          object = l_obj$df_oid,
+          expected = l_exp$df_oid
         )
 
         expect_identical(
-          object = list_top$df_meta,
-          expected = df_tmp_meta
+          object = l_obj$df_meta,
+          expected = l_exp$df_meta
         )
 
         expect_identical(
-          object = list_top$df_qc_dev,
-          expected = df_tmp_qc_dev
+          object = l_obj$df_qc_dev,
+          expected = l_exp$df_qc_dev
         )
+
       }
     )
+
+    ## Int Ctrl shuffled with customer assays  and in different row ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df_top ----
+
+        o_platform <- "Target 48"
+        n_panel <- 1L
+        n_assay <- 45L
+        data_t <- "Quantified"
+
+        l_df <- npx_wide_top(olink_platform = o_platform,
+                             n_panels = n_panel,
+                             n_assays = n_assay,
+                             data_type = data_t,
+                             show_int_ctrl = TRUE,
+                             loc_int_ctrl = "V2",
+                             shuffle_assays = TRUE)
+
+        df <- l_df$df
+        df_t <- l_df$df_t
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # run function ----
+
+        expect_no_condition(
+          object = l_obj <- read_npx_wide_top_split(df = df_t,
+                                                    file = wide_excel,
+                                                    data_type = data_t,
+                                                    olink_platform = o_platform)
+        )
+
+        # modify df so that we can test output ----
+
+        l_exp <- npx_wide_top_test(df = df)
+
+        # check that tmp df are identical to function output ----
+
+        expect_identical(
+          object = l_obj$df_oid,
+          expected = l_exp$df_oid
+        )
+
+        expect_identical(
+          object = l_obj$df_meta,
+          expected = l_exp$df_meta
+        )
+
+        expect_identical(
+          object = l_obj$df_qc_dev,
+          expected = l_exp$df_qc_dev
+        )
+
+      }
+    )
+
   }
 )
 
 # Test read_npx_wide_bottom_t ----
-
-npx_wide_bottom <- function(n_plates,
-                            n_panels,
-                            n_assays,
-                            data_type) {
-  # this is the last column of the bottom matrix.
-  # commonly it contains data when data is Quantified, and not
-  # when it is NPX.
-  last_v <- paste0("V", n_assays * n_panels + 2)
-
-  # create matrix data that are specific to the data type
-  if (data_type == "NPX") {
-
-    # df_dt ----
-
-    df_dt <- matrix(
-      data = rnorm(n = (n_panels * n_assays)),
-      nrow = 1L,
-      ncol = (n_assays * n_panels),
-      dimnames = list(
-        "LOD",
-        paste0("V", 2L:((n_assays * n_panels) + 1L))
-      )
-    ) |>
-      dplyr::as_tibble(
-        rownames = "V1"
-      ) |>
-      dplyr::mutate(
-        dplyr::across(
-          dplyr::everything(),
-          ~ as.character(.x)
-        )
-      )
-
-  } else if (data_type == "Quantified") {
-
-    # df_rep ("Assay warning", "Lowest quantifiable level", "Plate LOD") ----
-
-    df_rep <- matrix(
-      data = sample(x = c("Pass", "Warn"),
-                    size = (n_plates * n_panels * n_assays),
-                    replace = TRUE),
-      nrow = n_plates,
-      ncol = (n_assays * n_panels),
-      dimnames = list(
-        rep(x = "Assay warning", times = n_plates),
-        paste0("V", 2L:((n_assays * n_panels) + 1L))
-      )
-    ) |>
-      dplyr::as_tibble(
-        rownames = "V1"
-      ) |>
-      dplyr::mutate(
-        {{last_v}} := paste("Plate", seq_len(n_plates)) # nolint object_usage_linter
-      ) |>
-      dplyr::bind_rows(
-        matrix(
-          data = rnorm(n = (n_plates * n_panels * n_assays)),
-          nrow = n_plates,
-          ncol = (n_assays * n_panels),
-          dimnames = list(
-            rep(x = "Lowest quantifiable level", times = n_plates),
-            paste0("V", 2L:((n_assays * n_panels) + 1L))
-          )
-        ) |>
-          dplyr::as_tibble(
-            rownames = "V1"
-          ) |>
-          dplyr::mutate(
-            {{last_v}} := paste("Plate", seq_len(n_plates)) # nolint object_usage_linter
-          ) |>
-          dplyr::mutate(
-            dplyr::across(
-              dplyr::everything(), ~ as.character(.x)
-            )
-          )
-      ) |>
-      dplyr::bind_rows(
-        matrix(
-          data = rnorm(n = (n_plates * n_panels * n_assays)),
-          nrow = n_plates,
-          ncol = (n_assays * n_panels),
-          dimnames = list(
-            rep(x = "Plate LOD", times = n_plates),
-            paste0("V", 2L:((n_assays * n_panels) + 1L))
-          )
-        ) |>
-          dplyr::as_tibble(
-            rownames = "V1"
-          ) |>
-          dplyr::mutate(
-            {{last_v}} := paste("Plate", seq_len(n_plates)) # nolint object_usage_linter
-          ) |>
-          dplyr::mutate(
-            dplyr::across(
-              dplyr::everything(),
-              ~ as.character(.x)
-            )
-          )
-      )
-
-    # df_spec ("LLOQ", "ULOQ")----
-    df_spec <- matrix(
-      data = rnorm(n = (n_panels * n_assays)),
-      nrow = 1L,
-      ncol = (n_assays * n_panels),
-      dimnames = list(
-        "LLOQ",
-        paste0("V", 2L:((n_assays * n_panels) + 1L))
-      )
-    ) |>
-      dplyr::as_tibble(
-        rownames = "V1"
-      ) |>
-      dplyr::bind_rows(
-        matrix(
-          data = rnorm(n = (n_panels * n_assays)),
-          nrow = 1L,
-          ncol = (n_assays * n_panels),
-          dimnames = list(
-            "ULOQ",
-            paste0("V", 2L:((n_assays * n_panels) + 1L))
-          )
-        ) |>
-          dplyr::as_tibble(
-            rownames = "V1"
-          )
-      ) |>
-      dplyr::mutate(
-        dplyr::across(
-          dplyr::everything(), ~ as.character(.x)
-        )
-      )
-
-    # df_dt ----
-
-    df_dt <- dplyr::bind_rows(df_rep, df_spec)
-
-  }
-
-  # df shared ("Missing Data freq.", "Normalization") ----
-  df_shared <- matrix(
-    data = rnorm(n = (n_panels * n_assays)),
-    nrow = 1L,
-    ncol = (n_assays * n_panels),
-    dimnames = list(
-      "Missing Data freq.",
-      paste0("V", 2L:((n_assays * n_panels) + 1L))
-    )
-  ) |>
-    dplyr::as_tibble(
-      rownames = "V1"
-    ) |>
-    dplyr::mutate(
-      dplyr::across(
-        dplyr::everything(), ~ as.character(.x)
-      )
-    ) |>
-    dplyr::bind_rows(
-      matrix(
-        data = rep(x = "Intensity", times = (n_panels * n_assays)),
-        nrow = 1L,
-        ncol = (n_assays * n_panels),
-        dimnames = list(
-          "Normalization",
-          paste0("V", 2L:((n_assays * n_panels) + 1L))
-        )
-      ) |>
-        dplyr::as_tibble(
-          rownames = "V1"
-        )
-    )
-
-  # df ----
-
-  df <- dplyr::bind_rows(df_dt, df_shared)
-
-  # return ----
-
-  return(df)
-
-}
-
-npx_wide_bottom_test <- function(df,
-                                 data_type,
-                                 col_split) {
-
-  # remove all NA columns ----
-
-  df <- remove_all_na_cols(df = df)
-
-  # df bottom matrix with plate-specific data ----
-
-  # This is done for Quantified data only
-  if (col_split %in% colnames(df)
-      && data_type == "Quantified") {
-
-    df_q <- df |>
-      # keep only rows to be pivoted
-      dplyr::filter(
-        !is.na(.data[[col_split]])
-      )
-
-    # for each variable in V1 and do a pivot_longer
-    df_q <- lapply(unique(df_q$V1), function(x) {
-      df_q |>
-        dplyr::filter(
-          .data[["V1"]] == .env[["x"]]
-        ) |>
-        dplyr::select(
-          -dplyr::all_of("V1")
-        ) |>
-        tidyr::pivot_longer(
-          -dplyr::all_of(col_split),
-          names_to = "col_index",
-          values_to = x
-        ) |>
-        dplyr::rename(
-          "Plate ID" = dplyr::all_of(col_split)
-        )
-    })
-
-    # left join all data frames from the list
-    df_q <- Reduce(f = function(df_1, df_2) {
-      dplyr::left_join(x = df_1,
-                       y = df_2,
-                       by = c("Plate ID", "col_index"),
-                       relationship = "one-to-one")
-    },
-    x = df_q)
-
-    # remove the rows with plate-specific data and the col_split column
-    df <- df |>
-      dplyr::filter(
-        is.na(.data[[col_split]])
-      ) |>
-      dplyr::select(
-        -dplyr::all_of(col_split)
-      )
-
-  }
-
-  # df without plate-specific info ----
-
-  # transpose and add column names
-  df_t <- t(df)
-  colnames(df_t) <- df_t[1L, ]
-
-  # fix column names and remove extra rows
-  df_t <- df_t |>
-    dplyr::as_tibble(
-      rownames = "col_index"
-    ) |>
-    dplyr::mutate(
-      col_index = dplyr::if_else(
-        .data[["col_index"]] == "V1",
-        "col_index",
-        .data[["col_index"]]
-      )
-    ) |>
-    dplyr::slice(
-      2L:dplyr::n()
-    )
-
-  # join df_q and df_t if needed ----
-
-  if (exists("df_q")) {
-
-    df_t <- dplyr::left_join(
-      x = df_t,
-      y = df_q,
-      by = "col_index",
-      relationship = "one-to-many"
-    )
-
-  }
-
-  # finalize df_t  ----
-
-  # sort columns of df_t
-  df_t <- df_t |>
-    dplyr::select(
-      order(colnames(df_t))
-    )
-
-  # return ----
-
-  return(df_t)
-
-}
 
 test_that(
   "read_npx_wide_top_split - T48 - works single panel file",
