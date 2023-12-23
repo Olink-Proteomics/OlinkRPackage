@@ -1,5 +1,17 @@
 # Help functions ----
 
+## Header matrix ----
+
+npx_wide_head <- function(data_type) {
+
+  df <- dplyr::tibble(
+    "V1" = c("Project Name", data_type),
+    "V2" = c("Test", NA_character_)
+  )
+
+  return(df)
+}
+
 ## Top matrix ----
 
 npx_wide_top <- function(olink_platform,
@@ -192,6 +204,185 @@ npx_wide_top_test <- function(df) {
     )
   )
 
+}
+
+## Middle matrix ----
+
+npx_wide_middle <- function(n_panels,
+                            n_assays,
+                            n_samples,
+                            data_type,
+                            show_int_ctrl = TRUE,
+                            shuffle_assays = FALSE) {
+
+  # pre-compute variables ----
+
+  n_base_plate <- 88L
+  n_sample_plates <- ceiling(x = (n_samples) / n_base_plate) |> as.integer()
+  n_int_ctrl <- 3L
+
+  if (data_type == "Ct") {
+    qc_warns <- FALSE
+    int_ctrl <- FALSE
+  } else {
+    qc_warns <- TRUE
+    if (data_type == "NPX") {
+      int_ctrl <- FALSE
+    } else if (data_type == "Quantified") {
+      if (show_int_ctrl == TRUE) {
+        int_ctrl <- TRUE
+      } else {
+        int_ctrl <- FALSE
+      }
+    }
+  }
+
+  # create parts of df ----
+
+  ## sample id ----
+
+  df_s <- dplyr::tibble(
+    "sample_id" = paste0("S", seq_len(n_samples))
+  )
+
+  ## quant values ----
+
+  df_q <- matrix(
+    data = rnorm(n = n_samples * n_assays * n_panels),
+    nrow = n_samples,
+    ncol = (n_assays * n_panels),
+    dimnames = list(
+      paste0("S", seq_len(n_samples)),
+      paste0("Q", seq_len(n_assays * n_panels))
+    )
+  ) |>
+    dplyr::as_tibble()
+
+  ## plate names ----
+
+  plate_name <- paste0(
+    rep(x = "Plate", times = (n_base_plate * n_sample_plates)),
+    rep(x = seq_len(n_sample_plates), each = n_base_plate)
+  )
+  plate_name <- plate_name[seq_len(n_samples)]
+
+  panel_name <- paste0("Panel", seq_len(n_panels))
+
+  panel_plate_name <- expand.grid(plate_name,
+                                  panel_name,
+                                  stringsAsFactors = FALSE)
+  colnames(panel_plate_name) <- c("X1", "X2")
+  panel_plate_name <- panel_plate_name |>
+    dplyr::as_tibble() |>
+    dplyr::mutate(X = paste(.data[["X1"]], .data[["X2"]], sep = "_")) |>
+    dplyr::pull(.data[["X"]])
+
+  df_p <- matrix(
+    data = panel_plate_name,
+    nrow = n_samples,
+    ncol = n_panels,
+    dimnames = list(
+      paste0("S", seq_len(n_samples)),
+      paste0("P", seq_len(n_panels))
+    )
+  ) |>
+    dplyr::as_tibble()
+
+  rm(plate_name, panel_name, panel_plate_name)
+
+  ## qc warning ----
+
+  df_w <- matrix(
+    data = sample(x = c("Pass", "Warn"),
+                  size = (n_samples * n_panels),
+                  replace = TRUE),
+    nrow = n_samples,
+    ncol = n_panels,
+    dimnames = list(
+      paste0("S", seq_len(n_samples)),
+      paste0("W", seq_len(n_panels))
+    )
+  ) |>
+    dplyr::as_tibble()
+
+  ## internal controls ----
+
+  df_i <- matrix(
+    data = rnorm(n = n_samples * n_int_ctrl * n_panels),
+    nrow = n_samples,
+    ncol = (n_int_ctrl * n_panels),
+    dimnames = list(
+      paste0("S", seq_len(n_samples)),
+      paste0("I", seq_len(n_int_ctrl * n_panels))
+    )
+  ) |>
+    dplyr::as_tibble()
+
+  # combine df ----
+
+  df <- df_s |>
+    dplyr::bind_cols(
+      df_q
+    ) |>
+    dplyr::bind_cols(
+      df_p
+    )
+
+  if (qc_warns == TRUE) {
+    df <- df |>
+      dplyr::bind_cols(
+        df_w
+      )
+  }
+
+  if (int_ctrl == TRUE) {
+    df <- df |>
+      dplyr::bind_cols(
+        df_i
+      )
+  }
+
+  # modify df ----
+
+  ## shuffle cols ----
+
+  if (shuffle_assays == TRUE) {
+
+    c_names <- colnames(df)
+    c_names_shuffle <- c_names[grepl(pattern = "^Q|^I", x = c_names)]
+    c_names_sid <- c_names[1]
+    c_names_no_shuffle <- c_names[!(c_names %in% c(c_names_shuffle,
+                                                   c_names_sid))]
+    c_names_shuffle <- sample(x = c_names_shuffle,
+                              size = length(c_names_shuffle),
+                              replace = FALSE)
+    rm(c_names)
+
+    df <- df |>
+      dplyr::select(
+        dplyr::all_of(
+          c(c_names_sid, c_names_shuffle, c_names_no_shuffle)
+        )
+      )
+
+  }
+
+  ## rename columns ----
+
+  colnames(df) <- paste0("V", seq_len(ncol(df)))
+
+  ## convert all to character ----
+
+  df <- df |>
+    dplyr::mutate(
+      dplyr::across(
+        dplyr::everything(), ~ as.character(.x)
+      )
+    )
+
+  # return ----
+
+  return(df)
 }
 
 ## Bottom matrix ----
@@ -487,6 +678,91 @@ npx_wide_bottom_test <- function(df,
 
 }
 
+## Full df ----
+
+npx_wide <- function(olink_platform,
+                     data_type,
+                     n_panels,
+                     n_assays,
+                     n_samples,
+                     show_int_ctrl = TRUE,
+                     loc_int_ctrl = "V3",
+                     shuffle_assays = FALSE) {
+
+  n_base_plate <- 88L
+  n_plates <- ceiling(x = (n_samples) / n_base_plate) |> as.integer()
+
+  # head ----
+
+  df_head <- npx_wide_head(data_type = data_type)
+
+  # top matrix ----
+
+  df_top <- npx_wide_top(olink_platform = olink_platform,
+                         n_panels = n_panels,
+                         n_assays = n_assays,
+                         data_type = data_type,
+                         show_int_ctrl = show_int_ctrl,
+                         loc_int_ctrl = loc_int_ctrl,
+                         shuffle_assays = shuffle_assays)
+  df_top <- df_top$df_t
+
+  # middle matrix ----
+
+  df_middle <- npx_wide_middle(n_panels = n_panels,
+                               n_assays = n_assays,
+                               n_samples = n_samples,
+                               data_type = data_type,
+                               show_int_ctrl = show_int_ctrl,
+                               shuffle_assays = shuffle_assays)
+
+  # bottom matrix ----
+
+  if (data_type != "Ct") {
+    df_bottom <- npx_wide_bottom(n_plates = n_plates,
+                                 n_panels = n_panels,
+                                 n_assays = n_assays,
+                                 data_type = data_type)
+  }
+
+  # na rows ----
+
+  df_na <- dplyr::tibble(
+    "X" = rep(x = NA_character_, times = ncol(df_top))
+  ) |>
+    t()
+  colnames(df_na) <- paste0("V", seq_len(ncol(df_top)))
+  df_na <- dplyr::as_tibble(df_na)
+
+  # combine df ----
+
+  df <- df_head |>
+    dplyr::bind_rows(
+      df_top
+    ) |>
+    dplyr::bind_rows(
+      df_na
+    ) |>
+    dplyr::bind_rows(
+      df_middle
+    )
+
+  if (data_type != "Ct") {
+    df <- df |>
+      dplyr::bind_rows(
+        df_na
+      ) |>
+      dplyr::bind_rows(
+        df_bottom
+      )
+  }
+
+  # return ----
+
+  return(df)
+
+}
+
 # Test read_npx_wide_split_row ----
 
 test_that(
@@ -501,17 +777,18 @@ test_that(
       code = {
 
         # random df
-        df <- dplyr::tibble(
-          "V1" = c("project_Name", "NPX", "Panel", "Assay",
-                   "Uniprot ID", "OlinkID", NA_character_, "Sample1",
-                   NA_character_, "LOD"),
-          "V2" = c("SW Version", NA_character_, "Olink Target 48", "Assay1",
-                   "Uniprot1", "OID1", NA_character_, 1.1, NA_character_, 1.1),
-          "V3" = c(NA_character_, NA_character_, "Olink Target 48", "Assay2",
-                   "Uniprot2", "OID2", NA_character_, 2.2, NA_character_, 1.1),
-          "V4" = c(NA_character_, NA_character_, "Olink Target 48", "Assay3",
-                   "Uniprot3", "OID3", NA_character_, 3.3, NA_character_, 1.1)
-        )
+        data_t <- "NPX"
+        n_sample <- 88L
+        n_plates <- ceiling(x = (n_sample / 88L)) |> as.integer()
+
+        df <- npx_wide(olink_platform = "Target 48",
+                       data_type = data_t,
+                       n_panels = 2L,
+                       n_assays = 45L,
+                       n_samples = n_sample,
+                       show_int_ctrl = TRUE,
+                       loc_int_ctrl = "V3",
+                       shuffle_assays = FALSE)
 
         # write df
         writexl::write_xlsx(
@@ -527,42 +804,124 @@ test_that(
         # check that function runs for NPX
         expect_no_condition(
           object = df_out <- read_npx_wide_split_row(file = wide_excel,
-                                                     data_type = "NPX")
+                                                     data_type = data_t)
         )
 
         # check that output exists
         expect_true(object = exists("df_out"))
 
         # check that df_top works
+        top_start <- 3L
+        top_end <- ifelse(data_t == "Quantified", 7L, 6L)
         expect_identical(
           object = df_out$df_top,
           expected = df |>
-            dplyr::slice(3L:6L)
+            dplyr::slice(
+              top_start:top_end
+            )
         )
 
         # check that df_mid works
+        sample_start <- ifelse(data_t == "Quantified", 9L, 8L)
+        sample_end <- sample_start + n_sample - 1L
         expect_identical(
           object = df_out$df_mid,
           expected = df |>
-            dplyr::slice(8L) |>
-            dplyr::mutate(
-              dplyr::across(
-                dplyr::everything(),
-                ~ as.character(.x)
-              )
+            dplyr::slice(
+              sample_start:sample_end
             )
         )
 
         # check that df_bottom works
+        bottom_start <- sample_end + 2L
+        bottom_end <- ifelse(data_t == "Quantified",
+                             bottom_start + 4L + (3 * n_plates) - 1,
+                             bottom_start + 3L - 1)
         expect_identical(
           object = df_out$df_bottom,
           expected = df |>
-            dplyr::slice(10L) |>
-            dplyr::mutate(
-              dplyr::across(
-                dplyr::everything(),
-                ~ as.character(.x)
-              )
+            dplyr::slice(
+              bottom_start:bottom_end
+            )
+        )
+
+      }
+    )
+
+    ## NPX shuffle ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df
+        data_t <- "NPX"
+        n_sample <- 88L
+        n_plates <- ceiling(x = (n_sample / 88L)) |> as.integer()
+
+        df <- npx_wide(olink_platform = "Target 48",
+                       data_type = data_t,
+                       n_panels = 2L,
+                       n_assays = 45L,
+                       n_samples = n_sample,
+                       show_int_ctrl = TRUE,
+                       loc_int_ctrl = "V3",
+                       shuffle_assays = TRUE)
+
+        # write df
+        writexl::write_xlsx(
+          x = df,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs for NPX
+        expect_no_condition(
+          object = df_out <- read_npx_wide_split_row(file = wide_excel,
+                                                     data_type = data_t)
+        )
+
+        # check that output exists
+        expect_true(object = exists("df_out"))
+
+        # check that df_top works
+        top_start <- 3L
+        top_end <- ifelse(data_t == "Quantified", 7L, 6L)
+        expect_identical(
+          object = df_out$df_top,
+          expected = df |>
+            dplyr::slice(
+              top_start:top_end
+            )
+        )
+
+        # check that df_mid works
+        sample_start <- ifelse(data_t == "Quantified", 9L, 8L)
+        sample_end <- sample_start + n_sample - 1L
+        expect_identical(
+          object = df_out$df_mid,
+          expected = df |>
+            dplyr::slice(
+              sample_start:sample_end
+            )
+        )
+
+        # check that df_bottom works
+        bottom_start <- sample_end + 2L
+        bottom_end <- ifelse(data_t == "Quantified",
+                             bottom_start + 4L + (3 * n_plates) - 1,
+                             bottom_start + 3L - 1)
+        expect_identical(
+          object = df_out$df_bottom,
+          expected = df |>
+            dplyr::slice(
+              bottom_start:bottom_end
             )
         )
 
@@ -578,16 +937,18 @@ test_that(
       code = {
 
         # random df
-        df <- dplyr::tibble(
-          "V1" = c("project_Name", "Ct", "Panel", "Assay",
-                   "Uniprot ID", "OlinkID", NA_character_, "Sample1"),
-          "V2" = c("SW Version", NA_character_, "Olink Target 48", "Assay1",
-                   "Uniprot1", "OID1", NA_character_, 1.1),
-          "V3" = c(NA_character_, NA_character_, "Olink Target 48", "Assay2",
-                   "Uniprot2", "OID2", NA_character_, 2.2),
-          "V4" = c(NA_character_, NA_character_, "Olink Target 48", "Assay3",
-                   "Uniprot3", "OID3", NA_character_, 3.3)
-        )
+        data_t <- "Ct"
+        n_sample <- 88L
+        n_plates <- ceiling(x = (n_sample / 88L)) |> as.integer()
+
+        df <- npx_wide(olink_platform = "Target 48",
+                       data_type = data_t,
+                       n_panels = 2L,
+                       n_assays = 45L,
+                       n_samples = n_sample,
+                       show_int_ctrl = TRUE,
+                       loc_int_ctrl = "V3",
+                       shuffle_assays = FALSE)
 
         # write df
         writexl::write_xlsx(
@@ -603,29 +964,31 @@ test_that(
         # check that function runs for Ct
         expect_no_condition(
           object = df_out <- read_npx_wide_split_row(file = wide_excel,
-                                                     data_type = "Ct")
+                                                     data_type = data_t)
         )
 
         # check that output exists
         expect_true(object = exists("df_out"))
 
         # check that df_top works
+        top_start <- 3L
+        top_end <- ifelse(data_t == "Quantified", 7L, 6L)
         expect_identical(
           object = df_out$df_top,
           expected = df |>
-            dplyr::slice(3L:6L)
+            dplyr::slice(
+              top_start:top_end
+            )
         )
 
         # check that df_mid works
+        sample_start <- ifelse(data_t == "Quantified", 9L, 8L)
+        sample_end <- sample_start + n_sample - 1L
         expect_identical(
           object = df_out$df_mid,
           expected = df |>
-            dplyr::slice(8L) |>
-            dplyr::mutate(
-              dplyr::across(
-                dplyr::everything(),
-                ~ as.character(.x)
-              )
+            dplyr::slice(
+              sample_start:sample_end
             )
         )
 
@@ -635,7 +998,7 @@ test_that(
       }
     )
 
-    ## Quantified ----
+    ## Ct shuffle ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -644,20 +1007,88 @@ test_that(
       code = {
 
         # random df
-        df <- dplyr::tibble(
-          "V1" = c("project_Name", "Quantified", "Panel", "Assay",
-                   "Uniprot ID", "OlinkID", "Unit", NA_character_, "Sample1",
-                   NA_character_, "LOD"),
-          "V2" = c("SW Version", NA_character_, "Olink Target 48", "Assay1",
-                   "Uniprot1", "OID1", "pg/mL", NA_character_, 1.1,
-                   NA_character_, 1.1),
-          "V3" = c(NA_character_, NA_character_, "Olink Target 48", "Assay2",
-                   "Uniprot2", "OID2", "pg/mL", NA_character_, 2.2,
-                   NA_character_, 1.1),
-          "V4" = c(NA_character_, NA_character_, "Olink Target 48", "Assay3",
-                   "Uniprot3", "OID3", "pg/mL", NA_character_, 3.3,
-                   NA_character_, 1.1)
+        data_t <- "Ct"
+        n_sample <- 88L
+        n_plates <- ceiling(x = (n_sample / 88L)) |> as.integer()
+
+        df <- npx_wide(olink_platform = "Target 48",
+                       data_type = data_t,
+                       n_panels = 2L,
+                       n_assays = 45L,
+                       n_samples = n_sample,
+                       show_int_ctrl = TRUE,
+                       loc_int_ctrl = "V3",
+                       shuffle_assays = TRUE)
+
+        # write df
+        writexl::write_xlsx(
+          x = df,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
         )
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs for Ct
+        expect_no_condition(
+          object = df_out <- read_npx_wide_split_row(file = wide_excel,
+                                                     data_type = data_t)
+        )
+
+        # check that output exists
+        expect_true(object = exists("df_out"))
+
+        # check that df_top works
+        top_start <- 3L
+        top_end <- ifelse(data_t == "Quantified", 7L, 6L)
+        expect_identical(
+          object = df_out$df_top,
+          expected = df |>
+            dplyr::slice(
+              top_start:top_end
+            )
+        )
+
+        # check that df_mid works
+        sample_start <- ifelse(data_t == "Quantified", 9L, 8L)
+        sample_end <- sample_start + n_sample - 1L
+        expect_identical(
+          object = df_out$df_mid,
+          expected = df |>
+            dplyr::slice(
+              sample_start:sample_end
+            )
+        )
+
+        # check that df_bottom works
+        expect_true(object = is.null(df_out$df_bottom))
+
+      }
+    )
+
+    ## Quantified wo int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df
+        data_t <- "Quantified"
+        n_sample <- 88L
+        n_plates <- ceiling(x = (n_sample / 88L)) |> as.integer()
+
+        df <- npx_wide(olink_platform = "Target 48",
+                       data_type = data_t,
+                       n_panels = 2L,
+                       n_assays = 45L,
+                       n_samples = n_sample,
+                       show_int_ctrl = FALSE,
+                       loc_int_ctrl = "V3",
+                       shuffle_assays = FALSE)
 
         # write file
         writexl::write_xlsx(
@@ -673,42 +1104,284 @@ test_that(
         # check that function runs for Quantified
         expect_no_condition(
           object = df_out <- read_npx_wide_split_row(file = wide_excel,
-                                                     data_type = "Quantified")
+                                                     data_type = data_t)
         )
 
         # check that output exists
         expect_true(object = exists("df_out"))
 
         # check that df_top works
+        top_start <- 3L
+        top_end <- ifelse(data_t == "Quantified", 7L, 6L)
         expect_identical(
           object = df_out$df_top,
           expected = df |>
-            dplyr::slice(3L:7L)
+            dplyr::slice(
+              top_start:top_end
+            )
         )
 
         # check that df_mid works
+        sample_start <- ifelse(data_t == "Quantified", 9L, 8L)
+        sample_end <- sample_start + n_sample - 1L
         expect_identical(
           object = df_out$df_mid,
           expected = df |>
-            dplyr::slice(9L) |>
-            dplyr::mutate(
-              dplyr::across(
-                dplyr::everything(),
-                ~ as.character(.x)
-              )
+            dplyr::slice(
+              sample_start:sample_end
             )
         )
 
         # check that df_bottom works
+        bottom_start <- sample_end + 2L
+        bottom_end <- ifelse(data_t == "Quantified",
+                             bottom_start + 4L + (3 * n_plates) - 1,
+                             bottom_start + 3L - 1)
         expect_identical(
           object = df_out$df_bottom,
           expected = df |>
-            dplyr::slice(11L) |>
-            dplyr::mutate(
-              dplyr::across(
-                dplyr::everything(),
-                ~ as.character(.x)
-              )
+            dplyr::slice(
+              bottom_start:bottom_end
+            )
+        )
+
+      }
+    )
+
+    ## Quantified w int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df
+        data_t <- "Quantified"
+        n_sample <- 88L
+        n_plates <- ceiling(x = (n_sample / 88L)) |> as.integer()
+
+        df <- npx_wide(olink_platform = "Target 48",
+                       data_type = data_t,
+                       n_panels = 2L,
+                       n_assays = 45L,
+                       n_samples = n_sample,
+                       show_int_ctrl = TRUE,
+                       loc_int_ctrl = "V3",
+                       shuffle_assays = FALSE)
+
+        # write file
+        writexl::write_xlsx(
+          x = df,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs for Quantified
+        expect_no_condition(
+          object = df_out <- read_npx_wide_split_row(file = wide_excel,
+                                                     data_type = data_t)
+        )
+
+        # check that output exists
+        expect_true(object = exists("df_out"))
+
+        # check that df_top works
+        top_start <- 3L
+        top_end <- ifelse(data_t == "Quantified", 7L, 6L)
+        expect_identical(
+          object = df_out$df_top,
+          expected = df |>
+            dplyr::slice(
+              top_start:top_end
+            )
+        )
+
+        # check that df_mid works
+        sample_start <- ifelse(data_t == "Quantified", 9L, 8L)
+        sample_end <- sample_start + n_sample - 1L
+        expect_identical(
+          object = df_out$df_mid,
+          expected = df |>
+            dplyr::slice(
+              sample_start:sample_end
+            )
+        )
+
+        # check that df_bottom works
+        bottom_start <- sample_end + 2L
+        bottom_end <- ifelse(data_t == "Quantified",
+                             bottom_start + 4L + (3 * n_plates) - 1,
+                             bottom_start + 3L - 1)
+        expect_identical(
+          object = df_out$df_bottom,
+          expected = df |>
+            dplyr::slice(
+              bottom_start:bottom_end
+            )
+        )
+
+      }
+    )
+
+    ## Quantified w int ctrl in V2 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df
+        data_t <- "Quantified"
+        n_sample <- 88L
+        n_plates <- ceiling(x = (n_sample / 88L)) |> as.integer()
+
+        df <- npx_wide(olink_platform = "Target 48",
+                       data_type = data_t,
+                       n_panels = 2L,
+                       n_assays = 45L,
+                       n_samples = n_sample,
+                       show_int_ctrl = TRUE,
+                       loc_int_ctrl = "V2",
+                       shuffle_assays = FALSE)
+
+        # write file
+        writexl::write_xlsx(
+          x = df,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs for Quantified
+        expect_no_condition(
+          object = df_out <- read_npx_wide_split_row(file = wide_excel,
+                                                     data_type = data_t)
+        )
+
+        # check that output exists
+        expect_true(object = exists("df_out"))
+
+        # check that df_top works
+        top_start <- 3L
+        top_end <- ifelse(data_t == "Quantified", 7L, 6L)
+        expect_identical(
+          object = df_out$df_top,
+          expected = df |>
+            dplyr::slice(
+              top_start:top_end
+            )
+        )
+
+        # check that df_mid works
+        sample_start <- ifelse(data_t == "Quantified", 9L, 8L)
+        sample_end <- sample_start + n_sample - 1L
+        expect_identical(
+          object = df_out$df_mid,
+          expected = df |>
+            dplyr::slice(
+              sample_start:sample_end
+            )
+        )
+
+        # check that df_bottom works
+        bottom_start <- sample_end + 2L
+        bottom_end <- ifelse(data_t == "Quantified",
+                             bottom_start + 4L + (3 * n_plates) - 1,
+                             bottom_start + 3L - 1)
+        expect_identical(
+          object = df_out$df_bottom,
+          expected = df |>
+            dplyr::slice(
+              bottom_start:bottom_end
+            )
+        )
+
+      }
+    )
+
+    ## Quantified w int ctrl in V2 shuffled ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df
+        data_t <- "Quantified"
+        n_sample <- 88L
+        n_plates <- ceiling(x = (n_sample / 88L)) |> as.integer()
+
+        df <- npx_wide(olink_platform = "Target 48",
+                       data_type = data_t,
+                       n_panels = 2L,
+                       n_assays = 45L,
+                       n_samples = n_sample,
+                       show_int_ctrl = TRUE,
+                       loc_int_ctrl = "V2",
+                       shuffle_assays = TRUE)
+
+        # write file
+        writexl::write_xlsx(
+          x = df,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs for Quantified
+        expect_no_condition(
+          object = df_out <- read_npx_wide_split_row(file = wide_excel,
+                                                     data_type = data_t)
+        )
+
+        # check that output exists
+        expect_true(object = exists("df_out"))
+
+        # check that df_top works
+        top_start <- 3L
+        top_end <- ifelse(data_t == "Quantified", 7L, 6L)
+        expect_identical(
+          object = df_out$df_top,
+          expected = df |>
+            dplyr::slice(
+              top_start:top_end
+            )
+        )
+
+        # check that df_mid works
+        sample_start <- ifelse(data_t == "Quantified", 9L, 8L)
+        sample_end <- sample_start + n_sample - 1L
+        expect_identical(
+          object = df_out$df_mid,
+          expected = df |>
+            dplyr::slice(
+              sample_start:sample_end
+            )
+        )
+
+        # check that df_bottom works
+        bottom_start <- sample_end + 2L
+        bottom_end <- ifelse(data_t == "Quantified",
+                             bottom_start + 4L + (3 * n_plates) - 1,
+                             bottom_start + 3L - 1)
+        expect_identical(
+          object = df_out$df_bottom,
+          expected = df |>
+            dplyr::slice(
+              bottom_start:bottom_end
             )
         )
 
@@ -730,22 +1403,26 @@ test_that(
       code = {
 
         # write random df
-        dplyr::tibble(
-          "V1" = c("project_Name", "NPX", "Panel", "Assay",
-                   "Uniprot ID", "OlinkID", "A", "Sample1",
-                   "A", "LOD"),
-          "V2" = c("SW Version", NA_character_, "Olink Target 48", "Assay1",
-                   "Uniprot1", "OID1", NA_character_, 1.1, NA_character_, 1.1),
-          "V3" = c(NA_character_, NA_character_, "Olink Target 48", "Assay2",
-                   "Uniprot2", "OID2", NA_character_, 2.2, NA_character_, 1.1),
-          "V4" = c(NA_character_, NA_character_, "Olink Target 48", "Assay3",
-                   "Uniprot3", "OID3", NA_character_, 3.3, NA_character_, 1.1)
-        ) |>
-          writexl::write_xlsx(
-            path = wide_excel,
-            col_names = FALSE,
-            format_headers = FALSE
+        data_t <- "NPX"
+
+        df <- npx_wide(olink_platform = "Target 48",
+                       data_type = data_t,
+                       n_panels = 2L,
+                       n_assays = 45L,
+                       n_samples = 88L,
+                       show_int_ctrl = TRUE,
+                       loc_int_ctrl = "V3",
+                       shuffle_assays = FALSE) |>
+          dplyr::filter(
+            is.na(.data[["V1"]])
           )
+
+        writexl::write_xlsx(
+          x = df,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
 
         # check that file exists
         expect_true(object = file.exists(wide_excel))
@@ -753,7 +1430,7 @@ test_that(
         # check that function runs for NPX
         expect_error(
           object = read_npx_wide_split_row(file = wide_excel,
-                                           data_type = "NPX"),
+                                           data_type = data_t),
           regexp = "We identified 0 rows with all columns `NA` in file"
         )
       }
@@ -768,22 +1445,28 @@ test_that(
       code = {
 
         # write random df
-        dplyr::tibble(
-          "V1" = c("project_Name", NA_character_, "Panel", "Assay",
-                   "Uniprot ID", "OlinkID", NA_character_, "Sample1",
-                   NA_character_, "LOD"),
-          "V2" = c("SW Version", NA_character_, "Olink Target 48", "Assay1",
-                   "Uniprot1", "OID1", NA_character_, 1.1, NA_character_, 1.1),
-          "V3" = c(NA_character_, NA_character_, "Olink Target 48", "Assay2",
-                   "Uniprot2", "OID2", NA_character_, 2.2, NA_character_, 1.1),
-          "V4" = c(NA_character_, NA_character_, "Olink Target 48", "Assay3",
-                   "Uniprot3", "OID3", NA_character_, 3.3, NA_character_, 1.1)
-        ) |>
-          writexl::write_xlsx(
-            path = wide_excel,
-            col_names = FALSE,
-            format_headers = FALSE
+        data_t <- "NPX"
+
+        df <- npx_wide(olink_platform = "Target 48",
+                       data_type = data_t,
+                       n_panels = 2L,
+                       n_assays = 45L,
+                       n_samples = 88L,
+                       show_int_ctrl = TRUE,
+                       loc_int_ctrl = "V3",
+                       shuffle_assays = FALSE) |>
+          dplyr::mutate(
+            V1 = dplyr::if_else(.data[["V1"]] == data_t,
+                                NA_character_,
+                                .data[["V1"]])
           )
+
+        writexl::write_xlsx(
+          x = df,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
 
         # check that file exists
         expect_true(object = file.exists(wide_excel))
@@ -791,7 +1474,7 @@ test_that(
         # check that function runs for NPX
         expect_error(
           object = read_npx_wide_split_row(file = wide_excel,
-                                           data_type = "NPX"),
+                                           data_type = data_t),
           regexp = "We identified 3 rows with all columns `NA` in file"
         )
       }
@@ -811,25 +1494,22 @@ test_that(
       fileext = ".xlsx",
       code = {
 
-        # random df
-        df <- dplyr::tibble(
-          "V1" = c("project_Name", "NPX", "Panel", "Assay",
-                   "Uniprot ID", "OlinkID", NA_character_, "Sample1"),
-          "V2" = c("SW Version", NA_character_, "Olink Target 48", "Assay1",
-                   "Uniprot1", "OID1", NA_character_, 1.1),
-          "V3" = c(NA_character_, NA_character_, "Olink Target 48", "Assay2",
-                   "Uniprot2", "OID2", NA_character_, 2.2),
-          "V4" = c(NA_character_, NA_character_, "Olink Target 48", "Assay3",
-                   "Uniprot3", "OID3", NA_character_, 3.3)
-        )
+        # write random df
+        data_t <- "Ct"
 
-        # write df
-        writexl::write_xlsx(
-          x = df,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        npx_wide(olink_platform = "Target 48",
+                 data_type = data_t,
+                 n_panels = 2L,
+                 n_assays = 45L,
+                 n_samples = 88L,
+                 show_int_ctrl = TRUE,
+                 loc_int_ctrl = "V3",
+                 shuffle_assays = FALSE) |>
+          writexl::write_xlsx(
+            path = wide_excel,
+            col_names = FALSE,
+            format_headers = FALSE
+          )
 
         # check that file exists
         expect_true(object = file.exists(wide_excel))
@@ -852,26 +1532,22 @@ test_that(
       fileext = ".xlsx",
       code = {
 
-        # random df
-        df <- dplyr::tibble(
-          "V1" = c("project_Name", "Ct", "Panel", "Assay",
-                   "Uniprot ID", "OlinkID", NA_character_, "Sample1",
-                   NA_character_, "LOD"),
-          "V2" = c("SW Version", NA_character_, "Olink Target 48", "Assay1",
-                   "Uniprot1", "OID1", NA_character_, 1.1, NA_character_, 1.1),
-          "V3" = c(NA_character_, NA_character_, "Olink Target 48", "Assay2",
-                   "Uniprot2", "OID2", NA_character_, 2.2, NA_character_, 1.1),
-          "V4" = c(NA_character_, NA_character_, "Olink Target 48", "Assay3",
-                   "Uniprot3", "OID3", NA_character_, 3.3, NA_character_, 1.1)
-        )
+        # write random df
+        data_t <- "NPX"
 
-        # write df
-        writexl::write_xlsx(
-          x = df,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        npx_wide(olink_platform = "Target 48",
+                 data_type = data_t,
+                 n_panels = 2L,
+                 n_assays = 45L,
+                 n_samples = 88L,
+                 show_int_ctrl = TRUE,
+                 loc_int_ctrl = "V3",
+                 shuffle_assays = FALSE) |>
+          writexl::write_xlsx(
+            path = wide_excel,
+            col_names = FALSE,
+            format_headers = FALSE
+          )
 
         # check that file exists
         expect_true(object = file.exists(wide_excel))
@@ -894,25 +1570,22 @@ test_that(
       fileext = ".xlsx",
       code = {
 
-        # random df
-        df <- dplyr::tibble(
-          "V1" = c("project_Name", "Quantified", "Panel", "Assay",
-                   "Uniprot ID", "OlinkID", "Unit", NA_character_, "Sample1"),
-          "V2" = c("SW Version", NA_character_, "Olink Target 48", "Assay1",
-                   "Uniprot1", "OID1", "pg/mL", NA_character_, 1.1),
-          "V3" = c(NA_character_, NA_character_, "Olink Target 48", "Assay2",
-                   "Uniprot2", "OID2", "pg/mL", NA_character_, 2.2),
-          "V4" = c(NA_character_, NA_character_, "Olink Target 48", "Assay3",
-                   "Uniprot3", "OID3", "pg/mL", NA_character_, 3.3)
-        )
+        # write random df
+        data_t <- "Ct"
 
-        # write file
-        writexl::write_xlsx(
-          x = df,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        npx_wide(olink_platform = "Target 48",
+                 data_type = data_t,
+                 n_panels = 2L,
+                 n_assays = 45L,
+                 n_samples = 88L,
+                 show_int_ctrl = TRUE,
+                 loc_int_ctrl = "V3",
+                 shuffle_assays = FALSE) |>
+          writexl::write_xlsx(
+            path = wide_excel,
+            col_names = FALSE,
+            format_headers = FALSE
+          )
 
         # check that file exists
         expect_true(object = file.exists(wide_excel))
@@ -939,26 +1612,25 @@ test_that(
       fileext = ".xlsx",
       code = {
 
-        # random df
-        df <- dplyr::tibble(
-          "V1" = c("project_Name", "NPX", "Panel", "Assay",
-                   "Uniprot ID", "OlinkID", NA_character_, NA_character_,
-                   "Sample1"),
-          "V2" = c("SW Version", NA_character_, "Olink Target 48", "Assay1",
-                   "Uniprot1", "OID1", NA_character_, NA_character_, 1.1),
-          "V3" = c(NA_character_, NA_character_, "Olink Target 48", "Assay2",
-                   "Uniprot2", "OID2", NA_character_, NA_character_, 2.2),
-          "V4" = c(NA_character_, NA_character_, "Olink Target 48", "Assay3",
-                   "Uniprot3", "OID3", NA_character_, NA_character_, 3.3)
-        )
+        # write random df
+        data_t <- "NPX"
 
-        # write df
-        writexl::write_xlsx(
-          x = df,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        npx_wide(olink_platform = "Target 48",
+                 data_type = data_t,
+                 n_panels = 2L,
+                 n_assays = 45L,
+                 n_samples = 88L,
+                 show_int_ctrl = TRUE,
+                 loc_int_ctrl = "V3",
+                 shuffle_assays = FALSE) |>
+          dplyr::filter(
+            !grepl(pattern = "^S", x = .data[["V1"]])
+          ) |>
+          writexl::write_xlsx(
+            path = wide_excel,
+            col_names = FALSE,
+            format_headers = FALSE
+          )
 
         # check that file exists
         expect_true(object = file.exists(wide_excel))
@@ -966,7 +1638,7 @@ test_that(
         # check that function runs for NPX
         expect_error(
           object = read_npx_wide_split_row(file = wide_excel,
-                                           data_type = "NPX"),
+                                           data_type = data_t),
           regexp = "Consecutive rows with all columns NA."
         )
 
