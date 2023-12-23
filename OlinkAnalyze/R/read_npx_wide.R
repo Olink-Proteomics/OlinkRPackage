@@ -233,7 +233,6 @@ read_npx_wide_split_row <- function(file,
 
 }
 
-
 #' Help function to determine the number of rows with assay information in Olink
 #' excel wide format files.
 #'
