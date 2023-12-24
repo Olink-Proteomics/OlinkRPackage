@@ -2,6 +2,7 @@
 
 ## Header matrix ----
 
+# return the top 2x2 matrix in the first two rows of an Olink exceli wide file
 npx_wide_head <- function(data_type) {
 
   df <- dplyr::tibble(
@@ -14,6 +15,13 @@ npx_wide_head <- function(data_type) {
 
 ## Top matrix ----
 
+# computes the top matrix in an Olink excel wide file. This matrix contains
+# metadata about assays such as OlinkID, Assay name, UniProt ID, the Olink panel
+# they belong to and the measuring unit.
+# The right hand side of this matrix contains data about Plates, QC_Warnings and
+# internal controls.
+#
+# Returns a matrix in wide format.
 npx_wide_top <- function(olink_platform,
                          n_panels,
                          n_assays,
@@ -41,7 +49,8 @@ npx_wide_top <- function(olink_platform,
     }
   }
 
-  # random df
+  # random df ----
+
   df <- dplyr::tibble(
     "V1" = c("Panel",
              rep(x = paste("Olink ", olink_platform,
@@ -77,6 +86,8 @@ npx_wide_top <- function(olink_platform,
              rep(x = NA_character_,
                  times = (length(int_ctrl) * n_panels)))
   )
+
+  # modify df ----
 
   # if data_type is Quantified then add column "Unit"
   if (data_type == "Quantified") {
@@ -141,28 +152,29 @@ npx_wide_top <- function(olink_platform,
 
   # return ----
 
-  return(
-    list(
-      df = df,
-      df_t = df_t
-    )
-  )
+  return(df_t)
 
 }
 
-# This function modifies the output of npx_wide_top to help with tests
+# This function modifies the output of npx_wide_top to help with tests.
+# Input is the wide matrix, and output is the top matrix separated based on
+# assays, plate_id & qc_warning and internal controls.
 npx_wide_top_test <- function(df) {
 
   # modify df ----
 
-  colnames(df) <- dplyr::slice_head(df, n = 1L)
+  c_names <- colnames(df)
+
+  df <- df |> t()
+  colnames(df) <- df[1, ]
+
   df <- df |>
+    dplyr::as_tibble() |>
+    dplyr::mutate(
+      col_index = c_names
+    ) |>
     dplyr::slice(
       2L:dplyr::n()
-    ) |>
-    dplyr::mutate(
-      col_index = dplyr::row_number() + 1L,
-      col_index = paste0("V", .data[["col_index"]])
     )
 
   # separate df ----
@@ -208,6 +220,9 @@ npx_wide_top_test <- function(df) {
 
 ## Middle matrix ----
 
+# computes the middle matrix with assays measurements for each sample. The right
+# hand side of it should contan information on Plate ID, QC_Warning and internal
+# controls.
 npx_wide_middle <- function(n_panels,
                             n_assays,
                             n_samples,
@@ -387,6 +402,7 @@ npx_wide_middle <- function(n_panels,
 
 ## Bottom matrix ----
 
+# computes the bottom matrix with LOD, ULOQ, LLOQ, and plate-specific QC metrics
 npx_wide_bottom <- function(n_plates,
                             n_panels,
                             n_assays,
@@ -680,6 +696,7 @@ npx_wide_bottom_test <- function(df,
 
 ## Full df ----
 
+# combines the full matrix mimicing and Olink excel wide file.
 npx_wide <- function(olink_platform,
                      data_type,
                      n_panels,
@@ -705,7 +722,6 @@ npx_wide <- function(olink_platform,
                          show_int_ctrl = show_int_ctrl,
                          loc_int_ctrl = loc_int_ctrl,
                          shuffle_assays = shuffle_assays)
-  df_top <- df_top$df_t
 
   # middle matrix ----
 
@@ -1668,15 +1684,13 @@ test_that(
         n_assay <- 45L
         data_t <- "NPX"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write file
         writeLines("foo", wide_excel)
@@ -1686,7 +1700,7 @@ test_that(
 
         # check that function runs for NPX
         expect_no_condition(
-          object = read_npx_wide_check_top(df = df_t,
+          object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
                                            data_type = data_t)
         )
@@ -1709,15 +1723,13 @@ test_that(
         n_assay <- 45L
         data_t <- "Ct"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write file
         writeLines("foo", wide_excel)
@@ -1727,7 +1739,7 @@ test_that(
 
         # check that function runs for NPX
         expect_no_condition(
-          object = read_npx_wide_check_top(df = df_t,
+          object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
                                            data_type = data_t)
         )
@@ -1750,15 +1762,13 @@ test_that(
         n_assay <- 45L
         data_t <- "Quantified"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write file
         writeLines("foo", wide_excel)
@@ -1768,7 +1778,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = read_npx_wide_check_top(df = df_t,
+          object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
                                            data_type = data_t)
         )
@@ -1791,15 +1801,13 @@ test_that(
         n_assay <- 45L
         data_t <- "Quantified"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = TRUE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = TRUE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write file
         writeLines("foo", wide_excel)
@@ -1809,7 +1817,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = read_npx_wide_check_top(df = df_t,
+          object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
                                            data_type = data_t)
         )
@@ -1832,15 +1840,13 @@ test_that(
         n_assay <- 45L
         data_t <- "Quantified"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = TRUE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = TRUE)
-
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = TRUE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = TRUE)
 
         # write file
         writeLines("foo", wide_excel)
@@ -1850,7 +1856,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = read_npx_wide_check_top(df = df_t,
+          object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
                                            data_type = data_t)
         )
@@ -1873,15 +1879,13 @@ test_that(
         n_assay <- 45L
         data_t <- "Quantified"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = TRUE,
-                             loc_int_ctrl = "V2",
-                             shuffle_assays = FALSE)
-
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = TRUE,
+                           loc_int_ctrl = "V2",
+                           shuffle_assays = FALSE)
 
         # write file
         writeLines("foo", wide_excel)
@@ -1891,7 +1895,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = read_npx_wide_check_top(df = df_t,
+          object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
                                            data_type = data_t)
         )
@@ -1914,15 +1918,13 @@ test_that(
         n_assay <- 45L
         data_t <- "Quantified"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = TRUE,
-                             loc_int_ctrl = "V2",
-                             shuffle_assays = TRUE)
-
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = TRUE,
+                           loc_int_ctrl = "V2",
+                           shuffle_assays = TRUE)
 
         # write file
         writeLines("foo", wide_excel)
@@ -1932,7 +1934,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = read_npx_wide_check_top(df = df_t,
+          object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
                                            data_type = data_t)
         )
@@ -1961,15 +1963,13 @@ test_that(
         n_assay <- 45L
         data_t <- "NPX"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df_t <- l_df$df_t |>
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE) |>
           dplyr::filter(
             .data[["V1"]] != "OlinkID"
           )
@@ -1982,7 +1982,7 @@ test_that(
 
         # check that function runs
         expect_error(
-          object = read_npx_wide_check_top(df = df_t,
+          object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
                                            data_type = data_t),
           regexp = "We identified 3 rows containing data about assays in file"
@@ -2006,13 +2006,13 @@ test_that(
         n_assay <- 45L
         data_t <- "Quantified"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = TRUE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = TRUE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         add_row <- dplyr::tibble(
           "X" = c("Extra_Row",
@@ -2023,10 +2023,10 @@ test_that(
         ) |>
           t()
         rownames(add_row) <- NULL
-        colnames(add_row) <- paste0("V", seq_len(ncol(l_df$df_t)))
+        colnames(add_row) <- paste0("V", seq_len(ncol(df)))
         add_row <- dplyr::as_tibble(add_row)
 
-        df_t <- l_df$df_t |>
+        df <- df |>
           dplyr::bind_rows(
             add_row
           )
@@ -2039,7 +2039,7 @@ test_that(
 
         # check that function runs
         expect_error(
-          object = read_npx_wide_check_top(df = df_t,
+          object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
                                            data_type = data_t),
           regexp = "We identified 6 rows containing data about assays in file"
@@ -2069,15 +2069,13 @@ test_that(
         n_assay <- 45L
         data_t <- "NPX"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write file
         writeLines("foo", wide_excel)
@@ -2087,7 +2085,7 @@ test_that(
 
         # check that function runs
         expect_error(
-          object = read_npx_wide_check_top(df = df_t,
+          object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
                                            data_type = "Quantified"),
           regexp = "while we expected 5"
@@ -2111,15 +2109,13 @@ test_that(
         n_assay <- 45L
         data_t <- "Quantified"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df_t <- l_df$df_t |>
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE) |>
           dplyr::filter(
             .data[["V1"]] != "OlinkID"
           )
@@ -2132,7 +2128,7 @@ test_that(
 
         # check that function runs
         expect_error(
-          object = read_npx_wide_check_top(df = df_t,
+          object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
                                            data_type = data_t),
           regexp = "while we expected 5"
@@ -2162,15 +2158,13 @@ test_that(
         n_assay <- 45L
         data_t <- "NPX"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df_t <- l_df$df_t |>
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE) |>
           dplyr::mutate(
             V1 = dplyr::if_else(.data[["V1"]] == "OlinkID",
                                 "OlinkID_2",
@@ -2185,7 +2179,7 @@ test_that(
 
         # check that function runs
         expect_error(
-          object = read_npx_wide_check_top(df = df_t,
+          object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
                                            data_type = data_t),
           regexp = "Column 1 of of the top matrix with assay metadata in file"
@@ -2209,15 +2203,13 @@ test_that(
         n_assay <- 45L
         data_t <- "Quantified"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df_t <- l_df$df_t |>
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE) |>
           dplyr::mutate(
             V1 = dplyr::if_else(.data[["V1"]] == "Unit",
                                 "Unit_2",
@@ -2232,7 +2224,7 @@ test_that(
 
         # check that function runs
         expect_error(
-          object = read_npx_wide_check_top(df = df_t,
+          object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
                                            data_type = data_t),
           regexp = "Column 1 of of the top matrix with assay metadata in file"
@@ -2264,15 +2256,13 @@ test_that(
         n_assay <- 45L
         data_t <- "NPX"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -2282,7 +2272,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df_t,
+          object = x_index <- read_npx_wide_split_col(df = df,
                                                       file = wide_excel)
         )
 
@@ -2313,15 +2303,13 @@ test_that(
         n_assay <- 45L
         data_t <- "NPX"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = TRUE)
-
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = TRUE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -2331,7 +2319,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df_t,
+          object = x_index <- read_npx_wide_split_col(df = df,
                                                       file = wide_excel)
         )
 
@@ -2362,15 +2350,13 @@ test_that(
         n_assay <- 45L
         data_t <- "NPX"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = TRUE)
-
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = TRUE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -2380,7 +2366,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df_t,
+          object = x_index <- read_npx_wide_split_col(df = df,
                                                       file = wide_excel)
         )
 
@@ -2411,14 +2397,6 @@ test_that(
         n_assay <- 45L
         data_t <- "NPX"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = TRUE)
-
         n_select <- 100L
         random_assays <- sample(
           x = paste0("V",
@@ -2427,7 +2405,13 @@ test_that(
           replace = FALSE
         )
 
-        df_t <- l_df$df_t |>
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = TRUE) |>
           dplyr::select(
             -dplyr::all_of(random_assays)
           )
@@ -2440,7 +2424,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df_t,
+          object = x_index <- read_npx_wide_split_col(df = df,
                                                       file = wide_excel)
         )
 
@@ -2471,15 +2455,13 @@ test_that(
         n_assay <- 92L
         data_t <- "NPX"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -2489,7 +2471,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df_t,
+          object = x_index <- read_npx_wide_split_col(df = df,
                                                       file = wide_excel)
         )
 
@@ -2520,15 +2502,13 @@ test_that(
         n_assay <- 92L
         data_t <- "NPX"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = TRUE)
-
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = TRUE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -2538,7 +2518,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df_t,
+          object = x_index <- read_npx_wide_split_col(df = df,
                                                       file = wide_excel)
         )
 
@@ -2569,15 +2549,13 @@ test_that(
         n_assay <- 92L
         data_t <- "NPX"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = TRUE)
-
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = TRUE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -2587,7 +2565,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df_t,
+          object = x_index <- read_npx_wide_split_col(df = df,
                                                       file = wide_excel)
         )
 
@@ -2618,14 +2596,6 @@ test_that(
         n_assay <- 92L
         data_t <- "NPX"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = TRUE)
-
         n_select <- 100L
         random_assays <- sample(
           x = paste0("V",
@@ -2634,7 +2604,13 @@ test_that(
           replace = FALSE
         )
 
-        df_t <- l_df$df_t |>
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = TRUE) |>
           dplyr::select(
             -dplyr::all_of(random_assays)
           )
@@ -2647,7 +2623,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df_t,
+          object = x_index <- read_npx_wide_split_col(df = df,
                                                       file = wide_excel)
         )
 
@@ -2678,15 +2654,13 @@ test_that(
         n_assay <- 21L
         data_t <- "NPX"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -2696,7 +2670,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df_t,
+          object = x_index <- read_npx_wide_split_col(df = df,
                                                       file = wide_excel)
         )
 
@@ -2727,15 +2701,13 @@ test_that(
         n_assay <- 21L
         data_t <- "NPX"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = TRUE)
-
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = TRUE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -2745,7 +2717,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df_t,
+          object = x_index <- read_npx_wide_split_col(df = df,
                                                       file = wide_excel)
         )
 
@@ -2776,15 +2748,13 @@ test_that(
         n_assay <- 21L
         data_t <- "NPX"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = TRUE)
-
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = TRUE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -2794,7 +2764,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df_t,
+          object = x_index <- read_npx_wide_split_col(df = df,
                                                       file = wide_excel)
         )
 
@@ -2825,14 +2795,6 @@ test_that(
         n_assay <- 21L
         data_t <- "NPX"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = TRUE)
-
         n_select <- 50L
         random_assays <- sample(
           x = paste0("V",
@@ -2841,7 +2803,13 @@ test_that(
           replace = FALSE
         )
 
-        df_t <- l_df$df_t |>
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = TRUE) |>
           dplyr::select(
             -dplyr::all_of(random_assays)
           )
@@ -2854,7 +2822,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df_t,
+          object = x_index <- read_npx_wide_split_col(df = df,
                                                       file = wide_excel)
         )
 
@@ -2892,15 +2860,13 @@ test_that(
         n_assay <- 45L
         data_t <- "Ct"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -2910,7 +2876,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df_t,
+          object = x_index <- read_npx_wide_split_col(df = df,
                                                       file = wide_excel)
         )
 
@@ -2941,15 +2907,13 @@ test_that(
         n_assay <- 45L
         data_t <- "Ct"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = TRUE)
-
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = TRUE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -2959,7 +2923,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df_t,
+          object = x_index <- read_npx_wide_split_col(df = df,
                                                       file = wide_excel)
         )
 
@@ -2990,15 +2954,13 @@ test_that(
         n_assay <- 45L
         data_t <- "Ct"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = TRUE)
-
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = TRUE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -3008,7 +2970,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df_t,
+          object = x_index <- read_npx_wide_split_col(df = df,
                                                       file = wide_excel)
         )
 
@@ -3039,14 +3001,6 @@ test_that(
         n_assay <- 45L
         data_t <- "Ct"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = TRUE)
-
         n_select <- 100L
         random_assays <- sample(
           x = paste0("V",
@@ -3055,7 +3009,13 @@ test_that(
           replace = FALSE
         )
 
-        df_t <- l_df$df_t |>
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = TRUE) |>
           dplyr::select(
             -dplyr::all_of(random_assays)
           )
@@ -3068,7 +3028,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df_t,
+          object = x_index <- read_npx_wide_split_col(df = df,
                                                       file = wide_excel)
         )
 
@@ -3099,15 +3059,13 @@ test_that(
         n_assay <- 92L
         data_t <- "Ct"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -3117,7 +3075,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df_t,
+          object = x_index <- read_npx_wide_split_col(df = df,
                                                       file = wide_excel)
         )
 
@@ -3148,15 +3106,13 @@ test_that(
         n_assay <- 92L
         data_t <- "Ct"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = TRUE)
-
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = TRUE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -3166,7 +3122,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df_t,
+          object = x_index <- read_npx_wide_split_col(df = df,
                                                       file = wide_excel)
         )
 
@@ -3197,15 +3153,13 @@ test_that(
         n_assay <- 92L
         data_t <- "Ct"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = TRUE)
-
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = TRUE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -3215,7 +3169,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df_t,
+          object = x_index <- read_npx_wide_split_col(df = df,
                                                       file = wide_excel)
         )
 
@@ -3246,14 +3200,6 @@ test_that(
         n_assay <- 92L
         data_t <- "Ct"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = TRUE)
-
         n_select <- 100L
         random_assays <- sample(
           x = paste0("V",
@@ -3262,7 +3208,13 @@ test_that(
           replace = FALSE
         )
 
-        df_t <- l_df$df_t |>
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = TRUE) |>
           dplyr::select(
             -dplyr::all_of(random_assays)
           )
@@ -3275,7 +3227,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df_t,
+          object = x_index <- read_npx_wide_split_col(df = df,
                                                       file = wide_excel)
         )
 
@@ -3306,15 +3258,13 @@ test_that(
         n_assay <- 21L
         data_t <- "Ct"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -3324,7 +3274,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df_t,
+          object = x_index <- read_npx_wide_split_col(df = df,
                                                       file = wide_excel)
         )
 
@@ -3355,15 +3305,13 @@ test_that(
         n_assay <- 21L
         data_t <- "Ct"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = TRUE)
-
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = TRUE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -3373,7 +3321,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df_t,
+          object = x_index <- read_npx_wide_split_col(df = df,
                                                       file = wide_excel)
         )
 
@@ -3404,15 +3352,13 @@ test_that(
         n_assay <- 21L
         data_t <- "Ct"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = TRUE)
-
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = TRUE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -3422,7 +3368,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df_t,
+          object = x_index <- read_npx_wide_split_col(df = df,
                                                       file = wide_excel)
         )
 
@@ -3453,14 +3399,6 @@ test_that(
         n_assay <- 21L
         data_t <- "Ct"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = TRUE)
-
         n_select <- 50L
         random_assays <- sample(
           x = paste0("V",
@@ -3469,7 +3407,13 @@ test_that(
           replace = FALSE
         )
 
-        df_t <- l_df$df_t |>
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = TRUE) |>
           dplyr::select(
             -dplyr::all_of(random_assays)
           )
@@ -3482,7 +3426,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df_t,
+          object = x_index <- read_npx_wide_split_col(df = df,
                                                       file = wide_excel)
         )
 
@@ -3520,15 +3464,13 @@ test_that(
         n_assay <- 45L
         data_t <- "Quantified"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = TRUE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = TRUE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -3538,7 +3480,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df_t,
+          object = x_index <- read_npx_wide_split_col(df = df,
                                                       file = wide_excel)
         )
 
@@ -3569,15 +3511,13 @@ test_that(
         n_assay <- 45L
         data_t <- "Quantified"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = TRUE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = TRUE)
-
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = TRUE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = TRUE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -3587,7 +3527,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df_t,
+          object = x_index <- read_npx_wide_split_col(df = df,
                                                       file = wide_excel)
         )
 
@@ -3618,15 +3558,13 @@ test_that(
         n_assay <- 45L
         data_t <- "Quantified"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = TRUE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = TRUE)
-
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = TRUE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = TRUE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -3636,7 +3574,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df_t,
+          object = x_index <- read_npx_wide_split_col(df = df,
                                                       file = wide_excel)
         )
 
@@ -3667,14 +3605,6 @@ test_that(
         n_assay <- 45L
         data_t <- "Quantified"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = TRUE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = TRUE)
-
         n_select <- 100L
         random_assays <- sample(
           x = paste0("V",
@@ -3683,7 +3613,13 @@ test_that(
           replace = FALSE
         )
 
-        df_t <- l_df$df_t |>
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = TRUE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = TRUE) |>
           dplyr::select(
             -dplyr::all_of(random_assays)
           )
@@ -3696,7 +3632,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df_t,
+          object = x_index <- read_npx_wide_split_col(df = df,
                                                       file = wide_excel)
         )
 
@@ -3727,14 +3663,6 @@ test_that(
         n_assay <- 45L
         data_t <- "Quantified"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = TRUE,
-                             loc_int_ctrl = "V2",
-                             shuffle_assays = TRUE)
-
         n_select <- 100L
         random_assays <- sample(
           x = paste0("V",
@@ -3743,7 +3671,13 @@ test_that(
           replace = FALSE
         )
 
-        df_t <- l_df$df_t |>
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = TRUE,
+                           loc_int_ctrl = "V2",
+                           shuffle_assays = TRUE) |>
           dplyr::select(
             -dplyr::all_of(random_assays)
           )
@@ -3756,7 +3690,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df_t,
+          object = x_index <- read_npx_wide_split_col(df = df,
                                                       file = wide_excel)
         )
 
@@ -3787,15 +3721,13 @@ test_that(
         n_assay <- 21L
         data_t <- "Quantified"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = TRUE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = TRUE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -3805,7 +3737,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df_t,
+          object = x_index <- read_npx_wide_split_col(df = df,
                                                       file = wide_excel)
         )
 
@@ -3836,15 +3768,13 @@ test_that(
         n_assay <- 21L
         data_t <- "Quantified"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = TRUE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = TRUE)
-
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = TRUE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = TRUE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -3854,7 +3784,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df_t,
+          object = x_index <- read_npx_wide_split_col(df = df,
                                                       file = wide_excel)
         )
 
@@ -3885,15 +3815,13 @@ test_that(
         n_assay <- 21L
         data_t <- "Quantified"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = TRUE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = TRUE)
-
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = TRUE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = TRUE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -3903,7 +3831,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df_t,
+          object = x_index <- read_npx_wide_split_col(df = df,
                                                       file = wide_excel)
         )
 
@@ -3934,14 +3862,6 @@ test_that(
         n_assay <- 21L
         data_t <- "Quantified"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = TRUE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = TRUE)
-
         n_select <- 50L
         random_assays <- sample(
           x = paste0("V",
@@ -3950,7 +3870,13 @@ test_that(
           replace = FALSE
         )
 
-        df_t <- l_df$df_t |>
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = TRUE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = TRUE) |>
           dplyr::select(
             -dplyr::all_of(random_assays)
           )
@@ -3963,7 +3889,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df_t,
+          object = x_index <- read_npx_wide_split_col(df = df,
                                                       file = wide_excel)
         )
 
@@ -3994,14 +3920,6 @@ test_that(
         n_assay <- 21L
         data_t <- "Quantified"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = TRUE,
-                             loc_int_ctrl = "V2",
-                             shuffle_assays = TRUE)
-
         n_select <- 50L
         random_assays <- sample(
           x = paste0("V",
@@ -4010,7 +3928,13 @@ test_that(
           replace = FALSE
         )
 
-        df_t <- l_df$df_t |>
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = TRUE,
+                           loc_int_ctrl = "V2",
+                           shuffle_assays = TRUE) |>
           dplyr::select(
             -dplyr::all_of(random_assays)
           )
@@ -4023,7 +3947,7 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = x_index <- read_npx_wide_split_col(df = df_t,
+          object = x_index <- read_npx_wide_split_col(df = df,
                                                       file = wide_excel)
         )
 
@@ -4058,15 +3982,13 @@ test_that(
         n_assay <- 45L
         data_t <- "NPX"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df_t <- l_df$df_t |>
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE) |>
           dplyr::select(
             -dplyr::all_of("V47")
           )
@@ -4079,7 +4001,7 @@ test_that(
 
         # check that function runs
         expect_error(
-          object = read_npx_wide_split_col(df = df_t,
+          object = read_npx_wide_split_col(df = df,
                                            file = wide_excel),
           regexp = "Unexpected format of the top metadata in file"
         )
@@ -4110,16 +4032,13 @@ test_that(
         n_assay <- 45L
         data_t <- "NPX"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df <- l_df$df
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -4127,7 +4046,7 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_t,
+          object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
                                                     olink_platform = o_platform)
@@ -4169,16 +4088,13 @@ test_that(
         n_assay <- 45L
         data_t <- "Ct"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df <- l_df$df
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -4186,7 +4102,7 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_t,
+          object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
                                                     olink_platform = o_platform)
@@ -4228,16 +4144,13 @@ test_that(
         n_assay <- 45L
         data_t <- "Quantified"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = TRUE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df <- l_df$df
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = TRUE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -4245,7 +4158,7 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_t,
+          object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
                                                     olink_platform = o_platform)
@@ -4290,16 +4203,13 @@ test_that(
         n_assay <- 45L
         data_t <- "Quantified"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df <- l_df$df
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -4307,7 +4217,7 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_t,
+          object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
                                                     olink_platform = o_platform)
@@ -4355,16 +4265,13 @@ test_that(
         n_assay <- 45L
         data_t <- "NPX"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df <- l_df$df
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -4372,7 +4279,7 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_t,
+          object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
                                                     olink_platform = o_platform)
@@ -4414,16 +4321,13 @@ test_that(
         n_assay <- 45L
         data_t <- "Ct"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df <- l_df$df
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -4431,7 +4335,7 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_t,
+          object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
                                                     olink_platform = o_platform)
@@ -4473,16 +4377,13 @@ test_that(
         n_assay <- 45L
         data_t <- "Quantified"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = TRUE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df <- l_df$df
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = TRUE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -4490,7 +4391,7 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_t,
+          object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
                                                     olink_platform = o_platform)
@@ -4535,16 +4436,13 @@ test_that(
         n_assay <- 45L
         data_t <- "Quantified"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df <- l_df$df
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -4552,7 +4450,7 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_t,
+          object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
                                                     olink_platform = o_platform)
@@ -4600,16 +4498,13 @@ test_that(
         n_assay <- 92L
         data_t <- "NPX"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df <- l_df$df
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -4617,7 +4512,7 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_t,
+          object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
                                                     olink_platform = o_platform)
@@ -4659,16 +4554,13 @@ test_that(
         n_assay <- 92L
         data_t <- "Ct"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df <- l_df$df
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -4676,7 +4568,7 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_t,
+          object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
                                                     olink_platform = o_platform)
@@ -4724,16 +4616,13 @@ test_that(
         n_assay <- 92L
         data_t <- "NPX"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df <- l_df$df
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -4741,7 +4630,7 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_t,
+          object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
                                                     olink_platform = o_platform)
@@ -4783,16 +4672,13 @@ test_that(
         n_assay <- 92L
         data_t <- "Ct"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df <- l_df$df
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -4800,7 +4686,7 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_t,
+          object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
                                                     olink_platform = o_platform)
@@ -4848,16 +4734,13 @@ test_that(
         n_assay <- 33L
         data_t <- "NPX"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df <- l_df$df
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -4865,7 +4748,7 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_t,
+          object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
                                                     olink_platform = o_platform)
@@ -4907,16 +4790,13 @@ test_that(
         n_assay <- 33L
         data_t <- "Ct"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df <- l_df$df
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -4924,7 +4804,7 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_t,
+          object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
                                                     olink_platform = o_platform)
@@ -4966,16 +4846,13 @@ test_that(
         n_assay <- 33L
         data_t <- "Quantified"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = TRUE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df <- l_df$df
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = TRUE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -4983,7 +4860,7 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_t,
+          object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
                                                     olink_platform = o_platform)
@@ -5028,16 +4905,13 @@ test_that(
         n_assay <- 33L
         data_t <- "Quantified"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df <- l_df$df
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -5045,7 +4919,7 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_t,
+          object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
                                                     olink_platform = o_platform)
@@ -5093,16 +4967,13 @@ test_that(
         n_assay <- 21L
         data_t <- "NPX"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df <- l_df$df
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -5110,7 +4981,7 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_t,
+          object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
                                                     olink_platform = o_platform)
@@ -5152,16 +5023,13 @@ test_that(
         n_assay <- 21L
         data_t <- "Ct"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df <- l_df$df
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -5169,7 +5037,7 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_t,
+          object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
                                                     olink_platform = o_platform)
@@ -5211,16 +5079,13 @@ test_that(
         n_assay <- 21L
         data_t <- "Quantified"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = TRUE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df <- l_df$df
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = TRUE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -5228,7 +5093,7 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_t,
+          object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
                                                     olink_platform = o_platform)
@@ -5273,16 +5138,13 @@ test_that(
         n_assay <- 21L
         data_t <- "Quantified"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df <- l_df$df
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -5290,7 +5152,7 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_t,
+          object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
                                                     olink_platform = o_platform)
@@ -5337,32 +5199,33 @@ test_that(
         n_assay <- 45L
         data_t <- "NPX"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # modify df and df_t to add new row/column with unknown label
-        df <- l_df$df |>
-          dplyr::bind_rows(
-            l_df$df |>
-              dplyr::slice_tail(
-                n = 1L
-              ) |>
-              dplyr::mutate(
-                V2 = "Unknown"
-              )
-          )
-        tmp_cname <- paste0("V", nrow(df))
-        df_t <- l_df$df_t |>
+        df_add_cname <- paste0("V", (ncol(df) + 1))
+        df_add <- df |>
+          dplyr::select(
+            dplyr::all_of(paste0("V", ncol(df)))
+          ) |>
+          dplyr::rename(
+            {{df_add_cname}} := dplyr::all_of(paste0("V", ncol(df)))
+          ) |>
           dplyr::mutate(
-            {{tmp_cname}} := df |>
-              dplyr::slice_tail(n = 1L) |>
-              t() |>
-              as.character()
+            dplyr::across(
+              dplyr::everything(),
+              ~ dplyr::if_else(dplyr::row_number() == 2L, "Unknown", .x)
+            )
+          )
+
+        df <- df |>
+          dplyr::bind_cols(
+            df_add
           )
 
         # write something in the file
@@ -5371,7 +5234,7 @@ test_that(
         # run function ----
 
         expect_error(
-          object = read_npx_wide_top_split(df = df_t,
+          object = read_npx_wide_top_split(df = df,
                                            file = wide_excel,
                                            data_type = data_t,
                                            olink_platform = o_platform),
@@ -5402,22 +5265,14 @@ test_that(
         n_assay <- 45L
         data_t <- "NPX"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        # modify df and df_t to intrduce NA cells
-        df <- l_df$df |>
-          dplyr::mutate(
-            V3 = dplyr::if_else(.data[["V3"]] %in% "Uniprot1",
-                                NA_character_,
-                                .data[["V3"]])
-          )
-        df_t <- l_df$df_t |>
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE) |>
+          # modify df and df_t to intrduce NA cells
           dplyr::mutate(
             V2 = dplyr::if_else(.data[["V2"]] %in% "Uniprot1",
                                 NA_character_,
@@ -5430,7 +5285,7 @@ test_that(
         # run function ----
 
         expect_error(
-          object = read_npx_wide_top_split(df = df_t,
+          object = read_npx_wide_top_split(df = df,
                                            file = wide_excel,
                                            data_type = data_t,
                                            olink_platform = o_platform),
@@ -5455,29 +5310,14 @@ test_that(
         n_assay <- 45L
         data_t <- "NPX"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        # modify df and df_t to intrduce NA cells
-        df <- l_df$df |>
-          dplyr::mutate(
-            V2 = dplyr::if_else(
-              .data[["V2"]] %in% paste0("Assay", seq_len(2L)),
-              NA_character_,
-              .data[["V2"]]
-            ),
-            V3 = dplyr::if_else(
-              .data[["V3"]] %in% paste0("Uniprot", seq_len(2L)),
-              NA_character_,
-              .data[["V3"]]
-            )
-          )
-        df_t <- l_df$df_t |>
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE) |>
+          # modify df and df_t to intrduce NA cells
           dplyr::mutate(
             V2 = dplyr::if_else(
               .data[["V2"]] %in% paste0(c("Assay", "Uniprot"), 1L),
@@ -5497,7 +5337,7 @@ test_that(
         # run function ----
 
         expect_error(
-          object = read_npx_wide_top_split(df = df_t,
+          object = read_npx_wide_top_split(df = df,
                                            file = wide_excel,
                                            data_type = data_t,
                                            olink_platform = o_platform),
@@ -5528,16 +5368,13 @@ test_that(
         n_assay <- 40L
         data_t <- "NPX"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df <- l_df$df
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -5545,7 +5382,7 @@ test_that(
         # run function ----
 
         expect_error(
-          object = read_npx_wide_top_split(df = df_t,
+          object = read_npx_wide_top_split(df = df,
                                            file = wide_excel,
                                            data_type = data_t,
                                            olink_platform = o_platform),
@@ -5570,16 +5407,13 @@ test_that(
         n_assay <- 32L
         data_t <- "NPX"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df <- l_df$df
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -5587,7 +5421,7 @@ test_that(
         # run function ----
 
         expect_error(
-          object = read_npx_wide_top_split(df = df_t,
+          object = read_npx_wide_top_split(df = df,
                                            file = wide_excel,
                                            data_type = data_t,
                                            olink_platform = o_platform),
@@ -5611,16 +5445,13 @@ test_that(
         n_assay <- 67L
         data_t <- "NPX"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df <- l_df$df
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -5628,7 +5459,7 @@ test_that(
         # run function ----
 
         expect_error(
-          object = read_npx_wide_top_split(df = df_t,
+          object = read_npx_wide_top_split(df = df,
                                            file = wide_excel,
                                            data_type = data_t,
                                            olink_platform = o_platform),
@@ -5653,16 +5484,13 @@ test_that(
         n_assay <- 78L
         data_t <- "NPX"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df <- l_df$df
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -5670,7 +5498,7 @@ test_that(
         # run function ----
 
         expect_error(
-          object = read_npx_wide_top_split(df = df_t,
+          object = read_npx_wide_top_split(df = df,
                                            file = wide_excel,
                                            data_type = data_t,
                                            olink_platform = o_platform),
@@ -5699,16 +5527,13 @@ test_that(
         n_assay <- 45L
         data_t <- "NPX"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = FALSE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = FALSE)
-
-        df <- l_df$df
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -5716,7 +5541,7 @@ test_that(
         # run function ----
 
         expect_error(
-          object = read_npx_wide_top_split(df = df_t,
+          object = read_npx_wide_top_split(df = df,
                                            file = wide_excel,
                                            data_type = "Ct",
                                            olink_platform = o_platform),
@@ -5747,16 +5572,13 @@ test_that(
         n_assay <- 45L
         data_t <- "Quantified"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = TRUE,
-                             loc_int_ctrl = "V3",
-                             shuffle_assays = TRUE)
-
-        df <- l_df$df
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = TRUE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = TRUE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -5764,7 +5586,7 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_t,
+          object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
                                                     olink_platform = o_platform)
@@ -5809,16 +5631,13 @@ test_that(
         n_assay <- 45L
         data_t <- "Quantified"
 
-        l_df <- npx_wide_top(olink_platform = o_platform,
-                             n_panels = n_panel,
-                             n_assays = n_assay,
-                             data_type = data_t,
-                             show_int_ctrl = TRUE,
-                             loc_int_ctrl = "V2",
-                             shuffle_assays = TRUE)
-
-        df <- l_df$df
-        df_t <- l_df$df_t
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = TRUE,
+                           loc_int_ctrl = "V2",
+                           shuffle_assays = TRUE)
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -5826,7 +5645,7 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_t,
+          object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
                                                     olink_platform = o_platform)
