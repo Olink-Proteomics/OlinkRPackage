@@ -30,30 +30,34 @@ read_npx_wide <- function(file,
 
   # get x-axis split index ----
 
-  col_split <- read_npx_wide_split_col(df = df_split$df_top,
-                                       file = file)
+  col_split <- read_npx_wide_split_col(
+    df = df_split$df_top,
+    file = file
+  )
 
   # split top df ----
 
-  df_top_list <- read_npx_wide_top_split(df = df_split$df_top,
-                                         file = file,
-                                         data_type = data_type,
-                                         olink_platform = olink_platform)
+  df_top_list <- read_npx_wide_top_split(
+    df = df_split$df_top,
+    file = file,
+    data_type = data_type,
+    olink_platform = olink_platform
+  )
 
   # bottom df to long ----
 
-  df_bottom <- read_npx_wide_bottom_t(df = df_split$df_bottom,
-                                      file = file,
-                                      data_type = data_type,
-                                      col_split = col_split,
-                                      assay_cols = df_top_list$df_oid$col_index)
+  if (data_type != "Ct"
+      && length(df_split) == 3L) {
 
-  # if (data_type != "Ct"
-  #     & length(df_split) == 3L) {
-  #
-  #   # check df_split$df_split
-  #
-  # }
+    df_bottom <- read_npx_wide_bottom_t(
+      df = df_split$df_bottom,
+      file = file,
+      data_type = data_type,
+      col_split = col_split,
+      assay_cols = df_top_list$df_oid$col_index
+    )
+
+  }
 
   # function vector of SampleID
   # function vector of OlinkID
