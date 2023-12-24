@@ -31,7 +31,7 @@ read_npx_wide <- function(file,
   # get x-axis split index ----
 
   col_split <- read_npx_wide_split_col(df = df_split$df_top,
-                                             file = file)
+                                       file = file)
 
   # split top df ----
 
@@ -40,14 +40,13 @@ read_npx_wide <- function(file,
                                          data_type = data_type,
                                          olink_platform = olink_platform)
 
-  df_top_list
-
   # bottom df to long ----
 
   read_npx_wide_bottom_t(df = df_split$df_bottom,
                          file = file,
                          data_type = data_type,
-                         col_split = col_split)
+                         col_split = col_split,
+                         assay_cols = df_top_list$df_oid$col_index)
 
   # if (data_type != "Ct"
   #     & length(df_split) == 3L) {
@@ -375,10 +374,7 @@ read_npx_wide_split_col <- function(df,
   df_t <- t(df) # transpose the wide df
   colnames(df_t) <- df_t[1, ] # add colnames
   df_t <- df_t |>
-    dplyr::as_tibble() |>
-    dplyr::mutate(
-      col_index = colnames(df)
-    ) |>
+    dplyr::as_tibble(rownames = "col_index") |>
     dplyr::slice(
       2L:dplyr::n()
     )
@@ -435,8 +431,8 @@ read_npx_wide_split_col <- function(df,
 #' @param olink_platform The Olink platform used to generate the input file.
 #' Expecting "Target 96", "Target 48", "Flex" or "Focus".
 #'
-#' @return List of the data frames (df_oid, df_meta and df_qc_dev) that df_top
-#' is split on.
+#' @return List of the data frames (df_oid, df_meta and df_qc_dev) in long
+#' format that df_top is split on.
 #'
 read_npx_wide_top_split <- function(df,
                                     file,
@@ -462,14 +458,9 @@ read_npx_wide_top_split <- function(df,
   df_t <- t(df) # transpose the wide df
   colnames(df_t) <- df_t[1, ] # add colnames
   df_t <- df_t |>
-    dplyr::as_tibble() |>
+    dplyr::as_tibble(rownames = "col_index") |>
     dplyr::slice(
       2L:dplyr::n()
-    ) |>
-    dplyr::mutate(
-      # column 1 became colnames of df_t
-      col_index = dplyr::row_number() + 1L,
-      col_index = paste0("V", .data[["col_index"]])
     )
 
   # check columns of df
@@ -621,15 +612,18 @@ read_npx_wide_top_split <- function(df,
 #' @param file The input excel file.
 #' @param data_type The quantification in which the data comes in. Expecting one
 #' of NPX or Quantified.
-#' @param col_split The column the splits the Olink wide excel file into left
-#' and right.
+#' @param col_split The name of the column that splits the Olink wide excel file
+#' into left (assay info) and right  hand side (PlateID and QC_Warning info).
+#' @param assay_cols Character vector with the names of the columns containing
+#' Olink assays.
 #'
 #' @return The bottom matrix in long format.
 #'
 read_npx_wide_bottom_t <- function(df,
                                    file,
                                    data_type,
-                                   col_split) {
+                                   col_split,
+                                   assay_cols) {
   # check input ----
 
   check_is_data_frame(df = df,
@@ -643,6 +637,9 @@ read_npx_wide_bottom_t <- function(df,
 
   check_is_scalar_character(string = col_split,
                             error = TRUE)
+
+  check_is_character(string = assay_cols,
+                     error = TRUE)
 
   # check if Ct ----
 
@@ -690,9 +687,21 @@ read_npx_wide_bottom_t <- function(df,
 
   }
 
-  # remove all NA columns ----
+  # keep necessary columns ----
 
-  df <- remove_all_na_cols(df = df)
+  df <- df |>
+    # keep only columns absolutely required:
+    # V1 that contains names of variables
+    # assay_cols that contains info for customer assays only
+    # col_split the column that might contain plate names in case of Quantified
+    dplyr::select(
+      dplyr::any_of(
+        c("V1", assay_cols, col_split)
+      )
+    ) |>
+    # The col_split was selected but it contains only NA values the remove it.
+    # This might be the case in NPX files.
+    remove_all_na_cols()
 
   # per-plate metrics ----
 
@@ -713,6 +722,7 @@ read_npx_wide_bottom_t <- function(df,
 
   } else if (col_split %in% colnames(df)
              && data_type == "Quantified") {
+
     # if it is Quantified data
     df_q <- df |>
       # keep only rows to be pivoted
@@ -768,9 +778,6 @@ read_npx_wide_bottom_t <- function(df,
 
   }
 
-  # remove all NA columns
-  df <- remove_all_na_cols(df = df)
-
   df_t <- t(df)
   colnames(df_t) <- df_t[1, ]
   df_t <- df_t |>
@@ -781,41 +788,23 @@ read_npx_wide_bottom_t <- function(df,
       2L:dplyr::n()
     )
 
-  # checks ----
-
-  ## rows of df_t and df_q match ----
-
-  if (exists("df_q")) {
-
-    if ((nrow(df_q) %% nrow(df_t)) != 0L) {
-
-      cli::cli_abort(
-        message = c(
-          "x" = "Some full columns in the bottom matrix with assay metadata in
-        file {.file {file}} do not contain any values!",
-          "i" = "Has the excel file been modified manually?"
-        ),
-        call = rlang::caller_env(),
-        wrap = FALSE
-      )
-
-    }
-
-  }
-
   # return ----
 
   if (exists("df_q")) {
 
-    df_t <- df_t |>
+    df_long <- df_t |>
       dplyr::full_join(
         y = df_q,
         by = "col_index",
         relationship = "one-to-many"
       )
 
+  } else {
+
+    df_long <- df_t
+
   }
 
-  return(df_t)
+  return(df_long)
 
 }

@@ -175,6 +175,9 @@ npx_wide_top_test <- function(df) {
     ) |>
     dplyr::slice(
       2L:dplyr::n()
+    ) |>
+    dplyr::select(
+      dplyr::all_of("col_index"), dplyr::everything()
     )
 
   # separate df ----
@@ -5728,6 +5731,8 @@ test_that(
                               n_assays = n_assay,
                               data_type = data_t)
 
+        a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -5737,7 +5742,8 @@ test_that(
           object = df_b <- read_npx_wide_bottom_t(df = df,
                                                   file = wide_excel,
                                                   data_type = data_t,
-                                                  col_split = col_s)
+                                                  col_split = col_s,
+                                                  assay_cols = a_cols)
         )
 
         # modify df so that we can test output ----
@@ -5783,6 +5789,8 @@ test_that(
                               n_assays = n_assay,
                               data_type = data_t)
 
+        a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -5792,7 +5800,8 @@ test_that(
           object = df_b <- read_npx_wide_bottom_t(df = df,
                                                   file = wide_excel,
                                                   data_type = data_t,
-                                                  col_split = col_s)
+                                                  col_split = col_s,
+                                                  assay_cols = a_cols)
         )
 
         # modify df so that we can test output ----
@@ -5844,6 +5853,8 @@ test_that(
                               n_assays = n_assay,
                               data_type = data_t)
 
+        a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -5853,7 +5864,8 @@ test_that(
           object = df_b <- read_npx_wide_bottom_t(df = df,
                                                   file = wide_excel,
                                                   data_type = data_t,
-                                                  col_split = col_s)
+                                                  col_split = col_s,
+                                                  assay_cols = a_cols)
         )
 
         # modify df so that we can test output ----
@@ -5899,6 +5911,8 @@ test_that(
                               n_assays = n_assay,
                               data_type = data_t)
 
+        a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -5908,7 +5922,8 @@ test_that(
           object = df_b <- read_npx_wide_bottom_t(df = df,
                                                   file = wide_excel,
                                                   data_type = data_t,
-                                                  col_split = col_s)
+                                                  col_split = col_s,
+                                                  assay_cols = a_cols)
         )
 
         # modify df so that we can test output ----
@@ -5960,6 +5975,8 @@ test_that(
                               n_assays = n_assay,
                               data_type = data_t)
 
+        a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -5969,7 +5986,8 @@ test_that(
           object = df_b <- read_npx_wide_bottom_t(df = df,
                                                   file = wide_excel,
                                                   data_type = data_t,
-                                                  col_split = col_s)
+                                                  col_split = col_s,
+                                                  assay_cols = a_cols)
         )
 
         # modify df so that we can test output ----
@@ -6021,6 +6039,8 @@ test_that(
                               n_assays = n_assay,
                               data_type = data_t)
 
+        a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -6030,7 +6050,8 @@ test_that(
           object = df_b <- read_npx_wide_bottom_t(df = df,
                                                   file = wide_excel,
                                                   data_type = data_t,
-                                                  col_split = col_s)
+                                                  col_split = col_s,
+                                                  assay_cols = a_cols)
         )
 
         # modify df so that we can test output ----
@@ -6082,6 +6103,8 @@ test_that(
                               n_assays = n_assay,
                               data_type = data_t)
 
+        a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -6091,7 +6114,8 @@ test_that(
           object = df_b <- read_npx_wide_bottom_t(df = df,
                                                   file = wide_excel,
                                                   data_type = data_t,
-                                                  col_split = col_s)
+                                                  col_split = col_s,
+                                                  assay_cols = a_cols)
         )
 
         # modify df so that we can test output ----
@@ -6137,6 +6161,8 @@ test_that(
                               n_assays = n_assay,
                               data_type = data_t)
 
+        a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -6146,7 +6172,8 @@ test_that(
           object = df_b <- read_npx_wide_bottom_t(df = df,
                                                   file = wide_excel,
                                                   data_type = data_t,
-                                                  col_split = col_s)
+                                                  col_split = col_s,
+                                                  assay_cols = a_cols)
         )
 
         # modify df so that we can test output ----
@@ -6198,6 +6225,8 @@ test_that(
                               n_assays = n_assay,
                               data_type = data_t)
 
+        a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -6207,7 +6236,8 @@ test_that(
           object = df_b <- read_npx_wide_bottom_t(df = df,
                                                   file = wide_excel,
                                                   data_type = data_t,
-                                                  col_split = col_s)
+                                                  col_split = col_s,
+                                                  assay_cols = a_cols)
         )
 
         # modify df so that we can test output ----
@@ -6253,6 +6283,8 @@ test_that(
                               n_assays = n_assay,
                               data_type = data_t)
 
+        a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -6262,7 +6294,8 @@ test_that(
           object = df_b <- read_npx_wide_bottom_t(df = df,
                                                   file = wide_excel,
                                                   data_type = data_t,
-                                                  col_split = col_s)
+                                                  col_split = col_s,
+                                                  assay_cols = a_cols)
         )
 
         # modify df so that we can test output ----
@@ -6312,6 +6345,8 @@ test_that(
                               n_assays = n_assay,
                               data_type = data_t)
 
+        a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -6321,7 +6356,8 @@ test_that(
           object = read_npx_wide_bottom_t(df = df,
                                           file = wide_excel,
                                           data_type = "Ct",
-                                          col_split = col_s),
+                                          col_split = col_s,
+                                          assay_cols = a_cols),
           regexp = "contains a bottom matrix. Files with"
         )
 
@@ -6353,13 +6389,13 @@ test_that(
         df <- npx_wide_bottom(n_plates = n_plate,
                               n_panels = n_panel,
                               n_assays = n_assay,
-                              data_type = data_t)
-
-        # modify df with wrong V1
-        df <- df |>
+                              data_type = data_t) |>
+          # modify df with wrong V1
           dplyr::mutate(
             V1 = dplyr::if_else(.data[["V1"]] == "LOD", "LOD2", .data[["V1"]])
           )
+
+        a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -6370,7 +6406,8 @@ test_that(
           object = read_npx_wide_bottom_t(df = df,
                                           file = wide_excel,
                                           data_type = data_t,
-                                          col_split = col_s),
+                                          col_split = col_s,
+                                          assay_cols = a_cols),
           regexp = "Column 1 of the bottom matrix with assay metadata in file"
         )
 
@@ -6396,15 +6433,15 @@ test_that(
         df <- npx_wide_bottom(n_plates = n_plate,
                               n_panels = n_panel,
                               n_assays = n_assay,
-                              data_type = data_t)
-
-        # modify df with wrong V1
-        df <- df |>
+                              data_type = data_t) |>
+          # modify df with wrong V1
           dplyr::mutate(
             V1 = dplyr::if_else(.data[["V1"]] == "Assay warning",
                                 "I_am_Unexpected",
                                 .data[["V1"]])
           )
+
+        a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -6415,7 +6452,8 @@ test_that(
           object = read_npx_wide_bottom_t(df = df,
                                           file = wide_excel,
                                           data_type = data_t,
-                                          col_split = col_s),
+                                          col_split = col_s,
+                                          assay_cols = a_cols),
           regexp = "Column 1 of the bottom matrix with assay metadata in file"
         )
 
@@ -6442,7 +6480,7 @@ test_that(
         n_panel <- 1L
         n_assay <- 45L
         data_t <- "NPX"
-        col_s <- paste0("V", n_assay * n_panel + 2)
+        col_s <- paste0("V", n_assay * n_panel + 2L)
 
         df <- npx_wide_bottom(n_plates = n_plate,
                               n_panels = n_panel,
@@ -6455,6 +6493,8 @@ test_that(
             {{col_s}} := rep(x = "A", times = nrow(df))
           )
 
+        a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -6464,7 +6504,8 @@ test_that(
           object = read_npx_wide_bottom_t(df = df,
                                           file = wide_excel,
                                           data_type = data_t,
-                                          col_split = col_s),
+                                          col_split = col_s,
+                                          assay_cols = a_cols),
           regexp = "does not contain plate information"
         )
 
@@ -6485,18 +6526,18 @@ test_that(
         n_panel <- 1L
         n_assay <- 45L
         data_t <- "Quantified"
-        col_s <- paste0("V", n_assay * n_panel + 2)
+        col_s <- paste0("V", n_assay * n_panel + 2L)
 
         df <- npx_wide_bottom(n_plates = n_plate,
                               n_panels = n_panel,
                               n_assays = n_assay,
-                              data_type = data_t)
-
-        # remove plate column from df
-        df <- df |>
+                              data_type = data_t) |>
+          # remove plate column from df
           dplyr::select(
             -dplyr::all_of(col_s)
           )
+
+        a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -6507,7 +6548,8 @@ test_that(
           object = read_npx_wide_bottom_t(df = df,
                                           file = wide_excel,
                                           data_type = data_t,
-                                          col_split = col_s),
+                                          col_split = col_s,
+                                          assay_cols = a_cols),
           regexp = "does not contain plate information"
         )
 
@@ -6532,7 +6574,7 @@ test_that(
         n_panel <- 1L
         n_assay <- 45L
         data_t <- "NPX"
-        col_s <- paste0("V", n_assay * n_panel + 2)
+        col_s <- paste0("V", n_assay * n_panel + 2L)
 
         df <- npx_wide_bottom(n_plates = n_plate,
                               n_panels = n_panel,
@@ -6545,6 +6587,8 @@ test_that(
             {{col_s}} := rep(x = NA_character_, times = nrow(df))
           )
 
+        a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -6554,7 +6598,8 @@ test_that(
           object = df_b <- read_npx_wide_bottom_t(df = df,
                                                   file = wide_excel,
                                                   data_type = data_t,
-                                                  col_split = col_s)
+                                                  col_split = col_s,
+                                                  assay_cols = a_cols)
         )
 
         # modify df so that we can test output ----
@@ -6574,58 +6619,6 @@ test_that(
         expect_identical(
           object = df_b,
           expected = df_t
-        )
-
-      }
-    )
-
-  }
-)
-
-test_that(
-  "read_npx_wide_top_split - T48 - uneven number of columns for sub-matrices",
-  {
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # random df_bottom ----
-
-        n_plate <- 1L
-        n_panel <- 1L
-        n_assay <- 45L
-        data_t <- "Quantified"
-        col_s <- paste0("V", n_assay * n_panel + 2)
-
-        df <- npx_wide_bottom(n_plates = n_plate,
-                              n_panels = n_panel,
-                              n_assays = n_assay,
-                              data_type = data_t)
-
-        # modify df with uneven number of columns for plate specific and
-        # non-plate specific columns
-        df <- df |>
-          dplyr::mutate(
-            V2 = dplyr::if_else(.data[["V1"]] %in% c("LLOQ", "ULOQ",
-                                                     "Missing Data freq.",
-                                                     "Normalization"),
-                                NA_character_,
-                                .data[["V2"]])
-          )
-
-        # write something in the file
-        writeLines("foo", wide_excel)
-
-        # run function ----
-
-        expect_error(
-          object = read_npx_wide_bottom_t(df = df,
-                                          file = wide_excel,
-                                          data_type = data_t,
-                                          col_split = col_s),
-          regexp = "Some full columns in the bottom matrix with assay metadata"
         )
 
       }
