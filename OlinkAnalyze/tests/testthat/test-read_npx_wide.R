@@ -5705,10 +5705,10 @@ test_that(
   }
 )
 
-# Test read_npx_wide_bottom_t ----
+# Test read_npx_wide_bottom ----
 
 test_that(
-  "read_npx_wide_top_split - T48 - works single panel file",
+  "read_npx_wide_bottom - T48 - works single panel file",
   {
     ## NPX ----
 
@@ -5739,11 +5739,11 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object = df_b <- read_npx_wide_bottom_t(df = df,
-                                                  file = wide_excel,
-                                                  data_type = data_t,
-                                                  col_split = col_s,
-                                                  assay_cols = a_cols)
+          object = df_b <- read_npx_wide_bottom(df = df,
+                                                file = wide_excel,
+                                                data_type = data_t,
+                                                col_split = col_s,
+                                                assay_cols = a_cols)
         )
 
         # modify df so that we can test output ----
@@ -5803,13 +5803,11 @@ test_that(
         # Looks like it has been fixed, but we still get the error.
         expect_no_error(
           expect_no_warning(
-            expect_no_message(
-              object = df_b <- read_npx_wide_bottom_t(df = df,
-                                                      file = wide_excel,
-                                                      data_type = data_t,
-                                                      col_split = col_s,
-                                                      assay_cols = a_cols)
-            )
+            object = df_b <- read_npx_wide_bottom(df = df,
+                                                  file = wide_excel,
+                                                  data_type = data_t,
+                                                  col_split = col_s,
+                                                  assay_cols = a_cols)
           )
         )
 
@@ -5839,7 +5837,7 @@ test_that(
 )
 
 test_that(
-  "read_npx_wide_top_split - T48 - works multi panel and multi plate file",
+  "read_npx_wide_bottom - T48 - works multi panel and multi plate file",
   {
     ## NPX ----
 
@@ -5870,11 +5868,11 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object = df_b <- read_npx_wide_bottom_t(df = df,
-                                                  file = wide_excel,
-                                                  data_type = data_t,
-                                                  col_split = col_s,
-                                                  assay_cols = a_cols)
+          object = df_b <- read_npx_wide_bottom(df = df,
+                                                file = wide_excel,
+                                                data_type = data_t,
+                                                col_split = col_s,
+                                                assay_cols = a_cols)
         )
 
         # modify df so that we can test output ----
@@ -5934,13 +5932,11 @@ test_that(
         # Looks like it has been fixed, but we still get the error.
         expect_no_error(
           expect_no_warning(
-            expect_no_message(
-              object = df_b <- read_npx_wide_bottom_t(df = df,
-                                                      file = wide_excel,
-                                                      data_type = data_t,
-                                                      col_split = col_s,
-                                                      assay_cols = a_cols)
-            )
+            object = df_b <- read_npx_wide_bottom(df = df,
+                                                  file = wide_excel,
+                                                  data_type = data_t,
+                                                  col_split = col_s,
+                                                  assay_cols = a_cols)
           )
         )
 
@@ -5970,10 +5966,8 @@ test_that(
 )
 
 test_that(
-  "read_npx_wide_top_split - T96 - works single panel file",
+  "read_npx_wide_bottom - T96 - works single panel file",
   {
-    ## NPX ----
-
     withr::with_tempfile(
       new = "wide_excel",
       pattern = "test-excel-wide",
@@ -6001,11 +5995,11 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object = df_b <- read_npx_wide_bottom_t(df = df,
-                                                  file = wide_excel,
-                                                  data_type = data_t,
-                                                  col_split = col_s,
-                                                  assay_cols = a_cols)
+          object = df_b <- read_npx_wide_bottom(df = df,
+                                                file = wide_excel,
+                                                data_type = data_t,
+                                                col_split = col_s,
+                                                assay_cols = a_cols)
         )
 
         # modify df so that we can test output ----
@@ -6034,10 +6028,8 @@ test_that(
 )
 
 test_that(
-  "read_npx_wide_top_split - T96 - works multi panel and multi plate file",
+  "read_npx_wide_bottom - T96 - works multi panel and multi plate file",
   {
-    ## NPX ----
-
     withr::with_tempfile(
       new = "wide_excel",
       pattern = "test-excel-wide",
@@ -6065,11 +6057,11 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object = df_b <- read_npx_wide_bottom_t(df = df,
-                                                  file = wide_excel,
-                                                  data_type = data_t,
-                                                  col_split = col_s,
-                                                  assay_cols = a_cols)
+          object = df_b <- read_npx_wide_bottom(df = df,
+                                                file = wide_excel,
+                                                data_type = data_t,
+                                                col_split = col_s,
+                                                assay_cols = a_cols)
         )
 
         # modify df so that we can test output ----
@@ -6098,7 +6090,7 @@ test_that(
 )
 
 test_that(
-  "read_npx_wide_top_split - Flex/Focus - works single panel file",
+  "read_npx_wide_bottom - Flex/Focus - works single panel file",
   {
     ## NPX ----
 
@@ -6129,11 +6121,11 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object = df_b <- read_npx_wide_bottom_t(df = df,
-                                                  file = wide_excel,
-                                                  data_type = data_t,
-                                                  col_split = col_s,
-                                                  assay_cols = a_cols)
+          object = df_b <- read_npx_wide_bottom(df = df,
+                                                file = wide_excel,
+                                                data_type = data_t,
+                                                col_split = col_s,
+                                                assay_cols = a_cols)
         )
 
         # modify df so that we can test output ----
@@ -6193,13 +6185,11 @@ test_that(
         # Looks like it has been fixed, but we still get the error.
         expect_no_error(
           expect_no_warning(
-            expect_no_message(
-              object = df_b <- read_npx_wide_bottom_t(df = df,
-                                                      file = wide_excel,
-                                                      data_type = data_t,
-                                                      col_split = col_s,
-                                                      assay_cols = a_cols)
-            )
+            object = df_b <- read_npx_wide_bottom(df = df,
+                                                  file = wide_excel,
+                                                  data_type = data_t,
+                                                  col_split = col_s,
+                                                  assay_cols = a_cols)
           )
         )
 
@@ -6229,7 +6219,7 @@ test_that(
 )
 
 test_that(
-  "read_npx_wide_top_split - Flex/Focus - works multi panel & multi plate file",
+  "read_npx_wide_bottom - Flex/Focus - works multi panel & multi plate file",
   {
     ## NPX ----
 
@@ -6260,11 +6250,11 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object = df_b <- read_npx_wide_bottom_t(df = df,
-                                                  file = wide_excel,
-                                                  data_type = data_t,
-                                                  col_split = col_s,
-                                                  assay_cols = a_cols)
+          object = df_b <- read_npx_wide_bottom(df = df,
+                                                file = wide_excel,
+                                                data_type = data_t,
+                                                col_split = col_s,
+                                                assay_cols = a_cols)
         )
 
         # modify df so that we can test output ----
@@ -6324,13 +6314,11 @@ test_that(
         # Looks like it has been fixed, but we still get the error.
         expect_no_error(
           expect_no_warning(
-            expect_no_message(
-              object = df_b <- read_npx_wide_bottom_t(df = df,
-                                                      file = wide_excel,
-                                                      data_type = data_t,
-                                                      col_split = col_s,
-                                                      assay_cols = a_cols)
-            )
+            object = df_b <- read_npx_wide_bottom(df = df,
+                                                  file = wide_excel,
+                                                  data_type = data_t,
+                                                  col_split = col_s,
+                                                  assay_cols = a_cols)
           )
         )
 
@@ -6360,7 +6348,7 @@ test_that(
 )
 
 test_that(
-  "read_npx_wide_top_split - T48 - error for Ct",
+  "read_npx_wide_bottom - T48 - error for Ct",
   {
     withr::with_tempfile(
       new = "wide_excel",
@@ -6389,11 +6377,11 @@ test_that(
         # run function ----
 
         expect_error(
-          object = read_npx_wide_bottom_t(df = df,
-                                          file = wide_excel,
-                                          data_type = "Ct",
-                                          col_split = col_s,
-                                          assay_cols = a_cols),
+          object = read_npx_wide_bottom(df = df,
+                                        file = wide_excel,
+                                        data_type = "Ct",
+                                        col_split = col_s,
+                                        assay_cols = a_cols),
           regexp = "contains a bottom matrix. Files with"
         )
 
@@ -6404,7 +6392,7 @@ test_that(
 )
 
 test_that(
-  "read_npx_wide_top_split - T48 - error for unexpected values in V1",
+  "read_npx_wide_bottom - T48 - error for unexpected values in V1",
   {
     ## NPX ----
 
@@ -6439,11 +6427,11 @@ test_that(
         # run function ----
 
         expect_error(
-          object = read_npx_wide_bottom_t(df = df,
-                                          file = wide_excel,
-                                          data_type = data_t,
-                                          col_split = col_s,
-                                          assay_cols = a_cols),
+          object = read_npx_wide_bottom(df = df,
+                                        file = wide_excel,
+                                        data_type = data_t,
+                                        col_split = col_s,
+                                        assay_cols = a_cols),
           regexp = "Column 1 of the bottom matrix with assay metadata in file"
         )
 
@@ -6485,11 +6473,11 @@ test_that(
         # run function ----
 
         expect_error(
-          object = read_npx_wide_bottom_t(df = df,
-                                          file = wide_excel,
-                                          data_type = data_t,
-                                          col_split = col_s,
-                                          assay_cols = a_cols),
+          object = read_npx_wide_bottom(df = df,
+                                        file = wide_excel,
+                                        data_type = data_t,
+                                        col_split = col_s,
+                                        assay_cols = a_cols),
           regexp = "Column 1 of the bottom matrix with assay metadata in file"
         )
 
@@ -6500,7 +6488,7 @@ test_that(
 )
 
 test_that(
-  "read_npx_wide_top_split - T48 - works with additonal all NA col",
+  "read_npx_wide_bottom - T48 - works with additonal all NA col",
   {
     withr::with_tempfile(
       new = "wide_excel",
@@ -6535,11 +6523,11 @@ test_that(
         # run function ----
 
         expect_no_condition(
-          object = df_b <- read_npx_wide_bottom_t(df = df,
-                                                  file = wide_excel,
-                                                  data_type = data_t,
-                                                  col_split = col_s,
-                                                  assay_cols = a_cols)
+          object = df_b <- read_npx_wide_bottom(df = df,
+                                                file = wide_excel,
+                                                data_type = data_t,
+                                                col_split = col_s,
+                                                assay_cols = a_cols)
         )
 
         # modify df so that we can test output ----
@@ -6568,7 +6556,7 @@ test_that(
 )
 
 test_that(
-  "read_npx_wide_top_split - T48 - incorrect number of plates x QC data",
+  "read_npx_wide_bottom - T48 - incorrect number of plates x QC data",
   {
     withr::with_tempfile(
       new = "wide_excel",
@@ -6601,11 +6589,11 @@ test_that(
         # run function ----
 
         expect_error(
-          object = read_npx_wide_bottom_t(df = df,
-                                          file = wide_excel,
-                                          data_type = data_t,
-                                          col_split = col_s,
-                                          assay_cols = a_cols),
+          object = read_npx_wide_bottom(df = df,
+                                        file = wide_excel,
+                                        data_type = data_t,
+                                        col_split = col_s,
+                                        assay_cols = a_cols),
           regexp = "Column 1 of the bottom matrix contains uneven rows of plate"
         )
 

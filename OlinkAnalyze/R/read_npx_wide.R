@@ -49,7 +49,7 @@ read_npx_wide <- function(file,
   if (data_type != "Ct"
       && length(df_split) == 3L) {
 
-    df_bottom <- read_npx_wide_bottom_t(
+    df_bottom <- read_npx_wide_bottom( # nolint object_usage_linter
       df = df_split$df_bottom,
       file = file,
       data_type = data_type,
@@ -628,11 +628,11 @@ read_npx_wide_top_split <- function(df,
 #'
 #' @return The bottom matrix in long format.
 #'
-read_npx_wide_bottom_t <- function(df,
-                                   file,
-                                   data_type,
-                                   col_split,
-                                   assay_cols) {
+read_npx_wide_bottom <- function(df,
+                                 file,
+                                 data_type,
+                                 col_split,
+                                 assay_cols) {
   # check input ----
 
   check_is_data_frame(df = df,
