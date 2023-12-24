@@ -26,3 +26,6 @@ The bottom matrix in long format.
 \description{
 Help function that converts df_bottom into long format.
 }
+\author{
+Klev Diamanti
+}

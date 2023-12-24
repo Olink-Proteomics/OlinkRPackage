@@ -26,3 +26,6 @@ format that df_top is split on.
 Help function that splits df_top from a Olink wide excel file into 3 data
 frames.
 }
+\author{
+Klev Diamanti
+}
