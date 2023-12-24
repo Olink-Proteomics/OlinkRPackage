@@ -42,11 +42,11 @@ read_npx_wide <- function(file,
 
   # bottom df to long ----
 
-  read_npx_wide_bottom_t(df = df_split$df_bottom,
-                         file = file,
-                         data_type = data_type,
-                         col_split = col_split,
-                         assay_cols = df_top_list$df_oid$col_index)
+  df_bottom <- read_npx_wide_bottom_t(df = df_split$df_bottom,
+                                      file = file,
+                                      data_type = data_type,
+                                      col_split = col_split,
+                                      assay_cols = df_top_list$df_oid$col_index)
 
   # if (data_type != "Ct"
   #     & length(df_split) == 3L) {
@@ -330,7 +330,12 @@ read_npx_wide_check_top <- function(df,
     accepted_vals_v1 <- c(accepted_vals_v1, "Unit")
 
   }
-  if (!identical(dplyr::pull(df, 1L), accepted_vals_v1)) {
+
+  # check that df contains "V1"
+  check_columns(df = df, col_list = list("V1"))
+
+
+  if (!identical(dplyr::pull(df, .data[["V1"]]), accepted_vals_v1)) {
 
     cli::cli_abort(
       message = c(
@@ -660,6 +665,9 @@ read_npx_wide_bottom_t <- function(df,
 
   # check first column ----
 
+  # check that column "V1" exists in the df
+  check_columns(df = df, col_list = list("V1"))
+
   accepted_vals_v1 <- c("Missing Data freq.", "Normalization")
   if (data_type == "NPX") {
     accepted_vals_q <- character(0)
@@ -671,7 +679,7 @@ read_npx_wide_bottom_t <- function(df,
                           accepted_vals_q)
   }
 
-  if (!identical(dplyr::pull(df, 1L) |> unique() |> sort(),
+  if (!identical(dplyr::pull(df, .data[["V1"]]) |> unique() |> sort(),
                  accepted_vals_v1 |> sort())) {
 
     cli::cli_abort(
@@ -689,15 +697,21 @@ read_npx_wide_bottom_t <- function(df,
 
   # keep necessary columns ----
 
+  # columns expected to be present in the df
+  expected_cols <- c("V1", assay_cols)
+  if (data_type == "Quantified") {
+    expected_cols <- c(expected_cols, col_split)
+  }
+  # check that columns in expected_cols exist in the df
+  check_columns(df = df, col_list = as.list(expected_cols))
+
   df <- df |>
     # keep only columns absolutely required:
     # V1 that contains names of variables
     # assay_cols that contains info for customer assays only
     # col_split the column that might contain plate names in case of Quantified
     dplyr::select(
-      dplyr::any_of(
-        c("V1", assay_cols, col_split)
-      )
+      dplyr::all_of(expected_cols)
     ) |>
     # The col_split was selected but it contains only NA values the remove it.
     # This might be the case in NPX files.
@@ -705,23 +719,7 @@ read_npx_wide_bottom_t <- function(df,
 
   # per-plate metrics ----
 
-  if (xor(col_split %in% colnames(df),
-          data_type == "Quantified")) {
-    # if only one of the above is true then throw and error as we expect either
-    # both to be true or both to be false.
-
-    cli::cli_abort(
-      message = c(
-        "x" = "The bottom matrix with the assays metrics in file {.file {file}}
-        does not contain plate information!",
-        "i" = "Has the excel file been modified manually?"
-      ),
-      call = rlang::caller_env(),
-      wrap = FALSE
-    )
-
-  } else if (col_split %in% colnames(df)
-             && data_type == "Quantified") {
+  if (data_type == "Quantified") {
 
     # if it is Quantified data
     df_q <- df |>
