@@ -5796,12 +5796,21 @@ test_that(
 
         # run function ----
 
-        expect_no_condition(
-          object = df_b <- read_npx_wide_bottom_t(df = df,
-                                                  file = wide_excel,
-                                                  data_type = data_t,
-                                                  col_split = col_s,
-                                                  assay_cols = a_cols)
+        # switched from expect_no_condition to the one below because of a very
+        # weird silent message thrown by rlang when using group_by and arrange
+        # in dplyr. This is documented here
+        # https://github.com/aryoda/tryCatchLog/issues/62
+        # Looks like it has been fixed, but we still get the error.
+        expect_no_error(
+          expect_no_warning(
+            expect_no_message(
+              object = df_b <- read_npx_wide_bottom_t(df = df,
+                                                      file = wide_excel,
+                                                      data_type = data_t,
+                                                      col_split = col_s,
+                                                      assay_cols = a_cols)
+            )
+          )
         )
 
         # modify df so that we can test output ----
@@ -5918,12 +5927,21 @@ test_that(
 
         # run function ----
 
-        expect_no_condition(
-          object = df_b <- read_npx_wide_bottom_t(df = df,
-                                                  file = wide_excel,
-                                                  data_type = data_t,
-                                                  col_split = col_s,
-                                                  assay_cols = a_cols)
+        # switched from expect_no_condition to the one below because of a very
+        # weird silent message thrown by rlang when using group_by and arrange
+        # in dplyr. This is documented here
+        # https://github.com/aryoda/tryCatchLog/issues/62
+        # Looks like it has been fixed, but we still get the error.
+        expect_no_error(
+          expect_no_warning(
+            expect_no_message(
+              object = df_b <- read_npx_wide_bottom_t(df = df,
+                                                      file = wide_excel,
+                                                      data_type = data_t,
+                                                      col_split = col_s,
+                                                      assay_cols = a_cols)
+            )
+          )
         )
 
         # modify df so that we can test output ----
@@ -6168,12 +6186,21 @@ test_that(
 
         # run function ----
 
-        expect_no_condition(
-          object = df_b <- read_npx_wide_bottom_t(df = df,
-                                                  file = wide_excel,
-                                                  data_type = data_t,
-                                                  col_split = col_s,
-                                                  assay_cols = a_cols)
+        # switched from expect_no_condition to the one below because of a very
+        # weird silent message thrown by rlang when using group_by and arrange
+        # in dplyr. This is documented here
+        # https://github.com/aryoda/tryCatchLog/issues/62
+        # Looks like it has been fixed, but we still get the error.
+        expect_no_error(
+          expect_no_warning(
+            expect_no_message(
+              object = df_b <- read_npx_wide_bottom_t(df = df,
+                                                      file = wide_excel,
+                                                      data_type = data_t,
+                                                      col_split = col_s,
+                                                      assay_cols = a_cols)
+            )
+          )
         )
 
         # modify df so that we can test output ----
@@ -6290,12 +6317,21 @@ test_that(
 
         # run function ----
 
-        expect_no_condition(
-          object = df_b <- read_npx_wide_bottom_t(df = df,
-                                                  file = wide_excel,
-                                                  data_type = data_t,
-                                                  col_split = col_s,
-                                                  assay_cols = a_cols)
+        # switched from expect_no_condition to the one below because of a very
+        # weird silent message thrown by rlang when using group_by and arrange
+        # in dplyr. This is documented here
+        # https://github.com/aryoda/tryCatchLog/issues/62
+        # Looks like it has been fixed, but we still get the error.
+        expect_no_error(
+          expect_no_warning(
+            expect_no_message(
+              object = df_b <- read_npx_wide_bottom_t(df = df,
+                                                      file = wide_excel,
+                                                      data_type = data_t,
+                                                      col_split = col_s,
+                                                      assay_cols = a_cols)
+            )
+          )
         )
 
         # modify df so that we can test output ----
@@ -6619,6 +6655,54 @@ test_that(
         expect_identical(
           object = df_b,
           expected = df_t
+        )
+
+      }
+    )
+
+  }
+)
+
+test_that(
+  "read_npx_wide_top_split - T48 - incorrect number of plates x QC data",
+  {
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df_bottom ----
+
+        n_plate <- 2L
+        n_panel <- 4L
+        n_assay <- 45L
+        data_t <- "Quantified"
+        col_s <- paste0("V", n_assay * n_panel + 2)
+
+        df <- npx_wide_bottom(n_plates = n_plate,
+                              n_panels = n_panel,
+                              n_assays = n_assay,
+                              data_type = data_t) |>
+          dplyr::filter(
+            !(.data[["V1"]] == "Plate LOD"
+              & .data[[col_s]] == "Plate 2")
+          )
+
+        a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # run function ----
+
+        expect_error(
+          object = read_npx_wide_bottom_t(df = df,
+                                          file = wide_excel,
+                                          data_type = data_t,
+                                          col_split = col_s,
+                                          assay_cols = a_cols),
+          regexp = "Column 1 of the bottom matrix contains uneven rows of plate"
         )
 
       }

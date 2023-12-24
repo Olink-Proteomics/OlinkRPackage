@@ -731,6 +731,33 @@ read_npx_wide_bottom_t <- function(df,
         & !is.na(.data[[col_split]])
       )
 
+    # check that each row with plate-specific QC metrics contains the same
+    # number of plate
+    df_q_n_r <- df_q |>
+      dplyr::count(
+        .data[[col_split]],
+        name = "n_plate"
+      ) |>
+      dplyr::pull(
+        .data[["n_plate"]]
+      ) |>
+      unique() |>
+      length()
+
+    if (df_q_n_r != 1L) {
+
+      cli::cli_abort(
+        message = c(
+          "x" = "Column 1 of the bottom matrix contains uneven rows of plates
+          and plate-specific QC measurements in file {.file {file}}!",
+          "i" = "Has the excel file been modified manually?"
+        ),
+        call = rlang::caller_env(),
+        wrap = FALSE
+      )
+
+    }
+
     # for each variable in V1 and do a pivot_longer
     df_q <- lapply(unique(df_q$V1),
                    function(x) {
