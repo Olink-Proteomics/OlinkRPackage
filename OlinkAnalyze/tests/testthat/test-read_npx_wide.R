@@ -2281,7 +2281,8 @@ test_that(
 
         # check that df_top works
         expect_identical(
-          object = x_index,
+          object = stringr::str_sub(string = x_index, start = 2L) |>
+            as.integer(),
           expected = (n_assay * n_panel) + 2L
         )
 
@@ -2328,7 +2329,8 @@ test_that(
 
         # check that df_top works
         expect_identical(
-          object = x_index,
+          object = stringr::str_sub(string = x_index, start = 2L) |>
+            as.integer(),
           expected = (n_assay * n_panel) + 2L
         )
 
@@ -2375,7 +2377,8 @@ test_that(
 
         # check that df_top works
         expect_identical(
-          object = x_index,
+          object = stringr::str_sub(string = x_index, start = 2L) |>
+            as.integer(),
           expected = (n_assay * n_panel) + 2L
         )
 
@@ -2397,11 +2400,10 @@ test_that(
         n_assay <- 45L
         data_t <- "NPX"
 
-        n_select <- 100L
         random_assays <- sample(
           x = paste0("V",
                      tail(x = seq_len((n_panel * n_assay) + 1L), n = -1L)),
-          size = n_select,
+          size = 100L,
           replace = FALSE
         )
 
@@ -2433,8 +2435,9 @@ test_that(
 
         # check that df_top works
         expect_identical(
-          object = x_index,
-          expected = ((n_assay * n_panel) + 2L) - n_select
+          object = stringr::str_sub(string = x_index, start = 2L) |>
+            as.integer(),
+          expected = (n_assay * n_panel) + 2L
         )
 
       }
@@ -2480,7 +2483,8 @@ test_that(
 
         # check that df_top works
         expect_identical(
-          object = x_index,
+          object = stringr::str_sub(string = x_index, start = 2L) |>
+            as.integer(),
           expected = (n_assay * n_panel) + 2L
         )
 
@@ -2527,7 +2531,8 @@ test_that(
 
         # check that df_top works
         expect_identical(
-          object = x_index,
+          object = stringr::str_sub(string = x_index, start = 2L) |>
+            as.integer(),
           expected = (n_assay * n_panel) + 2L
         )
 
@@ -2574,7 +2579,8 @@ test_that(
 
         # check that df_top works
         expect_identical(
-          object = x_index,
+          object = stringr::str_sub(string = x_index, start = 2L) |>
+            as.integer(),
           expected = (n_assay * n_panel) + 2L
         )
 
@@ -2596,11 +2602,10 @@ test_that(
         n_assay <- 92L
         data_t <- "NPX"
 
-        n_select <- 100L
         random_assays <- sample(
           x = paste0("V",
                      tail(x = seq_len((n_panel * n_assay) + 1L), n = -1L)),
-          size = n_select,
+          size = 100L,
           replace = FALSE
         )
 
@@ -2632,8 +2637,9 @@ test_that(
 
         # check that df_top works
         expect_identical(
-          object = x_index,
-          expected = ((n_assay * n_panel) + 2L) - n_select
+          object = stringr::str_sub(string = x_index, start = 2L) |>
+            as.integer(),
+          expected = (n_assay * n_panel) + 2L
         )
 
       }
@@ -2679,7 +2685,8 @@ test_that(
 
         # check that df_top works
         expect_identical(
-          object = x_index,
+          object = stringr::str_sub(string = x_index, start = 2L) |>
+            as.integer(),
           expected = (n_assay * n_panel) + 2L
         )
 
@@ -2726,7 +2733,8 @@ test_that(
 
         # check that df_top works
         expect_identical(
-          object = x_index,
+          object = stringr::str_sub(string = x_index, start = 2L) |>
+            as.integer(),
           expected = (n_assay * n_panel) + 2L
         )
 
@@ -2773,7 +2781,8 @@ test_that(
 
         # check that df_top works
         expect_identical(
-          object = x_index,
+          object = stringr::str_sub(string = x_index, start = 2L) |>
+            as.integer(),
           expected = (n_assay * n_panel) + 2L
         )
 
@@ -2795,11 +2804,10 @@ test_that(
         n_assay <- 21L
         data_t <- "NPX"
 
-        n_select <- 50L
         random_assays <- sample(
           x = paste0("V",
                      tail(x = seq_len((n_panel * n_assay) + 1L), n = -1L)),
-          size = n_select,
+          size = 50L,
           replace = FALSE
         )
 
@@ -2831,8 +2839,9 @@ test_that(
 
         # check that df_top works
         expect_identical(
-          object = x_index,
-          expected = ((n_assay * n_panel) + 2L) - n_select
+          object = stringr::str_sub(string = x_index, start = 2L) |>
+            as.integer(),
+          expected = (n_assay * n_panel) + 2L
         )
 
       }
@@ -2885,7 +2894,8 @@ test_that(
 
         # check that df_top works
         expect_identical(
-          object = x_index,
+          object = stringr::str_sub(string = x_index, start = 2L) |>
+            as.integer(),
           expected = (n_assay * n_panel) + 2L
         )
 
@@ -2932,7 +2942,8 @@ test_that(
 
         # check that df_top works
         expect_identical(
-          object = x_index,
+          object = stringr::str_sub(string = x_index, start = 2L) |>
+            as.integer(),
           expected = (n_assay * n_panel) + 2L
         )
 
@@ -2979,7 +2990,8 @@ test_that(
 
         # check that df_top works
         expect_identical(
-          object = x_index,
+          object = stringr::str_sub(string = x_index, start = 2L) |>
+            as.integer(),
           expected = (n_assay * n_panel) + 2L
         )
 
@@ -3001,11 +3013,10 @@ test_that(
         n_assay <- 45L
         data_t <- "Ct"
 
-        n_select <- 100L
         random_assays <- sample(
           x = paste0("V",
                      tail(x = seq_len((n_panel * n_assay) + 1L), n = -1L)),
-          size = n_select,
+          size = 100L,
           replace = FALSE
         )
 
@@ -3037,8 +3048,9 @@ test_that(
 
         # check that df_top works
         expect_identical(
-          object = x_index,
-          expected = ((n_assay * n_panel) + 2L) - n_select
+          object = stringr::str_sub(string = x_index, start = 2L) |>
+            as.integer(),
+          expected = (n_assay * n_panel) + 2L
         )
 
       }
@@ -3084,7 +3096,8 @@ test_that(
 
         # check that df_top works
         expect_identical(
-          object = x_index,
+          object = stringr::str_sub(string = x_index, start = 2L) |>
+            as.integer(),
           expected = (n_assay * n_panel) + 2L
         )
 
@@ -3131,7 +3144,8 @@ test_that(
 
         # check that df_top works
         expect_identical(
-          object = x_index,
+          object = stringr::str_sub(string = x_index, start = 2L) |>
+            as.integer(),
           expected = (n_assay * n_panel) + 2L
         )
 
@@ -3178,7 +3192,8 @@ test_that(
 
         # check that df_top works
         expect_identical(
-          object = x_index,
+          object = stringr::str_sub(string = x_index, start = 2L) |>
+            as.integer(),
           expected = (n_assay * n_panel) + 2L
         )
 
@@ -3200,11 +3215,10 @@ test_that(
         n_assay <- 92L
         data_t <- "Ct"
 
-        n_select <- 100L
         random_assays <- sample(
           x = paste0("V",
                      tail(x = seq_len((n_panel * n_assay) + 1L), n = -1L)),
-          size = n_select,
+          size = 100L,
           replace = FALSE
         )
 
@@ -3236,8 +3250,9 @@ test_that(
 
         # check that df_top works
         expect_identical(
-          object = x_index,
-          expected = ((n_assay * n_panel) + 2L) - n_select
+          object = stringr::str_sub(string = x_index, start = 2L) |>
+            as.integer(),
+          expected = (n_assay * n_panel) + 2L
         )
 
       }
@@ -3283,7 +3298,8 @@ test_that(
 
         # check that df_top works
         expect_identical(
-          object = x_index,
+          object = stringr::str_sub(string = x_index, start = 2L) |>
+            as.integer(),
           expected = (n_assay * n_panel) + 2L
         )
 
@@ -3330,7 +3346,8 @@ test_that(
 
         # check that df_top works
         expect_identical(
-          object = x_index,
+          object = stringr::str_sub(string = x_index, start = 2L) |>
+            as.integer(),
           expected = (n_assay * n_panel) + 2L
         )
 
@@ -3377,7 +3394,8 @@ test_that(
 
         # check that df_top works
         expect_identical(
-          object = x_index,
+          object = stringr::str_sub(string = x_index, start = 2L) |>
+            as.integer(),
           expected = (n_assay * n_panel) + 2L
         )
 
@@ -3399,11 +3417,10 @@ test_that(
         n_assay <- 21L
         data_t <- "Ct"
 
-        n_select <- 50L
         random_assays <- sample(
           x = paste0("V",
                      tail(x = seq_len((n_panel * n_assay) + 1L), n = -1L)),
-          size = n_select,
+          size = 50L,
           replace = FALSE
         )
 
@@ -3435,8 +3452,9 @@ test_that(
 
         # check that df_top works
         expect_identical(
-          object = x_index,
-          expected = ((n_assay * n_panel) + 2L) - n_select
+          object = stringr::str_sub(string = x_index, start = 2L) |>
+            as.integer(),
+          expected = (n_assay * n_panel) + 2L
         )
 
       }
@@ -3489,7 +3507,8 @@ test_that(
 
         # check that df_top works
         expect_identical(
-          object = x_index,
+          object = stringr::str_sub(string = x_index, start = 2L) |>
+            as.integer(),
           expected = (n_assay * n_panel) + 2L
         )
 
@@ -3536,7 +3555,8 @@ test_that(
 
         # check that df_top works
         expect_identical(
-          object = x_index,
+          object = stringr::str_sub(string = x_index, start = 2L) |>
+            as.integer(),
           expected = (n_assay * n_panel) + 2L + (3L * n_panel)
         )
 
@@ -3583,7 +3603,8 @@ test_that(
 
         # check that df_top works
         expect_identical(
-          object = x_index,
+          object = stringr::str_sub(string = x_index, start = 2L) |>
+            as.integer(),
           expected = (n_assay * n_panel) + 2L + (3L * n_panel)
         )
 
@@ -3605,11 +3626,10 @@ test_that(
         n_assay <- 45L
         data_t <- "Quantified"
 
-        n_select <- 100L
         random_assays <- sample(
           x = paste0("V",
                      tail(x = seq_len((n_panel * n_assay) + 1L), n = -1L)),
-          size = n_select,
+          size = 100L,
           replace = FALSE
         )
 
@@ -3641,8 +3661,9 @@ test_that(
 
         # check that df_top works
         expect_identical(
-          object = x_index,
-          expected = ((n_assay * n_panel) + 2L) - n_select + (3L * n_panel)
+          object = stringr::str_sub(string = x_index, start = 2L) |>
+            as.integer(),
+          expected = ((n_assay * n_panel) + 2L) + (3L * n_panel)
         )
 
       }
@@ -3663,11 +3684,10 @@ test_that(
         n_assay <- 45L
         data_t <- "Quantified"
 
-        n_select <- 100L
         random_assays <- sample(
           x = paste0("V",
                      tail(x = seq_len((n_panel * n_assay) + 1L), n = -1L)),
-          size = n_select,
+          size = 100L,
           replace = FALSE
         )
 
@@ -3699,8 +3719,9 @@ test_that(
 
         # check that df_top works
         expect_identical(
-          object = x_index,
-          expected = ((n_assay * n_panel) + 2L) - n_select + (3L * n_panel)
+          object = stringr::str_sub(string = x_index, start = 2L) |>
+            as.integer(),
+          expected = ((n_assay * n_panel) + 2L) + (3L * n_panel)
         )
 
       }
@@ -3746,7 +3767,8 @@ test_that(
 
         # check that df_top works
         expect_identical(
-          object = x_index,
+          object = stringr::str_sub(string = x_index, start = 2L) |>
+            as.integer(),
           expected = (n_assay * n_panel) + 2L
         )
 
@@ -3793,7 +3815,8 @@ test_that(
 
         # check that df_top works
         expect_identical(
-          object = x_index,
+          object = stringr::str_sub(string = x_index, start = 2L) |>
+            as.integer(),
           expected = (n_assay * n_panel) + 2L + (3L * n_panel)
         )
 
@@ -3840,7 +3863,8 @@ test_that(
 
         # check that df_top works
         expect_identical(
-          object = x_index,
+          object = stringr::str_sub(string = x_index, start = 2L) |>
+            as.integer(),
           expected = (n_assay * n_panel) + 2L + (3L * n_panel)
         )
 
@@ -3862,11 +3886,10 @@ test_that(
         n_assay <- 21L
         data_t <- "Quantified"
 
-        n_select <- 50L
         random_assays <- sample(
           x = paste0("V",
                      tail(x = seq_len((n_panel * n_assay) + 1L), n = -1L)),
-          size = n_select,
+          size = 50L,
           replace = FALSE
         )
 
@@ -3898,8 +3921,9 @@ test_that(
 
         # check that df_top works
         expect_identical(
-          object = x_index,
-          expected = ((n_assay * n_panel) + 2L) - n_select + (3L * n_panel)
+          object = stringr::str_sub(string = x_index, start = 2L) |>
+            as.integer(),
+          expected = ((n_assay * n_panel) + 2L) + (3L * n_panel)
         )
 
       }
@@ -3920,11 +3944,10 @@ test_that(
         n_assay <- 21L
         data_t <- "Quantified"
 
-        n_select <- 50L
         random_assays <- sample(
           x = paste0("V",
                      tail(x = seq_len((n_panel * n_assay) + 1L), n = -1L)),
-          size = n_select,
+          size = 50L,
           replace = FALSE
         )
 
@@ -3956,8 +3979,9 @@ test_that(
 
         # check that df_top works
         expect_identical(
-          object = x_index,
-          expected = ((n_assay * n_panel) + 2L) - n_select + (3L * n_panel)
+          object = stringr::str_sub(string = x_index, start = 2L) |>
+            as.integer(),
+          expected = ((n_assay * n_panel) + 2L) + (3L * n_panel)
         )
 
       }

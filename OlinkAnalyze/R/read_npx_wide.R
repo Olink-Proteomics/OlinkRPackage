@@ -30,7 +30,8 @@ read_npx_wide <- function(file,
 
   # get x-axis split index ----
 
-  col_index_split <- read_npx_wide_split_col(df = df_split$df_top, file = file)
+  col_split <- read_npx_wide_split_col(df = df_split$df_top,
+                                             file = file)
 
   # split top df ----
 
@@ -46,7 +47,7 @@ read_npx_wide <- function(file,
   read_npx_wide_bottom_t(df = df_split$df_bottom,
                          file = file,
                          data_type = data_type,
-                         col_split = paste0("V", col_index_split))
+                         col_split = col_split)
 
   # if (data_type != "Ct"
   #     & length(df_split) == 3L) {
@@ -191,6 +192,7 @@ read_npx_wide_split_row <- function(file,
 
   # split df from start and stop row indexes ----
 
+  # mark starting and ending row indexes of each sub-matrix
   df_split_index <- dplyr::tibble(
     start_row = c(
       3L, # skip first two rows
@@ -202,6 +204,7 @@ read_npx_wide_split_row <- function(file,
     )
   )
 
+  # extract sub-matrices
   list_df_split <- lapply(
     seq_len(nrow(df_split_index)),
     function(i) {
@@ -220,7 +223,7 @@ read_npx_wide_split_row <- function(file,
   )
 
   # output is a list of 2 or 3 dataframes, depending on data_type
-
+  # name each data frame
   if (length(na_row_index) == 1L) {
     names(list_df_split) <- c("df_top", "df_mid")
   } else {
@@ -286,7 +289,7 @@ read_npx_wide_check_top <- function(df,
 
   # checks ----
 
-  # check that number of rows is expected
+  # check that number of rows of the top matrix from the file is expected
   accepted_assay_row_num <- c(4L, 5L)
   if (!(nrow(df) %in% accepted_assay_row_num)) {
 
@@ -363,6 +366,7 @@ read_npx_wide_split_col <- function(df,
 
   check_is_tibble(df = df,
                   error = TRUE)
+
   check_file_exists(file = file,
                     error = TRUE)
 
@@ -372,6 +376,9 @@ read_npx_wide_split_col <- function(df,
   colnames(df_t) <- df_t[1, ] # add colnames
   df_t <- df_t |>
     dplyr::as_tibble() |>
+    dplyr::mutate(
+      col_index = colnames(df)
+    ) |>
     dplyr::slice(
       2L:dplyr::n()
     )
@@ -380,11 +387,9 @@ read_npx_wide_split_col <- function(df,
   check_columns(df = df_t,
                 col_list = list("Assay"))
 
-  # identify the split index
+  # identify the split index based on the values of the Assay column.
+  # When Assay is "Plate ID" we identify the column name we need to split on.
   col_index_split <- df_t |>
-    dplyr::mutate(
-      row_index = dplyr::row_number() + 1L
-    ) |>
     dplyr::filter(
       .data[["Assay"]] == "Plate ID"
     ) |>
@@ -392,13 +397,15 @@ read_npx_wide_split_col <- function(df,
       n = 1L
     ) |>
     dplyr::pull(
-      .data[["row_index"]]
+      .data[["col_index"]]
     )
 
   # check ----
 
   # no rows contained OlinkID == NA
-  if (identical(col_index_split, integer(0L))) {
+  if (identical(stringr::str_sub(string = col_index_split,
+                                 start = 2L) |> as.integer(),
+                integer(0L))) {
 
     cli::cli_abort(
       message = c(
