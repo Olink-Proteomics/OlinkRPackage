@@ -28,13 +28,6 @@ read_npx_wide <- function(file,
     data_type = data_type
   )
 
-  # get x-axis split index ----
-
-  col_split <- read_npx_wide_split_col(
-    df = df_split$df_top,
-    file = file
-  )
-
   # split top df ----
 
   df_top_list <- read_npx_wide_top_split(
@@ -53,7 +46,21 @@ read_npx_wide <- function(file,
       df = df_split$df_bottom,
       file = file,
       data_type = data_type,
-      col_split = col_split,
+      col_split = { # get col_split that splits left from right hand side matrix
+        df_top_list$df_meta |>
+          dplyr::filter(
+            .data[["Var"]] == "Plate ID"
+          ) |>
+          dplyr::arrange(
+            .data[["col_index"]]
+          ) |>
+          dplyr::slice_head(
+            n = 1L
+          ) |>
+          dplyr::pull(
+            .data[["col_index"]]
+          )
+      },
       assay_cols = df_top_list$df_oid$col_index
     )
 
@@ -353,80 +360,6 @@ read_npx_wide_check_top <- function(df,
     )
 
   }
-
-}
-
-#' Help function to determine the number of columns with assay measurements in
-#' Olink excel wide format files.
-#'
-#' @author Klev Diamanti
-#'
-#' @param df The top data frame from a split Olink wide excel file.
-#' @param file The input excel file.
-#'
-#' @return The index at which the columns of the Olink wide file are split into
-#' the assay measurements and other metadata.
-#'
-read_npx_wide_split_col <- function(df,
-                                    file) {
-
-  # initial checks ----
-
-  check_is_tibble(df = df,
-                  error = TRUE)
-
-  check_file_exists(file = file,
-                    error = TRUE)
-
-  # identify x axis split index ----
-
-  df_t <- t(df) # transpose the wide df
-  colnames(df_t) <- df_t[1, ] # add colnames
-  df_t <- df_t |>
-    dplyr::as_tibble(rownames = "col_index") |>
-    dplyr::slice(
-      2L:dplyr::n()
-    )
-
-  # check that the transposed dataset contains column "Assay"
-  check_columns(df = df_t,
-                col_list = list("Assay"))
-
-  # identify the split index based on the values of the Assay column.
-  # When Assay is "Plate ID" we identify the column name we need to split on.
-  col_index_split <- df_t |>
-    dplyr::filter(
-      .data[["Assay"]] == "Plate ID"
-    ) |>
-    dplyr::slice_head(
-      n = 1L
-    ) |>
-    dplyr::pull(
-      .data[["col_index"]]
-    )
-
-  # check ----
-
-  # no rows contained OlinkID == NA
-  if (identical(stringr::str_sub(string = col_index_split,
-                                 start = 2L) |> as.integer(),
-                integer(0L))) {
-
-    cli::cli_abort(
-      message = c(
-        "x" = "Unexpected format of the top metadata in file {.file {file}}!",
-        "i" = "Expected to identify rows with {.arg OlinkID} = {.val NA}. Found
-        0 such cases."
-      ),
-      call = rlang::caller_env(),
-      wrap = FALSE
-    )
-
-  }
-
-  # return ----
-
-  return(col_index_split)
 
 }
 
