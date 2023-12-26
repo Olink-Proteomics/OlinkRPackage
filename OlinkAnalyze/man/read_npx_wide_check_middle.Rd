@@ -9,7 +9,7 @@ read_npx_wide_check_middle(
   file,
   data_type,
   assay_cols,
-  pid_cols,
+  plate_cols,
   qc_warn_cols,
   int_ctrl_cols
 )
@@ -25,7 +25,7 @@ of NPX or Quantified.}
 \item{assay_cols}{Character vector with the names of the columns containing
 Olink assays.}
 
-\item{pid_cols}{Character vector with the names of the columns containing
+\item{plate_cols}{Character vector with the names of the columns containing
 "Plate ID".}
 
 \item{qc_warn_cols}{Character vector with the names of the columns containing

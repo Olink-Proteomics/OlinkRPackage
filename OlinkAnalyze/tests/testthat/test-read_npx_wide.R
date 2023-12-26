@@ -248,10 +248,22 @@ npx_wide_top_test <- function(df) {
       !is.na(.data[["OlinkID"]])
     )
 
-  df_meta <- df |>
+  df_plate <- df |>
     dplyr::filter(
       is.na(.data[["OlinkID"]])
-      & .data[["Assay"]] %in% c("Plate ID", "QC Warning")
+      & .data[["Assay"]] %in% c("Plate ID")
+    ) |>
+    dplyr::select(
+      -dplyr::all_of(c("Uniprot ID", "OlinkID"))
+    ) |>
+    dplyr::rename(
+      "Var" = "Assay"
+    )
+
+  df_qc_warn <- df |>
+    dplyr::filter(
+      is.na(.data[["OlinkID"]])
+      & .data[["Assay"]] %in% c("QC Warning")
     ) |>
     dplyr::select(
       -dplyr::all_of(c("Uniprot ID", "OlinkID"))
@@ -275,7 +287,8 @@ npx_wide_top_test <- function(df) {
   return(
     list(
       df_oid = df_oid,
-      df_meta = df_meta,
+      df_plate = df_plate,
+      df_qc_warn = df_qc_warn,
       df_qc_dev = df_qc_dev
     )
   )
@@ -2453,11 +2466,14 @@ test_that(
         )
 
         expect_identical(
-          object = l_obj$df_meta,
-          expected = l_exp$df_meta
+          object = l_obj$df_plate,
+          expected = l_exp$df_plate
         )
 
-        expect_true(object = is.null(l_obj$df_qc_dev))
+        expect_identical(
+          object = l_obj$df_qc_warn,
+          expected = l_exp$df_qc_warn
+        )
 
       }
     )
@@ -2509,11 +2525,9 @@ test_that(
         )
 
         expect_identical(
-          object = l_obj$df_meta,
-          expected = l_exp$df_meta
+          object = l_obj$df_plate,
+          expected = l_exp$df_plate
         )
-
-        expect_true(object = is.null(l_obj$df_qc_dev))
 
       }
     )
@@ -2565,8 +2579,13 @@ test_that(
         )
 
         expect_identical(
-          object = l_obj$df_meta,
-          expected = l_exp$df_meta
+          object = l_obj$df_plate,
+          expected = l_exp$df_plate
+        )
+
+        expect_identical(
+          object = l_obj$df_qc_warn,
+          expected = l_exp$df_qc_warn
         )
 
         expect_identical(
@@ -2624,11 +2643,14 @@ test_that(
         )
 
         expect_identical(
-          object = l_obj$df_meta,
-          expected = l_exp$df_meta
+          object = l_obj$df_plate,
+          expected = l_exp$df_plate
         )
 
-        expect_true(object = is.null(l_obj$df_qc_dev))
+        expect_identical(
+          object = l_obj$df_qc_warn,
+          expected = l_exp$df_qc_warn
+        )
 
       }
     )
@@ -2686,11 +2708,14 @@ test_that(
         )
 
         expect_identical(
-          object = l_obj$df_meta,
-          expected = l_exp$df_meta
+          object = l_obj$df_plate,
+          expected = l_exp$df_plate
         )
 
-        expect_true(object = is.null(l_obj$df_qc_dev))
+        expect_identical(
+          object = l_obj$df_qc_warn,
+          expected = l_exp$df_qc_warn
+        )
 
       }
     )
@@ -2742,11 +2767,9 @@ test_that(
         )
 
         expect_identical(
-          object = l_obj$df_meta,
-          expected = l_exp$df_meta
+          object = l_obj$df_plate,
+          expected = l_exp$df_plate
         )
-
-        expect_true(object = is.null(l_obj$df_qc_dev))
 
       }
     )
@@ -2798,8 +2821,13 @@ test_that(
         )
 
         expect_identical(
-          object = l_obj$df_meta,
-          expected = l_exp$df_meta
+          object = l_obj$df_plate,
+          expected = l_exp$df_plate
+        )
+
+        expect_identical(
+          object = l_obj$df_qc_warn,
+          expected = l_exp$df_qc_warn
         )
 
         expect_identical(
@@ -2857,11 +2885,14 @@ test_that(
         )
 
         expect_identical(
-          object = l_obj$df_meta,
-          expected = l_exp$df_meta
+          object = l_obj$df_plate,
+          expected = l_exp$df_plate
         )
 
-        expect_true(object = is.null(l_obj$df_qc_dev))
+        expect_identical(
+          object = l_obj$df_qc_warn,
+          expected = l_exp$df_qc_warn
+        )
 
       }
     )
@@ -2919,11 +2950,14 @@ test_that(
         )
 
         expect_identical(
-          object = l_obj$df_meta,
-          expected = l_exp$df_meta
+          object = l_obj$df_plate,
+          expected = l_exp$df_plate
         )
 
-        expect_true(object = is.null(l_obj$df_qc_dev))
+        expect_identical(
+          object = l_obj$df_qc_warn,
+          expected = l_exp$df_qc_warn
+        )
 
       }
     )
@@ -2975,11 +3009,9 @@ test_that(
         )
 
         expect_identical(
-          object = l_obj$df_meta,
-          expected = l_exp$df_meta
+          object = l_obj$df_plate,
+          expected = l_exp$df_plate
         )
-
-        expect_true(object = is.null(l_obj$df_qc_dev))
 
       }
     )
@@ -3037,11 +3069,14 @@ test_that(
         )
 
         expect_identical(
-          object = l_obj$df_meta,
-          expected = l_exp$df_meta
+          object = l_obj$df_plate,
+          expected = l_exp$df_plate
         )
 
-        expect_true(object = is.null(l_obj$df_qc_dev))
+        expect_identical(
+          object = l_obj$df_qc_warn,
+          expected = l_exp$df_qc_warn
+        )
 
       }
     )
@@ -3093,11 +3128,9 @@ test_that(
         )
 
         expect_identical(
-          object = l_obj$df_meta,
-          expected = l_exp$df_meta
+          object = l_obj$df_plate,
+          expected = l_exp$df_plate
         )
-
-        expect_true(object = is.null(l_obj$df_qc_dev))
 
       }
     )
@@ -3155,11 +3188,14 @@ test_that(
         )
 
         expect_identical(
-          object = l_obj$df_meta,
-          expected = l_exp$df_meta
+          object = l_obj$df_plate,
+          expected = l_exp$df_plate
         )
 
-        expect_true(object = is.null(l_obj$df_qc_dev))
+        expect_identical(
+          object = l_obj$df_qc_warn,
+          expected = l_exp$df_qc_warn
+        )
 
       }
     )
@@ -3211,11 +3247,9 @@ test_that(
         )
 
         expect_identical(
-          object = l_obj$df_meta,
-          expected = l_exp$df_meta
+          object = l_obj$df_plate,
+          expected = l_exp$df_plate
         )
-
-        expect_true(object = is.null(l_obj$df_qc_dev))
 
       }
     )
@@ -3267,8 +3301,13 @@ test_that(
         )
 
         expect_identical(
-          object = l_obj$df_meta,
-          expected = l_exp$df_meta
+          object = l_obj$df_plate,
+          expected = l_exp$df_plate
+        )
+
+        expect_identical(
+          object = l_obj$df_qc_warn,
+          expected = l_exp$df_qc_warn
         )
 
         expect_identical(
@@ -3326,11 +3365,14 @@ test_that(
         )
 
         expect_identical(
-          object = l_obj$df_meta,
-          expected = l_exp$df_meta
+          object = l_obj$df_plate,
+          expected = l_exp$df_plate
         )
 
-        expect_true(object = is.null(l_obj$df_qc_dev))
+        expect_identical(
+          object = l_obj$df_qc_warn,
+          expected = l_exp$df_qc_warn
+        )
 
       }
     )
@@ -3388,11 +3430,14 @@ test_that(
         )
 
         expect_identical(
-          object = l_obj$df_meta,
-          expected = l_exp$df_meta
+          object = l_obj$df_plate,
+          expected = l_exp$df_plate
         )
 
-        expect_true(object = is.null(l_obj$df_qc_dev))
+        expect_identical(
+          object = l_obj$df_qc_warn,
+          expected = l_exp$df_qc_warn
+        )
 
       }
     )
@@ -3444,11 +3489,9 @@ test_that(
         )
 
         expect_identical(
-          object = l_obj$df_meta,
-          expected = l_exp$df_meta
+          object = l_obj$df_plate,
+          expected = l_exp$df_plate
         )
-
-        expect_true(object = is.null(l_obj$df_qc_dev))
 
       }
     )
@@ -3500,8 +3543,13 @@ test_that(
         )
 
         expect_identical(
-          object = l_obj$df_meta,
-          expected = l_exp$df_meta
+          object = l_obj$df_plate,
+          expected = l_exp$df_plate
+        )
+
+        expect_identical(
+          object = l_obj$df_qc_warn,
+          expected = l_exp$df_qc_warn
         )
 
         expect_identical(
@@ -3559,11 +3607,14 @@ test_that(
         )
 
         expect_identical(
-          object = l_obj$df_meta,
-          expected = l_exp$df_meta
+          object = l_obj$df_plate,
+          expected = l_exp$df_plate
         )
 
-        expect_true(object = is.null(l_obj$df_qc_dev))
+        expect_identical(
+          object = l_obj$df_qc_warn,
+          expected = l_exp$df_qc_warn
+        )
 
       }
     )
@@ -3934,7 +3985,101 @@ test_that(
                                            file = wide_excel,
                                            data_type = "Ct",
                                            olink_platform = o_platform),
-          regexp = "in the right-hand side of the top matrix in file"
+          regexp = "Column \"QC Warning\" in the right-hand side of the top"
+        )
+
+      }
+    )
+
+  }
+)
+
+test_that(
+  "read_npx_wide_top_split - uneven number of Plate ID and QC_Warning cols",
+  {
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df_top ----
+
+        o_platform <- "Target 48"
+        n_panel <- 2L
+        n_assay <- 45L
+        data_t <- "NPX"
+
+        remove_col <- paste0("V", (1L + (n_panel * n_assay) + (2L * n_panel)))
+
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE) |>
+          dplyr::select(
+            -dplyr::all_of(remove_col)
+          )
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # run function ----
+
+        expect_error(
+          object = read_npx_wide_top_split(df = df,
+                                           file = wide_excel,
+                                           data_type = data_t,
+                                           olink_platform = o_platform),
+          regexp = "Expected equal number of \"Plate ID\" and \"QC\ Warning\""
+        )
+
+      }
+    )
+
+  }
+)
+
+test_that(
+  "read_npx_wide_top_split - QC_Warning on Ct data",
+  {
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df_top ----
+
+        o_platform <- "Target 48"
+        n_panel <- 1L
+        n_assay <- 45L
+        data_t <- "Quantified"
+
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = TRUE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE) |>
+          dplyr::slice(
+            1L:4L
+          )
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # run function ----
+
+        expect_error(
+          object = read_npx_wide_top_split(df = df,
+                                           file = wide_excel,
+                                           data_type = "NPX",
+                                           olink_platform = o_platform),
+          regexp = "Columns for \"Internal controls\" in the right-hand side of"
         )
 
       }
@@ -5064,7 +5209,7 @@ test_that(
                   file = wide_excel,
                   data_type = df_combos_tmp$data_type,
                   assay_cols = na_to_null(x = df_combos_tmp$assay),
-                  pid_cols = na_to_null(x = df_combos_tmp$plate_id),
+                  plate_cols = na_to_null(x = df_combos_tmp$plate_id),
                   qc_warn_cols = na_to_null(x = df_combos_tmp$qc_warn),
                   int_ctrl_cols = na_to_null(x = df_combos_tmp$int_ctrl)
                 )
@@ -5083,7 +5228,7 @@ test_that(
                   file = wide_excel,
                   data_type = df_combos_tmp$data_type,
                   assay_cols = na_to_null(x = df_combos_tmp$assay),
-                  pid_cols = na_to_null(x = df_combos_tmp$plate_id),
+                  plate_cols = na_to_null(x = df_combos_tmp$plate_id),
                   qc_warn_cols = na_to_null(x = df_combos_tmp$qc_warn),
                   int_ctrl_cols = na_to_null(x = df_combos_tmp$int_ctrl)
                 ),
@@ -5142,7 +5287,7 @@ test_that(
                                               file = wide_excel,
                                               data_type = data_t,
                                               assay_cols = cname$assay_cols,
-                                              pid_cols = cname$plate_cols,
+                                              plate_cols = cname$plate_cols,
                                               qc_warn_cols = cname$qc_warn_cols,
                                               int_ctrl_cols = NULL),
           regexp = "does not contain unique sample identifiers."
@@ -5193,7 +5338,7 @@ test_that(
                                               file = wide_excel,
                                               data_type = data_t,
                                               assay_cols = cname$assay_cols,
-                                              pid_cols = cname$plate_cols,
+                                              plate_cols = cname$plate_cols,
                                               qc_warn_cols = cname$qc_warn_cols,
                                               int_ctrl_cols = NULL),
           regexp = "does not contain unique sample identifiers."
@@ -5252,7 +5397,7 @@ test_that(
               file = wide_excel,
               data_type = data_t,
               assay_cols = cname$assay_cols,
-              pid_cols = cname$plate_cols,
+              plate_cols = cname$plate_cols,
               qc_warn_cols = cname$qc_warn_cols,
               int_ctrl_cols = NULL
             )
@@ -5339,7 +5484,7 @@ test_that(
               file = wide_excel,
               data_type = data_t,
               assay_cols = cname$assay_cols,
-              pid_cols = cname$plate_cols,
+              plate_cols = cname$plate_cols,
               qc_warn_cols = cname$qc_warn_cols,
               int_ctrl_cols = NULL
             )
@@ -5416,7 +5561,7 @@ test_that(
               file = wide_excel,
               data_type = data_t,
               assay_cols = cname$assay_cols,
-              pid_cols = cname$plate_cols,
+              plate_cols = cname$plate_cols,
               qc_warn_cols = NULL,
               int_ctrl_cols = NULL
             )
@@ -5488,7 +5633,7 @@ test_that(
               file = wide_excel,
               data_type = data_t,
               assay_cols = cname$assay_cols,
-              pid_cols = cname$plate_cols,
+              plate_cols = cname$plate_cols,
               qc_warn_cols = NULL,
               int_ctrl_cols = NULL
             )
@@ -5560,7 +5705,7 @@ test_that(
               file = wide_excel,
               data_type = data_t,
               assay_cols = cname$assay_cols,
-              pid_cols = cname$plate_cols,
+              plate_cols = cname$plate_cols,
               qc_warn_cols = cname$qc_warn_cols,
               int_ctrl_cols = cname$int_ctrl_cols
             )
@@ -5642,7 +5787,7 @@ test_that(
               file = wide_excel,
               data_type = data_t,
               assay_cols = cname$assay_cols,
-              pid_cols = cname$plate_cols,
+              plate_cols = cname$plate_cols,
               qc_warn_cols = cname$qc_warn_cols,
               int_ctrl_cols = cname$int_ctrl_cols
             )
@@ -5724,7 +5869,7 @@ test_that(
               file = wide_excel,
               data_type = data_t,
               assay_cols = cname$assay_cols,
-              pid_cols = cname$plate_cols,
+              plate_cols = cname$plate_cols,
               qc_warn_cols = cname$qc_warn_cols,
               int_ctrl_cols = cname$int_ctrl_cols
             )
@@ -5813,7 +5958,7 @@ test_that(
                                         file = wide_excel,
                                         data_type = data_t,
                                         assay_cols = cname$assay_cols,
-                                        pid_cols = cname$plate_cols,
+                                        plate_cols = cname$plate_cols,
                                         qc_warn_cols = cname$qc_warn_cols,
                                         int_ctrl_cols = NULL),
           regexp = "Uneven number of entries of \"Plate ID\" and \"QC Warning\""
@@ -5866,7 +6011,7 @@ test_that(
                                         file = wide_excel,
                                         data_type = data_t,
                                         assay_cols = cname$assay_cols,
-                                        pid_cols = cname$plate_cols,
+                                        plate_cols = cname$plate_cols,
                                         qc_warn_cols = cname$qc_warn_cols,
                                         int_ctrl_cols = NULL),
           regexp = "Uneven number of entries of \"Plate ID\" and \"QC Warning\""
@@ -5925,7 +6070,7 @@ test_that(
                                         file = wide_excel,
                                         data_type = data_t,
                                         assay_cols = cname$assay_cols,
-                                        pid_cols = cname$plate_cols,
+                                        plate_cols = cname$plate_cols,
                                         qc_warn_cols = cname$qc_warn_cols,
                                         int_ctrl_cols = cname$int_ctrl_cols),
           regexp = "Uneven number of entries of \"Internal Control\" assays in"
@@ -5978,7 +6123,7 @@ test_that(
                                         file = wide_excel,
                                         data_type = data_t,
                                         assay_cols = cname$assay_cols,
-                                        pid_cols = cname$plate_cols,
+                                        plate_cols = cname$plate_cols,
                                         qc_warn_cols = cname$qc_warn_cols,
                                         int_ctrl_cols = cname$int_ctrl_cols),
           regexp = "Uneven number of entries of \"Internal Control\" assays in"
@@ -6032,7 +6177,7 @@ test_that(
                                         file = wide_excel,
                                         data_type = data_t,
                                         assay_cols = cname$assay_cols,
-                                        pid_cols = cname$plate_cols,
+                                        plate_cols = cname$plate_cols,
                                         qc_warn_cols = cname$qc_warn_cols,
                                         int_ctrl_cols = cname$int_ctrl_cols)
         )
@@ -6085,7 +6230,7 @@ test_that(
                                         file = wide_excel,
                                         data_type = data_t,
                                         assay_cols = cname$assay_cols,
-                                        pid_cols = cname$plate_cols,
+                                        plate_cols = cname$plate_cols,
                                         qc_warn_cols = cname$qc_warn_cols,
                                         int_ctrl_cols = cname$int_ctrl_cols)
         )

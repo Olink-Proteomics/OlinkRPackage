@@ -20,14 +20,6 @@ read_npx_wide <- function(file,
     data_type = data_type
   )
 
-  # check top df ----
-
-  read_npx_wide_check_top(
-    df = df_split$df_top,
-    file = file,
-    data_type = data_type
-  )
-
   # top list of df to long ----
 
   df_top_list <- read_npx_wide_top_split(
@@ -37,11 +29,43 @@ read_npx_wide <- function(file,
     olink_platform = olink_platform
   )
 
+  ## top list of df colnames ----
+
+  # assay columns
+  assay_cols <- df_top_list$df_oid |>
+    dplyr::pull(
+      .data[["col_index"]]
+    )
+
+  # plate columns
+  plate_cols <- df_top_list$df_plate |>
+    dplyr::pull(
+      .data[["col_index"]]
+    )
+
+  # qc warning columns
+  if (data_type != "Ct") {
+    qc_warn_cols <- df_top_list$df_qc_warn |>
+      dplyr::pull(
+        .data[["col_index"]]
+      )
+  } else {
+    qc_warn_cols <- NULL
+  }
+
+  # internal controls columns
+  if (data_type == "Quantified"
+      && !is.null(df_top_list$df_qc_dev)) {
+    int_ctrl_cols <- df_top_list$df_qc_dev |>
+      dplyr::pull(
+        .data[["col_index"]]
+      )
+  } else {
+    int_ctrl_cols <- NULL
+  }
+
   # get col_split that splits left from right hand side matrix
-  col_split <- df_top_list$df_meta |>
-    dplyr::filter(
-      .data[["Var"]] == "Plate ID"
-    ) |>
+  col_split <- df_top_list$df_plate |>
     dplyr::arrange(
       .data[["col_index"]]
     ) |>
@@ -62,14 +86,22 @@ read_npx_wide <- function(file,
       file = file,
       data_type = data_type,
       col_split = col_split,
-      assay_cols = df_top_list$df_oid$col_index
+      assay_cols = assay_cols
     )
 
   }
 
   # middle list of df to long ----
 
-
+  df_middle <- read_npx_wide_middle( # nolint object_usage_linter
+    df = df_split$df_mid,
+    file = file,
+    data_type = data_type,
+    assay_cols = assay_cols,
+    plate_cols = plate_cols,
+    qc_warn_cols = qc_warn_cols,
+    int_ctrl_cols = int_ctrl_cols
+  )
 
 }
 
@@ -384,19 +416,16 @@ read_npx_wide_top_split <- function(df,
                                     data_type,
                                     olink_platform) {
 
-  # check input ----
-
-  check_is_data_frame(df = df,
-                      error = TRUE)
-
-  check_file_exists(file = file,
-                    error = TRUE)
-
-  check_olink_data_type(x = data_type,
-                        broader_platform = "qPCR")
+  # check input and top matrix ----
 
   check_olink_platform(x = olink_platform,
                        broader_platform = "qPCR")
+
+  read_npx_wide_check_top(
+    df = df,
+    file = file,
+    data_type = data_type
+  )
 
   # transpose df to long ----
 
@@ -424,9 +453,21 @@ read_npx_wide_top_split <- function(df,
 
   # data frame containing assay info
   # Panel, Assay, Uniprot ID and Olink ID (and Unit if data_type=Quantified)
-  df_meta <- df_t |>
+  df_plate <- df_t |>
     dplyr::filter(
-      .data[["Assay"]] %in% c("Plate ID", "QC Warning")
+      .data[["Assay"]] %in% c("Plate ID")
+      & is.na(.data[["OlinkID"]])
+    ) |>
+    dplyr::select(
+      -dplyr::all_of(c("OlinkID", "Uniprot ID"))
+    ) |>
+    dplyr::rename(
+      "Var" = "Assay"
+    )
+
+  df_qc_warn <- df_t |>
+    dplyr::filter(
+      .data[["Assay"]] %in% c("QC Warning")
       & is.na(.data[["OlinkID"]])
     ) |>
     dplyr::select(
@@ -450,7 +491,7 @@ read_npx_wide_top_split <- function(df,
 
   ## check sum of rows ----
 
-  if (nrow(df_t) != (nrow(df_oid) + nrow(df_meta) + nrow(df_qc_dev))) {
+  if (nrow(df_t) != (nrow(df_oid) + nrow(df_plate) + nrow(df_qc_warn) + nrow(df_qc_dev))) { # nolint object_usage_linter
 
     cli::cli_abort(
       message = c(
@@ -484,11 +525,20 @@ read_npx_wide_top_split <- function(df,
   # we will check number of assays only for Target 96 and 48 Olink platforms.
   # Other Olink platforms such as Flex and Focus allow a varying number of
   # assays, which does not allow us to check number of assays.
-  if (olink_platform == "Target 96") {
-    expected_num_assays <- 92L * length(unique(df_oid$Panel))
-  } else if (olink_platform == "Target 48") {
-    expected_num_assays <- 45L * length(unique(df_oid$Panel))
-  } else {
+  expected_num_assays <- dplyr::tibble(platform = c("Target 96",
+                                                    "Target 48"),
+                                       n = c(92L,
+                                             45L)) |>
+    dplyr::mutate(
+      total_n = .data[["n"]] * length(unique(df_oid$Panel))
+    ) |>
+    dplyr::filter(
+      .data[["platform"]] == .env[["olink_platform"]]
+    ) |>
+    dplyr::pull(
+      .data[["total_n"]]
+    )
+  if (identical(expected_num_assays, integer(0L))) {
     expected_num_assays <- NA_integer_
   }
 
@@ -507,23 +557,16 @@ read_npx_wide_top_split <- function(df,
 
   }
 
-  ## check df_meta ----
+  ## check df_qc_warn ----
 
-  # check that "Plate ID" is there in any file
-  expected_meta_var <- c("Plate ID")
-  # when the data_type is NPX or Quantified, "QC Warning" is also exepcted
-  if (data_type != "Ct") {
-    expected_meta_var <- c(expected_meta_var, "QC Warning")
-  }
-
-  if (!identical(dplyr::pull(df_meta, .data[["Var"]]) |> unique() |> sort(),
-                 sort(expected_meta_var))) {
+  # when data_type = Ct we do not expect QC Warning
+  if (xor(x = data_type == "Ct",
+          y = nrow(df_qc_warn) == 0L)) {
 
     cli::cli_abort(
       message = c(
-        "x" = "Expected {.val {expected_meta_var}} in the right-hand side of the
-        top matrix in file {.file {file}}, but detected
-        {.val {dplyr::pull(df_meta, .data[[\"Var\"]]) |> unique()}}",
+        "x" = "Column \"QC Warning\" in the right-hand side of the top matrix
+        is expected only for \"NPX\" and \"Quantified\" data!",
         "i" = "Has the excel file been modified manually?"
       ),
       call = rlang::caller_env(),
@@ -532,22 +575,66 @@ read_npx_wide_top_split <- function(df,
 
   }
 
+  ## check df_plate & df_qc_warn ----
+
+  # when the data_type is NPX or Quantified, "QC Warning" is also expected
+  if (data_type != "Ct") {
+
+    if (!identical(dim(df_plate), dim(df_qc_warn))) {
+
+      cli::cli_abort(
+        message = c(
+          "x" = "Expected equal number of \"Plate ID\" and \"QC\ Warning\"
+          columns in the right-hand side of the top matrix in file
+          {.file {file}}!",
+          "i" = "Has the excel file been modified manually?"
+        ),
+        call = rlang::caller_env(),
+        wrap = FALSE
+      )
+
+    }
+
+  }
+
   ## check df_qc_dev ----
 
-  # make df_qc_dev NULL if it has no rows
-  if (nrow(df_qc_dev) == 0L) {
-    df_qc_dev <- NULL
+  # only when the data_type is Quantified we expect internal controls
+  if (data_type != "Quantified"
+      && nrow(df_qc_dev) != 0L) {
+
+    cli::cli_abort(
+      message = c(
+        "x" = "Columns for \"Internal controls\" in the right-hand side of the
+        top matrix are expected only for \"Quantified\" data!",
+        "i" = "Has the excel file been modified manually?"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
   }
 
   # return ----
 
-  return(
-    list(
-      df_oid = df_oid,
-      df_meta = df_meta,
-      df_qc_dev = df_qc_dev
-    )
+  list_df <- list(
+    df_oid = df_oid,
+    df_plate = df_plate
   )
+
+  # add df_qc_warn if not empty
+  if (nrow(df_qc_warn) != 0L) {
+    list_df <- append(x = list_df,
+                      values = list(df_qc_warn = df_qc_warn))
+  }
+
+  # add df_qc_dev if not empty
+  if (nrow(df_qc_warn) != 0L) {
+    list_df <- append(x = list_df,
+                      values = list(df_qc_dev = df_qc_dev))
+  }
+
+  return(list_df)
 
 }
 
@@ -786,7 +873,7 @@ read_npx_wide_bottom <- function(df,
 #' of NPX or Quantified.
 #' @param assay_cols Character vector with the names of the columns containing
 #' Olink assays.
-#' @param pid_cols Character vector with the names of the columns containing
+#' @param plate_cols Character vector with the names of the columns containing
 #' "Plate ID".
 #' @param qc_warn_cols Character vector with the names of the columns containing
 #' "QC Warning".
@@ -799,7 +886,7 @@ read_npx_wide_check_middle <- function(df,
                                        file,
                                        data_type,
                                        assay_cols,
-                                       pid_cols,
+                                       plate_cols,
                                        qc_warn_cols,
                                        int_ctrl_cols) {
   # check input ----
@@ -818,8 +905,8 @@ read_npx_wide_check_middle <- function(df,
                        error = TRUE)
   }
 
-  if (!is.null(pid_cols)) {
-    check_is_character(string = pid_cols,
+  if (!is.null(plate_cols)) {
+    check_is_character(string = plate_cols,
                        error = TRUE)
   }
 
@@ -838,14 +925,14 @@ read_npx_wide_check_middle <- function(df,
   # creating a control string from bits of the input flags.
   # This was done to lower the complexity of the function.
   assay_str <- ifelse(is.null(assay_cols), "0", "1")
-  plate_id_str <- ifelse(is.null(pid_cols), "0", "1")
+  plate_id_str <- ifelse(is.null(plate_cols), "0", "1")
   qc_warn_str <- ifelse(is.null(qc_warn_cols), "0", "1")
   int_sctrl_str <- ifelse(is.null(int_ctrl_cols), "0", "1")
   cols_str <- paste0(assay_str, plate_id_str, qc_warn_str, int_sctrl_str)
 
   if (data_type == "Ct"
       && cols_str != "1100") {
-    # when data_type is Ct then assay_cols and pid_cols are required to have
+    # when data_type is Ct then assay_cols and plate_cols are required to have
     # values.
     # qc_warn_cols and int_ctrl_cols should be NULL.
 
@@ -862,7 +949,7 @@ read_npx_wide_check_middle <- function(df,
 
   } else if (data_type == "NPX"
              && cols_str != "1110") {
-    # when data_type is NPX then assay_cols, pid_cols and qc_warn_cols are
+    # when data_type is NPX then assay_cols, plate_cols and qc_warn_cols are
     # required to have values.
     # int_ctrl_cols should be NULL.
 
@@ -930,7 +1017,7 @@ read_npx_wide_check_middle <- function(df,
 #' of NPX or Quantified.
 #' @param assay_cols Character vector with the names of the columns containing
 #' Olink assays.
-#' @param pid_cols Character vector with the names of the columns containing
+#' @param plate_cols Character vector with the names of the columns containing
 #' "Plate ID".
 #' @param qc_warn_cols Character vector with the names of the columns containing
 #' "QC Warning".
@@ -944,7 +1031,7 @@ read_npx_wide_middle <- function(df,
                                  file,
                                  data_type,
                                  assay_cols,
-                                 pid_cols,
+                                 plate_cols,
                                  qc_warn_cols,
                                  int_ctrl_cols) {
 
@@ -954,7 +1041,7 @@ read_npx_wide_middle <- function(df,
                              file = file,
                              data_type = data_type,
                              assay_cols = assay_cols,
-                             pid_cols = pid_cols,
+                             plate_cols = plate_cols,
                              qc_warn_cols = qc_warn_cols,
                              int_ctrl_cols = int_ctrl_cols)
 
@@ -981,11 +1068,11 @@ read_npx_wide_middle <- function(df,
   ## split plates and pivot to longer ----
 
   # check all columns exist
-  check_columns(df = df, col_list = as.list(pid_cols))
+  check_columns(df = df, col_list = as.list(plate_cols))
 
   df_pid <- df |>
     dplyr::select(
-      dplyr::all_of(c("V1", pid_cols))
+      dplyr::all_of(c("V1", plate_cols))
     ) |>
     dplyr::rename(
       "SampleID" = dplyr::all_of("V1")
@@ -1070,7 +1157,7 @@ read_npx_wide_middle <- function(df,
 
     # identify number of internal control assays
     int_ctrl_num <- c(3L, 2L, 1L)
-    mod_int_ctrl <- (length(int_ctrl_cols) / length(pid_cols)) %% int_ctrl_num
+    mod_int_ctrl <- (length(int_ctrl_cols) / length(plate_cols)) %% int_ctrl_num
     names(mod_int_ctrl) <- int_ctrl_num
     n_int_ctrl <- utils::head(x = mod_int_ctrl[mod_int_ctrl == 0L],
                               n = 1L) |>
@@ -1083,7 +1170,7 @@ read_npx_wide_middle <- function(df,
     n_uniq_sample <- dplyr::pull(df, .data[["V1"]]) |> unique() |> length()
 
     # check
-    if (nrow(df_int_ctrl) != (n_uniq_sample * n_int_ctrl * length(pid_cols))) {
+    if (nrow(df_int_ctrl) != (n_uniq_sample * n_int_ctrl * length(plate_cols))) { # nolint object_usage_linter
 
       cli::cli_abort(
         message = c(
