@@ -1,5 +1,66 @@
 # Help functions ----
 
+# generate vectors with names of columns for assays, plates, qc warning and
+# internal controls
+npx_wide_col_index <- function(n_panels,
+                               n_assays,
+                               is_shuffled) {
+
+  n_int_ctrl <- 3L
+
+  # if internal controls and customer assays are shuffled in cols
+  if (is_shuffled) {
+
+    assay_start <- 2L
+    assay_end <- (n_panels * n_assays) + (n_panels * n_int_ctrl) + 1L
+    assay_cols <- paste0("V", assay_start:assay_end)
+
+  } else {
+
+    assay_start <- 2L
+    assay_end <- (n_panels * n_assays) + 1L
+    assay_cols <- paste0("V", assay_start:assay_end)
+
+  }
+
+  # Plate ID columns
+  plate_start <- assay_end + 1L
+  plate_end <- plate_start + n_panels - 1L
+  plate_cols <- paste0("V", plate_start:plate_end)
+
+  # QC Warning columns
+  qc_warn_start <- plate_end + 1L
+  qc_warn_end <- qc_warn_start + n_panels - 1L
+  qc_warn_cols <- paste0("V", qc_warn_start:qc_warn_end)
+
+  # Internal controls columns
+  if (is_shuffled) {
+    # if assays and internal controls are shuffled then select randomly from
+    # the assays
+
+    int_ctrl_cols <- sample(x = assay_cols,
+                            size = (n_panels * n_int_ctrl),
+                            replace = FALSE)
+    assay_cols <- assay_cols[!(assay_cols %in% int_ctrl_cols)]
+
+  } else {
+
+    int_ctrl_start <- qc_warn_end + 1L
+    int_ctrl_end <- int_ctrl_start + (n_panels * n_int_ctrl) - 1L
+    int_ctrl_cols <- paste0("V", int_ctrl_start:int_ctrl_end)
+
+  }
+
+  return(
+    list(
+      assay_cols = assay_cols,
+      plate_cols = plate_cols,
+      qc_warn_cols = qc_warn_cols,
+      int_ctrl_cols = int_ctrl_cols
+    )
+  )
+}
+
 ## Header matrix ----
 
 # return the top 2x2 matrix in the first two rows of an Olink exceli wide file
@@ -401,6 +462,107 @@ npx_wide_middle <- function(n_panels,
   # return ----
 
   return(df)
+}
+
+# takes as input the middle matrix and splits it into its components to help
+# with the testing.
+#
+# output contains df_oid, df_pid, df_qc_warn and df_int_ctrl
+npx_wide_middle_test <- function(df,
+                                 n_panels,
+                                 n_assays,
+                                 data_type,
+                                 is_shuffled,
+                                 cname) {
+
+  # columns to split df into ----
+
+  if (is.null(cname)) {
+    cname <- npx_wide_col_index(n_panels = n_panels,
+                                n_assays = n_assays,
+                                is_shuffled = is_shuffled)
+  }
+
+  # split df ----
+
+  # assays
+  df_oid <- df |>
+    dplyr::select(
+      dplyr::all_of(c("V1", cname$assay_cols))
+    ) |>
+    dplyr::rename(
+      "SampleID" = dplyr::all_of("V1")
+    ) |>
+    tidyr::pivot_longer(
+      -dplyr::all_of("SampleID"),
+      names_to = "col_index",
+      values_to = data_type
+    )
+
+  # plate id
+  df_pid <- df |>
+    dplyr::select(
+      dplyr::all_of(c("V1", cname$plate_cols))
+    ) |>
+    dplyr::rename(
+      "SampleID" = dplyr::all_of("V1")
+    ) |>
+    tidyr::pivot_longer(
+      -dplyr::all_of("SampleID"),
+      names_to = "col_index",
+      values_to = "PlateID"
+    )
+
+  list_df <- list(
+    df_oid = df_oid,
+    df_pid = df_pid
+  )
+
+  if (data_type != "Ct") {
+
+    # qc warning
+    df_qc_warn <- df |>
+      dplyr::select(
+        dplyr::all_of(c("V1", cname$qc_warn_cols))
+      ) |>
+      dplyr::rename(
+        "SampleID" = dplyr::all_of("V1")
+      ) |>
+      tidyr::pivot_longer(
+        -dplyr::all_of("SampleID"),
+        names_to = "col_index",
+        values_to = "QC_Warning"
+      )
+
+    list_df <- append(x = list_df,
+                      values = list(df_qc_warn = df_qc_warn))
+
+    if (data_type == "Quantified") {
+
+      # internal controls
+      df_int_ctrl <- df |>
+        dplyr::select(
+          dplyr::all_of(c("V1", cname$int_ctrl_cols))
+        ) |>
+        dplyr::rename(
+          "SampleID" = dplyr::all_of("V1")
+        ) |>
+        tidyr::pivot_longer(
+          -dplyr::all_of("SampleID"),
+          names_to = "col_index",
+          values_to = data_type
+        )
+
+      list_df <- append(x = list_df,
+                        values = list(df_int_ctrl = df_int_ctrl))
+    }
+
+  }
+
+  # return ----
+
+  return(list_df)
+
 }
 
 ## Bottom matrix ----
@@ -4795,6 +4957,1137 @@ test_that(
                                         col_split = col_s,
                                         assay_cols = a_cols),
           regexp = "Column 1 of the bottom matrix contains uneven rows of plate"
+        )
+
+      }
+    )
+
+  }
+)
+
+# Test read_npx_wide_check_middle ----
+
+test_that(
+  "read_npx_wide_check_middle - wrong combo of data_type and column names",
+  {
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # write something in the file ----
+        writeLines("foo", wide_excel)
+
+        # random df with all possible combos ----
+
+        # all possible values
+        plate_id_cols <- c("V0", NA_character_)
+        qc_warning_cols <- c("V0", NA_character_)
+        assay_cols <- c("V0", NA_character_)
+        internal_ctrl_cols <- c("V0", NA_character_)
+        data_type <- c("Ct", "NPX", "Quantified")
+
+        # create a df with all combos
+        df_combos <- expand.grid(
+          plate_id_cols,
+          qc_warning_cols,
+          assay_cols,
+          internal_ctrl_cols,
+          data_type
+        ) |>
+          dplyr::as_tibble()
+        colnames(df_combos) <- c("plate_id", "qc_warn", "assay",
+                                 "int_ctrl", "data_type")
+
+        # add epected outcome for every single scenario
+        df_combos <- df_combos |>
+          dplyr::mutate(
+            outcome = dplyr::case_when(
+              data_type == "Ct" &
+                !is.na(plate_id) &
+                !is.na(assay) &
+                is.na(qc_warn) &
+                is.na(int_ctrl) ~ "OK",
+              data_type == "NPX" &
+                !is.na(plate_id) &
+                !is.na(assay) &
+                !is.na(qc_warn) &
+                is.na(int_ctrl) ~ "OK",
+              data_type == "Quantified" &
+                !is.na(plate_id) &
+                !is.na(assay) &
+                !is.na(qc_warn) ~ "OK",
+              TRUE ~ "The middle matrix of the Olink wide excel file",
+              .default = NA_character_
+            )
+          ) |>
+          dplyr::mutate(
+            dplyr::across(
+              dplyr::everything(),
+              ~ as.character(.x)
+            )
+          )
+
+        # temporary internal function ----
+
+        # function to return NULL if input is NA
+        na_to_null <- function(x) {
+          if (is.na(x)) {
+            return(NULL)
+          } else {
+            return(paste0("V", 2L:46L))
+          }
+        }
+
+        # run function testing all combos ----
+
+        lapply(
+          seq_len(nrow(df_combos)),
+          function(i) {
+            # tmp df
+            df_combos_tmp <- df_combos |>
+              dplyr::slice(i)
+
+            # test
+            if (df_combos_tmp$outcome == "OK") {
+              expect_no_condition(
+                object = read_npx_wide_check_middle(
+                  df = npx_wide_middle(
+                    n_panels = 1L,
+                    n_assays = 45L,
+                    n_samples = 88L,
+                    data_type = df_combos_tmp$data_type,
+                    show_int_ctrl = TRUE,
+                    shuffle_assays = FALSE
+                  ),
+                  file = wide_excel,
+                  data_type = df_combos_tmp$data_type,
+                  assay_cols = na_to_null(x = df_combos_tmp$assay),
+                  pid_cols = na_to_null(x = df_combos_tmp$plate_id),
+                  qc_warn_cols = na_to_null(x = df_combos_tmp$qc_warn),
+                  int_ctrl_cols = na_to_null(x = df_combos_tmp$int_ctrl)
+                )
+              )
+            } else {
+              expect_error(
+                object = read_npx_wide_check_middle(
+                  df = npx_wide_middle(
+                    n_panels = 1L,
+                    n_assays = 45L,
+                    n_samples = 88L,
+                    data_type = df_combos_tmp$data_type,
+                    show_int_ctrl = TRUE,
+                    shuffle_assays = FALSE
+                  ),
+                  file = wide_excel,
+                  data_type = df_combos_tmp$data_type,
+                  assay_cols = na_to_null(x = df_combos_tmp$assay),
+                  pid_cols = na_to_null(x = df_combos_tmp$plate_id),
+                  qc_warn_cols = na_to_null(x = df_combos_tmp$qc_warn),
+                  int_ctrl_cols = na_to_null(x = df_combos_tmp$int_ctrl)
+                ),
+                regexp = "The middle matrix of the Olink wide excel file"
+              )
+            }
+
+          }
+        )
+
+      }
+    )
+
+  }
+)
+
+test_that(
+  "read_npx_wide_check_middle - non-unique sample id",
+  {
+    # 1 duplicate ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # write something in the file ----
+        writeLines("foo", wide_excel)
+
+        # random middle df ----
+
+        data_t <- "NPX"
+        n_panel <- 2L
+        n_assay <- 45L
+        shuffle <- FALSE
+
+        df <- npx_wide_middle(n_panels = n_panel,
+                              n_assays = n_assay,
+                              n_samples = 88L,
+                              data_type = data_t,
+                              show_int_ctrl = FALSE,
+                              shuffle_assays = shuffle) |>
+          dplyr::mutate(
+            V1 = dplyr::if_else(.data[["V1"]] == "S2", "S1", .data[["V1"]])
+          )
+
+        cname <- npx_wide_col_index(n_panels = n_panel,
+                                    n_assays = n_assay,
+                                    is_shuffled = shuffle)
+
+        # run function ----
+
+        expect_error(
+          object = read_npx_wide_check_middle(df = df,
+                                              file = wide_excel,
+                                              data_type = data_t,
+                                              assay_cols = cname$assay_cols,
+                                              pid_cols = cname$plate_cols,
+                                              qc_warn_cols = cname$qc_warn_cols,
+                                              int_ctrl_cols = NULL),
+          regexp = "does not contain unique sample identifiers."
+        )
+
+      }
+    )
+
+    # 3 duplicates ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # write something in the file ----
+        writeLines("foo", wide_excel)
+
+        # random middle df ----
+
+        data_t <- "NPX"
+        n_panel <- 2L
+        n_assay <- 45L
+        shuffle <- FALSE
+
+        df <- npx_wide_middle(n_panels = n_panel,
+                              n_assays = n_assay,
+                              n_samples = 88L,
+                              data_type = data_t,
+                              show_int_ctrl = FALSE,
+                              shuffle_assays = shuffle) |>
+          dplyr::mutate(
+            V1 = dplyr::case_when(.data[["V1"]] %in% c("S2", "S3") ~ "S1",
+                                  .data[["V1"]] %in% c("S4", "S5") ~ "S2",
+                                  TRUE ~ .data[["V1"]],
+                                  .default = .data[["V1"]])
+          )
+
+        cname <- npx_wide_col_index(n_panels = n_panel,
+                                    n_assays = n_assay,
+                                    is_shuffled = shuffle)
+
+        # run function ----
+
+        expect_error(
+          object = read_npx_wide_check_middle(df = df,
+                                              file = wide_excel,
+                                              data_type = data_t,
+                                              assay_cols = cname$assay_cols,
+                                              pid_cols = cname$plate_cols,
+                                              qc_warn_cols = cname$qc_warn_cols,
+                                              int_ctrl_cols = NULL),
+          regexp = "does not contain unique sample identifiers."
+        )
+
+      }
+    )
+
+  }
+)
+
+# Test read_npx_wide_middle ----
+
+test_that(
+  "read_npx_wide_middle - NPX - works",
+  {
+    # NPX 1 panel ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+        # write something in the excel file ----
+
+        writeLines("foo", wide_excel)
+
+        # create middle df ----
+
+        n_panel <- 1L
+        n_assay <- 45L
+        data_t <- "NPX"
+        n_sample <- 200L
+        shuffle <- FALSE
+        int_ctrl <- TRUE
+
+        df <- npx_wide_middle(n_panels = n_panel,
+                              n_assays = n_assay,
+                              n_samples = n_sample,
+                              data_type = data_t,
+                              show_int_ctrl = int_ctrl,
+                              shuffle_assays = shuffle)
+
+        # get columns ----
+
+        cname <- npx_wide_col_index(n_panels = n_panel,
+                                    n_assays = n_assay,
+                                    is_shuffled = shuffle)
+
+        # run function ----
+
+        expect_no_condition(
+          object =
+            l_obj <- read_npx_wide_middle(
+              df = df,
+              file = wide_excel,
+              data_type = data_t,
+              assay_cols = cname$assay_cols,
+              pid_cols = cname$plate_cols,
+              qc_warn_cols = cname$qc_warn_cols,
+              int_ctrl_cols = NULL
+            )
+        )
+
+        # modify df for tests ----
+
+        l_exp <- npx_wide_middle_test(df = df,
+                                      n_panels = n_panel,
+                                      n_assays = n_assay,
+                                      data_type = data_t,
+                                      is_shuffled = shuffle,
+                                      cname = cname)
+
+        # test on output ----
+
+        expect_identical(
+          object = l_obj$df_oid,
+          expected = l_exp$df_oid
+        )
+
+        expect_identical(
+          object = l_obj$df_pid,
+          expected = l_exp$df_pid
+        )
+
+        if (data_t != "Ct") {
+          expect_identical(
+            object = l_obj$df_qc_warn,
+            expected = l_exp$df_qc_warn
+          )
+        }
+
+        if (data_t != "Quantified"
+            && int_ctrl == TRUE) {
+          expect_identical(
+            object = l_obj$df_int_ctrl,
+            expected = l_exp$df_int_ctrl
+          )
+        }
+
+      }
+    )
+
+    # NPX multi-panel ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+        # write something in the excel file ----
+
+        writeLines("foo", wide_excel)
+
+        # create middle df ----
+
+        n_panel <- 4L
+        n_assay <- 45L
+        data_t <- "NPX"
+        n_sample <- 200L
+        shuffle <- FALSE
+        int_ctrl <- TRUE
+
+        df <- npx_wide_middle(n_panels = n_panel,
+                              n_assays = n_assay,
+                              n_samples = n_sample,
+                              data_type = data_t,
+                              show_int_ctrl = int_ctrl,
+                              shuffle_assays = shuffle)
+
+        # get columns ----
+
+        cname <- npx_wide_col_index(n_panels = n_panel,
+                                    n_assays = n_assay,
+                                    is_shuffled = shuffle)
+
+        # run function ----
+
+        expect_no_condition(
+          object =
+            l_obj <- read_npx_wide_middle(
+              df = df,
+              file = wide_excel,
+              data_type = data_t,
+              assay_cols = cname$assay_cols,
+              pid_cols = cname$plate_cols,
+              qc_warn_cols = cname$qc_warn_cols,
+              int_ctrl_cols = NULL
+            )
+        )
+
+        # modify df for tests ----
+
+        l_exp <- npx_wide_middle_test(df = df,
+                                      n_panels = n_panel,
+                                      n_assays = n_assay,
+                                      data_type = data_t,
+                                      is_shuffled = shuffle,
+                                      cname = cname)
+
+        # test on output ----
+
+        expect_identical(
+          object = l_obj$df_oid,
+          expected = l_exp$df_oid
+        )
+
+        expect_identical(
+          object = l_obj$df_pid,
+          expected = l_exp$df_pid
+        )
+
+        expect_identical(
+          object = l_obj$df_qc_warn,
+          expected = l_exp$df_qc_warn
+        )
+
+      }
+    )
+
+    # Ct 1 panel ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+        # write something in the excel file ----
+
+        writeLines("foo", wide_excel)
+
+        # create middle df ----
+
+        n_panel <- 1L
+        n_assay <- 45L
+        data_t <- "Ct"
+        n_sample <- 200L
+        shuffle <- FALSE
+        int_ctrl <- TRUE
+
+        df <- npx_wide_middle(n_panels = n_panel,
+                              n_assays = n_assay,
+                              n_samples = n_sample,
+                              data_type = data_t,
+                              show_int_ctrl = int_ctrl,
+                              shuffle_assays = shuffle)
+
+        # get columns ----
+
+        cname <- npx_wide_col_index(n_panels = n_panel,
+                                    n_assays = n_assay,
+                                    is_shuffled = shuffle)
+
+        # run function ----
+
+        expect_no_condition(
+          object =
+            l_obj <- read_npx_wide_middle(
+              df = df,
+              file = wide_excel,
+              data_type = data_t,
+              assay_cols = cname$assay_cols,
+              pid_cols = cname$plate_cols,
+              qc_warn_cols = NULL,
+              int_ctrl_cols = NULL
+            )
+        )
+
+        # modify df for tests ----
+
+        l_exp <- npx_wide_middle_test(df = df,
+                                      n_panels = n_panel,
+                                      n_assays = n_assay,
+                                      data_type = data_t,
+                                      is_shuffled = shuffle,
+                                      cname = cname)
+
+        # test on output ----
+
+        expect_identical(
+          object = l_obj$df_oid,
+          expected = l_exp$df_oid
+        )
+
+        expect_identical(
+          object = l_obj$df_pid,
+          expected = l_exp$df_pid
+        )
+
+      }
+    )
+
+    # Ct multi-panel ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+        # write something in the excel file ----
+
+        writeLines("foo", wide_excel)
+
+        # create middle df ----
+
+        n_panel <- 4L
+        n_assay <- 45L
+        data_t <- "Ct"
+        n_sample <- 200L
+        shuffle <- FALSE
+        int_ctrl <- TRUE
+
+        df <- npx_wide_middle(n_panels = n_panel,
+                              n_assays = n_assay,
+                              n_samples = n_sample,
+                              data_type = data_t,
+                              show_int_ctrl = int_ctrl,
+                              shuffle_assays = shuffle)
+
+        # get columns ----
+
+        cname <- npx_wide_col_index(n_panels = n_panel,
+                                    n_assays = n_assay,
+                                    is_shuffled = shuffle)
+
+        # run function ----
+
+        expect_no_condition(
+          object =
+            l_obj <- read_npx_wide_middle(
+              df = df,
+              file = wide_excel,
+              data_type = data_t,
+              assay_cols = cname$assay_cols,
+              pid_cols = cname$plate_cols,
+              qc_warn_cols = NULL,
+              int_ctrl_cols = NULL
+            )
+        )
+
+        # modify df for tests ----
+
+        l_exp <- npx_wide_middle_test(df = df,
+                                      n_panels = n_panel,
+                                      n_assays = n_assay,
+                                      data_type = data_t,
+                                      is_shuffled = shuffle,
+                                      cname = cname)
+
+        # test on output ----
+
+        expect_identical(
+          object = l_obj$df_oid,
+          expected = l_exp$df_oid
+        )
+
+        expect_identical(
+          object = l_obj$df_pid,
+          expected = l_exp$df_pid
+        )
+
+      }
+    )
+
+    # Quantified 1 panel ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+        # write something in the excel file ----
+
+        writeLines("foo", wide_excel)
+
+        # create middle df ----
+
+        n_panel <- 1L
+        n_assay <- 45L
+        data_t <- "Quantified"
+        n_sample <- 200L
+        shuffle <- FALSE
+        int_ctrl <- TRUE
+
+        df <- npx_wide_middle(n_panels = n_panel,
+                              n_assays = n_assay,
+                              n_samples = n_sample,
+                              data_type = data_t,
+                              show_int_ctrl = int_ctrl,
+                              shuffle_assays = shuffle)
+
+        # get columns ----
+
+        cname <- npx_wide_col_index(n_panels = n_panel,
+                                    n_assays = n_assay,
+                                    is_shuffled = shuffle)
+
+        # run function ----
+
+        expect_no_condition(
+          object =
+            l_obj <- read_npx_wide_middle(
+              df = df,
+              file = wide_excel,
+              data_type = data_t,
+              assay_cols = cname$assay_cols,
+              pid_cols = cname$plate_cols,
+              qc_warn_cols = cname$qc_warn_cols,
+              int_ctrl_cols = cname$int_ctrl_cols
+            )
+        )
+
+        # modify df for tests ----
+
+        l_exp <- npx_wide_middle_test(df = df,
+                                      n_panels = n_panel,
+                                      n_assays = n_assay,
+                                      data_type = data_t,
+                                      is_shuffled = shuffle,
+                                      cname = cname)
+
+        # test on output ----
+
+        expect_identical(
+          object = l_obj$df_oid,
+          expected = l_exp$df_oid
+        )
+
+        expect_identical(
+          object = l_obj$df_pid,
+          expected = l_exp$df_pid
+        )
+
+        expect_identical(
+          object = l_obj$df_qc_warn,
+          expected = l_exp$df_qc_warn
+        )
+
+        expect_identical(
+          object = l_obj$df_int_ctrl,
+          expected = l_exp$df_int_ctrl
+        )
+
+      }
+    )
+
+    # Quantified multi-panel ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+        # write something in the excel file ----
+
+        writeLines("foo", wide_excel)
+
+        # create middle df ----
+
+        n_panel <- 4L
+        n_assay <- 45L
+        data_t <- "Quantified"
+        n_sample <- 200L
+        shuffle <- FALSE
+        int_ctrl <- TRUE
+
+        df <- npx_wide_middle(n_panels = n_panel,
+                              n_assays = n_assay,
+                              n_samples = n_sample,
+                              data_type = data_t,
+                              show_int_ctrl = int_ctrl,
+                              shuffle_assays = shuffle)
+
+        # get columns ----
+
+        cname <- npx_wide_col_index(n_panels = n_panel,
+                                    n_assays = n_assay,
+                                    is_shuffled = shuffle)
+
+        # run function ----
+
+        expect_no_condition(
+          object =
+            l_obj <- read_npx_wide_middle(
+              df = df,
+              file = wide_excel,
+              data_type = data_t,
+              assay_cols = cname$assay_cols,
+              pid_cols = cname$plate_cols,
+              qc_warn_cols = cname$qc_warn_cols,
+              int_ctrl_cols = cname$int_ctrl_cols
+            )
+        )
+
+        # modify df for tests ----
+
+        l_exp <- npx_wide_middle_test(df = df,
+                                      n_panels = n_panel,
+                                      n_assays = n_assay,
+                                      data_type = data_t,
+                                      is_shuffled = shuffle,
+                                      cname = cname)
+
+        # test on output ----
+
+        expect_identical(
+          object = l_obj$df_oid,
+          expected = l_exp$df_oid
+        )
+
+        expect_identical(
+          object = l_obj$df_pid,
+          expected = l_exp$df_pid
+        )
+
+        expect_identical(
+          object = l_obj$df_qc_warn,
+          expected = l_exp$df_qc_warn
+        )
+
+        expect_identical(
+          object = l_obj$df_int_ctrl,
+          expected = l_exp$df_int_ctrl
+        )
+
+      }
+    )
+
+    # Quantified multi-panel shuffled ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+        # write something in the excel file ----
+
+        writeLines("foo", wide_excel)
+
+        # create middle df ----
+
+        n_panel <- 4L
+        n_assay <- 45L
+        data_t <- "Quantified"
+        n_sample <- 200L
+        shuffle <- TRUE
+        int_ctrl <- TRUE
+
+        df <- npx_wide_middle(n_panels = n_panel,
+                              n_assays = n_assay,
+                              n_samples = n_sample,
+                              data_type = data_t,
+                              show_int_ctrl = int_ctrl,
+                              shuffle_assays = shuffle)
+
+        # get columns ----
+
+        cname <- npx_wide_col_index(n_panels = n_panel,
+                                    n_assays = n_assay,
+                                    is_shuffled = shuffle)
+
+        # run function ----
+
+        expect_no_condition(
+          object =
+            l_obj <- read_npx_wide_middle(
+              df = df,
+              file = wide_excel,
+              data_type = data_t,
+              assay_cols = cname$assay_cols,
+              pid_cols = cname$plate_cols,
+              qc_warn_cols = cname$qc_warn_cols,
+              int_ctrl_cols = cname$int_ctrl_cols
+            )
+        )
+
+        # modify df for tests ----
+
+        l_exp <- npx_wide_middle_test(df = df,
+                                      n_panels = n_panel,
+                                      n_assays = n_assay,
+                                      data_type = data_t,
+                                      is_shuffled = shuffle,
+                                      cname = cname)
+
+        # test on output ----
+
+        expect_identical(
+          object = l_obj$df_oid,
+          expected = l_exp$df_oid
+        )
+
+        expect_identical(
+          object = l_obj$df_pid,
+          expected = l_exp$df_pid
+        )
+
+        expect_identical(
+          object = l_obj$df_qc_warn,
+          expected = l_exp$df_qc_warn
+        )
+
+        expect_identical(
+          object = l_obj$df_int_ctrl,
+          expected = l_exp$df_int_ctrl
+        )
+
+      }
+    )
+  }
+)
+
+test_that(
+  "read_npx_wide_middle - uneven number of platid and qc_warning",
+  {
+    # Missing plateid column ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # write something in the file ----
+        writeLines("foo", wide_excel)
+
+        # random middle df ----
+
+        data_t <- "NPX"
+        n_panel <- 2L
+        n_assay <- 45L
+        shuffle <- FALSE
+
+        df <- npx_wide_middle(n_panels = n_panel,
+                              n_assays = n_assay,
+                              n_samples = 88L,
+                              data_type = data_t,
+                              show_int_ctrl = FALSE,
+                              shuffle_assays = shuffle)
+
+        cname <- npx_wide_col_index(n_panels = n_panel,
+                                    n_assays = n_assay,
+                                    is_shuffled = shuffle)
+
+        # remove one column with "Plate ID"
+        df <- df |>
+          dplyr::select(
+            -dplyr::all_of(cname$plate_cols[1])
+          )
+        cname$plate_cols <- cname$plate_cols[cname$plate_cols
+                                             != cname$plate_cols[1]]
+
+        # run function ----
+
+        expect_error(
+          object = read_npx_wide_middle(df = df,
+                                        file = wide_excel,
+                                        data_type = data_t,
+                                        assay_cols = cname$assay_cols,
+                                        pid_cols = cname$plate_cols,
+                                        qc_warn_cols = cname$qc_warn_cols,
+                                        int_ctrl_cols = NULL),
+          regexp = "Uneven number of entries of \"Plate ID\" and \"QC Warning\""
+        )
+
+      }
+    )
+
+    # Missing qc warning column ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # write something in the file ----
+        writeLines("foo", wide_excel)
+
+        # random middle df ----
+
+        data_t <- "NPX"
+        n_panel <- 2L
+        n_assay <- 45L
+        shuffle <- FALSE
+
+        df <- npx_wide_middle(n_panels = n_panel,
+                              n_assays = n_assay,
+                              n_samples = 88L,
+                              data_type = data_t,
+                              show_int_ctrl = FALSE,
+                              shuffle_assays = shuffle)
+
+        cname <- npx_wide_col_index(n_panels = n_panel,
+                                    n_assays = n_assay,
+                                    is_shuffled = shuffle)
+
+        # remove one column with "QC Warning"
+        df <- df |>
+          dplyr::select(
+            -dplyr::all_of(cname$qc_warn_cols[1])
+          )
+        cname$qc_warn_cols <- cname$qc_warn_cols[cname$qc_warn_cols
+                                                 != cname$qc_warn_cols[1]]
+
+        # run function ----
+
+        expect_error(
+          object = read_npx_wide_middle(df = df,
+                                        file = wide_excel,
+                                        data_type = data_t,
+                                        assay_cols = cname$assay_cols,
+                                        pid_cols = cname$plate_cols,
+                                        qc_warn_cols = cname$qc_warn_cols,
+                                        int_ctrl_cols = NULL),
+          regexp = "Uneven number of entries of \"Plate ID\" and \"QC Warning\""
+        )
+
+      }
+    )
+
+  }
+)
+
+test_that(
+  "read_npx_wide_middle - uneven number of internal controls",
+  {
+    # Not shuffled internal controls ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # write something in the file ----
+        writeLines("foo", wide_excel)
+
+        # random middle df ----
+
+        data_t <- "Quantified"
+        n_panel <- 2L
+        n_assay <- 45L
+        shuffle <- FALSE
+
+        df <- npx_wide_middle(n_panels = n_panel,
+                              n_assays = n_assay,
+                              n_samples = 88L,
+                              data_type = data_t,
+                              show_int_ctrl = TRUE,
+                              shuffle_assays = shuffle)
+
+        cname <- npx_wide_col_index(n_panels = n_panel,
+                                    n_assays = n_assay,
+                                    is_shuffled = shuffle)
+
+        # remove one column with "Internal Control"
+        df <- df |>
+          dplyr::select(
+            -dplyr::all_of(cname$int_ctrl_cols[1])
+          )
+        cname$int_ctrl_cols <- cname$int_ctrl_cols[cname$int_ctrl_cols
+                                                   != cname$int_ctrl_cols[1]]
+
+        # run function ----
+
+        expect_error(
+          object = read_npx_wide_middle(df = df,
+                                        file = wide_excel,
+                                        data_type = data_t,
+                                        assay_cols = cname$assay_cols,
+                                        pid_cols = cname$plate_cols,
+                                        qc_warn_cols = cname$qc_warn_cols,
+                                        int_ctrl_cols = cname$int_ctrl_cols),
+          regexp = "Uneven number of entries of \"Internal Control\" assays in"
+        )
+
+      }
+    )
+
+    # Shuffled internal controls ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # write something in the file ----
+        writeLines("foo", wide_excel)
+
+        # random middle df ----
+
+        data_t <- "Quantified"
+        n_panel <- 2L
+        n_assay <- 45L
+        shuffle <- TRUE
+
+        df <- npx_wide_middle(n_panels = n_panel,
+                              n_assays = n_assay,
+                              n_samples = 88L,
+                              data_type = data_t,
+                              show_int_ctrl = TRUE,
+                              shuffle_assays = shuffle)
+
+        cname <- npx_wide_col_index(n_panels = n_panel,
+                                    n_assays = n_assay,
+                                    is_shuffled = shuffle)
+
+        # remove one column with "Internal Control"
+        df <- df |>
+          dplyr::select(
+            -dplyr::all_of(cname$int_ctrl_cols[1])
+          )
+        cname$int_ctrl_cols <- cname$int_ctrl_cols[cname$int_ctrl_cols
+                                                   != cname$int_ctrl_cols[1]]
+
+        # run function ----
+
+        expect_error(
+          object = read_npx_wide_middle(df = df,
+                                        file = wide_excel,
+                                        data_type = data_t,
+                                        assay_cols = cname$assay_cols,
+                                        pid_cols = cname$plate_cols,
+                                        qc_warn_cols = cname$qc_warn_cols,
+                                        int_ctrl_cols = cname$int_ctrl_cols),
+          regexp = "Uneven number of entries of \"Internal Control\" assays in"
+        )
+
+      }
+    )
+
+    # 2 internal controls - NO ERROR ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # write something in the file ----
+        writeLines("foo", wide_excel)
+
+        # random middle df ----
+
+        data_t <- "Quantified"
+        n_panel <- 2L
+        n_assay <- 45L
+        shuffle <- TRUE
+
+        df <- npx_wide_middle(n_panels = n_panel,
+                              n_assays = n_assay,
+                              n_samples = 88L,
+                              data_type = data_t,
+                              show_int_ctrl = TRUE,
+                              shuffle_assays = shuffle)
+
+        cname <- npx_wide_col_index(n_panels = n_panel,
+                                    n_assays = n_assay,
+                                    is_shuffled = shuffle)
+
+        # remove one column with "Internal Control"
+        df <- df |>
+          dplyr::select(
+            -dplyr::all_of(cname$int_ctrl_cols[1:2])
+          )
+        cname$int_ctrl_cols <- cname$int_ctrl_cols[!(
+          cname$int_ctrl_cols %in% cname$int_ctrl_cols[1:2]
+        )]
+
+        # run function ----
+
+        expect_no_condition(
+          object = read_npx_wide_middle(df = df,
+                                        file = wide_excel,
+                                        data_type = data_t,
+                                        assay_cols = cname$assay_cols,
+                                        pid_cols = cname$plate_cols,
+                                        qc_warn_cols = cname$qc_warn_cols,
+                                        int_ctrl_cols = cname$int_ctrl_cols)
+        )
+
+      }
+    )
+
+    # 1 internal controls - NO ERROR ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # write something in the file ----
+        writeLines("foo", wide_excel)
+
+        # random middle df ----
+
+        data_t <- "Quantified"
+        n_panel <- 2L
+        n_assay <- 45L
+        shuffle <- FALSE
+
+        df <- npx_wide_middle(n_panels = n_panel,
+                              n_assays = n_assay,
+                              n_samples = 88L,
+                              data_type = data_t,
+                              show_int_ctrl = TRUE,
+                              shuffle_assays = shuffle)
+
+        cname <- npx_wide_col_index(n_panels = n_panel,
+                                    n_assays = n_assay,
+                                    is_shuffled = shuffle)
+
+        # remove one column with "Internal Control"
+        df <- df |>
+          dplyr::select(
+            -dplyr::all_of(cname$int_ctrl_cols[1:4])
+          )
+        cname$int_ctrl_cols <- cname$int_ctrl_cols[!(
+          cname$int_ctrl_cols %in% cname$int_ctrl_cols[1:4]
+        )]
+
+        # run function ----
+
+        expect_no_condition(
+          object = read_npx_wide_middle(df = df,
+                                        file = wide_excel,
+                                        data_type = data_t,
+                                        assay_cols = cname$assay_cols,
+                                        pid_cols = cname$plate_cols,
+                                        qc_warn_cols = cname$qc_warn_cols,
+                                        int_ctrl_cols = cname$int_ctrl_cols)
         )
 
       }

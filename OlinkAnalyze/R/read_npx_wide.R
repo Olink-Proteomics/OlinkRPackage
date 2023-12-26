@@ -28,7 +28,7 @@ read_npx_wide <- function(file,
     data_type = data_type
   )
 
-  # split top df ----
+  # top list of df to long ----
 
   df_top_list <- read_npx_wide_top_split(
     df = df_split$df_top,
@@ -36,6 +36,21 @@ read_npx_wide <- function(file,
     data_type = data_type,
     olink_platform = olink_platform
   )
+
+  # get col_split that splits left from right hand side matrix
+  col_split <- df_top_list$df_meta |>
+    dplyr::filter(
+      .data[["Var"]] == "Plate ID"
+    ) |>
+    dplyr::arrange(
+      .data[["col_index"]]
+    ) |>
+    dplyr::slice_head(
+      n = 1L
+    ) |>
+    dplyr::pull(
+      .data[["col_index"]]
+    )
 
   # bottom df to long ----
 
@@ -46,29 +61,15 @@ read_npx_wide <- function(file,
       df = df_split$df_bottom,
       file = file,
       data_type = data_type,
-      col_split = { # get col_split that splits left from right hand side matrix
-        df_top_list$df_meta |>
-          dplyr::filter(
-            .data[["Var"]] == "Plate ID"
-          ) |>
-          dplyr::arrange(
-            .data[["col_index"]]
-          ) |>
-          dplyr::slice_head(
-            n = 1L
-          ) |>
-          dplyr::pull(
-            .data[["col_index"]]
-          )
-      },
+      col_split = col_split,
       assay_cols = df_top_list$df_oid$col_index
     )
 
   }
 
-  # function vector of SampleID
-  # function vector of OlinkID
-  # function df_mid meta
+  # middle list of df to long ----
+
+
 
 }
 
@@ -366,6 +367,8 @@ read_npx_wide_check_top <- function(df,
 #' Help function that splits df_top from a Olink wide excel file into 3 data
 #' frames.
 #'
+#' @author Klev Diamanti
+#'
 #' @param df The top data frame from a split Olink wide excel file.
 #' @param file The input excel file.
 #' @param data_type The quantification in which the data comes in. Expecting one
@@ -549,6 +552,8 @@ read_npx_wide_top_split <- function(df,
 }
 
 #' Help function that converts df_bottom into long format.
+#'
+#' @author Klev Diamanti
 #'
 #' @param df The bottom data frame from a split Olink wide excel file.
 #' @param file The input excel file.
@@ -768,5 +773,349 @@ read_npx_wide_bottom <- function(df,
   }
 
   return(df_long)
+
+}
+
+#' Help function to check df_mid for potential inconsistencies.
+#'
+#' @author Klev Diamanti
+#'
+#' @param df The middle data frame from a split Olink wide excel file.
+#' @param file The input excel file.
+#' @param data_type The quantification in which the data comes in. Expecting one
+#' of NPX or Quantified.
+#' @param assay_cols Character vector with the names of the columns containing
+#' Olink assays.
+#' @param pid_cols Character vector with the names of the columns containing
+#' "Plate ID".
+#' @param qc_warn_cols Character vector with the names of the columns containing
+#' "QC Warning".
+#' @param int_ctrl_cols Character vector with the names of the columns
+#' containing "Internal Controls".
+#'
+#' @return Nothing or an error if inconsistencies are detected.
+#'
+read_npx_wide_check_middle <- function(df,
+                                       file,
+                                       data_type,
+                                       assay_cols,
+                                       pid_cols,
+                                       qc_warn_cols,
+                                       int_ctrl_cols) {
+  # check input ----
+
+  check_is_data_frame(df = df,
+                      error = TRUE)
+
+  check_file_exists(file = file,
+                    error = TRUE)
+
+  check_olink_data_type(x = data_type,
+                        broader_platform = "qPCR")
+
+  if (!is.null(assay_cols)) {
+    check_is_character(string = assay_cols,
+                       error = TRUE)
+  }
+
+  if (!is.null(pid_cols)) {
+    check_is_character(string = pid_cols,
+                       error = TRUE)
+  }
+
+  if (!is.null(qc_warn_cols)) {
+    check_is_character(string = qc_warn_cols,
+                       error = TRUE)
+  }
+
+  if (!is.null(int_ctrl_cols)) {
+    check_is_character(string = int_ctrl_cols,
+                       error = TRUE)
+  }
+
+  # check matches of data_type to input ----
+
+  # creating a control string from bits of the input flags.
+  # This was done to lower the complexity of the function.
+  assay_str <- ifelse(is.null(assay_cols), "0", "1")
+  plate_id_str <- ifelse(is.null(pid_cols), "0", "1")
+  qc_warn_str <- ifelse(is.null(qc_warn_cols), "0", "1")
+  int_sctrl_str <- ifelse(is.null(int_ctrl_cols), "0", "1")
+  cols_str <- paste0(assay_str, plate_id_str, qc_warn_str, int_sctrl_str)
+
+  if (data_type == "Ct"
+      && cols_str != "1100") {
+    # when data_type is Ct then assay_cols and pid_cols are required to have
+    # values.
+    # qc_warn_cols and int_ctrl_cols should be NULL.
+
+    cli::cli_abort(
+      message = c(
+        "x" = "The middle matrix of the Olink wide excel file {.file {file}}
+        contains unexpected components. Files with {.arg data_type} =
+        {.val {data_type}} should have assay measurements and plate id!",
+        "i" = "Has the excel file been modified manually?"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
+  } else if (data_type == "NPX"
+             && cols_str != "1110") {
+    # when data_type is NPX then assay_cols, pid_cols and qc_warn_cols are
+    # required to have values.
+    # int_ctrl_cols should be NULL.
+
+    cli::cli_abort(
+      message = c(
+        "x" = "The middle matrix of the Olink wide excel file {.file {file}}
+        contains unexpected components. Files with {.arg data_type} =
+        {.val {data_type}} should have assay measurements, plate id and QC
+        warning!",
+        "i" = "Has the excel file been modified manually?"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
+  } else if (data_type == "Quantified"
+             && !(cols_str %in% c("1110", "1111"))) {
+    # when data_type is NPX then assay_cols, pid_cols and qc_warn_cols are
+    # required to have values.
+    # int_ctrl_cols may be NULL or contain values.
+
+    cli::cli_abort(
+      message = c(
+        "x" = "The middle matrix of the Olink wide excel file {.file {file}}
+        contains unexpected components. Files with {.arg data_type} =
+        {.val {data_type}} should have assay measurements, plate id and QC
+        warning, and, not necessarily, internal controls!",
+        "i" = "Has the excel file been modified manually?"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
+  }
+
+  # check unique sample id ----
+
+  check_columns(df = df, col_list = list("V1"))
+
+  n_uniq_sample <- dplyr::pull(df, .data[["V1"]]) |> unique() |> length()
+  if (nrow(df) != n_uniq_sample) {
+
+    cli::cli_abort(
+      message = c(
+        "x" = "The middle matrix in file {.file {file}} does not contain unique
+        sample identifiers. Identified {nrow(df) - n_uniq_sample} duplicates!",
+        "i" = "Has the excel file been modified manually?"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
+  }
+
+}
+
+#' Help function that splits df_mid from a Olink wide excel file into 4 data
+#' frames.
+#'
+#' @author Klev Diamanti
+#'
+#' @param df The middle data frame from a split Olink wide excel file.
+#' @param file The input excel file.
+#' @param data_type The quantification in which the data comes in. Expecting one
+#' of NPX or Quantified.
+#' @param assay_cols Character vector with the names of the columns containing
+#' Olink assays.
+#' @param pid_cols Character vector with the names of the columns containing
+#' "Plate ID".
+#' @param qc_warn_cols Character vector with the names of the columns containing
+#' "QC Warning".
+#' @param int_ctrl_cols Character vector with the names of the columns
+#' containing "Internal Controls".
+#'
+#' @return A list of data frames (df_oid, df_pid, df_qc_warn and df_int_ctrl) in
+#' long format from the middle matrix of the Olink wide excel file.
+#'
+read_npx_wide_middle <- function(df,
+                                 file,
+                                 data_type,
+                                 assay_cols,
+                                 pid_cols,
+                                 qc_warn_cols,
+                                 int_ctrl_cols) {
+
+  # check input and middle matrix ----
+
+  read_npx_wide_check_middle(df = df,
+                             file = file,
+                             data_type = data_type,
+                             assay_cols = assay_cols,
+                             pid_cols = pid_cols,
+                             qc_warn_cols = qc_warn_cols,
+                             int_ctrl_cols = int_ctrl_cols)
+
+  # split datasets ----
+
+  ## split assays and pivot to longer ----
+
+  # check all columns exist
+  check_columns(df = df, col_list = as.list(assay_cols))
+
+  df_oid <- df |>
+    dplyr::select(
+      dplyr::all_of(c("V1", assay_cols))
+    ) |>
+    dplyr::rename(
+      "SampleID" = dplyr::all_of("V1")
+    ) |>
+    tidyr::pivot_longer(
+      -dplyr::all_of("SampleID"),
+      names_to = "col_index",
+      values_to = data_type
+    )
+
+  ## split plates and pivot to longer ----
+
+  # check all columns exist
+  check_columns(df = df, col_list = as.list(pid_cols))
+
+  df_pid <- df |>
+    dplyr::select(
+      dplyr::all_of(c("V1", pid_cols))
+    ) |>
+    dplyr::rename(
+      "SampleID" = dplyr::all_of("V1")
+    ) |>
+    tidyr::pivot_longer(
+      -dplyr::all_of("SampleID"),
+      names_to = "col_index",
+      values_to = "PlateID"
+    )
+
+  ## split qc_warnings and pivot to longer ----
+
+  # done only if the are columns with QC Warning
+  if (!is.null(qc_warn_cols)) {
+
+    # check all columns exist
+    check_columns(df = df, col_list = as.list(qc_warn_cols))
+
+    df_qc_warn <- df |>
+      dplyr::select(
+        dplyr::all_of(c("V1", qc_warn_cols))
+      ) |>
+      dplyr::rename(
+        "SampleID" = dplyr::all_of("V1")
+      ) |>
+      tidyr::pivot_longer(
+        -dplyr::all_of("SampleID"),
+        names_to = "col_index",
+        values_to = "QC_Warning"
+      )
+
+  }
+
+  ## split internal_controls and pivot to longer ----
+
+  # done only if the are columns with QC Warning
+  if (!is.null(int_ctrl_cols)) {
+
+    # check all columns exist
+    check_columns(df = df, col_list = as.list(int_ctrl_cols))
+
+    df_int_ctrl <- df |>
+      dplyr::select(
+        dplyr::all_of(c("V1", int_ctrl_cols))
+      ) |>
+      dplyr::rename(
+        "SampleID" = dplyr::all_of("V1")
+      ) |>
+      tidyr::pivot_longer(
+        -dplyr::all_of("SampleID"),
+        names_to = "col_index",
+        values_to = data_type
+      )
+  }
+
+  # checks ---------
+
+  ## check number of rows in plate and qc_warning data frames ----
+
+  # done only if the are columns with QC Warning
+  if (!is.null(qc_warn_cols)) {
+
+    if (nrow(df_pid) != nrow(df_qc_warn)) {
+
+      cli::cli_abort(
+        message = c(
+          "x" = "Uneven number of entries of \"Plate ID\" and \"QC Warning\" in
+          the middle matrix of the Olink wide excel file {.file {file}}!",
+          "i" = "Has the excel file been modified manually?"
+        ),
+        call = rlang::caller_env(),
+        wrap = FALSE
+      )
+
+    }
+
+  }
+
+  ## check correct number of internal controls ----
+
+  if (!is.null(int_ctrl_cols)) {
+
+    # identify number of internal control assays
+    int_ctrl_num <- c(3L, 2L, 1L)
+    mod_int_ctrl <- (length(int_ctrl_cols) / length(pid_cols)) %% int_ctrl_num
+    names(mod_int_ctrl) <- int_ctrl_num
+    n_int_ctrl <- utils::head(x = mod_int_ctrl[mod_int_ctrl == 0L],
+                              n = 1L) |>
+      names() |>
+      as.integer()
+    # if none of the modulos works assume 1 internal control
+    n_int_ctrl <- ifelse(identical(n_int_ctrl, integer(0L)), 1L, n_int_ctrl)
+
+    # number of unique samples
+    n_uniq_sample <- dplyr::pull(df, .data[["V1"]]) |> unique() |> length()
+
+    # check
+    if (nrow(df_int_ctrl) != (n_uniq_sample * n_int_ctrl * length(pid_cols))) {
+
+      cli::cli_abort(
+        message = c(
+          "x" = "Uneven number of entries of \"Internal Control\" assays in
+          the middle matrix of the Olink wide excel file {.file {file}}!",
+          "i" = "Has the excel file been modified manually?"
+        ),
+        call = rlang::caller_env(),
+        wrap = FALSE
+      )
+
+    }
+
+  }
+
+  # return ----
+
+  list_df <- list(
+    df_oid = df_oid,
+    df_pid = df_pid
+  )
+
+  if (!is.null(qc_warn_cols)) {
+    list_df <- append(x = list_df,
+                      values = list(df_qc_warn = df_qc_warn))
+  }
+
+  if (!is.null(int_ctrl_cols)) {
+    list_df <- append(x = list_df,
+                      values = list(df_int_ctrl = df_int_ctrl))
+  }
+
+  return(list_df)
 
 }
