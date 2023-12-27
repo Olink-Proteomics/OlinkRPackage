@@ -1953,7 +1953,6 @@ test_that(
         expect_no_condition(
           object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
-                                           data_type = data_t,
                                            format_spec = format_s)
         )
 
@@ -1996,7 +1995,6 @@ test_that(
         expect_no_condition(
           object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
-                                           data_type = data_t,
                                            format_spec = format_s)
         )
 
@@ -2039,7 +2037,6 @@ test_that(
         expect_no_condition(
           object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
-                                           data_type = data_t,
                                            format_spec = format_s)
         )
 
@@ -2082,7 +2079,6 @@ test_that(
         expect_no_condition(
           object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
-                                           data_type = data_t,
                                            format_spec = format_s)
         )
 
@@ -2125,7 +2121,6 @@ test_that(
         expect_no_condition(
           object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
-                                           data_type = data_t,
                                            format_spec = format_s)
         )
 
@@ -2168,7 +2163,6 @@ test_that(
         expect_no_condition(
           object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
-                                           data_type = data_t,
                                            format_spec = format_s)
         )
 
@@ -2211,7 +2205,6 @@ test_that(
         expect_no_condition(
           object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
-                                           data_type = data_t,
                                            format_spec = format_s)
         )
 
@@ -2263,7 +2256,6 @@ test_that(
         expect_error(
           object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
-                                           data_type = data_t,
                                            format_spec = format_s),
           regexp = "Column 1 of of the top matrix with assay metadata in file"
         )
@@ -2324,7 +2316,6 @@ test_that(
         expect_error(
           object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
-                                           data_type = data_t,
                                            format_spec = format_s),
           regexp = "Column 1 of of the top matrix with assay metadata in file"
         )
@@ -2379,7 +2370,6 @@ test_that(
         expect_error(
           object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
-                                           data_type = data_t,
                                            format_spec = format_s),
           regexp = "Columns 2 and 3 of of the top matrix with assay metadata in"
         )
@@ -2428,7 +2418,6 @@ test_that(
         expect_error(
           object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
-                                           data_type = data_t,
                                            format_spec = format_s),
           regexp = "Columns 2 and 3 of of the top matrix with assay metadata in"
         )
@@ -2477,7 +2466,6 @@ test_that(
         expect_error(
           object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
-                                           data_type = data_t,
                                            format_spec = format_s),
           regexp = "Columns 2 and 3 of of the top matrix with assay metadata in"
         )
@@ -2527,7 +2515,6 @@ test_that(
         expect_no_condition(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
-                                                    data_type = data_t,
                                                     olink_platform = o_platform,
                                                     format_spec = format_s)
         )
@@ -2590,7 +2577,6 @@ test_that(
         expect_no_condition(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
-                                                    data_type = data_t,
                                                     olink_platform = o_platform,
                                                     format_spec = format_s)
         )
@@ -2648,7 +2634,6 @@ test_that(
         expect_no_condition(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
-                                                    data_type = data_t,
                                                     olink_platform = o_platform,
                                                     format_spec = format_s)
         )
@@ -2716,7 +2701,6 @@ test_that(
         expect_no_condition(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
-                                                    data_type = data_t,
                                                     olink_platform = o_platform,
                                                     format_spec = format_s)
         )
@@ -2785,7 +2769,6 @@ test_that(
         expect_no_condition(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
-                                                    data_type = data_t,
                                                     olink_platform = o_platform,
                                                     format_spec = format_s)
         )
@@ -2848,7 +2831,6 @@ test_that(
         expect_no_condition(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
-                                                    data_type = data_t,
                                                     olink_platform = o_platform,
                                                     format_spec = format_s)
         )
@@ -2906,7 +2888,6 @@ test_that(
         expect_no_condition(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
-                                                    data_type = data_t,
                                                     olink_platform = o_platform,
                                                     format_spec = format_s)
         )
@@ -2974,7 +2955,6 @@ test_that(
         expect_no_condition(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
-                                                    data_type = data_t,
                                                     olink_platform = o_platform,
                                                     format_spec = format_s)
         )
@@ -3043,7 +3023,6 @@ test_that(
         expect_no_condition(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
-                                                    data_type = data_t,
                                                     olink_platform = o_platform,
                                                     format_spec = format_s)
         )
@@ -3106,7 +3085,6 @@ test_that(
         expect_no_condition(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
-                                                    data_type = data_t,
                                                     olink_platform = o_platform,
                                                     format_spec = format_s)
         )
@@ -3170,7 +3148,6 @@ test_that(
         expect_no_condition(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
-                                                    data_type = data_t,
                                                     olink_platform = o_platform,
                                                     format_spec = format_s)
         )
@@ -3233,7 +3210,6 @@ test_that(
         expect_no_condition(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
-                                                    data_type = data_t,
                                                     olink_platform = o_platform,
                                                     format_spec = format_s)
         )
@@ -3297,7 +3273,6 @@ test_that(
         expect_no_condition(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
-                                                    data_type = data_t,
                                                     olink_platform = o_platform,
                                                     format_spec = format_s)
         )
@@ -3360,7 +3335,6 @@ test_that(
         expect_no_condition(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
-                                                    data_type = data_t,
                                                     olink_platform = o_platform,
                                                     format_spec = format_s)
         )
@@ -3418,7 +3392,6 @@ test_that(
         expect_no_condition(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
-                                                    data_type = data_t,
                                                     olink_platform = o_platform,
                                                     format_spec = format_s)
         )
@@ -3486,7 +3459,6 @@ test_that(
         expect_no_condition(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
-                                                    data_type = data_t,
                                                     olink_platform = o_platform,
                                                     format_spec = format_s)
         )
@@ -3555,7 +3527,6 @@ test_that(
         expect_no_condition(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
-                                                    data_type = data_t,
                                                     olink_platform = o_platform,
                                                     format_spec = format_s)
         )
@@ -3618,7 +3589,6 @@ test_that(
         expect_no_condition(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
-                                                    data_type = data_t,
                                                     olink_platform = o_platform,
                                                     format_spec = format_s)
         )
@@ -3676,7 +3646,6 @@ test_that(
         expect_no_condition(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
-                                                    data_type = data_t,
                                                     olink_platform = o_platform,
                                                     format_spec = format_s)
         )
@@ -3744,7 +3713,6 @@ test_that(
         expect_no_condition(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
-                                                    data_type = data_t,
                                                     olink_platform = o_platform,
                                                     format_spec = format_s)
         )
@@ -3834,7 +3802,6 @@ test_that(
         expect_error(
           object = read_npx_wide_top_split(df = df,
                                            file = wide_excel,
-                                           data_type = data_t,
                                            olink_platform = o_platform,
                                            format_spec = format_s),
           regexp = "The top matrix with the assays metadata in file"
@@ -3877,7 +3844,6 @@ test_that(
         expect_error(
           object = read_npx_wide_top_split(df = df,
                                            file = wide_excel,
-                                           data_type = "Ct",
                                            olink_platform = o_platform,
                                            format_spec = format_s),
           regexp = "The top matrix with the assays metadata in file"
@@ -3923,7 +3889,6 @@ test_that(
         expect_error(
           object = read_npx_wide_top_split(df = df,
                                            file = wide_excel,
-                                           data_type = "NPX",
                                            olink_platform = o_platform,
                                            format_spec = format_s),
           regexp = "The top matrix with the assays metadata in file"
@@ -3978,7 +3943,6 @@ test_that(
         expect_error(
           object = read_npx_wide_top_split(df = df,
                                            file = wide_excel,
-                                           data_type = data_t,
                                            olink_platform = o_platform,
                                            format_spec = format_s),
           regexp = "Detected 1 empty cells in columns"
@@ -4034,7 +3998,6 @@ test_that(
         expect_error(
           object = read_npx_wide_top_split(df = df,
                                            file = wide_excel,
-                                           data_type = data_t,
                                            olink_platform = o_platform,
                                            format_spec = format_s),
           regexp = "Detected 4 empty cells in columns"
@@ -4083,7 +4046,6 @@ test_that(
         expect_error(
           object = read_npx_wide_top_split(df = df,
                                            file = wide_excel,
-                                           data_type = data_t,
                                            olink_platform = o_platform,
                                            format_spec = format_s),
           regexp = "Detected 40 assays in 1 panels in file"
@@ -4126,7 +4088,6 @@ test_that(
         expect_error(
           object = read_npx_wide_top_split(df = df,
                                            file = wide_excel,
-                                           data_type = data_t,
                                            olink_platform = o_platform,
                                            format_spec = format_s),
           regexp = "Detected 64 assays in 2 panels in file"
@@ -4168,7 +4129,6 @@ test_that(
         expect_error(
           object = read_npx_wide_top_split(df = df,
                                            file = wide_excel,
-                                           data_type = data_t,
                                            olink_platform = o_platform,
                                            format_spec = format_s),
           regexp = "Detected 67 assays in 1 panels in file"
@@ -4211,7 +4171,6 @@ test_that(
         expect_error(
           object = read_npx_wide_top_split(df = df,
                                            file = wide_excel,
-                                           data_type = data_t,
                                            olink_platform = o_platform,
                                            format_spec = format_s),
           regexp = "Detected 156 assays in 2 panels in file"
@@ -4263,7 +4222,6 @@ test_that(
         expect_error(
           object = read_npx_wide_top_split(df = df,
                                            file = wide_excel,
-                                           data_type = data_t,
                                            olink_platform = o_platform,
                                            format_spec = format_s),
           regexp = "Expected equal number of \"Plate ID\" and \"QC\ Warning\""
@@ -4312,7 +4270,6 @@ test_that(
         expect_no_condition(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
-                                                    data_type = data_t,
                                                     olink_platform = o_platform,
                                                     format_spec = format_s)
         )
@@ -4375,7 +4332,6 @@ test_that(
         expect_no_condition(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
-                                                    data_type = data_t,
                                                     olink_platform = o_platform,
                                                     format_spec = format_s)
         )
@@ -4445,7 +4401,6 @@ test_that(
         expect_no_condition(
           object = df_b <- read_npx_wide_bottom(df = df,
                                                 file = wide_excel,
-                                                data_type = data_t,
                                                 col_split = col_s,
                                                 assay_cols = a_cols,
                                                 format_spec = format_s)
@@ -4512,7 +4467,6 @@ test_that(
           expect_no_warning(
             object = df_b <- read_npx_wide_bottom(df = df,
                                                   file = wide_excel,
-                                                  data_type = data_t,
                                                   col_split = col_s,
                                                   assay_cols = a_cols,
                                                   format_spec = format_s)
@@ -4580,7 +4534,6 @@ test_that(
         expect_no_condition(
           object = df_b <- read_npx_wide_bottom(df = df,
                                                 file = wide_excel,
-                                                data_type = data_t,
                                                 col_split = col_s,
                                                 assay_cols = a_cols,
                                                 format_spec = format_s)
@@ -4647,7 +4600,6 @@ test_that(
           expect_no_warning(
             object = df_b <- read_npx_wide_bottom(df = df,
                                                   file = wide_excel,
-                                                  data_type = data_t,
                                                   col_split = col_s,
                                                   assay_cols = a_cols,
                                                   format_spec = format_s)
@@ -4713,7 +4665,6 @@ test_that(
         expect_no_condition(
           object = df_b <- read_npx_wide_bottom(df = df,
                                                 file = wide_excel,
-                                                data_type = data_t,
                                                 col_split = col_s,
                                                 assay_cols = a_cols,
                                                 format_spec = format_s)
@@ -4778,7 +4729,6 @@ test_that(
         expect_no_condition(
           object = df_b <- read_npx_wide_bottom(df = df,
                                                 file = wide_excel,
-                                                data_type = data_t,
                                                 col_split = col_s,
                                                 assay_cols = a_cols,
                                                 format_spec = format_s)
@@ -4845,7 +4795,6 @@ test_that(
         expect_no_condition(
           object = df_b <- read_npx_wide_bottom(df = df,
                                                 file = wide_excel,
-                                                data_type = data_t,
                                                 col_split = col_s,
                                                 assay_cols = a_cols,
                                                 format_spec = format_s)
@@ -4912,7 +4861,6 @@ test_that(
           expect_no_warning(
             object = df_b <- read_npx_wide_bottom(df = df,
                                                   file = wide_excel,
-                                                  data_type = data_t,
                                                   col_split = col_s,
                                                   assay_cols = a_cols,
                                                   format_spec = format_s)
@@ -4980,7 +4928,6 @@ test_that(
         expect_no_condition(
           object = df_b <- read_npx_wide_bottom(df = df,
                                                 file = wide_excel,
-                                                data_type = data_t,
                                                 col_split = col_s,
                                                 assay_cols = a_cols,
                                                 format_spec = format_s)
@@ -5047,7 +4994,6 @@ test_that(
           expect_no_warning(
             object = df_b <- read_npx_wide_bottom(df = df,
                                                   file = wide_excel,
-                                                  data_type = data_t,
                                                   col_split = col_s,
                                                   assay_cols = a_cols,
                                                   format_spec = format_s)
@@ -5119,7 +5065,6 @@ test_that(
         expect_error(
           object = read_npx_wide_bottom(df = df,
                                         file = wide_excel,
-                                        data_type = data_t,
                                         col_split = col_s,
                                         assay_cols = a_cols,
                                         format_spec = format_s),
@@ -5162,7 +5107,6 @@ test_that(
         expect_error(
           object = read_npx_wide_bottom(df = df,
                                         file = wide_excel,
-                                        data_type = data_t,
                                         col_split = col_s,
                                         assay_cols = a_cols,
                                         format_spec = format_s),
@@ -5211,7 +5155,6 @@ test_that(
         expect_error(
           object = read_npx_wide_bottom(df = df,
                                         file = wide_excel,
-                                        data_type = data_t,
                                         col_split = col_s,
                                         assay_cols = a_cols,
                                         format_spec = format_s),
@@ -5254,7 +5197,6 @@ test_that(
         expect_error(
           object = read_npx_wide_bottom(df = df,
                                         file = wide_excel,
-                                        data_type = data_t,
                                         col_split = col_s,
                                         assay_cols = a_cols,
                                         format_spec = format_s),
@@ -5307,7 +5249,6 @@ test_that(
         expect_no_condition(
           object = df_b <- read_npx_wide_bottom(df = df,
                                                 file = wide_excel,
-                                                data_type = data_t,
                                                 col_split = col_s,
                                                 assay_cols = a_cols,
                                                 format_spec = format_s)
@@ -5376,7 +5317,6 @@ test_that(
         expect_error(
           object = read_npx_wide_bottom(df = df,
                                         file = wide_excel,
-                                        data_type = data_t,
                                         col_split = col_s,
                                         assay_cols = a_cols,
                                         format_spec = format_s),

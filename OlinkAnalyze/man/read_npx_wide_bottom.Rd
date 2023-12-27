@@ -4,15 +4,12 @@
 \alias{read_npx_wide_bottom}
 \title{Help function that converts df_bottom into long format.}
 \usage{
-read_npx_wide_bottom(df, file, data_type, col_split, assay_cols, format_spec)
+read_npx_wide_bottom(df, file, col_split, assay_cols, format_spec)
 }
 \arguments{
 \item{df}{The bottom data frame from a split Olink wide excel file.}
 
 \item{file}{The input excel file.}
-
-\item{data_type}{The quantification in which the data comes in. Expecting one
-of NPX or Quantified.}
 
 \item{col_split}{The name of the column that splits the Olink wide excel file
 into left (assay info) and right  hand side (PlateID and QC_Warning info).}

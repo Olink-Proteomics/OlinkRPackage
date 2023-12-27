@@ -33,7 +33,6 @@ read_npx_wide <- function(file,
   df_top_list <- read_npx_wide_top_split(
     df = df_split$df_top,
     file = file,
-    data_type = data_type,
     olink_platform = olink_platform,
     format_spec = format_spec
   )
@@ -92,7 +91,6 @@ read_npx_wide <- function(file,
     df_bottom <- read_npx_wide_bottom( # nolint object_usage_linter
       df = df_split$df_bottom,
       file = file,
-      data_type = data_type,
       col_split = col_split,
       assay_cols = assay_cols,
       format_spec = format_spec
@@ -276,8 +274,6 @@ read_npx_wide_split_row <- function(file,
 #'
 #' @param df The top data frame from a split Olink wide excel file.
 #' @param file The input excel file.
-#' @param data_type The quantification in which the data comes in. Expecting one
-#' of NPX, Quantified or Ct.
 #' @param format_spec A one-row data frame filtered from olink_wide_excel_spec
 #' with the Olink wide excel file specifications.
 #'
@@ -285,7 +281,6 @@ read_npx_wide_split_row <- function(file,
 #'
 read_npx_wide_check_top <- function(df,
                                     file,
-                                    data_type,
                                     format_spec) {
 
   # initial checks ----
@@ -295,9 +290,6 @@ read_npx_wide_check_top <- function(df,
 
   check_file_exists(file = file,
                     error = TRUE)
-
-  check_olink_data_type(x = data_type,
-                        broader_platform = "qPCR")
 
   check_is_data_frame(df = format_spec,
                       error = TRUE)
@@ -376,8 +368,6 @@ read_npx_wide_check_top <- function(df,
 #'
 #' @param df The top data frame from a split Olink wide excel file.
 #' @param file The input excel file.
-#' @param data_type The quantification in which the data comes in. Expecting one
-#' of NPX, Quantified or Ct.
 #' @param olink_platform The Olink platform used to generate the input file.
 #' Expecting "Target 96", "Target 48", "Flex" or "Focus".
 #' @param format_spec A one-row data frame filtered from olink_wide_excel_spec
@@ -388,7 +378,6 @@ read_npx_wide_check_top <- function(df,
 #'
 read_npx_wide_top_split <- function(df,
                                     file,
-                                    data_type,
                                     olink_platform,
                                     format_spec) {
 
@@ -403,7 +392,6 @@ read_npx_wide_top_split <- function(df,
   read_npx_wide_check_top(
     df = df,
     file = file,
-    data_type = data_type,
     format_spec = format_spec
   )
 
@@ -579,8 +567,6 @@ read_npx_wide_top_split <- function(df,
 #'
 #' @param df The bottom data frame from a split Olink wide excel file.
 #' @param file The input excel file.
-#' @param data_type The quantification in which the data comes in. Expecting one
-#' of NPX or Quantified.
 #' @param col_split The name of the column that splits the Olink wide excel file
 #' into left (assay info) and right  hand side (PlateID and QC_Warning info).
 #' @param assay_cols Character vector with the names of the columns containing
@@ -592,7 +578,6 @@ read_npx_wide_top_split <- function(df,
 #'
 read_npx_wide_bottom <- function(df,
                                  file,
-                                 data_type,
                                  col_split,
                                  assay_cols,
                                  format_spec) {
@@ -603,9 +588,6 @@ read_npx_wide_bottom <- function(df,
 
   check_file_exists(file = file,
                     error = TRUE)
-
-  check_olink_data_type(x = data_type,
-                        broader_platform = "qPCR")
 
   check_is_scalar_character(string = col_split,
                             error = TRUE)
