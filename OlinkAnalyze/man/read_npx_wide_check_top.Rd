@@ -5,7 +5,7 @@
 \title{Help function to determine the number of rows with assay information in Olink
 excel wide format files.}
 \usage{
-read_npx_wide_check_top(df, file, data_type)
+read_npx_wide_check_top(df, file, data_type, format_spec)
 }
 \arguments{
 \item{df}{The top data frame from a split Olink wide excel file.}
@@ -14,6 +14,9 @@ read_npx_wide_check_top(df, file, data_type)
 
 \item{data_type}{The quantification in which the data comes in. Expecting one
 of NPX, Quantified or Ct.}
+
+\item{format_spec}{A one-row data frame filtered from olink_wide_excel_spec
+with the Olink wide excel file specifications.}
 }
 \value{
 An error inconsistency is spotted

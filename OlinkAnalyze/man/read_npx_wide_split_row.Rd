@@ -5,13 +5,16 @@
 \title{Help function the uses rows with all columns NA to split the wide Olink data
 file into 2 or 3 data sets.}
 \usage{
-read_npx_wide_split_row(file, data_type)
+read_npx_wide_split_row(file, data_type, format_spec)
 }
 \arguments{
 \item{file}{The input excel file.}
 
 \item{data_type}{The quantification in which the data comes in. Expecting one
 of NPX, Quantified or Ct.}
+
+\item{format_spec}{A one-row data frame filtered from olink_wide_excel_spec
+with the Olink wide excel file specifications.}
 }
 \value{
 A named list of 2 or 3 tibbles.

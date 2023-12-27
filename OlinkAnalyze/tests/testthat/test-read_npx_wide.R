@@ -61,6 +61,36 @@ npx_wide_col_index <- function(n_panels,
   )
 }
 
+npx_wide_row_index <- function(data_type,
+                               n_samples,
+                               n_plates) {
+
+  # top_df
+  top_start <- 3L
+  top_end <- ifelse(data_type == "Quantified", 7L, 6L)
+
+  # df_mid
+  sample_start <- top_end + 2L
+  sample_end <- sample_start + n_samples - 1L
+
+  # check that df_bottom works
+  bottom_start <- sample_end + 2L
+  bottom_end <- ifelse(data_type == "Quantified",
+                       bottom_start + 4L + (3 * n_plates) - 1,
+                       bottom_start + 3L - 1)
+
+  return(
+    list(
+      top_start = top_start,
+      top_end = top_end,
+      sample_start = sample_start,
+      sample_end = sample_end,
+      bottom_start = bottom_start,
+      bottom_end = bottom_end
+    )
+  )
+}
+
 ## Header matrix ----
 
 # return the top 2x2 matrix in the first two rows of an Olink exceli wide file
@@ -513,7 +543,7 @@ npx_wide_middle_test <- function(df,
     )
 
   # plate id
-  df_pid <- df |>
+  df_plate <- df |>
     dplyr::select(
       dplyr::all_of(c("V1", cname$plate_cols))
     ) |>
@@ -528,7 +558,7 @@ npx_wide_middle_test <- function(df,
 
   list_df <- list(
     df_oid = df_oid,
-    df_pid = df_pid
+    df_plate = df_plate
   )
 
   if (data_type != "Ct") {
@@ -984,6 +1014,9 @@ test_that(
                        loc_int_ctrl = "V3",
                        shuffle_assays = FALSE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write df
         writexl::write_xlsx(
           x = df,
@@ -998,44 +1031,42 @@ test_that(
         # check that function runs for NPX
         expect_no_condition(
           object = df_out <- read_npx_wide_split_row(file = wide_excel,
-                                                     data_type = data_t)
+                                                     data_type = data_t,
+                                                     format_spec = format_s)
         )
 
         # check that output exists
         expect_true(object = exists("df_out"))
 
+        # get expected row indexes
+        row_indx <- npx_wide_row_index(data_type = data_t,
+                                       n_samples = n_sample,
+                                       n_plates = n_plates)
+
         # check that df_top works
-        top_start <- 3L
-        top_end <- ifelse(data_t == "Quantified", 7L, 6L)
         expect_identical(
           object = df_out$df_top,
           expected = df |>
             dplyr::slice(
-              top_start:top_end
+              row_indx$top_start:row_indx$top_end
             )
         )
 
         # check that df_mid works
-        sample_start <- ifelse(data_t == "Quantified", 9L, 8L)
-        sample_end <- sample_start + n_sample - 1L
         expect_identical(
           object = df_out$df_mid,
           expected = df |>
             dplyr::slice(
-              sample_start:sample_end
+              row_indx$sample_start:row_indx$sample_end
             )
         )
 
         # check that df_bottom works
-        bottom_start <- sample_end + 2L
-        bottom_end <- ifelse(data_t == "Quantified",
-                             bottom_start + 4L + (3 * n_plates) - 1,
-                             bottom_start + 3L - 1)
         expect_identical(
           object = df_out$df_bottom,
           expected = df |>
             dplyr::slice(
-              bottom_start:bottom_end
+              row_indx$bottom_start:row_indx$bottom_end
             )
         )
 
@@ -1064,6 +1095,9 @@ test_that(
                        loc_int_ctrl = "V3",
                        shuffle_assays = TRUE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write df
         writexl::write_xlsx(
           x = df,
@@ -1078,44 +1112,42 @@ test_that(
         # check that function runs for NPX
         expect_no_condition(
           object = df_out <- read_npx_wide_split_row(file = wide_excel,
-                                                     data_type = data_t)
+                                                     data_type = data_t,
+                                                     format_spec = format_s)
         )
 
         # check that output exists
         expect_true(object = exists("df_out"))
 
+        # get expected row indexes
+        row_indx <- npx_wide_row_index(data_type = data_t,
+                                       n_samples = n_sample,
+                                       n_plates = n_plates)
+
         # check that df_top works
-        top_start <- 3L
-        top_end <- ifelse(data_t == "Quantified", 7L, 6L)
         expect_identical(
           object = df_out$df_top,
           expected = df |>
             dplyr::slice(
-              top_start:top_end
+              row_indx$top_start:row_indx$top_end
             )
         )
 
         # check that df_mid works
-        sample_start <- ifelse(data_t == "Quantified", 9L, 8L)
-        sample_end <- sample_start + n_sample - 1L
         expect_identical(
           object = df_out$df_mid,
           expected = df |>
             dplyr::slice(
-              sample_start:sample_end
+              row_indx$sample_start:row_indx$sample_end
             )
         )
 
         # check that df_bottom works
-        bottom_start <- sample_end + 2L
-        bottom_end <- ifelse(data_t == "Quantified",
-                             bottom_start + 4L + (3 * n_plates) - 1,
-                             bottom_start + 3L - 1)
         expect_identical(
           object = df_out$df_bottom,
           expected = df |>
             dplyr::slice(
-              bottom_start:bottom_end
+              row_indx$bottom_start:row_indx$bottom_end
             )
         )
 
@@ -1144,6 +1176,9 @@ test_that(
                        loc_int_ctrl = "V3",
                        shuffle_assays = FALSE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write df
         writexl::write_xlsx(
           x = df,
@@ -1158,31 +1193,33 @@ test_that(
         # check that function runs for Ct
         expect_no_condition(
           object = df_out <- read_npx_wide_split_row(file = wide_excel,
-                                                     data_type = data_t)
+                                                     data_type = data_t,
+                                                     format_spec = format_s)
         )
 
         # check that output exists
         expect_true(object = exists("df_out"))
 
+        # get expected row indexes
+        row_indx <- npx_wide_row_index(data_type = data_t,
+                                       n_samples = n_sample,
+                                       n_plates = n_plates)
+
         # check that df_top works
-        top_start <- 3L
-        top_end <- ifelse(data_t == "Quantified", 7L, 6L)
         expect_identical(
           object = df_out$df_top,
           expected = df |>
             dplyr::slice(
-              top_start:top_end
+              row_indx$top_start:row_indx$top_end
             )
         )
 
         # check that df_mid works
-        sample_start <- ifelse(data_t == "Quantified", 9L, 8L)
-        sample_end <- sample_start + n_sample - 1L
         expect_identical(
           object = df_out$df_mid,
           expected = df |>
             dplyr::slice(
-              sample_start:sample_end
+              row_indx$sample_start:row_indx$sample_end
             )
         )
 
@@ -1214,6 +1251,9 @@ test_that(
                        loc_int_ctrl = "V3",
                        shuffle_assays = TRUE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write df
         writexl::write_xlsx(
           x = df,
@@ -1228,31 +1268,33 @@ test_that(
         # check that function runs for Ct
         expect_no_condition(
           object = df_out <- read_npx_wide_split_row(file = wide_excel,
-                                                     data_type = data_t)
+                                                     data_type = data_t,
+                                                     format_spec = format_s)
         )
 
         # check that output exists
         expect_true(object = exists("df_out"))
 
+        # get expected row indexes
+        row_indx <- npx_wide_row_index(data_type = data_t,
+                                       n_samples = n_sample,
+                                       n_plates = n_plates)
+
         # check that df_top works
-        top_start <- 3L
-        top_end <- ifelse(data_t == "Quantified", 7L, 6L)
         expect_identical(
           object = df_out$df_top,
           expected = df |>
             dplyr::slice(
-              top_start:top_end
+              row_indx$top_start:row_indx$top_end
             )
         )
 
         # check that df_mid works
-        sample_start <- ifelse(data_t == "Quantified", 9L, 8L)
-        sample_end <- sample_start + n_sample - 1L
         expect_identical(
           object = df_out$df_mid,
           expected = df |>
             dplyr::slice(
-              sample_start:sample_end
+              row_indx$sample_start:row_indx$sample_end
             )
         )
 
@@ -1284,6 +1326,9 @@ test_that(
                        loc_int_ctrl = "V3",
                        shuffle_assays = FALSE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write file
         writexl::write_xlsx(
           x = df,
@@ -1298,44 +1343,42 @@ test_that(
         # check that function runs for Quantified
         expect_no_condition(
           object = df_out <- read_npx_wide_split_row(file = wide_excel,
-                                                     data_type = data_t)
+                                                     data_type = data_t,
+                                                     format_spec = format_s)
         )
 
         # check that output exists
         expect_true(object = exists("df_out"))
 
+        # get expected row indexes
+        row_indx <- npx_wide_row_index(data_type = data_t,
+                                       n_samples = n_sample,
+                                       n_plates = n_plates)
+
         # check that df_top works
-        top_start <- 3L
-        top_end <- ifelse(data_t == "Quantified", 7L, 6L)
         expect_identical(
           object = df_out$df_top,
           expected = df |>
             dplyr::slice(
-              top_start:top_end
+              row_indx$top_start:row_indx$top_end
             )
         )
 
         # check that df_mid works
-        sample_start <- ifelse(data_t == "Quantified", 9L, 8L)
-        sample_end <- sample_start + n_sample - 1L
         expect_identical(
           object = df_out$df_mid,
           expected = df |>
             dplyr::slice(
-              sample_start:sample_end
+              row_indx$sample_start:row_indx$sample_end
             )
         )
 
         # check that df_bottom works
-        bottom_start <- sample_end + 2L
-        bottom_end <- ifelse(data_t == "Quantified",
-                             bottom_start + 4L + (3 * n_plates) - 1,
-                             bottom_start + 3L - 1)
         expect_identical(
           object = df_out$df_bottom,
           expected = df |>
             dplyr::slice(
-              bottom_start:bottom_end
+              row_indx$bottom_start:row_indx$bottom_end
             )
         )
 
@@ -1364,6 +1407,9 @@ test_that(
                        loc_int_ctrl = "V3",
                        shuffle_assays = FALSE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write file
         writexl::write_xlsx(
           x = df,
@@ -1378,44 +1424,42 @@ test_that(
         # check that function runs for Quantified
         expect_no_condition(
           object = df_out <- read_npx_wide_split_row(file = wide_excel,
-                                                     data_type = data_t)
+                                                     data_type = data_t,
+                                                     format_spec = format_s)
         )
 
         # check that output exists
         expect_true(object = exists("df_out"))
 
+        # get expected row indexes
+        row_indx <- npx_wide_row_index(data_type = data_t,
+                                       n_samples = n_sample,
+                                       n_plates = n_plates)
+
         # check that df_top works
-        top_start <- 3L
-        top_end <- ifelse(data_t == "Quantified", 7L, 6L)
         expect_identical(
           object = df_out$df_top,
           expected = df |>
             dplyr::slice(
-              top_start:top_end
+              row_indx$top_start:row_indx$top_end
             )
         )
 
         # check that df_mid works
-        sample_start <- ifelse(data_t == "Quantified", 9L, 8L)
-        sample_end <- sample_start + n_sample - 1L
         expect_identical(
           object = df_out$df_mid,
           expected = df |>
             dplyr::slice(
-              sample_start:sample_end
+              row_indx$sample_start:row_indx$sample_end
             )
         )
 
         # check that df_bottom works
-        bottom_start <- sample_end + 2L
-        bottom_end <- ifelse(data_t == "Quantified",
-                             bottom_start + 4L + (3 * n_plates) - 1,
-                             bottom_start + 3L - 1)
         expect_identical(
           object = df_out$df_bottom,
           expected = df |>
             dplyr::slice(
-              bottom_start:bottom_end
+              row_indx$bottom_start:row_indx$bottom_end
             )
         )
 
@@ -1444,6 +1488,9 @@ test_that(
                        loc_int_ctrl = "V2",
                        shuffle_assays = FALSE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write file
         writexl::write_xlsx(
           x = df,
@@ -1458,44 +1505,42 @@ test_that(
         # check that function runs for Quantified
         expect_no_condition(
           object = df_out <- read_npx_wide_split_row(file = wide_excel,
-                                                     data_type = data_t)
+                                                     data_type = data_t,
+                                                     format_spec = format_s)
         )
 
         # check that output exists
         expect_true(object = exists("df_out"))
 
+        # get expected row indexes
+        row_indx <- npx_wide_row_index(data_type = data_t,
+                                       n_samples = n_sample,
+                                       n_plates = n_plates)
+
         # check that df_top works
-        top_start <- 3L
-        top_end <- ifelse(data_t == "Quantified", 7L, 6L)
         expect_identical(
           object = df_out$df_top,
           expected = df |>
             dplyr::slice(
-              top_start:top_end
+              row_indx$top_start:row_indx$top_end
             )
         )
 
         # check that df_mid works
-        sample_start <- ifelse(data_t == "Quantified", 9L, 8L)
-        sample_end <- sample_start + n_sample - 1L
         expect_identical(
           object = df_out$df_mid,
           expected = df |>
             dplyr::slice(
-              sample_start:sample_end
+              row_indx$sample_start:row_indx$sample_end
             )
         )
 
         # check that df_bottom works
-        bottom_start <- sample_end + 2L
-        bottom_end <- ifelse(data_t == "Quantified",
-                             bottom_start + 4L + (3 * n_plates) - 1,
-                             bottom_start + 3L - 1)
         expect_identical(
           object = df_out$df_bottom,
           expected = df |>
             dplyr::slice(
-              bottom_start:bottom_end
+              row_indx$bottom_start:row_indx$bottom_end
             )
         )
 
@@ -1524,6 +1569,9 @@ test_that(
                        loc_int_ctrl = "V2",
                        shuffle_assays = TRUE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write file
         writexl::write_xlsx(
           x = df,
@@ -1538,44 +1586,42 @@ test_that(
         # check that function runs for Quantified
         expect_no_condition(
           object = df_out <- read_npx_wide_split_row(file = wide_excel,
-                                                     data_type = data_t)
+                                                     data_type = data_t,
+                                                     format_spec = format_s)
         )
 
         # check that output exists
         expect_true(object = exists("df_out"))
 
+        # get expected row indexes
+        row_indx <- npx_wide_row_index(data_type = data_t,
+                                       n_samples = n_sample,
+                                       n_plates = n_plates)
+
         # check that df_top works
-        top_start <- 3L
-        top_end <- ifelse(data_t == "Quantified", 7L, 6L)
         expect_identical(
           object = df_out$df_top,
           expected = df |>
             dplyr::slice(
-              top_start:top_end
+              row_indx$top_start:row_indx$top_end
             )
         )
 
         # check that df_mid works
-        sample_start <- ifelse(data_t == "Quantified", 9L, 8L)
-        sample_end <- sample_start + n_sample - 1L
         expect_identical(
           object = df_out$df_mid,
           expected = df |>
             dplyr::slice(
-              sample_start:sample_end
+              row_indx$sample_start:row_indx$sample_end
             )
         )
 
         # check that df_bottom works
-        bottom_start <- sample_end + 2L
-        bottom_end <- ifelse(data_t == "Quantified",
-                             bottom_start + 4L + (3 * n_plates) - 1,
-                             bottom_start + 3L - 1)
         expect_identical(
           object = df_out$df_bottom,
           expected = df |>
             dplyr::slice(
-              bottom_start:bottom_end
+              row_indx$bottom_start:row_indx$bottom_end
             )
         )
 
@@ -1611,6 +1657,9 @@ test_that(
             is.na(.data[["V1"]])
           )
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         writexl::write_xlsx(
           x = df,
           path = wide_excel,
@@ -1624,7 +1673,8 @@ test_that(
         # check that function runs for NPX
         expect_error(
           object = read_npx_wide_split_row(file = wide_excel,
-                                           data_type = data_t),
+                                           data_type = data_t,
+                                           format_spec = format_s),
           regexp = "We identified 0 rows with all columns `NA` in file"
         )
       }
@@ -1655,6 +1705,9 @@ test_that(
                                 .data[["V1"]])
           )
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         writexl::write_xlsx(
           x = df,
           path = wide_excel,
@@ -1668,7 +1721,8 @@ test_that(
         # check that function runs for NPX
         expect_error(
           object = read_npx_wide_split_row(file = wide_excel,
-                                           data_type = data_t),
+                                           data_type = data_t,
+                                           format_spec = format_s),
           regexp = "We identified 3 rows with all columns `NA` in file"
         )
       }
@@ -1705,14 +1759,18 @@ test_that(
             format_headers = FALSE
           )
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == "NPX")
+
         # check that file exists
         expect_true(object = file.exists(wide_excel))
 
         # check that function runs for NPX
         expect_error(
           object = read_npx_wide_split_row(file = wide_excel,
-                                           data_type = "NPX"),
-          regexp = "contains 1 row with all columns NA, but based on"
+                                           data_type = "NPX",
+                                           format_spec = format_s),
+          regexp = "while we expected 2"
         )
 
       }
@@ -1743,14 +1801,18 @@ test_that(
             format_headers = FALSE
           )
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == "Ct")
+
         # check that file exists
         expect_true(object = file.exists(wide_excel))
 
         # check that function runs for Ct
         expect_error(
           object = read_npx_wide_split_row(file = wide_excel,
-                                           data_type = "Ct"),
-          regexp = "contains 2 rows with all columns NA, but based on"
+                                           data_type = "Ct",
+                                           format_spec = format_s),
+          regexp = "while we expected 1"
         )
 
       }
@@ -1781,14 +1843,18 @@ test_that(
             format_headers = FALSE
           )
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == "Quantified")
+
         # check that file exists
         expect_true(object = file.exists(wide_excel))
 
         # check that function runs for Quantified
         expect_error(
           object = read_npx_wide_split_row(file = wide_excel,
-                                           data_type = "Quantified"),
-          regexp = "contains 1 row with all columns NA, but based on"
+                                           data_type = "Quantified",
+                                           format_spec = format_s),
+          regexp = "while we expected 2"
         )
 
       }
@@ -1826,13 +1892,17 @@ test_that(
             format_headers = FALSE
           )
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # check that file exists
         expect_true(object = file.exists(wide_excel))
 
         # check that function runs for NPX
         expect_error(
           object = read_npx_wide_split_row(file = wide_excel,
-                                           data_type = data_t),
+                                           data_type = data_t,
+                                           format_spec = format_s),
           regexp = "Consecutive rows with all columns NA."
         )
 
@@ -1870,6 +1940,9 @@ test_that(
                            loc_int_ctrl = "V3",
                            shuffle_assays = FALSE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write file
         writeLines("foo", wide_excel)
 
@@ -1880,7 +1953,8 @@ test_that(
         expect_no_condition(
           object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
-                                           data_type = data_t)
+                                           data_type = data_t,
+                                           format_spec = format_s)
         )
 
       }
@@ -1909,6 +1983,9 @@ test_that(
                            loc_int_ctrl = "V3",
                            shuffle_assays = FALSE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write file
         writeLines("foo", wide_excel)
 
@@ -1919,7 +1996,8 @@ test_that(
         expect_no_condition(
           object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
-                                           data_type = data_t)
+                                           data_type = data_t,
+                                           format_spec = format_s)
         )
 
       }
@@ -1948,6 +2026,9 @@ test_that(
                            loc_int_ctrl = "V3",
                            shuffle_assays = FALSE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write file
         writeLines("foo", wide_excel)
 
@@ -1958,7 +2039,8 @@ test_that(
         expect_no_condition(
           object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
-                                           data_type = data_t)
+                                           data_type = data_t,
+                                           format_spec = format_s)
         )
 
       }
@@ -1987,6 +2069,9 @@ test_that(
                            loc_int_ctrl = "V3",
                            shuffle_assays = FALSE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write file
         writeLines("foo", wide_excel)
 
@@ -1997,7 +2082,8 @@ test_that(
         expect_no_condition(
           object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
-                                           data_type = data_t)
+                                           data_type = data_t,
+                                           format_spec = format_s)
         )
 
       }
@@ -2026,6 +2112,9 @@ test_that(
                            loc_int_ctrl = "V3",
                            shuffle_assays = TRUE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write file
         writeLines("foo", wide_excel)
 
@@ -2036,7 +2125,8 @@ test_that(
         expect_no_condition(
           object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
-                                           data_type = data_t)
+                                           data_type = data_t,
+                                           format_spec = format_s)
         )
 
       }
@@ -2065,6 +2155,9 @@ test_that(
                            loc_int_ctrl = "V2",
                            shuffle_assays = FALSE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write file
         writeLines("foo", wide_excel)
 
@@ -2075,7 +2168,8 @@ test_that(
         expect_no_condition(
           object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
-                                           data_type = data_t)
+                                           data_type = data_t,
+                                           format_spec = format_s)
         )
 
       }
@@ -2104,6 +2198,9 @@ test_that(
                            loc_int_ctrl = "V2",
                            shuffle_assays = TRUE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write file
         writeLines("foo", wide_excel)
 
@@ -2114,7 +2211,8 @@ test_that(
         expect_no_condition(
           object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
-                                           data_type = data_t)
+                                           data_type = data_t,
+                                           format_spec = format_s)
         )
 
       }
@@ -2124,7 +2222,7 @@ test_that(
 )
 
 test_that(
-  "read_npx_wide_check_top - unexpected number of assay rows",
+  "read_npx_wide_check_top - missing labels in V1",
   {
     ## NPX or Ct ----
 
@@ -2152,6 +2250,9 @@ test_that(
             .data[["V1"]] != "OlinkID"
           )
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write file
         writeLines("foo", wide_excel)
 
@@ -2162,8 +2263,9 @@ test_that(
         expect_error(
           object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
-                                           data_type = data_t),
-          regexp = "We identified 3 rows containing data about assays in file"
+                                           data_type = data_t,
+                                           format_spec = format_s),
+          regexp = "Column 1 of of the top matrix with assay metadata in file"
         )
 
       }
@@ -2209,6 +2311,9 @@ test_that(
             add_row
           )
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write file
         writeLines("foo", wide_excel)
 
@@ -2219,8 +2324,9 @@ test_that(
         expect_error(
           object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
-                                           data_type = data_t),
-          regexp = "We identified 6 rows containing data about assays in file"
+                                           data_type = data_t,
+                                           format_spec = format_s),
+          regexp = "Column 1 of of the top matrix with assay metadata in file"
         )
 
       }
@@ -2230,9 +2336,9 @@ test_that(
 )
 
 test_that(
-  "read_npx_wide_check_top - non-matching number of assay rows",
+  "read_npx_wide_check_top - missing labels in rows 2 & 3",
   {
-    ## NPX or Ct ----
+    ## NPX ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -2247,13 +2353,21 @@ test_that(
         n_assay <- 45L
         data_t <- "NPX"
 
+        keep_cols <- paste0("V", seq_len((n_panel * n_assay) + 1L + n_panel))
+
         df <- npx_wide_top(olink_platform = o_platform,
                            n_panels = n_panel,
                            n_assays = n_assay,
                            data_type = data_t,
                            show_int_ctrl = FALSE,
                            loc_int_ctrl = "V3",
-                           shuffle_assays = FALSE)
+                           shuffle_assays = FALSE) |>
+          dplyr::select(
+            dplyr::all_of(keep_cols)
+          )
+
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
 
         # write file
         writeLines("foo", wide_excel)
@@ -2265,8 +2379,58 @@ test_that(
         expect_error(
           object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
-                                           data_type = "Quantified"),
-          regexp = "while we expected 5"
+                                           data_type = data_t,
+                                           format_spec = format_s),
+          regexp = "Columns 2 and 3 of of the top matrix with assay metadata in"
+        )
+
+      }
+    )
+
+    ## Ct ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df ----
+
+        o_platform <- "Target 48"
+        n_panel <- 3L
+        n_assay <- 45L
+        data_t <- "Ct"
+
+        keep_cols <- paste0("V", seq_len((n_panel * n_assay) + 1L))
+
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE) |>
+          dplyr::select(
+            dplyr::all_of(keep_cols)
+          )
+
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
+        # write file
+        writeLines("foo", wide_excel)
+
+        # check that file exists
+        expect_true(object = file.exists(wide_excel))
+
+        # check that function runs
+        expect_error(
+          object = read_npx_wide_check_top(df = df,
+                                           file = wide_excel,
+                                           data_type = data_t,
+                                           format_spec = format_s),
+          regexp = "Columns 2 and 3 of of the top matrix with assay metadata in"
         )
 
       }
@@ -2287,16 +2451,21 @@ test_that(
         n_assay <- 45L
         data_t <- "Quantified"
 
+        keep_cols <- paste0("V", seq_len((n_panel * n_assay) + 1L + n_panel))
+
         df <- npx_wide_top(olink_platform = o_platform,
                            n_panels = n_panel,
                            n_assays = n_assay,
                            data_type = data_t,
-                           show_int_ctrl = FALSE,
+                           show_int_ctrl = TRUE,
                            loc_int_ctrl = "V3",
                            shuffle_assays = FALSE) |>
-          dplyr::filter(
-            .data[["V1"]] != "OlinkID"
+          dplyr::select(
+            dplyr::all_of(keep_cols)
           )
+
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
 
         # write file
         writeLines("foo", wide_excel)
@@ -2308,104 +2477,9 @@ test_that(
         expect_error(
           object = read_npx_wide_check_top(df = df,
                                            file = wide_excel,
-                                           data_type = data_t),
-          regexp = "while we expected 5"
-        )
-
-      }
-    )
-
-  }
-)
-
-test_that(
-  "read_npx_wide_check_top - incorrect values in column 1",
-  {
-    ## NPX or Ct ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # random df ----
-
-        o_platform <- "Target 48"
-        n_panel <- 3L
-        n_assay <- 45L
-        data_t <- "NPX"
-
-        df <- npx_wide_top(olink_platform = o_platform,
-                           n_panels = n_panel,
-                           n_assays = n_assay,
-                           data_type = data_t,
-                           show_int_ctrl = FALSE,
-                           loc_int_ctrl = "V3",
-                           shuffle_assays = FALSE) |>
-          dplyr::mutate(
-            V1 = dplyr::if_else(.data[["V1"]] == "OlinkID",
-                                "OlinkID_2",
-                                .data[["V1"]])
-          )
-
-        # write file
-        writeLines("foo", wide_excel)
-
-        # check that file exists
-        expect_true(object = file.exists(wide_excel))
-
-        # check that function runs
-        expect_error(
-          object = read_npx_wide_check_top(df = df,
-                                           file = wide_excel,
-                                           data_type = data_t),
-          regexp = "Column 1 of of the top matrix with assay metadata in file"
-        )
-
-      }
-    )
-
-    ## Quantified ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # random df ----
-
-        o_platform <- "Target 48"
-        n_panel <- 3L
-        n_assay <- 45L
-        data_t <- "Quantified"
-
-        df <- npx_wide_top(olink_platform = o_platform,
-                           n_panels = n_panel,
-                           n_assays = n_assay,
-                           data_type = data_t,
-                           show_int_ctrl = FALSE,
-                           loc_int_ctrl = "V3",
-                           shuffle_assays = FALSE) |>
-          dplyr::mutate(
-            V1 = dplyr::if_else(.data[["V1"]] == "Unit",
-                                "Unit_2",
-                                .data[["V1"]])
-          )
-
-        # write file
-        writeLines("foo", wide_excel)
-
-        # check that file exists
-        expect_true(object = file.exists(wide_excel))
-
-        # check that function runs
-        expect_error(
-          object = read_npx_wide_check_top(df = df,
-                                           file = wide_excel,
-                                           data_type = data_t),
-          regexp = "Column 1 of of the top matrix with assay metadata in file"
+                                           data_type = data_t,
+                                           format_spec = format_s),
+          regexp = "Columns 2 and 3 of of the top matrix with assay metadata in"
         )
 
       }
@@ -2442,6 +2516,9 @@ test_that(
                            loc_int_ctrl = "V3",
                            shuffle_assays = FALSE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -2451,7 +2528,8 @@ test_that(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
-                                                    olink_platform = o_platform)
+                                                    olink_platform = o_platform,
+                                                    format_spec = format_s)
         )
 
         # modify df so that we can test output ----
@@ -2501,6 +2579,9 @@ test_that(
                            loc_int_ctrl = "V3",
                            shuffle_assays = FALSE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -2510,7 +2591,8 @@ test_that(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
-                                                    olink_platform = o_platform)
+                                                    olink_platform = o_platform,
+                                                    format_spec = format_s)
         )
 
         # modify df so that we can test output ----
@@ -2555,6 +2637,9 @@ test_that(
                            loc_int_ctrl = "V3",
                            shuffle_assays = FALSE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -2564,7 +2649,8 @@ test_that(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
-                                                    olink_platform = o_platform)
+                                                    olink_platform = o_platform,
+                                                    format_spec = format_s)
         )
 
         # modify df so that we can test output ----
@@ -2619,6 +2705,9 @@ test_that(
                            loc_int_ctrl = "V3",
                            shuffle_assays = FALSE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -2628,7 +2717,8 @@ test_that(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
-                                                    olink_platform = o_platform)
+                                                    olink_platform = o_platform,
+                                                    format_spec = format_s)
         )
 
         # modify df so that we can test output ----
@@ -2684,6 +2774,9 @@ test_that(
                            loc_int_ctrl = "V3",
                            shuffle_assays = FALSE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -2693,7 +2786,8 @@ test_that(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
-                                                    olink_platform = o_platform)
+                                                    olink_platform = o_platform,
+                                                    format_spec = format_s)
         )
 
         # modify df so that we can test output ----
@@ -2743,6 +2837,9 @@ test_that(
                            loc_int_ctrl = "V3",
                            shuffle_assays = FALSE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -2752,7 +2849,8 @@ test_that(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
-                                                    olink_platform = o_platform)
+                                                    olink_platform = o_platform,
+                                                    format_spec = format_s)
         )
 
         # modify df so that we can test output ----
@@ -2797,6 +2895,9 @@ test_that(
                            loc_int_ctrl = "V3",
                            shuffle_assays = FALSE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -2806,7 +2907,8 @@ test_that(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
-                                                    olink_platform = o_platform)
+                                                    olink_platform = o_platform,
+                                                    format_spec = format_s)
         )
 
         # modify df so that we can test output ----
@@ -2861,6 +2963,9 @@ test_that(
                            loc_int_ctrl = "V3",
                            shuffle_assays = FALSE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -2870,7 +2975,8 @@ test_that(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
-                                                    olink_platform = o_platform)
+                                                    olink_platform = o_platform,
+                                                    format_spec = format_s)
         )
 
         # modify df so that we can test output ----
@@ -2926,6 +3032,9 @@ test_that(
                            loc_int_ctrl = "V3",
                            shuffle_assays = FALSE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -2935,7 +3044,8 @@ test_that(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
-                                                    olink_platform = o_platform)
+                                                    olink_platform = o_platform,
+                                                    format_spec = format_s)
         )
 
         # modify df so that we can test output ----
@@ -2985,6 +3095,9 @@ test_that(
                            loc_int_ctrl = "V3",
                            shuffle_assays = FALSE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -2994,7 +3107,8 @@ test_that(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
-                                                    olink_platform = o_platform)
+                                                    olink_platform = o_platform,
+                                                    format_spec = format_s)
         )
 
         # modify df so that we can test output ----
@@ -3045,6 +3159,9 @@ test_that(
                            loc_int_ctrl = "V3",
                            shuffle_assays = FALSE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -3054,7 +3171,8 @@ test_that(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
-                                                    olink_platform = o_platform)
+                                                    olink_platform = o_platform,
+                                                    format_spec = format_s)
         )
 
         # modify df so that we can test output ----
@@ -3104,6 +3222,9 @@ test_that(
                            loc_int_ctrl = "V3",
                            shuffle_assays = FALSE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -3113,7 +3234,8 @@ test_that(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
-                                                    olink_platform = o_platform)
+                                                    olink_platform = o_platform,
+                                                    format_spec = format_s)
         )
 
         # modify df so that we can test output ----
@@ -3164,6 +3286,9 @@ test_that(
                            loc_int_ctrl = "V3",
                            shuffle_assays = FALSE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -3173,7 +3298,8 @@ test_that(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
-                                                    olink_platform = o_platform)
+                                                    olink_platform = o_platform,
+                                                    format_spec = format_s)
         )
 
         # modify df so that we can test output ----
@@ -3223,6 +3349,9 @@ test_that(
                            loc_int_ctrl = "V3",
                            shuffle_assays = FALSE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -3232,7 +3361,8 @@ test_that(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
-                                                    olink_platform = o_platform)
+                                                    olink_platform = o_platform,
+                                                    format_spec = format_s)
         )
 
         # modify df so that we can test output ----
@@ -3277,6 +3407,9 @@ test_that(
                            loc_int_ctrl = "V3",
                            shuffle_assays = FALSE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -3286,7 +3419,8 @@ test_that(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
-                                                    olink_platform = o_platform)
+                                                    olink_platform = o_platform,
+                                                    format_spec = format_s)
         )
 
         # modify df so that we can test output ----
@@ -3341,6 +3475,9 @@ test_that(
                            loc_int_ctrl = "V3",
                            shuffle_assays = FALSE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -3350,7 +3487,8 @@ test_that(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
-                                                    olink_platform = o_platform)
+                                                    olink_platform = o_platform,
+                                                    format_spec = format_s)
         )
 
         # modify df so that we can test output ----
@@ -3406,6 +3544,9 @@ test_that(
                            loc_int_ctrl = "V3",
                            shuffle_assays = FALSE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -3415,7 +3556,8 @@ test_that(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
-                                                    olink_platform = o_platform)
+                                                    olink_platform = o_platform,
+                                                    format_spec = format_s)
         )
 
         # modify df so that we can test output ----
@@ -3465,6 +3607,9 @@ test_that(
                            loc_int_ctrl = "V3",
                            shuffle_assays = FALSE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -3474,7 +3619,8 @@ test_that(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
-                                                    olink_platform = o_platform)
+                                                    olink_platform = o_platform,
+                                                    format_spec = format_s)
         )
 
         # modify df so that we can test output ----
@@ -3519,6 +3665,9 @@ test_that(
                            loc_int_ctrl = "V3",
                            shuffle_assays = FALSE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -3528,7 +3677,8 @@ test_that(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
-                                                    olink_platform = o_platform)
+                                                    olink_platform = o_platform,
+                                                    format_spec = format_s)
         )
 
         # modify df so that we can test output ----
@@ -3583,6 +3733,9 @@ test_that(
                            loc_int_ctrl = "V3",
                            shuffle_assays = FALSE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -3592,7 +3745,8 @@ test_that(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
-                                                    olink_platform = o_platform)
+                                                    olink_platform = o_platform,
+                                                    format_spec = format_s)
         )
 
         # modify df so that we can test output ----
@@ -3625,6 +3779,7 @@ test_that(
 test_that(
   "read_npx_wide_top_split - unrecognizable tags",
   {
+    # df containsan unrecognizeable tag ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -3668,6 +3823,9 @@ test_that(
             df_add
           )
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -3677,7 +3835,97 @@ test_that(
           object = read_npx_wide_top_split(df = df,
                                            file = wide_excel,
                                            data_type = data_t,
-                                           olink_platform = o_platform),
+                                           olink_platform = o_platform,
+                                           format_spec = format_s),
+          regexp = "The top matrix with the assays metadata in file"
+        )
+
+      }
+    )
+
+    # df contains QC Warning with data type is Ct ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df_top ----
+
+        o_platform <- "Target 48"
+        n_panel <- 1L
+        n_assay <- 45L
+        data_t <- "NPX"
+
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = FALSE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE)
+
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == "Ct")
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # run function ----
+
+        expect_error(
+          object = read_npx_wide_top_split(df = df,
+                                           file = wide_excel,
+                                           data_type = "Ct",
+                                           olink_platform = o_platform,
+                                           format_spec = format_s),
+          regexp = "The top matrix with the assays metadata in file"
+        )
+
+      }
+    )
+
+    # df contains contains internal controls with data type is NPX ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df_top ----
+
+        o_platform <- "Target 48"
+        n_panel <- 1L
+        n_assay <- 45L
+        data_t <- "Quantified"
+
+        df <- npx_wide_top(olink_platform = o_platform,
+                           n_panels = n_panel,
+                           n_assays = n_assay,
+                           data_type = data_t,
+                           show_int_ctrl = TRUE,
+                           loc_int_ctrl = "V3",
+                           shuffle_assays = FALSE) |>
+          dplyr::slice(
+            1L:4L
+          )
+
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == "NPX")
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # run function ----
+
+        expect_error(
+          object = read_npx_wide_top_split(df = df,
+                                           file = wide_excel,
+                                           data_type = "NPX",
+                                           olink_platform = o_platform,
+                                           format_spec = format_s),
           regexp = "The top matrix with the assays metadata in file"
         )
 
@@ -3719,6 +3967,9 @@ test_that(
                                 .data[["V2"]])
           )
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -3728,7 +3979,8 @@ test_that(
           object = read_npx_wide_top_split(df = df,
                                            file = wide_excel,
                                            data_type = data_t,
-                                           olink_platform = o_platform),
+                                           olink_platform = o_platform,
+                                           format_spec = format_s),
           regexp = "Detected 1 empty cells in columns"
         )
 
@@ -3771,6 +4023,9 @@ test_that(
             )
           )
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -3780,7 +4035,8 @@ test_that(
           object = read_npx_wide_top_split(df = df,
                                            file = wide_excel,
                                            data_type = data_t,
-                                           olink_platform = o_platform),
+                                           olink_platform = o_platform,
+                                           format_spec = format_s),
           regexp = "Detected 4 empty cells in columns"
         )
 
@@ -3816,6 +4072,9 @@ test_that(
                            loc_int_ctrl = "V3",
                            shuffle_assays = FALSE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -3825,7 +4084,8 @@ test_that(
           object = read_npx_wide_top_split(df = df,
                                            file = wide_excel,
                                            data_type = data_t,
-                                           olink_platform = o_platform),
+                                           olink_platform = o_platform,
+                                           format_spec = format_s),
           regexp = "Detected 40 assays in 1 panels in file"
         )
 
@@ -3855,6 +4115,9 @@ test_that(
                            loc_int_ctrl = "V3",
                            shuffle_assays = FALSE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -3864,7 +4127,8 @@ test_that(
           object = read_npx_wide_top_split(df = df,
                                            file = wide_excel,
                                            data_type = data_t,
-                                           olink_platform = o_platform),
+                                           olink_platform = o_platform,
+                                           format_spec = format_s),
           regexp = "Detected 64 assays in 2 panels in file"
         )
       }
@@ -3893,6 +4157,9 @@ test_that(
                            loc_int_ctrl = "V3",
                            shuffle_assays = FALSE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -3902,7 +4169,8 @@ test_that(
           object = read_npx_wide_top_split(df = df,
                                            file = wide_excel,
                                            data_type = data_t,
-                                           olink_platform = o_platform),
+                                           olink_platform = o_platform,
+                                           format_spec = format_s),
           regexp = "Detected 67 assays in 1 panels in file"
         )
 
@@ -3932,6 +4200,9 @@ test_that(
                            loc_int_ctrl = "V3",
                            shuffle_assays = FALSE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -3941,55 +4212,13 @@ test_that(
           object = read_npx_wide_top_split(df = df,
                                            file = wide_excel,
                                            data_type = data_t,
-                                           olink_platform = o_platform),
+                                           olink_platform = o_platform,
+                                           format_spec = format_s),
           regexp = "Detected 156 assays in 2 panels in file"
         )
       }
     )
 
-
-  }
-)
-
-test_that(
-  "read_npx_wide_top_split - QC_Warning on Ct data",
-  {
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # random df_top ----
-
-        o_platform <- "Target 48"
-        n_panel <- 1L
-        n_assay <- 45L
-        data_t <- "NPX"
-
-        df <- npx_wide_top(olink_platform = o_platform,
-                           n_panels = n_panel,
-                           n_assays = n_assay,
-                           data_type = data_t,
-                           show_int_ctrl = FALSE,
-                           loc_int_ctrl = "V3",
-                           shuffle_assays = FALSE)
-
-        # write something in the file
-        writeLines("foo", wide_excel)
-
-        # run function ----
-
-        expect_error(
-          object = read_npx_wide_top_split(df = df,
-                                           file = wide_excel,
-                                           data_type = "Ct",
-                                           olink_platform = o_platform),
-          regexp = "Column \"QC Warning\" in the right-hand side of the top"
-        )
-
-      }
-    )
 
   }
 )
@@ -4023,6 +4252,9 @@ test_that(
             -dplyr::all_of(remove_col)
           )
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -4032,54 +4264,9 @@ test_that(
           object = read_npx_wide_top_split(df = df,
                                            file = wide_excel,
                                            data_type = data_t,
-                                           olink_platform = o_platform),
+                                           olink_platform = o_platform,
+                                           format_spec = format_s),
           regexp = "Expected equal number of \"Plate ID\" and \"QC\ Warning\""
-        )
-
-      }
-    )
-
-  }
-)
-
-test_that(
-  "read_npx_wide_top_split - QC_Warning on Ct data",
-  {
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # random df_top ----
-
-        o_platform <- "Target 48"
-        n_panel <- 1L
-        n_assay <- 45L
-        data_t <- "Quantified"
-
-        df <- npx_wide_top(olink_platform = o_platform,
-                           n_panels = n_panel,
-                           n_assays = n_assay,
-                           data_type = data_t,
-                           show_int_ctrl = TRUE,
-                           loc_int_ctrl = "V3",
-                           shuffle_assays = FALSE) |>
-          dplyr::slice(
-            1L:4L
-          )
-
-        # write something in the file
-        writeLines("foo", wide_excel)
-
-        # run function ----
-
-        expect_error(
-          object = read_npx_wide_top_split(df = df,
-                                           file = wide_excel,
-                                           data_type = "NPX",
-                                           olink_platform = o_platform),
-          regexp = "Columns for \"Internal controls\" in the right-hand side of"
         )
 
       }
@@ -4114,6 +4301,9 @@ test_that(
                            loc_int_ctrl = "V3",
                            shuffle_assays = TRUE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -4123,7 +4313,8 @@ test_that(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
-                                                    olink_platform = o_platform)
+                                                    olink_platform = o_platform,
+                                                    format_spec = format_s)
         )
 
         # modify df so that we can test output ----
@@ -4173,6 +4364,9 @@ test_that(
                            loc_int_ctrl = "V2",
                            shuffle_assays = TRUE)
 
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # write something in the file
         writeLines("foo", wide_excel)
 
@@ -4182,7 +4376,8 @@ test_that(
           object = l_obj <- read_npx_wide_top_split(df = df,
                                                     file = wide_excel,
                                                     data_type = data_t,
-                                                    olink_platform = o_platform)
+                                                    olink_platform = o_platform,
+                                                    format_spec = format_s)
         )
 
         # modify df so that we can test output ----
@@ -4231,14 +4426,16 @@ test_that(
         n_panel <- 1L
         n_assay <- 45L
         data_t <- "NPX"
-        col_s <- paste0("V", n_assay * n_panel + 2)
 
         df <- npx_wide_bottom(n_plates = n_plate,
                               n_panels = n_panel,
                               n_assays = n_assay,
                               data_type = data_t)
 
+        col_s <- paste0("V", n_assay * n_panel + 2)
         a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -4250,7 +4447,8 @@ test_that(
                                                 file = wide_excel,
                                                 data_type = data_t,
                                                 col_split = col_s,
-                                                assay_cols = a_cols)
+                                                assay_cols = a_cols,
+                                                format_spec = format_s)
         )
 
         # modify df so that we can test output ----
@@ -4289,14 +4487,16 @@ test_that(
         n_panel <- 1L
         n_assay <- 45L
         data_t <- "Quantified"
-        col_s <- paste0("V", n_assay * n_panel + 2)
 
         df <- npx_wide_bottom(n_plates = n_plate,
                               n_panels = n_panel,
                               n_assays = n_assay,
                               data_type = data_t)
 
+        col_s <- paste0("V", n_assay * n_panel + 2)
         a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -4314,7 +4514,8 @@ test_that(
                                                   file = wide_excel,
                                                   data_type = data_t,
                                                   col_split = col_s,
-                                                  assay_cols = a_cols)
+                                                  assay_cols = a_cols,
+                                                  format_spec = format_s)
           )
         )
 
@@ -4360,14 +4561,16 @@ test_that(
         n_panel <- 4L
         n_assay <- 45L
         data_t <- "NPX"
-        col_s <- paste0("V", n_assay * n_panel + 2)
 
         df <- npx_wide_bottom(n_plates = n_plate,
                               n_panels = n_panel,
                               n_assays = n_assay,
                               data_type = data_t)
 
+        col_s <- paste0("V", n_assay * n_panel + 2)
         a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -4379,7 +4582,8 @@ test_that(
                                                 file = wide_excel,
                                                 data_type = data_t,
                                                 col_split = col_s,
-                                                assay_cols = a_cols)
+                                                assay_cols = a_cols,
+                                                format_spec = format_s)
         )
 
         # modify df so that we can test output ----
@@ -4418,14 +4622,16 @@ test_that(
         n_panel <- 4L
         n_assay <- 45L
         data_t <- "Quantified"
-        col_s <- paste0("V", n_assay * n_panel + 2)
 
         df <- npx_wide_bottom(n_plates = n_plate,
                               n_panels = n_panel,
                               n_assays = n_assay,
                               data_type = data_t)
 
+        col_s <- paste0("V", n_assay * n_panel + 2)
         a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -4443,7 +4649,8 @@ test_that(
                                                   file = wide_excel,
                                                   data_type = data_t,
                                                   col_split = col_s,
-                                                  assay_cols = a_cols)
+                                                  assay_cols = a_cols,
+                                                  format_spec = format_s)
           )
         )
 
@@ -4487,14 +4694,16 @@ test_that(
         n_panel <- 1L
         n_assay <- 92L
         data_t <- "NPX"
-        col_s <- paste0("V", n_assay * n_panel + 2)
 
         df <- npx_wide_bottom(n_plates = n_plate,
                               n_panels = n_panel,
                               n_assays = n_assay,
                               data_type = data_t)
 
+        col_s <- paste0("V", n_assay * n_panel + 2)
         a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -4506,7 +4715,8 @@ test_that(
                                                 file = wide_excel,
                                                 data_type = data_t,
                                                 col_split = col_s,
-                                                assay_cols = a_cols)
+                                                assay_cols = a_cols,
+                                                format_spec = format_s)
         )
 
         # modify df so that we can test output ----
@@ -4549,14 +4759,16 @@ test_that(
         n_panel <- 4L
         n_assay <- 92L
         data_t <- "NPX"
-        col_s <- paste0("V", n_assay * n_panel + 2)
 
         df <- npx_wide_bottom(n_plates = n_plate,
                               n_panels = n_panel,
                               n_assays = n_assay,
                               data_type = data_t)
 
+        col_s <- paste0("V", n_assay * n_panel + 2)
         a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -4568,7 +4780,8 @@ test_that(
                                                 file = wide_excel,
                                                 data_type = data_t,
                                                 col_split = col_s,
-                                                assay_cols = a_cols)
+                                                assay_cols = a_cols,
+                                                format_spec = format_s)
         )
 
         # modify df so that we can test output ----
@@ -4613,14 +4826,16 @@ test_that(
         n_panel <- 1L
         n_assay <- 33L
         data_t <- "NPX"
-        col_s <- paste0("V", n_assay * n_panel + 2)
 
         df <- npx_wide_bottom(n_plates = n_plate,
                               n_panels = n_panel,
                               n_assays = n_assay,
                               data_type = data_t)
 
+        col_s <- paste0("V", n_assay * n_panel + 2)
         a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -4632,7 +4847,8 @@ test_that(
                                                 file = wide_excel,
                                                 data_type = data_t,
                                                 col_split = col_s,
-                                                assay_cols = a_cols)
+                                                assay_cols = a_cols,
+                                                format_spec = format_s)
         )
 
         # modify df so that we can test output ----
@@ -4671,14 +4887,16 @@ test_that(
         n_panel <- 1L
         n_assay <- 33L
         data_t <- "Quantified"
-        col_s <- paste0("V", n_assay * n_panel + 2)
 
         df <- npx_wide_bottom(n_plates = n_plate,
                               n_panels = n_panel,
                               n_assays = n_assay,
                               data_type = data_t)
 
+        col_s <- paste0("V", n_assay * n_panel + 2)
         a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -4696,7 +4914,8 @@ test_that(
                                                   file = wide_excel,
                                                   data_type = data_t,
                                                   col_split = col_s,
-                                                  assay_cols = a_cols)
+                                                  assay_cols = a_cols,
+                                                  format_spec = format_s)
           )
         )
 
@@ -4742,14 +4961,16 @@ test_that(
         n_panel <- 4L
         n_assay <- 21L
         data_t <- "NPX"
-        col_s <- paste0("V", n_assay * n_panel + 2)
 
         df <- npx_wide_bottom(n_plates = n_plate,
                               n_panels = n_panel,
                               n_assays = n_assay,
                               data_type = data_t)
 
+        col_s <- paste0("V", n_assay * n_panel + 2)
         a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -4761,7 +4982,8 @@ test_that(
                                                 file = wide_excel,
                                                 data_type = data_t,
                                                 col_split = col_s,
-                                                assay_cols = a_cols)
+                                                assay_cols = a_cols,
+                                                format_spec = format_s)
         )
 
         # modify df so that we can test output ----
@@ -4800,14 +5022,16 @@ test_that(
         n_panel <- 4L
         n_assay <- 21L
         data_t <- "Quantified"
-        col_s <- paste0("V", n_assay * n_panel + 2)
 
         df <- npx_wide_bottom(n_plates = n_plate,
                               n_panels = n_panel,
                               n_assays = n_assay,
                               data_type = data_t)
 
+        col_s <- paste0("V", n_assay * n_panel + 2)
         a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -4825,7 +5049,8 @@ test_that(
                                                   file = wide_excel,
                                                   data_type = data_t,
                                                   col_split = col_s,
-                                                  assay_cols = a_cols)
+                                                  assay_cols = a_cols,
+                                                  format_spec = format_s)
           )
         )
 
@@ -4855,53 +5080,9 @@ test_that(
 )
 
 test_that(
-  "read_npx_wide_bottom - T48 - error for Ct",
-  {
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # random df_bottom ----
-
-        n_plate <- 1L
-        n_panel <- 1L
-        n_assay <- 45L
-        data_t <- "NPX"
-        col_s <- paste0("V", n_assay * n_panel + 2)
-
-        df <- npx_wide_bottom(n_plates = n_plate,
-                              n_panels = n_panel,
-                              n_assays = n_assay,
-                              data_type = data_t)
-
-        a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
-
-        # write something in the file
-        writeLines("foo", wide_excel)
-
-        # run function ----
-
-        expect_error(
-          object = read_npx_wide_bottom(df = df,
-                                        file = wide_excel,
-                                        data_type = "Ct",
-                                        col_split = col_s,
-                                        assay_cols = a_cols),
-          regexp = "contains a bottom matrix. Files with"
-        )
-
-      }
-    )
-
-  }
-)
-
-test_that(
   "read_npx_wide_bottom - T48 - error for unexpected values in V1",
   {
-    ## NPX ----
+    ## NPX v1 ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -4915,7 +5096,6 @@ test_that(
         n_panel <- 1L
         n_assay <- 45L
         data_t <- "NPX"
-        col_s <- paste0("V", n_assay * n_panel + 2)
 
         df <- npx_wide_bottom(n_plates = n_plate,
                               n_panels = n_panel,
@@ -4926,7 +5106,10 @@ test_that(
             V1 = dplyr::if_else(.data[["V1"]] == "LOD", "LOD2", .data[["V1"]])
           )
 
+        col_s <- paste0("V", n_assay * n_panel + 2)
         a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -4938,14 +5121,58 @@ test_that(
                                         file = wide_excel,
                                         data_type = data_t,
                                         col_split = col_s,
-                                        assay_cols = a_cols),
+                                        assay_cols = a_cols,
+                                        format_spec = format_s),
           regexp = "Column 1 of the bottom matrix with assay metadata in file"
         )
 
       }
     )
 
-    ## Quantified ----
+    ## NPX v2 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df_bottom ----
+
+        n_plate <- 1L
+        n_panel <- 1L
+        n_assay <- 45L
+        data_t <- "NPX"
+
+        df <- npx_wide_bottom(n_plates = n_plate,
+                              n_panels = n_panel,
+                              n_assays = n_assay,
+                              data_type = "Quantified")
+
+        col_s <- paste0("V", n_assay * n_panel + 2)
+        a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # run function ----
+
+        expect_error(
+          object = read_npx_wide_bottom(df = df,
+                                        file = wide_excel,
+                                        data_type = data_t,
+                                        col_split = col_s,
+                                        assay_cols = a_cols,
+                                        format_spec = format_s),
+          regexp = "Column 1 of the bottom matrix with assay metadata in file"
+        )
+
+      }
+    )
+
+    ## Quantified v1 ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -4959,7 +5186,6 @@ test_that(
         n_panel <- 1L
         n_assay <- 45L
         data_t <- "Quantified"
-        col_s <- paste0("V", n_assay * n_panel + 2)
 
         df <- npx_wide_bottom(n_plates = n_plate,
                               n_panels = n_panel,
@@ -4972,7 +5198,10 @@ test_that(
                                 .data[["V1"]])
           )
 
+        col_s <- paste0("V", n_assay * n_panel + 2)
         a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -4984,7 +5213,51 @@ test_that(
                                         file = wide_excel,
                                         data_type = data_t,
                                         col_split = col_s,
-                                        assay_cols = a_cols),
+                                        assay_cols = a_cols,
+                                        format_spec = format_s),
+          regexp = "Column 1 of the bottom matrix with assay metadata in file"
+        )
+
+      }
+    )
+
+    ## Quantified v2 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # random df_bottom ----
+
+        n_plate <- 1L
+        n_panel <- 1L
+        n_assay <- 45L
+        data_t <- "Quantified"
+
+        df <- npx_wide_bottom(n_plates = n_plate,
+                              n_panels = n_panel,
+                              n_assays = n_assay,
+                              data_type = "NPX")
+
+        col_s <- paste0("V", n_assay * n_panel + 2)
+        a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
+        # write something in the file
+        writeLines("foo", wide_excel)
+
+        # run function ----
+
+        expect_error(
+          object = read_npx_wide_bottom(df = df,
+                                        file = wide_excel,
+                                        data_type = data_t,
+                                        col_split = col_s,
+                                        assay_cols = a_cols,
+                                        format_spec = format_s),
           regexp = "Column 1 of the bottom matrix with assay metadata in file"
         )
 
@@ -5009,20 +5282,22 @@ test_that(
         n_panel <- 1L
         n_assay <- 45L
         data_t <- "NPX"
-        col_s <- paste0("V", n_assay * n_panel + 2L)
 
         df <- npx_wide_bottom(n_plates = n_plate,
                               n_panels = n_panel,
                               n_assays = n_assay,
                               data_type = data_t)
 
+        col_s <- paste0("V", n_assay * n_panel + 2L)
+        a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+
         # add new column with all NA
         df <- df |>
           dplyr::mutate(
             {{col_s}} := rep(x = NA_character_, times = nrow(df))
           )
-
-        a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -5034,7 +5309,8 @@ test_that(
                                                 file = wide_excel,
                                                 data_type = data_t,
                                                 col_split = col_s,
-                                                assay_cols = a_cols)
+                                                assay_cols = a_cols,
+                                                format_spec = format_s)
         )
 
         # modify df so that we can test output ----
@@ -5089,6 +5365,8 @@ test_that(
           )
 
         a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
+        format_s <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
 
         # write something in the file
         writeLines("foo", wide_excel)
@@ -5100,248 +5378,9 @@ test_that(
                                         file = wide_excel,
                                         data_type = data_t,
                                         col_split = col_s,
-                                        assay_cols = a_cols),
+                                        assay_cols = a_cols,
+                                        format_spec = format_s),
           regexp = "Column 1 of the bottom matrix contains uneven rows of plate"
-        )
-
-      }
-    )
-
-  }
-)
-
-# Test read_npx_wide_check_middle ----
-
-test_that(
-  "read_npx_wide_check_middle - wrong combo of data_type and column names",
-  {
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # write something in the file ----
-        writeLines("foo", wide_excel)
-
-        # random df with all possible combos ----
-
-        # all possible values
-        plate_id_cols <- c("V0", NA_character_)
-        qc_warning_cols <- c("V0", NA_character_)
-        assay_cols <- c("V0", NA_character_)
-        internal_ctrl_cols <- c("V0", NA_character_)
-        data_type <- c("Ct", "NPX", "Quantified")
-
-        # create a df with all combos
-        df_combos <- expand.grid(
-          plate_id_cols,
-          qc_warning_cols,
-          assay_cols,
-          internal_ctrl_cols,
-          data_type
-        ) |>
-          dplyr::as_tibble()
-        colnames(df_combos) <- c("plate_id", "qc_warn", "assay",
-                                 "int_ctrl", "data_type")
-
-        # add epected outcome for every single scenario
-        df_combos <- df_combos |>
-          dplyr::mutate(
-            outcome = dplyr::case_when(
-              data_type == "Ct" &
-                !is.na(plate_id) &
-                !is.na(assay) &
-                is.na(qc_warn) &
-                is.na(int_ctrl) ~ "OK",
-              data_type == "NPX" &
-                !is.na(plate_id) &
-                !is.na(assay) &
-                !is.na(qc_warn) &
-                is.na(int_ctrl) ~ "OK",
-              data_type == "Quantified" &
-                !is.na(plate_id) &
-                !is.na(assay) &
-                !is.na(qc_warn) ~ "OK",
-              TRUE ~ "The middle matrix of the Olink wide excel file",
-              .default = NA_character_
-            )
-          ) |>
-          dplyr::mutate(
-            dplyr::across(
-              dplyr::everything(),
-              ~ as.character(.x)
-            )
-          )
-
-        # temporary internal function ----
-
-        # function to return NULL if input is NA
-        na_to_null <- function(x) {
-          if (is.na(x)) {
-            return(NULL)
-          } else {
-            return(paste0("V", 2L:46L))
-          }
-        }
-
-        # run function testing all combos ----
-
-        lapply(
-          seq_len(nrow(df_combos)),
-          function(i) {
-            # tmp df
-            df_combos_tmp <- df_combos |>
-              dplyr::slice(i)
-
-            # test
-            if (df_combos_tmp$outcome == "OK") {
-              expect_no_condition(
-                object = read_npx_wide_check_middle(
-                  df = npx_wide_middle(
-                    n_panels = 1L,
-                    n_assays = 45L,
-                    n_samples = 88L,
-                    data_type = df_combos_tmp$data_type,
-                    show_int_ctrl = TRUE,
-                    shuffle_assays = FALSE
-                  ),
-                  file = wide_excel,
-                  data_type = df_combos_tmp$data_type,
-                  assay_cols = na_to_null(x = df_combos_tmp$assay),
-                  plate_cols = na_to_null(x = df_combos_tmp$plate_id),
-                  qc_warn_cols = na_to_null(x = df_combos_tmp$qc_warn),
-                  int_ctrl_cols = na_to_null(x = df_combos_tmp$int_ctrl)
-                )
-              )
-            } else {
-              expect_error(
-                object = read_npx_wide_check_middle(
-                  df = npx_wide_middle(
-                    n_panels = 1L,
-                    n_assays = 45L,
-                    n_samples = 88L,
-                    data_type = df_combos_tmp$data_type,
-                    show_int_ctrl = TRUE,
-                    shuffle_assays = FALSE
-                  ),
-                  file = wide_excel,
-                  data_type = df_combos_tmp$data_type,
-                  assay_cols = na_to_null(x = df_combos_tmp$assay),
-                  plate_cols = na_to_null(x = df_combos_tmp$plate_id),
-                  qc_warn_cols = na_to_null(x = df_combos_tmp$qc_warn),
-                  int_ctrl_cols = na_to_null(x = df_combos_tmp$int_ctrl)
-                ),
-                regexp = "The middle matrix of the Olink wide excel file"
-              )
-            }
-
-          }
-        )
-
-      }
-    )
-
-  }
-)
-
-test_that(
-  "read_npx_wide_check_middle - non-unique sample id",
-  {
-    # 1 duplicate ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # write something in the file ----
-        writeLines("foo", wide_excel)
-
-        # random middle df ----
-
-        data_t <- "NPX"
-        n_panel <- 2L
-        n_assay <- 45L
-        shuffle <- FALSE
-
-        df <- npx_wide_middle(n_panels = n_panel,
-                              n_assays = n_assay,
-                              n_samples = 88L,
-                              data_type = data_t,
-                              show_int_ctrl = FALSE,
-                              shuffle_assays = shuffle) |>
-          dplyr::mutate(
-            V1 = dplyr::if_else(.data[["V1"]] == "S2", "S1", .data[["V1"]])
-          )
-
-        cname <- npx_wide_col_index(n_panels = n_panel,
-                                    n_assays = n_assay,
-                                    is_shuffled = shuffle)
-
-        # run function ----
-
-        expect_error(
-          object = read_npx_wide_check_middle(df = df,
-                                              file = wide_excel,
-                                              data_type = data_t,
-                                              assay_cols = cname$assay_cols,
-                                              plate_cols = cname$plate_cols,
-                                              qc_warn_cols = cname$qc_warn_cols,
-                                              int_ctrl_cols = NULL),
-          regexp = "does not contain unique sample identifiers."
-        )
-
-      }
-    )
-
-    # 3 duplicates ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # write something in the file ----
-        writeLines("foo", wide_excel)
-
-        # random middle df ----
-
-        data_t <- "NPX"
-        n_panel <- 2L
-        n_assay <- 45L
-        shuffle <- FALSE
-
-        df <- npx_wide_middle(n_panels = n_panel,
-                              n_assays = n_assay,
-                              n_samples = 88L,
-                              data_type = data_t,
-                              show_int_ctrl = FALSE,
-                              shuffle_assays = shuffle) |>
-          dplyr::mutate(
-            V1 = dplyr::case_when(.data[["V1"]] %in% c("S2", "S3") ~ "S1",
-                                  .data[["V1"]] %in% c("S4", "S5") ~ "S2",
-                                  TRUE ~ .data[["V1"]],
-                                  .default = .data[["V1"]])
-          )
-
-        cname <- npx_wide_col_index(n_panels = n_panel,
-                                    n_assays = n_assay,
-                                    is_shuffled = shuffle)
-
-        # run function ----
-
-        expect_error(
-          object = read_npx_wide_check_middle(df = df,
-                                              file = wide_excel,
-                                              data_type = data_t,
-                                              assay_cols = cname$assay_cols,
-                                              plate_cols = cname$plate_cols,
-                                              qc_warn_cols = cname$qc_warn_cols,
-                                              int_ctrl_cols = NULL),
-          regexp = "does not contain unique sample identifiers."
         )
 
       }
@@ -5353,7 +5392,7 @@ test_that(
 # Test read_npx_wide_middle ----
 
 test_that(
-  "read_npx_wide_middle - NPX - works",
+  "read_npx_wide_middle - works",
   {
     # NPX 1 panel ----
 
@@ -5420,8 +5459,8 @@ test_that(
         )
 
         expect_identical(
-          object = l_obj$df_pid,
-          expected = l_exp$df_pid
+          object = l_obj$df_plate,
+          expected = l_exp$df_plate
         )
 
         if (data_t != "Ct") {
@@ -5507,8 +5546,8 @@ test_that(
         )
 
         expect_identical(
-          object = l_obj$df_pid,
-          expected = l_exp$df_pid
+          object = l_obj$df_plate,
+          expected = l_exp$df_plate
         )
 
         expect_identical(
@@ -5584,8 +5623,8 @@ test_that(
         )
 
         expect_identical(
-          object = l_obj$df_pid,
-          expected = l_exp$df_pid
+          object = l_obj$df_plate,
+          expected = l_exp$df_plate
         )
 
       }
@@ -5656,8 +5695,8 @@ test_that(
         )
 
         expect_identical(
-          object = l_obj$df_pid,
-          expected = l_exp$df_pid
+          object = l_obj$df_plate,
+          expected = l_exp$df_plate
         )
 
       }
@@ -5728,8 +5767,8 @@ test_that(
         )
 
         expect_identical(
-          object = l_obj$df_pid,
-          expected = l_exp$df_pid
+          object = l_obj$df_plate,
+          expected = l_exp$df_plate
         )
 
         expect_identical(
@@ -5810,8 +5849,8 @@ test_that(
         )
 
         expect_identical(
-          object = l_obj$df_pid,
-          expected = l_exp$df_pid
+          object = l_obj$df_plate,
+          expected = l_exp$df_plate
         )
 
         expect_identical(
@@ -5892,8 +5931,8 @@ test_that(
         )
 
         expect_identical(
-          object = l_obj$df_pid,
-          expected = l_exp$df_pid
+          object = l_obj$df_plate,
+          expected = l_exp$df_plate
         )
 
         expect_identical(
@@ -5908,6 +5947,111 @@ test_that(
 
       }
     )
+  }
+)
+
+test_that(
+  "read_npx_wide_middle - non-unique sample id",
+  {
+    # 1 duplicate ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # write something in the file ----
+        writeLines("foo", wide_excel)
+
+        # random middle df ----
+
+        data_t <- "NPX"
+        n_panel <- 2L
+        n_assay <- 45L
+        shuffle <- FALSE
+
+        df <- npx_wide_middle(n_panels = n_panel,
+                              n_assays = n_assay,
+                              n_samples = 88L,
+                              data_type = data_t,
+                              show_int_ctrl = FALSE,
+                              shuffle_assays = shuffle) |>
+          dplyr::mutate(
+            V1 = dplyr::if_else(.data[["V1"]] == "S2", "S1", .data[["V1"]])
+          )
+
+        cname <- npx_wide_col_index(n_panels = n_panel,
+                                    n_assays = n_assay,
+                                    is_shuffled = shuffle)
+
+        # run function ----
+
+        expect_error(
+          object = read_npx_wide_middle(df = df,
+                                        file = wide_excel,
+                                        data_type = data_t,
+                                        assay_cols = cname$assay_cols,
+                                        plate_cols = cname$plate_cols,
+                                        qc_warn_cols = cname$qc_warn_cols,
+                                        int_ctrl_cols = NULL),
+          regexp = "does not contain unique sample identifiers."
+        )
+
+      }
+    )
+
+    # 3 duplicates ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # write something in the file ----
+        writeLines("foo", wide_excel)
+
+        # random middle df ----
+
+        data_t <- "NPX"
+        n_panel <- 2L
+        n_assay <- 45L
+        shuffle <- FALSE
+
+        df <- npx_wide_middle(n_panels = n_panel,
+                              n_assays = n_assay,
+                              n_samples = 88L,
+                              data_type = data_t,
+                              show_int_ctrl = FALSE,
+                              shuffle_assays = shuffle) |>
+          dplyr::mutate(
+            V1 = dplyr::case_when(.data[["V1"]] %in% c("S2", "S3") ~ "S1",
+                                  .data[["V1"]] %in% c("S4", "S5") ~ "S2",
+                                  TRUE ~ .data[["V1"]],
+                                  .default = .data[["V1"]])
+          )
+
+        cname <- npx_wide_col_index(n_panels = n_panel,
+                                    n_assays = n_assay,
+                                    is_shuffled = shuffle)
+
+        # run function ----
+
+        expect_error(
+          object = read_npx_wide_middle(df = df,
+                                        file = wide_excel,
+                                        data_type = data_t,
+                                        assay_cols = cname$assay_cols,
+                                        plate_cols = cname$plate_cols,
+                                        qc_warn_cols = cname$qc_warn_cols,
+                                        int_ctrl_cols = NULL),
+          regexp = "does not contain unique sample identifiers."
+        )
+
+      }
+    )
+
   }
 )
 

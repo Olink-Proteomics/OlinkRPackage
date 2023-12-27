@@ -13,11 +13,19 @@ read_npx_wide <- function(file,
   check_olink_platform(x = olink_platform,
                        broader_platform = "qPCR")
 
+  # get expected format specifications ----
+
+  format_spec <- olink_wide_excel_spec |>
+    dplyr::filter(
+      .data[["data_type"]] == .env[["data_type"]]
+    )
+
   # split the file into sub- data frames ----
 
   df_split <- read_npx_wide_split_row(
     file = file,
-    data_type = data_type
+    data_type = data_type,
+    format_spec = format_spec
   )
 
   # top list of df to long ----
@@ -26,7 +34,8 @@ read_npx_wide <- function(file,
     df = df_split$df_top,
     file = file,
     data_type = data_type,
-    olink_platform = olink_platform
+    olink_platform = olink_platform,
+    format_spec = format_spec
   )
 
   ## top list of df colnames ----
@@ -78,15 +87,15 @@ read_npx_wide <- function(file,
 
   # bottom df to long ----
 
-  if (data_type != "Ct"
-      && length(df_split) == 3L) {
+  if (format_spec$bottom_matrix) {
 
     df_bottom <- read_npx_wide_bottom( # nolint object_usage_linter
       df = df_split$df_bottom,
       file = file,
       data_type = data_type,
       col_split = col_split,
-      assay_cols = assay_cols
+      assay_cols = assay_cols,
+      format_spec = format_spec
     )
 
   }
@@ -122,11 +131,14 @@ read_npx_wide <- function(file,
 #' @param file The input excel file.
 #' @param data_type The quantification in which the data comes in. Expecting one
 #' of NPX, Quantified or Ct.
+#' @param format_spec A one-row data frame filtered from olink_wide_excel_spec
+#' with the Olink wide excel file specifications.
 #'
 #' @return A named list of 2 or 3 tibbles.
 #'
 read_npx_wide_split_row <- function(file,
-                                    data_type) {
+                                    data_type,
+                                    format_spec) {
 
   # initial checks ----
   check_file_exists(file = file,
@@ -134,6 +146,9 @@ read_npx_wide_split_row <- function(file,
 
   check_olink_data_type(x = data_type,
                         broader_platform = "qPCR")
+
+  check_is_data_frame(df = format_spec,
+                      error = TRUE)
 
   # read data ----
 
@@ -177,39 +192,14 @@ read_npx_wide_split_row <- function(file,
   # check that row indexes are correct ----
 
   # check that there are 1 or 2 rows with all NA
-  if (!(length(na_row_index) %in% c(1L, 2L))) {
+  if (length(na_row_index) != format_spec$n_na_rows) {
 
     cli::cli_abort(
       message = c(
         "x" = "We identified
         {ifelse(identical(na_row_index, integer(0L)), 0L, length(na_row_index))}
-        rows with all columns `NA` in file {.file {file}} while we expected 1
-        (for Ct data) or 2 (for NPX or Quantified data)",
-        "i" = "Has the excel file been modified manually?"
-      ),
-      call = rlang::caller_env(),
-      wrap = FALSE
-    )
-
-  }
-
-  # We want this to kick in only if there is only 1 row with all NA OR
-  # data_type is Ct. This checks catches all possible scenarios:
-  # NROW   data_type  Outcome
-  #    1          Ct       OK
-  #    1         NPX    ERROR
-  #    1  Quantified    ERROR
-  #    2          Ct    ERROR
-  #    2         NPX       OK
-  #    2  Quantified       OK
-  if (xor(x = length(na_row_index) == 1L,
-          y = data_type == "Ct")) {
-
-    cli::cli_abort(
-      message = c(
-        "x" = "The file {.file {file}} contains {length(na_row_index)} row{?s}
-        with all columns NA, but based on {.arg data_type} = {.val {data_type}}
-        we expected {ifelse(data_type == \"Ct\", 1L, 2L)}.",
+        rows with all columns `NA` in file {.file {file}}, while we expected
+        {format_spec$n_na_rows} for {.val {data_type}}",
         "i" = "Has the excel file been modified manually?"
       ),
       call = rlang::caller_env(),
@@ -220,7 +210,7 @@ read_npx_wide_split_row <- function(file,
 
   # check that rows are not consecutive
   if (length(na_row_index) == 2L
-      && na_row_index[2L] - na_row_index[1L] < 2) {
+      && (na_row_index[2L] - na_row_index[1L] < 2)) {
 
     cli::cli_abort(
       message = c(
@@ -288,12 +278,15 @@ read_npx_wide_split_row <- function(file,
 #' @param file The input excel file.
 #' @param data_type The quantification in which the data comes in. Expecting one
 #' of NPX, Quantified or Ct.
+#' @param format_spec A one-row data frame filtered from olink_wide_excel_spec
+#' with the Olink wide excel file specifications.
 #'
 #' @return An error inconsistency is spotted
 #'
 read_npx_wide_check_top <- function(df,
                                     file,
-                                    data_type) {
+                                    data_type,
+                                    format_spec) {
 
   # initial checks ----
 
@@ -306,86 +299,32 @@ read_npx_wide_check_top <- function(df,
   check_olink_data_type(x = data_type,
                         broader_platform = "qPCR")
 
-  # expected number of assay rows ----
-
-  # number of rows containing metadata about assays and panels based on
-  # the quantification method in the top dataset:
-  # If relative quantification (NPX, Ct) we expect 4 rows
-  # If absolute quantification (Quantified) we expect 5 rows
-  n_top_rows_expected <- accepted_olink_platforms |>
-    dplyr::select(
-      dplyr::all_of(
-        c("quant_method", "quant_type")
-      )
-    ) |>
-    tidyr::unnest(
-      cols = dplyr::everything()
-    ) |>
-    dplyr::distinct() |>
-    dplyr::filter(
-      .data[["quant_method"]] == .env[["data_type"]]
-    ) |>
-    dplyr::pull(
-      .data[["quant_type"]]
-    ) |>
-    (\(x) ifelse(x == "relative", 4L, 5L))()
+  check_is_data_frame(df = format_spec,
+                      error = TRUE)
 
   # checks ----
 
-  # check that number of rows of the top matrix from the file is expected
-  accepted_assay_row_num <- c(4L, 5L)
-  if (!(nrow(df) %in% accepted_assay_row_num)) {
-
-    cli::cli_abort(
-      message = c(
-        "x" = "We identified {nrow(df)} rows containing data about assays
-        in file {.file {file}} while we expected
-        { cli::ansi_collapse(x = accepted_assay_row_num,
-                             sep = \", \",
-                             last = \" or \") }!",
-        "i" = "Has the excel file been modified manually?"
-      ),
-      call = rlang::caller_env(),
-      wrap = FALSE
-    )
-
-  }
-
-  # check that expected and actual rows match
-  if (nrow(df) != n_top_rows_expected) {
-
-    cli::cli_abort(
-      message = c(
-        "x" = "We identified {nrow(df)} rows containing data about assays
-        in {.file {file}} while we expected {n_top_rows_expected}!",
-        "i" = "Has the excel file been modified manually?"
-      ),
-      call = rlang::caller_env(),
-      wrap = FALSE
-    )
-
-  }
-
-  # check that column 1 contains the expected values
-  accepted_vals_v1 <- c("Panel", "Assay", "Uniprot ID", "OlinkID")
-  if (nrow(df) == 5L) {
-
-    # in case of quantified data top df contains 1 additional row
-    accepted_vals_v1 <- c(accepted_vals_v1, "Unit")
-
-  }
+  ## check that column 1 contains the expected values ----
 
   # check that df contains "V1"
   check_columns(df = df, col_list = list("V1"))
 
+  # rows containing metadata about assays and panels based on the quantification
+  # method in the top dataset.
+  top_mat_v1_expected <- format_spec |>
+    dplyr::pull(
+      .data[["top_matrix_v1"]]
+    ) |>
+    unlist()
 
-  if (!identical(dplyr::pull(df, .data[["V1"]]), accepted_vals_v1)) {
+  if (!identical(dplyr::pull(df, .data[["V1"]]), top_mat_v1_expected)) {
+
+    top_v1_miss <- top_mat_v1_expected[!(top_mat_v1_expected %in% dplyr::pull(df, .data[["V1"]]))] # nolint object_usage_linter
 
     cli::cli_abort(
       message = c(
         "x" = "Column 1 of of the top matrix with assay metadata in file
-        {.file {file}} does not contain the expected values:
-        {accepted_vals_v1}",
+        {.file {file}} does not contain: {top_v1_miss}",
         "i" = "Has the excel file been modified manually?"
       ),
       call = rlang::caller_env(),
@@ -394,6 +333,40 @@ read_npx_wide_check_top <- function(df,
 
   }
 
+  ## check that rows 2 and 3 contain the expected values ----
+
+  # rows containing information on plate id, qc warning and internal controls
+  top_mat_v2_v3_expected <- format_spec |>
+    dplyr::pull(
+      .data[["top_matrix_assay_labels"]]
+    ) |>
+    unlist()
+
+  # the labels may be located in rows 2 or 3 of the wide matrix
+  # we need to check that all expected labels are present
+  top_mat_v2_v3_identified <- sapply(top_mat_v2_v3_expected,
+                                     grepl,
+                                     x = c(as.character(df[2L, ]),
+                                           as.character(df[3L, ])) |>
+                                       unique(),
+                                     ignore.case = TRUE) |>
+    apply(MARGIN = 2L, sum)
+
+  if (any(top_mat_v2_v3_identified == 0L)) {
+
+    top_v2_v3_miss <- names(top_mat_v2_v3_identified)[top_mat_v2_v3_identified == 0L] # nolint object_usage_linter
+
+    cli::cli_abort(
+      message = c(
+        "x" = "Columns 2 and 3 of of the top matrix with assay metadata in file
+        {.file {file}} do not contain: {top_v2_v3_miss}",
+        "i" = "Has the excel file been modified manually?"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
+  }
 }
 
 #' Help function that splits df_top from a Olink wide excel file into 3 data
@@ -407,6 +380,8 @@ read_npx_wide_check_top <- function(df,
 #' of NPX, Quantified or Ct.
 #' @param olink_platform The Olink platform used to generate the input file.
 #' Expecting "Target 96", "Target 48", "Flex" or "Focus".
+#' @param format_spec A one-row data frame filtered from olink_wide_excel_spec
+#' with the Olink wide excel file specifications.
 #'
 #' @return List of the data frames (df_oid, df_meta and df_qc_dev) in long
 #' format that df_top is split on.
@@ -414,17 +389,22 @@ read_npx_wide_check_top <- function(df,
 read_npx_wide_top_split <- function(df,
                                     file,
                                     data_type,
-                                    olink_platform) {
+                                    olink_platform,
+                                    format_spec) {
 
   # check input and top matrix ----
 
   check_olink_platform(x = olink_platform,
                        broader_platform = "qPCR")
 
+  check_is_data_frame(df = format_spec,
+                      error = TRUE)
+
   read_npx_wide_check_top(
     df = df,
     file = file,
-    data_type = data_type
+    data_type = data_type,
+    format_spec = format_spec
   )
 
   # transpose df to long ----
@@ -437,15 +417,13 @@ read_npx_wide_top_split <- function(df,
       2L:dplyr::n()
     )
 
-  # check columns of df
-  check_columns(df = df_t,
-                col_list = list("Panel", "Assay", "Uniprot ID", "OlinkID"))
+  # we have checked in read_npx_wide_check_top that all expected columns based
+  # on data_type are present
 
   # split df_t into its parts ----
 
   # data frame containing assay info
   # Panel, Assay, Uniprot ID and Olink ID (and Unit if data_type=Quantified)
-  # index
   df_oid <- df_t |>
     dplyr::filter(
       !is.na(.data[["OlinkID"]])
@@ -453,34 +431,28 @@ read_npx_wide_top_split <- function(df,
 
   # data frame containing assay info
   # Panel, Assay, Uniprot ID and Olink ID (and Unit if data_type=Quantified)
-  df_plate <- df_t |>
-    dplyr::filter(
-      .data[["Assay"]] %in% c("Plate ID")
-      & is.na(.data[["OlinkID"]])
-    ) |>
-    dplyr::select(
-      -dplyr::all_of(c("OlinkID", "Uniprot ID"))
-    ) |>
-    dplyr::rename(
-      "Var" = "Assay"
-    )
-
-  df_qc_warn <- df_t |>
-    dplyr::filter(
-      .data[["Assay"]] %in% c("QC Warning")
-      & is.na(.data[["OlinkID"]])
-    ) |>
-    dplyr::select(
-      -dplyr::all_of(c("OlinkID", "Uniprot ID"))
-    ) |>
-    dplyr::rename(
-      "Var" = "Assay"
-    )
+  df_v2_v3_req <- lapply(unlist(format_spec$top_matrix_assay_labels),
+                         function(x) {
+                           df_t |>
+                             dplyr::filter(
+                               .data[["Assay"]] %in% x
+                               & is.na(.data[["OlinkID"]])
+                             ) |>
+                             dplyr::select(
+                               -dplyr::all_of(c("OlinkID", "Uniprot ID"))
+                             ) |>
+                             dplyr::rename(
+                               "Var" = "Assay"
+                             )
+                         })
+  names(df_v2_v3_req) <- paste("df", names(df_v2_v3_req), sep = "_")
 
   df_qc_dev <- df_t |>
     dplyr::filter(
-      (.data[["Assay"]] == "QC Deviation from median"
-       | grepl(pattern = "ctrl", x = .data[["Assay"]], ignore.case = TRUE))
+      grepl(pattern = paste(unlist(format_spec$top_matrix_assay_optional),
+                            collapse = "|"),
+            x = .data[["Assay"]],
+            ignore.case = TRUE)
       & is.na(.data[["OlinkID"]])
     ) |>
     dplyr::select(
@@ -491,7 +463,9 @@ read_npx_wide_top_split <- function(df,
 
   ## check sum of rows ----
 
-  if (nrow(df_t) != (nrow(df_oid) + nrow(df_plate) + nrow(df_qc_warn) + nrow(df_qc_dev))) { # nolint object_usage_linter
+  if (nrow(df_t) != (nrow(df_oid)
+                     + sapply(df_v2_v3_req, nrow) |> sum()
+                     + nrow(df_qc_dev))) {
 
     cli::cli_abort(
       message = c(
@@ -557,30 +531,14 @@ read_npx_wide_top_split <- function(df,
 
   }
 
-  ## check df_qc_warn ----
-
-  # when data_type = Ct we do not expect QC Warning
-  if (xor(x = data_type == "Ct",
-          y = nrow(df_qc_warn) == 0L)) {
-
-    cli::cli_abort(
-      message = c(
-        "x" = "Column \"QC Warning\" in the right-hand side of the top matrix
-        is expected only for \"NPX\" and \"Quantified\" data!",
-        "i" = "Has the excel file been modified manually?"
-      ),
-      call = rlang::caller_env(),
-      wrap = FALSE
-    )
-
-  }
-
   ## check df_plate & df_qc_warn ----
 
-  # when the data_type is NPX or Quantified, "QC Warning" is also expected
-  if (data_type != "Ct") {
+  # when both elements of the list with required labels are present in the top
+  # wide matrix, expect identical dimensions
+  if (all(sapply(df_v2_v3_req, nrow) > 0L)) {
 
-    if (!identical(dim(df_plate), dim(df_qc_warn))) {
+    # check that that dimensions of the dfs in the list are identical
+    if (sapply(df_v2_v3_req, dim) |> unique(MARGIN = 2L) |> ncol()  != 1L) {
 
       cli::cli_abort(
         message = c(
@@ -597,39 +555,16 @@ read_npx_wide_top_split <- function(df,
 
   }
 
-  ## check df_qc_dev ----
-
-  # only when the data_type is Quantified we expect internal controls
-  if (data_type != "Quantified"
-      && nrow(df_qc_dev) != 0L) {
-
-    cli::cli_abort(
-      message = c(
-        "x" = "Columns for \"Internal controls\" in the right-hand side of the
-        top matrix are expected only for \"Quantified\" data!",
-        "i" = "Has the excel file been modified manually?"
-      ),
-      call = rlang::caller_env(),
-      wrap = FALSE
-    )
-
-  }
-
   # return ----
 
-  list_df <- list(
-    df_oid = df_oid,
-    df_plate = df_plate
-  )
+  list_df <- list_df <- append(x = df_v2_v3_req,
+                               values = list(df_oid = df_oid))
 
-  # add df_qc_warn if not empty
-  if (nrow(df_qc_warn) != 0L) {
-    list_df <- append(x = list_df,
-                      values = list(df_qc_warn = df_qc_warn))
-  }
+  # remove df with no rows
+  list_df <- list_df[which(lapply(list_df, nrow) != 0L)]
 
   # add df_qc_dev if not empty
-  if (nrow(df_qc_warn) != 0L) {
+  if (nrow(df_qc_dev) != 0L) {
     list_df <- append(x = list_df,
                       values = list(df_qc_dev = df_qc_dev))
   }
@@ -650,6 +585,8 @@ read_npx_wide_top_split <- function(df,
 #' into left (assay info) and right  hand side (PlateID and QC_Warning info).
 #' @param assay_cols Character vector with the names of the columns containing
 #' Olink assays.
+#' @param format_spec A one-row data frame filtered from olink_wide_excel_spec
+#' with the Olink wide excel file specifications.
 #'
 #' @return The bottom matrix in long format.
 #'
@@ -657,7 +594,8 @@ read_npx_wide_bottom <- function(df,
                                  file,
                                  data_type,
                                  col_split,
-                                 assay_cols) {
+                                 assay_cols,
+                                 format_spec) {
   # check input ----
 
   check_is_data_frame(df = df,
@@ -675,38 +613,15 @@ read_npx_wide_bottom <- function(df,
   check_is_character(string = assay_cols,
                      error = TRUE)
 
-  # check if Ct ----
-
-  if (data_type == "Ct") {
-
-    cli::cli_abort(
-      message = c(
-        "x" = "The Olink wide excel file {.file {file}} contains a bottom
-        matrix. Files with {.arg data_type} = {.val {data_type}} should not have
-        one!",
-        "i" = "Has the excel file been modified manually?"
-      ),
-      call = rlang::caller_env(),
-      wrap = FALSE
-    )
-
-  }
+  check_is_data_frame(df = format_spec,
+                      error = TRUE)
 
   # check first column ----
 
   # check that column "V1" exists in the df
   check_columns(df = df, col_list = list("V1"))
 
-  accepted_vals_v1 <- c("Missing Data freq.", "Normalization")
-  if (data_type == "NPX") {
-    accepted_vals_q <- character(0)
-    accepted_vals_v1 <- c(accepted_vals_v1, "LOD")
-  } else {
-    accepted_vals_q <- c("Assay warning", "Lowest quantifiable level",
-                         "Plate LOD", "LLOQ", "ULOQ")
-    accepted_vals_v1 <- c(accepted_vals_v1,
-                          accepted_vals_q)
-  }
+  accepted_vals_v1 <- unlist(format_spec$bottom_matrix_v1)
 
   if (!identical(dplyr::pull(df, .data[["V1"]]) |> unique() |> sort(),
                  accepted_vals_v1 |> sort())) {
@@ -728,7 +643,7 @@ read_npx_wide_bottom <- function(df,
 
   # columns expected to be present in the df
   expected_cols <- c("V1", assay_cols)
-  if (data_type == "Quantified") {
+  if (format_spec$use_plate_col) {
     expected_cols <- c(expected_cols, col_split)
   }
   # check that columns in expected_cols exist in the df
@@ -748,14 +663,13 @@ read_npx_wide_bottom <- function(df,
 
   # per-plate metrics ----
 
-  if (data_type == "Quantified") {
+  if (format_spec$use_plate_col) {
 
     # if it is Quantified data
     df_q <- df |>
-      # keep only rows to be pivoted
+      # keep only rows with -plate-specific info
       dplyr::filter(
-        .data[["V1"]] %in% .env[["accepted_vals_q"]]
-        & !is.na(.data[[col_split]])
+        !is.na(.data[[col_split]])
       )
 
     # check that each row with plate-specific QC metrics contains the same
@@ -785,7 +699,7 @@ read_npx_wide_bottom <- function(df,
 
     }
 
-    # for each variable in V1 and do a pivot_longer
+    # for each variable in V1 do a pivot_longer
     df_q <- lapply(unique(df_q$V1),
                    function(x) {
                      df_q |>
@@ -863,7 +777,8 @@ read_npx_wide_bottom <- function(df,
 
 }
 
-#' Help function to check df_mid for potential inconsistencies.
+#' Help function that splits df_mid from a Olink wide excel file into 4 data
+#' frames.
 #'
 #' @author Klev Diamanti
 #'
@@ -880,15 +795,17 @@ read_npx_wide_bottom <- function(df,
 #' @param int_ctrl_cols Character vector with the names of the columns
 #' containing "Internal Controls".
 #'
-#' @return Nothing or an error if inconsistencies are detected.
+#' @return A list of data frames (df_oid, df_pid, df_qc_warn and df_int_ctrl) in
+#' long format from the middle matrix of the Olink wide excel file.
 #'
-read_npx_wide_check_middle <- function(df,
-                                       file,
-                                       data_type,
-                                       assay_cols,
-                                       plate_cols,
-                                       qc_warn_cols,
-                                       int_ctrl_cols) {
+read_npx_wide_middle <- function(df,
+                                 file,
+                                 data_type,
+                                 assay_cols,
+                                 plate_cols,
+                                 qc_warn_cols,
+                                 int_ctrl_cols) {
+
   # check input ----
 
   check_is_data_frame(df = df,
@@ -920,71 +837,6 @@ read_npx_wide_check_middle <- function(df,
                        error = TRUE)
   }
 
-  # check matches of data_type to input ----
-
-  # creating a control string from bits of the input flags.
-  # This was done to lower the complexity of the function.
-  assay_str <- ifelse(is.null(assay_cols), "0", "1")
-  plate_id_str <- ifelse(is.null(plate_cols), "0", "1")
-  qc_warn_str <- ifelse(is.null(qc_warn_cols), "0", "1")
-  int_sctrl_str <- ifelse(is.null(int_ctrl_cols), "0", "1")
-  cols_str <- paste0(assay_str, plate_id_str, qc_warn_str, int_sctrl_str)
-
-  if (data_type == "Ct"
-      && cols_str != "1100") {
-    # when data_type is Ct then assay_cols and plate_cols are required to have
-    # values.
-    # qc_warn_cols and int_ctrl_cols should be NULL.
-
-    cli::cli_abort(
-      message = c(
-        "x" = "The middle matrix of the Olink wide excel file {.file {file}}
-        contains unexpected components. Files with {.arg data_type} =
-        {.val {data_type}} should have assay measurements and plate id!",
-        "i" = "Has the excel file been modified manually?"
-      ),
-      call = rlang::caller_env(),
-      wrap = FALSE
-    )
-
-  } else if (data_type == "NPX"
-             && cols_str != "1110") {
-    # when data_type is NPX then assay_cols, plate_cols and qc_warn_cols are
-    # required to have values.
-    # int_ctrl_cols should be NULL.
-
-    cli::cli_abort(
-      message = c(
-        "x" = "The middle matrix of the Olink wide excel file {.file {file}}
-        contains unexpected components. Files with {.arg data_type} =
-        {.val {data_type}} should have assay measurements, plate id and QC
-        warning!",
-        "i" = "Has the excel file been modified manually?"
-      ),
-      call = rlang::caller_env(),
-      wrap = FALSE
-    )
-
-  } else if (data_type == "Quantified"
-             && !(cols_str %in% c("1110", "1111"))) {
-    # when data_type is NPX then assay_cols, pid_cols and qc_warn_cols are
-    # required to have values.
-    # int_ctrl_cols may be NULL or contain values.
-
-    cli::cli_abort(
-      message = c(
-        "x" = "The middle matrix of the Olink wide excel file {.file {file}}
-        contains unexpected components. Files with {.arg data_type} =
-        {.val {data_type}} should have assay measurements, plate id and QC
-        warning, and, not necessarily, internal controls!",
-        "i" = "Has the excel file been modified manually?"
-      ),
-      call = rlang::caller_env(),
-      wrap = FALSE
-    )
-
-  }
-
   # check unique sample id ----
 
   check_columns(df = df, col_list = list("V1"))
@@ -1003,47 +855,6 @@ read_npx_wide_check_middle <- function(df,
     )
 
   }
-
-}
-
-#' Help function that splits df_mid from a Olink wide excel file into 4 data
-#' frames.
-#'
-#' @author Klev Diamanti
-#'
-#' @param df The middle data frame from a split Olink wide excel file.
-#' @param file The input excel file.
-#' @param data_type The quantification in which the data comes in. Expecting one
-#' of NPX or Quantified.
-#' @param assay_cols Character vector with the names of the columns containing
-#' Olink assays.
-#' @param plate_cols Character vector with the names of the columns containing
-#' "Plate ID".
-#' @param qc_warn_cols Character vector with the names of the columns containing
-#' "QC Warning".
-#' @param int_ctrl_cols Character vector with the names of the columns
-#' containing "Internal Controls".
-#'
-#' @return A list of data frames (df_oid, df_pid, df_qc_warn and df_int_ctrl) in
-#' long format from the middle matrix of the Olink wide excel file.
-#'
-read_npx_wide_middle <- function(df,
-                                 file,
-                                 data_type,
-                                 assay_cols,
-                                 plate_cols,
-                                 qc_warn_cols,
-                                 int_ctrl_cols) {
-
-  # check input and middle matrix ----
-
-  read_npx_wide_check_middle(df = df,
-                             file = file,
-                             data_type = data_type,
-                             assay_cols = assay_cols,
-                             plate_cols = plate_cols,
-                             qc_warn_cols = qc_warn_cols,
-                             int_ctrl_cols = int_ctrl_cols)
 
   # split datasets ----
 
@@ -1070,7 +881,7 @@ read_npx_wide_middle <- function(df,
   # check all columns exist
   check_columns(df = df, col_list = as.list(plate_cols))
 
-  df_pid <- df |>
+  df_plate <- df |>
     dplyr::select(
       dplyr::all_of(c("V1", plate_cols))
     ) |>
@@ -1135,7 +946,7 @@ read_npx_wide_middle <- function(df,
   # done only if the are columns with QC Warning
   if (!is.null(qc_warn_cols)) {
 
-    if (nrow(df_pid) != nrow(df_qc_warn)) {
+    if (nrow(df_plate) != nrow(df_qc_warn)) {
 
       cli::cli_abort(
         message = c(
@@ -1190,7 +1001,7 @@ read_npx_wide_middle <- function(df,
 
   list_df <- list(
     df_oid = df_oid,
-    df_pid = df_pid
+    df_plate = df_plate
   )
 
   if (!is.null(qc_warn_cols)) {

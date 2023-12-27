@@ -87,6 +87,48 @@ accepted_olink_platforms <- dplyr::tibble(
   )
 )
 
+## Specifications for quantification types in Olink wide excel files ----
+
+# Used in :
+#   - read_npx_wide
+olink_wide_excel_spec <- dplyr::tibble(
+  data_type = c("NPX",
+                "Ct",
+                "Quantified"),
+  bottom_matrix = c(TRUE,
+                    FALSE,
+                    TRUE),
+  n_na_rows = c(2L,
+                1L,
+                2L),
+  top_matrix_v1 = list(
+    c("Panel", "Assay", "Uniprot ID", "OlinkID"),
+    c("Panel", "Assay", "Uniprot ID", "OlinkID"),
+    c("Panel", "Assay", "Uniprot ID", "OlinkID", "Unit")
+  ),
+  top_matrix_assay_labels = list(
+    c("plate" = "Plate ID", "qc_warn" = "QC Warning"),
+    c("plate" = "Plate ID"),
+    c("plate" = "Plate ID", "qc_warn" = "QC Warning")
+  ),
+  top_matrix_assay_optional = list(
+    NA_character_,
+    NA_character_,
+    c("QC Deviation from median", "Ext Ctrl", "Amp Ctrl", "Inc Ctrl")
+  ),
+  bottom_matrix_v1 = list(
+    c("Missing Data freq.", "Normalization", "LOD"),
+    NA_character_,
+    c("Missing Data freq.", "Normalization", "Assay warning",
+      "Lowest quantifiable level", "Plate LOD", "LLOQ", "ULOQ")
+  ),
+  use_plate_col = c(
+    FALSE,
+    FALSE,
+    TRUE
+  )
+)
+
 ## Acceptable checksum file names ----
 
 # Used in:

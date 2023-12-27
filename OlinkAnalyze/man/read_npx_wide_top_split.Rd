@@ -5,7 +5,7 @@
 \title{Help function that splits df_top from a Olink wide excel file into 3 data
 frames.}
 \usage{
-read_npx_wide_top_split(df, file, data_type, olink_platform)
+read_npx_wide_top_split(df, file, data_type, olink_platform, format_spec)
 }
 \arguments{
 \item{df}{The top data frame from a split Olink wide excel file.}
@@ -17,6 +17,9 @@ of NPX, Quantified or Ct.}
 
 \item{olink_platform}{The Olink platform used to generate the input file.
 Expecting "Target 96", "Target 48", "Flex" or "Focus".}
+
+\item{format_spec}{A one-row data frame filtered from olink_wide_excel_spec
+with the Olink wide excel file specifications.}
 }
 \value{
 List of the data frames (df_oid, df_meta and df_qc_dev) in long
