@@ -76,8 +76,8 @@ npx_wide_row_index <- function(data_type,
   # check that df_bottom works
   bottom_start <- sample_end + 2L
   bottom_end <- ifelse(data_type == "Quantified",
-                       bottom_start + 4L + (3 * n_plates) - 1,
-                       bottom_start + 3L - 1)
+                       bottom_start + 4L + (3L * n_plates) - 1L,
+                       bottom_start + 3L - 1L)
 
   return(
     list(
@@ -388,19 +388,8 @@ npx_wide_middle <- function(n_panels,
   )
   plate_name <- plate_name[seq_len(n_samples)]
 
-  panel_name <- paste0("Panel", seq_len(n_panels))
-
-  panel_plate_name <- expand.grid(plate_name,
-                                  panel_name,
-                                  stringsAsFactors = FALSE)
-  colnames(panel_plate_name) <- c("X1", "X2")
-  panel_plate_name <- panel_plate_name |>
-    dplyr::as_tibble() |>
-    dplyr::mutate(X = paste(.data[["X1"]], .data[["X2"]], sep = "_")) |>
-    dplyr::pull(.data[["X"]])
-
   df_p <- matrix(
-    data = panel_plate_name,
+    data = rep(plate_name, times = n_panels),
     nrow = n_samples,
     ncol = n_panels,
     dimnames = list(
@@ -410,7 +399,7 @@ npx_wide_middle <- function(n_panels,
   ) |>
     dplyr::as_tibble()
 
-  rm(plate_name, panel_name, panel_plate_name)
+  rm(plate_name)
 
   ## qc warning ----
 
@@ -580,7 +569,7 @@ npx_wide_middle_test <- function(df,
     list_df <- append(x = list_df,
                       values = list(df_qc_warn = df_qc_warn))
 
-    if (data_type == "Quantified") {
+    if (data_type == "Quantified" && "int_ctrl_cols" %in% names(cname)) {
 
       # internal controls
       df_int_ctrl <- df |>
@@ -614,7 +603,15 @@ npx_wide_middle_test <- function(df,
 npx_wide_bottom <- function(n_plates,
                             n_panels,
                             n_assays,
-                            data_type) {
+                            data_type,
+                            show_int_ctrl = FALSE,
+                            shuffle_assays = FALSE) {
+
+  # add internal controls
+  if (show_int_ctrl == TRUE && shuffle_assays == TRUE) {
+    n_assays <- n_assays + 3L
+  }
+
   # this is the last column of the bottom matrix.
   # commonly it contains data when data is Quantified, and not
   # when it is NPX.
@@ -663,7 +660,7 @@ npx_wide_bottom <- function(n_plates,
         rownames = "V1"
       ) |>
       dplyr::mutate(
-        {{last_v}} := paste("Plate", seq_len(n_plates)) # nolint object_usage_linter
+        {{last_v}} := paste0("Plate", seq_len(n_plates)) # nolint object_usage_linter
       ) |>
       dplyr::bind_rows(
         matrix(
@@ -679,7 +676,7 @@ npx_wide_bottom <- function(n_plates,
             rownames = "V1"
           ) |>
           dplyr::mutate(
-            {{last_v}} := paste("Plate", seq_len(n_plates)) # nolint object_usage_linter
+            {{last_v}} := paste0("Plate", seq_len(n_plates)) # nolint object_usage_linter
           ) |>
           dplyr::mutate(
             dplyr::across(
@@ -701,7 +698,7 @@ npx_wide_bottom <- function(n_plates,
             rownames = "V1"
           ) |>
           dplyr::mutate(
-            {{last_v}} := paste("Plate", seq_len(n_plates)) # nolint object_usage_linter
+            {{last_v}} := paste0("Plate", seq_len(n_plates)) # nolint object_usage_linter
           ) |>
           dplyr::mutate(
             dplyr::across(
@@ -943,10 +940,16 @@ npx_wide <- function(olink_platform,
   # bottom matrix ----
 
   if (data_type != "Ct") {
-    df_bottom <- npx_wide_bottom(n_plates = n_plates,
-                                 n_panels = n_panels,
-                                 n_assays = n_assays,
-                                 data_type = data_type)
+    df_bottom <- npx_wide_bottom(
+      n_plates = n_plates,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      data_type = data_type,
+      show_int_ctrl = ifelse(data_type == "Quantified"
+                             && show_int_ctrl == TRUE, TRUE, FALSE),
+      shuffle_assays = ifelse(data_type == "Quantified"
+                              && shuffle_assays == TRUE, TRUE, FALSE)
+    )
   }
 
   # na rows ----
@@ -983,7 +986,192 @@ npx_wide <- function(olink_platform,
 
   # return ----
 
-  return(df)
+  list_df <- list(
+    df = df,
+    df_top = df_top,
+    df_middle = df_middle
+  )
+
+  if (data_type != "Ct") {
+    list_df <- append(x = list_df,
+                      values = list(df_bottom = df_bottom))
+  }
+
+  return(list_df)
+
+}
+
+# converts the full wide excel file to a long df.
+npx_wide_test <- function(l_df_top,
+                          l_df_middle,
+                          l_df_bottom,
+                          n_panels,
+                          n_assays,
+                          data_type,
+                          is_shuffled) {
+  # convert the top matrix to a list of long df ----
+
+  df_top <- npx_wide_top_test(df = l_df_top)
+
+  # extract colnames to use below ----
+
+  cname <- sapply(df_top, \(x) (x$col_index))
+  if (sum(sapply(df_top, nrow) > 0L) == 4L) {
+    names(cname) <- c("assay_cols", "plate_cols",
+                      "qc_warn_cols", "int_ctrl_cols")
+  } else if (sum(sapply(df_top, nrow) > 0L) == 3L) {
+    cname <- cname[1L:3L]
+    names(cname) <- c("assay_cols", "plate_cols",
+                      "qc_warn_cols")
+  } else if (sum(sapply(df_top, nrow) > 0L) == 2L) {
+    cname <- cname[1L:2L]
+    names(cname) <- c("assay_cols", "plate_cols")
+  }
+
+  # convert the middle matrix to a list of long df ----
+
+  df_middle <- npx_wide_middle_test(df = l_df_middle,
+                                    n_panels = n_panels,
+                                    n_assays = n_assays,
+                                    data_type = data_type,
+                                    is_shuffled = is_shuffled,
+                                    cname = cname)
+
+  # convert the bottom matrix to a long df ----
+
+  if (!is.null(l_df_bottom)) {
+
+    df_bottom <- npx_wide_bottom_test(df = l_df_bottom,
+                                      data_type = data_type,
+                                      col_split = colnames(l_df_bottom) |>
+                                        tail(n = 1L))
+  }
+
+  # prepare components of long df ----
+
+  ## df oid ----
+
+  df_oid <- df_middle$df_oid |>
+    dplyr::left_join(
+      df_top$df_oid,
+      by = "col_index",
+      relationship = "many-to-one"
+    )
+
+  ## df plate id ----
+
+  df_plate <- df_middle$df_plate |>
+    dplyr::left_join(
+      df_top$df_plate,
+      by = "col_index",
+      relationship = "many-to-one"
+    ) |>
+    dplyr::select(
+      -dplyr::any_of(c("Var", "Unit", "col_index"))
+    )
+
+  ## df qc warning ----
+
+  if ("df_qc_warn" %in% names(df_middle)
+      && "df_qc_warn" %in% names(df_top)) {
+
+    df_qc_warn <- df_middle$df_qc_warn |>
+      dplyr::left_join(
+        df_top$df_qc_warn,
+        by = "col_index",
+        relationship = "many-to-one"
+      ) |>
+      dplyr::select(
+        -dplyr::any_of(c("Var", "Unit", "col_index"))
+      )
+
+    df_plate_qc <- df_plate |>
+      dplyr::left_join(
+        df_qc_warn,
+        by = c("SampleID", "Panel"),
+        relationship = "one-to-one"
+      )
+
+  } else {
+    df_plate_qc <- df_plate
+  }
+
+  ## combine oid and plate qc ----
+
+  df_out <- df_oid |>
+    dplyr::left_join(
+      df_plate_qc,
+      by = c("SampleID", "Panel"),
+      relationship = "many-to-one"
+    )
+
+  ## df internal controls ----
+
+  if ("df_int_ctrl" %in% names(df_middle)
+      && "df_qc_dev" %in% names(df_top)) {
+
+    df_int_ctrl <- df_middle$df_int_ctrl |>
+      dplyr::left_join(
+        df_top$df_qc_dev,
+        by = "col_index",
+        relationship = "many-to-one"
+      )
+
+    # move the names *Ctrl* to column Assay
+    if (all(grepl(pattern = "ctrl",
+                  x = df_int_ctrl$`Uniprot ID`,
+                  ignore.case = TRUE))) {
+      df_int_ctrl <- df_int_ctrl |>
+        dplyr::mutate(
+          Assay = .data[["Uniprot ID"]],
+          `Uniprot ID` = NA_character_
+        )
+    }
+
+    # join with the plate df
+    df_int_ctrl <- df_int_ctrl |>
+      dplyr::left_join(
+        df_plate_qc,
+        by = c("SampleID", "Panel"),
+        relationship = "many-to-one"
+      )
+
+    df_out <- df_out |>
+      dplyr::bind_rows(df_int_ctrl)
+  }
+
+  ## df bottom ----
+
+  if (exists("df_bottom")) {
+
+    if ("Plate ID" %in% colnames(df_bottom)) {
+      df_out <- df_out |>
+        dplyr::left_join(
+          df_bottom,
+          by = c("col_index" = "col_index",
+                 "PlateID" = "Plate ID"),
+          relationship = "many-to-many"
+        )
+    } else {
+      df_out <- df_out |>
+        dplyr::left_join(
+          df_bottom,
+          by = c("col_index" = "col_index"),
+          relationship = "many-to-many"
+        )
+    }
+  }
+
+  # remove col_index ----
+
+  df_out <- df_out |>
+    dplyr::select(
+      -dplyr::all_of("col_index")
+    )
+
+  # return ----
+
+  return(df_out)
 
 }
 
@@ -1019,7 +1207,7 @@ test_that(
 
         # write df
         writexl::write_xlsx(
-          x = df,
+          x = df$df,
           path = wide_excel,
           col_names = FALSE,
           format_headers = FALSE
@@ -1046,7 +1234,7 @@ test_that(
         # check that df_top works
         expect_identical(
           object = df_out$df_top,
-          expected = df |>
+          expected = df$df |>
             dplyr::slice(
               row_indx$top_start:row_indx$top_end
             )
@@ -1055,7 +1243,7 @@ test_that(
         # check that df_mid works
         expect_identical(
           object = df_out$df_mid,
-          expected = df |>
+          expected = df$df |>
             dplyr::slice(
               row_indx$sample_start:row_indx$sample_end
             )
@@ -1064,7 +1252,7 @@ test_that(
         # check that df_bottom works
         expect_identical(
           object = df_out$df_bottom,
-          expected = df |>
+          expected = df$df |>
             dplyr::slice(
               row_indx$bottom_start:row_indx$bottom_end
             )
@@ -1100,7 +1288,7 @@ test_that(
 
         # write df
         writexl::write_xlsx(
-          x = df,
+          x = df$df,
           path = wide_excel,
           col_names = FALSE,
           format_headers = FALSE
@@ -1127,7 +1315,7 @@ test_that(
         # check that df_top works
         expect_identical(
           object = df_out$df_top,
-          expected = df |>
+          expected = df$df |>
             dplyr::slice(
               row_indx$top_start:row_indx$top_end
             )
@@ -1136,7 +1324,7 @@ test_that(
         # check that df_mid works
         expect_identical(
           object = df_out$df_mid,
-          expected = df |>
+          expected = df$df |>
             dplyr::slice(
               row_indx$sample_start:row_indx$sample_end
             )
@@ -1145,7 +1333,7 @@ test_that(
         # check that df_bottom works
         expect_identical(
           object = df_out$df_bottom,
-          expected = df |>
+          expected = df$df |>
             dplyr::slice(
               row_indx$bottom_start:row_indx$bottom_end
             )
@@ -1181,7 +1369,7 @@ test_that(
 
         # write df
         writexl::write_xlsx(
-          x = df,
+          x = df$df,
           path = wide_excel,
           col_names = FALSE,
           format_headers = FALSE
@@ -1208,7 +1396,7 @@ test_that(
         # check that df_top works
         expect_identical(
           object = df_out$df_top,
-          expected = df |>
+          expected = df$df |>
             dplyr::slice(
               row_indx$top_start:row_indx$top_end
             )
@@ -1217,7 +1405,7 @@ test_that(
         # check that df_mid works
         expect_identical(
           object = df_out$df_mid,
-          expected = df |>
+          expected = df$df |>
             dplyr::slice(
               row_indx$sample_start:row_indx$sample_end
             )
@@ -1256,7 +1444,7 @@ test_that(
 
         # write df
         writexl::write_xlsx(
-          x = df,
+          x = df$df,
           path = wide_excel,
           col_names = FALSE,
           format_headers = FALSE
@@ -1283,7 +1471,7 @@ test_that(
         # check that df_top works
         expect_identical(
           object = df_out$df_top,
-          expected = df |>
+          expected = df$df |>
             dplyr::slice(
               row_indx$top_start:row_indx$top_end
             )
@@ -1292,7 +1480,7 @@ test_that(
         # check that df_mid works
         expect_identical(
           object = df_out$df_mid,
-          expected = df |>
+          expected = df$df |>
             dplyr::slice(
               row_indx$sample_start:row_indx$sample_end
             )
@@ -1331,7 +1519,7 @@ test_that(
 
         # write file
         writexl::write_xlsx(
-          x = df,
+          x = df$df,
           path = wide_excel,
           col_names = FALSE,
           format_headers = FALSE
@@ -1358,7 +1546,7 @@ test_that(
         # check that df_top works
         expect_identical(
           object = df_out$df_top,
-          expected = df |>
+          expected = df$df |>
             dplyr::slice(
               row_indx$top_start:row_indx$top_end
             )
@@ -1367,7 +1555,7 @@ test_that(
         # check that df_mid works
         expect_identical(
           object = df_out$df_mid,
-          expected = df |>
+          expected = df$df |>
             dplyr::slice(
               row_indx$sample_start:row_indx$sample_end
             )
@@ -1376,7 +1564,7 @@ test_that(
         # check that df_bottom works
         expect_identical(
           object = df_out$df_bottom,
-          expected = df |>
+          expected = df$df |>
             dplyr::slice(
               row_indx$bottom_start:row_indx$bottom_end
             )
@@ -1412,7 +1600,7 @@ test_that(
 
         # write file
         writexl::write_xlsx(
-          x = df,
+          x = df$df,
           path = wide_excel,
           col_names = FALSE,
           format_headers = FALSE
@@ -1439,7 +1627,7 @@ test_that(
         # check that df_top works
         expect_identical(
           object = df_out$df_top,
-          expected = df |>
+          expected = df$df |>
             dplyr::slice(
               row_indx$top_start:row_indx$top_end
             )
@@ -1448,7 +1636,7 @@ test_that(
         # check that df_mid works
         expect_identical(
           object = df_out$df_mid,
-          expected = df |>
+          expected = df$df |>
             dplyr::slice(
               row_indx$sample_start:row_indx$sample_end
             )
@@ -1457,7 +1645,7 @@ test_that(
         # check that df_bottom works
         expect_identical(
           object = df_out$df_bottom,
-          expected = df |>
+          expected = df$df |>
             dplyr::slice(
               row_indx$bottom_start:row_indx$bottom_end
             )
@@ -1493,7 +1681,7 @@ test_that(
 
         # write file
         writexl::write_xlsx(
-          x = df,
+          x = df$df,
           path = wide_excel,
           col_names = FALSE,
           format_headers = FALSE
@@ -1520,7 +1708,7 @@ test_that(
         # check that df_top works
         expect_identical(
           object = df_out$df_top,
-          expected = df |>
+          expected = df$df |>
             dplyr::slice(
               row_indx$top_start:row_indx$top_end
             )
@@ -1529,7 +1717,7 @@ test_that(
         # check that df_mid works
         expect_identical(
           object = df_out$df_mid,
-          expected = df |>
+          expected = df$df |>
             dplyr::slice(
               row_indx$sample_start:row_indx$sample_end
             )
@@ -1538,7 +1726,7 @@ test_that(
         # check that df_bottom works
         expect_identical(
           object = df_out$df_bottom,
-          expected = df |>
+          expected = df$df |>
             dplyr::slice(
               row_indx$bottom_start:row_indx$bottom_end
             )
@@ -1574,7 +1762,7 @@ test_that(
 
         # write file
         writexl::write_xlsx(
-          x = df,
+          x = df$df,
           path = wide_excel,
           col_names = FALSE,
           format_headers = FALSE
@@ -1601,7 +1789,7 @@ test_that(
         # check that df_top works
         expect_identical(
           object = df_out$df_top,
-          expected = df |>
+          expected = df$df |>
             dplyr::slice(
               row_indx$top_start:row_indx$top_end
             )
@@ -1610,7 +1798,7 @@ test_that(
         # check that df_mid works
         expect_identical(
           object = df_out$df_mid,
-          expected = df |>
+          expected = df$df |>
             dplyr::slice(
               row_indx$sample_start:row_indx$sample_end
             )
@@ -1619,7 +1807,7 @@ test_that(
         # check that df_bottom works
         expect_identical(
           object = df_out$df_bottom,
-          expected = df |>
+          expected = df$df |>
             dplyr::slice(
               row_indx$bottom_start:row_indx$bottom_end
             )
@@ -1652,7 +1840,9 @@ test_that(
                        n_samples = 88L,
                        show_int_ctrl = TRUE,
                        loc_int_ctrl = "V3",
-                       shuffle_assays = FALSE) |>
+                       shuffle_assays = FALSE)
+
+        df <- df$df |>
           dplyr::filter(
             is.na(.data[["V1"]])
           )
@@ -1698,7 +1888,9 @@ test_that(
                        n_samples = 88L,
                        show_int_ctrl = TRUE,
                        loc_int_ctrl = "V3",
-                       shuffle_assays = FALSE) |>
+                       shuffle_assays = FALSE)
+
+        df <- df$df |>
           dplyr::mutate(
             V1 = dplyr::if_else(.data[["V1"]] == data_t,
                                 NA_character_,
@@ -1745,19 +1937,21 @@ test_that(
         # write random df
         data_t <- "Ct"
 
-        npx_wide(olink_platform = "Target 48",
-                 data_type = data_t,
-                 n_panels = 2L,
-                 n_assays = 45L,
-                 n_samples = 88L,
-                 show_int_ctrl = TRUE,
-                 loc_int_ctrl = "V3",
-                 shuffle_assays = FALSE) |>
-          writexl::write_xlsx(
-            path = wide_excel,
-            col_names = FALSE,
-            format_headers = FALSE
-          )
+        df <- npx_wide(olink_platform = "Target 48",
+                       data_type = data_t,
+                       n_panels = 2L,
+                       n_assays = 45L,
+                       n_samples = 88L,
+                       show_int_ctrl = TRUE,
+                       loc_int_ctrl = "V3",
+                       shuffle_assays = FALSE)
+
+        writexl::write_xlsx(
+          x = df$df,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
 
         format_s <- olink_wide_excel_spec |>
           dplyr::filter(.data[["data_type"]] == "NPX")
@@ -1787,19 +1981,21 @@ test_that(
         # write random df
         data_t <- "NPX"
 
-        npx_wide(olink_platform = "Target 48",
-                 data_type = data_t,
-                 n_panels = 2L,
-                 n_assays = 45L,
-                 n_samples = 88L,
-                 show_int_ctrl = TRUE,
-                 loc_int_ctrl = "V3",
-                 shuffle_assays = FALSE) |>
-          writexl::write_xlsx(
-            path = wide_excel,
-            col_names = FALSE,
-            format_headers = FALSE
-          )
+        df <- npx_wide(olink_platform = "Target 48",
+                       data_type = data_t,
+                       n_panels = 2L,
+                       n_assays = 45L,
+                       n_samples = 88L,
+                       show_int_ctrl = TRUE,
+                       loc_int_ctrl = "V3",
+                       shuffle_assays = FALSE)
+
+        writexl::write_xlsx(
+          x = df$df,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
 
         format_s <- olink_wide_excel_spec |>
           dplyr::filter(.data[["data_type"]] == "Ct")
@@ -1829,19 +2025,21 @@ test_that(
         # write random df
         data_t <- "Ct"
 
-        npx_wide(olink_platform = "Target 48",
-                 data_type = data_t,
-                 n_panels = 2L,
-                 n_assays = 45L,
-                 n_samples = 88L,
-                 show_int_ctrl = TRUE,
-                 loc_int_ctrl = "V3",
-                 shuffle_assays = FALSE) |>
-          writexl::write_xlsx(
-            path = wide_excel,
-            col_names = FALSE,
-            format_headers = FALSE
-          )
+        df <- npx_wide(olink_platform = "Target 48",
+                       data_type = data_t,
+                       n_panels = 2L,
+                       n_assays = 45L,
+                       n_samples = 88L,
+                       show_int_ctrl = TRUE,
+                       loc_int_ctrl = "V3",
+                       shuffle_assays = FALSE)
+
+        writexl::write_xlsx(
+          x = df$df,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
 
         format_s <- olink_wide_excel_spec |>
           dplyr::filter(.data[["data_type"]] == "Quantified")
@@ -1875,14 +2073,17 @@ test_that(
         # write random df
         data_t <- "NPX"
 
-        npx_wide(olink_platform = "Target 48",
-                 data_type = data_t,
-                 n_panels = 2L,
-                 n_assays = 45L,
-                 n_samples = 88L,
-                 show_int_ctrl = TRUE,
-                 loc_int_ctrl = "V3",
-                 shuffle_assays = FALSE) |>
+        df <- npx_wide(olink_platform = "Target 48",
+                       data_type = data_t,
+                       n_panels = 2L,
+                       n_assays = 45L,
+                       n_samples = 88L,
+                       show_int_ctrl = TRUE,
+                       loc_int_ctrl = "V3",
+                       shuffle_assays = FALSE)
+
+
+        df$df |>
           dplyr::filter(
             !grepl(pattern = "^S", x = .data[["V1"]])
           ) |>
@@ -5302,7 +5503,7 @@ test_that(
                               data_type = data_t) |>
           dplyr::filter(
             !(.data[["V1"]] == "Plate LOD"
-              & .data[[col_s]] == "Plate 2")
+              & .data[[col_s]] == "Plate2")
           )
 
         a_cols <- paste0("V", 2L:((n_assay * n_panel) + 1L))
