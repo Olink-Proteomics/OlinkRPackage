@@ -74,8 +74,13 @@ read_npx_wide <- function(file,
 
   # get col_split that splits left from right hand side matrix
   col_split <- df_top_list$df_plate |>
+    dplyr::mutate(
+      col_index_n = stringr::str_sub(string = .data[["col_index"]],
+                                     start = 2L) |>
+        as.integer()
+    ) |>
     dplyr::arrange(
-      .data[["col_index"]]
+      .data[["col_index_n"]]
     ) |>
     dplyr::slice_head(
       n = 1L
@@ -373,8 +378,8 @@ read_npx_wide_check_top <- function(df,
 #' @param format_spec A one-row data frame filtered from olink_wide_excel_spec
 #' with the Olink wide excel file specifications.
 #'
-#' @return List of the data frames (df_oid, df_meta and df_qc_dev) in long
-#' format that df_top is split on.
+#' @return List of the data frames (df_oid, df_meta, df_qc_dev and df_int_ctrl)
+#' in long format that df_top is split on.
 #'
 read_npx_wide_top_split <- function(df,
                                     file,
@@ -435,7 +440,7 @@ read_npx_wide_top_split <- function(df,
                          })
   names(df_v2_v3_req) <- paste("df", names(df_v2_v3_req), sep = "_")
 
-  df_qc_dev <- df_t |>
+  df_int_ctrl <- df_t |>
     dplyr::filter(
       grepl(pattern = paste(unlist(format_spec$top_matrix_assay_optional),
                             collapse = "|"),
@@ -453,7 +458,7 @@ read_npx_wide_top_split <- function(df,
 
   if (nrow(df_t) != (nrow(df_oid)
                      + sapply(df_v2_v3_req, nrow) |> sum()
-                     + nrow(df_qc_dev))) {
+                     + nrow(df_int_ctrl))) {
 
     cli::cli_abort(
       message = c(
@@ -487,22 +492,16 @@ read_npx_wide_top_split <- function(df,
   # we will check number of assays only for Target 96 and 48 Olink platforms.
   # Other Olink platforms such as Flex and Focus allow a varying number of
   # assays, which does not allow us to check number of assays.
-  expected_num_assays <- dplyr::tibble(platform = c("Target 96",
-                                                    "Target 48"),
-                                       n = c(92L,
-                                             45L)) |>
-    dplyr::mutate(
-      total_n = .data[["n"]] * length(unique(df_oid$Panel))
-    ) |>
+  expected_num_assays <- accepted_olink_platforms |>
     dplyr::filter(
-      .data[["platform"]] == .env[["olink_platform"]]
+      .data[["name"]] == .env[["olink_platform"]]
+    ) |>
+    dplyr::mutate(
+      total_n = .data[["base_index"]] * length(unique(df_oid$Panel))
     ) |>
     dplyr::pull(
       .data[["total_n"]]
     )
-  if (identical(expected_num_assays, integer(0L))) {
-    expected_num_assays <- NA_integer_
-  }
 
   if (!is.na(expected_num_assays)
       && nrow(df_oid) != expected_num_assays) {
@@ -551,10 +550,10 @@ read_npx_wide_top_split <- function(df,
   # remove df with no rows
   list_df <- list_df[which(lapply(list_df, nrow) != 0L)]
 
-  # add df_qc_dev if not empty
-  if (nrow(df_qc_dev) != 0L) {
+  # add df_int_ctrl if not empty
+  if (nrow(df_int_ctrl) != 0L) {
     list_df <- append(x = list_df,
-                      values = list(df_qc_dev = df_qc_dev))
+                      values = list(df_int_ctrl = df_int_ctrl))
   }
 
   return(list_df)
@@ -997,5 +996,63 @@ read_npx_wide_middle <- function(df,
   }
 
   return(list_df)
+
+}
+
+read_npx_wide_long_assay_quant <- function(df_top_oid,
+                                           df_mid_quant,
+                                           file,
+                                           format_spec) {
+
+  # check input ----
+
+  check_is_data_frame(df = df_top_oid,
+                      error = TRUE)
+
+  check_is_data_frame(df = df_mid_quant,
+                      error = TRUE)
+
+  check_file_exists(file = file,
+                    error = TRUE)
+
+  check_is_data_frame(df = format_spec,
+                      error = TRUE)
+
+  # check columns of df's ----
+
+  check_columns(df = df_top_oid,
+                col_list = c("col_index", unlist(format_spec$top_matrix_v1)) |>
+                  as.list())
+
+  check_columns(df = df_mid_quant,
+                col_list = c("SampleID", "col_index", format_spec$data_type) |>
+                  as.list())
+
+  # checks ----
+
+  ## make sure col_index is identical ----
+
+  if (!identical(x = df_top_oid |>
+                 dplyr::pull(.data[["col_index"]]) |>
+                 sort(),
+                 y = df_mid_quant |>
+                 dplyr::pull(.data[["col_index"]]) |>
+                 unique() |>
+                 sort())) {
+
+    cli::cli_abort(
+      message = c(
+        "x" = "Column {.val {\"col_index\"}} of the top matrix with assay
+        metadata {.arg df_top_oid} does not match the one from the middle matrix
+        with assay quantification {.arg df_mid_quant} in file {.file {file}}!",
+        "i" = "Has the excel file been modified manually?"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
+  }
+
+  # make sure there are no missing samples for some assays ----
 
 }
