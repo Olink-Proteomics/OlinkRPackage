@@ -19,8 +19,8 @@ Expecting "Target 96", "Target 48", "Flex" or "Focus".}
 with the Olink wide excel file specifications.}
 }
 \value{
-List of the data frames (df_oid, df_meta and df_qc_dev) in long
-format that df_top is split on.
+List of the data frames (df_oid, df_meta, df_qc_dev and df_int_ctrl)
+in long format that df_top is split on.
 }
 \description{
 Help function that splits df_top from a Olink wide excel file into 3 data

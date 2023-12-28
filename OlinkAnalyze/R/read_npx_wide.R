@@ -63,8 +63,8 @@ read_npx_wide <- function(file,
 
   # internal controls columns
   if (data_type == "Quantified"
-      && !is.null(df_top_list$df_qc_dev)) {
-    int_ctrl_cols <- df_top_list$df_qc_dev |>
+      && !is.null(df_top_list$df_int_ctrl)) {
+    int_ctrl_cols <- df_top_list$df_int_ctrl |>
       dplyr::pull(
         .data[["col_index"]]
       )
@@ -89,20 +89,6 @@ read_npx_wide <- function(file,
       .data[["col_index"]]
     )
 
-  # bottom df to long ----
-
-  if (format_spec$bottom_matrix) {
-
-    df_bottom <- read_npx_wide_bottom( # nolint object_usage_linter
-      df = df_split$df_bottom,
-      file = file,
-      col_split = col_split,
-      assay_cols = assay_cols,
-      format_spec = format_spec
-    )
-
-  }
-
   # middle list of df to long ----
 
   df_middle <- read_npx_wide_middle( # nolint object_usage_linter
@@ -115,6 +101,43 @@ read_npx_wide <- function(file,
     int_ctrl_cols = int_ctrl_cols
   )
 
+  # bottom df to long ----
+
+  if (format_spec$bottom_matrix) {
+
+    # check if internal controls are shuffled with assays
+    if (!is.null(int_ctrl_cols)) {
+      col_split_n <- stringr::str_sub(string = col_split, start = 2L) |>
+        as.integer()
+      int_ctrl_cols_n <- stringr::str_sub(string = int_ctrl_cols, start = 2L) |>
+        as.integer()
+
+      if (all(int_ctrl_cols_n < col_split_n)) {
+        # all internal controls are on the left hand side of Plate ID
+        # leave them as are for read_npx_wide_bottom
+        int_ctrl_cols <- int_ctrl_cols
+      } else if (all(int_ctrl_cols_n < col_split_n)) {
+        # all internal controls are on the very right hand side of Plate ID
+        # make them NULL so that read_npx_wide_bottom ignores them
+        int_ctrl_cols <- NULL
+      } else {
+        # ERROR
+        # some internal controls are left and others reight of Plate ID
+        # and this in unexpected
+        print(1)
+      }
+    }
+
+    df_bottom <- read_npx_wide_bottom( # nolint object_usage_linter
+      df = df_split$df_bottom,
+      file = file,
+      col_split = col_split,
+      assay_cols = assay_cols,
+      int_ctrl_cols = int_ctrl_cols,
+      format_spec = format_spec
+    )
+
+  }
 }
 
 #' Help function the uses rows with all columns NA to split the wide Olink data
@@ -570,6 +593,8 @@ read_npx_wide_top_split <- function(df,
 #' into left (assay info) and right  hand side (PlateID and QC_Warning info).
 #' @param assay_cols Character vector with the names of the columns containing
 #' Olink assays.
+#' @param int_ctrl_cols Character vector with the names of the columns
+#' containing "Internal Controls".
 #' @param format_spec A one-row data frame filtered from olink_wide_excel_spec
 #' with the Olink wide excel file specifications.
 #'
@@ -579,6 +604,7 @@ read_npx_wide_bottom <- function(df,
                                  file,
                                  col_split,
                                  assay_cols,
+                                 int_ctrl_cols,
                                  format_spec) {
   # check input ----
 
@@ -593,6 +619,11 @@ read_npx_wide_bottom <- function(df,
 
   check_is_character(string = assay_cols,
                      error = TRUE)
+
+  if (!is.null(int_ctrl_cols)) {
+    check_is_character(string = int_ctrl_cols,
+                       error = TRUE)
+  }
 
   check_is_data_frame(df = format_spec,
                       error = TRUE)
@@ -626,6 +657,9 @@ read_npx_wide_bottom <- function(df,
   expected_cols <- c("V1", assay_cols)
   if (format_spec$use_plate_col) {
     expected_cols <- c(expected_cols, col_split)
+  }
+  if (!is.null(int_ctrl_cols)) {
+    expected_cols <- c(expected_cols, int_ctrl_cols)
   }
   # check that columns in expected_cols exist in the df
   check_columns(df = df, col_list = as.list(expected_cols))
@@ -737,7 +771,7 @@ read_npx_wide_bottom <- function(df,
       2L:dplyr::n()
     )
 
-  # return ----
+  # join df_t and df_q ----
 
   if (exists("df_q")) {
 
@@ -754,7 +788,31 @@ read_npx_wide_bottom <- function(df,
 
   }
 
-  return(df_long)
+  # output l_df ----
+
+  # split into internal controls and assays
+  if (!is.null(int_ctrl_cols)) {
+
+    list_df <- list(
+      df_oid = df_long |>
+        dplyr::filter(
+          !(.data[["col_index"]] %in% int_ctrl_cols)
+        ),
+      df_int_ctrl = df_long |>
+        dplyr::filter(
+          .data[["col_index"]] %in% int_ctrl_cols
+        )
+    )
+
+  } else {
+
+    list_df <- list(
+      df_oid = df_long
+    )
+
+  }
+
+  return(list_df)
 
 }
 
@@ -1032,13 +1090,8 @@ read_npx_wide_long_assay_quant <- function(df_top_oid,
 
   ## make sure col_index is identical ----
 
-  if (!identical(x = df_top_oid |>
-                 dplyr::pull(.data[["col_index"]]) |>
-                 sort(),
-                 y = df_mid_quant |>
-                 dplyr::pull(.data[["col_index"]]) |>
-                 unique() |>
-                 sort())) {
+  if (!identical(x = sort(unique(df_top_oid$col_index)),
+                 y = sort(unique(df_mid_quant$col_index)))) {
 
     cli::cli_abort(
       message = c(
