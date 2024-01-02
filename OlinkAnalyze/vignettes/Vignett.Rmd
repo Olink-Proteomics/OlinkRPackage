@@ -221,13 +221,15 @@ olink_normalization(df1 = npx_data1,
 
 # Example of using all samples for normalization
 subset_df1 <- npx_data1 %>% 
-  filter(QC_Warning == 'Pass') %>% 
+  group_by(SampleID) %>%
+  filter(all(QC_Warning == 'Pass')) %>% 
   filter(!str_detect(SampleID, 'CONTROL_SAMPLE')) %>%
   pull(SampleID) %>% 
   unique()
 
-subset_df2 <- npx_data2 %>% 
-  filter(QC_Warning == 'Pass') %>% 
+subset_df2 <- npx_data2 %>%   
+  group_by(SampleID) %>%
+  filter(all(QC_Warning == 'Pass')) %>% 
   filter(!str_detect(SampleID, 'CONTROL_SAMPLE')) %>%
   pull(SampleID) %>% 
   unique()
