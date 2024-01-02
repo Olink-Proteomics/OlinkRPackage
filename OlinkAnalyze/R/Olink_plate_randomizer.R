@@ -216,7 +216,7 @@ generatePlateHolder <- function(n.plates,n.spots,n.samples, PlateSize, num_ctrl,
 #' @param Manifest tibble/data frame in long format containing all sample ID's. Sample ID column must be named SampleID.
 #' @param PlateSize Integer. Either 96 or 48. 96 is default.
 #' @param Product String. Name of Olink product used to set PlateSize if not provided. Optional.
-#' @param SubjectColumn (Optional) Column name of the subject ID column. Cannot contain missings. If provided, subjects are kept on the same plate.
+#' @param SubjectColumn (Optional) Column name of the subject ID column. Cannot contain missing values. If provided, subjects are kept on the same plate. This argument is used for longitudinal studies and must be a separate column from the SampleID column.
 #' @param iterations Number of iterations for fitting subjects on the same plate.
 #' @param available.spots Numeric. Number of wells available on each plate. Maximum 40 for T48 and 88 for T96. Takes a vector equal to the number of plates to be used indicating the number of wells available on each plate.
 #' @param num_ctrl Numeric. Number of controls on each plate (default = 8)
@@ -242,7 +242,7 @@ generatePlateHolder <- function(n.plates,n.spots,n.samples, PlateSize, num_ctrl,
 #' #Generate randomization scheme using complete randomization
 #' randomized.manifest_a <- olink_plate_randomizer(manifest, seed=12345)
 #'
-#' #Generate randomization scheme that keeps subjects on the same plate
+#' #Generate randomization scheme that keeps subjects on the same plate (for longitudinal studies)
 #' randomized.manifest_b <- olink_plate_randomizer(manifest,SubjectColumn="SubjectID",
 #'                                                         available.spots=c(88,88), seed=12345)
 #'
