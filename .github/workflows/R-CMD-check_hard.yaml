@@ -42,6 +42,7 @@ jobs:
             any::testthat
             any::knitr
             any::rmarkdown
+            any::kableExtra
           needs: check
           working-directory: OlinkAnalyze  
 
