@@ -67,6 +67,9 @@ test_that("olink_one_non_parametric_posthoc function works", {
                    dplyr::select(contrast) %>%
                    unique() %>%
                    nrow(),10)
+    expect_error(olink_one_non_parametric_posthoc(npx_data1, 'Site')) ##no olinkid list
+
+    expect_warning(olink_one_non_parametric_posthoc(npx_data_format221010, variable = 'treatment2')) # data with all NPX=NA for some assays
 
   }
   expect_equal(friedman_posthoc_results, ref_results$friedman_posthoc_results) ## result equal to testfile - posthoc
@@ -74,12 +77,11 @@ test_that("olink_one_non_parametric_posthoc function works", {
 
   expect_equal(nrow(friedman_posthoc_results), 3) ## check nr of rows
 
-  expect_error(olink_one_non_parametric_posthoc(npx_data1, 'Site')) ##no olinkid list
+
   expect_equal(friedman_posthoc_results %>%
                  dplyr::select(contrast) %>%
                  unique() %>%
                  nrow(),3)
 
-  expect_warning(olink_one_non_parametric_posthoc(npx_data_format221010, variable = 'treatment2')) # data with all NPX=NA for some assays
 })
 
