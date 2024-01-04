@@ -41,8 +41,10 @@
 #' library(dplyr)
 #'
 #' # One-way Kruskal-Wallis Test
+#' try({ # May fail if dependencies are not installed
 #' kruskal_results <- olink_one_non_parametric(df = npx_data1,
 #'                                             variable = "Site")
+#' })
 #'
 #' #Friedman Test
 #' friedman_results <- olink_one_non_parametric(df = npx_data1,
@@ -277,9 +279,13 @@ olink_one_non_parametric <- function(df,
 #' @examples \donttest{
 #' library(dplyr)
 #'
+#'try({ # May fail if dependencies are not installed
 #' # One-way Kruskal-Wallis Test
 #' kruskal_results <- olink_one_non_parametric(df = npx_data1,
 #'                                             variable = "Site")
+#'}
+#')
+
 #'
 #' #Friedman Test
 #' friedman_results <- olink_one_non_parametric(df = npx_data1,
