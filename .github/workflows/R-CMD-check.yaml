@@ -151,7 +151,7 @@ jobs:
         with:
           name: ${{ runner.os }}-r${{ matrix.config.r }}-results
           path: "check"
- 
+# From https://github.com/r-lib/actions/blob/5e080d8d4241b4e7ed3834b113a6fa643d3f1351/examples/check-no-suggests.yaml#L8 
 name: R-CMD-check-nosuggest
 
 jobs:
