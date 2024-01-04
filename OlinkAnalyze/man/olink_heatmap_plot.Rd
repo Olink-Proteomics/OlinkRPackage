@@ -64,7 +64,7 @@ library(dplyr)
 npx_data <- npx_data1 \%>\%
       filter(!stringr::str_detect(SampleID,'CONT'))
 try({ # This will fail if ggplotify is not installed
-#' #Heatmap
+#Heatmap
   olink_heatmap_plot(df=npx_data)
 
 #Heatmap with annotation
