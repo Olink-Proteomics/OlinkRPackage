@@ -44,10 +44,12 @@
 #' @examples \donttest{
 #' library(dplyr)
 #'
+#' try({ # May fail if dependencies are not installed.
 #' #Two-way Ordinal Regression with CLM.
 #' #Results in model NPX~Treatment+Time+Treatment:Time.
-#' ordinalRegression_results <- olink_ordinalRegression(df = npx_data1,
-#'                                                      variable="Treatment:Time")}
+#'    ordinalRegression_results <- olink_ordinalRegression(df = npx_data1,
+#'                                                        variable="Treatment:Time")}
+#' })
 #'
 #' @importFrom dplyr filter group_by ungroup pull do select arrange mutate
 #' @importFrom stringr str_detect
