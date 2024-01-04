@@ -5,17 +5,18 @@ load(refRes_file)
 #Load data with hidden/excluded assays (all NPX=NA)
 load(file = '../data/npx_data_format221010.RData')
 
+if (requireNamespace("ordinal", quietly = TRUE) ){
 #Two-way Ordinal Regression
-ordinalRegression_results <- olink_ordinalRegression(df = npx_data1,
+  ordinalRegression_results <- olink_ordinalRegression(df = npx_data1,
                                                      variable="Treatment:Time") %>%
-  mutate(id = as.character(OlinkID)) %>%
-  arrange(id, Assay) %>% #Just for consistency. Not actually needed in this case
-  select(-id)
+    mutate(id = as.character(OlinkID)) %>%
+    arrange(id, Assay) %>% #Just for consistency. Not actually needed in this case
+      select(-id)
 
 #Posthoc
-ordinalRegression_results_posthoc_results <- olink_ordinalRegression_posthoc(npx_data1,
-                                                                             variable=c("Treatment:Time"),
-                                                                             olinkid_list = {ordinalRegression_results %>%
+  ordinalRegression_results_posthoc_results <- olink_ordinalRegression_posthoc(npx_data1,
+                                                                               variable=c("Treatment:Time"),
+                                                                               olinkid_list = {ordinalRegression_results %>%
                                                                                  filter(Threshold == 'Significant' & term == 'Time') %>%
                                                                                  dplyr::select(OlinkID) %>%
                                                                                  distinct() %>%
@@ -47,3 +48,4 @@ test_that("olink_ordinalRegression_posthoc works", {
 
   expect_warning(olink_ordinalRegression_posthoc(npx_data_format221010, variable = 'treatment2', effect = 'treatment2')) # data with all NPX=NA for some assays
 })
+}

@@ -12,8 +12,10 @@ qc_plot2 <- npx_data1 %>%
   olink_qc_plot(coloroption =  c('teal', 'pink'), label_outliers = FALSE)
 
 test_that("olink_qc_plot works", {
-  vdiffr::expect_doppelganger('QC plot', qc_plot)
-  vdiffr::expect_doppelganger('QC plot with coloroption', qc_plot2)
+  if (requireNamespace("vdiffr", quietly = TRUE) ){
+    vdiffr::expect_doppelganger('QC plot', qc_plot)
+    vdiffr::expect_doppelganger('QC plot with coloroption', qc_plot2)
+  }
 
   expect_warning(olink_qc_plot(npx_data_format221010)) # data with all NPX=NA for some assays
   expect_warning(olink_qc_plot(npx_data_format221121)) # data with all NPX=NA for some assays
