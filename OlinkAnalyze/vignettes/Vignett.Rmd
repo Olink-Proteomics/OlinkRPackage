@@ -1102,7 +1102,9 @@ npx_data_small <- npx_data1 %>%
   filter(OlinkID %in% first10) %>% 
   filter(SampleID %in% first15samples)
 
-olink_heatmap_plot(npx_data_small, variable_row_list =  'Treatment')
+try({ #This statement might fail if dependencies are not installed
+  olink_heatmap_plot(npx_data_small, variable_row_list =  'Treatment')
+  })
 ```
 
 ### Function output
