@@ -27,15 +27,16 @@
 #' library(dplyr)
 #' npx_data <- npx_data1 %>%
 #'       filter(!stringr::str_detect(SampleID,'CONT'))
-#'
+#' try({ # This will fail if ggplotify is not installed
 #' #Heatmap
-#' olink_heatmap_plot(df=npx_data)
+#'   olink_heatmap_plot(df=npx_data)
 #'
 #' #Heatmap with annotation
-#' olink_heatmap_plot(df=npx_data, variable_row_list = c('Time','Site'))
+#'   olink_heatmap_plot(df=npx_data, variable_row_list = c('Time','Site'))
 #'
 #' #Heatmap with calls from pheatmap
-#' olink_heatmap_plot(df=npx_data, cutree_rows = 3)
+#'   olink_heatmap_plot(df=npx_data, cutree_rows = 3)
+#' })
 #'
 #' }
 #'

@@ -74,7 +74,7 @@ NOTE: UMAP is a non-linear data transformation that might not accurately preserv
 library(dplyr)
 npx_data <- npx_data1 \%>\%
     mutate(SampleID = paste(SampleID, "_", Index, sep = ""))
-
+try({ # Requires umap package dependency
 #UMAP using all the data
 olink_umap_plot(df=npx_data, color_g = "QC_Warning")
 
@@ -94,6 +94,7 @@ g <- olink_umap_plot(df=npx_data, color_g = "QC_Warning",
 outliers <- lapply(g, function(x){x$data}) \%>\%
     bind_rows() \%>\%
     filter(Outlier == 1)
+})
 }
 }
 \keyword{NPX}

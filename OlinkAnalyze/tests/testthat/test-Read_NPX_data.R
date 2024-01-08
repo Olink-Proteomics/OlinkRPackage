@@ -15,7 +15,10 @@ test_that("Data loads correctly with 'read_NPX()'", {
   df_ext_v1 <- read_NPX(filename = npx_file_ext_v1)
   npx_file_ext_v2 <- system.file("extdata", "npx_data_ext_v2.zip", package = "OlinkAnalyze", mustWork = TRUE)
   df_ext_v2 <- read_NPX(filename = npx_file_ext_v2)
-  df_parquet <- read_NPX(filename = parquet_file)
+  if (requireNamespace("arrow", quietly = TRUE) ){
+    df_parquet <- read_NPX(filename = parquet_file)
+  }
+
 
   #NPX read ok?
   expect(exists("df_1"), failure_message = "read_NPX failed on dataset 1")
@@ -23,7 +26,9 @@ test_that("Data loads correctly with 'read_NPX()'", {
   expect(exists("df_v3"), failure_message = "read_NPX failed on dataset v3")
   expect(exists("df_ext_v1"), failure_message = "read_NPX failed on extended dataset v1")
   expect(exists("df_ext_v2"), failure_message = "read_NPX failed on extended dataset v2")
-  expect(exists("df_parquet"), failure_message = "read_NPX failed on parquet dataset")
+  if (requireNamespace("arrow", quietly = TRUE) ){
+    expect(exists("df_parquet"), failure_message = "read_NPX failed on parquet dataset")
+  }
 
   #NPX zip read ok?
   zip_npx_file_fail_1 <- system.file("extdata", "Example_NPX_Data_zip.zip", package = "OlinkAnalyze", mustWork = TRUE)
@@ -54,8 +59,8 @@ test_that("Data loads correctly with 'read_NPX()'", {
   expect_equal(ncol(df_ext_v1), 24)
   expect_equal(nrow(df_ext_v2), 1000)
   expect_equal(ncol(df_ext_v2), 22)
-  expect_equal(nrow(df_parquet), 1)
-  expect_equal(ncol(df_parquet),19)
+  if (requireNamespace("arrow", quietly = TRUE) ){expect_equal(nrow(df_parquet), 1)}
+  if (requireNamespace("arrow", quietly = TRUE) ){expect_equal(ncol(df_parquet),19)}
 
   #Correct col names?
   expect_identical(colnames(df_1),
@@ -90,12 +95,14 @@ test_that("Data loads correctly with 'read_NPX()'", {
                      "Assay_Warning", "Sample_Type", "ExploreVersion", "WellID",
                      "IntraCV", "InterCV", "Processing_StartDate",
                      "Processing_EndDate", "AnalyzerID"))
-  expect_identical(colnames(df_parquet),
+  if (requireNamespace("arrow", quietly = TRUE) ){
+    expect_identical(colnames(df_parquet),
                    c("SampleID", "SampleType", "WellID", "PlateID",
                      "DataAnalysisRefID", "OlinkID", "UniProt", "Assay",
                      "AssayType", "Panel", "Block", "Count", "ExtNPX", "NPX",
                      "Normalization", "PCNormalizedNPX", "AssayQC", "SampleQC",
                      "ExploreVersion"))
+  }
 
   #All samples in the manifest?
   sample_names <- df_1 %>%

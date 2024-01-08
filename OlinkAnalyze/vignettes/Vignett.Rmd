@@ -871,8 +871,16 @@ The arguments outlierDefX and outlierDefY can be used to identify outliers in th
 * verbose: Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 * quiet: Logical. Default: False. If TRUE, the resulting plot is not printed.
 
-
 ```{r message=FALSE}
+if (requireNamespace("umap", quietly = TRUE) ){
+npx_data1 %>% 
+  filter(!str_detect(SampleID, 'CONTROL_SAMPLE')) %>% 
+  olink_umap_plot(df = .,
+                 color_g = "QC_Warning", byPanel = TRUE)  
+  }
+```
+
+```{r message=FALSE, eval =FALSE}
 npx_data1 %>% 
   filter(!str_detect(SampleID, 'CONTROL_SAMPLE')) %>% 
   olink_umap_plot(df = .,
@@ -1094,7 +1102,9 @@ npx_data_small <- npx_data1 %>%
   filter(OlinkID %in% first10) %>% 
   filter(SampleID %in% first15samples)
 
-olink_heatmap_plot(npx_data_small, variable_row_list =  'Treatment')
+try({ #This statement might fail if dependencies are not installed
+  olink_heatmap_plot(npx_data_small, variable_row_list =  'Treatment')
+  })
 ```
 
 ### Function output

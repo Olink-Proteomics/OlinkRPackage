@@ -60,8 +60,10 @@ The threshold is determined by logic evaluation of Adjusted_pval < 0.05.
 library(dplyr)
 
 # One-way Kruskal-Wallis Test
+try({ # May fail if dependencies are not installed
 kruskal_results <- olink_one_non_parametric(df = npx_data1,
                                             variable = "Site")
+})
 
 #Friedman Test
 friedman_results <- olink_one_non_parametric(df = npx_data1,

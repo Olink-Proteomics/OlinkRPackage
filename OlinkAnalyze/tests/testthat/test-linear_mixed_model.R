@@ -85,7 +85,9 @@ lmer_plot_excludedids<- suppressWarnings(olink_lmer_plot(df = npx_data_format221
                x_axis_variable = "treatment1", number_of_proteins_per_plot = 5))
 
 test_that("olink_lmer_plot works", {
-  vdiffr::expect_doppelganger('lmer plot', lmer_plot)
-  vdiffr::expect_doppelganger('lmer plot more prots than space', lmer_plot_moreProts[[2]])
+  if (requireNamespace("vdiffr", quietly = TRUE) ){
+    vdiffr::expect_doppelganger('lmer plot', lmer_plot)
+    vdiffr::expect_doppelganger('lmer plot more prots than space', lmer_plot_moreProts[[2]])
+  }
   expect_length(unique(lmer_plot_excludedids[[1]]$data$OlinkID), 1)
 })

@@ -44,10 +44,13 @@
 #' @examples \donttest{
 #' library(dplyr)
 #'
+#' try({ # May fail if dependencies are not installed.
 #' #Two-way Ordinal Regression with CLM.
 #' #Results in model NPX~Treatment+Time+Treatment:Time.
-#' ordinalRegression_results <- olink_ordinalRegression(df = npx_data1,
-#'                                                      variable="Treatment:Time")}
+#'    ordinalRegression_results <- olink_ordinalRegression(df = npx_data1,
+#'                                                        variable="Treatment:Time")
+#' })
+#' }
 #'
 #' @importFrom dplyr filter group_by ungroup pull do select arrange mutate
 #' @importFrom stringr str_detect
@@ -302,6 +305,7 @@ olink_ordinalRegression <- function(df,
 #' library(dplyr)
 #' #Two-way Ordinal Regression.
 #' #Results in model NPX~Treatment*Time.
+#' try({ # May not work if dependencies are not installed.
 #' ordinalRegression_results <- olink_ordinalRegression(df = npx_data1,
 #'                               variable="Treatment:Time")
 #'
@@ -319,7 +323,10 @@ olink_ordinalRegression <- function(df,
 #' ordinalRegression_results_posthoc_results <- olink_ordinalRegression_posthoc(npx_data1,
 #'                                                    variable=c("Treatment:Time"),
 #'                                                    olinkid_list = significant_assays,
-#'                                                    effect = "Time")}
+#'                                                    effect = "Time")
+#'                                                    })
+#'                                                    }
+#'
 #' @importFrom dplyr filter group_by ungroup pull do select arrange mutate
 #' @importFrom stringr str_detect
 #' @importFrom rstatix convert_as_factor
