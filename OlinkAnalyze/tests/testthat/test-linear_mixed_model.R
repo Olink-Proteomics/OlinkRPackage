@@ -60,6 +60,8 @@ test_that("olink_lmer works", {
   expect_equal(lmer_results_1, ref_results$lmer_results_1, tolerance = 1e-4)
   expect_error(olink_lmer(npx_data1))
   expect_warning(olink_lmer(npx_data_format221010, variable = 'treatment1', random = 'SubjectDummy')) # data with all NPX=NA for some assays
+  expect_no_error(olink_lmer(df = {npx_data1 |> dplyr::select(-Index)}, variable = c('Treatment', "Time"),
+                             random = "Subject")) #Function works without index column
 })
 
 test_that("olink_lmer_posthoc works", {
