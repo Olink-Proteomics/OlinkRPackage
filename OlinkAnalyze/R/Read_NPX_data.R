@@ -326,15 +326,19 @@ read_NPX_target <- function(filename) {
     isTarget96 <- TRUE
     isFlex <- FALSE
 
-  } else if (any(stringr::str_detect(c(panel_name, panel_name_long), pattern = "[A-Z]{4}-[A-Z]{4} || Flex"))){
+  } else if (any(stringr::str_detect(c(panel_name, panel_name_long), pattern = "[A-Z]{4}-[A-Z]{4}|Flex"))){
 
     isTarget48 <- FALSE
     isTarget96 <- FALSE
     isFlex <- TRUE
 
+  } else if(any(stringr::str_detect(c(panel_name, panel_name_long), pattern = "Olink"))){
+    isTarget48 <- FALSE
+    isTarget96 <- TRUE
+    isFlex <- FALSE
   } else {
 
-    stop("Cannot detect if Target or Flex.")
+    stop("Cannot detect if Target or Flex. Note: Data exported from NPXS 1.8+ is only supported in long format csv.")
 
   }
 
