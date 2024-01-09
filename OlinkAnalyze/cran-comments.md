@@ -1,6 +1,6 @@
 ## Release Summary
 
-This release contains new features to version 3.5.1 including support for new data types and minor bug fixes.
+This release contains bug fixes to version 3.6.1 to restore and expand data support and to ensure Suggests packages are used conditionally.
 
 ## R CMD check results
 

@@ -1,4 +1,12 @@
-# OlinkAnalyze 3.6.1
+# Olink Analyze 3.6.2
+## Bug Fixes
+* Packages in Suggest field are now called conditionally in vignettes, tests, and examples. (#319, @kathy-nevola)
+* read_NPX will now work with Target 96 data that does not contain "Target 96" in the panel name (#320, @kathy-nevola)
+* olink_lmer will no longer require the presence of an Index column in the data (#321, @kathy-nevola)
+
+
+
+# Olink Analyze 3.6.1
 ## Minor Changes
 * Install package Matrix from source in CI. (#299 @klevdiamanti, @AskPascal)
 
