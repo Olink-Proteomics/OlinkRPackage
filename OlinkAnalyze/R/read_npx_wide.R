@@ -20,7 +20,7 @@ read_npx_wide <- function(file,
       .data[["data_type"]] == .env[["data_type"]]
     )
 
-  # split the file into sub- data frames ----
+  # split the file into sub-data frames ----
 
   df_split <- read_npx_wide_split_row(
     file = file,
@@ -30,7 +30,7 @@ read_npx_wide <- function(file,
 
   # top list of df to long ----
 
-  df_top_list <- read_npx_wide_top_split(
+  df_top_list <- read_npx_wide_top(
     df = df_split$df_top,
     file = file,
     olink_platform = olink_platform,
@@ -404,10 +404,10 @@ read_npx_wide_check_top <- function(df,
 #' @return List of the data frames (df_oid, df_meta, df_qc_dev and df_int_ctrl)
 #' in long format that df_top is split on.
 #'
-read_npx_wide_top_split <- function(df,
-                                    file,
-                                    olink_platform,
-                                    format_spec) {
+read_npx_wide_top <- function(df,
+                              file,
+                              olink_platform,
+                              format_spec) {
 
   # check input and top matrix ----
 

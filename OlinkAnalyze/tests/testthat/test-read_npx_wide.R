@@ -1,9 +1,3 @@
-# Help functions ----
-
-# test_that will automagically source the file
-# helper-olink_wide_synthetic_data.R
-# which contains help functions in this test
-
 # Test read_npx_wide_split_row ----
 
 test_that(
@@ -1157,10 +1151,10 @@ test_that(
   }
 )
 
-# Test read_npx_wide_top_split ----
+# Test read_npx_wide_top ----
 
 test_that(
-  "read_npx_wide_top_split - works - T48 - single panel",
+  "read_npx_wide_top - works - T48 - single panel",
   {
     ## NPX ----
 
@@ -1191,10 +1185,10 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                                    file = wide_excel,
-                                                    olink_platform = o_platform,
-                                                    format_spec = format_s)
+          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
+                                              file = wide_excel,
+                                              olink_platform = o_platform,
+                                              format_spec = format_s)
         )
 
         # check that output match
@@ -1249,10 +1243,10 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                                    file = wide_excel,
-                                                    olink_platform = o_platform,
-                                                    format_spec = format_s)
+          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
+                                              file = wide_excel,
+                                              olink_platform = o_platform,
+                                              format_spec = format_s)
         )
 
         # check that output match
@@ -1306,10 +1300,10 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                                    file = wide_excel,
-                                                    olink_platform = o_platform,
-                                                    format_spec = format_s)
+          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
+                                              file = wide_excel,
+                                              olink_platform = o_platform,
+                                              format_spec = format_s)
         )
 
         # check that output match
@@ -1364,10 +1358,10 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                                    file = wide_excel,
-                                                    olink_platform = o_platform,
-                                                    format_spec = format_s)
+          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
+                                              file = wide_excel,
+                                              olink_platform = o_platform,
+                                              format_spec = format_s)
         )
 
         # check that output match
@@ -1423,10 +1417,10 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                                    file = wide_excel,
-                                                    olink_platform = o_platform,
-                                                    format_spec = format_s)
+          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
+                                              file = wide_excel,
+                                              olink_platform = o_platform,
+                                              format_spec = format_s)
         )
 
         # check that output match
@@ -1482,10 +1476,10 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                                    file = wide_excel,
-                                                    olink_platform = o_platform,
-                                                    format_spec = format_s)
+          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
+                                              file = wide_excel,
+                                              olink_platform = o_platform,
+                                              format_spec = format_s)
         )
 
         # check that output match
@@ -1516,7 +1510,7 @@ test_that(
 )
 
 test_that(
-  "read_npx_wide_top_split - works - T48 - multiple panels",
+  "read_npx_wide_top - works - T48 - multiple panels",
   {
     ## NPX ----
 
@@ -1547,10 +1541,10 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                                    file = wide_excel,
-                                                    olink_platform = o_platform,
-                                                    format_spec = format_s)
+          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
+                                              file = wide_excel,
+                                              olink_platform = o_platform,
+                                              format_spec = format_s)
         )
 
         # check that output match
@@ -1605,10 +1599,10 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                                    file = wide_excel,
-                                                    olink_platform = o_platform,
-                                                    format_spec = format_s)
+          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
+                                              file = wide_excel,
+                                              olink_platform = o_platform,
+                                              format_spec = format_s)
         )
 
         # check that output match
@@ -1662,10 +1656,10 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                                    file = wide_excel,
-                                                    olink_platform = o_platform,
-                                                    format_spec = format_s)
+          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
+                                              file = wide_excel,
+                                              olink_platform = o_platform,
+                                              format_spec = format_s)
         )
 
         # check that output match
@@ -1720,10 +1714,10 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                                    file = wide_excel,
-                                                    olink_platform = o_platform,
-                                                    format_spec = format_s)
+          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
+                                              file = wide_excel,
+                                              olink_platform = o_platform,
+                                              format_spec = format_s)
         )
 
         # check that output match
@@ -1779,10 +1773,10 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                                    file = wide_excel,
-                                                    olink_platform = o_platform,
-                                                    format_spec = format_s)
+          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
+                                              file = wide_excel,
+                                              olink_platform = o_platform,
+                                              format_spec = format_s)
         )
 
         # check that output match
@@ -1838,10 +1832,10 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                                    file = wide_excel,
-                                                    olink_platform = o_platform,
-                                                    format_spec = format_s)
+          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
+                                              file = wide_excel,
+                                              olink_platform = o_platform,
+                                              format_spec = format_s)
         )
 
         # check that output match
@@ -1872,7 +1866,7 @@ test_that(
 )
 
 test_that(
-  "read_npx_wide_top_split - works - T96 - single panel",
+  "read_npx_wide_top - works - T96 - single panel",
   {
     ## NPX ----
 
@@ -1903,10 +1897,10 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                                    file = wide_excel,
-                                                    olink_platform = o_platform,
-                                                    format_spec = format_s)
+          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
+                                              file = wide_excel,
+                                              olink_platform = o_platform,
+                                              format_spec = format_s)
         )
 
         # check that output match
@@ -1961,10 +1955,10 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                                    file = wide_excel,
-                                                    olink_platform = o_platform,
-                                                    format_spec = format_s)
+          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
+                                              file = wide_excel,
+                                              olink_platform = o_platform,
+                                              format_spec = format_s)
         )
 
         # check that output match
@@ -1993,7 +1987,7 @@ test_that(
 )
 
 test_that(
-  "read_npx_wide_top_split - works - T96 - multiple panels",
+  "read_npx_wide_top - works - T96 - multiple panels",
   {
     ## NPX ----
 
@@ -2024,10 +2018,10 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                                    file = wide_excel,
-                                                    olink_platform = o_platform,
-                                                    format_spec = format_s)
+          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
+                                              file = wide_excel,
+                                              olink_platform = o_platform,
+                                              format_spec = format_s)
         )
 
         # check that output match
@@ -2082,10 +2076,10 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                                    file = wide_excel,
-                                                    olink_platform = o_platform,
-                                                    format_spec = format_s)
+          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
+                                              file = wide_excel,
+                                              olink_platform = o_platform,
+                                              format_spec = format_s)
         )
 
         # check that output match
@@ -2114,7 +2108,7 @@ test_that(
 )
 
 test_that(
-  "read_npx_wide_top_split - works - Flex/Focus - single panel",
+  "read_npx_wide_top - works - Flex/Focus - single panel",
   {
     ## NPX ----
 
@@ -2145,10 +2139,10 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                                    file = wide_excel,
-                                                    olink_platform = o_platform,
-                                                    format_spec = format_s)
+          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
+                                              file = wide_excel,
+                                              olink_platform = o_platform,
+                                              format_spec = format_s)
         )
 
         # check that output match
@@ -2203,10 +2197,10 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                                    file = wide_excel,
-                                                    olink_platform = o_platform,
-                                                    format_spec = format_s)
+          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
+                                              file = wide_excel,
+                                              olink_platform = o_platform,
+                                              format_spec = format_s)
         )
 
         # check that output match
@@ -2260,10 +2254,10 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                                    file = wide_excel,
-                                                    olink_platform = o_platform,
-                                                    format_spec = format_s)
+          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
+                                              file = wide_excel,
+                                              olink_platform = o_platform,
+                                              format_spec = format_s)
         )
 
         # check that output match
@@ -2318,10 +2312,10 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                                    file = wide_excel,
-                                                    olink_platform = o_platform,
-                                                    format_spec = format_s)
+          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
+                                              file = wide_excel,
+                                              olink_platform = o_platform,
+                                              format_spec = format_s)
         )
 
         # check that output match
@@ -2377,10 +2371,10 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                                    file = wide_excel,
-                                                    olink_platform = o_platform,
-                                                    format_spec = format_s)
+          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
+                                              file = wide_excel,
+                                              olink_platform = o_platform,
+                                              format_spec = format_s)
         )
 
         # check that output match
@@ -2436,10 +2430,10 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                                    file = wide_excel,
-                                                    olink_platform = o_platform,
-                                                    format_spec = format_s)
+          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
+                                              file = wide_excel,
+                                              olink_platform = o_platform,
+                                              format_spec = format_s)
         )
 
         # check that output match
@@ -2470,7 +2464,7 @@ test_that(
 )
 
 test_that(
-  "read_npx_wide_top_split - works - Flex/Focus - multiple panels",
+  "read_npx_wide_top - works - Flex/Focus - multiple panels",
   {
     ## NPX ----
 
@@ -2501,10 +2495,10 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                                    file = wide_excel,
-                                                    olink_platform = o_platform,
-                                                    format_spec = format_s)
+          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
+                                              file = wide_excel,
+                                              olink_platform = o_platform,
+                                              format_spec = format_s)
         )
 
         # check that output match
@@ -2559,10 +2553,10 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                                    file = wide_excel,
-                                                    olink_platform = o_platform,
-                                                    format_spec = format_s)
+          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
+                                              file = wide_excel,
+                                              olink_platform = o_platform,
+                                              format_spec = format_s)
         )
 
         # check that output match
@@ -2616,10 +2610,10 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                                    file = wide_excel,
-                                                    olink_platform = o_platform,
-                                                    format_spec = format_s)
+          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
+                                              file = wide_excel,
+                                              olink_platform = o_platform,
+                                              format_spec = format_s)
         )
 
         # check that output match
@@ -2674,10 +2668,10 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                                    file = wide_excel,
-                                                    olink_platform = o_platform,
-                                                    format_spec = format_s)
+          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
+                                              file = wide_excel,
+                                              olink_platform = o_platform,
+                                              format_spec = format_s)
         )
 
         # check that output match
@@ -2733,10 +2727,10 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                                    file = wide_excel,
-                                                    olink_platform = o_platform,
-                                                    format_spec = format_s)
+          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
+                                              file = wide_excel,
+                                              olink_platform = o_platform,
+                                              format_spec = format_s)
         )
 
         # check that output match
@@ -2792,10 +2786,10 @@ test_that(
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                                    file = wide_excel,
-                                                    olink_platform = o_platform,
-                                                    format_spec = format_s)
+          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
+                                              file = wide_excel,
+                                              olink_platform = o_platform,
+                                              format_spec = format_s)
         )
 
         # check that output match
@@ -2826,7 +2820,7 @@ test_that(
 )
 
 test_that(
-  "read_npx_wide_top_split - error - missing or too many labels in rows 2 & 3",
+  "read_npx_wide_top - error - missing or too many labels in rows 2 & 3",
   {
     # df contains an unrecognizable tag ----
 
@@ -2879,10 +2873,10 @@ test_that(
 
         # check that function runs with error
         expect_error(
-          object = read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                           file = wide_excel,
-                                           olink_platform = o_platform,
-                                           format_spec = format_s),
+          object = read_npx_wide_top(df = df_rand$wide$df_top,
+                                     file = wide_excel,
+                                     olink_platform = o_platform,
+                                     format_spec = format_s),
           regexp = "The top matrix with the assays metadata in file"
         )
 
@@ -2918,10 +2912,10 @@ test_that(
 
         # check that function runs with error
         expect_error(
-          object = read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                           file = wide_excel,
-                                           olink_platform = o_platform,
-                                           format_spec = format_s),
+          object = read_npx_wide_top(df = df_rand$wide$df_top,
+                                     file = wide_excel,
+                                     olink_platform = o_platform,
+                                     format_spec = format_s),
           regexp = "The top matrix with the assays metadata in file"
         )
 
@@ -2963,10 +2957,10 @@ test_that(
 
         # check that function runs with error
         expect_error(
-          object = read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                           file = wide_excel,
-                                           olink_platform = o_platform,
-                                           format_spec = format_s),
+          object = read_npx_wide_top(df = df_rand$wide$df_top,
+                                     file = wide_excel,
+                                     olink_platform = o_platform,
+                                     format_spec = format_s),
           regexp = "The top matrix with the assays metadata in file"
         )
 
@@ -2977,7 +2971,7 @@ test_that(
 )
 
 test_that(
-  "read_npx_wide_top_split - error - NAs in OlinkID/Uniprot/Assay",
+  "read_npx_wide_top - error - NAs in OlinkID/Uniprot/Assay",
   {
     ## OlinkID = NA 1 instance ----
 
@@ -3016,10 +3010,10 @@ test_that(
 
         # check that function runs with error
         expect_error(
-          object = read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                           file = wide_excel,
-                                           olink_platform = o_platform,
-                                           format_spec = format_s),
+          object = read_npx_wide_top(df = df_rand$wide$df_top,
+                                     file = wide_excel,
+                                     olink_platform = o_platform,
+                                     format_spec = format_s),
           regexp = "Detected 1 empty cells in columns"
         )
 
@@ -3070,10 +3064,10 @@ test_that(
 
         # check that function runs with error
         expect_error(
-          object = read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                           file = wide_excel,
-                                           olink_platform = o_platform,
-                                           format_spec = format_s),
+          object = read_npx_wide_top(df = df_rand$wide$df_top,
+                                     file = wide_excel,
+                                     olink_platform = o_platform,
+                                     format_spec = format_s),
           regexp = "Detected 4 empty cells in columns"
         )
 
@@ -3084,7 +3078,7 @@ test_that(
 )
 
 test_that(
-  "read_npx_wide_top_split - error - wrong # of assays",
+  "read_npx_wide_top - error - wrong # of assays",
   {
     ## T48 1 panel ----
 
@@ -3117,10 +3111,10 @@ test_that(
 
         # check that function runs
         expect_error(
-          object = read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                           file = wide_excel,
-                                           olink_platform = o_platform,
-                                           format_spec = format_s),
+          object = read_npx_wide_top(df = df_rand$wide$df_top,
+                                     file = wide_excel,
+                                     olink_platform = o_platform,
+                                     format_spec = format_s),
           regexp = "Detected 40 assays in 1 panels in file"
         )
 
@@ -3158,10 +3152,10 @@ test_that(
 
         # check that function runs
         expect_error(
-          object = read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                           file = wide_excel,
-                                           olink_platform = o_platform,
-                                           format_spec = format_s),
+          object = read_npx_wide_top(df = df_rand$wide$df_top,
+                                     file = wide_excel,
+                                     olink_platform = o_platform,
+                                     format_spec = format_s),
           regexp = "Detected 64 assays in 2 panels in file"
         )
 
@@ -3199,10 +3193,10 @@ test_that(
 
         # check that function runs
         expect_error(
-          object = read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                           file = wide_excel,
-                                           olink_platform = o_platform,
-                                           format_spec = format_s),
+          object = read_npx_wide_top(df = df_rand$wide$df_top,
+                                     file = wide_excel,
+                                     olink_platform = o_platform,
+                                     format_spec = format_s),
           regexp = "Detected 67 assays in 1 panels in file"
         )
 
@@ -3240,10 +3234,10 @@ test_that(
 
         # check that function runs
         expect_error(
-          object = read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                           file = wide_excel,
-                                           olink_platform = o_platform,
-                                           format_spec = format_s),
+          object = read_npx_wide_top(df = df_rand$wide$df_top,
+                                     file = wide_excel,
+                                     olink_platform = o_platform,
+                                     format_spec = format_s),
           regexp = "Detected 156 assays in 2 panels in file"
         )
 
@@ -3254,7 +3248,7 @@ test_that(
 )
 
 test_that(
-  "read_npx_wide_top_split - error - uneven # of Plate ID and QC_Warning cols",
+  "read_npx_wide_top - error - uneven # of Plate ID and QC_Warning cols",
   {
     withr::with_tempfile(
       new = "wide_excel",
@@ -3293,10 +3287,10 @@ test_that(
 
         # check that function runs
         expect_error(
-          object = read_npx_wide_top_split(df = df_rand$wide$df_top,
-                                           file = wide_excel,
-                                           olink_platform = o_platform,
-                                           format_spec = format_s),
+          object = read_npx_wide_top(df = df_rand$wide$df_top,
+                                     file = wide_excel,
+                                     olink_platform = o_platform,
+                                     format_spec = format_s),
           regexp = "Expected equal number of \"Plate ID\" and \"QC\ Warning\""
         )
 
