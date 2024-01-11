@@ -8,6 +8,7 @@ dat <- npx_data1 %>%
   mutate(NPX = ifelse(SampleID %in% outGroup, NPX + 5, NPX),
          group = ifelse(SampleID %in% outGroup, 'A', 'B'))
 
+if (requireNamespace("umap", quietly = TRUE) ){
 #Run UMAP and cluster the results
 umap_plot <- olink_umap_plot(dat, color_g = 'group', quiet = TRUE) #UMAP
 umap_plot.cl <- kmeans(umap_plot[[1]]$data, centers = 2) #Cluster umap results
@@ -31,3 +32,4 @@ test_that("olink_umap_plot works", {
 
   expect_warning(olink_umap_plot(npx_data_format221010)) # data with all NPX=NA for some assays
 })
+}

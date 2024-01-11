@@ -147,14 +147,14 @@ The olink_plate_randomizer function randomly assigns samples to a plate well wit
 
 + Manifest: tibble/data frame in long format containing all sample ID's. Sample ID column should be named SampleID.
 + PlateSize: Integer, either 96 or 48. 96 is default and should be used for Olink® Target 96 and Olink® Explore projects. For Olink® Target 48 projects, use 48.
-+ SubjectColumn: (Optional) Column name of the subject ID column. Cannot contain missing values. If provided, subjects are kept on the same plate.
++ SubjectColumn: (Optional) Column name of the subject ID column. Cannot contain missing values. If provided, subjects are kept on the same plate. This argument is used for longitudinal studies and must be a separate column from the SampleID column.
 + iterations: Number of iterations for fitting subjects on the same plate.
 + available.spots: (Optional) Integer. Number of wells available on each plate. Maximum 40 for Olink® Target 48 and 88 for Olink® Target 96/Explore. Can also take a vector equal to the number of plates to be used indicating the number of wells available on each plate.
 + seed: Seed to set. Highly recommend setting it for reproducibility.
 
 ```{r message=FALSE, eval=FALSE}
 olink_plate_randomizer(manifest, 
-                       SubjectColumn ="SampleID",
+                       SubjectColumn ="SubjectID",
                        seed=111)
 ```  
 
@@ -221,13 +221,15 @@ olink_normalization(df1 = npx_data1,
 
 # Example of using all samples for normalization
 subset_df1 <- npx_data1 %>% 
-  filter(QC_Warning == 'Pass') %>% 
+  group_by(SampleID) %>%
+  filter(all(QC_Warning == 'Pass')) %>% 
   filter(!str_detect(SampleID, 'CONTROL_SAMPLE')) %>%
   pull(SampleID) %>% 
   unique()
 
-subset_df2 <- npx_data2 %>% 
-  filter(QC_Warning == 'Pass') %>% 
+subset_df2 <- npx_data2 %>%   
+  group_by(SampleID) %>%
+  filter(all(QC_Warning == 'Pass')) %>% 
   filter(!str_detect(SampleID, 'CONTROL_SAMPLE')) %>%
   pull(SampleID) %>% 
   unique()
@@ -869,8 +871,16 @@ The arguments outlierDefX and outlierDefY can be used to identify outliers in th
 * verbose: Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 * quiet: Logical. Default: False. If TRUE, the resulting plot is not printed.
 
-
 ```{r message=FALSE}
+if (requireNamespace("umap", quietly = TRUE) ){
+npx_data1 %>% 
+  filter(!str_detect(SampleID, 'CONTROL_SAMPLE')) %>% 
+  olink_umap_plot(df = .,
+                 color_g = "QC_Warning", byPanel = TRUE)  
+  }
+```
+
+```{r message=FALSE, eval =FALSE}
 npx_data1 %>% 
   filter(!str_detect(SampleID, 'CONTROL_SAMPLE')) %>% 
   olink_umap_plot(df = .,
@@ -1092,7 +1102,9 @@ npx_data_small <- npx_data1 %>%
   filter(OlinkID %in% first10) %>% 
   filter(SampleID %in% first15samples)
 
-olink_heatmap_plot(npx_data_small, variable_row_list =  'Treatment')
+try({ #This statement might fail if dependencies are not installed
+  olink_heatmap_plot(npx_data_small, variable_row_list =  'Treatment')
+  })
 ```
 
 ### Function output

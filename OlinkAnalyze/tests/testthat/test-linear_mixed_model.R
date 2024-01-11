@@ -60,6 +60,8 @@ test_that("olink_lmer works", {
   expect_equal(lmer_results_1, ref_results$lmer_results_1, tolerance = 1e-4)
   expect_error(olink_lmer(npx_data1))
   expect_warning(olink_lmer(npx_data_format221010, variable = 'treatment1', random = 'SubjectDummy')) # data with all NPX=NA for some assays
+  expect_no_error(olink_lmer(df = {npx_data1 |> dplyr::select(-Index)}, variable = c('Treatment', "Time"),
+                             random = "Subject")) #Function works without index column
 })
 
 test_that("olink_lmer_posthoc works", {
@@ -85,7 +87,9 @@ lmer_plot_excludedids<- suppressWarnings(olink_lmer_plot(df = npx_data_format221
                x_axis_variable = "treatment1", number_of_proteins_per_plot = 5))
 
 test_that("olink_lmer_plot works", {
-  vdiffr::expect_doppelganger('lmer plot', lmer_plot)
-  vdiffr::expect_doppelganger('lmer plot more prots than space', lmer_plot_moreProts[[2]])
+  if (requireNamespace("vdiffr", quietly = TRUE) ){
+    vdiffr::expect_doppelganger('lmer plot', lmer_plot)
+    vdiffr::expect_doppelganger('lmer plot more prots than space', lmer_plot_moreProts[[2]])
+  }
   expect_length(unique(lmer_plot_excludedids[[1]]$data$OlinkID), 1)
 })

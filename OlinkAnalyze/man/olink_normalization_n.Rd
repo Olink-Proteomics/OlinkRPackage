@@ -130,13 +130,15 @@ npx_df2 <- npx_data2 |>
 # controls and samples that fail QC.
 df1_samples <- npx_df1 |>
   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
-  dplyr::filter(QC_Warning == 'Pass') |>
+  dplyr::group_by(SampleID) |>
+  dplyr::filter(all(QC_Warning == 'Pass')) |>
   dplyr::pull(SampleID) |>
   unique() |>
   sample(size = 16, replace = FALSE)
 df2_samples <- npx_df2 |>
   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
-  dplyr::filter(QC_Warning == 'Pass') |>
+  dplyr::group_by(SampleID) |>
+  dplyr::filter(all(QC_Warning == 'Pass')) |>
   dplyr::pull(SampleID) |>
   unique() |>
   sample(size = 16, replace = FALSE)
@@ -176,10 +178,14 @@ npx_df2 <- npx_data2 |>
 # controls and samples that fail QC.
 df1_samples_all <- npx_df1 |>
   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
+  dplyr::group_by(SampleID) |>
+  dplyr::filter(all(QC_Warning == 'Pass')) |>
   dplyr::pull(SampleID) |>
   unique()
 df2_samples_all <- npx_df2 |>
   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
+  dplyr::group_by(SampleID) |>
+  dplyr::filter(all(QC_Warning == 'Pass')) |>
   dplyr::pull(SampleID) |>
   unique()
 

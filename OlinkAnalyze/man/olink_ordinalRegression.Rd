@@ -44,7 +44,7 @@ Columns include:
 }
 }
 \description{
-Performs an ANOVA F-test for each assay (by OlinkID) in every panel using car::Anova and Type II sum of squares.
+Performs an ANOVA F-test for each assay (by OlinkID) in every panel using stats::Anova and Type III sum of squares. Dependent variable will be treated as ordered factor.
 The function handles only factor and/or covariates. \cr\cr
 Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a message if verbose = T).
 Character columns in the input dataframe are automatically converted to factors (specified in a message if verbose = T).
@@ -63,9 +63,12 @@ The threshold is determined by logic evaluation of Adjusted_pval < 0.05. Covaria
 \donttest{
 library(dplyr)
 
+try({ # May fail if dependencies are not installed.
 #Two-way Ordinal Regression with CLM.
 #Results in model NPX~Treatment+Time+Treatment:Time.
-ordinalRegression_results <- olink_ordinalRegression(df = npx_data1,
-                                                     variable="Treatment:Time")}
+   ordinalRegression_results <- olink_ordinalRegression(df = npx_data1,
+                                                       variable="Treatment:Time")
+})
+}
 
 }

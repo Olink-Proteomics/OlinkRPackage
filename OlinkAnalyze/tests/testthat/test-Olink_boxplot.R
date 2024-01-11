@@ -46,11 +46,13 @@ boxplot_time_site <- npx_data1 %>%
 
 
 test_that("olink_boxplot works", {
-  vdiffr::expect_doppelganger('boxplot site 2prots', boxplot_site_2prots)
-  vdiffr::expect_doppelganger('boxplot site 10prots', boxplot_site_10prots[[2]])
-  vdiffr::expect_doppelganger('boxplot time', boxplot_time)
-  vdiffr::expect_doppelganger('boxplot time with coloroption', boxplot_time_coloroption)
-  vdiffr::expect_doppelganger('boxplot time and site', boxplot_time_site)
+  if (requireNamespace("vdiffr", quietly = TRUE) ){
+    vdiffr::expect_doppelganger('boxplot site 2prots', boxplot_site_2prots)
+    vdiffr::expect_doppelganger('boxplot site 10prots', boxplot_site_10prots[[2]])
+    vdiffr::expect_doppelganger('boxplot time', boxplot_time)
+    vdiffr::expect_doppelganger('boxplot time with coloroption', boxplot_time_coloroption)
+    vdiffr::expect_doppelganger('boxplot time and site', boxplot_time_site)
+  }
   expect_warning(npx_data_format221010 %>%
                    olink_boxplot(variable = "treatment2",
                                  olinkid_list = c(npx_Check$all_nas[1:5],"OID30538")))

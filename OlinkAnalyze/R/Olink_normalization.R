@@ -58,13 +58,15 @@
 #' # Find a suitable subset of samples from both projects, but exclude Olink controls
 #' # and samples which do not pass QC.
 #' df1_sampleIDs <- npx_df1 %>%
-#'     dplyr::filter(QC_Warning == 'Pass') %>%
+#'     dplyr::group_by(SampleID) %>%
+#'     dplyr::filter(all(QC_Warning == 'Pass')) %>%
 #'     dplyr::filter(!stringr::str_detect(SampleID, 'CONTROL_SAMPLE')) %>%
 #'     dplyr::select(SampleID) %>%
 #'     unique() %>%
 #'     dplyr::pull(SampleID)
 #' df2_sampleIDs <- npx_df2 %>%
-#'     dplyr::filter(QC_Warning == 'Pass') %>%
+#'     dplyr::group_by(SampleID) %>%
+#'     dplyr::filter(all(QC_Warning == 'Pass')) %>%
 #'     dplyr::filter(!stringr::str_detect(SampleID, 'CONTROL_SAMPLE')) %>%
 #'     dplyr::select(SampleID) %>%
 #'     unique() %>%

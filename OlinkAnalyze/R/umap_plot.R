@@ -32,7 +32,7 @@
 #' library(dplyr)
 #' npx_data <- npx_data1 %>%
 #'     mutate(SampleID = paste(SampleID, "_", Index, sep = ""))
-#'
+#' try({ # Requires umap package dependency
 #' #UMAP using all the data
 #' olink_umap_plot(df=npx_data, color_g = "QC_Warning")
 #'
@@ -52,6 +52,7 @@
 #' outliers <- lapply(g, function(x){x$data}) %>%
 #'     bind_rows() %>%
 #'     filter(Outlier == 1)
+#' })
 #' }
 #' @importFrom magrittr %>%
 #' @importFrom dplyr filter select group_by ungroup mutate mutate_at if_else n_distinct summarise left_join arrange distinct
