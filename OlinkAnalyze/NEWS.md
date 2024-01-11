@@ -6,7 +6,7 @@
 * corrected examples for subset normalization (#312 @kathy-nevola)
 * added additional information on example data to outlier vignette (#313 @kathy-nevola)
 * clarified documentation for longitudinal randomization (#314 @kathy-nevola)
-
+* corrected warning message for olink_ordinalRegression (#296 @boxizhang)
 
 # Olink Analyze 3.6.1
 ## Minor Changes
