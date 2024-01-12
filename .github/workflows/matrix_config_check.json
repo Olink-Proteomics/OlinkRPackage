@@ -38,5 +38,11 @@
       "os": "ubuntu-22.04",
       "r": "4.3.0",
       "runOn": "pull_request"
+   },
+   {
+      "os": "ubuntu-latest",
+      "r": "release",
+      "runOn": "always",
+      "container": "fedora:35"
    }
 ]
