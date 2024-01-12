@@ -63,4 +63,9 @@ jobs:
 
       - uses: r-lib/actions/check-r-package@v2
         with:
-          working-directory: OlinkAnalyze     
+          working-directory: OlinkAnalyze
+          
+      - name: Check OS
+        run: |
+          Sys.info()          
+        shell: Rscript {0}
