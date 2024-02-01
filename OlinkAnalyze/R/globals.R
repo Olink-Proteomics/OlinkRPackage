@@ -63,11 +63,11 @@ accepted_olink_platforms <- dplyr::tibble(
   ),
   quant_method = list(
     c("NPX", "Quantified", "Ct"),
-    c("NPX", "Quantified"),
+    c("NPX", "Quantified", "Ct"),
     c("NPX", "Ct"),
     c("NPX"),
     c("NPX"),
-    c("NPX", "Quantified")
+    c("NPX", "Quantified", "Ct")
   ),
   quant_type = list(
     c("relative", "absolute", "relative"),
@@ -84,6 +84,14 @@ accepted_olink_platforms <- dplyr::tibble(
     NA_integer_,
     NA_integer_,
     NA_integer_
+  ),
+  wide_format_plate_info = c(
+    TRUE,
+    TRUE,
+    FALSE,
+    NA,
+    NA,
+    TRUE
   )
 )
 
@@ -92,15 +100,21 @@ accepted_olink_platforms <- dplyr::tibble(
 # Used in :
 #   - read_npx_wide
 olink_wide_excel_spec <- dplyr::tibble(
-  data_type = c("NPX",
-                "Ct",
-                "Quantified"),
-  bottom_matrix = c(TRUE,
-                    FALSE,
-                    TRUE),
-  n_na_rows = c(2L,
-                1L,
-                2L),
+  data_type = c(
+    "NPX",
+    "Ct",
+    "Quantified"
+  ),
+  has_qc_data = c(
+    TRUE,
+    FALSE,
+    TRUE
+  ),
+  n_na_rows = c(
+    2L,
+    1L,
+    2L
+  ),
   top_matrix_v1 = list(
     c("Panel", "Assay", "Uniprot ID", "OlinkID"),
     c("Panel", "Assay", "Uniprot ID", "OlinkID"),
@@ -111,23 +125,25 @@ olink_wide_excel_spec <- dplyr::tibble(
     c("plate" = "Plate ID"),
     c("plate" = "Plate ID", "qc_warn" = "QC Warning")
   ),
-  top_matrix_assay_optional = list(
-    NA_character_,
-    NA_character_,
-    c("QC Deviation from median", "Ext Ctrl", "Amp Ctrl", "Inc Ctrl")
+  top_matrix_assay_int_ctrl = list(
+    c("Inc Ctrl", "Inc Ctrl 1", "Inc Ctrl 2", "Det Ctrl", "Ext Ctrl"),
+    c("Inc Ctrl", "Inc Ctrl 1", "Inc Ctrl 2", "Det Ctrl", "Ext Ctrl"),
+    c("Inc Ctrl", "Inc Ctrl 1", "Inc Ctrl 2", "Det Ctrl", "Ext Ctrl")
   ),
-  bottom_matrix_v1 = list(
-    c("Missing Data freq.", "Normalization", "LOD"),
-    NA_character_,
-    c("Missing Data freq.", "Normalization", "Assay warning",
-      "Lowest quantifiable level", "Plate LOD", "LLOQ", "ULOQ")
+  top_matrix_assay_dev_int_ctrl = list(
+    c("QC Deviation from median"),
+    character(0L),
+    c("QC Deviation from median")
   ),
-  use_plate_col = c(
-    FALSE,
-    FALSE,
-    TRUE
+  top_matrix_uniprot_dev_int_ctrl = list(
+    c("Inc Ctrl", "Inc Ctrl 1", "Inc Ctrl 2", "Det Ctrl"),
+    character(0L),
+    c("Inc Ctrl", "Inc Ctrl 1", "Inc Ctrl 2", "Det Ctrl")
   )
 )
+
+olink_wide_excel_bottom_matrix <-
+  readRDS("data/npx_signature_bottom_mat_v1_long.rds")
 
 ## Acceptable checksum file names ----
 

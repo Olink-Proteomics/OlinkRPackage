@@ -23,124 +23,161 @@ olink_wide_head <- function(data_type) {
 #
 # Returns a matrix in wide format.
 olink_wide_top <- function(olink_platform,
+                           data_type,
                            n_panels,
                            n_assays,
-                           data_type,
-                           show_int_ctrl = TRUE,
-                           loc_int_ctrl = "V3",
-                           shuffle_assays = FALSE) {
+                           show_dev_int_ctrl = TRUE,
+                           show_int_ctrl = TRUE) {
 
+  # basics ----
+
+  # select set of internal controls
+  sample_int_ctrl <- dplyr::tibble(
+    int_ctrl = olink_wide_excel_spec |>
+      dplyr::pull(
+        dplyr::all_of("top_matrix_assay_int_ctrl")
+      ) |>
+      unlist() |>
+      unique()
+  ) |>
+    dplyr::mutate(
+      int_ctrl_group = strsplit(x = int_ctrl, split = " ", fixed = TRUE) |>
+        lapply(head, 2L) |>
+        lapply(paste, collapse = " ") |>
+        unlist()
+    ) |>
+    dplyr::group_by(
+      .data[["int_ctrl_group"]]
+    ) |>
+    dplyr::slice_sample(
+      n = 1L
+    ) |>
+    dplyr::ungroup() |>
+    dplyr::pull(
+      .data[["int_ctrl"]]
+    )
+
+  # get format specifications
+  format_spec <- olink_wide_excel_spec |>
+    dplyr::filter(
+      .data[["data_type"]] == .env[["data_type"]]
+    )
+
+  # number of plates always corresponds to number of panels
   n_plates <- n_panels
 
-  # number of QC Warnings and Internal controls based on data_type
-  if (data_type == "Ct") {
-    n_qc_warns <- 0L
-    int_ctrl <- character(0)
-  } else {
-    n_qc_warns <- n_panels
-    if (data_type == "NPX") {
-      int_ctrl <- character(0)
-    } else if (data_type == "Quantified") {
-      if (show_int_ctrl == TRUE) {
-        int_ctrl <- c("Inc Ctrl", "Amp Ctrl", "Ext Ctrl")
-      } else {
-        int_ctrl <- character(0)
-      }
-    }
-  }
+  # number of QC warning is equal to number of panels if there are QC warnings
+  n_qc_warns <- format_spec |>
+    dplyr::pull(
+      .data[["has_qc_data"]]
+    ) |>
+    (\(x) ifelse(x == TRUE, n_panels, 0L))()
+
+  # columns with deviation from internal controls
+  dev_int_ctrl <- format_spec |>
+    dplyr::pull(
+      .data[["top_matrix_uniprot_dev_int_ctrl"]]
+    ) |>
+    unlist() |>
+    (\(x) x[x %in% sample_int_ctrl])()
+
+
+  # internal controls if any
+  int_ctrl <- format_spec |>
+    dplyr::pull(
+      .data[["top_matrix_assay_int_ctrl"]]
+    ) |>
+    unlist() |>
+    (\(x) x[x %in% sample_int_ctrl])()
 
   # random df ----
 
   df <- dplyr::tibble(
     "V1" = c("Panel",
-             rep(x = paste("Olink ", olink_platform,
-                           " Panel", seq_len(n_panels)),
+             rep(x = paste0("Olink ", olink_platform,
+                            " Panel ", seq_len(n_panels)),
                  each = n_assays),
-             paste(rep(paste("Olink ", olink_platform, " Panel"),
-                       times = n_plates),
-                   seq_len(n_plates)),
-             paste(rep(paste("Olink ", olink_platform, " Panel"),
-                       times = n_qc_warns),
-                   seq_len(n_qc_warns)),
-             rep(x = paste("Olink ", olink_platform,
-                           " Panel", seq_len(n_panels)),
-                 each = length(int_ctrl))),
+             rep(x = paste0("Olink ", olink_platform,
+                            " Panel ", seq_len(n_panels)),
+                 each = length(int_ctrl)),
+             paste0(rep(paste0("Olink ", olink_platform, " Panel "),
+                        times = n_plates),
+                    seq_len(n_plates)),
+             paste0(rep(paste0("Olink ", olink_platform, " Panel "),
+                        times = n_qc_warns),
+                    seq_len(n_qc_warns)),
+             rep(x = paste0("Olink ", olink_platform,
+                            " Panel ", seq_len(n_panels)),
+                 each = length(dev_int_ctrl))),
     "V2" = c("Assay",
              paste0(rep(x = "Assay", times = (n_panels * n_assays)),
                     seq_len(n_panels * n_assays)),
+             rep(x = int_ctrl, times = n_panels),
              rep(x = "Plate ID", times = n_plates),
              rep(x = "QC Warning", times = n_qc_warns),
              rep(x = "QC Deviation from median",
-                 times = (length(int_ctrl) * n_panels))),
+                 times = (length(dev_int_ctrl) * n_panels))),
     "V3" = c("Uniprot ID",
              paste0(rep(x = "Uniprot", times = (n_panels * n_assays)),
                     seq_len((n_panels * n_assays))),
+             rep(x = NA_character_, times = (length(int_ctrl) * n_panels)),
              rep(x = NA_character_, times = n_plates),
              rep(x = NA_character_, times = n_qc_warns),
-             rep(x = int_ctrl, times = n_panels)),
+             rep(x = dev_int_ctrl, times = n_panels)),
     "V4" = c("OlinkID",
              paste0(rep(x = "OID", times = (n_panels * n_assays)),
                     seq_len((n_panels * n_assays))),
+             rep(x = NA_character_, times = (length(int_ctrl) * n_panels)),
              rep(x = NA_character_, times = n_plates),
              rep(x = NA_character_, times = n_qc_warns),
              rep(x = NA_character_,
-                 times = (length(int_ctrl) * n_panels)))
-  )
+                 times = (length(dev_int_ctrl) * n_panels))),
+    "V5" = c("Unit",
+             rep(x = "pg/mL", times = (n_panels * n_assays)),
+             rep(x = "pg/mL", times = (length(int_ctrl) * n_panels)),
+             rep(x = NA_character_, times = n_plates),
+             rep(x = NA_character_, times = n_qc_warns),
+             rep(x = NA_character_,
+                 times = (length(dev_int_ctrl) * n_panels)))
+  ) |>
+    dplyr::mutate(
+      V6 = strsplit(x = .data[["V1"]], split = " ", fixed = TRUE) |>
+        sapply(tail, 1L) |>
+        unlist(),
+      V1 = dplyr::if_else(.data[["V1"]] == "Panel",
+                          .data[["V1"]],
+                          paste0(.data[["V1"]], "(v.", .data[["V6"]], ")"))
+    ) |>
+    dplyr::select(
+      -dplyr::all_of("V6")
+    )
 
   # modify df ----
 
-  # if data_type is Quantified then add column "Unit"
-  if (data_type == "Quantified") {
+  # if top matrix should contain another row "Unit"
+  if (!("Unit" %in%  unlist(format_spec$top_matrix_v1))) {
     df <- df |>
-      dplyr::mutate(
-        "V5" = c("Unit",
-                 rep(x = "pg/mL", times = (n_panels * n_assays)),
-                 rep(x = NA_character_, times = n_plates),
-                 rep(x = NA_character_, times = n_qc_warns),
-                 rep(x = NA_character_,
-                     times = (length(int_ctrl) * n_panels)))
+      dplyr::select(
+        -dplyr::all_of("V5")
       )
   }
 
-  # if the internal controls should be in column 2 instead of column 3
-  if (loc_int_ctrl == "V2"
-      && data_type == "Quantified"
-      && show_int_ctrl == TRUE) {
+  # if the internal controls should be shown
+  if (show_int_ctrl == FALSE) {
     df <- df |>
-      dplyr::mutate(
-        V2 = dplyr::if_else(.data[["V2"]] == "QC Deviation from median",
-                            .data[["V3"]],
-                            .data[["V2"]]),
-        V3 = dplyr::if_else(.data[["V2"]] %in% .env[["int_ctrl"]],
-                            NA_character_,
-                            .data[["V3"]])
+      dplyr::filter(
+        !grepl(pattern = "ctrl",
+               x = .data[["V2"]],
+               ignore.case = TRUE)
       )
   }
 
   # if internal controls and customer assays should be shuffled
-  if (shuffle_assays == TRUE) {
-
+  if (show_dev_int_ctrl == FALSE) {
     df <- df |>
-      # keep first row as is
-      dplyr::slice_head(n = 1L) |>
-      # shuffle rows with customer assays and internal controls
-      dplyr::bind_rows(
-        df |>
-          dplyr::filter(
-            grepl("^OID", .data[["V4"]])
-            | .data[["V2"]] %in% .env[["int_ctrl"]]
-            | .data[["V3"]] %in% .env[["int_ctrl"]]
-          ) |>
-          dplyr::slice_sample(prop = 1)
-      ) |>
-      # append rows with "Plate ID" or "QC Warning" in "V2"
-      dplyr::bind_rows(
-        df |>
-          dplyr::filter(
-            .data[["V2"]] %in% c("Plate ID", "QC Warning")
-          )
+      dplyr::filter(
+        .data[["V2"]] != "QC Deviation from median"
       )
-
   }
 
   # transpose df ----
@@ -163,15 +200,12 @@ olink_wide_top_long <- function(df) {
 
   # modify df ----
 
-  c_names <- colnames(df)
-
-  df <- df |> t()
+  df <- t(df)
   colnames(df) <- df[1, ]
 
   df <- df |>
-    dplyr::as_tibble() |>
-    dplyr::mutate(
-      col_index = c_names
+    dplyr::as_tibble(
+      rownames = "col_index"
     ) |>
     dplyr::slice(
       2L:dplyr::n()
@@ -187,13 +221,24 @@ olink_wide_top_long <- function(df) {
       !is.na(.data[["OlinkID"]])
     )
 
+  df_int_ctrl <- df |>
+    dplyr::filter(
+      is.na(.data[["OlinkID"]])
+      & grepl(pattern = "ctrl",
+              x = .data[["Assay"]],
+              ignore.case = TRUE)
+    ) |>
+    dplyr::select(
+      -dplyr::any_of(c("Uniprot ID", "OlinkID", "Unit"))
+    )
+
   df_plate <- df |>
     dplyr::filter(
       is.na(.data[["OlinkID"]])
-      & .data[["Assay"]] %in% c("Plate ID")
+      & (.data[["Assay"]] %in% c("Plate ID"))
     ) |>
     dplyr::select(
-      -dplyr::all_of(c("Uniprot ID", "OlinkID"))
+      -dplyr::any_of(c("Uniprot ID", "OlinkID", "Unit"))
     ) |>
     dplyr::rename(
       "Var" = "Assay"
@@ -202,23 +247,22 @@ olink_wide_top_long <- function(df) {
   df_qc_warn <- df |>
     dplyr::filter(
       is.na(.data[["OlinkID"]])
-      & .data[["Assay"]] %in% c("QC Warning")
+      & (.data[["Assay"]] %in% c("QC Warning"))
     ) |>
     dplyr::select(
-      -dplyr::all_of(c("Uniprot ID", "OlinkID"))
+      -dplyr::any_of(c("Uniprot ID", "OlinkID", "Unit"))
     ) |>
     dplyr::rename(
       "Var" = "Assay"
     )
 
-  df_int_ctrl <- df |>
+  df_dev_int_ctrl <- df |>
     dplyr::filter(
       is.na(.data[["OlinkID"]])
-      & (.data[["Assay"]] == "QC Deviation from median"
-         | grepl("ctrl", .data[["Assay"]], ignore.case = TRUE))
+      & .data[["Assay"]] == "QC Deviation from median"
     ) |>
     dplyr::select(
-      -dplyr::all_of(c("OlinkID"))
+      -dplyr::any_of(c("OlinkID", "Unit"))
     )
 
   # return ----
@@ -226,9 +270,10 @@ olink_wide_top_long <- function(df) {
   return(
     list(
       df_oid = df_oid,
+      df_int_ctrl = df_int_ctrl,
       df_plate = df_plate,
       df_qc_warn = df_qc_warn,
-      df_int_ctrl = df_int_ctrl
+      df_dev_int_ctrl = df_dev_int_ctrl
     )
   )
 
@@ -237,36 +282,68 @@ olink_wide_top_long <- function(df) {
 ## Middle matrix ----
 
 # computes the middle matrix with assays measurements for each sample. The right
-# hand side of it should contan information on Plate ID, QC_Warning and internal
-# controls.
-olink_wide_middle <- function(n_panels,
+# hand side of it should contain information on Plate ID, QC_Warning and
+# internal controls.
+olink_wide_middle <- function(data_type,
+                              n_panels,
                               n_assays,
                               n_samples,
-                              data_type,
-                              show_int_ctrl = TRUE,
-                              shuffle_assays = FALSE) {
+                              show_dev_int_ctrl = TRUE,
+                              show_int_ctrl = TRUE) {
 
   # pre-compute variables ----
 
-  n_base_plate <- 88L
-  n_sample_plates <- ceiling(x = (n_samples) / n_base_plate) |> as.integer()
-  n_int_ctrl <- 3L
+  # get format specifications
+  format_spec <- olink_wide_excel_spec |>
+    dplyr::filter(
+      .data[["data_type"]] == .env[["data_type"]]
+    )
 
-  if (data_type == "Ct") {
-    qc_warns <- FALSE
-    int_ctrl <- FALSE
-  } else {
-    qc_warns <- TRUE
-    if (data_type == "NPX") {
-      int_ctrl <- FALSE
-    } else if (data_type == "Quantified") {
-      if (show_int_ctrl == TRUE) {
-        int_ctrl <- TRUE
-      } else {
-        int_ctrl <- FALSE
-      }
-    }
-  }
+  # number of plates
+  n_base_plate <- 88L
+  n_sample_plates <- ceiling(x = n_samples / n_base_plate) |> as.integer()
+
+  # number of internal controls
+  n_int_ctrl <- format_spec |>
+    dplyr::pull(
+      .data[["top_matrix_assay_int_ctrl"]]
+    ) |>
+    unlist() |>
+    (\(x) {
+      strsplit(x = x,
+               split = " ",
+               fixed = TRUE) |>
+        sapply(function(y) {
+          paste(y[1L:2L], collapse = " ")
+        }) |>
+        unlist()
+    })() |>
+    unique() |>
+    length()
+
+  # number of deviations from internal controls
+  n_dev_int_ctrl <- format_spec |>
+    dplyr::pull(
+      .data[["top_matrix_uniprot_dev_int_ctrl"]]
+    ) |>
+    unlist() |>
+    (\(x) {
+      strsplit(x = x,
+               split = " ",
+               fixed = TRUE) |>
+        sapply(function(y) {
+          paste(y[1L:2L], collapse = " ")
+        }) |>
+        unlist()
+    })() |>
+    unique() |>
+    length()
+
+  # are there any QC data
+  qc_data <- format_spec |>
+    dplyr::pull(
+      .data[["has_qc_data"]]
+    )
 
   # create parts of df ----
 
@@ -276,7 +353,10 @@ olink_wide_middle <- function(n_panels,
     "sample_id" = paste0("S", seq_len(n_samples))
   )
 
-  ## quant values ----
+  df <- df_s
+  rm(df_s)
+
+  ## quantification values for customer assays ----
 
   df_q <- matrix(
     data = rnorm(n = n_samples * n_assays * n_panels),
@@ -289,109 +369,126 @@ olink_wide_middle <- function(n_panels,
   ) |>
     dplyr::as_tibble()
 
+  df <- df |>
+    dplyr::bind_cols(
+      df_q
+    )
+  rm(df_q)
+
+  ## quantification values for internal controls ----
+
+  if (n_int_ctrl > 0L) {
+    df_i <- matrix(
+      data = rnorm(n = n_samples * n_int_ctrl * n_panels),
+      nrow = n_samples,
+      ncol = (n_int_ctrl * n_panels),
+      dimnames = list(
+        paste0("S", seq_len(n_samples)),
+        paste0("I", seq_len(n_int_ctrl * n_panels))
+      )
+    ) |>
+      dplyr::as_tibble()
+
+    df <- df |>
+      dplyr::bind_cols(
+        df_i
+      )
+    rm(df_i)
+  }
+
   ## plate names ----
 
   plate_name <- paste0(
     rep(x = "Plate", times = (n_base_plate * n_sample_plates)),
     rep(x = seq_len(n_sample_plates), each = n_base_plate)
-  )
-  plate_name <- plate_name[seq_len(n_samples)]
-
-  df_p <- matrix(
-    data = rep(plate_name, times = n_panels),
-    nrow = n_samples,
-    ncol = n_panels,
-    dimnames = list(
-      paste0("S", seq_len(n_samples)),
-      paste0("P", seq_len(n_panels))
-    )
   ) |>
-    dplyr::as_tibble()
+    (\(x) x[seq_len(n_samples)])()
+  panel_name <- paste0("Panel", seq_len(n_panels))
 
-  rm(plate_name)
-
-  ## qc warning ----
-
-  df_w <- matrix(
-    data = sample(x = c("Pass", "Warn"),
-                  size = (n_samples * n_panels),
-                  replace = TRUE),
-    nrow = n_samples,
-    ncol = n_panels,
-    dimnames = list(
-      paste0("S", seq_len(n_samples)),
-      paste0("W", seq_len(n_panels))
+  df_p <- sapply(panel_name, function(x) paste(plate_name, x, sep = "_")) |>
+    dplyr::as_tibble() |>
+    dplyr::slice_head(
+      n = n_samples
     )
-  ) |>
-    dplyr::as_tibble()
+  colnames(df_p) <- paste0("P", seq_len(n_panels))
 
-  ## internal controls ----
-
-  df_i <- matrix(
-    data = rnorm(n = n_samples * n_int_ctrl * n_panels),
-    nrow = n_samples,
-    ncol = (n_int_ctrl * n_panels),
-    dimnames = list(
-      paste0("S", seq_len(n_samples)),
-      paste0("I", seq_len(n_int_ctrl * n_panels))
-    )
-  ) |>
-    dplyr::as_tibble()
-
-  # combine df ----
-
-  df <- df_s |>
-    dplyr::bind_cols(
-      df_q
-    ) |>
+  df <- df |>
     dplyr::bind_cols(
       df_p
     )
+  rm(plate_name, df_p)
 
-  if (qc_warns == TRUE) {
+  ## qc warning ----
+
+  if (qc_data == TRUE) {
+    df_w <- matrix(
+      data = sample(x = c("Pass", "Warn"),
+                    size = (n_samples * n_panels),
+                    replace = TRUE),
+      nrow = n_samples,
+      ncol = n_panels,
+      dimnames = list(
+        paste0("S", seq_len(n_samples)),
+        paste0("W", seq_len(n_panels))
+      )
+    ) |>
+      dplyr::as_tibble()
+
     df <- df |>
       dplyr::bind_cols(
         df_w
       )
+    rm(df_w)
   }
 
-  if (int_ctrl == TRUE) {
+  ## deviation from internal controls ----
+
+  if (n_dev_int_ctrl > 0L) {
+    df_d <- matrix(
+      data = rnorm(n = n_samples * n_dev_int_ctrl * n_panels),
+      nrow = n_samples,
+      ncol = (n_dev_int_ctrl * n_panels),
+      dimnames = list(
+        paste0("S", seq_len(n_samples)),
+        paste0("D", seq_len(n_dev_int_ctrl * n_panels))
+      )
+    ) |>
+      dplyr::as_tibble()
+
     df <- df |>
       dplyr::bind_cols(
-        df_i
+        df_d
       )
+    rm(df_d)
   }
 
   # modify df ----
 
-  ## shuffle cols ----
+  ## remove internal controls ----
 
-  if (shuffle_assays == TRUE) {
-
-    c_names <- colnames(df)
-    c_names_shuffle <- c_names[grepl(pattern = "^Q|^I", x = c_names)]
-    c_names_sid <- c_names[1]
-    c_names_no_shuffle <- c_names[!(c_names %in% c(c_names_shuffle,
-                                                   c_names_sid))]
-    c_names_shuffle <- sample(x = c_names_shuffle,
-                              size = length(c_names_shuffle),
-                              replace = FALSE)
-    rm(c_names)
-
+  if (n_int_ctrl > 0L
+      && show_int_ctrl == FALSE) {
     df <- df |>
       dplyr::select(
-        dplyr::all_of(
-          c(c_names_sid, c_names_shuffle, c_names_no_shuffle)
-        )
+        -dplyr::starts_with("I")
       )
+  }
 
+  ## remove deviation from internal controls ----
+
+  if (n_dev_int_ctrl > 0L
+      && show_dev_int_ctrl == FALSE) {
+    df <- df |>
+      dplyr::select(
+        -dplyr::starts_with("D")
+      )
   }
 
   ## rename columns ----
 
   colnames(df) <- paste0("V", seq_len(ncol(df)))
 
-  ## convert all to character ----
+  ## convert df to character ----
 
   df <- df |>
     dplyr::mutate(
@@ -410,17 +507,15 @@ olink_wide_middle <- function(n_panels,
 #
 # output contains df_oid, df_pid, df_qc_warn and df_int_ctrl
 olink_wide_middle_long <- function(df,
-                                   n_panels,
-                                   n_assays,
                                    data_type,
-                                   shuffle_assays,
                                    cname) {
   # split df ----
 
-  # assays
+  ## customer assays ----
+
   df_oid <- df |>
     dplyr::select(
-      dplyr::all_of(c("V1", cname$assay_cols))
+      dplyr::all_of(c("V1", cname$df_oid))
     ) |>
     dplyr::rename(
       "SampleID" = dplyr::all_of("V1")
@@ -431,10 +526,35 @@ olink_wide_middle_long <- function(df,
       values_to = data_type
     )
 
-  # plate id
+  list_df <- list(
+    df_oid = df_oid
+  )
+
+  ## internal controls ----
+
+  if ("df_int_ctrl" %in% names(cname)) {
+    df_int_ctrl <- df |>
+      dplyr::select(
+        dplyr::all_of(c("V1", cname$df_int_ctrl))
+      ) |>
+      dplyr::rename(
+        "SampleID" = dplyr::all_of("V1")
+      ) |>
+      tidyr::pivot_longer(
+        -dplyr::all_of("SampleID"),
+        names_to = "col_index",
+        values_to = data_type
+      )
+
+    list_df <- append(x = list_df,
+                      values = list(df_int_ctrl = df_int_ctrl))
+  }
+
+  ## plate id ----
+
   df_plate <- df |>
     dplyr::select(
-      dplyr::all_of(c("V1", cname$plate_cols))
+      dplyr::all_of(c("V1", cname$df_plate))
     ) |>
     dplyr::rename(
       "SampleID" = dplyr::all_of("V1")
@@ -445,17 +565,15 @@ olink_wide_middle_long <- function(df,
       values_to = "PlateID"
     )
 
-  list_df <- list(
-    df_oid = df_oid,
-    df_plate = df_plate
-  )
+  list_df <- append(x = list_df,
+                    values = list(df_plate = df_plate))
 
-  if (data_type != "Ct") {
+  ## qc warning ----
 
-    # qc warning
+  if ("df_qc_warn" %in% names(cname)) {
     df_qc_warn <- df |>
       dplyr::select(
-        dplyr::all_of(c("V1", cname$qc_warn_cols))
+        dplyr::all_of(c("V1", cname$df_qc_warn))
       ) |>
       dplyr::rename(
         "SampleID" = dplyr::all_of("V1")
@@ -468,27 +586,26 @@ olink_wide_middle_long <- function(df,
 
     list_df <- append(x = list_df,
                       values = list(df_qc_warn = df_qc_warn))
+  }
 
-    if (data_type == "Quantified" && "int_ctrl_cols" %in% names(cname)) {
+  ## deviation from internal controls ----
 
-      # internal controls
-      df_int_ctrl <- df |>
-        dplyr::select(
-          dplyr::all_of(c("V1", cname$int_ctrl_cols))
-        ) |>
-        dplyr::rename(
-          "SampleID" = dplyr::all_of("V1")
-        ) |>
-        tidyr::pivot_longer(
-          -dplyr::all_of("SampleID"),
-          names_to = "col_index",
-          values_to = data_type
-        )
+  if ("df_dev_int_ctrl" %in% names(cname)) {
+    df_dev_int_ctrl <- df |>
+      dplyr::select(
+        dplyr::all_of(c("V1", cname$df_dev_int_ctrl))
+      ) |>
+      dplyr::rename(
+        "SampleID" = dplyr::all_of("V1")
+      ) |>
+      tidyr::pivot_longer(
+        -dplyr::all_of("SampleID"),
+        names_to = "col_index",
+        values_to = data_type
+      )
 
-      list_df <- append(x = list_df,
-                        values = list(df_int_ctrl = df_int_ctrl))
-    }
-
+    list_df <- append(x = list_df,
+                      values = list(df_dev_int_ctrl = df_dev_int_ctrl))
   }
 
   # return ----
@@ -500,162 +617,246 @@ olink_wide_middle_long <- function(df,
 ## Bottom matrix ----
 
 # computes the bottom matrix with LOD, ULOQ, LLOQ, and plate-specific QC metrics
-olink_wide_bottom <- function(n_plates,
+olink_wide_bottom <- function(olink_platform,
+                              data_type,
+                              plates,
                               n_panels,
                               n_assays,
-                              data_type,
-                              show_int_ctrl = FALSE,
-                              shuffle_assays = FALSE) {
+                              show_int_ctrl = TRUE,
+                              version = 1L) {
 
-  # add internal controls
-  if (show_int_ctrl == TRUE && shuffle_assays == TRUE) {
-    n_assays <- n_assays + 3L
+  # pre-compute variables ----
+
+  # get bottom matrix format specifications
+  format_spec_bottom <- olink_wide_excel_bottom_matrix |>
+    dplyr::filter(
+      .data[["data_type"]] == .env[["data_type"]]
+      & .data[["olink_platform"]] == .env[["olink_platform"]]
+    ) |>
+    dplyr::mutate(
+      variable_alt_names = lapply(.data[["variable_alt_names"]],
+                                  sample,
+                                  size = 1L) |>
+        unlist()
+    )
+  if (!(version %in% format_spec_bottom$version)) {
+    stop("Wrong version!")
+  } else {
+    format_spec_bottom <- format_spec_bottom |>
+      dplyr::filter(
+        .data[["version"]] %in% c(0L, .env[["version"]])
+      )
   }
 
-  # this is the last column of the bottom matrix.
-  # commonly it contains data when data is Quantified, and not
-  # when it is NPX.
-  last_v <- paste0("V", n_assays * n_panels + 2)
-
-  # create matrix data that are specific to the data type
-  if (data_type == "NPX") {
-
-    # df_dt ----
-
-    df_dt <- matrix(
-      data = rnorm(n = (n_panels * n_assays)),
-      nrow = 1L,
-      ncol = (n_assays * n_panels),
-      dimnames = list(
-        "LOD",
-        paste0("V", 2L:((n_assays * n_panels) + 1L))
-      )
+  # number of internal controls
+  n_int_ctrl <- olink_wide_excel_spec |>
+    dplyr::filter(
+      .data[["data_type"]] == .env[["data_type"]]
     ) |>
-      dplyr::as_tibble(
-        rownames = "V1"
-      ) |>
-      dplyr::mutate(
-        dplyr::across(
-          dplyr::everything(),
-          ~ as.character(.x)
-        )
-      )
-
-  } else if (data_type == "Quantified") {
-
-    # df_rep ("Assay warning", "Lowest quantifiable level", "Plate LOD") ----
-
-    df_rep <- matrix(
-      data = sample(x = c("Pass", "Warn"),
-                    size = (n_plates * n_panels * n_assays),
-                    replace = TRUE),
-      nrow = n_plates,
-      ncol = (n_assays * n_panels),
-      dimnames = list(
-        rep(x = "Assay warning", times = n_plates),
-        paste0("V", 2L:((n_assays * n_panels) + 1L))
-      )
+    dplyr::pull(
+      .data[["top_matrix_assay_int_ctrl"]]
     ) |>
-      dplyr::as_tibble(
-        rownames = "V1"
-      ) |>
-      dplyr::mutate(
-        {{last_v}} := paste0("Plate", seq_len(n_plates)) # nolint object_usage_linter
-      ) |>
-      dplyr::bind_rows(
-        matrix(
-          data = rnorm(n = (n_plates * n_panels * n_assays)),
-          nrow = n_plates,
-          ncol = (n_assays * n_panels),
-          dimnames = list(
-            rep(x = "Lowest quantifiable level", times = n_plates),
-            paste0("V", 2L:((n_assays * n_panels) + 1L))
-          )
-        ) |>
-          dplyr::as_tibble(
-            rownames = "V1"
-          ) |>
-          dplyr::mutate(
-            {{last_v}} := paste0("Plate", seq_len(n_plates)) # nolint object_usage_linter
-          ) |>
-          dplyr::mutate(
-            dplyr::across(
-              dplyr::everything(), ~ as.character(.x)
-            )
-          )
-      ) |>
-      dplyr::bind_rows(
-        matrix(
-          data = rnorm(n = (n_plates * n_panels * n_assays)),
-          nrow = n_plates,
-          ncol = (n_assays * n_panels),
-          dimnames = list(
-            rep(x = "Plate LOD", times = n_plates),
-            paste0("V", 2L:((n_assays * n_panels) + 1L))
-          )
-        ) |>
-          dplyr::as_tibble(
-            rownames = "V1"
-          ) |>
-          dplyr::mutate(
-            {{last_v}} := paste0("Plate", seq_len(n_plates)) # nolint object_usage_linter
-          ) |>
-          dplyr::mutate(
-            dplyr::across(
-              dplyr::everything(),
-              ~ as.character(.x)
-            )
-          )
-      )
-
-    # df_spec ("LLOQ", "ULOQ")----
-    df_spec <- matrix(
-      data = rnorm(n = (n_panels * n_assays)),
-      nrow = 1L,
-      ncol = (n_assays * n_panels),
-      dimnames = list(
-        "LLOQ",
-        paste0("V", 2L:((n_assays * n_panels) + 1L))
-      )
-    ) |>
-      dplyr::as_tibble(
-        rownames = "V1"
-      ) |>
-      dplyr::bind_rows(
-        matrix(
-          data = rnorm(n = (n_panels * n_assays)),
-          nrow = 1L,
-          ncol = (n_assays * n_panels),
-          dimnames = list(
-            "ULOQ",
-            paste0("V", 2L:((n_assays * n_panels) + 1L))
-          )
-        ) |>
-          dplyr::as_tibble(
-            rownames = "V1"
-          )
-      ) |>
-      dplyr::mutate(
-        dplyr::across(
-          dplyr::everything(), ~ as.character(.x)
-        )
-      )
-
-    # df_dt ----
-
-    df_dt <- dplyr::bind_rows(df_rep, df_spec)
-
+    unlist() |>
+    (\(x) {
+      strsplit(x = x, split = " ", fixed = TRUE) |>
+        lapply(function(y) paste(y[1:2], collapse = " ")) |>
+        unlist()
+    })() |>
+    unique() |>
+    length()
+  if (show_int_ctrl == FALSE) {
+    n_int_ctrl <- 0L
   }
 
-  # df shared ("Missing Data freq.", "Normalization") ----
+  # prepare bottom matrix ----
 
-  df_shared <- matrix(
-    data = rnorm(n = (n_panels * n_assays)),
+  ## plate-specific QC metrics ----
+
+  # Assay warning
+  df_assay_warn <- matrix(
+    data = sample(x = c("Pass", "Warn"),
+                  size = (nrow(plates) * n_panels * (n_assays + n_int_ctrl)),
+                  replace = TRUE),
+    nrow = nrow(plates),
+    ncol = ((n_assays + n_int_ctrl) * n_panels),
+    dimnames = list(
+      rep(x = "Assay warning", times = nrow(plates)),
+      paste0("V", 2L:(((n_assays + n_int_ctrl) * n_panels) + 1L))
+    )
+  ) |>
+    dplyr::as_tibble(
+      rownames = "V1"
+    ) |>
+    dplyr::bind_cols(
+      plates
+    )
+
+  # Lowest quantifiable level
+  df_low_quant_lvl <- matrix(
+    data = rnorm(n = (nrow(plates) * n_panels * (n_assays + n_int_ctrl))),
+    nrow = nrow(plates),
+    ncol = ((n_assays + n_int_ctrl) * n_panels),
+    dimnames = list(
+      rep(x = "Lowest quantifiable level", times = nrow(plates)),
+      paste0("V", 2L:(((n_assays + n_int_ctrl) * n_panels) + 1L))
+    )
+  ) |>
+    dplyr::as_tibble(
+      rownames = "V1"
+    ) |>
+    dplyr::bind_cols(
+      plates
+    ) |>
+    dplyr::mutate(
+      dplyr::across(
+        dplyr::everything(), ~ as.character(.x)
+      )
+    )
+
+  # Plate LOD
+  df_plate_lod <- matrix(
+    data = rnorm(n = (nrow(plates) * n_panels * (n_assays + n_int_ctrl))),
+    nrow = nrow(plates),
+    ncol = ((n_assays + n_int_ctrl) * n_panels),
+    dimnames = list(
+      rep(x = "Plate LOD", times = nrow(plates)),
+      paste0("V", 2L:(((n_assays + n_int_ctrl) * n_panels) + 1L))
+    )
+  ) |>
+    dplyr::as_tibble(
+      rownames = "V1"
+    ) |>
+    dplyr::bind_cols(
+      plates
+    ) |>
+    dplyr::mutate(
+      dplyr::across(
+        dplyr::everything(),
+        ~ as.character(.x)
+      )
+    )
+
+  # Plate LOD v2
+  df_plate_lod_v2 <- matrix(
+    data = rnorm(n = (nrow(plates) * n_panels * (n_assays + n_int_ctrl))),
+    nrow = nrow(plates),
+    ncol = ((n_assays + n_int_ctrl) * n_panels),
+    dimnames = list(
+      rep(x = "PlateLOD", times = nrow(plates)),
+      paste0("V", 2L:(((n_assays + n_int_ctrl) * n_panels) + 1L))
+    )
+  ) |>
+    dplyr::as_tibble(
+      rownames = "V1"
+    ) |>
+    dplyr::bind_cols(
+      plates
+    ) |>
+    dplyr::mutate(
+      dplyr::across(
+        dplyr::everything(),
+        ~ as.character(.x)
+      )
+    )
+
+  df_plate_specific <- df_assay_warn |>
+    dplyr::bind_rows(
+      df_low_quant_lvl
+    ) |>
+    dplyr::bind_rows(
+      df_plate_lod
+    ) |>
+    dplyr::bind_rows(
+      df_plate_lod_v2
+    ) |>
+    dplyr::filter(
+      .data[["V1"]] %in% format_spec_bottom$variable_alt_names
+    ) |>
+    remove_all_na_cols()
+  rm(df_assay_warn, df_low_quant_lvl, df_plate_lod, df_plate_lod_v2)
+
+  ## plate shared variables ----
+
+  # LOD
+  df_lod <- matrix(
+    data = rnorm(n = (n_panels * (n_assays + n_int_ctrl))),
     nrow = 1L,
-    ncol = (n_assays * n_panels),
+    ncol = ((n_assays + n_int_ctrl) * n_panels),
+    dimnames = list(
+      "LOD",
+      paste0("V", 2L:(((n_assays + n_int_ctrl) * n_panels) + 1L))
+    )
+  ) |>
+    dplyr::as_tibble(
+      rownames = "V1"
+    ) |>
+    dplyr::mutate(
+      dplyr::across(
+        dplyr::everything(),
+        ~ as.character(.x)
+      )
+    )
+
+  # Max LOD
+  df_max_lod <- df_lod |>
+    dplyr::mutate(
+      V1 = "Max LOD"
+    )
+
+  # Max LOD v2
+  df_max_lod_v2 <- df_lod |>
+    dplyr::mutate(
+      V1 = "MaxLOD"
+    )
+
+  # LLOQ
+  df_lloq <- matrix(
+    data = rnorm(n = (n_panels * (n_assays + n_int_ctrl))),
+    nrow = 1L,
+    ncol = ((n_assays + n_int_ctrl) * n_panels),
+    dimnames = list(
+      "LLOQ",
+      paste0("V", 2L:(((n_assays + n_int_ctrl) * n_panels) + 1L))
+    )
+  ) |>
+    dplyr::as_tibble(
+      rownames = "V1"
+    ) |>
+    dplyr::mutate(
+      dplyr::across(
+        dplyr::everything(),
+        ~ as.character(.x)
+      )
+    )
+
+  # ULOQ
+  df_uloq <- matrix(
+    data = rnorm(n = (n_panels * (n_assays + n_int_ctrl))),
+    nrow = 1L,
+    ncol = ((n_assays + n_int_ctrl) * n_panels),
+    dimnames = list(
+      "ULOQ",
+      paste0("V", 2L:(((n_assays + n_int_ctrl) * n_panels) + 1L))
+    )
+  ) |>
+    dplyr::as_tibble(
+      rownames = "V1"
+    ) |>
+    dplyr::mutate(
+      dplyr::across(
+        dplyr::everything(),
+        ~ as.character(.x)
+      )
+    )
+
+  # Missing Data freq.
+  df_miss_freq <- matrix(
+    data = rnorm(n = (n_panels * (n_assays + n_int_ctrl))),
+    nrow = 1L,
+    ncol = ((n_assays + n_int_ctrl) * n_panels),
     dimnames = list(
       "Missing Data freq.",
-      paste0("V", 2L:((n_assays * n_panels) + 1L))
+      paste0("V", 2L:(((n_assays + n_int_ctrl) * n_panels) + 1L))
     )
   ) |>
     dplyr::as_tibble(
@@ -665,56 +866,108 @@ olink_wide_bottom <- function(n_plates,
       dplyr::across(
         dplyr::everything(), ~ as.character(.x)
       )
-    ) |>
-    dplyr::bind_rows(
-      matrix(
-        data = rep(x = "Intensity", times = (n_panels * n_assays)),
-        nrow = 1L,
-        ncol = (n_assays * n_panels),
-        dimnames = list(
-          "Normalization",
-          paste0("V", 2L:((n_assays * n_panels) + 1L))
-        )
-      ) |>
-        dplyr::as_tibble(
-          rownames = "V1"
-        )
     )
 
-  # df ----
+  # Normalization
+  df_norm <- matrix(
+    data = rep(x = "Intensity", times = (n_panels * (n_assays + n_int_ctrl))),
+    nrow = 1L,
+    ncol = ((n_assays + n_int_ctrl) * n_panels),
+    dimnames = list(
+      "Normalization",
+      paste0("V", 2L:(((n_assays + n_int_ctrl) * n_panels) + 1L))
+    )
+  ) |>
+    dplyr::as_tibble(
+      rownames = "V1"
+    )
 
-  df <- dplyr::bind_rows(df_dt, df_shared)
+  df_plate_shared <- df_lod |>
+    dplyr::bind_rows(
+      df_max_lod
+    ) |>
+    dplyr::bind_rows(
+      df_max_lod_v2
+    ) |>
+    dplyr::bind_rows(
+      df_lloq
+    ) |>
+    dplyr::bind_rows(
+      df_uloq
+    ) |>
+    dplyr::bind_rows(
+      df_miss_freq
+    ) |>
+    dplyr::bind_rows(
+      df_norm
+    ) |>
+    dplyr::filter(
+      .data[["V1"]] %in% format_spec_bottom$variable_alt_names
+    ) |>
+    remove_all_na_cols()
+  rm(df_lod, df_max_lod, df_max_lod_v2, df_lloq, df_uloq, df_miss_freq, df_norm)
 
   # return ----
+
+  df <- df_plate_specific |>
+    dplyr::bind_rows(
+      df_plate_shared
+    )
 
   return(df)
 
 }
 
 olink_wide_bottom_long <- function(df,
+                                   olink_platform,
                                    data_type,
-                                   col_split,
-                                   int_ctrl_cols) {
+                                   int_ctrl_cols,
+                                   plate_cols,
+                                   version = 1L,
+                                   df_panel_plate) {
 
-  # remove all NA columns ----
+  # pre-compute variables ----
 
+  # remove all NA columns
   df <- remove_all_na_cols(df = df)
+
+  # get bottom matrix format specifications
+  format_spec_bottom <- olink_wide_excel_bottom_matrix |>
+    dplyr::filter(
+      .data[["data_type"]] == .env[["data_type"]]
+      & .data[["olink_platform"]] == .env[["olink_platform"]]
+    )
+  if (!(version %in% format_spec_bottom$version)) {
+    stop("Wrong version!")
+  } else {
+    format_spec_bottom <- format_spec_bottom |>
+      dplyr::filter(
+        .data[["version"]] %in% c(0L, .env[["version"]])
+      )
+  }
 
   # df bottom matrix with plate-specific data ----
 
-  # This is done for Quantified data only
-  if (col_split %in% colnames(df)
-      && data_type == "Quantified") {
+  bottom_mat_plate_spec <- format_spec_bottom |>
+    dplyr::filter(
+      .data[["plate_specific"]] == TRUE
+    ) |>
+    dplyr::pull(
+      .data[["variable_alt_names"]]
+    ) |>
+    unlist()
 
-    df_q <- df |>
-      # keep only rows to be pivoted
-      dplyr::filter(
-        !is.na(.data[[col_split]])
-      )
+  df_plate_specific <- df |>
+    dplyr::filter(
+      .data[["V1"]] %in% bottom_mat_plate_spec
+    )
+
+  if (nrow(df_plate_specific) > 0L) {
 
     # for each variable in V1 and do a pivot_longer
-    df_q <- lapply(unique(df_q$V1), function(x) {
-      df_q |>
+    df_plate_specific <- lapply(unique(df_plate_specific$V1), function(x) {
+
+      df_plate_specific_tmp <- df_plate_specific |>
         dplyr::filter(
           .data[["V1"]] == .env[["x"]]
         ) |>
@@ -722,98 +975,124 @@ olink_wide_bottom_long <- function(df,
           -dplyr::all_of("V1")
         ) |>
         tidyr::pivot_longer(
-          -dplyr::all_of(col_split),
-          names_to = "col_index",
+          -dplyr::all_of(plate_cols),
+          names_to = "col_index_oid",
           values_to = x
+        )
+
+      if (ncol(df_plate_specific_tmp) == 3L) {
+        df_plate_specific_tmp <- df_plate_specific_tmp |>
+          dplyr::rename(
+            "PlateID" = dplyr::all_of(plate_cols)
+          ) |>
+          dplyr::mutate(
+            col_index_plate = .env[["plate_cols"]]
+          )
+      } else {
+        df_plate_specific_tmp <- df_plate_specific_tmp |>
+          tidyr::pivot_longer(
+            -dplyr::all_of(c("col_index_oid", x)),
+            names_to = "col_index_plate",
+            values_to = "PlateID"
+          )
+      }
+
+      df_plate_specific_tmp <- df_plate_specific_tmp |>
+        dplyr::inner_join(
+          df_panel_plate,
+          by = c("col_index_oid", "col_index_plate", "PlateID")
+        ) |>
+        dplyr::select(
+          -dplyr::all_of(c("col_index_plate", "Panel"))
         ) |>
         dplyr::rename(
-          "Plate ID" = dplyr::all_of(col_split)
+          "col_index" = "col_index_oid"
         )
+
+      return(df_plate_specific_tmp)
     })
 
     # left join all data frames from the list
-    df_q <- Reduce(f = function(df_1, df_2) {
+    df_plate_specific <- Reduce(f = function(df_1, df_2) {
       dplyr::left_join(x = df_1,
                        y = df_2,
-                       by = c("Plate ID", "col_index"),
+                       by = c("col_index", "PlateID"),
                        relationship = "one-to-one")
     },
-    x = df_q)
-
-    # remove the rows with plate-specific data and the col_split column
-    df <- df |>
-      dplyr::filter(
-        is.na(.data[[col_split]])
-      ) |>
-      dplyr::select(
-        -dplyr::all_of(col_split)
-      )
-
+    x = df_plate_specific)
   }
 
-  # df without plate-specific info ----
+  # df bottom matrix with plate-shared data ----
+
+  bottom_mat_plate_shared <- format_spec_bottom |>
+    dplyr::filter(
+      .data[["plate_specific"]] == FALSE
+    ) |>
+    dplyr::pull(
+      .data[["variable_alt_names"]]
+    ) |>
+    unlist()
+
+  df_plate_shared <- df |>
+    dplyr::filter(
+      .data[["V1"]] %in% bottom_mat_plate_shared
+    ) |>
+    remove_all_na_cols()
 
   # transpose and add column names
-  df_t <- t(df)
-  colnames(df_t) <- df_t[1L, ]
+  df_plate_shared <- t(df_plate_shared)
+  colnames(df_plate_shared) <- df_plate_shared[1L, ]
 
   # fix column names and remove extra rows
-  df_t <- df_t |>
+  df_plate_shared <- df_plate_shared |>
     dplyr::as_tibble(
       rownames = "col_index"
-    ) |>
-    dplyr::mutate(
-      col_index = dplyr::if_else(
-        .data[["col_index"]] == "V1",
-        "col_index",
-        .data[["col_index"]]
-      )
     ) |>
     dplyr::slice(
       2L:dplyr::n()
     )
 
-  # join df_q and df_t if needed ----
+  # join df_plate_specific and df_plate_shared if needed ----
 
-  if (exists("df_q")) {
-
-    df_t <- dplyr::left_join(
-      x = df_t,
-      y = df_q,
+  if (nrow(df_plate_specific) > 0L) {
+    df_out <- dplyr::left_join(
+      x = df_plate_shared,
+      y = df_plate_specific,
       by = "col_index",
       relationship = "one-to-many"
     )
-
+  } else {
+    df_out <- df_plate_shared
   }
 
-  # finalize df_t  ----
+  # modify df  ----
 
-  # sort columns of df_t
-  df_t <- df_t |>
+  # sort columns of df_out
+  df_out <- df_out |>
     dplyr::select(
-      order(colnames(df_t))
+      order(colnames(df_out))
     )
 
   # return ----
 
   if (!is.null(int_ctrl_cols)) {
-    l_df <- list(
-      df_oid = df_t |>
+    list_df <- list(
+      df_oid = df_out |>
         dplyr::filter(
-          !(.data[["col_index"]] %in% int_ctrl_cols)
+          !(.data[["col_index"]] %in% .env[["int_ctrl_cols"]])
         ),
-      df_int_ctrl = df_t |>
+      df_int_ctrl = df_out |>
         dplyr::filter(
-          .data[["col_index"]] %in% int_ctrl_cols
+          .data[["col_index"]] %in% .env[["int_ctrl_cols"]]
         )
     )
   } else {
-    l_df <- list(
-      df_oid = df_t
+    list_df <- list(
+      df_oid = df_out
     )
   }
 
-  return(l_df)
+  return(list_df)
 
 }
 
@@ -825,174 +1104,242 @@ olink_wide <- function(olink_platform,
                        n_panels,
                        n_assays,
                        n_samples,
+                       show_dev_int_ctrl = TRUE,
                        show_int_ctrl = TRUE,
-                       loc_int_ctrl = "V3",
-                       shuffle_assays = FALSE) {
+                       version = 1L) {
 
-  n_base_plate <- 88L
-  n_plates <- ceiling(x = (n_samples) / n_base_plate) |> as.integer()
+  # get format specifications
+  format_spec <- olink_wide_excel_spec |>
+    dplyr::filter(
+      .data[["data_type"]] == .env[["data_type"]]
+    )
 
   # head ----
 
-  df_head <- olink_wide_head(data_type = data_type)
+  df_head_wide <- olink_wide_head(data_type = data_type)
 
   # top matrix ----
 
-  df_top <- olink_wide_top(olink_platform = olink_platform,
-                           n_panels = n_panels,
-                           n_assays = n_assays,
-                           data_type = data_type,
-                           show_int_ctrl = show_int_ctrl,
-                           loc_int_ctrl = loc_int_ctrl,
-                           shuffle_assays = shuffle_assays)
+  df_top_wide <- olink_wide_top(olink_platform = olink_platform,
+                                data_type = data_type,
+                                n_panels = n_panels,
+                                n_assays = n_assays,
+                                show_dev_int_ctrl = show_dev_int_ctrl,
+                                show_int_ctrl = show_int_ctrl)
 
   # middle matrix ----
 
-  df_middle <- olink_wide_middle(n_panels = n_panels,
-                                 n_assays = n_assays,
-                                 n_samples = n_samples,
-                                 data_type = data_type,
-                                 show_int_ctrl = show_int_ctrl,
-                                 shuffle_assays = shuffle_assays)
+  df_middle_wide <- olink_wide_middle(data_type = data_type,
+                                      n_panels = n_panels,
+                                      n_assays = n_assays,
+                                      n_samples = n_samples,
+                                      show_dev_int_ctrl = show_dev_int_ctrl,
+                                      show_int_ctrl = show_int_ctrl)
 
   # bottom matrix ----
 
-  if (data_type != "Ct") {
-    df_bottom <- olink_wide_bottom(
-      n_plates = n_plates,
-      n_panels = n_panels,
-      n_assays = n_assays,
-      data_type = data_type,
-      show_int_ctrl = ifelse(data_type == "Quantified"
-                             && show_int_ctrl == TRUE, TRUE, FALSE),
-      shuffle_assays = ifelse(data_type == "Quantified"
-                              && shuffle_assays == TRUE, TRUE, FALSE)
-    )
+  if (format_spec$has_qc_data == TRUE) {
+    # get df top matrix in long format
+    df_top_long <- olink_wide_top_long(df = df_top_wide)
+
+    # get column names
+    cname <- sapply(df_top_long, \(x) (x$col_index))
+    cname <- cname[sapply(cname, length) > 0L]
+    rm(df_top_long)
+
+    # get middle matrix in long format
+    df_middle_long <- olink_wide_middle_long(df = df_middle_wide,
+                                             data_type = data_type,
+                                             cname = cname)
+    rm(cname)
+
+    plates <- df_middle_long$df_plate |>
+      dplyr::select(
+        -dplyr::all_of("SampleID")
+      ) |>
+      dplyr::distinct() |>
+      tidyr::separate(
+        col = dplyr::all_of("PlateID"),
+        into = c("plate_id", "panel_id"),
+        sep = "_",
+        remove = FALSE
+      ) |>
+      dplyr::select(
+        -dplyr::all_of("panel_id")
+      ) |>
+      tidyr::pivot_wider(
+        names_from = dplyr::all_of("col_index"),
+        values_from = dplyr::all_of("PlateID")
+      ) |>
+      dplyr::select(
+        -dplyr::all_of("plate_id")
+      )
+    rm(df_middle_long)
+
+    df_bottom_wide <- olink_wide_bottom(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        plates = plates,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        show_int_ctrl = show_int_ctrl,
+                                        version = version)
+    rm(plates)
   }
 
   # na rows ----
 
-  df_na <- dplyr::tibble(
-    "X" = rep(x = NA_character_, times = ncol(df_top))
+  df_na_wide <- dplyr::tibble(
+    "X" = rep(x = NA_character_, times = ncol(df_top_wide))
   ) |>
     t()
-  colnames(df_na) <- paste0("V", seq_len(ncol(df_top)))
-  df_na <- dplyr::as_tibble(df_na)
+  colnames(df_na_wide) <- paste0("V", seq_len(ncol(df_top_wide)))
+  df_na_wide <- dplyr::as_tibble(df_na_wide)
 
   # combine df ----
 
-  df <- df_head |>
+  df_wide <- df_head_wide |>
     dplyr::bind_rows(
-      df_top
+      df_top_wide
     ) |>
     dplyr::bind_rows(
-      df_na
+      df_na_wide
     ) |>
     dplyr::bind_rows(
-      df_middle
+      df_middle_wide
     )
 
-  if (data_type != "Ct") {
-    df <- df |>
+  if (format_spec$has_qc_data == TRUE) {
+    df_wide <- df_wide |>
       dplyr::bind_rows(
-        df_na
+        df_na_wide
       ) |>
       dplyr::bind_rows(
-        df_bottom
+        df_bottom_wide
       )
   }
 
   # return ----
 
-  list_df <- list(
-    df = df,
-    df_top = df_top,
-    df_middle = df_middle
+  list_df_wide <- list(
+    df_wide = df_wide,
+    df_top_wide = df_top_wide,
+    df_middle_wide = df_middle_wide,
+    df_head_wide = df_head_wide,
+    df_na_wide = df_na_wide
   )
 
-  if (data_type != "Ct") {
-    list_df <- append(x = list_df,
-                      values = list(df_bottom = df_bottom))
+  if (format_spec$has_qc_data == TRUE) {
+    list_df_wide <- append(x = list_df_wide,
+                           values = list(df_bottom_wide = df_bottom_wide))
   }
 
-  list_df <- append(x = list_df,
-                    values = list(df_head = df_head,
-                                  df_na = df_na))
-
-  return(list_df)
+  return(list_df_wide)
 
 }
 
 # converts the full wide excel file to a long df.
-olink_wide_long <- function(l_df_top,
-                            l_df_middle,
-                            l_df_bottom,
-                            n_panels,
-                            n_assays,
-                            data_type,
-                            shuffle_assays) {
+olink_wide_to_long <- function(df_top_wide,
+                               df_middle_wide,
+                               df_bottom_wide,
+                               olink_platform,
+                               data_type,
+                               version = 1L) {
 
   # convert the top matrix to a list of long df ----
 
-  df_top <- olink_wide_top_long(df = l_df_top)
+  df_top_long <- olink_wide_top_long(df = df_top_wide)
 
   # extract colnames to use below ----
 
-  cname <- sapply(df_top, \(x) (x$col_index))
-  n_cname <- c("assay_cols", "plate_cols", "qc_warn_cols", "int_ctrl_cols")
-  cname <- cname[sapply(df_top, nrow) > 0L]
-  n_cname <- n_cname[sapply(df_top, nrow) > 0L]
-  names(cname) <- n_cname
-  rm(n_cname)
+  cname <- sapply(df_top_long, \(x) (x$col_index))
+  cname <- cname[sapply(cname, length) > 0L]
 
   # convert the middle matrix to a list of long df ----
 
-  df_middle <- olink_wide_middle_long(df = l_df_middle,
-                                      n_panels = n_panels,
-                                      n_assays = n_assays,
-                                      data_type = data_type,
-                                      shuffle_assays = shuffle_assays,
-                                      cname = cname)
+  df_middle_long <- olink_wide_middle_long(df = df_middle_wide,
+                                           data_type = data_type,
+                                           cname = cname)
+
+  has_qc_warn <- "df_qc_warn" %in% names(df_middle_long) &&
+    "df_qc_warn" %in% names(df_top_long)
+
+  has_dev_int_ctrl <- "df_dev_int_ctrl" %in% names(df_middle_long) &&
+    "df_dev_int_ctrl" %in% names(df_top_long)
+
+  has_int_ctrl <- "df_int_ctrl" %in% names(cname) &&
+    length(cname$df_int_ctrl) > 0L
+
+  has_bottom_mat <- !is.null(df_bottom_wide)
 
   # convert the bottom matrix to a long df ----
 
-  if (!is.null(l_df_bottom)) {
+  if (has_bottom_mat) {
 
-    if (shuffle_assays == TRUE) {
-      df_bottom <- olink_wide_bottom_long(
-        df = l_df_bottom,
-        data_type = data_type,
-        col_split = colnames(l_df_bottom) |>
-          tail(n = 1L),
-        int_ctrl_cols = df_top$df_int_ctrl$col_index
-      )
-    } else {
-      df_bottom <- olink_wide_bottom_long(
-        df = l_df_bottom,
-        data_type = data_type,
-        col_split = colnames(l_df_bottom) |>
-          tail(n = 1L),
-        int_ctrl_cols = NULL
-      )
+    df_panel_plate <- df_top_long$df_oid
+    if (has_int_ctrl) {
+      df_panel_plate <- df_panel_plate |>
+        dplyr::bind_rows(
+          df_top_long$df_int_ctrl
+        )
     }
+    df_panel_plate <- df_panel_plate |>
+      dplyr::select(
+        dplyr::all_of(c("col_index_oid" = "col_index", "Panel"))
+      ) |>
+      dplyr::left_join(
+        df_top_long$df_plate |>
+          dplyr::select(
+            dplyr::all_of(c("col_index_plate" = "col_index", "Panel"))
+          ),
+        by = "Panel",
+        relationship = "many-to-one"
+      ) |>
+      dplyr::left_join(
+        df_middle_long$df_plate |>
+          dplyr::select(
+            dplyr::all_of(c("col_index_plate" = "col_index", "PlateID"))
+          ) |>
+          dplyr::distinct(),
+        by = "col_index_plate",
+        relationship = "many-to-many"
+      )
+
+    # get column names of internal controls
+    if (has_int_ctrl) {
+      int_ctrl_cols <- cname$df_int_ctrl
+    } else {
+      int_ctrl_cols <- NULL
+    }
+
+    plate_cols <- unique(df_top_long$df_plate$col_index)
+
+    df_bottom_long <- olink_wide_bottom_long(
+      df = df_bottom_wide,
+      olink_platform = olink_platform,
+      data_type = data_type,
+      int_ctrl_cols = int_ctrl_cols,
+      plate_cols = plate_cols,
+      version = version,
+      df_panel_plate = df_panel_plate
+    )
   }
 
   # prepare components of long df ----
 
   ## df oid ----
 
-  df_oid <- df_middle$df_oid |>
+  df_oid <- df_middle_long$df_oid |>
     dplyr::left_join(
-      df_top$df_oid,
+      df_top_long$df_oid,
       by = "col_index",
       relationship = "many-to-one"
     )
 
   ## df plate id ----
 
-  df_plate <- df_middle$df_plate |>
+  df_plate <- df_middle_long$df_plate |>
     dplyr::left_join(
-      df_top$df_plate,
+      df_top_long$df_plate,
       by = "col_index",
       relationship = "many-to-one"
     ) |>
@@ -1002,12 +1349,11 @@ olink_wide_long <- function(l_df_top,
 
   ## df qc warning ----
 
-  if ("df_qc_warn" %in% names(df_middle)
-      && "df_qc_warn" %in% names(df_top)) {
+  if (has_qc_warn) {
 
-    df_qc_warn <- df_middle$df_qc_warn |>
+    df_qc_warn <- df_middle_long$df_qc_warn |>
       dplyr::left_join(
-        df_top$df_qc_warn,
+        df_top_long$df_qc_warn,
         by = "col_index",
         relationship = "many-to-one"
       ) |>
@@ -1028,7 +1374,7 @@ olink_wide_long <- function(l_df_top,
 
   ## combine oid and plate qc ----
 
-  df_out <- df_oid |>
+  df_long <- df_oid |>
     dplyr::left_join(
       df_plate_qc,
       by = c("SampleID", "Panel"),
@@ -1037,26 +1383,14 @@ olink_wide_long <- function(l_df_top,
 
   ## df internal controls ----
 
-  if ("df_int_ctrl" %in% names(df_middle)
-      && "df_int_ctrl" %in% names(df_top)) {
+  if (has_int_ctrl) {
 
-    df_int_ctrl <- df_middle$df_int_ctrl |>
+    df_int_ctrl <- df_middle_long$df_int_ctrl |>
       dplyr::left_join(
-        df_top$df_int_ctrl,
+        df_top_long$df_int_ctrl,
         by = "col_index",
         relationship = "many-to-one"
       )
-
-    # move the names *Ctrl* to column Assay
-    if (all(grepl(pattern = "ctrl",
-                  x = df_int_ctrl$`Uniprot ID`,
-                  ignore.case = TRUE))) {
-      df_int_ctrl <- df_int_ctrl |>
-        dplyr::mutate(
-          Assay = .data[["Uniprot ID"]],
-          `Uniprot ID` = NA_character_
-        )
-    }
 
     # join with the plate df
     df_int_ctrl_pid <- df_int_ctrl |>
@@ -1066,30 +1400,58 @@ olink_wide_long <- function(l_df_top,
         relationship = "many-to-one"
       )
 
-    df_out <- df_out |>
-      dplyr::bind_rows(df_int_ctrl_pid)
+    df_long <- df_long |>
+      dplyr::bind_rows(
+        df_int_ctrl_pid
+      )
+  }
+
+  ## df deviation internal controls ----
+
+  if (has_dev_int_ctrl) {
+
+    df_dev_int_ctrl <- df_middle_long$df_dev_int_ctrl |>
+      dplyr::left_join(
+        df_top_long$df_dev_int_ctrl,
+        by = "col_index",
+        relationship = "many-to-one"
+      ) |>
+      dplyr::select(
+        -dplyr::all_of(c("Assay", "col_index"))
+      ) |>
+      tidyr::pivot_wider(
+        id_cols = dplyr::all_of(c("SampleID", "Panel")),
+        names_from = dplyr::all_of("Uniprot ID"),
+        values_from = dplyr::all_of(data_type)
+      )
+
+    df_long <- df_long |>
+      dplyr::left_join(
+        df_dev_int_ctrl,
+        by = c("SampleID", "Panel"),
+        relationship = "many-to-one"
+      )
   }
 
   ## df bottom ----
 
-  if (exists("df_bottom")) {
+  if (has_bottom_mat) {
 
-    df_bottom_merge <- df_bottom |>
+    df_bottom_merge <- df_bottom_long |>
       dplyr::bind_rows()
 
-    if ("Plate ID" %in% colnames(df_bottom_merge)) {
-      df_out <- df_out |>
+    if ("PlateID" %in% colnames(df_bottom_merge)) {
+      df_long <- df_long |>
         dplyr::left_join(
           df_bottom_merge,
-          by = c("col_index" = "col_index",
-                 "PlateID" = "Plate ID"),
+          by = c("col_index", "PlateID"),
           relationship = "many-to-many"
         )
     } else {
-      df_out <- df_out |>
+      df_long <- df_long |>
         dplyr::left_join(
           df_bottom_merge,
-          by = c("col_index" = "col_index"),
+          by = "col_index",
           relationship = "many-to-many"
         )
     }
@@ -1097,37 +1459,48 @@ olink_wide_long <- function(l_df_top,
 
   # remove col_index ----
 
-  df_out <- df_out |>
+  df_long <- df_long |>
     dplyr::select(
       -dplyr::all_of("col_index")
     )
 
   # return ----
 
-  l_out <- list(
-    df = df_out,
-    df_oid = df_oid,
-    df_plate = df_plate
+  list_df_long <- list(
+    df_long = df_long,
+    df_oid_long = df_oid,
+    df_plate_long = df_plate
   )
 
-  l_long <- list(
-    df_top = df_top,
-    df_middle = df_middle
+  list_split_long <- list(
+    df_top_long = df_top_long,
+    df_middle_long = df_middle_long
   )
 
-  if (exists("df_bottom")) {
-    l_out <- append(x = l_out, values = list(df_qc_warn = df_qc_warn))
+  if (has_bottom_mat) {
+    list_df_long <- append(x = list_df_long,
+                           values = list(df_qc_warn_long = df_qc_warn))
 
-    l_long <- append(x = l_long, values = list(df_bottom = df_bottom))
+    list_split_long <- append(x = list_split_long,
+                              values = list(df_bottom_long = df_bottom_long))
   }
 
-  if (exists("df_int_ctrl")) {
-    l_out <- append(x = l_out, values = list(df_int_ctrl = df_int_ctrl))
+  if (has_int_ctrl) {
+    list_df_long <- append(x = list_df_long,
+                           values = list(df_int_ctrl_long = df_int_ctrl))
   }
 
-  l_out <- append(x = l_out, values = l_long)
+  if (has_dev_int_ctrl) {
+    list_df_long <- append(
+      x = list_df_long,
+      values = list(df_dev_int_ctrl_long = df_dev_int_ctrl)
+    )
+  }
 
-  return(l_out)
+  list_df_long <- append(x = list_df_long,
+                         values = list_split_long)
+
+  return(list_df_long)
 
 }
 
@@ -1138,37 +1511,42 @@ olink_wide_synthetic <- function(olink_platform,
                                  n_panels,
                                  n_assays,
                                  n_samples,
+                                 show_dev_int_ctrl = TRUE,
                                  show_int_ctrl = TRUE,
-                                 loc_int_ctrl = "V3",
-                                 shuffle_assays = FALSE) {
+                                 version = 1L) {
 
-  l_wide <- olink_wide(olink_platform = olink_platform,
-                       data_type = data_type,
-                       n_panels = n_panels,
-                       n_assays = n_assays,
-                       n_samples = n_samples,
-                       show_int_ctrl = show_int_ctrl,
-                       loc_int_ctrl = loc_int_ctrl,
-                       shuffle_assays = shuffle_assays)
+  # list of wide df ----
 
-  if (!("df_bottom" %in% names(l_wide))) {
-    l_wide_bottom <- NULL
+  list_df_wide <- olink_wide(olink_platform = olink_platform,
+                             data_type = data_type,
+                             n_panels = n_panels,
+                             n_assays = n_assays,
+                             n_samples = n_samples,
+                             show_dev_int_ctrl = show_dev_int_ctrl,
+                             show_int_ctrl = show_int_ctrl,
+                             version = version)
+
+  # list of long df ----
+
+  if (!("df_bottom_wide" %in% names(list_df_wide))) {
+    df_bottom_wide <- NULL
   } else {
-    l_wide_bottom <- l_wide$df_bottom
+    df_bottom_wide <- list_df_wide$df_bottom_wide
   }
 
-  l_long <- olink_wide_long(l_df_top = l_wide$df_top,
-                            l_df_middle = l_wide$df_middle,
-                            l_df_bottom = l_wide_bottom,
-                            n_panels = n_panels,
-                            n_assays = n_assays,
-                            data_type = data_type,
-                            shuffle_assays = shuffle_assays)
+  list_df_long <- olink_wide_to_long(
+    df_top_wide = list_df_wide$df_top_wide,
+    df_middle_wide = list_df_wide$df_middle_wide,
+    df_bottom_wide = df_bottom_wide,
+    olink_platform = olink_platform,
+    data_type = data_type,
+    version = version
+  )
 
   return(
     list(
-      wide = l_wide,
-      long = l_long
+      list_df_wide = list_df_wide,
+      list_df_long = list_df_long
     )
   )
 }
