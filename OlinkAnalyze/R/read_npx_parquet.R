@@ -33,7 +33,8 @@ read_npx_parquet <- function (filename) {
     stop("Reading parquet files requires the arrow package.
          Please install arrow before continuing.
 
-         install.packages(\"arrow\")")
+         install.packages(lib = \"arrow\",
+         repos = \"https://p3m.dev/cran/2024-02-02\")")
   }
 
   # pointer to parquet file
