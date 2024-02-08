@@ -77,3 +77,5 @@ Suggests:
     withr,
     writexl,
     zip
+Depends: 
+    R (>= 2.10)

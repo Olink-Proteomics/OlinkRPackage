@@ -29,7 +29,9 @@ test_that("check_olinkid returns correct non_conforming_OID", {
                           ))
 
   # Test that the function returns the correct non_conforming_OID
-  result <- check_olinkid(df)
+  expect_warning(check_olinkid(df),
+                 "Unrecognized Olink IDs detected: OID1234, 12345, and OID123456")
+  result <- suppressWarnings(check_olinkid(df))
   expect_equal(result, c("OID1234",
                          "12345",
                          "OID123456"))

@@ -1,38 +1,48 @@
-#' Help function to identify assays with Only NAs
+#' Help function to identify Olink assays with all quantified values NA.
 #'
 #' @author
 #'  Simon Forsberg
 #'  Masoumeh Sheikhi
-#' @param df An arrow object containing columns OlinkID and
-#' either NPX or Quantified_value
-#' @return A character vector of assays with all NA values.
+#'
+#' @param df An arrow object containing columns "OlinkID" and
+#' either "NPX" or "Quantified_value"
+#'
+#' @return A character vector containing
+#' Olink ID of assays with all quantified values NA,
+#' otherwise returns `character(0)`.
 
 check_all_na_assays <- function(df) {
   # detect data type, NPX or Quantified_value
-  # Q1, since detect_data_type checks whether
-  # df is an arrow object or not, can we skip it here?
-  # Q2, when writing a test for this function,
-  # should we write a test for next line as well?
-  # seems like double testing for hidden internal functions..?
   data_type <- detect_data_type(df)
 
+  # required column: OlinkID
+  # check column OlinkID exists
+  # replace this chunck with check_columns function
+  olink_id <- "OlinkID"
+  if (!olink_id %in% names(df)) {
+    cli::cli_abort(
+      c("x" = "The data frame {.arg {rlang::caller_arg(df)}} is missing the
+        required column: {olink_id}!"),
+      call = rlang::caller_env(),
+      wrap = TRUE
+    )
+  }
+
   # Identify assays with only NAs
-  all_nas <- df  |>
-    dplyr::group_by(OlinkID)  |>
-    dplyr::summarise(
-      n = dplyr::n(),
-      n_na = sum(is.na(!!rlang::ensym(data_type))),
-      .groups = "drop"
-    )  |>
-    dplyr::filter(n == n_na) %>%
-    dplyr::pull(OlinkID, as_vector = TRUE)
+  all_nas <- df |>
+    dplyr::select(dplyr::all_of(c(olink_id, data_type))) |>
+    dplyr::group_by(.data[[olink_id]]) |>
+    dplyr::mutate(is_na = ifelse(is.na(.data[[data_type]]), 1L, 0L)) |>
+    dplyr::summarise(n = dplyr::n(),
+                     n_na = sum(is_na),
+                     .groups = "drop")  |>
+    dplyr::filter(n == n_na)  |>
+    dplyr::pull(.data[[olink_id]], as_vector = TRUE)
 
   # Issue warning if any assays with only NAs are found
-  if (length(all_nas) > 0) {
-    cli::cli_warn(
-      c(x = "{all_nas} ha{?s/ve} {data_type} = NA for all samples
-        and will be excluded from the analysis.")
-    )
+  if (length(all_nas) > 0L) {
+    cli::cli_warn(c(
+      x = "{all_nas} ha{?s/ve} {data_type} = NA for all samples."))
   }
 
   return(all_nas)

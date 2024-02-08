@@ -8,7 +8,7 @@ test_that("all NA values are detected", {
     NPX = c(NA_real_, NA_real_, 1.2, 1.3)
   )
   expect_warning(check_all_na_assays(df),
-                 "OID12345 has NPX = NA for all samples and will be excluded from the analysis.")
+                 "OID12345 has NPX = NA for all samples.")
   expect_equal(suppressWarnings(check_all_na_assays(df)), "OID12345")
 
 })
