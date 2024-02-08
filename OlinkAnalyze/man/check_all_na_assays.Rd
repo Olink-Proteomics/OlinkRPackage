@@ -2,19 +2,21 @@
 % Please edit documentation in R/check_all_na_assays.R
 \name{check_all_na_assays}
 \alias{check_all_na_assays}
-\title{Help function to identify assays with Only NAs}
+\title{Help function to identify Olink assays with all quantified values NA.}
 \usage{
 check_all_na_assays(df)
 }
 \arguments{
-\item{df}{An arrow object containing columns OlinkID and
-either NPX or Quantified_value}
+\item{df}{An arrow object containing columns "OlinkID" and
+either "NPX" or "Quantified_value"}
 }
 \value{
-A character vector of assays with all NA values.
+A character vector containing
+Olink ID of assays with all quantified values NA,
+otherwise returns `character(0)`.
 }
 \description{
-Help function to identify assays with Only NAs
+Help function to identify Olink assays with all quantified values NA.
 }
 \author{
 Simon Forsberg
