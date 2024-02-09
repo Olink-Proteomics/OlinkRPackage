@@ -4,7 +4,7 @@
 \alias{check_all_na_assays}
 \title{Help function to identify Olink assays with all quantified values NA.}
 \usage{
-check_all_na_assays(df)
+check_all_na_assays(df, column_name_df)
 }
 \arguments{
 \item{df}{An arrow object containing columns "OlinkID" and
