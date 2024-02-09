@@ -1,14 +1,18 @@
 ## code to prepare `column_name_dict` dataset goes here
 
 column_name_dict <- list(
-  SampleID = c("SampleID", "sample_id"),
-  Sample_Type = c("Sample_Type", "SampleType"),
-  OlinkID = c("OlinkID", "OID", "olink_id"),
-  # Panel = c("Panel"),
-  PlateID = c("PlateID", "plate_id"),
-  QC_Warning = c("QC_Warning", "SampleQC", "sample_qc"),
-  LOD = c("LOD", "Plate LOD", "Plate_LOD", "Max LOD", "Max_LOD"),
-  NPX = c("NPX", "Ct")
+  sample_id = c("SampleID", "sampleid", "sample_id"),
+  sample_type = c("Sample_Type", "SampleType",
+                  "sample_type", "sampletype", NA_character_),
+  olink_id = c("OlinkID", "OID",
+               "olinkid", "oid", "olink_id"),
+  plate_id = c("PlateID","plateid", "plate_id"),
+  qc_warning = c("QC_Warning", "SampleQC",
+                 "qc_warning", "sample_qc"),
+  lod = c("LOD", "Plate LOD", "Plate_LOD", "Max LOD", "Max_LOD",
+          "lod", "plate lod", "plate_lod", "max lod", "max_lod",  NA_character_),
+  quant = c("NPX", "Ct", "Quantified", "Quantified_value",
+            "npx", "ct", "quantified", "quantified_value")
 )
 
 # Save the dictionary as an R data object
