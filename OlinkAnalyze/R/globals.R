@@ -143,7 +143,7 @@ olink_wide_excel_spec <- dplyr::tibble(
 )
 
 olink_wide_excel_bottom_matrix <-
-  readRDS("data/npx_signature_bottom_mat_v1_long.rds")
+  readRDS("inst/extdata/npx_signature_bottom_mat_v1_long.rds")
 
 ## Acceptable checksum file names ----
 

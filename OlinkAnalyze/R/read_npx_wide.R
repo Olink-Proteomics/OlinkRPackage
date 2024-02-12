@@ -1,3 +1,15 @@
+#' Read wide Olink files with NPX, Ct or Quantified data.
+#'
+#' @author Klev Diamanti
+#'
+#' @param file The input excel file.
+#' @param data_type The quantification in which the data comes in. Expecting one
+#' of NPX, Quantified or Ct.
+#' @param olink_platform The Olink platform used to generate the input file.
+#' Expecting "Target 96", "Target 48", "Flex" or "Focus".
+#'
+#' @return A tibble of the wide Olink file in long format.
+#'
 read_npx_wide <- function(file,
                           data_type,
                           olink_platform) {
@@ -22,7 +34,7 @@ read_npx_wide <- function(file,
 
   # split the file into sub-data frames ----
 
-  df_split <- read_npx_wide_split_row(
+  df_split_row <- read_npx_wide_split_row(
     file = file,
     data_type = data_type,
     format_spec = format_spec
@@ -31,113 +43,80 @@ read_npx_wide <- function(file,
   # top list of df to long ----
 
   df_top_list <- read_npx_wide_top(
-    df = df_split$df_top,
+    df = df_split_row$df_top,
     file = file,
     olink_platform = olink_platform,
     format_spec = format_spec
   )
 
-  ## top list of df colnames ----
-
-  # assay columns
-  assay_cols <- df_top_list$df_oid |>
-    dplyr::pull(
-      .data[["col_index"]]
-    )
-
-  # plate columns
-  plate_cols <- df_top_list$df_plate |>
-    dplyr::pull(
-      .data[["col_index"]]
-    )
-
-  # qc warning columns
-  if (data_type != "Ct") {
-    qc_warn_cols <- df_top_list$df_qc_warn |>
-      dplyr::pull(
-        .data[["col_index"]]
-      )
-  } else {
-    qc_warn_cols <- NULL
-  }
-
-  # internal controls columns
-  if (data_type == "Quantified"
-      && !is.null(df_top_list$df_int_ctrl)) {
-    int_ctrl_cols <- df_top_list$df_int_ctrl |>
-      dplyr::pull(
-        .data[["col_index"]]
-      )
-  } else {
-    int_ctrl_cols <- NULL
-  }
-
-  # get col_split that splits left from right hand side matrix
-  col_split <- df_top_list$df_plate |>
-    dplyr::mutate(
-      col_index_n = stringr::str_sub(string = .data[["col_index"]],
-                                     start = 2L) |>
-        as.integer()
-    ) |>
-    dplyr::arrange(
-      .data[["col_index_n"]]
-    ) |>
-    dplyr::slice_head(
-      n = 1L
-    ) |>
-    dplyr::pull(
-      .data[["col_index"]]
-    )
+  col_names <- sapply(df_top_list, function(x) x$col_index)
 
   # middle list of df to long ----
 
-  df_middle <- read_npx_wide_middle( # nolint object_usage_linter
-    df = df_split$df_mid,
+  df_middle_list <- read_npx_wide_middle(
+    df = df_split_row$df_mid,
     file = file,
     data_type = data_type,
-    assay_cols = assay_cols,
-    plate_cols = plate_cols,
-    qc_warn_cols = qc_warn_cols,
-    int_ctrl_cols = int_ctrl_cols
+    col_names = col_names
   )
 
-  # bottom df to long ----
+  # combine top and middle matrices ----
 
-  if (format_spec$bottom_matrix) {
+  df_long <- red_npx_wide_top_mid_long(df_top_list = df_top_list,
+                                       df_middle_list = df_middle_list,
+                                       data_type = data_type,
+                                       format_spec = format_spec)
 
-    # check if internal controls are shuffled with assays
-    if (!is.null(int_ctrl_cols)) {
-      col_split_n <- stringr::str_sub(string = col_split, start = 2L) |>
-        as.integer()
-      int_ctrl_cols_n <- stringr::str_sub(string = int_ctrl_cols, start = 2L) |>
-        as.integer()
+  # add bottom df to long ----
 
-      if (all(int_ctrl_cols_n < col_split_n)) {
-        # all internal controls are on the left hand side of Plate ID
-        # leave them as are for read_npx_wide_bottom
-        int_ctrl_cols <- int_ctrl_cols
-      } else if (all(int_ctrl_cols_n < col_split_n)) {
-        # all internal controls are on the very right hand side of Plate ID
-        # make them NULL so that read_npx_wide_bottom ignores them
-        int_ctrl_cols <- NULL
-      } else {
-        # ERROR
-        # some internal controls are left and others reight of Plate ID
-        # and this in unexpected
-        print(1)
-      }
-    }
+  if (format_spec$has_qc_data == TRUE) {
 
-    df_bottom <- read_npx_wide_bottom( # nolint object_usage_linter
-      df = df_split$df_bottom,
+    df_bottom <- read_npx_wide_bottom(
+      df = df_split_row$df_bottom,
       file = file,
-      col_split = col_split,
-      assay_cols = assay_cols,
-      int_ctrl_cols = int_ctrl_cols,
-      format_spec = format_spec
+      olink_platform = olink_platform,
+      data_type = data_type,
+      col_names = col_names,
+      format_spec = format_spec,
+      df_plate_panel = df_long |>
+        dplyr::select(
+          dplyr::all_of(c("col_index", "PlateID", "Panel"))
+        ) |>
+        dplyr::distinct()
     )
 
+    # add columns from bottom matrix
+    if ("PlateID" %in% colnames(df_bottom$df_bottom_oid)) {
+
+      df_long <- df_long |>
+        dplyr::left_join(
+          dplyr::bind_rows(df_bottom),
+          by = c("col_index", "PlateID"),
+          relationship = "many-to-one"
+        )
+
+    } else {
+
+      df_long <- df_long |>
+        dplyr::left_join(
+          dplyr::bind_rows(df_bottom),
+          by = "col_index",
+          relationship = "many-to-one"
+        )
+
+    }
+
   }
+
+  # remove col_index from output df
+  df_long <- df_long |>
+    dplyr::select(
+      -dplyr::all_of(c("col_index"))
+    )
+
+  # return ----
+
+  return(df_long)
 }
 
 #' Help function the uses rows with all columns NA to split the wide Olink data
@@ -225,7 +204,7 @@ read_npx_wide_split_row <- function(file,
         "x" = "We identified
         {ifelse(identical(na_row_index, integer(0L)), 0L, length(na_row_index))}
         rows with all columns `NA` in file {.file {file}}, while we expected
-        {format_spec$n_na_rows} for {.val {data_type}}",
+        {format_spec$n_na_rows}!",
         "i" = "Has the excel file been modified manually?"
       ),
       call = rlang::caller_env(),
@@ -324,26 +303,26 @@ read_npx_wide_check_top <- function(df,
 
   # checks ----
 
-  ## check that column 1 contains the expected values ----
+  ## column 1 contains the expected values ----
 
   # check that df contains "V1"
   check_columns(df = df, col_list = list("V1"))
 
   # rows containing metadata about assays and panels based on the quantification
   # method in the top dataset.
-  top_mat_v1_expected <- format_spec |>
+  top_mat_v1 <- format_spec |>
     dplyr::pull(
       .data[["top_matrix_v1"]]
     ) |>
     unlist()
 
-  if (!identical(dplyr::pull(df, .data[["V1"]]), top_mat_v1_expected)) {
+  if (!identical(dplyr::pull(df, .data[["V1"]]), top_mat_v1)) {
 
-    top_v1_miss <- top_mat_v1_expected[!(top_mat_v1_expected %in% dplyr::pull(df, .data[["V1"]]))] # nolint object_usage_linter
+    top_v1_miss <- top_mat_v1[!(top_mat_v1 %in% df$V1)] # nolint object_usage_linter
 
     cli::cli_abort(
       message = c(
-        "x" = "Column 1 of of the top matrix with assay metadata in file
+        "x" = "Column 1 of the top matrix with assay data in file
         {.file {file}} does not contain: {top_v1_miss}",
         "i" = "Has the excel file been modified manually?"
       ),
@@ -353,33 +332,23 @@ read_npx_wide_check_top <- function(df,
 
   }
 
-  ## check that rows 2 and 3 contain the expected values ----
+  ## row 2 contains Plate ID (and QC Warning) ----
 
-  # rows containing information on plate id, qc warning and internal controls
-  top_mat_v2_v3_expected <- format_spec |>
+  # rows containing information on plate id and qc warning
+  top_mat_assay_labels <- format_spec |>
     dplyr::pull(
       .data[["top_matrix_assay_labels"]]
     ) |>
     unlist()
 
-  # the labels may be located in rows 2 or 3 of the wide matrix
-  # we need to check that all expected labels are present
-  top_mat_v2_v3_identified <- sapply(top_mat_v2_v3_expected,
-                                     grepl,
-                                     x = c(as.character(df[2L, ]),
-                                           as.character(df[3L, ])) |>
-                                       unique(),
-                                     ignore.case = TRUE) |>
-    apply(MARGIN = 2L, sum)
+  if (!all(top_mat_assay_labels %in% df[2L, ])) {
 
-  if (any(top_mat_v2_v3_identified == 0L)) {
-
-    top_v2_v3_miss <- names(top_mat_v2_v3_identified)[top_mat_v2_v3_identified == 0L] # nolint object_usage_linter
+    top_mat_assay_miss <- top_mat_assay_labels[!(top_mat_assay_labels %in% df[2L, ])] # nolint object_usage_linter
 
     cli::cli_abort(
       message = c(
-        "x" = "Columns 2 and 3 of of the top matrix with assay metadata in file
-        {.file {file}} do not contain: {top_v2_v3_miss}",
+        "x" = "Row 2 of the top matrix with assay data in file {.file {file}}
+        does not contain: {top_mat_assay_miss}",
         "i" = "Has the excel file been modified manually?"
       ),
       call = rlang::caller_env(),
@@ -387,6 +356,210 @@ read_npx_wide_check_top <- function(df,
     )
 
   }
+
+  ## row 2 contains the correct number of internal controls ----
+
+  # list of expected names of internal control assays
+  int_ctrl_list <- format_spec |>
+    dplyr::pull(
+      .data[["top_matrix_assay_int_ctrl"]]
+    ) |>
+    unlist()
+
+  panel_list <- df[1L, 2L:ncol(df)] |>
+    as.character() |>
+    unique()
+
+  # expected combos of int ctrl and panels
+  panel_int_ctrl_exp <- expand.grid(
+    "panel" = panel_list,
+    "int_ctrl" = int_ctrl_list
+  ) |>
+    dplyr::as_tibble() |>
+    dplyr::mutate(
+      dplyr::across(
+        dplyr::everything(),
+        ~ as.character(.x)
+      )
+    ) |>
+    dplyr::mutate(
+      int_ctrl_strip = strsplit(x = .data[["int_ctrl"]],
+                                split = " ",
+                                fixed = TRUE) |>
+        lapply(utils::head, 2L) |>
+        lapply(paste, collapse = " ") |>
+        unlist()
+    )
+
+  # check for internal control assays
+  int_ctrl_df_col <- colnames(df)[which(df[2L, ] %in% int_ctrl_list)]
+
+  # run only if there are internal controls
+  if (length(int_ctrl_df_col) > 0L) {
+
+    # data frame of internal controls present
+    int_ctrl_df <- df |>
+      dplyr::select(
+        dplyr::all_of(int_ctrl_df_col)
+      ) |>
+      dplyr::slice(
+        1L:2L
+      ) |>
+      t() |>
+      `colnames<-`(c("panel", "int_ctrl")) |>
+      dplyr::as_tibble(
+        .name_repair = "minimal"
+      ) |>
+      dplyr::mutate(
+        in_df = TRUE
+      )
+
+    # intersect real with expected datasets
+    int_ctrl_df_present <- panel_int_ctrl_exp |>
+      dplyr::inner_join(
+        int_ctrl_df,
+        by = c("panel", "int_ctrl")
+      )
+
+    # missing internal controls
+    int_ctrl_df_missing <- panel_int_ctrl_exp |>
+      dplyr::anti_join(
+        int_ctrl_df,
+        by = c("panel", "int_ctrl")
+      ) |>
+      dplyr::filter(
+        .data[["int_ctrl"]] == .data[["int_ctrl_strip"]]
+      ) |>
+      dplyr::anti_join(
+        int_ctrl_df_present,
+        by = c("panel", "int_ctrl_strip")
+      )
+
+    if (nrow(int_ctrl_df_missing) > 0L) {
+
+      cli::cli_abort(
+        message = c(
+          "x" = "Panel(s) {unique(int_ctrl_df_missing$panel)} {?is/are} missing
+          one or more of the internal control assays
+          {unique(int_ctrl_df_missing$int_ctrl)} from row 2 of the top matrix
+          with assay data in file {.file {file}}!",
+          "i" = "Has the excel file been modified manually?"
+        ),
+        call = rlang::caller_env(),
+        wrap = FALSE
+      )
+
+    }
+
+  }
+
+  ## row 3 contains the correct number of deviation from internal controls ----
+
+  # list of expected tags of deviations from internal controls
+  dev_int_ctrl_tag <- format_spec |>
+    dplyr::pull(
+      .data[["top_matrix_assay_dev_int_ctrl"]]
+    ) |>
+    unlist()
+
+  if (length(dev_int_ctrl_tag) > 0L) {
+
+    # names of deviation from internal control assays
+    dev_int_ctrl_list <- format_spec |>
+      dplyr::pull(
+        .data[["top_matrix_uniprot_dev_int_ctrl"]]
+      ) |>
+      unlist()
+
+    panel_list <- df[1L, 2L:ncol(df)] |>
+      as.character() |>
+      unique()
+
+    # expected combos of int ctrl and panels
+    panel_dev_int_ctrl_exp <- expand.grid(
+      "panel" = panel_list,
+      "dev_int_ctrl" = dev_int_ctrl_list
+    ) |>
+      dplyr::as_tibble() |>
+      dplyr::mutate(
+        dplyr::across(
+          dplyr::everything(),
+          ~ as.character(.x)
+        )
+      ) |>
+      dplyr::mutate(
+        dev_int_ctrl_strip = strsplit(x = .data[["dev_int_ctrl"]],
+                                      split = " ",
+                                      fixed = TRUE) |>
+          lapply(utils::head, 2L) |>
+          lapply(paste, collapse = " ") |>
+          unlist()
+      )
+
+    # check for deviation from internal control assays
+    dev_int_ctrl_df_col <- colnames(df)[which(df[3L, ] %in% dev_int_ctrl_list)]
+
+    # run only if there are deviations from internal controls
+    if (length(dev_int_ctrl_df_col) > 0L) {
+
+      # data frame of internal controls present
+      dev_int_ctrl_df <- df |>
+        dplyr::select(
+          dplyr::all_of(dev_int_ctrl_df_col)
+        ) |>
+        dplyr::slice(
+          c(1L, 3L)
+        ) |>
+        t() |>
+        `colnames<-`(c("panel", "dev_int_ctrl")) |>
+        dplyr::as_tibble(
+          .name_repair = "minimal"
+        ) |>
+        dplyr::mutate(
+          in_df = TRUE
+        )
+
+      # intersect real with expected datasets
+      dev_int_ctrl_df_present <- panel_dev_int_ctrl_exp |>
+        dplyr::inner_join(
+          dev_int_ctrl_df,
+          by = c("panel", "dev_int_ctrl")
+        )
+
+      # missing internal controls
+      dev_int_ctrl_df_missing <- panel_dev_int_ctrl_exp |>
+        dplyr::anti_join(
+          dev_int_ctrl_df,
+          by = c("panel", "dev_int_ctrl")
+        ) |>
+        dplyr::filter(
+          .data[["dev_int_ctrl"]] == .data[["dev_int_ctrl_strip"]]
+        ) |>
+        dplyr::anti_join(
+          dev_int_ctrl_df_present,
+          by = c("panel", "dev_int_ctrl_strip")
+        )
+
+      if (nrow(dev_int_ctrl_df_missing) > 0L) {
+
+        cli::cli_abort(
+          message = c(
+            "x" = "Panel(s) {unique(dev_int_ctrl_df_missing$panel)} {?is/are}
+            missing one or more of the deviations from the internal control
+            assays {unique(dev_int_ctrl_df_missing$dev_int_ctrl)} from row 3 of
+            the top matrix with assay data in file {.file {file}}!",
+            "i" = "Has the excel file been modified manually?"
+          ),
+          call = rlang::caller_env(),
+          wrap = FALSE
+        )
+
+      }
+
+    }
+
+  }
+
 }
 
 #' Help function that splits df_top from a Olink wide excel file into 3 data
@@ -428,7 +601,9 @@ read_npx_wide_top <- function(df,
   df_t <- t(df) # transpose the wide df
   colnames(df_t) <- df_t[1, ] # add colnames
   df_t <- df_t |>
-    dplyr::as_tibble(rownames = "col_index") |>
+    dplyr::as_tibble(
+      rownames = "col_index"
+    ) |>
     dplyr::slice(
       2L:dplyr::n()
     )
@@ -438,55 +613,71 @@ read_npx_wide_top <- function(df,
 
   # split df_t into its parts ----
 
-  # data frame containing assay info
-  # Panel, Assay, Uniprot ID and Olink ID (and Unit if data_type=Quantified)
-  df_oid <- df_t |>
+  # extract customer assays from assay column
+  df_top_oid <- df_t |>
     dplyr::filter(
       !is.na(.data[["OlinkID"]])
     )
 
-  # data frame containing assay info
-  # Panel, Assay, Uniprot ID and Olink ID (and Unit if data_type=Quantified)
-  df_v2_v3_req <- lapply(unlist(format_spec$top_matrix_assay_labels),
-                         function(x) {
-                           df_t |>
-                             dplyr::filter(
-                               .data[["Assay"]] %in% x
-                               & is.na(.data[["OlinkID"]])
-                             ) |>
-                             dplyr::select(
-                               -dplyr::all_of(c("OlinkID", "Uniprot ID"))
-                             ) |>
-                             dplyr::rename(
-                               "Var" = "Assay"
-                             )
-                         })
-  names(df_v2_v3_req) <- paste("df", names(df_v2_v3_req), sep = "_")
+  # extract plate_id and qc_warning from Assay column
+  df_pid_qcw <- lapply(unlist(format_spec$top_matrix_assay_labels),
+                       function(x) {
+                         df_t |>
+                           dplyr::filter(
+                             is.na(.data[["OlinkID"]])
+                             & .data[["Assay"]] %in% .env[["x"]]
+                           ) |>
+                           dplyr::select(
+                             -dplyr::any_of(c("Uniprot ID", "OlinkID", "Unit"))
+                           ) |>
+                           dplyr::rename(
+                             "Var" = "Assay"
+                           )
+                       })
+  names(df_pid_qcw) <- paste("df_top", names(df_pid_qcw), sep = "_")
 
-  df_int_ctrl <- df_t |>
+  # extract internal control from Assay column
+  df_top_int_ctrl <- df_t |>
     dplyr::filter(
-      grepl(pattern = paste(unlist(format_spec$top_matrix_assay_optional),
-                            collapse = "|"),
-            x = .data[["Assay"]],
-            ignore.case = TRUE)
-      & is.na(.data[["OlinkID"]])
+      is.na(.data[["OlinkID"]])
+      & .data[["Assay"]] %in% unlist(format_spec$top_matrix_assay_int_ctrl)
     ) |>
     dplyr::select(
-      -dplyr::all_of(c("OlinkID"))
+      -dplyr::any_of(c("Uniprot ID", "OlinkID", "Unit"))
+    )
+
+  # extract deviation from internal controls from Assay column
+  df_top_dev_int_ctrl <- df_t |>
+    dplyr::filter(
+      is.na(.data[["OlinkID"]])
+      & .data[["Assay"]] %in% unlist(format_spec$top_matrix_assay_dev_int_ctrl)
+    ) |>
+    dplyr::select(
+      -dplyr::any_of(c("OlinkID", "Unit"))
     )
 
   # checks ----
 
   ## check sum of rows ----
 
-  if (nrow(df_t) != (nrow(df_oid)
-                     + sapply(df_v2_v3_req, nrow) |> sum()
-                     + nrow(df_int_ctrl))) {
+  if (nrow(df_t) != (nrow(df_top_oid)
+                     + sapply(df_pid_qcw, nrow) |> sum()
+                     + nrow(df_top_int_ctrl)
+                     + nrow(df_top_dev_int_ctrl))) {
+
+    top_mat_unknown_cols <- setdiff(df_t$col_index, # nolint object_usage_linter
+                                    c(df_top_oid$col_index,
+                                      sapply(df_pid_qcw, \(x) x$col_index) |>
+                                        unname() |>
+                                        unlist(),
+                                      df_top_int_ctrl$col_index,
+                                      df_top_dev_int_ctrl$col_index))
 
     cli::cli_abort(
       message = c(
-        "x" = "The top matrix with the assays metadata in file {.file {file}}
-        contains unexpected values!",
+        "x" = "The top matrix with the assay data in file {.file {file}} in row
+        `Assay` contains unrecognized values in columns:
+        {top_mat_unknown_cols}!",
         "i" = "Has the excel file been modified manually?"
       ),
       call = rlang::caller_env(),
@@ -495,15 +686,16 @@ read_npx_wide_top <- function(df,
 
   }
 
-  ## check df_oid ----
+  ## check df_top_oid ----
 
-  # no NAs are allowed in df_oid
-  if (any(is.na(df_oid))) {
+  # no NAs are allowed in df_top_oid
+  if (any(is.na(df_top_oid))) {
 
     cli::cli_abort(
       message = c(
-        "x" = "Detected {sum(is.na(df_oid))} empty cells in columns of file
-        {.file {file}}. Expected no empty cells!",
+        "x" = "The top matrix with the assay data in file {.file {file}} expects
+        no empty cells for assays other than internal controls. Identified
+        { sum(is.na(df_top_oid)) } empty cells!",
         "i" = "Has the excel file been modified manually?"
       ),
       call = rlang::caller_env(),
@@ -520,19 +712,20 @@ read_npx_wide_top <- function(df,
       .data[["name"]] == .env[["olink_platform"]]
     ) |>
     dplyr::mutate(
-      total_n = .data[["base_index"]] * length(unique(df_oid$Panel))
+      total_n = .data[["base_index"]] * length(unique(df_top_oid$Panel))
     ) |>
     dplyr::pull(
       .data[["total_n"]]
     )
 
   if (!is.na(expected_num_assays)
-      && nrow(df_oid) != expected_num_assays) {
+      && nrow(df_top_oid) != expected_num_assays) {
 
     cli::cli_abort(
       message = c(
-        "x" = "Detected {nrow(df_oid)} assays in {length(unique(df_oid$Panel))}
-        panels in file {.file {file}}, but expected {expected_num_assays}!",
+        "x" = "Detected {nrow(df_top_oid)} assays in
+        {length(unique(df_top_oid$Panel))} panels in file {.file {file}}, but
+        expected {expected_num_assays}!",
         "i" = "Has the excel file been modified manually?"
       ),
       call = rlang::caller_env(),
@@ -545,16 +738,18 @@ read_npx_wide_top <- function(df,
 
   # when both elements of the list with required labels are present in the top
   # wide matrix, expect identical dimensions
-  if (all(sapply(df_v2_v3_req, nrow) > 0L)) {
+  if (all(sapply(df_pid_qcw, nrow) > 0L)) {
 
     # check that that dimensions of the dfs in the list are identical
-    if (sapply(df_v2_v3_req, dim) |> unique(MARGIN = 2L) |> ncol()  != 1L) {
+    if (sapply(df_pid_qcw, dim) |> unique(MARGIN = 2L) |> ncol()  != 1L) {
 
       cli::cli_abort(
         message = c(
-          "x" = "Expected equal number of \"Plate ID\" and \"QC\ Warning\"
-          columns in the right-hand side of the top matrix in file
-          {.file {file}}!",
+          "x" = "Expected equal number of
+          {unlist(format_spec$top_matrix_assay_labels) |>
+          sapply(\\(x) paste0(\"`\", x, \"`\")) |>
+          cli::ansi_collapse(last = \" and \")} columns in the top matrix with
+          the assay data in file {.file {file}}!",
           "i" = "Has the excel file been modified manually?"
         ),
         call = rlang::caller_env(),
@@ -567,252 +762,27 @@ read_npx_wide_top <- function(df,
 
   # return ----
 
-  list_df <- list_df <- append(x = df_v2_v3_req,
-                               values = list(df_oid = df_oid))
+  list_df_top <- append(x = df_pid_qcw,
+                        values = list(df_top_oid = df_top_oid))
 
   # remove df with no rows
-  list_df <- list_df[which(lapply(list_df, nrow) != 0L)]
+  list_df_top <- list_df_top[which(lapply(list_df_top, nrow) != 0L)]
 
-  # add df_int_ctrl if not empty
-  if (nrow(df_int_ctrl) != 0L) {
-    list_df <- append(x = list_df,
-                      values = list(df_int_ctrl = df_int_ctrl))
+  # add df_top_int_ctrl if not empty
+  if (nrow(df_top_int_ctrl) != 0L) {
+    list_df_top <- append(x = list_df_top,
+                          values = list(df_top_int_ctrl = df_top_int_ctrl))
   }
 
-  return(list_df)
-
-}
-
-#' Help function that converts df_bottom into long format.
-#'
-#' @author Klev Diamanti
-#'
-#' @param df The bottom data frame from a split Olink wide excel file.
-#' @param file The input excel file.
-#' @param col_split The name of the column that splits the Olink wide excel file
-#' into left (assay info) and right  hand side (PlateID and QC_Warning info).
-#' @param assay_cols Character vector with the names of the columns containing
-#' Olink assays.
-#' @param int_ctrl_cols Character vector with the names of the columns
-#' containing "Internal Controls".
-#' @param format_spec A one-row data frame filtered from olink_wide_excel_spec
-#' with the Olink wide excel file specifications.
-#'
-#' @return The bottom matrix in long format.
-#'
-read_npx_wide_bottom <- function(df,
-                                 file,
-                                 col_split,
-                                 assay_cols,
-                                 int_ctrl_cols,
-                                 format_spec) {
-  # check input ----
-
-  check_is_data_frame(df = df,
-                      error = TRUE)
-
-  check_file_exists(file = file,
-                    error = TRUE)
-
-  check_is_scalar_character(string = col_split,
-                            error = TRUE)
-
-  check_is_character(string = assay_cols,
-                     error = TRUE)
-
-  if (!is.null(int_ctrl_cols)) {
-    check_is_character(string = int_ctrl_cols,
-                       error = TRUE)
-  }
-
-  check_is_data_frame(df = format_spec,
-                      error = TRUE)
-
-  # check first column ----
-
-  # check that column "V1" exists in the df
-  check_columns(df = df, col_list = list("V1"))
-
-  accepted_vals_v1 <- unlist(format_spec$bottom_matrix_v1)
-
-  if (!identical(dplyr::pull(df, .data[["V1"]]) |> unique() |> sort(),
-                 accepted_vals_v1 |> sort())) {
-
-    cli::cli_abort(
-      message = c(
-        "x" = "Column 1 of the bottom matrix with assay metadata in file
-        {.file {file}} contains unexpected values. Expected:
-        {accepted_vals_v1}",
-        "i" = "Has the excel file been modified manually?"
-      ),
-      call = rlang::caller_env(),
-      wrap = FALSE
+  # add df_top_dev_int_ctrl if not empty
+  if (nrow(df_top_dev_int_ctrl) != 0L) {
+    list_df_top <- append(
+      x = list_df_top,
+      values = list(df_top_dev_int_ctrl = df_top_dev_int_ctrl)
     )
-
   }
 
-  # keep necessary columns ----
-
-  # columns expected to be present in the df
-  expected_cols <- c("V1", assay_cols)
-  if (format_spec$use_plate_col) {
-    expected_cols <- c(expected_cols, col_split)
-  }
-  if (!is.null(int_ctrl_cols)) {
-    expected_cols <- c(expected_cols, int_ctrl_cols)
-  }
-  # check that columns in expected_cols exist in the df
-  check_columns(df = df, col_list = as.list(expected_cols))
-
-  df <- df |>
-    # keep only columns absolutely required:
-    # V1 that contains names of variables
-    # assay_cols that contains info for customer assays only
-    # col_split the column that might contain plate names in case of Quantified
-    dplyr::select(
-      dplyr::all_of(expected_cols)
-    ) |>
-    # The col_split was selected but it contains only NA values the remove it.
-    # This might be the case in NPX files.
-    remove_all_na_cols()
-
-  # per-plate metrics ----
-
-  if (format_spec$use_plate_col) {
-
-    # if it is Quantified data
-    df_q <- df |>
-      # keep only rows with -plate-specific info
-      dplyr::filter(
-        !is.na(.data[[col_split]])
-      )
-
-    # check that each row with plate-specific QC metrics contains the same
-    # number of plate
-    df_q_n_r <- df_q |>
-      dplyr::count(
-        .data[[col_split]],
-        name = "n_plate"
-      ) |>
-      dplyr::pull(
-        .data[["n_plate"]]
-      ) |>
-      unique() |>
-      length()
-
-    if (df_q_n_r != 1L) {
-
-      cli::cli_abort(
-        message = c(
-          "x" = "Column 1 of the bottom matrix contains uneven rows of plates
-          and plate-specific QC measurements in file {.file {file}}!",
-          "i" = "Has the excel file been modified manually?"
-        ),
-        call = rlang::caller_env(),
-        wrap = FALSE
-      )
-
-    }
-
-    # for each variable in V1 do a pivot_longer
-    df_q <- lapply(unique(df_q$V1),
-                   function(x) {
-                     df_q |>
-                       dplyr::filter(
-                         .data[["V1"]] == .env[["x"]]
-                       ) |>
-                       dplyr::select(
-                         -dplyr::all_of("V1")
-                       ) |>
-                       tidyr::pivot_longer(
-                         -dplyr::all_of(col_split),
-                         names_to = "col_index",
-                         values_to = x
-                       ) |>
-                       dplyr::rename(
-                         "Plate ID" = dplyr::all_of(col_split)
-                       )
-                   })
-
-    # left join all data frames from the list
-    df_q <- Reduce(f = function(df_1, df_2) {
-      dplyr::left_join(x = df_1,
-                       y = df_2,
-                       by = c("Plate ID", "col_index"),
-                       relationship = "one-to-one")
-    },
-    x = df_q)
-
-  }
-
-  # across plates metrics ----
-
-  # remove rows processed earlier
-  # these rows are now columns df_q
-  if (exists("df_q")) {
-
-    df <- df |>
-      dplyr::filter(
-        !(.data[["V1"]] %in% colnames(df_q))
-      ) |>
-      dplyr::select(
-        -dplyr::all_of(col_split)
-      )
-
-  }
-
-  df_t <- t(df)
-  colnames(df_t) <- df_t[1, ]
-  df_t <- df_t |>
-    dplyr::as_tibble(
-      rownames = "col_index"
-    ) |>
-    dplyr::slice(
-      2L:dplyr::n()
-    )
-
-  # join df_t and df_q ----
-
-  if (exists("df_q")) {
-
-    df_long <- df_t |>
-      dplyr::full_join(
-        y = df_q,
-        by = "col_index",
-        relationship = "one-to-many"
-      )
-
-  } else {
-
-    df_long <- df_t
-
-  }
-
-  # output l_df ----
-
-  # split into internal controls and assays
-  if (!is.null(int_ctrl_cols)) {
-
-    list_df <- list(
-      df_oid = df_long |>
-        dplyr::filter(
-          !(.data[["col_index"]] %in% int_ctrl_cols)
-        ),
-      df_int_ctrl = df_long |>
-        dplyr::filter(
-          .data[["col_index"]] %in% int_ctrl_cols
-        )
-    )
-
-  } else {
-
-    list_df <- list(
-      df_oid = df_long
-    )
-
-  }
-
-  return(list_df)
+  return(list_df_top)
 
 }
 
@@ -825,14 +795,9 @@ read_npx_wide_bottom <- function(df,
 #' @param file The input excel file.
 #' @param data_type The quantification in which the data comes in. Expecting one
 #' of NPX or Quantified.
-#' @param assay_cols Character vector with the names of the columns containing
-#' Olink assays.
-#' @param plate_cols Character vector with the names of the columns containing
-#' "Plate ID".
-#' @param qc_warn_cols Character vector with the names of the columns containing
-#' "QC Warning".
-#' @param int_ctrl_cols Character vector with the names of the columns
-#' containing "Internal Controls".
+#' @param col_names Names list of character vector with the names of the columns
+#' containing Olink data on assays, plates, QC Warnings, internal control
+#' assays and deviations from internal controls.
 #'
 #' @return A list of data frames (df_oid, df_pid, df_qc_warn and df_int_ctrl) in
 #' long format from the middle matrix of the Olink wide excel file.
@@ -840,10 +805,7 @@ read_npx_wide_bottom <- function(df,
 read_npx_wide_middle <- function(df,
                                  file,
                                  data_type,
-                                 assay_cols,
-                                 plate_cols,
-                                 qc_warn_cols,
-                                 int_ctrl_cols) {
+                                 col_names) {
 
   # check input ----
 
@@ -856,25 +818,10 @@ read_npx_wide_middle <- function(df,
   check_olink_data_type(x = data_type,
                         broader_platform = "qPCR")
 
-  if (!is.null(assay_cols)) {
-    check_is_character(string = assay_cols,
-                       error = TRUE)
-  }
+  check_is_list(lst = col_names,
+                error = TRUE)
 
-  if (!is.null(plate_cols)) {
-    check_is_character(string = plate_cols,
-                       error = TRUE)
-  }
-
-  if (!is.null(qc_warn_cols)) {
-    check_is_character(string = qc_warn_cols,
-                       error = TRUE)
-  }
-
-  if (!is.null(int_ctrl_cols)) {
-    check_is_character(string = int_ctrl_cols,
-                       error = TRUE)
-  }
+  sapply(col_names, function(x) check_is_character(string = x, error = TRUE))
 
   # check unique sample id ----
 
@@ -895,16 +842,23 @@ read_npx_wide_middle <- function(df,
 
   }
 
+  # check that all relevant columns exist ----
+
+  check_columns(df = df,
+                col_list = col_names |>
+                  unlist() |>
+                  unname() |>
+                  as.list())
+
   # split datasets ----
 
   ## split assays and pivot to longer ----
 
-  # check all columns exist
-  check_columns(df = df, col_list = as.list(assay_cols))
+  list_df_mid <- list()
 
-  df_oid <- df |>
+  list_df_mid$df_mid_oid <- df |>
     dplyr::select(
-      dplyr::all_of(c("V1", assay_cols))
+      dplyr::all_of(c("V1", col_names$df_top_oid))
     ) |>
     dplyr::rename(
       "SampleID" = dplyr::all_of("V1")
@@ -917,12 +871,9 @@ read_npx_wide_middle <- function(df,
 
   ## split plates and pivot to longer ----
 
-  # check all columns exist
-  check_columns(df = df, col_list = as.list(plate_cols))
-
-  df_plate <- df |>
+  list_df_mid$df_mid_plate <- df |>
     dplyr::select(
-      dplyr::all_of(c("V1", plate_cols))
+      dplyr::all_of(c("V1", col_names$df_top_plate))
     ) |>
     dplyr::rename(
       "SampleID" = dplyr::all_of("V1")
@@ -936,14 +887,11 @@ read_npx_wide_middle <- function(df,
   ## split qc_warnings and pivot to longer ----
 
   # done only if the are columns with QC Warning
-  if (!is.null(qc_warn_cols)) {
+  if ("df_top_qc_warn" %in% names(col_names)) {
 
-    # check all columns exist
-    check_columns(df = df, col_list = as.list(qc_warn_cols))
-
-    df_qc_warn <- df |>
+    list_df_mid$df_mid_qc_warn <- df |>
       dplyr::select(
-        dplyr::all_of(c("V1", qc_warn_cols))
+        dplyr::all_of(c("V1", col_names$df_top_qc_warn))
       ) |>
       dplyr::rename(
         "SampleID" = dplyr::all_of("V1")
@@ -959,14 +907,30 @@ read_npx_wide_middle <- function(df,
   ## split internal_controls and pivot to longer ----
 
   # done only if the are columns with QC Warning
-  if (!is.null(int_ctrl_cols)) {
+  if ("df_top_int_ctrl" %in% names(col_names)) {
 
-    # check all columns exist
-    check_columns(df = df, col_list = as.list(int_ctrl_cols))
-
-    df_int_ctrl <- df |>
+    list_df_mid$df_mid_int_ctrl <- df |>
       dplyr::select(
-        dplyr::all_of(c("V1", int_ctrl_cols))
+        dplyr::all_of(c("V1", col_names$df_top_int_ctrl))
+      ) |>
+      dplyr::rename(
+        "SampleID" = dplyr::all_of("V1")
+      ) |>
+      tidyr::pivot_longer(
+        -dplyr::all_of("SampleID"),
+        names_to = "col_index",
+        values_to = data_type
+      )
+  }
+
+  ## split deviation from internal_controls and pivot to longer ----
+
+  # done only if the are columns with QC Warning
+  if ("df_top_dev_int_ctrl" %in% names(col_names)) {
+
+    list_df_mid$df_mid_dev_int_ctrl <- df |>
+      dplyr::select(
+        dplyr::all_of(c("V1", col_names$df_top_dev_int_ctrl))
       ) |>
       dplyr::rename(
         "SampleID" = dplyr::all_of("V1")
@@ -983,9 +947,9 @@ read_npx_wide_middle <- function(df,
   ## check number of rows in plate and qc_warning data frames ----
 
   # done only if the are columns with QC Warning
-  if (!is.null(qc_warn_cols)) {
+  if ("df_mid_qc_warn" %in% names(list_df_mid)) {
 
-    if (nrow(df_plate) != nrow(df_qc_warn)) {
+    if (nrow(list_df_mid$df_mid_plate) != nrow(list_df_mid$df_mid_qc_warn)) {
 
       cli::cli_abort(
         message = c(
@@ -1001,103 +965,24 @@ read_npx_wide_middle <- function(df,
 
   }
 
-  ## check correct number of internal controls ----
+  ## check if all cols from df_mid were consumed ----
 
-  if (!is.null(int_ctrl_cols)) {
+  col_names_mid <- sapply(list_df_mid, function(x) x$col_index) |>
+    unlist() |>
+    unname() |>
+    unique()
+  col_names_mid <- c("V1", col_names_mid) |> sort()
 
-    # identify number of internal control assays
-    int_ctrl_num <- c(3L, 2L, 1L)
-    mod_int_ctrl <- (length(int_ctrl_cols) / length(plate_cols)) %% int_ctrl_num
-    names(mod_int_ctrl) <- int_ctrl_num
-    n_int_ctrl <- utils::head(x = mod_int_ctrl[mod_int_ctrl == 0L],
-                              n = 1L) |>
-      names() |>
-      as.integer()
-    # if none of the modulos works assume 1 internal control
-    n_int_ctrl <- ifelse(identical(n_int_ctrl, integer(0L)), 1L, n_int_ctrl)
+  if (!identical(x = colnames(df) |> sort(),
+                 y = col_names_mid)) {
 
-    # number of unique samples
-    n_uniq_sample <- dplyr::pull(df, .data[["V1"]]) |> unique() |> length()
-
-    # check
-    if (nrow(df_int_ctrl) != (n_uniq_sample * n_int_ctrl * length(plate_cols))) { # nolint object_usage_linter
-
-      cli::cli_abort(
-        message = c(
-          "x" = "Uneven number of entries of \"Internal Control\" assays in
-          the middle matrix of the Olink wide excel file {.file {file}}!",
-          "i" = "Has the excel file been modified manually?"
-        ),
-        call = rlang::caller_env(),
-        wrap = FALSE
-      )
-
-    }
-
-  }
-
-  # return ----
-
-  list_df <- list(
-    df_oid = df_oid,
-    df_plate = df_plate
-  )
-
-  if (!is.null(qc_warn_cols)) {
-    list_df <- append(x = list_df,
-                      values = list(df_qc_warn = df_qc_warn))
-  }
-
-  if (!is.null(int_ctrl_cols)) {
-    list_df <- append(x = list_df,
-                      values = list(df_int_ctrl = df_int_ctrl))
-  }
-
-  return(list_df)
-
-}
-
-read_npx_wide_long_assay_quant <- function(df_top_oid,
-                                           df_mid_quant,
-                                           file,
-                                           format_spec) {
-
-  # check input ----
-
-  check_is_data_frame(df = df_top_oid,
-                      error = TRUE)
-
-  check_is_data_frame(df = df_mid_quant,
-                      error = TRUE)
-
-  check_file_exists(file = file,
-                    error = TRUE)
-
-  check_is_data_frame(df = format_spec,
-                      error = TRUE)
-
-  # check columns of df's ----
-
-  check_columns(df = df_top_oid,
-                col_list = c("col_index", unlist(format_spec$top_matrix_v1)) |>
-                  as.list())
-
-  check_columns(df = df_mid_quant,
-                col_list = c("SampleID", "col_index", format_spec$data_type) |>
-                  as.list())
-
-  # checks ----
-
-  ## make sure col_index is identical ----
-
-  if (!identical(x = sort(unique(df_top_oid$col_index)),
-                 y = sort(unique(df_mid_quant$col_index)))) {
+    col_mid_missing <- colnames(df)[!(colnames(df) %in% col_names_mid)]
+    col_mid_missing <- sub(pattern = "V", replacement = "", x = col_mid_missing)
 
     cli::cli_abort(
       message = c(
-        "x" = "Column {.val {\"col_index\"}} of the top matrix with assay
-        metadata {.arg df_top_oid} does not match the one from the middle matrix
-        with assay quantification {.arg df_mid_quant} in file {.file {file}}!",
+        "x" = "Unable to assign column(s) {col_mid_missing} from the Olink wide
+        excel file {.file {file}}!",
         "i" = "Has the excel file been modified manually?"
       ),
       call = rlang::caller_env(),
@@ -1106,6 +991,538 @@ read_npx_wide_long_assay_quant <- function(df_top_oid,
 
   }
 
-  # make sure there are no missing samples for some assays ----
+  # return ----
+
+  return(list_df_mid)
+
+}
+
+#' Combine top and middle matrices.
+#'
+#' @author Klev Diamanti
+#'
+#' @param df_top_list List of data frames from the top matrix. Output of
+#' function `read_npx_wide_top`.
+#' @param df_middle_list List of data frames from the middle matrix. Output of
+#' function `read_npx_wide_middle`.
+#' @param data_type The quantification in which the data comes in. Expecting one
+#' of NPX or Quantified.
+#' @param format_spec A one-row data frame filtered from olink_wide_excel_spec
+#' with the Olink wide excel file specifications.
+#'
+#' @return A tibble combining the top and middle matrices in long format.
+#'
+red_npx_wide_top_mid_long <- function(df_top_list,
+                                      df_middle_list,
+                                      data_type,
+                                      format_spec) {
+  # check input ----
+
+  check_is_list(lst = df_top_list)
+
+  sapply(df_top_list, check_is_data_frame, error = TRUE)
+
+  check_is_list(lst = df_middle_list)
+
+  sapply(df_middle_list, check_is_data_frame, error = TRUE)
+
+  check_is_tibble(df = format_spec,
+                  error = TRUE)
+
+  # prepare components of long df ----
+
+  ## df oid ----
+
+  df_long <- df_middle_list$df_mid_oid |>
+    dplyr::left_join(
+      df_top_list$df_top_oid,
+      by = "col_index",
+      relationship = "many-to-one"
+    )
+
+  ## df plate id ----
+
+  df_plate <- df_middle_list$df_mid_plate |>
+    dplyr::left_join(
+      df_top_list$df_top_plate,
+      by = "col_index",
+      relationship = "many-to-one"
+    ) |>
+    dplyr::select(
+      -dplyr::any_of(c("Var", "Unit", "col_index"))
+    )
+
+  df_long <- df_long |>
+    dplyr::left_join(
+      df_plate,
+      by = c("SampleID", "Panel"),
+      relationship = "many-to-one"
+    )
+  rm(df_plate)
+
+  ## df qc warning ----
+
+  if (format_spec$has_qc_data == TRUE) {
+
+    df_qc_warn <- df_middle_list$df_mid_qc_warn |>
+      dplyr::left_join(
+        df_top_list$df_top_qc_warn,
+        by = "col_index",
+        relationship = "many-to-one"
+      ) |>
+      dplyr::select(
+        -dplyr::any_of(c("Var", "Unit", "col_index"))
+      )
+
+    df_long <- df_long |>
+      dplyr::left_join(
+        df_qc_warn,
+        by = c("SampleID", "Panel"),
+        relationship = "many-to-one"
+      )
+    rm(df_qc_warn)
+  }
+
+  ## df internal controls ----
+
+  if ("df_mid_int_ctrl" %in% names(df_middle_list)
+      && "df_top_int_ctrl" %in% names(df_top_list)) {
+
+    df_int_ctrl <- df_middle_list$df_mid_int_ctrl |>
+      dplyr::left_join(
+        df_top_list$df_top_int_ctrl,
+        by = "col_index",
+        relationship = "many-to-one"
+      )
+
+    # join with the plate df
+    df_int_ctrl_pid <- df_int_ctrl |>
+      dplyr::left_join(
+        df_long |>
+          dplyr::select(
+            dplyr::any_of("QC_Warning"),
+            dplyr::all_of(c("PlateID", "SampleID", "Panel"))
+          ) |>
+          dplyr::distinct(),
+        by = c("SampleID", "Panel"),
+        relationship = "many-to-one"
+      )
+
+    df_long <- df_long |>
+      dplyr::bind_rows(
+        df_int_ctrl_pid
+      )
+    rm(df_int_ctrl, df_int_ctrl_pid)
+  }
+
+  ## df deviation internal controls ----
+
+  if ("df_mid_dev_int_ctrl" %in% names(df_middle_list)
+      && "df_top_dev_int_ctrl" %in% names(df_top_list)) {
+
+    df_dev_int_ctrl <- df_middle_list$df_mid_dev_int_ctrl |>
+      dplyr::left_join(
+        df_top_list$df_top_dev_int_ctrl,
+        by = "col_index",
+        relationship = "many-to-one"
+      ) |>
+      dplyr::select(
+        -dplyr::all_of(c("Assay", "col_index"))
+      ) |>
+      tidyr::pivot_wider(
+        id_cols = dplyr::all_of(c("SampleID", "Panel")),
+        names_from = dplyr::all_of("Uniprot ID"),
+        values_from = dplyr::all_of(data_type)
+      )
+
+    df_long <- df_long |>
+      dplyr::left_join(
+        df_dev_int_ctrl,
+        by = c("SampleID", "Panel"),
+        relationship = "many-to-one"
+      )
+    rm(df_dev_int_ctrl)
+  }
+
+  # return ----
+
+  return(df_long)
+}
+
+#' Helper function that output all possible row names for the bottom matrix.
+#'
+#' @author Klev Diamanti
+#'
+#' @param data_type The quantification in which the data comes in. Expecting one
+#' of NPX, Quantified or Ct.
+#' @param olink_platform The Olink platform used to generate the input file.
+#' Expecting "Target 96", "Target 48", "Flex" or "Focus".
+#'
+#' @return List of data frames with two columns each. Columns contain unique and
+#' alternative expected names for the V1 of each row of the bottom matrix in an
+#' Olink wide file.
+#'
+read_npx_wide_bottom_version <- function(data_type,
+                                         olink_platform) {
+
+  # extract all possible variable names from the global matrix
+  format_spec_bottom <- olink_wide_excel_bottom_matrix |>
+    dplyr::filter(
+      .data[["olink_platform"]] == .env[["olink_platform"]]
+      & .data[["data_type"]] == .env[["data_type"]]
+    )
+
+  # number of unique versions of names
+  format_spec_bottom_v <- format_spec_bottom$version |> unique()
+
+  # list dfs to store possible combinations of names in V1 of bottom matrix
+  list_bottom_v <- list()
+
+  # return if 0 is the only available version
+  if (length(format_spec_bottom_v) == 1L
+      && format_spec_bottom_v == 0L) {
+
+    list_bottom_v$`0` <- format_spec_bottom |>
+      dplyr::select(
+        dplyr::all_of("plate_specific"),
+        dplyr::starts_with("variable")
+      )
+
+  } else {
+
+    # if 0 is not the only version, then create a list of df with each element
+    # containing one version merged with 0 version
+    format_spec_bottom_v <- format_spec_bottom_v[format_spec_bottom_v != 0L]
+
+    list_bottom_v <- lapply(format_spec_bottom_v,
+                            function(x) {
+                              format_spec_bottom |>
+                                dplyr::filter(
+                                  .data[["version"]] %in% c(0L, x)
+                                ) |>
+                                dplyr::select(
+                                  dplyr::all_of("plate_specific"),
+                                  dplyr::starts_with("variable")
+                                )
+                            })
+    names(list_bottom_v) <- format_spec_bottom_v
+
+  }
+
+  return(list_bottom_v)
+}
+
+#' Help function that converts df_bottom into long format.
+#'
+#' @author Klev Diamanti
+#'
+#' @param df The bottom data frame from a split Olink wide excel file.
+#' @param file The input excel file.
+#' @param olink_platform The Olink platform used to generate the input file.
+#' Expecting "Target 96", "Target 48", "Flex" or "Focus".
+#' @param data_type The quantification in which the data comes in. Expecting one
+#' of NPX, Quantified or Ct.
+#' @param col_names Names list of character vector with the names of the columns
+#' containing Olink data on assays and internal control assays.
+#' @param format_spec A one-row data frame filtered from olink_wide_excel_spec
+#' with the Olink wide excel file specifications.
+#' @param df_plate_panel Data frame with unique combinations of panels and
+#' plates from the combination of top and middle data frames.
+#'
+#' @return The bottom matrix in long format.
+#'
+read_npx_wide_bottom <- function(df,
+                                 file,
+                                 olink_platform,
+                                 data_type,
+                                 col_names,
+                                 format_spec,
+                                 df_plate_panel) {
+  # check input ----
+
+  check_is_data_frame(df = df,
+                      error = TRUE)
+
+  check_file_exists(file = file,
+                    error = TRUE)
+
+  check_olink_platform(x = olink_platform,
+                       broader_platform = "qPCR")
+
+  check_olink_data_type(x = data_type,
+                        broader_platform = "qPCR")
+
+  check_is_list(lst = col_names,
+                error = TRUE)
+
+  sapply(col_names, function(x) check_is_character(string = x, error = TRUE))
+
+  check_is_data_frame(df = format_spec,
+                      error = TRUE)
+
+  check_is_data_frame(df = df_plate_panel,
+                      error = TRUE)
+
+  # get first column options ----
+
+  # list with all possible combinations
+  format_spec_bottom <- read_npx_wide_bottom_version(
+    data_type = data_type,
+    olink_platform = olink_platform
+  )
+
+  # check first column ----
+
+  # check that column "V1" exists in the df
+  check_columns(df = df, col_list = list("V1"))
+
+  # check that at least one of the alternatives combinations of names
+  # contains all names in V1
+  format_spec_bottom <- lapply(format_spec_bottom, function(x) {
+    name_in_df <- lapply(x$variable_alt_names,
+                         \(y) (y[y %in% df$V1])) |>
+      lapply(\(y) (ifelse(length(y) == 0L, NA_character_, y))) |>
+      unlist()
+
+    x |>
+      dplyr::mutate(
+        variable_name_in_df = name_in_df,
+        in_df = dplyr::if_else(
+          is.na(.data[["variable_name_in_df"]]),
+          FALSE,
+          TRUE
+        )
+      )
+  })
+
+  names_in_v1 <- sapply(format_spec_bottom, \(x) (all(x$in_df))) |>
+    (\(x) x[x == TRUE])()
+
+  # if none or multiple combinations match
+  # or, if df$V1 is a superset of the expected columns
+  if (length(names_in_v1) != 1
+      || nrow(format_spec_bottom[[names(names_in_v1)]])
+      != length(unique(df$V1))) {
+
+    bottom_mat_v1_expected <- sapply( # nolint object_usage_linter
+      format_spec_bottom,
+      function(x) {
+        sapply(x$variable_alt_names, utils::head, 1L) |>
+          cli::ansi_collapse()
+      }
+    ) |>
+      cli::ansi_collapse(sep2 = ", or ", last = ", or ")
+
+    cli::cli_abort(
+      message = c(
+        "x" = "Unexpected values in column 1 of the bottom matrix with QC data
+        in file {.file {file}}. Expected on of the combos:
+        {bottom_mat_v1_expected}",
+        "i" = "Has the excel file been modified manually?"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
+  }
+
+  # clean up format_spec_bottom for downstream use
+  format_spec_bottom_df <- format_spec_bottom[[names(names_in_v1)]] |>
+    dplyr::select(
+      -dplyr::all_of(c("variable_name", "variable_alt_names", "in_df"))
+    )
+
+  # keep necessary columns ----
+
+  # columns expected to be present in the df
+  expected_cols <- c("V1", col_names$df_top_oid)
+  if ("df_top_int_ctrl" %in% names(col_names)) {
+    expected_cols <- c(expected_cols, col_names$df_top_int_ctrl)
+  }
+  if (any(format_spec_bottom_df$plate_specific == TRUE)) {
+    expected_cols <- c(expected_cols, col_names$df_top_plate)
+  }
+  # check that columns in expected_cols exist in the df
+  check_columns(df = df, col_list = as.list(expected_cols))
+
+  df <- df |>
+    # keep only columns absolutely required:
+    # V1 that contains names of variables
+    # columns that contain info for customer assays
+    # columns that contain info for internal control assays
+    # columns that might contain plate names in case of plate-specific QC data
+    dplyr::select(
+      dplyr::all_of(expected_cols)
+    )
+
+  # per-plate metrics ----
+
+  if (any(format_spec_bottom_df$plate_specific == TRUE)) {
+
+    # plate specific qc metrics
+    format_spec_bottom_plate_spec <- format_spec_bottom_df |>
+      dplyr::filter(
+        .data[["plate_specific"]] == TRUE
+      ) |>
+      dplyr::pull(
+        .data[["variable_name_in_df"]]
+      )
+
+    # extract rows with plate-specific metrics
+    df_plate_spec <- df |>
+      # keep only rows with -plate-specific info
+      dplyr::filter(
+        .data[["V1"]] %in% format_spec_bottom_plate_spec
+      ) |>
+      remove_all_na_cols()
+
+    # equal number of rows for each QC metric at bottom matrix
+    df_plate_spec_n_row <- df_plate_spec |>
+      dplyr::pull(
+        .data[["V1"]]
+      ) |>
+      table() |>
+      unname() |>
+      unique() |>
+      length()
+
+    if (df_plate_spec_n_row != 1L) {
+
+      cli::cli_abort(
+        message = c(
+          "x" = "Column 1 of the bottom matrix does not contain the same number
+          of  rows for plate-specific QC measurement(s)
+          {format_spec_bottom_plate_spec} in file {.file {file}}!",
+          "i" = "Has the excel file been modified manually?"
+        ),
+        call = rlang::caller_env(),
+        wrap = FALSE
+      )
+
+    }
+
+    # for each variable in V1 do a pivot_longer
+    df_plate_spec <- lapply(
+      format_spec_bottom_plate_spec,
+      function(x) {
+        df_plate_spec |>
+          # keep only one Vq variable at a time
+          dplyr::filter(
+            .data[["V1"]] == .env[["x"]]
+          ) |>
+          # remove V1 columns to allow for pivoting
+          dplyr::select(
+            -dplyr::all_of("V1")
+          ) |>
+          # make the wide matrix into a long one
+          # each PlateID will become a column
+          tidyr::pivot_longer(
+            -dplyr::all_of(col_names$df_top_plate),
+            names_to = "col_index",
+            values_to = x
+          ) |>
+          # one more pivot longer to make PlateID into a single column
+          tidyr::pivot_longer(
+            -dplyr::all_of(c("col_index", x)),
+            names_to = "col_index_pid",
+            values_to = "PlateID"
+          ) |>
+          # remove the PlateID index column
+          dplyr::select(
+            -dplyr::all_of("col_index_pid")
+          )
+      }
+    )
+
+    # left join all data frames from the list
+    df_plate_spec <- Reduce(f = function(df_1, df_2) {
+      dplyr::left_join(x = df_1,
+                       y = df_2,
+                       by = c("PlateID", "col_index"),
+                       relationship = "one-to-one")
+    },
+    x = df_plate_spec)
+
+  }
+
+  # plates-shared metrics ----
+
+  # plate shared qc metrics
+  format_spec_bottom_plate_share <- format_spec_bottom_df |>
+    dplyr::filter(
+      .data[["plate_specific"]] == FALSE
+    ) |>
+    dplyr::pull(
+      .data[["variable_name_in_df"]]
+    )
+
+  # remove rows processed earlier as plate-specific
+  df_plate_shared <- df |>
+    # keep only rows with plate-shared info
+    dplyr::filter(
+      .data[["V1"]] %in% format_spec_bottom_plate_share
+    ) |>
+    remove_all_na_cols()
+
+  df_plate_shared <- t(df_plate_shared)
+  colnames(df_plate_shared) <- df_plate_shared[1, ]
+  df_plate_shared <- df_plate_shared |>
+    dplyr::as_tibble(
+      rownames = "col_index"
+    ) |>
+    dplyr::slice(
+      2L:dplyr::n()
+    )
+
+  # join df_plate_shared and df_plate_spec ----
+
+  if (exists("df_plate_spec")) {
+
+    df_long <- df_plate_shared |>
+      dplyr::full_join(
+        y = df_plate_spec,
+        by = "col_index",
+        relationship = "one-to-many"
+      ) |>
+      # remove duplicates from the pivot_longer in PlateID
+      dplyr::inner_join(
+        df_plate_panel,
+        by = c("col_index", "PlateID")
+      ) |>
+      dplyr::select(
+        -dplyr::all_of(c("Panel"))
+      )
+
+  } else {
+
+    df_long <- df_plate_shared
+
+  }
+
+  # output list_df ----
+
+  # split into internal controls and assays
+  if ("df_top_int_ctrl" %in% names(col_names)) {
+
+    list_df <- list(
+      df_bottom_oid = df_long |>
+        dplyr::filter(
+          .data[["col_index"]] %in% col_names$df_top_oid
+        ),
+      df_bottom_int_ctrl = df_long |>
+        dplyr::filter(
+          .data[["col_index"]] %in% col_names$df_top_int_ctrl
+        )
+    )
+
+  } else {
+
+    list_df <- list(
+      df_bottom_oid = df_long
+    )
+
+  }
+
+  return(list_df)
 
 }

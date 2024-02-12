@@ -82,7 +82,7 @@ read_npx_excel <- function(file,
 
   ## Determine Olink platform ----
 
-  file_olink_platform <- read_npx_excel_platform( # nolint object_usage_linter
+  file_olink_platform <- read_npx_excel_platform(
     file = file,
     olink_platform = olink_platform,
     is_long_format = file_format_check$is_long_format,
@@ -92,7 +92,7 @@ read_npx_excel <- function(file,
   ## Determine quantification method ----
 
   # auto-detect quantification method
-  file_quant_method <- read_npx_excel_quant( # nolint object_usage_linter
+  file_quant_method <- read_npx_excel_quant(
     file = file,
     data_type = data_type,
     data_cells = file_format_check$data_cells,
@@ -130,7 +130,9 @@ read_npx_excel <- function(file,
   } else if (file_format_check$is_long_format == FALSE) {
     # if data is in wide format
 
-    df_olink <- "This is an temporary output"
+    df_olink <- read_npx_wide(file = file,
+                              data_type = file_quant_method,
+                              olink_platform = file_olink_platform)
 
   }
 

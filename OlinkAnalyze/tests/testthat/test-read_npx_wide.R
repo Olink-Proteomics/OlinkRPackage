@@ -3,6 +3,14 @@
 test_that(
   "read_npx_wide_split_row - works",
   {
+    # variables that apply to all tests
+    olink_platform <- "Target 48"
+    n_panels <- 2L
+    n_assays <- 45L
+    n_samples <- 88L
+    show_dev_int_ctrl <- TRUE
+    show_int_ctrl <- TRUE
+
     ## NPX ----
 
     withr::with_tempfile(
@@ -12,23 +20,24 @@ test_that(
       code = {
 
         # synthetic wide df
-        data_t <- "NPX"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 2L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
+                                        show_int_ctrl = show_int_ctrl,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write wide df
         writexl::write_xlsx(
-          x = df_rand$wide$df,
+          x = df_rand$list_df_wide$df_wide,
           path = wide_excel,
           col_names = FALSE,
           format_headers = FALSE
@@ -37,26 +46,26 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_split_row(file = wide_excel,
-                                                     data_type = data_t,
-                                                     format_spec = format_s)
+                                                     data_type = data_type,
+                                                     format_spec = format_spec)
         )
 
         # check that df_top works
         expect_identical(
           object = df_out$df_top,
-          expected = df_rand$wide$df_top
+          expected = df_rand$list_df_wide$df_top_wide
         )
 
         # check that df_mid works
         expect_identical(
           object = df_out$df_mid,
-          expected = df_rand$wide$df_middle
+          expected = df_rand$list_df_wide$df_middle_wide
         )
 
         # check that df_bottom works
         expect_identical(
           object = remove_all_na_cols(df = df_out$df_bottom),
-          expected = df_rand$wide$df_bottom
+          expected = df_rand$list_df_wide$df_bottom_wide
         )
 
       }
@@ -71,23 +80,24 @@ test_that(
       code = {
 
         # synthetic wide df
-        data_t <- "Ct"
+        data_type <- "Ct"
 
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 2L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
+                                        show_int_ctrl = show_int_ctrl,
+                                        version = 0L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write wide df
         writexl::write_xlsx(
-          x = df_rand$wide$df,
+          x = df_rand$list_df_wide$df_wide,
           path = wide_excel,
           col_names = FALSE,
           format_headers = FALSE
@@ -96,20 +106,20 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_split_row(file = wide_excel,
-                                                     data_type = data_t,
-                                                     format_spec = format_s)
+                                                     data_type = data_type,
+                                                     format_spec = format_spec)
         )
 
         # check that df_top works
         expect_identical(
           object = df_out$df_top,
-          expected = df_rand$wide$df_top
+          expected = df_rand$list_df_wide$df_top_wide
         )
 
         # check that df_mid works
         expect_identical(
           object = df_out$df_mid,
-          expected = df_rand$wide$df_middle
+          expected = df_rand$list_df_wide$df_middle_wide
         )
 
         # check that df_bottom works
@@ -118,7 +128,7 @@ test_that(
       }
     )
 
-    ## Quantified wo int ctrl ----
+    ## Quantified ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -127,23 +137,24 @@ test_that(
       code = {
 
         # synthetic wide df
-        data_t <- "Quantified"
+        data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 2L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = FALSE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
+                                        show_int_ctrl = show_int_ctrl,
+                                        version = 0L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write wide df
         writexl::write_xlsx(
-          x = df_rand$wide$df,
+          x = df_rand$list_df_wide$df_wide,
           path = wide_excel,
           col_names = FALSE,
           format_headers = FALSE
@@ -152,203 +163,26 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_split_row(file = wide_excel,
-                                                     data_type = data_t,
-                                                     format_spec = format_s)
+                                                     data_type = data_type,
+                                                     format_spec = format_spec)
         )
 
         # check that df_top works
         expect_identical(
           object = df_out$df_top,
-          expected = df_rand$wide$df_top
+          expected = df_rand$list_df_wide$df_top_wide
         )
 
         # check that df_mid works
         expect_identical(
           object = df_out$df_mid,
-          expected = df_rand$wide$df_middle
+          expected = df_rand$list_df_wide$df_middle_wide
         )
 
         # check that df_bottom works
         expect_identical(
           object = remove_all_na_cols(df = df_out$df_bottom),
-          expected = df_rand$wide$df_bottom
-        )
-
-      }
-    )
-
-    ## Quantified w int ctrl ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        data_t <- "Quantified"
-
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 2L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$wide$df,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
-
-        # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide_split_row(file = wide_excel,
-                                                     data_type = data_t,
-                                                     format_spec = format_s)
-        )
-
-        # check that df_top works
-        expect_identical(
-          object = df_out$df_top,
-          expected = df_rand$wide$df_top
-        )
-
-        # check that df_mid works
-        expect_identical(
-          object = df_out$df_mid,
-          expected = df_rand$wide$df_middle
-        )
-
-        # check that df_bottom works
-        expect_identical(
-          object = remove_all_na_cols(df = df_out$df_bottom),
-          expected = df_rand$wide$df_bottom
-        )
-
-      }
-    )
-
-    ## Quantified w int ctrl in V2 ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        data_t <- "Quantified"
-
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 2L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V2",
-                                        shuffle_assays = FALSE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$wide$df,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
-
-        # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide_split_row(file = wide_excel,
-                                                     data_type = data_t,
-                                                     format_spec = format_s)
-        )
-
-        # check that df_top works
-        expect_identical(
-          object = df_out$df_top,
-          expected = df_rand$wide$df_top
-        )
-
-        # check that df_mid works
-        expect_identical(
-          object = df_out$df_mid,
-          expected = df_rand$wide$df_middle
-        )
-
-        # check that df_bottom works
-        expect_identical(
-          object = remove_all_na_cols(df = df_out$df_bottom),
-          expected = df_rand$wide$df_bottom
-        )
-
-      }
-    )
-
-    ## Quantified w int ctrl in V2 shuffled ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        data_t <- "Quantified"
-
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 2L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V2",
-                                        shuffle_assays = TRUE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$wide$df,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
-
-        # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide_split_row(file = wide_excel,
-                                                     data_type = data_t,
-                                                     format_spec = format_s)
-        )
-
-        # check that df_top works
-        expect_identical(
-          object = df_out$df_top,
-          expected = df_rand$wide$df_top
-        )
-
-        # check that df_mid works
-        expect_identical(
-          object = df_out$df_mid,
-          expected = df_rand$wide$df_middle
-        )
-
-        # check that df_bottom works
-        expect_identical(
-          object = remove_all_na_cols(df = df_out$df_bottom),
-          expected = df_rand$wide$df_bottom
+          expected = df_rand$list_df_wide$df_bottom_wide
         )
 
       }
@@ -360,6 +194,15 @@ test_that(
 test_that(
   "read_npx_wide_split_row - error - no or too many all-NA rows",
   {
+    # variables that apply to all tests
+    olink_platform <- "Target 48"
+    n_panels <- 2L
+    n_assays <- 45L
+    n_samples <- 88L
+    show_dev_int_ctrl <- TRUE
+    show_int_ctrl <- TRUE
+    version <- 1L
+
     ## No all-NA rows ----
 
     withr::with_tempfile(
@@ -369,19 +212,19 @@ test_that(
       code = {
 
         # synthetic wide df
-        data_t <- "NPX"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 2L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
+                                        show_int_ctrl = show_int_ctrl,
+                                        version = version)
 
         # modify and write wide df
-        df_rand$wide$df |>
+        df_rand$list_df_wide$df_wide |>
           dplyr::filter(
             is.na(.data[["V1"]])
           ) |>
@@ -391,14 +234,15 @@ test_that(
             format_headers = FALSE
           )
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # check that function runs with error
         expect_error(
           object = read_npx_wide_split_row(file = wide_excel,
-                                           data_type = data_t,
-                                           format_spec = format_s),
+                                           data_type = data_type,
+                                           format_spec = format_spec),
           regexp = "We identified 0 rows with all columns `NA` in file"
         )
       }
@@ -413,21 +257,21 @@ test_that(
       code = {
 
         # synthetic wide df
-        data_t <- "NPX"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 2L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
+                                        show_int_ctrl = show_int_ctrl,
+                                        version = version)
 
         # modify and write wide df
-        df_rand$wide$df |>
+        df_rand$list_df_wide$df_wide |>
           dplyr::mutate(
-            V1 = dplyr::if_else(.data[["V1"]] == .env[["data_t"]],
+            V1 = dplyr::if_else(.data[["V1"]] == .env[["data_type"]],
                                 NA_character_,
                                 .data[["V1"]])
           ) |>
@@ -437,14 +281,15 @@ test_that(
             format_headers = FALSE
           )
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # check that function runs with error
         expect_error(
           object = read_npx_wide_split_row(file = wide_excel,
-                                           data_type = data_t,
-                                           format_spec = format_s),
+                                           data_type = data_type,
+                                           format_spec = format_spec),
           regexp = "We identified 3 rows with all columns `NA` in file"
         )
       }
@@ -456,6 +301,15 @@ test_that(
 test_that(
   "read_npx_wide_split_row - error - not as many all-NA rows as expected",
   {
+    # variables that apply to all tests
+    olink_platform <- "Target 48"
+    n_panels <- 2L
+    n_assays <- 45L
+    n_samples <- 88L
+    show_dev_int_ctrl <- TRUE
+    show_int_ctrl <- TRUE
+    version <- 1L
+
     ## NPX ----
 
     withr::with_tempfile(
@@ -465,23 +319,24 @@ test_that(
       code = {
 
         # synthetic wide df
-        data_t <- "NPX"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
                                         data_type = "Ct",
-                                        n_panels = 2L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
+                                        show_int_ctrl = show_int_ctrl,
+                                        version = version)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write wide df
         writexl::write_xlsx(
-          x = df_rand$wide$df,
+          x = df_rand$list_df_wide$df_wide,
           path = wide_excel,
           col_names = FALSE,
           format_headers = FALSE
@@ -490,8 +345,8 @@ test_that(
         # check that function runs with error
         expect_error(
           object = read_npx_wide_split_row(file = wide_excel,
-                                           data_type = data_t,
-                                           format_spec = format_s),
+                                           data_type = data_type,
+                                           format_spec = format_spec),
           regexp = "while we expected 2"
         )
 
@@ -507,23 +362,24 @@ test_that(
       code = {
 
         # synthetic wide df
-        data_t <- "Ct"
+        data_type <- "Ct"
 
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
                                         data_type = "NPX",
-                                        n_panels = 2L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
+                                        show_int_ctrl = show_int_ctrl,
+                                        version = version)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write wide df
         writexl::write_xlsx(
-          x = df_rand$wide$df,
+          x = df_rand$list_df_wide$df_wide,
           path = wide_excel,
           col_names = FALSE,
           format_headers = FALSE
@@ -532,8 +388,8 @@ test_that(
         # check that function runs with error
         expect_error(
           object = read_npx_wide_split_row(file = wide_excel,
-                                           data_type = data_t,
-                                           format_spec = format_s),
+                                           data_type = data_type,
+                                           format_spec = format_spec),
           regexp = "while we expected 1"
         )
 
@@ -549,23 +405,24 @@ test_that(
       code = {
 
         # synthetic wide df
-        data_t <- "Quantified"
+        data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
                                         data_type = "Ct",
-                                        n_panels = 2L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
+                                        show_int_ctrl = show_int_ctrl,
+                                        version = version)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write wide df
         writexl::write_xlsx(
-          x = df_rand$wide$df,
+          x = df_rand$list_df_wide$df_wide,
           path = wide_excel,
           col_names = FALSE,
           format_headers = FALSE
@@ -574,8 +431,8 @@ test_that(
         # check that function runs with error
         expect_error(
           object = read_npx_wide_split_row(file = wide_excel,
-                                           data_type = data_t,
-                                           format_spec = format_s),
+                                           data_type = data_type,
+                                           format_spec = format_spec),
           regexp = "while we expected 2"
         )
 
@@ -588,6 +445,16 @@ test_that(
 test_that(
   "read_npx_wide_split_row - error - all-NA rows are consecutive",
   {
+    # variables that apply to all tests
+    olink_platform <- "Target 48"
+    data_type <- "NPX"
+    n_panels <- 2L
+    n_assays <- 45L
+    n_samples <- 88L
+    show_dev_int_ctrl <- TRUE
+    show_int_ctrl <- TRUE
+    version <- 1L
+
     withr::with_tempfile(
       new = "wide_excel",
       pattern = "test-excel-wide",
@@ -595,22 +462,20 @@ test_that(
       code = {
 
         # synthetic wide df
-        data_t <- "NPX"
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
+                                        show_int_ctrl = show_int_ctrl,
+                                        version = version)
 
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 2L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        df_rand$wide$df |>
+        df_rand$list_df_wide$df_wide |>
           dplyr::filter(
             !grepl(pattern = "^S", x = .data[["V1"]])
           ) |>
@@ -623,8 +488,8 @@ test_that(
         # check that function runs with error
         expect_error(
           object = read_npx_wide_split_row(file = wide_excel,
-                                           data_type = data_t,
-                                           format_spec = format_s),
+                                           data_type = data_type,
+                                           format_spec = format_spec),
           regexp = "Consecutive rows with all columns NA."
         )
 
@@ -639,7 +504,13 @@ test_that(
 test_that(
   "read_npx_wide_check_top - works",
   {
-    ## NPX ----
+    # variables that apply to all tests
+    olink_platform <- "Target 48"
+    n_panels <- 3L
+    n_assays <- 45L
+    n_samples <- 88L
+
+    ## NPX no int ctrl & no dev int ctrl ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -648,109 +519,37 @@ test_that(
       code = {
 
         # synthetic wide df
-        data_t <- "NPX"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 2L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # check that function runs
-        expect_no_condition(
-          object = read_npx_wide_check_top(df = df_rand$wide$df_top,
-                                           file = wide_excel,
-                                           format_spec = format_s)
-        )
-
-      }
-    )
-
-    ## Ct ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        data_t <- "Ct"
-
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 2L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # check that function runs
-        expect_no_condition(
-          object = read_npx_wide_check_top(df = df_rand$wide$df_top,
-                                           file = wide_excel,
-                                           format_spec = format_s)
-        )
-
-      }
-    )
-
-    ## Quantified wo int ctrl ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        data_t <- "Quantified"
-
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 2L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_dev_int_ctrl = FALSE,
                                         show_int_ctrl = FALSE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_no_condition(
-          object = read_npx_wide_check_top(df = df_rand$wide$df_top,
-                                           file = wide_excel,
-                                           format_spec = format_s)
+          object = read_npx_wide_check_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            format_spec = format_spec
+          )
         )
 
       }
     )
 
-    ## Quantified w int ctrl ----
+    ## NPX with int ctrl & no dev int ctrl ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -759,34 +558,37 @@ test_that(
       code = {
 
         # synthetic wide df
-        data_t <- "Quantified"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 2L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_dev_int_ctrl = FALSE,
                                         show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_no_condition(
-          object = read_npx_wide_check_top(df = df_rand$wide$df_top,
-                                           file = wide_excel,
-                                           format_spec = format_s)
+          object = read_npx_wide_check_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            format_spec = format_spec
+          )
         )
 
       }
     )
 
-    ## Quantified w int ctrl shuffled ----
+    ## NPX with int ctrl & with dev int ctrl ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -795,34 +597,37 @@ test_that(
       code = {
 
         # synthetic wide df
-        data_t <- "Quantified"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 2L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_dev_int_ctrl = TRUE,
                                         show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = TRUE)
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_no_condition(
-          object = read_npx_wide_check_top(df = df_rand$wide$df_top,
-                                           file = wide_excel,
-                                           format_spec = format_s)
+          object = read_npx_wide_check_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            format_spec = format_spec
+          )
         )
 
       }
     )
 
-    ## Quantified w int ctrl in V2 ----
+    ## Ct no int ctrl & no dev int ctrl ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -831,34 +636,37 @@ test_that(
       code = {
 
         # synthetic wide df
-        data_t <- "Quantified"
+        data_type <- "Ct"
 
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 2L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V2",
-                                        shuffle_assays = FALSE)
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_dev_int_ctrl = FALSE,
+                                        show_int_ctrl = FALSE,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_no_condition(
-          object = read_npx_wide_check_top(df = df_rand$wide$df_top,
-                                           file = wide_excel,
-                                           format_spec = format_s)
+          object = read_npx_wide_check_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            format_spec = format_spec
+          )
         )
 
       }
     )
 
-    ## Quantified w int ctrl shuffled and in V2 ----
+    ## Ct with int ctrl & no dev int ctrl ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -867,28 +675,187 @@ test_that(
       code = {
 
         # synthetic wide df
-        data_t <- "Quantified"
+        data_type <- "Ct"
 
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 2L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_dev_int_ctrl = FALSE,
                                         show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V2",
-                                        shuffle_assays = TRUE)
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_no_condition(
-          object = read_npx_wide_check_top(df = df_rand$wide$df_top,
-                                           file = wide_excel,
-                                           format_spec = format_s)
+          object = read_npx_wide_check_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            format_spec = format_spec
+          )
+        )
+
+      }
+    )
+
+    ## Ct with int ctrl & with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Ct"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_dev_int_ctrl = TRUE,
+                                        show_int_ctrl = TRUE,
+                                        version = 1L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = read_npx_wide_check_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            format_spec = format_spec
+          )
+        )
+
+      }
+    )
+
+    ## Quantified no int ctrl & no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_dev_int_ctrl = FALSE,
+                                        show_int_ctrl = FALSE,
+                                        version = 0L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = read_npx_wide_check_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            format_spec = format_spec
+          )
+        )
+
+      }
+    )
+
+    ## Quantified with int ctrl & no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_dev_int_ctrl = FALSE,
+                                        show_int_ctrl = TRUE,
+                                        version = 0L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = read_npx_wide_check_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            format_spec = format_spec
+          )
+        )
+
+      }
+    )
+
+    ## Quantified with int ctrl & no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_dev_int_ctrl = TRUE,
+                                        show_int_ctrl = TRUE,
+                                        version = 0L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = read_npx_wide_check_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            format_spec = format_spec
+          )
         )
 
       }
@@ -900,7 +867,15 @@ test_that(
 test_that(
   "read_npx_wide_check_top - error - missing labels in V1",
   {
-    ## NPX or Ct ----
+    # variables that apply to all tests
+    olink_platform <- "Target 48"
+    n_panels <- 1L
+    n_assays <- 45L
+    n_samples <- 88L
+    show_dev_int_ctrl <- FALSE
+    show_int_ctrl <- FALSE
+
+    ## NPX/Ct ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -909,35 +884,38 @@ test_that(
       code = {
 
         # synthetic wide df
-        data_t <- "NPX"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 2L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
+                                        show_int_ctrl = show_int_ctrl,
+                                        version = 1L)
 
         # modify df_top
-        df_rand$wide$df_top <- df_rand$wide$df_top |>
+        df_rand$list_df_wide$df_top_wide <- df_rand$list_df_wide$df_top_wide |>
           dplyr::filter(
             .data[["V1"]] != "OlinkID"
           )
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs with error
         expect_error(
-          object = read_npx_wide_check_top(df = df_rand$wide$df_top,
-                                           file = wide_excel,
-                                           format_spec = format_s),
-          regexp = "Column 1 of of the top matrix with assay metadata in file"
+          object = read_npx_wide_check_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            format_spec = format_spec
+          ),
+          regexp = "Column 1 of the top matrix with assay data in file"
         )
 
       }
@@ -952,50 +930,49 @@ test_that(
       code = {
 
         # synthetic wide df
-        data_t <- "Quantified"
-        n_panel <- 2L
-        n_assay <- 45L
+        data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = n_panel,
-                                        n_assays = n_assay,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
+                                        show_int_ctrl = show_int_ctrl,
+                                        version = 0L)
 
-        # modify df_top
+        # modify df_top_wide
         df_top_add_row <- dplyr::tibble(
           "X" = c("Extra_Row",
-                  rep(x = "A", times = n_panel * n_assay),
-                  rep(x = NA_character_, times = n_panel),
-                  rep(x = NA_character_, times = n_panel),
-                  rep(x = NA_character_, times = 3L * n_panel))
+                  rep(x = "A", times = (n_panels * n_assays)),
+                  rep(x = NA_character_, times = n_panels),
+                  rep(x = NA_character_, times = n_panels))
         ) |>
           t()
         rownames(df_top_add_row) <- NULL
-        colnames(df_top_add_row) <- paste0("V",
-                                           seq_len(ncol(df_rand$wide$df_top)))
+        colnames(df_top_add_row) <- colnames(df_rand$list_df_wide$df_top_wide)
         df_top_add_row <- dplyr::as_tibble(df_top_add_row)
 
-        df_rand$wide$df_top <- df_rand$wide$df_top |>
+        df_rand$list_df_wide$df_top_wide <- df_rand$list_df_wide$df_top_wide |>
           dplyr::bind_rows(
             df_top_add_row
           )
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs with error
         expect_error(
-          object = read_npx_wide_check_top(df = df_rand$wide$df_top,
-                                           file = wide_excel,
-                                           format_spec = format_s),
-          regexp = "Column 1 of of the top matrix with assay metadata in file"
+          object = read_npx_wide_check_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            format_spec = format_spec
+          ),
+          regexp = "Column 1 of the top matrix with assay data in file"
         )
 
       }
@@ -1005,8 +982,16 @@ test_that(
 )
 
 test_that(
-  "read_npx_wide_check_top - error - missing labels in rows 2 & 3",
+  "read_npx_wide_check_top - error - missing labels in row 2 (Assay)",
   {
+    # variables that apply to all tests
+    olink_platform <- "Target 48"
+    n_panels <- 1L
+    n_assays <- 45L
+    n_samples <- 88L
+    show_dev_int_ctrl <- FALSE
+    show_int_ctrl <- FALSE
+
     ## NPX ----
 
     withr::with_tempfile(
@@ -1016,39 +1001,40 @@ test_that(
       code = {
 
         # synthetic wide df
-        data_t <- "NPX"
-        n_panel <- 2L
-        n_assay <- 45L
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = n_panel,
-                                        n_assays = n_assay,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
+                                        show_int_ctrl = show_int_ctrl,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # modify df_top_wide - remove QC Warning
+        qc_warn_col <- colnames(df_rand$list_df_wide$df_top_wide) |> tail(1L)
 
-        # remove some columns to reproduce error
-        keep_cols <- paste0("V", seq_len((n_panel * n_assay) + 1L + n_panel))
-
-        df_rand$wide$df_top <- df_rand$wide$df_top |>
+        df_rand$list_df_wide$df_top_wide <- df_rand$list_df_wide$df_top_wide |>
           dplyr::select(
-            dplyr::all_of(keep_cols)
+            -dplyr::all_of(qc_warn_col)
           )
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs with error
         expect_error(
-          object = read_npx_wide_check_top(df = df_rand$wide$df_top,
-                                           file = wide_excel,
-                                           format_spec = format_s),
-          regexp = "Columns 2 and 3 of of the top matrix with assay metadata in"
+          object = read_npx_wide_check_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            format_spec = format_spec
+          ),
+          regexp = "does not contain: QC Warning"
         )
 
       }
@@ -1063,39 +1049,40 @@ test_that(
       code = {
 
         # synthetic wide df
-        data_t <- "Ct"
-        n_panel <- 2L
-        n_assay <- 45L
+        data_type <- "Ct"
 
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = n_panel,
-                                        n_assays = n_assay,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
+                                        show_int_ctrl = show_int_ctrl,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # modify df_top_wide - remove Plate ID
+        plate_id_col <- colnames(df_rand$list_df_wide$df_top_wide) |> tail(1L)
 
-        # remove some columns to reproduce error
-        keep_cols <- paste0("V", seq_len((n_panel * n_assay) + 1L))
-
-        df_rand$wide$df_top <- df_rand$wide$df_top |>
+        df_rand$list_df_wide$df_top_wide <- df_rand$list_df_wide$df_top_wide |>
           dplyr::select(
-            dplyr::all_of(keep_cols)
+            -dplyr::all_of(plate_id_col)
           )
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs with error
         expect_error(
-          object = read_npx_wide_check_top(df = df_rand$wide$df_top,
-                                           file = wide_excel,
-                                           format_spec = format_s),
-          regexp = "Columns 2 and 3 of of the top matrix with assay metadata in"
+          object = read_npx_wide_check_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            format_spec = format_spec
+          ),
+          regexp = "does not contain: Plate ID"
         )
 
       }
@@ -1110,39 +1097,382 @@ test_that(
       code = {
 
         # synthetic wide df
-        data_t <- "Quantified"
-        n_panel <- 2L
-        n_assay <- 45L
+        data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = n_panel,
-                                        n_assays = n_assay,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
+                                        show_int_ctrl = show_int_ctrl,
+                                        version = 0L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # modify df_top_wide - remove Plate ID and QC Warning
+        pid_qcw_col <- colnames(df_rand$list_df_wide$df_top_wide) |> tail(2L)
 
-        # remove some columns to reproduce error
-        keep_cols <- paste0("V", seq_len((n_panel * n_assay) + 1L + n_panel))
-
-        df_rand$wide$df_top <- df_rand$wide$df_top |>
+        df_rand$list_df_wide$df_top_wide <- df_rand$list_df_wide$df_top_wide |>
           dplyr::select(
-            dplyr::all_of(keep_cols)
+            -dplyr::all_of(pid_qcw_col)
           )
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs with error
         expect_error(
-          object = read_npx_wide_check_top(df = df_rand$wide$df_top,
-                                           file = wide_excel,
-                                           format_spec = format_s),
-          regexp = "Columns 2 and 3 of of the top matrix with assay metadata in"
+          object = read_npx_wide_check_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            format_spec = format_spec
+          ),
+          regexp = "does not contain: Plate ID and QC Warning"
+        )
+
+      }
+    )
+
+  }
+)
+
+test_that(
+  "read_npx_wide_check_top - error - incorrect num of int ctrl",
+  {
+    # variables that apply to all tests
+    olink_platform <- "Target 48"
+    data_type <- "NPX"
+    n_assays <- 45L
+    n_samples <- 88L
+    show_dev_int_ctrl <- FALSE
+    show_int_ctrl <- TRUE
+    version <- 1L
+
+    ## 1 missing int ctrl in 1 panel ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = 1L,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
+                                        show_int_ctrl = show_int_ctrl,
+                                        version = version)
+
+        # modify df_top
+        remove_col <- df_rand$list_df_long$df_top_long$df_int_ctrl |>
+          dplyr::sample_n(
+            size = 1L
+          ) |>
+          dplyr::pull(
+            .data[["col_index"]]
+          )
+
+        df_rand$list_df_wide$df_top_wide <- df_rand$list_df_wide$df_top_wide |>
+          dplyr::select(
+            -dplyr::all_of(remove_col)
+          )
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs with error
+        expect_error(
+          object = read_npx_wide_check_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            format_spec = format_spec
+          ),
+          regexp = "is missing one or more of the internal control"
+        )
+
+      }
+    )
+
+    ## 1 missing int ctrl 2 panels ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = 2L,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
+                                        show_int_ctrl = show_int_ctrl,
+                                        version = version)
+
+        # modify df_top
+        remove_col <- df_rand$list_df_long$df_top_long$df_int_ctrl |>
+          dplyr::sample_n(
+            size = 1L
+          ) |>
+          dplyr::pull(
+            .data[["col_index"]]
+          )
+
+        df_rand$list_df_wide$df_top_wide <- df_rand$list_df_wide$df_top_wide |>
+          dplyr::select(
+            -dplyr::all_of(remove_col)
+          )
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs with error
+        expect_error(
+          object = read_npx_wide_check_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            format_spec = format_spec
+          ),
+          regexp = "is missing one or more of the internal control"
+        )
+
+      }
+    )
+
+    ## 4 missing int ctrl 3 panels ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = 3L,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
+                                        show_int_ctrl = show_int_ctrl,
+                                        version = version)
+
+        # modify df_top
+        remove_col <- df_rand$list_df_long$df_top_long$df_int_ctrl |>
+          dplyr::sample_n(
+            size = 4L
+          ) |>
+          dplyr::pull(
+            .data[["col_index"]]
+          )
+
+        df_rand$list_df_wide$df_top_wide <- df_rand$list_df_wide$df_top_wide |>
+          dplyr::select(
+            -dplyr::all_of(remove_col)
+          )
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs with error
+        expect_error(
+          object = read_npx_wide_check_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            format_spec = format_spec
+          ),
+          regexp = "are missing one or more of the internal control"
+        )
+
+      }
+    )
+
+  }
+)
+
+test_that(
+  "read_npx_wide_check_top - error - incorrect num of dev int ctrl",
+  {
+    # variables that apply to all tests
+    olink_platform <- "Target 48"
+    data_type <- "NPX"
+    n_assays <- 45L
+    n_samples <- 88L
+    show_dev_int_ctrl <- TRUE
+    show_int_ctrl <- TRUE
+    version <- 1L
+
+    ## 1 missing int ctrl in 1 panel ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = 1L,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
+                                        show_int_ctrl = show_int_ctrl,
+                                        version = version)
+
+        # modify df_top
+        remove_col <- df_rand$list_df_long$df_top_long$df_dev_int_ctrl |>
+          dplyr::sample_n(
+            size = 1L
+          ) |>
+          dplyr::pull(
+            .data[["col_index"]]
+          )
+
+        df_rand$list_df_wide$df_top_wide <- df_rand$list_df_wide$df_top_wide |>
+          dplyr::select(
+            -dplyr::all_of(remove_col)
+          )
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs with error
+        expect_error(
+          object = read_npx_wide_check_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            format_spec = format_spec
+          ),
+          regexp = "is missing one or more of the deviations"
+        )
+
+      }
+    )
+
+    ## 1 missing int ctrl 2 panels ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = 2L,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
+                                        show_int_ctrl = show_int_ctrl,
+                                        version = version)
+
+        # modify df_top
+        remove_col <- df_rand$list_df_long$df_top_long$df_dev_int_ctrl |>
+          dplyr::sample_n(
+            size = 1L
+          ) |>
+          dplyr::pull(
+            .data[["col_index"]]
+          )
+
+        df_rand$list_df_wide$df_top_wide <- df_rand$list_df_wide$df_top_wide |>
+          dplyr::select(
+            -dplyr::all_of(remove_col)
+          )
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs with error
+        expect_error(
+          object = read_npx_wide_check_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            format_spec = format_spec
+          ),
+          regexp = "is missing one or more of the deviations"
+        )
+
+      }
+    )
+
+    ## 4 missing int ctrl 3 panels ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = 3L,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
+                                        show_int_ctrl = show_int_ctrl,
+                                        version = version)
+
+        # modify df_top
+        remove_col <- df_rand$list_df_long$df_top_long$df_dev_int_ctrl |>
+          dplyr::sample_n(
+            size = 4L
+          ) |>
+          dplyr::pull(
+            .data[["col_index"]]
+          )
+
+        df_rand$list_df_wide$df_top_wide <- df_rand$list_df_wide$df_top_wide |>
+          dplyr::select(
+            -dplyr::all_of(remove_col)
+          )
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs with error
+        expect_error(
+          object = read_npx_wide_check_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            format_spec = format_spec
+          ),
+          regexp = "are missing one or more of the deviations"
         )
 
       }
@@ -1156,7 +1486,13 @@ test_that(
 test_that(
   "read_npx_wide_top - works - T48 - single panel",
   {
-    ## NPX ----
+    # variables that apply to all tests
+    olink_platform <- "Target 48"
+    n_panels <- 1L
+    n_assays <- 45L
+    n_samples <- 88L
+
+    ## NPX no int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -1165,171 +1501,70 @@ test_that(
       code = {
 
         # synthetic wide df
-        o_platform <- "Target 48"
-        data_t <- "NPX"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = 1L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # check that function runs
-        expect_no_condition(
-          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
-                                              file = wide_excel,
-                                              olink_platform = o_platform,
-                                              format_spec = format_s)
-        )
-
-        # check that output match
-        expect_identical(
-          object = l_obj$df_oid,
-          expected = df_rand$long$df_top$df_oid
-        )
-
-        expect_identical(
-          object = l_obj$df_plate,
-          expected = df_rand$long$df_top$df_plate
-        )
-
-        expect_identical(
-          object = l_obj$df_qc_warn,
-          expected = df_rand$long$df_top$df_qc_warn
-        )
-
-        expect_false(
-          object = "df_int_ctrl" %in% names(l_obj)
-        )
-
-      }
-    )
-
-    ## Ct ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        o_platform <- "Target 48"
-        data_t <- "Ct"
-
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = 1L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # check that function runs
-        expect_no_condition(
-          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
-                                              file = wide_excel,
-                                              olink_platform = o_platform,
-                                              format_spec = format_s)
-        )
-
-        # check that output match
-        expect_identical(
-          object = l_obj$df_oid,
-          expected = df_rand$long$df_top$df_oid
-        )
-
-        expect_identical(
-          object = l_obj$df_plate,
-          expected = df_rand$long$df_top$df_plate
-        )
-
-        expect_false(
-          object = "df_qc_warn" %in% names(l_obj)
-        )
-
-        expect_false(
-          object = "df_int_ctrl" %in% names(l_obj)
-        )
-
-      }
-    )
-
-    ## Quantified wo int ctrl ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        o_platform <- "Target 48"
-        data_t <- "Quantified"
-
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = 1L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
                                         show_int_ctrl = FALSE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
-                                              file = wide_excel,
-                                              olink_platform = o_platform,
-                                              format_spec = format_s)
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
         )
 
         # check that output match
         expect_identical(
-          object = l_obj$df_oid,
-          expected = df_rand$long$df_top$df_oid
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
         )
 
         expect_identical(
-          object = l_obj$df_plate,
-          expected = df_rand$long$df_top$df_plate
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
         )
 
         expect_identical(
-          object = l_obj$df_qc_warn,
-          expected = df_rand$long$df_top$df_qc_warn
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
         )
 
         expect_false(
-          object = "df_int_ctrl" %in% names(l_obj)
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
         )
 
       }
     )
 
-    ## Quantified w int ctrl ----
+    ## NPX with int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -1338,57 +1573,67 @@ test_that(
       code = {
 
         # synthetic wide df
-        o_platform <- "Target 48"
-        data_t <- "Quantified"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = 1L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
                                         show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
-                                              file = wide_excel,
-                                              olink_platform = o_platform,
-                                              format_spec = format_s)
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
         )
 
         # check that output match
         expect_identical(
-          object = l_obj$df_oid,
-          expected = df_rand$long$df_top$df_oid
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
         )
 
         expect_identical(
-          object = l_obj$df_plate,
-          expected = df_rand$long$df_top$df_plate
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
         )
 
         expect_identical(
-          object = l_obj$df_qc_warn,
-          expected = df_rand$long$df_top$df_qc_warn
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
         )
 
         expect_identical(
-          object = l_obj$df_int_ctrl,
-          expected = df_rand$long$df_top$df_int_ctrl
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
         )
 
       }
     )
 
-    ## Quantified w int ctrl shuffled ----
+    ## NPX no int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -1397,57 +1642,67 @@ test_that(
       code = {
 
         # synthetic wide df
-        o_platform <- "Target 48"
-        data_t <- "Quantified"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = 1L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = TRUE)
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
-                                              file = wide_excel,
-                                              olink_platform = o_platform,
-                                              format_spec = format_s)
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
         )
 
         # check that output match
         expect_identical(
-          object = l_obj$df_oid,
-          expected = df_rand$long$df_top$df_oid
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
         )
 
         expect_identical(
-          object = l_obj$df_plate,
-          expected = df_rand$long$df_top$df_plate
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
         )
 
         expect_identical(
-          object = l_obj$df_qc_warn,
-          expected = df_rand$long$df_top$df_qc_warn
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_false(
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
         )
 
         expect_identical(
-          object = l_obj$df_int_ctrl,
-          expected = df_rand$long$df_top$df_int_ctrl
+          object = df_out$df_top_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_dev_int_ctrl
         )
 
       }
     )
 
-    ## Quantified w int ctrl shuffled in V2 ----
+    ## NPX with int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -1456,51 +1711,478 @@ test_that(
       code = {
 
         # synthetic wide df
-        o_platform <- "Target 48"
-        data_t <- "Quantified"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = 1L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
                                         show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V2",
-                                        shuffle_assays = TRUE)
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
-                                              file = wide_excel,
-                                              olink_platform = o_platform,
-                                              format_spec = format_s)
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
         )
 
         # check that output match
         expect_identical(
-          object = l_obj$df_oid,
-          expected = df_rand$long$df_top$df_oid
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
         )
 
         expect_identical(
-          object = l_obj$df_plate,
-          expected = df_rand$long$df_top$df_plate
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
         )
 
         expect_identical(
-          object = l_obj$df_qc_warn,
-          expected = df_rand$long$df_top$df_qc_warn
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
         )
 
         expect_identical(
-          object = l_obj$df_int_ctrl,
-          expected = df_rand$long$df_top$df_int_ctrl
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
+        )
+
+        expect_identical(
+          object = df_out$df_top_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_dev_int_ctrl
+        )
+
+      }
+    )
+
+
+    ## Ct no int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Ct"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_false(
+          object = "df_top_qc_warn" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_qc_warn) == 0L
+        )
+
+        expect_false(
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
+        )
+
+      }
+    )
+
+    ## Ct with int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Ct"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_false(
+          object = "df_top_qc_warn" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_qc_warn) == 0L
+        )
+
+        expect_identical(
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
+        )
+
+      }
+    )
+
+    ## Quantified no int ctrl and no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_false(
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
+        )
+
+      }
+    )
+
+    ## Quantified with int ctrl and no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_identical(
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
+        )
+
+      }
+    )
+
+    ## Quantified no int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 0L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_false(
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
+        )
+
+        expect_identical(
+          object = df_out$df_top_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_dev_int_ctrl
+        )
+
+      }
+    )
+
+    ## Quantified with int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 0L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_identical(
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
+        )
+
+        expect_identical(
+          object = df_out$df_top_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_dev_int_ctrl
         )
 
       }
@@ -1512,7 +2194,13 @@ test_that(
 test_that(
   "read_npx_wide_top - works - T48 - multiple panels",
   {
-    ## NPX ----
+    # variables that apply to all tests
+    olink_platform <- "Target 48"
+    n_panels <- 3L
+    n_assays <- 45L
+    n_samples <- 88L
+
+    ## NPX no int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -1521,171 +2209,70 @@ test_that(
       code = {
 
         # synthetic wide df
-        o_platform <- "Target 48"
-        data_t <- "NPX"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = 3L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # check that function runs
-        expect_no_condition(
-          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
-                                              file = wide_excel,
-                                              olink_platform = o_platform,
-                                              format_spec = format_s)
-        )
-
-        # check that output match
-        expect_identical(
-          object = l_obj$df_oid,
-          expected = df_rand$long$df_top$df_oid
-        )
-
-        expect_identical(
-          object = l_obj$df_plate,
-          expected = df_rand$long$df_top$df_plate
-        )
-
-        expect_identical(
-          object = l_obj$df_qc_warn,
-          expected = df_rand$long$df_top$df_qc_warn
-        )
-
-        expect_false(
-          object = "df_int_ctrl" %in% names(l_obj)
-        )
-
-      }
-    )
-
-    ## Ct ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        o_platform <- "Target 48"
-        data_t <- "Ct"
-
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = 3L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # check that function runs
-        expect_no_condition(
-          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
-                                              file = wide_excel,
-                                              olink_platform = o_platform,
-                                              format_spec = format_s)
-        )
-
-        # check that output match
-        expect_identical(
-          object = l_obj$df_oid,
-          expected = df_rand$long$df_top$df_oid
-        )
-
-        expect_identical(
-          object = l_obj$df_plate,
-          expected = df_rand$long$df_top$df_plate
-        )
-
-        expect_false(
-          object = "df_qc_warn" %in% names(l_obj)
-        )
-
-        expect_false(
-          object = "df_int_ctrl" %in% names(l_obj)
-        )
-
-      }
-    )
-
-    ## Quantified wo int ctrl ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        o_platform <- "Target 48"
-        data_t <- "Quantified"
-
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = 3L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
                                         show_int_ctrl = FALSE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
-                                              file = wide_excel,
-                                              olink_platform = o_platform,
-                                              format_spec = format_s)
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
         )
 
         # check that output match
         expect_identical(
-          object = l_obj$df_oid,
-          expected = df_rand$long$df_top$df_oid
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
         )
 
         expect_identical(
-          object = l_obj$df_plate,
-          expected = df_rand$long$df_top$df_plate
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
         )
 
         expect_identical(
-          object = l_obj$df_qc_warn,
-          expected = df_rand$long$df_top$df_qc_warn
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
         )
 
         expect_false(
-          object = "df_int_ctrl" %in% names(l_obj)
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
         )
 
       }
     )
 
-    ## Quantified w int ctrl ----
+    ## NPX with int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -1694,57 +2281,67 @@ test_that(
       code = {
 
         # synthetic wide df
-        o_platform <- "Target 48"
-        data_t <- "Quantified"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = 3L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
                                         show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
-                                              file = wide_excel,
-                                              olink_platform = o_platform,
-                                              format_spec = format_s)
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
         )
 
         # check that output match
         expect_identical(
-          object = l_obj$df_oid,
-          expected = df_rand$long$df_top$df_oid
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
         )
 
         expect_identical(
-          object = l_obj$df_plate,
-          expected = df_rand$long$df_top$df_plate
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
         )
 
         expect_identical(
-          object = l_obj$df_qc_warn,
-          expected = df_rand$long$df_top$df_qc_warn
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
         )
 
         expect_identical(
-          object = l_obj$df_int_ctrl,
-          expected = df_rand$long$df_top$df_int_ctrl
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
         )
 
       }
     )
 
-    ## Quantified w int ctrl shuffled ----
+    ## NPX no int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -1753,57 +2350,67 @@ test_that(
       code = {
 
         # synthetic wide df
-        o_platform <- "Target 48"
-        data_t <- "Quantified"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = 3L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = TRUE)
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
-                                              file = wide_excel,
-                                              olink_platform = o_platform,
-                                              format_spec = format_s)
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
         )
 
         # check that output match
         expect_identical(
-          object = l_obj$df_oid,
-          expected = df_rand$long$df_top$df_oid
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
         )
 
         expect_identical(
-          object = l_obj$df_plate,
-          expected = df_rand$long$df_top$df_plate
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
         )
 
         expect_identical(
-          object = l_obj$df_qc_warn,
-          expected = df_rand$long$df_top$df_qc_warn
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_false(
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
         )
 
         expect_identical(
-          object = l_obj$df_int_ctrl,
-          expected = df_rand$long$df_top$df_int_ctrl
+          object = df_out$df_top_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_dev_int_ctrl
         )
 
       }
     )
 
-    ## Quantified w int ctrl shuffled in V2 ----
+    ## NPX with int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -1812,51 +2419,478 @@ test_that(
       code = {
 
         # synthetic wide df
-        o_platform <- "Target 48"
-        data_t <- "Quantified"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = 3L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
                                         show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V2",
-                                        shuffle_assays = TRUE)
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
-                                              file = wide_excel,
-                                              olink_platform = o_platform,
-                                              format_spec = format_s)
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
         )
 
         # check that output match
         expect_identical(
-          object = l_obj$df_oid,
-          expected = df_rand$long$df_top$df_oid
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
         )
 
         expect_identical(
-          object = l_obj$df_plate,
-          expected = df_rand$long$df_top$df_plate
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
         )
 
         expect_identical(
-          object = l_obj$df_qc_warn,
-          expected = df_rand$long$df_top$df_qc_warn
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
         )
 
         expect_identical(
-          object = l_obj$df_int_ctrl,
-          expected = df_rand$long$df_top$df_int_ctrl
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
+        )
+
+        expect_identical(
+          object = df_out$df_top_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_dev_int_ctrl
+        )
+
+      }
+    )
+
+
+    ## Ct no int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Ct"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_false(
+          object = "df_top_qc_warn" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_qc_warn) == 0L
+        )
+
+        expect_false(
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
+        )
+
+      }
+    )
+
+    ## Ct with int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Ct"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_false(
+          object = "df_top_qc_warn" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_qc_warn) == 0L
+        )
+
+        expect_identical(
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
+        )
+
+      }
+    )
+
+    ## Quantified no int ctrl and no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_false(
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
+        )
+
+      }
+    )
+
+    ## Quantified with int ctrl and no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_identical(
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
+        )
+
+      }
+    )
+
+    ## Quantified no int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 0L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_false(
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
+        )
+
+        expect_identical(
+          object = df_out$df_top_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_dev_int_ctrl
+        )
+
+      }
+    )
+
+    ## Quantified with int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 0L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_identical(
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
+        )
+
+        expect_identical(
+          object = df_out$df_top_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_dev_int_ctrl
         )
 
       }
@@ -1868,7 +2902,13 @@ test_that(
 test_that(
   "read_npx_wide_top - works - T96 - single panel",
   {
-    ## NPX ----
+    # variables that apply to all tests
+    olink_platform <- "Target 96"
+    n_panels <- 1L
+    n_assays <- 92L
+    n_samples <- 88L
+
+    ## NPX no int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -1877,56 +2917,70 @@ test_that(
       code = {
 
         # synthetic wide df
-        o_platform <- "Target 96"
-        data_t <- "NPX"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = 1L,
-                                        n_assays = 92L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
-                                              file = wide_excel,
-                                              olink_platform = o_platform,
-                                              format_spec = format_s)
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
         )
 
         # check that output match
         expect_identical(
-          object = l_obj$df_oid,
-          expected = df_rand$long$df_top$df_oid
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
         )
 
         expect_identical(
-          object = l_obj$df_plate,
-          expected = df_rand$long$df_top$df_plate
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
         )
 
         expect_identical(
-          object = l_obj$df_qc_warn,
-          expected = df_rand$long$df_top$df_qc_warn
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
         )
 
         expect_false(
-          object = "df_int_ctrl" %in% names(l_obj)
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
         )
 
       }
     )
 
-    ## Ct ----
+    ## NPX with int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -1935,49 +2989,344 @@ test_that(
       code = {
 
         # synthetic wide df
-        o_platform <- "Target 96"
-        data_t <- "Ct"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = 1L,
-                                        n_assays = 92L,
-                                        n_samples = 88L,
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
                                         show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
-                                              file = wide_excel,
-                                              olink_platform = o_platform,
-                                              format_spec = format_s)
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
         )
 
         # check that output match
         expect_identical(
-          object = l_obj$df_oid,
-          expected = df_rand$long$df_top$df_oid
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
         )
 
         expect_identical(
-          object = l_obj$df_plate,
-          expected = df_rand$long$df_top$df_plate
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_identical(
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
         )
 
         expect_false(
-          object = "df_qc_warn" %in% names(l_obj)
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
+        )
+
+      }
+    )
+
+    ## NPX no int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 1L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
         )
 
         expect_false(
-          object = "df_int_ctrl" %in% names(l_obj)
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
+        )
+
+        expect_identical(
+          object = df_out$df_top_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_dev_int_ctrl
+        )
+
+      }
+    )
+
+    ## NPX with int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 1L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_identical(
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
+        )
+
+        expect_identical(
+          object = df_out$df_top_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_dev_int_ctrl
+        )
+
+      }
+    )
+
+
+    ## Ct no int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Ct"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_false(
+          object = "df_top_qc_warn" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_qc_warn) == 0L
+        )
+
+        expect_false(
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
+        )
+
+      }
+    )
+
+    ## Ct with int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Ct"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_false(
+          object = "df_top_qc_warn" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_qc_warn) == 0L
+        )
+
+        expect_identical(
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
         )
 
       }
@@ -1989,7 +3338,13 @@ test_that(
 test_that(
   "read_npx_wide_top - works - T96 - multiple panels",
   {
-    ## NPX ----
+    # variables that apply to all tests
+    olink_platform <- "Target 96"
+    n_panels <- 3L
+    n_assays <- 92L
+    n_samples <- 88L
+
+    ## NPX no int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -1998,56 +3353,70 @@ test_that(
       code = {
 
         # synthetic wide df
-        o_platform <- "Target 96"
-        data_t <- "NPX"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = 3L,
-                                        n_assays = 92L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
-                                              file = wide_excel,
-                                              olink_platform = o_platform,
-                                              format_spec = format_s)
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
         )
 
         # check that output match
         expect_identical(
-          object = l_obj$df_oid,
-          expected = df_rand$long$df_top$df_oid
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
         )
 
         expect_identical(
-          object = l_obj$df_plate,
-          expected = df_rand$long$df_top$df_plate
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
         )
 
         expect_identical(
-          object = l_obj$df_qc_warn,
-          expected = df_rand$long$df_top$df_qc_warn
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
         )
 
         expect_false(
-          object = "df_int_ctrl" %in% names(l_obj)
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
         )
 
       }
     )
 
-    ## Ct ----
+    ## NPX with int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -2056,49 +3425,344 @@ test_that(
       code = {
 
         # synthetic wide df
-        o_platform <- "Target 96"
-        data_t <- "Ct"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = 3L,
-                                        n_assays = 92L,
-                                        n_samples = 88L,
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
                                         show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
-                                              file = wide_excel,
-                                              olink_platform = o_platform,
-                                              format_spec = format_s)
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
         )
 
         # check that output match
         expect_identical(
-          object = l_obj$df_oid,
-          expected = df_rand$long$df_top$df_oid
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
         )
 
         expect_identical(
-          object = l_obj$df_plate,
-          expected = df_rand$long$df_top$df_plate
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_identical(
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
         )
 
         expect_false(
-          object = "df_qc_warn" %in% names(l_obj)
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
+        )
+
+      }
+    )
+
+    ## NPX no int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 1L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
         )
 
         expect_false(
-          object = "df_int_ctrl" %in% names(l_obj)
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
+        )
+
+        expect_identical(
+          object = df_out$df_top_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_dev_int_ctrl
+        )
+
+      }
+    )
+
+    ## NPX with int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 1L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_identical(
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
+        )
+
+        expect_identical(
+          object = df_out$df_top_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_dev_int_ctrl
+        )
+
+      }
+    )
+
+
+    ## Ct no int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Ct"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_false(
+          object = "df_top_qc_warn" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_qc_warn) == 0L
+        )
+
+        expect_false(
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
+        )
+
+      }
+    )
+
+    ## Ct with int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Ct"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_false(
+          object = "df_top_qc_warn" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_qc_warn) == 0L
+        )
+
+        expect_identical(
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
         )
 
       }
@@ -2108,9 +3772,15 @@ test_that(
 )
 
 test_that(
-  "read_npx_wide_top - works - Flex/Focus - single panel",
+  "read_npx_wide_top - works - Flex - single panel",
   {
-    ## NPX ----
+    # variables that apply to all tests
+    olink_platform <- "Flex"
+    n_panels <- 1L
+    n_assays <- 21L
+    n_samples <- 88L
+
+    ## NPX no int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -2119,171 +3789,70 @@ test_that(
       code = {
 
         # synthetic wide df
-        o_platform <- "Flex"
-        data_t <- "NPX"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = 1L,
-                                        n_assays = 33L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # check that function runs
-        expect_no_condition(
-          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
-                                              file = wide_excel,
-                                              olink_platform = o_platform,
-                                              format_spec = format_s)
-        )
-
-        # check that output match
-        expect_identical(
-          object = l_obj$df_oid,
-          expected = df_rand$long$df_top$df_oid
-        )
-
-        expect_identical(
-          object = l_obj$df_plate,
-          expected = df_rand$long$df_top$df_plate
-        )
-
-        expect_identical(
-          object = l_obj$df_qc_warn,
-          expected = df_rand$long$df_top$df_qc_warn
-        )
-
-        expect_false(
-          object = "df_int_ctrl" %in% names(l_obj)
-        )
-
-      }
-    )
-
-    ## Ct ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        o_platform <- "Flex"
-        data_t <- "Ct"
-
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = 1L,
-                                        n_assays = 33L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # check that function runs
-        expect_no_condition(
-          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
-                                              file = wide_excel,
-                                              olink_platform = o_platform,
-                                              format_spec = format_s)
-        )
-
-        # check that output match
-        expect_identical(
-          object = l_obj$df_oid,
-          expected = df_rand$long$df_top$df_oid
-        )
-
-        expect_identical(
-          object = l_obj$df_plate,
-          expected = df_rand$long$df_top$df_plate
-        )
-
-        expect_false(
-          object = "df_qc_warn" %in% names(l_obj)
-        )
-
-        expect_false(
-          object = "df_int_ctrl" %in% names(l_obj)
-        )
-
-      }
-    )
-
-    ## Quantified wo int ctrl ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        o_platform <- "Flex"
-        data_t <- "Quantified"
-
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = 1L,
-                                        n_assays = 33L,
-                                        n_samples = 88L,
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
                                         show_int_ctrl = FALSE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
-                                              file = wide_excel,
-                                              olink_platform = o_platform,
-                                              format_spec = format_s)
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
         )
 
         # check that output match
         expect_identical(
-          object = l_obj$df_oid,
-          expected = df_rand$long$df_top$df_oid
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
         )
 
         expect_identical(
-          object = l_obj$df_plate,
-          expected = df_rand$long$df_top$df_plate
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
         )
 
         expect_identical(
-          object = l_obj$df_qc_warn,
-          expected = df_rand$long$df_top$df_qc_warn
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
         )
 
         expect_false(
-          object = "df_int_ctrl" %in% names(l_obj)
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
         )
 
       }
     )
 
-    ## Quantified w int ctrl ----
+    ## NPX with int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -2292,57 +3861,67 @@ test_that(
       code = {
 
         # synthetic wide df
-        o_platform <- "Flex"
-        data_t <- "Quantified"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = 1L,
-                                        n_assays = 33L,
-                                        n_samples = 88L,
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
                                         show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
-                                              file = wide_excel,
-                                              olink_platform = o_platform,
-                                              format_spec = format_s)
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
         )
 
         # check that output match
         expect_identical(
-          object = l_obj$df_oid,
-          expected = df_rand$long$df_top$df_oid
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
         )
 
         expect_identical(
-          object = l_obj$df_plate,
-          expected = df_rand$long$df_top$df_plate
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
         )
 
         expect_identical(
-          object = l_obj$df_qc_warn,
-          expected = df_rand$long$df_top$df_qc_warn
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
         )
 
         expect_identical(
-          object = l_obj$df_int_ctrl,
-          expected = df_rand$long$df_top$df_int_ctrl
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
         )
 
       }
     )
 
-    ## Quantified w int ctrl shuffled ----
+    ## NPX no int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -2351,57 +3930,67 @@ test_that(
       code = {
 
         # synthetic wide df
-        o_platform <- "Flex"
-        data_t <- "Quantified"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = 1L,
-                                        n_assays = 33L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = TRUE)
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
-                                              file = wide_excel,
-                                              olink_platform = o_platform,
-                                              format_spec = format_s)
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
         )
 
         # check that output match
         expect_identical(
-          object = l_obj$df_oid,
-          expected = df_rand$long$df_top$df_oid
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
         )
 
         expect_identical(
-          object = l_obj$df_plate,
-          expected = df_rand$long$df_top$df_plate
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
         )
 
         expect_identical(
-          object = l_obj$df_qc_warn,
-          expected = df_rand$long$df_top$df_qc_warn
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_false(
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
         )
 
         expect_identical(
-          object = l_obj$df_int_ctrl,
-          expected = df_rand$long$df_top$df_int_ctrl
+          object = df_out$df_top_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_dev_int_ctrl
         )
 
       }
     )
 
-    ## Quantified w int ctrl shuffled in V2 ----
+    ## NPX with int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -2410,51 +3999,478 @@ test_that(
       code = {
 
         # synthetic wide df
-        o_platform <- "Flex"
-        data_t <- "Quantified"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = 1L,
-                                        n_assays = 33L,
-                                        n_samples = 88L,
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
                                         show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V2",
-                                        shuffle_assays = TRUE)
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
-                                              file = wide_excel,
-                                              olink_platform = o_platform,
-                                              format_spec = format_s)
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
         )
 
         # check that output match
         expect_identical(
-          object = l_obj$df_oid,
-          expected = df_rand$long$df_top$df_oid
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
         )
 
         expect_identical(
-          object = l_obj$df_plate,
-          expected = df_rand$long$df_top$df_plate
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
         )
 
         expect_identical(
-          object = l_obj$df_qc_warn,
-          expected = df_rand$long$df_top$df_qc_warn
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
         )
 
         expect_identical(
-          object = l_obj$df_int_ctrl,
-          expected = df_rand$long$df_top$df_int_ctrl
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
+        )
+
+        expect_identical(
+          object = df_out$df_top_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_dev_int_ctrl
+        )
+
+      }
+    )
+
+
+    ## Ct no int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Ct"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_false(
+          object = "df_top_qc_warn" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_qc_warn) == 0L
+        )
+
+        expect_false(
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
+        )
+
+      }
+    )
+
+    ## Ct with int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Ct"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_false(
+          object = "df_top_qc_warn" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_qc_warn) == 0L
+        )
+
+        expect_identical(
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
+        )
+
+      }
+    )
+
+    ## Quantified no int ctrl and no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_false(
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
+        )
+
+      }
+    )
+
+    ## Quantified with int ctrl and no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_identical(
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
+        )
+
+      }
+    )
+
+    ## Quantified no int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 0L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_false(
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
+        )
+
+        expect_identical(
+          object = df_out$df_top_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_dev_int_ctrl
+        )
+
+      }
+    )
+
+    ## Quantified with int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 0L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_identical(
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
+        )
+
+        expect_identical(
+          object = df_out$df_top_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_dev_int_ctrl
         )
 
       }
@@ -2464,9 +4480,15 @@ test_that(
 )
 
 test_that(
-  "read_npx_wide_top - works - Flex/Focus - multiple panels",
+  "read_npx_wide_top - works - Flex - multiple panels",
   {
-    ## NPX ----
+    # variables that apply to all tests
+    olink_platform <- "Flex"
+    n_panels <- 3L
+    n_assays <- 15L
+    n_samples <- 88L
+
+    ## NPX no int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -2475,171 +4497,70 @@ test_that(
       code = {
 
         # synthetic wide df
-        o_platform <- "Focus"
-        data_t <- "NPX"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = 3L,
-                                        n_assays = 21L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # check that function runs
-        expect_no_condition(
-          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
-                                              file = wide_excel,
-                                              olink_platform = o_platform,
-                                              format_spec = format_s)
-        )
-
-        # check that output match
-        expect_identical(
-          object = l_obj$df_oid,
-          expected = df_rand$long$df_top$df_oid
-        )
-
-        expect_identical(
-          object = l_obj$df_plate,
-          expected = df_rand$long$df_top$df_plate
-        )
-
-        expect_identical(
-          object = l_obj$df_qc_warn,
-          expected = df_rand$long$df_top$df_qc_warn
-        )
-
-        expect_false(
-          object = "df_int_ctrl" %in% names(l_obj)
-        )
-
-      }
-    )
-
-    ## Ct ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        o_platform <- "Focus"
-        data_t <- "Ct"
-
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = 3L,
-                                        n_assays = 21L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # check that function runs
-        expect_no_condition(
-          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
-                                              file = wide_excel,
-                                              olink_platform = o_platform,
-                                              format_spec = format_s)
-        )
-
-        # check that output match
-        expect_identical(
-          object = l_obj$df_oid,
-          expected = df_rand$long$df_top$df_oid
-        )
-
-        expect_identical(
-          object = l_obj$df_plate,
-          expected = df_rand$long$df_top$df_plate
-        )
-
-        expect_false(
-          object = "df_qc_warn" %in% names(l_obj)
-        )
-
-        expect_false(
-          object = "df_int_ctrl" %in% names(l_obj)
-        )
-
-      }
-    )
-
-    ## Quantified wo int ctrl ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        o_platform <- "Focus"
-        data_t <- "Quantified"
-
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = 3L,
-                                        n_assays = 21L,
-                                        n_samples = 88L,
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
                                         show_int_ctrl = FALSE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
-                                              file = wide_excel,
-                                              olink_platform = o_platform,
-                                              format_spec = format_s)
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
         )
 
         # check that output match
         expect_identical(
-          object = l_obj$df_oid,
-          expected = df_rand$long$df_top$df_oid
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
         )
 
         expect_identical(
-          object = l_obj$df_plate,
-          expected = df_rand$long$df_top$df_plate
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
         )
 
         expect_identical(
-          object = l_obj$df_qc_warn,
-          expected = df_rand$long$df_top$df_qc_warn
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
         )
 
         expect_false(
-          object = "df_int_ctrl" %in% names(l_obj)
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
         )
 
       }
     )
 
-    ## Quantified w int ctrl ----
+    ## NPX with int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -2648,57 +4569,67 @@ test_that(
       code = {
 
         # synthetic wide df
-        o_platform <- "Focus"
-        data_t <- "Quantified"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = 3L,
-                                        n_assays = 21L,
-                                        n_samples = 88L,
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
                                         show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
-                                              file = wide_excel,
-                                              olink_platform = o_platform,
-                                              format_spec = format_s)
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
         )
 
         # check that output match
         expect_identical(
-          object = l_obj$df_oid,
-          expected = df_rand$long$df_top$df_oid
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
         )
 
         expect_identical(
-          object = l_obj$df_plate,
-          expected = df_rand$long$df_top$df_plate
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
         )
 
         expect_identical(
-          object = l_obj$df_qc_warn,
-          expected = df_rand$long$df_top$df_qc_warn
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
         )
 
         expect_identical(
-          object = l_obj$df_int_ctrl,
-          expected = df_rand$long$df_top$df_int_ctrl
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
         )
 
       }
     )
 
-    ## Quantified w int ctrl shuffled ----
+    ## NPX no int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -2707,57 +4638,67 @@ test_that(
       code = {
 
         # synthetic wide df
-        o_platform <- "Focus"
-        data_t <- "Quantified"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = 3L,
-                                        n_assays = 21L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = TRUE)
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
-                                              file = wide_excel,
-                                              olink_platform = o_platform,
-                                              format_spec = format_s)
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
         )
 
         # check that output match
         expect_identical(
-          object = l_obj$df_oid,
-          expected = df_rand$long$df_top$df_oid
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
         )
 
         expect_identical(
-          object = l_obj$df_plate,
-          expected = df_rand$long$df_top$df_plate
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
         )
 
         expect_identical(
-          object = l_obj$df_qc_warn,
-          expected = df_rand$long$df_top$df_qc_warn
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_false(
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
         )
 
         expect_identical(
-          object = l_obj$df_int_ctrl,
-          expected = df_rand$long$df_top$df_int_ctrl
+          object = df_out$df_top_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_dev_int_ctrl
         )
 
       }
     )
 
-    ## Quantified w int ctrl shuffled in V2 ----
+    ## NPX with int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -2766,51 +4707,1894 @@ test_that(
       code = {
 
         # synthetic wide df
-        o_platform <- "Focus"
-        data_t <- "Quantified"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = 3L,
-                                        n_assays = 21L,
-                                        n_samples = 88L,
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
                                         show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V2",
-                                        shuffle_assays = TRUE)
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_no_condition(
-          object = l_obj <- read_npx_wide_top(df = df_rand$wide$df_top,
-                                              file = wide_excel,
-                                              olink_platform = o_platform,
-                                              format_spec = format_s)
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
         )
 
         # check that output match
         expect_identical(
-          object = l_obj$df_oid,
-          expected = df_rand$long$df_top$df_oid
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
         )
 
         expect_identical(
-          object = l_obj$df_plate,
-          expected = df_rand$long$df_top$df_plate
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
         )
 
         expect_identical(
-          object = l_obj$df_qc_warn,
-          expected = df_rand$long$df_top$df_qc_warn
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
         )
 
         expect_identical(
-          object = l_obj$df_int_ctrl,
-          expected = df_rand$long$df_top$df_int_ctrl
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
+        )
+
+        expect_identical(
+          object = df_out$df_top_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_dev_int_ctrl
+        )
+
+      }
+    )
+
+
+    ## Ct no int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Ct"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_false(
+          object = "df_top_qc_warn" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_qc_warn) == 0L
+        )
+
+        expect_false(
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
+        )
+
+      }
+    )
+
+    ## Ct with int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Ct"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_false(
+          object = "df_top_qc_warn" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_qc_warn) == 0L
+        )
+
+        expect_identical(
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
+        )
+
+      }
+    )
+
+    ## Quantified no int ctrl and no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_false(
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
+        )
+
+      }
+    )
+
+    ## Quantified with int ctrl and no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_identical(
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
+        )
+
+      }
+    )
+
+    ## Quantified no int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 0L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_false(
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
+        )
+
+        expect_identical(
+          object = df_out$df_top_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_dev_int_ctrl
+        )
+
+      }
+    )
+
+    ## Quantified with int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 0L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_identical(
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
+        )
+
+        expect_identical(
+          object = df_out$df_top_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_dev_int_ctrl
+        )
+
+      }
+    )
+
+  }
+)
+
+test_that(
+  "read_npx_wide_top - works - Focus - single panel",
+  {
+    # variables that apply to all tests
+    olink_platform <- "Focus"
+    n_panels <- 1L
+    n_assays <- 15L
+    n_samples <- 88L
+
+    ## NPX no int ctrl and no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_false(
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
+        )
+
+      }
+    )
+
+    ## NPX with int ctrl and no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_identical(
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
+        )
+
+      }
+    )
+
+    ## NPX no int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 0L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_false(
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
+        )
+
+        expect_identical(
+          object = df_out$df_top_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_dev_int_ctrl
+        )
+
+      }
+    )
+
+    ## NPX with int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 0L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_identical(
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
+        )
+
+        expect_identical(
+          object = df_out$df_top_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_dev_int_ctrl
+        )
+
+      }
+    )
+
+
+    ## Ct no int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Ct"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_false(
+          object = "df_top_qc_warn" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_qc_warn) == 0L
+        )
+
+        expect_false(
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
+        )
+
+      }
+    )
+
+    ## Ct with int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Ct"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_false(
+          object = "df_top_qc_warn" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_qc_warn) == 0L
+        )
+
+        expect_identical(
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
+        )
+
+      }
+    )
+
+    ## Quantified no int ctrl and no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_false(
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
+        )
+
+      }
+    )
+
+    ## Quantified with int ctrl and no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_identical(
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
+        )
+
+      }
+    )
+
+    ## Quantified no int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 0L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_false(
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
+        )
+
+        expect_identical(
+          object = df_out$df_top_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_dev_int_ctrl
+        )
+
+      }
+    )
+
+    ## Quantified with int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 0L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_identical(
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
+        )
+
+        expect_identical(
+          object = df_out$df_top_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_dev_int_ctrl
+        )
+
+      }
+    )
+
+  }
+)
+
+test_that(
+  "read_npx_wide_top - works - Focus - multiple panels",
+  {
+    # variables that apply to all tests
+    olink_platform <- "Focus"
+    n_panels <- 3L
+    n_assays <- 21L
+    n_samples <- 88L
+
+    ## NPX no int ctrl and no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_false(
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
+        )
+
+      }
+    )
+
+    ## NPX with int ctrl and no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_identical(
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
+        )
+
+      }
+    )
+
+    ## NPX no int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 0L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_false(
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
+        )
+
+        expect_identical(
+          object = df_out$df_top_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_dev_int_ctrl
+        )
+
+      }
+    )
+
+    ## NPX with int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 0L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_identical(
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
+        )
+
+        expect_identical(
+          object = df_out$df_top_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_dev_int_ctrl
+        )
+
+      }
+    )
+
+
+    ## Ct no int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Ct"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_false(
+          object = "df_top_qc_warn" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_qc_warn) == 0L
+        )
+
+        expect_false(
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
+        )
+
+      }
+    )
+
+    ## Ct with int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Ct"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_false(
+          object = "df_top_qc_warn" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_qc_warn) == 0L
+        )
+
+        expect_identical(
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
+        )
+
+      }
+    )
+
+    ## Quantified no int ctrl and no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_false(
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
+        )
+
+      }
+    )
+
+    ## Quantified with int ctrl and no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_identical(
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
+        )
+
+        expect_false(
+          object = "df_top_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_dev_int_ctrl) == 0L
+        )
+
+      }
+    )
+
+    ## Quantified no int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 0L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_false(
+          object = "df_top_int_ctrl" %in% names(df_out)
+        )
+
+        expect_true(
+          object = nrow(df_rand$list_df_long$df_top_long$df_int_ctrl) == 0L
+        )
+
+        expect_identical(
+          object = df_out$df_top_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_dev_int_ctrl
+        )
+
+      }
+    )
+
+    ## Quantified with int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 0L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_top(
+            df = df_rand$list_df_wide$df_top_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_top_oid,
+          expected = df_rand$list_df_long$df_top_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_top_plate,
+          expected = df_rand$list_df_long$df_top_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_top_qc_warn,
+          expected = df_rand$list_df_long$df_top_long$df_qc_warn
+        )
+
+        expect_identical(
+          object = df_out$df_top_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_int_ctrl
+        )
+
+        expect_identical(
+          object = df_out$df_top_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_top_long$df_dev_int_ctrl
         )
 
       }
@@ -2822,7 +6606,13 @@ test_that(
 test_that(
   "read_npx_wide_top - error - missing or too many labels in rows 2 & 3",
   {
-    # df contains an unrecognizable tag ----
+    # variables that apply to all tests
+    olink_platform <- "Target 48"
+    n_panels <- 1L
+    n_assays <- 45L
+    n_samples <- 88L
+
+    # df contains unrecognizable tag ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -2831,25 +6621,26 @@ test_that(
       code = {
 
         # synthetic wide df
-        o_platform <- "Target 48"
-        data_t <- "NPX"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = 1L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
                                         show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # add a new column with an unrecognizable tag
-        df_top_add_col_cname <- paste0("V", (ncol(df_rand$wide$df_top) + 1L))
-        df_top_last_cname <- paste0("V", ncol(df_rand$wide$df_top))
-        df_top_add_col <- df_rand$wide$df_top |>
+        # modify df_top_wide to add a new column with an unrecognizable tag
+        df_top_wide_last_v <- ncol(df_rand$list_df_wide$df_top_wide)
+        df_top_add_col_cname <- paste0("V", (df_top_wide_last_v + 1L))
+        df_top_last_cname <- paste0("V", df_top_wide_last_v)
+        df_top_add_col <- df_rand$list_df_wide$df_top_wide |>
           dplyr::select(
             dplyr::all_of(df_top_last_cname)
           ) |>
@@ -2863,7 +6654,7 @@ test_that(
             )
           )
 
-        df_rand$wide$df_top <- df_rand$wide$df_top |>
+        df_rand$list_df_wide$df_top_wide <- df_rand$list_df_wide$df_top_wide |>
           dplyr::bind_cols(
             df_top_add_col
           )
@@ -2873,17 +6664,17 @@ test_that(
 
         # check that function runs with error
         expect_error(
-          object = read_npx_wide_top(df = df_rand$wide$df_top,
+          object = read_npx_wide_top(df = df_rand$list_df_wide$df_top_wide,
                                      file = wide_excel,
-                                     olink_platform = o_platform,
-                                     format_spec = format_s),
-          regexp = "The top matrix with the assays metadata in file"
+                                     olink_platform = olink_platform,
+                                     format_spec = format_spec),
+          regexp = "in row `Assay` contains unrecognized values in columns: V54"
         )
 
       }
     )
 
-    # df contains QC Warning with data type Ct ----
+    # df contains QC Warning when data_type Ct ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -2892,76 +6683,31 @@ test_that(
       code = {
 
         # synthetic wide df
-        o_platform <- "Target 48"
-        data_t <- "Ct"
+        data_type <- "Ct"
 
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
                                         data_type = "NPX",
-                                        n_panels = 1L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # check that function runs with error
-        expect_error(
-          object = read_npx_wide_top(df = df_rand$wide$df_top,
-                                     file = wide_excel,
-                                     olink_platform = o_platform,
-                                     format_spec = format_s),
-          regexp = "The top matrix with the assays metadata in file"
-        )
-
-      }
-    )
-
-    # df contains contains internal controls with data type NPX ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        o_platform <- "Target 48"
-        data_t <- "NPX"
-
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = "Quantified",
-                                        n_panels = 1L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # remove row with V1 = Unit to run the test
-        df_rand$wide$df_top <- df_rand$wide$df_top |>
-          dplyr::slice(
-            1L:4L
-          )
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs with error
         expect_error(
-          object = read_npx_wide_top(df = df_rand$wide$df_top,
+          object = read_npx_wide_top(df = df_rand$list_df_wide$df_top_wide,
                                      file = wide_excel,
-                                     olink_platform = o_platform,
-                                     format_spec = format_s),
-          regexp = "The top matrix with the assays metadata in file"
+                                     olink_platform = olink_platform,
+                                     format_spec = format_spec),
+          regexp = "in row `Assay` contains unrecognized values in columns: V48"
         )
 
       }
@@ -2973,6 +6719,13 @@ test_that(
 test_that(
   "read_npx_wide_top - error - NAs in OlinkID/Uniprot/Assay",
   {
+    # variables that apply to all tests
+    olink_platform <- "Target 48"
+    data_type <- "NPX"
+    n_panels <- 1L
+    n_assays <- 45L
+    n_samples <- 88L
+
     ## OlinkID = NA 1 instance ----
 
     withr::with_tempfile(
@@ -2982,39 +6735,37 @@ test_that(
       code = {
 
         # synthetic wide df
-        o_platform <- "Target 48"
-        data_t <- "NPX"
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
 
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = 1L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # intrduce NA cells to test
-        df_rand$wide$df_top <- df_rand$wide$df_top |>
+        # modify dt_top_wide intrduce NA cells to test
+        df_rand$list_df_wide$df_top_wide <- df_rand$list_df_wide$df_top_wide |>
           dplyr::mutate(
             V2 = dplyr::if_else(.data[["V2"]] %in% "Uniprot1",
                                 NA_character_,
                                 .data[["V2"]])
           )
 
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs with error
         expect_error(
-          object = read_npx_wide_top(df = df_rand$wide$df_top,
+          object = read_npx_wide_top(df = df_rand$list_df_wide$df_top_wide,
                                      file = wide_excel,
-                                     olink_platform = o_platform,
-                                     format_spec = format_s),
-          regexp = "Detected 1 empty cells in columns"
+                                     olink_platform = olink_platform,
+                                     format_spec = format_spec),
+          regexp = "Identified 1 empty cells!"
         )
 
       }
@@ -3029,23 +6780,21 @@ test_that(
       code = {
 
         # synthetic wide df
-        o_platform <- "Target 48"
-        data_t <- "NPX"
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
 
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = 1L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # intrduce NA cells to test
-        df_rand$wide$df_top <- df_rand$wide$df_top |>
+        df_rand$list_df_wide$df_top_wide <- df_rand$list_df_wide$df_top_wide |>
           dplyr::mutate(
             V2 = dplyr::if_else(
               .data[["V2"]] %in% paste0(c("Assay", "Uniprot"), 1L),
@@ -3064,11 +6813,11 @@ test_that(
 
         # check that function runs with error
         expect_error(
-          object = read_npx_wide_top(df = df_rand$wide$df_top,
+          object = read_npx_wide_top(df = df_rand$list_df_wide$df_top_wide,
                                      file = wide_excel,
-                                     olink_platform = o_platform,
-                                     format_spec = format_s),
-          regexp = "Detected 4 empty cells in columns"
+                                     olink_platform = olink_platform,
+                                     format_spec = format_spec),
+          regexp = "Identified 4 empty cells!"
         )
 
       }
@@ -3080,6 +6829,10 @@ test_that(
 test_that(
   "read_npx_wide_top - error - wrong # of assays",
   {
+    # variables that apply to all tests
+    data_type <- "NPX"
+    n_samples <- 88L
+
     ## T48 1 panel ----
 
     withr::with_tempfile(
@@ -3089,33 +6842,33 @@ test_that(
       code = {
 
         # synthetic wide df
-        o_platform <- "Target 48"
-        data_t <- "NPX"
-        n_panel <- 1L
-        n_assay <- 40L
+        olink_platform <- "Target 48"
+        n_panels <- 1L
+        n_assays <- 40L
 
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = n_panel,
-                                        n_assays = n_assay,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_error(
-          object = read_npx_wide_top(df = df_rand$wide$df_top,
+          object = read_npx_wide_top(df = df_rand$list_df_wide$df_top_wide,
                                      file = wide_excel,
-                                     olink_platform = o_platform,
-                                     format_spec = format_s),
-          regexp = "Detected 40 assays in 1 panels in file"
+                                     olink_platform = olink_platform,
+                                     format_spec = format_spec),
+          regexp = paste("Detected 40 assays in 1 panels in file")
         )
 
       }
@@ -3130,32 +6883,32 @@ test_that(
       code = {
 
         # synthetic wide df
-        o_platform <- "Target 48"
-        data_t <- "NPX"
-        n_panel <- 2L
-        n_assay <- 32L
+        olink_platform <- "Target 48"
+        n_panels <- 2L
+        n_assays <- 32L
 
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = n_panel,
-                                        n_assays = n_assay,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_error(
-          object = read_npx_wide_top(df = df_rand$wide$df_top,
+          object = read_npx_wide_top(df = df_rand$list_df_wide$df_top_wide,
                                      file = wide_excel,
-                                     olink_platform = o_platform,
-                                     format_spec = format_s),
+                                     olink_platform = olink_platform,
+                                     format_spec = format_spec),
           regexp = "Detected 64 assays in 2 panels in file"
         )
 
@@ -3171,32 +6924,32 @@ test_that(
       code = {
 
         # synthetic wide df
-        o_platform <- "Target 96"
-        data_t <- "NPX"
-        n_panel <- 1L
-        n_assay <- 67L
+        olink_platform <- "Target 96"
+        n_panels <- 1L
+        n_assays <- 67L
 
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = n_panel,
-                                        n_assays = n_assay,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_error(
-          object = read_npx_wide_top(df = df_rand$wide$df_top,
+          object = read_npx_wide_top(df = df_rand$list_df_wide$df_top_wide,
                                      file = wide_excel,
-                                     olink_platform = o_platform,
-                                     format_spec = format_s),
+                                     olink_platform = olink_platform,
+                                     format_spec = format_spec),
           regexp = "Detected 67 assays in 1 panels in file"
         )
 
@@ -3212,32 +6965,32 @@ test_that(
       code = {
 
         # synthetic wide df
-        o_platform <- "Target 96"
-        data_t <- "NPX"
-        n_panel <- 2L
-        n_assay <- 78L
+        olink_platform <- "Target 96"
+        n_panels <- 2L
+        n_assays <- 78L
 
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = n_panel,
-                                        n_assays = n_assay,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_error(
-          object = read_npx_wide_top(df = df_rand$wide$df_top,
+          object = read_npx_wide_top(df = df_rand$list_df_wide$df_top_wide,
                                      file = wide_excel,
-                                     olink_platform = o_platform,
-                                     format_spec = format_s),
+                                     olink_platform = olink_platform,
+                                     format_spec = format_spec),
           regexp = "Detected 156 assays in 2 panels in file"
         )
 
@@ -3257,41 +7010,3496 @@ test_that(
       code = {
 
         # synthetic wide df
-        o_platform <- "Target 48"
-        n_panel <- 2L
-        n_assay <- 45L
-        data_t <- "NPX"
+        olink_platform <- "Target 48"
+        data_type <- "NPX"
+        n_panels <- 2L
+        n_assays <- 45L
+        n_samples <- 88L
 
-        df_rand <- olink_wide_synthetic(olink_platform = o_platform,
-                                        data_type = data_t,
-                                        n_panels = n_panel,
-                                        n_assays = n_assay,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
 
         # remove one column from df_top to reproduce the error
-        remove_col <- paste0("V", (1L + (n_panel * n_assay) + (2L * n_panel)))
+        remove_col <- colnames(df_rand$list_df_wide$df_top_wide) |> tail(1L)
 
-        df_rand$wide$df_top <- df_rand$wide$df_top |>
+        df_rand$list_df_wide$df_top_wide <- df_rand$list_df_wide$df_top_wide |>
           dplyr::select(
             -dplyr::all_of(remove_col)
           )
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_error(
-          object = read_npx_wide_top(df = df_rand$wide$df_top,
+          object = read_npx_wide_top(df = df_rand$list_df_wide$df_top_wide,
                                      file = wide_excel,
-                                     olink_platform = o_platform,
-                                     format_spec = format_s),
-          regexp = "Expected equal number of \"Plate ID\" and \"QC\ Warning\""
+                                     olink_platform = olink_platform,
+                                     format_spec = format_spec),
+          regexp = "Expected equal number of `Plate ID` and `QC\ Warning`"
+        )
+
+      }
+    )
+
+  }
+)
+
+# Test read_npx_wide_middle ----
+
+test_that(
+  "read_npx_wide_middle - single panel - works",
+  {
+    # variables that apply to all tests
+    olink_platform <- "Target 48"
+    n_panels <- 1L
+    n_assays <- 45L
+    n_samples <- 88L
+
+    ## NPX no int ctrl and no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_middle(
+            df = df_rand$list_df_wide$df_middle_wide,
+            file = wide_excel,
+            data_type = data_type,
+            col_names = col_names
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_mid_oid,
+          expected = df_rand$list_df_long$df_middle_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_mid_plate,
+          expected = df_rand$list_df_long$df_middle_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_mid_qc_warn,
+          expected = df_rand$list_df_long$df_middle_long$df_qc_warn
+        )
+
+        expect_false(
+          object = "df_mid_int_ctrl" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_int_ctrl" %in% names(df_rand$list_df_long$df_middle_long)
+        )
+
+        expect_false(
+          object = "df_mid_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_dev_int_ctrl" %in%
+            names(df_rand$list_df_long$df_middle_long)
+        )
+
+      }
+    )
+
+    ## NPX with int ctrl and no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_middle(
+            df = df_rand$list_df_wide$df_middle_wide,
+            file = wide_excel,
+            data_type = data_type,
+            col_names = col_names
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_mid_oid,
+          expected = df_rand$list_df_long$df_middle_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_mid_plate,
+          expected = df_rand$list_df_long$df_middle_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_mid_qc_warn,
+          expected = df_rand$list_df_long$df_middle_long$df_qc_warn
+        )
+
+        expect_identical(
+          object = df_out$df_mid_int_ctrl,
+          expected = df_rand$list_df_long$df_middle_long$df_int_ctrl
+        )
+
+        expect_false(
+          object = "df_mid_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_dev_int_ctrl" %in%
+            names(df_rand$list_df_long$df_middle_long)
+        )
+
+      }
+    )
+
+    ## NPX no int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 1L)
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_middle(
+            df = df_rand$list_df_wide$df_middle_wide,
+            file = wide_excel,
+            data_type = data_type,
+            col_names = col_names
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_mid_oid,
+          expected = df_rand$list_df_long$df_middle_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_mid_plate,
+          expected = df_rand$list_df_long$df_middle_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_mid_qc_warn,
+          expected = df_rand$list_df_long$df_middle_long$df_qc_warn
+        )
+
+        expect_false(
+          object = "df_mid_int_ctrl" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_int_ctrl" %in%
+            names(df_rand$list_df_long$df_middle_long)
+        )
+
+        expect_identical(
+          object = df_out$df_mid_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_middle_long$df_dev_int_ctrl
+        )
+
+      }
+    )
+
+    ## NPX with int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 1L)
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_middle(
+            df = df_rand$list_df_wide$df_middle_wide,
+            file = wide_excel,
+            data_type = data_type,
+            col_names = col_names
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_mid_oid,
+          expected = df_rand$list_df_long$df_middle_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_mid_plate,
+          expected = df_rand$list_df_long$df_middle_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_mid_qc_warn,
+          expected = df_rand$list_df_long$df_middle_long$df_qc_warn
+        )
+
+        expect_identical(
+          object = df_out$df_mid_int_ctrl,
+          expected = df_rand$list_df_long$df_middle_long$df_int_ctrl
+        )
+
+        expect_identical(
+          object = df_out$df_mid_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_middle_long$df_dev_int_ctrl
+        )
+
+      }
+    )
+
+
+    ## Ct no int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Ct"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_middle(
+            df = df_rand$list_df_wide$df_middle_wide,
+            file = wide_excel,
+            data_type = data_type,
+            col_names = col_names
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_mid_oid,
+          expected = df_rand$list_df_long$df_middle_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_mid_plate,
+          expected = df_rand$list_df_long$df_middle_long$df_plate
+        )
+
+        expect_false(
+          object = "df_mid_qc_warn" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_qc_warn" %in% names(df_rand$list_df_long$df_middle_long)
+        )
+
+        expect_false(
+          object = "df_mid_int_ctrl" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_int_ctrl" %in% names(df_rand$list_df_long$df_middle_long)
+        )
+
+        expect_false(
+          object = "df_mid_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_dev_int_ctrl" %in%
+            names(df_rand$list_df_long$df_middle_long)
+        )
+
+      }
+    )
+
+    ## Ct with int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Ct"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_middle(
+            df = df_rand$list_df_wide$df_middle_wide,
+            file = wide_excel,
+            data_type = data_type,
+            col_names = col_names
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_mid_oid,
+          expected = df_rand$list_df_long$df_middle_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_mid_plate,
+          expected = df_rand$list_df_long$df_middle_long$df_plate
+        )
+
+        expect_false(
+          object = "df_mid_qc_warn" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_qc_warn" %in% names(df_rand$list_df_long$df_middle_long)
+        )
+
+        expect_identical(
+          object = df_out$df_mid_int_ctrl,
+          expected = df_rand$list_df_long$df_middle_long$df_int_ctrl
+        )
+
+        expect_false(
+          object = "df_mid_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_dev_int_ctrl" %in%
+            names(df_rand$list_df_long$df_middle_long)
+        )
+
+      }
+    )
+
+    ## Quantified no int ctrl and no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_middle(
+            df = df_rand$list_df_wide$df_middle_wide,
+            file = wide_excel,
+            data_type = data_type,
+            col_names = col_names
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_mid_oid,
+          expected = df_rand$list_df_long$df_middle_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_mid_plate,
+          expected = df_rand$list_df_long$df_middle_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_mid_qc_warn,
+          expected = df_rand$list_df_long$df_middle_long$df_qc_warn
+        )
+
+        expect_false(
+          object = "df_mid_int_ctrl" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_int_ctrl" %in% names(df_rand$list_df_long$df_middle_long)
+        )
+
+        expect_false(
+          object = "df_mid_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_dev_int_ctrl" %in%
+            names(df_rand$list_df_long$df_middle_long)
+        )
+
+      }
+    )
+
+    ## Quantified with int ctrl and no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_middle(
+            df = df_rand$list_df_wide$df_middle_wide,
+            file = wide_excel,
+            data_type = data_type,
+            col_names = col_names
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_mid_oid,
+          expected = df_rand$list_df_long$df_middle_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_mid_plate,
+          expected = df_rand$list_df_long$df_middle_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_mid_qc_warn,
+          expected = df_rand$list_df_long$df_middle_long$df_qc_warn
+        )
+
+        expect_identical(
+          object = df_out$df_mid_int_ctrl,
+          expected = df_rand$list_df_long$df_middle_long$df_int_ctrl
+        )
+
+        expect_false(
+          object = "df_mid_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_dev_int_ctrl" %in%
+            names(df_rand$list_df_long$df_middle_long)
+        )
+
+      }
+    )
+
+    ## Quantified no int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 0L)
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_middle(
+            df = df_rand$list_df_wide$df_middle_wide,
+            file = wide_excel,
+            data_type = data_type,
+            col_names = col_names
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_mid_oid,
+          expected = df_rand$list_df_long$df_middle_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_mid_plate,
+          expected = df_rand$list_df_long$df_middle_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_mid_qc_warn,
+          expected = df_rand$list_df_long$df_middle_long$df_qc_warn
+        )
+
+        expect_false(
+          object = "df_mid_int_ctrl" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_int_ctrl" %in%
+            names(df_rand$list_df_long$df_middle_long)
+        )
+
+        expect_identical(
+          object = df_out$df_mid_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_middle_long$df_dev_int_ctrl
+        )
+
+      }
+    )
+
+    ## Quantified with int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 0L)
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_middle(
+            df = df_rand$list_df_wide$df_middle_wide,
+            file = wide_excel,
+            data_type = data_type,
+            col_names = col_names
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_mid_oid,
+          expected = df_rand$list_df_long$df_middle_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_mid_plate,
+          expected = df_rand$list_df_long$df_middle_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_mid_qc_warn,
+          expected = df_rand$list_df_long$df_middle_long$df_qc_warn
+        )
+
+        expect_identical(
+          object = df_out$df_mid_int_ctrl,
+          expected = df_rand$list_df_long$df_middle_long$df_int_ctrl
+        )
+
+        expect_identical(
+          object = df_out$df_mid_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_middle_long$df_dev_int_ctrl
+        )
+
+      }
+    )
+
+  }
+)
+
+test_that(
+  "read_npx_wide_middle - multiple panels - works",
+  {
+    # variables that apply to all tests
+    olink_platform <- "Target 48"
+    n_panels <- 3L
+    n_assays <- 45L
+    n_samples <- 100L
+
+    ## NPX no int ctrl and no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_middle(
+            df = df_rand$list_df_wide$df_middle_wide,
+            file = wide_excel,
+            data_type = data_type,
+            col_names = col_names
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_mid_oid,
+          expected = df_rand$list_df_long$df_middle_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_mid_plate,
+          expected = df_rand$list_df_long$df_middle_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_mid_qc_warn,
+          expected = df_rand$list_df_long$df_middle_long$df_qc_warn
+        )
+
+        expect_false(
+          object = "df_mid_int_ctrl" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_int_ctrl" %in% names(df_rand$list_df_long$df_middle_long)
+        )
+
+        expect_false(
+          object = "df_mid_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_dev_int_ctrl" %in%
+            names(df_rand$list_df_long$df_middle_long)
+        )
+
+      }
+    )
+
+    ## NPX with int ctrl and no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_middle(
+            df = df_rand$list_df_wide$df_middle_wide,
+            file = wide_excel,
+            data_type = data_type,
+            col_names = col_names
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_mid_oid,
+          expected = df_rand$list_df_long$df_middle_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_mid_plate,
+          expected = df_rand$list_df_long$df_middle_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_mid_qc_warn,
+          expected = df_rand$list_df_long$df_middle_long$df_qc_warn
+        )
+
+        expect_identical(
+          object = df_out$df_mid_int_ctrl,
+          expected = df_rand$list_df_long$df_middle_long$df_int_ctrl
+        )
+
+        expect_false(
+          object = "df_mid_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_dev_int_ctrl" %in%
+            names(df_rand$list_df_long$df_middle_long)
+        )
+
+      }
+    )
+
+    ## NPX no int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 1L)
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_middle(
+            df = df_rand$list_df_wide$df_middle_wide,
+            file = wide_excel,
+            data_type = data_type,
+            col_names = col_names
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_mid_oid,
+          expected = df_rand$list_df_long$df_middle_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_mid_plate,
+          expected = df_rand$list_df_long$df_middle_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_mid_qc_warn,
+          expected = df_rand$list_df_long$df_middle_long$df_qc_warn
+        )
+
+        expect_false(
+          object = "df_mid_int_ctrl" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_int_ctrl" %in%
+            names(df_rand$list_df_long$df_middle_long)
+        )
+
+        expect_identical(
+          object = df_out$df_mid_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_middle_long$df_dev_int_ctrl
+        )
+
+      }
+    )
+
+    ## NPX with int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 1L)
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_middle(
+            df = df_rand$list_df_wide$df_middle_wide,
+            file = wide_excel,
+            data_type = data_type,
+            col_names = col_names
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_mid_oid,
+          expected = df_rand$list_df_long$df_middle_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_mid_plate,
+          expected = df_rand$list_df_long$df_middle_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_mid_qc_warn,
+          expected = df_rand$list_df_long$df_middle_long$df_qc_warn
+        )
+
+        expect_identical(
+          object = df_out$df_mid_int_ctrl,
+          expected = df_rand$list_df_long$df_middle_long$df_int_ctrl
+        )
+
+        expect_identical(
+          object = df_out$df_mid_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_middle_long$df_dev_int_ctrl
+        )
+
+      }
+    )
+
+
+    ## Ct no int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Ct"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_middle(
+            df = df_rand$list_df_wide$df_middle_wide,
+            file = wide_excel,
+            data_type = data_type,
+            col_names = col_names
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_mid_oid,
+          expected = df_rand$list_df_long$df_middle_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_mid_plate,
+          expected = df_rand$list_df_long$df_middle_long$df_plate
+        )
+
+        expect_false(
+          object = "df_mid_qc_warn" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_qc_warn" %in% names(df_rand$list_df_long$df_middle_long)
+        )
+
+        expect_false(
+          object = "df_mid_int_ctrl" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_int_ctrl" %in% names(df_rand$list_df_long$df_middle_long)
+        )
+
+        expect_false(
+          object = "df_mid_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_dev_int_ctrl" %in%
+            names(df_rand$list_df_long$df_middle_long)
+        )
+
+      }
+    )
+
+    ## Ct with int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Ct"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_middle(
+            df = df_rand$list_df_wide$df_middle_wide,
+            file = wide_excel,
+            data_type = data_type,
+            col_names = col_names
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_mid_oid,
+          expected = df_rand$list_df_long$df_middle_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_mid_plate,
+          expected = df_rand$list_df_long$df_middle_long$df_plate
+        )
+
+        expect_false(
+          object = "df_mid_qc_warn" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_qc_warn" %in% names(df_rand$list_df_long$df_middle_long)
+        )
+
+        expect_identical(
+          object = df_out$df_mid_int_ctrl,
+          expected = df_rand$list_df_long$df_middle_long$df_int_ctrl
+        )
+
+        expect_false(
+          object = "df_mid_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_dev_int_ctrl" %in%
+            names(df_rand$list_df_long$df_middle_long)
+        )
+
+      }
+    )
+
+    ## Quantified no int ctrl and no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_middle(
+            df = df_rand$list_df_wide$df_middle_wide,
+            file = wide_excel,
+            data_type = data_type,
+            col_names = col_names
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_mid_oid,
+          expected = df_rand$list_df_long$df_middle_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_mid_plate,
+          expected = df_rand$list_df_long$df_middle_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_mid_qc_warn,
+          expected = df_rand$list_df_long$df_middle_long$df_qc_warn
+        )
+
+        expect_false(
+          object = "df_mid_int_ctrl" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_int_ctrl" %in% names(df_rand$list_df_long$df_middle_long)
+        )
+
+        expect_false(
+          object = "df_mid_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_dev_int_ctrl" %in%
+            names(df_rand$list_df_long$df_middle_long)
+        )
+
+      }
+    )
+
+    ## Quantified with int ctrl and no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_middle(
+            df = df_rand$list_df_wide$df_middle_wide,
+            file = wide_excel,
+            data_type = data_type,
+            col_names = col_names
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_mid_oid,
+          expected = df_rand$list_df_long$df_middle_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_mid_plate,
+          expected = df_rand$list_df_long$df_middle_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_mid_qc_warn,
+          expected = df_rand$list_df_long$df_middle_long$df_qc_warn
+        )
+
+        expect_identical(
+          object = df_out$df_mid_int_ctrl,
+          expected = df_rand$list_df_long$df_middle_long$df_int_ctrl
+        )
+
+        expect_false(
+          object = "df_mid_dev_int_ctrl" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_dev_int_ctrl" %in%
+            names(df_rand$list_df_long$df_middle_long)
+        )
+
+      }
+    )
+
+    ## Quantified no int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 0L)
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_middle(
+            df = df_rand$list_df_wide$df_middle_wide,
+            file = wide_excel,
+            data_type = data_type,
+            col_names = col_names
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_mid_oid,
+          expected = df_rand$list_df_long$df_middle_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_mid_plate,
+          expected = df_rand$list_df_long$df_middle_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_mid_qc_warn,
+          expected = df_rand$list_df_long$df_middle_long$df_qc_warn
+        )
+
+        expect_false(
+          object = "df_mid_int_ctrl" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_int_ctrl" %in%
+            names(df_rand$list_df_long$df_middle_long)
+        )
+
+        expect_identical(
+          object = df_out$df_mid_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_middle_long$df_dev_int_ctrl
+        )
+
+      }
+    )
+
+    ## Quantified with int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 0L)
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_middle(
+            df = df_rand$list_df_wide$df_middle_wide,
+            file = wide_excel,
+            data_type = data_type,
+            col_names = col_names
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = df_out$df_mid_oid,
+          expected = df_rand$list_df_long$df_middle_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_mid_plate,
+          expected = df_rand$list_df_long$df_middle_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_mid_qc_warn,
+          expected = df_rand$list_df_long$df_middle_long$df_qc_warn
+        )
+
+        expect_identical(
+          object = df_out$df_mid_int_ctrl,
+          expected = df_rand$list_df_long$df_middle_long$df_int_ctrl
+        )
+
+        expect_identical(
+          object = df_out$df_mid_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_middle_long$df_dev_int_ctrl
+        )
+
+      }
+    )
+
+  }
+)
+
+test_that(
+  "read_npx_wide_middle - error - non-unique sample id",
+  {
+    # variables that apply to all tests
+    olink_platform <- "Target 48"
+    data_type <- "NPX"
+    n_panels <- 2L
+    n_assays <- 45L
+    n_samples <- 101L
+    show_int_ctrl <- FALSE
+    show_dev_int_ctrl <- FALSE
+    version <- 1L
+
+    # 1 duplicate ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
+                                        version = version)
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # introduce duplicate sample id for the test
+        df_rand$list_df_wide$df_middle_wide <-
+          df_rand$list_df_wide$df_middle_wide |>
+          dplyr::mutate(
+            V1 = dplyr::if_else(.data[["V1"]] == "S2",
+                                "S1",
+                                .data[["V1"]])
+          )
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs with error
+        expect_error(
+          object = read_npx_wide_middle(
+            df = df_rand$list_df_wide$df_middle_wide,
+            file = wide_excel,
+            data_type = data_type,
+            col_names = col_names
+          ),
+          regexp = "does not contain unique sample identifiers."
+        )
+
+      }
+    )
+
+    # 3 duplicates ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
+                                        version = version)
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # introduce duplicate sample id for the test
+        df_rand$list_df_wide$df_middle_wide <-
+          df_rand$list_df_wide$df_middle_wide |>
+          dplyr::mutate(
+            V1 = dplyr::case_when(.data[["V1"]] %in% c("S2", "S3") ~ "S1",
+                                  .data[["V1"]] %in% c("S4", "S5") ~ "S2",
+                                  TRUE ~ .data[["V1"]],
+                                  .default = .data[["V1"]])
+          )
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs with error
+        expect_error(
+          object = read_npx_wide_middle(
+            df = df_rand$list_df_wide$df_middle_wide,
+            file = wide_excel,
+            data_type = data_type,
+            col_names = col_names
+          ),
+          regexp = "does not contain unique sample identifiers."
+        )
+
+      }
+    )
+
+  }
+)
+
+test_that(
+  "read_npx_wide_middle - error - uneven number of platid and qc_warning",
+  {
+    # variables that apply to all tests
+    olink_platform <- "Target 48"
+    data_type <- "NPX"
+    n_panels <- 2L
+    n_assays <- 45L
+    n_samples <- 101L
+    show_int_ctrl <- FALSE
+    show_dev_int_ctrl <- FALSE
+    version <- 1L
+
+    # Missing plateid column ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
+                                        version = version)
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # remove one column with "Plate ID"
+        df_rand$list_df_wide$df_middle_wide <-
+          df_rand$list_df_wide$df_middle_wide |>
+          dplyr::select(
+            -dplyr::all_of(head(col_names$df_top_plate, 1L))
+          )
+        col_names$df_top_plate <- tail(col_names$df_top_plate, 1L)
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs with error
+        expect_error(
+          object = read_npx_wide_middle(
+            df = df_rand$list_df_wide$df_middle_wide,
+            file = wide_excel,
+            data_type = data_type,
+            col_names = col_names
+          ),
+          regexp = "Uneven number of entries of \"Plate ID\" and \"QC Warning\""
+        )
+
+      }
+    )
+
+    # Missing qc warning column ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
+                                        version = version)
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # remove one column with "Plate ID"
+        df_rand$list_df_wide$df_middle_wide <-
+          df_rand$list_df_wide$df_middle_wide |>
+          dplyr::select(
+            -dplyr::all_of(head(col_names$df_top_qc_warn, 1L))
+          )
+        col_names$df_top_qc_warn <- tail(col_names$df_top_qc_warn, 1L)
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs with error
+        expect_error(
+          object = read_npx_wide_middle(
+            df = df_rand$list_df_wide$df_middle_wide,
+            file = wide_excel,
+            data_type = data_type,
+            col_names = col_names
+          ),
+          regexp = "Uneven number of entries of \"Plate ID\" and \"QC Warning\""
+        )
+
+      }
+    )
+
+  }
+)
+
+test_that(
+  "read_npx_wide_middle - error - unidentified cols in mid matrix",
+  {
+    # variables that apply to all tests
+    olink_platform <- "Target 48"
+    data_type <- "NPX"
+    n_panels <- 2L
+    n_assays <- 45L
+    n_samples <- 101L
+    show_int_ctrl <- FALSE
+    show_dev_int_ctrl <- FALSE
+    version <- 1L
+
+    # 1 additional column ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
+                                        version = version)
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # add one column to mid wide
+        last_col_idx <- ncol(df_rand$list_df_wide$df_middle_wide) + 1L
+        last_col <- paste0("V", last_col_idx)
+        df_rand$list_df_wide$df_middle_wide <-
+          df_rand$list_df_wide$df_middle_wide |>
+          dplyr::mutate(
+            {{last_col}} := NA
+          )
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs with error
+        expect_error(
+          object = read_npx_wide_middle(
+            df = df_rand$list_df_wide$df_middle_wide,
+            file = wide_excel,
+            data_type = data_type,
+            col_names = col_names
+          ),
+          regexp = "96 from the Olink wide excel file"
+        )
+
+      }
+    )
+
+    # 3 additional column ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
+                                        version = version)
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # add one column to mid wide
+        last_col_idx <- ncol(df_rand$list_df_wide$df_middle_wide) + 1L
+        last_col_idx <- last_col_idx:(last_col_idx + 2L)
+        last_col <- paste0("V", last_col_idx)
+        rep_col <- colnames(df_rand$list_df_wide$df_middle_wide) |> tail(1L)
+        df_rand$list_df_wide$df_middle_wide[last_col] <- NA
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs with error
+        expect_error(
+          object = read_npx_wide_middle(
+            df = df_rand$list_df_wide$df_middle_wide,
+            file = wide_excel,
+            data_type = data_type,
+            col_names = col_names
+          ),
+          regexp = "96, 97, and 98 from the Olink wide excel file"
+        )
+
+      }
+    )
+
+  }
+)
+
+# Test red_npx_wide_top_mid_long ----
+
+test_that(
+  "red_npx_wide_top_mid_long - single panel - works",
+  {
+    # variables that apply to all tests
+    olink_platform <- "Target 48"
+    n_panels <- 1L
+    n_assays <- 45L
+    n_samples <- 88L
+
+    ## NPX no int ctrl and no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # column names of each subset of data
+        names(df_rand$list_df_long$df_top_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_top_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_top_", x))()
+        names(df_rand$list_df_long$df_middle_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_middle_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_mid_", x))()
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # expected dim of output df ----
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- red_npx_wide_top_mid_long(
+            df_top_list = df_rand$list_df_long$df_top_long,
+            df_middle_list = df_rand$list_df_long$df_middle_long,
+            data_type = data_type,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+        expect_identical(
+          object = dplyr::select(df_out,
+                                 -dplyr::all_of("col_index")),
+          expected = dplyr::select(df_rand$list_df_long$df_long,
+                                   dplyr::any_of(colnames(df_out)))
+        )
+
+      }
+    )
+
+    ## NPX with int ctrl and no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # column names of each subset of data
+        names(df_rand$list_df_long$df_top_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_top_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_top_", x))()
+        names(df_rand$list_df_long$df_middle_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_middle_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_mid_", x))()
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # expected dim of output df ----
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- red_npx_wide_top_mid_long(
+            df_top_list = df_rand$list_df_long$df_top_long,
+            df_middle_list = df_rand$list_df_long$df_middle_long,
+            data_type = data_type,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+        expect_identical(
+          object = dplyr::select(df_out,
+                                 -dplyr::all_of("col_index")),
+          expected = dplyr::select(df_rand$list_df_long$df_long,
+                                   dplyr::any_of(colnames(df_out)))
+        )
+
+      }
+    )
+
+    ## NPX no int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 1L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # column names of each subset of data
+        names(df_rand$list_df_long$df_top_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_top_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_top_", x))()
+        names(df_rand$list_df_long$df_middle_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_middle_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_mid_", x))()
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # expected dim of output df ----
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- red_npx_wide_top_mid_long(
+            df_top_list = df_rand$list_df_long$df_top_long,
+            df_middle_list = df_rand$list_df_long$df_middle_long,
+            data_type = data_type,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+        expect_identical(
+          object = dplyr::select(df_out,
+                                 -dplyr::all_of("col_index")),
+          expected = dplyr::select(df_rand$list_df_long$df_long,
+                                   dplyr::any_of(colnames(df_out)))
+        )
+
+      }
+    )
+
+    ## NPX with int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 1L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # column names of each subset of data
+        names(df_rand$list_df_long$df_top_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_top_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_top_", x))()
+        names(df_rand$list_df_long$df_middle_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_middle_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_mid_", x))()
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # expected dim of output df ----
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- red_npx_wide_top_mid_long(
+            df_top_list = df_rand$list_df_long$df_top_long,
+            df_middle_list = df_rand$list_df_long$df_middle_long,
+            data_type = data_type,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+        expect_identical(
+          object = dplyr::select(df_out,
+                                 -dplyr::all_of("col_index")),
+          expected = dplyr::select(df_rand$list_df_long$df_long,
+                                   dplyr::any_of(colnames(df_out)))
+        )
+
+      }
+    )
+
+
+    ## Ct no int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Ct"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # column names of each subset of data
+        names(df_rand$list_df_long$df_top_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_top_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_top_", x))()
+        names(df_rand$list_df_long$df_middle_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_middle_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_mid_", x))()
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # expected dim of output df ----
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- red_npx_wide_top_mid_long(
+            df_top_list = df_rand$list_df_long$df_top_long,
+            df_middle_list = df_rand$list_df_long$df_middle_long,
+            data_type = data_type,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+        expect_identical(
+          object = dplyr::select(df_out,
+                                 -dplyr::all_of("col_index")),
+          expected = dplyr::select(df_rand$list_df_long$df_long,
+                                   dplyr::any_of(colnames(df_out)))
+        )
+
+      }
+    )
+
+    ## Ct with int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Ct"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # column names of each subset of data
+        names(df_rand$list_df_long$df_top_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_top_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_top_", x))()
+        names(df_rand$list_df_long$df_middle_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_middle_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_mid_", x))()
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # expected dim of output df ----
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- red_npx_wide_top_mid_long(
+            df_top_list = df_rand$list_df_long$df_top_long,
+            df_middle_list = df_rand$list_df_long$df_middle_long,
+            data_type = data_type,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+        expect_identical(
+          object = dplyr::select(df_out,
+                                 -dplyr::all_of("col_index")),
+          expected = dplyr::select(df_rand$list_df_long$df_long,
+                                   dplyr::any_of(colnames(df_out)))
+        )
+
+      }
+    )
+
+    ## Quantified no int ctrl and no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # column names of each subset of data
+        names(df_rand$list_df_long$df_top_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_top_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_top_", x))()
+        names(df_rand$list_df_long$df_middle_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_middle_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_mid_", x))()
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # expected dim of output df ----
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- red_npx_wide_top_mid_long(
+            df_top_list = df_rand$list_df_long$df_top_long,
+            df_middle_list = df_rand$list_df_long$df_middle_long,
+            data_type = data_type,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+        expect_identical(
+          object = dplyr::select(df_out,
+                                 -dplyr::all_of("col_index")),
+          expected = dplyr::select(df_rand$list_df_long$df_long,
+                                   dplyr::any_of(colnames(df_out)))
+        )
+
+      }
+    )
+
+    ## Quantified with int ctrl and no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # column names of each subset of data
+        names(df_rand$list_df_long$df_top_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_top_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_top_", x))()
+        names(df_rand$list_df_long$df_middle_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_middle_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_mid_", x))()
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # expected dim of output df ----
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- red_npx_wide_top_mid_long(
+            df_top_list = df_rand$list_df_long$df_top_long,
+            df_middle_list = df_rand$list_df_long$df_middle_long,
+            data_type = data_type,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+        expect_identical(
+          object = dplyr::select(df_out,
+                                 -dplyr::all_of("col_index")),
+          expected = dplyr::select(df_rand$list_df_long$df_long,
+                                   dplyr::any_of(colnames(df_out)))
+        )
+
+      }
+    )
+
+    ## Quantified no int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 0L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # column names of each subset of data
+        names(df_rand$list_df_long$df_top_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_top_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_top_", x))()
+        names(df_rand$list_df_long$df_middle_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_middle_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_mid_", x))()
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # expected dim of output df ----
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- red_npx_wide_top_mid_long(
+            df_top_list = df_rand$list_df_long$df_top_long,
+            df_middle_list = df_rand$list_df_long$df_middle_long,
+            data_type = data_type,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+        expect_identical(
+          object = dplyr::select(df_out,
+                                 -dplyr::all_of("col_index")),
+          expected = dplyr::select(df_rand$list_df_long$df_long,
+                                   dplyr::any_of(colnames(df_out)))
+        )
+
+      }
+    )
+
+    ## Quantified with int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 0L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # column names of each subset of data
+        names(df_rand$list_df_long$df_top_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_top_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_top_", x))()
+        names(df_rand$list_df_long$df_middle_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_middle_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_mid_", x))()
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # expected dim of output df ----
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- red_npx_wide_top_mid_long(
+            df_top_list = df_rand$list_df_long$df_top_long,
+            df_middle_list = df_rand$list_df_long$df_middle_long,
+            data_type = data_type,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+        expect_identical(
+          object = dplyr::select(df_out,
+                                 -dplyr::all_of("col_index")),
+          expected = dplyr::select(df_rand$list_df_long$df_long,
+                                   dplyr::any_of(colnames(df_out)))
+        )
+
+      }
+    )
+
+  }
+)
+
+test_that(
+  "red_npx_wide_top_mid_long - multiple panels - works",
+  {
+    # variables that apply to all tests
+    olink_platform <- "Target 48"
+    n_panels <- 3L
+    n_assays <- 45L
+    n_samples <- 100L
+
+    ## NPX no int ctrl and no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # column names of each subset of data
+        names(df_rand$list_df_long$df_top_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_top_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_top_", x))()
+        names(df_rand$list_df_long$df_middle_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_middle_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_mid_", x))()
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # expected dim of output df ----
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- red_npx_wide_top_mid_long(
+            df_top_list = df_rand$list_df_long$df_top_long,
+            df_middle_list = df_rand$list_df_long$df_middle_long,
+            data_type = data_type,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+        expect_identical(
+          object = dplyr::select(df_out,
+                                 -dplyr::all_of("col_index")),
+          expected = dplyr::select(df_rand$list_df_long$df_long,
+                                   dplyr::any_of(colnames(df_out)))
+        )
+
+      }
+    )
+
+    ## NPX with int ctrl and no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # column names of each subset of data
+        names(df_rand$list_df_long$df_top_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_top_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_top_", x))()
+        names(df_rand$list_df_long$df_middle_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_middle_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_mid_", x))()
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # expected dim of output df ----
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- red_npx_wide_top_mid_long(
+            df_top_list = df_rand$list_df_long$df_top_long,
+            df_middle_list = df_rand$list_df_long$df_middle_long,
+            data_type = data_type,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+        expect_identical(
+          object = dplyr::select(df_out,
+                                 -dplyr::all_of("col_index")),
+          expected = dplyr::select(df_rand$list_df_long$df_long,
+                                   dplyr::any_of(colnames(df_out)))
+        )
+
+      }
+    )
+
+    ## NPX no int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 1L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # column names of each subset of data
+        names(df_rand$list_df_long$df_top_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_top_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_top_", x))()
+        names(df_rand$list_df_long$df_middle_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_middle_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_mid_", x))()
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # expected dim of output df ----
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- red_npx_wide_top_mid_long(
+            df_top_list = df_rand$list_df_long$df_top_long,
+            df_middle_list = df_rand$list_df_long$df_middle_long,
+            data_type = data_type,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+        expect_identical(
+          object = dplyr::select(df_out,
+                                 -dplyr::all_of("col_index")),
+          expected = dplyr::select(df_rand$list_df_long$df_long,
+                                   dplyr::any_of(colnames(df_out)))
+        )
+
+      }
+    )
+
+    ## NPX with int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 1L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # column names of each subset of data
+        names(df_rand$list_df_long$df_top_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_top_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_top_", x))()
+        names(df_rand$list_df_long$df_middle_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_middle_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_mid_", x))()
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # expected dim of output df ----
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- red_npx_wide_top_mid_long(
+            df_top_list = df_rand$list_df_long$df_top_long,
+            df_middle_list = df_rand$list_df_long$df_middle_long,
+            data_type = data_type,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+        expect_identical(
+          object = dplyr::select(df_out,
+                                 -dplyr::all_of("col_index")),
+          expected = dplyr::select(df_rand$list_df_long$df_long,
+                                   dplyr::any_of(colnames(df_out)))
+        )
+
+      }
+    )
+
+
+    ## Ct no int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Ct"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # column names of each subset of data
+        names(df_rand$list_df_long$df_top_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_top_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_top_", x))()
+        names(df_rand$list_df_long$df_middle_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_middle_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_mid_", x))()
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # expected dim of output df ----
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- red_npx_wide_top_mid_long(
+            df_top_list = df_rand$list_df_long$df_top_long,
+            df_middle_list = df_rand$list_df_long$df_middle_long,
+            data_type = data_type,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+        expect_identical(
+          object = dplyr::select(df_out,
+                                 -dplyr::all_of("col_index")),
+          expected = dplyr::select(df_rand$list_df_long$df_long,
+                                   dplyr::any_of(colnames(df_out)))
+        )
+
+      }
+    )
+
+    ## Ct with int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Ct"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # column names of each subset of data
+        names(df_rand$list_df_long$df_top_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_top_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_top_", x))()
+        names(df_rand$list_df_long$df_middle_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_middle_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_mid_", x))()
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # expected dim of output df ----
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- red_npx_wide_top_mid_long(
+            df_top_list = df_rand$list_df_long$df_top_long,
+            df_middle_list = df_rand$list_df_long$df_middle_long,
+            data_type = data_type,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+        expect_identical(
+          object = dplyr::select(df_out,
+                                 -dplyr::all_of("col_index")),
+          expected = dplyr::select(df_rand$list_df_long$df_long,
+                                   dplyr::any_of(colnames(df_out)))
+        )
+
+      }
+    )
+
+    ## Quantified no int ctrl and no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # column names of each subset of data
+        names(df_rand$list_df_long$df_top_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_top_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_top_", x))()
+        names(df_rand$list_df_long$df_middle_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_middle_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_mid_", x))()
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # expected dim of output df ----
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- red_npx_wide_top_mid_long(
+            df_top_list = df_rand$list_df_long$df_top_long,
+            df_middle_list = df_rand$list_df_long$df_middle_long,
+            data_type = data_type,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+        expect_identical(
+          object = dplyr::select(df_out,
+                                 -dplyr::all_of("col_index")),
+          expected = dplyr::select(df_rand$list_df_long$df_long,
+                                   dplyr::any_of(colnames(df_out)))
+        )
+
+      }
+    )
+
+    ## Quantified with int ctrl and no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # column names of each subset of data
+        names(df_rand$list_df_long$df_top_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_top_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_top_", x))()
+        names(df_rand$list_df_long$df_middle_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_middle_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_mid_", x))()
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # expected dim of output df ----
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- red_npx_wide_top_mid_long(
+            df_top_list = df_rand$list_df_long$df_top_long,
+            df_middle_list = df_rand$list_df_long$df_middle_long,
+            data_type = data_type,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+        expect_identical(
+          object = dplyr::select(df_out,
+                                 -dplyr::all_of("col_index")),
+          expected = dplyr::select(df_rand$list_df_long$df_long,
+                                   dplyr::any_of(colnames(df_out)))
+        )
+
+      }
+    )
+
+    ## Quantified no int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 0L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # column names of each subset of data
+        names(df_rand$list_df_long$df_top_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_top_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_top_", x))()
+        names(df_rand$list_df_long$df_middle_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_middle_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_mid_", x))()
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # expected dim of output df ----
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- red_npx_wide_top_mid_long(
+            df_top_list = df_rand$list_df_long$df_top_long,
+            df_middle_list = df_rand$list_df_long$df_middle_long,
+            data_type = data_type,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+        expect_identical(
+          object = dplyr::select(df_out,
+                                 -dplyr::all_of("col_index")),
+          expected = dplyr::select(df_rand$list_df_long$df_long,
+                                   dplyr::any_of(colnames(df_out)))
+        )
+
+      }
+    )
+
+    ## Quantified with int ctrl and with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 0L)
+
+        # matrix specifications
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # column names of each subset of data
+        names(df_rand$list_df_long$df_top_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_top_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_top_", x))()
+        names(df_rand$list_df_long$df_middle_long) <- strsplit(
+          x = names(df_rand$list_df_long$df_middle_long),
+          split = "_"
+        ) |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist() |>
+          (\(x) paste0("df_mid_", x))()
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # expected dim of output df ----
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- red_npx_wide_top_mid_long(
+            df_top_list = df_rand$list_df_long$df_top_long,
+            df_middle_list = df_rand$list_df_long$df_middle_long,
+            data_type = data_type,
+            format_spec = format_spec
+          )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+        expect_identical(
+          object = dplyr::select(df_out,
+                                 -dplyr::all_of("col_index")),
+          expected = dplyr::select(df_rand$list_df_long$df_long,
+                                   dplyr::any_of(colnames(df_out)))
         )
 
       }
@@ -3303,9 +10511,15 @@ test_that(
 # Test read_npx_wide_bottom ----
 
 test_that(
-  "read_npx_wide_bottom - works - T48 - single panel",
+  "read_npx_wide_bottom - works - T48 - single panel - single plate",
   {
-    ## NPX ----
+    # variables that apply to all tests
+    olink_platform <- "Target 48"
+    n_panels <- 1L
+    n_assays <- 45L
+    n_samples <- 88L
+
+    ## NPX no int ctrl v1 ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -3314,60 +10528,87 @@ test_that(
       code = {
 
         # synthetic wide df
-        data_t <- "NPX"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 1L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # extract col_split and assa_cols
-        col_s <- df_rand$long$df_top$df_plate |>
-          dplyr::mutate(
-            col_index_n = stringr::str_sub(string = .data[["col_index"]],
-                                           start = 2L) |>
-              as.integer()
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # plate panel combos
+        df_plate_panel <- df_rand$list_df_long$df_oid_long |>
+          dplyr::select(
+            dplyr::all_of(c("col_index", "Panel"))
           ) |>
-          dplyr::arrange(.data[["col_index_n"]]) |>
-          dplyr::slice_head(n = 1L) |>
-          dplyr::pull(.data[["col_index"]])
-        assay_c <- df_rand$long$df_top$df_oid$col_index
+          dplyr::distinct() |>
+          dplyr::left_join(
+            df_rand$list_df_long$df_plate_long |>
+              dplyr::select(
+                dplyr::all_of(c("PlateID", "Panel"))
+              ) |>
+              dplyr::distinct(),
+            by = "Panel",
+            relationship = "many-to-many"
+          )
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_no_condition(
-          object = df_obj <- read_npx_wide_bottom(df = df_rand$wide$df_bottom,
-                                                  file = wide_excel,
-                                                  col_split = col_s,
-                                                  assay_cols = assay_c,
-                                                  int_ctrl_cols = NULL,
-                                                  format_spec = format_s)
+          object = df_out <- read_npx_wide_bottom(
+            df = df_rand$list_df_wide$df_bottom_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            data_type = data_type,
+            col_names = col_names,
+            format_spec = format_spec,
+            df_plate_panel = df_plate_panel
+          )
         )
 
-        # check that dfs are identical
+        # check that output match
         expect_identical(
-          object = df_obj$df_oid |>
+          object = colnames(df_out$df_bottom_oid) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_bottom_long$df_oid) |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_oid,
+          expected = df_rand$list_df_long$df_bottom_long$df_oid |>
             dplyr::select(
-              order(colnames(df_obj$df_oid))
-            ),
-          expected = df_rand$long$df_bottom$df_oid
+              dplyr::all_of(colnames(df_out$df_bottom_oid))
+            )
         )
 
-        expect_false(object = "df_int_ctrl" %in% names(df_obj))
+        expect_false(
+          object = "df_bottom_int_ctrl" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_int_ctrl" %in% names(df_rand$list_df_long$df_bottom_long)
+        )
 
       }
     )
 
-    ## Quantified ----
+    ## NPX with int ctrl v1 ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -3376,68 +10617,100 @@ test_that(
       code = {
 
         # synthetic wide df
-        data_t <- "Quantified"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 1L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
                                         show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # extract col_split and assa_cols
-        col_s <- df_rand$long$df_top$df_plate |>
-          dplyr::mutate(
-            col_index_n = stringr::str_sub(string = .data[["col_index"]],
-                                           start = 2L) |>
-              as.integer()
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # plate panel combos
+        df_plate_panel <- df_rand$list_df_long$df_oid_long |>
+          dplyr::select(
+            dplyr::all_of(c("col_index", "Panel"))
           ) |>
-          dplyr::arrange(.data[["col_index_n"]]) |>
-          dplyr::slice_head(n = 1L) |>
-          dplyr::pull(.data[["col_index"]])
-        assay_c <- df_rand$long$df_top$df_oid$col_index
+          dplyr::distinct() |>
+          dplyr::bind_rows(
+            df_rand$list_df_long$df_int_ctrl_long |>
+              dplyr::select(
+                dplyr::all_of(c("col_index", "Panel"))
+              ) |>
+              dplyr::distinct()
+          ) |>
+          dplyr::left_join(
+            df_rand$list_df_long$df_plate_long |>
+              dplyr::select(
+                dplyr::all_of(c("PlateID", "Panel"))
+              ) |>
+              dplyr::distinct(),
+            by = "Panel",
+            relationship = "many-to-many"
+          )
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
-        # run function ----
-
-        # switched from expect_no_condition to the one below because of a very
-        # weird silent message thrown by rlang when using group_by and arrange
-        # in dplyr. This is documented here
-        # https://github.com/aryoda/tryCatchLog/issues/62
-        # Looks like it has been fixed, but we still get the error.
-        expect_no_error(
-          expect_no_warning(
-            object = df_obj <- read_npx_wide_bottom(df = df_rand$wide$df_bottom,
-                                                    file = wide_excel,
-                                                    col_split = col_s,
-                                                    assay_cols = assay_c,
-                                                    int_ctrl_cols = NULL,
-                                                    format_spec = format_s)
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_bottom(
+            df = df_rand$list_df_wide$df_bottom_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            data_type = data_type,
+            col_names = col_names,
+            format_spec = format_spec,
+            df_plate_panel = df_plate_panel
           )
         )
 
-        # check that dfs are identical
+        # check that output match
         expect_identical(
-          object = df_obj$df_oid |>
+          object = colnames(df_out$df_bottom_oid) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_bottom_long$df_oid) |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_oid,
+          expected = df_rand$list_df_long$df_bottom_long$df_oid |>
             dplyr::select(
-              order(colnames(df_obj$df_oid))
-            ),
-          expected = df_rand$long$df_bottom$df_oid
+              dplyr::all_of(colnames(df_out$df_bottom_oid))
+            )
         )
 
-        expect_false(object = "df_int_ctrl" %in% names(df_obj))
+        expect_identical(
+          object = colnames(df_out$df_bottom_int_ctrl) |> sort(),
+          expected = df_rand$list_df_long$df_bottom_long$df_int_ctrl |>
+            colnames() |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_int_ctrl,
+          expected = df_rand$list_df_long$df_bottom_long$df_int_ctrl |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out$df_bottom_int_ctrl))
+            )
+        )
 
       }
     )
 
-    ## Quantified shuffled ----
+    ## NPX no int ctrl v2 ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -3446,69 +10719,374 @@ test_that(
       code = {
 
         # synthetic wide df
-        data_t <- "Quantified"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 1L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = TRUE)
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 2L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # extract col_split and assa_cols
-        col_s <- df_rand$long$df_top$df_plate |>
-          dplyr::mutate(
-            col_index_n = stringr::str_sub(string = .data[["col_index"]],
-                                           start = 2L) |>
-              as.integer()
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # plate panel combos
+        df_plate_panel <- df_rand$list_df_long$df_oid_long |>
+          dplyr::select(
+            dplyr::all_of(c("col_index", "Panel"))
           ) |>
-          dplyr::arrange(.data[["col_index_n"]]) |>
-          dplyr::slice_head(n = 1L) |>
-          dplyr::pull(.data[["col_index"]])
-        assay_c <- df_rand$long$df_top$df_oid$col_index
-        int_ctrl_c <- df_rand$long$df_top$df_int_ctrl$col_index
+          dplyr::distinct() |>
+          dplyr::left_join(
+            df_rand$list_df_long$df_plate_long |>
+              dplyr::select(
+                dplyr::all_of(c("PlateID", "Panel"))
+              ) |>
+              dplyr::distinct(),
+            by = "Panel",
+            relationship = "many-to-many"
+          )
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
-        # run function ----
-
-        # switched from expect_no_condition to the one below because of a very
-        # weird silent message thrown by rlang when using group_by and arrange
-        # in dplyr. This is documented here
-        # https://github.com/aryoda/tryCatchLog/issues/62
-        # Looks like it has been fixed, but we still get the error.
-        expect_no_error(
-          expect_no_warning(
-            object = df_obj <- read_npx_wide_bottom(df = df_rand$wide$df_bottom,
-                                                    file = wide_excel,
-                                                    col_split = col_s,
-                                                    assay_cols = assay_c,
-                                                    int_ctrl_cols = int_ctrl_c,
-                                                    format_spec = format_s)
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_bottom(
+            df = df_rand$list_df_wide$df_bottom_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            data_type = data_type,
+            col_names = col_names,
+            format_spec = format_spec,
+            df_plate_panel = df_plate_panel
           )
         )
 
-        # check that dfs are identical
+        # check that output match
         expect_identical(
-          object = df_obj$df_oid |>
+          object = colnames(df_out$df_bottom_oid) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_bottom_long$df_oid) |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_oid,
+          expected = df_rand$list_df_long$df_bottom_long$df_oid |>
             dplyr::select(
-              order(colnames(df_obj$df_oid))
-            ),
-          expected = df_rand$long$df_bottom$df_oid
+              dplyr::all_of(colnames(df_out$df_bottom_oid))
+            )
+        )
+
+        expect_false(
+          object = "df_bottom_int_ctrl" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_int_ctrl" %in% names(df_rand$list_df_long$df_bottom_long)
+        )
+
+      }
+    )
+
+    ## NPX with int ctrl v2 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 2L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # plate panel combos
+        df_plate_panel <- df_rand$list_df_long$df_oid_long |>
+          dplyr::select(
+            dplyr::all_of(c("col_index", "Panel"))
+          ) |>
+          dplyr::distinct() |>
+          dplyr::bind_rows(
+            df_rand$list_df_long$df_int_ctrl_long |>
+              dplyr::select(
+                dplyr::all_of(c("col_index", "Panel"))
+              ) |>
+              dplyr::distinct()
+          ) |>
+          dplyr::left_join(
+            df_rand$list_df_long$df_plate_long |>
+              dplyr::select(
+                dplyr::all_of(c("PlateID", "Panel"))
+              ) |>
+              dplyr::distinct(),
+            by = "Panel",
+            relationship = "many-to-many"
+          )
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_bottom(
+            df = df_rand$list_df_wide$df_bottom_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            data_type = data_type,
+            col_names = col_names,
+            format_spec = format_spec,
+            df_plate_panel = df_plate_panel
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out$df_bottom_oid) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_bottom_long$df_oid) |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_oid,
+          expected = df_rand$list_df_long$df_bottom_long$df_oid |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out$df_bottom_oid))
+            )
         )
 
         expect_identical(
-          object = df_obj$df_int_ctrl |>
+          object = colnames(df_out$df_bottom_int_ctrl) |> sort(),
+          expected = df_rand$list_df_long$df_bottom_long$df_int_ctrl |>
+            colnames() |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_int_ctrl,
+          expected = df_rand$list_df_long$df_bottom_long$df_int_ctrl |>
             dplyr::select(
-              order(colnames(df_obj$df_int_ctrl))
-            ),
-          expected = df_rand$long$df_bottom$df_int_ctrl
+              dplyr::all_of(colnames(df_out$df_bottom_int_ctrl))
+            )
+        )
+
+      }
+    )
+
+    ## Quantified no int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # plate panel combos
+        df_plate_panel <- df_rand$list_df_long$df_oid_long |>
+          dplyr::select(
+            dplyr::all_of(c("col_index", "Panel"))
+          ) |>
+          dplyr::distinct() |>
+          dplyr::left_join(
+            df_rand$list_df_long$df_plate_long |>
+              dplyr::select(
+                dplyr::all_of(c("PlateID", "Panel"))
+              ) |>
+              dplyr::distinct(),
+            by = "Panel",
+            relationship = "many-to-many"
+          )
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_bottom(
+            df = df_rand$list_df_wide$df_bottom_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            data_type = data_type,
+            col_names = col_names,
+            format_spec = format_spec,
+            df_plate_panel = df_plate_panel
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out$df_bottom_oid) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_bottom_long$df_oid) |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_oid,
+          expected = df_rand$list_df_long$df_bottom_long$df_oid |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out$df_bottom_oid))
+            )
+        )
+
+        expect_false(
+          object = "df_bottom_int_ctrl" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_int_ctrl" %in% names(df_rand$list_df_long$df_bottom_long)
+        )
+
+      }
+    )
+
+    ## Quantified with int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # plate panel combos
+        df_plate_panel <- df_rand$list_df_long$df_oid_long |>
+          dplyr::select(
+            dplyr::all_of(c("col_index", "Panel"))
+          ) |>
+          dplyr::distinct() |>
+          dplyr::bind_rows(
+            df_rand$list_df_long$df_int_ctrl_long |>
+              dplyr::select(
+                dplyr::all_of(c("col_index", "Panel"))
+              ) |>
+              dplyr::distinct()
+          ) |>
+          dplyr::left_join(
+            df_rand$list_df_long$df_plate_long |>
+              dplyr::select(
+                dplyr::all_of(c("PlateID", "Panel"))
+              ) |>
+              dplyr::distinct(),
+            by = "Panel",
+            relationship = "many-to-many"
+          )
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_bottom(
+            df = df_rand$list_df_wide$df_bottom_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            data_type = data_type,
+            col_names = col_names,
+            format_spec = format_spec,
+            df_plate_panel = df_plate_panel
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out$df_bottom_oid) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_bottom_long$df_oid) |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_oid,
+          expected = df_rand$list_df_long$df_bottom_long$df_oid |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out$df_bottom_oid))
+            )
+        )
+
+        expect_identical(
+          object = colnames(df_out$df_bottom_int_ctrl) |> sort(),
+          expected = df_rand$list_df_long$df_bottom_long$df_int_ctrl |>
+            colnames() |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_int_ctrl,
+          expected = df_rand$list_df_long$df_bottom_long$df_int_ctrl |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out$df_bottom_int_ctrl))
+            )
         )
 
       }
@@ -3518,9 +11096,15 @@ test_that(
 )
 
 test_that(
-  "read_npx_wide_bottom - works - T48 - multiple panels",
+  "read_npx_wide_bottom - works - T48 - multiple panels - single plate",
   {
-    ## NPX ----
+    # variables that apply to all tests
+    olink_platform <- "Target 48"
+    n_panels <- 3L
+    n_assays <- 45L
+    n_samples <- 88L
+
+    ## NPX no int ctrl v1 ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -3529,60 +11113,87 @@ test_that(
       code = {
 
         # synthetic wide df
-        data_t <- "NPX"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 4L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # extract col_split and assa_cols
-        col_s <- df_rand$long$df_top$df_plate |>
-          dplyr::mutate(
-            col_index_n = stringr::str_sub(string = .data[["col_index"]],
-                                           start = 2L) |>
-              as.integer()
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # plate panel combos
+        df_plate_panel <- df_rand$list_df_long$df_oid_long |>
+          dplyr::select(
+            dplyr::all_of(c("col_index", "Panel"))
           ) |>
-          dplyr::arrange(.data[["col_index_n"]]) |>
-          dplyr::slice_head(n = 1L) |>
-          dplyr::pull(.data[["col_index"]])
-        assay_c <- df_rand$long$df_top$df_oid$col_index
+          dplyr::distinct() |>
+          dplyr::left_join(
+            df_rand$list_df_long$df_plate_long |>
+              dplyr::select(
+                dplyr::all_of(c("PlateID", "Panel"))
+              ) |>
+              dplyr::distinct(),
+            by = "Panel",
+            relationship = "many-to-many"
+          )
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_no_condition(
-          object = df_obj <- read_npx_wide_bottom(df = df_rand$wide$df_bottom,
-                                                  file = wide_excel,
-                                                  col_split = col_s,
-                                                  assay_cols = assay_c,
-                                                  int_ctrl_cols = NULL,
-                                                  format_spec = format_s)
+          object = df_out <- read_npx_wide_bottom(
+            df = df_rand$list_df_wide$df_bottom_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            data_type = data_type,
+            col_names = col_names,
+            format_spec = format_spec,
+            df_plate_panel = df_plate_panel
+          )
         )
 
-        # check that dfs are identical
+        # check that output match
         expect_identical(
-          object = df_obj$df_oid |>
+          object = colnames(df_out$df_bottom_oid) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_bottom_long$df_oid) |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_oid,
+          expected = df_rand$list_df_long$df_bottom_long$df_oid |>
             dplyr::select(
-              order(colnames(df_obj$df_oid))
-            ),
-          expected = df_rand$long$df_bottom$df_oid
+              dplyr::all_of(colnames(df_out$df_bottom_oid))
+            )
         )
 
-        expect_false(object = "df_int_ctrl" %in% names(df_obj))
+        expect_false(
+          object = "df_bottom_int_ctrl" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_int_ctrl" %in% names(df_rand$list_df_long$df_bottom_long)
+        )
 
       }
     )
 
-    ## Quantified ----
+    ## NPX with int ctrl v1 ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -3591,68 +11202,100 @@ test_that(
       code = {
 
         # synthetic wide df
-        data_t <- "Quantified"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 4L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
                                         show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # extract col_split and assa_cols
-        col_s <- df_rand$long$df_top$df_plate |>
-          dplyr::mutate(
-            col_index_n = stringr::str_sub(string = .data[["col_index"]],
-                                           start = 2L) |>
-              as.integer()
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # plate panel combos
+        df_plate_panel <- df_rand$list_df_long$df_oid_long |>
+          dplyr::select(
+            dplyr::all_of(c("col_index", "Panel"))
           ) |>
-          dplyr::arrange(.data[["col_index_n"]]) |>
-          dplyr::slice_head(n = 1L) |>
-          dplyr::pull(.data[["col_index"]])
-        assay_c <- df_rand$long$df_top$df_oid$col_index
+          dplyr::distinct() |>
+          dplyr::bind_rows(
+            df_rand$list_df_long$df_int_ctrl_long |>
+              dplyr::select(
+                dplyr::all_of(c("col_index", "Panel"))
+              ) |>
+              dplyr::distinct()
+          ) |>
+          dplyr::left_join(
+            df_rand$list_df_long$df_plate_long |>
+              dplyr::select(
+                dplyr::all_of(c("PlateID", "Panel"))
+              ) |>
+              dplyr::distinct(),
+            by = "Panel",
+            relationship = "many-to-many"
+          )
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
-        # run function ----
-
-        # switched from expect_no_condition to the one below because of a very
-        # weird silent message thrown by rlang when using group_by and arrange
-        # in dplyr. This is documented here
-        # https://github.com/aryoda/tryCatchLog/issues/62
-        # Looks like it has been fixed, but we still get the error.
-        expect_no_error(
-          expect_no_warning(
-            object = df_obj <- read_npx_wide_bottom(df = df_rand$wide$df_bottom,
-                                                    file = wide_excel,
-                                                    col_split = col_s,
-                                                    assay_cols = assay_c,
-                                                    int_ctrl_cols = NULL,
-                                                    format_spec = format_s)
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_bottom(
+            df = df_rand$list_df_wide$df_bottom_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            data_type = data_type,
+            col_names = col_names,
+            format_spec = format_spec,
+            df_plate_panel = df_plate_panel
           )
         )
 
-        # check that dfs are identical
+        # check that output match
         expect_identical(
-          object = df_obj$df_oid |>
+          object = colnames(df_out$df_bottom_oid) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_bottom_long$df_oid) |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_oid,
+          expected = df_rand$list_df_long$df_bottom_long$df_oid |>
             dplyr::select(
-              order(colnames(df_obj$df_oid))
-            ),
-          expected = df_rand$long$df_bottom$df_oid
+              dplyr::all_of(colnames(df_out$df_bottom_oid))
+            )
         )
 
-        expect_false(object = "df_int_ctrl" %in% names(df_obj))
+        expect_identical(
+          object = colnames(df_out$df_bottom_int_ctrl) |> sort(),
+          expected = df_rand$list_df_long$df_bottom_long$df_int_ctrl |>
+            colnames() |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_int_ctrl,
+          expected = df_rand$list_df_long$df_bottom_long$df_int_ctrl |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out$df_bottom_int_ctrl))
+            )
+        )
 
       }
     )
 
-    ## Quantified shuffled ----
+    ## NPX no int ctrl v2 ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -3661,69 +11304,374 @@ test_that(
       code = {
 
         # synthetic wide df
-        data_t <- "Quantified"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 4L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = TRUE)
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 2L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # extract col_split and assa_cols
-        col_s <- df_rand$long$df_top$df_plate |>
-          dplyr::mutate(
-            col_index_n = stringr::str_sub(string = .data[["col_index"]],
-                                           start = 2L) |>
-              as.integer()
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # plate panel combos
+        df_plate_panel <- df_rand$list_df_long$df_oid_long |>
+          dplyr::select(
+            dplyr::all_of(c("col_index", "Panel"))
           ) |>
-          dplyr::arrange(.data[["col_index_n"]]) |>
-          dplyr::slice_head(n = 1L) |>
-          dplyr::pull(.data[["col_index"]])
-        assay_c <- df_rand$long$df_top$df_oid$col_index
-        int_ctrl_c <- df_rand$long$df_top$df_int_ctrl$col_index
+          dplyr::distinct() |>
+          dplyr::left_join(
+            df_rand$list_df_long$df_plate_long |>
+              dplyr::select(
+                dplyr::all_of(c("PlateID", "Panel"))
+              ) |>
+              dplyr::distinct(),
+            by = "Panel",
+            relationship = "many-to-many"
+          )
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
-        # run function ----
-
-        # switched from expect_no_condition to the one below because of a very
-        # weird silent message thrown by rlang when using group_by and arrange
-        # in dplyr. This is documented here
-        # https://github.com/aryoda/tryCatchLog/issues/62
-        # Looks like it has been fixed, but we still get the error.
-        expect_no_error(
-          expect_no_warning(
-            object = df_obj <- read_npx_wide_bottom(df = df_rand$wide$df_bottom,
-                                                    file = wide_excel,
-                                                    col_split = col_s,
-                                                    assay_cols = assay_c,
-                                                    int_ctrl_cols = int_ctrl_c,
-                                                    format_spec = format_s)
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_bottom(
+            df = df_rand$list_df_wide$df_bottom_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            data_type = data_type,
+            col_names = col_names,
+            format_spec = format_spec,
+            df_plate_panel = df_plate_panel
           )
         )
 
-        # check that dfs are identical
+        # check that output match
         expect_identical(
-          object = df_obj$df_oid |>
+          object = colnames(df_out$df_bottom_oid) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_bottom_long$df_oid) |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_oid,
+          expected = df_rand$list_df_long$df_bottom_long$df_oid |>
             dplyr::select(
-              order(colnames(df_obj$df_oid))
-            ),
-          expected = df_rand$long$df_bottom$df_oid
+              dplyr::all_of(colnames(df_out$df_bottom_oid))
+            )
+        )
+
+        expect_false(
+          object = "df_bottom_int_ctrl" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_int_ctrl" %in% names(df_rand$list_df_long$df_bottom_long)
+        )
+
+      }
+    )
+
+    ## NPX with int ctrl v2 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 2L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # plate panel combos
+        df_plate_panel <- df_rand$list_df_long$df_oid_long |>
+          dplyr::select(
+            dplyr::all_of(c("col_index", "Panel"))
+          ) |>
+          dplyr::distinct() |>
+          dplyr::bind_rows(
+            df_rand$list_df_long$df_int_ctrl_long |>
+              dplyr::select(
+                dplyr::all_of(c("col_index", "Panel"))
+              ) |>
+              dplyr::distinct()
+          ) |>
+          dplyr::left_join(
+            df_rand$list_df_long$df_plate_long |>
+              dplyr::select(
+                dplyr::all_of(c("PlateID", "Panel"))
+              ) |>
+              dplyr::distinct(),
+            by = "Panel",
+            relationship = "many-to-many"
+          )
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_bottom(
+            df = df_rand$list_df_wide$df_bottom_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            data_type = data_type,
+            col_names = col_names,
+            format_spec = format_spec,
+            df_plate_panel = df_plate_panel
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out$df_bottom_oid) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_bottom_long$df_oid) |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_oid,
+          expected = df_rand$list_df_long$df_bottom_long$df_oid |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out$df_bottom_oid))
+            )
         )
 
         expect_identical(
-          object = df_obj$df_int_ctrl |>
+          object = colnames(df_out$df_bottom_int_ctrl) |> sort(),
+          expected = df_rand$list_df_long$df_bottom_long$df_int_ctrl |>
+            colnames() |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_int_ctrl,
+          expected = df_rand$list_df_long$df_bottom_long$df_int_ctrl |>
             dplyr::select(
-              order(colnames(df_obj$df_int_ctrl))
-            ),
-          expected = df_rand$long$df_bottom$df_int_ctrl
+              dplyr::all_of(colnames(df_out$df_bottom_int_ctrl))
+            )
+        )
+
+      }
+    )
+
+    ## Quantified no int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # plate panel combos
+        df_plate_panel <- df_rand$list_df_long$df_oid_long |>
+          dplyr::select(
+            dplyr::all_of(c("col_index", "Panel"))
+          ) |>
+          dplyr::distinct() |>
+          dplyr::left_join(
+            df_rand$list_df_long$df_plate_long |>
+              dplyr::select(
+                dplyr::all_of(c("PlateID", "Panel"))
+              ) |>
+              dplyr::distinct(),
+            by = "Panel",
+            relationship = "many-to-many"
+          )
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_bottom(
+            df = df_rand$list_df_wide$df_bottom_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            data_type = data_type,
+            col_names = col_names,
+            format_spec = format_spec,
+            df_plate_panel = df_plate_panel
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out$df_bottom_oid) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_bottom_long$df_oid) |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_oid,
+          expected = df_rand$list_df_long$df_bottom_long$df_oid |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out$df_bottom_oid))
+            )
+        )
+
+        expect_false(
+          object = "df_bottom_int_ctrl" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_int_ctrl" %in% names(df_rand$list_df_long$df_bottom_long)
+        )
+
+      }
+    )
+
+    ## Quantified with int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # plate panel combos
+        df_plate_panel <- df_rand$list_df_long$df_oid_long |>
+          dplyr::select(
+            dplyr::all_of(c("col_index", "Panel"))
+          ) |>
+          dplyr::distinct() |>
+          dplyr::bind_rows(
+            df_rand$list_df_long$df_int_ctrl_long |>
+              dplyr::select(
+                dplyr::all_of(c("col_index", "Panel"))
+              ) |>
+              dplyr::distinct()
+          ) |>
+          dplyr::left_join(
+            df_rand$list_df_long$df_plate_long |>
+              dplyr::select(
+                dplyr::all_of(c("PlateID", "Panel"))
+              ) |>
+              dplyr::distinct(),
+            by = "Panel",
+            relationship = "many-to-many"
+          )
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_bottom(
+            df = df_rand$list_df_wide$df_bottom_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            data_type = data_type,
+            col_names = col_names,
+            format_spec = format_spec,
+            df_plate_panel = df_plate_panel
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out$df_bottom_oid) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_bottom_long$df_oid) |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_oid,
+          expected = df_rand$list_df_long$df_bottom_long$df_oid |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out$df_bottom_oid))
+            )
+        )
+
+        expect_identical(
+          object = colnames(df_out$df_bottom_int_ctrl) |> sort(),
+          expected = df_rand$list_df_long$df_bottom_long$df_int_ctrl |>
+            colnames() |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_int_ctrl,
+          expected = df_rand$list_df_long$df_bottom_long$df_int_ctrl |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out$df_bottom_int_ctrl))
+            )
         )
 
       }
@@ -3733,8 +11681,16 @@ test_that(
 )
 
 test_that(
-  "read_npx_wide_bottom - works - T96 - single panel",
+  "read_npx_wide_bottom - works - T48 - single panel - multiple plates",
   {
+    # variables that apply to all tests
+    olink_platform <- "Target 48"
+    n_panels <- 1L
+    n_assays <- 45L
+    n_samples <- 100L
+
+    ## NPX no int ctrl v1 ----
+
     withr::with_tempfile(
       new = "wide_excel",
       pattern = "test-excel-wide",
@@ -3742,55 +11698,566 @@ test_that(
       code = {
 
         # synthetic wide df
-        data_t <- "NPX"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 96",
-                                        data_type = data_t,
-                                        n_panels = 1L,
-                                        n_assays = 92L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # extract col_split and assa_cols
-        col_s <- df_rand$long$df_top$df_plate |>
-          dplyr::mutate(
-            col_index_n = stringr::str_sub(string = .data[["col_index"]],
-                                           start = 2L) |>
-              as.integer()
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # plate panel combos
+        df_plate_panel <- df_rand$list_df_long$df_long |>
+          dplyr::select(
+            dplyr::all_of(c("Panel", "PlateID"))
           ) |>
-          dplyr::arrange(.data[["col_index_n"]]) |>
-          dplyr::slice_head(n = 1L) |>
-          dplyr::pull(.data[["col_index"]])
-        assay_c <- df_rand$long$df_top$df_oid$col_index
+          dplyr::distinct() |>
+          dplyr::left_join(
+            df_rand$list_df_long$df_plate_long |>
+              dplyr::select(
+                dplyr::all_of(c("PlateID", "Panel"))
+              ) |>
+              dplyr::distinct(),
+            by = "Panel",
+            relationship = "many-to-many"
+          )
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_no_condition(
-          object = df_obj <- read_npx_wide_bottom(df = df_rand$wide$df_bottom,
-                                                  file = wide_excel,
-                                                  col_split = col_s,
-                                                  assay_cols = assay_c,
-                                                  int_ctrl_cols = NULL,
-                                                  format_spec = format_s)
+          object = df_out <- read_npx_wide_bottom(
+            df = df_rand$list_df_wide$df_bottom_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            data_type = data_type,
+            col_names = col_names,
+            format_spec = format_spec,
+            df_plate_panel = df_plate_panel
+          )
         )
 
-        # check that dfs are identical
+        # check that output match
         expect_identical(
-          object = df_obj$df_oid |>
+          object = colnames(df_out$df_bottom_oid) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_bottom_long$df_oid) |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_oid,
+          expected = df_rand$list_df_long$df_bottom_long$df_oid |>
             dplyr::select(
-              order(colnames(df_obj$df_oid))
-            ),
-          expected = df_rand$long$df_bottom$df_oid
+              dplyr::all_of(colnames(df_out$df_bottom_oid))
+            )
         )
 
-        expect_false(object = "df_int_ctrl" %in% names(df_obj))
+        expect_false(
+          object = "df_bottom_int_ctrl" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_int_ctrl" %in% names(df_rand$list_df_long$df_bottom_long)
+        )
+
+      }
+    )
+
+    ## NPX with int ctrl v1 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # plate panel combos
+        df_plate_panel <- df_rand$list_df_long$df_oid_long |>
+          dplyr::select(
+            dplyr::all_of(c("col_index", "Panel"))
+          ) |>
+          dplyr::distinct() |>
+          dplyr::bind_rows(
+            df_rand$list_df_long$df_int_ctrl_long |>
+              dplyr::select(
+                dplyr::all_of(c("col_index", "Panel"))
+              ) |>
+              dplyr::distinct()
+          ) |>
+          dplyr::left_join(
+            df_rand$list_df_long$df_plate_long |>
+              dplyr::select(
+                dplyr::all_of(c("PlateID", "Panel"))
+              ) |>
+              dplyr::distinct(),
+            by = "Panel",
+            relationship = "many-to-many"
+          )
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_bottom(
+            df = df_rand$list_df_wide$df_bottom_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            data_type = data_type,
+            col_names = col_names,
+            format_spec = format_spec,
+            df_plate_panel = df_plate_panel
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out$df_bottom_oid) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_bottom_long$df_oid) |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_oid,
+          expected = df_rand$list_df_long$df_bottom_long$df_oid |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out$df_bottom_oid))
+            )
+        )
+
+        expect_identical(
+          object = colnames(df_out$df_bottom_int_ctrl) |> sort(),
+          expected = df_rand$list_df_long$df_bottom_long$df_int_ctrl |>
+            colnames() |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_int_ctrl,
+          expected = df_rand$list_df_long$df_bottom_long$df_int_ctrl |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out$df_bottom_int_ctrl))
+            )
+        )
+
+      }
+    )
+
+    ## NPX no int ctrl v2 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 2L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # plate panel combos
+        df_plate_panel <- df_rand$list_df_long$df_oid_long |>
+          dplyr::select(
+            dplyr::all_of(c("col_index", "Panel"))
+          ) |>
+          dplyr::distinct() |>
+          dplyr::left_join(
+            df_rand$list_df_long$df_plate_long |>
+              dplyr::select(
+                dplyr::all_of(c("PlateID", "Panel"))
+              ) |>
+              dplyr::distinct(),
+            by = "Panel",
+            relationship = "many-to-many"
+          )
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_bottom(
+            df = df_rand$list_df_wide$df_bottom_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            data_type = data_type,
+            col_names = col_names,
+            format_spec = format_spec,
+            df_plate_panel = df_plate_panel
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out$df_bottom_oid) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_bottom_long$df_oid) |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_oid,
+          expected = df_rand$list_df_long$df_bottom_long$df_oid |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out$df_bottom_oid))
+            )
+        )
+
+        expect_false(
+          object = "df_bottom_int_ctrl" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_int_ctrl" %in% names(df_rand$list_df_long$df_bottom_long)
+        )
+
+      }
+    )
+
+    ## NPX with int ctrl v2 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 2L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # plate panel combos
+        df_plate_panel <- df_rand$list_df_long$df_oid_long |>
+          dplyr::select(
+            dplyr::all_of(c("col_index", "Panel"))
+          ) |>
+          dplyr::distinct() |>
+          dplyr::bind_rows(
+            df_rand$list_df_long$df_int_ctrl_long |>
+              dplyr::select(
+                dplyr::all_of(c("col_index", "Panel"))
+              ) |>
+              dplyr::distinct()
+          ) |>
+          dplyr::left_join(
+            df_rand$list_df_long$df_plate_long |>
+              dplyr::select(
+                dplyr::all_of(c("PlateID", "Panel"))
+              ) |>
+              dplyr::distinct(),
+            by = "Panel",
+            relationship = "many-to-many"
+          )
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_bottom(
+            df = df_rand$list_df_wide$df_bottom_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            data_type = data_type,
+            col_names = col_names,
+            format_spec = format_spec,
+            df_plate_panel = df_plate_panel
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out$df_bottom_oid) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_bottom_long$df_oid) |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_oid,
+          expected = df_rand$list_df_long$df_bottom_long$df_oid |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out$df_bottom_oid))
+            )
+        )
+
+        expect_identical(
+          object = colnames(df_out$df_bottom_int_ctrl) |> sort(),
+          expected = df_rand$list_df_long$df_bottom_long$df_int_ctrl |>
+            colnames() |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_int_ctrl,
+          expected = df_rand$list_df_long$df_bottom_long$df_int_ctrl |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out$df_bottom_int_ctrl))
+            )
+        )
+
+      }
+    )
+
+    ## Quantified no int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # plate panel combos
+        df_plate_panel <- df_rand$list_df_long$df_oid_long |>
+          dplyr::select(
+            dplyr::all_of(c("col_index", "Panel"))
+          ) |>
+          dplyr::distinct() |>
+          dplyr::left_join(
+            df_rand$list_df_long$df_plate_long |>
+              dplyr::select(
+                dplyr::all_of(c("PlateID", "Panel"))
+              ) |>
+              dplyr::distinct(),
+            by = "Panel",
+            relationship = "many-to-many"
+          )
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_bottom(
+            df = df_rand$list_df_wide$df_bottom_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            data_type = data_type,
+            col_names = col_names,
+            format_spec = format_spec,
+            df_plate_panel = df_plate_panel
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out$df_bottom_oid) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_bottom_long$df_oid) |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_oid,
+          expected = df_rand$list_df_long$df_bottom_long$df_oid |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out$df_bottom_oid))
+            )
+        )
+
+        expect_false(
+          object = "df_bottom_int_ctrl" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_int_ctrl" %in% names(df_rand$list_df_long$df_bottom_long)
+        )
+
+      }
+    )
+
+    ## Quantified with int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # plate panel combos
+        df_plate_panel <- df_rand$list_df_long$df_oid_long |>
+          dplyr::select(
+            dplyr::all_of(c("col_index", "Panel"))
+          ) |>
+          dplyr::distinct() |>
+          dplyr::bind_rows(
+            df_rand$list_df_long$df_int_ctrl_long |>
+              dplyr::select(
+                dplyr::all_of(c("col_index", "Panel"))
+              ) |>
+              dplyr::distinct()
+          ) |>
+          dplyr::left_join(
+            df_rand$list_df_long$df_plate_long |>
+              dplyr::select(
+                dplyr::all_of(c("PlateID", "Panel"))
+              ) |>
+              dplyr::distinct(),
+            by = "Panel",
+            relationship = "many-to-many"
+          )
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_bottom(
+            df = df_rand$list_df_wide$df_bottom_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            data_type = data_type,
+            col_names = col_names,
+            format_spec = format_spec,
+            df_plate_panel = df_plate_panel
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out$df_bottom_oid) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_bottom_long$df_oid) |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_oid,
+          expected = df_rand$list_df_long$df_bottom_long$df_oid |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out$df_bottom_oid))
+            )
+        )
+
+        expect_identical(
+          object = colnames(df_out$df_bottom_int_ctrl) |> sort(),
+          expected = df_rand$list_df_long$df_bottom_long$df_int_ctrl |>
+            colnames() |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_int_ctrl,
+          expected = df_rand$list_df_long$df_bottom_long$df_int_ctrl |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out$df_bottom_int_ctrl))
+            )
+        )
 
       }
     )
@@ -3799,8 +12266,16 @@ test_that(
 )
 
 test_that(
-  "read_npx_wide_bottom - works - T96 - multiple panels",
+  "read_npx_wide_bottom - works - T48 - single panel - multiple plates",
   {
+    # variables that apply to all tests
+    olink_platform <- "Target 48"
+    n_panels <- 3L
+    n_assays <- 45L
+    n_samples <- 100L
+
+    ## NPX no int ctrl v1 ----
+
     withr::with_tempfile(
       new = "wide_excel",
       pattern = "test-excel-wide",
@@ -3808,66 +12283,87 @@ test_that(
       code = {
 
         # synthetic wide df
-        data_t <- "NPX"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 96",
-                                        data_type = data_t,
-                                        n_panels = 4L,
-                                        n_assays = 92L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # extract col_split and assa_cols
-        col_s <- df_rand$long$df_top$df_plate |>
-          dplyr::mutate(
-            col_index_n = stringr::str_sub(string = .data[["col_index"]],
-                                           start = 2L) |>
-              as.integer()
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # plate panel combos
+        df_plate_panel <- df_rand$list_df_long$df_long |>
+          dplyr::select(
+            dplyr::all_of(c("Panel", "PlateID"))
           ) |>
-          dplyr::arrange(.data[["col_index_n"]]) |>
-          dplyr::slice_head(n = 1L) |>
-          dplyr::pull(.data[["col_index"]])
-        assay_c <- df_rand$long$df_top$df_oid$col_index
+          dplyr::distinct() |>
+          dplyr::left_join(
+            df_rand$list_df_long$df_plate_long |>
+              dplyr::select(
+                dplyr::all_of(c("PlateID", "Panel"))
+              ) |>
+              dplyr::distinct(),
+            by = "Panel",
+            relationship = "many-to-many"
+          )
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_no_condition(
-          object = df_obj <- read_npx_wide_bottom(df = df_rand$wide$df_bottom,
-                                                  file = wide_excel,
-                                                  col_split = col_s,
-                                                  assay_cols = assay_c,
-                                                  int_ctrl_cols = NULL,
-                                                  format_spec = format_s)
+          object = df_out <- read_npx_wide_bottom(
+            df = df_rand$list_df_wide$df_bottom_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            data_type = data_type,
+            col_names = col_names,
+            format_spec = format_spec,
+            df_plate_panel = df_plate_panel
+          )
         )
 
-        # check that dfs are identical
+        # check that output match
         expect_identical(
-          object = df_obj$df_oid |>
+          object = colnames(df_out$df_bottom_oid) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_bottom_long$df_oid) |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_oid,
+          expected = df_rand$list_df_long$df_bottom_long$df_oid |>
             dplyr::select(
-              order(colnames(df_obj$df_oid))
-            ),
-          expected = df_rand$long$df_bottom$df_oid
+              dplyr::all_of(colnames(df_out$df_bottom_oid))
+            )
         )
 
-        expect_false(object = "df_int_ctrl" %in% names(df_obj))
+        expect_false(
+          object = "df_bottom_int_ctrl" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_int_ctrl" %in% names(df_rand$list_df_long$df_bottom_long)
+        )
 
       }
     )
 
-  }
-)
-
-test_that(
-  "read_npx_wide_bottom - works - Flex/Focus - single panel",
-  {
-    ## NPX ----
+    ## NPX with int ctrl v1 ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -3876,128 +12372,100 @@ test_that(
       code = {
 
         # synthetic wide df
-        data_t <- "NPX"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = "Focus",
-                                        data_type = data_t,
-                                        n_panels = 1L,
-                                        n_assays = 33L,
-                                        n_samples = 88L,
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
                                         show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # extract col_split and assa_cols
-        col_s <- df_rand$long$df_top$df_plate |>
-          dplyr::mutate(
-            col_index_n = stringr::str_sub(string = .data[["col_index"]],
-                                           start = 2L) |>
-              as.integer()
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # plate panel combos
+        df_plate_panel <- df_rand$list_df_long$df_oid_long |>
+          dplyr::select(
+            dplyr::all_of(c("col_index", "Panel"))
           ) |>
-          dplyr::arrange(.data[["col_index_n"]]) |>
-          dplyr::slice_head(n = 1L) |>
-          dplyr::pull(.data[["col_index"]])
-        assay_c <- df_rand$long$df_top$df_oid$col_index
+          dplyr::distinct() |>
+          dplyr::bind_rows(
+            df_rand$list_df_long$df_int_ctrl_long |>
+              dplyr::select(
+                dplyr::all_of(c("col_index", "Panel"))
+              ) |>
+              dplyr::distinct()
+          ) |>
+          dplyr::left_join(
+            df_rand$list_df_long$df_plate_long |>
+              dplyr::select(
+                dplyr::all_of(c("PlateID", "Panel"))
+              ) |>
+              dplyr::distinct(),
+            by = "Panel",
+            relationship = "many-to-many"
+          )
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_no_condition(
-          object = df_obj <- read_npx_wide_bottom(df = df_rand$wide$df_bottom,
-                                                  file = wide_excel,
-                                                  col_split = col_s,
-                                                  assay_cols = assay_c,
-                                                  int_ctrl_cols = NULL,
-                                                  format_spec = format_s)
-        )
-
-        # check that dfs are identical
-        expect_identical(
-          object = df_obj$df_oid |>
-            dplyr::select(
-              order(colnames(df_obj$df_oid))
-            ),
-          expected = df_rand$long$df_bottom$df_oid
-        )
-
-        expect_false(object = "df_int_ctrl" %in% names(df_obj))
-
-      }
-    )
-
-    ## Quantified ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        data_t <- "Quantified"
-
-        df_rand <- olink_wide_synthetic(olink_platform = "Focus",
-                                        data_type = data_t,
-                                        n_panels = 1L,
-                                        n_assays = 33L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # extract col_split and assa_cols
-        col_s <- df_rand$long$df_top$df_plate |>
-          dplyr::mutate(
-            col_index_n = stringr::str_sub(string = .data[["col_index"]],
-                                           start = 2L) |>
-              as.integer()
-          ) |>
-          dplyr::arrange(.data[["col_index_n"]]) |>
-          dplyr::slice_head(n = 1L) |>
-          dplyr::pull(.data[["col_index"]])
-        assay_c <- df_rand$long$df_top$df_oid$col_index
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # switched from expect_no_condition to the one below because of a very
-        # weird silent message thrown by rlang when using group_by and arrange
-        # in dplyr. This is documented here
-        # https://github.com/aryoda/tryCatchLog/issues/62
-        # Looks like it has been fixed, but we still get the error.
-        expect_no_error(
-          expect_no_warning(
-            object = df_obj <- read_npx_wide_bottom(df = df_rand$wide$df_bottom,
-                                                    file = wide_excel,
-                                                    col_split = col_s,
-                                                    assay_cols = assay_c,
-                                                    int_ctrl_cols = NULL,
-                                                    format_spec = format_s)
+          object = df_out <- read_npx_wide_bottom(
+            df = df_rand$list_df_wide$df_bottom_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            data_type = data_type,
+            col_names = col_names,
+            format_spec = format_spec,
+            df_plate_panel = df_plate_panel
           )
         )
 
-        # check that dfs are identical
+        # check that output match
         expect_identical(
-          object = df_obj$df_oid |>
+          object = colnames(df_out$df_bottom_oid) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_bottom_long$df_oid) |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_oid,
+          expected = df_rand$list_df_long$df_bottom_long$df_oid |>
             dplyr::select(
-              order(colnames(df_obj$df_oid))
-            ),
-          expected = df_rand$long$df_bottom$df_oid
+              dplyr::all_of(colnames(df_out$df_bottom_oid))
+            )
         )
 
-        expect_false(object = "df_int_ctrl" %in% names(df_obj))
+        expect_identical(
+          object = colnames(df_out$df_bottom_int_ctrl) |> sort(),
+          expected = df_rand$list_df_long$df_bottom_long$df_int_ctrl |>
+            colnames() |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_int_ctrl,
+          expected = df_rand$list_df_long$df_bottom_long$df_int_ctrl |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out$df_bottom_int_ctrl))
+            )
+        )
 
       }
     )
 
-    ## Quantified shuffled ----
+    ## NPX no int ctrl v2 ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -4006,141 +12474,87 @@ test_that(
       code = {
 
         # synthetic wide df
-        data_t <- "Quantified"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = "Focus",
-                                        data_type = data_t,
-                                        n_panels = 1L,
-                                        n_assays = 33L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = TRUE)
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 2L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # extract col_split and assa_cols
-        col_s <- df_rand$long$df_top$df_plate |>
-          dplyr::mutate(
-            col_index_n = stringr::str_sub(string = .data[["col_index"]],
-                                           start = 2L) |>
-              as.integer()
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # plate panel combos
+        df_plate_panel <- df_rand$list_df_long$df_oid_long |>
+          dplyr::select(
+            dplyr::all_of(c("col_index", "Panel"))
           ) |>
-          dplyr::arrange(.data[["col_index_n"]]) |>
-          dplyr::slice_head(n = 1L) |>
-          dplyr::pull(.data[["col_index"]])
-        assay_c <- df_rand$long$df_top$df_oid$col_index
-        int_ctrl_c <- df_rand$long$df_top$df_int_ctrl$col_index
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # switched from expect_no_condition to the one below because of a very
-        # weird silent message thrown by rlang when using group_by and arrange
-        # in dplyr. This is documented here
-        # https://github.com/aryoda/tryCatchLog/issues/62
-        # Looks like it has been fixed, but we still get the error.
-        expect_no_error(
-          expect_no_warning(
-            object = df_obj <- read_npx_wide_bottom(df = df_rand$wide$df_bottom,
-                                                    file = wide_excel,
-                                                    col_split = col_s,
-                                                    assay_cols = assay_c,
-                                                    int_ctrl_cols = int_ctrl_c,
-                                                    format_spec = format_s)
+          dplyr::distinct() |>
+          dplyr::left_join(
+            df_rand$list_df_long$df_plate_long |>
+              dplyr::select(
+                dplyr::all_of(c("PlateID", "Panel"))
+              ) |>
+              dplyr::distinct(),
+            by = "Panel",
+            relationship = "many-to-many"
           )
-        )
-
-        # check that dfs are identical
-        expect_identical(
-          object = df_obj$df_oid |>
-            dplyr::select(
-              order(colnames(df_obj$df_oid))
-            ),
-          expected = df_rand$long$df_bottom$df_oid
-        )
-
-        expect_identical(
-          object = df_obj$df_int_ctrl |>
-            dplyr::select(
-              order(colnames(df_obj$df_int_ctrl))
-            ),
-          expected = df_rand$long$df_bottom$df_int_ctrl
-        )
-
-      }
-    )
-
-  }
-)
-
-test_that(
-  "read_npx_wide_bottom - works - Flex/Focus - multiple panels",
-  {
-    ## NPX ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        data_t <- "NPX"
-
-        df_rand <- olink_wide_synthetic(olink_platform = "Flex",
-                                        data_type = data_t,
-                                        n_panels = 4L,
-                                        n_assays = 21L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # extract col_split and assa_cols
-        col_s <- df_rand$long$df_top$df_plate |>
-          dplyr::mutate(
-            col_index_n = stringr::str_sub(string = .data[["col_index"]],
-                                           start = 2L) |>
-              as.integer()
-          ) |>
-          dplyr::arrange(.data[["col_index_n"]]) |>
-          dplyr::slice_head(n = 1L) |>
-          dplyr::pull(.data[["col_index"]])
-        assay_c <- df_rand$long$df_top$df_oid$col_index
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs
         expect_no_condition(
-          object = df_obj <- read_npx_wide_bottom(df = df_rand$wide$df_bottom,
-                                                  file = wide_excel,
-                                                  col_split = col_s,
-                                                  assay_cols = assay_c,
-                                                  int_ctrl_cols = NULL,
-                                                  format_spec = format_s)
+          object = df_out <- read_npx_wide_bottom(
+            df = df_rand$list_df_wide$df_bottom_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            data_type = data_type,
+            col_names = col_names,
+            format_spec = format_spec,
+            df_plate_panel = df_plate_panel
+          )
         )
 
-        # check that dfs are identical
+        # check that output match
         expect_identical(
-          object = df_obj$df_oid |>
+          object = colnames(df_out$df_bottom_oid) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_bottom_long$df_oid) |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_oid,
+          expected = df_rand$list_df_long$df_bottom_long$df_oid |>
             dplyr::select(
-              order(colnames(df_obj$df_oid))
-            ),
-          expected = df_rand$long$df_bottom$df_oid
+              dplyr::all_of(colnames(df_out$df_bottom_oid))
+            )
         )
 
-        expect_false(object = "df_int_ctrl" %in% names(df_obj))
+        expect_false(
+          object = "df_bottom_int_ctrl" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_int_ctrl" %in% names(df_rand$list_df_long$df_bottom_long)
+        )
 
       }
     )
 
-    ## Quantified ----
+    ## NPX with int ctrl v2 ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -4149,209 +12563,286 @@ test_that(
       code = {
 
         # synthetic wide df
-        data_t <- "Quantified"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = "Flex",
-                                        data_type = data_t,
-                                        n_panels = 4L,
-                                        n_assays = 21L,
-                                        n_samples = 88L,
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
                                         show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 2L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # extract col_split and assa_cols
-        col_s <- df_rand$long$df_top$df_plate |>
-          dplyr::mutate(
-            col_index_n = stringr::str_sub(string = .data[["col_index"]],
-                                           start = 2L) |>
-              as.integer()
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # plate panel combos
+        df_plate_panel <- df_rand$list_df_long$df_oid_long |>
+          dplyr::select(
+            dplyr::all_of(c("col_index", "Panel"))
           ) |>
-          dplyr::arrange(.data[["col_index_n"]]) |>
-          dplyr::slice_head(n = 1L) |>
-          dplyr::pull(.data[["col_index"]])
-        assay_c <- df_rand$long$df_top$df_oid$col_index
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # switched from expect_no_condition to the one below because of a very
-        # weird silent message thrown by rlang when using group_by and arrange
-        # in dplyr. This is documented here
-        # https://github.com/aryoda/tryCatchLog/issues/62
-        # Looks like it has been fixed, but we still get the error.
-        expect_no_error(
-          expect_no_warning(
-            object = df_obj <- read_npx_wide_bottom(df = df_rand$wide$df_bottom,
-                                                    file = wide_excel,
-                                                    col_split = col_s,
-                                                    assay_cols = assay_c,
-                                                    int_ctrl_cols = NULL,
-                                                    format_spec = format_s)
-          )
-        )
-
-        # check that dfs are identical
-        expect_identical(
-          object = df_obj$df_oid |>
-            dplyr::select(
-              order(colnames(df_obj$df_oid))
-            ),
-          expected = df_rand$long$df_bottom$df_oid
-        )
-
-        expect_false(object = "df_int_ctrl" %in% names(df_obj))
-
-      }
-    )
-
-    ## Quantified shuffled ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        data_t <- "Quantified"
-
-        df_rand <- olink_wide_synthetic(olink_platform = "Flex",
-                                        data_type = data_t,
-                                        n_panels = 4L,
-                                        n_assays = 21L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = TRUE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # extract col_split and assa_cols
-        col_s <- df_rand$long$df_top$df_plate |>
-          dplyr::mutate(
-            col_index_n = stringr::str_sub(string = .data[["col_index"]],
-                                           start = 2L) |>
-              as.integer()
+          dplyr::distinct() |>
+          dplyr::bind_rows(
+            df_rand$list_df_long$df_int_ctrl_long |>
+              dplyr::select(
+                dplyr::all_of(c("col_index", "Panel"))
+              ) |>
+              dplyr::distinct()
           ) |>
-          dplyr::arrange(.data[["col_index_n"]]) |>
-          dplyr::slice_head(n = 1L) |>
-          dplyr::pull(.data[["col_index"]])
-        assay_c <- df_rand$long$df_top$df_oid$col_index
-        int_ctrl_c <- df_rand$long$df_top$df_int_ctrl$col_index
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # switched from expect_no_condition to the one below because of a very
-        # weird silent message thrown by rlang when using group_by and arrange
-        # in dplyr. This is documented here
-        # https://github.com/aryoda/tryCatchLog/issues/62
-        # Looks like it has been fixed, but we still get the error.
-        expect_no_error(
-          expect_no_warning(
-            object = df_obj <- read_npx_wide_bottom(df = df_rand$wide$df_bottom,
-                                                    file = wide_excel,
-                                                    col_split = col_s,
-                                                    assay_cols = assay_c,
-                                                    int_ctrl_cols = int_ctrl_c,
-                                                    format_spec = format_s)
-          )
-        )
-
-        # check that dfs are identical
-        expect_identical(
-          object = df_obj$df_oid |>
-            dplyr::select(
-              order(colnames(df_obj$df_oid))
-            ),
-          expected = df_rand$long$df_bottom$df_oid
-        )
-
-        expect_identical(
-          object = df_obj$df_int_ctrl |>
-            dplyr::select(
-              order(colnames(df_obj$df_int_ctrl))
-            ),
-          expected = df_rand$long$df_bottom$df_int_ctrl
-        )
-
-      }
-    )
-
-  }
-)
-
-test_that(
-  "read_npx_wide_bottom - works - additonal all-NA columns",
-  {
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        data_t <- "NPX"
-
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 1L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # extract col_split and assa_cols
-        col_s <- df_rand$long$df_top$df_plate |>
-          dplyr::mutate(
-            col_index_n = stringr::str_sub(string = .data[["col_index"]],
-                                           start = 2L) |>
-              as.integer()
-          ) |>
-          dplyr::arrange(.data[["col_index_n"]]) |>
-          dplyr::slice_head(n = 1L) |>
-          dplyr::pull(.data[["col_index"]])
-        assay_c <- df_rand$long$df_top$df_oid$col_index
-
-        # add new column with all NA
-        df_rand$wide$df_bottom <- df_rand$wide$df_bottom |>
-          dplyr::mutate(
-            {{col_s}} := rep(x = NA_character_,
-                             times = nrow(df_rand$wide$df_bottom))
+          dplyr::left_join(
+            df_rand$list_df_long$df_plate_long |>
+              dplyr::select(
+                dplyr::all_of(c("PlateID", "Panel"))
+              ) |>
+              dplyr::distinct(),
+            by = "Panel",
+            relationship = "many-to-many"
           )
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
-        # check that function runs with error
+        # check that function runs
         expect_no_condition(
-          object = df_obj <- read_npx_wide_bottom(df = df_rand$wide$df_bottom,
-                                                  file = wide_excel,
-                                                  col_split = col_s,
-                                                  assay_cols = assay_c,
-                                                  int_ctrl_cols = NULL,
-                                                  format_spec = format_s)
+          object = df_out <- read_npx_wide_bottom(
+            df = df_rand$list_df_wide$df_bottom_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            data_type = data_type,
+            col_names = col_names,
+            format_spec = format_spec,
+            df_plate_panel = df_plate_panel
+          )
         )
 
-        # check that dfs are identical
+        # check that output match
         expect_identical(
-          object = df_obj$df_oid |>
+          object = colnames(df_out$df_bottom_oid) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_bottom_long$df_oid) |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_oid,
+          expected = df_rand$list_df_long$df_bottom_long$df_oid |>
             dplyr::select(
-              order(colnames(df_obj$df_oid))
-            ),
-          expected = df_rand$long$df_bottom$df_oid
+              dplyr::all_of(colnames(df_out$df_bottom_oid))
+            )
         )
 
-        expect_false(object = "df_int_ctrl" %in% names(df_obj))
+        expect_identical(
+          object = colnames(df_out$df_bottom_int_ctrl) |> sort(),
+          expected = df_rand$list_df_long$df_bottom_long$df_int_ctrl |>
+            colnames() |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_int_ctrl,
+          expected = df_rand$list_df_long$df_bottom_long$df_int_ctrl |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out$df_bottom_int_ctrl))
+            )
+        )
+
+      }
+    )
+
+    ## Quantified no int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # plate panel combos
+        df_plate_panel <- df_rand$list_df_long$df_oid_long |>
+          dplyr::select(
+            dplyr::all_of(c("col_index", "Panel"))
+          ) |>
+          dplyr::distinct() |>
+          dplyr::left_join(
+            df_rand$list_df_long$df_plate_long |>
+              dplyr::select(
+                dplyr::all_of(c("PlateID", "Panel"))
+              ) |>
+              dplyr::distinct(),
+            by = "Panel",
+            relationship = "many-to-many"
+          )
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_bottom(
+            df = df_rand$list_df_wide$df_bottom_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            data_type = data_type,
+            col_names = col_names,
+            format_spec = format_spec,
+            df_plate_panel = df_plate_panel
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out$df_bottom_oid) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_bottom_long$df_oid) |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_oid,
+          expected = df_rand$list_df_long$df_bottom_long$df_oid |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out$df_bottom_oid))
+            )
+        )
+
+        expect_false(
+          object = "df_bottom_int_ctrl" %in% names(df_out)
+        )
+
+        expect_false(
+          object = "df_int_ctrl" %in% names(df_rand$list_df_long$df_bottom_long)
+        )
+
+      }
+    )
+
+    ## Quantified with int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = TRUE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # plate panel combos
+        df_plate_panel <- df_rand$list_df_long$df_oid_long |>
+          dplyr::select(
+            dplyr::all_of(c("col_index", "Panel"))
+          ) |>
+          dplyr::distinct() |>
+          dplyr::bind_rows(
+            df_rand$list_df_long$df_int_ctrl_long |>
+              dplyr::select(
+                dplyr::all_of(c("col_index", "Panel"))
+              ) |>
+              dplyr::distinct()
+          ) |>
+          dplyr::left_join(
+            df_rand$list_df_long$df_plate_long |>
+              dplyr::select(
+                dplyr::all_of(c("PlateID", "Panel"))
+              ) |>
+              dplyr::distinct(),
+            by = "Panel",
+            relationship = "many-to-many"
+          )
+
+        # write empty-ish file
+        writeLines("foo", wide_excel)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_bottom(
+            df = df_rand$list_df_wide$df_bottom_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            data_type = data_type,
+            col_names = col_names,
+            format_spec = format_spec,
+            df_plate_panel = df_plate_panel
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out$df_bottom_oid) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_bottom_long$df_oid) |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_oid,
+          expected = df_rand$list_df_long$df_bottom_long$df_oid |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out$df_bottom_oid))
+            )
+        )
+
+        expect_identical(
+          object = colnames(df_out$df_bottom_int_ctrl) |> sort(),
+          expected = df_rand$list_df_long$df_bottom_long$df_int_ctrl |>
+            colnames() |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_int_ctrl,
+          expected = df_rand$list_df_long$df_bottom_long$df_int_ctrl |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out$df_bottom_int_ctrl))
+            )
+        )
 
       }
     )
@@ -4362,7 +12853,13 @@ test_that(
 test_that(
   "read_npx_wide_bottom - error - unexpected values in V1",
   {
-    ## NPX v1 ----
+    # variables that apply to all tests
+    olink_platform <- "Target 48"
+    n_panels <- 1L
+    n_assays <- 45L
+    n_samples <- 88L
+
+    ## NPX - LOD2 ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -4371,34 +12868,48 @@ test_that(
       code = {
 
         # synthetic wide df
-        data_t <- "NPX"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 1L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # extract col_split and assa_cols
-        col_s <- df_rand$long$df_top$df_plate |>
-          dplyr::mutate(
-            col_index_n = stringr::str_sub(string = .data[["col_index"]],
-                                           start = 2L) |>
-              as.integer()
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # plate panel combos
+        df_plate_panel <- df_rand$list_df_long$df_long |>
+          dplyr::select(
+            dplyr::all_of(c("Panel", "PlateID"))
           ) |>
-          dplyr::arrange(.data[["col_index_n"]]) |>
-          dplyr::slice_head(n = 1L) |>
-          dplyr::pull(.data[["col_index"]])
-        assay_c <- df_rand$long$df_top$df_oid$col_index
+          dplyr::distinct() |>
+          dplyr::left_join(
+            df_rand$list_df_long$df_plate_long |>
+              dplyr::select(
+                dplyr::all_of(c("PlateID", "Panel"))
+              ) |>
+              dplyr::distinct(),
+            by = "Panel",
+            relationship = "many-to-many"
+          )
 
         # modify df with wrong V1
-        df_rand$wide$df_bottom <- df_rand$wide$df_bottom |>
+        df_rand$list_df_wide$df_bottom_wide <-
+          df_rand$list_df_wide$df_bottom_wide |>
           dplyr::mutate(
             V1 = dplyr::if_else(.data[["V1"]] == "LOD",
                                 "LOD2",
@@ -4410,19 +12921,22 @@ test_that(
 
         # check that function runs with error
         expect_error(
-          object = read_npx_wide_bottom(df = df_rand$wide$df_bottom,
-                                        file = wide_excel,
-                                        col_split = col_s,
-                                        assay_cols = assay_c,
-                                        int_ctrl_cols = NULL,
-                                        format_spec = format_s),
-          regexp = "Column 1 of the bottom matrix with assay metadata in file"
+          object = df_out <- read_npx_wide_bottom(
+            df = df_rand$list_df_wide$df_bottom_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            data_type = data_type,
+            col_names = col_names,
+            format_spec = format_spec,
+            df_plate_panel = df_plate_panel
+          ),
+          regexp = "Unexpected values in column 1 of the bottom matrix with QC"
         )
 
       }
     )
 
-    ## NPX v2 ----
+    ## NPX - Additional vals in V1 ----
 
     withr::with_tempfile(
       new = "wide_excel",
@@ -4431,44 +12945,60 @@ test_that(
       code = {
 
         # synthetic wide df
-        data_t <- "NPX"
+        data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
                                         data_type = "Quantified",
-                                        n_panels = 1L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # extract col_split and assa_cols
-        col_s <- df_rand$long$df_top$df_plate |>
-          dplyr::mutate(
-            col_index_n = stringr::str_sub(string = .data[["col_index"]],
-                                           start = 2L) |>
-              as.integer()
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # plate panel combos
+        df_plate_panel <- df_rand$list_df_long$df_long |>
+          dplyr::select(
+            dplyr::all_of(c("Panel", "PlateID"))
           ) |>
-          dplyr::arrange(.data[["col_index_n"]]) |>
-          dplyr::slice_head(n = 1L) |>
-          dplyr::pull(.data[["col_index"]])
-        assay_c <- df_rand$long$df_top$df_oid$col_index
+          dplyr::distinct() |>
+          dplyr::left_join(
+            df_rand$list_df_long$df_plate_long |>
+              dplyr::select(
+                dplyr::all_of(c("PlateID", "Panel"))
+              ) |>
+              dplyr::distinct(),
+            by = "Panel",
+            relationship = "many-to-many"
+          )
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs with error
         expect_error(
-          object = read_npx_wide_bottom(df = df_rand$wide$df_bottom,
-                                        file = wide_excel,
-                                        col_split = col_s,
-                                        assay_cols = assay_c,
-                                        int_ctrl_cols = NULL,
-                                        format_spec = format_s),
-          regexp = "Column 1 of the bottom matrix with assay metadata in file"
+          object = df_out <- read_npx_wide_bottom(
+            df = df_rand$list_df_wide$df_bottom_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            data_type = data_type,
+            col_names = col_names,
+            format_spec = format_spec,
+            df_plate_panel = df_plate_panel
+          ),
+          regexp = "Unexpected values in column 1 of the bottom matrix with QC"
         )
 
       }
@@ -4483,34 +13013,48 @@ test_that(
       code = {
 
         # synthetic wide df
-        data_t <- "Quantified"
+        data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 1L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # extract col_split and assa_cols
-        col_s <- df_rand$long$df_top$df_plate |>
-          dplyr::mutate(
-            col_index_n = stringr::str_sub(string = .data[["col_index"]],
-                                           start = 2L) |>
-              as.integer()
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # plate panel combos
+        df_plate_panel <- df_rand$list_df_long$df_long |>
+          dplyr::select(
+            dplyr::all_of(c("Panel", "PlateID"))
           ) |>
-          dplyr::arrange(.data[["col_index_n"]]) |>
-          dplyr::slice_head(n = 1L) |>
-          dplyr::pull(.data[["col_index"]])
-        assay_c <- df_rand$long$df_top$df_oid$col_index
+          dplyr::distinct() |>
+          dplyr::left_join(
+            df_rand$list_df_long$df_plate_long |>
+              dplyr::select(
+                dplyr::all_of(c("PlateID", "Panel"))
+              ) |>
+              dplyr::distinct(),
+            by = "Panel",
+            relationship = "many-to-many"
+          )
 
         # modify df with wrong V1
-        df_rand$wide$df_bottom <- df_rand$wide$df_bottom |>
+        df_rand$list_df_wide$df_bottom_wide <-
+          df_rand$list_df_wide$df_bottom_wide |>
           dplyr::mutate(
             V1 = dplyr::if_else(.data[["V1"]] == "Assay warning",
                                 "I_am_Unexpected",
@@ -4522,13 +13066,16 @@ test_that(
 
         # check that function runs with error
         expect_error(
-          object = read_npx_wide_bottom(df = df_rand$wide$df_bottom,
-                                        file = wide_excel,
-                                        col_split = col_s,
-                                        assay_cols = assay_c,
-                                        int_ctrl_cols = NULL,
-                                        format_spec = format_s),
-          regexp = "Column 1 of the bottom matrix with assay metadata in file"
+          object = df_out <- read_npx_wide_bottom(
+            df = df_rand$list_df_wide$df_bottom_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            data_type = data_type,
+            col_names = col_names,
+            format_spec = format_spec,
+            df_plate_panel = df_plate_panel
+          ),
+          regexp = "Unexpected values in column 1 of the bottom matrix with QC"
         )
 
       }
@@ -4543,44 +13090,69 @@ test_that(
       code = {
 
         # synthetic wide df
-        data_t <- "Quantified"
+        data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
                                         data_type = "NPX",
-                                        n_panels = 1L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # extract col_split and assa_cols
-        col_s <- df_rand$long$df_top$df_plate |>
-          dplyr::mutate(
-            col_index_n = stringr::str_sub(string = .data[["col_index"]],
-                                           start = 2L) |>
-              as.integer()
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # plate panel combos
+        df_plate_panel <- df_rand$list_df_long$df_long |>
+          dplyr::select(
+            dplyr::all_of(c("Panel", "PlateID"))
           ) |>
-          dplyr::arrange(.data[["col_index_n"]]) |>
-          dplyr::slice_head(n = 1L) |>
-          dplyr::pull(.data[["col_index"]])
-        assay_c <- df_rand$long$df_top$df_oid$col_index
+          dplyr::distinct() |>
+          dplyr::left_join(
+            df_rand$list_df_long$df_plate_long |>
+              dplyr::select(
+                dplyr::all_of(c("PlateID", "Panel"))
+              ) |>
+              dplyr::distinct(),
+            by = "Panel",
+            relationship = "many-to-many"
+          )
+
+        # modify df with wrong V1
+        df_rand$list_df_wide$df_bottom_wide <-
+          df_rand$list_df_wide$df_bottom_wide |>
+          dplyr::mutate(
+            V1 = dplyr::if_else(.data[["V1"]] == "Assay warning",
+                                "I_am_Unexpected",
+                                .data[["V1"]])
+          )
 
         # write empty-ish file
         writeLines("foo", wide_excel)
 
         # check that function runs with error
         expect_error(
-          object = read_npx_wide_bottom(df = df_rand$wide$df_bottom,
-                                        file = wide_excel,
-                                        col_split = col_s,
-                                        assay_cols = assay_c,
-                                        int_ctrl_cols = NULL,
-                                        format_spec = format_s),
-          regexp = "Column 1 of the bottom matrix with assay metadata in file"
+          object = df_out <- read_npx_wide_bottom(
+            df = df_rand$list_df_wide$df_bottom_wide,
+            file = wide_excel,
+            olink_platform = olink_platform,
+            data_type = data_type,
+            col_names = col_names,
+            format_spec = format_spec,
+            df_plate_panel = df_plate_panel
+          ),
+          regexp = "Unexpected values in column 1 of the bottom matrix with QC"
         )
 
       }
@@ -4599,37 +13171,52 @@ test_that(
       code = {
 
         # synthetic wide df
-        data_t <- "Quantified"
+        data_type <- "Quantified"
+        olink_platform <- "Target 48"
 
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
                                         n_panels = 1L,
                                         n_assays = 45L,
                                         n_samples = 100L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
+                                        show_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
 
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
+        format_spec <- olink_wide_excel_spec |>
+          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # extract col_split and assa_cols
-        col_s <- df_rand$long$df_top$df_plate |>
-          dplyr::mutate(
-            col_index_n = stringr::str_sub(string = .data[["col_index"]],
-                                           start = 2L) |>
-              as.integer()
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # plate panel combos
+        df_plate_panel <- df_rand$list_df_long$df_long |>
+          dplyr::select(
+            dplyr::all_of(c("Panel", "PlateID"))
           ) |>
-          dplyr::arrange(.data[["col_index_n"]]) |>
-          dplyr::slice_head(n = 1L) |>
-          dplyr::pull(.data[["col_index"]])
-        assay_c <- df_rand$long$df_top$df_oid$col_index
+          dplyr::distinct() |>
+          dplyr::left_join(
+            df_rand$list_df_long$df_plate_long |>
+              dplyr::select(
+                dplyr::all_of(c("PlateID", "Panel"))
+              ) |>
+              dplyr::distinct(),
+            by = "Panel",
+            relationship = "many-to-many"
+          )
 
-        # remove one row with plate into from bottom row
-        df_rand$wide$df_bottom <- df_rand$wide$df_bottom |>
+        # modify df with wrong V1
+        df_rand$list_df_wide$df_bottom_wide <-
+          df_rand$list_df_wide$df_bottom_wide |>
           dplyr::filter(
-            !(.data[["V1"]] == "Plate LOD"
-              & .data[[col_s]] == "Plate2")
+            !(.data[["V1"]] == "Assay warning"
+              & .data[["V47"]] == "Plate1_Panel1")
           )
 
         # write empty-ish file
@@ -4637,964 +13224,3818 @@ test_that(
 
         # check that function runs with error
         expect_error(
-          object = read_npx_wide_bottom(df = df_rand$wide$df_bottom,
-                                        file = wide_excel,
-                                        col_split = col_s,
-                                        assay_cols = assay_c,
-                                        int_ctrl_cols = NULL,
-                                        format_spec = format_s),
-          regexp = "Column 1 of the bottom matrix contains uneven rows of plate"
-        )
-
-      }
-    )
-
-  }
-)
-
-# Test read_npx_wide_middle ----
-
-test_that(
-  "read_npx_wide_middle - works",
-  {
-    # NPX 1 panel ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        data_t <- "NPX"
-
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 1L,
-                                        n_assays = 45L,
-                                        n_samples = 200L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # get column names
-        assay_c <- df_rand$long$df_top$df_oid$col_index
-        plate_c <- df_rand$long$df_top$df_plate$col_index
-        qc_warn_c <- df_rand$long$df_top$df_qc_warn$col_index
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # check that function runs
-        expect_no_condition(
-          object = l_obj <- read_npx_wide_middle(df = df_rand$wide$df_middle,
-                                                 file = wide_excel,
-                                                 data_type = data_t,
-                                                 assay_cols = assay_c,
-                                                 plate_cols = plate_c,
-                                                 qc_warn_cols = qc_warn_c,
-                                                 int_ctrl_cols = NULL)
-        )
-
-        # check that dfs are identical
-        expect_identical(
-          object = l_obj$df_oid,
-          expected = df_rand$long$df_middle$df_oid
-        )
-
-        expect_identical(
-          object = l_obj$df_plate,
-          expected = df_rand$long$df_middle$df_plate
-        )
-
-        expect_identical(
-          object = l_obj$df_qc_warn,
-          expected = df_rand$long$df_middle$df_qc_warn
-        )
-
-        expect_false(object = "df_int_ctrl" %in% names(l_obj$df_plate))
-
-      }
-    )
-
-    # NPX multi-panel ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        data_t <- "NPX"
-
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 4L,
-                                        n_assays = 45L,
-                                        n_samples = 200L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # get column names
-        assay_c <- df_rand$long$df_top$df_oid$col_index
-        plate_c <- df_rand$long$df_top$df_plate$col_index
-        qc_warn_c <- df_rand$long$df_top$df_qc_warn$col_index
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # check that function runs
-        expect_no_condition(
-          object = l_obj <- read_npx_wide_middle(df = df_rand$wide$df_middle,
-                                                 file = wide_excel,
-                                                 data_type = data_t,
-                                                 assay_cols = assay_c,
-                                                 plate_cols = plate_c,
-                                                 qc_warn_cols = qc_warn_c,
-                                                 int_ctrl_cols = NULL)
-        )
-
-        # check that dfs are identical
-        expect_identical(
-          object = l_obj$df_oid,
-          expected = df_rand$long$df_middle$df_oid
-        )
-
-        expect_identical(
-          object = l_obj$df_plate,
-          expected = df_rand$long$df_middle$df_plate
-        )
-
-        expect_identical(
-          object = l_obj$df_qc_warn,
-          expected = df_rand$long$df_middle$df_qc_warn
-        )
-
-        expect_false(object = "df_int_ctrl" %in% names(l_obj$df_plate))
-
-      }
-    )
-
-    # Ct 1 panel ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        data_t <- "Ct"
-
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 1L,
-                                        n_assays = 45L,
-                                        n_samples = 200L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # get column names
-        assay_c <- df_rand$long$df_top$df_oid$col_index
-        plate_c <- df_rand$long$df_top$df_plate$col_index
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # check that function runs
-        expect_no_condition(
-          object = l_obj <- read_npx_wide_middle(df = df_rand$wide$df_middle,
-                                                 file = wide_excel,
-                                                 data_type = data_t,
-                                                 assay_cols = assay_c,
-                                                 plate_cols = plate_c,
-                                                 qc_warn_cols = NULL,
-                                                 int_ctrl_cols = NULL)
-        )
-
-        # check that dfs are identical
-        expect_identical(
-          object = l_obj$df_oid,
-          expected = df_rand$long$df_middle$df_oid
-        )
-
-        expect_identical(
-          object = l_obj$df_plate,
-          expected = df_rand$long$df_middle$df_plate
-        )
-
-        expect_false(object = "df_qc_warn" %in% names(l_obj$df_plate))
-
-        expect_false(object = "df_int_ctrl" %in% names(l_obj$df_plate))
-
-      }
-    )
-
-    # Ct multi-panel ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        data_t <- "Ct"
-
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 4L,
-                                        n_assays = 45L,
-                                        n_samples = 200L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # get column names
-        assay_c <- df_rand$long$df_top$df_oid$col_index
-        plate_c <- df_rand$long$df_top$df_plate$col_index
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # check that function runs
-        expect_no_condition(
-          object = l_obj <- read_npx_wide_middle(df = df_rand$wide$df_middle,
-                                                 file = wide_excel,
-                                                 data_type = data_t,
-                                                 assay_cols = assay_c,
-                                                 plate_cols = plate_c,
-                                                 qc_warn_cols = NULL,
-                                                 int_ctrl_cols = NULL)
-        )
-
-        # check that dfs are identical
-        expect_identical(
-          object = l_obj$df_oid,
-          expected = df_rand$long$df_middle$df_oid
-        )
-
-        expect_identical(
-          object = l_obj$df_plate,
-          expected = df_rand$long$df_middle$df_plate
-        )
-
-        expect_false(object = "df_qc_warn" %in% names(l_obj$df_plate))
-
-        expect_false(object = "df_int_ctrl" %in% names(l_obj$df_plate))
-
-      }
-    )
-
-    # Quantified 1 panel ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        data_t <- "Quantified"
-
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 1L,
-                                        n_assays = 45L,
-                                        n_samples = 200L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # get column names
-        assay_c <- df_rand$long$df_top$df_oid$col_index
-        plate_c <- df_rand$long$df_top$df_plate$col_index
-        qc_warn_c <- df_rand$long$df_top$df_qc_warn$col_index
-        int_ctrl_cols <- df_rand$long$df_top$df_int_ctrl$col_index
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # check that function runs
-        expect_no_condition(
-          object = l_obj <- read_npx_wide_middle(df = df_rand$wide$df_middle,
-                                                 file = wide_excel,
-                                                 data_type = data_t,
-                                                 assay_cols = assay_c,
-                                                 plate_cols = plate_c,
-                                                 qc_warn_cols = qc_warn_c,
-                                                 int_ctrl_cols = int_ctrl_cols)
-        )
-
-        # check that dfs are identical
-        expect_identical(
-          object = l_obj$df_oid,
-          expected = df_rand$long$df_middle$df_oid
-        )
-
-        expect_identical(
-          object = l_obj$df_plate,
-          expected = df_rand$long$df_middle$df_plate
-        )
-
-        expect_identical(
-          object = l_obj$df_qc_warn,
-          expected = df_rand$long$df_middle$df_qc_warn
-        )
-
-        expect_identical(
-          object = l_obj$df_int_ctrl,
-          expected = df_rand$long$df_middle$df_int_ctrl
-        )
-
-      }
-    )
-
-    # Quantified multi-panel ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        data_t <- "Quantified"
-
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 4L,
-                                        n_assays = 45L,
-                                        n_samples = 200L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # get column names
-        assay_c <- df_rand$long$df_top$df_oid$col_index
-        plate_c <- df_rand$long$df_top$df_plate$col_index
-        qc_warn_c <- df_rand$long$df_top$df_qc_warn$col_index
-        int_ctrl_cols <- df_rand$long$df_top$df_int_ctrl$col_index
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # check that function runs
-        expect_no_condition(
-          object = l_obj <- read_npx_wide_middle(df = df_rand$wide$df_middle,
-                                                 file = wide_excel,
-                                                 data_type = data_t,
-                                                 assay_cols = assay_c,
-                                                 plate_cols = plate_c,
-                                                 qc_warn_cols = qc_warn_c,
-                                                 int_ctrl_cols = int_ctrl_cols)
-        )
-
-        # check that dfs are identical
-        expect_identical(
-          object = l_obj$df_oid,
-          expected = df_rand$long$df_middle$df_oid
-        )
-
-        expect_identical(
-          object = l_obj$df_plate,
-          expected = df_rand$long$df_middle$df_plate
-        )
-
-        expect_identical(
-          object = l_obj$df_qc_warn,
-          expected = df_rand$long$df_middle$df_qc_warn
-        )
-
-        expect_identical(
-          object = l_obj$df_int_ctrl,
-          expected = df_rand$long$df_middle$df_int_ctrl
-        )
-
-      }
-    )
-
-    # Quantified multi-panel shuffled ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        data_t <- "Quantified"
-
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 4L,
-                                        n_assays = 45L,
-                                        n_samples = 200L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = TRUE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # get column names
-        assay_c <- df_rand$long$df_top$df_oid$col_index
-        plate_c <- df_rand$long$df_top$df_plate$col_index
-        qc_warn_c <- df_rand$long$df_top$df_qc_warn$col_index
-        int_ctrl_cols <- df_rand$long$df_top$df_int_ctrl$col_index
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # check that function runs
-        expect_no_condition(
-          object = l_obj <- read_npx_wide_middle(df = df_rand$wide$df_middle,
-                                                 file = wide_excel,
-                                                 data_type = data_t,
-                                                 assay_cols = assay_c,
-                                                 plate_cols = plate_c,
-                                                 qc_warn_cols = qc_warn_c,
-                                                 int_ctrl_cols = int_ctrl_cols)
-        )
-
-        # check that dfs are identical
-        expect_identical(
-          object = l_obj$df_oid,
-          expected = df_rand$long$df_middle$df_oid
-        )
-
-        expect_identical(
-          object = l_obj$df_plate,
-          expected = df_rand$long$df_middle$df_plate
-        )
-
-        expect_identical(
-          object = l_obj$df_qc_warn,
-          expected = df_rand$long$df_middle$df_qc_warn
-        )
-
-        expect_identical(
-          object = l_obj$df_int_ctrl,
-          expected = df_rand$long$df_middle$df_int_ctrl
-        )
-
-      }
-    )
-  }
-)
-
-test_that(
-  "read_npx_wide_middle - error - non-unique sample id",
-  {
-    # 1 duplicate ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        data_t <- "NPX"
-
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 2L,
-                                        n_assays = 45L,
-                                        n_samples = 101L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # get column names
-        assay_c <- df_rand$long$df_top$df_oid$col_index
-        plate_c <- df_rand$long$df_top$df_plate$col_index
-        qc_warn_c <- df_rand$long$df_top$df_qc_warn$col_index
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # introduce duplicate sample id for the test
-        df_rand$wide$df_middle <- df_rand$wide$df_middle |>
-          dplyr::mutate(
-            V1 = dplyr::if_else(.data[["V1"]] == "S2",
-                                "S1",
-                                .data[["V1"]])
-          )
-
-        # check that function runs with error
-        expect_error(
-          object = read_npx_wide_middle(df = df_rand$wide$df_middle,
-                                        file = wide_excel,
-                                        data_type = data_t,
-                                        assay_cols = assay_c,
-                                        plate_cols = plate_c,
-                                        qc_warn_cols = qc_warn_c,
-                                        int_ctrl_cols = NULL),
-          regexp = "does not contain unique sample identifiers."
-        )
-
-      }
-    )
-
-    # 3 duplicates ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        data_t <- "NPX"
-
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 2L,
-                                        n_assays = 45L,
-                                        n_samples = 101L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # get column names
-        assay_c <- df_rand$long$df_top$df_oid$col_index
-        plate_c <- df_rand$long$df_top$df_plate$col_index
-        qc_warn_c <- df_rand$long$df_top$df_qc_warn$col_index
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # introduce duplicate sample id for the test
-        df_rand$wide$df_middle <- df_rand$wide$df_middle |>
-          dplyr::mutate(
-            V1 = dplyr::case_when(.data[["V1"]] %in% c("S2", "S3") ~ "S1",
-                                  .data[["V1"]] %in% c("S4", "S5") ~ "S2",
-                                  TRUE ~ .data[["V1"]],
-                                  .default = .data[["V1"]])
-          )
-
-        # check that function runs with error
-        expect_error(
-          object = read_npx_wide_middle(df = df_rand$wide$df_middle,
-                                        file = wide_excel,
-                                        data_type = data_t,
-                                        assay_cols = assay_c,
-                                        plate_cols = plate_c,
-                                        qc_warn_cols = qc_warn_c,
-                                        int_ctrl_cols = NULL),
-          regexp = "does not contain unique sample identifiers."
-        )
-
-      }
-    )
-
-  }
-)
-
-test_that(
-  "read_npx_wide_middle - error - uneven number of platid and qc_warning",
-  {
-    # Missing plateid column ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        data_t <- "NPX"
-
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 2L,
-                                        n_assays = 45L,
-                                        n_samples = 101L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # get column names
-        assay_c <- df_rand$long$df_top$df_oid$col_index
-        plate_c <- df_rand$long$df_top$df_plate$col_index
-        qc_warn_c <- df_rand$long$df_top$df_qc_warn$col_index
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # remove one column with "Plate ID"
-        df_rand$wide$df_middle <- df_rand$wide$df_middle |>
-          dplyr::select(
-            -dplyr::all_of(plate_c[1])
-          )
-        plate_c <- plate_c[plate_c != plate_c[1]]
-
-        # check that function runs with error
-        expect_error(
-          object = read_npx_wide_middle(df = df_rand$wide$df_middle,
-                                        file = wide_excel,
-                                        data_type = data_t,
-                                        assay_cols = assay_c,
-                                        plate_cols = plate_c,
-                                        qc_warn_cols = qc_warn_c,
-                                        int_ctrl_cols = NULL),
-          regexp = "Uneven number of entries of \"Plate ID\" and \"QC Warning\""
-        )
-
-      }
-    )
-
-    # Missing qc warning column ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        data_t <- "NPX"
-
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 2L,
-                                        n_assays = 45L,
-                                        n_samples = 101L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # get column names
-        assay_c <- df_rand$long$df_top$df_oid$col_index
-        plate_c <- df_rand$long$df_top$df_plate$col_index
-        qc_warn_c <- df_rand$long$df_top$df_qc_warn$col_index
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # remove one column with "Plate ID"
-        df_rand$wide$df_middle <- df_rand$wide$df_middle |>
-          dplyr::select(
-            -dplyr::all_of(qc_warn_c[1])
-          )
-        qc_warn_c <- qc_warn_c[qc_warn_c != qc_warn_c[1]]
-
-        # check that function runs with error
-        expect_error(
-          object = read_npx_wide_middle(df = df_rand$wide$df_middle,
-                                        file = wide_excel,
-                                        data_type = data_t,
-                                        assay_cols = assay_c,
-                                        plate_cols = plate_c,
-                                        qc_warn_cols = qc_warn_c,
-                                        int_ctrl_cols = NULL),
-          regexp = "Uneven number of entries of \"Plate ID\" and \"QC Warning\""
-        )
-
-      }
-    )
-
-  }
-)
-
-test_that(
-  "read_npx_wide_middle - works/error - uneven number of internal controls",
-  {
-    # Not shuffled internal controls ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        data_t <- "Quantified"
-
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 2L,
-                                        n_assays = 45L,
-                                        n_samples = 110L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # get column names
-        assay_c <- df_rand$long$df_top$df_oid$col_index
-        plate_c <- df_rand$long$df_top$df_plate$col_index
-        qc_warn_c <- df_rand$long$df_top$df_qc_warn$col_index
-        int_ctrl_cols <- df_rand$long$df_top$df_int_ctrl$col_index
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # remove one column with "Internal Control"
-        df_rand$wide$df_middle <- df_rand$wide$df_middle |>
-          dplyr::select(
-            -dplyr::all_of(int_ctrl_cols[1])
-          )
-        int_ctrl_cols <- int_ctrl_cols[int_ctrl_cols != int_ctrl_cols[1]]
-
-        # check that function runs with error
-        expect_error(
-          object = read_npx_wide_middle(df = df_rand$wide$df_middle,
-                                        file = wide_excel,
-                                        data_type = data_t,
-                                        assay_cols = assay_c,
-                                        plate_cols = plate_c,
-                                        qc_warn_cols = qc_warn_c,
-                                        int_ctrl_cols = int_ctrl_cols),
-          regexp = "Uneven number of entries of \"Internal Control\" assays in"
-        )
-
-      }
-    )
-
-    # Shuffled internal controls ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        data_t <- "Quantified"
-
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 2L,
-                                        n_assays = 45L,
-                                        n_samples = 110L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = TRUE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # get column names
-        assay_c <- df_rand$long$df_top$df_oid$col_index
-        plate_c <- df_rand$long$df_top$df_plate$col_index
-        qc_warn_c <- df_rand$long$df_top$df_qc_warn$col_index
-        int_ctrl_cols <- df_rand$long$df_top$df_int_ctrl$col_index
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # remove one column with "Internal Control"
-        df_rand$wide$df_middle <- df_rand$wide$df_middle |>
-          dplyr::select(
-            -dplyr::all_of(int_ctrl_cols[1])
-          )
-        int_ctrl_cols <- int_ctrl_cols[int_ctrl_cols != int_ctrl_cols[1]]
-
-        # check that function runs with error
-        expect_error(
-          object = read_npx_wide_middle(df = df_rand$wide$df_middle,
-                                        file = wide_excel,
-                                        data_type = data_t,
-                                        assay_cols = assay_c,
-                                        plate_cols = plate_c,
-                                        qc_warn_cols = qc_warn_c,
-                                        int_ctrl_cols = int_ctrl_cols),
-          regexp = "Uneven number of entries of \"Internal Control\" assays in"
-        )
-
-      }
-    )
-
-    # 2 internal controls - NO ERROR ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        data_t <- "Quantified"
-
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 2L,
-                                        n_assays = 45L,
-                                        n_samples = 110L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = TRUE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # get column names
-        assay_c <- df_rand$long$df_top$df_oid$col_index
-        plate_c <- df_rand$long$df_top$df_plate$col_index
-        qc_warn_c <- df_rand$long$df_top$df_qc_warn$col_index
-        int_ctrl_cols <- df_rand$long$df_top$df_int_ctrl$col_index
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # remove one column with "Internal Control"
-        df_rand$wide$df_middle <- df_rand$wide$df_middle |>
-          dplyr::select(
-            -dplyr::all_of(int_ctrl_cols[1:2])
-          )
-        int_ctrl_cols <- int_ctrl_cols[!(int_ctrl_cols %in% int_ctrl_cols[1:2])]
-
-        # check that function runs
-        expect_no_condition(
-          object = l_obj <- read_npx_wide_middle(df = df_rand$wide$df_middle,
-                                                 file = wide_excel,
-                                                 data_type = data_t,
-                                                 assay_cols = assay_c,
-                                                 plate_cols = plate_c,
-                                                 qc_warn_cols = qc_warn_c,
-                                                 int_ctrl_cols = int_ctrl_cols)
-        )
-
-      }
-    )
-
-    # 1 internal controls - NO ERROR ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        data_t <- "Quantified"
-
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 2L,
-                                        n_assays = 45L,
-                                        n_samples = 110L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = TRUE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # get column names
-        assay_c <- df_rand$long$df_top$df_oid$col_index
-        plate_c <- df_rand$long$df_top$df_plate$col_index
-        qc_warn_c <- df_rand$long$df_top$df_qc_warn$col_index
-        int_ctrl_cols <- df_rand$long$df_top$df_int_ctrl$col_index
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # remove one column with "Internal Control"
-        df_rand$wide$df_middle <- df_rand$wide$df_middle |>
-          dplyr::select(
-            -dplyr::all_of(int_ctrl_cols[1:4])
-          )
-        int_ctrl_cols <- int_ctrl_cols[!(int_ctrl_cols %in% int_ctrl_cols[1:4])]
-
-        # check that function runs
-        expect_no_condition(
-          object = l_obj <- read_npx_wide_middle(df = df_rand$wide$df_middle,
-                                                 file = wide_excel,
-                                                 data_type = data_t,
-                                                 assay_cols = assay_c,
-                                                 plate_cols = plate_c,
-                                                 qc_warn_cols = qc_warn_c,
-                                                 int_ctrl_cols = int_ctrl_cols)
-        )
-
-      }
-    )
-
-  }
-)
-
-# Test read_npx_wide_long_assay_quant ----
-
-test_that(
-  "read_npx_wide_long_assay_quant - error - non-identical col_index",
-  {
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # synthetic wide df
-        data_t <- "NPX"
-
-        df_rand <- olink_wide_synthetic(olink_platform = "Target 48",
-                                        data_type = data_t,
-                                        n_panels = 2L,
-                                        n_assays = 45L,
-                                        n_samples = 101L,
-                                        show_int_ctrl = TRUE,
-                                        loc_int_ctrl = "V3",
-                                        shuffle_assays = FALSE)
-
-        format_s <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_t"]])
-
-        # modify df_rand$long$df_middle$df_oid to reproduce error
-        df_rand$long$df_middle$df_oid <- df_rand$long$df_middle$df_oid |>
-          dplyr::filter(
-            .data[["col_index"]] != "V2"
-          )
-
-        # check that function runs with error
-        expect_error(
-          object = read_npx_wide_long_assay_quant(
-            df_top_oid = df_rand$long$df_top$df_oid,
-            df_mid_quant = df_rand$long$df_middle$df_oid,
+          object = read_npx_wide_bottom(
+            df = df_rand$list_df_wide$df_bottom_wide,
             file = wide_excel,
-            format_spec = format_s
+            olink_platform = olink_platform,
+            data_type = data_type,
+            col_names = col_names,
+            format_spec = format_spec,
+            df_plate_panel = df_plate_panel
           ),
-          regexp = "Column \"col_index\" of the top matrix with assay metadata"
+          regexp = "Column 1 of the bottom matrix does not contain the same"
+        )
+
+      }
+    )
+
+  }
+)
+
+# Test read_npx_wide ----
+
+test_that(
+  "read_npx_wide - works - T48 - single panel - single plate",
+  {
+    # variables that apply to all tests
+    olink_platform <- "Target 48"
+    n_panels <- 1L
+    n_assays <- 45L
+    n_samples <- 88L
+
+    ## NPX no int ctrl, no dev int ctrl, v1 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## NPX no int ctrl, no dev int ctrl, v2 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 2L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## NPX no int ctrl, with dev int ctrl, v1 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 1L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## NPX no int ctrl, with dev int ctrl, v2 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 2L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## NPX with int ctrl, no dev int ctrl, v1 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## NPX with int ctrl, no dev int ctrl, v2 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 2L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## NPX with int ctrl, with dev int ctrl, v1 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 1L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## NPX with int ctrl, with dev int ctrl, v2 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 2L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## Ct no int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Ct"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## Ct with int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Ct"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 2L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## Quantified no int ctrl, no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## Quantified no int ctrl, with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 0L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## Quantified with int ctrl, no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## Quantified with int ctrl, with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 0L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+  }
+)
+
+test_that(
+  "read_npx_wide - works - T48 - multiple panels - single plate",
+  {
+    # variables that apply to all tests
+    olink_platform <- "Target 48"
+    n_panels <- 3L
+    n_assays <- 45L
+    n_samples <- 88L
+
+    ## NPX no int ctrl, no dev int ctrl, v1 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## NPX no int ctrl, no dev int ctrl, v2 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 2L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## NPX no int ctrl, with dev int ctrl, v1 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 1L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## NPX no int ctrl, with dev int ctrl, v2 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 2L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## NPX with int ctrl, no dev int ctrl, v1 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## NPX with int ctrl, no dev int ctrl, v2 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 2L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## NPX with int ctrl, with dev int ctrl, v1 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 1L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## NPX with int ctrl, with dev int ctrl, v2 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 2L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## Ct no int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Ct"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## Ct with int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Ct"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 2L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## Quantified no int ctrl, no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## Quantified no int ctrl, with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 0L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## Quantified with int ctrl, no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## Quantified with int ctrl, with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 0L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+  }
+)
+
+test_that(
+  "read_npx_wide - works - T48 - single panel - multiple plates",
+  {
+    # variables that apply to all tests
+    olink_platform <- "Target 48"
+    n_panels <- 1L
+    n_assays <- 45L
+    n_samples <- 150L
+
+    ## NPX no int ctrl, no dev int ctrl, v1 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## NPX no int ctrl, no dev int ctrl, v2 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 2L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## NPX no int ctrl, with dev int ctrl, v1 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 1L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## NPX no int ctrl, with dev int ctrl, v2 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 2L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## NPX with int ctrl, no dev int ctrl, v1 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## NPX with int ctrl, no dev int ctrl, v2 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 2L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## NPX with int ctrl, with dev int ctrl, v1 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 1L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## NPX with int ctrl, with dev int ctrl, v2 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 2L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## Ct no int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Ct"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## Ct with int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Ct"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 2L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## Quantified no int ctrl, no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## Quantified no int ctrl, with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 0L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## Quantified with int ctrl, no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## Quantified with int ctrl, with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 0L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+  }
+)
+
+test_that(
+  "read_npx_wide - works - T48 - multiple panels - multiple plates",
+  {
+    # variables that apply to all tests
+    olink_platform <- "Target 48"
+    n_panels <- 4L
+    n_assays <- 45L
+    n_samples <- 150L
+
+    ## NPX no int ctrl, no dev int ctrl, v1 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## NPX no int ctrl, no dev int ctrl, v2 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 2L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## NPX no int ctrl, with dev int ctrl, v1 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 1L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## NPX no int ctrl, with dev int ctrl, v2 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 2L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## NPX with int ctrl, no dev int ctrl, v1 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## NPX with int ctrl, no dev int ctrl, v2 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 2L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## NPX with int ctrl, with dev int ctrl, v1 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 1L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## NPX with int ctrl, with dev int ctrl, v2 ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "NPX"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 2L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## Ct no int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Ct"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 1L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## Ct with int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Ct"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 2L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## Quantified no int ctrl, no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## Quantified no int ctrl, with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+        show_int_ctrl <- FALSE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 0L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## Quantified with int ctrl, no dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = FALSE,
+                                        version = 0L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
+        )
+
+      }
+    )
+
+    ## Quantified with int ctrl, with dev int ctrl ----
+
+    withr::with_tempfile(
+      new = "wide_excel",
+      pattern = "test-excel-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # synthetic wide df
+        data_type <- "Quantified"
+        show_int_ctrl <- TRUE
+
+        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                        data_type = data_type,
+                                        n_panels = n_panels,
+                                        n_assays = n_assays,
+                                        n_samples = n_samples,
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = TRUE,
+                                        version = 0L)
+
+        # write wide df
+        writexl::write_xlsx(
+          x = df_rand$list_df_wide$df_wide,
+          path = wide_excel,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # expected dim of output df
+        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                          n_assays = n_assays,
+                                          n_samples = n_samples,
+                                          has_int_ctrl = show_int_ctrl,
+                                          num_int_ctrl = 3L)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide(
+            file = wide_excel,
+            data_type = data_type,
+            olink_platform = olink_platform
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_long) |> sort()
+        )
+
+        expect_identical(
+          object = df_out,
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out))
+            )
+        )
+
+        # check that output match
+        expect_true(
+          object = identical(nrow(df_out), n_row_exp)
         )
 
       }

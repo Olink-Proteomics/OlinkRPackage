@@ -5,15 +5,7 @@
 \title{Help function that splits df_mid from a Olink wide excel file into 4 data
 frames.}
 \usage{
-read_npx_wide_middle(
-  df,
-  file,
-  data_type,
-  assay_cols,
-  plate_cols,
-  qc_warn_cols,
-  int_ctrl_cols
-)
+read_npx_wide_middle(df, file, data_type, col_names)
 }
 \arguments{
 \item{df}{The middle data frame from a split Olink wide excel file.}
@@ -23,17 +15,9 @@ read_npx_wide_middle(
 \item{data_type}{The quantification in which the data comes in. Expecting one
 of NPX or Quantified.}
 
-\item{assay_cols}{Character vector with the names of the columns containing
-Olink assays.}
-
-\item{plate_cols}{Character vector with the names of the columns containing
-"Plate ID".}
-
-\item{qc_warn_cols}{Character vector with the names of the columns containing
-"QC Warning".}
-
-\item{int_ctrl_cols}{Character vector with the names of the columns
-containing "Internal Controls".}
+\item{col_names}{Names list of character vector with the names of the columns
+containing Olink data on assays, plates, QC Warnings, internal control
+assays and deviations from internal controls.}
 }
 \value{
 A list of data frames (df_oid, df_pid, df_qc_warn and df_int_ctrl) in

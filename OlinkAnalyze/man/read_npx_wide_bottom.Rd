@@ -7,10 +7,11 @@
 read_npx_wide_bottom(
   df,
   file,
-  col_split,
-  assay_cols,
-  int_ctrl_cols,
-  format_spec
+  olink_platform,
+  data_type,
+  col_names,
+  format_spec,
+  df_plate_panel
 )
 }
 \arguments{
@@ -18,17 +19,20 @@ read_npx_wide_bottom(
 
 \item{file}{The input excel file.}
 
-\item{col_split}{The name of the column that splits the Olink wide excel file
-into left (assay info) and right  hand side (PlateID and QC_Warning info).}
+\item{olink_platform}{The Olink platform used to generate the input file.
+Expecting "Target 96", "Target 48", "Flex" or "Focus".}
 
-\item{assay_cols}{Character vector with the names of the columns containing
-Olink assays.}
+\item{data_type}{The quantification in which the data comes in. Expecting one
+of NPX, Quantified or Ct.}
 
-\item{int_ctrl_cols}{Character vector with the names of the columns
-containing "Internal Controls".}
+\item{col_names}{Names list of character vector with the names of the columns
+containing Olink data on assays and internal control assays.}
 
 \item{format_spec}{A one-row data frame filtered from olink_wide_excel_spec
 with the Olink wide excel file specifications.}
+
+\item{df_plate_panel}{Data frame with unique combinations of panels and
+plates from the combination of top and middle data frames.}
 }
 \value{
 The bottom matrix in long format.
