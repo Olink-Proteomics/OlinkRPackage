@@ -60,10 +60,10 @@ read_npx_parquet <- function (filename) {
   # We allow only Olink Explore HT parquet files for now
   # If other platforms are to be reported as parquet too, we have to add
   # them to this array
-  olink_platforms <- c("ExploreHT")
+  olink_platforms <- c("ExploreHT", "Explore3072")
   if (!(parquet_file$metadata$Product %in% olink_platforms)) {
 
-    stop("Only \"Olink Explore HT\" parquet files are currently supported.")
+    stop("Only \"Olink Explore HT\" or \"Olink Explore 3072\" parquet files are currently supported.")
 
   }
 
