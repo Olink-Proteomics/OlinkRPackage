@@ -34,6 +34,7 @@
 #' @importFrom dplyr pull filter
 #' @importFrom stringr str_detect str_replace
 #' @importFrom zip unzip
+#' @importFrom openssl sha256
 #'
 
 read_npx_zip <- function(filename) {
