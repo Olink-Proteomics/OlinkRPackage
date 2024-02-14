@@ -31,8 +31,11 @@ Helper function to read in Olink Explore zip csv files
 }
 \examples{
 \donttest{
+try({ # May fail if dependencies are not installed
 file <- system.file("extdata", "Example_NPX_Data.csv", package = "OlinkAnalyze")
 read_NPX(file)
+})
+
 }
 
 }
