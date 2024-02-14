@@ -174,13 +174,13 @@ test_that(
         # check that the comma delimited file exists
         expect_true(object = file.exists(dfile_test))
 
-        # check that reading the file works
-        expect_no_condition(
-          object = df_arrow <- read.delim(file = dfile_test,
-                                          header = TRUE,
-                                          sep = ",",
-                                          na.strings = c("", "NA")) |>
-            arrow::as_arrow_table()
+        # read the file
+        df_arrow <- arrow::open_delim_dataset(
+          sources = dfile_test,
+          delim = ",",
+          col_names = TRUE,
+          quoted_na = TRUE,
+          na = c("", "NA")
         )
 
         # check that variable exists
