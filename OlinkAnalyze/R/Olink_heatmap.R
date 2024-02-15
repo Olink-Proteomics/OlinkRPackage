@@ -216,7 +216,7 @@ olink_heatmap_plot <- function(df,
   # Add row annotations to call, if requested
   if (!is.null(variable_row_list)){
     variable_df <- df %>%
-      dplyr::select(SampleID, variable_row_list) %>%
+      dplyr::select(SampleID, all_of(variable_row_list)) %>%
       dplyr::distinct() %>%
       tibble::column_to_rownames('SampleID')
     pheatmap_args[["annotation_row"]] <- variable_df
@@ -226,7 +226,7 @@ olink_heatmap_plot <- function(df,
   if (!is.null(variable_col_list)){
     variable_df <- df %>%
       mutate(Assay_OlinkID = paste0(Assay,'_',OlinkID)) %>%
-      dplyr::select(Assay_OlinkID, variable_col_list) %>%
+      dplyr::select(Assay_OlinkID, all_of(variable_col_list)) %>%
       dplyr::distinct() %>%
       tibble::column_to_rownames('Assay_OlinkID')
     pheatmap_args[["annotation_col"]] <- variable_df
@@ -251,7 +251,7 @@ olink_heatmap_plot <- function(df,
     if (length(vars_to_color) > 0L) {
       # 'cols' contains all new colors for all variables to be annotated
       colors <- OlinkAnalyze::olink_pal()(
-        sum(sapply(dplyr::select(df, vars_to_color), function(x) length(unique(x))))
+        sum(sapply(dplyr::select(df, all_of(vars_to_color)), function(x) length(unique(x))))
       )
       # 'var_colors' is a list that fits the format expected by pheatmap
       # Each entry is named by the variable to be annotated, and the content is a named vector of colors
