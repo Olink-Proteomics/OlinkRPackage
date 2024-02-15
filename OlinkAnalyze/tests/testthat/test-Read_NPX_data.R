@@ -76,15 +76,15 @@ test_that("Data loads correctly with 'read_NPX()'", {
                    c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
                      "MissingFreq", "Panel","Panel_Version", "PlateID", "QC_Warning", "LOD",
                      "NPX"))
-  expect_identical(colnames(df_2),
-                   c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
-                     "MissingFreq", "Panel","Panel_Lot_Nr", "PlateID", "QC_Warning", "LOD",
-                     "NPX", "Normalization", "Assay_Warning"))
   expect_identical(colnames(df_2_2),
                    c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
                      "MissingFreq", "Panel","Panel_Lot_Nr", "PlateID", "QC_Warning", "LOD",
                      "NPX", "Normalization"))
   if (requireNamespace("openssl", quietly = TRUE)) {
+    expect_identical(colnames(df_2),
+                     c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
+                       "MissingFreq", "Panel","Panel_Lot_Nr", "PlateID", "QC_Warning", "LOD",
+                       "NPX", "Normalization", "Assay_Warning"))
     expect_identical(colnames(df_v3),
                      c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
                        "MissingFreq", "Panel", "Panel_Lot_Nr", "PlateID",
