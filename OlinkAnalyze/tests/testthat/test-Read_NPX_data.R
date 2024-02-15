@@ -9,12 +9,14 @@ test_that("Data loads correctly with 'read_NPX()'", {
 
   # load manifest 1
   df_2_2 <- read_NPX(system.file("extdata", "Example_NPX_Data2_1.csv", package = "OlinkAnalyze", mustWork = TRUE))
-  npx_file_v3 <- system.file("extdata", "npx_data_v3.zip", package = "OlinkAnalyze", mustWork = TRUE)
-  df_v3 <- read_NPX(filename = npx_file_v3)
-  npx_file_ext_v1 <- system.file("extdata", "npx_data_ext_v1.zip", package = "OlinkAnalyze", mustWork = TRUE)
-  df_ext_v1 <- read_NPX(filename = npx_file_ext_v1)
-  npx_file_ext_v2 <- system.file("extdata", "npx_data_ext_v2.zip", package = "OlinkAnalyze", mustWork = TRUE)
-  df_ext_v2 <- read_NPX(filename = npx_file_ext_v2)
+  if (requireNamespace("openssl", quietly = TRUE)) {
+    npx_file_v3 <- system.file("extdata", "npx_data_v3.zip", package = "OlinkAnalyze", mustWork = TRUE)
+    df_v3 <- read_NPX(filename = npx_file_v3)
+    npx_file_ext_v1 <- system.file("extdata", "npx_data_ext_v1.zip", package = "OlinkAnalyze", mustWork = TRUE)
+    df_ext_v1 <- read_NPX(filename = npx_file_ext_v1)
+    npx_file_ext_v2 <- system.file("extdata", "npx_data_ext_v2.zip", package = "OlinkAnalyze", mustWork = TRUE)
+    df_ext_v2 <- read_NPX(filename = npx_file_ext_v2)
+  }
   if (requireNamespace("arrow", quietly = TRUE) ){
     df_parquet <- read_NPX(filename = parquet_file)
   }
@@ -31,18 +33,19 @@ test_that("Data loads correctly with 'read_NPX()'", {
   }
 
   #NPX zip read ok?
-  zip_npx_file_fail_1 <- system.file("extdata", "Example_NPX_Data_zip.zip", package = "OlinkAnalyze", mustWork = TRUE)
-  expect_error(read_NPX(filename = zip_npx_file_fail_1), "Checksum of NPX file does not match the one from \"MD5_checksum.txt\"! Loss of data?")
+  if (requireNamespace("openssl", quietly = TRUE)) {
+    zip_npx_file_fail_1 <- system.file("extdata", "Example_NPX_Data_zip.zip", package = "OlinkAnalyze", mustWork = TRUE)
+    expect_error(read_NPX(filename = zip_npx_file_fail_1), "Checksum of NPX file does not match the one from \"MD5_checksum.txt\"! Loss of data?")
 
-  zip_npx_file_fail_2 <- system.file("extdata", "Example_NPX_Data_empty.zip", package = "OlinkAnalyze", mustWork = TRUE)
-  expect_error(read_NPX(filename = zip_npx_file_fail_2), "The compressed file does not contain a valid NPX file. Expecting: \"README.txt\", \"MD5_checksum.txt\" or \"checksum_sha256.txt\" and the NPX file.")
+    zip_npx_file_fail_2 <- system.file("extdata", "Example_NPX_Data_empty.zip", package = "OlinkAnalyze", mustWork = TRUE)
+    expect_error(read_NPX(filename = zip_npx_file_fail_2), "The compressed file does not contain a valid NPX file. Expecting: \"README.txt\", \"MD5_checksum.txt\" or \"checksum_sha256.txt\" and the NPX file.")
 
-  zip_npx_file_success <- system.file("extdata", "Example_NPX_Data_3K.zip", package = "OlinkAnalyze", mustWork = TRUE)
-  df_2 <- read_NPX(filename = zip_npx_file_success)
+    zip_npx_file_success <- system.file("extdata", "Example_NPX_Data_3K.zip", package = "OlinkAnalyze", mustWork = TRUE)
+    df_2 <- read_NPX(filename = zip_npx_file_success)
 
-  zip_npx_file_success_sha <- system.file("extdata", "Example_NPX_Data_sha256.zip", package = "OlinkAnalyze", mustWork = TRUE)
-  expect_snapshot(read_NPX(filename = zip_npx_file_success_sha))
-
+    zip_npx_file_success_sha <- system.file("extdata", "Example_NPX_Data_sha256.zip", package = "OlinkAnalyze", mustWork = TRUE)
+    expect_snapshot(read_NPX(filename = zip_npx_file_success_sha))
+  }
 
   #Manifest read ok?
   expect(exists("manifest_1"), failure_message = "Failed to read manifest_1.")
