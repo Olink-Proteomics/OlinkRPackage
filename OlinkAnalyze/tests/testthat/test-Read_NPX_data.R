@@ -25,9 +25,11 @@ test_that("Data loads correctly with 'read_NPX()'", {
   #NPX read ok?
   expect(exists("df_1"), failure_message = "read_NPX failed on dataset 1")
   expect_s3_class(df_1, class = "tbl_df")
-  expect(exists("df_v3"), failure_message = "read_NPX failed on dataset v3")
-  expect(exists("df_ext_v1"), failure_message = "read_NPX failed on extended dataset v1")
-  expect(exists("df_ext_v2"), failure_message = "read_NPX failed on extended dataset v2")
+  if (requireNamespace("openssl", quietly = TRUE)) {
+    expect(exists("df_v3"), failure_message = "read_NPX failed on dataset v3")
+    expect(exists("df_ext_v1"), failure_message = "read_NPX failed on extended dataset v1")
+    expect(exists("df_ext_v2"), failure_message = "read_NPX failed on extended dataset v2")
+  }
   if (requireNamespace("arrow", quietly = TRUE) ){
     expect(exists("df_parquet"), failure_message = "read_NPX failed on parquet dataset")
   }
@@ -56,14 +58,18 @@ test_that("Data loads correctly with 'read_NPX()'", {
   expect_equal(ncol(df_1), 12)
   expect_equal(nrow(df_2), 11772)
   expect_equal(ncol(df_2), 14)
-  expect_equal(nrow(df_v3), 1000)
-  expect_equal(ncol(df_v3), 16)
-  expect_equal(nrow(df_ext_v1), 1000)
-  expect_equal(ncol(df_ext_v1), 24)
-  expect_equal(nrow(df_ext_v2), 1000)
-  expect_equal(ncol(df_ext_v2), 22)
-  if (requireNamespace("arrow", quietly = TRUE) ){expect_equal(nrow(df_parquet), 1)}
-  if (requireNamespace("arrow", quietly = TRUE) ){expect_equal(ncol(df_parquet),19)}
+  if (requireNamespace("openssl", quietly = TRUE)) {
+    expect_equal(nrow(df_v3), 1000)
+    expect_equal(ncol(df_v3), 16)
+    expect_equal(nrow(df_ext_v1), 1000)
+    expect_equal(ncol(df_ext_v1), 24)
+    expect_equal(nrow(df_ext_v2), 1000)
+    expect_equal(ncol(df_ext_v2), 22)
+  }
+  if (requireNamespace("arrow", quietly = TRUE) ) {
+    expect_equal(nrow(df_parquet), 1)
+    expect_equal(ncol(df_parquet),19)
+  }
 
   #Correct col names?
   expect_identical(colnames(df_1),
@@ -78,26 +84,28 @@ test_that("Data loads correctly with 'read_NPX()'", {
                    c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
                      "MissingFreq", "Panel","Panel_Lot_Nr", "PlateID", "QC_Warning", "LOD",
                      "NPX", "Normalization"))
-  expect_identical(colnames(df_v3),
-                   c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
-                     "MissingFreq", "Panel", "Panel_Lot_Nr", "PlateID",
-                     "QC_Warning", "LOD", "NPX", "Normalization",
-                     "Assay_Warning", "Sample_Type", "ExploreVersion"))
-  expect_identical(colnames(df_ext_v1),
-                   c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
-                     "MissingFreq", "Panel", "Panel_Lot_Nr", "PlateID",
-                     "QC_Warning", "LOD", "NPX", "Normalization",
-                     "Assay_Warning", "Sample_Type", "WellID", "IntraCV",
-                     "InterCV", "Processing_StartDate", "Processing_EndDate",
-                     "AnalyzerID", "INC_Warning", "AMP_Warning",
-                     "Count_Warning"))
-  expect_identical(colnames(df_ext_v2),
-                   c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
-                     "MissingFreq", "Panel", "Panel_Lot_Nr", "PlateID",
-                     "QC_Warning", "LOD", "NPX", "Normalization",
-                     "Assay_Warning", "Sample_Type", "ExploreVersion", "WellID",
-                     "IntraCV", "InterCV", "Processing_StartDate",
-                     "Processing_EndDate", "AnalyzerID"))
+  if (requireNamespace("openssl", quietly = TRUE)) {
+    expect_identical(colnames(df_v3),
+                     c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
+                       "MissingFreq", "Panel", "Panel_Lot_Nr", "PlateID",
+                       "QC_Warning", "LOD", "NPX", "Normalization",
+                       "Assay_Warning", "Sample_Type", "ExploreVersion"))
+    expect_identical(colnames(df_ext_v1),
+                     c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
+                       "MissingFreq", "Panel", "Panel_Lot_Nr", "PlateID",
+                       "QC_Warning", "LOD", "NPX", "Normalization",
+                       "Assay_Warning", "Sample_Type", "WellID", "IntraCV",
+                       "InterCV", "Processing_StartDate", "Processing_EndDate",
+                       "AnalyzerID", "INC_Warning", "AMP_Warning",
+                       "Count_Warning"))
+    expect_identical(colnames(df_ext_v2),
+                     c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
+                       "MissingFreq", "Panel", "Panel_Lot_Nr", "PlateID",
+                       "QC_Warning", "LOD", "NPX", "Normalization",
+                       "Assay_Warning", "Sample_Type", "ExploreVersion", "WellID",
+                       "IntraCV", "InterCV", "Processing_StartDate",
+                       "Processing_EndDate", "AnalyzerID"))
+  }
   if (requireNamespace("arrow", quietly = TRUE) ){
     expect_identical(colnames(df_parquet),
                    c("SampleID", "SampleType", "WellID", "PlateID",
