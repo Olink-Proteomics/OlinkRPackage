@@ -56,9 +56,9 @@ test_that("Data loads correctly with 'read_NPX()'", {
   #Correct number of cols and rows?
   expect_equal(nrow(df_1), 29440)
   expect_equal(ncol(df_1), 12)
-  expect_equal(nrow(df_2), 11772)
-  expect_equal(ncol(df_2), 14)
   if (requireNamespace("openssl", quietly = TRUE)) {
+    expect_equal(nrow(df_2), 11772)
+    expect_equal(ncol(df_2), 14)
     expect_equal(nrow(df_v3), 1000)
     expect_equal(ncol(df_v3), 16)
     expect_equal(nrow(df_ext_v1), 1000)
