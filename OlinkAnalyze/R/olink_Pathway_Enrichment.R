@@ -169,6 +169,24 @@ data_prep <- function(data) {
     dplyr::filter(!(OlinkID %in% npx_check$all_nas)) %>%
     dplyr::filter(stringr::str_detect(OlinkID,
                                       "OID[0-9]{5}"))
+  # For data missing LOD column
+  if(!("LOD" %in% names(data))){
+    if("PlateLOD" %in% names(data)){
+      data$LOD <- data$PlateLOD
+    }
+    else if("MaxLOD" %in% names(data)){
+      data$LOD <- data$MaxLOD
+    }
+    else{
+      data$LOD <- -Inf
+    }
+  }
+  
+  # For data with SampleQC instead of QC_Warning
+  if("SampleQC" %in% names(data)){
+    data$QC_Warning <- data$SampleQC
+  }
+  
   # Filter highest detectibility for repeated IDs
   olink_ids <- data %>%
     dplyr::filter(!stringr::str_detect(string = SampleID, pattern = "CONTROL*.")) %>%
