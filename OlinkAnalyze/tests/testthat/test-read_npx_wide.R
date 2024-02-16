@@ -35,6 +35,8 @@ test_that(
         format_spec <- olink_wide_excel_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
+        wide_excel <- "../../lala.xlsx"
+
         # write wide df
         writexl::write_xlsx(
           x = df_rand$list_df_wide$df_wide,
@@ -48,6 +50,12 @@ test_that(
           object = df_out <- read_npx_wide_split_row(file = wide_excel,
                                                      data_type = data_type,
                                                      format_spec = format_spec)
+        )
+
+        # check that df_head works
+        expect_identical(
+          object = remove_all_na_cols(df = df_out$df_head),
+          expected = df_rand$list_df_wide$df_head_wide
         )
 
         # check that df_top works
@@ -110,6 +118,12 @@ test_that(
                                                      format_spec = format_spec)
         )
 
+        # check that df_head works
+        expect_identical(
+          object = remove_all_na_cols(df = df_out$df_head),
+          expected = df_rand$list_df_wide$df_head_wide
+        )
+
         # check that df_top works
         expect_identical(
           object = df_out$df_top,
@@ -165,6 +179,12 @@ test_that(
           object = df_out <- read_npx_wide_split_row(file = wide_excel,
                                                      data_type = data_type,
                                                      format_spec = format_spec)
+        )
+
+        # check that df_head works
+        expect_identical(
+          object = remove_all_na_cols(df = df_out$df_head),
+          expected = df_rand$list_df_wide$df_head_wide
         )
 
         # check that df_top works

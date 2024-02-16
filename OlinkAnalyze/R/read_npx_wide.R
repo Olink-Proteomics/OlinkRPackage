@@ -252,10 +252,12 @@ read_npx_wide_split_row <- function(file,
   # mark starting and ending row indexes of each sub-matrix
   df_split_index <- dplyr::tibble(
     start_row = c(
+      1L, # header
       3L, # skip first two rows
       na_row_index + 1L # all NA rows +1
     ),
     end_row = c(
+      2L, # header
       na_row_index - 1L, # all NA rows -1
       nrow(df) # last row of file
     )
@@ -282,9 +284,9 @@ read_npx_wide_split_row <- function(file,
   # output is a list of 2 or 3 dataframes, depending on data_type
   # name each data frame
   if (length(na_row_index) == 1L) {
-    names(list_df_split) <- c("df_top", "df_mid")
+    names(list_df_split) <- c("df_head", "df_top", "df_mid")
   } else {
-    names(list_df_split) <- c("df_top", "df_mid", "df_bottom")
+    names(list_df_split) <- c("df_head", "df_top", "df_mid", "df_bottom")
   }
 
   # return list of data frames ----
