@@ -127,8 +127,6 @@ read_npx_zip <- function(file,
   # temporary directory to extract
   tmp_unzip_dir <- tempfile()
 
-  print(paste("Zip fun", tmp_unzip_dir))
-
   zip::unzip(zipfile = file,
              files = files_to_extract,
              exdir = tmp_unzip_dir,
