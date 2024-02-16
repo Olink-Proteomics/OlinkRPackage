@@ -1085,6 +1085,7 @@ test_that(
             # exiting
             with_mocked_bindings(
               code = {
+                print(paste("Tempfile", tempfile()))
 
                 # write zip file
                 utils::zip(
@@ -1110,7 +1111,6 @@ test_that(
 
                 expect_false(dir.exists(tempfile()))
                 expect_false(file.exists(tempfile()))
-
               },
               tempfile = function() file.path(tempdir(), "I_am_4_TeMpFiLe"),
               .package = "base"
