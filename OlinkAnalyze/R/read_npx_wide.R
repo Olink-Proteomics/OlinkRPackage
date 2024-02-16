@@ -110,8 +110,27 @@ read_npx_wide <- function(file,
 
   # remove col_index from output df
   df_long <- df_long |>
+    dplyr::mutate(
+      Panel_Version = strsplit(x = .data[["Panel"]],
+                               split = "(",
+                               fixed = TRUE) |>
+        lapply(tail, 1L) |>
+        unlist() |>
+        (\(x) sub(pattern = ")",
+                  replacement = "",
+                  x = x,
+                  fixed = TRUE))()
+    ) |>
+    dplyr::mutate(
+      Panel = strsplit(x = .data[["Panel"]],
+                       split = "(",
+                       fixed = TRUE) |>
+        lapply(head, -1L) |>
+        lapply(paste, collapse = "(") |>
+        unlist()
+    ) |>
     dplyr::select(
-      -dplyr::all_of(c("col_index"))
+      -dplyr::all_of("col_index")
     )
 
   # return ----

@@ -1457,9 +1457,28 @@ olink_wide_to_long <- function(df_top_wide,
     }
   }
 
-  # remove col_index ----
+  ## Compute Panel_Version and remove col_index ----
 
   df_long <- df_long |>
+    dplyr::mutate(
+      Panel_Version = strsplit(x = .data[["Panel"]],
+                               split = "(",
+                               fixed = TRUE) |>
+        lapply(tail, 1L) |>
+        unlist() |>
+        (\(x) sub(pattern = ")",
+                  replacement = "",
+                  x = x,
+                  fixed = TRUE))()
+    ) |>
+    dplyr::mutate(
+      Panel = strsplit(x = .data[["Panel"]],
+                       split = "(",
+                       fixed = TRUE) |>
+        lapply(head, -1L) |>
+        lapply(paste, collapse = "(") |>
+        unlist()
+    ) |>
     dplyr::select(
       -dplyr::all_of("col_index")
     )

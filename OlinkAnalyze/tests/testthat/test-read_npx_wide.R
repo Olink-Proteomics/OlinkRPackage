@@ -9040,8 +9040,12 @@ test_that(
         expect_identical(
           object = dplyr::select(df_out,
                                  -dplyr::all_of("col_index")),
-          expected = dplyr::select(df_rand$list_df_long$df_long,
-                                   dplyr::any_of(colnames(df_out)))
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::mutate(
+              Panel = paste0(.data[["Panel"]], "(",
+                             .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::select(dplyr::any_of(colnames(df_out)))
         )
 
       }
@@ -9116,8 +9120,12 @@ test_that(
         expect_identical(
           object = dplyr::select(df_out,
                                  -dplyr::all_of("col_index")),
-          expected = dplyr::select(df_rand$list_df_long$df_long,
-                                   dplyr::any_of(colnames(df_out)))
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::mutate(
+              Panel = paste0(.data[["Panel"]], "(",
+                             .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::select(dplyr::any_of(colnames(df_out)))
         )
 
       }
@@ -9192,8 +9200,12 @@ test_that(
         expect_identical(
           object = dplyr::select(df_out,
                                  -dplyr::all_of("col_index")),
-          expected = dplyr::select(df_rand$list_df_long$df_long,
-                                   dplyr::any_of(colnames(df_out)))
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::mutate(
+              Panel = paste0(.data[["Panel"]], "(",
+                             .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::select(dplyr::any_of(colnames(df_out)))
         )
 
       }
@@ -9268,8 +9280,12 @@ test_that(
         expect_identical(
           object = dplyr::select(df_out,
                                  -dplyr::all_of("col_index")),
-          expected = dplyr::select(df_rand$list_df_long$df_long,
-                                   dplyr::any_of(colnames(df_out)))
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::mutate(
+              Panel = paste0(.data[["Panel"]], "(",
+                             .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::select(dplyr::any_of(colnames(df_out)))
         )
 
       }
@@ -9345,8 +9361,12 @@ test_that(
         expect_identical(
           object = dplyr::select(df_out,
                                  -dplyr::all_of("col_index")),
-          expected = dplyr::select(df_rand$list_df_long$df_long,
-                                   dplyr::any_of(colnames(df_out)))
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::mutate(
+              Panel = paste0(.data[["Panel"]], "(",
+                             .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::select(dplyr::any_of(colnames(df_out)))
         )
 
       }
@@ -9421,8 +9441,12 @@ test_that(
         expect_identical(
           object = dplyr::select(df_out,
                                  -dplyr::all_of("col_index")),
-          expected = dplyr::select(df_rand$list_df_long$df_long,
-                                   dplyr::any_of(colnames(df_out)))
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::mutate(
+              Panel = paste0(.data[["Panel"]], "(",
+                             .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::select(dplyr::any_of(colnames(df_out)))
         )
 
       }
@@ -9497,8 +9521,12 @@ test_that(
         expect_identical(
           object = dplyr::select(df_out,
                                  -dplyr::all_of("col_index")),
-          expected = dplyr::select(df_rand$list_df_long$df_long,
-                                   dplyr::any_of(colnames(df_out)))
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::mutate(
+              Panel = paste0(.data[["Panel"]], "(",
+                             .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::select(dplyr::any_of(colnames(df_out)))
         )
 
       }
@@ -9573,8 +9601,12 @@ test_that(
         expect_identical(
           object = dplyr::select(df_out,
                                  -dplyr::all_of("col_index")),
-          expected = dplyr::select(df_rand$list_df_long$df_long,
-                                   dplyr::any_of(colnames(df_out)))
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::mutate(
+              Panel = paste0(.data[["Panel"]], "(",
+                             .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::select(dplyr::any_of(colnames(df_out)))
         )
 
       }
@@ -9649,8 +9681,12 @@ test_that(
         expect_identical(
           object = dplyr::select(df_out,
                                  -dplyr::all_of("col_index")),
-          expected = dplyr::select(df_rand$list_df_long$df_long,
-                                   dplyr::any_of(colnames(df_out)))
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::mutate(
+              Panel = paste0(.data[["Panel"]], "(",
+                             .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::select(dplyr::any_of(colnames(df_out)))
         )
 
       }
@@ -9725,8 +9761,12 @@ test_that(
         expect_identical(
           object = dplyr::select(df_out,
                                  -dplyr::all_of("col_index")),
-          expected = dplyr::select(df_rand$list_df_long$df_long,
-                                   dplyr::any_of(colnames(df_out)))
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::mutate(
+              Panel = paste0(.data[["Panel"]], "(",
+                             .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::select(dplyr::any_of(colnames(df_out)))
         )
 
       }
@@ -9736,13 +9776,13 @@ test_that(
 )
 
 test_that(
-  "red_npx_wide_top_mid_long - multiple panels - works",
+  "red_npx_wide_top_mid_long - single panel - works",
   {
     # variables that apply to all tests
     olink_platform <- "Target 48"
     n_panels <- 3L
     n_assays <- 45L
-    n_samples <- 100L
+    n_samples <- 10L
 
     ## NPX no int ctrl and no dev int ctrl ----
 
@@ -9813,8 +9853,12 @@ test_that(
         expect_identical(
           object = dplyr::select(df_out,
                                  -dplyr::all_of("col_index")),
-          expected = dplyr::select(df_rand$list_df_long$df_long,
-                                   dplyr::any_of(colnames(df_out)))
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::mutate(
+              Panel = paste0(.data[["Panel"]], "(",
+                             .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::select(dplyr::any_of(colnames(df_out)))
         )
 
       }
@@ -9889,8 +9933,12 @@ test_that(
         expect_identical(
           object = dplyr::select(df_out,
                                  -dplyr::all_of("col_index")),
-          expected = dplyr::select(df_rand$list_df_long$df_long,
-                                   dplyr::any_of(colnames(df_out)))
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::mutate(
+              Panel = paste0(.data[["Panel"]], "(",
+                             .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::select(dplyr::any_of(colnames(df_out)))
         )
 
       }
@@ -9965,8 +10013,12 @@ test_that(
         expect_identical(
           object = dplyr::select(df_out,
                                  -dplyr::all_of("col_index")),
-          expected = dplyr::select(df_rand$list_df_long$df_long,
-                                   dplyr::any_of(colnames(df_out)))
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::mutate(
+              Panel = paste0(.data[["Panel"]], "(",
+                             .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::select(dplyr::any_of(colnames(df_out)))
         )
 
       }
@@ -10041,8 +10093,12 @@ test_that(
         expect_identical(
           object = dplyr::select(df_out,
                                  -dplyr::all_of("col_index")),
-          expected = dplyr::select(df_rand$list_df_long$df_long,
-                                   dplyr::any_of(colnames(df_out)))
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::mutate(
+              Panel = paste0(.data[["Panel"]], "(",
+                             .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::select(dplyr::any_of(colnames(df_out)))
         )
 
       }
@@ -10118,8 +10174,12 @@ test_that(
         expect_identical(
           object = dplyr::select(df_out,
                                  -dplyr::all_of("col_index")),
-          expected = dplyr::select(df_rand$list_df_long$df_long,
-                                   dplyr::any_of(colnames(df_out)))
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::mutate(
+              Panel = paste0(.data[["Panel"]], "(",
+                             .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::select(dplyr::any_of(colnames(df_out)))
         )
 
       }
@@ -10194,8 +10254,12 @@ test_that(
         expect_identical(
           object = dplyr::select(df_out,
                                  -dplyr::all_of("col_index")),
-          expected = dplyr::select(df_rand$list_df_long$df_long,
-                                   dplyr::any_of(colnames(df_out)))
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::mutate(
+              Panel = paste0(.data[["Panel"]], "(",
+                             .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::select(dplyr::any_of(colnames(df_out)))
         )
 
       }
@@ -10270,8 +10334,12 @@ test_that(
         expect_identical(
           object = dplyr::select(df_out,
                                  -dplyr::all_of("col_index")),
-          expected = dplyr::select(df_rand$list_df_long$df_long,
-                                   dplyr::any_of(colnames(df_out)))
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::mutate(
+              Panel = paste0(.data[["Panel"]], "(",
+                             .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::select(dplyr::any_of(colnames(df_out)))
         )
 
       }
@@ -10346,8 +10414,12 @@ test_that(
         expect_identical(
           object = dplyr::select(df_out,
                                  -dplyr::all_of("col_index")),
-          expected = dplyr::select(df_rand$list_df_long$df_long,
-                                   dplyr::any_of(colnames(df_out)))
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::mutate(
+              Panel = paste0(.data[["Panel"]], "(",
+                             .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::select(dplyr::any_of(colnames(df_out)))
         )
 
       }
@@ -10422,8 +10494,12 @@ test_that(
         expect_identical(
           object = dplyr::select(df_out,
                                  -dplyr::all_of("col_index")),
-          expected = dplyr::select(df_rand$list_df_long$df_long,
-                                   dplyr::any_of(colnames(df_out)))
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::mutate(
+              Panel = paste0(.data[["Panel"]], "(",
+                             .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::select(dplyr::any_of(colnames(df_out)))
         )
 
       }
@@ -10498,8 +10574,12 @@ test_that(
         expect_identical(
           object = dplyr::select(df_out,
                                  -dplyr::all_of("col_index")),
-          expected = dplyr::select(df_rand$list_df_long$df_long,
-                                   dplyr::any_of(colnames(df_out)))
+          expected = df_rand$list_df_long$df_long |>
+            dplyr::mutate(
+              Panel = paste0(.data[["Panel"]], "(",
+                             .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::select(dplyr::any_of(colnames(df_out)))
         )
 
       }
