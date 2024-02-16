@@ -22,8 +22,11 @@
 #'
 #' @examples
 #' \donttest{
+#' try({ # May fail if dependencies are not installed
 #' file <- system.file("extdata", "Example_NPX_Data.csv", package = "OlinkAnalyze")
 #' read_NPX(file)
+#' })
+#'
 #' }
 #'
 #' @importFrom magrittr %>%
@@ -34,6 +37,13 @@
 #'
 
 read_npx_zip <- function(filename) {
+
+  if(!requireNamespace("openssl", quietly = TRUE)){
+    stop("Importing compressed Olink datasets requires the \"openssl\" package.
+         Please install package \"openssl\" before continuing.
+
+         install.packages(\"openssl\")")
+  }
 
   # **** Prep ****
 
