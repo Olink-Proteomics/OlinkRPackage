@@ -40,6 +40,10 @@ read_npx_wide <- function(file,
     format_spec = format_spec
   )
 
+  # header matrix NPXS version ----
+
+  npxs_v <- read_npx_wide_npxs_version(df = df_split_row$df_head)
+
   # top list of df to long ----
 
   df_top_list <- read_npx_wide_top(
@@ -108,8 +112,9 @@ read_npx_wide <- function(file,
 
   }
 
-  # remove col_index from output df
+  # modify output df ----
   df_long <- df_long |>
+    # add Panel_Version
     dplyr::mutate(
       Panel_Version = strsplit(x = .data[["Panel"]],
                                split = "(",
@@ -121,6 +126,7 @@ read_npx_wide <- function(file,
                   x = x,
                   fixed = TRUE))()
     ) |>
+    # modify Panel
     dplyr::mutate(
       Panel = strsplit(x = .data[["Panel"]],
                        split = "(",
@@ -129,6 +135,10 @@ read_npx_wide <- function(file,
         lapply(paste, collapse = "(") |>
         unlist()
     ) |>
+    dplyr::mutate(
+      `Olink NPX Signature Version` = npxs_v
+    ) |>
+    # remove col_index
     dplyr::select(
       -dplyr::all_of("col_index")
     )
@@ -136,6 +146,42 @@ read_npx_wide <- function(file,
   # return ----
 
   return(df_long)
+}
+
+#' Help function that extracts the version of the NPX Signature software from
+#' Olink wide excel files.
+#'
+#' @param df The 2x2 header data frame from an Olink wide excel file.
+#'
+#' @return A scalar character vector with the version of the NPXS software from
+#' cell B1 of the wide Olink file.
+#'
+read_npx_wide_npxs_version <- function(df) {
+
+  # check input ----
+
+  check_is_data_frame(df = df,
+                      error = TRUE)
+
+  # check necessary columns ----
+
+  check_columns(df = df, col_list = list("V1", "V2"))
+
+  # extract NPXS sw version ----
+
+  npxs_sw_v <- df |>
+    dplyr::slice_head(
+      n = 1L
+    ) |>
+    dplyr::pull(
+      .data[["V2"]]
+    ) |>
+    as.character()
+
+  # return ----
+
+  return(npxs_sw_v)
+
 }
 
 #' Help function the uses rows with all columns NA to split the wide Olink data

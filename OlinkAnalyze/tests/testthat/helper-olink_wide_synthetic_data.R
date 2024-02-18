@@ -13,6 +13,18 @@ olink_wide_head <- function(data_type) {
   return(df)
 }
 
+# extract NPXS version
+olink_wide_npxs_v <- function(df) {
+  df |>
+    dplyr::slice_head(
+      n = 1L
+    ) |>
+    dplyr::pull(
+      .data[["V2"]]
+    ) |>
+    as.character()
+}
+
 ## Top matrix ----
 
 # computes the top matrix in an Olink excel wide file. This matrix contains
@@ -1241,6 +1253,7 @@ olink_wide <- function(olink_platform,
 olink_wide_to_long <- function(df_top_wide,
                                df_middle_wide,
                                df_bottom_wide,
+                               df_head,
                                olink_platform,
                                data_type,
                                version = 1L) {
@@ -1459,6 +1472,8 @@ olink_wide_to_long <- function(df_top_wide,
 
   ## Compute Panel_Version and remove col_index ----
 
+  npxs_v <- olink_wide_npxs_v(df = df_head)
+
   df_long <- df_long |>
     dplyr::mutate(
       Panel_Version = strsplit(x = .data[["Panel"]],
@@ -1478,6 +1493,9 @@ olink_wide_to_long <- function(df_top_wide,
         lapply(head, -1L) |>
         lapply(paste, collapse = "(") |>
         unlist()
+    ) |>
+    dplyr::mutate(
+      `Olink NPX Signature Version` = npxs_v
     ) |>
     dplyr::select(
       -dplyr::all_of("col_index")
@@ -1557,6 +1575,7 @@ olink_wide_synthetic <- function(olink_platform,
     df_top_wide = list_df_wide$df_top_wide,
     df_middle_wide = list_df_wide$df_middle_wide,
     df_bottom_wide = df_bottom_wide,
+    df_head = list_df_wide$df_head_wide,
     olink_platform = olink_platform,
     data_type = data_type,
     version = version
