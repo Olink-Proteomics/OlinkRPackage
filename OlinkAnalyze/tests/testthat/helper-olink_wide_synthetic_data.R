@@ -1501,6 +1501,19 @@ olink_wide_to_long <- function(df_top_wide,
       -dplyr::all_of("col_index")
     )
 
+  # rename columns ----
+
+  olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+    dplyr::filter(
+      .data[["OA_internal"]] %in% colnames(df_long)
+    )
+
+  df_long <- df_long |>
+    dplyr::rename_with(
+      .fn = ~olink_wide_rename_npxs_tmp$NPXS,
+      .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$OA_internal)
+    )
+
   # return ----
 
   list_df_long <- list(

@@ -119,7 +119,7 @@ read_npx_wide <- function(file,
       Panel_Version = strsplit(x = .data[["Panel"]],
                                split = "(",
                                fixed = TRUE) |>
-        lapply(tail, 1L) |>
+        lapply(utils::tail, 1L) |>
         unlist() |>
         (\(x) sub(pattern = ")",
                   replacement = "",
@@ -131,7 +131,7 @@ read_npx_wide <- function(file,
       Panel = strsplit(x = .data[["Panel"]],
                        split = "(",
                        fixed = TRUE) |>
-        lapply(head, -1L) |>
+        lapply(utils::head, -1L) |>
         lapply(paste, collapse = "(") |>
         unlist()
     ) |>
@@ -141,6 +141,19 @@ read_npx_wide <- function(file,
     # remove col_index
     dplyr::select(
       -dplyr::all_of("col_index")
+    )
+
+  # rename columns ----
+
+  olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+    dplyr::filter(
+      .data[["OA_internal"]] %in% colnames(df_long)
+    )
+
+  df_long <- df_long |>
+    dplyr::rename_with(
+      .fn = ~olink_wide_rename_npxs_tmp$NPXS,
+      .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$OA_internal)
     )
 
   # return ----

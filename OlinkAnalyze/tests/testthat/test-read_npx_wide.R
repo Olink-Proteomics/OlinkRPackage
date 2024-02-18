@@ -9052,6 +9052,12 @@ test_that(
           )
         )
 
+        # rename from NPXS
+        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+          dplyr::filter(
+            .data[["OA_internal"]] %in% colnames(df_out)
+          )
+
         # check that output match
         expect_true(
           object = identical(nrow(df_out), n_row_exp)
@@ -9064,6 +9070,10 @@ test_that(
             dplyr::mutate(
               Panel = paste0(.data[["Panel"]], "(",
                              .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::rename_with(
+              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
             ) |>
             dplyr::select(dplyr::any_of(colnames(df_out)))
         )
@@ -9132,6 +9142,12 @@ test_that(
           )
         )
 
+        # rename from NPXS
+        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+          dplyr::filter(
+            .data[["OA_internal"]] %in% colnames(df_out)
+          )
+
         # check that output match
         expect_true(
           object = identical(nrow(df_out), n_row_exp)
@@ -9144,6 +9160,10 @@ test_that(
             dplyr::mutate(
               Panel = paste0(.data[["Panel"]], "(",
                              .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::rename_with(
+              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
             ) |>
             dplyr::select(dplyr::any_of(colnames(df_out)))
         )
@@ -9212,6 +9232,12 @@ test_that(
           )
         )
 
+        # rename from NPXS
+        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+          dplyr::filter(
+            .data[["OA_internal"]] %in% colnames(df_out)
+          )
+
         # check that output match
         expect_true(
           object = identical(nrow(df_out), n_row_exp)
@@ -9224,6 +9250,10 @@ test_that(
             dplyr::mutate(
               Panel = paste0(.data[["Panel"]], "(",
                              .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::rename_with(
+              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
             ) |>
             dplyr::select(dplyr::any_of(colnames(df_out)))
         )
@@ -9292,6 +9322,12 @@ test_that(
           )
         )
 
+        # rename from NPXS
+        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+          dplyr::filter(
+            .data[["OA_internal"]] %in% colnames(df_out)
+          )
+
         # check that output match
         expect_true(
           object = identical(nrow(df_out), n_row_exp)
@@ -9304,6 +9340,10 @@ test_that(
             dplyr::mutate(
               Panel = paste0(.data[["Panel"]], "(",
                              .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::rename_with(
+              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
             ) |>
             dplyr::select(dplyr::any_of(colnames(df_out)))
         )
@@ -9373,6 +9413,12 @@ test_that(
           )
         )
 
+        # rename from NPXS
+        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+          dplyr::filter(
+            .data[["OA_internal"]] %in% colnames(df_out)
+          )
+
         # check that output match
         expect_true(
           object = identical(nrow(df_out), n_row_exp)
@@ -9385,6 +9431,10 @@ test_that(
             dplyr::mutate(
               Panel = paste0(.data[["Panel"]], "(",
                              .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::rename_with(
+              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
             ) |>
             dplyr::select(dplyr::any_of(colnames(df_out)))
         )
@@ -9453,6 +9503,12 @@ test_that(
           )
         )
 
+        # rename from NPXS
+        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+          dplyr::filter(
+            .data[["OA_internal"]] %in% colnames(df_out)
+          )
+
         # check that output match
         expect_true(
           object = identical(nrow(df_out), n_row_exp)
@@ -9465,6 +9521,10 @@ test_that(
             dplyr::mutate(
               Panel = paste0(.data[["Panel"]], "(",
                              .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::rename_with(
+              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
             ) |>
             dplyr::select(dplyr::any_of(colnames(df_out)))
         )
@@ -9533,6 +9593,12 @@ test_that(
           )
         )
 
+        # rename from NPXS
+        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+          dplyr::filter(
+            .data[["OA_internal"]] %in% colnames(df_out)
+          )
+
         # check that output match
         expect_true(
           object = identical(nrow(df_out), n_row_exp)
@@ -9545,6 +9611,10 @@ test_that(
             dplyr::mutate(
               Panel = paste0(.data[["Panel"]], "(",
                              .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::rename_with(
+              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
             ) |>
             dplyr::select(dplyr::any_of(colnames(df_out)))
         )
@@ -9613,6 +9683,12 @@ test_that(
           )
         )
 
+        # rename from NPXS
+        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+          dplyr::filter(
+            .data[["OA_internal"]] %in% colnames(df_out)
+          )
+
         # check that output match
         expect_true(
           object = identical(nrow(df_out), n_row_exp)
@@ -9625,6 +9701,10 @@ test_that(
             dplyr::mutate(
               Panel = paste0(.data[["Panel"]], "(",
                              .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::rename_with(
+              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
             ) |>
             dplyr::select(dplyr::any_of(colnames(df_out)))
         )
@@ -9693,6 +9773,12 @@ test_that(
           )
         )
 
+        # rename from NPXS
+        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+          dplyr::filter(
+            .data[["OA_internal"]] %in% colnames(df_out)
+          )
+
         # check that output match
         expect_true(
           object = identical(nrow(df_out), n_row_exp)
@@ -9705,6 +9791,10 @@ test_that(
             dplyr::mutate(
               Panel = paste0(.data[["Panel"]], "(",
                              .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::rename_with(
+              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
             ) |>
             dplyr::select(dplyr::any_of(colnames(df_out)))
         )
@@ -9773,6 +9863,12 @@ test_that(
           )
         )
 
+        # rename from NPXS
+        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+          dplyr::filter(
+            .data[["OA_internal"]] %in% colnames(df_out)
+          )
+
         # check that output match
         expect_true(
           object = identical(nrow(df_out), n_row_exp)
@@ -9785,6 +9881,10 @@ test_that(
             dplyr::mutate(
               Panel = paste0(.data[["Panel"]], "(",
                              .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::rename_with(
+              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
             ) |>
             dplyr::select(dplyr::any_of(colnames(df_out)))
         )
@@ -9865,6 +9965,12 @@ test_that(
           )
         )
 
+        # rename from NPXS
+        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+          dplyr::filter(
+            .data[["OA_internal"]] %in% colnames(df_out)
+          )
+
         # check that output match
         expect_true(
           object = identical(nrow(df_out), n_row_exp)
@@ -9877,6 +9983,10 @@ test_that(
             dplyr::mutate(
               Panel = paste0(.data[["Panel"]], "(",
                              .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::rename_with(
+              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
             ) |>
             dplyr::select(dplyr::any_of(colnames(df_out)))
         )
@@ -9945,6 +10055,12 @@ test_that(
           )
         )
 
+        # rename from NPXS
+        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+          dplyr::filter(
+            .data[["OA_internal"]] %in% colnames(df_out)
+          )
+
         # check that output match
         expect_true(
           object = identical(nrow(df_out), n_row_exp)
@@ -9957,6 +10073,10 @@ test_that(
             dplyr::mutate(
               Panel = paste0(.data[["Panel"]], "(",
                              .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::rename_with(
+              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
             ) |>
             dplyr::select(dplyr::any_of(colnames(df_out)))
         )
@@ -10025,6 +10145,12 @@ test_that(
           )
         )
 
+        # rename from NPXS
+        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+          dplyr::filter(
+            .data[["OA_internal"]] %in% colnames(df_out)
+          )
+
         # check that output match
         expect_true(
           object = identical(nrow(df_out), n_row_exp)
@@ -10037,6 +10163,10 @@ test_that(
             dplyr::mutate(
               Panel = paste0(.data[["Panel"]], "(",
                              .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::rename_with(
+              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
             ) |>
             dplyr::select(dplyr::any_of(colnames(df_out)))
         )
@@ -10105,6 +10235,12 @@ test_that(
           )
         )
 
+        # rename from NPXS
+        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+          dplyr::filter(
+            .data[["OA_internal"]] %in% colnames(df_out)
+          )
+
         # check that output match
         expect_true(
           object = identical(nrow(df_out), n_row_exp)
@@ -10117,6 +10253,10 @@ test_that(
             dplyr::mutate(
               Panel = paste0(.data[["Panel"]], "(",
                              .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::rename_with(
+              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
             ) |>
             dplyr::select(dplyr::any_of(colnames(df_out)))
         )
@@ -10186,6 +10326,12 @@ test_that(
           )
         )
 
+        # rename from NPXS
+        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+          dplyr::filter(
+            .data[["OA_internal"]] %in% colnames(df_out)
+          )
+
         # check that output match
         expect_true(
           object = identical(nrow(df_out), n_row_exp)
@@ -10198,6 +10344,10 @@ test_that(
             dplyr::mutate(
               Panel = paste0(.data[["Panel"]], "(",
                              .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::rename_with(
+              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
             ) |>
             dplyr::select(dplyr::any_of(colnames(df_out)))
         )
@@ -10266,6 +10416,12 @@ test_that(
           )
         )
 
+        # rename from NPXS
+        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+          dplyr::filter(
+            .data[["OA_internal"]] %in% colnames(df_out)
+          )
+
         # check that output match
         expect_true(
           object = identical(nrow(df_out), n_row_exp)
@@ -10278,6 +10434,10 @@ test_that(
             dplyr::mutate(
               Panel = paste0(.data[["Panel"]], "(",
                              .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::rename_with(
+              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
             ) |>
             dplyr::select(dplyr::any_of(colnames(df_out)))
         )
@@ -10346,6 +10506,12 @@ test_that(
           )
         )
 
+        # rename from NPXS
+        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+          dplyr::filter(
+            .data[["OA_internal"]] %in% colnames(df_out)
+          )
+
         # check that output match
         expect_true(
           object = identical(nrow(df_out), n_row_exp)
@@ -10358,6 +10524,10 @@ test_that(
             dplyr::mutate(
               Panel = paste0(.data[["Panel"]], "(",
                              .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::rename_with(
+              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
             ) |>
             dplyr::select(dplyr::any_of(colnames(df_out)))
         )
@@ -10426,6 +10596,12 @@ test_that(
           )
         )
 
+        # rename from NPXS
+        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+          dplyr::filter(
+            .data[["OA_internal"]] %in% colnames(df_out)
+          )
+
         # check that output match
         expect_true(
           object = identical(nrow(df_out), n_row_exp)
@@ -10438,6 +10614,10 @@ test_that(
             dplyr::mutate(
               Panel = paste0(.data[["Panel"]], "(",
                              .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::rename_with(
+              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
             ) |>
             dplyr::select(dplyr::any_of(colnames(df_out)))
         )
@@ -10506,6 +10686,12 @@ test_that(
           )
         )
 
+        # rename from NPXS
+        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+          dplyr::filter(
+            .data[["OA_internal"]] %in% colnames(df_out)
+          )
+
         # check that output match
         expect_true(
           object = identical(nrow(df_out), n_row_exp)
@@ -10518,6 +10704,10 @@ test_that(
             dplyr::mutate(
               Panel = paste0(.data[["Panel"]], "(",
                              .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::rename_with(
+              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
             ) |>
             dplyr::select(dplyr::any_of(colnames(df_out)))
         )
@@ -10586,6 +10776,12 @@ test_that(
           )
         )
 
+        # rename from NPXS
+        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+          dplyr::filter(
+            .data[["OA_internal"]] %in% colnames(df_out)
+          )
+
         # check that output match
         expect_true(
           object = identical(nrow(df_out), n_row_exp)
@@ -10598,6 +10794,10 @@ test_that(
             dplyr::mutate(
               Panel = paste0(.data[["Panel"]], "(",
                              .data[["Panel_Version"]], ")")
+            ) |>
+            dplyr::rename_with(
+              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
             ) |>
             dplyr::select(dplyr::any_of(colnames(df_out)))
         )
