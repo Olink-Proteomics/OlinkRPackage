@@ -121,10 +121,12 @@ read_npx_wide <- function(file,
                                fixed = TRUE) |>
         lapply(utils::tail, 1L) |>
         unlist() |>
-        (\(x) sub(pattern = ")",
-                  replacement = "",
-                  x = x,
-                  fixed = TRUE))()
+        (\(x) {
+          sub(pattern = ")",
+              replacement = "",
+              x = x,
+              fixed = TRUE)
+        })()
     ) |>
     # modify Panel
     dplyr::mutate(
@@ -159,42 +161,6 @@ read_npx_wide <- function(file,
   # return ----
 
   return(df_long)
-}
-
-#' Help function that extracts the version of the NPX Signature software from
-#' Olink wide excel files.
-#'
-#' @param df The 2x2 header data frame from an Olink wide excel file.
-#'
-#' @return A scalar character vector with the version of the NPXS software from
-#' cell B1 of the wide Olink file.
-#'
-read_npx_wide_npxs_version <- function(df) {
-
-  # check input ----
-
-  check_is_data_frame(df = df,
-                      error = TRUE)
-
-  # check necessary columns ----
-
-  check_columns(df = df, col_list = list("V1", "V2"))
-
-  # extract NPXS sw version ----
-
-  npxs_sw_v <- df |>
-    dplyr::slice_head(
-      n = 1L
-    ) |>
-    dplyr::pull(
-      .data[["V2"]]
-    ) |>
-    as.character()
-
-  # return ----
-
-  return(npxs_sw_v)
-
 }
 
 #' Help function the uses rows with all columns NA to split the wide Olink data
@@ -351,6 +317,51 @@ read_npx_wide_split_row <- function(file,
   # return list of data frames ----
 
   return(list_df_split)
+
+}
+
+#' Help function that extracts the version of the NPX Signature software from
+#' Olink wide excel files.
+#'
+#' @author Klev Diamanti
+#'
+#' @param df The 2x2 header data frame from an Olink wide excel file.
+#'
+#' @return A scalar character vector with the version of the NPXS software from
+#' cell B1 of the wide Olink file.
+#'
+read_npx_wide_npxs_version <- function(df) {
+
+  # check input ----
+
+  check_is_data_frame(df = df,
+                      error = TRUE)
+
+  # check necessary columns ----
+
+  check_columns(df = df, col_list = list("V1", "V2"))
+
+  # extract NPXS sw version ----
+
+  npxs_sw_v <- df |>
+    dplyr::slice_head(
+      n = 1L
+    ) |>
+    dplyr::pull(
+      .data[["V2"]]
+    ) |>
+    as.character() |>
+    (\(x) {
+      strsplit(x = x,
+               split = " ",
+               fixed = TRUE) |>
+        lapply(utils::tail, 1L) |>
+        unlist()
+    })()
+
+  # return ----
+
+  return(npxs_sw_v)
 
 }
 

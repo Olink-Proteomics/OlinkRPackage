@@ -22,7 +22,12 @@ olink_wide_npxs_v <- function(df) {
     dplyr::pull(
       .data[["V2"]]
     ) |>
-    as.character()
+    as.character() |>
+    (\(x) {
+      strsplit(x = x, split = " ", fixed = TRUE) |>
+        lapply(utils::tail, 1L) |>
+        unlist()
+    })()
 }
 
 ## Top matrix ----
@@ -1481,10 +1486,12 @@ olink_wide_to_long <- function(df_top_wide,
                                fixed = TRUE) |>
         lapply(tail, 1L) |>
         unlist() |>
-        (\(x) sub(pattern = ")",
-                  replacement = "",
-                  x = x,
-                  fixed = TRUE))()
+        (\(x) {
+          sub(pattern = ")",
+              replacement = "",
+              x = x,
+              fixed = TRUE)
+        })()
     ) |>
     dplyr::mutate(
       Panel = strsplit(x = .data[["Panel"]],

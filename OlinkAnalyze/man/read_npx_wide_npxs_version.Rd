@@ -18,3 +18,6 @@ cell B1 of the wide Olink file.
 Help function that extracts the version of the NPX Signature software from
 Olink wide excel files.
 }
+\author{
+Klev Diamanti
+}
