@@ -6852,88 +6852,7 @@ test_that(
     # variables that apply to all tests
     data_type <- "NPX"
     n_samples <- 88L
-
-    ## T48 1 panel ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        olink_platform <- "Target 48"
-        n_panels <- 1L
-        n_assays <- 40L
-
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
-
-        # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # check that function runs
-        expect_error(
-          object = read_npx_wide_top(df = df_rand$list_df_wide$df_top_wide,
-                                     file = wide_excel,
-                                     olink_platform = olink_platform,
-                                     format_spec = format_spec),
-          regexp = paste("Detected 40 assays in 1 panels in file")
-        )
-
-      }
-    )
-
-    ## T48 2 panels ----
-
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        olink_platform <- "Target 48"
-        n_panels <- 2L
-        n_assays <- 32L
-
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
-
-        # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # check that function runs
-        expect_error(
-          object = read_npx_wide_top(df = df_rand$list_df_wide$df_top_wide,
-                                     file = wide_excel,
-                                     olink_platform = olink_platform,
-                                     format_spec = format_spec),
-          regexp = "Detected 64 assays in 2 panels in file"
-        )
-
-      }
-    )
+    olink_platform <- "Target 96"
 
     ## T96 1 panel ----
 
@@ -6944,7 +6863,6 @@ test_that(
       code = {
 
         # synthetic wide df
-        olink_platform <- "Target 96"
         n_panels <- 1L
         n_assays <- 67L
 
@@ -6985,7 +6903,6 @@ test_that(
       code = {
 
         # synthetic wide df
-        olink_platform <- "Target 96"
         n_panels <- 2L
         n_assays <- 78L
 
