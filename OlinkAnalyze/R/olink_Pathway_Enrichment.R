@@ -170,12 +170,16 @@ data_prep <- function(data) {
     dplyr::filter(stringr::str_detect(OlinkID,
                                       "OID[0-9]{5}"))
   # For data missing LOD column
+  alt_plate_lods <- c("Plate LOD", "PlateLOD", "plateLOD", "Plate_LOD")
+  alt_max_lods <- c("Max LOD", "MaxLOD", "maxLOD", "Max_LOD")
   if(!("LOD" %in% names(data))){
-    if("PlateLOD" %in% names(data)){
-      data$LOD <- data$PlateLOD
+    if(any(alt_plate_lods %in% names(df))){
+      data <- data |>
+        dplyr::rename(LOD = any_of(alt_plate_lods))
     }
-    else if("MaxLOD" %in% names(data)){
-      data$LOD <- data$MaxLOD
+    else if(any(alt_max_lods %in% names(df))){
+      data <- data |>
+        dplyr::rename(LOD = any_of(alt_max_lods))
     }
     else{
       data$LOD <- -Inf
