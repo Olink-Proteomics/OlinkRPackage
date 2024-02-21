@@ -11,8 +11,37 @@ anova_posthoc_results <- olink_anova_posthoc(npx_df, variable = "Site", effect =
 lme_results <- olink_lmer_posthoc(npx_df, variable = "Time", random = "Site", effect = "Time")
 set.seed(123)
 
+duplicate_assay_data <- npx_data1 |> 
+  dplyr::filter(Assay == "MET") |> 
+  dplyr::mutate(OlinkID = "OID01254") |> 
+  dplyr::mutate(LOD = LOD + 1)
+
+npx_platelod <- npx_data1 |> 
+  rbind(duplicate_assay_data) |> 
+  dplyr::mutate(SampleQC = QC_Warning) |> 
+  dplyr::mutate(PlateLOD = LOD) |> 
+  dplyr::select(-QC_Warning, -LOD)
+
+npx_maxlod <- npx_data1 |> 
+  rbind(duplicate_assay_data) |>
+  dplyr::mutate(SampleQC = QC_Warning) |> 
+  dplyr::mutate(MaxLOD = LOD) |> 
+  dplyr::select(-QC_Warning, -LOD)
+
+npx_nolod <- npx_data1 |> 
+  rbind(duplicate_assay_data) |>
+  dplyr::mutate(SampleQC = QC_Warning) |> 
+  dplyr::select(-QC_Warning, -LOD)
+
 ttest_results_no_estimate <- ttest_results %>% dplyr::select(-estimate)
 ttest_na <- suppressWarnings(olink_ttest(df = npx_data_format221010, variable = "treatment1"))
+
+test_that("Input data equal for different LOD names", {
+  expect_equal(unique(data_prep(npx_data1)$OlinkID), unique(data_prep(npx_platelod)$OlinkID))
+  expect_equal(unique(data_prep(npx_data1)$OlinkID), unique(data_prep(npx_maxlod)$OlinkID))
+  expect_equal(unique(data_prep(npx_data1)$OlinkID), unique(data_prep(npx_nolod)$OlinkID))
+})
+
 
 test_that("T-test GSEA works", {
   skip_if_not_installed("clusterProfiler")

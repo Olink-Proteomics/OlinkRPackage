@@ -1,3 +1,11 @@
+# Olink Analyze 3.7.0
+## Minor Changes
+* Support for Explore 3072 data in parquet form added (#327, @kathy-nevola, @klevdiamanti)
+* Support for pathway enrichment when LOD is not present added (#329, @kathy-nevola)
+* Clarification to remove controls when selecting bridging samples added in bridging tutorial (#330, @kathy-nevola)
+* Addition of Kristyn Chin as contributor (#331, @kathy-nevola)
+* Addition of URLs and Contact information in Description (#331, @kathy-nevola)
+
 # Olink Analyze 3.6.2
 ## Bug Fixes
 * Packages in Suggest field are now called conditionally in vignettes, tests, and examples. (#319, @kathy-nevola)

@@ -32,7 +32,7 @@ knitr::opts_chunk$set(
 Individual Olink® NPX datasets are normalized using either plate control
 normalization or intensity normalization methods. Plate control
 normalization is generally used for single plate projects or for Explore HT projects, while
-intensity normalization is generally used for multiplate projects. Additionally,
+intensity normalization is generally used for multi-plate projects. Additionally,
 intensity normalization method assumes that all samples within a project
 are fully randomized.
 
@@ -95,7 +95,7 @@ from the reference study and be added to the second study. These samples
 can be selected using the `olink_bridgeselector()` function in Olink
 Analyze. The bridge selection function will select a number of bridge
 samples based on the reference data. This function selects samples which
-passes QC and have high detectibility. In the case of where detectibility cannot be calculated from the test data set (ex: Explore HT data), the function will only select samples which pass QC. External controls are not selected as bridge samples as they are not necessarily representative of the study and therefore may not cover the dynamic range of assays that would be expressed within the samples.
+passes QC and have high detectability. In the case of where detectability cannot be calculated from the test data set (ex: Explore HT data), the function will only select samples which pass QC. External controls are not selected as bridge samples as they are not necessarily representative of the study and therefore may not cover the dynamic range of assays that would be expressed within the samples. Note that due to naming convention differences, it is necessary to exclude the control samples using either `SampleType == "SAMPLE"` if available or `stringr::str_detect()` as shown below.
 
 To select samples across the range of the data, the samples are ordered by mean NPX value and selected across this range. When running the selector, Olink recommends starting at sampleMissingFreq = 0.10 which represents a maximum of 10% data below LOD per sample. If there are not enough samples output, increase to 20%. For alternative matrices and specific disease types, it may be needed to increase the sampleMissingFreq to higher levels.
 
@@ -104,14 +104,18 @@ In this example we will demonstrate how to select 16 bridging samples
 using `npx_data1` which will act as the reference data. The selected bridge samples are displayed in Table 2.
 
 ```{r bridge_sample_selection_example, echo=T, eval=T}
-bridge_Samples<-olink_bridgeselector(df = npx_data1,
-                     sampleMissingFreq = 0.1,
+
+bridge_Samples<- npx_data1 %>% 
+  # Excluding control samples. Naming convention may differ.
+  dplyr::filter((stringr::str_detect(SampleID, "CONTROL", negate = TRUE))) %>%
+  olink_bridgeselector(sampleMissingFreq = 0.1,
                      n = 16)
 ```
 
 ```{r bridge_sample_selection, echo=FALSE}
-olink_bridgeselector(df = npx_data1,
-                     sampleMissingFreq = 0.1,
+npx_data1 %>% 
+  filter((stringr::str_detect(SampleID, "CONTROL", negate = TRUE))) %>%
+  olink_bridgeselector(sampleMissingFreq = 0.1,
                      n = 16) %>%
   kableExtra::kbl(booktabs = TRUE,
       digits = 2,

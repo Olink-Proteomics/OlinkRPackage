@@ -63,36 +63,18 @@ olink_bridgeselector<-function(df, sampleMissingFreq, n){
 
 
   # Alternative LODs for when LOD is not present
+  alt_plate_lods <- c("Plate LOD", "PlateLOD", "plateLOD", "Plate_LOD")
+  alt_max_lods <- c("Max LOD", "MaxLOD", "maxLOD", "Max_LOD")
   if(!("LOD" %in% names(df))){
-    if("Plate LOD" %in% names(df)){
+    if(any(alt_plate_lods %in% names(df))){
       df <- df |>
-        dplyr::mutate(LOD = `Plate LOD`)
-      message("Using Plate LOD as filter criteria...")
-    } else if ("Plate_LOD" %in% names(df)){
+        dplyr::rename(LOD = any_of(alt_plate_lods) )
+      message("Using plate LOD as filter criteria...")
+    } else if (any(alt_max_lods %in% names(df))){
       df <- df |>
-        dplyr::mutate(LOD = Plate_LOD)
+        dplyr::rename(LOD = any_of(alt_max_lods))
 
-      message("Using Plate_LOD as filter criteria...")
-    } else if ("plateLOD" %in% names(df)){
-      df <- df |>
-        dplyr::mutate(LOD = plateLOD)
-
-      message("Using plateLOD as filter criteria...")
-    } else if ("Max LOD" %in% names(df)){
-      df <- df |>
-        dplyr::mutate(LOD = `Max LOD`)
-
-      message("Using Max LOD as filter criteria...")
-    } else if ("Max_LOD" %in% names(df)){
-      df <- df |>
-        dplyr::mutate(LOD = Max_LOD)
-
-      message("Using Max_LOD as filter criteria...")
-    } else if ("maxLOD" %in% names(df)){
-      df <- df |>
-        dplyr::mutate(LOD = maxLOD)
-
-      message("Using maxLOD as filter criteria...")
+      message("Using max LOD as filter criteria...")
     } else {
       df <- df |>
         dplyr::mutate(LOD = -Inf)

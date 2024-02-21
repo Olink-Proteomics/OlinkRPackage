@@ -36,6 +36,7 @@ emmeans
 enrichmentScore
 ExploreVersion
 eXpression
+ExtNPX
 extrafont
 facetNcol
 facetNrow
@@ -136,6 +137,7 @@ SampleID
 SampleID's
 SampleIDs
 sampleMissingFreq
+SampleQC
 Satterthwaite's
 setSize
 sidak
