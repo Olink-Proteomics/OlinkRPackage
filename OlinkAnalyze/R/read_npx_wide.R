@@ -2,19 +2,24 @@
 #'
 #' @author Klev Diamanti
 #'
-#' @param file The input excel file.
+#' @param df A tibble containing the full Olink dataset in wide format.
+#' @param file The input Olink wide file.
 #' @param data_type The quantification in which the data comes in. Expecting one
-#' of NPX, Quantified or Ct.
+#' of "NPX", "Quantified" or "Ct".
 #' @param olink_platform The Olink platform used to generate the input file.
-#' Expecting "Target 96", "Target 48", "Flex" or "Focus".
+#' Expecting one of "Target 96", "Target 48", "Flex" or "Focus".
 #'
 #' @return A tibble of the wide Olink file in long format.
 #'
-read_npx_wide <- function(file,
+read_npx_wide <- function(df,
+                          file,
                           data_type,
                           olink_platform) {
 
   # initial checks ----
+
+  check_is_data_frame(df = df,
+                      error = TRUE)
 
   check_file_exists(file = file,
                     error = TRUE)
@@ -27,7 +32,7 @@ read_npx_wide <- function(file,
 
   # get expected format specifications ----
 
-  format_spec <- olink_wide_excel_spec |>
+  format_spec <- olink_wide_spec |>
     dplyr::filter(
       .data[["data_type"]] == .env[["data_type"]]
     )
@@ -35,6 +40,7 @@ read_npx_wide <- function(file,
   # split the file into sub-data frames ----
 
   df_split_row <- read_npx_wide_split_row(
+    df = df,
     file = file,
     data_type = data_type,
     format_spec = format_spec
@@ -164,32 +170,39 @@ read_npx_wide <- function(file,
 }
 
 #' Help function the uses rows with all columns NA to split the wide Olink data
-#' file into 2 or 3 data sets.
+#' file into 3 or 4 data sets.
 #'
 #' @description
 #' Wide Olink files contains 1 or 2 rows with all columns NA as a break between
 #' subsections of the data. This function takes advantage of that feature and
-#' splits the excel file into 2 or 3 data sets each of which will be used
+#' splits the wide file into 2 or 3 data sets each of which will be used
 #' downstream to create a long data frame.
 #'
 #' The function captures the rows with all columns NA and computes the row
-#' indexes to split the dataset from the excel file into sub-data sets.
+#' indexes to split the dataset from the wide file into sub-data sets.
 #'
 #' @author Klev Diamanti
 #'
-#' @param file The input excel file.
+#' @param df A tibble containing the full Olink dataset in wide format.
+#' @param file The input Olink wide file.
 #' @param data_type The quantification in which the data comes in. Expecting one
-#' of NPX, Quantified or Ct.
-#' @param format_spec A one-row data frame filtered from olink_wide_excel_spec
-#' with the Olink wide excel file specifications.
+#' of "NPX", "Quantified" or "Ct".
+#' @param format_spec A one-row data frame filtered from olink_wide_spec with
+#' the Olink wide file specifications.
 #'
-#' @return A named list of 2 or 3 tibbles.
+#' @return A named list of tibbles containing the sub-matrices of the Olink wide
+#' format file split on: "df_head", "df_top", "df_mid", "df_bottom".
 #'
-read_npx_wide_split_row <- function(file,
+read_npx_wide_split_row <- function(df,
+                                    file,
                                     data_type,
                                     format_spec) {
 
   # initial checks ----
+
+  check_is_data_frame(df = df,
+                      error = TRUE)
+
   check_file_exists(file = file,
                     error = TRUE)
 
@@ -199,18 +212,9 @@ read_npx_wide_split_row <- function(file,
   check_is_data_frame(df = format_spec,
                       error = TRUE)
 
-  # read data ----
-
-  # read the entire wide excel file
-  # we want to identify the first row with all values NA
-  df <-  readxl::read_excel(path = file,
-                            col_names = FALSE,
-                            .name_repair = "minimal")
-  colnames(df) <- paste0("V", seq_len(ncol(df)))
-
   # detect rows with all NA columns ----
 
-  # Use the rows full of NAs in the excel file to compute the number of rows
+  # Use the rows full of NAs in the file to compute the number of rows
   # that contain data about assays.
   na_row_index <- df |>
     # total number of columns
@@ -249,7 +253,7 @@ read_npx_wide_split_row <- function(file,
         {ifelse(identical(na_row_index, integer(0L)), 0L, length(na_row_index))}
         rows with all columns `NA` in file {.file {file}}, while we expected
         {format_spec$n_na_rows}!",
-        "i" = "Has the excel file been modified manually?"
+        "i" = "Has the file been modified manually?"
       ),
       call = rlang::caller_env(),
       wrap = FALSE
@@ -264,7 +268,7 @@ read_npx_wide_split_row <- function(file,
     cli::cli_abort(
       message = c(
         "x" = "Consecutive rows with all columns NA.",
-        "i" = "Has the excel file been modified manually?"
+        "i" = "Has the file been modified manually?"
       ),
       call = rlang::caller_env(),
       wrap = FALSE
@@ -321,14 +325,14 @@ read_npx_wide_split_row <- function(file,
 }
 
 #' Help function that extracts the version of the NPX Signature software from
-#' Olink wide excel files.
+#' Olink wide format files.
 #'
 #' @author Klev Diamanti
 #'
-#' @param df The 2x2 header data frame from an Olink wide excel file.
+#' @param df The 2x2 header data frame from an Olink wide file.
 #'
-#' @return A scalar character vector with the version of the NPXS software from
-#' cell B1 of the wide Olink file.
+#' @return A scalar character vector with the version of the NPX Signature
+#' software from cell B1 of the Olink wide format file.
 #'
 read_npx_wide_npxs_version <- function(df) {
 
@@ -366,16 +370,16 @@ read_npx_wide_npxs_version <- function(df) {
 }
 
 #' Help function to determine the number of rows with assay information in Olink
-#' excel wide format files.
+#' wide format file.
 #'
 #' @author Klev Diamanti
 #'
-#' @param df The top data frame from a split Olink wide excel file.
-#' @param file The input excel file.
-#' @param format_spec A one-row data frame filtered from olink_wide_excel_spec
-#' with the Olink wide excel file specifications.
+#' @param df The top data frame from a split Olink wide  file.
+#' @param file The input Olink wide file.
+#' @param format_spec A one-row data frame filtered from olink_wide_spec with
+#' the Olink wide file specifications.
 #'
-#' @return An error inconsistency is spotted
+#' @return NULL unless an inconsistency is spotted.
 #'
 read_npx_wide_check_top <- function(df,
                                     file,
@@ -415,7 +419,7 @@ read_npx_wide_check_top <- function(df,
       message = c(
         "x" = "Column 1 of the top matrix with assay data in file
         {.file {file}} does not contain: {top_v1_miss}",
-        "i" = "Has the excel file been modified manually?"
+        "i" = "Has the file been modified manually?"
       ),
       call = rlang::caller_env(),
       wrap = FALSE
@@ -440,7 +444,7 @@ read_npx_wide_check_top <- function(df,
       message = c(
         "x" = "Row 2 of the top matrix with assay data in file {.file {file}}
         does not contain: {top_mat_assay_miss}",
-        "i" = "Has the excel file been modified manually?"
+        "i" = "Has the file been modified manually?"
       ),
       call = rlang::caller_env(),
       wrap = FALSE
@@ -534,7 +538,7 @@ read_npx_wide_check_top <- function(df,
           one or more of the internal control assays
           {unique(int_ctrl_df_missing$int_ctrl)} from row 2 of the top matrix
           with assay data in file {.file {file}}!",
-          "i" = "Has the excel file been modified manually?"
+          "i" = "Has the file been modified manually?"
         ),
         call = rlang::caller_env(),
         wrap = FALSE
@@ -639,7 +643,7 @@ read_npx_wide_check_top <- function(df,
             missing one or more of the deviations from the internal control
             assays {unique(dev_int_ctrl_df_missing$dev_int_ctrl)} from row 3 of
             the top matrix with assay data in file {.file {file}}!",
-            "i" = "Has the excel file been modified manually?"
+            "i" = "Has the file been modified manually?"
           ),
           call = rlang::caller_env(),
           wrap = FALSE
@@ -653,20 +657,20 @@ read_npx_wide_check_top <- function(df,
 
 }
 
-#' Help function that splits df_top from a Olink wide excel file into 3 data
+#' Help function that splits the top from an Olink wide file into more data
 #' frames.
 #'
 #' @author Klev Diamanti
 #'
-#' @param df The top data frame from a split Olink wide excel file.
-#' @param file The input excel file.
+#' @param df The top data frame from a split Olink wide file.
+#' @param file The input Olink wide file.
 #' @param olink_platform The Olink platform used to generate the input file.
-#' Expecting "Target 96", "Target 48", "Flex" or "Focus".
-#' @param format_spec A one-row data frame filtered from olink_wide_excel_spec
-#' with the Olink wide excel file specifications.
+#' Expecting one of "Target 96", "Target 48", "Flex" or "Focus".
+#' @param format_spec A one-row data frame filtered from olink_wide_spec with
+#' the Olink wide file specifications.
 #'
-#' @return List of the data frames (df_oid, df_meta, df_qc_dev and df_int_ctrl)
-#' in long format that df_top is split on.
+#' @return A list of data frames (df_oid, df_pid, df_qc_warn and df_int_ctrl) in
+#' long format from the top matrix of an Olink wide file.
 #'
 read_npx_wide_top <- function(df,
                               file,
@@ -769,7 +773,7 @@ read_npx_wide_top <- function(df,
         "x" = "The top matrix with the assay data in file {.file {file}} in row
         `Assay` contains unrecognized values in columns:
         {top_mat_unknown_cols}!",
-        "i" = "Has the excel file been modified manually?"
+        "i" = "Has the file been modified manually?"
       ),
       call = rlang::caller_env(),
       wrap = FALSE
@@ -787,7 +791,7 @@ read_npx_wide_top <- function(df,
         "x" = "The top matrix with the assay data in file {.file {file}} expects
         no empty cells for assays other than internal controls. Identified
         { sum(is.na(df_top_oid)) } empty cells!",
-        "i" = "Has the excel file been modified manually?"
+        "i" = "Has the file been modified manually?"
       ),
       call = rlang::caller_env(),
       wrap = FALSE
@@ -817,7 +821,7 @@ read_npx_wide_top <- function(df,
         "x" = "Detected {nrow(df_top_oid)} assays in
         {length(unique(df_top_oid$Panel))} panels in file {.file {file}}, but
         expected {expected_num_assays}!",
-        "i" = "Has the excel file been modified manually?"
+        "i" = "Has the file been modified manually?"
       ),
       call = rlang::caller_env(),
       wrap = FALSE
@@ -841,7 +845,7 @@ read_npx_wide_top <- function(df,
           sapply(\\(x) paste0(\"`\", x, \"`\")) |>
           cli::ansi_collapse(last = \" and \")} columns in the top matrix with
           the assay data in file {.file {file}}!",
-          "i" = "Has the excel file been modified manually?"
+          "i" = "Has the file been modified manually?"
         ),
         call = rlang::caller_env(),
         wrap = FALSE
@@ -877,21 +881,21 @@ read_npx_wide_top <- function(df,
 
 }
 
-#' Help function that splits df_mid from a Olink wide excel file into 4 data
-#' frames.
+#' Help function that splits the middle matrix from an Olink wide file into more
+#' data frames.
 #'
 #' @author Klev Diamanti
 #'
-#' @param df The middle data frame from a split Olink wide excel file.
-#' @param file The input excel file.
+#' @param df The middle data frame from a split Olink wide file.
+#' @param file The input Olink wide file.
 #' @param data_type The quantification in which the data comes in. Expecting one
-#' of NPX or Quantified.
-#' @param col_names Names list of character vector with the names of the columns
-#' containing Olink data on assays, plates, QC Warnings, internal control
-#' assays and deviations from internal controls.
+#' of "NPX", "Quantified" or "Ct".
+#' @param col_names Named list of character vectors with the names of the
+#' columns containing Olink data on Assays, Plates, QC Warnings, Internal
+#' Control assays and deviations from internal controls.
 #'
 #' @return A list of data frames (df_oid, df_pid, df_qc_warn and df_int_ctrl) in
-#' long format from the middle matrix of the Olink wide excel file.
+#' long format from the middle matrix of an Olink wide file.
 #'
 read_npx_wide_middle <- function(df,
                                  file,
@@ -925,7 +929,7 @@ read_npx_wide_middle <- function(df,
       message = c(
         "x" = "The middle matrix in file {.file {file}} does not contain unique
         sample identifiers. Identified {nrow(df) - n_uniq_sample} duplicates!",
-        "i" = "Has the excel file been modified manually?"
+        "i" = "Has the file been modified manually?"
       ),
       call = rlang::caller_env(),
       wrap = FALSE
@@ -1045,8 +1049,8 @@ read_npx_wide_middle <- function(df,
       cli::cli_abort(
         message = c(
           "x" = "Uneven number of entries of \"Plate ID\" and \"QC Warning\" in
-          the middle matrix of the Olink wide excel file {.file {file}}!",
-          "i" = "Has the excel file been modified manually?"
+          the middle matrix of the Olink wide format file {.file {file}}!",
+          "i" = "Has the file been modified manually?"
         ),
         call = rlang::caller_env(),
         wrap = FALSE
@@ -1073,8 +1077,8 @@ read_npx_wide_middle <- function(df,
     cli::cli_abort(
       message = c(
         "x" = "Unable to assign column(s) {col_mid_missing} from the Olink wide
-        excel file {.file {file}}!",
-        "i" = "Has the excel file been modified manually?"
+        format file {.file {file}}!",
+        "i" = "Has the file been modified manually?"
       ),
       call = rlang::caller_env(),
       wrap = FALSE
@@ -1088,7 +1092,8 @@ read_npx_wide_middle <- function(df,
 
 }
 
-#' Combine top and middle matrices.
+#' Help function to combine top and middle matrices of an Olink wide file to
+#' long format.
 #'
 #' @author Klev Diamanti
 #'
@@ -1097,9 +1102,9 @@ read_npx_wide_middle <- function(df,
 #' @param df_middle_list List of data frames from the middle matrix. Output of
 #' function `read_npx_wide_middle`.
 #' @param data_type The quantification in which the data comes in. Expecting one
-#' of NPX or Quantified.
-#' @param format_spec A one-row data frame filtered from olink_wide_excel_spec
-#' with the Olink wide excel file specifications.
+#' of "NPX", "Quantified" or "Ct".
+#' @param format_spec A one-row data frame filtered from olink_wide_spec with
+#' the Olink wide file specifications.
 #'
 #' @return A tibble combining the top and middle matrices in long format.
 #'
@@ -1240,14 +1245,15 @@ red_npx_wide_top_mid_long <- function(df_top_list,
   return(df_long)
 }
 
-#' Helper function that output all possible row names for the bottom matrix.
+#' Help function that output all possible row names for the bottom matrix given
+#' data_type.
 #'
 #' @author Klev Diamanti
 #'
 #' @param data_type The quantification in which the data comes in. Expecting one
-#' of NPX, Quantified or Ct.
+#' of "NPX", "Quantified" or "Ct".
 #' @param olink_platform The Olink platform used to generate the input file.
-#' Expecting "Target 96", "Target 48", "Flex" or "Focus".
+#' Expecting one of "Target 96", "Target 48", "Flex" or "Focus".
 #'
 #' @return List of data frames with two columns each. Columns contain unique and
 #' alternative expected names for the V1 of each row of the bottom matrix in an
@@ -1257,7 +1263,7 @@ read_npx_wide_bottom_version <- function(data_type,
                                          olink_platform) {
 
   # extract all possible variable names from the global matrix
-  format_spec_bottom <- olink_wide_excel_bottom_matrix |>
+  format_spec_bottom <- olink_wide_bottom_matrix |>
     dplyr::filter(
       .data[["olink_platform"]] == .env[["olink_platform"]]
       & .data[["data_type"]] == .env[["data_type"]]
@@ -1303,24 +1309,25 @@ read_npx_wide_bottom_version <- function(data_type,
   return(list_bottom_v)
 }
 
-#' Help function that converts df_bottom into long format.
+#' Help function that converts the bottom matrix of an Olink wide file to long
+#' format.
 #'
 #' @author Klev Diamanti
 #'
-#' @param df The bottom data frame from a split Olink wide excel file.
-#' @param file The input excel file.
+#' @param df The bottom data frame from a split Olink wide file.
+#' @param file The input Olink wide file.
 #' @param olink_platform The Olink platform used to generate the input file.
-#' Expecting "Target 96", "Target 48", "Flex" or "Focus".
+#' Expecting one of "Target 96", "Target 48", "Flex" or "Focus".
 #' @param data_type The quantification in which the data comes in. Expecting one
-#' of NPX, Quantified or Ct.
-#' @param col_names Names list of character vector with the names of the columns
-#' containing Olink data on assays and internal control assays.
-#' @param format_spec A one-row data frame filtered from olink_wide_excel_spec
-#' with the Olink wide excel file specifications.
+#' of "NPX", "Quantified" or "Ct".
+#' @param col_names Named list of character vectors with the names of the
+#' columns containing Olink data on Assays and Internal Control assays.
+#' @param format_spec A one-row data frame filtered from olink_wide_spec with
+#' the Olink wide file specifications.
 #' @param df_plate_panel Data frame with unique combinations of panels and
 #' plates from the combination of top and middle data frames.
 #'
-#' @return The bottom matrix in long format.
+#' @return A tibble with the bottom matrix of an Olink wide file in long format.
 #'
 read_npx_wide_bottom <- function(df,
                                  file,
@@ -1409,7 +1416,7 @@ read_npx_wide_bottom <- function(df,
         "x" = "Unexpected values in column 1 of the bottom matrix with QC data
         in file {.file {file}}. Expected on of the combos:
         {bottom_mat_v1_expected}",
-        "i" = "Has the excel file been modified manually?"
+        "i" = "Has the file been modified manually?"
       ),
       call = rlang::caller_env(),
       wrap = FALSE
@@ -1484,7 +1491,7 @@ read_npx_wide_bottom <- function(df,
           "x" = "Column 1 of the bottom matrix does not contain the same number
           of  rows for plate-specific QC measurement(s)
           {format_spec_bottom_plate_spec} in file {.file {file}}!",
-          "i" = "Has the excel file been modified manually?"
+          "i" = "Has the file been modified manually?"
         ),
         call = rlang::caller_env(),
         wrap = FALSE

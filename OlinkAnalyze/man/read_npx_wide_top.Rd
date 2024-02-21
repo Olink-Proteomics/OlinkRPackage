@@ -2,28 +2,28 @@
 % Please edit documentation in R/read_npx_wide.R
 \name{read_npx_wide_top}
 \alias{read_npx_wide_top}
-\title{Help function that splits df_top from a Olink wide excel file into 3 data
+\title{Help function that splits the top from an Olink wide file into more data
 frames.}
 \usage{
 read_npx_wide_top(df, file, olink_platform, format_spec)
 }
 \arguments{
-\item{df}{The top data frame from a split Olink wide excel file.}
+\item{df}{The top data frame from a split Olink wide file.}
 
-\item{file}{The input excel file.}
+\item{file}{The input Olink wide file.}
 
 \item{olink_platform}{The Olink platform used to generate the input file.
-Expecting "Target 96", "Target 48", "Flex" or "Focus".}
+Expecting one of "Target 96", "Target 48", "Flex" or "Focus".}
 
-\item{format_spec}{A one-row data frame filtered from olink_wide_excel_spec
-with the Olink wide excel file specifications.}
+\item{format_spec}{A one-row data frame filtered from olink_wide_spec with
+the Olink wide file specifications.}
 }
 \value{
-List of the data frames (df_oid, df_meta, df_qc_dev and df_int_ctrl)
-in long format that df_top is split on.
+A list of data frames (df_oid, df_pid, df_qc_warn and df_int_ctrl) in
+long format from the top matrix of an Olink wide file.
 }
 \description{
-Help function that splits df_top from a Olink wide excel file into 3 data
+Help function that splits the top from an Olink wide file into more data
 frames.
 }
 \author{

@@ -3,24 +3,24 @@
 \name{read_npx_wide_check_top}
 \alias{read_npx_wide_check_top}
 \title{Help function to determine the number of rows with assay information in Olink
-excel wide format files.}
+wide format file.}
 \usage{
 read_npx_wide_check_top(df, file, format_spec)
 }
 \arguments{
-\item{df}{The top data frame from a split Olink wide excel file.}
+\item{df}{The top data frame from a split Olink wide  file.}
 
-\item{file}{The input excel file.}
+\item{file}{The input Olink wide file.}
 
-\item{format_spec}{A one-row data frame filtered from olink_wide_excel_spec
-with the Olink wide excel file specifications.}
+\item{format_spec}{A one-row data frame filtered from olink_wide_spec with
+the Olink wide file specifications.}
 }
 \value{
-An error inconsistency is spotted
+NULL unless an inconsistency is spotted.
 }
 \description{
 Help function to determine the number of rows with assay information in Olink
-excel wide format files.
+wide format file.
 }
 \author{
 Klev Diamanti

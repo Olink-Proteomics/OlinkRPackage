@@ -4,16 +4,18 @@
 \alias{read_npx_wide}
 \title{Read wide Olink files with NPX, Ct or Quantified data.}
 \usage{
-read_npx_wide(file, data_type, olink_platform)
+read_npx_wide(df, file, data_type, olink_platform)
 }
 \arguments{
-\item{file}{The input excel file.}
+\item{df}{A tibble containing the full Olink dataset in wide format.}
+
+\item{file}{The input Olink wide file.}
 
 \item{data_type}{The quantification in which the data comes in. Expecting one
-of NPX, Quantified or Ct.}
+of "NPX", "Quantified" or "Ct".}
 
 \item{olink_platform}{The Olink platform used to generate the input file.
-Expecting "Target 96", "Target 48", "Flex" or "Focus".}
+Expecting one of "Target 96", "Target 48", "Flex" or "Focus".}
 }
 \value{
 A tibble of the wide Olink file in long format.

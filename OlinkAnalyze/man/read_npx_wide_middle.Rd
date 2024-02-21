@@ -2,30 +2,30 @@
 % Please edit documentation in R/read_npx_wide.R
 \name{read_npx_wide_middle}
 \alias{read_npx_wide_middle}
-\title{Help function that splits df_mid from a Olink wide excel file into 4 data
-frames.}
+\title{Help function that splits the middle matrix from an Olink wide file into more
+data frames.}
 \usage{
 read_npx_wide_middle(df, file, data_type, col_names)
 }
 \arguments{
-\item{df}{The middle data frame from a split Olink wide excel file.}
+\item{df}{The middle data frame from a split Olink wide file.}
 
-\item{file}{The input excel file.}
+\item{file}{The input Olink wide file.}
 
 \item{data_type}{The quantification in which the data comes in. Expecting one
-of NPX or Quantified.}
+of "NPX", "Quantified" or "Ct".}
 
-\item{col_names}{Names list of character vector with the names of the columns
-containing Olink data on assays, plates, QC Warnings, internal control
-assays and deviations from internal controls.}
+\item{col_names}{Named list of character vectors with the names of the
+columns containing Olink data on Assays, Plates, QC Warnings, Internal
+Control assays and deviations from internal controls.}
 }
 \value{
 A list of data frames (df_oid, df_pid, df_qc_warn and df_int_ctrl) in
-long format from the middle matrix of the Olink wide excel file.
+long format from the middle matrix of an Olink wide file.
 }
 \description{
-Help function that splits df_mid from a Olink wide excel file into 4 data
-frames.
+Help function that splits the middle matrix from an Olink wide file into more
+data frames.
 }
 \author{
 Klev Diamanti

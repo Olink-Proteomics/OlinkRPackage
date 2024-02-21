@@ -14,8 +14,8 @@ test_that(
     ## NPX ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -32,24 +32,20 @@ test_that(
                                         version = 1L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        wide_excel <- "../../lala.xlsx"
-
         # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
-          object = df_out <- read_npx_wide_split_row(file = wide_excel,
-                                                     data_type = data_type,
-                                                     format_spec = format_spec)
+          object = df_out <- read_npx_wide_split_row(
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
+            data_type = data_type,
+            format_spec = format_spec
+          )
         )
 
         # check that df_head works
@@ -82,8 +78,8 @@ test_that(
     ## Ct ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -100,22 +96,20 @@ test_that(
                                         version = 0L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
-          object = df_out <- read_npx_wide_split_row(file = wide_excel,
-                                                     data_type = data_type,
-                                                     format_spec = format_spec)
+          object = df_out <- read_npx_wide_split_row(
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
+            data_type = data_type,
+            format_spec = format_spec
+          )
         )
 
         # check that df_head works
@@ -145,8 +139,8 @@ test_that(
     ## Quantified ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -163,22 +157,20 @@ test_that(
                                         version = 0L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
-          object = df_out <- read_npx_wide_split_row(file = wide_excel,
-                                                     data_type = data_type,
-                                                     format_spec = format_spec)
+          object = df_out <- read_npx_wide_split_row(
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
+            data_type = data_type,
+            format_spec = format_spec
+          )
         )
 
         # check that df_head works
@@ -216,6 +208,7 @@ test_that(
   {
     # variables that apply to all tests
     olink_platform <- "Target 48"
+    data_type <- "NPX"
     n_panels <- 2L
     n_assays <- 45L
     n_samples <- 88L
@@ -223,17 +216,19 @@ test_that(
     show_int_ctrl <- TRUE
     version <- 1L
 
+    # matrix specifications
+    format_spec <- olink_wide_spec |>
+      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
     ## No all-NA rows ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
         # synthetic wide df
-        data_type <- "NPX"
-
         df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
                                         data_type = data_type,
                                         n_panels = n_panels,
@@ -243,26 +238,23 @@ test_that(
                                         show_int_ctrl = show_int_ctrl,
                                         version = version)
 
-        # modify and write wide df
-        df_rand$list_df_wide$df_wide |>
+        # modify wide df
+        df_rand$list_df_wide$df_wide <- df_rand$list_df_wide$df_wide |>
           dplyr::filter(
-            is.na(.data[["V1"]])
-          ) |>
-          writexl::write_xlsx(
-            path = wide_excel,
-            col_names = FALSE,
-            format_headers = FALSE
+            !is.na(.data[["V1"]])
           )
 
-        # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+        # write wide df
+        writeLines("foo", olink_wide_format)
 
         # check that function runs with error
         expect_error(
-          object = read_npx_wide_split_row(file = wide_excel,
-                                           data_type = data_type,
-                                           format_spec = format_spec),
+          object = read_npx_wide_split_row(
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
+            data_type = data_type,
+            format_spec = format_spec
+          ),
           regexp = "We identified 0 rows with all columns `NA` in file"
         )
       }
@@ -271,14 +263,12 @@ test_that(
     ## Too many all-NA rows ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
         # synthetic wide df
-        data_type <- "NPX"
-
         df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
                                         data_type = data_type,
                                         n_panels = n_panels,
@@ -289,27 +279,24 @@ test_that(
                                         version = version)
 
         # modify and write wide df
-        df_rand$list_df_wide$df_wide |>
+        df_rand$list_df_wide$df_wide <- df_rand$list_df_wide$df_wide |>
           dplyr::mutate(
             V1 = dplyr::if_else(.data[["V1"]] == .env[["data_type"]],
                                 NA_character_,
                                 .data[["V1"]])
-          ) |>
-          writexl::write_xlsx(
-            path = wide_excel,
-            col_names = FALSE,
-            format_headers = FALSE
           )
 
-        # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+        # write wide df
+        writeLines("foo", olink_wide_format)
 
         # check that function runs with error
         expect_error(
-          object = read_npx_wide_split_row(file = wide_excel,
-                                           data_type = data_type,
-                                           format_spec = format_spec),
+          object = read_npx_wide_split_row(
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
+            data_type = data_type,
+            format_spec = format_spec
+          ),
           regexp = "We identified 3 rows with all columns `NA` in file"
         )
       }
@@ -333,8 +320,8 @@ test_that(
     ## NPX ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -351,22 +338,20 @@ test_that(
                                         version = version)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        writeLines("foo", olink_wide_format)
 
         # check that function runs with error
         expect_error(
-          object = read_npx_wide_split_row(file = wide_excel,
-                                           data_type = data_type,
-                                           format_spec = format_spec),
+          object = read_npx_wide_split_row(
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
+            data_type = data_type,
+            format_spec = format_spec
+          ),
           regexp = "while we expected 2"
         )
 
@@ -376,8 +361,8 @@ test_that(
     ## Ct ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -394,22 +379,20 @@ test_that(
                                         version = version)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        writeLines("foo", olink_wide_format)
 
         # check that function runs with error
         expect_error(
-          object = read_npx_wide_split_row(file = wide_excel,
-                                           data_type = data_type,
-                                           format_spec = format_spec),
+          object = read_npx_wide_split_row(
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
+            data_type = data_type,
+            format_spec = format_spec
+          ),
           regexp = "while we expected 1"
         )
 
@@ -419,8 +402,8 @@ test_that(
     ## Quantified ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -437,22 +420,20 @@ test_that(
                                         version = version)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        writeLines("foo", olink_wide_format)
 
         # check that function runs with error
         expect_error(
-          object = read_npx_wide_split_row(file = wide_excel,
-                                           data_type = data_type,
-                                           format_spec = format_spec),
+          object = read_npx_wide_split_row(
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
+            data_type = data_type,
+            format_spec = format_spec
+          ),
           regexp = "while we expected 2"
         )
 
@@ -475,9 +456,13 @@ test_that(
     show_int_ctrl <- TRUE
     version <- 1L
 
+    # matrix specifications
+    format_spec <- olink_wide_spec |>
+      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -491,25 +476,22 @@ test_that(
                                         show_int_ctrl = show_int_ctrl,
                                         version = version)
 
-        # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
-        df_rand$list_df_wide$df_wide |>
+        df_rand$list_df_wide$df_wide <- df_rand$list_df_wide$df_wide |>
           dplyr::filter(
             !grepl(pattern = "^S", x = .data[["V1"]])
-          ) |>
-          writexl::write_xlsx(
-            path = wide_excel,
-            col_names = FALSE,
-            format_headers = FALSE
           )
+
+        # write wide df
+        writeLines("foo", olink_wide_format)
 
         # check that function runs with error
         expect_error(
-          object = read_npx_wide_split_row(file = wide_excel,
-                                           data_type = data_type,
-                                           format_spec = format_spec),
+          object = read_npx_wide_split_row(
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
+            data_type = data_type,
+            format_spec = format_spec
+          ),
           regexp = "Consecutive rows with all columns NA."
         )
 
@@ -533,8 +515,8 @@ test_that(
     ## NPX no int ctrl & no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -551,17 +533,17 @@ test_that(
                                         version = 1L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = read_npx_wide_check_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             format_spec = format_spec
           )
         )
@@ -572,8 +554,8 @@ test_that(
     ## NPX with int ctrl & no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -590,17 +572,17 @@ test_that(
                                         version = 1L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = read_npx_wide_check_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             format_spec = format_spec
           )
         )
@@ -611,8 +593,8 @@ test_that(
     ## NPX with int ctrl & with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -629,17 +611,17 @@ test_that(
                                         version = 1L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = read_npx_wide_check_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             format_spec = format_spec
           )
         )
@@ -650,8 +632,8 @@ test_that(
     ## Ct no int ctrl & no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -668,17 +650,17 @@ test_that(
                                         version = 1L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = read_npx_wide_check_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             format_spec = format_spec
           )
         )
@@ -689,8 +671,8 @@ test_that(
     ## Ct with int ctrl & no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -707,17 +689,17 @@ test_that(
                                         version = 1L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = read_npx_wide_check_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             format_spec = format_spec
           )
         )
@@ -728,8 +710,8 @@ test_that(
     ## Ct with int ctrl & with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -746,17 +728,17 @@ test_that(
                                         version = 1L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = read_npx_wide_check_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             format_spec = format_spec
           )
         )
@@ -767,8 +749,8 @@ test_that(
     ## Quantified no int ctrl & no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -785,17 +767,17 @@ test_that(
                                         version = 0L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = read_npx_wide_check_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             format_spec = format_spec
           )
         )
@@ -806,8 +788,8 @@ test_that(
     ## Quantified with int ctrl & no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -824,17 +806,17 @@ test_that(
                                         version = 0L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = read_npx_wide_check_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             format_spec = format_spec
           )
         )
@@ -845,8 +827,8 @@ test_that(
     ## Quantified with int ctrl & no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -863,17 +845,17 @@ test_that(
                                         version = 0L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = read_npx_wide_check_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             format_spec = format_spec
           )
         )
@@ -898,8 +880,8 @@ test_that(
     ## NPX/Ct ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -922,17 +904,17 @@ test_that(
           )
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs with error
         expect_error(
           object = read_npx_wide_check_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             format_spec = format_spec
           ),
           regexp = "Column 1 of the top matrix with assay data in file"
@@ -944,8 +926,8 @@ test_that(
     ## Quantified ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -979,17 +961,17 @@ test_that(
           )
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs with error
         expect_error(
           object = read_npx_wide_check_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             format_spec = format_spec
           ),
           regexp = "Column 1 of the top matrix with assay data in file"
@@ -1015,8 +997,8 @@ test_that(
     ## NPX ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -1041,17 +1023,17 @@ test_that(
           )
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs with error
         expect_error(
           object = read_npx_wide_check_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             format_spec = format_spec
           ),
           regexp = "does not contain: QC Warning"
@@ -1063,8 +1045,8 @@ test_that(
     ## Ct ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -1089,17 +1071,17 @@ test_that(
           )
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs with error
         expect_error(
           object = read_npx_wide_check_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             format_spec = format_spec
           ),
           regexp = "does not contain: Plate ID"
@@ -1111,8 +1093,8 @@ test_that(
     ## Quantified ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -1137,17 +1119,17 @@ test_that(
           )
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs with error
         expect_error(
           object = read_npx_wide_check_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             format_spec = format_spec
           ),
           regexp = "does not contain: Plate ID and QC Warning"
@@ -1171,11 +1153,15 @@ test_that(
     show_int_ctrl <- TRUE
     version <- 1L
 
+    # matrix specifications
+    format_spec <- olink_wide_spec |>
+      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
     ## 1 missing int ctrl in 1 panel ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -1203,18 +1189,14 @@ test_that(
             -dplyr::all_of(remove_col)
           )
 
-        # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs with error
         expect_error(
           object = read_npx_wide_check_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             format_spec = format_spec
           ),
           regexp = "is missing one or more of the internal control"
@@ -1226,8 +1208,8 @@ test_that(
     ## 1 missing int ctrl 2 panels ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -1255,18 +1237,14 @@ test_that(
             -dplyr::all_of(remove_col)
           )
 
-        # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs with error
         expect_error(
           object = read_npx_wide_check_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             format_spec = format_spec
           ),
           regexp = "is missing one or more of the internal control"
@@ -1278,8 +1256,8 @@ test_that(
     ## 4 missing int ctrl 3 panels ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -1307,18 +1285,14 @@ test_that(
             -dplyr::all_of(remove_col)
           )
 
-        # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs with error
         expect_error(
           object = read_npx_wide_check_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             format_spec = format_spec
           ),
           regexp = "are missing one or more of the internal control"
@@ -1342,11 +1316,15 @@ test_that(
     show_int_ctrl <- TRUE
     version <- 1L
 
+    # matrix specifications
+    format_spec <- olink_wide_spec |>
+      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
     ## 1 missing int ctrl in 1 panel ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -1374,18 +1352,14 @@ test_that(
             -dplyr::all_of(remove_col)
           )
 
-        # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs with error
         expect_error(
           object = read_npx_wide_check_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             format_spec = format_spec
           ),
           regexp = "is missing one or more of the deviations"
@@ -1397,8 +1371,8 @@ test_that(
     ## 1 missing int ctrl 2 panels ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -1426,18 +1400,14 @@ test_that(
             -dplyr::all_of(remove_col)
           )
 
-        # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs with error
         expect_error(
           object = read_npx_wide_check_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             format_spec = format_spec
           ),
           regexp = "is missing one or more of the deviations"
@@ -1449,8 +1419,8 @@ test_that(
     ## 4 missing int ctrl 3 panels ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -1478,18 +1448,14 @@ test_that(
             -dplyr::all_of(remove_col)
           )
 
-        # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs with error
         expect_error(
           object = read_npx_wide_check_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             format_spec = format_spec
           ),
           regexp = "are missing one or more of the deviations"
@@ -1515,8 +1481,8 @@ test_that(
     ## NPX no int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -1533,17 +1499,17 @@ test_that(
                                         version = 1L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -1587,8 +1553,8 @@ test_that(
     ## NPX with int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -1605,17 +1571,17 @@ test_that(
                                         version = 1L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -1656,8 +1622,8 @@ test_that(
     ## NPX no int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -1674,17 +1640,17 @@ test_that(
                                         version = 1L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -1725,8 +1691,8 @@ test_that(
     ## NPX with int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -1743,17 +1709,17 @@ test_that(
                                         version = 1L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -1792,8 +1758,8 @@ test_that(
     ## Ct no int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -1810,17 +1776,17 @@ test_that(
                                         version = 1L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -1867,8 +1833,8 @@ test_that(
     ## Ct with int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -1885,17 +1851,17 @@ test_that(
                                         version = 1L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -1939,8 +1905,8 @@ test_that(
     ## Quantified no int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -1956,17 +1922,17 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 0L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -2010,8 +1976,8 @@ test_that(
     ## Quantified with int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -2027,17 +1993,17 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 0L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -2078,8 +2044,8 @@ test_that(
     ## Quantified no int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -2095,17 +2061,17 @@ test_that(
                                         show_dev_int_ctrl = TRUE,
                                         version = 0L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -2146,8 +2112,8 @@ test_that(
     ## Quantified with int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -2163,17 +2129,17 @@ test_that(
                                         show_dev_int_ctrl = TRUE,
                                         version = 0L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -2223,8 +2189,8 @@ test_that(
     ## NPX no int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -2241,17 +2207,17 @@ test_that(
                                         version = 1L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -2295,8 +2261,8 @@ test_that(
     ## NPX with int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -2313,17 +2279,17 @@ test_that(
                                         version = 1L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -2364,8 +2330,8 @@ test_that(
     ## NPX no int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -2382,17 +2348,17 @@ test_that(
                                         version = 1L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -2433,8 +2399,8 @@ test_that(
     ## NPX with int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -2451,17 +2417,17 @@ test_that(
                                         version = 1L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -2500,8 +2466,8 @@ test_that(
     ## Ct no int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -2518,17 +2484,17 @@ test_that(
                                         version = 1L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -2575,8 +2541,8 @@ test_that(
     ## Ct with int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -2593,17 +2559,17 @@ test_that(
                                         version = 1L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -2647,8 +2613,8 @@ test_that(
     ## Quantified no int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -2664,17 +2630,17 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 0L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -2718,8 +2684,8 @@ test_that(
     ## Quantified with int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -2735,17 +2701,17 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 0L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -2786,8 +2752,8 @@ test_that(
     ## Quantified no int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -2803,17 +2769,17 @@ test_that(
                                         show_dev_int_ctrl = TRUE,
                                         version = 0L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -2854,8 +2820,8 @@ test_that(
     ## Quantified with int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -2871,17 +2837,17 @@ test_that(
                                         show_dev_int_ctrl = TRUE,
                                         version = 0L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -2927,12 +2893,13 @@ test_that(
     n_panels <- 1L
     n_assays <- 92L
     n_samples <- 88L
+    version <- 1L
 
     ## NPX no int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -2946,20 +2913,20 @@ test_that(
                                         n_samples = n_samples,
                                         show_int_ctrl = FALSE,
                                         show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+                                        version = version)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -3003,8 +2970,8 @@ test_that(
     ## NPX with int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -3018,20 +2985,20 @@ test_that(
                                         n_samples = n_samples,
                                         show_int_ctrl = TRUE,
                                         show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+                                        version = version)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -3072,8 +3039,8 @@ test_that(
     ## NPX no int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -3087,20 +3054,20 @@ test_that(
                                         n_samples = n_samples,
                                         show_int_ctrl = FALSE,
                                         show_dev_int_ctrl = TRUE,
-                                        version = 1L)
+                                        version = version)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -3141,8 +3108,8 @@ test_that(
     ## NPX with int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -3156,20 +3123,20 @@ test_that(
                                         n_samples = n_samples,
                                         show_int_ctrl = TRUE,
                                         show_dev_int_ctrl = TRUE,
-                                        version = 1L)
+                                        version = version)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -3208,8 +3175,8 @@ test_that(
     ## Ct no int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -3223,20 +3190,20 @@ test_that(
                                         n_samples = n_samples,
                                         show_int_ctrl = FALSE,
                                         show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+                                        version = version)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -3283,8 +3250,8 @@ test_that(
     ## Ct with int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -3298,20 +3265,20 @@ test_that(
                                         n_samples = n_samples,
                                         show_int_ctrl = TRUE,
                                         show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+                                        version = version)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -3363,12 +3330,13 @@ test_that(
     n_panels <- 3L
     n_assays <- 92L
     n_samples <- 88L
+    version <- 2L
 
     ## NPX no int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -3382,20 +3350,20 @@ test_that(
                                         n_samples = n_samples,
                                         show_int_ctrl = FALSE,
                                         show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+                                        version = version)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -3439,8 +3407,8 @@ test_that(
     ## NPX with int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -3454,20 +3422,20 @@ test_that(
                                         n_samples = n_samples,
                                         show_int_ctrl = TRUE,
                                         show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+                                        version = version)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -3508,8 +3476,8 @@ test_that(
     ## NPX no int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -3523,20 +3491,20 @@ test_that(
                                         n_samples = n_samples,
                                         show_int_ctrl = FALSE,
                                         show_dev_int_ctrl = TRUE,
-                                        version = 1L)
+                                        version = version)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -3577,8 +3545,8 @@ test_that(
     ## NPX with int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -3592,20 +3560,20 @@ test_that(
                                         n_samples = n_samples,
                                         show_int_ctrl = TRUE,
                                         show_dev_int_ctrl = TRUE,
-                                        version = 1L)
+                                        version = version)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -3644,8 +3612,8 @@ test_that(
     ## Ct no int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -3659,20 +3627,20 @@ test_that(
                                         n_samples = n_samples,
                                         show_int_ctrl = FALSE,
                                         show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+                                        version = version)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -3719,8 +3687,8 @@ test_that(
     ## Ct with int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -3734,20 +3702,20 @@ test_that(
                                         n_samples = n_samples,
                                         show_int_ctrl = TRUE,
                                         show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+                                        version = version)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -3803,8 +3771,8 @@ test_that(
     ## NPX no int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -3821,17 +3789,17 @@ test_that(
                                         version = 1L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -3875,8 +3843,8 @@ test_that(
     ## NPX with int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -3893,17 +3861,17 @@ test_that(
                                         version = 1L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -3944,8 +3912,8 @@ test_that(
     ## NPX no int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -3962,17 +3930,17 @@ test_that(
                                         version = 1L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -4013,8 +3981,8 @@ test_that(
     ## NPX with int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -4031,17 +3999,17 @@ test_that(
                                         version = 1L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -4080,8 +4048,8 @@ test_that(
     ## Ct no int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -4098,17 +4066,17 @@ test_that(
                                         version = 1L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -4155,8 +4123,8 @@ test_that(
     ## Ct with int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -4173,17 +4141,17 @@ test_that(
                                         version = 1L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -4227,8 +4195,8 @@ test_that(
     ## Quantified no int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -4244,17 +4212,17 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 0L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -4298,8 +4266,8 @@ test_that(
     ## Quantified with int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -4315,17 +4283,17 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 0L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -4366,8 +4334,8 @@ test_that(
     ## Quantified no int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -4383,17 +4351,17 @@ test_that(
                                         show_dev_int_ctrl = TRUE,
                                         version = 0L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -4434,8 +4402,8 @@ test_that(
     ## Quantified with int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -4451,17 +4419,17 @@ test_that(
                                         show_dev_int_ctrl = TRUE,
                                         version = 0L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -4511,8 +4479,8 @@ test_that(
     ## NPX no int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -4529,17 +4497,17 @@ test_that(
                                         version = 1L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -4583,8 +4551,8 @@ test_that(
     ## NPX with int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -4601,17 +4569,17 @@ test_that(
                                         version = 1L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -4652,8 +4620,8 @@ test_that(
     ## NPX no int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -4670,17 +4638,17 @@ test_that(
                                         version = 1L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -4721,8 +4689,8 @@ test_that(
     ## NPX with int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -4739,17 +4707,17 @@ test_that(
                                         version = 1L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -4788,8 +4756,8 @@ test_that(
     ## Ct no int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -4806,17 +4774,17 @@ test_that(
                                         version = 1L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -4863,8 +4831,8 @@ test_that(
     ## Ct with int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -4881,17 +4849,17 @@ test_that(
                                         version = 1L)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -4935,8 +4903,8 @@ test_that(
     ## Quantified no int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -4952,17 +4920,17 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 0L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -5006,8 +4974,8 @@ test_that(
     ## Quantified with int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -5023,17 +4991,17 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 0L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -5074,8 +5042,8 @@ test_that(
     ## Quantified no int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -5091,17 +5059,17 @@ test_that(
                                         show_dev_int_ctrl = TRUE,
                                         version = 0L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -5142,8 +5110,8 @@ test_that(
     ## Quantified with int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -5159,17 +5127,17 @@ test_that(
                                         show_dev_int_ctrl = TRUE,
                                         version = 0L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -5215,12 +5183,13 @@ test_that(
     n_panels <- 1L
     n_assays <- 15L
     n_samples <- 88L
+    version <- 0L
 
     ## NPX no int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -5234,20 +5203,20 @@ test_that(
                                         n_samples = n_samples,
                                         show_int_ctrl = FALSE,
                                         show_dev_int_ctrl = FALSE,
-                                        version = 0L)
+                                        version = version)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -5291,8 +5260,8 @@ test_that(
     ## NPX with int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -5306,20 +5275,20 @@ test_that(
                                         n_samples = n_samples,
                                         show_int_ctrl = TRUE,
                                         show_dev_int_ctrl = FALSE,
-                                        version = 0L)
+                                        version = version)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -5360,8 +5329,8 @@ test_that(
     ## NPX no int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -5375,20 +5344,20 @@ test_that(
                                         n_samples = n_samples,
                                         show_int_ctrl = FALSE,
                                         show_dev_int_ctrl = TRUE,
-                                        version = 0L)
+                                        version = version)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -5429,8 +5398,8 @@ test_that(
     ## NPX with int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -5444,20 +5413,20 @@ test_that(
                                         n_samples = n_samples,
                                         show_int_ctrl = TRUE,
                                         show_dev_int_ctrl = TRUE,
-                                        version = 0L)
+                                        version = version)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -5496,8 +5465,8 @@ test_that(
     ## Ct no int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -5511,20 +5480,20 @@ test_that(
                                         n_samples = n_samples,
                                         show_int_ctrl = FALSE,
                                         show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+                                        version = version)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -5571,8 +5540,8 @@ test_that(
     ## Ct with int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -5586,20 +5555,20 @@ test_that(
                                         n_samples = n_samples,
                                         show_int_ctrl = TRUE,
                                         show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+                                        version = version)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -5643,8 +5612,8 @@ test_that(
     ## Quantified no int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -5658,19 +5627,19 @@ test_that(
                                         n_samples = n_samples,
                                         show_int_ctrl = FALSE,
                                         show_dev_int_ctrl = FALSE,
-                                        version = 0L)
+                                        version = version)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -5714,8 +5683,8 @@ test_that(
     ## Quantified with int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -5729,19 +5698,19 @@ test_that(
                                         n_samples = n_samples,
                                         show_int_ctrl = TRUE,
                                         show_dev_int_ctrl = FALSE,
-                                        version = 0L)
+                                        version = version)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -5782,8 +5751,8 @@ test_that(
     ## Quantified no int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -5797,19 +5766,19 @@ test_that(
                                         n_samples = n_samples,
                                         show_int_ctrl = FALSE,
                                         show_dev_int_ctrl = TRUE,
-                                        version = 0L)
+                                        version = version)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -5850,8 +5819,8 @@ test_that(
     ## Quantified with int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -5865,19 +5834,19 @@ test_that(
                                         n_samples = n_samples,
                                         show_int_ctrl = TRUE,
                                         show_dev_int_ctrl = TRUE,
-                                        version = 0L)
+                                        version = version)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -5920,15 +5889,16 @@ test_that(
   {
     # variables that apply to all tests
     olink_platform <- "Focus"
-    n_panels <- 3L
+    n_panels <- 2L
     n_assays <- 21L
     n_samples <- 88L
+    version <- 0L
 
     ## NPX no int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -5942,20 +5912,20 @@ test_that(
                                         n_samples = n_samples,
                                         show_int_ctrl = FALSE,
                                         show_dev_int_ctrl = FALSE,
-                                        version = 0L)
+                                        version = version)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -5999,8 +5969,8 @@ test_that(
     ## NPX with int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -6014,20 +5984,20 @@ test_that(
                                         n_samples = n_samples,
                                         show_int_ctrl = TRUE,
                                         show_dev_int_ctrl = FALSE,
-                                        version = 0L)
+                                        version = version)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -6068,8 +6038,8 @@ test_that(
     ## NPX no int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -6083,20 +6053,20 @@ test_that(
                                         n_samples = n_samples,
                                         show_int_ctrl = FALSE,
                                         show_dev_int_ctrl = TRUE,
-                                        version = 0L)
+                                        version = version)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -6137,8 +6107,8 @@ test_that(
     ## NPX with int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -6152,20 +6122,20 @@ test_that(
                                         n_samples = n_samples,
                                         show_int_ctrl = TRUE,
                                         show_dev_int_ctrl = TRUE,
-                                        version = 0L)
+                                        version = version)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -6204,8 +6174,8 @@ test_that(
     ## Ct no int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -6219,20 +6189,20 @@ test_that(
                                         n_samples = n_samples,
                                         show_int_ctrl = FALSE,
                                         show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+                                        version = version)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -6279,8 +6249,8 @@ test_that(
     ## Ct with int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -6294,20 +6264,20 @@ test_that(
                                         n_samples = n_samples,
                                         show_int_ctrl = TRUE,
                                         show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+                                        version = version)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -6351,8 +6321,8 @@ test_that(
     ## Quantified no int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -6366,19 +6336,19 @@ test_that(
                                         n_samples = n_samples,
                                         show_int_ctrl = FALSE,
                                         show_dev_int_ctrl = FALSE,
-                                        version = 0L)
+                                        version = version)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -6422,8 +6392,8 @@ test_that(
     ## Quantified with int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -6437,19 +6407,19 @@ test_that(
                                         n_samples = n_samples,
                                         show_int_ctrl = TRUE,
                                         show_dev_int_ctrl = FALSE,
-                                        version = 0L)
+                                        version = version)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -6490,8 +6460,8 @@ test_that(
     ## Quantified no int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -6505,19 +6475,19 @@ test_that(
                                         n_samples = n_samples,
                                         show_int_ctrl = FALSE,
                                         show_dev_int_ctrl = TRUE,
-                                        version = 0L)
+                                        version = version)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -6558,8 +6528,8 @@ test_that(
     ## Quantified with int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -6573,19 +6543,19 @@ test_that(
                                         n_samples = n_samples,
                                         show_int_ctrl = TRUE,
                                         show_dev_int_ctrl = TRUE,
-                                        version = 0L)
+                                        version = version)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_top(
             df = df_rand$list_df_wide$df_top_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             format_spec = format_spec
           )
@@ -6631,12 +6601,13 @@ test_that(
     n_panels <- 1L
     n_assays <- 45L
     n_samples <- 88L
+    version <- 1L
 
     # df contains unrecognizable tag ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -6650,10 +6621,10 @@ test_that(
                                         n_samples = n_samples,
                                         show_int_ctrl = TRUE,
                                         show_dev_int_ctrl = TRUE,
-                                        version = 1L)
+                                        version = version)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # modify df_top_wide to add a new column with an unrecognizable tag
@@ -6680,12 +6651,12 @@ test_that(
           )
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs with error
         expect_error(
           object = read_npx_wide_top(df = df_rand$list_df_wide$df_top_wide,
-                                     file = wide_excel,
+                                     file = olink_wide_format,
                                      olink_platform = olink_platform,
                                      format_spec = format_spec),
           regexp = "in row `Assay` contains unrecognized values in columns: V54"
@@ -6697,8 +6668,8 @@ test_that(
     # df contains QC Warning when data_type Ct ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -6712,19 +6683,19 @@ test_that(
                                         n_samples = n_samples,
                                         show_int_ctrl = FALSE,
                                         show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+                                        version = version)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs with error
         expect_error(
           object = read_npx_wide_top(df = df_rand$list_df_wide$df_top_wide,
-                                     file = wide_excel,
+                                     file = olink_wide_format,
                                      olink_platform = olink_platform,
                                      format_spec = format_spec),
           regexp = "in row `Assay` contains unrecognized values in columns: V48"
@@ -6745,12 +6716,19 @@ test_that(
     n_panels <- 1L
     n_assays <- 45L
     n_samples <- 88L
+    show_int_ctrl <- FALSE
+    show_dev_int_ctrl <- FALSE
+    version <- 1L
+
+    # matrix specifications
+    format_spec <- olink_wide_spec |>
+      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
     ## OlinkID = NA 1 instance ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -6760,9 +6738,9 @@ test_that(
                                         n_panels = n_panels,
                                         n_assays = n_assays,
                                         n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
+                                        version = version)
 
         # modify dt_top_wide intrduce NA cells to test
         df_rand$list_df_wide$df_top_wide <- df_rand$list_df_wide$df_top_wide |>
@@ -6772,17 +6750,13 @@ test_that(
                                 .data[["V2"]])
           )
 
-        # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs with error
         expect_error(
           object = read_npx_wide_top(df = df_rand$list_df_wide$df_top_wide,
-                                     file = wide_excel,
+                                     file = olink_wide_format,
                                      olink_platform = olink_platform,
                                      format_spec = format_spec),
           regexp = "Identified 1 empty cells!"
@@ -6794,8 +6768,8 @@ test_that(
     ## OlinkID = NA 4 instances ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -6805,12 +6779,12 @@ test_that(
                                         n_panels = n_panels,
                                         n_assays = n_assays,
                                         n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
+                                        version = version)
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # intrduce NA cells to test
@@ -6829,12 +6803,12 @@ test_that(
           )
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs with error
         expect_error(
           object = read_npx_wide_top(df = df_rand$list_df_wide$df_top_wide,
-                                     file = wide_excel,
+                                     file = olink_wide_format,
                                      olink_platform = olink_platform,
                                      format_spec = format_spec),
           regexp = "Identified 4 empty cells!"
@@ -6850,15 +6824,22 @@ test_that(
   "read_npx_wide_top - error - wrong # of assays",
   {
     # variables that apply to all tests
+    olink_platform <- "Target 96"
     data_type <- "NPX"
     n_samples <- 88L
-    olink_platform <- "Target 96"
+    show_int_ctrl <- FALSE
+    show_dev_int_ctrl <- FALSE
+    version <- 1L
+
+    # matrix specifications
+    format_spec <- olink_wide_spec |>
+      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
     ## T96 1 panel ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -6871,21 +6852,17 @@ test_that(
                                         n_panels = n_panels,
                                         n_assays = n_assays,
                                         n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
-
-        # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
+                                        version = version)
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_error(
           object = read_npx_wide_top(df = df_rand$list_df_wide$df_top_wide,
-                                     file = wide_excel,
+                                     file = olink_wide_format,
                                      olink_platform = olink_platform,
                                      format_spec = format_spec),
           regexp = "Detected 67 assays in 1 panels in file"
@@ -6897,8 +6874,8 @@ test_that(
     ## T96 2 panels ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -6911,21 +6888,17 @@ test_that(
                                         n_panels = n_panels,
                                         n_assays = n_assays,
                                         n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
-
-        # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+                                        show_int_ctrl = show_int_ctrl,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
+                                        version = version)
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_error(
           object = read_npx_wide_top(df = df_rand$list_df_wide$df_top_wide,
-                                     file = wide_excel,
+                                     file = olink_wide_format,
                                      olink_platform = olink_platform,
                                      format_spec = format_spec),
           regexp = "Detected 156 assays in 2 panels in file"
@@ -6941,23 +6914,20 @@ test_that(
   "read_npx_wide_top - error - uneven # of Plate ID and QC_Warning cols",
   {
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
         # synthetic wide df
         olink_platform <- "Target 48"
         data_type <- "NPX"
-        n_panels <- 2L
-        n_assays <- 45L
-        n_samples <- 88L
 
         df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
                                         data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
+                                        n_panels = 2L,
+                                        n_assays = 45L,
+                                        n_samples = 88L,
                                         show_int_ctrl = FALSE,
                                         show_dev_int_ctrl = FALSE,
                                         version = 1L)
@@ -6971,16 +6941,16 @@ test_that(
           )
 
         # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_error(
           object = read_npx_wide_top(df = df_rand$list_df_wide$df_top_wide,
-                                     file = wide_excel,
+                                     file = olink_wide_format,
                                      olink_platform = olink_platform,
                                      format_spec = format_spec),
           regexp = "Expected equal number of `Plate ID` and `QC\ Warning`"
@@ -7006,8 +6976,8 @@ test_that(
     ## NPX no int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -7033,13 +7003,13 @@ test_that(
         names(col_names) <- paste0("df_top_", names(col_names))
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_middle(
             df = df_rand$list_df_wide$df_middle_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             data_type = data_type,
             col_names = col_names
           )
@@ -7084,8 +7054,8 @@ test_that(
     ## NPX with int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -7111,13 +7081,13 @@ test_that(
         names(col_names) <- paste0("df_top_", names(col_names))
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_middle(
             df = df_rand$list_df_wide$df_middle_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             data_type = data_type,
             col_names = col_names
           )
@@ -7159,8 +7129,8 @@ test_that(
     ## NPX no int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -7186,13 +7156,13 @@ test_that(
         names(col_names) <- paste0("df_top_", names(col_names))
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_middle(
             df = df_rand$list_df_wide$df_middle_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             data_type = data_type,
             col_names = col_names
           )
@@ -7234,8 +7204,8 @@ test_that(
     ## NPX with int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -7261,13 +7231,13 @@ test_that(
         names(col_names) <- paste0("df_top_", names(col_names))
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_middle(
             df = df_rand$list_df_wide$df_middle_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             data_type = data_type,
             col_names = col_names
           )
@@ -7306,8 +7276,8 @@ test_that(
     ## Ct no int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -7333,13 +7303,13 @@ test_that(
         names(col_names) <- paste0("df_top_", names(col_names))
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_middle(
             df = df_rand$list_df_wide$df_middle_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             data_type = data_type,
             col_names = col_names
           )
@@ -7387,8 +7357,8 @@ test_that(
     ## Ct with int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -7414,13 +7384,13 @@ test_that(
         names(col_names) <- paste0("df_top_", names(col_names))
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_middle(
             df = df_rand$list_df_wide$df_middle_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             data_type = data_type,
             col_names = col_names
           )
@@ -7465,8 +7435,8 @@ test_that(
     ## Quantified no int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -7492,13 +7462,13 @@ test_that(
         names(col_names) <- paste0("df_top_", names(col_names))
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_middle(
             df = df_rand$list_df_wide$df_middle_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             data_type = data_type,
             col_names = col_names
           )
@@ -7543,8 +7513,8 @@ test_that(
     ## Quantified with int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -7570,13 +7540,13 @@ test_that(
         names(col_names) <- paste0("df_top_", names(col_names))
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_middle(
             df = df_rand$list_df_wide$df_middle_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             data_type = data_type,
             col_names = col_names
           )
@@ -7618,8 +7588,8 @@ test_that(
     ## Quantified no int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -7645,13 +7615,13 @@ test_that(
         names(col_names) <- paste0("df_top_", names(col_names))
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_middle(
             df = df_rand$list_df_wide$df_middle_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             data_type = data_type,
             col_names = col_names
           )
@@ -7693,8 +7663,8 @@ test_that(
     ## Quantified with int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -7720,13 +7690,13 @@ test_that(
         names(col_names) <- paste0("df_top_", names(col_names))
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_middle(
             df = df_rand$list_df_wide$df_middle_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             data_type = data_type,
             col_names = col_names
           )
@@ -7776,8 +7746,8 @@ test_that(
     ## NPX no int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -7803,13 +7773,13 @@ test_that(
         names(col_names) <- paste0("df_top_", names(col_names))
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_middle(
             df = df_rand$list_df_wide$df_middle_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             data_type = data_type,
             col_names = col_names
           )
@@ -7854,8 +7824,8 @@ test_that(
     ## NPX with int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -7881,13 +7851,13 @@ test_that(
         names(col_names) <- paste0("df_top_", names(col_names))
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_middle(
             df = df_rand$list_df_wide$df_middle_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             data_type = data_type,
             col_names = col_names
           )
@@ -7929,8 +7899,8 @@ test_that(
     ## NPX no int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -7956,13 +7926,13 @@ test_that(
         names(col_names) <- paste0("df_top_", names(col_names))
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_middle(
             df = df_rand$list_df_wide$df_middle_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             data_type = data_type,
             col_names = col_names
           )
@@ -8004,8 +7974,8 @@ test_that(
     ## NPX with int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -8031,13 +8001,13 @@ test_that(
         names(col_names) <- paste0("df_top_", names(col_names))
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_middle(
             df = df_rand$list_df_wide$df_middle_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             data_type = data_type,
             col_names = col_names
           )
@@ -8076,8 +8046,8 @@ test_that(
     ## Ct no int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -8103,13 +8073,13 @@ test_that(
         names(col_names) <- paste0("df_top_", names(col_names))
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_middle(
             df = df_rand$list_df_wide$df_middle_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             data_type = data_type,
             col_names = col_names
           )
@@ -8157,8 +8127,8 @@ test_that(
     ## Ct with int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -8184,13 +8154,13 @@ test_that(
         names(col_names) <- paste0("df_top_", names(col_names))
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_middle(
             df = df_rand$list_df_wide$df_middle_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             data_type = data_type,
             col_names = col_names
           )
@@ -8235,8 +8205,8 @@ test_that(
     ## Quantified no int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -8262,13 +8232,13 @@ test_that(
         names(col_names) <- paste0("df_top_", names(col_names))
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_middle(
             df = df_rand$list_df_wide$df_middle_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             data_type = data_type,
             col_names = col_names
           )
@@ -8313,8 +8283,8 @@ test_that(
     ## Quantified with int ctrl and no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -8340,13 +8310,13 @@ test_that(
         names(col_names) <- paste0("df_top_", names(col_names))
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_middle(
             df = df_rand$list_df_wide$df_middle_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             data_type = data_type,
             col_names = col_names
           )
@@ -8388,8 +8358,8 @@ test_that(
     ## Quantified no int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -8415,13 +8385,13 @@ test_that(
         names(col_names) <- paste0("df_top_", names(col_names))
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_middle(
             df = df_rand$list_df_wide$df_middle_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             data_type = data_type,
             col_names = col_names
           )
@@ -8463,8 +8433,8 @@ test_that(
     ## Quantified with int ctrl and with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -8490,13 +8460,13 @@ test_that(
         names(col_names) <- paste0("df_top_", names(col_names))
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_middle(
             df = df_rand$list_df_wide$df_middle_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             data_type = data_type,
             col_names = col_names
           )
@@ -8550,8 +8520,8 @@ test_that(
     # 1 duplicate ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -8584,13 +8554,13 @@ test_that(
           )
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs with error
         expect_error(
           object = read_npx_wide_middle(
             df = df_rand$list_df_wide$df_middle_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             data_type = data_type,
             col_names = col_names
           ),
@@ -8603,8 +8573,8 @@ test_that(
     # 3 duplicates ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -8638,13 +8608,13 @@ test_that(
           )
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs with error
         expect_error(
           object = read_npx_wide_middle(
             df = df_rand$list_df_wide$df_middle_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             data_type = data_type,
             col_names = col_names
           ),
@@ -8673,8 +8643,8 @@ test_that(
     # Missing plateid column ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -8706,13 +8676,13 @@ test_that(
         col_names$df_top_plate <- tail(col_names$df_top_plate, 1L)
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs with error
         expect_error(
           object = read_npx_wide_middle(
             df = df_rand$list_df_wide$df_middle_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             data_type = data_type,
             col_names = col_names
           ),
@@ -8725,8 +8695,8 @@ test_that(
     # Missing qc warning column ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -8758,13 +8728,13 @@ test_that(
         col_names$df_top_qc_warn <- tail(col_names$df_top_qc_warn, 1L)
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs with error
         expect_error(
           object = read_npx_wide_middle(
             df = df_rand$list_df_wide$df_middle_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             data_type = data_type,
             col_names = col_names
           ),
@@ -8793,8 +8763,8 @@ test_that(
     # 1 additional column ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -8827,17 +8797,17 @@ test_that(
           )
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs with error
         expect_error(
           object = read_npx_wide_middle(
             df = df_rand$list_df_wide$df_middle_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             data_type = data_type,
             col_names = col_names
           ),
-          regexp = "96 from the Olink wide excel file"
+          regexp = "96 from the Olink wide format file"
         )
 
       }
@@ -8846,8 +8816,8 @@ test_that(
     # 3 additional column ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -8878,17 +8848,17 @@ test_that(
         df_rand$list_df_wide$df_middle_wide[last_col] <- NA
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs with error
         expect_error(
           object = read_npx_wide_middle(
             df = df_rand$list_df_wide$df_middle_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             data_type = data_type,
             col_names = col_names
           ),
-          regexp = "96, 97, and 98 from the Olink wide excel file"
+          regexp = "96, 97, and 98 from the Olink wide format file"
         )
 
       }
@@ -8910,903 +8880,803 @@ test_that(
 
     ## NPX no int ctrl and no dev int ctrl ----
 
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
+    # synthetic wide df
+    data_type <- "NPX"
+    show_int_ctrl <- FALSE
+    show_dev_int_ctrl <- FALSE
+    version <- 1L
 
-        # synthetic wide df
-        data_type <- "NPX"
-        show_int_ctrl <- FALSE
+    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                    data_type = data_type,
+                                    n_panels = n_panels,
+                                    n_assays = n_assays,
+                                    n_samples = n_samples,
+                                    show_int_ctrl = show_int_ctrl,
+                                    show_dev_int_ctrl = show_dev_int_ctrl,
+                                    version = version)
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+    # matrix specifications
+    format_spec <- olink_wide_spec |>
+      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+    # column names of each subset of data
+    names(df_rand$list_df_long$df_top_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_top_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_top_", x))()
+    names(df_rand$list_df_long$df_middle_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_middle_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_mid_", x))()
 
-        # column names of each subset of data
-        names(df_rand$list_df_long$df_top_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_top_long),
-          split = "_"
+    # expected dim of output df
+    n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                      n_assays = n_assays,
+                                      n_samples = n_samples,
+                                      has_int_ctrl = show_int_ctrl,
+                                      num_int_ctrl = 3L)
+
+    # check that function runs
+    expect_no_condition(
+      object = df_out <- red_npx_wide_top_mid_long(
+        df_top_list = df_rand$list_df_long$df_top_long,
+        df_middle_list = df_rand$list_df_long$df_middle_long,
+        data_type = data_type,
+        format_spec = format_spec
+      )
+    )
+
+    # rename from NPXS
+    olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+      dplyr::filter(
+        .data[["OA_internal"]] %in% colnames(df_out)
+      )
+
+    # check that output match
+    expect_true(
+      object = identical(nrow(df_out), n_row_exp)
+    )
+
+    expect_identical(
+      object = dplyr::select(df_out,
+                             -dplyr::all_of("col_index")),
+      expected = df_rand$list_df_long$df_long |>
+        dplyr::mutate(
+          Panel = paste0(.data[["Panel"]], "(",
+                         .data[["Panel_Version"]], ")")
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_top_", x))()
-        names(df_rand$list_df_long$df_middle_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_middle_long),
-          split = "_"
+        dplyr::rename_with(
+          .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+          .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_mid_", x))()
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # expected dim of output df ----
-        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
-                                          n_assays = n_assays,
-                                          n_samples = n_samples,
-                                          has_int_ctrl = show_int_ctrl,
-                                          num_int_ctrl = 3L)
-
-        # check that function runs
-        expect_no_condition(
-          object = df_out <- red_npx_wide_top_mid_long(
-            df_top_list = df_rand$list_df_long$df_top_long,
-            df_middle_list = df_rand$list_df_long$df_middle_long,
-            data_type = data_type,
-            format_spec = format_spec
-          )
-        )
-
-        # rename from NPXS
-        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
-          dplyr::filter(
-            .data[["OA_internal"]] %in% colnames(df_out)
-          )
-
-        # check that output match
-        expect_true(
-          object = identical(nrow(df_out), n_row_exp)
-        )
-
-        expect_identical(
-          object = dplyr::select(df_out,
-                                 -dplyr::all_of("col_index")),
-          expected = df_rand$list_df_long$df_long |>
-            dplyr::mutate(
-              Panel = paste0(.data[["Panel"]], "(",
-                             .data[["Panel_Version"]], ")")
-            ) |>
-            dplyr::rename_with(
-              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
-              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
-            ) |>
-            dplyr::select(dplyr::any_of(colnames(df_out)))
-        )
-
-      }
+        dplyr::select(dplyr::any_of(colnames(df_out)))
     )
 
     ## NPX with int ctrl and no dev int ctrl ----
 
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
+    # synthetic wide df
+    data_type <- "NPX"
+    show_int_ctrl <- TRUE
+    show_dev_int_ctrl <- FALSE
+    version <- 1L
 
-        # synthetic wide df
-        data_type <- "NPX"
-        show_int_ctrl <- TRUE
+    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                    data_type = data_type,
+                                    n_panels = n_panels,
+                                    n_assays = n_assays,
+                                    n_samples = n_samples,
+                                    show_int_ctrl = show_int_ctrl,
+                                    show_dev_int_ctrl = show_dev_int_ctrl,
+                                    version = version)
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+    # matrix specifications
+    format_spec <- olink_wide_spec |>
+      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+    # column names of each subset of data
+    names(df_rand$list_df_long$df_top_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_top_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_top_", x))()
+    names(df_rand$list_df_long$df_middle_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_middle_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_mid_", x))()
 
-        # column names of each subset of data
-        names(df_rand$list_df_long$df_top_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_top_long),
-          split = "_"
+    # expected dim of output df
+    n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                      n_assays = n_assays,
+                                      n_samples = n_samples,
+                                      has_int_ctrl = show_int_ctrl,
+                                      num_int_ctrl = 3L)
+
+    # check that function runs
+    expect_no_condition(
+      object = df_out <- red_npx_wide_top_mid_long(
+        df_top_list = df_rand$list_df_long$df_top_long,
+        df_middle_list = df_rand$list_df_long$df_middle_long,
+        data_type = data_type,
+        format_spec = format_spec
+      )
+    )
+
+    # rename from NPXS
+    olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+      dplyr::filter(
+        .data[["OA_internal"]] %in% colnames(df_out)
+      )
+
+    # check that output match
+    expect_true(
+      object = identical(nrow(df_out), n_row_exp)
+    )
+
+    expect_identical(
+      object = dplyr::select(df_out,
+                             -dplyr::all_of("col_index")),
+      expected = df_rand$list_df_long$df_long |>
+        dplyr::mutate(
+          Panel = paste0(.data[["Panel"]], "(",
+                         .data[["Panel_Version"]], ")")
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_top_", x))()
-        names(df_rand$list_df_long$df_middle_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_middle_long),
-          split = "_"
+        dplyr::rename_with(
+          .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+          .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_mid_", x))()
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # expected dim of output df ----
-        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
-                                          n_assays = n_assays,
-                                          n_samples = n_samples,
-                                          has_int_ctrl = show_int_ctrl,
-                                          num_int_ctrl = 3L)
-
-        # check that function runs
-        expect_no_condition(
-          object = df_out <- red_npx_wide_top_mid_long(
-            df_top_list = df_rand$list_df_long$df_top_long,
-            df_middle_list = df_rand$list_df_long$df_middle_long,
-            data_type = data_type,
-            format_spec = format_spec
-          )
-        )
-
-        # rename from NPXS
-        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
-          dplyr::filter(
-            .data[["OA_internal"]] %in% colnames(df_out)
-          )
-
-        # check that output match
-        expect_true(
-          object = identical(nrow(df_out), n_row_exp)
-        )
-
-        expect_identical(
-          object = dplyr::select(df_out,
-                                 -dplyr::all_of("col_index")),
-          expected = df_rand$list_df_long$df_long |>
-            dplyr::mutate(
-              Panel = paste0(.data[["Panel"]], "(",
-                             .data[["Panel_Version"]], ")")
-            ) |>
-            dplyr::rename_with(
-              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
-              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
-            ) |>
-            dplyr::select(dplyr::any_of(colnames(df_out)))
-        )
-
-      }
+        dplyr::select(dplyr::any_of(colnames(df_out)))
     )
 
     ## NPX no int ctrl and with dev int ctrl ----
 
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
+    # synthetic wide df
+    data_type <- "NPX"
+    show_int_ctrl <- FALSE
+    show_dev_int_ctrl <- TRUE
+    version <- 1L
 
-        # synthetic wide df
-        data_type <- "NPX"
-        show_int_ctrl <- FALSE
+    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                    data_type = data_type,
+                                    n_panels = n_panels,
+                                    n_assays = n_assays,
+                                    n_samples = n_samples,
+                                    show_int_ctrl = show_int_ctrl,
+                                    show_dev_int_ctrl = show_dev_int_ctrl,
+                                    version = version)
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 1L)
+    # matrix specifications
+    format_spec <- olink_wide_spec |>
+      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+    # column names of each subset of data
+    names(df_rand$list_df_long$df_top_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_top_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_top_", x))()
+    names(df_rand$list_df_long$df_middle_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_middle_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_mid_", x))()
 
-        # column names of each subset of data
-        names(df_rand$list_df_long$df_top_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_top_long),
-          split = "_"
+    # expected dim of output df
+    n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                      n_assays = n_assays,
+                                      n_samples = n_samples,
+                                      has_int_ctrl = show_int_ctrl,
+                                      num_int_ctrl = 3L)
+
+    # check that function runs
+    expect_no_condition(
+      object = df_out <- red_npx_wide_top_mid_long(
+        df_top_list = df_rand$list_df_long$df_top_long,
+        df_middle_list = df_rand$list_df_long$df_middle_long,
+        data_type = data_type,
+        format_spec = format_spec
+      )
+    )
+
+    # rename from NPXS
+    olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+      dplyr::filter(
+        .data[["OA_internal"]] %in% colnames(df_out)
+      )
+
+    # check that output match
+    expect_true(
+      object = identical(nrow(df_out), n_row_exp)
+    )
+
+    expect_identical(
+      object = dplyr::select(df_out,
+                             -dplyr::all_of("col_index")),
+      expected = df_rand$list_df_long$df_long |>
+        dplyr::mutate(
+          Panel = paste0(.data[["Panel"]], "(",
+                         .data[["Panel_Version"]], ")")
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_top_", x))()
-        names(df_rand$list_df_long$df_middle_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_middle_long),
-          split = "_"
+        dplyr::rename_with(
+          .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+          .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_mid_", x))()
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # expected dim of output df ----
-        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
-                                          n_assays = n_assays,
-                                          n_samples = n_samples,
-                                          has_int_ctrl = show_int_ctrl,
-                                          num_int_ctrl = 3L)
-
-        # check that function runs
-        expect_no_condition(
-          object = df_out <- red_npx_wide_top_mid_long(
-            df_top_list = df_rand$list_df_long$df_top_long,
-            df_middle_list = df_rand$list_df_long$df_middle_long,
-            data_type = data_type,
-            format_spec = format_spec
-          )
-        )
-
-        # rename from NPXS
-        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
-          dplyr::filter(
-            .data[["OA_internal"]] %in% colnames(df_out)
-          )
-
-        # check that output match
-        expect_true(
-          object = identical(nrow(df_out), n_row_exp)
-        )
-
-        expect_identical(
-          object = dplyr::select(df_out,
-                                 -dplyr::all_of("col_index")),
-          expected = df_rand$list_df_long$df_long |>
-            dplyr::mutate(
-              Panel = paste0(.data[["Panel"]], "(",
-                             .data[["Panel_Version"]], ")")
-            ) |>
-            dplyr::rename_with(
-              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
-              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
-            ) |>
-            dplyr::select(dplyr::any_of(colnames(df_out)))
-        )
-
-      }
+        dplyr::select(dplyr::any_of(colnames(df_out)))
     )
 
     ## NPX with int ctrl and with dev int ctrl ----
 
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
+    # synthetic wide df
+    data_type <- "NPX"
+    show_int_ctrl <- TRUE
+    show_dev_int_ctrl <- TRUE
+    version <- 1L
 
-        # synthetic wide df
-        data_type <- "NPX"
-        show_int_ctrl <- TRUE
+    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                    data_type = data_type,
+                                    n_panels = n_panels,
+                                    n_assays = n_assays,
+                                    n_samples = n_samples,
+                                    show_int_ctrl = show_int_ctrl,
+                                    show_dev_int_ctrl = show_dev_int_ctrl,
+                                    version = version)
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 1L)
+    # matrix specifications
+    format_spec <- olink_wide_spec |>
+      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+    # column names of each subset of data
+    names(df_rand$list_df_long$df_top_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_top_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_top_", x))()
+    names(df_rand$list_df_long$df_middle_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_middle_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_mid_", x))()
 
-        # column names of each subset of data
-        names(df_rand$list_df_long$df_top_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_top_long),
-          split = "_"
+    # expected dim of output df
+    n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                      n_assays = n_assays,
+                                      n_samples = n_samples,
+                                      has_int_ctrl = show_int_ctrl,
+                                      num_int_ctrl = 3L)
+
+    # check that function runs
+    expect_no_condition(
+      object = df_out <- red_npx_wide_top_mid_long(
+        df_top_list = df_rand$list_df_long$df_top_long,
+        df_middle_list = df_rand$list_df_long$df_middle_long,
+        data_type = data_type,
+        format_spec = format_spec
+      )
+    )
+
+    # rename from NPXS
+    olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+      dplyr::filter(
+        .data[["OA_internal"]] %in% colnames(df_out)
+      )
+
+    # check that output match
+    expect_true(
+      object = identical(nrow(df_out), n_row_exp)
+    )
+
+    expect_identical(
+      object = dplyr::select(df_out,
+                             -dplyr::all_of("col_index")),
+      expected = df_rand$list_df_long$df_long |>
+        dplyr::mutate(
+          Panel = paste0(.data[["Panel"]], "(",
+                         .data[["Panel_Version"]], ")")
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_top_", x))()
-        names(df_rand$list_df_long$df_middle_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_middle_long),
-          split = "_"
+        dplyr::rename_with(
+          .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+          .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_mid_", x))()
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # expected dim of output df ----
-        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
-                                          n_assays = n_assays,
-                                          n_samples = n_samples,
-                                          has_int_ctrl = show_int_ctrl,
-                                          num_int_ctrl = 3L)
-
-        # check that function runs
-        expect_no_condition(
-          object = df_out <- red_npx_wide_top_mid_long(
-            df_top_list = df_rand$list_df_long$df_top_long,
-            df_middle_list = df_rand$list_df_long$df_middle_long,
-            data_type = data_type,
-            format_spec = format_spec
-          )
-        )
-
-        # rename from NPXS
-        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
-          dplyr::filter(
-            .data[["OA_internal"]] %in% colnames(df_out)
-          )
-
-        # check that output match
-        expect_true(
-          object = identical(nrow(df_out), n_row_exp)
-        )
-
-        expect_identical(
-          object = dplyr::select(df_out,
-                                 -dplyr::all_of("col_index")),
-          expected = df_rand$list_df_long$df_long |>
-            dplyr::mutate(
-              Panel = paste0(.data[["Panel"]], "(",
-                             .data[["Panel_Version"]], ")")
-            ) |>
-            dplyr::rename_with(
-              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
-              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
-            ) |>
-            dplyr::select(dplyr::any_of(colnames(df_out)))
-        )
-
-      }
+        dplyr::select(dplyr::any_of(colnames(df_out)))
     )
 
 
     ## Ct no int ctrl ----
 
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
+    # synthetic wide df
+    data_type <- "Ct"
+    show_int_ctrl <- FALSE
+    show_dev_int_ctrl <- FALSE
+    version <- 1L
 
-        # synthetic wide df
-        data_type <- "Ct"
-        show_int_ctrl <- FALSE
+    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                    data_type = data_type,
+                                    n_panels = n_panels,
+                                    n_assays = n_assays,
+                                    n_samples = n_samples,
+                                    show_int_ctrl = show_int_ctrl,
+                                    show_dev_int_ctrl = show_dev_int_ctrl,
+                                    version = version)
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+    # matrix specifications
+    format_spec <- olink_wide_spec |>
+      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+    # column names of each subset of data
+    names(df_rand$list_df_long$df_top_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_top_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_top_", x))()
+    names(df_rand$list_df_long$df_middle_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_middle_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_mid_", x))()
 
-        # column names of each subset of data
-        names(df_rand$list_df_long$df_top_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_top_long),
-          split = "_"
+    # expected dim of output df
+    n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                      n_assays = n_assays,
+                                      n_samples = n_samples,
+                                      has_int_ctrl = show_int_ctrl,
+                                      num_int_ctrl = 3L)
+
+    # check that function runs
+    expect_no_condition(
+      object = df_out <- red_npx_wide_top_mid_long(
+        df_top_list = df_rand$list_df_long$df_top_long,
+        df_middle_list = df_rand$list_df_long$df_middle_long,
+        data_type = data_type,
+        format_spec = format_spec
+      )
+    )
+
+    # rename from NPXS
+    olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+      dplyr::filter(
+        .data[["OA_internal"]] %in% colnames(df_out)
+      )
+
+    # check that output match
+    expect_true(
+      object = identical(nrow(df_out), n_row_exp)
+    )
+
+    expect_identical(
+      object = dplyr::select(df_out,
+                             -dplyr::all_of("col_index")),
+      expected = df_rand$list_df_long$df_long |>
+        dplyr::mutate(
+          Panel = paste0(.data[["Panel"]], "(",
+                         .data[["Panel_Version"]], ")")
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_top_", x))()
-        names(df_rand$list_df_long$df_middle_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_middle_long),
-          split = "_"
+        dplyr::rename_with(
+          .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+          .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_mid_", x))()
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # expected dim of output df ----
-        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
-                                          n_assays = n_assays,
-                                          n_samples = n_samples,
-                                          has_int_ctrl = show_int_ctrl,
-                                          num_int_ctrl = 3L)
-
-        # check that function runs
-        expect_no_condition(
-          object = df_out <- red_npx_wide_top_mid_long(
-            df_top_list = df_rand$list_df_long$df_top_long,
-            df_middle_list = df_rand$list_df_long$df_middle_long,
-            data_type = data_type,
-            format_spec = format_spec
-          )
-        )
-
-        # rename from NPXS
-        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
-          dplyr::filter(
-            .data[["OA_internal"]] %in% colnames(df_out)
-          )
-
-        # check that output match
-        expect_true(
-          object = identical(nrow(df_out), n_row_exp)
-        )
-
-        expect_identical(
-          object = dplyr::select(df_out,
-                                 -dplyr::all_of("col_index")),
-          expected = df_rand$list_df_long$df_long |>
-            dplyr::mutate(
-              Panel = paste0(.data[["Panel"]], "(",
-                             .data[["Panel_Version"]], ")")
-            ) |>
-            dplyr::rename_with(
-              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
-              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
-            ) |>
-            dplyr::select(dplyr::any_of(colnames(df_out)))
-        )
-
-      }
+        dplyr::select(dplyr::any_of(colnames(df_out)))
     )
 
     ## Ct with int ctrl ----
 
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
+    # synthetic wide df
+    data_type <- "Ct"
+    show_int_ctrl <- TRUE
+    show_dev_int_ctrl <- FALSE
+    version <- 1L
 
-        # synthetic wide df
-        data_type <- "Ct"
-        show_int_ctrl <- TRUE
+    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                    data_type = data_type,
+                                    n_panels = n_panels,
+                                    n_assays = n_assays,
+                                    n_samples = n_samples,
+                                    show_int_ctrl = show_int_ctrl,
+                                    show_dev_int_ctrl = show_dev_int_ctrl,
+                                    version = version)
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+    # matrix specifications
+    format_spec <- olink_wide_spec |>
+      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+    # column names of each subset of data
+    names(df_rand$list_df_long$df_top_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_top_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_top_", x))()
+    names(df_rand$list_df_long$df_middle_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_middle_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_mid_", x))()
 
-        # column names of each subset of data
-        names(df_rand$list_df_long$df_top_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_top_long),
-          split = "_"
+    # expected dim of output df
+    n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                      n_assays = n_assays,
+                                      n_samples = n_samples,
+                                      has_int_ctrl = show_int_ctrl,
+                                      num_int_ctrl = 3L)
+
+    # check that function runs
+    expect_no_condition(
+      object = df_out <- red_npx_wide_top_mid_long(
+        df_top_list = df_rand$list_df_long$df_top_long,
+        df_middle_list = df_rand$list_df_long$df_middle_long,
+        data_type = data_type,
+        format_spec = format_spec
+      )
+    )
+
+    # rename from NPXS
+    olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+      dplyr::filter(
+        .data[["OA_internal"]] %in% colnames(df_out)
+      )
+
+    # check that output match
+    expect_true(
+      object = identical(nrow(df_out), n_row_exp)
+    )
+
+    expect_identical(
+      object = dplyr::select(df_out,
+                             -dplyr::all_of("col_index")),
+      expected = df_rand$list_df_long$df_long |>
+        dplyr::mutate(
+          Panel = paste0(.data[["Panel"]], "(",
+                         .data[["Panel_Version"]], ")")
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_top_", x))()
-        names(df_rand$list_df_long$df_middle_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_middle_long),
-          split = "_"
+        dplyr::rename_with(
+          .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+          .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_mid_", x))()
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # expected dim of output df ----
-        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
-                                          n_assays = n_assays,
-                                          n_samples = n_samples,
-                                          has_int_ctrl = show_int_ctrl,
-                                          num_int_ctrl = 3L)
-
-        # check that function runs
-        expect_no_condition(
-          object = df_out <- red_npx_wide_top_mid_long(
-            df_top_list = df_rand$list_df_long$df_top_long,
-            df_middle_list = df_rand$list_df_long$df_middle_long,
-            data_type = data_type,
-            format_spec = format_spec
-          )
-        )
-
-        # rename from NPXS
-        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
-          dplyr::filter(
-            .data[["OA_internal"]] %in% colnames(df_out)
-          )
-
-        # check that output match
-        expect_true(
-          object = identical(nrow(df_out), n_row_exp)
-        )
-
-        expect_identical(
-          object = dplyr::select(df_out,
-                                 -dplyr::all_of("col_index")),
-          expected = df_rand$list_df_long$df_long |>
-            dplyr::mutate(
-              Panel = paste0(.data[["Panel"]], "(",
-                             .data[["Panel_Version"]], ")")
-            ) |>
-            dplyr::rename_with(
-              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
-              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
-            ) |>
-            dplyr::select(dplyr::any_of(colnames(df_out)))
-        )
-
-      }
+        dplyr::select(dplyr::any_of(colnames(df_out)))
     )
 
     ## Quantified no int ctrl and no dev int ctrl ----
 
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
+    # synthetic wide df
+    data_type <- "Quantified"
+    show_int_ctrl <- FALSE
+    show_dev_int_ctrl <- FALSE
+    version <- 0L
 
-        # synthetic wide df
-        data_type <- "Quantified"
-        show_int_ctrl <- FALSE
+    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                    data_type = data_type,
+                                    n_panels = n_panels,
+                                    n_assays = n_assays,
+                                    n_samples = n_samples,
+                                    show_int_ctrl = show_int_ctrl,
+                                    show_dev_int_ctrl = show_dev_int_ctrl,
+                                    version = version)
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 0L)
+    # matrix specifications
+    format_spec <- olink_wide_spec |>
+      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+    # column names of each subset of data
+    names(df_rand$list_df_long$df_top_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_top_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_top_", x))()
+    names(df_rand$list_df_long$df_middle_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_middle_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_mid_", x))()
 
-        # column names of each subset of data
-        names(df_rand$list_df_long$df_top_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_top_long),
-          split = "_"
+    # expected dim of output df
+    n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                      n_assays = n_assays,
+                                      n_samples = n_samples,
+                                      has_int_ctrl = show_int_ctrl,
+                                      num_int_ctrl = 3L)
+
+    # check that function runs
+    expect_no_condition(
+      object = df_out <- red_npx_wide_top_mid_long(
+        df_top_list = df_rand$list_df_long$df_top_long,
+        df_middle_list = df_rand$list_df_long$df_middle_long,
+        data_type = data_type,
+        format_spec = format_spec
+      )
+    )
+
+    # rename from NPXS
+    olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+      dplyr::filter(
+        .data[["OA_internal"]] %in% colnames(df_out)
+      )
+
+    # check that output match
+    expect_true(
+      object = identical(nrow(df_out), n_row_exp)
+    )
+
+    expect_identical(
+      object = dplyr::select(df_out,
+                             -dplyr::all_of("col_index")),
+      expected = df_rand$list_df_long$df_long |>
+        dplyr::mutate(
+          Panel = paste0(.data[["Panel"]], "(",
+                         .data[["Panel_Version"]], ")")
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_top_", x))()
-        names(df_rand$list_df_long$df_middle_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_middle_long),
-          split = "_"
+        dplyr::rename_with(
+          .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+          .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_mid_", x))()
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # expected dim of output df ----
-        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
-                                          n_assays = n_assays,
-                                          n_samples = n_samples,
-                                          has_int_ctrl = show_int_ctrl,
-                                          num_int_ctrl = 3L)
-
-        # check that function runs
-        expect_no_condition(
-          object = df_out <- red_npx_wide_top_mid_long(
-            df_top_list = df_rand$list_df_long$df_top_long,
-            df_middle_list = df_rand$list_df_long$df_middle_long,
-            data_type = data_type,
-            format_spec = format_spec
-          )
-        )
-
-        # rename from NPXS
-        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
-          dplyr::filter(
-            .data[["OA_internal"]] %in% colnames(df_out)
-          )
-
-        # check that output match
-        expect_true(
-          object = identical(nrow(df_out), n_row_exp)
-        )
-
-        expect_identical(
-          object = dplyr::select(df_out,
-                                 -dplyr::all_of("col_index")),
-          expected = df_rand$list_df_long$df_long |>
-            dplyr::mutate(
-              Panel = paste0(.data[["Panel"]], "(",
-                             .data[["Panel_Version"]], ")")
-            ) |>
-            dplyr::rename_with(
-              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
-              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
-            ) |>
-            dplyr::select(dplyr::any_of(colnames(df_out)))
-        )
-
-      }
+        dplyr::select(dplyr::any_of(colnames(df_out)))
     )
 
     ## Quantified with int ctrl and no dev int ctrl ----
 
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
+    # synthetic wide df
+    data_type <- "Quantified"
+    show_int_ctrl <- TRUE
+    show_dev_int_ctrl <- FALSE
+    version <- 0L
 
-        # synthetic wide df
-        data_type <- "Quantified"
-        show_int_ctrl <- TRUE
+    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                    data_type = data_type,
+                                    n_panels = n_panels,
+                                    n_assays = n_assays,
+                                    n_samples = n_samples,
+                                    show_int_ctrl = show_int_ctrl,
+                                    show_dev_int_ctrl = show_dev_int_ctrl,
+                                    version = version)
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 0L)
+    # matrix specifications
+    format_spec <- olink_wide_spec |>
+      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+    # column names of each subset of data
+    names(df_rand$list_df_long$df_top_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_top_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_top_", x))()
+    names(df_rand$list_df_long$df_middle_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_middle_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_mid_", x))()
 
-        # column names of each subset of data
-        names(df_rand$list_df_long$df_top_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_top_long),
-          split = "_"
+    # expected dim of output df
+    n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                      n_assays = n_assays,
+                                      n_samples = n_samples,
+                                      has_int_ctrl = show_int_ctrl,
+                                      num_int_ctrl = 3L)
+
+    # check that function runs
+    expect_no_condition(
+      object = df_out <- red_npx_wide_top_mid_long(
+        df_top_list = df_rand$list_df_long$df_top_long,
+        df_middle_list = df_rand$list_df_long$df_middle_long,
+        data_type = data_type,
+        format_spec = format_spec
+      )
+    )
+
+    # rename from NPXS
+    olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+      dplyr::filter(
+        .data[["OA_internal"]] %in% colnames(df_out)
+      )
+
+    # check that output match
+    expect_true(
+      object = identical(nrow(df_out), n_row_exp)
+    )
+
+    expect_identical(
+      object = dplyr::select(df_out,
+                             -dplyr::all_of("col_index")),
+      expected = df_rand$list_df_long$df_long |>
+        dplyr::mutate(
+          Panel = paste0(.data[["Panel"]], "(",
+                         .data[["Panel_Version"]], ")")
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_top_", x))()
-        names(df_rand$list_df_long$df_middle_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_middle_long),
-          split = "_"
+        dplyr::rename_with(
+          .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+          .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_mid_", x))()
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # expected dim of output df ----
-        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
-                                          n_assays = n_assays,
-                                          n_samples = n_samples,
-                                          has_int_ctrl = show_int_ctrl,
-                                          num_int_ctrl = 3L)
-
-        # check that function runs
-        expect_no_condition(
-          object = df_out <- red_npx_wide_top_mid_long(
-            df_top_list = df_rand$list_df_long$df_top_long,
-            df_middle_list = df_rand$list_df_long$df_middle_long,
-            data_type = data_type,
-            format_spec = format_spec
-          )
-        )
-
-        # rename from NPXS
-        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
-          dplyr::filter(
-            .data[["OA_internal"]] %in% colnames(df_out)
-          )
-
-        # check that output match
-        expect_true(
-          object = identical(nrow(df_out), n_row_exp)
-        )
-
-        expect_identical(
-          object = dplyr::select(df_out,
-                                 -dplyr::all_of("col_index")),
-          expected = df_rand$list_df_long$df_long |>
-            dplyr::mutate(
-              Panel = paste0(.data[["Panel"]], "(",
-                             .data[["Panel_Version"]], ")")
-            ) |>
-            dplyr::rename_with(
-              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
-              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
-            ) |>
-            dplyr::select(dplyr::any_of(colnames(df_out)))
-        )
-
-      }
+        dplyr::select(dplyr::any_of(colnames(df_out)))
     )
 
     ## Quantified no int ctrl and with dev int ctrl ----
 
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
+    # synthetic wide df
+    data_type <- "Quantified"
+    show_int_ctrl <- FALSE
+    show_dev_int_ctrl <- TRUE
+    version <- 0L
 
-        # synthetic wide df
-        data_type <- "Quantified"
-        show_int_ctrl <- FALSE
+    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                    data_type = data_type,
+                                    n_panels = n_panels,
+                                    n_assays = n_assays,
+                                    n_samples = n_samples,
+                                    show_int_ctrl = show_int_ctrl,
+                                    show_dev_int_ctrl = show_dev_int_ctrl,
+                                    version = version)
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 0L)
+    # matrix specifications
+    format_spec <- olink_wide_spec |>
+      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+    # column names of each subset of data
+    names(df_rand$list_df_long$df_top_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_top_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_top_", x))()
+    names(df_rand$list_df_long$df_middle_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_middle_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_mid_", x))()
 
-        # column names of each subset of data
-        names(df_rand$list_df_long$df_top_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_top_long),
-          split = "_"
+    # expected dim of output df
+    n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                      n_assays = n_assays,
+                                      n_samples = n_samples,
+                                      has_int_ctrl = show_int_ctrl,
+                                      num_int_ctrl = 3L)
+
+    # check that function runs
+    expect_no_condition(
+      object = df_out <- red_npx_wide_top_mid_long(
+        df_top_list = df_rand$list_df_long$df_top_long,
+        df_middle_list = df_rand$list_df_long$df_middle_long,
+        data_type = data_type,
+        format_spec = format_spec
+      )
+    )
+
+    # rename from NPXS
+    olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+      dplyr::filter(
+        .data[["OA_internal"]] %in% colnames(df_out)
+      )
+
+    # check that output match
+    expect_true(
+      object = identical(nrow(df_out), n_row_exp)
+    )
+
+    expect_identical(
+      object = dplyr::select(df_out,
+                             -dplyr::all_of("col_index")),
+      expected = df_rand$list_df_long$df_long |>
+        dplyr::mutate(
+          Panel = paste0(.data[["Panel"]], "(",
+                         .data[["Panel_Version"]], ")")
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_top_", x))()
-        names(df_rand$list_df_long$df_middle_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_middle_long),
-          split = "_"
+        dplyr::rename_with(
+          .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+          .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_mid_", x))()
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # expected dim of output df ----
-        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
-                                          n_assays = n_assays,
-                                          n_samples = n_samples,
-                                          has_int_ctrl = show_int_ctrl,
-                                          num_int_ctrl = 3L)
-
-        # check that function runs
-        expect_no_condition(
-          object = df_out <- red_npx_wide_top_mid_long(
-            df_top_list = df_rand$list_df_long$df_top_long,
-            df_middle_list = df_rand$list_df_long$df_middle_long,
-            data_type = data_type,
-            format_spec = format_spec
-          )
-        )
-
-        # rename from NPXS
-        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
-          dplyr::filter(
-            .data[["OA_internal"]] %in% colnames(df_out)
-          )
-
-        # check that output match
-        expect_true(
-          object = identical(nrow(df_out), n_row_exp)
-        )
-
-        expect_identical(
-          object = dplyr::select(df_out,
-                                 -dplyr::all_of("col_index")),
-          expected = df_rand$list_df_long$df_long |>
-            dplyr::mutate(
-              Panel = paste0(.data[["Panel"]], "(",
-                             .data[["Panel_Version"]], ")")
-            ) |>
-            dplyr::rename_with(
-              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
-              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
-            ) |>
-            dplyr::select(dplyr::any_of(colnames(df_out)))
-        )
-
-      }
+        dplyr::select(dplyr::any_of(colnames(df_out)))
     )
 
     ## Quantified with int ctrl and with dev int ctrl ----
 
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
+    # synthetic wide df
+    data_type <- "Quantified"
+    show_int_ctrl <- TRUE
+    show_dev_int_ctrl <- TRUE
+    version <- 0L
 
-        # synthetic wide df
-        data_type <- "Quantified"
-        show_int_ctrl <- TRUE
+    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                    data_type = data_type,
+                                    n_panels = n_panels,
+                                    n_assays = n_assays,
+                                    n_samples = n_samples,
+                                    show_int_ctrl = show_int_ctrl,
+                                    show_dev_int_ctrl = show_dev_int_ctrl,
+                                    version = version)
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 0L)
+    # matrix specifications
+    format_spec <- olink_wide_spec |>
+      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+    # column names of each subset of data
+    names(df_rand$list_df_long$df_top_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_top_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_top_", x))()
+    names(df_rand$list_df_long$df_middle_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_middle_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_mid_", x))()
 
-        # column names of each subset of data
-        names(df_rand$list_df_long$df_top_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_top_long),
-          split = "_"
+    # expected dim of output df
+    n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                      n_assays = n_assays,
+                                      n_samples = n_samples,
+                                      has_int_ctrl = show_int_ctrl,
+                                      num_int_ctrl = 3L)
+
+    # check that function runs
+    expect_no_condition(
+      object = df_out <- red_npx_wide_top_mid_long(
+        df_top_list = df_rand$list_df_long$df_top_long,
+        df_middle_list = df_rand$list_df_long$df_middle_long,
+        data_type = data_type,
+        format_spec = format_spec
+      )
+    )
+
+    # rename from NPXS
+    olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+      dplyr::filter(
+        .data[["OA_internal"]] %in% colnames(df_out)
+      )
+
+    # check that output match
+    expect_true(
+      object = identical(nrow(df_out), n_row_exp)
+    )
+
+    expect_identical(
+      object = dplyr::select(df_out,
+                             -dplyr::all_of("col_index")),
+      expected = df_rand$list_df_long$df_long |>
+        dplyr::mutate(
+          Panel = paste0(.data[["Panel"]], "(",
+                         .data[["Panel_Version"]], ")")
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_top_", x))()
-        names(df_rand$list_df_long$df_middle_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_middle_long),
-          split = "_"
+        dplyr::rename_with(
+          .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+          .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_mid_", x))()
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # expected dim of output df ----
-        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
-                                          n_assays = n_assays,
-                                          n_samples = n_samples,
-                                          has_int_ctrl = show_int_ctrl,
-                                          num_int_ctrl = 3L)
-
-        # check that function runs
-        expect_no_condition(
-          object = df_out <- red_npx_wide_top_mid_long(
-            df_top_list = df_rand$list_df_long$df_top_long,
-            df_middle_list = df_rand$list_df_long$df_middle_long,
-            data_type = data_type,
-            format_spec = format_spec
-          )
-        )
-
-        # rename from NPXS
-        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
-          dplyr::filter(
-            .data[["OA_internal"]] %in% colnames(df_out)
-          )
-
-        # check that output match
-        expect_true(
-          object = identical(nrow(df_out), n_row_exp)
-        )
-
-        expect_identical(
-          object = dplyr::select(df_out,
-                                 -dplyr::all_of("col_index")),
-          expected = df_rand$list_df_long$df_long |>
-            dplyr::mutate(
-              Panel = paste0(.data[["Panel"]], "(",
-                             .data[["Panel_Version"]], ")")
-            ) |>
-            dplyr::rename_with(
-              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
-              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
-            ) |>
-            dplyr::select(dplyr::any_of(colnames(df_out)))
-        )
-
-      }
+        dplyr::select(dplyr::any_of(colnames(df_out)))
     )
 
   }
@@ -9819,907 +9689,807 @@ test_that(
     olink_platform <- "Target 48"
     n_panels <- 3L
     n_assays <- 45L
-    n_samples <- 10L
+    n_samples <- 100L
 
     ## NPX no int ctrl and no dev int ctrl ----
 
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
+    # synthetic wide df
+    data_type <- "NPX"
+    show_int_ctrl <- FALSE
+    show_dev_int_ctrl <- FALSE
+    version <- 1L
 
-        # synthetic wide df
-        data_type <- "NPX"
-        show_int_ctrl <- FALSE
+    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                    data_type = data_type,
+                                    n_panels = n_panels,
+                                    n_assays = n_assays,
+                                    n_samples = n_samples,
+                                    show_int_ctrl = show_int_ctrl,
+                                    show_dev_int_ctrl = show_dev_int_ctrl,
+                                    version = version)
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+    # matrix specifications
+    format_spec <- olink_wide_spec |>
+      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+    # column names of each subset of data
+    names(df_rand$list_df_long$df_top_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_top_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_top_", x))()
+    names(df_rand$list_df_long$df_middle_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_middle_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_mid_", x))()
 
-        # column names of each subset of data
-        names(df_rand$list_df_long$df_top_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_top_long),
-          split = "_"
+    # expected dim of output df
+    n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                      n_assays = n_assays,
+                                      n_samples = n_samples,
+                                      has_int_ctrl = show_int_ctrl,
+                                      num_int_ctrl = 3L)
+
+    # check that function runs
+    expect_no_condition(
+      object = df_out <- red_npx_wide_top_mid_long(
+        df_top_list = df_rand$list_df_long$df_top_long,
+        df_middle_list = df_rand$list_df_long$df_middle_long,
+        data_type = data_type,
+        format_spec = format_spec
+      )
+    )
+
+    # rename from NPXS
+    olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+      dplyr::filter(
+        .data[["OA_internal"]] %in% colnames(df_out)
+      )
+
+    # check that output match
+    expect_true(
+      object = identical(nrow(df_out), n_row_exp)
+    )
+
+    expect_identical(
+      object = dplyr::select(df_out,
+                             -dplyr::all_of("col_index")),
+      expected = df_rand$list_df_long$df_long |>
+        dplyr::mutate(
+          Panel = paste0(.data[["Panel"]], "(",
+                         .data[["Panel_Version"]], ")")
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_top_", x))()
-        names(df_rand$list_df_long$df_middle_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_middle_long),
-          split = "_"
+        dplyr::rename_with(
+          .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+          .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_mid_", x))()
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # expected dim of output df ----
-        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
-                                          n_assays = n_assays,
-                                          n_samples = n_samples,
-                                          has_int_ctrl = show_int_ctrl,
-                                          num_int_ctrl = 3L)
-
-        # check that function runs
-        expect_no_condition(
-          object = df_out <- red_npx_wide_top_mid_long(
-            df_top_list = df_rand$list_df_long$df_top_long,
-            df_middle_list = df_rand$list_df_long$df_middle_long,
-            data_type = data_type,
-            format_spec = format_spec
-          )
-        )
-
-        # rename from NPXS
-        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
-          dplyr::filter(
-            .data[["OA_internal"]] %in% colnames(df_out)
-          )
-
-        # check that output match
-        expect_true(
-          object = identical(nrow(df_out), n_row_exp)
-        )
-
-        expect_identical(
-          object = dplyr::select(df_out,
-                                 -dplyr::all_of("col_index")),
-          expected = df_rand$list_df_long$df_long |>
-            dplyr::mutate(
-              Panel = paste0(.data[["Panel"]], "(",
-                             .data[["Panel_Version"]], ")")
-            ) |>
-            dplyr::rename_with(
-              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
-              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
-            ) |>
-            dplyr::select(dplyr::any_of(colnames(df_out)))
-        )
-
-      }
+        dplyr::select(dplyr::any_of(colnames(df_out)))
     )
 
     ## NPX with int ctrl and no dev int ctrl ----
 
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
+    # synthetic wide df
+    data_type <- "NPX"
+    show_int_ctrl <- TRUE
+    show_dev_int_ctrl <- FALSE
+    version <- 1L
 
-        # synthetic wide df
-        data_type <- "NPX"
-        show_int_ctrl <- TRUE
+    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                    data_type = data_type,
+                                    n_panels = n_panels,
+                                    n_assays = n_assays,
+                                    n_samples = n_samples,
+                                    show_int_ctrl = show_int_ctrl,
+                                    show_dev_int_ctrl = show_dev_int_ctrl,
+                                    version = version)
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+    # matrix specifications
+    format_spec <- olink_wide_spec |>
+      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+    # column names of each subset of data
+    names(df_rand$list_df_long$df_top_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_top_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_top_", x))()
+    names(df_rand$list_df_long$df_middle_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_middle_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_mid_", x))()
 
-        # column names of each subset of data
-        names(df_rand$list_df_long$df_top_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_top_long),
-          split = "_"
+    # expected dim of output df
+    n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                      n_assays = n_assays,
+                                      n_samples = n_samples,
+                                      has_int_ctrl = show_int_ctrl,
+                                      num_int_ctrl = 3L)
+
+    # check that function runs
+    expect_no_condition(
+      object = df_out <- red_npx_wide_top_mid_long(
+        df_top_list = df_rand$list_df_long$df_top_long,
+        df_middle_list = df_rand$list_df_long$df_middle_long,
+        data_type = data_type,
+        format_spec = format_spec
+      )
+    )
+
+    # rename from NPXS
+    olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+      dplyr::filter(
+        .data[["OA_internal"]] %in% colnames(df_out)
+      )
+
+    # check that output match
+    expect_true(
+      object = identical(nrow(df_out), n_row_exp)
+    )
+
+    expect_identical(
+      object = dplyr::select(df_out,
+                             -dplyr::all_of("col_index")),
+      expected = df_rand$list_df_long$df_long |>
+        dplyr::mutate(
+          Panel = paste0(.data[["Panel"]], "(",
+                         .data[["Panel_Version"]], ")")
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_top_", x))()
-        names(df_rand$list_df_long$df_middle_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_middle_long),
-          split = "_"
+        dplyr::rename_with(
+          .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+          .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_mid_", x))()
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # expected dim of output df ----
-        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
-                                          n_assays = n_assays,
-                                          n_samples = n_samples,
-                                          has_int_ctrl = show_int_ctrl,
-                                          num_int_ctrl = 3L)
-
-        # check that function runs
-        expect_no_condition(
-          object = df_out <- red_npx_wide_top_mid_long(
-            df_top_list = df_rand$list_df_long$df_top_long,
-            df_middle_list = df_rand$list_df_long$df_middle_long,
-            data_type = data_type,
-            format_spec = format_spec
-          )
-        )
-
-        # rename from NPXS
-        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
-          dplyr::filter(
-            .data[["OA_internal"]] %in% colnames(df_out)
-          )
-
-        # check that output match
-        expect_true(
-          object = identical(nrow(df_out), n_row_exp)
-        )
-
-        expect_identical(
-          object = dplyr::select(df_out,
-                                 -dplyr::all_of("col_index")),
-          expected = df_rand$list_df_long$df_long |>
-            dplyr::mutate(
-              Panel = paste0(.data[["Panel"]], "(",
-                             .data[["Panel_Version"]], ")")
-            ) |>
-            dplyr::rename_with(
-              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
-              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
-            ) |>
-            dplyr::select(dplyr::any_of(colnames(df_out)))
-        )
-
-      }
+        dplyr::select(dplyr::any_of(colnames(df_out)))
     )
 
     ## NPX no int ctrl and with dev int ctrl ----
 
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
+    # synthetic wide df
+    data_type <- "NPX"
+    show_int_ctrl <- FALSE
+    show_dev_int_ctrl <- TRUE
+    version <- 1L
 
-        # synthetic wide df
-        data_type <- "NPX"
-        show_int_ctrl <- FALSE
+    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                    data_type = data_type,
+                                    n_panels = n_panels,
+                                    n_assays = n_assays,
+                                    n_samples = n_samples,
+                                    show_int_ctrl = show_int_ctrl,
+                                    show_dev_int_ctrl = show_dev_int_ctrl,
+                                    version = version)
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 1L)
+    # matrix specifications
+    format_spec <- olink_wide_spec |>
+      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+    # column names of each subset of data
+    names(df_rand$list_df_long$df_top_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_top_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_top_", x))()
+    names(df_rand$list_df_long$df_middle_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_middle_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_mid_", x))()
 
-        # column names of each subset of data
-        names(df_rand$list_df_long$df_top_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_top_long),
-          split = "_"
+    # expected dim of output df
+    n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                      n_assays = n_assays,
+                                      n_samples = n_samples,
+                                      has_int_ctrl = show_int_ctrl,
+                                      num_int_ctrl = 3L)
+
+    # check that function runs
+    expect_no_condition(
+      object = df_out <- red_npx_wide_top_mid_long(
+        df_top_list = df_rand$list_df_long$df_top_long,
+        df_middle_list = df_rand$list_df_long$df_middle_long,
+        data_type = data_type,
+        format_spec = format_spec
+      )
+    )
+
+    # rename from NPXS
+    olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+      dplyr::filter(
+        .data[["OA_internal"]] %in% colnames(df_out)
+      )
+
+    # check that output match
+    expect_true(
+      object = identical(nrow(df_out), n_row_exp)
+    )
+
+    expect_identical(
+      object = dplyr::select(df_out,
+                             -dplyr::all_of("col_index")),
+      expected = df_rand$list_df_long$df_long |>
+        dplyr::mutate(
+          Panel = paste0(.data[["Panel"]], "(",
+                         .data[["Panel_Version"]], ")")
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_top_", x))()
-        names(df_rand$list_df_long$df_middle_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_middle_long),
-          split = "_"
+        dplyr::rename_with(
+          .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+          .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_mid_", x))()
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # expected dim of output df ----
-        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
-                                          n_assays = n_assays,
-                                          n_samples = n_samples,
-                                          has_int_ctrl = show_int_ctrl,
-                                          num_int_ctrl = 3L)
-
-        # check that function runs
-        expect_no_condition(
-          object = df_out <- red_npx_wide_top_mid_long(
-            df_top_list = df_rand$list_df_long$df_top_long,
-            df_middle_list = df_rand$list_df_long$df_middle_long,
-            data_type = data_type,
-            format_spec = format_spec
-          )
-        )
-
-        # rename from NPXS
-        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
-          dplyr::filter(
-            .data[["OA_internal"]] %in% colnames(df_out)
-          )
-
-        # check that output match
-        expect_true(
-          object = identical(nrow(df_out), n_row_exp)
-        )
-
-        expect_identical(
-          object = dplyr::select(df_out,
-                                 -dplyr::all_of("col_index")),
-          expected = df_rand$list_df_long$df_long |>
-            dplyr::mutate(
-              Panel = paste0(.data[["Panel"]], "(",
-                             .data[["Panel_Version"]], ")")
-            ) |>
-            dplyr::rename_with(
-              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
-              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
-            ) |>
-            dplyr::select(dplyr::any_of(colnames(df_out)))
-        )
-
-      }
+        dplyr::select(dplyr::any_of(colnames(df_out)))
     )
 
     ## NPX with int ctrl and with dev int ctrl ----
 
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
+    # synthetic wide df
+    data_type <- "NPX"
+    show_int_ctrl <- TRUE
+    show_dev_int_ctrl <- TRUE
+    version <- 1L
 
-        # synthetic wide df
-        data_type <- "NPX"
-        show_int_ctrl <- TRUE
+    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                    data_type = data_type,
+                                    n_panels = n_panels,
+                                    n_assays = n_assays,
+                                    n_samples = n_samples,
+                                    show_int_ctrl = show_int_ctrl,
+                                    show_dev_int_ctrl = show_dev_int_ctrl,
+                                    version = version)
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 1L)
+    # matrix specifications
+    format_spec <- olink_wide_spec |>
+      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+    # column names of each subset of data
+    names(df_rand$list_df_long$df_top_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_top_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_top_", x))()
+    names(df_rand$list_df_long$df_middle_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_middle_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_mid_", x))()
 
-        # column names of each subset of data
-        names(df_rand$list_df_long$df_top_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_top_long),
-          split = "_"
+    # expected dim of output df
+    n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                      n_assays = n_assays,
+                                      n_samples = n_samples,
+                                      has_int_ctrl = show_int_ctrl,
+                                      num_int_ctrl = 3L)
+
+    # check that function runs
+    expect_no_condition(
+      object = df_out <- red_npx_wide_top_mid_long(
+        df_top_list = df_rand$list_df_long$df_top_long,
+        df_middle_list = df_rand$list_df_long$df_middle_long,
+        data_type = data_type,
+        format_spec = format_spec
+      )
+    )
+
+    # rename from NPXS
+    olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+      dplyr::filter(
+        .data[["OA_internal"]] %in% colnames(df_out)
+      )
+
+    # check that output match
+    expect_true(
+      object = identical(nrow(df_out), n_row_exp)
+    )
+
+    expect_identical(
+      object = dplyr::select(df_out,
+                             -dplyr::all_of("col_index")),
+      expected = df_rand$list_df_long$df_long |>
+        dplyr::mutate(
+          Panel = paste0(.data[["Panel"]], "(",
+                         .data[["Panel_Version"]], ")")
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_top_", x))()
-        names(df_rand$list_df_long$df_middle_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_middle_long),
-          split = "_"
+        dplyr::rename_with(
+          .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+          .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_mid_", x))()
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # expected dim of output df ----
-        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
-                                          n_assays = n_assays,
-                                          n_samples = n_samples,
-                                          has_int_ctrl = show_int_ctrl,
-                                          num_int_ctrl = 3L)
-
-        # check that function runs
-        expect_no_condition(
-          object = df_out <- red_npx_wide_top_mid_long(
-            df_top_list = df_rand$list_df_long$df_top_long,
-            df_middle_list = df_rand$list_df_long$df_middle_long,
-            data_type = data_type,
-            format_spec = format_spec
-          )
-        )
-
-        # rename from NPXS
-        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
-          dplyr::filter(
-            .data[["OA_internal"]] %in% colnames(df_out)
-          )
-
-        # check that output match
-        expect_true(
-          object = identical(nrow(df_out), n_row_exp)
-        )
-
-        expect_identical(
-          object = dplyr::select(df_out,
-                                 -dplyr::all_of("col_index")),
-          expected = df_rand$list_df_long$df_long |>
-            dplyr::mutate(
-              Panel = paste0(.data[["Panel"]], "(",
-                             .data[["Panel_Version"]], ")")
-            ) |>
-            dplyr::rename_with(
-              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
-              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
-            ) |>
-            dplyr::select(dplyr::any_of(colnames(df_out)))
-        )
-
-      }
+        dplyr::select(dplyr::any_of(colnames(df_out)))
     )
 
 
     ## Ct no int ctrl ----
 
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
+    # synthetic wide df
+    data_type <- "Ct"
+    show_int_ctrl <- FALSE
+    show_dev_int_ctrl <- FALSE
+    version <- 1L
 
-        # synthetic wide df
-        data_type <- "Ct"
-        show_int_ctrl <- FALSE
+    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                    data_type = data_type,
+                                    n_panels = n_panels,
+                                    n_assays = n_assays,
+                                    n_samples = n_samples,
+                                    show_int_ctrl = show_int_ctrl,
+                                    show_dev_int_ctrl = show_dev_int_ctrl,
+                                    version = version)
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+    # matrix specifications
+    format_spec <- olink_wide_spec |>
+      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+    # column names of each subset of data
+    names(df_rand$list_df_long$df_top_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_top_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_top_", x))()
+    names(df_rand$list_df_long$df_middle_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_middle_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_mid_", x))()
 
-        # column names of each subset of data
-        names(df_rand$list_df_long$df_top_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_top_long),
-          split = "_"
+    # expected dim of output df
+    n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                      n_assays = n_assays,
+                                      n_samples = n_samples,
+                                      has_int_ctrl = show_int_ctrl,
+                                      num_int_ctrl = 3L)
+
+    # check that function runs
+    expect_no_condition(
+      object = df_out <- red_npx_wide_top_mid_long(
+        df_top_list = df_rand$list_df_long$df_top_long,
+        df_middle_list = df_rand$list_df_long$df_middle_long,
+        data_type = data_type,
+        format_spec = format_spec
+      )
+    )
+
+    # rename from NPXS
+    olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+      dplyr::filter(
+        .data[["OA_internal"]] %in% colnames(df_out)
+      )
+
+    # check that output match
+    expect_true(
+      object = identical(nrow(df_out), n_row_exp)
+    )
+
+    expect_identical(
+      object = dplyr::select(df_out,
+                             -dplyr::all_of("col_index")),
+      expected = df_rand$list_df_long$df_long |>
+        dplyr::mutate(
+          Panel = paste0(.data[["Panel"]], "(",
+                         .data[["Panel_Version"]], ")")
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_top_", x))()
-        names(df_rand$list_df_long$df_middle_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_middle_long),
-          split = "_"
+        dplyr::rename_with(
+          .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+          .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_mid_", x))()
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # expected dim of output df ----
-        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
-                                          n_assays = n_assays,
-                                          n_samples = n_samples,
-                                          has_int_ctrl = show_int_ctrl,
-                                          num_int_ctrl = 3L)
-
-        # check that function runs
-        expect_no_condition(
-          object = df_out <- red_npx_wide_top_mid_long(
-            df_top_list = df_rand$list_df_long$df_top_long,
-            df_middle_list = df_rand$list_df_long$df_middle_long,
-            data_type = data_type,
-            format_spec = format_spec
-          )
-        )
-
-        # rename from NPXS
-        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
-          dplyr::filter(
-            .data[["OA_internal"]] %in% colnames(df_out)
-          )
-
-        # check that output match
-        expect_true(
-          object = identical(nrow(df_out), n_row_exp)
-        )
-
-        expect_identical(
-          object = dplyr::select(df_out,
-                                 -dplyr::all_of("col_index")),
-          expected = df_rand$list_df_long$df_long |>
-            dplyr::mutate(
-              Panel = paste0(.data[["Panel"]], "(",
-                             .data[["Panel_Version"]], ")")
-            ) |>
-            dplyr::rename_with(
-              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
-              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
-            ) |>
-            dplyr::select(dplyr::any_of(colnames(df_out)))
-        )
-
-      }
+        dplyr::select(dplyr::any_of(colnames(df_out)))
     )
 
     ## Ct with int ctrl ----
 
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
+    # synthetic wide df
+    data_type <- "Ct"
+    show_int_ctrl <- TRUE
+    show_dev_int_ctrl <- FALSE
+    version <- 1L
 
-        # synthetic wide df
-        data_type <- "Ct"
-        show_int_ctrl <- TRUE
+    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                    data_type = data_type,
+                                    n_panels = n_panels,
+                                    n_assays = n_assays,
+                                    n_samples = n_samples,
+                                    show_int_ctrl = show_int_ctrl,
+                                    show_dev_int_ctrl = show_dev_int_ctrl,
+                                    version = version)
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+    # matrix specifications
+    format_spec <- olink_wide_spec |>
+      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+    # column names of each subset of data
+    names(df_rand$list_df_long$df_top_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_top_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_top_", x))()
+    names(df_rand$list_df_long$df_middle_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_middle_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_mid_", x))()
 
-        # column names of each subset of data
-        names(df_rand$list_df_long$df_top_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_top_long),
-          split = "_"
+    # expected dim of output df
+    n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                      n_assays = n_assays,
+                                      n_samples = n_samples,
+                                      has_int_ctrl = show_int_ctrl,
+                                      num_int_ctrl = 3L)
+
+    # check that function runs
+    expect_no_condition(
+      object = df_out <- red_npx_wide_top_mid_long(
+        df_top_list = df_rand$list_df_long$df_top_long,
+        df_middle_list = df_rand$list_df_long$df_middle_long,
+        data_type = data_type,
+        format_spec = format_spec
+      )
+    )
+
+    # rename from NPXS
+    olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+      dplyr::filter(
+        .data[["OA_internal"]] %in% colnames(df_out)
+      )
+
+    # check that output match
+    expect_true(
+      object = identical(nrow(df_out), n_row_exp)
+    )
+
+    expect_identical(
+      object = dplyr::select(df_out,
+                             -dplyr::all_of("col_index")),
+      expected = df_rand$list_df_long$df_long |>
+        dplyr::mutate(
+          Panel = paste0(.data[["Panel"]], "(",
+                         .data[["Panel_Version"]], ")")
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_top_", x))()
-        names(df_rand$list_df_long$df_middle_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_middle_long),
-          split = "_"
+        dplyr::rename_with(
+          .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+          .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_mid_", x))()
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # expected dim of output df ----
-        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
-                                          n_assays = n_assays,
-                                          n_samples = n_samples,
-                                          has_int_ctrl = show_int_ctrl,
-                                          num_int_ctrl = 3L)
-
-        # check that function runs
-        expect_no_condition(
-          object = df_out <- red_npx_wide_top_mid_long(
-            df_top_list = df_rand$list_df_long$df_top_long,
-            df_middle_list = df_rand$list_df_long$df_middle_long,
-            data_type = data_type,
-            format_spec = format_spec
-          )
-        )
-
-        # rename from NPXS
-        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
-          dplyr::filter(
-            .data[["OA_internal"]] %in% colnames(df_out)
-          )
-
-        # check that output match
-        expect_true(
-          object = identical(nrow(df_out), n_row_exp)
-        )
-
-        expect_identical(
-          object = dplyr::select(df_out,
-                                 -dplyr::all_of("col_index")),
-          expected = df_rand$list_df_long$df_long |>
-            dplyr::mutate(
-              Panel = paste0(.data[["Panel"]], "(",
-                             .data[["Panel_Version"]], ")")
-            ) |>
-            dplyr::rename_with(
-              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
-              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
-            ) |>
-            dplyr::select(dplyr::any_of(colnames(df_out)))
-        )
-
-      }
+        dplyr::select(dplyr::any_of(colnames(df_out)))
     )
 
     ## Quantified no int ctrl and no dev int ctrl ----
 
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
+    # synthetic wide df
+    data_type <- "Quantified"
+    show_int_ctrl <- FALSE
+    show_dev_int_ctrl <- FALSE
+    version <- 0L
 
-        # synthetic wide df
-        data_type <- "Quantified"
-        show_int_ctrl <- FALSE
+    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                    data_type = data_type,
+                                    n_panels = n_panels,
+                                    n_assays = n_assays,
+                                    n_samples = n_samples,
+                                    show_int_ctrl = show_int_ctrl,
+                                    show_dev_int_ctrl = show_dev_int_ctrl,
+                                    version = version)
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 0L)
+    # matrix specifications
+    format_spec <- olink_wide_spec |>
+      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+    # column names of each subset of data
+    names(df_rand$list_df_long$df_top_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_top_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_top_", x))()
+    names(df_rand$list_df_long$df_middle_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_middle_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_mid_", x))()
 
-        # column names of each subset of data
-        names(df_rand$list_df_long$df_top_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_top_long),
-          split = "_"
+    # expected dim of output df
+    n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                      n_assays = n_assays,
+                                      n_samples = n_samples,
+                                      has_int_ctrl = show_int_ctrl,
+                                      num_int_ctrl = 3L)
+
+    # check that function runs
+    expect_no_condition(
+      object = df_out <- red_npx_wide_top_mid_long(
+        df_top_list = df_rand$list_df_long$df_top_long,
+        df_middle_list = df_rand$list_df_long$df_middle_long,
+        data_type = data_type,
+        format_spec = format_spec
+      )
+    )
+
+    # rename from NPXS
+    olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+      dplyr::filter(
+        .data[["OA_internal"]] %in% colnames(df_out)
+      )
+
+    # check that output match
+    expect_true(
+      object = identical(nrow(df_out), n_row_exp)
+    )
+
+    expect_identical(
+      object = dplyr::select(df_out,
+                             -dplyr::all_of("col_index")),
+      expected = df_rand$list_df_long$df_long |>
+        dplyr::mutate(
+          Panel = paste0(.data[["Panel"]], "(",
+                         .data[["Panel_Version"]], ")")
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_top_", x))()
-        names(df_rand$list_df_long$df_middle_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_middle_long),
-          split = "_"
+        dplyr::rename_with(
+          .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+          .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_mid_", x))()
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # expected dim of output df ----
-        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
-                                          n_assays = n_assays,
-                                          n_samples = n_samples,
-                                          has_int_ctrl = show_int_ctrl,
-                                          num_int_ctrl = 3L)
-
-        # check that function runs
-        expect_no_condition(
-          object = df_out <- red_npx_wide_top_mid_long(
-            df_top_list = df_rand$list_df_long$df_top_long,
-            df_middle_list = df_rand$list_df_long$df_middle_long,
-            data_type = data_type,
-            format_spec = format_spec
-          )
-        )
-
-        # rename from NPXS
-        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
-          dplyr::filter(
-            .data[["OA_internal"]] %in% colnames(df_out)
-          )
-
-        # check that output match
-        expect_true(
-          object = identical(nrow(df_out), n_row_exp)
-        )
-
-        expect_identical(
-          object = dplyr::select(df_out,
-                                 -dplyr::all_of("col_index")),
-          expected = df_rand$list_df_long$df_long |>
-            dplyr::mutate(
-              Panel = paste0(.data[["Panel"]], "(",
-                             .data[["Panel_Version"]], ")")
-            ) |>
-            dplyr::rename_with(
-              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
-              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
-            ) |>
-            dplyr::select(dplyr::any_of(colnames(df_out)))
-        )
-
-      }
+        dplyr::select(dplyr::any_of(colnames(df_out)))
     )
 
     ## Quantified with int ctrl and no dev int ctrl ----
 
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
+    # synthetic wide df
+    data_type <- "Quantified"
+    show_int_ctrl <- TRUE
+    show_dev_int_ctrl <- FALSE
+    version <- 0L
 
-        # synthetic wide df
-        data_type <- "Quantified"
-        show_int_ctrl <- TRUE
+    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                    data_type = data_type,
+                                    n_panels = n_panels,
+                                    n_assays = n_assays,
+                                    n_samples = n_samples,
+                                    show_int_ctrl = show_int_ctrl,
+                                    show_dev_int_ctrl = show_dev_int_ctrl,
+                                    version = version)
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 0L)
+    # matrix specifications
+    format_spec <- olink_wide_spec |>
+      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+    # column names of each subset of data
+    names(df_rand$list_df_long$df_top_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_top_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_top_", x))()
+    names(df_rand$list_df_long$df_middle_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_middle_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_mid_", x))()
 
-        # column names of each subset of data
-        names(df_rand$list_df_long$df_top_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_top_long),
-          split = "_"
+    # expected dim of output df
+    n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                      n_assays = n_assays,
+                                      n_samples = n_samples,
+                                      has_int_ctrl = show_int_ctrl,
+                                      num_int_ctrl = 3L)
+
+    # check that function runs
+    expect_no_condition(
+      object = df_out <- red_npx_wide_top_mid_long(
+        df_top_list = df_rand$list_df_long$df_top_long,
+        df_middle_list = df_rand$list_df_long$df_middle_long,
+        data_type = data_type,
+        format_spec = format_spec
+      )
+    )
+
+    # rename from NPXS
+    olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+      dplyr::filter(
+        .data[["OA_internal"]] %in% colnames(df_out)
+      )
+
+    # check that output match
+    expect_true(
+      object = identical(nrow(df_out), n_row_exp)
+    )
+
+    expect_identical(
+      object = dplyr::select(df_out,
+                             -dplyr::all_of("col_index")),
+      expected = df_rand$list_df_long$df_long |>
+        dplyr::mutate(
+          Panel = paste0(.data[["Panel"]], "(",
+                         .data[["Panel_Version"]], ")")
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_top_", x))()
-        names(df_rand$list_df_long$df_middle_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_middle_long),
-          split = "_"
+        dplyr::rename_with(
+          .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+          .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_mid_", x))()
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # expected dim of output df ----
-        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
-                                          n_assays = n_assays,
-                                          n_samples = n_samples,
-                                          has_int_ctrl = show_int_ctrl,
-                                          num_int_ctrl = 3L)
-
-        # check that function runs
-        expect_no_condition(
-          object = df_out <- red_npx_wide_top_mid_long(
-            df_top_list = df_rand$list_df_long$df_top_long,
-            df_middle_list = df_rand$list_df_long$df_middle_long,
-            data_type = data_type,
-            format_spec = format_spec
-          )
-        )
-
-        # rename from NPXS
-        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
-          dplyr::filter(
-            .data[["OA_internal"]] %in% colnames(df_out)
-          )
-
-        # check that output match
-        expect_true(
-          object = identical(nrow(df_out), n_row_exp)
-        )
-
-        expect_identical(
-          object = dplyr::select(df_out,
-                                 -dplyr::all_of("col_index")),
-          expected = df_rand$list_df_long$df_long |>
-            dplyr::mutate(
-              Panel = paste0(.data[["Panel"]], "(",
-                             .data[["Panel_Version"]], ")")
-            ) |>
-            dplyr::rename_with(
-              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
-              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
-            ) |>
-            dplyr::select(dplyr::any_of(colnames(df_out)))
-        )
-
-      }
+        dplyr::select(dplyr::any_of(colnames(df_out)))
     )
 
     ## Quantified no int ctrl and with dev int ctrl ----
 
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
+    # synthetic wide df
+    data_type <- "Quantified"
+    show_int_ctrl <- FALSE
+    show_dev_int_ctrl <- TRUE
+    version <- 0L
 
-        # synthetic wide df
-        data_type <- "Quantified"
-        show_int_ctrl <- FALSE
+    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                    data_type = data_type,
+                                    n_panels = n_panels,
+                                    n_assays = n_assays,
+                                    n_samples = n_samples,
+                                    show_int_ctrl = show_int_ctrl,
+                                    show_dev_int_ctrl = show_dev_int_ctrl,
+                                    version = version)
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 0L)
+    # matrix specifications
+    format_spec <- olink_wide_spec |>
+      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+    # column names of each subset of data
+    names(df_rand$list_df_long$df_top_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_top_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_top_", x))()
+    names(df_rand$list_df_long$df_middle_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_middle_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_mid_", x))()
 
-        # column names of each subset of data
-        names(df_rand$list_df_long$df_top_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_top_long),
-          split = "_"
+    # expected dim of output df
+    n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                      n_assays = n_assays,
+                                      n_samples = n_samples,
+                                      has_int_ctrl = show_int_ctrl,
+                                      num_int_ctrl = 3L)
+
+    # check that function runs
+    expect_no_condition(
+      object = df_out <- red_npx_wide_top_mid_long(
+        df_top_list = df_rand$list_df_long$df_top_long,
+        df_middle_list = df_rand$list_df_long$df_middle_long,
+        data_type = data_type,
+        format_spec = format_spec
+      )
+    )
+
+    # rename from NPXS
+    olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+      dplyr::filter(
+        .data[["OA_internal"]] %in% colnames(df_out)
+      )
+
+    # check that output match
+    expect_true(
+      object = identical(nrow(df_out), n_row_exp)
+    )
+
+    expect_identical(
+      object = dplyr::select(df_out,
+                             -dplyr::all_of("col_index")),
+      expected = df_rand$list_df_long$df_long |>
+        dplyr::mutate(
+          Panel = paste0(.data[["Panel"]], "(",
+                         .data[["Panel_Version"]], ")")
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_top_", x))()
-        names(df_rand$list_df_long$df_middle_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_middle_long),
-          split = "_"
+        dplyr::rename_with(
+          .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+          .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_mid_", x))()
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # expected dim of output df ----
-        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
-                                          n_assays = n_assays,
-                                          n_samples = n_samples,
-                                          has_int_ctrl = show_int_ctrl,
-                                          num_int_ctrl = 3L)
-
-        # check that function runs
-        expect_no_condition(
-          object = df_out <- red_npx_wide_top_mid_long(
-            df_top_list = df_rand$list_df_long$df_top_long,
-            df_middle_list = df_rand$list_df_long$df_middle_long,
-            data_type = data_type,
-            format_spec = format_spec
-          )
-        )
-
-        # rename from NPXS
-        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
-          dplyr::filter(
-            .data[["OA_internal"]] %in% colnames(df_out)
-          )
-
-        # check that output match
-        expect_true(
-          object = identical(nrow(df_out), n_row_exp)
-        )
-
-        expect_identical(
-          object = dplyr::select(df_out,
-                                 -dplyr::all_of("col_index")),
-          expected = df_rand$list_df_long$df_long |>
-            dplyr::mutate(
-              Panel = paste0(.data[["Panel"]], "(",
-                             .data[["Panel_Version"]], ")")
-            ) |>
-            dplyr::rename_with(
-              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
-              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
-            ) |>
-            dplyr::select(dplyr::any_of(colnames(df_out)))
-        )
-
-      }
+        dplyr::select(dplyr::any_of(colnames(df_out)))
     )
 
     ## Quantified with int ctrl and with dev int ctrl ----
 
-    withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
-      fileext = ".xlsx",
-      code = {
+    # synthetic wide df
+    data_type <- "Quantified"
+    show_int_ctrl <- TRUE
+    show_dev_int_ctrl <- TRUE
+    version <- 0L
 
-        # synthetic wide df
-        data_type <- "Quantified"
-        show_int_ctrl <- TRUE
+    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                    data_type = data_type,
+                                    n_panels = n_panels,
+                                    n_assays = n_assays,
+                                    n_samples = n_samples,
+                                    show_int_ctrl = show_int_ctrl,
+                                    show_dev_int_ctrl = show_dev_int_ctrl,
+                                    version = version)
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 0L)
+    # matrix specifications
+    format_spec <- olink_wide_spec |>
+      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
-        # matrix specifications
-        format_spec <- olink_wide_excel_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+    # column names of each subset of data
+    names(df_rand$list_df_long$df_top_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_top_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_top_", x))()
+    names(df_rand$list_df_long$df_middle_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_middle_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_mid_", x))()
 
-        # column names of each subset of data
-        names(df_rand$list_df_long$df_top_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_top_long),
-          split = "_"
+    # expected dim of output df
+    n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                      n_assays = n_assays,
+                                      n_samples = n_samples,
+                                      has_int_ctrl = show_int_ctrl,
+                                      num_int_ctrl = 3L)
+
+    # check that function runs
+    expect_no_condition(
+      object = df_out <- red_npx_wide_top_mid_long(
+        df_top_list = df_rand$list_df_long$df_top_long,
+        df_middle_list = df_rand$list_df_long$df_middle_long,
+        data_type = data_type,
+        format_spec = format_spec
+      )
+    )
+
+    # rename from NPXS
+    olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+      dplyr::filter(
+        .data[["OA_internal"]] %in% colnames(df_out)
+      )
+
+    # check that output match
+    expect_true(
+      object = identical(nrow(df_out), n_row_exp)
+    )
+
+    expect_identical(
+      object = dplyr::select(df_out,
+                             -dplyr::all_of("col_index")),
+      expected = df_rand$list_df_long$df_long |>
+        dplyr::mutate(
+          Panel = paste0(.data[["Panel"]], "(",
+                         .data[["Panel_Version"]], ")")
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_top_", x))()
-        names(df_rand$list_df_long$df_middle_long) <- strsplit(
-          x = names(df_rand$list_df_long$df_middle_long),
-          split = "_"
+        dplyr::rename_with(
+          .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+          .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
         ) |>
-          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
-          unlist() |>
-          (\(x) paste0("df_mid_", x))()
-
-        # write empty-ish file
-        writeLines("foo", wide_excel)
-
-        # expected dim of output df ----
-        n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
-                                          n_assays = n_assays,
-                                          n_samples = n_samples,
-                                          has_int_ctrl = show_int_ctrl,
-                                          num_int_ctrl = 3L)
-
-        # check that function runs
-        expect_no_condition(
-          object = df_out <- red_npx_wide_top_mid_long(
-            df_top_list = df_rand$list_df_long$df_top_long,
-            df_middle_list = df_rand$list_df_long$df_middle_long,
-            data_type = data_type,
-            format_spec = format_spec
-          )
-        )
-
-        # rename from NPXS
-        olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
-          dplyr::filter(
-            .data[["OA_internal"]] %in% colnames(df_out)
-          )
-
-        # check that output match
-        expect_true(
-          object = identical(nrow(df_out), n_row_exp)
-        )
-
-        expect_identical(
-          object = dplyr::select(df_out,
-                                 -dplyr::all_of("col_index")),
-          expected = df_rand$list_df_long$df_long |>
-            dplyr::mutate(
-              Panel = paste0(.data[["Panel"]], "(",
-                             .data[["Panel_Version"]], ")")
-            ) |>
-            dplyr::rename_with(
-              .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
-              .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
-            ) |>
-            dplyr::select(dplyr::any_of(colnames(df_out)))
-        )
-
-      }
+        dplyr::select(dplyr::any_of(colnames(df_out)))
     )
 
   }
@@ -10735,12 +10505,13 @@ test_that(
     n_panels <- 1L
     n_assays <- 45L
     n_samples <- 88L
+    show_dev_int_ctrl <- FALSE
 
     ## NPX no int ctrl v1 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -10753,10 +10524,10 @@ test_that(
                                         n_assays = n_assays,
                                         n_samples = n_samples,
                                         show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
                                         version = 1L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # column names of each subset of data
@@ -10785,13 +10556,13 @@ test_that(
           )
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_bottom(
             df = df_rand$list_df_wide$df_bottom_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
@@ -10828,8 +10599,8 @@ test_that(
     ## NPX with int ctrl v1 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -10842,10 +10613,10 @@ test_that(
                                         n_assays = n_assays,
                                         n_samples = n_samples,
                                         show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
                                         version = 1L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # column names of each subset of data
@@ -10881,13 +10652,13 @@ test_that(
           )
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_bottom(
             df = df_rand$list_df_wide$df_bottom_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
@@ -10930,8 +10701,8 @@ test_that(
     ## NPX no int ctrl v2 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -10944,10 +10715,10 @@ test_that(
                                         n_assays = n_assays,
                                         n_samples = n_samples,
                                         show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
                                         version = 2L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # column names of each subset of data
@@ -10976,13 +10747,13 @@ test_that(
           )
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_bottom(
             df = df_rand$list_df_wide$df_bottom_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
@@ -11019,8 +10790,8 @@ test_that(
     ## NPX with int ctrl v2 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -11033,10 +10804,10 @@ test_that(
                                         n_assays = n_assays,
                                         n_samples = n_samples,
                                         show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
                                         version = 2L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # column names of each subset of data
@@ -11072,13 +10843,13 @@ test_that(
           )
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_bottom(
             df = df_rand$list_df_wide$df_bottom_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
@@ -11121,8 +10892,8 @@ test_that(
     ## Quantified no int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -11135,10 +10906,10 @@ test_that(
                                         n_assays = n_assays,
                                         n_samples = n_samples,
                                         show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
                                         version = 0L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # column names of each subset of data
@@ -11167,13 +10938,13 @@ test_that(
           )
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_bottom(
             df = df_rand$list_df_wide$df_bottom_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
@@ -11210,8 +10981,8 @@ test_that(
     ## Quantified with int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -11224,10 +10995,10 @@ test_that(
                                         n_assays = n_assays,
                                         n_samples = n_samples,
                                         show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
                                         version = 0L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # column names of each subset of data
@@ -11263,13 +11034,13 @@ test_that(
           )
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_bottom(
             df = df_rand$list_df_wide$df_bottom_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
@@ -11320,12 +11091,13 @@ test_that(
     n_panels <- 3L
     n_assays <- 45L
     n_samples <- 88L
+    show_dev_int_ctrl <- FALSE
 
     ## NPX no int ctrl v1 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -11338,10 +11110,10 @@ test_that(
                                         n_assays = n_assays,
                                         n_samples = n_samples,
                                         show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
                                         version = 1L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # column names of each subset of data
@@ -11370,13 +11142,13 @@ test_that(
           )
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_bottom(
             df = df_rand$list_df_wide$df_bottom_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
@@ -11413,8 +11185,8 @@ test_that(
     ## NPX with int ctrl v1 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -11427,10 +11199,10 @@ test_that(
                                         n_assays = n_assays,
                                         n_samples = n_samples,
                                         show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
                                         version = 1L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # column names of each subset of data
@@ -11466,13 +11238,13 @@ test_that(
           )
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_bottom(
             df = df_rand$list_df_wide$df_bottom_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
@@ -11515,8 +11287,8 @@ test_that(
     ## NPX no int ctrl v2 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -11529,10 +11301,10 @@ test_that(
                                         n_assays = n_assays,
                                         n_samples = n_samples,
                                         show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
                                         version = 2L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # column names of each subset of data
@@ -11561,13 +11333,13 @@ test_that(
           )
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_bottom(
             df = df_rand$list_df_wide$df_bottom_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
@@ -11604,8 +11376,8 @@ test_that(
     ## NPX with int ctrl v2 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -11618,10 +11390,10 @@ test_that(
                                         n_assays = n_assays,
                                         n_samples = n_samples,
                                         show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
                                         version = 2L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # column names of each subset of data
@@ -11657,13 +11429,13 @@ test_that(
           )
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_bottom(
             df = df_rand$list_df_wide$df_bottom_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
@@ -11706,8 +11478,8 @@ test_that(
     ## Quantified no int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -11720,10 +11492,10 @@ test_that(
                                         n_assays = n_assays,
                                         n_samples = n_samples,
                                         show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
                                         version = 0L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # column names of each subset of data
@@ -11752,13 +11524,13 @@ test_that(
           )
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_bottom(
             df = df_rand$list_df_wide$df_bottom_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
@@ -11795,8 +11567,8 @@ test_that(
     ## Quantified with int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -11809,10 +11581,10 @@ test_that(
                                         n_assays = n_assays,
                                         n_samples = n_samples,
                                         show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
                                         version = 0L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # column names of each subset of data
@@ -11848,13 +11620,13 @@ test_that(
           )
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_bottom(
             df = df_rand$list_df_wide$df_bottom_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
@@ -11905,12 +11677,13 @@ test_that(
     n_panels <- 1L
     n_assays <- 45L
     n_samples <- 100L
+    show_dev_int_ctrl <- FALSE
 
     ## NPX no int ctrl v1 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -11923,10 +11696,10 @@ test_that(
                                         n_assays = n_assays,
                                         n_samples = n_samples,
                                         show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
                                         version = 1L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # column names of each subset of data
@@ -11939,9 +11712,9 @@ test_that(
         names(col_names) <- paste0("df_top_", names(col_names))
 
         # plate panel combos
-        df_plate_panel <- df_rand$list_df_long$df_long |>
+        df_plate_panel <- df_rand$list_df_long$df_oid_long |>
           dplyr::select(
-            dplyr::all_of(c("Panel", "PlateID"))
+            dplyr::all_of(c("col_index", "Panel"))
           ) |>
           dplyr::distinct() |>
           dplyr::left_join(
@@ -11955,13 +11728,13 @@ test_that(
           )
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_bottom(
             df = df_rand$list_df_wide$df_bottom_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
@@ -11998,8 +11771,8 @@ test_that(
     ## NPX with int ctrl v1 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -12012,10 +11785,10 @@ test_that(
                                         n_assays = n_assays,
                                         n_samples = n_samples,
                                         show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
                                         version = 1L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # column names of each subset of data
@@ -12051,13 +11824,13 @@ test_that(
           )
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_bottom(
             df = df_rand$list_df_wide$df_bottom_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
@@ -12100,8 +11873,8 @@ test_that(
     ## NPX no int ctrl v2 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -12114,10 +11887,10 @@ test_that(
                                         n_assays = n_assays,
                                         n_samples = n_samples,
                                         show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
                                         version = 2L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # column names of each subset of data
@@ -12146,13 +11919,13 @@ test_that(
           )
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_bottom(
             df = df_rand$list_df_wide$df_bottom_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
@@ -12189,8 +11962,8 @@ test_that(
     ## NPX with int ctrl v2 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -12203,10 +11976,10 @@ test_that(
                                         n_assays = n_assays,
                                         n_samples = n_samples,
                                         show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
                                         version = 2L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # column names of each subset of data
@@ -12242,13 +12015,13 @@ test_that(
           )
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_bottom(
             df = df_rand$list_df_wide$df_bottom_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
@@ -12291,8 +12064,8 @@ test_that(
     ## Quantified no int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -12305,10 +12078,10 @@ test_that(
                                         n_assays = n_assays,
                                         n_samples = n_samples,
                                         show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
                                         version = 0L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # column names of each subset of data
@@ -12337,13 +12110,13 @@ test_that(
           )
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_bottom(
             df = df_rand$list_df_wide$df_bottom_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
@@ -12380,8 +12153,8 @@ test_that(
     ## Quantified with int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -12394,10 +12167,10 @@ test_that(
                                         n_assays = n_assays,
                                         n_samples = n_samples,
                                         show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
                                         version = 0L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # column names of each subset of data
@@ -12433,13 +12206,13 @@ test_that(
           )
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_bottom(
             df = df_rand$list_df_wide$df_bottom_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
@@ -12483,19 +12256,20 @@ test_that(
 )
 
 test_that(
-  "read_npx_wide_bottom - works - T48 - single panel - multiple plates",
+  "read_npx_wide_bottom - works - T48 - multiple panels - multiple plates",
   {
     # variables that apply to all tests
     olink_platform <- "Target 48"
     n_panels <- 3L
     n_assays <- 45L
     n_samples <- 100L
+    show_dev_int_ctrl <- FALSE
 
     ## NPX no int ctrl v1 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -12508,10 +12282,10 @@ test_that(
                                         n_assays = n_assays,
                                         n_samples = n_samples,
                                         show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
                                         version = 1L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # column names of each subset of data
@@ -12524,9 +12298,9 @@ test_that(
         names(col_names) <- paste0("df_top_", names(col_names))
 
         # plate panel combos
-        df_plate_panel <- df_rand$list_df_long$df_long |>
+        df_plate_panel <- df_rand$list_df_long$df_oid_long |>
           dplyr::select(
-            dplyr::all_of(c("Panel", "PlateID"))
+            dplyr::all_of(c("col_index", "Panel"))
           ) |>
           dplyr::distinct() |>
           dplyr::left_join(
@@ -12540,13 +12314,13 @@ test_that(
           )
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_bottom(
             df = df_rand$list_df_wide$df_bottom_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
@@ -12583,8 +12357,8 @@ test_that(
     ## NPX with int ctrl v1 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -12597,10 +12371,10 @@ test_that(
                                         n_assays = n_assays,
                                         n_samples = n_samples,
                                         show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
                                         version = 1L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # column names of each subset of data
@@ -12636,13 +12410,13 @@ test_that(
           )
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_bottom(
             df = df_rand$list_df_wide$df_bottom_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
@@ -12685,8 +12459,8 @@ test_that(
     ## NPX no int ctrl v2 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -12699,10 +12473,10 @@ test_that(
                                         n_assays = n_assays,
                                         n_samples = n_samples,
                                         show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
                                         version = 2L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # column names of each subset of data
@@ -12731,13 +12505,13 @@ test_that(
           )
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_bottom(
             df = df_rand$list_df_wide$df_bottom_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
@@ -12774,8 +12548,8 @@ test_that(
     ## NPX with int ctrl v2 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -12788,10 +12562,10 @@ test_that(
                                         n_assays = n_assays,
                                         n_samples = n_samples,
                                         show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
                                         version = 2L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # column names of each subset of data
@@ -12827,13 +12601,13 @@ test_that(
           )
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_bottom(
             df = df_rand$list_df_wide$df_bottom_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
@@ -12876,8 +12650,8 @@ test_that(
     ## Quantified no int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -12890,10 +12664,10 @@ test_that(
                                         n_assays = n_assays,
                                         n_samples = n_samples,
                                         show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
                                         version = 0L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # column names of each subset of data
@@ -12922,13 +12696,13 @@ test_that(
           )
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_bottom(
             df = df_rand$list_df_wide$df_bottom_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
@@ -12965,8 +12739,8 @@ test_that(
     ## Quantified with int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -12979,10 +12753,10 @@ test_that(
                                         n_assays = n_assays,
                                         n_samples = n_samples,
                                         show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
                                         version = 0L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # column names of each subset of data
@@ -13018,13 +12792,13 @@ test_that(
           )
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide_bottom(
             df = df_rand$list_df_wide$df_bottom_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
@@ -13075,12 +12849,13 @@ test_that(
     n_panels <- 1L
     n_assays <- 45L
     n_samples <- 88L
+    show_dev_int_ctrl <- FALSE
 
     ## NPX - LOD2 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -13093,10 +12868,10 @@ test_that(
                                         n_assays = n_assays,
                                         n_samples = n_samples,
                                         show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
                                         version = 1L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # column names of each subset of data
@@ -13134,13 +12909,13 @@ test_that(
           )
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs with error
         expect_error(
           object = df_out <- read_npx_wide_bottom(
             df = df_rand$list_df_wide$df_bottom_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
@@ -13156,8 +12931,8 @@ test_that(
     ## NPX - Additional vals in V1 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -13170,10 +12945,10 @@ test_that(
                                         n_assays = n_assays,
                                         n_samples = n_samples,
                                         show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
                                         version = 0L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # column names of each subset of data
@@ -13202,13 +12977,13 @@ test_that(
           )
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs with error
         expect_error(
           object = df_out <- read_npx_wide_bottom(
             df = df_rand$list_df_wide$df_bottom_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
@@ -13224,8 +12999,8 @@ test_that(
     ## Quantified v1 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -13238,10 +13013,10 @@ test_that(
                                         n_assays = n_assays,
                                         n_samples = n_samples,
                                         show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
                                         version = 0L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # column names of each subset of data
@@ -13279,13 +13054,13 @@ test_that(
           )
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs with error
         expect_error(
           object = df_out <- read_npx_wide_bottom(
             df = df_rand$list_df_wide$df_bottom_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
@@ -13301,8 +13076,8 @@ test_that(
     ## Quantified v2 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -13315,10 +13090,10 @@ test_that(
                                         n_assays = n_assays,
                                         n_samples = n_samples,
                                         show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
+                                        show_dev_int_ctrl = show_dev_int_ctrl,
                                         version = 0L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # column names of each subset of data
@@ -13356,13 +13131,13 @@ test_that(
           )
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs with error
         expect_error(
           object = df_out <- read_npx_wide_bottom(
             df = df_rand$list_df_wide$df_bottom_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
@@ -13382,8 +13157,8 @@ test_that(
   "read_npx_wide_bottom - error - incorrect # of plates x QC data",
   {
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -13400,7 +13175,7 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 0L)
 
-        format_spec <- olink_wide_excel_spec |>
+        format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # column names of each subset of data
@@ -13437,13 +13212,13 @@ test_that(
           )
 
         # write empty-ish file
-        writeLines("foo", wide_excel)
+        writeLines("foo", olink_wide_format)
 
         # check that function runs with error
         expect_error(
           object = read_npx_wide_bottom(
             df = df_rand$list_df_wide$df_bottom_wide,
-            file = wide_excel,
+            file = olink_wide_format,
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
@@ -13473,8 +13248,8 @@ test_that(
     ## NPX no int ctrl, no dev int ctrl, v1 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -13491,13 +13266,8 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 1L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -13509,7 +13279,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -13540,8 +13311,8 @@ test_that(
     ## NPX no int ctrl, no dev int ctrl, v2 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -13558,13 +13329,8 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 2L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -13576,7 +13342,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -13607,8 +13374,8 @@ test_that(
     ## NPX no int ctrl, with dev int ctrl, v1 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -13625,13 +13392,8 @@ test_that(
                                         show_dev_int_ctrl = TRUE,
                                         version = 1L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -13643,7 +13405,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -13674,8 +13437,8 @@ test_that(
     ## NPX no int ctrl, with dev int ctrl, v2 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -13692,13 +13455,8 @@ test_that(
                                         show_dev_int_ctrl = TRUE,
                                         version = 2L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -13710,7 +13468,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -13741,8 +13500,8 @@ test_that(
     ## NPX with int ctrl, no dev int ctrl, v1 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -13759,13 +13518,8 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 1L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -13777,7 +13531,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -13808,8 +13563,8 @@ test_that(
     ## NPX with int ctrl, no dev int ctrl, v2 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -13826,13 +13581,8 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 2L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -13844,7 +13594,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -13875,8 +13626,8 @@ test_that(
     ## NPX with int ctrl, with dev int ctrl, v1 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -13893,13 +13644,8 @@ test_that(
                                         show_dev_int_ctrl = TRUE,
                                         version = 1L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -13911,7 +13657,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -13942,8 +13689,8 @@ test_that(
     ## NPX with int ctrl, with dev int ctrl, v2 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -13960,13 +13707,8 @@ test_that(
                                         show_dev_int_ctrl = TRUE,
                                         version = 2L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -13978,7 +13720,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -14009,8 +13752,8 @@ test_that(
     ## Ct no int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -14027,13 +13770,8 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 1L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -14045,7 +13783,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -14076,8 +13815,8 @@ test_that(
     ## Ct with int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -14094,13 +13833,8 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 2L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -14112,7 +13846,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -14143,8 +13878,8 @@ test_that(
     ## Quantified no int ctrl, no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -14161,13 +13896,8 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 0L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -14179,7 +13909,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -14210,8 +13941,8 @@ test_that(
     ## Quantified no int ctrl, with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -14228,13 +13959,8 @@ test_that(
                                         show_dev_int_ctrl = TRUE,
                                         version = 0L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -14246,7 +13972,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -14277,8 +14004,8 @@ test_that(
     ## Quantified with int ctrl, no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -14295,13 +14022,8 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 0L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -14313,7 +14035,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -14344,8 +14067,8 @@ test_that(
     ## Quantified with int ctrl, with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -14362,13 +14085,8 @@ test_that(
                                         show_dev_int_ctrl = TRUE,
                                         version = 0L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -14380,7 +14098,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -14423,8 +14142,8 @@ test_that(
     ## NPX no int ctrl, no dev int ctrl, v1 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -14441,13 +14160,8 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 1L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -14459,7 +14173,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -14490,8 +14205,8 @@ test_that(
     ## NPX no int ctrl, no dev int ctrl, v2 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -14508,13 +14223,8 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 2L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -14526,7 +14236,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -14557,8 +14268,8 @@ test_that(
     ## NPX no int ctrl, with dev int ctrl, v1 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -14575,13 +14286,8 @@ test_that(
                                         show_dev_int_ctrl = TRUE,
                                         version = 1L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -14593,7 +14299,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -14624,8 +14331,8 @@ test_that(
     ## NPX no int ctrl, with dev int ctrl, v2 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -14642,13 +14349,8 @@ test_that(
                                         show_dev_int_ctrl = TRUE,
                                         version = 2L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -14660,7 +14362,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -14691,8 +14394,8 @@ test_that(
     ## NPX with int ctrl, no dev int ctrl, v1 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -14709,13 +14412,8 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 1L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -14727,7 +14425,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -14758,8 +14457,8 @@ test_that(
     ## NPX with int ctrl, no dev int ctrl, v2 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -14776,13 +14475,8 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 2L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -14794,7 +14488,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -14825,8 +14520,8 @@ test_that(
     ## NPX with int ctrl, with dev int ctrl, v1 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -14843,13 +14538,8 @@ test_that(
                                         show_dev_int_ctrl = TRUE,
                                         version = 1L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -14861,7 +14551,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -14892,8 +14583,8 @@ test_that(
     ## NPX with int ctrl, with dev int ctrl, v2 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -14910,13 +14601,8 @@ test_that(
                                         show_dev_int_ctrl = TRUE,
                                         version = 2L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -14928,7 +14614,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -14959,8 +14646,8 @@ test_that(
     ## Ct no int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -14977,13 +14664,8 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 1L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -14995,7 +14677,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -15026,8 +14709,8 @@ test_that(
     ## Ct with int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -15044,13 +14727,8 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 2L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -15062,7 +14740,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -15093,8 +14772,8 @@ test_that(
     ## Quantified no int ctrl, no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -15111,13 +14790,8 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 0L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -15129,7 +14803,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -15160,8 +14835,8 @@ test_that(
     ## Quantified no int ctrl, with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -15178,13 +14853,8 @@ test_that(
                                         show_dev_int_ctrl = TRUE,
                                         version = 0L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -15196,7 +14866,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -15227,8 +14898,8 @@ test_that(
     ## Quantified with int ctrl, no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -15245,13 +14916,8 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 0L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -15263,7 +14929,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -15294,8 +14961,8 @@ test_that(
     ## Quantified with int ctrl, with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -15312,13 +14979,8 @@ test_that(
                                         show_dev_int_ctrl = TRUE,
                                         version = 0L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -15330,7 +14992,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -15373,8 +15036,8 @@ test_that(
     ## NPX no int ctrl, no dev int ctrl, v1 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -15391,13 +15054,8 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 1L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -15409,7 +15067,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -15440,8 +15099,8 @@ test_that(
     ## NPX no int ctrl, no dev int ctrl, v2 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -15458,13 +15117,8 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 2L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -15476,7 +15130,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -15507,8 +15162,8 @@ test_that(
     ## NPX no int ctrl, with dev int ctrl, v1 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -15525,13 +15180,8 @@ test_that(
                                         show_dev_int_ctrl = TRUE,
                                         version = 1L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -15543,7 +15193,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -15574,8 +15225,8 @@ test_that(
     ## NPX no int ctrl, with dev int ctrl, v2 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -15592,13 +15243,8 @@ test_that(
                                         show_dev_int_ctrl = TRUE,
                                         version = 2L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -15610,7 +15256,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -15641,8 +15288,8 @@ test_that(
     ## NPX with int ctrl, no dev int ctrl, v1 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -15659,13 +15306,8 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 1L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -15677,7 +15319,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -15708,8 +15351,8 @@ test_that(
     ## NPX with int ctrl, no dev int ctrl, v2 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -15726,13 +15369,8 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 2L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -15744,7 +15382,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -15775,8 +15414,8 @@ test_that(
     ## NPX with int ctrl, with dev int ctrl, v1 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -15793,13 +15432,8 @@ test_that(
                                         show_dev_int_ctrl = TRUE,
                                         version = 1L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -15811,7 +15445,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -15842,8 +15477,8 @@ test_that(
     ## NPX with int ctrl, with dev int ctrl, v2 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -15860,13 +15495,8 @@ test_that(
                                         show_dev_int_ctrl = TRUE,
                                         version = 2L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -15878,7 +15508,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -15909,8 +15540,8 @@ test_that(
     ## Ct no int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -15927,13 +15558,8 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 1L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -15945,7 +15571,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -15976,8 +15603,8 @@ test_that(
     ## Ct with int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -15994,13 +15621,8 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 2L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -16012,7 +15634,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -16043,8 +15666,8 @@ test_that(
     ## Quantified no int ctrl, no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -16061,13 +15684,8 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 0L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -16079,7 +15697,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -16110,8 +15729,8 @@ test_that(
     ## Quantified no int ctrl, with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -16128,13 +15747,8 @@ test_that(
                                         show_dev_int_ctrl = TRUE,
                                         version = 0L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -16146,7 +15760,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -16177,8 +15792,8 @@ test_that(
     ## Quantified with int ctrl, no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -16195,13 +15810,8 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 0L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -16213,7 +15823,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -16244,8 +15855,8 @@ test_that(
     ## Quantified with int ctrl, with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -16262,13 +15873,8 @@ test_that(
                                         show_dev_int_ctrl = TRUE,
                                         version = 0L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -16280,7 +15886,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -16323,8 +15930,8 @@ test_that(
     ## NPX no int ctrl, no dev int ctrl, v1 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -16341,13 +15948,8 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 1L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -16359,7 +15961,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -16390,8 +15993,8 @@ test_that(
     ## NPX no int ctrl, no dev int ctrl, v2 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -16408,13 +16011,8 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 2L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -16426,7 +16024,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -16457,8 +16056,8 @@ test_that(
     ## NPX no int ctrl, with dev int ctrl, v1 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -16475,13 +16074,8 @@ test_that(
                                         show_dev_int_ctrl = TRUE,
                                         version = 1L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -16493,7 +16087,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -16524,8 +16119,8 @@ test_that(
     ## NPX no int ctrl, with dev int ctrl, v2 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -16542,13 +16137,8 @@ test_that(
                                         show_dev_int_ctrl = TRUE,
                                         version = 2L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -16560,7 +16150,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -16591,8 +16182,8 @@ test_that(
     ## NPX with int ctrl, no dev int ctrl, v1 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -16609,13 +16200,8 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 1L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -16627,7 +16213,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -16658,8 +16245,8 @@ test_that(
     ## NPX with int ctrl, no dev int ctrl, v2 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -16676,13 +16263,8 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 2L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -16694,7 +16276,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -16725,8 +16308,8 @@ test_that(
     ## NPX with int ctrl, with dev int ctrl, v1 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -16743,13 +16326,8 @@ test_that(
                                         show_dev_int_ctrl = TRUE,
                                         version = 1L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -16761,7 +16339,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -16792,8 +16371,8 @@ test_that(
     ## NPX with int ctrl, with dev int ctrl, v2 ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -16810,13 +16389,8 @@ test_that(
                                         show_dev_int_ctrl = TRUE,
                                         version = 2L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -16828,7 +16402,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -16859,8 +16434,8 @@ test_that(
     ## Ct no int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -16877,13 +16452,8 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 1L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -16895,7 +16465,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -16926,8 +16497,8 @@ test_that(
     ## Ct with int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -16944,13 +16515,8 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 2L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -16962,7 +16528,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -16993,8 +16560,8 @@ test_that(
     ## Quantified no int ctrl, no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -17011,13 +16578,8 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 0L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -17029,7 +16591,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -17060,8 +16623,8 @@ test_that(
     ## Quantified no int ctrl, with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -17078,13 +16641,8 @@ test_that(
                                         show_dev_int_ctrl = TRUE,
                                         version = 0L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -17096,7 +16654,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -17127,8 +16686,8 @@ test_that(
     ## Quantified with int ctrl, no dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -17145,13 +16704,8 @@ test_that(
                                         show_dev_int_ctrl = FALSE,
                                         version = 0L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -17163,7 +16717,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )
@@ -17194,8 +16749,8 @@ test_that(
     ## Quantified with int ctrl, with dev int ctrl ----
 
     withr::with_tempfile(
-      new = "wide_excel",
-      pattern = "test-excel-wide",
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
 
@@ -17212,13 +16767,8 @@ test_that(
                                         show_dev_int_ctrl = TRUE,
                                         version = 0L)
 
-        # write wide df
-        writexl::write_xlsx(
-          x = df_rand$list_df_wide$df_wide,
-          path = wide_excel,
-          col_names = FALSE,
-          format_headers = FALSE
-        )
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
 
         # expected dim of output df
         n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
@@ -17230,7 +16780,8 @@ test_that(
         # check that function runs
         expect_no_condition(
           object = df_out <- read_npx_wide(
-            file = wide_excel,
+            df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
             data_type = data_type,
             olink_platform = olink_platform
           )

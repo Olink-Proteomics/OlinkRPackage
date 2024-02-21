@@ -2,16 +2,17 @@
 % Please edit documentation in R/read_npx_wide.R
 \name{read_npx_wide_bottom_version}
 \alias{read_npx_wide_bottom_version}
-\title{Helper function that output all possible row names for the bottom matrix.}
+\title{Help function that output all possible row names for the bottom matrix given
+data_type.}
 \usage{
 read_npx_wide_bottom_version(data_type, olink_platform)
 }
 \arguments{
 \item{data_type}{The quantification in which the data comes in. Expecting one
-of NPX, Quantified or Ct.}
+of "NPX", "Quantified" or "Ct".}
 
 \item{olink_platform}{The Olink platform used to generate the input file.
-Expecting "Target 96", "Target 48", "Flex" or "Focus".}
+Expecting one of "Target 96", "Target 48", "Flex" or "Focus".}
 }
 \value{
 List of data frames with two columns each. Columns contain unique and
@@ -19,7 +20,8 @@ alternative expected names for the V1 of each row of the bottom matrix in an
 Olink wide file.
 }
 \description{
-Helper function that output all possible row names for the bottom matrix.
+Help function that output all possible row names for the bottom matrix given
+data_type.
 }
 \author{
 Klev Diamanti

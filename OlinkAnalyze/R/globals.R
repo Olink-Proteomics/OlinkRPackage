@@ -99,7 +99,7 @@ accepted_olink_platforms <- dplyr::tibble(
 
 # Used in :
 #   - read_npx_wide
-olink_wide_excel_spec <- dplyr::tibble(
+olink_wide_spec <- dplyr::tibble(
   data_type = c(
     "NPX",
     "Ct",
@@ -142,7 +142,7 @@ olink_wide_excel_spec <- dplyr::tibble(
   )
 )
 
-olink_wide_excel_bottom_matrix <-
+olink_wide_bottom_matrix <-
   readRDS("inst/extdata/npx_signature_bottom_mat_v1_long.rds")
 
 olink_wide_rename_npxs <- readRDS("inst/extdata/olink_wide_rename_npxs.rds")

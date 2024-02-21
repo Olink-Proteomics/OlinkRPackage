@@ -2,7 +2,8 @@
 % Please edit documentation in R/read_npx_wide.R
 \name{red_npx_wide_top_mid_long}
 \alias{red_npx_wide_top_mid_long}
-\title{Combine top and middle matrices.}
+\title{Help function to combine top and middle matrices of an Olink wide file to
+long format.}
 \usage{
 red_npx_wide_top_mid_long(df_top_list, df_middle_list, data_type, format_spec)
 }
@@ -14,16 +15,17 @@ function `read_npx_wide_top`.}
 function `read_npx_wide_middle`.}
 
 \item{data_type}{The quantification in which the data comes in. Expecting one
-of NPX or Quantified.}
+of "NPX", "Quantified" or "Ct".}
 
-\item{format_spec}{A one-row data frame filtered from olink_wide_excel_spec
-with the Olink wide excel file specifications.}
+\item{format_spec}{A one-row data frame filtered from olink_wide_spec with
+the Olink wide file specifications.}
 }
 \value{
 A tibble combining the top and middle matrices in long format.
 }
 \description{
-Combine top and middle matrices.
+Help function to combine top and middle matrices of an Olink wide file to
+long format.
 }
 \author{
 Klev Diamanti

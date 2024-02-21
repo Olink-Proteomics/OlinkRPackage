@@ -2,7 +2,7 @@
 
 ## Header matrix ----
 
-# return the top 2x2 matrix in the first two rows of an Olink excel wide file
+# return the top 2x2 matrix in the first two rows of an Olink format wide file
 olink_wide_head <- function(data_type) {
 
   df <- dplyr::tibble(
@@ -32,7 +32,7 @@ olink_wide_npxs_v <- function(df) {
 
 ## Top matrix ----
 
-# computes the top matrix in an Olink excel wide file. This matrix contains
+# computes the top matrix in an Olink format wide file. This matrix contains
 # metadata about assays such as OlinkID, Assay name, UniProt ID, the Olink panel
 # they belong to and the measuring unit.
 # The right hand side of this matrix contains data about Plates, QC_Warnings and
@@ -50,7 +50,7 @@ olink_wide_top <- function(olink_platform,
 
   # select set of internal controls
   sample_int_ctrl <- dplyr::tibble(
-    int_ctrl = olink_wide_excel_spec |>
+    int_ctrl = olink_wide_spec |>
       dplyr::pull(
         dplyr::all_of("top_matrix_assay_int_ctrl")
       ) |>
@@ -75,7 +75,7 @@ olink_wide_top <- function(olink_platform,
     )
 
   # get format specifications
-  format_spec <- olink_wide_excel_spec |>
+  format_spec <- olink_wide_spec |>
     dplyr::filter(
       .data[["data_type"]] == .env[["data_type"]]
     )
@@ -311,7 +311,7 @@ olink_wide_middle <- function(data_type,
   # pre-compute variables ----
 
   # get format specifications
-  format_spec <- olink_wide_excel_spec |>
+  format_spec <- olink_wide_spec |>
     dplyr::filter(
       .data[["data_type"]] == .env[["data_type"]]
     )
@@ -645,7 +645,7 @@ olink_wide_bottom <- function(olink_platform,
   # pre-compute variables ----
 
   # get bottom matrix format specifications
-  format_spec_bottom <- olink_wide_excel_bottom_matrix |>
+  format_spec_bottom <- olink_wide_bottom_matrix |>
     dplyr::filter(
       .data[["data_type"]] == .env[["data_type"]]
       & .data[["olink_platform"]] == .env[["olink_platform"]]
@@ -666,7 +666,7 @@ olink_wide_bottom <- function(olink_platform,
   }
 
   # number of internal controls
-  n_int_ctrl <- olink_wide_excel_spec |>
+  n_int_ctrl <- olink_wide_spec |>
     dplyr::filter(
       .data[["data_type"]] == .env[["data_type"]]
     ) |>
@@ -949,7 +949,7 @@ olink_wide_bottom_long <- function(df,
   df <- remove_all_na_cols(df = df)
 
   # get bottom matrix format specifications
-  format_spec_bottom <- olink_wide_excel_bottom_matrix |>
+  format_spec_bottom <- olink_wide_bottom_matrix |>
     dplyr::filter(
       .data[["data_type"]] == .env[["data_type"]]
       & .data[["olink_platform"]] == .env[["olink_platform"]]
@@ -1115,7 +1115,7 @@ olink_wide_bottom_long <- function(df,
 
 ## Full matrix ----
 
-# combines the full matrix mimicing and Olink excel wide file.
+# combines the full matrix mimicing and Olink format wide file.
 olink_wide <- function(olink_platform,
                        data_type,
                        n_panels,
@@ -1126,7 +1126,7 @@ olink_wide <- function(olink_platform,
                        version = 1L) {
 
   # get format specifications
-  format_spec <- olink_wide_excel_spec |>
+  format_spec <- olink_wide_spec |>
     dplyr::filter(
       .data[["data_type"]] == .env[["data_type"]]
     )
@@ -1254,7 +1254,7 @@ olink_wide <- function(olink_platform,
 
 }
 
-# converts the full wide excel file to a long df.
+# converts the full wide format file to a long df.
 olink_wide_to_long <- function(df_top_wide,
                                df_middle_wide,
                                df_bottom_wide,

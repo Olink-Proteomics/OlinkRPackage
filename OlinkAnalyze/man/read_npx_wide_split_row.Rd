@@ -3,30 +3,33 @@
 \name{read_npx_wide_split_row}
 \alias{read_npx_wide_split_row}
 \title{Help function the uses rows with all columns NA to split the wide Olink data
-file into 2 or 3 data sets.}
+file into 3 or 4 data sets.}
 \usage{
-read_npx_wide_split_row(file, data_type, format_spec)
+read_npx_wide_split_row(df, file, data_type, format_spec)
 }
 \arguments{
-\item{file}{The input excel file.}
+\item{df}{A tibble containing the full Olink dataset in wide format.}
+
+\item{file}{The input Olink wide file.}
 
 \item{data_type}{The quantification in which the data comes in. Expecting one
-of NPX, Quantified or Ct.}
+of "NPX", "Quantified" or "Ct".}
 
-\item{format_spec}{A one-row data frame filtered from olink_wide_excel_spec
-with the Olink wide excel file specifications.}
+\item{format_spec}{A one-row data frame filtered from olink_wide_spec with
+the Olink wide file specifications.}
 }
 \value{
-A named list of 2 or 3 tibbles.
+A named list of tibbles containing the sub-matrices of the Olink wide
+format file split on: "df_head", "df_top", "df_mid", "df_bottom".
 }
 \description{
 Wide Olink files contains 1 or 2 rows with all columns NA as a break between
 subsections of the data. This function takes advantage of that feature and
-splits the excel file into 2 or 3 data sets each of which will be used
+splits the wide file into 2 or 3 data sets each of which will be used
 downstream to create a long data frame.
 
 The function captures the rows with all columns NA and computes the row
-indexes to split the dataset from the excel file into sub-data sets.
+indexes to split the dataset from the wide file into sub-data sets.
 }
 \author{
 Klev Diamanti

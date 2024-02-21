@@ -2,7 +2,8 @@
 % Please edit documentation in R/read_npx_wide.R
 \name{read_npx_wide_bottom}
 \alias{read_npx_wide_bottom}
-\title{Help function that converts df_bottom into long format.}
+\title{Help function that converts the bottom matrix of an Olink wide file to long
+format.}
 \usage{
 read_npx_wide_bottom(
   df,
@@ -15,30 +16,31 @@ read_npx_wide_bottom(
 )
 }
 \arguments{
-\item{df}{The bottom data frame from a split Olink wide excel file.}
+\item{df}{The bottom data frame from a split Olink wide file.}
 
-\item{file}{The input excel file.}
+\item{file}{The input Olink wide file.}
 
 \item{olink_platform}{The Olink platform used to generate the input file.
-Expecting "Target 96", "Target 48", "Flex" or "Focus".}
+Expecting one of "Target 96", "Target 48", "Flex" or "Focus".}
 
 \item{data_type}{The quantification in which the data comes in. Expecting one
-of NPX, Quantified or Ct.}
+of "NPX", "Quantified" or "Ct".}
 
-\item{col_names}{Names list of character vector with the names of the columns
-containing Olink data on assays and internal control assays.}
+\item{col_names}{Named list of character vectors with the names of the
+columns containing Olink data on Assays and Internal Control assays.}
 
-\item{format_spec}{A one-row data frame filtered from olink_wide_excel_spec
-with the Olink wide excel file specifications.}
+\item{format_spec}{A one-row data frame filtered from olink_wide_spec with
+the Olink wide file specifications.}
 
 \item{df_plate_panel}{Data frame with unique combinations of panels and
 plates from the combination of top and middle data frames.}
 }
 \value{
-The bottom matrix in long format.
+A tibble with the bottom matrix of an Olink wide file in long format.
 }
 \description{
-Help function that converts df_bottom into long format.
+Help function that converts the bottom matrix of an Olink wide file to long
+format.
 }
 \author{
 Klev Diamanti

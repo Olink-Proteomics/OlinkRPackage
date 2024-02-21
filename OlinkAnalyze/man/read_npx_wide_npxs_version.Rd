@@ -3,20 +3,20 @@
 \name{read_npx_wide_npxs_version}
 \alias{read_npx_wide_npxs_version}
 \title{Help function that extracts the version of the NPX Signature software from
-Olink wide excel files.}
+Olink wide format files.}
 \usage{
 read_npx_wide_npxs_version(df)
 }
 \arguments{
-\item{df}{The 2x2 header data frame from an Olink wide excel file.}
+\item{df}{The 2x2 header data frame from an Olink wide file.}
 }
 \value{
-A scalar character vector with the version of the NPXS software from
-cell B1 of the wide Olink file.
+A scalar character vector with the version of the NPX Signature
+software from cell B1 of the Olink wide format file.
 }
 \description{
 Help function that extracts the version of the NPX Signature software from
-Olink wide excel files.
+Olink wide format files.
 }
 \author{
 Klev Diamanti
