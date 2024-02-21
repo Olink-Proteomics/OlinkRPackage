@@ -1,6 +1,6 @@
 ## Release Summary
 
-This release contains bug fixes to version 3.6.1 to restore and expand data support and to ensure Suggests packages are used conditionally.
+This release contains extending the functionality of to existing functions (from version 3.6.2) to new data. This version also contains improvements to tutorials for clarity.
 
 ## R CMD check results
 
