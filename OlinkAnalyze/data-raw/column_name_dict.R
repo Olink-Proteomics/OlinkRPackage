@@ -10,7 +10,8 @@ column_name_dict <- list(
   qc_warning = c("QC_Warning", "SampleQC",
                  "qc_warning", "sample_qc"),
   lod = c("LOD", "Plate LOD", "Plate_LOD", "Max LOD", "Max_LOD",
-          "lod", "plate lod", "plate_lod", "max lod", "max_lod",  NA_character_),
+          "lod", "plate lod", "plate_lod", "max lod", "max_lod",
+                  "PlateLOD", "MaxLOD", NA_character_),
   quant = c("NPX", "Ct", "Quantified", "Quantified_value",
             "npx", "ct", "quantified", "quantified_value")
 )

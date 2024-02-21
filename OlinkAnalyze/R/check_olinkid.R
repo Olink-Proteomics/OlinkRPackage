@@ -10,7 +10,7 @@
 #'
 
 check_olinkid <- function(df) {
-  # check if it's an arrow object, stop if not
+  # check if df is an arrow object
   check_is_arrow_object(df = df, error = TRUE)
 
   # Extract column names

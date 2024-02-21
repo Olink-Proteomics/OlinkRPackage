@@ -12,20 +12,6 @@
 #' otherwise returns `character(0)`.
 
 check_all_na_assays <- function(df, column_name_df) {
-  # # detect data type, NPX or Quantified_value
-  # data_type <- detect_data_type(df)
-  # # required column: OlinkID
-  # # check column OlinkID exists
-  # # replace this chunck with check_columns function
-  # olink_id <- "OlinkID"
-  # if (!olink_id %in% names(df)) {
-  #   cli::cli_abort(
-  #     c("x" = "The data frame {.arg {rlang::caller_arg(df)}} is missing the
-  #       required column: {olink_id}!"),
-  #     call = rlang::caller_env(),
-  #     wrap = TRUE
-  #   )
-  # } # I have already check that col exists in check_npx_col_names function
 
   # Identify assays with only NAs
   all_nas <-
