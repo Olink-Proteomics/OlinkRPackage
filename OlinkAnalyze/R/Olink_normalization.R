@@ -211,7 +211,7 @@ olink_normalization <- function(df1,
 
         if(any(alt_max_lods %in% names(df_adjusted_data))){
           df_adjusted_data <- df_adjusted_data %>%
-            dplyr::mutate(across(any_of(alt_max_lods), ~ .x + Adj_factor))
+            dplyr::mutate(dplyr::across(any_of(alt_max_lods), ~ .x + Adj_factor))
         }
 
         if(any(alt_plate_lods %in% names(df_adjusted_data))){
