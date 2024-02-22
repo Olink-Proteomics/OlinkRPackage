@@ -97,6 +97,27 @@ accepted_olink_platforms <- dplyr::tibble(
 
 ## Specifications for quantification types in Olink wide excel files ----
 
+olink_parquet_spec <- list(
+  parquet_metadata = c(
+    file_version = "FileVersion",
+    project_name = "ProjectName",
+    sample_matrix = "SampleMatrix",
+    product = "Product",
+    data_file_type = "DataFileType"
+  ),
+  parquet_platforms = c(
+    "ExploreHT",
+    "Explore3072"
+  ),
+  parquet_files = c(
+    "NPX File",
+    "Extended NPX File",
+    "CLI Data Export File",
+    "Internal CLI Data Export File",
+    "R Package Export File"
+  )
+)
+
 # Used in :
 #   - read_npx_wide
 olink_wide_spec <- dplyr::tibble(
@@ -145,7 +166,8 @@ olink_wide_spec <- dplyr::tibble(
 olink_wide_bottom_matrix <-
   readRDS("inst/extdata/npx_signature_bottom_mat_v1_long.rds")
 
-olink_wide_rename_npxs <- readRDS("inst/extdata/olink_wide_rename_npxs.rds")
+olink_wide_rename_npxs <-
+  readRDS("inst/extdata/olink_wide_rename_npxs.rds")
 
 ## Acceptable checksum file names ----
 
@@ -163,8 +185,8 @@ accepted_checksum_files <- c(
 #   - read_npx
 #   - get_npx_file
 accepted_npx_file_ext <- c(
-  excel_1       = "xls",
-  excel_2       = "xlsx",
+  excel_1      = "xls",
+  excel_2      = "xlsx",
   delim_1      = "csv",
   delim_2      = "txt",
   parquet_1    = "parquet",

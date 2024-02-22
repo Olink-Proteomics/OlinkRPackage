@@ -56,18 +56,10 @@ read_npx_parquet <- function(file,
 
   # Check metadata ----
 
-  olink_parquet_metadata <- list(
-    file_version = "FileVersion",
-    project_name = "ProjectName",
-    sample_matrix = "SampleMatrix",
-    product = "Product",
-    data_file_type = "DataFileType"
-  )
-
   # Check that all required parquet metadata is in place
-  if (!all(unlist(olink_parquet_metadata) %in% names(df_olink$metadata))) {
-    missing_fields <- unlist(olink_parquet_metadata)[ # nolint object_usage_linter
-      !(unlist(olink_parquet_metadata) %in% names(df_olink$metadata))
+  if (!all(olink_parquet_spec$parquet_metadata %in% names(df_olink$metadata))) {
+    missing_fields <- olink_parquet_spec$parquet_metadata[ # nolint object_usage_linter
+      !(olink_parquet_spec$parquet_metadata %in% names(df_olink$metadata))
     ]
 
     cli::cli_abort(
@@ -83,20 +75,19 @@ read_npx_parquet <- function(file,
 
   # Check specific fields of metadata ----
 
-  # We allow only Olink Explore HT parquet files for now.
-  # If other platforms are to be reported in parquet format, we need to add
-  # them to this array.
-  olink_parquet_platforms <- c("ExploreHT")
+  # Product
+  olink_parquet_product <- olink_parquet_spec$parquet_metadata[
+    names(olink_parquet_spec$parquet_metadata) == "product"
+  ]
 
-  if (!(df_olink$metadata[[olink_parquet_metadata$product]] %in% olink_parquet_platforms)) { # nolint object_usage_linter
+  if (!(df_olink$metadata[[olink_parquet_product]] %in% olink_parquet_spec$parquet_platforms)) { # nolint object_usage_linter
 
     cli::cli_abort(
       c(
-        "x" = "Unsupported platform:
-        {.val {df_olink$metadata[[olink_parquet_metadata$product]]}}",
-        "i" =
-          "Metadata field {.val {olink_parquet_metadata$product}} expects:
-        {olink_parquet_platforms}"
+        "x" = "Unsupported product:
+        {.val {df_olink$metadata[[olink_parquet_product]]}}",
+        "i" = "Metadata field {.val {olink_parquet_product}} expects:
+        {olink_parquet_spec$parquet_platforms}"
       ),
       call = rlang::caller_env(),
       wrap = FALSE
@@ -104,23 +95,19 @@ read_npx_parquet <- function(file,
 
   }
 
-  # We allow only  NPX file for now.
-  # If other files are to be accepted, we need to add them to this array.
-  olink_parquet_files <- c("NPX File",
-                           "Extended NPX File",
-                           "CLI Data Export File",
-                           "Internal CLI Data Export File",
-                           "R Package Export File")
+  # Data file type
+  olink_parquet_files <- olink_parquet_spec$parquet_metadata[
+    names(olink_parquet_spec$parquet_metadata) == "data_file_type"
+  ]
 
-  if (!(df_olink$metadata[[olink_parquet_metadata$data_file_type]] %in% olink_parquet_files)) { # nolint object_usage_linter
+  if (!(df_olink$metadata[[olink_parquet_files]] %in% olink_parquet_spec$parquet_files)) {
 
     cli::cli_abort(
       c(
         "x" = "Unsupported file:
-        {.val {df_olink$metadata[[olink_parquet_metadata$data_file_type]]}}",
-        "i" =
-          "Metadata field {.val {olink_parquet_metadata$data_file_type}}
-          expects: {olink_parquet_files}"
+        {.val {df_olink$metadata[[olink_parquet_files]]}}",
+        "i" = "Metadata field {.val {olink_parquet_files}} expects:
+        {olink_parquet_spec$parquet_files}"
       ),
       call = rlang::caller_env(),
       wrap = FALSE
@@ -128,7 +115,7 @@ read_npx_parquet <- function(file,
 
   }
 
-  # Return the ArrowObject ----
+  # Return ----
 
   # if needed convert the object to the requested output
   df_olink <- convert_read_npx_output(df = df_olink,
