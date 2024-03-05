@@ -16,6 +16,7 @@
 #' @seealso
 #'   [read_npx()]
 #'   [read_npx_delim()]
+#'   [read_npx_delim_wide()]
 #'   [read_npx_zip()]
 #'   [read_npx_excel()]
 #'
@@ -100,7 +101,7 @@ read_npx_parquet <- function(file,
     names(olink_parquet_spec$parquet_metadata) == "data_file_type"
   ]
 
-  if (!(df_olink$metadata[[olink_parquet_files]] %in% olink_parquet_spec$parquet_files)) {
+  if (!(df_olink$metadata[[olink_parquet_files]] %in% olink_parquet_spec$parquet_files)) { # nolint object_usage_linter
 
     cli::cli_abort(
       c(

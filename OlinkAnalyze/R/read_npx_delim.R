@@ -1,4 +1,5 @@
-#' Help function to read in Olink data from comma or semicolon delimited files.
+#' Help function to read in Olink data in long format from comma or semicolon
+#' delimited files.
 #'
 #' @author
 #'   Klev Diamanti;
@@ -11,7 +12,7 @@
 #' @param sep The separator of the file: NULL (autodetect), comma (,) or
 #' semicolon (;).
 #'
-#' @return An R6 class ArrowObject.
+#' @return An R6 class ArrowObject or tibble.
 #'
 #' @keywords NPX csv txt delim sep
 #'
@@ -20,10 +21,13 @@
 #'   [read_npx_parquet()]
 #'   [read_npx_zip()]
 #'   [read_npx_excel()]
+#'   [read_npx_delim_wide()]
 #'
 read_npx_delim <- function(file,
                            out_df = "arrow",
                            sep = NULL) {
+
+  # check input ----
 
   # check if file exists
   check_file_exists(file = file,
@@ -31,6 +35,182 @@ read_npx_delim <- function(file,
 
   # check that the requested output df is ok
   check_out_df_arg(out_df = out_df)
+
+  # read file ----
+
+  # using two tryCatch to check if file is long or wide
+
+  # check if long long works
+  df_olink <- tryCatch({
+    # Try executing long
+    read_npx_delim_long(file = file, sep = sep)
+  }, warning = function(w) {
+    # Handle warnings
+    return("warning")
+  }, error = function(e) {
+    # Handle errors
+    return("error")
+  })
+
+  # if long failed, try wide
+  if (is.character(df_olink) && df_olink %in% c("warning", "error")) {
+    df_olink <- tryCatch({
+      # Try executing wide
+      read_npx_delim_wide(file = file, sep = sep)
+    }, warning = function(w) {
+      # Handle warnings
+      return("warning")
+    }, error = function(e) {
+      # Handle errors
+      return("error")
+    })
+  }
+
+  # check if any error or warning occurred ----
+
+  if (is.character(df_olink) && df_olink %in% c("warning", "error")) {
+
+    # If both functions throw errors, return an error message
+    cli::cli_abort(
+      c(
+        "x" = "Unable to open delimited file: {.file {file}}",
+        "i" = "Check if the input {.arg file} is a delimited file."
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
+  }
+
+  # additional checks ----
+
+  if (length(names(df_olink)) == 1L) {
+
+    cli::cli_warn(
+      message = c(
+        "The delimited file {.file {file}} has only one column.",
+        "i" = "Wrong input {.arg sep} = {.val {sep}}?"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
+  }
+
+  # convert df class ----
+
+  # if needed convert the object to the requested output
+  df_olink <- convert_read_npx_output(df = df_olink,
+                                      out_df = out_df)
+
+  # return ----
+
+  return(df_olink)
+}
+
+#' @rdname read_npx_delim
+read_npx_csv <- read_npx_delim
+
+#' Help function to read in Olink data in long format from comma or semicolon
+#' delimited files.
+#'
+#' @author
+#'   Klev Diamanti;
+#'   Christoffer Cambronero;
+#'   Kathleen Nevola
+#'
+#' @param file Path to Olink software output in txt or csv.
+#' @param sep The separator of the file: NULL (autodetect), comma (,) or
+#' semicolon (;).
+#'
+#' @return An R6 class ArrowObject or tibble.
+#'
+read_npx_delim_long <- function(file,
+                                sep = NULL) {
+
+  # check input ----
+
+  # check if file exists
+  check_file_exists(file = file,
+                    error = TRUE)
+  # check separator
+  sep <- check_field_separator(file = file,
+                               sep = sep)
+
+  # read long file ----
+
+  df_olink <- arrow::open_delim_dataset(
+    sources = file,
+    delim = sep,
+    col_names = TRUE,
+    quoted_na = TRUE,
+    na = c("", "NA")
+  )
+
+  # return ----
+
+  return(df_olink)
+
+}
+
+#' Help function to read in Olink data in wide format from comma or semicolon
+#' delimited files.
+#'
+#' @author
+#'   Klev Diamanti;
+#'   Christoffer Cambronero;
+#'   Kathleen Nevola
+#'
+#' @param file Path to Olink software output in txt or csv.
+#' @param sep The separator of the file: NULL (autodetect), comma (,) or
+#' semicolon (;).
+#'
+#' @return An R6 class ArrowObject or tibble.
+#'
+read_npx_delim_wide <- function(file,
+                                sep = NULL) {
+
+  # check input ----
+
+  # check if file exists
+  check_file_exists(file = file,
+                    error = TRUE)
+
+  # check separator
+  sep <- check_field_separator(file = file,
+                               sep = sep)
+
+  # read wide file ----
+
+  df_olink <- utils::read.delim(
+    file = file,
+    header = FALSE,
+    sep = sep,
+    blank.lines.skip = FALSE,
+    na.strings = c("", "NA")
+  )
+  colnames(df_olink) <- paste0("V", seq_len(ncol(df_olink)))
+
+  dplyr::as_tibble(df_olink)
+
+  # return ----
+
+  return(df_olink)
+
+}
+
+#' Help function to check and get the file's field separator.
+#'
+#' @author Klev Diamanti
+#'
+#' @param file Path to Olink software output in txt or csv.
+#' @param sep The separator of the file: NULL (autodetect), comma (,) or
+#' semicolon (;).
+#'
+#' @return The file separator comma (;) or semicolon (;)
+#'
+check_field_separator <- function(file,
+                                  sep = NULL) {
 
   # check separator
   if (is.null(sep)) {
@@ -60,56 +240,10 @@ read_npx_delim <- function(file,
 
   }
 
-  # tryCatch in case reading the delimited file fails
-  tryCatch(
-    {
-
-      df_olink <- arrow::open_delim_dataset(
-        sources = file,
-        delim = sep,
-        col_names = TRUE,
-        quoted_na = TRUE,
-        na = c("", "NA")
-      )
-
-    }, error = function(msg) {
-
-      cli::cli_abort(
-        c(
-          "x" = "Unable to open delimited file: {.file {file}}",
-          "i" = "Check if the input {.arg file} is a delimiter-separated file."
-        ),
-        call = rlang::caller_env(),
-        wrap = FALSE
-      )
-
-    }
-  )
-
-  if (length(names(df_olink)) == 1L) {
-
-    cli::cli_warn(
-      message = c(
-        "The delimited file {.file {file}} has only one column.",
-        "i" = "Wrong input {.arg sep} = {.val {sep}}?"
-      ),
-      call = rlang::caller_env(),
-      wrap = FALSE
-    )
-
-  }
-
-  # if needed convert the object to the requested output
-  df_olink <- convert_read_npx_output(df = df_olink,
-                                      out_df = out_df)
-
-  return(df_olink)
+  return(sep)
 }
 
-#' @rdname read_npx_delim
-read_npx_csv <- read_npx_delim
-
-#' Help function to get the file separator.
+#' Help function to get the file's field separator.
 #'
 #' @author Klev Diamanti
 #'
@@ -125,6 +259,7 @@ read_npx_csv <- read_npx_delim
 #'
 #' @seealso
 #'   [read_npx_delim()]
+#'   [read_npx_delim_wide()]
 #'   [read_npx_csv()]
 #'
 get_field_separator <- function(file) {

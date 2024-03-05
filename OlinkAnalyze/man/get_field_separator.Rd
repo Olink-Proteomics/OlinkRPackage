@@ -2,7 +2,7 @@
 % Please edit documentation in R/read_npx_delim.R
 \name{get_field_separator}
 \alias{get_field_separator}
-\title{Help function to get the file separator.}
+\title{Help function to get the file's field separator.}
 \usage{
 get_field_separator(file)
 }
@@ -20,6 +20,7 @@ semicolons on the same line.
 }
 \seealso{
 [read_npx_delim()]
+  [read_npx_delim_wide()]
   [read_npx_csv()]
 }
 \author{

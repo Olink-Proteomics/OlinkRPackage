@@ -1,302 +1,9 @@
 # Test read_npx_delim ----
 
-# Test that relevant error is thrown when sep is not a string
 test_that(
-  "read NPX delim error - sep not a string",
+  "read_npx_delim - works - long format - output df matches input df",
   {
-
-    withr::with_tempfile(
-      new = "cfile_test",
-      pattern = "csv_temp_file",
-      fileext = ".csv",
-      code = {
-
-        writeLines("foo", cfile_test)
-        expect_true(object = file.exists(cfile_test))
-
-        expect_error(
-          object = read_npx_delim(file = cfile_test,
-                                  sep = c(",", ";")),
-          regexp = "`sep` should be a string!"
-        )
-
-        expect_error(
-          object = read_npx_delim(file = cfile_test,
-                                  sep = character()),
-          regexp = "`sep` should be a string!"
-        )
-
-        expect_error(
-          object = read_npx_delim(file = cfile_test,
-                                  sep = 1),
-          regexp = "`sep` should be a string!"
-        )
-
-
-        expect_error(
-          object = read_npx_delim(file = cfile_test,
-                                  sep = TRUE),
-          regexp = "`sep` should be a string!"
-        )
-
-      }
-    )
-
-  }
-)
-
-# Test that relevant error is thrown when sep is not a string
-test_that(
-  "read NPX delim error - sep not accepted",
-  {
-
-    withr::with_tempfile(
-      new = "cfile_test",
-      pattern = "csv_temp_file",
-      fileext = ".csv",
-      code = {
-
-        # write a random delimited file
-        dplyr::tibble("A" = c(1, 2.2, 3.14),
-                      "B" = c("a", "b", "c"),
-                      "C" = c(TRUE, TRUE, FALSE),
-                      "D" = c("NA", "B", NA_character_),
-                      "E" = c(1L, 2L, 3L)) |>
-          utils::write.table(file = cfile_test,
-                             append = FALSE,
-                             quote = FALSE,
-                             sep = ";",
-                             eol = "\n",
-                             na = "",
-                             dec = ".",
-                             row.names = FALSE,
-                             col.names = TRUE)
-
-        expect_error(
-          object = read_npx_delim(file = cfile_test,
-                                  sep = "I_Am_Unaccepted"),
-          regexp = "Unexpected separator:"
-        )
-
-        expect_error(
-          object = read_npx_delim(file = cfile_test,
-                                  sep = "A"),
-          regexp = "Unexpected separator:"
-        )
-
-        expect_error(
-          object = read_npx_delim(file = cfile_test,
-                                  sep = "#"),
-          regexp = "Unexpected separator:"
-        )
-
-
-        expect_error(
-          object = read_npx_delim(file = cfile_test,
-                                  sep = "|"),
-          regexp = "Unexpected separator:"
-        )
-
-      }
-    )
-
-  }
-)
-
-# Test read delim works when sep is NULL
-test_that(
-  "read NPX delim works - sep is NULL",
-  {
-
-    withr::with_tempfile(
-      new = c("cdfile_test", "scdfile_test"),
-      pattern = "delim-file-test",
-      fileext = ".txt",
-      code = {
-
-        # random data frame
-        df <- dplyr::tibble(
-          "A" = c(1, 2.2, 3.14),
-          "B" = c("a", "b", "c"),
-          "C" = c(TRUE, TRUE, FALSE),
-          "D" = c("NA", "B", NA_character_),
-          "E" = c(1L, 2L, 3L)
-        )
-
-        # write the coma-delimited file
-        utils::write.table(
-          x = df,
-          file = cdfile_test,
-          append = FALSE,
-          quote = FALSE,
-          sep = ",",
-          eol = "\n",
-          na = "",
-          dec = ".",
-          row.names = FALSE,
-          col.names = TRUE
-        )
-
-        # check that the comma delimited file exists
-        expect_true(object = file.exists(cdfile_test))
-
-        # chech that reading the file works
-        expect_no_condition(
-          object = coma_df <- read_npx_delim(file = cdfile_test,
-                                             out_df = "arrow",
-                                             sep = NULL)
-        )
-
-        # check that variable exists
-        expect_true(object = exists("coma_df"))
-
-        expect_true(inherits(x = coma_df, what = "ArrowObject"))
-
-        expect_true(
-          object = read_npx_delim(file = cdfile_test,
-                                  out_df = "tibble",
-                                  sep = NULL) |>
-            inherits(what = "tbl_df")
-        )
-
-        # write the semicolon-delimited file
-        utils::write.table(
-          x = df,
-          file = scdfile_test,
-          append = FALSE,
-          quote = FALSE,
-          sep = ";",
-          eol = "\n",
-          na = "",
-          dec = ".",
-          row.names = FALSE,
-          col.names = TRUE
-        )
-
-        # check that the semicolon delimited file exists
-        expect_true(object = file.exists(scdfile_test))
-
-        # chech that reading the file works
-        expect_no_condition(
-          object = semicolon_df <- read_npx_delim(file = scdfile_test,
-                                                  out_df = "arrow",
-                                                  sep = NULL)
-        )
-
-        # check that variable exists
-        expect_true(object = exists("semicolon_df"))
-
-        expect_true(inherits(x = semicolon_df, what = "ArrowObject"))
-
-        expect_true(
-          object = read_npx_delim(file = scdfile_test,
-                                  out_df = "tibble",
-                                  sep = NULL) |>
-            inherits(what = "tbl_df")
-        )
-
-        # check that the two dataframes are identical
-        expect_equal(
-          object = dplyr::as_tibble(coma_df),
-          expected = dplyr::as_tibble(semicolon_df)
-        )
-
-      }
-    )
-
-  }
-)
-
-# Test read delim works when sep is the correct string
-test_that(
-  "read NPX delim works - sep is correct",
-  {
-
-    withr::with_tempfile(
-      new = c("cdfile_test", "scdfile_test"),
-      pattern = "delim-file-test",
-      fileext = ".txt",
-      code = {
-
-        # random data frame
-        df <- dplyr::tibble(
-          "A" = c(1, 2.2, 3.14),
-          "B" = c("a", "b", "c"),
-          "C" = c(TRUE, TRUE, FALSE),
-          "D" = c("NA", "B", NA_character_),
-          "E" = c(1L, 2L, 3L)
-        )
-
-        # write the coma-delimited file
-        utils::write.table(
-          x = df,
-          file = cdfile_test,
-          append = FALSE,
-          quote = FALSE,
-          sep = ",",
-          eol = "\n",
-          na = "",
-          dec = ".",
-          row.names = FALSE,
-          col.names = TRUE
-        )
-
-        # check that the comma delimited file exists
-        expect_true(object = file.exists(cdfile_test))
-
-        # check that reading the file works
-        expect_no_condition(
-          object = coma_df <- read_npx_delim(file = cdfile_test,
-                                             out_df = "arrow",
-                                             sep = ",")
-        )
-
-        # check that variable exists
-        expect_true(object = exists("coma_df"))
-
-        # write the semicolon-delimited file
-        utils::write.table(
-          x = df,
-          file = scdfile_test,
-          append = FALSE,
-          quote = FALSE,
-          sep = ";",
-          eol = "\n",
-          na = "",
-          dec = ".",
-          row.names = FALSE,
-          col.names = TRUE
-        )
-
-        # check that the semicolon delimited file exists
-        expect_true(object = file.exists(scdfile_test))
-
-        # chech that reading the file works
-        expect_no_condition(
-          object = semicolon_df <- read_npx_delim(file = scdfile_test,
-                                                  out_df = "arrow",
-                                                  sep = ";")
-        )
-
-        # check that variable exists
-        expect_true(object = exists("semicolon_df"))
-
-        # check that the two dataframes are identical
-        expect_equal(
-          object = dplyr::as_tibble(coma_df),
-          expected = dplyr::as_tibble(semicolon_df)
-        )
-
-      }
-    )
-
-  }
-)
-
-# Test read delim returns that same df as its input df
-test_that(
-  "read NPX delim works - output df matches input df",
-  {
+    ## tibble ----
 
     withr::with_tempfile(
       new = "scdfile_test",
@@ -361,88 +68,66 @@ test_that(
       }
     )
 
-  }
-)
-
-# Test read delim throws an error when file is not delimited
-test_that(
-  "read NPX delim error - file not delimited",
-  {
+    ## arrow ----
 
     withr::with_tempfile(
-      new = "pfile_test",
-      pattern = "parquet-file_test",
-      fileext = ".parquet",
+      new = "scdfile_test",
+      pattern = "delim-file-test",
+      fileext = ".csv",
       code = {
 
-        # write the parquet file from a random data frame
-        dplyr::tibble(
-          "A" = c(1, 2.2, 3.14),
-          "B" = c("a", "b", "c"),
-          "C" = c(TRUE, TRUE, FALSE),
+        # random data frame
+        df <- dplyr::tibble(
+          "A" = c(1, 2.2, NA_real_),
+          "B" = c("a", NA_character_, "c"),
+          "C" = c(NA, TRUE, FALSE),
           "D" = c("NA", "B", NA_character_),
-          "E" = c(1L, 2L, 3L)
-        ) |>
-          arrow::write_parquet(
-            sink = pfile_test,
-            compression = "gzip"
-          )
-
-        # check that the semicolon delimited file exists
-        expect_true(object = file.exists(pfile_test))
-
-        # check that relevant error is thrown
-        expect_error(
-          object = read_npx_delim(file = pfile_test,
-                                  sep = ","),
-          regexp = "Unable to open delimited file:"
+          "E" = c(1L, 2L, NA_integer_)
         )
 
-      }
-    )
-
-  }
-)
-
-# Test read delim throws warning when wrong separator
-test_that(
-  "read NPX delim error - wrong sep",
-  {
-
-    withr::with_tempfile(
-      new = "cdfile_test",
-      pattern = "delim-file-test",
-      fileext = ".txt",
-      code = {
-
-        # write the coma-delimited file from a random data frame
-        dplyr::tibble(
-          "A" = c(1, 2.2, 3.14),
-          "B" = c("a", "b", "c"),
-          "C" = c(TRUE, TRUE, FALSE),
-          "D" = c("NA", "B", NA_character_),
-          "E" = c(1L, 2L, 3L)
-        ) |>
-          utils::write.table(
-            file = cdfile_test,
-            append = FALSE,
-            quote = FALSE,
-            sep = ",",
-            eol = "\n",
-            na = "",
-            dec = ".",
-            row.names = FALSE,
-            col.names = TRUE
-          )
+        # write the coma-delimited file
+        utils::write.table(
+          x = df,
+          file = scdfile_test,
+          append = FALSE,
+          quote = FALSE,
+          sep = ";",
+          eol = "\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = TRUE
+        )
 
         # check that the comma delimited file exists
-        expect_true(object = file.exists(cdfile_test))
+        expect_true(object = file.exists(scdfile_test))
 
         # chech that reading the file works
-        expect_warning(
-          object = read_npx_delim(file = cdfile_test,
-                                  sep = ";"),
-          regexp = "Wrong input `sep` = \";\"?"
+        expect_no_condition(
+          object = df_out <- read_npx_delim(file = scdfile_test,
+                                            out_df = "arrow",
+                                            sep = NULL)
+        )
+
+        # check that variable exists
+        expect_true(object = exists("df_out"))
+
+        expect_true(inherits(x = df_out, what = "ArrowObject"))
+
+        # convert "NA" in df to NA so that the test below works
+        # this is to simulate how to arrow reader is epected to work
+        df <- df |>
+          dplyr::mutate(
+            dplyr::across(
+              .cols = dplyr::everything(),
+              .fns = ~ dplyr::if_else(.x == "NA", NA, .x)
+            )
+          )
+
+        # check that the two dataframes are identical
+        expect_equal(
+          object = dplyr::as_tibble(df_out),
+          expected = df
         )
 
       }
@@ -451,9 +136,117 @@ test_that(
   }
 )
 
-# Test that hashtags (#) can be read without a problem
 test_that(
-  "read NPX delim works - hashtags \"#\"",
+  "read_npx_delim - works - wide fornat - output df matches input df",
+  {
+    # random data frame
+    df_synthetic <- olink_wide_synthetic(olink_platform = "Target 96",
+                                         data_type = "NPX",
+                                         n_panels = 2L,
+                                         n_assays = 92L,
+                                         n_samples = 100L,
+                                         show_dev_int_ctrl = TRUE,
+                                         show_int_ctrl = TRUE,
+                                         version = 1L)
+    df <- df_synthetic$list_df_wide$df_wide
+
+    ## tibble ----
+
+    withr::with_tempfile(
+      new = "scdfile_test",
+      pattern = "delim-file-test",
+      fileext = ".csv",
+      code = {
+
+        # write the coma-delimited file
+        utils::write.table(
+          x = df,
+          file = scdfile_test,
+          append = FALSE,
+          quote = FALSE,
+          sep = ";",
+          eol = "\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = FALSE
+        )
+
+        # check that the comma delimited file exists
+        expect_true(object = file.exists(scdfile_test))
+
+        # chech that reading the file works
+        expect_no_condition(
+          object = df_out <- read_npx_delim(file = scdfile_test,
+                                            out_df = "tibble",
+                                            sep = NULL)
+        )
+
+        # check that variable exists
+        expect_true(object = exists("df_out"))
+
+        expect_true(inherits(x = df_out, what = "tbl_df"))
+
+        # check that the two dataframes are identical
+        expect_equal(
+          object = df_out,
+          expected = df
+        )
+
+      }
+    )
+
+    ## arrow ----
+
+    withr::with_tempfile(
+      new = "scdfile_test",
+      pattern = "delim-file-test",
+      fileext = ".csv",
+      code = {
+
+        # write the coma-delimited file
+        utils::write.table(
+          x = df,
+          file = scdfile_test,
+          append = FALSE,
+          quote = FALSE,
+          sep = ";",
+          eol = "\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = FALSE
+        )
+
+        # check that the comma delimited file exists
+        expect_true(object = file.exists(scdfile_test))
+
+        # chech that reading the file works
+        expect_no_condition(
+          object = df_out <- read_npx_delim(file = scdfile_test,
+                                            out_df = "arrow",
+                                            sep = NULL)
+        )
+
+        # check that variable exists
+        expect_true(object = exists("df_out"))
+
+        expect_true(inherits(x = df_out, what = "ArrowObject"))
+
+        # check that the two dataframes are identical
+        expect_equal(
+          object = dplyr::as_tibble(df_out),
+          expected = df
+        )
+
+      }
+    )
+
+  }
+)
+
+test_that(
+  "read_npx_delim - works - long format - file contains hashtags \"#\"",
   {
 
     withr::with_tempfile(
@@ -508,14 +301,571 @@ test_that(
     )
 
   }
+)
 
+test_that(
+  "read_npx_delim - error - long format - file not delimited",
+  {
+    withr::with_tempfile(
+      new = "pfile_test",
+      pattern = "parquet-file_test",
+      fileext = ".parquet",
+      code = {
+
+        # write the parquet file from a random data frame
+        dplyr::tibble(
+          "A" = c(1, 2.2, 3.14),
+          "B" = c("a", "b", "c"),
+          "C" = c(TRUE, TRUE, FALSE),
+          "D" = c("NA", "B", NA_character_),
+          "E" = c(1L, 2L, 3L)
+        ) |>
+          arrow::write_parquet(
+            sink = pfile_test,
+            compression = "gzip"
+          )
+
+        # check that the semicolon delimited file exists
+        expect_true(object = file.exists(pfile_test))
+
+        # check that relevant error is thrown
+        expect_error(
+          object = read_npx_delim(file = pfile_test,
+                                  sep = ","),
+          regexp = "Unable to open delimited file:"
+        )
+
+      }
+    )
+  }
+)
+
+test_that(
+  "read_npx_delim - error - wide formnat - file not delimited",
+  {
+    withr::with_tempfile(
+      new = "pfile_test",
+      pattern = "parquet-file_test",
+      fileext = ".parquet",
+      code = {
+
+        # random data frame
+        df_synthetic <- olink_wide_synthetic(olink_platform = "Target 96",
+                                             data_type = "NPX",
+                                             n_panels = 2L,
+                                             n_assays = 92L,
+                                             n_samples = 100L,
+                                             show_dev_int_ctrl = TRUE,
+                                             show_int_ctrl = TRUE,
+                                             version = 1L)
+        df <- df_synthetic$list_df_wide$df_wide
+
+        arrow::write_parquet(
+          x = df,
+          sink = pfile_test,
+          compression = "gzip"
+        )
+
+        # check that the semicolon delimited file exists
+        expect_true(object = file.exists(pfile_test))
+
+        # check that relevant error is thrown
+        expect_error(
+          object = read_npx_delim(file = pfile_test,
+                                  sep = ",") |>
+            suppressWarnings(),
+          regexp = "Unable to open delimited file:"
+        )
+
+      }
+    )
+  }
+)
+
+
+
+test_that(
+  "read_npx_delim - error - df has one column only",
+  {
+    withr::with_tempfile(
+      new = "cdfile_test",
+      pattern = "delim-file-test",
+      fileext = ".txt",
+      code = {
+
+        # write the coma-delimited file from a random data frame
+        dplyr::tibble(
+          "A" = c(1, 2.2, 3.14),
+          "B" = c("a", "b", "c"),
+          "C" = c(TRUE, TRUE, FALSE),
+          "D" = c("NA", "B", NA_character_),
+          "E" = c(1L, 2L, 3L)
+        ) |>
+          utils::write.table(
+            file = cdfile_test,
+            append = FALSE,
+            quote = FALSE,
+            sep = ",",
+            eol = "\n",
+            na = "",
+            dec = ".",
+            row.names = FALSE,
+            col.names = TRUE
+          )
+
+        # check that the comma delimited file exists
+        expect_true(object = file.exists(cdfile_test))
+
+        # chech that reading the file works
+        expect_warning(
+          object = read_npx_delim(file = cdfile_test,
+                                  sep = ";"),
+          regexp = "Wrong input `sep` = \";\"?"
+        )
+
+      }
+    )
+  }
+)
+
+# Test check_field_separator ----
+
+test_that(
+  "check_field_separator - error - sep not a scalar string",
+  {
+
+    withr::with_tempfile(
+      new = "cfile_test",
+      pattern = "csv_temp_file",
+      fileext = ".csv",
+      code = {
+
+        writeLines("foo", cfile_test)
+        expect_true(object = file.exists(cfile_test))
+
+        expect_error(
+          object = check_field_separator(file = cfile_test,
+                                         sep = c(",", ";")),
+          regexp = "`sep` should be a string!"
+        )
+
+        expect_error(
+          object = check_field_separator(file = cfile_test,
+                                         sep = character()),
+          regexp = "`sep` should be a string!"
+        )
+
+        expect_error(
+          object = check_field_separator(file = cfile_test,
+                                         sep = 1),
+          regexp = "`sep` should be a string!"
+        )
+
+
+        expect_error(
+          object = check_field_separator(file = cfile_test,
+                                         sep = TRUE),
+          regexp = "`sep` should be a string!"
+        )
+
+      }
+    )
+
+  }
+)
+
+test_that(
+  "check_field_separator - error - sep is scalar string but not accepted",
+  {
+
+    withr::with_tempfile(
+      new = "cfile_test",
+      pattern = "csv_temp_file",
+      fileext = ".csv",
+      code = {
+
+        writeLines("foo", cfile_test)
+        expect_true(object = file.exists(cfile_test))
+
+        expect_error(
+          object = check_field_separator(file = cfile_test,
+                                         sep = "I_Am_Unaccepted"),
+          regexp = "Unexpected separator:"
+        )
+
+        expect_error(
+          object = check_field_separator(file = cfile_test,
+                                         sep = "A"),
+          regexp = "Unexpected separator:"
+        )
+
+        expect_error(
+          object = check_field_separator(file = cfile_test,
+                                         sep = "#"),
+          regexp = "Unexpected separator:"
+        )
+
+
+        expect_error(
+          object = check_field_separator(file = cfile_test,
+                                         sep = "|"),
+          regexp = "Unexpected separator:"
+        )
+
+      }
+    )
+
+  }
+)
+
+test_that(
+  "check_field_separator - works - long format - sep is NULL",
+  {
+
+    withr::with_tempfile(
+      new = c("cdfile_test", "scdfile_test"),
+      pattern = "delim-file-test",
+      fileext = ".txt",
+      code = {
+
+        ## comma delimited ----
+
+        # random data frame
+        df <- dplyr::tibble(
+          "A" = c(1, 2.2, 3.14),
+          "B" = c("a", "b", "c"),
+          "C" = c(TRUE, TRUE, FALSE),
+          "D" = c("NA", "B", NA_character_),
+          "E" = c(1L, 2L, 3L)
+        )
+
+        # write the coma-delimited file
+        utils::write.table(
+          x = df,
+          file = cdfile_test,
+          append = FALSE,
+          quote = FALSE,
+          sep = ",",
+          eol = "\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = TRUE
+        )
+
+        # check that the comma delimited file exists
+        expect_true(object = file.exists(cdfile_test))
+
+        # chech that reading the file works
+        expect_no_condition(
+          object = comma_sep <- check_field_separator(file = cdfile_test,
+                                                      sep = NULL)
+        )
+
+        # check that variable exists
+        expect_true(object = exists("comma_sep"))
+
+        expect_identical(object = comma_sep,
+                         expected = ",")
+
+        ## semicolon delimited ----
+
+        # write the semicolon-delimited file
+        utils::write.table(
+          x = df,
+          file = scdfile_test,
+          append = FALSE,
+          quote = FALSE,
+          sep = ";",
+          eol = "\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = TRUE
+        )
+
+        # check that the semicolon delimited file exists
+        expect_true(object = file.exists(scdfile_test))
+
+        # chech that reading the file works
+        expect_no_condition(
+          object = semicolon_sep <- check_field_separator(file = scdfile_test,
+                                                          sep = NULL)
+        )
+
+        # check that variable exists
+        expect_true(object = exists("semicolon_sep"))
+
+        expect_identical(object = semicolon_sep,
+                         expected = ";")
+
+      }
+    )
+
+  }
+)
+
+test_that(
+  "check_field_separator - works - wide format - sep is NULL",
+  {
+
+    withr::with_tempfile(
+      new = c("cdfile_test", "scdfile_test"),
+      pattern = "delim-file-test",
+      fileext = ".txt",
+      code = {
+
+        ## comma delimited ----
+
+        # random data frame
+        df <- dplyr::tibble(
+          "V1" = c("Test", "NPX", NA_character_, "Panel"),
+          "V2" = c("SW Version", NA_character_, NA_character_, "Olink Panel"),
+          "V3" = c(NA_character_, NA_character_, NA_character_, "Olink Panel")
+        )
+
+        # write the coma-delimited file
+        utils::write.table(
+          x = df,
+          file = cdfile_test,
+          append = FALSE,
+          quote = FALSE,
+          sep = ",",
+          eol = "\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = FALSE
+        )
+
+        # check that the comma delimited file exists
+        expect_true(object = file.exists(cdfile_test))
+
+        # chech that reading the file works
+        expect_no_condition(
+          object = comma_sep <- check_field_separator(file = cdfile_test,
+                                                      sep = NULL)
+        )
+
+        # check that variable exists
+        expect_true(object = exists("comma_sep"))
+
+        expect_identical(object = comma_sep,
+                         expected = ",")
+
+        ## semicolon delimited ----
+
+        # write the semicolon-delimited file
+        utils::write.table(
+          x = df,
+          file = scdfile_test,
+          append = FALSE,
+          quote = FALSE,
+          sep = ";",
+          eol = "\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = FALSE
+        )
+
+        # check that the semicolon delimited file exists
+        expect_true(object = file.exists(scdfile_test))
+
+        # chech that reading the file works
+        expect_no_condition(
+          object = semicolon_sep <- check_field_separator(file = scdfile_test,
+                                                          sep = NULL)
+        )
+
+        # check that variable exists
+        expect_true(object = exists("semicolon_sep"))
+
+        expect_identical(object = semicolon_sep,
+                         expected = ";")
+
+      }
+    )
+
+  }
+)
+
+test_that(
+  "check_field_separator - works - long format - sep is correct",
+  {
+
+    withr::with_tempfile(
+      new = c("cdfile_test", "scdfile_test"),
+      pattern = "delim-file-test",
+      fileext = ".txt",
+      code = {
+
+        ## comma delimited ----
+
+        # random data frame
+        df <- dplyr::tibble(
+          "A" = c(1, 2.2, 3.14),
+          "B" = c("a", "b", "c"),
+          "C" = c(TRUE, TRUE, FALSE),
+          "D" = c("NA", "B", NA_character_),
+          "E" = c(1L, 2L, 3L)
+        )
+
+        # write the coma-delimited file
+        utils::write.table(
+          x = df,
+          file = cdfile_test,
+          append = FALSE,
+          quote = FALSE,
+          sep = ",",
+          eol = "\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = TRUE
+        )
+
+        # check that the comma delimited file exists
+        expect_true(object = file.exists(cdfile_test))
+
+        # chech that reading the file works
+        expect_no_condition(
+          object = comma_sep <- check_field_separator(file = cdfile_test,
+                                                      sep = ",")
+        )
+
+        # check that variable exists
+        expect_true(object = exists("comma_sep"))
+
+        expect_identical(object = comma_sep,
+                         expected = ",")
+
+        ## semicolon delimited ----
+
+        # write the semicolon-delimited file
+        utils::write.table(
+          x = df,
+          file = scdfile_test,
+          append = FALSE,
+          quote = FALSE,
+          sep = ";",
+          eol = "\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = TRUE
+        )
+
+        # check that the semicolon delimited file exists
+        expect_true(object = file.exists(scdfile_test))
+
+        # chech that reading the file works
+        expect_no_condition(
+          object = semicolon_sep <- check_field_separator(file = scdfile_test,
+                                                          sep = ";")
+        )
+
+        # check that variable exists
+        expect_true(object = exists("semicolon_sep"))
+
+        expect_identical(object = semicolon_sep,
+                         expected = ";")
+
+      }
+    )
+
+  }
+)
+
+test_that(
+  "check_field_separator - works - wide format - sep is correct",
+  {
+
+    withr::with_tempfile(
+      new = c("cdfile_test", "scdfile_test"),
+      pattern = "delim-file-test",
+      fileext = ".txt",
+      code = {
+
+        ## comma delimited ----
+
+        # random data frame
+        df <- dplyr::tibble(
+          "V1" = c("Test", "NPX", NA_character_, "Panel"),
+          "V2" = c("SW Version", NA_character_, NA_character_, "Olink Panel"),
+          "V3" = c(NA_character_, NA_character_, NA_character_, "Olink Panel")
+        )
+
+        # write the coma-delimited file
+        utils::write.table(
+          x = df,
+          file = cdfile_test,
+          append = FALSE,
+          quote = FALSE,
+          sep = ",",
+          eol = "\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = FALSE
+        )
+
+        # check that the comma delimited file exists
+        expect_true(object = file.exists(cdfile_test))
+
+        # chech that reading the file works
+        expect_no_condition(
+          object = comma_sep <- check_field_separator(file = cdfile_test,
+                                                      sep = ",")
+        )
+
+        # check that variable exists
+        expect_true(object = exists("comma_sep"))
+
+        expect_identical(object = comma_sep,
+                         expected = ",")
+
+        ## semicolon delimited ----
+
+        # write the semicolon-delimited file
+        utils::write.table(
+          x = df,
+          file = scdfile_test,
+          append = FALSE,
+          quote = FALSE,
+          sep = ";",
+          eol = "\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = FALSE
+        )
+
+        # check that the semicolon delimited file exists
+        expect_true(object = file.exists(scdfile_test))
+
+        # chech that reading the file works
+        expect_no_condition(
+          object = semicolon_sep <- check_field_separator(file = scdfile_test,
+                                                          sep = ";")
+        )
+
+        # check that variable exists
+        expect_true(object = exists("semicolon_sep"))
+
+        expect_identical(object = semicolon_sep,
+                         expected = ";")
+
+      }
+    )
+
+  }
 )
 
 # Test get_field_separator ----
 
-# Test that the header line of the file is not empty or the file is empty
 test_that(
-  "check get_field_separator works - check empty haeder or file",
+  "get_field_separator - error - empty header or file",
   {
 
     withr::with_tempfile(
@@ -542,10 +892,8 @@ test_that(
   }
 )
 
-# Test that the function returns a semicolon when the file is separated by
-# semicolon.
 test_that(
-  "check get_field_separator works - semicolon",
+  "get_field_separator - works - semicolon",
   {
 
     withr::with_tempfile(
@@ -572,9 +920,8 @@ test_that(
   }
 )
 
-# Test that the function returns a comma when the file is separated by comma.
 test_that(
-  "check get_field_separator works - comma",
+  "get_field_separator - works - comma",
   {
 
     withr::with_tempfile(
@@ -601,9 +948,8 @@ test_that(
   }
 )
 
-# Test that the relevant error is thrown when unexpected separator in file.
 test_that(
-  "check get_field_separator works - hashtag",
+  "get_field_separator - error - wrong sep",
   {
 
     withr::with_tempfile(
@@ -630,9 +976,8 @@ test_that(
   }
 )
 
-# Test that the relevant error is thrown when unexpected separator in file.
 test_that(
-  "check get_field_separator works - both comma and semicolon",
+  "get_field_separator - error - both comma and semicolon",
   {
 
     withr::with_tempfile(

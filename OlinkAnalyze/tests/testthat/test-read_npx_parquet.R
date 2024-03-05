@@ -120,8 +120,6 @@ test_that(
       fileext = ".parquet",
       code = {
 
-        tmp_product_name <-
-
         # random data frame
         df <- dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -453,7 +451,7 @@ test_that(
       unname()
     df$metadata <- df_metadata_list
 
-    ## Product == "ExploreHT"
+    ## Product is "ExploreHT"
 
     withr::with_tempfile(
       new = "pfile_test",
@@ -490,7 +488,7 @@ test_that(
       }
     )
 
-    ## Product == "Explore3072"
+    ## Product is "Explore3072"
 
     withr::with_tempfile(
       new = "pfile_test",

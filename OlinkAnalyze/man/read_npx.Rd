@@ -13,7 +13,7 @@ read_npx(
   olink_platform = NULL,
   data_type = NULL,
   .ignore_files = c("README.txt"),
-  quiet = FALSE
+  quiet = TRUE
 )
 
 read_NPX(
@@ -24,7 +24,7 @@ read_NPX(
   olink_platform = NULL,
   data_type = NULL,
   .ignore_files = c("README.txt"),
-  quiet = FALSE
+  quiet = TRUE
 )
 }
 \arguments{
@@ -52,7 +52,7 @@ output files. Used only for zip-compressed Olink software output files.}
 \item{quiet}{Print a confirmation message after reading in the input file.}
 }
 \value{
-A tibble in long format or an ArrowObject.
+A tibble or an ArrowObject in long format .
 }
 \description{
 Imports an NPX or QUANT file exported from Olink software.

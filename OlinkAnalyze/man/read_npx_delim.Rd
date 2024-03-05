@@ -3,7 +3,8 @@
 \name{read_npx_delim}
 \alias{read_npx_delim}
 \alias{read_npx_csv}
-\title{Help function to read in Olink data from comma or semicolon delimited files.}
+\title{Help function to read in Olink data in long format from comma or semicolon
+delimited files.}
 \usage{
 read_npx_delim(file, out_df = "arrow", sep = NULL)
 
@@ -19,16 +20,18 @@ are "tibble" and "arrow" (default).}
 semicolon (;).}
 }
 \value{
-An R6 class ArrowObject.
+An R6 class ArrowObject or tibble.
 }
 \description{
-Help function to read in Olink data from comma or semicolon delimited files.
+Help function to read in Olink data in long format from comma or semicolon
+delimited files.
 }
 \seealso{
 [read_npx()]
   [read_npx_parquet()]
   [read_npx_zip()]
   [read_npx_excel()]
+  [read_npx_delim_wide()]
 }
 \author{
 Klev Diamanti;

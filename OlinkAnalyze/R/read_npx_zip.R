@@ -27,6 +27,7 @@
 #' @seealso
 #'   [read_npx()]
 #'   [read_npx_delim()]
+#'   [read_npx_delim_wide()]
 #'   [read_npx_parquet()]
 #'   [read_npx_excel()]
 #'

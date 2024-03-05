@@ -21,6 +21,7 @@ Help function to read Olink parquet files.
 \seealso{
 [read_npx()]
   [read_npx_delim()]
+  [read_npx_delim_wide()]
   [read_npx_zip()]
   [read_npx_excel()]
 }

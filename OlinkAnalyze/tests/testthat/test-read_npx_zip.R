@@ -149,8 +149,14 @@ test_that(
             expect_true(object = file.exists(zfile_test))
 
             # check that this works
-            expect_no_condition(
-              object = read_npx_zip(file = zfile_test)
+            # warning comes from read_npx_format because the long file is
+            # totally made up.
+            expect_warning(
+              object = read_npx_zip(file = zfile_test,
+                                    out_df = "arrow",
+                                    long_format = TRUE,
+                                    quiet = TRUE),
+              regexp = "Unable to confirm the \"long\" format from the input"
             )
 
           }
@@ -218,8 +224,14 @@ test_that(
             expect_true(object = file.exists(zfile_test))
 
             # check that this works
-            expect_no_condition(
-              object = read_npx_zip(file = zfile_test)
+            # warning comes from read_npx_format because the long file is
+            # totally made up.
+            expect_warning(
+              object = read_npx_zip(file = zfile_test,
+                                    out_df = "arrow",
+                                    long_format = TRUE,
+                                    quiet = TRUE),
+              regexp = "Unable to confirm the \"long\" format from the input"
             )
           }
         )
@@ -300,9 +312,16 @@ test_that(
                 # check that the zip file was created
                 expect_true(object = file.exists(zfile_test))
 
+
                 # check that this works
-                expect_no_condition(
-                  object = read_npx_zip(file = zfile_test)
+                # warning comes from read_npx_format because the long file is
+                # totally made up.
+                expect_warning(
+                  object = read_npx_zip(file = zfile_test,
+                                        out_df = "arrow",
+                                        long_format = TRUE,
+                                        quiet = TRUE),
+                  regexp = "Unable to confirm the \"long\" format from the inpu"
                 )
 
               }
@@ -389,12 +408,17 @@ test_that(
                 expect_true(object = file.exists(zfile_test))
 
                 # check that this works
-                expect_no_condition(
-                  object = read_npx_zip(
-                    file = zfile_test,
-                    .ignore_files = c(basename(readmefile_test),
-                                      basename(rfile_test))
-                  )
+                # warning comes from read_npx_format because the long file is
+                # totally made up.
+                expect_warning(
+                  object = read_npx_zip(file = zfile_test,
+                                        out_df = "arrow",
+                                        long_format = TRUE,
+                                        .ignore_files =
+                                          c(basename(readmefile_test),
+                                            basename(rfile_test)),
+                                        quiet = TRUE),
+                  regexp = "Unable to confirm the \"long\" format from the inpu"
                 )
 
               }
@@ -481,13 +505,19 @@ test_that(
                 expect_true(object = file.exists(zfile_test))
 
                 # check that this works
-                expect_no_condition(
-                  object = read_npx_zip(
-                    file = zfile_test,
-                    .ignore_files = c(basename(readmefile_test),
-                                      basename(rfile_test))
-                  )
+                # warning comes from read_npx_format because the long file is
+                # totally made up.
+                expect_warning(
+                  object = read_npx_zip(file = zfile_test,
+                                        out_df = "arrow",
+                                        long_format = TRUE,
+                                        .ignore_files =
+                                          c(basename(readmefile_test),
+                                            basename(rfile_test)),
+                                        quiet = TRUE),
+                  regexp = "Unable to confirm the \"long\" format from the inpu"
                 )
+
               }
             )
 
@@ -572,22 +602,33 @@ test_that(
             expect_true(object = file.exists(zfile_test))
 
             # check that this works
-            expect_no_condition(
-              object = df_out <- read_npx_zip(file = zfile_test,
-                                              out_df = "arrow",
-                                              sep = NULL)
+            # warning comes from read_npx_format because the long file is
+            # totally made up.
+            expect_warning(
+              object = df_out_arrow <- read_npx_zip(file = zfile_test,
+                                                    out_df = "arrow",
+                                                    sep = NULL,
+                                                    long_format = TRUE,
+                                                    quiet = TRUE),
+              regexp = "Unable to confirm the \"long\" format from the inpu"
             )
 
-            expect_true(exists("df_out"))
+            expect_true(exists("df_out_arrow"))
 
-            expect_true(inherits(x = df_out, what = "ArrowObject"))
+            expect_true(inherits(x = df_out_arrow, what = "ArrowObject"))
 
-            expect_true(
-              read_npx_zip(file = zfile_test,
-                           out_df = "tibble",
-                           sep = NULL) |>
-                inherits(what = "tbl_df")
+            expect_warning(
+              object = df_out_tibble <- read_npx_zip(file = zfile_test,
+                                                     out_df = "tibble",
+                                                     sep = NULL,
+                                                     long_format = TRUE,
+                                                     quiet = TRUE),
+              regexp = "Unable to confirm the \"long\" format from the inpu"
             )
+
+            expect_true(exists("df_out_tibble"))
+
+            expect_true(inherits(x = df_out_tibble, what = "tbl_df"))
 
           }
         )
@@ -665,8 +706,14 @@ test_that(
             expect_true(object = file.exists(zfile_test))
 
             # check that this works
-            expect_no_condition(
-              object = read_npx_zip(file = zfile_test)
+            # warning comes from read_npx_format because the long file is
+            # totally made up.
+            expect_warning(
+              object = df_out_arrow <- read_npx_zip(file = zfile_test,
+                                                    out_df = "arrow",
+                                                    long_format = TRUE,
+                                                    quiet = TRUE),
+              regexp = "Unable to confirm the \"long\" format from the inpu"
             )
           }
         )
@@ -749,22 +796,34 @@ test_that(
             expect_true(object = file.exists(zfile_test))
 
             # check that this works
-            expect_no_condition(
-              object = df_out <- read_npx_zip(file = zfile_test,
-                                              out_df = "arrow",
-                                              sep = NULL)
+            # warning comes from read_npx_format because the long file is
+            # totally made up.
+            expect_warning(
+              object = df_out_arrow <- read_npx_zip(file = zfile_test,
+                                                    out_df = "arrow",
+                                                    sep = NULL,
+                                                    long_format = TRUE,
+                                                    quiet = TRUE),
+              regexp = "Unable to confirm the \"long\" format from the inpu"
             )
 
-            expect_true(exists("df_out"))
+            expect_true(exists("df_out_arrow"))
 
-            expect_true(inherits(x = df_out, what = "ArrowObject"))
+            expect_true(inherits(x = df_out_arrow, what = "ArrowObject"))
 
-            expect_true(
-              read_npx_zip(file = zfile_test,
-                           out_df = "tibble",
-                           sep = NULL) |>
-                inherits(what = "tbl_df")
+            expect_warning(
+              object = df_out_tibble <- read_npx_zip(file = zfile_test,
+                                                     out_df = "tibble",
+                                                     sep = NULL,
+                                                     long_format = TRUE,
+                                                     quiet = TRUE),
+              regexp = "Unable to confirm the \"long\" format from the inpu"
             )
+
+            expect_true(exists("df_out_tibble"))
+
+            expect_true(inherits(x = df_out_tibble, what = "tbl_df"))
+
           }
         )
 
@@ -842,8 +901,14 @@ test_that(
             expect_true(object = file.exists(zfile_test))
 
             # check that this works
-            expect_no_condition(
-              object = read_npx_zip(file = zfile_test)
+            # warning comes from read_npx_format because the long file is
+            # totally made up.
+            expect_warning(
+              object = read_npx_zip(file = zfile_test,
+                                    out_df = "arrow",
+                                    long_format = TRUE,
+                                    quiet = TRUE),
+              regexp = "Unable to confirm the \"long\" format from the inpu"
             )
 
           }
