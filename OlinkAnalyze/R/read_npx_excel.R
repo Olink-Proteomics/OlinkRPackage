@@ -9,8 +9,6 @@
 #' @param file Path to Olink software output in txt or csv.
 #' @param out_df The class of output data frame to be returned. Accepted values
 #' are "tibble" and "arrow" (default).
-#' @param sep The separator of the file: NULL (autodetect), comma (,) or
-#' semicolon (;).
 #'
 #' @return An R6 class ArrowObject or tibble.
 #'

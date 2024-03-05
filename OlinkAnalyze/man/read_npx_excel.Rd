@@ -12,9 +12,6 @@ read_npx_excel(file, out_df = "arrow")
 
 \item{out_df}{The class of output data frame to be returned. Accepted values
 are "tibble" and "arrow" (default).}
-
-\item{sep}{The separator of the file: NULL (autodetect), comma (,) or
-semicolon (;).}
 }
 \value{
 An R6 class ArrowObject or tibble.
