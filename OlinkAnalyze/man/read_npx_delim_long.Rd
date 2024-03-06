@@ -2,23 +2,29 @@
 % Please edit documentation in R/read_npx_delim.R
 \name{read_npx_delim_long}
 \alias{read_npx_delim_long}
-\title{Help function to read in Olink data in long format from comma or semicolon
-delimited files.}
+\title{Help function to read NPX, Ct or absolute quantification data from semicolon-
+or comma-delimited Olink software output files in R.}
 \usage{
 read_npx_delim_long(file, sep = NULL)
 }
 \arguments{
-\item{file}{Path to Olink software output in txt or csv.}
+\item{file}{Path to Olink software output delimited file in long format.
+Expecting file extensions `csv` or `txt`.}
 
-\item{sep}{The separator of the file: NULL (autodetect), comma (,) or
-semicolon (;).}
+\item{sep}{Character separator of delimited input file. One of `NULL` for
+auto-detection (default), `,` for comma or `;` for semicolon. Used only for
+delimited output files from Olink software.}
 }
 \value{
-An R6 class ArrowObject or tibble.
+Tibble or ArrowObject with Olink data in long format.
 }
 \description{
-Help function to read in Olink data in long format from comma or semicolon
-delimited files.
+#' @description
+The function can handle delimited files in long format.
+}
+\seealso{
+[read_npx_delim()]
+  [read_npx_delim_wide()]
 }
 \author{
 Klev Diamanti;

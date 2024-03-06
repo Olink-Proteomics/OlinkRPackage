@@ -2,38 +2,35 @@
 % Please edit documentation in R/read_npx_excel.R
 \name{read_npx_excel}
 \alias{read_npx_excel}
-\title{Help function to read in Olink data in long format from comma or semicolon
-delimited files.}
+\title{Help function to read NPX, Ct or absolute quantification data from excel
+Olink software output files in R.}
 \usage{
 read_npx_excel(file, out_df = "arrow")
 }
 \arguments{
-\item{file}{Path to Olink software output in txt or csv.}
+\item{file}{Path to Olink software output excel file in wide or long
+format. Expecting file extensions `xlsx` or `xls`.}
 
-\item{out_df}{The class of output data frame to be returned. Accepted values
-are "tibble" and "arrow" (default).}
+\item{out_df}{The class of output data frame. One of `tibble` (default) or
+`arrow` for ArrowObject.}
 }
 \value{
-An R6 class ArrowObject or tibble.
+Tibble or ArrowObject with Olink data in long format.
 }
 \description{
-Help function to read in Olink data in long format from comma or semicolon
-delimited files.
+Help function to read NPX, Ct or absolute quantification data from excel
+Olink software output files in R.
 }
 \seealso{
 [read_npx()]
   [read_npx_parquet()]
   [read_npx_zip()]
+  [read_npx_excel()]
   [read_npx_delim()]
-  [read_npx_delim_wide()]
+  [read_npx_format()]
 }
 \author{
 Klev Diamanti;
   Christoffer Cambronero;
   Kathleen Nevola
 }
-\keyword{NPX}
-\keyword{csv}
-\keyword{delim}
-\keyword{sep}
-\keyword{txt}

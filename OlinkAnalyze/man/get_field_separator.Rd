@@ -2,26 +2,28 @@
 % Please edit documentation in R/read_npx_delim.R
 \name{get_field_separator}
 \alias{get_field_separator}
-\title{Help function to get the file's field separator.}
+\title{Help function to get the separator of a delimited file from Olink software.}
 \usage{
 get_field_separator(file)
 }
 \arguments{
-\item{file}{Path to Olink software output in txt or csv.}
+\item{file}{Path to Olink software output delimited file in wide or long
+format. Expecting file extensions `csv` or `txt`.}
 }
 \value{
-The file separator comma (;) or semicolon (;)
+The file separator comma `,` or semicolon `;`.
 }
 \description{
 This function uses the first line of the provided file to determine the
 separator of the file.
-_Note_ that the function will not accept the presence of commas and
-semicolons on the same line.
+
+\strong{Note:} The function does not allow presence of commas and semicolons
+on the same line.
 }
 \seealso{
 [read_npx_delim()]
+  [read_npx_delim_long()]
   [read_npx_delim_wide()]
-  [read_npx_csv()]
 }
 \author{
 Klev Diamanti

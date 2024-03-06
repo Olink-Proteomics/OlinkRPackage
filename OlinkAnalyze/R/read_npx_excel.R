@@ -1,25 +1,25 @@
-#' Help function to read in Olink data in long format from comma or semicolon
-#' delimited files.
+#' Help function to read NPX, Ct or absolute quantification data from excel
+#' Olink software output files in R.
 #'
 #' @author
 #'   Klev Diamanti;
 #'   Christoffer Cambronero;
 #'   Kathleen Nevola
 #'
-#' @param file Path to Olink software output in txt or csv.
-#' @param out_df The class of output data frame to be returned. Accepted values
-#' are "tibble" and "arrow" (default).
+#' @param file Path to Olink software output excel file in wide or long
+#' format. Expecting file extensions `xlsx` or `xls`.
+#' @param out_df The class of output data frame. One of `tibble` (default) or
+#' `arrow` for ArrowObject.
 #'
-#' @return An R6 class ArrowObject or tibble.
-#'
-#' @keywords NPX csv txt delim sep
+#' @return Tibble or ArrowObject with Olink data in long format.
 #'
 #' @seealso
 #'   [read_npx()]
 #'   [read_npx_parquet()]
 #'   [read_npx_zip()]
+#'   [read_npx_excel()]
 #'   [read_npx_delim()]
-#'   [read_npx_delim_wide()]
+#'   [read_npx_format()]
 #'
 read_npx_excel <- function(file,
                            out_df = "arrow") {
