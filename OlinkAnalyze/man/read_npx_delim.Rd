@@ -28,13 +28,13 @@ Tibble or ArrowObject with Olink data in long format.
 The function can handle delimited files in long and wide format.
 }
 \seealso{
-[read_npx()]
-  [read_npx_parquet()]
-  [read_npx_zip()]
-  [read_npx_excel()]
-  [read_npx_delim_wide()]
-  [read_npx_delim_long()]
-  [read_npx_format()]
+\code{\link{read_npx}}
+  \code{\link{read_npx_parquet}}
+  \code{\link{read_npx_zip}}
+  \code{\link{read_npx_excel}}
+  \code{\link{read_npx_format}}
+  \code{\link{read_npx_delim_wide}}
+  \code{\link{read_npx_delim_long}}
 }
 \author{
 Klev Diamanti;

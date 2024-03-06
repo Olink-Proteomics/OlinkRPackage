@@ -19,12 +19,11 @@ delimited output files from Olink software.}
 Tibble or ArrowObject with Olink data in long format.
 }
 \description{
-#' @description
 The function can handle delimited files in long format.
 }
 \seealso{
-[read_npx_delim()]
-  [read_npx_delim_wide()]
+\code{\link{read_npx_delim_wide}}
+  \code{\link{read_npx_delim}}
 }
 \author{
 Klev Diamanti;

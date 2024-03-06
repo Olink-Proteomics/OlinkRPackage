@@ -19,12 +19,11 @@ delimited output files from Olink software.}
 An R6 class ArrowObject or tibble.
 }
 \description{
-#' @description
 The function can handle delimited files in wide format.
 }
 \seealso{
-[read_npx_delim()]
-  [read_npx_delim_long()]
+\code{\link{read_npx_delim_long}}
+  \code{\link{read_npx_delim}}
 }
 \author{
 Klev Diamanti

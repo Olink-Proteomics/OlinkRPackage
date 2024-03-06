@@ -14,10 +14,11 @@
 #' @return Tibble or ArrowObject with Olink data in long format.
 #'
 #' @seealso
-#'   [read_npx()]
-#'   [read_npx_zip()]
-#'   [read_npx_excel()]
-#'   [read_npx_delim()]
+#'   \code{\link{read_npx}}
+#'   \code{\link{read_npx_zip}}
+#'   \code{\link{read_npx_excel}}
+#'   \code{\link{read_npx_format}}
+#'   \code{\link{read_npx_delim}}
 #'
 read_npx_parquet <- function(file,
                              out_df = "arrow") {

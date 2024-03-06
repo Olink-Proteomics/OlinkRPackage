@@ -22,12 +22,11 @@ Help function to read NPX, Ct or absolute quantification data from excel
 Olink software output files in R.
 }
 \seealso{
-[read_npx()]
-  [read_npx_parquet()]
-  [read_npx_zip()]
-  [read_npx_excel()]
-  [read_npx_delim()]
-  [read_npx_format()]
+\code{\link{read_npx}}
+  \code{\link{read_npx_parquet}}
+  \code{\link{read_npx_zip}}
+  \code{\link{read_npx_format}}
+  \code{\link{read_npx_delim}}
 }
 \author{
 Klev Diamanti;

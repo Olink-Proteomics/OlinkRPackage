@@ -23,9 +23,9 @@ Help function to check and get the separator of a delimited file from Olink
 software.
 }
 \seealso{
-[read_npx_delim()]
-  [read_npx_delim_long()]
-  [read_npx_delim_wide()]
+\code{\link{read_npx_delim_long}}
+  \code{\link{read_npx_delim_wide}}
+  \code{\link{read_npx_delim}}
 }
 \author{
 Klev Diamanti

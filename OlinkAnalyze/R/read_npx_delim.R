@@ -20,13 +20,13 @@
 #' @return Tibble or ArrowObject with Olink data in long format.
 #'
 #' @seealso
-#'   [read_npx()]
-#'   [read_npx_parquet()]
-#'   [read_npx_zip()]
-#'   [read_npx_excel()]
-#'   [read_npx_delim_wide()]
-#'   [read_npx_delim_long()]
-#'   [read_npx_format()]
+#'   \code{\link{read_npx}}
+#'   \code{\link{read_npx_parquet}}
+#'   \code{\link{read_npx_zip}}
+#'   \code{\link{read_npx_excel}}
+#'   \code{\link{read_npx_format}}
+#'   \code{\link{read_npx_delim_wide}}
+#'   \code{\link{read_npx_delim_long}}
 #'
 read_npx_delim <- function(file,
                            out_df = "arrow",
@@ -119,7 +119,7 @@ read_npx_csv <- read_npx_delim
 #' Help function to read NPX, Ct or absolute quantification data from semicolon-
 #' or comma-delimited Olink software output files in R.
 #'
-#' #' @description
+#' @description
 #' The function can handle delimited files in long format.
 #'
 #' @author
@@ -136,8 +136,8 @@ read_npx_csv <- read_npx_delim
 #' @return Tibble or ArrowObject with Olink data in long format.
 #'
 #' @seealso
-#'   [read_npx_delim()]
-#'   [read_npx_delim_wide()]
+#'   \code{\link{read_npx_delim_wide}}
+#'   \code{\link{read_npx_delim}}
 #'
 read_npx_delim_long <- function(file,
                                 sep = NULL) {
@@ -170,7 +170,7 @@ read_npx_delim_long <- function(file,
 #' Help function to read NPX, Ct or absolute quantification data from semicolon-
 #' or comma-delimited Olink software output files in R.
 #'
-#' #' @description
+#' @description
 #' The function can handle delimited files in wide format.
 #'
 #' @author
@@ -185,8 +185,8 @@ read_npx_delim_long <- function(file,
 #' @return An R6 class ArrowObject or tibble.
 #'
 #' @seealso
-#'   [read_npx_delim()]
-#'   [read_npx_delim_long()]
+#'   \code{\link{read_npx_delim_long}}
+#'   \code{\link{read_npx_delim}}
 #'
 read_npx_delim_wide <- function(file,
                                 sep = NULL) {
@@ -235,9 +235,9 @@ read_npx_delim_wide <- function(file,
 #' @return The file separator comma `,` or semicolon `;`.
 #'
 #' @seealso
-#'   [read_npx_delim()]
-#'   [read_npx_delim_long()]
-#'   [read_npx_delim_wide()]
+#'   \code{\link{read_npx_delim_long}}
+#'   \code{\link{read_npx_delim_wide}}
+#'   \code{\link{read_npx_delim}}
 #'
 check_field_separator <- function(file,
                                   sep = NULL) {
@@ -291,9 +291,9 @@ check_field_separator <- function(file,
 #' @return The file separator comma `,` or semicolon `;`.
 #'
 #' @seealso
-#'   [read_npx_delim()]
-#'   [read_npx_delim_long()]
-#'   [read_npx_delim_wide()]
+#'   \code{\link{read_npx_delim_long}}
+#'   \code{\link{read_npx_delim_wide}}
+#'   \code{\link{read_npx_delim}}
 #'
 get_field_separator <- function(file) {
 

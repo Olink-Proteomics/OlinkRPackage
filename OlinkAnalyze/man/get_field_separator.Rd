@@ -21,9 +21,9 @@ separator of the file.
 on the same line.
 }
 \seealso{
-[read_npx_delim()]
-  [read_npx_delim_long()]
-  [read_npx_delim_wide()]
+\code{\link{read_npx_delim_long}}
+  \code{\link{read_npx_delim_wide}}
+  \code{\link{read_npx_delim}}
 }
 \author{
 Klev Diamanti
