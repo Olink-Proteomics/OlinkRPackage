@@ -1,24 +1,23 @@
-#' Help function to read Olink parquet files.
+#' Help function to read NPX data from long format parquet Olink software output
+#' files in R.
 #'
 #' @author
 #'   Klev Diamanti;
 #'   Kathleen Nevola;
 #'   Pascal Pucholt
 #'
-#' @param file Path to Olink Software parquet output file.
-#' @param out_df The class of output data frame to be returned. Accepted values
-#' are "tibble" and "arrow" (default).
+#' @param file Path to Olink software output parquet file in long format.
+#' Expecting file extension `parquet`.
+#' @param out_df The class of output data frame. One of `tibble` (default) or
+#' `arrow` for ArrowObject.
 #'
-#' @return An R6 class ArrowObject.
-#'
-#' @keywords NPX parquet
+#' @return Tibble or ArrowObject with Olink data in long format.
 #'
 #' @seealso
 #'   [read_npx()]
-#'   [read_npx_delim()]
-#'   [read_npx_delim_wide()]
 #'   [read_npx_zip()]
 #'   [read_npx_excel()]
+#'   [read_npx_delim()]
 #'
 read_npx_parquet <- function(file,
                              out_df = "arrow") {
