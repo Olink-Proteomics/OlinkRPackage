@@ -2,28 +2,30 @@
 % Please edit documentation in R/read_npx_zip.R
 \name{get_npx_file}
 \alias{get_npx_file}
-\title{Help function to get the name of the NPX file from a compresseed NPX.}
+\title{Help function to get the file name of the Olink data file from the list of
+contents of a zip-compressed file.}
 \usage{
-get_npx_file(files, compressed_file_ext = c("zip"))
+get_npx_file(files, excl_file_ext = c("zip"))
 }
 \arguments{
-\item{files}{A vector of file names without any path prefix.}
+\item{files}{A character vector listing file names included in the
+zip-compressed input file.}
 
-\item{compressed_file_ext}{Character vector of file extensions for
-compressed files.}
+\item{excl_file_ext}{Character vector of file extensions that should not be
+considered as Olink data file. Mainly used to avoid nested compressed files.}
 }
 \value{
-The name of the NPX file.
+The file name of the Olink data file.
 }
 \description{
-Help function to get the name of the NPX file from a compresseed NPX.
+Help function to get the file name of the Olink data file from the list of
+contents of a zip-compressed file.
 }
 \seealso{
-[check_checksum()]
-  [get_checksum_file()]
+\code{\link{read_npx_zip}}
+  \code{\link{get_checksum_file}}
+  \code{\link{check_checksum}}
 }
 \author{
 Klev Diamanti
 }
-\keyword{NPX}
-\keyword{zip}

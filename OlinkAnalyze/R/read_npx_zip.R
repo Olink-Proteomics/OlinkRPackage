@@ -1,35 +1,61 @@
-#' Helper function to read NPX zip-compressed files with checksum.
+#' Help function to read NPX, Ct or absolute quantification data from
+#' zip-compressed Olink software output files in R.
+#'
+#' @description
+#' A zip-compressed input file might contain a file from the Olink software
+#' containing NPX, Ct or absolute quantification data, a checksum file and one
+#' or more files to be ignored.
+#'
+#' \strong{Note:} The zip-compressed file should strictly contain \strong{one}
+#' Olink data file, \strong{none or one} checksum file and
+#' \strong{none or one, or more} files that might be ignored.
+#'
+#' \itemize{
+#' \item \strong{Olink file} exported by Olink software in wide or long format.
+#' Expecting file extensions `csv`, `txt`, `xls`, `xlsx`, `parquet` or `zip`.
+#' This file is subsequently provided as input to \code{\link{read_npx}}.
+#' \item \strong{checksum file} named `MD5_checksum.txt` or`checksum_sha256.txt`
+#' depending on the checksum algorithm. The file contains only one line with the
+#' checksum string of characters.
+#' \item \strong{File(s) to be ignored} from the zip file. These files can be
+#' named as a character vector in the argument \var{.ignore_files}.
+#' }
 #'
 #' @author
 #'   Klev Diamanti;
 #'   Kathleen Nevola;
 #'   Pascal Pucholt
 #'
-#' @param file Path to Olink Software output zip file.
-#' @param out_df The class of output data frame to be returned. Accepted values
-#' are "tibble" and "arrow" (default).
-#' @param sep The separator of the delimited file: NULL (autodetect), comma (,)
-#' or semicolon (;). Used only for delimited Olink software output files.
-#' @param long_format Boolean marking if input file is in long (TRUE) or wide
-#' (FALSE) format. Ignored for non-excel input files.
-#' @param olink_platform The Olink platform used to generate the input file.
-#' Expecting "Target 96", "Target 48" or "Flex". Ignored for non-excel input
-#' files.
-#' @param data_type The quantification in which the data comes in, Expecting on
-#' of NPX, Quantified or Ct. Ignored for non-excel input files.
-#' @param .ignore_files Vector of files to ignore.
-#' @param quiet Print a confirmation message after reading in the input file.
+#' @param file Path to Olink software output zip-compressed file in wide or long
+#' format. Expecting file extension `zip`.
+#' @param out_df The class of output data frame. One of `tibble` (default) or
+#' `arrow` for ArrowObject.
+#' @param sep Character separator of delimited input file. One of `NULL` for
+#' auto-detection (default), `,` for comma or `;` for semicolon. Used only for
+#' delimited output files from Olink software.
+#' @param long_format Boolean marking format of input file. One of `NULL`
+#' (default) for auto-detection, `TRUE` for long format files or `FALSE` for
+#' wide format files.
+#' @param olink_platform Olink platform used to generate the input file.
+#' One of `NULL` (default), `Explore 3072`, `Explore HT`, `Target 96`,
+#' `Target 48`, `Flex` or `Focus`.
+#' @param data_type Quantification method of the input data. One of `NULL`
+#' (default), `NPX`, `Quantified` or `Ct`.
+#' @param .ignore_files Character vector of files included in the zip-compressed
+#' Olink software output files that should be ignored. Applies only to
+#' zip-compressed input files. `c("README.txt")` (default).
+#' @param quiet Boolean to print a confirmation message when reading the input
+#' file. Applies to excel or delimited input only. `TRUE` (default) to not print
+#' and `FALSE` to print.
 #'
-#' @return An R6 class ArrowObject.
-#'
-#' @keywords NPX csv txt delim sep parquet
+#' @return Tibble or ArrowObject with Olink data in long format.
 #'
 #' @seealso
-#'   [read_npx()]
-#'   [read_npx_delim()]
-#'   [read_npx_delim_wide()]
-#'   [read_npx_parquet()]
-#'   [read_npx_excel()]
+#'   \code{\link{read_npx}}
+#'   \code{\link{read_npx_parquet}}
+#'   \code{\link{read_npx_excel}}
+#'   \code{\link{read_npx_format}}
+#'   \code{\link{read_npx_delim}}
 #'
 read_npx_zip <- function(file,
                          out_df = "arrow",
@@ -59,7 +85,7 @@ read_npx_zip <- function(file,
 
   # **** Help vars ----
 
-  compressed_file_ext <- c("zip")
+  excl_file_ext <- c("zip")
 
   # **** Prep ****
 
@@ -114,7 +140,7 @@ read_npx_zip <- function(file,
   # Get the name of the NPX files
   compressed_file_npx <- get_npx_file(
     files = compressed_file_contents,
-    compressed_file_ext = compressed_file_ext
+    excl_file_ext = excl_file_ext
   )
 
   # Array of files to extract
@@ -177,19 +203,21 @@ read_npx_zip <- function(file,
   return(df_olink)
 }
 
-#' Help function to get the name of the checksum file from a zip NPX.
+#' Help function to get the file name of the checksum file from the list of
+#' contents of a zip-compressed file.
 #'
-#' @author Klev Diamanti
+#' @author
+#'   Klev Diamanti
 #'
-#' @param files A vector of file names without any path prefix.
+#' @param files A character vector listing file names included in the
+#' zip-compressed input file.
 #'
-#' @return The name of checksum file or NA if the file is not present.
-#'
-#' @keywords zip NPX checksum MD5 SHA256
+#' @return The file name of the checksum file, or NA if file is absent.
 #'
 #' @seealso
-#'   [check_checksum()]
-#'   [get_npx_file()]
+#'   \code{\link{read_npx_zip}}
+#'   \code{\link{get_npx_file}}
+#'   \code{\link{check_checksum}}
 #'
 get_checksum_file <- function(files) {
 
@@ -228,24 +256,26 @@ get_checksum_file <- function(files) {
 }
 
 
-#' Help function to get the name of the NPX file from a compresseed NPX.
+#' Help function to get the file name of the Olink data file from the list of
+#' contents of a zip-compressed file.
 #'
-#' @author Klev Diamanti
+#' @author
+#'   Klev Diamanti
 #'
-#' @param files A vector of file names without any path prefix.
-#' @param compressed_file_ext Character vector of file extensions for
-#' compressed files.
+#' @param files A character vector listing file names included in the
+#' zip-compressed input file.
+#' @param excl_file_ext Character vector of file extensions that should not be
+#' considered as Olink data file. Mainly used to avoid nested compressed files.
 #'
-#' @return The name of the NPX file.
-#'
-#' @keywords zip NPX
+#' @return The file name of the Olink data file.
 #'
 #' @seealso
-#'   [check_checksum()]
-#'   [get_checksum_file()]
+#'   \code{\link{read_npx_zip}}
+#'   \code{\link{get_checksum_file}}
+#'   \code{\link{check_checksum}}
 #'
 get_npx_file <- function(files,
-                         compressed_file_ext = c("zip")) {
+                         excl_file_ext = c("zip")) {
 
   # check that the input is a character vector
   check_is_character(string = files,
@@ -276,7 +306,7 @@ get_npx_file <- function(files,
         "i" = "The compressed input file should contain {.strong only} one
         file with extension:
         {cli::ansi_collapse(x =
-      accepted_npx_file_ext[!(accepted_npx_file_ext %in% compressed_file_ext)],
+      accepted_npx_file_ext[!(accepted_npx_file_ext %in% excl_file_ext)],
         last = \", or \")}."
       ),
       call = rlang::caller_env(),
@@ -284,7 +314,7 @@ get_npx_file <- function(files,
     )
 
   } else if (nrow(df_files) == 1L
-             && df_files$files_extension %in% compressed_file_ext) {
+             && df_files$files_extension %in% excl_file_ext) {
 
     cli::cli_abort(
       c(
@@ -310,22 +340,23 @@ get_npx_file <- function(files,
 
 
 #' Help function comparing the checksum reported by Olink software to the
-#' checksum of the delivered NPX file.
+#' checksum of the Olink data file from the input zip-compressed file.
 #'
 #' @description
-#' We should make it here only if MD5_checksum.txt or checksum_sha256.txt are
-#' present in the zip file.
+#' Runs only if `MD5_checksum.txt` or `checksum_sha256.txt` are present in the
+#' input zip-compressed file. This function does not check if the
+#' \var{checksum_file} is in acceptable format.
 #'
-#' This function does not check whether checksum_file is in acceptable format.
+#' @author
+#'   Klev Diamanti
 #'
-#' @author Klev Diamanti
+#' @param checksum_file Extracted checksum file from the zip-compressed file
+#' that contains the checksum file from Olink software.
+#' @param npx_file Extracted file from the zip-compressed file that contains the
+#' Olink data file from Olink software.
 #'
-#' @param checksum_file The plain file that contains the checksum output from
-#' Olink software. The file should contain "MD5" or "SHA256" in the file name.
-#' @param npx_file The NPX file accompanying the checksum file.
-#'
-#' @return A string or NA. If the function return NA then everything worked
-#' fine, otherwise there was some sort of error.
+#' @return NULL or an error if the files could not be opened or if checksum did
+#' not match.
 #'
 check_checksum <- function(checksum_file,
                            npx_file) {
