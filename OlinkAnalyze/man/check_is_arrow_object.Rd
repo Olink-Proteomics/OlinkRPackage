@@ -2,25 +2,27 @@
 % Please edit documentation in R/check_df.R
 \name{check_is_arrow_object}
 \alias{check_is_arrow_object}
-\title{Help function to check if a data frame is an R6 ArrowObject.}
+\title{Help function checking if a data frame is an R6 ArrowObject.}
 \usage{
 check_is_arrow_object(df, error = FALSE)
 }
 \arguments{
 \item{df}{Data frame to check.}
 
-\item{error}{Boolean to return error or a boolean (default).}
+\item{error}{`TRUE` to return an error if \var{df} is not an arrow object;
+`FALSE` (default) to return a boolean.}
 }
 \value{
-Boolean if the file is an R6 ArrowObject or not, and an error if
-`error = TRUE`.
+A scalar boolean if the object is an arrow object or not, and an
+error if \var{error} = `TRUE`.
 }
 \description{
-Help function to check if a data frame is an R6 ArrowObject.
+Help function checking if a data frame is an R6 ArrowObject.
 }
 \seealso{
-[check_is_tibble()]
-  [check_is_data_frame()]
+\code{\link{check_is_data_frame}}
+  \code{\link{check_is_tibble}}
+  \code{\link{check_is_arrow_or_data_frame}}
 }
 \author{
 Klev Diamanti
