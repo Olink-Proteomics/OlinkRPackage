@@ -212,7 +212,7 @@ read_npx_delim_wide <- function(file,
   )
   colnames(df_olink) <- paste0("V", seq_len(ncol(df_olink)))
 
-  dplyr::as_tibble(df_olink)
+  df_olink <- dplyr::as_tibble(df_olink)
 
   # return ----
 
