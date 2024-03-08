@@ -3,17 +3,10 @@
 #'
 #' @author Klev Diamanti
 #'
-#' @param out_df The class of output data frame to be returned. Accepted values
-#' are "tibble" and "arrow".
+#' @param out_df The class of output data frame. One of `tibble` (default) or
+#' `arrow` for ArrowObject.
 #'
 #' @return An error if the argument is not as expected.
-#'
-#' @seealso
-#'   [read_npx()]
-#'   [read_npx_delim()]
-#'   [read_npx_zip()]
-#'   [read_npx_parquet()]
-#'   [convert_read_npx_output()]
 #'
 check_out_df_arg <- function(out_df) {
 
