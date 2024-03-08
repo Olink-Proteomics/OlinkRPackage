@@ -1,14 +1,23 @@
-#' Help function to identify the format, data type and platform from the input
-#' Olink file.
+#' Help function to read excel and delimited Olink data files in R and determine
+#' their format, data type and platform.
 #'
 #' @description
-#' This function should be processing all Olink excel or delimited files
-#' regardless of data type, platform or wide/long format. Files in wide format
-#' should be handled by read_npx_wide; files in long format delimited by comma
-#' or semicolon (csv) should be handled by read_npx_delim; and files in long
-#' format in excel (xlsx) should be handled by read_npx_excel. Only files in
-#' wide format that always originate from qPCR platforma should be further
-#' investigated for data type and olink platform.
+#' This function processes Olink software excel or delimited files regardless of
+#' data type, platform or format.
+#'
+#' \strong{Olink software excel files} with the suffix `xlsx` or `xls` are
+#' imported in R by the function `read_npx_excel`.
+#'
+#' \strong{Olink software delimited files} with suffix `csv` or `txt` are
+#' imported in R by the function `read_npx_delim` or `read_npx_csv`.
+#'
+#' Files in wide format are subsequently handled by the function
+#' `read_npx_wide`.
+#'
+#' \strong{Olink software files in wide format} always originate from the Olink
+#' qPCR platforms, and are further processed by `read_npx_get_platform` and
+#' `read_npx_get_quant` to determine the data type and Olink platform,
+#' respectively.
 #'
 #' @author
 #'   Klev Diamanti;
@@ -19,21 +28,32 @@
 #'   Olof Mansson;
 #'   Marianne Sandin
 #'
-#' @param file The input Olink file in excel or delimited format.
-#' @param out_df The class of output data frame to be returned. Accepted values
-#' are "tibble" (default) and "arrow".
-#' @param sep The separator of the file: NULL (autodetect), comma (,) or
-#' semicolon (;). Ignored if file is in excel format.
-#' @param long_format Boolean marking if input file is in long (TRUE) or wide
-#' (FALSE) format.
-#' @param olink_platform The Olink platform used to generate the input file.
-#' Expecting "Explore 3072", "Explore HT", "Target 96", "Target 48", "Flex" or
-#' "Focus".
-#' @param data_type The quantification in which the data comes in. Expecting one
-#' of NPX, Quantified or Ct.
-#' @param quiet Print a confirmation message after reading in the input file.
+#' @param file Path to Olink software output file in wide or long format.
+#' Expecting file extensions `csv`, `txt`, `xls`, or `xlsx`.
+#' @param out_df The class of output data frame. One of `tibble` (default) or
+#' `arrow` for ArrowObject.
+#' @param sep Character separator of delimited input file. One of `NULL` for
+#' auto-detection (default), `,` for comma or `;` for semicolon. Used only for
+#' delimited output files from Olink software.
+#' @param long_format Boolean marking format of input file. One of `NULL`
+#' (default) for auto-detection, `TRUE` for long format files or `FALSE` for
+#' wide format files.
+#' @param olink_platform Olink platform used to generate the input file.
+#' One of `NULL` (default), `Explore 3072`, `Explore HT`, `Target 96`,
+#' `Target 48`, `Flex` or `Focus`.
+#' @param data_type Quantification method of the input data. One of `NULL`
+#' (default), `NPX`, `Quantified` or `Ct`.
+#' @param quiet Boolean to print a confirmation message when reading the input
+#' file. Applies to excel or delimited input only. `TRUE` (default) to not print
+#' and `FALSE` to print.
 #'
-#' @return  A tibble in long format or an ArrowObject.
+#' @return Tibble or ArrowObject with Olink data in long format.
+#'
+#' @seealso
+#'   \code{\link{read_npx_format_read}}
+#'   \code{\link{read_npx_format_get_format}}
+#'   \code{\link{read_npx_format_get_platform}}
+#'   \code{\link{read_npx_format_get_quant}}
 #'
 read_npx_format <- function(file,
                             out_df = "arrow",
@@ -81,7 +101,7 @@ read_npx_format <- function(file,
 
   ## Determine long or wide format ----
 
-  file_format_check <- read_npx_get_format(
+  file_format_check <- read_npx_format_get_format(
     df = list_df_read$df_top_n,
     file = file,
     long_format = long_format,
@@ -109,7 +129,7 @@ read_npx_format <- function(file,
       )
 
     # get platform
-    file_olink_platform <- read_npx_get_platform(
+    file_olink_platform <- read_npx_format_get_platform(
       df = list_df_read$df_top_n,
       file = file,
       olink_platform = olink_platform,
@@ -117,7 +137,7 @@ read_npx_format <- function(file,
     )
 
     # get quantification method
-    file_quant_method <- read_npx_get_quant(
+    file_quant_method <- read_npx_format_get_quant(
       file = file,
       data_type = data_type,
       data_cells = file_format_check$data_cells,
@@ -152,7 +172,7 @@ read_npx_format <- function(file,
 
   }
 
-  # Read data in ----
+  # return ----
 
   if (file_format_check$is_long_format == TRUE) {
     # if data is in long format
@@ -184,31 +204,50 @@ read_npx_format <- function(file,
 
 }
 
-#' Help function that reads the first two rows of an Olink delimited or excel
-#' file.
+#' Help function to read excel and delimited Olink data files in R.
 #'
 #' @description
-#' This function extracts the first two rows of an Olink output file to detect
-#' the Olink platform that generated the file, the data type and and file
-#' format. The input file format may be wide or long, and the input file type
-#' can be excel (xls/xlsx) or delimited (csv/txt).
+#' This function reads Olink software excel or delimited files regardless of
+#' data type, platform or format.
 #'
-#' In case of long format input, the function will return the row of the column
-#' names and the first row with data.
+#' \strong{Olink software excel files} with the suffix `xlsx` or `xls` are
+#' imported in R by the function `read_npx_excel`.
 #'
-#' In case of wide format inpiut, the function will return the first two rows of
-#' the inpit file.
+#' \strong{Olink software delimited files} with suffix `csv` or `txt` are
+#' imported in R by the function `read_npx_delim` or `read_npx_csv`.
 #'
-#' @author Klev Diamanti
+#' \itemize{
+#' \item Files in long format are read with the column row as column names.
+#' \item Files in wide format are read with column names as V1, V2, etc.
+#' }
 #'
-#' @param file Path to Olink software output in excel, txt or csv.
-#' @param sep The separator of the file: NULL (autodetect), comma (,) or
-#' semicolon (;). Ignored if file is in excel format.
+#' This function also extracts the first \var{read_n} rows of the dataset read
+#' earlier to determine the Olink platform that generated the file, the data
+#' type and and file format.
+#'
+#' @author
+#'   Klev Diamanti
+#'
+#' @param file Path to Olink software output file in wide or long format.
+#' Expecting file extensions `csv`, `txt`, `xls`, or `xlsx`.
+#' @param sep Character separator of delimited input file. One of `NULL` for
+#' auto-detection (default), `,` for comma or `;` for semicolon. Used only for
+#' delimited output files from Olink software.
 #' @param read_n Number of top rows to read.
 #'
-#' @return A list with one tibble (df_top_n) and one ArrowObject (df). The
-#' ArrowObject contains the full dataset and the tibble the 3 rows that will
-#' allow us to determine the characteristics of the input file.
+#' @return A list with two elements:
+#' \itemize{
+#' \item An ArrowObject (\var{df}) containing the full dataset.
+#' \item A tibble (\var{df_top_n}) containing the \var{read_n} rows of the full
+#' dataset. This subset of data is used to determine \var{long_format},
+#' \var{olink_platform} and \var{data_type}.
+#' }
+#'
+#' @seealso
+#'   \code{\link{read_npx_format}}
+#'   \code{\link{read_npx_format_get_format}}
+#'   \code{\link{read_npx_format_get_platform}}
+#'   \code{\link{read_npx_format_get_quant}}
 #'
 read_npx_format_read <- function(file,
                                  sep = NULL,
@@ -318,32 +357,57 @@ read_npx_format_read <- function(file,
 
 }
 
-#' Help function to determine the wide or long file format.
+#' Help function to determine wide or long file format.
 #'
-#' @author Klev Diamanti
+#' @description
+#' The function uses the first \var{read_n} rows of the input dataset to
+#' determine the format of the input file.
 #'
-#' @param df Tibble containing the first three rows of the input Olink file.
-#' @param file The input Olink file.
-#' @param long_format Boolean marking if input file is in long (TRUE) or wide
-#' (FALSE) format.
-#' @param quant_methods Character vector with the Olink protein
-#' quantification methods.
+#' The user can provide the file format as an input argument. If the user did
+#' not provide an input with regards to the file format, then it is
+#' auto-determined exclusively from the function. If user provided the file
+#' format as input, then the function cross-checks that it's auto-detection
+#' matches user's input. If not, it will throw a warning, and accept user's
+#' input as the correct answer.
 #'
-#' @return A list of two variables: is_long_format and data_cells The first one
-#' is a boolean noting the file format and the second one is the character
-#' vector from the input file where the format was determined from.
-#' An error is returned if the format cannot be determined, unless the user has
-#' defined the file format from the input.
+#' @author
+#'   Klev Diamanti
 #'
-read_npx_get_format <- function(df,
-                                file,
-                                long_format = NULL,
-                                quant_methods) {
+#' @param df A tibble containing the first \var{read_n} rows of the input Olink
+#' file.
+#' @param file Path to Olink software output file in wide or long format.
+#' Expecting file extensions `csv`, `txt`, `xls`, or `xlsx`.
+#' @param long_format Boolean marking format of input file. One of `NULL`
+#' (default) for auto-detection, `TRUE` for long format files or `FALSE` for
+#' wide format files.
+#' @param quant_methods Character vector with the Olink protein quantification
+#' methods extracted from \var{accepted_olink_platforms$quant_method} in the
+#' local environment.
+#'
+#' @return A list with two elements:
+#' \itemize{
+#' \item A scalar boolean (\var{is_long_format}) marking if the input file is in
+#' long (`TRUE`) or wide (`FALSE`) format.
+#' \item A character vector (\var{data_cells}) from the input file which allows
+#' detection of the quantification method. Used in function
+#' `read_npx_get_quant`.
+#' }
+#'
+#' @seealso
+#'   \code{\link{read_npx_format}}
+#'   \code{\link{read_npx_format_read}}
+#'   \code{\link{read_npx_format_get_platform}}
+#'   \code{\link{read_npx_format_get_quant}}
+#'
+read_npx_format_get_format <- function(df,
+                                       file,
+                                       long_format = NULL,
+                                       quant_methods) {
 
   # Check inputs ----
 
-  check_is_data_frame(df = df,
-                      error = TRUE)
+  check_is_tibble(df = df,
+                  error = TRUE)
 
   check_file_exists(file = file,
                     error = TRUE)
@@ -493,36 +557,49 @@ read_npx_get_format <- function(df,
 
 }
 
-#' Help function to determine the Olink platform from the input Olink wide file.
+#' Help function to determine Olink platform from the input file in wide format.
 #'
-#' @author Klev Diamanti
+#' @description
+#' This function uses the panel name from Olink software files in wide format to
+#' determine the qPCR platform that was used for the project that this dataset
+#' represents.
 #'
-#' @param df Tibble containing the first three rows of the input Olink file in
-#' wide format.
-#' @param file The input excel file.
-#' @param olink_platform The Olink platform used to generate the input file in
-#' wide format. Expecting "Target 96", "Target 48", "Flex" or "Focus".
-#' @param olink_platforms_wide Data frame from the global variable
-#' accepted_olink_platforms.
+#' @author
+#'   Klev Diamanti
 #'
-#' @return The name of the Olink platform detected automatically or set by the
-#' user.
+#' @param df A tibble containing the first \var{read_n} rows of the input Olink
+#' file.
+#' @param file Path to Olink software output file in wide or long format.
+#' Expecting file extensions `csv`, `txt`, `xls`, or `xlsx`.
+#' @param olink_platform Olink platform used to generate the input file.
+#' One of `NULL` (default), `Target 96`, `Target 48`, `Flex` or `Focus`.
+#' @param olink_platforms_wide Tibble with rows corresponding to qPCR platforms
+#' extracted from \var{accepted_olink_platforms} from the local environment.
 #'
-read_npx_get_platform <- function(df,
-                                  file,
-                                  olink_platform = NULL,
-                                  olink_platforms_wide) {
+#' @return The name of the Olink platform. One of `Target 96`, `Target 48`,
+#' `Flex` or `Focus`.
+#'
+#' @seealso
+#'   \code{\link{read_npx_format}}
+#'   \code{\link{read_npx_format_read}}
+#'   \code{\link{read_npx_format_get_format}}
+#'   \code{\link{read_npx_format_get_quant}}
+#'
+read_npx_format_get_platform <- function(df,
+                                         file,
+                                         olink_platform = NULL,
+                                         olink_platforms_wide) {
 
   # Checks inputs ----
 
-  check_is_data_frame(df = df,
-                      error = TRUE)
+  check_is_tibble(df = df,
+                  error = TRUE)
 
   check_file_exists(file = file,
                     error = TRUE)
 
-  check_is_data_frame(df = olink_platforms_wide,
-                      error = TRUE)
+  check_is_tibble(df = olink_platforms_wide,
+                  error = TRUE)
 
   # check olink platform
   if (!is.null(olink_platform)) {
@@ -655,26 +732,41 @@ read_npx_get_platform <- function(df,
 
 }
 
-#' Help function to determine the the type of the quantification of the data in
-#' the excel file.
+#' Help function to determine the type of quantification from the input file in
+#' wide format.
 #'
-#' @author Klev Diamanti
+#' @description
+#' This function uses information from the cell A2 from Olink software files in
+#' wide format to determine the quantification method of the data that the
+#' dataset contains.
 #'
-#' @param file The input excel file.
-#' @param data_type The quantification in which the data comes in. Expecting one
-#' of NPX, Quantified or Ct.
-#' @param data_cells A character vector with the contents of the cells
-#' indicating the quantification method.
+#' @author
+#'   Klev Diamanti
+#'
+#' @param file Path to Olink software output file in wide or long format.
+#' Expecting file extensions `csv`, `txt`, `xls`, or `xlsx`.
+#' @param data_type Quantification method of the input data. One of `NULL`
+#' (default), `NPX`, `Quantified` or `Ct`.
+#' @param data_cells A character vector with the contents of the cell A2 from
+#' the Olink software file in wide format indicating the quantification method.
 #' @param quant_methods_expected Character vector with the Olink protein
-#' quantification methods.
+#' quantification methods extracted from \var{accepted_olink_platforms} from the
+#' local environment filtered for the Olink platform detected in function
+#' `read_npx_format_get_platform`.
 #'
-#' @return The quantification method detected in the file.
-#' An error is returned if the format cannot be determined.
+#' @return The name of the quantification method. One of `NPX`, `Quantified` or
+#' `Ct`.
 #'
-read_npx_get_quant <- function(file,
-                               data_type = NULL,
-                               data_cells,
-                               quant_methods_expected) {
+#' @seealso
+#'   \code{\link{read_npx_format}}
+#'   \code{\link{read_npx_format_read}}
+#'   \code{\link{read_npx_format_get_format}}
+#'   \code{\link{read_npx_format_get_platform}}
+#'
+read_npx_format_get_quant <- function(file,
+                                      data_type = NULL,
+                                      data_cells,
+                                      quant_methods_expected) {
 
   # Checks inputs ----
 

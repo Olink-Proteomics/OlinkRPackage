@@ -2,35 +2,53 @@
 % Please edit documentation in R/read_npx_format.R
 \name{read_npx_format_read}
 \alias{read_npx_format_read}
-\title{Help function that reads the first two rows of an Olink delimited or excel
-file.}
+\title{Help function to read excel and delimited Olink data files in R.}
 \usage{
 read_npx_format_read(file, sep = NULL, read_n = 3L)
 }
 \arguments{
-\item{file}{Path to Olink software output in excel, txt or csv.}
+\item{file}{Path to Olink software output file in wide or long format.
+Expecting file extensions `csv`, `txt`, `xls`, or `xlsx`.}
 
-\item{sep}{The separator of the file: NULL (autodetect), comma (,) or
-semicolon (;). Ignored if file is in excel format.}
+\item{sep}{Character separator of delimited input file. One of `NULL` for
+auto-detection (default), `,` for comma or `;` for semicolon. Used only for
+delimited output files from Olink software.}
 
 \item{read_n}{Number of top rows to read.}
 }
 \value{
-A list with one tibble (df_top_n) and one ArrowObject (df). The
-ArrowObject contains the full dataset and the tibble the 3 rows that will
-allow us to determine the characteristics of the input file.
+A list with two elements:
+\itemize{
+\item An ArrowObject (\var{df}) containing the full dataset.
+\item A tibble (\var{df_top_n}) containing the \var{read_n} rows of the full
+dataset. This subset of data is used to determine \var{long_format},
+\var{olink_platform} and \var{data_type}.
+}
 }
 \description{
-This function extracts the first two rows of an Olink output file to detect
-the Olink platform that generated the file, the data type and and file
-format. The input file format may be wide or long, and the input file type
-can be excel (xls/xlsx) or delimited (csv/txt).
+This function reads Olink software excel or delimited files regardless of
+data type, platform or format.
 
-In case of long format input, the function will return the row of the column
-names and the first row with data.
+\strong{Olink software excel files} with the suffix `xlsx` or `xls` are
+imported in R by the function `read_npx_excel`.
 
-In case of wide format inpiut, the function will return the first two rows of
-the inpit file.
+\strong{Olink software delimited files} with suffix `csv` or `txt` are
+imported in R by the function `read_npx_delim` or `read_npx_csv`.
+
+\itemize{
+\item Files in long format are read with the column row as column names.
+\item Files in wide format are read with column names as V1, V2, etc.
+}
+
+This function also extracts the first \var{read_n} rows of the dataset read
+earlier to determine the Olink platform that generated the file, the data
+type and and file format.
+}
+\seealso{
+\code{\link{read_npx_format}}
+  \code{\link{read_npx_format_get_format}}
+  \code{\link{read_npx_format_get_platform}}
+  \code{\link{read_npx_format_get_quant}}
 }
 \author{
 Klev Diamanti

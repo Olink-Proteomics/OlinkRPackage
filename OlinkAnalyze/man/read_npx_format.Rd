@@ -2,8 +2,8 @@
 % Please edit documentation in R/read_npx_format.R
 \name{read_npx_format}
 \alias{read_npx_format}
-\title{Help function to identify the format, data type and platform from the input
-Olink file.}
+\title{Help function to read excel and delimited Olink data files in R and determine
+their format, data type and platform.}
 \usage{
 read_npx_format(
   file,
@@ -16,37 +16,57 @@ read_npx_format(
 )
 }
 \arguments{
-\item{file}{The input Olink file in excel or delimited format.}
+\item{file}{Path to Olink software output file in wide or long format.
+Expecting file extensions `csv`, `txt`, `xls`, or `xlsx`.}
 
-\item{out_df}{The class of output data frame to be returned. Accepted values
-are "tibble" (default) and "arrow".}
+\item{out_df}{The class of output data frame. One of `tibble` (default) or
+`arrow` for ArrowObject.}
 
-\item{sep}{The separator of the file: NULL (autodetect), comma (,) or
-semicolon (;). Ignored if file is in excel format.}
+\item{sep}{Character separator of delimited input file. One of `NULL` for
+auto-detection (default), `,` for comma or `;` for semicolon. Used only for
+delimited output files from Olink software.}
 
-\item{long_format}{Boolean marking if input file is in long (TRUE) or wide
-(FALSE) format.}
+\item{long_format}{Boolean marking format of input file. One of `NULL`
+(default) for auto-detection, `TRUE` for long format files or `FALSE` for
+wide format files.}
 
-\item{olink_platform}{The Olink platform used to generate the input file.
-Expecting "Explore 3072", "Explore HT", "Target 96", "Target 48", "Flex" or
-"Focus".}
+\item{olink_platform}{Olink platform used to generate the input file.
+One of `NULL` (default), `Explore 3072`, `Explore HT`, `Target 96`,
+`Target 48`, `Flex` or `Focus`.}
 
-\item{data_type}{The quantification in which the data comes in. Expecting one
-of NPX, Quantified or Ct.}
+\item{data_type}{Quantification method of the input data. One of `NULL`
+(default), `NPX`, `Quantified` or `Ct`.}
 
-\item{quiet}{Print a confirmation message after reading in the input file.}
+\item{quiet}{Boolean to print a confirmation message when reading the input
+file. Applies to excel or delimited input only. `TRUE` (default) to not print
+and `FALSE` to print.}
 }
 \value{
-A tibble in long format or an ArrowObject.
+Tibble or ArrowObject with Olink data in long format.
 }
 \description{
-This function should be processing all Olink excel or delimited files
-regardless of data type, platform or wide/long format. Files in wide format
-should be handled by read_npx_wide; files in long format delimited by comma
-or semicolon (csv) should be handled by read_npx_delim; and files in long
-format in excel (xlsx) should be handled by read_npx_excel. Only files in
-wide format that always originate from qPCR platforma should be further
-investigated for data type and olink platform.
+This function processes Olink software excel or delimited files regardless of
+data type, platform or format.
+
+\strong{Olink software excel files} with the suffix `xlsx` or `xls` are
+imported in R by the function `read_npx_excel`.
+
+\strong{Olink software delimited files} with suffix `csv` or `txt` are
+imported in R by the function `read_npx_delim` or `read_npx_csv`.
+
+Files in wide format are subsequently handled by the function
+`read_npx_wide`.
+
+\strong{Olink software files in wide format} always originate from the Olink
+qPCR platforms, and are further processed by `read_npx_get_platform` and
+`read_npx_get_quant` to determine the data type and Olink platform,
+respectively.
+}
+\seealso{
+\code{\link{read_npx_format_read}}
+  \code{\link{read_npx_format_get_format}}
+  \code{\link{read_npx_format_get_platform}}
+  \code{\link{read_npx_format_get_quant}}
 }
 \author{
 Klev Diamanti;
