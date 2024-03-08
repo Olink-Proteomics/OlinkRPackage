@@ -1,9 +1,9 @@
 #' Help function checking that the olink_platform is acceptable.
 #'
-#' @param x The name of the Olink platform. One of "Target 48", "Flex",
-#' "Target 96", "Explore 3072", "Explore HT" or "Focus".
-#' @param broader_platform Name of the broader Olink platform. On of "qPCR" or
-#' "NGS".
+#' @param x The name of the Olink platform. One of `Explore 3072`, `Explore HT`,
+#' `Target 96`, `Target 48`, `Flex` or `Focus`.
+#' @param broader_platform Name of the broader Olink platform. One of `qPCR` or
+#' `NGS`.
 #'
 #' @return
 #' Nothing if platform is ok, otherwise an error.
@@ -52,9 +52,9 @@ check_olink_platform <- function(x,
 
 #' Help function checking that the Olink data_type is acceptable.
 #'
-#' @param x The name of the Olink data type. One of "NPX", "Quantified" or "Ct".
-#' @param broader_platform Name of the broader Olink platform. On of "qPCR" or
-#' "NGS".
+#' @param x The name of the Olink data type. One of `NPX`, `Quantified` or `Ct`.
+#' @param broader_platform Name of the broader Olink platform. One of `qPCR` or
+#' `NGS`.
 #'
 #' @return
 #' Nothing if data_type is ok, otherwise an error.
@@ -111,7 +111,7 @@ check_olink_data_type <- function(x,
 
 #' Help function checking that the broader Olink platform is acceptable.
 #'
-#' @param x Name of the broader Olink platform. On of "qPCR" or "NGS".
+#' @param x Name of the broader Olink platform. One of `qPCR` or `NGS`.
 #'
 #' @return
 #' Nothing if broader Olink platform is ok, otherwise an error.
