@@ -137,7 +137,7 @@ test_that(
 )
 
 test_that(
-  "read_npx_delim - works - wide fornat - output df matches input df",
+  "read_npx_delim - works - wide format - output df matches input df",
   {
     # random data frame
     df_synthetic <- olink_wide_synthetic(olink_platform = "Target 96",
@@ -341,7 +341,7 @@ test_that(
 )
 
 test_that(
-  "read_npx_delim - error - wide formnat - file not delimited",
+  "read_npx_delim - error - wide format - file not delimited",
   {
     withr::with_tempfile(
       new = "pfile_test",
@@ -381,8 +381,6 @@ test_that(
     )
   }
 )
-
-
 
 test_that(
   "read_npx_delim - error - df has one column only",
