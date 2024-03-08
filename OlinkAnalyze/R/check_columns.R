@@ -1,7 +1,11 @@
-#' Check that an input data frame contains the required columns
+#' Check that an input tibble or arrow object contains the required columns.
 #'
-#' `check_columns` checks if the data frame `data` contains all of the columns
-#' in the list `col_list`.
+#' @description
+#' `check_columns` checks if the input tibble or arrow object `data` contains
+#' all of the columns in \var{col_list}.
+#'
+#' \var{col_list} might contain also vectors of characters as elements. In this
+#' case one of the characters in the vector is expected to be present.
 #'
 #' @author
 #'   Klev Diamanti
@@ -10,12 +14,13 @@
 #'   Pascal Pucholt
 #'   Gil Henriques
 #'
-#' @param df A data frame.
+#' @param df A tibble or arrow object.
 #' @param col_list A list, where each element is a character vector (usually of
-#' length one). The function will check whether the column names of `data`
-#' include the elements of `col_list`. When an element of `col_list` is a vector
-#' of length higher than one, the function will check whether the column names
-#' of `data` include *at least one* of the elements of that vector.
+#' length one). The function will check whether the column names of \var{df}
+#' contain elements from \var{col_list}. When an element of \var{col_list}
+#' contains more than one elements, the function will check whether the column
+#' names of \var{df} include \strong{at least one} of the elements of that
+#' vector.
 #'
 #' @examples
 #' \dontrun{
@@ -62,8 +67,9 @@ check_columns <- function(df,
                           col_list) {
 
   # Check input ----
-  check_is_data_frame(df = df,
+  check_is_arrow_or_tibble(df = df,
                       error = TRUE)
+
   check_is_list(lst = col_list,
                 error = TRUE)
 
@@ -90,7 +96,7 @@ check_columns <- function(df,
   # Check columns ----
 
   # get column of the data frame
-  df_column_names <- colnames(df)
+  df_column_names <- names(df)
 
   ## Columns that _must_ be present ----
 
