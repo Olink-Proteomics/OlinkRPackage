@@ -3,7 +3,7 @@
 \name{read_npx}
 \alias{read_npx}
 \alias{read_NPX}
-\title{Function to read NPX data into R in long format.}
+\title{Read NPX, Ct or absolute quantification data in R.}
 \usage{
 read_npx(
   filename,
@@ -28,37 +28,43 @@ read_NPX(
 )
 }
 \arguments{
-\item{filename}{Path to Olink software output file.}
+\item{filename}{Path to Olink software output file in wide or long format.
+Expecting file extensions `csv`, `txt`, `xls`, `xlsx`, `parquet` or `zip`.}
 
-\item{out_df}{The class of output data frame to be returned. Accepted values
-are "tibble" (default) and "arrow".}
+\item{out_df}{The class of output data frame. One of `tibble` (default) or
+`arrow` for ArrowObject.}
 
-\item{sep}{The separator of the delimited file: NULL (autodetect), comma (,)
-or semicolon (;). Used only for delimited Olink software output files.}
+\item{sep}{Character separator of delimited input file. One of `NULL` for
+auto-detection (default), `,` for comma or `;` for semicolon. Used only for
+delimited output files from Olink software.}
 
-\item{long_format}{Boolean marking if input file is in long (TRUE) or wide
-(FALSE) format. Ignored for non-excel input files.}
+\item{long_format}{Boolean marking format of input file. One of `NULL`
+(default) for auto-detection, `TRUE` for long format files or `FALSE` for
+wide format files.}
 
-\item{olink_platform}{The Olink platform used to generate the input file.
-Expecting "Target 96", "Target 48", "Flex" or "Focus". Ignored for non-excel
-input files.}
+\item{olink_platform}{Olink platform used to generate the input file.
+One of `NULL` (default), `Explore 3072`, `Explore HT`, `Target 96`,
+`Target 48`, `Flex` or `Focus`.}
 
-\item{data_type}{The quantification in which the data comes in. Expecting one
-of NPX, Quantified or Ct. Ignored for non-excel input files.}
+\item{data_type}{Quantification method of the input data. One of `NULL`
+(default), `NPX`, `Quantified` or `Ct`.}
 
-\item{.ignore_files}{Files to ignore in the zip-compressed Olink software
-output files. Used only for zip-compressed Olink software output files.}
+\item{.ignore_files}{Character vector of files included in the zip-compressed
+Olink software output files that should be ignored. Applies only to
+zip-compressed input files. `c("README.txt")` (default).}
 
-\item{quiet}{Print a confirmation message after reading in the input file.}
+\item{quiet}{Boolean to print a confirmation message when reading the input
+file. Applies to excel or delimited input only. `TRUE` (default) to not print
+and `FALSE` to print.}
 }
 \value{
-A tibble or an ArrowObject in long format .
+Tibble or ArrowObject with Olink data in long format.
 }
 \description{
-Imports an NPX or QUANT file exported from Olink software.
+Imports an NPX, Ct or Quantification file exported from Olink software.
 
-__Note__ Please do not alter the Olink software output file prior to
-importing it using `read_NPX()` as it might fail.
+\strong{Note:} Do not modify the Olink software output file prior to
+importing it with `read_npx()` as it might fail.
 }
 \examples{
 \donttest{

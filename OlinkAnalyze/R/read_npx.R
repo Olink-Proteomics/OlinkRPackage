@@ -1,10 +1,10 @@
-#' Function to read NPX data into R in long format.
+#' Read NPX, Ct or absolute quantification data in R.
 #'
 #' @description
-#' Imports an NPX or QUANT file exported from Olink software.
+#' Imports an NPX, Ct or Quantification file exported from Olink software.
 #'
-#' __Note__ Please do not alter the Olink software output file prior to
-#' importing it using `read_NPX()` as it might fail.
+#' \strong{Note:} Do not modify the Olink software output file prior to
+#' importing it with `read_npx()` as it might fail.
 #'
 #' @author
 #'   Klev Diamanti;
@@ -15,23 +15,29 @@
 #'   Olof Mansson;
 #'   Marianne Sandin
 #'
-#' @param filename Path to Olink software output file.
-#' @param out_df The class of output data frame to be returned. Accepted values
-#' are "tibble" (default) and "arrow".
-#' @param sep The separator of the delimited file: NULL (autodetect), comma (,)
-#' or semicolon (;). Used only for delimited Olink software output files.
-#' @param long_format Boolean marking if input file is in long (TRUE) or wide
-#' (FALSE) format. Ignored for non-excel input files.
-#' @param olink_platform The Olink platform used to generate the input file.
-#' Expecting "Target 96", "Target 48", "Flex" or "Focus". Ignored for non-excel
-#' input files.
-#' @param data_type The quantification in which the data comes in. Expecting one
-#' of NPX, Quantified or Ct. Ignored for non-excel input files.
-#' @param .ignore_files Files to ignore in the zip-compressed Olink software
-#' output files. Used only for zip-compressed Olink software output files.
-#' @param quiet Print a confirmation message after reading in the input file.
+#' @param filename Path to Olink software output file in wide or long format.
+#' Expecting file extensions `csv`, `txt`, `xls`, `xlsx`, `parquet` or `zip`.
+#' @param out_df The class of output data frame. One of `tibble` (default) or
+#' `arrow` for ArrowObject.
+#' @param sep Character separator of delimited input file. One of `NULL` for
+#' auto-detection (default), `,` for comma or `;` for semicolon. Used only for
+#' delimited output files from Olink software.
+#' @param long_format Boolean marking format of input file. One of `NULL`
+#' (default) for auto-detection, `TRUE` for long format files or `FALSE` for
+#' wide format files.
+#' @param olink_platform Olink platform used to generate the input file.
+#' One of `NULL` (default), `Explore 3072`, `Explore HT`, `Target 96`,
+#' `Target 48`, `Flex` or `Focus`.
+#' @param data_type Quantification method of the input data. One of `NULL`
+#' (default), `NPX`, `Quantified` or `Ct`.
+#' @param .ignore_files Character vector of files included in the zip-compressed
+#' Olink software output files that should be ignored. Applies only to
+#' zip-compressed input files. `c("README.txt")` (default).
+#' @param quiet Boolean to print a confirmation message when reading the input
+#' file. Applies to excel or delimited input only. `TRUE` (default) to not print
+#' and `FALSE` to print.
 #'
-#' @return A tibble or an ArrowObject in long format .
+#' @return Tibble or ArrowObject with Olink data in long format.
 #'
 #' @keywords
 #'   NPX;
@@ -64,7 +70,6 @@
 #'          sep = ";")
 #' }
 #'
-
 read_npx <- function(filename,
                      out_df = "tibble",
                      sep = NULL,
@@ -93,6 +98,8 @@ read_npx <- function(filename,
   # check what type of label the extension of the input matches to
   f_label <- accepted_npx_file_ext[accepted_npx_file_ext == f_ext] |>
     names()
+
+  # read data ----
 
   # if the extension of the input file was within the accepted ones it should
   # be a scalar character
@@ -142,6 +149,8 @@ read_npx <- function(filename,
     )
 
   }
+
+  # convert and return ----
 
   # if needed convert the object to the requested output
   df_olink <- convert_read_npx_output(df = df_olink,
