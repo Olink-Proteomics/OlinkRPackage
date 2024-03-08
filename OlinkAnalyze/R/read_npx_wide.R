@@ -1,15 +1,26 @@
-#' Read wide Olink files with NPX, Ct or Quantified data.
+#' Convert Olink data in wide format with NPX, Ct or Quantified data to long
+#' format.
 #'
-#' @author Klev Diamanti
+#' @author
+#'   Klev Diamanti
 #'
 #' @param df A tibble containing the full Olink dataset in wide format.
-#' @param file The input Olink wide file.
-#' @param data_type The quantification in which the data comes in. Expecting one
-#' of "NPX", "Quantified" or "Ct".
-#' @param olink_platform The Olink platform used to generate the input file.
-#' Expecting one of "Target 96", "Target 48", "Flex" or "Focus".
+#' @param file Path to Olink software output file in wide or long format.
+#' Expecting file extensions `csv`, `txt`, `xls`, or `xlsx`.
+#' @param olink_platform Olink platform used to generate the input file.
+#' One of `Target 96`, `Target 48`, `Flex` or `Focus`.
+#' @param data_type Quantification method of the input data. One of `NPX`,
+#' `Quantified` or `Ct`.
 #'
-#' @return A tibble of the wide Olink file in long format.
+#' @return Tibble with Olink data in long format.
+#'
+#' @seealso
+#'   \code{\link{read_npx_format}}
+#'   \code{\link{read_npx_wide_split_row}}
+#'   \code{\link{read_npx_wide_npxs_version}}
+#'   \code{\link{read_npx_wide_top}}
+#'   \code{\link{read_npx_wide_middle}}
+#'   \code{\link{read_npx_wide_bottom}}
 #'
 read_npx_wide <- function(df,
                           file,
@@ -18,8 +29,8 @@ read_npx_wide <- function(df,
 
   # initial checks ----
 
-  check_is_data_frame(df = df,
-                      error = TRUE)
+  check_is_tibble(df = df,
+                  error = TRUE)
 
   check_file_exists(file = file,
                     error = TRUE)
@@ -170,29 +181,63 @@ read_npx_wide <- function(df,
   return(df_long)
 }
 
-#' Help function the uses rows with all columns NA to split the wide Olink data
-#' file into 3 or 4 data sets.
+#' Split Olink wide files to sub-matrices.
 #'
 #' @description
-#' Wide Olink files contains 1 or 2 rows with all columns NA as a break between
-#' subsections of the data. This function takes advantage of that feature and
-#' splits the wide file into 2 or 3 data sets each of which will be used
-#' downstream to create a long data frame.
+#' Olink datasets in wide format contain 1 or 2 rows with all columns NA marking
+#' sub-matrices of the data. This function takes advantage of that feature and
+#' splits the dataset into 3 or 4 sub-matrices. Each sub-matrix is used
+#' downstream to assemble a long data frame.
 #'
-#' The function captures the rows with all columns NA and computes the row
-#' indexes to split the dataset from the wide file into sub-data sets.
+#' Specifically:
+#' \itemize{
+#'   \item \strong{Head matrix} consists of the first 2 rows of the wide
+#'   dataset. This matrix contains the project name, the NPX Signature version
+#'   that was used to generate the wide dataset and the quantification method.
+#'   \item \strong{Top matrix} consists of the next 4 or 5 rows of the wide
+#'   dataset, depending on the quantification method. This matrix contains data
+#'   on assays, panels, columns with plate identifiers, columns with sample QC
+#'   warnings and column with deviations from the internal controls. Note that
+#'   not all the columns are present in all datasets and for all quantification
+#'   methods. The local environment variable \var{olink_wide_spec} marks all
+#'   the expected configurations.
+#'   \item \strong{Middle matrix} is marked by rows with all columns `NA` above
+#'   and below. This matrix contains sample identifiers, quantification
+#'   measurements for all assays, plate identifiers, sample QC warnings and
+#'   deviations from the internal controls.
+#'   \item \strong{Bottom matrix} is located below the middle matrix and
+#'   contains information of LOD, missing frequency, assay warning and data
+#'   normalization approach. Note that this matrix is not available for all
+#'   quantification methods.
+#' }
 #'
-#' @author Klev Diamanti
+#' @author
+#'   Klev Diamanti
 #'
 #' @param df A tibble containing the full Olink dataset in wide format.
-#' @param file The input Olink wide file.
-#' @param data_type The quantification in which the data comes in. Expecting one
-#' of "NPX", "Quantified" or "Ct".
-#' @param format_spec A one-row data frame filtered from olink_wide_spec with
-#' the Olink wide file specifications.
+#' @param file Path to Olink software output file in wide or long format.
+#' Expecting file extensions `csv`, `txt`, `xls`, or `xlsx`.
+#' @param data_type Quantification method of the input data. One of `NPX`,
+#' `Quantified` or `Ct`.
+#' @param format_spec A tibble derived from \var{olink_wide_spec} in the local
+#' environment containing the expected format of the Olink wide file based on
+#' the \var{olink_platform} and \var{data_type}.
 #'
 #' @return A named list of tibbles containing the sub-matrices of the Olink wide
-#' format file split on: "df_head", "df_top", "df_mid", "df_bottom".
+#' format file split on:
+#' \itemize{
+#'   \item \strong{Head matrix} as \var{df_head}
+#'   \item \strong{Top matrix} as \var{df_top}
+#'   \item \strong{Middle} as \var{df_mid}
+#'   \item \strong{Bottom matrix} as \var{df_bottom}
+#' }
+#'
+#' @seealso
+#'   \code{\link{read_npx_wide}}
+#'   \code{\link{read_npx_wide_npxs_version}}
+#'   \code{\link{read_npx_wide_top}}
+#'   \code{\link{read_npx_wide_middle}}
+#'   \code{\link{read_npx_wide_bottom}}
 #'
 read_npx_wide_split_row <- function(df,
                                     file,
@@ -201,8 +246,8 @@ read_npx_wide_split_row <- function(df,
 
   # initial checks ----
 
-  check_is_data_frame(df = df,
-                      error = TRUE)
+  check_is_tibble(df = df,
+                  error = TRUE)
 
   check_file_exists(file = file,
                     error = TRUE)
@@ -210,8 +255,8 @@ read_npx_wide_split_row <- function(df,
   check_olink_data_type(x = data_type,
                         broader_platform = "qPCR")
 
-  check_is_data_frame(df = format_spec,
-                      error = TRUE)
+  check_is_tibble(df = format_spec,
+                  error = TRUE)
 
   # detect rows with all NA columns ----
 
@@ -325,22 +370,30 @@ read_npx_wide_split_row <- function(df,
 
 }
 
-#' Help function that extracts the version of the NPX Signature software from
-#' Olink wide format files.
+#' Extract version of NPX Signature from the head matrix of Olink datasets in
+#' wide format.
 #'
-#' @author Klev Diamanti
+#' @author
+#'   Klev Diamanti
 #'
-#' @param df The 2x2 header data frame from an Olink wide file.
+#' @param df Head matrix of Olink datasets in wide format \var{df_head}.
 #'
-#' @return A scalar character vector with the version of the NPX Signature
-#' software from cell B1 of the Olink wide format file.
+#' @return The version of the NPX Signature software.
+#'
+#' @seealso
+#'   \code{\link{read_npx_wide}}
+#'   \code{\link{read_npx_wide_split_row}}
+#'   \code{\link{read_npx_wide_npxs_version}}
+#'   \code{\link{read_npx_wide_top}}
+#'   \code{\link{read_npx_wide_middle}}
+#'   \code{\link{read_npx_wide_bottom}}
 #'
 read_npx_wide_npxs_version <- function(df) {
 
   # check input ----
 
-  check_is_data_frame(df = df,
-                      error = TRUE)
+  check_is_tibble(df = df,
+                  error = TRUE)
 
   # check necessary columns ----
 
@@ -370,17 +423,22 @@ read_npx_wide_npxs_version <- function(df) {
 
 }
 
-#' Help function to determine the number of rows with assay information in Olink
-#' wide format file.
+#' Additional checks of the top matrix of Olink dataset in wide format.
 #'
-#' @author Klev Diamanti
+#' @author
+#'   Klev Diamanti
 #'
-#' @param df The top data frame from a split Olink wide  file.
-#' @param file The input Olink wide file.
-#' @param format_spec A one-row data frame filtered from olink_wide_spec with
-#' the Olink wide file specifications.
+#' @param df Top matrix of Olink datasets in wide format \var{df_top}.
+#' @param file Path to Olink software output file in wide or long format.
+#' Expecting file extensions `csv`, `txt`, `xls`, or `xlsx`.
+#' @param format_spec A tibble derived from \var{olink_wide_spec} in the local
+#' environment containing the expected format of the Olink wide file based on
+#' the \var{olink_platform} and \var{data_type}.
 #'
 #' @return NULL unless an inconsistency is spotted.
+#'
+#' @seealso
+#'   \code{\link{read_npx_wide_top}}
 #'
 read_npx_wide_check_top <- function(df,
                                     file,
@@ -394,8 +452,8 @@ read_npx_wide_check_top <- function(df,
   check_file_exists(file = file,
                     error = TRUE)
 
-  check_is_data_frame(df = format_spec,
-                      error = TRUE)
+  check_is_tibble(df = format_spec,
+                  error = TRUE)
 
   # checks ----
 
@@ -658,20 +716,41 @@ read_npx_wide_check_top <- function(df,
 
 }
 
-#' Help function that splits the top from an Olink wide file into more data
-#' frames.
+#' Split the top matrix from Olink dataset in wide format.
 #'
-#' @author Klev Diamanti
+#' @description
+#' The function splits the top matrix \var{df_top} into chunks of columns, each
+#' of which contains separate information that will be combined with matching
+#' chunks from \var{df_mid} to convert the wide dataset into a long one.
 #'
-#' @param df The top data frame from a split Olink wide file.
-#' @param file The input Olink wide file.
-#' @param olink_platform The Olink platform used to generate the input file.
-#' Expecting one of "Target 96", "Target 48", "Flex" or "Focus".
-#' @param format_spec A one-row data frame filtered from olink_wide_spec with
-#' the Olink wide file specifications.
+#' @author
+#'   Klev Diamanti
 #'
-#' @return A list of data frames (df_oid, df_pid, df_qc_warn and df_int_ctrl) in
-#' long format from the top matrix of an Olink wide file.
+#' @param df Top matrix of Olink dataset in wide format \var{df_top}.
+#' @param file Path to Olink software output file in wide or long format.
+#' Expecting file extensions `csv`, `txt`, `xls`, or `xlsx`.
+#' @param olink_platform Olink platform used to generate the input file.
+#' One of `Target 96`, `Target 48`, `Flex` or `Focus`.
+#' @param format_spec A tibble derived from \var{olink_wide_spec} in the local
+#' environment containing the expected format of the Olink wide file based on
+#' the \var{olink_platform} and \var{data_type}.
+#'
+#' @return A list of data frames from top matrix in long format:
+#' \itemize{
+#'   \item Data frame containing Olink assays \var{df_top_oid}
+#'   \item Data frame containing plate identifiers \var{df_top_pid}
+#'   \item Data frame containing QC warnings \var{df_top_qc_warn}
+#'   \item Data frame containing internal control assays \var{df_top_int_ctrl}
+#'   \item Data frame containing deviation from internal control assays
+#'   \var{df_top_dev_int_ctrl}
+#' }
+#'
+#' @seealso
+#'   \code{\link{read_npx_wide}}
+#'   \code{\link{read_npx_wide_split_row}}
+#'   \code{\link{read_npx_wide_npxs_version}}
+#'   \code{\link{read_npx_wide_middle}}
+#'   \code{\link{read_npx_wide_bottom}}
 #'
 read_npx_wide_top <- function(df,
                               file,
@@ -683,8 +762,8 @@ read_npx_wide_top <- function(df,
   check_olink_platform(x = olink_platform,
                        broader_platform = "qPCR")
 
-  check_is_data_frame(df = format_spec,
-                      error = TRUE)
+  check_is_tibble(df = format_spec,
+                  error = TRUE)
 
   read_npx_wide_check_top(
     df = df,
@@ -882,21 +961,44 @@ read_npx_wide_top <- function(df,
 
 }
 
-#' Help function that splits the middle matrix from an Olink wide file into more
-#' data frames.
+#' Split the middle matrix from Olink dataset in wide format.
 #'
-#' @author Klev Diamanti
+#' @description
+#' Use chunks of columns from `read_npx_wide_top` to split the middle matrix
+#' \var{df_mid} into corresponding chunks of columns.
 #'
-#' @param df The middle data frame from a split Olink wide file.
-#' @param file The input Olink wide file.
-#' @param data_type The quantification in which the data comes in. Expecting one
-#' of "NPX", "Quantified" or "Ct".
-#' @param col_names Named list of character vectors with the names of the
-#' columns containing Olink data on Assays, Plates, QC Warnings, Internal
-#' Control assays and deviations from internal controls.
+#' @author
+#'   Klev Diamanti
+#'
+#' @param df Middle matrix of Olink dataset in wide format \var{df_mid}.
+#' @param file Path to Olink software output file in wide or long format.
+#' Expecting file extensions `csv`, `txt`, `xls`, or `xlsx`.
+#' @param data_type Quantification method of the input data. One of `NPX`,
+#' `Quantified` or `Ct`.
+#' @param col_names Names list of character vectors containing column names from
+#' each chunk of columns \var{df_top} was split on in function.
+#' `read_npx_wide_top`.
 #'
 #' @return A list of data frames (df_oid, df_pid, df_qc_warn and df_int_ctrl) in
 #' long format from the middle matrix of an Olink wide file.
+#'
+#' A list of data frames from middle matrix in long format:
+#' \itemize{
+#'   \item Data frame containing measurements of Olink assays \var{df_mid_oid}
+#'   \item Data frame containing plate identifiers \var{df_mid_pid}
+#'   \item Data frame containing QC warnings \var{df_mid_qc_warn}
+#'   \item Data frame containing measurements of internal control assays
+#'   \var{df_mid_int_ctrl}
+#'   \item Data frame containing measurements of deviations from internal
+#'   control assays \var{df_mid_dev_int_ctrl}
+#' }
+#'
+#' @seealso
+#'   \code{\link{read_npx_wide}}
+#'   \code{\link{read_npx_wide_split_row}}
+#'   \code{\link{read_npx_wide_npxs_version}}
+#'   \code{\link{read_npx_wide_top}}
+#'   \code{\link{read_npx_wide_bottom}}
 #'
 read_npx_wide_middle <- function(df,
                                  file,
@@ -905,8 +1007,8 @@ read_npx_wide_middle <- function(df,
 
   # check input ----
 
-  check_is_data_frame(df = df,
-                      error = TRUE)
+  check_is_tibble(df = df,
+                  error = TRUE)
 
   check_file_exists(file = file,
                     error = TRUE)
@@ -1093,21 +1195,31 @@ read_npx_wide_middle <- function(df,
 
 }
 
-#' Help function to combine top and middle matrices of an Olink wide file to
-#' long format.
+#' Combine top and middle matrices in long format.
 #'
-#' @author Klev Diamanti
+#' @description
+#' Combined corresponding chunks of columns from the top and middle matrix
+#' that were computed from `read_npx_wide_top` and `read_npx_wide_middle`,
+#' respectively.
+#'
+#' @author
+#'   Klev Diamanti
 #'
 #' @param df_top_list List of data frames from the top matrix. Output of
 #' function `read_npx_wide_top`.
 #' @param df_middle_list List of data frames from the middle matrix. Output of
 #' function `read_npx_wide_middle`.
-#' @param data_type The quantification in which the data comes in. Expecting one
-#' of "NPX", "Quantified" or "Ct".
-#' @param format_spec A one-row data frame filtered from olink_wide_spec with
-#' the Olink wide file specifications.
+#' @param data_type Quantification method of the input data. One of `NPX`,
+#' `Quantified` or `Ct`.
+#' @param format_spec A tibble derived from \var{olink_wide_spec} in the local
+#' environment containing the expected format of the Olink wide file based on
+#' the \var{olink_platform} and \var{data_type}.
 #'
-#' @return A tibble combining the top and middle matrices in long format.
+#' @return Tibble in long format combining the top and middle matrices.
+#'
+#' @seealso
+#'   \code{\link{read_npx_wide_top}}
+#'   \code{\link{read_npx_wide_middle}}
 #'
 red_npx_wide_top_mid_long <- function(df_top_list,
                                       df_middle_list,
@@ -1117,11 +1229,11 @@ red_npx_wide_top_mid_long <- function(df_top_list,
 
   check_is_list(lst = df_top_list)
 
-  sapply(df_top_list, check_is_data_frame, error = TRUE)
+  sapply(df_top_list, check_is_tibble, error = TRUE)
 
   check_is_list(lst = df_middle_list)
 
-  sapply(df_middle_list, check_is_data_frame, error = TRUE)
+  sapply(df_middle_list, check_is_tibble, error = TRUE)
 
   check_is_tibble(df = format_spec,
                   error = TRUE)
@@ -1246,19 +1358,29 @@ red_npx_wide_top_mid_long <- function(df_top_list,
   return(df_long)
 }
 
-#' Help function that output all possible row names for the bottom matrix given
-#' data_type.
+#' Additional checks of the bottom matrix of Olink dataset in wide format.
 #'
-#' @author Klev Diamanti
+#' @description
+#' The rows included in the bottom matrix have evolved through the years. For us
+#' to be able to support as many such versions as possible we have used the
+#' local environment variable \var{olink_wide_bottom_matrix} to mark these
+#' different versions. This function extract these version and allows us to
+#' check the validity of the data.
+#'
+#' @author
+#'   Klev Diamanti
 #'
 #' @param data_type The quantification in which the data comes in. Expecting one
 #' of "NPX", "Quantified" or "Ct".
-#' @param olink_platform The Olink platform used to generate the input file.
-#' Expecting one of "Target 96", "Target 48", "Flex" or "Focus".
+#' @param olink_platform Olink platform used to generate the input file.
+#' One of `Target 96`, `Target 48`, `Flex` or `Focus`.
 #'
-#' @return List of data frames with two columns each. Columns contain unique and
-#' alternative expected names for the V1 of each row of the bottom matrix in an
+#' @return List of tibbles with two columns each. Columns contain unique and
+#' alternative expected names for V1 of each row of the bottom matrix in an
 #' Olink wide file.
+#'
+#' @seealso
+#'   \code{\link{read_npx_wide_bottom}}
 #'
 read_npx_wide_bottom_version <- function(data_type,
                                          olink_platform) {
@@ -1310,25 +1432,38 @@ read_npx_wide_bottom_version <- function(data_type,
   return(list_bottom_v)
 }
 
-#' Help function that converts the bottom matrix of an Olink wide file to long
-#' format.
+#' Convert the bottom matrix from Olink dataset in wide format to long.
 #'
-#' @author Klev Diamanti
+#' @description
+#' Use chunks of columns from `read_npx_wide_top` to covert the bottom matrix
+#' \var{df_bottom} into a long format tibble.
 #'
-#' @param df The bottom data frame from a split Olink wide file.
-#' @param file The input Olink wide file.
-#' @param olink_platform The Olink platform used to generate the input file.
-#' Expecting one of "Target 96", "Target 48", "Flex" or "Focus".
-#' @param data_type The quantification in which the data comes in. Expecting one
-#' of "NPX", "Quantified" or "Ct".
-#' @param col_names Named list of character vectors with the names of the
-#' columns containing Olink data on Assays and Internal Control assays.
-#' @param format_spec A one-row data frame filtered from olink_wide_spec with
-#' the Olink wide file specifications.
-#' @param df_plate_panel Data frame with unique combinations of panels and
-#' plates from the combination of top and middle data frames.
+#' @author
+#'   Klev Diamanti
+#'
+#' @param df Bottom matrix of Olink dataset in wide format \var{df_bottom}.
+#' @param file Path to Olink software output file in wide or long format.
+#' Expecting file extensions `csv`, `txt`, `xls`, or `xlsx`.
+#' @param olink_platform Olink platform used to generate the input file.
+#' One of `Target 96`, `Target 48`, `Flex` or `Focus`.
+#' @param data_type Quantification method of the input data. One of `NPX`,
+#' `Quantified` or `Ct`.
+#' @param col_names Names list of character vectors containing column names from
+#' each chunk of columns \var{df_top} was split on in function.
+#' @param format_spec A tibble derived from \var{olink_wide_spec} in the local
+#' environment containing the expected format of the Olink wide file based on
+#' the \var{olink_platform} and \var{data_type}.
+#' @param df_plate_panel Tibble with unique combinations of panels and plates
+#' from the combination of top and middle data frames.
 #'
 #' @return A tibble with the bottom matrix of an Olink wide file in long format.
+#'
+#' @seealso
+#'   \code{\link{read_npx_wide}}
+#'   \code{\link{read_npx_wide_split_row}}
+#'   \code{\link{read_npx_wide_npxs_version}}
+#'   \code{\link{read_npx_wide_top}}
+#'   \code{\link{read_npx_wide_middle}}
 #'
 read_npx_wide_bottom <- function(df,
                                  file,
@@ -1339,8 +1474,8 @@ read_npx_wide_bottom <- function(df,
                                  df_plate_panel) {
   # check input ----
 
-  check_is_data_frame(df = df,
-                      error = TRUE)
+  check_is_tibble(df = df,
+                  error = TRUE)
 
   check_file_exists(file = file,
                     error = TRUE)
@@ -1356,11 +1491,11 @@ read_npx_wide_bottom <- function(df,
 
   sapply(col_names, function(x) check_is_character(string = x, error = TRUE))
 
-  check_is_data_frame(df = format_spec,
-                      error = TRUE)
+  check_is_tibble(df = format_spec,
+                  error = TRUE)
 
-  check_is_data_frame(df = df_plate_panel,
-                      error = TRUE)
+  check_is_tibble(df = df_plate_panel,
+                  error = TRUE)
 
   # get first column options ----
 

@@ -2,30 +2,48 @@
 % Please edit documentation in R/read_npx_wide.R
 \name{read_npx_wide_middle}
 \alias{read_npx_wide_middle}
-\title{Help function that splits the middle matrix from an Olink wide file into more
-data frames.}
+\title{Split the middle matrix from Olink dataset in wide format.}
 \usage{
 read_npx_wide_middle(df, file, data_type, col_names)
 }
 \arguments{
-\item{df}{The middle data frame from a split Olink wide file.}
+\item{df}{Middle matrix of Olink dataset in wide format \var{df_mid}.}
 
-\item{file}{The input Olink wide file.}
+\item{file}{Path to Olink software output file in wide or long format.
+Expecting file extensions `csv`, `txt`, `xls`, or `xlsx`.}
 
-\item{data_type}{The quantification in which the data comes in. Expecting one
-of "NPX", "Quantified" or "Ct".}
+\item{data_type}{Quantification method of the input data. One of `NPX`,
+`Quantified` or `Ct`.}
 
-\item{col_names}{Named list of character vectors with the names of the
-columns containing Olink data on Assays, Plates, QC Warnings, Internal
-Control assays and deviations from internal controls.}
+\item{col_names}{Names list of character vectors containing column names from
+each chunk of columns \var{df_top} was split on in function.
+`read_npx_wide_top`.}
 }
 \value{
 A list of data frames (df_oid, df_pid, df_qc_warn and df_int_ctrl) in
 long format from the middle matrix of an Olink wide file.
+
+A list of data frames from middle matrix in long format:
+\itemize{
+  \item Data frame containing measurements of Olink assays \var{df_mid_oid}
+  \item Data frame containing plate identifiers \var{df_mid_pid}
+  \item Data frame containing QC warnings \var{df_mid_qc_warn}
+  \item Data frame containing measurements of internal control assays
+  \var{df_mid_int_ctrl}
+  \item Data frame containing measurements of deviations from internal
+  control assays \var{df_mid_dev_int_ctrl}
+}
 }
 \description{
-Help function that splits the middle matrix from an Olink wide file into more
-data frames.
+Use chunks of columns from `read_npx_wide_top` to split the middle matrix
+\var{df_mid} into corresponding chunks of columns.
+}
+\seealso{
+\code{\link{read_npx_wide}}
+  \code{\link{read_npx_wide_split_row}}
+  \code{\link{read_npx_wide_npxs_version}}
+  \code{\link{read_npx_wide_top}}
+  \code{\link{read_npx_wide_bottom}}
 }
 \author{
 Klev Diamanti

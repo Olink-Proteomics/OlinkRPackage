@@ -2,8 +2,7 @@
 % Please edit documentation in R/read_npx_wide.R
 \name{red_npx_wide_top_mid_long}
 \alias{red_npx_wide_top_mid_long}
-\title{Help function to combine top and middle matrices of an Olink wide file to
-long format.}
+\title{Combine top and middle matrices in long format.}
 \usage{
 red_npx_wide_top_mid_long(df_top_list, df_middle_list, data_type, format_spec)
 }
@@ -14,18 +13,24 @@ function `read_npx_wide_top`.}
 \item{df_middle_list}{List of data frames from the middle matrix. Output of
 function `read_npx_wide_middle`.}
 
-\item{data_type}{The quantification in which the data comes in. Expecting one
-of "NPX", "Quantified" or "Ct".}
+\item{data_type}{Quantification method of the input data. One of `NPX`,
+`Quantified` or `Ct`.}
 
-\item{format_spec}{A one-row data frame filtered from olink_wide_spec with
-the Olink wide file specifications.}
+\item{format_spec}{A tibble derived from \var{olink_wide_spec} in the local
+environment containing the expected format of the Olink wide file based on
+the \var{olink_platform} and \var{data_type}.}
 }
 \value{
-A tibble combining the top and middle matrices in long format.
+Tibble in long format combining the top and middle matrices.
 }
 \description{
-Help function to combine top and middle matrices of an Olink wide file to
-long format.
+Combined corresponding chunks of columns from the top and middle matrix
+that were computed from `read_npx_wide_top` and `read_npx_wide_middle`,
+respectively.
+}
+\seealso{
+\code{\link{read_npx_wide_top}}
+  \code{\link{read_npx_wide_middle}}
 }
 \author{
 Klev Diamanti

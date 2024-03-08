@@ -2,26 +2,37 @@
 % Please edit documentation in R/read_npx_wide.R
 \name{read_npx_wide}
 \alias{read_npx_wide}
-\title{Read wide Olink files with NPX, Ct or Quantified data.}
+\title{Convert Olink data in wide format with NPX, Ct or Quantified data to long
+format.}
 \usage{
 read_npx_wide(df, file, data_type, olink_platform)
 }
 \arguments{
 \item{df}{A tibble containing the full Olink dataset in wide format.}
 
-\item{file}{The input Olink wide file.}
+\item{file}{Path to Olink software output file in wide or long format.
+Expecting file extensions `csv`, `txt`, `xls`, or `xlsx`.}
 
-\item{data_type}{The quantification in which the data comes in. Expecting one
-of "NPX", "Quantified" or "Ct".}
+\item{data_type}{Quantification method of the input data. One of `NPX`,
+`Quantified` or `Ct`.}
 
-\item{olink_platform}{The Olink platform used to generate the input file.
-Expecting one of "Target 96", "Target 48", "Flex" or "Focus".}
+\item{olink_platform}{Olink platform used to generate the input file.
+One of `Target 96`, `Target 48`, `Flex` or `Focus`.}
 }
 \value{
-A tibble of the wide Olink file in long format.
+Tibble with Olink data in long format.
 }
 \description{
-Read wide Olink files with NPX, Ct or Quantified data.
+Convert Olink data in wide format with NPX, Ct or Quantified data to long
+format.
+}
+\seealso{
+\code{\link{read_npx_format}}
+  \code{\link{read_npx_wide_split_row}}
+  \code{\link{read_npx_wide_npxs_version}}
+  \code{\link{read_npx_wide_top}}
+  \code{\link{read_npx_wide_middle}}
+  \code{\link{read_npx_wide_bottom}}
 }
 \author{
 Klev Diamanti

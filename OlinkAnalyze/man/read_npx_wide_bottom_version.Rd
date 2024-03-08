@@ -2,8 +2,7 @@
 % Please edit documentation in R/read_npx_wide.R
 \name{read_npx_wide_bottom_version}
 \alias{read_npx_wide_bottom_version}
-\title{Help function that output all possible row names for the bottom matrix given
-data_type.}
+\title{Additional checks of the bottom matrix of Olink dataset in wide format.}
 \usage{
 read_npx_wide_bottom_version(data_type, olink_platform)
 }
@@ -11,17 +10,23 @@ read_npx_wide_bottom_version(data_type, olink_platform)
 \item{data_type}{The quantification in which the data comes in. Expecting one
 of "NPX", "Quantified" or "Ct".}
 
-\item{olink_platform}{The Olink platform used to generate the input file.
-Expecting one of "Target 96", "Target 48", "Flex" or "Focus".}
+\item{olink_platform}{Olink platform used to generate the input file.
+One of `Target 96`, `Target 48`, `Flex` or `Focus`.}
 }
 \value{
-List of data frames with two columns each. Columns contain unique and
-alternative expected names for the V1 of each row of the bottom matrix in an
+List of tibbles with two columns each. Columns contain unique and
+alternative expected names for V1 of each row of the bottom matrix in an
 Olink wide file.
 }
 \description{
-Help function that output all possible row names for the bottom matrix given
-data_type.
+The rows included in the bottom matrix have evolved through the years. For us
+to be able to support as many such versions as possible we have used the
+local environment variable \var{olink_wide_bottom_matrix} to mark these
+different versions. This function extract these version and allows us to
+check the validity of the data.
+}
+\seealso{
+\code{\link{read_npx_wide_bottom}}
 }
 \author{
 Klev Diamanti

@@ -2,25 +2,28 @@
 % Please edit documentation in R/read_npx_wide.R
 \name{read_npx_wide_check_top}
 \alias{read_npx_wide_check_top}
-\title{Help function to determine the number of rows with assay information in Olink
-wide format file.}
+\title{Additional checks of the top matrix of Olink dataset in wide format.}
 \usage{
 read_npx_wide_check_top(df, file, format_spec)
 }
 \arguments{
-\item{df}{The top data frame from a split Olink wide  file.}
+\item{df}{Top matrix of Olink datasets in wide format \var{df_top}.}
 
-\item{file}{The input Olink wide file.}
+\item{file}{Path to Olink software output file in wide or long format.
+Expecting file extensions `csv`, `txt`, `xls`, or `xlsx`.}
 
-\item{format_spec}{A one-row data frame filtered from olink_wide_spec with
-the Olink wide file specifications.}
+\item{format_spec}{A tibble derived from \var{olink_wide_spec} in the local
+environment containing the expected format of the Olink wide file based on
+the \var{olink_platform} and \var{data_type}.}
 }
 \value{
 NULL unless an inconsistency is spotted.
 }
 \description{
-Help function to determine the number of rows with assay information in Olink
-wide format file.
+Additional checks of the top matrix of Olink dataset in wide format.
+}
+\seealso{
+\code{\link{read_npx_wide_top}}
 }
 \author{
 Klev Diamanti

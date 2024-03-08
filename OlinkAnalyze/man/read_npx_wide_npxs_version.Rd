@@ -2,21 +2,28 @@
 % Please edit documentation in R/read_npx_wide.R
 \name{read_npx_wide_npxs_version}
 \alias{read_npx_wide_npxs_version}
-\title{Help function that extracts the version of the NPX Signature software from
-Olink wide format files.}
+\title{Extract version of NPX Signature from the head matrix of Olink datasets in
+wide format.}
 \usage{
 read_npx_wide_npxs_version(df)
 }
 \arguments{
-\item{df}{The 2x2 header data frame from an Olink wide file.}
+\item{df}{Head matrix of Olink datasets in wide format \var{df_head}.}
 }
 \value{
-A scalar character vector with the version of the NPX Signature
-software from cell B1 of the Olink wide format file.
+The version of the NPX Signature software.
 }
 \description{
-Help function that extracts the version of the NPX Signature software from
-Olink wide format files.
+Extract version of NPX Signature from the head matrix of Olink datasets in
+wide format.
+}
+\seealso{
+\code{\link{read_npx_wide}}
+  \code{\link{read_npx_wide_split_row}}
+  \code{\link{read_npx_wide_npxs_version}}
+  \code{\link{read_npx_wide_top}}
+  \code{\link{read_npx_wide_middle}}
+  \code{\link{read_npx_wide_bottom}}
 }
 \author{
 Klev Diamanti

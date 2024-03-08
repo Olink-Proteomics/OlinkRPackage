@@ -2,8 +2,7 @@
 % Please edit documentation in R/read_npx_wide.R
 \name{read_npx_wide_bottom}
 \alias{read_npx_wide_bottom}
-\title{Help function that converts the bottom matrix of an Olink wide file to long
-format.}
+\title{Convert the bottom matrix from Olink dataset in wide format to long.}
 \usage{
 read_npx_wide_bottom(
   df,
@@ -16,31 +15,40 @@ read_npx_wide_bottom(
 )
 }
 \arguments{
-\item{df}{The bottom data frame from a split Olink wide file.}
+\item{df}{Bottom matrix of Olink dataset in wide format \var{df_bottom}.}
 
-\item{file}{The input Olink wide file.}
+\item{file}{Path to Olink software output file in wide or long format.
+Expecting file extensions `csv`, `txt`, `xls`, or `xlsx`.}
 
-\item{olink_platform}{The Olink platform used to generate the input file.
-Expecting one of "Target 96", "Target 48", "Flex" or "Focus".}
+\item{olink_platform}{Olink platform used to generate the input file.
+One of `Target 96`, `Target 48`, `Flex` or `Focus`.}
 
-\item{data_type}{The quantification in which the data comes in. Expecting one
-of "NPX", "Quantified" or "Ct".}
+\item{data_type}{Quantification method of the input data. One of `NPX`,
+`Quantified` or `Ct`.}
 
-\item{col_names}{Named list of character vectors with the names of the
-columns containing Olink data on Assays and Internal Control assays.}
+\item{col_names}{Names list of character vectors containing column names from
+each chunk of columns \var{df_top} was split on in function.}
 
-\item{format_spec}{A one-row data frame filtered from olink_wide_spec with
-the Olink wide file specifications.}
+\item{format_spec}{A tibble derived from \var{olink_wide_spec} in the local
+environment containing the expected format of the Olink wide file based on
+the \var{olink_platform} and \var{data_type}.}
 
-\item{df_plate_panel}{Data frame with unique combinations of panels and
-plates from the combination of top and middle data frames.}
+\item{df_plate_panel}{Tibble with unique combinations of panels and plates
+from the combination of top and middle data frames.}
 }
 \value{
 A tibble with the bottom matrix of an Olink wide file in long format.
 }
 \description{
-Help function that converts the bottom matrix of an Olink wide file to long
-format.
+Use chunks of columns from `read_npx_wide_top` to covert the bottom matrix
+\var{df_bottom} into a long format tibble.
+}
+\seealso{
+\code{\link{read_npx_wide}}
+  \code{\link{read_npx_wide_split_row}}
+  \code{\link{read_npx_wide_npxs_version}}
+  \code{\link{read_npx_wide_top}}
+  \code{\link{read_npx_wide_middle}}
 }
 \author{
 Klev Diamanti
