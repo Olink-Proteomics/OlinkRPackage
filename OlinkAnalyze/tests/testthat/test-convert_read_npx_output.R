@@ -81,46 +81,6 @@ test_that(
 )
 
 test_that(
-  "check convert read npx output - df: data.frame; out: arrow",
-  {
-    expect_true(
-      object = convert_read_npx_output(
-        df = data.frame(
-          "A" = c(1, 2.2, 3.14),
-          "B" = c("a", "b", "c"),
-          "C" = c(TRUE, TRUE, FALSE),
-          "D" = c("NA", "B", NA_character_),
-          "E" = c(1L, 2L, 3L)
-        ),
-        out_df = "arrow"
-      ) |>
-        inherits(what = "ArrowObject")
-    )
-
-  }
-)
-
-test_that(
-  "check convert read npx output - df: data.frame; out: tibble",
-  {
-    expect_true(
-      object = convert_read_npx_output(
-        df = data.frame(
-          "A" = c(1, 2.2, 3.14),
-          "B" = c("a", "b", "c"),
-          "C" = c(TRUE, TRUE, FALSE),
-          "D" = c("NA", "B", NA_character_),
-          "E" = c(1L, 2L, 3L)
-        ),
-        out_df = "tibble"
-      ) |>
-        inherits(what = "tbl_df")
-    )
-
-  }
-)
-
-test_that(
   "check convert read npx output - ERROR",
   {
 
@@ -158,6 +118,20 @@ test_that(
     expect_error(
       object = convert_read_npx_output(df = TRUE,
                                        out_df = "tibble"),
+      regexp = "Unexpected input data frame"
+    )
+
+    expect_error(
+      object = convert_read_npx_output(
+        df = data.frame(
+          "A" = c(1, 2.2, 3.14),
+          "B" = c("a", "b", "c"),
+          "C" = c(TRUE, TRUE, FALSE),
+          "D" = c("NA", "B", NA_character_),
+          "E" = c(1L, 2L, 3L)
+        ),
+        out_df = "tibble"
+      ),
       regexp = "Unexpected input data frame"
     )
 
