@@ -2,16 +2,18 @@
 % Please edit documentation in R/utils.R
 \name{remove_all_na_cols}
 \alias{remove_all_na_cols}
-\title{Utility function removing columns with all values NA.}
+\title{Utility function removing columns with all values NA from a tibble or an
+arrow object.}
 \usage{
 remove_all_na_cols(df)
 }
 \arguments{
-\item{df}{A tibble or data.frame.}
+\item{df}{A tibble or an arrow object.}
 }
 \value{
-The same data frame as input without all NA columns.
+The same data frame as input without all-NA columns.
 }
 \description{
-Utility function removing columns with all values NA.
+Utility function removing columns with all values NA from a tibble or an
+arrow object.
 }

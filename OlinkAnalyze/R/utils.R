@@ -1,15 +1,16 @@
-#' Utility function removing columns with all values NA.
+#' Utility function removing columns with all values NA from a tibble or an
+#' arrow object.
 #'
-#' @param df A tibble or data.frame.
+#' @param df A tibble or an arrow object.
 #'
-#' @return The same data frame as input without all NA columns.
+#' @return The same data frame as input without all-NA columns.
 #'
 remove_all_na_cols <- function(df) {
 
   # input check ----
 
-  check_is_data_frame(df = df,
-                      error = TRUE)
+  check_is_arrow_or_tibble(df = df,
+                           error = TRUE)
 
   # identify all NA cols ----
 
