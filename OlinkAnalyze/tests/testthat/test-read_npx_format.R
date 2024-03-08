@@ -1394,7 +1394,7 @@ test_that(
         #check that file exists
         expect_true(object = file.exists(excel_long))
 
-        # check that read_npx_format_get_format throws warn with long_format = FALSE
+        # read_npx_format_get_format throws warn with long_format = FALSE
         expect_warning(
           object = df_npx_false <- read_npx_format_get_format(
             df = df,
@@ -1460,7 +1460,7 @@ test_that(
         #check that file exists
         expect_true(object = file.exists(excel_wide))
 
-        # check that read_npx_format_get_format throws warn with long_format = TRUE
+        # read_npx_format_get_format throws warn with long_format = TRUE
         expect_warning(
           object = df_npx_true <- read_npx_format_get_format(
             df = df,
@@ -1544,7 +1544,7 @@ test_that(
         #check that file exists
         expect_true(object = file.exists(excel_long))
 
-        # check that read_npx_format_get_format throws warn with long_format = FALSE
+        # read_npx_format_get_format throws warn with long_format = FALSE
         expect_warning(
           object = df_npx_false <- read_npx_format_get_format(
             df = df,
@@ -1614,7 +1614,7 @@ test_that(
         #check that file exists
         expect_true(object = file.exists(excel_wide))
 
-        # check that read_npx_format_get_format throws warn with long_format = TRUE
+        # read_npx_format_get_format throws warn with long_format = TRUE
         expect_warning(
           object = df_npx_true <- read_npx_format_get_format(
             df = df,
@@ -1699,7 +1699,7 @@ test_that(
         #check that file exists
         expect_true(object = file.exists(excel_long))
 
-        # check that read_npx_format_get_format throws warn with long_format = FALSE
+        # read_npx_format_get_format throws warn with long_format = FALSE
         expect_error(
           object = df_npx_false <- read_npx_format_get_format(
             df = df,
@@ -1746,7 +1746,7 @@ test_that(
         #check that file exists
         expect_true(object = file.exists(excel_wide))
 
-        # check that read_npx_format_get_format throws warn with long_format = TRUE
+        # read_npx_format_get_format throws warn with long_format = TRUE
         expect_error(
           object = df_npx_true <- read_npx_format_get_format(
             df = df,
@@ -1799,7 +1799,7 @@ test_that(
         #check that file exists
         expect_true(object = file.exists(excel_t96))
 
-        # check that read_npx_format_get_platform works for olink_platform = NULL
+        # read_npx_format_get_platform works for olink_platform = NULL
         expect_no_condition(
           object = df_npx_null <- read_npx_format_get_platform(
             df = df,
@@ -1818,7 +1818,7 @@ test_that(
           expected = "Target 96"
         )
 
-        # check that read_npx_format_get_platform works for olink_platform = "T96"
+        # read_npx_format_get_platform works for olink_platform = "T96"
         expect_no_condition(
           object = df_npx_t96 <- read_npx_format_get_platform(
             df = df,
@@ -1865,7 +1865,7 @@ test_that(
         # write a dummy file
         writeLines("foo", excel_t48)
 
-        # check that read_npx_format_get_platform works for olink_platform = NULL
+        # read_npx_format_get_platform works for olink_platform = NULL
         expect_no_condition(
           object = df_npx_null <- read_npx_format_get_platform(
             df = df,
@@ -1884,7 +1884,7 @@ test_that(
           expected = "Target 48"
         )
 
-        # check that read_npx_format_get_platform works for olink_platform = "T48"
+        # read_npx_format_get_platform works for olink_platform = "T48"
         expect_no_condition(
           object = df_npx_t48 <- read_npx_format_get_platform(
             df = df,
@@ -1934,7 +1934,7 @@ test_that(
         #check that file exists
         expect_true(object = file.exists(excel_flex))
 
-        # check that read_npx_format_get_platform works for olink_platform = NULL
+        # read_npx_format_get_platform works for olink_platform = NULL
         expect_no_condition(
           object = df_npx_null <- read_npx_format_get_platform(
             df = df,
@@ -1953,7 +1953,7 @@ test_that(
           expected = "Flex"
         )
 
-        # check that read_npx_format_get_platform works for olink_platform = "Flex"
+        # read_npx_format_get_platform works for olink_platform = "Flex"
         expect_no_condition(
           object = df_npx_flex <- read_npx_format_get_platform(
             df = df,
@@ -2012,7 +2012,7 @@ test_that(
         #check that file exists
         expect_true(object = file.exists(excel_flex))
 
-        # check that read_npx_format_get_platform works for olink_platform = NULL
+        # read_npx_format_get_platform works for olink_platform = NULL
         expect_no_condition(
           object = df_npx_null <- read_npx_format_get_platform(
             df = df,
@@ -2031,7 +2031,7 @@ test_that(
           expected = "Flex"
         )
 
-        # check that read_npx_format_get_platform works for olink_platform = "Flex"
+        # read_npx_format_get_platform works for olink_platform = "Flex"
         expect_no_condition(
           object = df_npx_flex <- read_npx_format_get_platform(
             df = df,
