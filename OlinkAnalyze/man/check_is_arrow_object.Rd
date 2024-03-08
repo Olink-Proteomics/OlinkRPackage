@@ -20,9 +20,8 @@ error if \var{error} = `TRUE`.
 Help function checking if a data frame is an R6 ArrowObject.
 }
 \seealso{
-\code{\link{check_is_data_frame}}
-  \code{\link{check_is_tibble}}
-  \code{\link{check_is_arrow_or_data_frame}}
+\code{\link{check_is_tibble}}
+  \code{\link{check_is_arrow_or_tibble}}
 }
 \author{
 Klev Diamanti

@@ -11,9 +11,8 @@
 #' error if \var{error} = `TRUE`.
 #'
 #' @seealso
-#'   \code{\link{check_is_data_frame}}
 #'   \code{\link{check_is_tibble}}
-#'   \code{\link{check_is_arrow_or_data_frame}}
+#'   \code{\link{check_is_arrow_or_tibble}}
 #'
 check_is_arrow_object <- function(df,
                                   error = FALSE) {
@@ -64,8 +63,7 @@ check_is_arrow_object <- function(df,
 #'
 #' @seealso
 #'   \code{\link{check_is_arrow_object}}
-#'   \code{\link{check_is_data_frame}}
-#'   \code{\link{check_is_arrow_or_data_frame}}
+#'   \code{\link{check_is_arrow_or_tibble}}
 #'
 check_is_tibble <- function(df,
                             error = FALSE) {
@@ -116,7 +114,6 @@ check_is_tibble <- function(df,
 #'
 #' @seealso
 #'   \code{\link{check_is_arrow_object}}
-#'   \code{\link{check_is_data_frame}}
 #'   \code{\link{check_is_tibble}}
 #'
 check_is_arrow_or_tibble <- function(df,

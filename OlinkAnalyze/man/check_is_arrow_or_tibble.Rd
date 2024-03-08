@@ -21,7 +21,6 @@ Help function checking if a data frame is a tibble or an arrow object.
 }
 \seealso{
 \code{\link{check_is_arrow_object}}
-  \code{\link{check_is_data_frame}}
   \code{\link{check_is_tibble}}
 }
 \author{
