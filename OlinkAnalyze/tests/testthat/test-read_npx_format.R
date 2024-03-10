@@ -488,6 +488,9 @@ test_that(
                 dplyr::everything(),
                 ~ as.character(.x)
               )
+            ) |>
+            dplyr::select(
+              dplyr::all_of(names(df_synthetic$list_df_long$df_long))
             ),
           expected = df_synthetic$list_df_long$df_long
         )
@@ -499,6 +502,9 @@ test_that(
                 dplyr::everything(),
                 ~ as.character(.x)
               )
+            ) |>
+            dplyr::select(
+              dplyr::all_of(names(df_synthetic$list_df_long$df_long))
             ),
           expected = df_synthetic$list_df_long$df_long
         )
@@ -510,6 +516,9 @@ test_that(
                 dplyr::everything(),
                 ~ as.character(.x)
               )
+            ) |>
+            dplyr::select(
+              dplyr::all_of(names(df_synthetic$list_df_long$df_long))
             ),
           expected = df_synthetic$list_df_long$df_long
         )
@@ -521,6 +530,9 @@ test_that(
                 dplyr::everything(),
                 ~ as.character(.x)
               )
+            ) |>
+            dplyr::select(
+              dplyr::all_of(names(df_synthetic$list_df_long$df_long))
             ),
           expected = df_synthetic$list_df_long$df_long
         )
@@ -615,6 +627,9 @@ test_that(
                 dplyr::everything(),
                 ~ as.character(.x)
               )
+            ) |>
+            dplyr::select(
+              dplyr::all_of(names(df_synthetic$list_df_long$df_long))
             ),
           expected = df_synthetic$list_df_long$df_long
         )
@@ -626,6 +641,9 @@ test_that(
                 dplyr::everything(),
                 ~ as.character(.x)
               )
+            ) |>
+            dplyr::select(
+              dplyr::all_of(names(df_synthetic$list_df_long$df_long))
             ),
           expected = df_synthetic$list_df_long$df_long
         )
@@ -637,6 +655,9 @@ test_that(
                 dplyr::everything(),
                 ~ as.character(.x)
               )
+            ) |>
+            dplyr::select(
+              dplyr::all_of(names(df_synthetic$list_df_long$df_long))
             ),
           expected = df_synthetic$list_df_long$df_long
         )
@@ -648,6 +669,9 @@ test_that(
                 dplyr::everything(),
                 ~ as.character(.x)
               )
+            ) |>
+            dplyr::select(
+              dplyr::all_of(names(df_synthetic$list_df_long$df_long))
             ),
           expected = df_synthetic$list_df_long$df_long
         )
@@ -736,6 +760,9 @@ test_that(
                 dplyr::everything(),
                 ~ as.character(.x)
               )
+            ) |>
+            dplyr::select(
+              dplyr::all_of(names(df_synthetic$list_df_long$df_long))
             ),
           expected = df_synthetic$list_df_long$df_long
         )
@@ -747,6 +774,9 @@ test_that(
                 dplyr::everything(),
                 ~ as.character(.x)
               )
+            ) |>
+            dplyr::select(
+              dplyr::all_of(names(df_synthetic$list_df_long$df_long))
             ),
           expected = df_synthetic$list_df_long$df_long
         )
@@ -758,6 +788,9 @@ test_that(
                 dplyr::everything(),
                 ~ as.character(.x)
               )
+            ) |>
+            dplyr::select(
+              dplyr::all_of(names(df_synthetic$list_df_long$df_long))
             ),
           expected = df_synthetic$list_df_long$df_long
         )
@@ -769,6 +802,9 @@ test_that(
                 dplyr::everything(),
                 ~ as.character(.x)
               )
+            ) |>
+            dplyr::select(
+              dplyr::all_of(names(df_synthetic$list_df_long$df_long))
             ),
           expected = df_synthetic$list_df_long$df_long
         )

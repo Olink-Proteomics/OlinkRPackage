@@ -132,29 +132,6 @@ read_npx_wide <- function(df,
   # modify output df ----
 
   df_long <- df_long |>
-    # add Panel_Version
-    dplyr::mutate(
-      Panel_Version = strsplit(x = .data[["Panel"]],
-                               split = "(",
-                               fixed = TRUE) |>
-        lapply(utils::tail, 1L) |>
-        unlist() |>
-        (\(x) {
-          sub(pattern = ")",
-              replacement = "",
-              x = x,
-              fixed = TRUE)
-        })()
-    ) |>
-    # modify Panel
-    dplyr::mutate(
-      Panel = strsplit(x = .data[["Panel"]],
-                       split = "(",
-                       fixed = TRUE) |>
-        lapply(utils::head, -1L) |>
-        lapply(paste, collapse = "(") |>
-        unlist()
-    ) |>
     dplyr::mutate(
       `Olink NPX Signature Version` = npxs_v
     ) |>
@@ -258,6 +235,22 @@ read_npx_wide_split_row <- function(df,
   check_is_tibble(df = format_spec,
                   error = TRUE)
 
+  # help gunction to fill NA ----
+
+  # we are not using tidyr::fill because it still depends on dplyr::mutate_at
+  # which is superseded, and throws error in test
+  fill_na_with_previous <- function(x) {
+    last_non_na <- NA
+    for (i in seq_along(x)) {
+      if (!is.na(x[i])) {
+        last_non_na <- x[i]
+      } else {
+        x[i] <- last_non_na
+      }
+    }
+    return(x)
+  }
+
   # detect rows with all NA columns ----
 
   # Use the rows full of NAs in the file to compute the number of rows
@@ -282,38 +275,48 @@ read_npx_wide_split_row <- function(df,
     # filter rows with all cols NA
     dplyr::filter(
       .data[["num_na"]] == .data[["total_col"]]
-    ) |>
-    # extract only the row_number as this is the index we are interested in
-    dplyr::pull(
-      .data[["row_number"]]
     )
+
+  if (nrow(na_row_index) > 0L) {
+    na_row_index <- na_row_index |>
+      # allow for consecutive all NA rows
+      dplyr::mutate(
+        dif_nxt_r = dplyr::lead(.data[["row_number"]]) - .data[["row_number"]],
+        dif_nxt_r = fill_na_with_previous(x = .data[["dif_nxt_r"]])
+      ) |>
+      # create groups of consecutive rows with all cols NA
+      dplyr::mutate(
+        all_na_g = dplyr::case_when(
+          dplyr::row_number() == 1L ~ paste0("g", .data[["row_number"]]),
+          dplyr::lag(.data[["dif_nxt_r"]]) == 1L ~ NA_character_,
+          TRUE ~ paste0("g", .data[["row_number"]]),
+          .default = NA_character_
+        ),
+        all_na_g = fill_na_with_previous(x = .data[["all_na_g"]])
+      ) |>
+      # extract start and end of groups
+      dplyr::group_by(.data[["all_na_g"]]) |>
+      dplyr::summarise(
+        start_g = min(.data[["row_number"]]),
+        end_g = max(.data[["row_number"]]),
+        .groups = "drop"
+      ) |>
+      dplyr::arrange(
+        .data[["start_g"]], .data[["end_g"]]
+      )
+  }
 
   # check that row indexes are correct ----
 
   # check that there are 1 or 2 rows with all NA
-  if (length(na_row_index) != format_spec$n_na_rows) {
+  if (nrow(na_row_index) != format_spec$n_na_rows) {
 
     cli::cli_abort(
       message = c(
         "x" = "We identified
-        {ifelse(identical(na_row_index, integer(0L)), 0L, length(na_row_index))}
+        {ifelse(identical(na_row_index, integer(0L)), 0L, nrow(na_row_index))}
         rows with all columns `NA` in file {.file {file}}, while we expected
         {format_spec$n_na_rows}!",
-        "i" = "Has the file been modified manually?"
-      ),
-      call = rlang::caller_env(),
-      wrap = FALSE
-    )
-
-  }
-
-  # check that rows are not consecutive
-  if (length(na_row_index) == 2L
-      && (na_row_index[2L] - na_row_index[1L] < 2)) {
-
-    cli::cli_abort(
-      message = c(
-        "x" = "Consecutive rows with all columns NA.",
         "i" = "Has the file been modified manually?"
       ),
       call = rlang::caller_env(),
@@ -329,11 +332,11 @@ read_npx_wide_split_row <- function(df,
     start_row = c(
       1L, # header
       3L, # skip first two rows
-      na_row_index + 1L # all NA rows +1
+      na_row_index$end_g + 1L # all NA rows +1
     ),
     end_row = c(
       2L, # header
-      na_row_index - 1L, # all NA rows -1
+      na_row_index$start_g - 1L, # all NA rows -1
       nrow(df) # last row of file
     )
   )
@@ -358,7 +361,7 @@ read_npx_wide_split_row <- function(df,
 
   # output is a list of 2 or 3 dataframes, depending on data_type
   # name each data frame
-  if (length(na_row_index) == 1L) {
+  if (nrow(na_row_index) == 1L) {
     names(list_df_split) <- c("df_head", "df_top", "df_mid")
   } else {
     names(list_df_split) <- c("df_head", "df_top", "df_mid", "df_bottom")
@@ -1195,6 +1198,64 @@ read_npx_wide_middle <- function(df,
 
 }
 
+#' Help function to extract Panel_Version from Panel column.
+#'
+#' @param df A tibble containing the column `Panel`.
+#'
+#' @return Same tibble as input with additional column Panel_Version.
+#'
+read_npx_wide_panel_version <- function(df) {
+
+  # check input ----
+
+  check_is_tibble(df = df,
+                  error = TRUE)
+
+  # check columns ----
+
+  check_columns(df = df,
+                col_list = list("Panel"))
+
+  # extarct Panel_Version and modify Panel ----
+
+  df |>
+    # add Panel_Version
+    dplyr::mutate(
+      # if else allows us to have Panel_Version NA when the pattern (v.X) is not
+      # present
+      Panel_Version = dplyr::if_else(
+        grepl(pattern = "(", x = .data[["Panel"]], fixed = TRUE),
+        strsplit(x = .data[["Panel"]],
+                 split = "(",
+                 fixed = TRUE) |>
+          lapply(utils::tail, 1L) |>
+          unlist() |>
+          (\(x) {
+            sub(pattern = ")",
+                replacement = "",
+                x = x,
+                fixed = TRUE)
+          })(),
+        NA_character_
+      )
+    ) |>
+    # modify Panel
+    dplyr::mutate(
+      # if else allows us to have Panel unchanged when the pattern (v.X) is not
+      # present
+      Panel = dplyr::if_else(
+        grepl(pattern = "(", x = .data[["Panel"]], fixed = TRUE),
+        strsplit(x = .data[["Panel"]],
+                 split = "(",
+                 fixed = TRUE) |>
+          lapply(utils::head, -1L) |>
+          lapply(paste, collapse = "(") |>
+          unlist(),
+        .data[["Panel"]]
+      )
+    )
+}
+
 #' Combine top and middle matrices in long format.
 #'
 #' @description
@@ -1247,7 +1308,8 @@ red_npx_wide_top_mid_long <- function(df_top_list,
       df_top_list$df_top_oid,
       by = "col_index",
       relationship = "many-to-one"
-    )
+    ) |>
+    read_npx_wide_panel_version()
 
   ## df plate id ----
 
@@ -1259,6 +1321,10 @@ red_npx_wide_top_mid_long <- function(df_top_list,
     ) |>
     dplyr::select(
       -dplyr::any_of(c("Var", "Unit", "col_index"))
+    ) |>
+    read_npx_wide_panel_version() |>
+    dplyr::select(
+      -dplyr::all_of("Panel_Version")
     )
 
   df_long <- df_long |>
@@ -1281,6 +1347,10 @@ red_npx_wide_top_mid_long <- function(df_top_list,
       ) |>
       dplyr::select(
         -dplyr::any_of(c("Var", "Unit", "col_index"))
+      ) |>
+      read_npx_wide_panel_version() |>
+      dplyr::select(
+        -dplyr::all_of("Panel_Version")
       )
 
     df_long <- df_long |>
@@ -1302,7 +1372,8 @@ red_npx_wide_top_mid_long <- function(df_top_list,
         df_top_list$df_top_int_ctrl,
         by = "col_index",
         relationship = "many-to-one"
-      )
+      ) |>
+      read_npx_wide_panel_version()
 
     # join with the plate df
     df_int_ctrl_pid <- df_int_ctrl |>
@@ -1310,10 +1381,10 @@ red_npx_wide_top_mid_long <- function(df_top_list,
         df_long |>
           dplyr::select(
             dplyr::any_of("QC_Warning"),
-            dplyr::all_of(c("PlateID", "SampleID", "Panel"))
+            dplyr::all_of(c("PlateID", "SampleID", "Panel", "Panel_Version"))
           ) |>
           dplyr::distinct(),
-        by = c("SampleID", "Panel"),
+        by = c("SampleID", "Panel", "Panel_Version"),
         relationship = "many-to-one"
       )
 
@@ -1342,6 +1413,10 @@ red_npx_wide_top_mid_long <- function(df_top_list,
         id_cols = dplyr::all_of(c("SampleID", "Panel")),
         names_from = dplyr::all_of("Uniprot ID"),
         values_from = dplyr::all_of(data_type)
+      ) |>
+      read_npx_wide_panel_version() |>
+      dplyr::select(
+        -dplyr::all_of("Panel_Version")
       )
 
     df_long <- df_long |>

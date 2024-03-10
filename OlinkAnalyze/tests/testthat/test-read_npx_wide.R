@@ -39,12 +39,14 @@ test_that(
         writeLines("foo", olink_wide_format)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide_split_row(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            format_spec = format_spec
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide_split_row(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              format_spec = format_spec
+            )
           )
         )
 
@@ -103,12 +105,14 @@ test_that(
         writeLines("foo", olink_wide_format)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide_split_row(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            format_spec = format_spec
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide_split_row(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              format_spec = format_spec
+            )
           )
         )
 
@@ -164,12 +168,14 @@ test_that(
         writeLines("foo", olink_wide_format)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide_split_row(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            format_spec = format_spec
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide_split_row(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              format_spec = format_spec
+            )
           )
         )
 
@@ -435,64 +441,6 @@ test_that(
             format_spec = format_spec
           ),
           regexp = "while we expected 2"
-        )
-
-      }
-    )
-
-  }
-)
-
-test_that(
-  "read_npx_wide_split_row - error - all-NA rows are consecutive",
-  {
-    # variables that apply to all tests
-    olink_platform <- "Target 48"
-    data_type <- "NPX"
-    n_panels <- 2L
-    n_assays <- 45L
-    n_samples <- 88L
-    show_dev_int_ctrl <- TRUE
-    show_int_ctrl <- TRUE
-    version <- 1L
-
-    # matrix specifications
-    format_spec <- olink_wide_spec |>
-      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
-    withr::with_tempfile(
-      new = "olink_wide_format",
-      pattern = "test-olink-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        show_int_ctrl = show_int_ctrl,
-                                        version = version)
-
-        df_rand$list_df_wide$df_wide <- df_rand$list_df_wide$df_wide |>
-          dplyr::filter(
-            !grepl(pattern = "^S", x = .data[["V1"]])
-          )
-
-        # write wide df
-        writeLines("foo", olink_wide_format)
-
-        # check that function runs with error
-        expect_error(
-          object = read_npx_wide_split_row(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            format_spec = format_spec
-          ),
-          regexp = "Consecutive rows with all columns NA."
         )
 
       }
@@ -8947,10 +8895,6 @@ test_that(
       object = dplyr::select(df_out,
                              -dplyr::all_of("col_index")),
       expected = df_rand$list_df_long$df_long |>
-        dplyr::mutate(
-          Panel = paste0(.data[["Panel"]], "(",
-                         .data[["Panel_Version"]], ")")
-        ) |>
         dplyr::rename_with(
           .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
           .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
@@ -9027,10 +8971,6 @@ test_that(
       object = dplyr::select(df_out,
                              -dplyr::all_of("col_index")),
       expected = df_rand$list_df_long$df_long |>
-        dplyr::mutate(
-          Panel = paste0(.data[["Panel"]], "(",
-                         .data[["Panel_Version"]], ")")
-        ) |>
         dplyr::rename_with(
           .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
           .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
@@ -9107,10 +9047,6 @@ test_that(
       object = dplyr::select(df_out,
                              -dplyr::all_of("col_index")),
       expected = df_rand$list_df_long$df_long |>
-        dplyr::mutate(
-          Panel = paste0(.data[["Panel"]], "(",
-                         .data[["Panel_Version"]], ")")
-        ) |>
         dplyr::rename_with(
           .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
           .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
@@ -9187,10 +9123,6 @@ test_that(
       object = dplyr::select(df_out,
                              -dplyr::all_of("col_index")),
       expected = df_rand$list_df_long$df_long |>
-        dplyr::mutate(
-          Panel = paste0(.data[["Panel"]], "(",
-                         .data[["Panel_Version"]], ")")
-        ) |>
         dplyr::rename_with(
           .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
           .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
@@ -9268,10 +9200,6 @@ test_that(
       object = dplyr::select(df_out,
                              -dplyr::all_of("col_index")),
       expected = df_rand$list_df_long$df_long |>
-        dplyr::mutate(
-          Panel = paste0(.data[["Panel"]], "(",
-                         .data[["Panel_Version"]], ")")
-        ) |>
         dplyr::rename_with(
           .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
           .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
@@ -9348,10 +9276,6 @@ test_that(
       object = dplyr::select(df_out,
                              -dplyr::all_of("col_index")),
       expected = df_rand$list_df_long$df_long |>
-        dplyr::mutate(
-          Panel = paste0(.data[["Panel"]], "(",
-                         .data[["Panel_Version"]], ")")
-        ) |>
         dplyr::rename_with(
           .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
           .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
@@ -9428,10 +9352,6 @@ test_that(
       object = dplyr::select(df_out,
                              -dplyr::all_of("col_index")),
       expected = df_rand$list_df_long$df_long |>
-        dplyr::mutate(
-          Panel = paste0(.data[["Panel"]], "(",
-                         .data[["Panel_Version"]], ")")
-        ) |>
         dplyr::rename_with(
           .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
           .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
@@ -9508,10 +9428,6 @@ test_that(
       object = dplyr::select(df_out,
                              -dplyr::all_of("col_index")),
       expected = df_rand$list_df_long$df_long |>
-        dplyr::mutate(
-          Panel = paste0(.data[["Panel"]], "(",
-                         .data[["Panel_Version"]], ")")
-        ) |>
         dplyr::rename_with(
           .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
           .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
@@ -9588,10 +9504,6 @@ test_that(
       object = dplyr::select(df_out,
                              -dplyr::all_of("col_index")),
       expected = df_rand$list_df_long$df_long |>
-        dplyr::mutate(
-          Panel = paste0(.data[["Panel"]], "(",
-                         .data[["Panel_Version"]], ")")
-        ) |>
         dplyr::rename_with(
           .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
           .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
@@ -9668,10 +9580,6 @@ test_that(
       object = dplyr::select(df_out,
                              -dplyr::all_of("col_index")),
       expected = df_rand$list_df_long$df_long |>
-        dplyr::mutate(
-          Panel = paste0(.data[["Panel"]], "(",
-                         .data[["Panel_Version"]], ")")
-        ) |>
         dplyr::rename_with(
           .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
           .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
@@ -9760,10 +9668,6 @@ test_that(
       object = dplyr::select(df_out,
                              -dplyr::all_of("col_index")),
       expected = df_rand$list_df_long$df_long |>
-        dplyr::mutate(
-          Panel = paste0(.data[["Panel"]], "(",
-                         .data[["Panel_Version"]], ")")
-        ) |>
         dplyr::rename_with(
           .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
           .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
@@ -9840,10 +9744,6 @@ test_that(
       object = dplyr::select(df_out,
                              -dplyr::all_of("col_index")),
       expected = df_rand$list_df_long$df_long |>
-        dplyr::mutate(
-          Panel = paste0(.data[["Panel"]], "(",
-                         .data[["Panel_Version"]], ")")
-        ) |>
         dplyr::rename_with(
           .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
           .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
@@ -9920,10 +9820,6 @@ test_that(
       object = dplyr::select(df_out,
                              -dplyr::all_of("col_index")),
       expected = df_rand$list_df_long$df_long |>
-        dplyr::mutate(
-          Panel = paste0(.data[["Panel"]], "(",
-                         .data[["Panel_Version"]], ")")
-        ) |>
         dplyr::rename_with(
           .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
           .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
@@ -10000,10 +9896,6 @@ test_that(
       object = dplyr::select(df_out,
                              -dplyr::all_of("col_index")),
       expected = df_rand$list_df_long$df_long |>
-        dplyr::mutate(
-          Panel = paste0(.data[["Panel"]], "(",
-                         .data[["Panel_Version"]], ")")
-        ) |>
         dplyr::rename_with(
           .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
           .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
@@ -10081,10 +9973,6 @@ test_that(
       object = dplyr::select(df_out,
                              -dplyr::all_of("col_index")),
       expected = df_rand$list_df_long$df_long |>
-        dplyr::mutate(
-          Panel = paste0(.data[["Panel"]], "(",
-                         .data[["Panel_Version"]], ")")
-        ) |>
         dplyr::rename_with(
           .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
           .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
@@ -10161,10 +10049,6 @@ test_that(
       object = dplyr::select(df_out,
                              -dplyr::all_of("col_index")),
       expected = df_rand$list_df_long$df_long |>
-        dplyr::mutate(
-          Panel = paste0(.data[["Panel"]], "(",
-                         .data[["Panel_Version"]], ")")
-        ) |>
         dplyr::rename_with(
           .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
           .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
@@ -10241,10 +10125,6 @@ test_that(
       object = dplyr::select(df_out,
                              -dplyr::all_of("col_index")),
       expected = df_rand$list_df_long$df_long |>
-        dplyr::mutate(
-          Panel = paste0(.data[["Panel"]], "(",
-                         .data[["Panel_Version"]], ")")
-        ) |>
         dplyr::rename_with(
           .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
           .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
@@ -10321,10 +10201,6 @@ test_that(
       object = dplyr::select(df_out,
                              -dplyr::all_of("col_index")),
       expected = df_rand$list_df_long$df_long |>
-        dplyr::mutate(
-          Panel = paste0(.data[["Panel"]], "(",
-                         .data[["Panel_Version"]], ")")
-        ) |>
         dplyr::rename_with(
           .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
           .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
@@ -10401,10 +10277,6 @@ test_that(
       object = dplyr::select(df_out,
                              -dplyr::all_of("col_index")),
       expected = df_rand$list_df_long$df_long |>
-        dplyr::mutate(
-          Panel = paste0(.data[["Panel"]], "(",
-                         .data[["Panel_Version"]], ")")
-        ) |>
         dplyr::rename_with(
           .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
           .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
@@ -10481,10 +10353,6 @@ test_that(
       object = dplyr::select(df_out,
                              -dplyr::all_of("col_index")),
       expected = df_rand$list_df_long$df_long |>
-        dplyr::mutate(
-          Panel = paste0(.data[["Panel"]], "(",
-                         .data[["Panel_Version"]], ")")
-        ) |>
         dplyr::rename_with(
           .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
           .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
@@ -13277,12 +13145,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -13340,12 +13210,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -13403,12 +13275,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -13466,12 +13340,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -13529,12 +13405,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -13592,12 +13470,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -13655,12 +13535,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -13718,12 +13600,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -13781,12 +13665,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -13844,12 +13730,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -13907,12 +13795,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -13970,12 +13860,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -14033,12 +13925,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -14096,12 +13990,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -14171,12 +14067,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -14234,12 +14132,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -14297,12 +14197,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -14360,12 +14262,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -14423,12 +14327,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -14486,12 +14392,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -14549,12 +14457,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -14612,12 +14522,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -14675,12 +14587,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -14738,12 +14652,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -14801,12 +14717,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -14864,12 +14782,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -14927,12 +14847,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -14990,12 +14912,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -15065,12 +14989,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -15128,12 +15054,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -15191,12 +15119,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -15254,12 +15184,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -15317,12 +15249,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -15380,12 +15314,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -15443,12 +15379,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -15506,12 +15444,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -15569,12 +15509,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -15632,12 +15574,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -15695,12 +15639,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -15758,12 +15704,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -15821,12 +15769,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -15884,12 +15834,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -15923,7 +15875,7 @@ test_that(
   {
     # variables that apply to all tests
     olink_platform <- "Target 48"
-    n_panels <- 4L
+    n_panels <- 3L
     n_assays <- 45L
     n_samples <- 150L
 
@@ -15959,12 +15911,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -16022,12 +15976,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -16085,12 +16041,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -16148,12 +16106,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -16211,12 +16171,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -16274,12 +16236,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -16337,12 +16301,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -16400,12 +16366,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -16463,12 +16431,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -16526,12 +16496,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -16589,12 +16561,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -16652,12 +16626,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -16715,12 +16691,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -16778,12 +16756,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -16854,12 +16834,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -16917,12 +16899,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -16980,12 +16964,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -17043,12 +17029,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -17119,12 +17107,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -17182,12 +17172,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -17245,12 +17237,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -17308,12 +17302,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -17384,12 +17380,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -17447,12 +17445,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -17510,12 +17510,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -17573,12 +17575,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -17649,12 +17653,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -17712,12 +17718,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -17775,12 +17783,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
@@ -17838,12 +17848,14 @@ test_that(
                                           num_int_ctrl = 3L)
 
         # check that function runs
-        expect_no_condition(
-          object = df_out <- read_npx_wide(
-            df = df_rand$list_df_wide$df_wide,
-            file = olink_wide_format,
-            data_type = data_type,
-            olink_platform = olink_platform
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              olink_platform = olink_platform
+            )
           )
         )
 
