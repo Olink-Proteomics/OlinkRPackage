@@ -9359,7 +9359,7 @@ test_that(
 # Test red_npx_wide_top_mid_long ----
 
 test_that(
-  "red_npx_wide_top_mid_long - single panel - works",
+  "red_npx_wide_top_mid_long - works - single panel - single plate",
   {
     # variables that apply to all tests
     olink_platform <- "Target 48"
@@ -10132,7 +10132,7 @@ test_that(
 )
 
 test_that(
-  "red_npx_wide_top_mid_long - single panel - works",
+  "red_npx_wide_top_mid_long - works - multiple panels - multiple plates",
   {
     # variables that apply to all tests
     olink_platform <- "Target 48"
@@ -10901,6 +10901,112 @@ test_that(
         dplyr::select(dplyr::any_of(colnames(df_out)))
     )
 
+  }
+)
+
+# NPX data from T96 NPX Manager, PlateID and QC_Warning columns did not contain
+# version of panel
+test_that(
+  "red_npx_wide_top_mid_long - works - T96 - NPXM missing panel/QC version",
+  {
+    # variables that apply to all tests
+    olink_platform <- "Target 96"
+    n_panels <- 3L
+    n_assays <- 92L
+    n_samples <- 100L
+    data_type <- "NPX"
+    show_int_ctrl <- TRUE
+    show_dev_int_ctrl <- TRUE
+    version <- 1L
+
+    # synthetic wide df
+    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
+                                    data_type = data_type,
+                                    n_panels = n_panels,
+                                    n_assays = n_assays,
+                                    n_samples = n_samples,
+                                    show_int_ctrl = show_int_ctrl,
+                                    show_dev_int_ctrl = show_dev_int_ctrl,
+                                    version = version)
+
+    # modify pid, qc_warn and dev_int_ctrl dfs
+    df_rand_top_long_tmp <- df_rand$list_df_long$df_top_long[
+      c("df_plate",
+        "df_qc_warn",
+        "df_dev_int_ctrl")
+    ] |>
+      lapply(function(.x) {
+        .x |>
+          dplyr::mutate(
+            Panel = strsplit(x = .data[["Panel"]], split = "(", fixed = TRUE) |>
+              lapply(head, 1L) |>
+              unlist()
+          )
+      })
+    df_rand_top_long <- append(
+      x = df_rand$list_df_long$df_top_long[c("df_oid",
+                                             "df_int_ctrl")],
+      values = df_rand_top_long_tmp
+    )
+
+    # matrix specifications
+    format_spec <- olink_wide_spec |>
+      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+    # column names of each subset of data
+    names(df_rand_top_long) <- strsplit(
+      x = names(df_rand_top_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_top_", x))()
+    names(df_rand$list_df_long$df_middle_long) <- strsplit(
+      x = names(df_rand$list_df_long$df_middle_long),
+      split = "_"
+    ) |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist() |>
+      (\(x) paste0("df_mid_", x))()
+
+    # expected dim of output df
+    n_row_exp <- olink_wide2long_rows(n_panels = n_panels,
+                                      n_assays = n_assays,
+                                      n_samples = n_samples,
+                                      has_int_ctrl = show_int_ctrl,
+                                      num_int_ctrl = 3L)
+
+    # check that function runs
+    expect_no_condition(
+      object = df_out <- red_npx_wide_top_mid_long(
+        df_top_list = df_rand_top_long,
+        df_middle_list = df_rand$list_df_long$df_middle_long,
+        data_type = data_type,
+        format_spec = format_spec
+      )
+    )
+
+    # rename from NPXS
+    olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
+      dplyr::filter(
+        .data[["OA_internal"]] %in% colnames(df_out)
+      )
+
+    # check that output match
+    expect_true(
+      object = identical(nrow(df_out), n_row_exp)
+    )
+
+    expect_identical(
+      object = dplyr::select(df_out,
+                             -dplyr::all_of("col_index")),
+      expected = df_rand$list_df_long$df_long |>
+        dplyr::rename_with(
+          .fn = ~olink_wide_rename_npxs_tmp$OA_internal,
+          .cols = dplyr::all_of(olink_wide_rename_npxs_tmp$NPXS)
+        ) |>
+        dplyr::select(dplyr::any_of(colnames(df_out)))
+    )
   }
 )
 
