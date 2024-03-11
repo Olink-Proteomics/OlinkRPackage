@@ -1,6 +1,16 @@
 test_that(
   "read_npx_excel - works - wide format",
   {
+    # get wide synthetic data
+    df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 96",
+                                            data_type = "NPX",
+                                            n_panels = 3L,
+                                            n_assays = 92L,
+                                            n_samples = 100L,
+                                            show_dev_int_ctrl = TRUE,
+                                            show_int_ctrl = TRUE,
+                                            version = 1L)
+
     ## tibble ----
 
     withr::with_tempfile(
@@ -9,19 +19,8 @@ test_that(
       fileext = ".xlsx",
       code = {
 
-        # random data frame
-        df_synthetic <- olink_wide_synthetic(olink_platform = "Target 96",
-                                             data_type = "NPX",
-                                             n_panels = 2L,
-                                             n_assays = 92L,
-                                             n_samples = 100L,
-                                             show_dev_int_ctrl = TRUE,
-                                             show_int_ctrl = TRUE,
-                                             version = 1L)
-        df <- df_synthetic$list_df_wide$df_wide
-
         # write excel file
-        writexl::write_xlsx(x = df,
+        writexl::write_xlsx(x = df_synthetic$list_df_wide$df_wide,
                             path = excel_file,
                             col_names = FALSE,
                             format_headers = FALSE)
@@ -43,7 +42,7 @@ test_that(
         # check that the two dataframes are identical
         expect_equal(
           object = df_out,
-          expected = df
+          expected = df_synthetic$list_df_wide$df_wide
         )
 
       }
@@ -57,19 +56,8 @@ test_that(
       fileext = ".xlsx",
       code = {
 
-        # random data frame
-        df_synthetic <- olink_wide_synthetic(olink_platform = "Target 96",
-                                             data_type = "NPX",
-                                             n_panels = 2L,
-                                             n_assays = 92L,
-                                             n_samples = 100L,
-                                             show_dev_int_ctrl = TRUE,
-                                             show_int_ctrl = TRUE,
-                                             version = 1L)
-        df <- df_synthetic$list_df_wide$df_wide
-
         # write excel file
-        writexl::write_xlsx(x = df,
+        writexl::write_xlsx(x = df_synthetic$list_df_wide$df_wide,
                             path = excel_file,
                             col_names = FALSE,
                             format_headers = FALSE)
@@ -91,7 +79,7 @@ test_that(
         # check that the two dataframes are identical
         expect_equal(
           object = dplyr::as_tibble(df_out),
-          expected = df
+          expected = df_synthetic$list_df_wide$df_wide
         )
 
       }
@@ -103,6 +91,16 @@ test_that(
 test_that(
   "read_npx_excel - works - long format",
   {
+    # get wide synthetic data
+    df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 96",
+                                            data_type = "NPX",
+                                            n_panels = 3L,
+                                            n_assays = 92L,
+                                            n_samples = 100L,
+                                            show_dev_int_ctrl = TRUE,
+                                            show_int_ctrl = TRUE,
+                                            version = 1L)
+
     ## tibble ----
 
     withr::with_tempfile(
@@ -111,19 +109,8 @@ test_that(
       fileext = ".csv",
       code = {
 
-        # random data frame
-        df_synthetic <- olink_wide_synthetic(olink_platform = "Target 96",
-                                             data_type = "NPX",
-                                             n_panels = 2L,
-                                             n_assays = 92L,
-                                             n_samples = 100L,
-                                             show_dev_int_ctrl = TRUE,
-                                             show_int_ctrl = TRUE,
-                                             version = 1L)
-        df <- df_synthetic$list_df_long$df_long
-
         # write excel file
-        writexl::write_xlsx(x = df,
+        writexl::write_xlsx(x = df_synthetic$list_df_long$df_long,
                             path = excel_file,
                             col_names = TRUE,
                             format_headers = FALSE)
@@ -145,7 +132,7 @@ test_that(
         # check that the two dataframes are identical
         expect_equal(
           object = df_out,
-          expected = df
+          expected = df_synthetic$list_df_long$df_long
         )
 
       }
@@ -159,19 +146,8 @@ test_that(
       fileext = ".xlsx",
       code = {
 
-        # random data frame
-        df_synthetic <- olink_wide_synthetic(olink_platform = "Target 96",
-                                             data_type = "NPX",
-                                             n_panels = 2L,
-                                             n_assays = 92L,
-                                             n_samples = 100L,
-                                             show_dev_int_ctrl = TRUE,
-                                             show_int_ctrl = TRUE,
-                                             version = 1L)
-        df <- df_synthetic$list_df_long$df_long
-
         # write excel file
-        writexl::write_xlsx(x = df,
+        writexl::write_xlsx(x = df_synthetic$list_df_long$df_long,
                             path = excel_file,
                             col_names = TRUE,
                             format_headers = FALSE)
@@ -193,7 +169,7 @@ test_that(
         # check that the two dataframes are identical
         expect_equal(
           object = dplyr::as_tibble(df_out),
-          expected = df
+          expected = df_synthetic$list_df_long$df_long
         )
 
       }
@@ -248,8 +224,6 @@ test_that(
       pattern = "excel-file-test",
       fileext = ".xlsx",
       code = {
-
-        excel_file <- "../../lala.xlsx"
 
         # write the excel file from a random data frame
         dplyr::tibble(
