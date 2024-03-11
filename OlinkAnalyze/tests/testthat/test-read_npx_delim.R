@@ -139,16 +139,15 @@ test_that(
 test_that(
   "read_npx_delim - works - wide format - output df matches input df",
   {
-    # random data frame
-    df_synthetic <- olink_wide_synthetic(olink_platform = "Target 96",
-                                         data_type = "NPX",
-                                         n_panels = 2L,
-                                         n_assays = 92L,
-                                         n_samples = 100L,
-                                         show_dev_int_ctrl = TRUE,
-                                         show_int_ctrl = TRUE,
-                                         version = 1L)
-    df <- df_synthetic$list_df_wide$df_wide
+    # get wide synthetic data
+    df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 96",
+                                            data_type = "NPX",
+                                            n_panels = 3L,
+                                            n_assays = 92L,
+                                            n_samples = 100L,
+                                            show_dev_int_ctrl = TRUE,
+                                            show_int_ctrl = TRUE,
+                                            version = 1L)
 
     ## tibble ----
 
@@ -160,7 +159,7 @@ test_that(
 
         # write the coma-delimited file
         utils::write.table(
-          x = df,
+          x = df_synthetic$list_df_wide$df_wide,
           file = scdfile_test,
           append = FALSE,
           quote = FALSE,
@@ -190,7 +189,7 @@ test_that(
         # check that the two dataframes are identical
         expect_equal(
           object = df_out,
-          expected = df
+          expected = df_synthetic$list_df_wide$df_wide
         )
 
       }
@@ -206,7 +205,7 @@ test_that(
 
         # write the coma-delimited file
         utils::write.table(
-          x = df,
+          x = df_synthetic$list_df_wide$df_wide,
           file = scdfile_test,
           append = FALSE,
           quote = FALSE,
@@ -236,7 +235,7 @@ test_that(
         # check that the two dataframes are identical
         expect_equal(
           object = dplyr::as_tibble(df_out),
-          expected = df
+          expected = df_synthetic$list_df_wide$df_wide
         )
 
       }
@@ -349,19 +348,18 @@ test_that(
       fileext = ".parquet",
       code = {
 
-        # random data frame
-        df_synthetic <- olink_wide_synthetic(olink_platform = "Target 96",
-                                             data_type = "NPX",
-                                             n_panels = 2L,
-                                             n_assays = 92L,
-                                             n_samples = 100L,
-                                             show_dev_int_ctrl = TRUE,
-                                             show_int_ctrl = TRUE,
-                                             version = 1L)
-        df <- df_synthetic$list_df_wide$df_wide
+        # get wide synthetic data
+        df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 96",
+                                                data_type = "NPX",
+                                                n_panels = 3L,
+                                                n_assays = 92L,
+                                                n_samples = 100L,
+                                                show_dev_int_ctrl = TRUE,
+                                                show_int_ctrl = TRUE,
+                                                version = 1L)
 
         arrow::write_parquet(
-          x = df,
+          x = df_synthetic$list_df_wide$df_wide,
           sink = pfile_test,
           compression = "gzip"
         )
