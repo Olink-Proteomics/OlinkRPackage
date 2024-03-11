@@ -3,29 +3,15 @@
 test_that(
   "read_npx_format - works - long",
   {
-    # vars
-    olink_platform <- "Target 48"
-    data_type <- "NPX"
-    n_panels <- 3L
-    n_assays <- 45L
-    n_samples <- 100L
-    show_int_ctrl <- TRUE
-    show_dev_int_ctrl <- TRUE
-    version <- 2L
-
-    # rand rds file
-    df_rand_file <- paste0("p=", n_panels, "_",
-                           "a=", n_assays, "_",
-                           "s=", n_samples, "_",
-                           "ic=", show_int_ctrl, "_",
-                           "dic=", show_dev_int_ctrl, "_",
-                           "v=", version, ".rds")
-    df_rand_path <- test_path("fixtures",
-                              olink_platform,
-                              data_type,
-                              df_rand_file)
-    expect_true(file.exists(df_rand_path))
-    df_synthetic <- readRDS(df_rand_path)
+    # get wide synthetic data
+    df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
+                                            data_type = "NPX",
+                                            n_panels = 3L,
+                                            n_assays = 45L,
+                                            n_samples = 100L,
+                                            show_dev_int_ctrl = TRUE,
+                                            show_int_ctrl = TRUE,
+                                            version = 2L)
 
     ## csv semicolon ----
 
@@ -407,29 +393,15 @@ test_that(
 test_that(
   "read_npx_format - works - wide",
   {
-    # vars
-    olink_platform <- "Target 48"
-    data_type <- "NPX"
-    n_panels <- 3L
-    n_assays <- 45L
-    n_samples <- 100L
-    show_int_ctrl <- TRUE
-    show_dev_int_ctrl <- TRUE
-    version <- 2L
-
-    # rand rds file
-    df_rand_file <- paste0("p=", n_panels, "_",
-                           "a=", n_assays, "_",
-                           "s=", n_samples, "_",
-                           "ic=", show_int_ctrl, "_",
-                           "dic=", show_dev_int_ctrl, "_",
-                           "v=", version, ".rds")
-    df_rand_path <- test_path("fixtures",
-                              olink_platform,
-                              data_type,
-                              df_rand_file)
-    expect_true(file.exists(df_rand_path))
-    df_synthetic <- readRDS(df_rand_path)
+    # get wide synthetic data
+    df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
+                                            data_type = "NPX",
+                                            n_panels = 3L,
+                                            n_assays = 45L,
+                                            n_samples = 100L,
+                                            show_dev_int_ctrl = TRUE,
+                                            show_int_ctrl = TRUE,
+                                            version = 2L)
 
     ## csv semicolon ----
 
@@ -849,29 +821,15 @@ test_that(
 test_that(
   "read_npx_format_read - works",
   {
-    # vars
-    olink_platform <- "Target 48"
-    data_type <- "Quantified"
-    n_panels <- 3L
-    n_assays <- 45L
-    n_samples <- 88L
-    show_int_ctrl <- TRUE
-    show_dev_int_ctrl <- TRUE
-    version <- 0L
-
-    # rand rds file
-    df_rand_file <- paste0("p=", n_panels, "_",
-                           "a=", n_assays, "_",
-                           "s=", n_samples, "_",
-                           "ic=", show_int_ctrl, "_",
-                           "dic=", show_dev_int_ctrl, "_",
-                           "v=", version, ".rds")
-    df_rand_path <- test_path("fixtures",
-                              olink_platform,
-                              data_type,
-                              df_rand_file)
-    expect_true(file.exists(df_rand_path))
-    df_synthetic <- readRDS(df_rand_path)
+    # get wide synthetic data
+    df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
+                                            data_type = "Quantified",
+                                            n_panels = 3L,
+                                            n_assays = 45L,
+                                            n_samples = 88L,
+                                            show_dev_int_ctrl = TRUE,
+                                            show_int_ctrl = TRUE,
+                                            version = 0L)
 
     # top n rows
     top_n_row <- 3L
@@ -1214,29 +1172,15 @@ test_that(
       fileext = ".parquet",
       code = {
 
-        # vars
-        olink_platform <- "Target 48"
-        data_type <- "Quantified"
-        n_panels <- 3L
-        n_assays <- 45L
-        n_samples <- 88L
-        show_int_ctrl <- TRUE
-        show_dev_int_ctrl <- TRUE
-        version <- 0L
-
-        # rand rds file
-        df_rand_file <- paste0("p=", n_panels, "_",
-                               "a=", n_assays, "_",
-                               "s=", n_samples, "_",
-                               "ic=", show_int_ctrl, "_",
-                               "dic=", show_dev_int_ctrl, "_",
-                               "v=", version, ".rds")
-        df_rand_path <- test_path("fixtures",
-                                  olink_platform,
-                                  data_type,
-                                  df_rand_file)
-        expect_true(file.exists(df_rand_path))
-        df_synthetic <- readRDS(df_rand_path)
+        # get wide synthetic data
+        df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
+                                                data_type = "Quantified",
+                                                n_panels = 3L,
+                                                n_assays = 45L,
+                                                n_samples = 88L,
+                                                show_dev_int_ctrl = TRUE,
+                                                show_int_ctrl = TRUE,
+                                                version = 0L)
 
         sep <- NULL
 
@@ -1273,29 +1217,15 @@ test_that(
       fileext = ".xlsx",
       code = {
 
-        # vars
-        olink_platform <- "Target 48"
-        data_type <- "NPX"
-        n_panels <- 3L
-        n_assays <- 45L
-        n_samples <- 88L
-        show_int_ctrl <- TRUE
-        show_dev_int_ctrl <- FALSE
-        version <- 1L
-
-        # rand rds file
-        df_rand_file <- paste0("p=", n_panels, "_",
-                               "a=", n_assays, "_",
-                               "s=", n_samples, "_",
-                               "ic=", show_int_ctrl, "_",
-                               "dic=", show_dev_int_ctrl, "_",
-                               "v=", version, ".rds")
-        df_rand_path <- test_path("fixtures",
-                                  olink_platform,
-                                  data_type,
-                                  df_rand_file)
-        expect_true(file.exists(df_rand_path))
-        df_synthetic <- readRDS(df_rand_path)
+        # get wide synthetic data
+        df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
+                                                data_type = "NPX",
+                                                n_panels = 3L,
+                                                n_assays = 45L,
+                                                n_samples = 88L,
+                                                show_dev_int_ctrl = FALSE,
+                                                show_int_ctrl = TRUE,
+                                                version = 1L)
 
         # modify df wide
         df <- df_synthetic$list_df_wide$df_wide |>
@@ -1374,29 +1304,15 @@ test_that(
       fileext = ".xlsx",
       code = {
 
-        # vars
-        olink_platform <- "Target 48"
-        data_type <- "NPX"
-        n_panels <- 3L
-        n_assays <- 45L
-        n_samples <- 88L
-        show_int_ctrl <- TRUE
-        show_dev_int_ctrl <- FALSE
-        version <- 1L
-
-        # rand rds file
-        df_rand_file <- paste0("p=", n_panels, "_",
-                               "a=", n_assays, "_",
-                               "s=", n_samples, "_",
-                               "ic=", show_int_ctrl, "_",
-                               "dic=", show_dev_int_ctrl, "_",
-                               "v=", version, ".rds")
-        df_rand_path <- test_path("fixtures",
-                                  olink_platform,
-                                  data_type,
-                                  df_rand_file)
-        expect_true(file.exists(df_rand_path))
-        df_synthetic <- readRDS(df_rand_path)
+        # get wide synthetic data
+        df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
+                                                data_type = "NPX",
+                                                n_panels = 3L,
+                                                n_assays = 45L,
+                                                n_samples = 88L,
+                                                show_dev_int_ctrl = FALSE,
+                                                show_int_ctrl = TRUE,
+                                                version = 1L)
 
         # modify df long
         df_exp_r1 <- df_synthetic$list_df_long$df_long |>
@@ -1481,6 +1397,16 @@ test_that(
 test_that(
   "read_npx_excel_format - warning - diff autodetection vs user input",
   {
+    # get wide synthetic data
+    df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
+                                            data_type = "NPX",
+                                            n_panels = 3L,
+                                            n_assays = 45L,
+                                            n_samples = 88L,
+                                            show_dev_int_ctrl = FALSE,
+                                            show_int_ctrl = TRUE,
+                                            version = 1L)
+
     ## long input ----
 
     withr::with_tempfile(
@@ -1488,30 +1414,6 @@ test_that(
       pattern = "test_excel_long",
       fileext = ".xlsx",
       code = {
-
-        # vars
-        olink_platform <- "Target 48"
-        data_type <- "NPX"
-        n_panels <- 3L
-        n_assays <- 45L
-        n_samples <- 88L
-        show_int_ctrl <- TRUE
-        show_dev_int_ctrl <- FALSE
-        version <- 1L
-
-        # rand rds file
-        df_rand_file <- paste0("p=", n_panels, "_",
-                               "a=", n_assays, "_",
-                               "s=", n_samples, "_",
-                               "ic=", show_int_ctrl, "_",
-                               "dic=", show_dev_int_ctrl, "_",
-                               "v=", version, ".rds")
-        df_rand_path <- test_path("fixtures",
-                                  olink_platform,
-                                  data_type,
-                                  df_rand_file)
-        expect_true(file.exists(df_rand_path))
-        df_synthetic <- readRDS(df_rand_path)
 
         # modify df long
         df_exp_r1 <- df_synthetic$list_df_long$df_long |>
@@ -1583,30 +1485,6 @@ test_that(
       fileext = ".xlsx",
       code = {
 
-        # vars
-        olink_platform <- "Target 48"
-        data_type <- "NPX"
-        n_panels <- 3L
-        n_assays <- 45L
-        n_samples <- 88L
-        show_int_ctrl <- TRUE
-        show_dev_int_ctrl <- FALSE
-        version <- 1L
-
-        # rand rds file
-        df_rand_file <- paste0("p=", n_panels, "_",
-                               "a=", n_assays, "_",
-                               "s=", n_samples, "_",
-                               "ic=", show_int_ctrl, "_",
-                               "dic=", show_dev_int_ctrl, "_",
-                               "v=", version, ".rds")
-        df_rand_path <- test_path("fixtures",
-                                  olink_platform,
-                                  data_type,
-                                  df_rand_file)
-        expect_true(file.exists(df_rand_path))
-        df_synthetic <- readRDS(df_rand_path)
-
         # modify df wide
         df <- df_synthetic$list_df_wide$df_wide |>
           dplyr::slice_head(
@@ -1662,6 +1540,16 @@ test_that(
 test_that(
   "read_npx_excel_format - warning - diff autodetection vs user input V2",
   {
+    # get wide synthetic data
+    df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
+                                            data_type = "NPX",
+                                            n_panels = 3L,
+                                            n_assays = 45L,
+                                            n_samples = 88L,
+                                            show_dev_int_ctrl = FALSE,
+                                            show_int_ctrl = TRUE,
+                                            version = 1L)
+
     ## long input ----
 
     withr::with_tempfile(
@@ -1669,30 +1557,6 @@ test_that(
       pattern = "test_excel_long",
       fileext = ".xlsx",
       code = {
-
-        # vars
-        olink_platform <- "Target 48"
-        data_type <- "NPX"
-        n_panels <- 3L
-        n_assays <- 45L
-        n_samples <- 88L
-        show_int_ctrl <- TRUE
-        show_dev_int_ctrl <- FALSE
-        version <- 1L
-
-        # rand rds file
-        df_rand_file <- paste0("p=", n_panels, "_",
-                               "a=", n_assays, "_",
-                               "s=", n_samples, "_",
-                               "ic=", show_int_ctrl, "_",
-                               "dic=", show_dev_int_ctrl, "_",
-                               "v=", version, ".rds")
-        df_rand_path <- test_path("fixtures",
-                                  olink_platform,
-                                  data_type,
-                                  df_rand_file)
-        expect_true(file.exists(df_rand_path))
-        df_synthetic <- readRDS(df_rand_path)
 
         # modify df long
         df_exp_r1 <- df_synthetic$list_df_long$df_long |>
@@ -1764,30 +1628,6 @@ test_that(
       fileext = ".xlsx",
       code = {
 
-        # vars
-        olink_platform <- "Target 48"
-        data_type <- "NPX"
-        n_panels <- 3L
-        n_assays <- 45L
-        n_samples <- 88L
-        show_int_ctrl <- TRUE
-        show_dev_int_ctrl <- FALSE
-        version <- 1L
-
-        # rand rds file
-        df_rand_file <- paste0("p=", n_panels, "_",
-                               "a=", n_assays, "_",
-                               "s=", n_samples, "_",
-                               "ic=", show_int_ctrl, "_",
-                               "dic=", show_dev_int_ctrl, "_",
-                               "v=", version, ".rds")
-        df_rand_path <- test_path("fixtures",
-                                  olink_platform,
-                                  data_type,
-                                  df_rand_file)
-        expect_true(file.exists(df_rand_path))
-        df_synthetic <- readRDS(df_rand_path)
-
         # modify df wide
         df <- df_synthetic$list_df_wide$df_wide |>
           dplyr::slice_head(
@@ -1849,6 +1689,16 @@ test_that(
 test_that(
   "read_npx_excel_format - error - unable to detect format",
   {
+    # get wide synthetic data
+    df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
+                                            data_type = "NPX",
+                                            n_panels = 3L,
+                                            n_assays = 45L,
+                                            n_samples = 88L,
+                                            show_dev_int_ctrl = FALSE,
+                                            show_int_ctrl = TRUE,
+                                            version = 1L)
+
     ## long input ----
 
     withr::with_tempfile(
@@ -1856,30 +1706,6 @@ test_that(
       pattern = "test_excel_long",
       fileext = ".xlsx",
       code = {
-
-        # vars
-        olink_platform <- "Target 48"
-        data_type <- "NPX"
-        n_panels <- 3L
-        n_assays <- 45L
-        n_samples <- 88L
-        show_int_ctrl <- TRUE
-        show_dev_int_ctrl <- FALSE
-        version <- 1L
-
-        # rand rds file
-        df_rand_file <- paste0("p=", n_panels, "_",
-                               "a=", n_assays, "_",
-                               "s=", n_samples, "_",
-                               "ic=", show_int_ctrl, "_",
-                               "dic=", show_dev_int_ctrl, "_",
-                               "v=", version, ".rds")
-        df_rand_path <- test_path("fixtures",
-                                  olink_platform,
-                                  data_type,
-                                  df_rand_file)
-        expect_true(file.exists(df_rand_path))
-        df_synthetic <- readRDS(df_rand_path)
 
         # modify df long
         df_exp_r1 <- df_synthetic$list_df_long$df_long |>
@@ -1927,30 +1753,6 @@ test_that(
       pattern = "test_excel_wide",
       fileext = ".xlsx",
       code = {
-
-        # vars
-        olink_platform <- "Target 48"
-        data_type <- "NPX"
-        n_panels <- 3L
-        n_assays <- 45L
-        n_samples <- 88L
-        show_int_ctrl <- TRUE
-        show_dev_int_ctrl <- FALSE
-        version <- 1L
-
-        # rand rds file
-        df_rand_file <- paste0("p=", n_panels, "_",
-                               "a=", n_assays, "_",
-                               "s=", n_samples, "_",
-                               "ic=", show_int_ctrl, "_",
-                               "dic=", show_dev_int_ctrl, "_",
-                               "v=", version, ".rds")
-        df_rand_path <- test_path("fixtures",
-                                  olink_platform,
-                                  data_type,
-                                  df_rand_file)
-        expect_true(file.exists(df_rand_path))
-        df_synthetic <- readRDS(df_rand_path)
 
         # modify df wide
         df <- df_synthetic$list_df_wide$df_wide |>
@@ -2002,29 +1804,15 @@ test_that(
       fileext = ".xlsx",
       code = {
 
-        # vars
-        olink_platform <- "Target 96"
-        data_type <- "NPX"
-        n_panels <- 1L
-        n_assays <- 92L
-        n_samples <- 88L
-        show_int_ctrl <- TRUE
-        show_dev_int_ctrl <- TRUE
-        version <- 2L
-
-        # rand rds file
-        df_rand_file <- paste0("p=", n_panels, "_",
-                               "a=", n_assays, "_",
-                               "s=", n_samples, "_",
-                               "ic=", show_int_ctrl, "_",
-                               "dic=", show_dev_int_ctrl, "_",
-                               "v=", version, ".rds")
-        df_rand_path <- test_path("fixtures",
-                                  olink_platform,
-                                  data_type,
-                                  df_rand_file)
-        expect_true(file.exists(df_rand_path))
-        df_synthetic <- readRDS(df_rand_path)
+        # get wide synthetic data
+        df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 96",
+                                                data_type = "NPX",
+                                                n_panels = 1L,
+                                                n_assays = 92L,
+                                                n_samples = 88L,
+                                                show_dev_int_ctrl = TRUE,
+                                                show_int_ctrl = TRUE,
+                                                version = 2L)
 
         # modify df wide
         df <- df_synthetic$list_df_wide$df_wide |>
@@ -2087,29 +1875,15 @@ test_that(
       fileext = ".xlsx",
       code = {
 
-        # vars
-        olink_platform <- "Target 48"
-        data_type <- "NPX"
-        n_panels <- 1L
-        n_assays <- 45L
-        n_samples <- 88L
-        show_int_ctrl <- TRUE
-        show_dev_int_ctrl <- TRUE
-        version <- 1L
-
-        # rand rds file
-        df_rand_file <- paste0("p=", n_panels, "_",
-                               "a=", n_assays, "_",
-                               "s=", n_samples, "_",
-                               "ic=", show_int_ctrl, "_",
-                               "dic=", show_dev_int_ctrl, "_",
-                               "v=", version, ".rds")
-        df_rand_path <- test_path("fixtures",
-                                  olink_platform,
-                                  data_type,
-                                  df_rand_file)
-        expect_true(file.exists(df_rand_path))
-        df_synthetic <- readRDS(df_rand_path)
+        # get wide synthetic data
+        df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
+                                                data_type = "NPX",
+                                                n_panels = 1L,
+                                                n_assays = 45L,
+                                                n_samples = 88L,
+                                                show_dev_int_ctrl = TRUE,
+                                                show_int_ctrl = TRUE,
+                                                version = 1L)
 
         # modify df wide
         df <- df_synthetic$list_df_wide$df_wide |>
@@ -2169,29 +1943,15 @@ test_that(
       fileext = ".xlsx",
       code = {
 
-        # vars
-        olink_platform <- "Flex"
-        data_type <- "NPX"
-        n_panels <- 1L
-        n_assays <- 20L
-        n_samples <- 88L
-        show_int_ctrl <- TRUE
-        show_dev_int_ctrl <- TRUE
-        version <- 1L
-
-        # rand rds file
-        df_rand_file <- paste0("p=", n_panels, "_",
-                               "a=", n_assays, "_",
-                               "s=", n_samples, "_",
-                               "ic=", show_int_ctrl, "_",
-                               "dic=", show_dev_int_ctrl, "_",
-                               "v=", version, ".rds")
-        df_rand_path <- test_path("fixtures",
-                                  olink_platform,
-                                  data_type,
-                                  df_rand_file)
-        expect_true(file.exists(df_rand_path))
-        df_synthetic <- readRDS(df_rand_path)
+        # get wide synthetic data
+        df_synthetic <- get_wide_synthetic_data(olink_platform = "Flex",
+                                                data_type = "NPX",
+                                                n_panels = 1L,
+                                                n_assays = 20L,
+                                                n_samples = 88L,
+                                                show_dev_int_ctrl = TRUE,
+                                                show_int_ctrl = TRUE,
+                                                version = 1L)
 
         # modify df wide
         df <- df_synthetic$list_df_wide$df_wide |>
@@ -2254,29 +2014,15 @@ test_that(
       fileext = ".xlsx",
       code = {
 
-        # vars
-        olink_platform <- "Flex"
-        data_type <- "NPX"
-        n_panels <- 1L
-        n_assays <- 20L
-        n_samples <- 88L
-        show_int_ctrl <- TRUE
-        show_dev_int_ctrl <- TRUE
-        version <- 1L
-
-        # rand rds file
-        df_rand_file <- paste0("p=", n_panels, "_",
-                               "a=", n_assays, "_",
-                               "s=", n_samples, "_",
-                               "ic=", show_int_ctrl, "_",
-                               "dic=", show_dev_int_ctrl, "_",
-                               "v=", version, ".rds")
-        df_rand_path <- test_path("fixtures",
-                                  olink_platform,
-                                  data_type,
-                                  df_rand_file)
-        expect_true(file.exists(df_rand_path))
-        df_synthetic <- readRDS(df_rand_path)
+        # get wide synthetic data
+        df_synthetic <- get_wide_synthetic_data(olink_platform = "Flex",
+                                                data_type = "NPX",
+                                                n_panels = 1L,
+                                                n_assays = 20L,
+                                                n_samples = 88L,
+                                                show_dev_int_ctrl = TRUE,
+                                                show_int_ctrl = TRUE,
+                                                version = 1L)
 
         # modify df wide
         df <- df_synthetic$list_df_wide$df_wide |>
@@ -2352,29 +2098,15 @@ test_that(
       fileext = ".xlsx",
       code = {
 
-        # vars
-        olink_platform <- "Target 96"
-        data_type <- "NPX"
-        n_panels <- 1L
-        n_assays <- 92L
-        n_samples <- 88L
-        show_int_ctrl <- TRUE
-        show_dev_int_ctrl <- TRUE
-        version <- 2L
-
-        # rand rds file
-        df_rand_file <- paste0("p=", n_panels, "_",
-                               "a=", n_assays, "_",
-                               "s=", n_samples, "_",
-                               "ic=", show_int_ctrl, "_",
-                               "dic=", show_dev_int_ctrl, "_",
-                               "v=", version, ".rds")
-        df_rand_path <- test_path("fixtures",
-                                  olink_platform,
-                                  data_type,
-                                  df_rand_file)
-        expect_true(file.exists(df_rand_path))
-        df_synthetic <- readRDS(df_rand_path)
+        # get wide synthetic data
+        df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 96",
+                                                data_type = "NPX",
+                                                n_panels = 1L,
+                                                n_assays = 92L,
+                                                n_samples = 88L,
+                                                show_dev_int_ctrl = TRUE,
+                                                show_int_ctrl = TRUE,
+                                                version = 2L)
 
         # modify df wide
         df <- df_synthetic$list_df_wide$df_wide |>
@@ -2424,29 +2156,15 @@ test_that(
       fileext = ".xlsx",
       code = {
 
-        # vars
-        olink_platform <- "Target 96"
-        data_type <- "NPX"
-        n_panels <- 1L
-        n_assays <- 92L
-        n_samples <- 88L
-        show_int_ctrl <- TRUE
-        show_dev_int_ctrl <- TRUE
-        version <- 2L
-
-        # rand rds file
-        df_rand_file <- paste0("p=", n_panels, "_",
-                               "a=", n_assays, "_",
-                               "s=", n_samples, "_",
-                               "ic=", show_int_ctrl, "_",
-                               "dic=", show_dev_int_ctrl, "_",
-                               "v=", version, ".rds")
-        df_rand_path <- test_path("fixtures",
-                                  olink_platform,
-                                  data_type,
-                                  df_rand_file)
-        expect_true(file.exists(df_rand_path))
-        df_synthetic <- readRDS(df_rand_path)
+        # get wide synthetic data
+        df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 96",
+                                                data_type = "NPX",
+                                                n_panels = 1L,
+                                                n_assays = 92L,
+                                                n_samples = 88L,
+                                                show_dev_int_ctrl = TRUE,
+                                                show_int_ctrl = TRUE,
+                                                version = 2L)
 
         # modify df wide
         df <- df_synthetic$list_df_wide$df_wide |>
@@ -2491,29 +2209,15 @@ test_that(
   "read_npx_format_get_platform - warning",
   {
 
-    # vars
-    olink_platform <- "Target 96"
-    data_type <- "NPX"
-    n_panels <- 1L
-    n_assays <- 92L
-    n_samples <- 88L
-    show_int_ctrl <- TRUE
-    show_dev_int_ctrl <- TRUE
-    version <- 2L
-
-    # rand rds file
-    df_rand_file <- paste0("p=", n_panels, "_",
-                           "a=", n_assays, "_",
-                           "s=", n_samples, "_",
-                           "ic=", show_int_ctrl, "_",
-                           "dic=", show_dev_int_ctrl, "_",
-                           "v=", version, ".rds")
-    df_rand_path <- test_path("fixtures",
-                              olink_platform,
-                              data_type,
-                              df_rand_file)
-    expect_true(file.exists(df_rand_path))
-    df_synthetic <- readRDS(df_rand_path)
+    # get wide synthetic data
+    df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 96",
+                                            data_type = "NPX",
+                                            n_panels = 1L,
+                                            n_assays = 92L,
+                                            n_samples = 88L,
+                                            show_dev_int_ctrl = TRUE,
+                                            show_int_ctrl = TRUE,
+                                            version = 2L)
 
     # modify df wide
     df <- df_synthetic$list_df_wide$df_wide |>
