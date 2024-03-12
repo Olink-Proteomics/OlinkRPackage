@@ -1,3 +1,5 @@
+source("tests/testthat/fixtures/olink_wide_synthetic_data.R")
+
 ## Generate sets of all possible wide matrix combinations ----
 
 df_wide_summary <- dplyr::tibble(
