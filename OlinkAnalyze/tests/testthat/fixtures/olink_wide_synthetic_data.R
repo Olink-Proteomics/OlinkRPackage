@@ -20,7 +20,7 @@ olink_wide_npxs_v <- function(df) {
       n = 1L
     ) |>
     dplyr::pull(
-      .data[["V2"]]
+      rlang::.data[["V2"]]
     ) |>
     as.character() |>
     (\(x) {
@@ -64,20 +64,20 @@ olink_wide_top <- function(olink_platform,
         unlist()
     ) |>
     dplyr::group_by(
-      .data[["int_ctrl_group"]]
+      rlang::.data[["int_ctrl_group"]]
     ) |>
     dplyr::slice_sample(
       n = 1L
     ) |>
     dplyr::ungroup() |>
     dplyr::pull(
-      .data[["int_ctrl"]]
+      rlang::.data[["int_ctrl"]]
     )
 
   # get format specifications
   format_spec <- olink_wide_spec |>
     dplyr::filter(
-      .data[["data_type"]] == .env[["data_type"]]
+      rlang::.data[["data_type"]] == rlang::.env[["data_type"]]
     )
 
   # number of plates always corresponds to number of panels
@@ -86,14 +86,14 @@ olink_wide_top <- function(olink_platform,
   # number of QC warning is equal to number of panels if there are QC warnings
   n_qc_warns <- format_spec |>
     dplyr::pull(
-      .data[["has_qc_data"]]
+      rlang::.data[["has_qc_data"]]
     ) |>
     (\(x) ifelse(x == TRUE, n_panels, 0L))()
 
   # columns with deviation from internal controls
   dev_int_ctrl <- format_spec |>
     dplyr::pull(
-      .data[["top_matrix_uniprot_dev_int_ctrl"]]
+      rlang::.data[["top_matrix_uniprot_dev_int_ctrl"]]
     ) |>
     unlist() |>
     (\(x) x[x %in% sample_int_ctrl])()
@@ -102,7 +102,7 @@ olink_wide_top <- function(olink_platform,
   # internal controls if any
   int_ctrl <- format_spec |>
     dplyr::pull(
-      .data[["top_matrix_assay_int_ctrl"]]
+      rlang::.data[["top_matrix_assay_int_ctrl"]]
     ) |>
     unlist() |>
     (\(x) x[x %in% sample_int_ctrl])()
@@ -158,12 +158,13 @@ olink_wide_top <- function(olink_platform,
                  times = (length(dev_int_ctrl) * n_panels)))
   ) |>
     dplyr::mutate(
-      V6 = strsplit(x = .data[["V1"]], split = " ", fixed = TRUE) |>
+      V6 = strsplit(x = rlang::.data[["V1"]], split = " ", fixed = TRUE) |>
         sapply(tail, 1L) |>
         unlist(),
-      V1 = dplyr::if_else(.data[["V1"]] == "Panel",
-                          .data[["V1"]],
-                          paste0(.data[["V1"]], "(v.", .data[["V6"]], ")"))
+      V1 = dplyr::if_else(rlang::.data[["V1"]] == "Panel",
+                          rlang::.data[["V1"]],
+                          paste0(rlang::.data[["V1"]], "(v.",
+                                 rlang::.data[["V6"]], ")"))
     ) |>
     dplyr::select(
       -dplyr::all_of("V6")
@@ -184,7 +185,7 @@ olink_wide_top <- function(olink_platform,
     df <- df |>
       dplyr::filter(
         !grepl(pattern = "ctrl",
-               x = .data[["V2"]],
+               x = rlang::.data[["V2"]],
                ignore.case = TRUE)
       )
   }
@@ -193,7 +194,7 @@ olink_wide_top <- function(olink_platform,
   if (show_dev_int_ctrl == FALSE) {
     df <- df |>
       dplyr::filter(
-        .data[["V2"]] != "QC Deviation from median"
+        rlang::.data[["V2"]] != "QC Deviation from median"
       )
   }
 
@@ -235,14 +236,14 @@ olink_wide_top_long <- function(df) {
 
   df_oid <- df |>
     dplyr::filter(
-      !is.na(.data[["OlinkID"]])
+      !is.na(rlang::.data[["OlinkID"]])
     )
 
   df_int_ctrl <- df |>
     dplyr::filter(
-      is.na(.data[["OlinkID"]])
+      is.na(rlang::.data[["OlinkID"]])
       & grepl(pattern = "ctrl",
-              x = .data[["Assay"]],
+              x = rlang::.data[["Assay"]],
               ignore.case = TRUE)
     ) |>
     dplyr::select(
@@ -251,8 +252,8 @@ olink_wide_top_long <- function(df) {
 
   df_plate <- df |>
     dplyr::filter(
-      is.na(.data[["OlinkID"]])
-      & (.data[["Assay"]] %in% c("Plate ID"))
+      is.na(rlang::.data[["OlinkID"]])
+      & (rlang::.data[["Assay"]] %in% c("Plate ID"))
     ) |>
     dplyr::select(
       -dplyr::any_of(c("Uniprot ID", "OlinkID", "Unit"))
@@ -263,8 +264,8 @@ olink_wide_top_long <- function(df) {
 
   df_qc_warn <- df |>
     dplyr::filter(
-      is.na(.data[["OlinkID"]])
-      & (.data[["Assay"]] %in% c("QC Warning"))
+      is.na(rlang::.data[["OlinkID"]])
+      & (rlang::.data[["Assay"]] %in% c("QC Warning"))
     ) |>
     dplyr::select(
       -dplyr::any_of(c("Uniprot ID", "OlinkID", "Unit"))
@@ -275,8 +276,8 @@ olink_wide_top_long <- function(df) {
 
   df_dev_int_ctrl <- df |>
     dplyr::filter(
-      is.na(.data[["OlinkID"]])
-      & .data[["Assay"]] == "QC Deviation from median"
+      is.na(rlang::.data[["OlinkID"]])
+      & rlang::.data[["Assay"]] == "QC Deviation from median"
     ) |>
     dplyr::select(
       -dplyr::any_of(c("OlinkID", "Unit"))
@@ -313,7 +314,7 @@ olink_wide_middle <- function(data_type,
   # get format specifications
   format_spec <- olink_wide_spec |>
     dplyr::filter(
-      .data[["data_type"]] == .env[["data_type"]]
+      rlang::.data[["data_type"]] == rlang::.env[["data_type"]]
     )
 
   # number of plates
@@ -323,7 +324,7 @@ olink_wide_middle <- function(data_type,
   # number of internal controls
   n_int_ctrl <- format_spec |>
     dplyr::pull(
-      .data[["top_matrix_assay_int_ctrl"]]
+      rlang::.data[["top_matrix_assay_int_ctrl"]]
     ) |>
     unlist() |>
     (\(x) {
@@ -341,7 +342,7 @@ olink_wide_middle <- function(data_type,
   # number of deviations from internal controls
   n_dev_int_ctrl <- format_spec |>
     dplyr::pull(
-      .data[["top_matrix_uniprot_dev_int_ctrl"]]
+      rlang::.data[["top_matrix_uniprot_dev_int_ctrl"]]
     ) |>
     unlist() |>
     (\(x) {
@@ -359,7 +360,7 @@ olink_wide_middle <- function(data_type,
   # are there any QC data
   qc_data <- format_spec |>
     dplyr::pull(
-      .data[["has_qc_data"]]
+      rlang::.data[["has_qc_data"]]
     )
 
   # create parts of df ----
@@ -647,11 +648,11 @@ olink_wide_bottom <- function(olink_platform,
   # get bottom matrix format specifications
   format_spec_bottom <- olink_wide_bottom_matrix |>
     dplyr::filter(
-      .data[["data_type"]] == .env[["data_type"]]
-      & .data[["olink_platform"]] == .env[["olink_platform"]]
+      rlang::.data[["data_type"]] == rlang::.env[["data_type"]]
+      & rlang::.data[["olink_platform"]] == rlang::.env[["olink_platform"]]
     ) |>
     dplyr::mutate(
-      variable_alt_names = lapply(.data[["variable_alt_names"]],
+      variable_alt_names = lapply(rlang::.data[["variable_alt_names"]],
                                   sample,
                                   size = 1L) |>
         unlist()
@@ -661,17 +662,17 @@ olink_wide_bottom <- function(olink_platform,
   } else {
     format_spec_bottom <- format_spec_bottom |>
       dplyr::filter(
-        .data[["version"]] %in% c(0L, .env[["version"]])
+        rlang::.data[["version"]] %in% c(0L, rlang::.env[["version"]])
       )
   }
 
   # number of internal controls
   n_int_ctrl <- olink_wide_spec |>
     dplyr::filter(
-      .data[["data_type"]] == .env[["data_type"]]
+      rlang::.data[["data_type"]] == rlang::.env[["data_type"]]
     ) |>
     dplyr::pull(
-      .data[["top_matrix_assay_int_ctrl"]]
+      rlang::.data[["top_matrix_assay_int_ctrl"]]
     ) |>
     unlist() |>
     (\(x) {
@@ -787,7 +788,7 @@ olink_wide_bottom <- function(olink_platform,
       df_plate_lod_v2
     ) |>
     dplyr::filter(
-      .data[["V1"]] %in% format_spec_bottom$variable_alt_names
+      rlang::.data[["V1"]] %in% format_spec_bottom$variable_alt_names
     ) |>
     remove_all_na_cols()
   rm(df_assay_warn, df_low_quant_lvl, df_plate_lod, df_plate_lod_v2)
@@ -919,7 +920,7 @@ olink_wide_bottom <- function(olink_platform,
       df_norm
     ) |>
     dplyr::filter(
-      .data[["V1"]] %in% format_spec_bottom$variable_alt_names
+      rlang::.data[["V1"]] %in% format_spec_bottom$variable_alt_names
     ) |>
     remove_all_na_cols()
   rm(df_lod, df_max_lod, df_max_lod_v2, df_lloq, df_uloq, df_miss_freq, df_norm)
@@ -951,15 +952,15 @@ olink_wide_bottom_long <- function(df,
   # get bottom matrix format specifications
   format_spec_bottom <- olink_wide_bottom_matrix |>
     dplyr::filter(
-      .data[["data_type"]] == .env[["data_type"]]
-      & .data[["olink_platform"]] == .env[["olink_platform"]]
+      rlang::.data[["data_type"]] == rlang::.env[["data_type"]]
+      & rlang::.data[["olink_platform"]] == rlang::.env[["olink_platform"]]
     )
   if (!(version %in% format_spec_bottom$version)) {
     stop("Wrong version!")
   } else {
     format_spec_bottom <- format_spec_bottom |>
       dplyr::filter(
-        .data[["version"]] %in% c(0L, .env[["version"]])
+        rlang::.data[["version"]] %in% c(0L, rlang::.env[["version"]])
       )
   }
 
@@ -967,16 +968,16 @@ olink_wide_bottom_long <- function(df,
 
   bottom_mat_plate_spec <- format_spec_bottom |>
     dplyr::filter(
-      .data[["plate_specific"]] == TRUE
+      rlang::.data[["plate_specific"]] == TRUE
     ) |>
     dplyr::pull(
-      .data[["variable_alt_names"]]
+      rlang::.data[["variable_alt_names"]]
     ) |>
     unlist()
 
   df_plate_specific <- df |>
     dplyr::filter(
-      .data[["V1"]] %in% bottom_mat_plate_spec
+      rlang::.data[["V1"]] %in% bottom_mat_plate_spec
     )
 
   if (nrow(df_plate_specific) > 0L) {
@@ -986,7 +987,7 @@ olink_wide_bottom_long <- function(df,
 
       df_plate_specific_tmp <- df_plate_specific |>
         dplyr::filter(
-          .data[["V1"]] == .env[["x"]]
+          rlang::.data[["V1"]] == rlang::.env[["x"]]
         ) |>
         dplyr::select(
           -dplyr::all_of("V1")
@@ -1003,7 +1004,7 @@ olink_wide_bottom_long <- function(df,
             "PlateID" = dplyr::all_of(plate_cols)
           ) |>
           dplyr::mutate(
-            col_index_plate = .env[["plate_cols"]]
+            col_index_plate = rlang::.env[["plate_cols"]]
           )
       } else {
         df_plate_specific_tmp <- df_plate_specific_tmp |>
@@ -1043,16 +1044,16 @@ olink_wide_bottom_long <- function(df,
 
   bottom_mat_plate_shared <- format_spec_bottom |>
     dplyr::filter(
-      .data[["plate_specific"]] == FALSE
+      rlang::.data[["plate_specific"]] == FALSE
     ) |>
     dplyr::pull(
-      .data[["variable_alt_names"]]
+      rlang::.data[["variable_alt_names"]]
     ) |>
     unlist()
 
   df_plate_shared <- df |>
     dplyr::filter(
-      .data[["V1"]] %in% bottom_mat_plate_shared
+      rlang::.data[["V1"]] %in% bottom_mat_plate_shared
     ) |>
     remove_all_na_cols()
 
@@ -1096,11 +1097,11 @@ olink_wide_bottom_long <- function(df,
     list_df <- list(
       df_oid = df_out |>
         dplyr::filter(
-          !(.data[["col_index"]] %in% .env[["int_ctrl_cols"]])
+          !(rlang::.data[["col_index"]] %in% rlang::.env[["int_ctrl_cols"]])
         ),
       df_int_ctrl = df_out |>
         dplyr::filter(
-          .data[["col_index"]] %in% .env[["int_ctrl_cols"]]
+          rlang::.data[["col_index"]] %in% rlang::.env[["int_ctrl_cols"]]
         )
     )
   } else {
@@ -1128,7 +1129,7 @@ olink_wide <- function(olink_platform,
   # get format specifications
   format_spec <- olink_wide_spec |>
     dplyr::filter(
-      .data[["data_type"]] == .env[["data_type"]]
+      rlang::.data[["data_type"]] == rlang::.env[["data_type"]]
     )
 
   # head ----
@@ -1481,7 +1482,7 @@ olink_wide_to_long <- function(df_top_wide,
 
   df_long <- df_long |>
     dplyr::mutate(
-      Panel_Version = strsplit(x = .data[["Panel"]],
+      Panel_Version = strsplit(x = rlang::.data[["Panel"]],
                                split = "(",
                                fixed = TRUE) |>
         lapply(tail, 1L) |>
@@ -1494,7 +1495,7 @@ olink_wide_to_long <- function(df_top_wide,
         })()
     ) |>
     dplyr::mutate(
-      Panel = strsplit(x = .data[["Panel"]],
+      Panel = strsplit(x = rlang::.data[["Panel"]],
                        split = "(",
                        fixed = TRUE) |>
         lapply(head, -1L) |>
@@ -1512,7 +1513,7 @@ olink_wide_to_long <- function(df_top_wide,
 
   olink_wide_rename_npxs_tmp <- olink_wide_rename_npxs |>
     dplyr::filter(
-      .data[["OA_internal"]] %in% colnames(df_long)
+      rlang::.data[["OA_internal"]] %in% colnames(df_long)
     )
 
   df_long <- df_long |>
