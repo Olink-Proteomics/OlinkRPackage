@@ -49,6 +49,13 @@ df_wide_combos <- lapply(seq_len(nrow(df_wide_summary)), function(i) {
     dplyr::as_tibble()
 }) |>
   dplyr::bind_rows() |>
+  # Focus has only version 0 on bottom matrix
+  dplyr::mutate(
+    version = dplyr::if_else(.data[["olink_platform"]] == "Focus"
+                             & .data[["data_type"]] == "NPX",
+                             .data[["version"]] - 1L,
+                             .data[["version"]])
+  ) |>
   # remove combinations that are not part of the data
   dplyr::inner_join(
     olink_wide_bottom_matrix |>
