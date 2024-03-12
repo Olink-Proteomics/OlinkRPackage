@@ -5,10 +5,9 @@ test_that(
   {
     # variables that apply to all tests
     olink_platform <- "Target 48"
-    n_panels <- 2L
+    n_panels <- 3L
     n_assays <- 45L
     n_samples <- 88L
-    show_dev_int_ctrl <- TRUE
     show_int_ctrl <- TRUE
 
     ## NPX ----
@@ -21,15 +20,19 @@ test_that(
 
         # synthetic wide df
         data_type <- "NPX"
+        show_dev_int_ctrl <- TRUE
+        version <- 1L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        show_int_ctrl = show_int_ctrl,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -87,15 +90,19 @@ test_that(
 
         # synthetic wide df
         data_type <- "Ct"
+        show_dev_int_ctrl <- FALSE
+        version <- 0L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        show_int_ctrl = show_int_ctrl,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -150,15 +157,19 @@ test_that(
 
         # synthetic wide df
         data_type <- "Quantified"
+        show_dev_int_ctrl <- TRUE
+        version <- 0L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        show_int_ctrl = show_int_ctrl,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -217,10 +228,31 @@ test_that(
     n_panels <- 1L
     n_assays <- 92L
     n_samples <- 88L
-    show_dev_int_ctrl <- TRUE
     show_int_ctrl <- TRUE
 
-    ## NPX - 2 all-NA + 1 all-NA ----
+    ## NPX ----
+
+    data_type <- "NPX"
+    show_dev_int_ctrl <- TRUE
+    version <- 1L
+
+    # get wide synthetic data
+    df_rand_npx <- get_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = show_dev_int_ctrl,
+      show_int_ctrl = show_int_ctrl,
+      version = version
+    )
+
+    # matrix specifications
+    format_spec_npx <- olink_wide_spec |>
+      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+    ### NPX - 2 all-NA + 1 all-NA ----
 
     withr::with_tempfile(
       new = "olink_wide_format",
@@ -228,42 +260,26 @@ test_that(
       fileext = ".xlsx",
       code = {
 
-        # synthetic wide df
-        data_type <- "NPX"
-
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        show_int_ctrl = show_int_ctrl,
-                                        version = 1L)
-
         # modify wide df
-        df_wide <- df_rand$list_df_wide$df_head_wide |>
+        df_wide <- df_rand_npx$list_df_wide$df_head_wide |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_top_wide
+            df_rand_npx$list_df_wide$df_top_wide
           ) |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_na_wide
+            df_rand_npx$list_df_wide$df_na_wide
           ) |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_na_wide
+            df_rand_npx$list_df_wide$df_na_wide
           ) |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_middle_wide
+            df_rand_npx$list_df_wide$df_middle_wide
           ) |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_na_wide
+            df_rand_npx$list_df_wide$df_na_wide
           ) |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_bottom_wide
+            df_rand_npx$list_df_wide$df_bottom_wide
           )
-
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write wide df
         writeLines("foo", olink_wide_format)
@@ -275,7 +291,7 @@ test_that(
               df = df_wide,
               file = olink_wide_format,
               data_type = data_type,
-              format_spec = format_spec
+              format_spec = format_spec_npx
             )
           )
         )
@@ -283,31 +299,31 @@ test_that(
         # check that df_head works
         expect_identical(
           object = remove_all_na_cols(df = df_out$df_head),
-          expected = df_rand$list_df_wide$df_head_wide
+          expected = df_rand_npx$list_df_wide$df_head_wide
         )
 
         # check that df_top works
         expect_identical(
           object = df_out$df_top,
-          expected = df_rand$list_df_wide$df_top_wide
+          expected = df_rand_npx$list_df_wide$df_top_wide
         )
 
         # check that df_mid works
         expect_identical(
           object = df_out$df_mid,
-          expected = df_rand$list_df_wide$df_middle_wide
+          expected = df_rand_npx$list_df_wide$df_middle_wide
         )
 
         # check that df_bottom works
         expect_identical(
           object = remove_all_na_cols(df = df_out$df_bottom),
-          expected = df_rand$list_df_wide$df_bottom_wide
+          expected = df_rand_npx$list_df_wide$df_bottom_wide
         )
 
       }
     )
 
-    ## NPX - 2 all-NA + 2 all-NA ----
+    ### NPX - 2 all-NA + 2 all-NA ----
 
     withr::with_tempfile(
       new = "olink_wide_format",
@@ -315,45 +331,29 @@ test_that(
       fileext = ".xlsx",
       code = {
 
-        # synthetic wide df
-        data_type <- "NPX"
-
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        show_int_ctrl = show_int_ctrl,
-                                        version = 1L)
-
         # modify wide df
-        df_wide <- df_rand$list_df_wide$df_head_wide |>
+        df_wide <- df_rand_npx$list_df_wide$df_head_wide |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_top_wide
+            df_rand_npx$list_df_wide$df_top_wide
           ) |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_na_wide
+            df_rand_npx$list_df_wide$df_na_wide
           ) |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_na_wide
+            df_rand_npx$list_df_wide$df_na_wide
           ) |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_middle_wide
+            df_rand_npx$list_df_wide$df_middle_wide
           ) |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_na_wide
+            df_rand_npx$list_df_wide$df_na_wide
           ) |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_na_wide
+            df_rand_npx$list_df_wide$df_na_wide
           ) |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_bottom_wide
+            df_rand_npx$list_df_wide$df_bottom_wide
           )
-
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write wide df
         writeLines("foo", olink_wide_format)
@@ -365,7 +365,7 @@ test_that(
               df = df_wide,
               file = olink_wide_format,
               data_type = data_type,
-              format_spec = format_spec
+              format_spec = format_spec_npx
             )
           )
         )
@@ -373,32 +373,32 @@ test_that(
         # check that df_head works
         expect_identical(
           object = remove_all_na_cols(df = df_out$df_head),
-          expected = df_rand$list_df_wide$df_head_wide
+          expected = df_rand_npx$list_df_wide$df_head_wide
         )
 
         # check that df_top works
         expect_identical(
           object = df_out$df_top,
-          expected = df_rand$list_df_wide$df_top_wide
+          expected = df_rand_npx$list_df_wide$df_top_wide
         )
 
         # check that df_mid works
         expect_identical(
           object = df_out$df_mid,
-          expected = df_rand$list_df_wide$df_middle_wide
+          expected = df_rand_npx$list_df_wide$df_middle_wide
         )
 
         # check that df_bottom works
         expect_identical(
           object = remove_all_na_cols(df = df_out$df_bottom),
-          expected = df_rand$list_df_wide$df_bottom_wide
+          expected = df_rand_npx$list_df_wide$df_bottom_wide
         )
 
       }
     )
 
 
-    ## NPX - 1 all-NA + 2 all-NA ----
+    ### NPX - 1 all-NA + 2 all-NA ----
 
     withr::with_tempfile(
       new = "olink_wide_format",
@@ -406,42 +406,26 @@ test_that(
       fileext = ".xlsx",
       code = {
 
-        # synthetic wide df
-        data_type <- "NPX"
-
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        show_int_ctrl = show_int_ctrl,
-                                        version = 1L)
-
         # modify wide df
-        df_wide <- df_rand$list_df_wide$df_head_wide |>
+        df_wide <- df_rand_npx$list_df_wide$df_head_wide |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_top_wide
+            df_rand_npx$list_df_wide$df_top_wide
           ) |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_na_wide
+            df_rand_npx$list_df_wide$df_na_wide
           ) |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_middle_wide
+            df_rand_npx$list_df_wide$df_middle_wide
           ) |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_na_wide
+            df_rand_npx$list_df_wide$df_na_wide
           ) |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_na_wide
+            df_rand_npx$list_df_wide$df_na_wide
           ) |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_bottom_wide
+            df_rand_npx$list_df_wide$df_bottom_wide
           )
-
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write wide df
         writeLines("foo", olink_wide_format)
@@ -453,7 +437,7 @@ test_that(
               df = df_wide,
               file = olink_wide_format,
               data_type = data_type,
-              format_spec = format_spec
+              format_spec = format_spec_npx
             )
           )
         )
@@ -461,32 +445,32 @@ test_that(
         # check that df_head works
         expect_identical(
           object = remove_all_na_cols(df = df_out$df_head),
-          expected = df_rand$list_df_wide$df_head_wide
+          expected = df_rand_npx$list_df_wide$df_head_wide
         )
 
         # check that df_top works
         expect_identical(
           object = df_out$df_top,
-          expected = df_rand$list_df_wide$df_top_wide
+          expected = df_rand_npx$list_df_wide$df_top_wide
         )
 
         # check that df_mid works
         expect_identical(
           object = df_out$df_mid,
-          expected = df_rand$list_df_wide$df_middle_wide
+          expected = df_rand_npx$list_df_wide$df_middle_wide
         )
 
         # check that df_bottom works
         expect_identical(
           object = remove_all_na_cols(df = df_out$df_bottom),
-          expected = df_rand$list_df_wide$df_bottom_wide
+          expected = df_rand_npx$list_df_wide$df_bottom_wide
         )
 
       }
     )
 
 
-    ## NPX - 4 all-NA + 3 all-NA ----
+    ### NPX - 4 all-NA + 3 all-NA ----
 
     withr::with_tempfile(
       new = "olink_wide_format",
@@ -494,54 +478,38 @@ test_that(
       fileext = ".xlsx",
       code = {
 
-        # synthetic wide df
-        data_type <- "NPX"
-
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        show_int_ctrl = show_int_ctrl,
-                                        version = 1L)
-
         # modify wide df
-        df_wide <- df_rand$list_df_wide$df_head_wide |>
+        df_wide <- df_rand_npx$list_df_wide$df_head_wide |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_top_wide
+            df_rand_npx$list_df_wide$df_top_wide
           ) |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_na_wide
+            df_rand_npx$list_df_wide$df_na_wide
           ) |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_na_wide
+            df_rand_npx$list_df_wide$df_na_wide
           ) |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_na_wide
+            df_rand_npx$list_df_wide$df_na_wide
           ) |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_na_wide
+            df_rand_npx$list_df_wide$df_na_wide
           ) |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_middle_wide
+            df_rand_npx$list_df_wide$df_middle_wide
           ) |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_na_wide
+            df_rand_npx$list_df_wide$df_na_wide
           ) |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_na_wide
+            df_rand_npx$list_df_wide$df_na_wide
           ) |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_na_wide
+            df_rand_npx$list_df_wide$df_na_wide
           ) |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_bottom_wide
+            df_rand_npx$list_df_wide$df_bottom_wide
           )
-
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write wide df
         writeLines("foo", olink_wide_format)
@@ -553,7 +521,7 @@ test_that(
               df = df_wide,
               file = olink_wide_format,
               data_type = data_type,
-              format_spec = format_spec
+              format_spec = format_spec_npx
             )
           )
         )
@@ -561,31 +529,53 @@ test_that(
         # check that df_head works
         expect_identical(
           object = remove_all_na_cols(df = df_out$df_head),
-          expected = df_rand$list_df_wide$df_head_wide
+          expected = df_rand_npx$list_df_wide$df_head_wide
         )
 
         # check that df_top works
         expect_identical(
           object = df_out$df_top,
-          expected = df_rand$list_df_wide$df_top_wide
+          expected = df_rand_npx$list_df_wide$df_top_wide
         )
 
         # check that df_mid works
         expect_identical(
           object = df_out$df_mid,
-          expected = df_rand$list_df_wide$df_middle_wide
+          expected = df_rand_npx$list_df_wide$df_middle_wide
         )
 
         # check that df_bottom works
         expect_identical(
           object = remove_all_na_cols(df = df_out$df_bottom),
-          expected = df_rand$list_df_wide$df_bottom_wide
+          expected = df_rand_npx$list_df_wide$df_bottom_wide
         )
 
       }
     )
 
-    ## Ct - 2 all-NA ----
+    ## Ct ----
+
+    data_type <- "Ct"
+    show_dev_int_ctrl <- FALSE
+    version <- 0L
+
+    # get wide synthetic data
+    df_rand_ct <- get_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = show_dev_int_ctrl,
+      show_int_ctrl = show_int_ctrl,
+      version = version
+    )
+
+    # matrix specifications
+    format_spec_ct <- olink_wide_spec |>
+      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+    ### Ct - 2 all-NA ----
 
     withr::with_tempfile(
       new = "olink_wide_format",
@@ -593,36 +583,20 @@ test_that(
       fileext = ".xlsx",
       code = {
 
-        # synthetic wide df
-        data_type <- "Ct"
-
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        show_int_ctrl = show_int_ctrl,
-                                        version = 0L)
-
         # modify wide df
-        df_wide <- df_rand$list_df_wide$df_head_wide |>
+        df_wide <- df_rand_ct$list_df_wide$df_head_wide |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_top_wide
+            df_rand_ct$list_df_wide$df_top_wide
           ) |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_na_wide
+            df_rand_ct$list_df_wide$df_na_wide
           ) |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_na_wide
+            df_rand_ct$list_df_wide$df_na_wide
           ) |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_middle_wide
+            df_rand_ct$list_df_wide$df_middle_wide
           )
-
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write wide df
         writeLines("foo", olink_wide_format)
@@ -634,7 +608,7 @@ test_that(
               df = df_wide,
               file = olink_wide_format,
               data_type = data_type,
-              format_spec = format_spec
+              format_spec = format_spec_ct
             )
           )
         )
@@ -642,19 +616,19 @@ test_that(
         # check that df_head works
         expect_identical(
           object = remove_all_na_cols(df = df_out$df_head),
-          expected = df_rand$list_df_wide$df_head_wide
+          expected = df_rand_ct$list_df_wide$df_head_wide
         )
 
         # check that df_top works
         expect_identical(
           object = df_out$df_top,
-          expected = df_rand$list_df_wide$df_top_wide
+          expected = df_rand_ct$list_df_wide$df_top_wide
         )
 
         # check that df_mid works
         expect_identical(
           object = df_out$df_mid,
-          expected = df_rand$list_df_wide$df_middle_wide
+          expected = df_rand_ct$list_df_wide$df_middle_wide
         )
 
         # check that df_bottom works
@@ -663,7 +637,7 @@ test_that(
       }
     )
 
-    ## Ct - 4 all-NA ----
+    ### Ct - 4 all-NA ----
 
     withr::with_tempfile(
       new = "olink_wide_format",
@@ -671,42 +645,26 @@ test_that(
       fileext = ".xlsx",
       code = {
 
-        # synthetic wide df
-        data_type <- "Ct"
-
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        show_int_ctrl = show_int_ctrl,
-                                        version = 0L)
-
         # modify wide df
-        df_wide <- df_rand$list_df_wide$df_head_wide |>
+        df_wide <- df_rand_ct$list_df_wide$df_head_wide |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_top_wide
+            df_rand_ct$list_df_wide$df_top_wide
           ) |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_na_wide
+            df_rand_ct$list_df_wide$df_na_wide
           ) |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_na_wide
+            df_rand_ct$list_df_wide$df_na_wide
           ) |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_na_wide
+            df_rand_ct$list_df_wide$df_na_wide
           ) |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_na_wide
+            df_rand_ct$list_df_wide$df_na_wide
           ) |>
           dplyr::bind_rows(
-            df_rand$list_df_wide$df_middle_wide
+            df_rand_ct$list_df_wide$df_middle_wide
           )
-
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # write wide df
         writeLines("foo", olink_wide_format)
@@ -718,7 +676,7 @@ test_that(
               df = df_wide,
               file = olink_wide_format,
               data_type = data_type,
-              format_spec = format_spec
+              format_spec = format_spec_ct
             )
           )
         )
@@ -726,19 +684,19 @@ test_that(
         # check that df_head works
         expect_identical(
           object = remove_all_na_cols(df = df_out$df_head),
-          expected = df_rand$list_df_wide$df_head_wide
+          expected = df_rand_ct$list_df_wide$df_head_wide
         )
 
         # check that df_top works
         expect_identical(
           object = df_out$df_top,
-          expected = df_rand$list_df_wide$df_top_wide
+          expected = df_rand_ct$list_df_wide$df_top_wide
         )
 
         # check that df_mid works
         expect_identical(
           object = df_out$df_mid,
-          expected = df_rand$list_df_wide$df_middle_wide
+          expected = df_rand_ct$list_df_wide$df_middle_wide
         )
 
         # check that df_bottom works
@@ -756,12 +714,24 @@ test_that(
     # variables that apply to all tests
     olink_platform <- "Target 48"
     data_type <- "NPX"
-    n_panels <- 2L
+    n_panels <- 3L
     n_assays <- 45L
     n_samples <- 88L
     show_dev_int_ctrl <- TRUE
     show_int_ctrl <- TRUE
     version <- 1L
+
+    # get wide synthetic data
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = show_dev_int_ctrl,
+      show_int_ctrl = show_int_ctrl,
+      version = version
+    )
 
     # matrix specifications
     format_spec <- olink_wide_spec |>
@@ -774,16 +744,6 @@ test_that(
       pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
-
-        # synthetic wide df
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        show_int_ctrl = show_int_ctrl,
-                                        version = version)
 
         # modify wide df
         df_rand$list_df_wide$df_wide <- df_rand$list_df_wide$df_wide |>
@@ -814,16 +774,6 @@ test_that(
       pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
-
-        # synthetic wide df
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        show_int_ctrl = show_int_ctrl,
-                                        version = version)
 
         # modify and write wide df
         df_rand$list_df_wide$df_wide <- df_rand$list_df_wide$df_wide |>
@@ -857,12 +807,10 @@ test_that(
   {
     # variables that apply to all tests
     olink_platform <- "Target 48"
-    n_panels <- 2L
+    n_panels <- 3L
     n_assays <- 45L
     n_samples <- 88L
-    show_dev_int_ctrl <- TRUE
     show_int_ctrl <- TRUE
-    version <- 1L
 
     ## NPX ----
 
@@ -875,14 +823,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = "Ct",
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        show_int_ctrl = show_int_ctrl,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = "Ct",
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = show_int_ctrl,
+          version = 0L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -899,7 +849,7 @@ test_that(
             data_type = data_type,
             format_spec = format_spec
           ),
-          regexp = "while we expected 2"
+          regexp = "We identified 1 rows with all columns `NA` in file"
         )
 
       }
@@ -916,14 +866,16 @@ test_that(
         # synthetic wide df
         data_type <- "Ct"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = "NPX",
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        show_int_ctrl = show_int_ctrl,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = "NPX",
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = show_int_ctrl,
+          version = 1L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -940,7 +892,7 @@ test_that(
             data_type = data_type,
             format_spec = format_spec
           ),
-          regexp = "while we expected 1"
+          regexp = "We identified 2 rows with all columns `NA` in file"
         )
 
       }
@@ -957,14 +909,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = "Ct",
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        show_int_ctrl = show_int_ctrl,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = "Ct",
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = show_int_ctrl,
+          version = 0L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -981,7 +935,7 @@ test_that(
             data_type = data_type,
             format_spec = format_spec
           ),
-          regexp = "while we expected 2"
+          regexp = "We identified 1 rows with all columns `NA` in file"
         )
 
       }
@@ -1012,14 +966,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_dev_int_ctrl = FALSE,
-                                        show_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 1L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -1051,14 +1007,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_dev_int_ctrl = FALSE,
-                                        show_int_ctrl = TRUE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = TRUE,
+          version = 1L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -1090,14 +1048,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_dev_int_ctrl = TRUE,
-                                        show_int_ctrl = TRUE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = TRUE,
+          version = 1L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -1129,14 +1089,16 @@ test_that(
         # synthetic wide df
         data_type <- "Ct"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_dev_int_ctrl = FALSE,
-                                        show_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 0L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -1168,53 +1130,16 @@ test_that(
         # synthetic wide df
         data_type <- "Ct"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_dev_int_ctrl = FALSE,
-                                        show_int_ctrl = TRUE,
-                                        version = 1L)
-
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
-        # write empty-ish file
-        writeLines("foo", olink_wide_format)
-
-        # check that function runs
-        expect_no_condition(
-          object = read_npx_wide_check_top(
-            df = df_rand$list_df_wide$df_top_wide,
-            file = olink_wide_format,
-            format_spec = format_spec
-          )
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = TRUE,
+          version = 0L
         )
-
-      }
-    )
-
-    ## Ct with int ctrl & with dev int ctrl ----
-
-    withr::with_tempfile(
-      new = "olink_wide_format",
-      pattern = "test-olink-wide",
-      fileext = ".xlsx",
-      code = {
-
-        # synthetic wide df
-        data_type <- "Ct"
-
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_dev_int_ctrl = TRUE,
-                                        show_int_ctrl = TRUE,
-                                        version = 1L)
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -1246,14 +1171,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_dev_int_ctrl = FALSE,
-                                        show_int_ctrl = FALSE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 0L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -1285,14 +1212,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_dev_int_ctrl = FALSE,
-                                        show_int_ctrl = TRUE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = TRUE,
+          version = 0L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -1324,14 +1253,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_dev_int_ctrl = TRUE,
-                                        show_int_ctrl = TRUE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = TRUE,
+          version = 0L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -1377,14 +1308,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        show_int_ctrl = show_int_ctrl,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = 1L
+        )
 
         # modify df_top
         df_rand$list_df_wide$df_top_wide <- df_rand$list_df_wide$df_top_wide |>
@@ -1423,14 +1356,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        show_int_ctrl = show_int_ctrl,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = 0L
+        )
 
         # modify df_top_wide
         df_top_add_row <- dplyr::tibble(
@@ -1494,14 +1429,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        show_int_ctrl = show_int_ctrl,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = 1L
+        )
 
         # modify df_top_wide - remove QC Warning
         qc_warn_col <- colnames(df_rand$list_df_wide$df_top_wide) |> tail(1L)
@@ -1542,14 +1479,16 @@ test_that(
         # synthetic wide df
         data_type <- "Ct"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        show_int_ctrl = show_int_ctrl,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = 0L
+        )
 
         # modify df_top_wide - remove Plate ID
         plate_id_col <- colnames(df_rand$list_df_wide$df_top_wide) |> tail(1L)
@@ -1590,14 +1529,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        show_int_ctrl = show_int_ctrl,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = 0L
+        )
 
         # modify df_top_wide - remove Plate ID and QC Warning
         pid_qcw_col <- colnames(df_rand$list_df_wide$df_top_wide) |> tail(2L)
@@ -1655,14 +1596,16 @@ test_that(
       code = {
 
         # synthetic wide df
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = 1L,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        show_int_ctrl = show_int_ctrl,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = 1L,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # modify df_top
         remove_col <- df_rand$list_df_long$df_top_long$df_int_ctrl |>
@@ -1703,14 +1646,16 @@ test_that(
       code = {
 
         # synthetic wide df
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = 2L,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        show_int_ctrl = show_int_ctrl,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = 3L,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # modify df_top
         remove_col <- df_rand$list_df_long$df_top_long$df_int_ctrl |>
@@ -1751,14 +1696,16 @@ test_that(
       code = {
 
         # synthetic wide df
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = 3L,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        show_int_ctrl = show_int_ctrl,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = 3L,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # modify df_top
         remove_col <- df_rand$list_df_long$df_top_long$df_int_ctrl |>
@@ -1818,14 +1765,16 @@ test_that(
       code = {
 
         # synthetic wide df
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = 1L,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        show_int_ctrl = show_int_ctrl,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = 1L,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # modify df_top
         remove_col <- df_rand$list_df_long$df_top_long$df_dev_int_ctrl |>
@@ -1866,14 +1815,16 @@ test_that(
       code = {
 
         # synthetic wide df
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = 2L,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        show_int_ctrl = show_int_ctrl,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = 3L,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # modify df_top
         remove_col <- df_rand$list_df_long$df_top_long$df_dev_int_ctrl |>
@@ -1914,14 +1865,16 @@ test_that(
       code = {
 
         # synthetic wide df
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = 3L,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        show_int_ctrl = show_int_ctrl,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = 3L,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # modify df_top
         remove_col <- df_rand$list_df_long$df_top_long$df_dev_int_ctrl |>
@@ -1978,14 +1931,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 1L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -2050,14 +2005,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = TRUE,
+          version = 1L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -2119,14 +2076,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = FALSE,
+          version = 1L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -2188,14 +2147,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = TRUE,
+          version = 1L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -2255,14 +2216,16 @@ test_that(
         # synthetic wide df
         data_type <- "Ct"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 0L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -2330,14 +2293,16 @@ test_that(
         # synthetic wide df
         data_type <- "Ct"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = TRUE,
+          version = 0L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -2402,14 +2367,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 0L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -2473,14 +2440,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = TRUE,
+          version = 0L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -2541,14 +2510,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = FALSE,
+          version = 0L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -2609,14 +2580,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = TRUE,
+          version = 0L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -2686,14 +2659,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 1L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -2758,14 +2733,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = TRUE,
+          version = 1L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -2827,14 +2804,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = FALSE,
+          version = 1L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -2896,14 +2875,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = TRUE,
+          version = 1L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -2963,14 +2944,16 @@ test_that(
         # synthetic wide df
         data_type <- "Ct"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 0L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -3038,14 +3021,16 @@ test_that(
         # synthetic wide df
         data_type <- "Ct"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = TRUE,
+          version = 0L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -3110,14 +3095,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 0L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -3181,14 +3168,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = TRUE,
+          version = 0L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -3249,14 +3238,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = FALSE,
+          version = 0L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -3317,14 +3308,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = TRUE,
+          version = 0L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -3382,7 +3375,6 @@ test_that(
     n_panels <- 1L
     n_assays <- 92L
     n_samples <- 88L
-    version <- 1L
 
     ## NPX no int ctrl and no dev int ctrl ----
 
@@ -3395,14 +3387,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 1L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -3467,14 +3461,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = TRUE,
+          version = 1L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -3536,14 +3532,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = FALSE,
+          version = 1L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -3605,14 +3603,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = TRUE,
+          version = 1L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -3672,14 +3672,16 @@ test_that(
         # synthetic wide df
         data_type <- "Ct"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 0L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -3747,14 +3749,16 @@ test_that(
         # synthetic wide df
         data_type <- "Ct"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = TRUE,
+          version = 0L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -3819,7 +3823,6 @@ test_that(
     n_panels <- 3L
     n_assays <- 92L
     n_samples <- 88L
-    version <- 2L
 
     ## NPX no int ctrl and no dev int ctrl ----
 
@@ -3832,14 +3835,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 1L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -3904,14 +3909,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = TRUE,
+          version = 1L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -3973,14 +3980,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = FALSE,
+          version = 1L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -4042,14 +4051,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = TRUE,
+          version = 1L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -4109,14 +4120,16 @@ test_that(
         # synthetic wide df
         data_type <- "Ct"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 0L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -4184,14 +4197,16 @@ test_that(
         # synthetic wide df
         data_type <- "Ct"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = TRUE,
+          version = 0L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -4254,7 +4269,7 @@ test_that(
     # variables that apply to all tests
     olink_platform <- "Flex"
     n_panels <- 1L
-    n_assays <- 21L
+    n_assays <- 20L
     n_samples <- 88L
 
     ## NPX no int ctrl and no dev int ctrl ----
@@ -4268,14 +4283,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 1L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -4340,14 +4357,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = TRUE,
+          version = 1L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -4409,14 +4428,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = FALSE,
+          version = 1L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -4478,14 +4499,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = TRUE,
+          version = 1L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -4545,14 +4568,16 @@ test_that(
         # synthetic wide df
         data_type <- "Ct"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 0L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -4620,14 +4645,16 @@ test_that(
         # synthetic wide df
         data_type <- "Ct"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = TRUE,
+          version = 0L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -4692,14 +4719,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 0L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -4763,14 +4792,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = TRUE,
+          version = 0L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -4831,14 +4862,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = FALSE,
+          version = 0L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -4899,14 +4932,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = TRUE,
+          version = 0L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -4962,7 +4997,7 @@ test_that(
     # variables that apply to all tests
     olink_platform <- "Flex"
     n_panels <- 3L
-    n_assays <- 15L
+    n_assays <- 20L
     n_samples <- 88L
 
     ## NPX no int ctrl and no dev int ctrl ----
@@ -4976,14 +5011,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 1L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -5048,14 +5085,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = TRUE,
+          version = 1L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -5117,14 +5156,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = FALSE,
+          version = 1L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -5186,14 +5227,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = TRUE,
+          version = 1L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -5253,14 +5296,16 @@ test_that(
         # synthetic wide df
         data_type <- "Ct"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 0L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -5328,14 +5373,16 @@ test_that(
         # synthetic wide df
         data_type <- "Ct"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = TRUE,
+          version = 0L
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -5400,14 +5447,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 0L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -5471,14 +5520,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = TRUE,
+          version = 0L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -5539,14 +5590,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = FALSE,
+          version = 0L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -5607,14 +5660,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = TRUE,
+          version = 0L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -5670,7 +5725,7 @@ test_that(
     # variables that apply to all tests
     olink_platform <- "Focus"
     n_panels <- 1L
-    n_assays <- 15L
+    n_assays <- 33L
     n_samples <- 88L
     version <- 0L
 
@@ -5685,14 +5740,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = version
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -5757,14 +5814,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = TRUE,
+          version = version
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -5826,14 +5885,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = FALSE,
+          version = version
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -5895,14 +5956,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = TRUE,
+          version = version
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -5962,14 +6025,16 @@ test_that(
         # synthetic wide df
         data_type <- "Ct"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = version
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -6037,14 +6102,16 @@ test_that(
         # synthetic wide df
         data_type <- "Ct"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = TRUE,
+          version = version
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -6109,14 +6176,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = version
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -6180,14 +6249,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = TRUE,
+          version = version
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -6248,14 +6319,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = FALSE,
+          version = version
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -6316,14 +6389,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = TRUE,
+          version = version
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -6378,8 +6453,8 @@ test_that(
   {
     # variables that apply to all tests
     olink_platform <- "Focus"
-    n_panels <- 2L
-    n_assays <- 21L
+    n_panels <- 3L
+    n_assays <- 33L
     n_samples <- 88L
     version <- 0L
 
@@ -6394,14 +6469,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = version
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -6466,14 +6543,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = TRUE,
+          version = version
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -6535,14 +6614,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = FALSE,
+          version = version
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -6604,14 +6685,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = TRUE,
+          version = version
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -6671,14 +6754,16 @@ test_that(
         # synthetic wide df
         data_type <- "Ct"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = version
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -6746,14 +6831,16 @@ test_that(
         # synthetic wide df
         data_type <- "Ct"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = TRUE,
+          version = version
+        )
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -6818,14 +6905,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = version
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -6889,14 +6978,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = TRUE,
+          version = version
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -6957,14 +7048,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = FALSE,
+          version = version
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -7025,14 +7118,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = TRUE,
+          version = version
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -7087,10 +7182,24 @@ test_that(
   {
     # variables that apply to all tests
     olink_platform <- "Target 48"
+    data_type <- "NPX"
     n_panels <- 1L
     n_assays <- 45L
     n_samples <- 88L
+    show_dev_int_ctrl <- FALSE
+    show_int_ctrl <- FALSE
     version <- 1L
+
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = show_dev_int_ctrl,
+      show_int_ctrl = show_int_ctrl,
+      version = version
+    )
 
     # df contains unrecognizable tag ----
 
@@ -7099,18 +7208,6 @@ test_that(
       pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
-
-        # synthetic wide df
-        data_type <- "NPX"
-
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = version)
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -7148,7 +7245,7 @@ test_that(
                                      file = olink_wide_format,
                                      olink_platform = olink_platform,
                                      format_spec = format_spec),
-          regexp = "in row `Assay` contains unrecognized values in columns: V54"
+          regexp = "in row `Assay` contains unrecognized values in columns: V49"
         )
 
       }
@@ -7164,15 +7261,6 @@ test_that(
 
         # synthetic wide df
         data_type <- "Ct"
-
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = "NPX",
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = version)
 
         # matrix specifications
         format_spec <- olink_wide_spec |>
@@ -7209,6 +7297,17 @@ test_that(
     show_dev_int_ctrl <- FALSE
     version <- 1L
 
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = show_dev_int_ctrl,
+      show_int_ctrl = show_int_ctrl,
+      version = version
+    )
+
     # matrix specifications
     format_spec <- olink_wide_spec |>
       dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -7220,16 +7319,6 @@ test_that(
       pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
-
-        # synthetic wide df
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = version)
 
         # modify dt_top_wide intrduce NA cells to test
         df_rand$list_df_wide$df_top_wide <- df_rand$list_df_wide$df_top_wide |>
@@ -7261,20 +7350,6 @@ test_that(
       pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
-
-        # synthetic wide df
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = version)
-
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # intrduce NA cells to test
         df_rand$list_df_wide$df_top_wide <- df_rand$list_df_wide$df_top_wide |>
@@ -7313,8 +7388,9 @@ test_that(
   "read_npx_wide_top - error - wrong # of assays",
   {
     # variables that apply to all tests
-    olink_platform <- "Target 96"
+    olink_platform <- "Target 48"
     data_type <- "NPX"
+    n_assays <- 45L
     n_samples <- 88L
     show_int_ctrl <- FALSE
     show_dev_int_ctrl <- FALSE
@@ -7333,17 +7409,16 @@ test_that(
       code = {
 
         # synthetic wide df
-        n_panels <- 1L
-        n_assays <- 67L
-
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = 1L,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -7352,15 +7427,15 @@ test_that(
         expect_error(
           object = read_npx_wide_top(df = df_rand$list_df_wide$df_top_wide,
                                      file = olink_wide_format,
-                                     olink_platform = olink_platform,
+                                     olink_platform = "Target 96",
                                      format_spec = format_spec),
-          regexp = "Detected 67 assays in 1 panels in file"
+          regexp = "Detected 45 assays in 1 panels in file"
         )
 
       }
     )
 
-    ## T96 2 panels ----
+    ## T96 3 panels ----
 
     withr::with_tempfile(
       new = "olink_wide_format",
@@ -7369,17 +7444,16 @@ test_that(
       code = {
 
         # synthetic wide df
-        n_panels <- 2L
-        n_assays <- 78L
-
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = version)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = 3L,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -7388,9 +7462,9 @@ test_that(
         expect_error(
           object = read_npx_wide_top(df = df_rand$list_df_wide$df_top_wide,
                                      file = olink_wide_format,
-                                     olink_platform = olink_platform,
+                                     olink_platform = "Target 96",
                                      format_spec = format_spec),
-          regexp = "Detected 156 assays in 2 panels in file"
+          regexp = "Detected 135 assays in 3 panels in file"
         )
 
       }
@@ -7412,14 +7486,16 @@ test_that(
         olink_platform <- "Target 48"
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = 2L,
-                                        n_assays = 45L,
-                                        n_samples = 88L,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = 3L,
+          n_assays = 45L,
+          n_samples = 88L,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 1L
+        )
 
         # remove one column from df_top to reproduce the error
         remove_col <- colnames(df_rand$list_df_wide$df_top_wide) |> tail(1L)
@@ -7454,7 +7530,7 @@ test_that(
 # Test read_npx_wide_middle ----
 
 test_that(
-  "read_npx_wide_middle - single panel - works",
+  "read_npx_wide_middle - works - single panel",
   {
     # variables that apply to all tests
     olink_platform <- "Target 48"
@@ -7473,14 +7549,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 1L
+        )
 
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
@@ -7551,14 +7629,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = TRUE,
+          version = 1L
+        )
 
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
@@ -7626,14 +7706,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = FALSE,
+          version = 1L
+        )
 
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
@@ -7701,14 +7783,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = TRUE,
+          version = 1L
+        )
 
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
@@ -7773,14 +7857,16 @@ test_that(
         # synthetic wide df
         data_type <- "Ct"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 0L
+        )
 
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
@@ -7854,14 +7940,16 @@ test_that(
         # synthetic wide df
         data_type <- "Ct"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = TRUE,
+          version = 0L
+        )
 
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
@@ -7932,14 +8020,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 0L
+        )
 
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
@@ -8010,14 +8100,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = TRUE,
+          version = 0L
+        )
 
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
@@ -8085,14 +8177,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = FALSE,
+          version = 0L
+        )
 
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
@@ -8160,14 +8254,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = TRUE,
+          version = 0L
+        )
 
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
@@ -8224,13 +8320,13 @@ test_that(
 )
 
 test_that(
-  "read_npx_wide_middle - multiple panels - works",
+  "read_npx_wide_middle - works - multiple panels",
   {
     # variables that apply to all tests
     olink_platform <- "Target 48"
     n_panels <- 3L
     n_assays <- 45L
-    n_samples <- 100L
+    n_samples <- 88L
 
     ## NPX no int ctrl and no dev int ctrl ----
 
@@ -8243,14 +8339,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 1L
+        )
 
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
@@ -8321,14 +8419,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = TRUE,
+          version = 1L
+        )
 
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
@@ -8396,14 +8496,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = FALSE,
+          version = 1L
+        )
 
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
@@ -8471,14 +8573,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = TRUE,
+          version = 1L
+        )
 
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
@@ -8543,14 +8647,16 @@ test_that(
         # synthetic wide df
         data_type <- "Ct"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 0L
+        )
 
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
@@ -8624,14 +8730,16 @@ test_that(
         # synthetic wide df
         data_type <- "Ct"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = TRUE,
+          version = 0L
+        )
 
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
@@ -8702,14 +8810,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 0L
+        )
 
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
@@ -8780,14 +8890,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = TRUE,
+          version = 0L
+        )
 
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
@@ -8855,14 +8967,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = FALSE,
+          version = 0L
+        )
 
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
@@ -8930,14 +9044,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = TRUE,
+          show_int_ctrl = TRUE,
+          version = 0L
+        )
 
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
@@ -8999,12 +9115,23 @@ test_that(
     # variables that apply to all tests
     olink_platform <- "Target 48"
     data_type <- "NPX"
-    n_panels <- 2L
+    n_panels <- 3L
     n_assays <- 45L
-    n_samples <- 101L
+    n_samples <- 100L
     show_int_ctrl <- FALSE
     show_dev_int_ctrl <- FALSE
     version <- 1L
+
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = show_dev_int_ctrl,
+      show_int_ctrl = show_int_ctrl,
+      version = version
+    )
 
     # 1 duplicate ----
 
@@ -9013,16 +9140,6 @@ test_that(
       pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
-
-        # synthetic wide df
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = version)
 
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
@@ -9066,16 +9183,6 @@ test_that(
       pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
-
-        # synthetic wide df
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = version)
 
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
@@ -9122,12 +9229,23 @@ test_that(
     # variables that apply to all tests
     olink_platform <- "Target 48"
     data_type <- "NPX"
-    n_panels <- 2L
+    n_panels <- 3L
     n_assays <- 45L
-    n_samples <- 101L
+    n_samples <- 100L
     show_int_ctrl <- FALSE
     show_dev_int_ctrl <- FALSE
     version <- 1L
+
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = show_dev_int_ctrl,
+      show_int_ctrl = show_int_ctrl,
+      version = version
+    )
 
     # Missing plateid column ----
 
@@ -9136,16 +9254,6 @@ test_that(
       pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
-
-        # synthetic wide df
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = version)
 
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
@@ -9188,16 +9296,6 @@ test_that(
       pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
-
-        # synthetic wide df
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = version)
 
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
@@ -9242,12 +9340,23 @@ test_that(
     # variables that apply to all tests
     olink_platform <- "Target 48"
     data_type <- "NPX"
-    n_panels <- 2L
+    n_panels <- 3L
     n_assays <- 45L
-    n_samples <- 101L
+    n_samples <- 100L
     show_int_ctrl <- FALSE
     show_dev_int_ctrl <- FALSE
     version <- 1L
+
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = show_dev_int_ctrl,
+      show_int_ctrl = show_int_ctrl,
+      version = version
+    )
 
     # 1 additional column ----
 
@@ -9256,16 +9365,6 @@ test_that(
       pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
-
-        # synthetic wide df
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = version)
 
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
@@ -9296,7 +9395,7 @@ test_that(
             data_type = data_type,
             col_names = col_names
           ),
-          regexp = "96 from the Olink wide format file"
+          regexp = "143 from the Olink wide format file"
         )
 
       }
@@ -9309,16 +9408,6 @@ test_that(
       pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
-
-        # synthetic wide df
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = version)
 
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
@@ -9347,7 +9436,7 @@ test_that(
             data_type = data_type,
             col_names = col_names
           ),
-          regexp = "96, 97, and 98 from the Olink wide format file"
+          regexp = "143, 144, and 145 from the Olink wide format file"
         )
 
       }
@@ -9372,17 +9461,17 @@ test_that(
     # synthetic wide df
     data_type <- "NPX"
     show_int_ctrl <- FALSE
-    show_dev_int_ctrl <- FALSE
-    version <- 1L
 
-    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                    data_type = data_type,
-                                    n_panels = n_panels,
-                                    n_assays = n_assays,
-                                    n_samples = n_samples,
-                                    show_int_ctrl = show_int_ctrl,
-                                    show_dev_int_ctrl = show_dev_int_ctrl,
-                                    version = version)
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = show_int_ctrl,
+      version = 1L
+    )
 
     # matrix specifications
     format_spec <- olink_wide_spec |>
@@ -9448,17 +9537,17 @@ test_that(
     # synthetic wide df
     data_type <- "NPX"
     show_int_ctrl <- TRUE
-    show_dev_int_ctrl <- FALSE
-    version <- 1L
 
-    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                    data_type = data_type,
-                                    n_panels = n_panels,
-                                    n_assays = n_assays,
-                                    n_samples = n_samples,
-                                    show_int_ctrl = show_int_ctrl,
-                                    show_dev_int_ctrl = show_dev_int_ctrl,
-                                    version = version)
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = show_int_ctrl,
+      version = 1L
+    )
 
     # matrix specifications
     format_spec <- olink_wide_spec |>
@@ -9524,17 +9613,17 @@ test_that(
     # synthetic wide df
     data_type <- "NPX"
     show_int_ctrl <- FALSE
-    show_dev_int_ctrl <- TRUE
-    version <- 1L
 
-    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                    data_type = data_type,
-                                    n_panels = n_panels,
-                                    n_assays = n_assays,
-                                    n_samples = n_samples,
-                                    show_int_ctrl = show_int_ctrl,
-                                    show_dev_int_ctrl = show_dev_int_ctrl,
-                                    version = version)
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = show_int_ctrl,
+      version = 1L
+    )
 
     # matrix specifications
     format_spec <- olink_wide_spec |>
@@ -9600,17 +9689,17 @@ test_that(
     # synthetic wide df
     data_type <- "NPX"
     show_int_ctrl <- TRUE
-    show_dev_int_ctrl <- TRUE
-    version <- 1L
 
-    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                    data_type = data_type,
-                                    n_panels = n_panels,
-                                    n_assays = n_assays,
-                                    n_samples = n_samples,
-                                    show_int_ctrl = show_int_ctrl,
-                                    show_dev_int_ctrl = show_dev_int_ctrl,
-                                    version = version)
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = show_int_ctrl,
+      version = 1L
+    )
 
     # matrix specifications
     format_spec <- olink_wide_spec |>
@@ -9677,17 +9766,17 @@ test_that(
     # synthetic wide df
     data_type <- "Ct"
     show_int_ctrl <- FALSE
-    show_dev_int_ctrl <- FALSE
-    version <- 1L
 
-    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                    data_type = data_type,
-                                    n_panels = n_panels,
-                                    n_assays = n_assays,
-                                    n_samples = n_samples,
-                                    show_int_ctrl = show_int_ctrl,
-                                    show_dev_int_ctrl = show_dev_int_ctrl,
-                                    version = version)
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = show_int_ctrl,
+      version = 0L
+    )
 
     # matrix specifications
     format_spec <- olink_wide_spec |>
@@ -9753,17 +9842,17 @@ test_that(
     # synthetic wide df
     data_type <- "Ct"
     show_int_ctrl <- TRUE
-    show_dev_int_ctrl <- FALSE
-    version <- 1L
 
-    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                    data_type = data_type,
-                                    n_panels = n_panels,
-                                    n_assays = n_assays,
-                                    n_samples = n_samples,
-                                    show_int_ctrl = show_int_ctrl,
-                                    show_dev_int_ctrl = show_dev_int_ctrl,
-                                    version = version)
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = show_int_ctrl,
+      version = 0L
+    )
 
     # matrix specifications
     format_spec <- olink_wide_spec |>
@@ -9829,17 +9918,17 @@ test_that(
     # synthetic wide df
     data_type <- "Quantified"
     show_int_ctrl <- FALSE
-    show_dev_int_ctrl <- FALSE
-    version <- 0L
 
-    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                    data_type = data_type,
-                                    n_panels = n_panels,
-                                    n_assays = n_assays,
-                                    n_samples = n_samples,
-                                    show_int_ctrl = show_int_ctrl,
-                                    show_dev_int_ctrl = show_dev_int_ctrl,
-                                    version = version)
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = show_int_ctrl,
+      version = 0L
+    )
 
     # matrix specifications
     format_spec <- olink_wide_spec |>
@@ -9905,17 +9994,17 @@ test_that(
     # synthetic wide df
     data_type <- "Quantified"
     show_int_ctrl <- TRUE
-    show_dev_int_ctrl <- FALSE
-    version <- 0L
 
-    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                    data_type = data_type,
-                                    n_panels = n_panels,
-                                    n_assays = n_assays,
-                                    n_samples = n_samples,
-                                    show_int_ctrl = show_int_ctrl,
-                                    show_dev_int_ctrl = show_dev_int_ctrl,
-                                    version = version)
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = show_int_ctrl,
+      version = 0L
+    )
 
     # matrix specifications
     format_spec <- olink_wide_spec |>
@@ -9981,17 +10070,17 @@ test_that(
     # synthetic wide df
     data_type <- "Quantified"
     show_int_ctrl <- FALSE
-    show_dev_int_ctrl <- TRUE
-    version <- 0L
 
-    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                    data_type = data_type,
-                                    n_panels = n_panels,
-                                    n_assays = n_assays,
-                                    n_samples = n_samples,
-                                    show_int_ctrl = show_int_ctrl,
-                                    show_dev_int_ctrl = show_dev_int_ctrl,
-                                    version = version)
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = show_int_ctrl,
+      version = 0L
+    )
 
     # matrix specifications
     format_spec <- olink_wide_spec |>
@@ -10057,17 +10146,17 @@ test_that(
     # synthetic wide df
     data_type <- "Quantified"
     show_int_ctrl <- TRUE
-    show_dev_int_ctrl <- TRUE
-    version <- 0L
 
-    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                    data_type = data_type,
-                                    n_panels = n_panels,
-                                    n_assays = n_assays,
-                                    n_samples = n_samples,
-                                    show_int_ctrl = show_int_ctrl,
-                                    show_dev_int_ctrl = show_dev_int_ctrl,
-                                    version = version)
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = show_int_ctrl,
+      version = 0L
+    )
 
     # matrix specifications
     format_spec <- olink_wide_spec |>
@@ -10145,17 +10234,17 @@ test_that(
     # synthetic wide df
     data_type <- "NPX"
     show_int_ctrl <- FALSE
-    show_dev_int_ctrl <- FALSE
-    version <- 1L
 
-    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                    data_type = data_type,
-                                    n_panels = n_panels,
-                                    n_assays = n_assays,
-                                    n_samples = n_samples,
-                                    show_int_ctrl = show_int_ctrl,
-                                    show_dev_int_ctrl = show_dev_int_ctrl,
-                                    version = version)
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = show_int_ctrl,
+      version = 1L
+    )
 
     # matrix specifications
     format_spec <- olink_wide_spec |>
@@ -10221,17 +10310,17 @@ test_that(
     # synthetic wide df
     data_type <- "NPX"
     show_int_ctrl <- TRUE
-    show_dev_int_ctrl <- FALSE
-    version <- 1L
 
-    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                    data_type = data_type,
-                                    n_panels = n_panels,
-                                    n_assays = n_assays,
-                                    n_samples = n_samples,
-                                    show_int_ctrl = show_int_ctrl,
-                                    show_dev_int_ctrl = show_dev_int_ctrl,
-                                    version = version)
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = show_int_ctrl,
+      version = 1L
+    )
 
     # matrix specifications
     format_spec <- olink_wide_spec |>
@@ -10297,17 +10386,17 @@ test_that(
     # synthetic wide df
     data_type <- "NPX"
     show_int_ctrl <- FALSE
-    show_dev_int_ctrl <- TRUE
-    version <- 1L
 
-    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                    data_type = data_type,
-                                    n_panels = n_panels,
-                                    n_assays = n_assays,
-                                    n_samples = n_samples,
-                                    show_int_ctrl = show_int_ctrl,
-                                    show_dev_int_ctrl = show_dev_int_ctrl,
-                                    version = version)
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = show_int_ctrl,
+      version = 1L
+    )
 
     # matrix specifications
     format_spec <- olink_wide_spec |>
@@ -10373,17 +10462,17 @@ test_that(
     # synthetic wide df
     data_type <- "NPX"
     show_int_ctrl <- TRUE
-    show_dev_int_ctrl <- TRUE
-    version <- 1L
 
-    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                    data_type = data_type,
-                                    n_panels = n_panels,
-                                    n_assays = n_assays,
-                                    n_samples = n_samples,
-                                    show_int_ctrl = show_int_ctrl,
-                                    show_dev_int_ctrl = show_dev_int_ctrl,
-                                    version = version)
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = show_int_ctrl,
+      version = 1L
+    )
 
     # matrix specifications
     format_spec <- olink_wide_spec |>
@@ -10450,17 +10539,17 @@ test_that(
     # synthetic wide df
     data_type <- "Ct"
     show_int_ctrl <- FALSE
-    show_dev_int_ctrl <- FALSE
-    version <- 1L
 
-    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                    data_type = data_type,
-                                    n_panels = n_panels,
-                                    n_assays = n_assays,
-                                    n_samples = n_samples,
-                                    show_int_ctrl = show_int_ctrl,
-                                    show_dev_int_ctrl = show_dev_int_ctrl,
-                                    version = version)
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = show_int_ctrl,
+      version = 0L
+    )
 
     # matrix specifications
     format_spec <- olink_wide_spec |>
@@ -10526,17 +10615,17 @@ test_that(
     # synthetic wide df
     data_type <- "Ct"
     show_int_ctrl <- TRUE
-    show_dev_int_ctrl <- FALSE
-    version <- 1L
 
-    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                    data_type = data_type,
-                                    n_panels = n_panels,
-                                    n_assays = n_assays,
-                                    n_samples = n_samples,
-                                    show_int_ctrl = show_int_ctrl,
-                                    show_dev_int_ctrl = show_dev_int_ctrl,
-                                    version = version)
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = show_int_ctrl,
+      version = 0L
+    )
 
     # matrix specifications
     format_spec <- olink_wide_spec |>
@@ -10602,17 +10691,17 @@ test_that(
     # synthetic wide df
     data_type <- "Quantified"
     show_int_ctrl <- FALSE
-    show_dev_int_ctrl <- FALSE
-    version <- 0L
 
-    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                    data_type = data_type,
-                                    n_panels = n_panels,
-                                    n_assays = n_assays,
-                                    n_samples = n_samples,
-                                    show_int_ctrl = show_int_ctrl,
-                                    show_dev_int_ctrl = show_dev_int_ctrl,
-                                    version = version)
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = show_int_ctrl,
+      version = 0L
+    )
 
     # matrix specifications
     format_spec <- olink_wide_spec |>
@@ -10678,17 +10767,17 @@ test_that(
     # synthetic wide df
     data_type <- "Quantified"
     show_int_ctrl <- TRUE
-    show_dev_int_ctrl <- FALSE
-    version <- 0L
 
-    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                    data_type = data_type,
-                                    n_panels = n_panels,
-                                    n_assays = n_assays,
-                                    n_samples = n_samples,
-                                    show_int_ctrl = show_int_ctrl,
-                                    show_dev_int_ctrl = show_dev_int_ctrl,
-                                    version = version)
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = show_int_ctrl,
+      version = 0L
+    )
 
     # matrix specifications
     format_spec <- olink_wide_spec |>
@@ -10754,17 +10843,17 @@ test_that(
     # synthetic wide df
     data_type <- "Quantified"
     show_int_ctrl <- FALSE
-    show_dev_int_ctrl <- TRUE
-    version <- 0L
 
-    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                    data_type = data_type,
-                                    n_panels = n_panels,
-                                    n_assays = n_assays,
-                                    n_samples = n_samples,
-                                    show_int_ctrl = show_int_ctrl,
-                                    show_dev_int_ctrl = show_dev_int_ctrl,
-                                    version = version)
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = show_int_ctrl,
+      version = 0L
+    )
 
     # matrix specifications
     format_spec <- olink_wide_spec |>
@@ -10830,17 +10919,17 @@ test_that(
     # synthetic wide df
     data_type <- "Quantified"
     show_int_ctrl <- TRUE
-    show_dev_int_ctrl <- TRUE
-    version <- 0L
 
-    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                    data_type = data_type,
-                                    n_panels = n_panels,
-                                    n_assays = n_assays,
-                                    n_samples = n_samples,
-                                    show_int_ctrl = show_int_ctrl,
-                                    show_dev_int_ctrl = show_dev_int_ctrl,
-                                    version = version)
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = show_int_ctrl,
+      version = 0L
+    )
 
     # matrix specifications
     format_spec <- olink_wide_spec |>
@@ -10920,14 +11009,16 @@ test_that(
     version <- 1L
 
     # synthetic wide df
-    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                    data_type = data_type,
-                                    n_panels = n_panels,
-                                    n_assays = n_assays,
-                                    n_samples = n_samples,
-                                    show_int_ctrl = show_int_ctrl,
-                                    show_dev_int_ctrl = show_dev_int_ctrl,
-                                    version = version)
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = show_dev_int_ctrl,
+      show_int_ctrl = show_int_ctrl,
+      version = version
+    )
 
     # modify pid, qc_warn and dev_int_ctrl dfs
     df_rand_top_long_tmp <- df_rand$list_df_long$df_top_long[
@@ -11033,14 +11124,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = FALSE,
+          version = 1L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -11122,14 +11215,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = TRUE,
+          version = 1L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -11224,14 +11319,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = 2L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = FALSE,
+          version = 2L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -11313,14 +11410,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = 2L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = TRUE,
+          version = 2L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -11415,14 +11514,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = FALSE,
+          version = 0L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -11504,14 +11605,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = TRUE,
+          version = 0L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -11619,14 +11722,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = FALSE,
+          version = 1L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -11708,14 +11813,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = TRUE,
+          version = 1L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -11810,14 +11917,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = 2L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = FALSE,
+          version = 2L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -11899,14 +12008,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = 2L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = TRUE,
+          version = 2L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -12001,14 +12112,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = FALSE,
+          version = 0L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -12090,14 +12203,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = TRUE,
+          version = 0L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -12205,14 +12320,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = FALSE,
+          version = 1L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -12294,14 +12411,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = TRUE,
+          version = 1L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -12396,14 +12515,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = 2L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = FALSE,
+          version = 2L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -12485,14 +12606,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = 2L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = TRUE,
+          version = 2L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -12587,14 +12710,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = FALSE,
+          version = 0L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -12676,14 +12801,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = TRUE,
+          version = 0L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -12791,14 +12918,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = FALSE,
+          version = 1L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -12880,14 +13009,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = TRUE,
+          version = 1L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -12982,14 +13113,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = 2L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = FALSE,
+          version = 2L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -13071,14 +13204,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = 2L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = TRUE,
+          version = 2L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -13173,14 +13308,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = FALSE,
+          version = 0L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -13262,14 +13399,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = TRUE,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = TRUE,
+          version = 0L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -13356,26 +13495,141 @@ test_that(
   }
 )
 
-# T96 NPX data from 2018 with NPX Manager
+# T96 NPX data v3
 test_that(
-  "read_npx_wide_bottom - works - T96 - multiple panels - multiple plates",
+  "read_npx_wide_bottom - works - T96 - NPX - v3",
   {
     # variables that apply to all tests
     olink_platform <- "Target 96"
+    data_type <- "NPX"
     n_panels <- 3L
-    n_assays <- 45L
+    n_assays <- 92L
+    n_samples <- 100L
+
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = 3L
+    )
+
+    format_spec <- olink_wide_spec |>
+      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+
+    # column names of each subset of data
+    col_names <- sapply(df_rand$list_df_long$df_top_long,
+                        function(x) x$col_index)
+    col_names <- col_names[which(lapply(col_names, length) != 0L)]
+    names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist()
+    names(col_names) <- paste0("df_top_", names(col_names))
+
+    # plate panel combos
+    df_plate_panel <- df_rand$list_df_long$df_oid_long |>
+      dplyr::select(
+        dplyr::all_of(c("col_index", "Panel"))
+      ) |>
+      dplyr::distinct() |>
+      dplyr::bind_rows(
+        df_rand$list_df_long$df_int_ctrl_long |>
+          dplyr::select(
+            dplyr::all_of(c("col_index", "Panel"))
+          ) |>
+          dplyr::distinct()
+      ) |>
+      dplyr::left_join(
+        df_rand$list_df_long$df_plate_long |>
+          dplyr::select(
+            dplyr::all_of(c("PlateID", "Panel"))
+          ) |>
+          dplyr::distinct(),
+        by = "Panel",
+        relationship = "many-to-many"
+      )
+
+    # check bottom df
+    withr::with_tempfile(
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_bottom(
+            df = df_rand$list_df_wide$df_bottom_wide,
+            file = olink_wide_format,
+            olink_platform = olink_platform,
+            data_type = data_type,
+            col_names = col_names,
+            format_spec = format_spec,
+            df_plate_panel = df_plate_panel
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out$df_bottom_oid) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_bottom_long$df_oid) |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_oid,
+          expected = df_rand$list_df_long$df_bottom_long$df_oid |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out$df_bottom_oid))
+            )
+        )
+
+        expect_identical(
+          object = colnames(df_out$df_bottom_int_ctrl) |> sort(),
+          expected = df_rand$list_df_long$df_bottom_long$df_int_ctrl |>
+            colnames() |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_int_ctrl,
+          expected = df_rand$list_df_long$df_bottom_long$df_int_ctrl |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out$df_bottom_int_ctrl))
+            )
+        )
+
+      }
+    )
+  }
+)
+
+# T96 NPX data from 2018 with NPX Manager
+test_that(
+  "read_npx_wide_bottom - works - T96 - NPX - NPX Manager 2018",
+  {
+    # variables that apply to all tests
+    olink_platform <- "Target 96"
+    data_type <- "NPX"
+    n_panels <- 3L
+    n_assays <- 92L
     n_samples <- 100L
     show_dev_int_ctrl <- FALSE
-    data_type <- "NPX"
 
-    df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                    data_type = data_type,
-                                    n_panels = n_panels,
-                                    n_assays = n_assays,
-                                    n_samples = n_samples,
-                                    show_int_ctrl = FALSE,
-                                    show_dev_int_ctrl = show_dev_int_ctrl,
-                                    version = 1L)
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = show_dev_int_ctrl,
+      show_int_ctrl = FALSE,
+      version = 1L
+    )
 
     format_spec <- olink_wide_spec |>
       dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -13476,14 +13730,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = FALSE,
+          version = 1L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -13553,14 +13809,16 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = "Quantified",
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = "Quantified",
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = FALSE,
+          version = 0L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -13621,14 +13879,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = FALSE,
+          version = 0L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -13698,14 +13958,16 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = "NPX",
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = show_dev_int_ctrl,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = "NPX",
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = FALSE,
+          version = 1L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -13780,14 +14042,16 @@ test_that(
         data_type <- "Quantified"
         olink_platform <- "Target 48"
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = 1L,
-                                        n_assays = 45L,
-                                        n_samples = 100L,
-                                        show_int_ctrl = FALSE,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = 1L,
+          n_assays = 45L,
+          n_samples = 100L,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 0L
+        )
 
         format_spec <- olink_wide_spec |>
           dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
@@ -13870,15 +14134,19 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
         show_int_ctrl <- FALSE
+        show_dev_int_ctrl <- FALSE
+        version <- 1L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -13935,15 +14203,19 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
         show_int_ctrl <- FALSE
+        show_dev_int_ctrl <- FALSE
+        version <- 2L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 2L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -14000,15 +14272,19 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
         show_int_ctrl <- FALSE
+        show_dev_int_ctrl <- TRUE
+        version <- 1L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -14065,15 +14341,19 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
         show_int_ctrl <- FALSE
+        show_dev_int_ctrl <- TRUE
+        version <- 2L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 2L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -14130,15 +14410,19 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
         show_int_ctrl <- TRUE
+        show_dev_int_ctrl <- FALSE
+        version <- 1L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -14195,15 +14479,19 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
         show_int_ctrl <- TRUE
+        show_dev_int_ctrl <- FALSE
+        version <- 2L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 2L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -14260,15 +14548,19 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
         show_int_ctrl <- TRUE
+        show_dev_int_ctrl <- TRUE
+        version <- 1L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -14325,15 +14617,19 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
         show_int_ctrl <- TRUE
+        show_dev_int_ctrl <- TRUE
+        version <- 2L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 2L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -14390,15 +14686,19 @@ test_that(
         # synthetic wide df
         data_type <- "Ct"
         show_int_ctrl <- FALSE
+        show_dev_int_ctrl <- FALSE
+        version <- 0L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -14455,15 +14755,19 @@ test_that(
         # synthetic wide df
         data_type <- "Ct"
         show_int_ctrl <- TRUE
+        show_dev_int_ctrl <- FALSE
+        version <- 0L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 2L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -14520,15 +14824,19 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
         show_int_ctrl <- FALSE
+        show_dev_int_ctrl <- FALSE
+        version <- 0L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -14585,15 +14893,19 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
         show_int_ctrl <- FALSE
+        show_dev_int_ctrl <- TRUE
+        version <- 0L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -14650,15 +14962,19 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
         show_int_ctrl <- TRUE
+        show_dev_int_ctrl <- FALSE
+        version <- 0L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -14715,15 +15031,19 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
         show_int_ctrl <- TRUE
+        show_dev_int_ctrl <- TRUE
+        version <- 0L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -14792,15 +15112,19 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
         show_int_ctrl <- FALSE
+        show_dev_int_ctrl <- FALSE
+        version <- 1L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -14857,15 +15181,19 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
         show_int_ctrl <- FALSE
+        show_dev_int_ctrl <- FALSE
+        version <- 2L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 2L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -14922,15 +15250,19 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
         show_int_ctrl <- FALSE
+        show_dev_int_ctrl <- TRUE
+        version <- 1L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -14987,15 +15319,19 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
         show_int_ctrl <- FALSE
+        show_dev_int_ctrl <- TRUE
+        version <- 2L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 2L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -15052,15 +15388,19 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
         show_int_ctrl <- TRUE
+        show_dev_int_ctrl <- FALSE
+        version <- 1L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -15117,15 +15457,19 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
         show_int_ctrl <- TRUE
+        show_dev_int_ctrl <- FALSE
+        version <- 2L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 2L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -15182,15 +15526,19 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
         show_int_ctrl <- TRUE
+        show_dev_int_ctrl <- TRUE
+        version <- 1L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -15247,15 +15595,19 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
         show_int_ctrl <- TRUE
+        show_dev_int_ctrl <- TRUE
+        version <- 2L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 2L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -15312,15 +15664,19 @@ test_that(
         # synthetic wide df
         data_type <- "Ct"
         show_int_ctrl <- FALSE
+        show_dev_int_ctrl <- FALSE
+        version <- 0L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -15377,15 +15733,19 @@ test_that(
         # synthetic wide df
         data_type <- "Ct"
         show_int_ctrl <- TRUE
+        show_dev_int_ctrl <- FALSE
+        version <- 0L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 2L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -15442,15 +15802,19 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
         show_int_ctrl <- FALSE
+        show_dev_int_ctrl <- FALSE
+        version <- 0L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -15507,15 +15871,19 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
         show_int_ctrl <- FALSE
+        show_dev_int_ctrl <- TRUE
+        version <- 0L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -15572,15 +15940,19 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
         show_int_ctrl <- TRUE
+        show_dev_int_ctrl <- FALSE
+        version <- 0L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -15637,15 +16009,19 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
         show_int_ctrl <- TRUE
+        show_dev_int_ctrl <- TRUE
+        version <- 0L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -15701,7 +16077,7 @@ test_that(
     olink_platform <- "Target 48"
     n_panels <- 1L
     n_assays <- 45L
-    n_samples <- 150L
+    n_samples <- 100L
 
     ## NPX no int ctrl, no dev int ctrl, v1 ----
 
@@ -15714,15 +16090,19 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
         show_int_ctrl <- FALSE
+        show_dev_int_ctrl <- FALSE
+        version <- 1L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -15779,15 +16159,19 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
         show_int_ctrl <- FALSE
+        show_dev_int_ctrl <- FALSE
+        version <- 2L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 2L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -15844,15 +16228,19 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
         show_int_ctrl <- FALSE
+        show_dev_int_ctrl <- TRUE
+        version <- 1L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -15909,15 +16297,19 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
         show_int_ctrl <- FALSE
+        show_dev_int_ctrl <- TRUE
+        version <- 2L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 2L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -15974,15 +16366,19 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
         show_int_ctrl <- TRUE
+        show_dev_int_ctrl <- FALSE
+        version <- 1L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -16039,15 +16435,19 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
         show_int_ctrl <- TRUE
+        show_dev_int_ctrl <- FALSE
+        version <- 2L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 2L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -16104,15 +16504,19 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
         show_int_ctrl <- TRUE
+        show_dev_int_ctrl <- TRUE
+        version <- 1L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -16169,15 +16573,19 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
         show_int_ctrl <- TRUE
+        show_dev_int_ctrl <- TRUE
+        version <- 2L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 2L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -16234,15 +16642,19 @@ test_that(
         # synthetic wide df
         data_type <- "Ct"
         show_int_ctrl <- FALSE
+        show_dev_int_ctrl <- FALSE
+        version <- 0L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -16299,15 +16711,19 @@ test_that(
         # synthetic wide df
         data_type <- "Ct"
         show_int_ctrl <- TRUE
+        show_dev_int_ctrl <- FALSE
+        version <- 0L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 2L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -16364,15 +16780,19 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
         show_int_ctrl <- FALSE
+        show_dev_int_ctrl <- FALSE
+        version <- 0L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -16429,15 +16849,19 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
         show_int_ctrl <- FALSE
+        show_dev_int_ctrl <- TRUE
+        version <- 0L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -16494,15 +16918,19 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
         show_int_ctrl <- TRUE
+        show_dev_int_ctrl <- FALSE
+        version <- 0L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -16559,15 +16987,19 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
         show_int_ctrl <- TRUE
+        show_dev_int_ctrl <- TRUE
+        version <- 0L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -16623,7 +17055,7 @@ test_that(
     olink_platform <- "Target 48"
     n_panels <- 3L
     n_assays <- 45L
-    n_samples <- 150L
+    n_samples <- 100L
 
     ## NPX no int ctrl, no dev int ctrl, v1 ----
 
@@ -16636,15 +17068,19 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
         show_int_ctrl <- FALSE
+        show_dev_int_ctrl <- FALSE
+        version <- 1L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -16701,15 +17137,19 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
         show_int_ctrl <- FALSE
+        show_dev_int_ctrl <- FALSE
+        version <- 2L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 2L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -16766,15 +17206,19 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
         show_int_ctrl <- FALSE
+        show_dev_int_ctrl <- TRUE
+        version <- 1L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -16831,15 +17275,19 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
         show_int_ctrl <- FALSE
+        show_dev_int_ctrl <- TRUE
+        version <- 2L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 2L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -16896,15 +17344,19 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
         show_int_ctrl <- TRUE
+        show_dev_int_ctrl <- FALSE
+        version <- 1L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -16961,15 +17413,19 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
         show_int_ctrl <- TRUE
+        show_dev_int_ctrl <- FALSE
+        version <- 2L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 2L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -17026,15 +17482,19 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
         show_int_ctrl <- TRUE
+        show_dev_int_ctrl <- TRUE
+        version <- 1L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -17091,15 +17551,19 @@ test_that(
         # synthetic wide df
         data_type <- "NPX"
         show_int_ctrl <- TRUE
+        show_dev_int_ctrl <- TRUE
+        version <- 2L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 2L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -17156,15 +17620,19 @@ test_that(
         # synthetic wide df
         data_type <- "Ct"
         show_int_ctrl <- FALSE
+        show_dev_int_ctrl <- FALSE
+        version <- 0L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 1L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -17221,15 +17689,19 @@ test_that(
         # synthetic wide df
         data_type <- "Ct"
         show_int_ctrl <- TRUE
+        show_dev_int_ctrl <- FALSE
+        version <- 0L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 2L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -17286,15 +17758,19 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
         show_int_ctrl <- FALSE
+        show_dev_int_ctrl <- FALSE
+        version <- 0L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -17351,15 +17827,19 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
         show_int_ctrl <- FALSE
+        show_dev_int_ctrl <- TRUE
+        version <- 0L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -17416,15 +17896,19 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
         show_int_ctrl <- TRUE
+        show_dev_int_ctrl <- FALSE
+        version <- 0L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = FALSE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -17481,15 +17965,19 @@ test_that(
         # synthetic wide df
         data_type <- "Quantified"
         show_int_ctrl <- TRUE
+        show_dev_int_ctrl <- TRUE
+        version <- 0L
 
-        df_rand <- olink_wide_synthetic(olink_platform = olink_platform,
-                                        data_type = data_type,
-                                        n_panels = n_panels,
-                                        n_assays = n_assays,
-                                        n_samples = n_samples,
-                                        show_int_ctrl = show_int_ctrl,
-                                        show_dev_int_ctrl = TRUE,
-                                        version = 0L)
+        df_rand <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = n_panels,
+          n_assays = n_assays,
+          n_samples = n_samples,
+          show_dev_int_ctrl = show_dev_int_ctrl,
+          show_int_ctrl = show_int_ctrl,
+          version = version
+        )
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
