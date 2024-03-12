@@ -1608,23 +1608,3 @@ olink_wide_synthetic <- function(olink_platform,
     )
   )
 }
-
-## Compute num of rows of output df ----
-
-olink_wide2long_rows <- function(n_panels,
-                                 n_assays,
-                                 n_samples,
-                                 has_int_ctrl,
-                                 num_int_ctrl) {
-  n_row <- n_panels * n_assays * n_samples
-
-  if (has_int_ctrl == TRUE) {
-    n_row_add <- n_panels * num_int_ctrl * n_samples
-  } else {
-    n_row_add <- 0L
-  }
-
-  n_row_out <- n_row + n_row_add
-
-  return(n_row_out)
-}
