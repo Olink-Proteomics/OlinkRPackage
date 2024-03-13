@@ -9110,6 +9110,120 @@ test_that(
 )
 
 test_that(
+  "read_npx_wide_middle - error - non-unique sample id",
+  {
+    # variables that apply to all tests
+    olink_platform <- "Target 48"
+    data_type <- "NPX"
+    n_panels <- 3L
+    n_assays <- 45L
+    n_samples <- 100L
+    show_int_ctrl <- FALSE
+    show_dev_int_ctrl <- FALSE
+    version <- 1L
+
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = show_dev_int_ctrl,
+      show_int_ctrl = show_int_ctrl,
+      version = version
+    )
+
+    # 1 duplicate ----
+
+    withr::with_tempfile(
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # introduce duplicate sample id for the test
+        df_rand$list_df_wide$df_middle_wide <-
+          df_rand$list_df_wide$df_middle_wide |>
+          dplyr::mutate(
+            V1 = dplyr::if_else(.data[["V1"]] == "S2",
+                                "S1",
+                                .data[["V1"]])
+          )
+
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
+
+        # check that function runs with error
+        expect_error(
+          object = read_npx_wide_middle(
+            df = df_rand$list_df_wide$df_middle_wide,
+            file = olink_wide_format,
+            data_type = data_type,
+            col_names = col_names
+          ),
+          regexp = "does not contain unique sample identifiers."
+        )
+
+      }
+    )
+
+    # 3 duplicates ----
+
+    withr::with_tempfile(
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # column names of each subset of data
+        col_names <- sapply(df_rand$list_df_long$df_top_long,
+                            function(x) x$col_index)
+        col_names <- col_names[which(lapply(col_names, length) != 0L)]
+        names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+          lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+          unlist()
+        names(col_names) <- paste0("df_top_", names(col_names))
+
+        # introduce duplicate sample id for the test
+        df_rand$list_df_wide$df_middle_wide <-
+          df_rand$list_df_wide$df_middle_wide |>
+          dplyr::mutate(
+            V1 = dplyr::case_when(.data[["V1"]] %in% c("S2", "S3") ~ "S1",
+                                  .data[["V1"]] %in% c("S4", "S5") ~ "S2",
+                                  TRUE ~ .data[["V1"]],
+                                  .default = .data[["V1"]])
+          )
+
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
+
+        # check that function runs with error
+        expect_error(
+          object = read_npx_wide_middle(
+            df = df_rand$list_df_wide$df_middle_wide,
+            file = olink_wide_format,
+            data_type = data_type,
+            col_names = col_names
+          ),
+          regexp = "does not contain unique sample identifiers."
+        )
+
+      }
+    )
+
+  }
+)
+
+test_that(
   "read_npx_wide_middle - error - uneven number of platid and qc_warning",
   {
     # variables that apply to all tests
