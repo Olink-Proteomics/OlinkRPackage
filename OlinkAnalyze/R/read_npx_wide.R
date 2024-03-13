@@ -1028,21 +1028,6 @@ read_npx_wide_middle <- function(df,
 
   check_columns(df = df, col_list = list("V1"))
 
-  n_uniq_sample <- dplyr::pull(df, .data[["V1"]]) |> unique() |> length()
-  if (nrow(df) != n_uniq_sample) {
-
-    cli::cli_abort(
-      message = c(
-        "x" = "The middle matrix in file {.file {file}} does not contain unique
-        sample identifiers. Identified {nrow(df) - n_uniq_sample} duplicates!",
-        "i" = "Has the file been modified manually?"
-      ),
-      call = rlang::caller_env(),
-      wrap = FALSE
-    )
-
-  }
-
   # check that all relevant columns exist ----
 
   check_columns(df = df,
