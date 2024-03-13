@@ -9117,7 +9117,7 @@ test_that(
     data_type <- "NPX"
     n_panels <- 3L
     n_assays <- 45L
-    n_samples <- 100L
+    n_samples <- 99L
     show_int_ctrl <- TRUE
     show_dev_int_ctrl <- TRUE
     version <- 1L
@@ -9310,7 +9310,7 @@ test_that(
     data_type <- "NPX"
     n_panels <- 3L
     n_assays <- 45L
-    n_samples <- 100L
+    n_samples <- 99L
     show_int_ctrl <- FALSE
     show_dev_int_ctrl <- FALSE
     version <- 1L
@@ -9421,7 +9421,7 @@ test_that(
     data_type <- "NPX"
     n_panels <- 3L
     n_assays <- 45L
-    n_samples <- 100L
+    n_samples <- 99L
     show_int_ctrl <- FALSE
     show_dev_int_ctrl <- FALSE
     version <- 1L
@@ -10306,7 +10306,7 @@ test_that(
     olink_platform <- "Target 48"
     n_panels <- 3L
     n_assays <- 45L
-    n_samples <- 100L
+    n_samples <- 99L
 
     ## NPX no int ctrl and no dev int ctrl ----
 
@@ -11081,7 +11081,7 @@ test_that(
     olink_platform <- "Target 96"
     n_panels <- 3L
     n_assays <- 92L
-    n_samples <- 100L
+    n_samples <- 99L
     data_type <- "NPX"
     show_int_ctrl <- TRUE
     show_dev_int_ctrl <- TRUE
@@ -12385,7 +12385,7 @@ test_that(
     olink_platform <- "Target 48"
     n_panels <- 1L
     n_assays <- 45L
-    n_samples <- 100L
+    n_samples <- 99L
     show_dev_int_ctrl <- FALSE
 
     ## NPX no int ctrl v1 ----
@@ -12983,7 +12983,7 @@ test_that(
     olink_platform <- "Target 48"
     n_panels <- 3L
     n_assays <- 45L
-    n_samples <- 100L
+    n_samples <- 99L
     show_dev_int_ctrl <- FALSE
 
     ## NPX no int ctrl v1 ----
@@ -13583,7 +13583,7 @@ test_that(
     data_type <- "NPX"
     n_panels <- 3L
     n_assays <- 92L
-    n_samples <- 100L
+    n_samples <- 99L
 
     df_rand <- get_wide_synthetic_data(
       olink_platform = olink_platform,
@@ -13696,7 +13696,7 @@ test_that(
     data_type <- "NPX"
     n_panels <- 3L
     n_assays <- 92L
-    n_samples <- 100L
+    n_samples <- 99L
     show_dev_int_ctrl <- FALSE
 
     df_rand <- get_wide_synthetic_data(
@@ -14126,7 +14126,7 @@ test_that(
           data_type = data_type,
           n_panels = 1L,
           n_assays = 45L,
-          n_samples = 100L,
+          n_samples = 99L,
           show_dev_int_ctrl = FALSE,
           show_int_ctrl = FALSE,
           version = 0L
@@ -16156,7 +16156,7 @@ test_that(
     olink_platform <- "Target 48"
     n_panels <- 1L
     n_assays <- 45L
-    n_samples <- 100L
+    n_samples <- 99L
 
     ## NPX no int ctrl, no dev int ctrl, v1 ----
 
@@ -17134,7 +17134,7 @@ test_that(
     olink_platform <- "Target 48"
     n_panels <- 3L
     n_assays <- 45L
-    n_samples <- 100L
+    n_samples <- 99L
 
     ## NPX no int ctrl, no dev int ctrl, v1 ----
 

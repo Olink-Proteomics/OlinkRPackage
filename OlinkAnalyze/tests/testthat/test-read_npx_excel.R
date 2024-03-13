@@ -6,7 +6,7 @@ test_that(
                                             data_type = "NPX",
                                             n_panels = 3L,
                                             n_assays = 92L,
-                                            n_samples = 100L,
+                                            n_samples = 99L,
                                             show_dev_int_ctrl = TRUE,
                                             show_int_ctrl = TRUE,
                                             version = 1L)
@@ -96,7 +96,7 @@ test_that(
                                             data_type = "NPX",
                                             n_panels = 3L,
                                             n_assays = 92L,
-                                            n_samples = 100L,
+                                            n_samples = 99L,
                                             show_dev_int_ctrl = TRUE,
                                             show_int_ctrl = TRUE,
                                             version = 1L)
