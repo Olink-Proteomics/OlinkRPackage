@@ -79,7 +79,7 @@ read_npx_excel <- function(file,
 
     cli::cli_warn(
       message = c(
-        "The excel file {.file {file}} has only one column."
+        "i" = "The excel file {.file {file}} has only one column!"
       ),
       call = rlang::caller_env(),
       wrap = FALSE

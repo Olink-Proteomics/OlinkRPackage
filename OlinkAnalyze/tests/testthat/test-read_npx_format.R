@@ -2262,7 +2262,7 @@ test_that(
             olink_platform = "Target 96",
             olink_platforms_wide = olink_platforms_wide
           ),
-          regexp = "No matches!"
+          regexp = "Unable to recognize the Olink platform from the input file:"
         )
 
         # check that object exists
@@ -2311,7 +2311,7 @@ test_that(
             olink_platform = "Target 96",
             olink_platforms_wide = olink_platforms_wide
           ),
-          regexp = "Too many matches!"
+          regexp = "Unable to recognize the Olink platform from the input file:"
         )
 
         # check that object exists
@@ -2614,7 +2614,7 @@ test_that(
             data_cells = "Wrong_Name",
             quant_methods_expected = c("NPX", "Ct", "Quantified")
           ),
-          regexp = "No matches!"
+          regexp = "Unable to recognize the quantification method from the inpu"
         )
 
         # check that object exists
@@ -2655,7 +2655,7 @@ test_that(
             data_cells = "NPX_Ct",
             quant_methods_expected = c("NPX", "Ct", "Quantified")
           ),
-          regexp = "Too many matches!"
+          regexp = "Unable to recognize the quantification method from the inpu"
         )
 
         # check that object exists

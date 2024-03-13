@@ -93,8 +93,8 @@ read_npx_delim <- function(file,
 
     cli::cli_warn(
       message = c(
-        "The delimited file {.file {file}} has only one column.",
-        "i" = "Wrong input {.arg sep} = {.val {sep}}?"
+        "i" = "The delimited file {.file {file}} has only one column. Wrong
+        input {.arg sep} = {.val {sep}}?"
       ),
       call = rlang::caller_env(),
       wrap = FALSE

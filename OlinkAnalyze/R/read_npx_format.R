@@ -505,9 +505,9 @@ read_npx_format_get_format <- function(df,
       # has already provided it as input.
       cli::cli_warn(
         message = c(
-          "Unable to confirm the \"{ifelse(long_format,\"long\",\"wide\")}\"
-          format from the input file: {.file {file}}.",
-          "i" = "We trust your input!"
+          "i" = "Unable to confirm the
+          \"{ifelse(long_format,\"long\",\"wide\")}\" format from the input
+          file: {.file {file}}. We trust your input!"
         ),
         call = rlang::caller_env(),
         wrap = FALSE
@@ -518,10 +518,10 @@ read_npx_format_get_format <- function(df,
       # warning if what we detected and the user provided as input differ.
       cli::cli_warn(
         message = c(
-          "Based on {.arg long_format} we were expecting
-    \"{ifelse(long_format,\"long\",\"wide\")}\" format data, but instead
-    detected \"{ifelse(detected_long_format,\"long\",\"wide\")}\".",
-          "i" = "We trust your input!"
+          "i" = "Based on {.arg long_format} we were expecting
+          \"{ifelse(long_format,\"long\",\"wide\")}\" format data, but instead
+          detected \"{ifelse(detected_long_format,\"long\",\"wide\")}\". We
+          trust your input!"
         ),
         call = rlang::caller_env(),
         wrap = FALSE
@@ -685,9 +685,8 @@ read_npx_format_get_platform <- function(df,
 
       cli::cli_warn(
         message = c(
-          "Unable to recognize the Olink platform from the input file:
-        {.file {file}}! No matches!",
-          "i" = "We trust your input!"
+          "i" = "Unable to recognize the Olink platform from the input file:
+        {.file {file}}! No matches. We trust your input!"
         ),
         call = rlang::caller_env(),
         wrap = FALSE
@@ -698,9 +697,8 @@ read_npx_format_get_platform <- function(df,
 
       cli::cli_warn(
         message = c(
-          "Unable to recognize the Olink platform from the input file:
-        {.file {file}}! Too many matches!",
-          "i" = "We trust your input!"
+          "i" = "Unable to recognize the Olink platform from the input file:
+        {.file {file}}! Too many matches. We trust your input!"
         ),
         call = rlang::caller_env(),
         wrap = FALSE
@@ -710,10 +708,9 @@ read_npx_format_get_platform <- function(df,
 
       cli::cli_warn(
         message = c(
-          "Based on {.arg olink_platform} we were expecting Olink
+          "i" = "Based on {.arg olink_platform} we were expecting Olink
           {olink_platform} data, but instead we detected
-          {olink_platform_df$name} data.",
-          "i" = "We trust your input!"
+          {olink_platform_df$name} data. We trust your input!"
         ),
         call = rlang::caller_env(),
         wrap = FALSE
@@ -860,9 +857,8 @@ read_npx_format_get_quant <- function(file,
 
       cli::cli_warn(
         message = c(
-          "Unable to recognize the quantification method from the input file:
-          {.file {file}}! No matches!",
-          "i" = "We trust your input!"
+          "i" = "Unable to recognize the quantification method from the input
+          file: {.file {file}}! No matches. We trust your input!"
         ),
         call = rlang::caller_env(),
         wrap = FALSE
@@ -873,9 +869,8 @@ read_npx_format_get_quant <- function(file,
 
       cli::cli_warn(
         message = c(
-          "Unable to recognize the quantification method from the input file:
-          {.file {file}}! Too many matches!",
-          "i" = "We trust your input!"
+          "i" = "Unable to recognize the quantification method from the input
+          file: {.file {file}}! Too many matches. We trust your input!"
         ),
         call = rlang::caller_env(),
         wrap = FALSE
@@ -885,9 +880,9 @@ read_npx_format_get_quant <- function(file,
 
       cli::cli_warn(
         message = c(
-          "Based on {.arg data_type} we were expecting \"{data_type}\" format
-          data, but instead detected \"{quant_matches$q_method}\".",
-          "i" = "We trust your input!"
+          "i" = "Based on {.arg data_type} we were expecting \"{data_type}\"
+          format data, but instead detected \"{quant_matches$q_method}\". We
+          trust your input!"
         ),
         call = rlang::caller_env(),
         wrap = FALSE
