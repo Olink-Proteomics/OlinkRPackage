@@ -1024,18 +1024,19 @@ read_npx_wide_middle <- function(df,
 
   sapply(col_names, function(x) check_is_character(string = x, error = TRUE))
 
-  # check unique sample id ----
+  # check columns ----
 
   check_columns(df = df, col_list = list("V1"))
+
+  # check unique sample identifiers ----
 
   n_uniq_sample <- dplyr::pull(df, .data[["V1"]]) |> unique() |> length()
   if (nrow(df) != n_uniq_sample) {
 
-    cli::cli_abort(
+    cli::cli_inform(
       message = c(
-        "x" = "The middle matrix in file {.file {file}} does not contain unique
-        sample identifiers. Identified {nrow(df) - n_uniq_sample} duplicates!",
-        "i" = "Has the file been modified manually?"
+        "i" = "The middle matrix in file {.file {file}} does not contain unique
+        sample identifiers. Identified {nrow(df) - n_uniq_sample} duplicates!"
       ),
       call = rlang::caller_env(),
       wrap = FALSE
@@ -1043,12 +1044,21 @@ read_npx_wide_middle <- function(df,
 
   }
 
+  # add a new column `rid` the will be used as a proxy to allow duplicated
+  # sample identifiers as input.
+  # Down stream we will be using SampleID and rid to match matrices.
+  df <- df |>
+    dplyr::mutate(
+      rid = dplyr::row_number()
+    )
+
   # check that all relevant columns exist ----
 
   check_columns(df = df,
                 col_list = col_names |>
                   unlist() |>
                   unname() |>
+                  (\(.x) c(.x, "rid"))() |> # adding rid to checked columns
                   as.list())
 
   # split datasets ----
@@ -1059,13 +1069,13 @@ read_npx_wide_middle <- function(df,
 
   list_df_mid$df_mid_oid <- df |>
     dplyr::select(
-      dplyr::all_of(c("V1", col_names$df_top_oid))
+      dplyr::all_of(c("V1", "rid", col_names$df_top_oid))
     ) |>
     dplyr::rename(
       "SampleID" = dplyr::all_of("V1")
     ) |>
     tidyr::pivot_longer(
-      -dplyr::all_of("SampleID"),
+      -dplyr::all_of(c("SampleID", "rid")),
       names_to = "col_index",
       values_to = data_type
     )
@@ -1074,13 +1084,13 @@ read_npx_wide_middle <- function(df,
 
   list_df_mid$df_mid_plate <- df |>
     dplyr::select(
-      dplyr::all_of(c("V1", col_names$df_top_plate))
+      dplyr::all_of(c("V1", "rid", col_names$df_top_plate))
     ) |>
     dplyr::rename(
       "SampleID" = dplyr::all_of("V1")
     ) |>
     tidyr::pivot_longer(
-      -dplyr::all_of("SampleID"),
+      -dplyr::all_of(c("SampleID", "rid")),
       names_to = "col_index",
       values_to = "PlateID"
     )
@@ -1092,13 +1102,13 @@ read_npx_wide_middle <- function(df,
 
     list_df_mid$df_mid_qc_warn <- df |>
       dplyr::select(
-        dplyr::all_of(c("V1", col_names$df_top_qc_warn))
+        dplyr::all_of(c("V1", "rid", col_names$df_top_qc_warn))
       ) |>
       dplyr::rename(
         "SampleID" = dplyr::all_of("V1")
       ) |>
       tidyr::pivot_longer(
-        -dplyr::all_of("SampleID"),
+        -dplyr::all_of(c("SampleID", "rid")),
         names_to = "col_index",
         values_to = "QC_Warning"
       )
@@ -1112,13 +1122,13 @@ read_npx_wide_middle <- function(df,
 
     list_df_mid$df_mid_int_ctrl <- df |>
       dplyr::select(
-        dplyr::all_of(c("V1", col_names$df_top_int_ctrl))
+        dplyr::all_of(c("V1", "rid", col_names$df_top_int_ctrl))
       ) |>
       dplyr::rename(
         "SampleID" = dplyr::all_of("V1")
       ) |>
       tidyr::pivot_longer(
-        -dplyr::all_of("SampleID"),
+        -dplyr::all_of(c("SampleID", "rid")),
         names_to = "col_index",
         values_to = data_type
       )
@@ -1131,13 +1141,13 @@ read_npx_wide_middle <- function(df,
 
     list_df_mid$df_mid_dev_int_ctrl <- df |>
       dplyr::select(
-        dplyr::all_of(c("V1", col_names$df_top_dev_int_ctrl))
+        dplyr::all_of(c("V1", "rid", col_names$df_top_dev_int_ctrl))
       ) |>
       dplyr::rename(
         "SampleID" = dplyr::all_of("V1")
       ) |>
       tidyr::pivot_longer(
-        -dplyr::all_of("SampleID"),
+        -dplyr::all_of(c("SampleID", "rid")),
         names_to = "col_index",
         values_to = data_type
       )
@@ -1171,8 +1181,9 @@ read_npx_wide_middle <- function(df,
   col_names_mid <- sapply(list_df_mid, function(x) x$col_index) |>
     unlist() |>
     unname() |>
-    unique()
-  col_names_mid <- c("V1", col_names_mid) |> sort()
+    unique() |>
+    (\(.x) c("V1", "rid", .x))() |>
+    sort()
 
   if (!identical(x = colnames(df) |> sort(),
                  y = col_names_mid)) {
@@ -1311,6 +1322,26 @@ red_npx_wide_top_mid_long <- function(df_top_list,
     ) |>
     read_npx_wide_panel_version()
 
+  ## df internal controls ----
+
+  if ("df_mid_int_ctrl" %in% names(df_middle_list)
+      && "df_top_int_ctrl" %in% names(df_top_list)) {
+
+    df_int_ctrl <- df_middle_list$df_mid_int_ctrl |>
+      dplyr::left_join(
+        df_top_list$df_top_int_ctrl,
+        by = "col_index",
+        relationship = "many-to-one"
+      ) |>
+      read_npx_wide_panel_version()
+
+    df_long <- df_long |>
+      dplyr::bind_rows(
+        df_int_ctrl
+      )
+    rm(df_int_ctrl)
+  }
+
   ## df plate id ----
 
   df_plate <- df_middle_list$df_mid_plate |>
@@ -1330,7 +1361,7 @@ red_npx_wide_top_mid_long <- function(df_top_list,
   df_long <- df_long |>
     dplyr::left_join(
       df_plate,
-      by = c("SampleID", "Panel"),
+      by = c("SampleID", "rid", "Panel"),
       relationship = "many-to-one"
     )
   rm(df_plate)
@@ -1356,43 +1387,10 @@ red_npx_wide_top_mid_long <- function(df_top_list,
     df_long <- df_long |>
       dplyr::left_join(
         df_qc_warn,
-        by = c("SampleID", "Panel"),
+        by = c("SampleID", "rid", "Panel"),
         relationship = "many-to-one"
       )
     rm(df_qc_warn)
-  }
-
-  ## df internal controls ----
-
-  if ("df_mid_int_ctrl" %in% names(df_middle_list)
-      && "df_top_int_ctrl" %in% names(df_top_list)) {
-
-    df_int_ctrl <- df_middle_list$df_mid_int_ctrl |>
-      dplyr::left_join(
-        df_top_list$df_top_int_ctrl,
-        by = "col_index",
-        relationship = "many-to-one"
-      ) |>
-      read_npx_wide_panel_version()
-
-    # join with the plate df
-    df_int_ctrl_pid <- df_int_ctrl |>
-      dplyr::left_join(
-        df_long |>
-          dplyr::select(
-            dplyr::any_of("QC_Warning"),
-            dplyr::all_of(c("PlateID", "SampleID", "Panel", "Panel_Version"))
-          ) |>
-          dplyr::distinct(),
-        by = c("SampleID", "Panel", "Panel_Version"),
-        relationship = "many-to-one"
-      )
-
-    df_long <- df_long |>
-      dplyr::bind_rows(
-        df_int_ctrl_pid
-      )
-    rm(df_int_ctrl, df_int_ctrl_pid)
   }
 
   ## df deviation internal controls ----
@@ -1410,7 +1408,7 @@ red_npx_wide_top_mid_long <- function(df_top_list,
         -dplyr::all_of(c("Assay", "col_index"))
       ) |>
       tidyr::pivot_wider(
-        id_cols = dplyr::all_of(c("SampleID", "Panel")),
+        id_cols = dplyr::all_of(c("SampleID", "rid", "Panel")),
         names_from = dplyr::all_of("Uniprot ID"),
         values_from = dplyr::all_of(data_type)
       ) |>
@@ -1422,11 +1420,18 @@ red_npx_wide_top_mid_long <- function(df_top_list,
     df_long <- df_long |>
       dplyr::left_join(
         df_dev_int_ctrl,
-        by = c("SampleID", "Panel"),
+        by = c("SampleID", "rid", "Panel"),
         relationship = "many-to-one"
       )
     rm(df_dev_int_ctrl)
   }
+
+  # remove rid ----
+
+  df_long <- df_long |>
+    dplyr::select(
+      -dplyr::all_of("rid")
+    )
 
   # return ----
 

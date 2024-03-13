@@ -9110,7 +9110,7 @@ test_that(
 )
 
 test_that(
-  "read_npx_wide_middle - error - non-unique sample id",
+  "read_npx_wide_middle - message - non-unique sample id",
   {
     # variables that apply to all tests
     olink_platform <- "Target 48"
@@ -9118,8 +9118,8 @@ test_that(
     n_panels <- 3L
     n_assays <- 45L
     n_samples <- 100L
-    show_int_ctrl <- FALSE
-    show_dev_int_ctrl <- FALSE
+    show_int_ctrl <- TRUE
+    show_dev_int_ctrl <- TRUE
     version <- 1L
 
     df_rand <- get_wide_synthetic_data(
@@ -9163,14 +9163,52 @@ test_that(
         writeLines("foo", olink_wide_format)
 
         # check that function runs with error
-        expect_error(
-          object = read_npx_wide_middle(
+        expect_message(
+          object = df_out <- read_npx_wide_middle(
             df = df_rand$list_df_wide$df_middle_wide,
             file = olink_wide_format,
             data_type = data_type,
             col_names = col_names
           ),
           regexp = "does not contain unique sample identifiers."
+        )
+
+        # check that output match
+
+        # rename samples from the separate dfs of the reference input
+        df_rand$list_df_long$df_middle_long <-
+          lapply(df_rand$list_df_long$df_middle_long, function(.x) {
+            .x |>
+              dplyr::mutate(
+                SampleID = dplyr::if_else(.data[["SampleID"]] == "S2",
+                                          "S1",
+                                          .data[["SampleID"]])
+              )
+          })
+
+        expect_identical(
+          object = df_out$df_mid_oid,
+          expected = df_rand$list_df_long$df_middle_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_mid_plate,
+          expected = df_rand$list_df_long$df_middle_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_mid_qc_warn,
+          expected = df_rand$list_df_long$df_middle_long$df_qc_warn
+        )
+
+        expect_identical(
+          object = df_out$df_mid_int_ctrl,
+          expected = df_rand$list_df_long$df_middle_long$df_int_ctrl
+        )
+
+        expect_identical(
+          object = df_out$df_mid_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_middle_long$df_dev_int_ctrl
         )
 
       }
@@ -9207,14 +9245,55 @@ test_that(
         writeLines("foo", olink_wide_format)
 
         # check that function runs with error
-        expect_error(
-          object = read_npx_wide_middle(
+        expect_message(
+          object = df_out <- read_npx_wide_middle(
             df = df_rand$list_df_wide$df_middle_wide,
             file = olink_wide_format,
             data_type = data_type,
             col_names = col_names
           ),
           regexp = "does not contain unique sample identifiers."
+        )
+
+        # check that output match
+
+        # rename samples from the separate dfs of the reference input
+        df_rand$list_df_long$df_middle_long <-
+          lapply(df_rand$list_df_long$df_middle_long, function(.x) {
+            .x |>
+              dplyr::mutate(
+                SampleID = dplyr::case_when(
+                  .data[["SampleID"]] %in% c("S2", "S3") ~ "S1",
+                  .data[["SampleID"]] %in% c("S4", "S5") ~ "S2",
+                  TRUE ~ .data[["SampleID"]],
+                  .default = .data[["SampleID"]]
+                )
+              )
+          })
+
+        expect_identical(
+          object = df_out$df_mid_oid,
+          expected = df_rand$list_df_long$df_middle_long$df_oid
+        )
+
+        expect_identical(
+          object = df_out$df_mid_plate,
+          expected = df_rand$list_df_long$df_middle_long$df_plate
+        )
+
+        expect_identical(
+          object = df_out$df_mid_qc_warn,
+          expected = df_rand$list_df_long$df_middle_long$df_qc_warn
+        )
+
+        expect_identical(
+          object = df_out$df_mid_int_ctrl,
+          expected = df_rand$list_df_long$df_middle_long$df_int_ctrl
+        )
+
+        expect_identical(
+          object = df_out$df_mid_dev_int_ctrl,
+          expected = df_rand$list_df_long$df_middle_long$df_dev_int_ctrl
         )
 
       }
