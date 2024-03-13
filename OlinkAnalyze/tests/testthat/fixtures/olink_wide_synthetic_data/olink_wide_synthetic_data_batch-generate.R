@@ -1,4 +1,7 @@
-source("tests/testthat/fixtures/olink_wide_synthetic_data.R")
+olink_wide_synthetic_data <- test_path("fixtures",
+                                       "olink_wide_synthetic_data",
+                                       "olink_wide_synthetic_data.R")
+source(olink_wide_synthetic_data)
 
 ## Generate sets of all possible wide matrix combinations ----
 
@@ -94,7 +97,7 @@ lapply(seq_len(nrow(df_wide_combos)), function(i) {
     dplyr::slice(i)
 
   # create olink_platform dir
-  olink_platform_dir <- file.path("tests/testthat/fixtures/",
+  olink_platform_dir <- file.path(dirname(olink_wide_synthetic_data),
                                   df_wide_combos_tmp$olink_platform[1L])
   if (!dir.exists(olink_platform_dir)) {
     dir.create(olink_platform_dir)
