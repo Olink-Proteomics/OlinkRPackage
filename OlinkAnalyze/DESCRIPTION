@@ -62,8 +62,6 @@ Imports:
     arrow,
     cli,
     dplyr,
-    kableExtra,
-    knitr,
     readxl,
     rlang,
     stringr,
