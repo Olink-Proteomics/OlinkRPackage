@@ -1,6 +1,6 @@
 # Test that a relevant error is thrown when a txt file was provided as parquet.
 test_that(
-  "Non-parquet input is handled - random file",
+  "read_npx_parquet - error - random non-parquet file",
   {
 
     withr::with_tempfile(
@@ -30,7 +30,7 @@ test_that(
 # Test that a relevant error is thrown when a text file with the extension
 # parquet was provided as input.
 test_that(
-  "Non-parquet input is handled - corrupt parquet file",
+  "read_npx_parquet - error - corrupt parquet file",
   {
 
     withr::with_tempfile(
@@ -57,10 +57,10 @@ test_that(
   }
 )
 
-# Test that a relevant error is thrown when required metadata fieleds are
+# Test that a relevant error is thrown when required metadata fields are
 # missing.
 test_that(
-  "Required metadata fields are missing",
+  "read_npx_parquet - error - required metadata fields are missing",
   {
 
     withr::with_tempfile(
@@ -80,9 +80,11 @@ test_that(
           arrow::as_arrow_table(df)
 
         # modify metadata
-        df$metadata$FileVersion <- "NA"
-        df$metadata$ProjectName <- "NA"
-        df$metadata$SampleMatrix <- "NA"
+        df_metadata_list <- rep(x = "NA", times = 3L) |>
+          as.list()
+        names(df_metadata_list) <- olink_parquet_spec$parquet_metadata[1L:3L] |>
+          unname()
+        df$metadata <- df_metadata_list
 
         # write parquet
         arrow::write_parquet(
@@ -109,7 +111,7 @@ test_that(
 # Test that a relevant error is thrown when the required metadata filed Product
 # contains unexpected entries.
 test_that(
-  "Product field is incorrect",
+  "read_npx_parquet - error - Product field is incorrect",
   {
 
     withr::with_tempfile(
@@ -117,8 +119,6 @@ test_that(
       pattern = "parquet-file_alt-product-type",
       fileext = ".parquet",
       code = {
-
-        tmp_product_name <- "Unknown_Product"
 
         # random data frame
         df <- dplyr::tibble(
@@ -131,11 +131,13 @@ test_that(
           arrow::as_arrow_table()
 
         # modify metadata
-        df$metadata$FileVersion <- "NA"
-        df$metadata$ProjectName <- "NA"
-        df$metadata$SampleMatrix <- "NA"
-        df$metadata$DataFileType <- "NPX File"
-        df$metadata$Product <- tmp_product_name
+        df_metadata_list <- c(rep(x = "NA", times = 3L),
+                              "Unknown_Product",
+                              "NPX File") |>
+          as.list()
+        names(df_metadata_list) <- olink_parquet_spec$parquet_metadata[1L:5L] |>
+          unname()
+        df$metadata <- df_metadata_list
 
         # write parquet
         arrow::write_parquet(
@@ -150,7 +152,7 @@ test_that(
         # check that relevant error is thrown
         expect_error(
           object = read_npx_parquet(file = pfile_product),
-          regexp = paste0("Unsupported platform: \"", tmp_product_name, "\"")
+          regexp = "Unsupported product"
         )
 
       }
@@ -162,16 +164,13 @@ test_that(
 # Test that a relevant error is thrown when the required metadata filed
 # DataFileType contains unexpected entries.
 test_that(
-  "DataFileType field is incorrect",
+  "read_npx_parquet - error - DataFileType field is incorrect",
   {
     withr::with_tempfile(
       new = "pfile_datafiletype",
       pattern = "parquet-file_alt-product-type",
       fileext = ".parquet",
       code = {
-
-        # random product name for testing
-        tmp_datafiletype_name <- "Unknown File"
 
         # random data frame
         df <- dplyr::tibble(
@@ -184,11 +183,13 @@ test_that(
           arrow::as_arrow_table()
 
         # modify metadata
-        df$metadata$FileVersion <- "NA"
-        df$metadata$ProjectName <- "NA"
-        df$metadata$SampleMatrix <- "NA"
-        df$metadata$DataFileType <- tmp_datafiletype_name
-        df$metadata$Product <- "ExploreHT"
+        df_metadata_list <- c(rep(x = "NA", times = 3L),
+                              "ExploreHT",
+                              "Unknown File") |>
+          as.list()
+        names(df_metadata_list) <- olink_parquet_spec$parquet_metadata[1L:5L] |>
+          unname()
+        df$metadata <- df_metadata_list
 
         # write parquet
         arrow::write_parquet(
@@ -203,7 +204,7 @@ test_that(
         # check that relevant error is thrown
         expect_error(
           object = read_npx_parquet(file = pfile_datafiletype),
-          regexp = paste0("Unsupported file: \"", tmp_datafiletype_name, "\"")
+          regexp = "Unsupported file"
         )
 
       }
@@ -212,12 +213,30 @@ test_that(
   }
 )
 
-# Test that a the function works if DataFileType is one of the accepted values.
+# Test that the function works if DataFileType is one of the accepted values.
 test_that(
-  "Function returns arrowobject - all DataFileType",
+  "read_npx_parquet - works - all DataFileType",
   {
+    # random data frame
+    df <- dplyr::tibble(
+      "A" = c(1, 2.2, 3.14),
+      "B" = c("a", "b", "c"),
+      "C" = c(TRUE, TRUE, FALSE),
+      "D" = c("NA", "B", NA_character_),
+      "E" = c(1L, 2L, 3L)
+    ) |>
+      arrow::as_arrow_table()
 
-    # DataFileType == "NPX File" ----
+    # modify metadata
+    df_metadata_list <- c(rep(x = "NA", times = 3L),
+                          "ExploreHT",
+                          "NA") |>
+      as.list()
+    names(df_metadata_list) <- olink_parquet_spec$parquet_metadata[1L:5L] |>
+      unname()
+    df$metadata <- df_metadata_list
+
+    # DataFileType = "NPX File" ----
 
     withr::with_tempfile(
       new = "pfile_test",
@@ -225,22 +244,8 @@ test_that(
       fileext = ".parquet",
       code = {
 
-        # random data frame
-        df <- dplyr::tibble(
-          "A" = c(1, 2.2, 3.14),
-          "B" = c("a", "b", "c"),
-          "C" = c(TRUE, TRUE, FALSE),
-          "D" = c("NA", "B", NA_character_),
-          "E" = c(1L, 2L, 3L)
-        ) |>
-          arrow::as_arrow_table()
-
-        # modify metadata ----
-        df$metadata$FileVersion <- "NA"
-        df$metadata$ProjectName <- "NA"
-        df$metadata$SampleMatrix <- "NA"
-        df$metadata$DataFileType <- "NPX File"
-        df$metadata$Product <- "ExploreHT"
+        # modify metadata
+        df$metadata[olink_parquet_spec$parquet_metadata[5L]] <- "NPX File"
 
         # write the parquet file
         arrow::write_parquet(
@@ -249,18 +254,15 @@ test_that(
           compression = "gzip"
         )
 
-        # check that the semicolon delimited file exists
+        # check that the file exists
         expect_true(object = file.exists(pfile_test))
 
-        # check that relevant error is thrown
-        expect_no_condition(
-          object = df_out <- read_npx_parquet(file = pfile_test,
-                                              out_df = "arrow")
+        # check that function works
+        expect_true(
+          object = read_npx_parquet(file = pfile_test,
+                                    out_df = "arrow") |>
+            inherits(what = "ArrowObject")
         )
-
-        expect_true(object = exists("df_out"))
-
-        expect_true(inherits(x = df_out, what = "ArrowObject"))
 
         expect_true(
           object = read_npx_parquet(file = pfile_test,
@@ -279,22 +281,9 @@ test_that(
       fileext = ".parquet",
       code = {
 
-        # random data frame
-        df <- dplyr::tibble(
-          "A" = c(1, 2.2, 3.14),
-          "B" = c("a", "b", "c"),
-          "C" = c(TRUE, TRUE, FALSE),
-          "D" = c("NA", "B", NA_character_),
-          "E" = c(1L, 2L, 3L)
-        ) |>
-          arrow::as_arrow_table()
-
         # modify metadata ----
-        df$metadata$FileVersion <- "NA"
-        df$metadata$ProjectName <- "NA"
-        df$metadata$SampleMatrix <- "NA"
-        df$metadata$DataFileType <- "Extended NPX File"
-        df$metadata$Product <- "ExploreHT"
+        df$metadata[olink_parquet_spec$parquet_metadata[5L]] <-
+          "Extended NPX File"
 
         # write the parquet file
         arrow::write_parquet(
@@ -303,12 +292,20 @@ test_that(
           compression = "gzip"
         )
 
-        # check that the semicolon delimited file exists
+        # check that the file exists
         expect_true(object = file.exists(pfile_test))
 
-        # check that relevant error is thrown
-        expect_no_condition(
-          object = read_npx_parquet(file = pfile_test)
+        # check that function works
+        expect_true(
+          object = read_npx_parquet(file = pfile_test,
+                                    out_df = "arrow") |>
+            inherits(what = "ArrowObject")
+        )
+
+        expect_true(
+          object = read_npx_parquet(file = pfile_test,
+                                    out_df = "tibble") |>
+            inherits(what = "tbl_df")
         )
 
       }
@@ -322,22 +319,9 @@ test_that(
       fileext = ".parquet",
       code = {
 
-        # random data frame
-        df <- dplyr::tibble(
-          "A" = c(1, 2.2, 3.14),
-          "B" = c("a", "b", "c"),
-          "C" = c(TRUE, TRUE, FALSE),
-          "D" = c("NA", "B", NA_character_),
-          "E" = c(1L, 2L, 3L)
-        ) |>
-          arrow::as_arrow_table()
-
         # modify metadata ----
-        df$metadata$FileVersion <- "NA"
-        df$metadata$ProjectName <- "NA"
-        df$metadata$SampleMatrix <- "NA"
-        df$metadata$DataFileType <- "CLI Data Export File"
-        df$metadata$Product <- "ExploreHT"
+        df$metadata[olink_parquet_spec$parquet_metadata[5L]] <-
+          "CLI Data Export File"
 
         # write the parquet file
         arrow::write_parquet(
@@ -346,12 +330,20 @@ test_that(
           compression = "gzip"
         )
 
-        # check that the semicolon delimited file exists
+        # check that the file exists
         expect_true(object = file.exists(pfile_test))
 
-        # check that relevant error is thrown
-        expect_no_condition(
-          object = read_npx_parquet(file = pfile_test)
+        # check that function works
+        expect_true(
+          object = read_npx_parquet(file = pfile_test,
+                                    out_df = "arrow") |>
+            inherits(what = "ArrowObject")
+        )
+
+        expect_true(
+          object = read_npx_parquet(file = pfile_test,
+                                    out_df = "tibble") |>
+            inherits(what = "tbl_df")
         )
 
       }
@@ -365,22 +357,9 @@ test_that(
       fileext = ".parquet",
       code = {
 
-        # random data frame
-        df <- dplyr::tibble(
-          "A" = c(1, 2.2, 3.14),
-          "B" = c("a", "b", "c"),
-          "C" = c(TRUE, TRUE, FALSE),
-          "D" = c("NA", "B", NA_character_),
-          "E" = c(1L, 2L, 3L)
-        ) |>
-          arrow::as_arrow_table()
-
         # modify metadata ----
-        df$metadata$FileVersion <- "NA"
-        df$metadata$ProjectName <- "NA"
-        df$metadata$SampleMatrix <- "NA"
-        df$metadata$DataFileType <- "Internal CLI Data Export File"
-        df$metadata$Product <- "ExploreHT"
+        df$metadata[olink_parquet_spec$parquet_metadata[5L]] <-
+          "Internal CLI Data Export File"
 
         # write the parquet file
         arrow::write_parquet(
@@ -389,12 +368,20 @@ test_that(
           compression = "gzip"
         )
 
-        # check that the semicolon delimited file exists
+        # check that the file exists
         expect_true(object = file.exists(pfile_test))
 
-        # check that relevant error is thrown
-        expect_no_condition(
-          object = read_npx_parquet(file = pfile_test)
+        # check that function works
+        expect_true(
+          object = read_npx_parquet(file = pfile_test,
+                                    out_df = "arrow") |>
+            inherits(what = "ArrowObject")
+        )
+
+        expect_true(
+          object = read_npx_parquet(file = pfile_test,
+                                    out_df = "tibble") |>
+            inherits(what = "tbl_df")
         )
 
       }
@@ -408,6 +395,149 @@ test_that(
       fileext = ".parquet",
       code = {
 
+        # modify metadata ----
+        df$metadata[olink_parquet_spec$parquet_metadata[5L]] <-
+          "R Package Export File"
+
+        # write the parquet file
+        arrow::write_parquet(
+          x = df,
+          sink = pfile_test,
+          compression = "gzip"
+        )
+
+        # check that the file exists
+        expect_true(object = file.exists(pfile_test))
+
+        # check that function works
+        expect_true(
+          object = read_npx_parquet(file = pfile_test,
+                                    out_df = "arrow") |>
+            inherits(what = "ArrowObject")
+        )
+
+        expect_true(
+          object = read_npx_parquet(file = pfile_test,
+                                    out_df = "tibble") |>
+            inherits(what = "tbl_df")
+        )
+
+      }
+    )
+
+  }
+)
+
+# Test that the function works if Product is one of the accepted values.
+test_that(
+  "read_npx_parquet - works - all Product",
+  {
+    # random data frame
+    df <- dplyr::tibble(
+      "A" = c(1, 2.2, 3.14),
+      "B" = c("a", "b", "c"),
+      "C" = c(TRUE, TRUE, FALSE),
+      "D" = c("NA", "B", NA_character_),
+      "E" = c(1L, 2L, 3L)
+    ) |>
+      arrow::as_arrow_table()
+
+    # modify metadata
+    df_metadata_list <- c(rep(x = "NA", times = 3L),
+                          "NA",
+                          "NPX File") |>
+      as.list()
+    names(df_metadata_list) <- olink_parquet_spec$parquet_metadata[1L:5L] |>
+      unname()
+    df$metadata <- df_metadata_list
+
+    ## Product is "ExploreHT"
+
+    withr::with_tempfile(
+      new = "pfile_test",
+      pattern = "parquet-file_test",
+      fileext = ".parquet",
+      code = {
+
+        # modify metadata
+        df$metadata[olink_parquet_spec$parquet_metadata[4L]] <- "ExploreHT"
+
+        # write the parquet file
+        arrow::write_parquet(
+          x = df,
+          sink = pfile_test,
+          compression = "gzip"
+        )
+
+        # check that the file exists
+        expect_true(object = file.exists(pfile_test))
+
+        # check that function works
+        expect_true(
+          object = read_npx_parquet(file = pfile_test,
+                                    out_df = "arrow") |>
+            inherits(what = "ArrowObject")
+        )
+
+        expect_true(
+          object = read_npx_parquet(file = pfile_test,
+                                    out_df = "tibble") |>
+            inherits(what = "tbl_df")
+        )
+
+      }
+    )
+
+    ## Product is "Explore3072"
+
+    withr::with_tempfile(
+      new = "pfile_test",
+      pattern = "parquet-file_test",
+      fileext = ".parquet",
+      code = {
+
+        # modify metadata
+        df$metadata[olink_parquet_spec$parquet_metadata[4L]] <- "Explore3072"
+
+        # write the parquet file
+        arrow::write_parquet(
+          x = df,
+          sink = pfile_test,
+          compression = "gzip"
+        )
+
+        # check that the file exists
+        expect_true(object = file.exists(pfile_test))
+
+        # check that function works
+        expect_true(
+          object = read_npx_parquet(file = pfile_test,
+                                    out_df = "arrow") |>
+            inherits(what = "ArrowObject")
+        )
+
+        expect_true(
+          object = read_npx_parquet(file = pfile_test,
+                                    out_df = "tibble") |>
+            inherits(what = "tbl_df")
+        )
+
+      }
+    )
+
+  }
+)
+
+# Test that the function return correct data frame
+test_that(
+  "read_npx_parquet - works",
+  {
+    withr::with_tempfile(
+      new = "pfile_test",
+      pattern = "parquet-file_test",
+      fileext = ".parquet",
+      code = {
+
         # random data frame
         df <- dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -418,12 +548,14 @@ test_that(
         ) |>
           arrow::as_arrow_table()
 
-        # modify metadata ----
-        df$metadata$FileVersion <- "NA"
-        df$metadata$ProjectName <- "NA"
-        df$metadata$SampleMatrix <- "NA"
-        df$metadata$DataFileType <- "R Package Export File"
-        df$metadata$Product <- "ExploreHT"
+        # modify metadata
+        df_metadata_list <- c(rep(x = "NA", times = 3L),
+                              "Explore3072",
+                              "NPX File") |>
+          as.list()
+        names(df_metadata_list) <- olink_parquet_spec$parquet_metadata[1L:5L] |>
+          unname()
+        df$metadata <- df_metadata_list
 
         # write the parquet file
         arrow::write_parquet(
@@ -432,76 +564,26 @@ test_that(
           compression = "gzip"
         )
 
-        # check that the semicolon delimited file exists
+        # check that the file exists
         expect_true(object = file.exists(pfile_test))
 
-        # check that relevant error is thrown
+        # check that function works
         expect_no_condition(
-          object = read_npx_parquet(file = pfile_test)
+          object = df_arrow <- read_npx_parquet(file = pfile_test,
+                                                out_df = "arrow")
         )
 
-      }
-    )
-
-  }
-)
-
-# Test that a the function returns the same df as its input.
-test_that(
-  "Function returns tibble - matches input",
-  {
-
-    withr::with_tempfile(
-      new = "pfile_test",
-      pattern = "parquet-file_test",
-      fileext = ".parquet",
-      code = {
-
-        # random data frame
-        df <- dplyr::tibble(
-          "A" = c(1, 2.2, NA_real_),
-          "B" = c("a", NA_character_, "c"),
-          "C" = c(NA, TRUE, FALSE),
-          "D" = c("A#1", "B", NA_character_),
-          "E" = c(1L, 2L, NA_integer_)
-        ) |>
-          arrow::as_arrow_table()
-
-        # modify metadata ----
-        df$metadata$FileVersion <- "NA"
-        df$metadata$ProjectName <- "NA"
-        df$metadata$SampleMatrix <- "NA"
-        df$metadata$DataFileType <- "NPX File"
-        df$metadata$Product <- "ExploreHT"
-
-        # write the parquet file
-        arrow::write_parquet(
-          x = df,
-          sink = pfile_test,
-          compression = "gzip"
-        )
-
-        # check that the semicolon delimited file exists
-        expect_true(object = file.exists(pfile_test))
-
-        # check that relevant error is thrown
         expect_no_condition(
-          object = df_out <- read_npx_parquet(file = pfile_test,
-                                              out_df = "tibble")
+          object = df_tibble <- read_npx_parquet(file = pfile_test,
+                                                 out_df = "tibble")
         )
 
-        expect_true(object = exists("df_out"))
+        # check df
+        expect_identical(object = df_tibble,
+                         expected = dplyr::as_tibble(df))
 
-        # convert df which is an ArrowObject to a tibble
-        # so that the test below works
-        df <- df |>
-          dplyr::as_tibble()
-
-        # check that the two dataframes are identical
-        expect_equal(
-          object = df_out,
-          expected = df
-        )
+        expect_identical(object = dplyr::as_tibble(df_arrow),
+                         expected = dplyr::as_tibble(df))
 
       }
     )

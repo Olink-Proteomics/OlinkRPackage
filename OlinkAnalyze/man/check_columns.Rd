@@ -2,25 +2,29 @@
 % Please edit documentation in R/check_columns.R
 \name{check_columns}
 \alias{check_columns}
-\title{Check that an input data frame contains the required columns}
+\title{Check that an input tibble or arrow object contains the required columns.}
 \usage{
 check_columns(df, col_list)
 }
 \arguments{
-\item{df}{A data frame.}
+\item{df}{A tibble or arrow object.}
 
 \item{col_list}{A list, where each element is a character vector (usually of
-length one). The function will check whether the column names of `data`
-include the elements of `col_list`. When an element of `col_list` is a vector
-of length higher than one, the function will check whether the column names
-of `data` include *at least one* of the elements of that vector.}
+length one). The function will check whether the column names of \var{df}
+contain elements from \var{col_list}. When an element of \var{col_list}
+contains more than one elements, the function will check whether the column
+names of \var{df} include \strong{at least one} of the elements of that
+vector.}
 }
 \value{
 Nothing or an error message if any column is missing.
 }
 \description{
-`check_columns` checks if the data frame `data` contains all of the columns
-in the list `col_list`.
+`check_columns` checks if the input tibble or arrow object `data` contains
+all of the columns in \var{col_list}.
+
+\var{col_list} might contain also vectors of characters as elements. In this
+case one of the characters in the vector is expected to be present.
 }
 \examples{
 \dontrun{

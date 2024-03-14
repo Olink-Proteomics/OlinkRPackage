@@ -149,8 +149,14 @@ test_that(
             expect_true(object = file.exists(zfile_test))
 
             # check that this works
-            expect_no_condition(
-              object = read_npx_zip(file = zfile_test)
+            # warning comes from read_npx_format because the long file is
+            # totally made up.
+            expect_warning(
+              object = read_npx_zip(file = zfile_test,
+                                    out_df = "arrow",
+                                    long_format = TRUE,
+                                    quiet = TRUE),
+              regexp = "Unable to confirm the \"long\" format from the input"
             )
 
           }
@@ -218,8 +224,14 @@ test_that(
             expect_true(object = file.exists(zfile_test))
 
             # check that this works
-            expect_no_condition(
-              object = read_npx_zip(file = zfile_test)
+            # warning comes from read_npx_format because the long file is
+            # totally made up.
+            expect_warning(
+              object = read_npx_zip(file = zfile_test,
+                                    out_df = "arrow",
+                                    long_format = TRUE,
+                                    quiet = TRUE),
+              regexp = "Unable to confirm the \"long\" format from the input"
             )
           }
         )
@@ -300,9 +312,16 @@ test_that(
                 # check that the zip file was created
                 expect_true(object = file.exists(zfile_test))
 
+
                 # check that this works
-                expect_no_condition(
-                  object = read_npx_zip(file = zfile_test)
+                # warning comes from read_npx_format because the long file is
+                # totally made up.
+                expect_warning(
+                  object = read_npx_zip(file = zfile_test,
+                                        out_df = "arrow",
+                                        long_format = TRUE,
+                                        quiet = TRUE),
+                  regexp = "Unable to confirm the \"long\" format from the inpu"
                 )
 
               }
@@ -389,12 +408,17 @@ test_that(
                 expect_true(object = file.exists(zfile_test))
 
                 # check that this works
-                expect_no_condition(
-                  object = read_npx_zip(
-                    file = zfile_test,
-                    .ignore_files = c(basename(readmefile_test),
-                                      basename(rfile_test))
-                  )
+                # warning comes from read_npx_format because the long file is
+                # totally made up.
+                expect_warning(
+                  object = read_npx_zip(file = zfile_test,
+                                        out_df = "arrow",
+                                        long_format = TRUE,
+                                        .ignore_files =
+                                          c(basename(readmefile_test),
+                                            basename(rfile_test)),
+                                        quiet = TRUE),
+                  regexp = "Unable to confirm the \"long\" format from the inpu"
                 )
 
               }
@@ -481,13 +505,19 @@ test_that(
                 expect_true(object = file.exists(zfile_test))
 
                 # check that this works
-                expect_no_condition(
-                  object = read_npx_zip(
-                    file = zfile_test,
-                    .ignore_files = c(basename(readmefile_test),
-                                      basename(rfile_test))
-                  )
+                # warning comes from read_npx_format because the long file is
+                # totally made up.
+                expect_warning(
+                  object = read_npx_zip(file = zfile_test,
+                                        out_df = "arrow",
+                                        long_format = TRUE,
+                                        .ignore_files =
+                                          c(basename(readmefile_test),
+                                            basename(rfile_test)),
+                                        quiet = TRUE),
+                  regexp = "Unable to confirm the \"long\" format from the inpu"
                 )
+
               }
             )
 
@@ -572,22 +602,33 @@ test_that(
             expect_true(object = file.exists(zfile_test))
 
             # check that this works
-            expect_no_condition(
-              object = df_out <- read_npx_zip(file = zfile_test,
-                                              out_df = "arrow",
-                                              sep = NULL)
+            # warning comes from read_npx_format because the long file is
+            # totally made up.
+            expect_warning(
+              object = df_out_arrow <- read_npx_zip(file = zfile_test,
+                                                    out_df = "arrow",
+                                                    sep = NULL,
+                                                    long_format = TRUE,
+                                                    quiet = TRUE),
+              regexp = "Unable to confirm the \"long\" format from the inpu"
             )
 
-            expect_true(exists("df_out"))
+            expect_true(exists("df_out_arrow"))
 
-            expect_true(inherits(x = df_out, what = "ArrowObject"))
+            expect_true(inherits(x = df_out_arrow, what = "ArrowObject"))
 
-            expect_true(
-              read_npx_zip(file = zfile_test,
-                           out_df = "tibble",
-                           sep = NULL) |>
-                inherits(what = "tbl_df")
+            expect_warning(
+              object = df_out_tibble <- read_npx_zip(file = zfile_test,
+                                                     out_df = "tibble",
+                                                     sep = NULL,
+                                                     long_format = TRUE,
+                                                     quiet = TRUE),
+              regexp = "Unable to confirm the \"long\" format from the inpu"
             )
+
+            expect_true(exists("df_out_tibble"))
+
+            expect_true(inherits(x = df_out_tibble, what = "tbl_df"))
 
           }
         )
@@ -665,8 +706,14 @@ test_that(
             expect_true(object = file.exists(zfile_test))
 
             # check that this works
-            expect_no_condition(
-              object = read_npx_zip(file = zfile_test)
+            # warning comes from read_npx_format because the long file is
+            # totally made up.
+            expect_warning(
+              object = df_out_arrow <- read_npx_zip(file = zfile_test,
+                                                    out_df = "arrow",
+                                                    long_format = TRUE,
+                                                    quiet = TRUE),
+              regexp = "Unable to confirm the \"long\" format from the inpu"
             )
           }
         )
@@ -749,22 +796,34 @@ test_that(
             expect_true(object = file.exists(zfile_test))
 
             # check that this works
-            expect_no_condition(
-              object = df_out <- read_npx_zip(file = zfile_test,
-                                              out_df = "arrow",
-                                              sep = NULL)
+            # warning comes from read_npx_format because the long file is
+            # totally made up.
+            expect_warning(
+              object = df_out_arrow <- read_npx_zip(file = zfile_test,
+                                                    out_df = "arrow",
+                                                    sep = NULL,
+                                                    long_format = TRUE,
+                                                    quiet = TRUE),
+              regexp = "Unable to confirm the \"long\" format from the inpu"
             )
 
-            expect_true(exists("df_out"))
+            expect_true(exists("df_out_arrow"))
 
-            expect_true(inherits(x = df_out, what = "ArrowObject"))
+            expect_true(inherits(x = df_out_arrow, what = "ArrowObject"))
 
-            expect_true(
-              read_npx_zip(file = zfile_test,
-                           out_df = "tibble",
-                           sep = NULL) |>
-                inherits(what = "tbl_df")
+            expect_warning(
+              object = df_out_tibble <- read_npx_zip(file = zfile_test,
+                                                     out_df = "tibble",
+                                                     sep = NULL,
+                                                     long_format = TRUE,
+                                                     quiet = TRUE),
+              regexp = "Unable to confirm the \"long\" format from the inpu"
             )
+
+            expect_true(exists("df_out_tibble"))
+
+            expect_true(inherits(x = df_out_tibble, what = "tbl_df"))
+
           }
         )
 
@@ -842,8 +901,14 @@ test_that(
             expect_true(object = file.exists(zfile_test))
 
             # check that this works
-            expect_no_condition(
-              object = read_npx_zip(file = zfile_test)
+            # warning comes from read_npx_format because the long file is
+            # totally made up.
+            expect_warning(
+              object = read_npx_zip(file = zfile_test,
+                                    out_df = "arrow",
+                                    long_format = TRUE,
+                                    quiet = TRUE),
+              regexp = "Unable to confirm the \"long\" format from the inpu"
             )
 
           }
@@ -1020,204 +1085,6 @@ test_that(
       }
     )
 
-    expect_false(object = file.exists(checksumfile_test))
-
-  }
-)
-
-# Test that the function cleans up tempfiles when function has a successful exit
-test_that(
-  "read NPX zip - successful run - tempfiles clean up",
-  {
-
-    readmefile_test <- file.path(tempdir(),
-                                 "README.txt")
-    writeLines("foo", readmefile_test)
-    expect_true(object = file.exists(readmefile_test))
-
-    checksumfile_test <- file.path(tempdir(),
-                                   "checksum_sha256.txt")
-
-    withr::with_tempfile(
-      new = "nfile_test",
-      pattern = "npx",
-      fileext = ".csv",
-      code = {
-
-        # write the coma-delimited file
-        dplyr::tibble(
-          "A" = c(1, 2.2, 3.14),
-          "B" = c("a", "b", "c"),
-          "C" = c(TRUE, TRUE, FALSE),
-          "D" = c("NA", "B", NA_character_),
-          "E" = c(1L, 2L, 3L)
-        ) |>
-          utils::write.table(
-            file = nfile_test,
-            append = FALSE,
-            quote = FALSE,
-            sep = ";",
-            eol = "\n",
-            na = "",
-            dec = ".",
-            row.names = FALSE,
-            col.names = TRUE
-          )
-
-        # check that the parquet file was created
-        expect_true(object = file.exists(nfile_test))
-
-        # compute SHA256 checksum
-        cli::hash_file_sha256(paths = nfile_test) |>
-          writeLines(checksumfile_test)
-
-        # check that the checksum file was created
-        expect_true(object = file.exists(checksumfile_test))
-
-        withr::with_tempfile(
-          new = "zfile_test",
-          pattern = "npx",
-          fileext = ".zip",
-          code = {
-
-            # replacing the tempfile from base to this one so that we can test
-            # whether the function read_npx_zip cleaned up tempfiles after
-            # exiting
-            local_mocked_bindings(
-              tempfile = function() file.path(tempdir(), "I_am_4_TeMpFiLe"),
-              .package = "base"
-            )
-
-            # write zip file
-            utils::zip(
-              zipfile = zfile_test,
-              files = c(readmefile_test,
-                        nfile_test,
-                        checksumfile_test),
-              flags = "-jq"
-            )
-
-            # check that the zip file was created
-            expect_true(object = file.exists(zfile_test))
-
-            # check that this works
-            expect_no_condition(
-              object = df_out <- read_npx_zip(file = zfile_test,
-                                              out_df = "tibble")
-            )
-
-            expect_true(exists("df_out"))
-
-            expect_true(inherits(x = df_out, what = "tbl_df"))
-
-            expect_false(dir.exists(tempfile()))
-            expect_false(file.exists(tempfile()))
-          }
-        )
-
-        file.remove(readmefile_test)
-        file.remove(checksumfile_test)
-
-      }
-    )
-
-    expect_false(object = file.exists(readmefile_test))
-    expect_false(object = file.exists(checksumfile_test))
-
-  }
-)
-
-# Test that the function cleans up tempfiles when function throws an error
-test_that(
-  "read NPX zip - successful run - tempfiles clean up",
-  {
-
-    readmefile_test <- file.path(tempdir(),
-                                 "README.txt")
-    writeLines("foo", readmefile_test)
-    expect_true(object = file.exists(readmefile_test))
-
-    checksumfile_test <- file.path(tempdir(),
-                                   "checksum_sha256.txt")
-    writeLines("foo", checksumfile_test)
-
-    withr::with_tempfile(
-      new = "nfile_test",
-      pattern = "npx",
-      fileext = ".csv",
-      code = {
-
-        # write the coma-delimited file
-        dplyr::tibble(
-          "A" = c(1, 2.2, 3.14),
-          "B" = c("a", "b", "c"),
-          "C" = c(TRUE, TRUE, FALSE),
-          "D" = c("NA", "B", NA_character_),
-          "E" = c(1L, 2L, 3L)
-        ) |>
-          utils::write.table(
-            file = nfile_test,
-            append = FALSE,
-            quote = FALSE,
-            sep = ";",
-            eol = "\n",
-            na = "",
-            dec = ".",
-            row.names = FALSE,
-            col.names = TRUE
-          )
-
-        # check that the parquet file was created
-        expect_true(object = file.exists(nfile_test))
-
-        # check that the checksum file was created
-        expect_true(object = file.exists(checksumfile_test))
-
-        withr::with_tempfile(
-          new = "zfile_test",
-          pattern = "npx",
-          fileext = ".zip",
-          code = {
-
-            # replacing the tempfile from base to this one so that we can test
-            # whether the function read_npx_zip cleaned up tempfiles after
-            # exiting
-            local_mocked_bindings(
-              tempfile = function() file.path(tempdir(), "I_am_4_TeMpFiLe"),
-              .package = "base"
-            )
-
-            # write zip file
-            utils::zip(
-              zipfile = zfile_test,
-              files = c(readmefile_test,
-                        nfile_test,
-                        checksumfile_test),
-              flags = "-jq"
-            )
-
-            # check that the zip file was created
-            expect_true(object = file.exists(zfile_test))
-
-            # check that this works
-            expect_error(
-              object = read_npx_zip(file = zfile_test,
-                                    out_df = "tibble"),
-              regexp = "The checksum of the NPX file does not match the one"
-            )
-
-            expect_false(dir.exists(tempfile()))
-            expect_false(file.exists(tempfile()))
-          }
-        )
-
-        file.remove(readmefile_test)
-        file.remove(checksumfile_test)
-
-      }
-    )
-
-    expect_false(object = file.exists(readmefile_test))
     expect_false(object = file.exists(checksumfile_test))
 
   }

@@ -2,46 +2,34 @@
 % Please edit documentation in R/read_npx_excel.R
 \name{read_npx_excel}
 \alias{read_npx_excel}
-\title{Help function to read Olink excel long or wide format files.}
+\title{Help function to read NPX, Ct or absolute quantification data from excel
+Olink software output files in R.}
 \usage{
-read_npx_excel(
-  file,
-  out_df = "tibble",
-  long_format = NULL,
-  olink_platform = NULL,
-  data_type = NULL,
-  quiet = FALSE
-)
+read_npx_excel(file, out_df = "arrow")
 }
 \arguments{
-\item{file}{The input excel file.}
+\item{file}{Path to Olink software output excel file in wide or long
+format. Expecting file extensions `xlsx` or `xls`.}
 
-\item{out_df}{The class of output data frame to be returned. Accepted values
-are "tibble" (default) and "arrow".}
-
-\item{long_format}{Boolean marking if input file is in long (TRUE) or wide
-(FALSE) format.}
-
-\item{olink_platform}{The Olink platform used to generate the input file.
-Expecting "Target 96", "Target 48", "Flex" or "Focus".}
-
-\item{data_type}{The quantification in which the data comes in. Expecting one
-of NPX, Quantified or Ct.}
-
-\item{quiet}{Print a confirmation message after reading in the input file.}
+\item{out_df}{The class of output data frame. One of `tibble` (default) or
+`arrow` for ArrowObject.}
 }
 \value{
-A tibble in long format or an ArrowObject.
+Tibble or ArrowObject with Olink data in long format.
 }
 \description{
-Help function to read Olink excel long or wide format files.
+Help function to read NPX, Ct or absolute quantification data from excel
+Olink software output files in R.
+}
+\seealso{
+\code{\link{read_npx}}
+  \code{\link{read_npx_parquet}}
+  \code{\link{read_npx_zip}}
+  \code{\link{read_npx_format}}
+  \code{\link{read_npx_delim}}
 }
 \author{
 Klev Diamanti;
-  Kathleen Nevola;
-  Pascal Pucholt;
   Christoffer Cambronero;
-  Boxi Zhang;
-  Olof Mansson;
-  Marianne Sandin
+  Kathleen Nevola
 }

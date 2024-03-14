@@ -1,13 +1,14 @@
-#' Help function converting the output data frame from the read_npx* function to
-#'  a tibble or an ArrowObject.
+#' Help function converting the output data frame from a read_npx* function to a
+#' tibble or an ArrowObject.
 #'
-#' @author Klev Diamanti
+#' @author
+#'   Klev Diamanti
 #'
 #' @param df The data frame to be converted.
-#' @param out_df The class of output data frame to be returned. Accepted values
-#' are "tibble" and "arrow".
+#' @param out_df The class of output data frame. One of `tibble` (default) or
+#' `arrow` for ArrowObject.
 #'
-#' @return The data frame in the requested format.
+#' @return The data frame in the requested class.
 #'
 convert_read_npx_output <- function(df,
                                     out_df) {
@@ -15,9 +16,7 @@ convert_read_npx_output <- function(df,
   # check that out_df is ok
   check_out_df_arg(out_df = out_df)
 
-  if (check_is_arrow_object(df = df, error = FALSE)
-      || check_is_tibble(df = df, error = FALSE)
-      || check_is_data_frame(df = df, error = FALSE)) {
+  if (check_is_arrow_or_tibble(df = df, error = FALSE)) {
 
     if (out_df == "tibble") {
 

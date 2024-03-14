@@ -2,28 +2,27 @@
 % Please edit documentation in R/read_npx_zip.R
 \name{get_checksum_file}
 \alias{get_checksum_file}
-\title{Help function to get the name of the checksum file from a zip NPX.}
+\title{Help function to get the file name of the checksum file from the list of
+contents of a zip-compressed file.}
 \usage{
 get_checksum_file(files)
 }
 \arguments{
-\item{files}{A vector of file names without any path prefix.}
+\item{files}{A character vector listing file names included in the
+zip-compressed input file.}
 }
 \value{
-The name of checksum file or NA if the file is not present.
+The file name of the checksum file, or NA if file is absent.
 }
 \description{
-Help function to get the name of the checksum file from a zip NPX.
+Help function to get the file name of the checksum file from the list of
+contents of a zip-compressed file.
 }
 \seealso{
-[check_checksum()]
-  [get_npx_file()]
+\code{\link{read_npx_zip}}
+  \code{\link{get_npx_file}}
+  \code{\link{check_checksum}}
 }
 \author{
 Klev Diamanti
 }
-\keyword{MD5}
-\keyword{NPX}
-\keyword{SHA256}
-\keyword{checksum}
-\keyword{zip}

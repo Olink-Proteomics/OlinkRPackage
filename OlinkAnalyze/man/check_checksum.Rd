@@ -3,25 +3,25 @@
 \name{check_checksum}
 \alias{check_checksum}
 \title{Help function comparing the checksum reported by Olink software to the
-checksum of the delivered NPX file.}
+checksum of the Olink data file from the input zip-compressed file.}
 \usage{
 check_checksum(checksum_file, npx_file)
 }
 \arguments{
-\item{checksum_file}{The plain file that contains the checksum output from
-Olink software. The file should contain "MD5" or "SHA256" in the file name.}
+\item{checksum_file}{Extracted checksum file from the zip-compressed file
+that contains the checksum file from Olink software.}
 
-\item{npx_file}{The NPX file accompanying the checksum file.}
+\item{npx_file}{Extracted file from the zip-compressed file that contains the
+Olink data file from Olink software.}
 }
 \value{
-A string or NA. If the function return NA then everything worked
-fine, otherwise there was some sort of error.
+NULL or an error if the files could not be opened or if checksum did
+not match.
 }
 \description{
-We should make it here only if MD5_checksum.txt or checksum_sha256.txt are
-present in the zip file.
-
-This function does not check whether checksum_file is in acceptable format.
+Runs only if `MD5_checksum.txt` or `checksum_sha256.txt` are present in the
+input zip-compressed file. This function does not check if the
+\var{checksum_file} is in acceptable format.
 }
 \author{
 Klev Diamanti

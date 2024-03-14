@@ -63,13 +63,111 @@ accepted_olink_platforms <- dplyr::tibble(
   ),
   quant_method = list(
     c("NPX", "Quantified", "Ct"),
-    c("NPX", "Quantified"),
+    c("NPX", "Quantified", "Ct"),
     c("NPX", "Ct"),
     c("NPX"),
     c("NPX"),
-    c("NPX", "Quantified")
+    c("NPX", "Quantified", "Ct")
+  ),
+  quant_type = list(
+    c("relative", "absolute", "relative"),
+    c("relative", "absolute"),
+    c("relative", "relative"),
+    c("relative"),
+    c("relative"),
+    c("relative", "absolute")
+  ),
+  base_index = c(
+    NA_integer_,
+    NA_integer_,
+    92L,
+    NA_integer_,
+    NA_integer_,
+    NA_integer_
+  ),
+  wide_format_plate_info = c(
+    TRUE,
+    TRUE,
+    FALSE,
+    NA,
+    NA,
+    TRUE
   )
 )
+
+## Specifications for quantification types in Olink wide excel files ----
+
+olink_parquet_spec <- list(
+  parquet_metadata = c(
+    file_version = "FileVersion",
+    project_name = "ProjectName",
+    sample_matrix = "SampleMatrix",
+    product = "Product",
+    data_file_type = "DataFileType"
+  ),
+  parquet_platforms = c(
+    "ExploreHT",
+    "Explore3072"
+  ),
+  parquet_files = c(
+    "NPX File",
+    "Extended NPX File",
+    "CLI Data Export File",
+    "Internal CLI Data Export File",
+    "R Package Export File"
+  )
+)
+
+# Used in :
+#   - read_npx_wide
+olink_wide_spec <- dplyr::tibble(
+  data_type = c(
+    "NPX",
+    "Ct",
+    "Quantified"
+  ),
+  has_qc_data = c(
+    TRUE,
+    FALSE,
+    TRUE
+  ),
+  n_na_rows = c(
+    2L,
+    1L,
+    2L
+  ),
+  top_matrix_v1 = list(
+    c("Panel", "Assay", "Uniprot ID", "OlinkID"),
+    c("Panel", "Assay", "Uniprot ID", "OlinkID"),
+    c("Panel", "Assay", "Uniprot ID", "OlinkID", "Unit")
+  ),
+  top_matrix_assay_labels = list(
+    c("plate" = "Plate ID", "qc_warn" = "QC Warning"),
+    c("plate" = "Plate ID"),
+    c("plate" = "Plate ID", "qc_warn" = "QC Warning")
+  ),
+  top_matrix_assay_int_ctrl = list(
+    c("Inc Ctrl", "Inc Ctrl 1", "Inc Ctrl 2", "Det Ctrl", "Ext Ctrl"),
+    c("Inc Ctrl", "Inc Ctrl 1", "Inc Ctrl 2", "Det Ctrl", "Ext Ctrl"),
+    c("Inc Ctrl", "Inc Ctrl 1", "Inc Ctrl 2", "Det Ctrl", "Ext Ctrl")
+  ),
+  top_matrix_assay_dev_int_ctrl = list(
+    c("QC Deviation from median"),
+    character(0L),
+    c("QC Deviation from median")
+  ),
+  top_matrix_uniprot_dev_int_ctrl = list(
+    c("Inc Ctrl", "Inc Ctrl 1", "Inc Ctrl 2", "Det Ctrl"),
+    character(0L),
+    c("Inc Ctrl", "Inc Ctrl 1", "Inc Ctrl 2", "Det Ctrl")
+  )
+)
+
+olink_wide_bottom_matrix <-
+  readRDS("inst/extdata/npx_signature_bottom_mat_v1_long.rds")
+
+olink_wide_rename_npxs <-
+  readRDS("inst/extdata/olink_wide_rename_npxs.rds")
 
 ## Acceptable checksum file names ----
 
@@ -87,8 +185,8 @@ accepted_checksum_files <- c(
 #   - read_npx
 #   - get_npx_file
 accepted_npx_file_ext <- c(
-  excel_1       = "xls",
-  excel_2       = "xlsx",
+  excel_1      = "xls",
+  excel_2      = "xlsx",
   delim_1      = "csv",
   delim_2      = "txt",
   parquet_1    = "parquet",
