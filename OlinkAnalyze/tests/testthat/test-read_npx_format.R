@@ -1366,7 +1366,12 @@ test_that(
         # check that the output string is correct
         expect_equal(
           object = df_npx_null$data_cells,
-          expected = colnames(df_synthetic$list_df_long$df_long)
+          expected = colnames(df_synthetic$list_df_long$df_long) |>
+            (\(.x) {
+              .x[!grepl(pattern = "Version",
+                        x = .x,
+                        ignore.case = TRUE)]
+            })()
         )
 
         # check that read_npx_format_get_format works with long_format = TRUE
@@ -1614,7 +1619,12 @@ test_that(
           object = df_npx_false$data_cells,
           expected = df |>
             dplyr::slice_head(n = 1L) |>
-            as.character()
+            as.character() |>
+            (\(.x) {
+              .x[!grepl(pattern = "Version",
+                        x = .x,
+                        ignore.case = TRUE)]
+            })()
         )
 
       }

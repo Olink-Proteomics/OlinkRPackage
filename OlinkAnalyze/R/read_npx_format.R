@@ -427,7 +427,7 @@ read_npx_format_get_format <- function(df,
   # and protein level metric (NPX, Quant or Ct)
   data_cells_wide <- df |>
     dplyr::select(
-      1L
+      dplyr::all_of("V1")
     ) |>
     dplyr::slice(
       2L
@@ -440,7 +440,10 @@ read_npx_format_get_format <- function(df,
       n = 1L
     ) |>
     # convert to character to simplify operations below
-    as.character()
+    as.character() |>
+    # exclude column NPX Signature Version as it results in the function not
+    # recognizing the format
+    (\(.x) .x[!grepl(pattern = "Version", x = .x, ignore.case = TRUE)])()
 
   # Determine long or wide format from file ----
 
