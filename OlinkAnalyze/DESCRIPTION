@@ -53,9 +53,6 @@ Description: A collection of functions to facilitate analysis of proteomic
     package is to help users extract biological insights from proteomic
     data run on the Olink platform.
 License: AGPL (>= 3)
-VignetteBuilder: 
-  kableExtra,
-  knitr
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
