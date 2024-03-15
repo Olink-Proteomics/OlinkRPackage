@@ -34,10 +34,6 @@ test_that(
           version = version
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write wide df
         writeLines("foo", olink_wide_format)
 
@@ -48,7 +44,7 @@ test_that(
               df = df_rand$list_df_wide$df_wide,
               file = olink_wide_format,
               data_type = data_type,
-              format_spec = format_spec
+              format_spec = get_format_spec(data_type = data_type)
             )
           )
         )
@@ -104,10 +100,6 @@ test_that(
           version = version
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write wide df
         writeLines("foo", olink_wide_format)
 
@@ -118,7 +110,7 @@ test_that(
               df = df_rand$list_df_wide$df_wide,
               file = olink_wide_format,
               data_type = data_type,
-              format_spec = format_spec
+              format_spec = get_format_spec(data_type = data_type)
             )
           )
         )
@@ -171,10 +163,6 @@ test_that(
           version = version
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write wide df
         writeLines("foo", olink_wide_format)
 
@@ -185,7 +173,7 @@ test_that(
               df = df_rand$list_df_wide$df_wide,
               file = olink_wide_format,
               data_type = data_type,
-              format_spec = format_spec
+              format_spec = get_format_spec(data_type = data_type)
             )
           )
         )
@@ -249,8 +237,7 @@ test_that(
     )
 
     # matrix specifications
-    format_spec_npx <- olink_wide_spec |>
-      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+    format_spec_npx <- get_format_spec(data_type = data_type)
 
     ### NPX - 2 all-NA + 1 all-NA ----
 
@@ -469,7 +456,6 @@ test_that(
       }
     )
 
-
     ### NPX - 4 all-NA + 3 all-NA ----
 
     withr::with_tempfile(
@@ -572,8 +558,7 @@ test_that(
     )
 
     # matrix specifications
-    format_spec_ct <- olink_wide_spec |>
-      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+    format_spec_ct <- get_format_spec(data_type = data_type)
 
     ### Ct - 2 all-NA ----
 
@@ -734,8 +719,7 @@ test_that(
     )
 
     # matrix specifications
-    format_spec <- olink_wide_spec |>
-      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+    format_spec <- get_format_spec(data_type = data_type)
 
     ## No all-NA rows ----
 
@@ -834,10 +818,6 @@ test_that(
           version = 0L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write wide df
         writeLines("foo", olink_wide_format)
 
@@ -847,7 +827,7 @@ test_that(
             df = df_rand$list_df_wide$df_wide,
             file = olink_wide_format,
             data_type = data_type,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           ),
           regexp = "We identified 1 rows with all columns `NA` in file"
         )
@@ -877,10 +857,6 @@ test_that(
           version = 1L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write wide df
         writeLines("foo", olink_wide_format)
 
@@ -890,7 +866,7 @@ test_that(
             df = df_rand$list_df_wide$df_wide,
             file = olink_wide_format,
             data_type = data_type,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           ),
           regexp = "We identified 2 rows with all columns `NA` in file"
         )
@@ -920,10 +896,6 @@ test_that(
           version = 0L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write wide df
         writeLines("foo", olink_wide_format)
 
@@ -933,7 +905,7 @@ test_that(
             df = df_rand$list_df_wide$df_wide,
             file = olink_wide_format,
             data_type = data_type,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           ),
           regexp = "We identified 1 rows with all columns `NA` in file"
         )
@@ -977,10 +949,6 @@ test_that(
           version = 1L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -989,7 +957,7 @@ test_that(
           object = read_npx_wide_check_top(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -1018,10 +986,6 @@ test_that(
           version = 1L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -1030,7 +994,7 @@ test_that(
           object = read_npx_wide_check_top(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -1059,10 +1023,6 @@ test_that(
           version = 1L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -1071,7 +1031,7 @@ test_that(
           object = read_npx_wide_check_top(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -1100,10 +1060,6 @@ test_that(
           version = 0L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -1112,7 +1068,7 @@ test_that(
           object = read_npx_wide_check_top(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -1141,10 +1097,6 @@ test_that(
           version = 0L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -1153,7 +1105,7 @@ test_that(
           object = read_npx_wide_check_top(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -1182,10 +1134,6 @@ test_that(
           version = 0L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -1194,7 +1142,7 @@ test_that(
           object = read_npx_wide_check_top(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -1223,10 +1171,6 @@ test_that(
           version = 0L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -1235,7 +1179,7 @@ test_that(
           object = read_npx_wide_check_top(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -1264,10 +1208,6 @@ test_that(
           version = 0L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -1276,7 +1216,7 @@ test_that(
           object = read_npx_wide_check_top(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -1325,10 +1265,6 @@ test_that(
             .data[["V1"]] != "OlinkID"
           )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -1337,7 +1273,7 @@ test_that(
           object = read_npx_wide_check_top(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           ),
           regexp = "Column 1 of the top matrix with assay data in file"
         )
@@ -1384,10 +1320,6 @@ test_that(
             df_top_add_row
           )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -1396,7 +1328,7 @@ test_that(
           object = read_npx_wide_check_top(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           ),
           regexp = "Column 1 of the top matrix with assay data in file"
         )
@@ -1448,10 +1380,6 @@ test_that(
             -dplyr::all_of(qc_warn_col)
           )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -1460,7 +1388,7 @@ test_that(
           object = read_npx_wide_check_top(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           ),
           regexp = "does not contain: QC Warning"
         )
@@ -1498,10 +1426,6 @@ test_that(
             -dplyr::all_of(plate_id_col)
           )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -1510,7 +1434,7 @@ test_that(
           object = read_npx_wide_check_top(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           ),
           regexp = "does not contain: Plate ID"
         )
@@ -1548,10 +1472,6 @@ test_that(
             -dplyr::all_of(pid_qcw_col)
           )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -1560,7 +1480,7 @@ test_that(
           object = read_npx_wide_check_top(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           ),
           regexp = "does not contain: Plate ID and QC Warning"
         )
@@ -1584,8 +1504,7 @@ test_that(
     version <- 1L
 
     # matrix specifications
-    format_spec <- olink_wide_spec |>
-      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+    format_spec <- get_format_spec(data_type = data_type)
 
     ## 1 missing int ctrl in 1 panel ----
 
@@ -1753,8 +1672,7 @@ test_that(
     version <- 1L
 
     # matrix specifications
-    format_spec <- olink_wide_spec |>
-      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+    format_spec <- get_format_spec(data_type = data_type)
 
     ## 1 missing int ctrl in 1 panel ----
 
@@ -1942,10 +1860,6 @@ test_that(
           version = 1L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -1955,7 +1869,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -2016,10 +1930,6 @@ test_that(
           version = 1L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -2029,7 +1939,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -2087,10 +1997,6 @@ test_that(
           version = 1L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -2100,7 +2006,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -2158,10 +2064,6 @@ test_that(
           version = 1L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -2171,7 +2073,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -2227,10 +2129,6 @@ test_that(
           version = 0L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -2240,7 +2138,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -2304,10 +2202,6 @@ test_that(
           version = 0L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -2317,7 +2211,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -2378,9 +2272,6 @@ test_that(
           version = 0L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -2390,7 +2281,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -2451,9 +2342,6 @@ test_that(
           version = 0L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -2463,7 +2351,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -2521,9 +2409,6 @@ test_that(
           version = 0L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -2533,7 +2418,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -2591,9 +2476,6 @@ test_that(
           version = 0L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -2603,7 +2485,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -2670,10 +2552,6 @@ test_that(
           version = 1L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -2683,7 +2561,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -2744,10 +2622,6 @@ test_that(
           version = 1L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -2757,7 +2631,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -2815,10 +2689,6 @@ test_that(
           version = 1L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -2828,7 +2698,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -2886,10 +2756,6 @@ test_that(
           version = 1L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -2899,7 +2765,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -2955,10 +2821,6 @@ test_that(
           version = 0L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -2968,7 +2830,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -3032,10 +2894,6 @@ test_that(
           version = 0L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -3045,7 +2903,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -3106,9 +2964,6 @@ test_that(
           version = 0L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -3118,7 +2973,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -3179,9 +3034,6 @@ test_that(
           version = 0L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -3191,7 +3043,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -3249,9 +3101,6 @@ test_that(
           version = 0L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -3261,7 +3110,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -3319,9 +3168,6 @@ test_that(
           version = 0L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -3331,7 +3177,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -3398,10 +3244,6 @@ test_that(
           version = 1L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -3411,7 +3253,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -3472,10 +3314,6 @@ test_that(
           version = 1L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -3485,7 +3323,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -3543,10 +3381,6 @@ test_that(
           version = 1L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -3556,7 +3390,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -3614,10 +3448,6 @@ test_that(
           version = 1L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -3627,7 +3457,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -3683,10 +3513,6 @@ test_that(
           version = 0L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -3696,7 +3522,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -3760,10 +3586,6 @@ test_that(
           version = 0L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -3773,7 +3595,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -3846,10 +3668,6 @@ test_that(
           version = 1L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -3859,7 +3677,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -3920,10 +3738,6 @@ test_that(
           version = 1L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -3933,7 +3747,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -3991,10 +3805,6 @@ test_that(
           version = 1L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -4004,7 +3814,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -4062,10 +3872,6 @@ test_that(
           version = 1L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -4075,7 +3881,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -4131,10 +3937,6 @@ test_that(
           version = 0L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -4144,7 +3946,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -4208,10 +4010,6 @@ test_that(
           version = 0L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -4221,7 +4019,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -4294,10 +4092,6 @@ test_that(
           version = 1L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -4307,7 +4101,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -4368,10 +4162,6 @@ test_that(
           version = 1L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -4381,7 +4171,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -4439,10 +4229,6 @@ test_that(
           version = 1L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -4452,7 +4238,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -4510,10 +4296,6 @@ test_that(
           version = 1L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -4523,7 +4305,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -4579,10 +4361,6 @@ test_that(
           version = 0L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -4592,7 +4370,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -4656,10 +4434,6 @@ test_that(
           version = 0L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -4669,7 +4443,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -4730,9 +4504,6 @@ test_that(
           version = 0L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -4742,7 +4513,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -4803,9 +4574,6 @@ test_that(
           version = 0L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -4815,7 +4583,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -4873,9 +4641,6 @@ test_that(
           version = 0L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -4885,7 +4650,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -4943,9 +4708,6 @@ test_that(
           version = 0L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -4955,7 +4717,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -5022,10 +4784,6 @@ test_that(
           version = 1L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -5035,7 +4793,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -5096,10 +4854,6 @@ test_that(
           version = 1L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -5109,7 +4863,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -5167,10 +4921,6 @@ test_that(
           version = 1L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -5180,7 +4930,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -5238,10 +4988,6 @@ test_that(
           version = 1L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -5251,7 +4997,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -5307,10 +5053,6 @@ test_that(
           version = 0L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -5320,7 +5062,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -5384,10 +5126,6 @@ test_that(
           version = 0L
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -5397,7 +5135,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -5458,9 +5196,6 @@ test_that(
           version = 0L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -5470,7 +5205,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -5531,9 +5266,6 @@ test_that(
           version = 0L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -5543,7 +5275,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -5601,9 +5333,6 @@ test_that(
           version = 0L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -5613,7 +5342,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -5671,9 +5400,6 @@ test_that(
           version = 0L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -5683,7 +5409,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -5751,10 +5477,6 @@ test_that(
           version = version
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -5764,7 +5486,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -5825,10 +5547,6 @@ test_that(
           version = version
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -5838,7 +5556,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -5896,10 +5614,6 @@ test_that(
           version = version
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -5909,7 +5623,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -5967,10 +5681,6 @@ test_that(
           version = version
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -5980,7 +5690,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -6036,10 +5746,6 @@ test_that(
           version = version
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -6049,7 +5755,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -6113,10 +5819,6 @@ test_that(
           version = version
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -6126,7 +5828,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -6187,9 +5889,6 @@ test_that(
           version = version
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -6199,7 +5898,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -6260,9 +5959,6 @@ test_that(
           version = version
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -6272,7 +5968,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -6330,9 +6026,6 @@ test_that(
           version = version
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -6342,7 +6035,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -6400,9 +6093,6 @@ test_that(
           version = version
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -6412,7 +6102,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -6480,10 +6170,6 @@ test_that(
           version = version
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -6493,7 +6179,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -6554,10 +6240,6 @@ test_that(
           version = version
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -6567,7 +6249,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -6625,10 +6307,6 @@ test_that(
           version = version
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -6638,7 +6316,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -6696,10 +6374,6 @@ test_that(
           version = version
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -6709,7 +6383,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -6765,10 +6439,6 @@ test_that(
           version = version
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -6778,7 +6448,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -6842,10 +6512,6 @@ test_that(
           version = version
         )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -6855,7 +6521,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -6916,9 +6582,6 @@ test_that(
           version = version
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -6928,7 +6591,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -6989,9 +6652,6 @@ test_that(
           version = version
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -7001,7 +6661,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -7059,9 +6719,6 @@ test_that(
           version = version
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -7071,7 +6728,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -7129,9 +6786,6 @@ test_that(
           version = version
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -7141,7 +6795,7 @@ test_that(
             df = df_rand$list_df_wide$df_top_wide,
             file = olink_wide_format,
             olink_platform = olink_platform,
-            format_spec = format_spec
+            format_spec = get_format_spec(data_type = data_type)
           )
         )
 
@@ -7209,10 +6863,6 @@ test_that(
       fileext = ".xlsx",
       code = {
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # modify df_top_wide to add a new column with an unrecognizable tag
         df_top_wide_last_v <- ncol(df_rand$list_df_wide$df_top_wide)
         df_top_add_col_cname <- paste0("V", (df_top_wide_last_v + 1L))
@@ -7244,7 +6894,9 @@ test_that(
           object = read_npx_wide_top(df = df_rand$list_df_wide$df_top_wide,
                                      file = olink_wide_format,
                                      olink_platform = olink_platform,
-                                     format_spec = format_spec),
+                                     format_spec = get_format_spec(
+                                       data_type = data_type
+                                     )),
           regexp = "in row `Assay` contains unrecognized values in columns: V49"
         )
 
@@ -7262,10 +6914,6 @@ test_that(
         # synthetic wide df
         data_type <- "Ct"
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -7274,7 +6922,9 @@ test_that(
           object = read_npx_wide_top(df = df_rand$list_df_wide$df_top_wide,
                                      file = olink_wide_format,
                                      olink_platform = olink_platform,
-                                     format_spec = format_spec),
+                                     format_spec = get_format_spec(
+                                       data_type = data_type
+                                     )),
           regexp = "in row `Assay` contains unrecognized values in columns: V48"
         )
 
@@ -7309,8 +6959,7 @@ test_that(
     )
 
     # matrix specifications
-    format_spec <- olink_wide_spec |>
-      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+    format_spec <- get_format_spec(data_type = data_type)
 
     ## OlinkID = NA 1 instance ----
 
@@ -7397,8 +7046,7 @@ test_that(
     version <- 1L
 
     # matrix specifications
-    format_spec <- olink_wide_spec |>
-      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
+    format_spec <- get_format_spec(data_type = data_type)
 
     ## T96 1 panel ----
 
@@ -7505,10 +7153,6 @@ test_that(
             -dplyr::all_of(remove_col)
           )
 
-        # matrix specifications
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # write empty-ish file
         writeLines("foo", olink_wide_format)
 
@@ -7517,7 +7161,9 @@ test_that(
           object = read_npx_wide_top(df = df_rand$list_df_wide$df_top_wide,
                                      file = olink_wide_format,
                                      olink_platform = olink_platform,
-                                     format_spec = format_spec),
+                                     format_spec = get_format_spec(
+                                       data_type = data_type
+                                     )),
           regexp = "Expected equal number of `Plate ID` and `QC\ Warning`"
         )
 
@@ -9552,10 +9198,6 @@ test_that(
       version = 1L
     )
 
-    # matrix specifications
-    format_spec <- olink_wide_spec |>
-      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
     # column names of each subset of data
     names(df_rand$list_df_long$df_top_long) <- strsplit(
       x = names(df_rand$list_df_long$df_top_long),
@@ -9585,7 +9227,7 @@ test_that(
         df_top_list = df_rand$list_df_long$df_top_long,
         df_middle_list = df_rand$list_df_long$df_middle_long,
         data_type = data_type,
-        format_spec = format_spec
+        format_spec = get_format_spec(data_type = data_type)
       )
     )
 
@@ -9628,10 +9270,6 @@ test_that(
       version = 1L
     )
 
-    # matrix specifications
-    format_spec <- olink_wide_spec |>
-      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
     # column names of each subset of data
     names(df_rand$list_df_long$df_top_long) <- strsplit(
       x = names(df_rand$list_df_long$df_top_long),
@@ -9661,7 +9299,7 @@ test_that(
         df_top_list = df_rand$list_df_long$df_top_long,
         df_middle_list = df_rand$list_df_long$df_middle_long,
         data_type = data_type,
-        format_spec = format_spec
+        format_spec = get_format_spec(data_type = data_type)
       )
     )
 
@@ -9704,10 +9342,6 @@ test_that(
       version = 1L
     )
 
-    # matrix specifications
-    format_spec <- olink_wide_spec |>
-      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
     # column names of each subset of data
     names(df_rand$list_df_long$df_top_long) <- strsplit(
       x = names(df_rand$list_df_long$df_top_long),
@@ -9737,7 +9371,7 @@ test_that(
         df_top_list = df_rand$list_df_long$df_top_long,
         df_middle_list = df_rand$list_df_long$df_middle_long,
         data_type = data_type,
-        format_spec = format_spec
+        format_spec = get_format_spec(data_type = data_type)
       )
     )
 
@@ -9780,10 +9414,6 @@ test_that(
       version = 1L
     )
 
-    # matrix specifications
-    format_spec <- olink_wide_spec |>
-      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
     # column names of each subset of data
     names(df_rand$list_df_long$df_top_long) <- strsplit(
       x = names(df_rand$list_df_long$df_top_long),
@@ -9813,7 +9443,7 @@ test_that(
         df_top_list = df_rand$list_df_long$df_top_long,
         df_middle_list = df_rand$list_df_long$df_middle_long,
         data_type = data_type,
-        format_spec = format_spec
+        format_spec = get_format_spec(data_type = data_type)
       )
     )
 
@@ -9857,10 +9487,6 @@ test_that(
       version = 0L
     )
 
-    # matrix specifications
-    format_spec <- olink_wide_spec |>
-      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
     # column names of each subset of data
     names(df_rand$list_df_long$df_top_long) <- strsplit(
       x = names(df_rand$list_df_long$df_top_long),
@@ -9890,7 +9516,7 @@ test_that(
         df_top_list = df_rand$list_df_long$df_top_long,
         df_middle_list = df_rand$list_df_long$df_middle_long,
         data_type = data_type,
-        format_spec = format_spec
+        format_spec = get_format_spec(data_type = data_type)
       )
     )
 
@@ -9933,10 +9559,6 @@ test_that(
       version = 0L
     )
 
-    # matrix specifications
-    format_spec <- olink_wide_spec |>
-      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
     # column names of each subset of data
     names(df_rand$list_df_long$df_top_long) <- strsplit(
       x = names(df_rand$list_df_long$df_top_long),
@@ -9966,7 +9588,7 @@ test_that(
         df_top_list = df_rand$list_df_long$df_top_long,
         df_middle_list = df_rand$list_df_long$df_middle_long,
         data_type = data_type,
-        format_spec = format_spec
+        format_spec = get_format_spec(data_type = data_type)
       )
     )
 
@@ -10009,10 +9631,6 @@ test_that(
       version = 0L
     )
 
-    # matrix specifications
-    format_spec <- olink_wide_spec |>
-      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
     # column names of each subset of data
     names(df_rand$list_df_long$df_top_long) <- strsplit(
       x = names(df_rand$list_df_long$df_top_long),
@@ -10042,7 +9660,7 @@ test_that(
         df_top_list = df_rand$list_df_long$df_top_long,
         df_middle_list = df_rand$list_df_long$df_middle_long,
         data_type = data_type,
-        format_spec = format_spec
+        format_spec = get_format_spec(data_type = data_type)
       )
     )
 
@@ -10085,10 +9703,6 @@ test_that(
       version = 0L
     )
 
-    # matrix specifications
-    format_spec <- olink_wide_spec |>
-      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
     # column names of each subset of data
     names(df_rand$list_df_long$df_top_long) <- strsplit(
       x = names(df_rand$list_df_long$df_top_long),
@@ -10118,7 +9732,7 @@ test_that(
         df_top_list = df_rand$list_df_long$df_top_long,
         df_middle_list = df_rand$list_df_long$df_middle_long,
         data_type = data_type,
-        format_spec = format_spec
+        format_spec = get_format_spec(data_type = data_type)
       )
     )
 
@@ -10161,10 +9775,6 @@ test_that(
       version = 0L
     )
 
-    # matrix specifications
-    format_spec <- olink_wide_spec |>
-      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
     # column names of each subset of data
     names(df_rand$list_df_long$df_top_long) <- strsplit(
       x = names(df_rand$list_df_long$df_top_long),
@@ -10194,7 +9804,7 @@ test_that(
         df_top_list = df_rand$list_df_long$df_top_long,
         df_middle_list = df_rand$list_df_long$df_middle_long,
         data_type = data_type,
-        format_spec = format_spec
+        format_spec = get_format_spec(data_type = data_type)
       )
     )
 
@@ -10237,10 +9847,6 @@ test_that(
       version = 0L
     )
 
-    # matrix specifications
-    format_spec <- olink_wide_spec |>
-      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
     # column names of each subset of data
     names(df_rand$list_df_long$df_top_long) <- strsplit(
       x = names(df_rand$list_df_long$df_top_long),
@@ -10270,7 +9876,7 @@ test_that(
         df_top_list = df_rand$list_df_long$df_top_long,
         df_middle_list = df_rand$list_df_long$df_middle_long,
         data_type = data_type,
-        format_spec = format_spec
+        format_spec = get_format_spec(data_type = data_type)
       )
     )
 
@@ -10325,10 +9931,6 @@ test_that(
       version = 1L
     )
 
-    # matrix specifications
-    format_spec <- olink_wide_spec |>
-      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
     # column names of each subset of data
     names(df_rand$list_df_long$df_top_long) <- strsplit(
       x = names(df_rand$list_df_long$df_top_long),
@@ -10358,7 +9960,7 @@ test_that(
         df_top_list = df_rand$list_df_long$df_top_long,
         df_middle_list = df_rand$list_df_long$df_middle_long,
         data_type = data_type,
-        format_spec = format_spec
+        format_spec = get_format_spec(data_type = data_type)
       )
     )
 
@@ -10401,10 +10003,6 @@ test_that(
       version = 1L
     )
 
-    # matrix specifications
-    format_spec <- olink_wide_spec |>
-      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
     # column names of each subset of data
     names(df_rand$list_df_long$df_top_long) <- strsplit(
       x = names(df_rand$list_df_long$df_top_long),
@@ -10434,7 +10032,7 @@ test_that(
         df_top_list = df_rand$list_df_long$df_top_long,
         df_middle_list = df_rand$list_df_long$df_middle_long,
         data_type = data_type,
-        format_spec = format_spec
+        format_spec = get_format_spec(data_type = data_type)
       )
     )
 
@@ -10477,10 +10075,6 @@ test_that(
       version = 1L
     )
 
-    # matrix specifications
-    format_spec <- olink_wide_spec |>
-      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
     # column names of each subset of data
     names(df_rand$list_df_long$df_top_long) <- strsplit(
       x = names(df_rand$list_df_long$df_top_long),
@@ -10510,7 +10104,7 @@ test_that(
         df_top_list = df_rand$list_df_long$df_top_long,
         df_middle_list = df_rand$list_df_long$df_middle_long,
         data_type = data_type,
-        format_spec = format_spec
+        format_spec = get_format_spec(data_type = data_type)
       )
     )
 
@@ -10553,10 +10147,6 @@ test_that(
       version = 1L
     )
 
-    # matrix specifications
-    format_spec <- olink_wide_spec |>
-      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
     # column names of each subset of data
     names(df_rand$list_df_long$df_top_long) <- strsplit(
       x = names(df_rand$list_df_long$df_top_long),
@@ -10586,7 +10176,7 @@ test_that(
         df_top_list = df_rand$list_df_long$df_top_long,
         df_middle_list = df_rand$list_df_long$df_middle_long,
         data_type = data_type,
-        format_spec = format_spec
+        format_spec = get_format_spec(data_type = data_type)
       )
     )
 
@@ -10630,10 +10220,6 @@ test_that(
       version = 0L
     )
 
-    # matrix specifications
-    format_spec <- olink_wide_spec |>
-      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
     # column names of each subset of data
     names(df_rand$list_df_long$df_top_long) <- strsplit(
       x = names(df_rand$list_df_long$df_top_long),
@@ -10663,7 +10249,7 @@ test_that(
         df_top_list = df_rand$list_df_long$df_top_long,
         df_middle_list = df_rand$list_df_long$df_middle_long,
         data_type = data_type,
-        format_spec = format_spec
+        format_spec = get_format_spec(data_type = data_type)
       )
     )
 
@@ -10706,10 +10292,6 @@ test_that(
       version = 0L
     )
 
-    # matrix specifications
-    format_spec <- olink_wide_spec |>
-      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
     # column names of each subset of data
     names(df_rand$list_df_long$df_top_long) <- strsplit(
       x = names(df_rand$list_df_long$df_top_long),
@@ -10739,7 +10321,7 @@ test_that(
         df_top_list = df_rand$list_df_long$df_top_long,
         df_middle_list = df_rand$list_df_long$df_middle_long,
         data_type = data_type,
-        format_spec = format_spec
+        format_spec = get_format_spec(data_type = data_type)
       )
     )
 
@@ -10782,10 +10364,6 @@ test_that(
       version = 0L
     )
 
-    # matrix specifications
-    format_spec <- olink_wide_spec |>
-      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
     # column names of each subset of data
     names(df_rand$list_df_long$df_top_long) <- strsplit(
       x = names(df_rand$list_df_long$df_top_long),
@@ -10815,7 +10393,7 @@ test_that(
         df_top_list = df_rand$list_df_long$df_top_long,
         df_middle_list = df_rand$list_df_long$df_middle_long,
         data_type = data_type,
-        format_spec = format_spec
+        format_spec = get_format_spec(data_type = data_type)
       )
     )
 
@@ -10858,10 +10436,6 @@ test_that(
       version = 0L
     )
 
-    # matrix specifications
-    format_spec <- olink_wide_spec |>
-      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
     # column names of each subset of data
     names(df_rand$list_df_long$df_top_long) <- strsplit(
       x = names(df_rand$list_df_long$df_top_long),
@@ -10891,7 +10465,7 @@ test_that(
         df_top_list = df_rand$list_df_long$df_top_long,
         df_middle_list = df_rand$list_df_long$df_middle_long,
         data_type = data_type,
-        format_spec = format_spec
+        format_spec = get_format_spec(data_type = data_type)
       )
     )
 
@@ -10934,10 +10508,6 @@ test_that(
       version = 0L
     )
 
-    # matrix specifications
-    format_spec <- olink_wide_spec |>
-      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
     # column names of each subset of data
     names(df_rand$list_df_long$df_top_long) <- strsplit(
       x = names(df_rand$list_df_long$df_top_long),
@@ -10967,7 +10537,7 @@ test_that(
         df_top_list = df_rand$list_df_long$df_top_long,
         df_middle_list = df_rand$list_df_long$df_middle_long,
         data_type = data_type,
-        format_spec = format_spec
+        format_spec = get_format_spec(data_type = data_type)
       )
     )
 
@@ -11010,10 +10580,6 @@ test_that(
       version = 0L
     )
 
-    # matrix specifications
-    format_spec <- olink_wide_spec |>
-      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
     # column names of each subset of data
     names(df_rand$list_df_long$df_top_long) <- strsplit(
       x = names(df_rand$list_df_long$df_top_long),
@@ -11043,7 +10609,7 @@ test_that(
         df_top_list = df_rand$list_df_long$df_top_long,
         df_middle_list = df_rand$list_df_long$df_middle_long,
         data_type = data_type,
-        format_spec = format_spec
+        format_spec = get_format_spec(data_type = data_type)
       )
     )
 
@@ -11119,10 +10685,6 @@ test_that(
       values = df_rand_top_long_tmp
     )
 
-    # matrix specifications
-    format_spec <- olink_wide_spec |>
-      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
     # column names of each subset of data
     names(df_rand_top_long) <- strsplit(
       x = names(df_rand_top_long),
@@ -11152,7 +10714,7 @@ test_that(
         df_top_list = df_rand_top_long,
         df_middle_list = df_rand$list_df_long$df_middle_long,
         data_type = data_type,
-        format_spec = format_spec
+        format_spec = get_format_spec(data_type = data_type)
       )
     )
 
@@ -11214,9 +10776,6 @@ test_that(
           version = 1L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
                             function(x) x$col_index)
@@ -11253,7 +10812,7 @@ test_that(
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
-            format_spec = format_spec,
+            format_spec = get_format_spec(data_type = data_type),
             df_plate_panel = df_plate_panel
           )
         )
@@ -11305,9 +10864,6 @@ test_that(
           version = 1L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
                             function(x) x$col_index)
@@ -11351,7 +10907,7 @@ test_that(
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
-            format_spec = format_spec,
+            format_spec = get_format_spec(data_type = data_type),
             df_plate_panel = df_plate_panel
           )
         )
@@ -11409,9 +10965,6 @@ test_that(
           version = 2L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
                             function(x) x$col_index)
@@ -11448,7 +11001,7 @@ test_that(
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
-            format_spec = format_spec,
+            format_spec = get_format_spec(data_type = data_type),
             df_plate_panel = df_plate_panel
           )
         )
@@ -11500,9 +11053,6 @@ test_that(
           version = 2L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
                             function(x) x$col_index)
@@ -11546,7 +11096,7 @@ test_that(
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
-            format_spec = format_spec,
+            format_spec = get_format_spec(data_type = data_type),
             df_plate_panel = df_plate_panel
           )
         )
@@ -11604,9 +11154,6 @@ test_that(
           version = 0L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
                             function(x) x$col_index)
@@ -11643,7 +11190,7 @@ test_that(
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
-            format_spec = format_spec,
+            format_spec = get_format_spec(data_type = data_type),
             df_plate_panel = df_plate_panel
           )
         )
@@ -11695,9 +11242,6 @@ test_that(
           version = 0L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
                             function(x) x$col_index)
@@ -11741,7 +11285,7 @@ test_that(
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
-            format_spec = format_spec,
+            format_spec = get_format_spec(data_type = data_type),
             df_plate_panel = df_plate_panel
           )
         )
@@ -11812,9 +11356,6 @@ test_that(
           version = 1L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
                             function(x) x$col_index)
@@ -11851,7 +11392,7 @@ test_that(
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
-            format_spec = format_spec,
+            format_spec = get_format_spec(data_type = data_type),
             df_plate_panel = df_plate_panel
           )
         )
@@ -11903,9 +11444,6 @@ test_that(
           version = 1L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
                             function(x) x$col_index)
@@ -11949,7 +11487,7 @@ test_that(
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
-            format_spec = format_spec,
+            format_spec = get_format_spec(data_type = data_type),
             df_plate_panel = df_plate_panel
           )
         )
@@ -12007,9 +11545,6 @@ test_that(
           version = 2L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
                             function(x) x$col_index)
@@ -12046,7 +11581,7 @@ test_that(
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
-            format_spec = format_spec,
+            format_spec = get_format_spec(data_type = data_type),
             df_plate_panel = df_plate_panel
           )
         )
@@ -12098,9 +11633,6 @@ test_that(
           version = 2L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
                             function(x) x$col_index)
@@ -12144,7 +11676,7 @@ test_that(
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
-            format_spec = format_spec,
+            format_spec = get_format_spec(data_type = data_type),
             df_plate_panel = df_plate_panel
           )
         )
@@ -12202,9 +11734,6 @@ test_that(
           version = 0L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
                             function(x) x$col_index)
@@ -12241,7 +11770,7 @@ test_that(
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
-            format_spec = format_spec,
+            format_spec = get_format_spec(data_type = data_type),
             df_plate_panel = df_plate_panel
           )
         )
@@ -12293,9 +11822,6 @@ test_that(
           version = 0L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
                             function(x) x$col_index)
@@ -12339,7 +11865,7 @@ test_that(
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
-            format_spec = format_spec,
+            format_spec = get_format_spec(data_type = data_type),
             df_plate_panel = df_plate_panel
           )
         )
@@ -12410,9 +11936,6 @@ test_that(
           version = 1L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
                             function(x) x$col_index)
@@ -12449,7 +11972,7 @@ test_that(
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
-            format_spec = format_spec,
+            format_spec = get_format_spec(data_type = data_type),
             df_plate_panel = df_plate_panel
           )
         )
@@ -12501,9 +12024,6 @@ test_that(
           version = 1L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
                             function(x) x$col_index)
@@ -12547,7 +12067,7 @@ test_that(
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
-            format_spec = format_spec,
+            format_spec = get_format_spec(data_type = data_type),
             df_plate_panel = df_plate_panel
           )
         )
@@ -12605,9 +12125,6 @@ test_that(
           version = 2L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
                             function(x) x$col_index)
@@ -12644,7 +12161,7 @@ test_that(
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
-            format_spec = format_spec,
+            format_spec = get_format_spec(data_type = data_type),
             df_plate_panel = df_plate_panel
           )
         )
@@ -12696,9 +12213,6 @@ test_that(
           version = 2L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
                             function(x) x$col_index)
@@ -12742,7 +12256,7 @@ test_that(
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
-            format_spec = format_spec,
+            format_spec = get_format_spec(data_type = data_type),
             df_plate_panel = df_plate_panel
           )
         )
@@ -12800,9 +12314,6 @@ test_that(
           version = 0L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
                             function(x) x$col_index)
@@ -12839,7 +12350,7 @@ test_that(
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
-            format_spec = format_spec,
+            format_spec = get_format_spec(data_type = data_type),
             df_plate_panel = df_plate_panel
           )
         )
@@ -12891,9 +12402,6 @@ test_that(
           version = 0L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
                             function(x) x$col_index)
@@ -12937,7 +12445,7 @@ test_that(
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
-            format_spec = format_spec,
+            format_spec = get_format_spec(data_type = data_type),
             df_plate_panel = df_plate_panel
           )
         )
@@ -13008,9 +12516,6 @@ test_that(
           version = 1L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
                             function(x) x$col_index)
@@ -13047,7 +12552,7 @@ test_that(
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
-            format_spec = format_spec,
+            format_spec = get_format_spec(data_type = data_type),
             df_plate_panel = df_plate_panel
           )
         )
@@ -13099,9 +12604,6 @@ test_that(
           version = 1L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
                             function(x) x$col_index)
@@ -13145,7 +12647,7 @@ test_that(
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
-            format_spec = format_spec,
+            format_spec = get_format_spec(data_type = data_type),
             df_plate_panel = df_plate_panel
           )
         )
@@ -13203,9 +12705,6 @@ test_that(
           version = 2L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
                             function(x) x$col_index)
@@ -13242,7 +12741,7 @@ test_that(
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
-            format_spec = format_spec,
+            format_spec = get_format_spec(data_type = data_type),
             df_plate_panel = df_plate_panel
           )
         )
@@ -13294,9 +12793,6 @@ test_that(
           version = 2L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
                             function(x) x$col_index)
@@ -13340,7 +12836,7 @@ test_that(
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
-            format_spec = format_spec,
+            format_spec = get_format_spec(data_type = data_type),
             df_plate_panel = df_plate_panel
           )
         )
@@ -13398,9 +12894,6 @@ test_that(
           version = 0L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
                             function(x) x$col_index)
@@ -13437,7 +12930,7 @@ test_that(
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
-            format_spec = format_spec,
+            format_spec = get_format_spec(data_type = data_type),
             df_plate_panel = df_plate_panel
           )
         )
@@ -13489,9 +12982,6 @@ test_that(
           version = 0L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
                             function(x) x$col_index)
@@ -13535,7 +13025,7 @@ test_that(
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
-            format_spec = format_spec,
+            format_spec = get_format_spec(data_type = data_type),
             df_plate_panel = df_plate_panel
           )
         )
@@ -13596,9 +13086,6 @@ test_that(
       version = 3L
     )
 
-    format_spec <- olink_wide_spec |>
-      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
     # column names of each subset of data
     col_names <- sapply(df_rand$list_df_long$df_top_long,
                         function(x) x$col_index)
@@ -13649,7 +13136,7 @@ test_that(
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
-            format_spec = format_spec,
+            format_spec = get_format_spec(data_type = data_type),
             df_plate_panel = df_plate_panel
           )
         )
@@ -13710,9 +13197,6 @@ test_that(
       version = 1L
     )
 
-    format_spec <- olink_wide_spec |>
-      dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
     # column names of each subset of data
     col_names <- sapply(df_rand$list_df_long$df_top_long,
                         function(x) x$col_index)
@@ -13756,7 +13240,7 @@ test_that(
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
-            format_spec = format_spec,
+            format_spec = get_format_spec(data_type = data_type),
             df_plate_panel = df_plate_panel
           )
         )
@@ -13820,9 +13304,6 @@ test_that(
           version = 1L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
                             function(x) x$col_index)
@@ -13868,7 +13349,7 @@ test_that(
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
-            format_spec = format_spec,
+            format_spec = get_format_spec(data_type = data_type),
             df_plate_panel = df_plate_panel
           ),
           regexp = "Unexpected values in column 1 of the bottom matrix with QC"
@@ -13899,9 +13380,6 @@ test_that(
           version = 0L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
                             function(x) x$col_index)
@@ -13938,7 +13416,7 @@ test_that(
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
-            format_spec = format_spec,
+            format_spec = get_format_spec(data_type = data_type),
             df_plate_panel = df_plate_panel
           ),
           regexp = "Unexpected values in column 1 of the bottom matrix with QC"
@@ -13969,9 +13447,6 @@ test_that(
           version = 0L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
                             function(x) x$col_index)
@@ -14017,7 +13492,7 @@ test_that(
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
-            format_spec = format_spec,
+            format_spec = get_format_spec(data_type = data_type),
             df_plate_panel = df_plate_panel
           ),
           regexp = "Unexpected values in column 1 of the bottom matrix with QC"
@@ -14048,9 +13523,6 @@ test_that(
           version = 1L
         )
 
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
-
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
                             function(x) x$col_index)
@@ -14096,7 +13568,7 @@ test_that(
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
-            format_spec = format_spec,
+            format_spec = get_format_spec(data_type = data_type),
             df_plate_panel = df_plate_panel
           ),
           regexp = "Unexpected values in column 1 of the bottom matrix with QC"
@@ -14131,9 +13603,6 @@ test_that(
           show_int_ctrl = FALSE,
           version = 0L
         )
-
-        format_spec <- olink_wide_spec |>
-          dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
         # column names of each subset of data
         col_names <- sapply(df_rand$list_df_long$df_top_long,
@@ -14179,7 +13648,7 @@ test_that(
             olink_platform = olink_platform,
             data_type = data_type,
             col_names = col_names,
-            format_spec = format_spec,
+            format_spec = get_format_spec(data_type = data_type),
             df_plate_panel = df_plate_panel
           ),
           regexp = "Column 1 of the bottom matrix does not contain the same"
