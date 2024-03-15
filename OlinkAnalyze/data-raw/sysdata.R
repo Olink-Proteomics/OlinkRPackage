@@ -45,12 +45,12 @@ rm(utils_spec_file)
 
 # olink_wide_bottom_mat_spec.R ----
 
-olink_wide_bottom_mat_spec_file <- system.file("data-raw",
-                                               "olink_wide_bottom_mat_spec.R",
-                                               package = "OlinkAnalyze",
-                                               mustWork = TRUE)
-source(olink_wide_bottom_mat_spec_file)
-rm(olink_wide_bottom_mat_spec_file)
+olink_wide_bottom_mat_spec_fil <- system.file("data-raw",
+                                              "olink_wide_bottom_mat_spec.R",
+                                              package = "OlinkAnalyze",
+                                              mustWork = TRUE)
+source(olink_wide_bottom_mat_spec_fil)
+rm(olink_wide_bottom_mat_spec_fil)
 
 # save to R/syssata.rda ----
 
