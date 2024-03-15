@@ -144,6 +144,8 @@ test_that(
 test_that(
   "check is arrow object - csv - TRUE",
   {
+    skip_on_cran()
+    skip_if_not_installed("withr")
 
     withr::with_tempfile(
       new = "dfile_test",
@@ -208,6 +210,8 @@ test_that(
 test_that(
   "check is arrow object - parquet - TRUE",
   {
+    skip_on_cran()
+    skip_if_not_installed("withr")
 
     withr::with_tempfile(
       new = "pfile_test",
@@ -438,6 +442,8 @@ test_that(
 test_that(
   "check is tibble - csv - TRUE",
   {
+    skip_on_cran()
+    skip_if_not_installed("withr")
 
     withr::with_tempfile(
       new = "dfile_test",
@@ -508,6 +514,8 @@ test_that(
 test_that(
   "check is tibble - parquet - TRUE",
   {
+    skip_on_cran()
+    skip_if_not_installed("withr")
 
     withr::with_tempfile(
       new = "pfile_test",
@@ -693,6 +701,9 @@ test_that(
 test_that(
   "check_is_arrow_or_tibble - works - csv to tibble or arrow",
   {
+    skip_on_cran()
+    skip_if_not_installed("withr")
+
     ## tibble ----
 
     withr::with_tempfile(
@@ -821,6 +832,9 @@ test_that(
 test_that(
   "check_is_arrow_or_tibble - works - parquet to arrow or tibble",
   {
+    skip_on_cran()
+    skip_if_not_installed("withr")
+
     ## arrow ----
 
     withr::with_tempfile(
