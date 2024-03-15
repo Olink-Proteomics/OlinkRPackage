@@ -43,10 +43,14 @@ utils_spec_file <- system.file("data-raw",
 source(utils_spec_file)
 rm(utils_spec_file)
 
-# others ----
+# olink_wide_bottom_mat_spec.R ----
 
-olink_wide_bottom_matrix <-
-  readRDS("inst/extdata/npx_signature_bottom_mat_v1_long.rds")
+olink_wide_bottom_mat_spec_file <- system.file("data-raw",
+                                               "olink_wide_bottom_mat_spec.R",
+                                               package = "OlinkAnalyze",
+                                               mustWork = TRUE)
+source(olink_wide_bottom_mat_spec_file)
+rm(olink_wide_bottom_mat_spec_file)
 
 # save to R/syssata.rda ----
 
