@@ -5,6 +5,8 @@
 test_that(
   "Non-zip input is handled - random file",
   {
+    skip_if_not_installed("zip")
+
     withr::with_tempfile(
       new = "txtfile_z",
       pattern = "txt-file_as_zip-file",
@@ -35,6 +37,8 @@ test_that(
 test_that(
   "Non-zip input is handled - corrupt zip file",
   {
+    skip_if_not_installed("zip")
+
     withr::with_tempfile(
       new = "txtfile_zcorrupt",
       pattern = "txt-file_as_corrupt-zip-file",
