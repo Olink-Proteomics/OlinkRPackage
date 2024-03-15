@@ -4,7 +4,7 @@
 # rename local names from Olink wide files to match equivalent long export ----
 
 olink_wide_rename_npxs <- dplyr::tribble(
-  ~OA_internal, ~NPXS,
+  ~OA_internal,                  ~NPXS,
   "SampleID",                    "SampleID",
   "Ct",                          "Ct",
   "Panel",                       "Panel",
