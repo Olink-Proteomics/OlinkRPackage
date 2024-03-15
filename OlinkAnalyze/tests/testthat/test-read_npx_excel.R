@@ -1,6 +1,8 @@
 test_that(
   "read_npx_excel - works - wide format",
   {
+    skip_if_not_installed("writexl")
+
     # get wide synthetic data
     df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 96",
                                             data_type = "NPX",
@@ -91,6 +93,8 @@ test_that(
 test_that(
   "read_npx_excel - works - long format",
   {
+    skip_if_not_installed("writexl")
+
     # get wide synthetic data
     df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 96",
                                             data_type = "NPX",
@@ -219,6 +223,8 @@ test_that(
 test_that(
   "read_npx_excel - error - df has one column only",
   {
+    skip_if_not_installed("writexl")
+
     withr::with_tempfile(
       new = "excel_file",
       pattern = "excel-file-test",

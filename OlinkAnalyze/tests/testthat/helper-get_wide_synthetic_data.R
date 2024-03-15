@@ -50,8 +50,15 @@ get_wide_synthetic_data <- function(olink_platform,
   return(df_synthetic)
 }
 
-## Compute num of rows of output df ----
+# function to get the format specifications for wide files
+get_format_spec <- function(data_type) {
+  format_spec <- olink_wide_spec |>
+    dplyr::filter(.data[["data_type"]] == .env[["data_type"]])
 
+  return(format_spec)
+}
+
+# Compute num of rows of output df
 olink_wide2long_rows <- function(n_panels,
                                  n_assays,
                                  n_samples,

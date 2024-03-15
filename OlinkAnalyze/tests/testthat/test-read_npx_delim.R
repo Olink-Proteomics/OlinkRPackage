@@ -429,6 +429,7 @@ test_that(
 test_that(
   "check_field_separator - error - sep not a scalar string",
   {
+    skip_on_cran()
 
     withr::with_tempfile(
       new = "cfile_test",
@@ -473,6 +474,7 @@ test_that(
 test_that(
   "check_field_separator - error - sep is scalar string but not accepted",
   {
+    skip_on_cran()
 
     withr::with_tempfile(
       new = "cfile_test",
@@ -517,6 +519,7 @@ test_that(
 test_that(
   "check_field_separator - works - long format - sep is NULL",
   {
+    skip_on_cran()
 
     withr::with_tempfile(
       new = c("cdfile_test", "scdfile_test"),
@@ -604,6 +607,7 @@ test_that(
 test_that(
   "check_field_separator - works - wide format - sep is NULL",
   {
+    skip_on_cran()
 
     withr::with_tempfile(
       new = c("cdfile_test", "scdfile_test"),
@@ -689,6 +693,7 @@ test_that(
 test_that(
   "check_field_separator - works - long format - sep is correct",
   {
+    skip_on_cran()
 
     withr::with_tempfile(
       new = c("cdfile_test", "scdfile_test"),
@@ -776,6 +781,7 @@ test_that(
 test_that(
   "check_field_separator - works - wide format - sep is correct",
   {
+    skip_on_cran()
 
     withr::with_tempfile(
       new = c("cdfile_test", "scdfile_test"),
@@ -863,6 +869,7 @@ test_that(
 test_that(
   "get_field_separator - error - empty header or file",
   {
+    skip_on_cran()
 
     withr::with_tempfile(
       new = "tfile_empty",
@@ -891,6 +898,7 @@ test_that(
 test_that(
   "get_field_separator - works - semicolon",
   {
+    skip_on_cran()
 
     withr::with_tempfile(
       new = "tfile_semicolon",
@@ -919,6 +927,7 @@ test_that(
 test_that(
   "get_field_separator - works - comma",
   {
+    skip_on_cran()
 
     withr::with_tempfile(
       new = "tfile_comma",
@@ -947,6 +956,7 @@ test_that(
 test_that(
   "get_field_separator - error - wrong sep",
   {
+    skip_on_cran()
 
     withr::with_tempfile(
       new = "tfile_hashtag",
@@ -975,6 +985,7 @@ test_that(
 test_that(
   "get_field_separator - error - both comma and semicolon",
   {
+    skip_on_cran()
 
     withr::with_tempfile(
       new = "tfile_mixed",

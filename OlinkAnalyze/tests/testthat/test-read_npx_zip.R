@@ -5,6 +5,8 @@
 test_that(
   "Non-zip input is handled - random file",
   {
+    skip_if_not_installed("zip")
+
     withr::with_tempfile(
       new = "txtfile_z",
       pattern = "txt-file_as_zip-file",
@@ -35,6 +37,8 @@ test_that(
 test_that(
   "Non-zip input is handled - corrupt zip file",
   {
+    skip_if_not_installed("zip")
+
     withr::with_tempfile(
       new = "txtfile_zcorrupt",
       pattern = "txt-file_as_corrupt-zip-file",
@@ -66,6 +70,8 @@ test_that(
 test_that(
   "read NPX zip - no checsum or NPX file",
   {
+    skip_if_not_installed("zip")
+
     readme_file <- file.path(tempdir(),
                              "README.txt")
     writeLines("foo", readme_file)
@@ -103,6 +109,8 @@ test_that(
 test_that(
   "read NPX zip - NPX file only",
   {
+    skip_if_not_installed("zip")
+
     withr::with_tempfile(
       new = "nfile_test",
       pattern = "npx",
@@ -173,6 +181,8 @@ test_that(
 test_that(
   "read NPX zip - NPX and README files only",
   {
+    skip_if_not_installed("zip")
+
     readmefile_test <- file.path(tempdir(),
                                  "README.txt")
     writeLines("foo", readmefile_test)
@@ -252,6 +262,8 @@ test_that(
 test_that(
   "read NPX zip - NPX, README and random non-npx",
   {
+    skip_if_not_installed("zip")
+
     readmefile_test <- file.path(tempdir(),
                                  "README.txt")
     writeLines("foo", readmefile_test)
@@ -347,6 +359,8 @@ test_that(
 test_that(
   "read NPX zip - NPX, README and random non-npx - .ignore_files works v1",
   {
+    skip_if_not_installed("zip")
+
     readmefile_test <- file.path(tempdir(),
                                  "README.txt")
     writeLines("foo", readmefile_test)
@@ -444,6 +458,8 @@ test_that(
 test_that(
   "read NPX zip - NPX, README and random npx - .ignore_files works v2",
   {
+    skip_if_not_installed("zip")
+
     readmefile_test <- file.path(tempdir(),
                                  "README.txt")
     writeLines("foo", readmefile_test)
@@ -539,6 +555,8 @@ test_that(
 test_that(
   "read NPX zip - NPX, README and MD5 checksum",
   {
+    skip_if_not_installed("zip")
+
     readmefile_test <- file.path(tempdir(),
                                  "README.txt")
     writeLines("foo", readmefile_test)
@@ -649,6 +667,8 @@ test_that(
 test_that(
   "read NPX zip - NPX and MD5 checksum",
   {
+    skip_if_not_installed("zip")
+
     checksumfile_test <- file.path(tempdir(),
                                    "MD5_checksum.txt")
 
@@ -733,6 +753,8 @@ test_that(
 test_that(
   "read NPX zip - NPX, README and SHA256 checksum",
   {
+    skip_if_not_installed("zip")
+
     readmefile_test <- file.path(tempdir(),
                                  "README.txt")
     writeLines("foo", readmefile_test)
@@ -844,6 +866,8 @@ test_that(
 test_that(
   "read NPX zip - NPX and SHA256 checksum",
   {
+    skip_if_not_installed("zip")
+
     checksumfile_test <- file.path(tempdir(),
                                    "checksum_sha256.txt")
 
@@ -930,6 +954,8 @@ test_that(
 test_that(
   "read NPX zip - NPX, README and wrong checksum",
   {
+    skip_if_not_installed("zip")
+
     readmefile_test <- file.path(tempdir(),
                                  "README.txt")
     writeLines("foo", readmefile_test)
@@ -1015,6 +1041,8 @@ test_that(
 test_that(
   "read NPX zip - NPX, README and wrong checksum",
   {
+    skip_if_not_installed("zip")
+
     checksumfile_test <- file.path(tempdir(),
                                    "checksum_sha256.txt")
 
