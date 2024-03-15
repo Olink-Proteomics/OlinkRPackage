@@ -3,6 +3,8 @@
 test_that(
   "read_npx_format - works - long",
   {
+    skip_if_not_installed("writexl")
+
     # get wide synthetic data
     df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
                                             data_type = "NPX",
@@ -393,6 +395,8 @@ test_that(
 test_that(
   "read_npx_format - works - wide",
   {
+    skip_if_not_installed("writexl")
+
     # get wide synthetic data
     df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
                                             data_type = "NPX",
@@ -821,6 +825,8 @@ test_that(
 test_that(
   "read_npx_format_read - works",
   {
+    skip_if_not_installed("writexl")
+
     # get wide synthetic data
     df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
                                             data_type = "Quantified",
