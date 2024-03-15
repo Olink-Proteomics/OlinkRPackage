@@ -826,6 +826,7 @@ test_that(
   "read_npx_format_read - works",
   {
     skip_if_not_installed("writexl")
+    skip_on_cran()
 
     # get wide synthetic data
     df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
@@ -1172,6 +1173,8 @@ test_that(
 test_that(
   "read_npx_format_read - error - unknown file type",
   {
+    skip_on_cran()
+
     withr::with_tempfile(
       new = "olink_wide_format",
       pattern = "test-olink-wide",
@@ -1217,6 +1220,8 @@ test_that(
 test_that(
   "read_npx_format_get_format - works - wide",
   {
+    skip_on_cran()
+
     withr::with_tempfile(
       new = "excel_wide",
       pattern = "test_excel_npx_wide",
@@ -1304,6 +1309,8 @@ test_that(
 test_that(
   "read_npx_format_get_format - works - long",
   {
+    skip_on_cran()
+
     withr::with_tempfile(
       new = "excel_long",
       pattern = "test_excel_npx_long",
@@ -1408,6 +1415,8 @@ test_that(
 test_that(
   "read_npx_excel_format - warning - diff autodetection vs user input",
   {
+    skip_on_cran()
+
     # get wide synthetic data
     df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
                                             data_type = "NPX",
@@ -1551,6 +1560,8 @@ test_that(
 test_that(
   "read_npx_excel_format - warning - diff autodetection vs user input V2",
   {
+    skip_on_cran()
+
     # get wide synthetic data
     df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
                                             data_type = "NPX",
@@ -1705,6 +1716,8 @@ test_that(
 test_that(
   "read_npx_excel_format - error - unable to detect format",
   {
+    skip_on_cran()
+
     # get wide synthetic data
     df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
                                             data_type = "NPX",
@@ -1809,6 +1822,8 @@ test_that(
 test_that(
   "read_npx_format_get_platform - works",
   {
+    skip_on_cran()
+
     olink_platforms_wide <- accepted_olink_platforms |>
       dplyr::filter(.data[["broader_platform"]] == "qPCR")
 
@@ -2108,6 +2123,8 @@ test_that(
 test_that(
   "read_npx_format_get_platform - error - no match",
   {
+    skip_on_cran()
+
     withr::with_tempfile(
       new = "excel_wide",
       pattern = "test_excel_wide",
@@ -2166,6 +2183,8 @@ test_that(
 test_that(
   "read_npx_format_get_platform - error - multiple matches",
   {
+    skip_on_cran()
+
     withr::with_tempfile(
       new = "excel_wide",
       pattern = "test_excel_wide",
@@ -2224,6 +2243,7 @@ test_that(
 test_that(
   "read_npx_format_get_platform - warning",
   {
+    skip_on_cran()
 
     # get wide synthetic data
     df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 96",
@@ -2387,6 +2407,8 @@ test_that(
 test_that(
   "read_npx_format_get_quant - works",
   {
+    skip_on_cran()
+
     ## NPX ----
 
     withr::with_tempfile(
@@ -2558,6 +2580,8 @@ test_that(
 test_that(
   "read_npx_format_get_quant - warning - difference in detection",
   {
+    skip_on_cran()
+
     withr::with_tempfile(
       new = "excel_wide",
       pattern = "test_excel_wide",
@@ -2599,6 +2623,8 @@ test_that(
 test_that(
   "read_npx_format_get_quant - warning - no quant method match",
   {
+    skip_on_cran()
+
     withr::with_tempfile(
       new = "excel_wide",
       pattern = "test_excel_wide",
@@ -2651,6 +2677,8 @@ test_that(
 test_that(
   "read_npx_format_get_quant - warning - multiple quant method matches",
   {
+    skip_on_cran()
+
     withr::with_tempfile(
       new = "excel_wide",
       pattern = "test_excel_wide",
@@ -2692,6 +2720,8 @@ test_that(
 test_that(
   "read_npx_format_get_quant - error - no quant method identified",
   {
+    skip_on_cran()
+
     withr::with_tempfile(
       new = "excel_wide",
       pattern = "test_excel_wide",

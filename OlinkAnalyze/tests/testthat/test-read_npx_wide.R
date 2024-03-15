@@ -3,6 +3,8 @@
 test_that(
   "read_npx_wide_split_row - works",
   {
+    skip_on_cran()
+
     # variables that apply to all tests
     olink_platform <- "Target 48"
     n_panels <- 3L
@@ -211,6 +213,8 @@ test_that(
 test_that(
   "read_npx_wide_split_row - works - consecutive all-NA rows",
   {
+    skip_on_cran()
+
     # variables that apply to all tests
     olink_platform <- "Target 96"
     n_panels <- 1L
@@ -696,6 +700,8 @@ test_that(
 test_that(
   "read_npx_wide_split_row - error - no or too many all-NA rows",
   {
+    skip_on_cran()
+
     # variables that apply to all tests
     olink_platform <- "Target 48"
     data_type <- "NPX"
@@ -789,6 +795,8 @@ test_that(
 test_that(
   "read_npx_wide_split_row - error - not as many all-NA rows as expected",
   {
+    skip_on_cran()
+
     # variables that apply to all tests
     olink_platform <- "Target 48"
     n_panels <- 3L
@@ -921,6 +929,8 @@ test_that(
 test_that(
   "read_npx_wide_check_top - works",
   {
+    skip_on_cran()
+
     # variables that apply to all tests
     olink_platform <- "Target 48"
     n_panels <- 3L
@@ -1229,6 +1239,8 @@ test_that(
 test_that(
   "read_npx_wide_check_top - error - missing labels in V1",
   {
+    skip_on_cran()
+
     # variables that apply to all tests
     olink_platform <- "Target 48"
     n_panels <- 1L
@@ -1342,6 +1354,8 @@ test_that(
 test_that(
   "read_npx_wide_check_top - error - missing labels in row 2 (Assay)",
   {
+    skip_on_cran()
+
     # variables that apply to all tests
     olink_platform <- "Target 48"
     n_panels <- 1L
@@ -1494,6 +1508,8 @@ test_that(
 test_that(
   "read_npx_wide_check_top - error - incorrect num of int ctrl",
   {
+    skip_on_cran()
+
     # variables that apply to all tests
     olink_platform <- "Target 48"
     data_type <- "NPX"
@@ -1662,6 +1678,8 @@ test_that(
 test_that(
   "read_npx_wide_check_top - error - incorrect num of dev int ctrl",
   {
+    skip_on_cran()
+
     # variables that apply to all tests
     olink_platform <- "Target 48"
     data_type <- "NPX"
@@ -1832,6 +1850,8 @@ test_that(
 test_that(
   "read_npx_wide_top - works - T48 - single panel",
   {
+    skip_on_cran()
+
     # variables that apply to all tests
     olink_platform <- "Target 48"
     n_panels <- 1L
@@ -2524,6 +2544,8 @@ test_that(
 test_that(
   "read_npx_wide_top - works - T48 - multiple panels",
   {
+    skip_on_cran()
+
     # variables that apply to all tests
     olink_platform <- "Target 48"
     n_panels <- 3L
@@ -3216,6 +3238,8 @@ test_that(
 test_that(
   "read_npx_wide_top - works - T96 - single panel",
   {
+    skip_on_cran()
+
     # variables that apply to all tests
     olink_platform <- "Target 96"
     n_panels <- 1L
@@ -3640,6 +3664,8 @@ test_that(
 test_that(
   "read_npx_wide_top - works - T96 - multiple panels",
   {
+    skip_on_cran()
+
     # variables that apply to all tests
     olink_platform <- "Target 96"
     n_panels <- 3L
@@ -4064,6 +4090,8 @@ test_that(
 test_that(
   "read_npx_wide_top - works - Flex - single panel",
   {
+    skip_on_cran()
+
     # variables that apply to all tests
     olink_platform <- "Flex"
     n_panels <- 1L
@@ -4756,6 +4784,8 @@ test_that(
 test_that(
   "read_npx_wide_top - works - Flex - multiple panels",
   {
+    skip_on_cran()
+
     # variables that apply to all tests
     olink_platform <- "Flex"
     n_panels <- 3L
@@ -5448,6 +5478,8 @@ test_that(
 test_that(
   "read_npx_wide_top - works - Focus - single panel",
   {
+    skip_on_cran()
+
     # variables that apply to all tests
     olink_platform <- "Focus"
     n_panels <- 1L
@@ -6141,6 +6173,8 @@ test_that(
 test_that(
   "read_npx_wide_top - works - Focus - multiple panels",
   {
+    skip_on_cran()
+
     # variables that apply to all tests
     olink_platform <- "Focus"
     n_panels <- 3L
@@ -6834,6 +6868,8 @@ test_that(
 test_that(
   "read_npx_wide_top - error - missing or too many labels in rows 2 & 3",
   {
+    skip_on_cran()
+
     # variables that apply to all tests
     olink_platform <- "Target 48"
     data_type <- "NPX"
@@ -6937,6 +6973,8 @@ test_that(
 test_that(
   "read_npx_wide_top - error - NAs in OlinkID/Uniprot/Assay",
   {
+    skip_on_cran()
+
     # variables that apply to all tests
     olink_platform <- "Target 48"
     data_type <- "NPX"
@@ -7036,6 +7074,8 @@ test_that(
 test_that(
   "read_npx_wide_top - error - wrong # of assays",
   {
+    skip_on_cran()
+
     # variables that apply to all tests
     olink_platform <- "Target 48"
     data_type <- "NPX"
@@ -7124,6 +7164,8 @@ test_that(
 test_that(
   "read_npx_wide_top - error - uneven # of Plate ID and QC_Warning cols",
   {
+    skip_on_cran()
+
     withr::with_tempfile(
       new = "olink_wide_format",
       pattern = "test-olink-wide",
@@ -7178,6 +7220,8 @@ test_that(
 test_that(
   "read_npx_wide_middle - works - single panel",
   {
+    skip_on_cran()
+
     # variables that apply to all tests
     olink_platform <- "Target 48"
     n_panels <- 1L
@@ -7968,6 +8012,8 @@ test_that(
 test_that(
   "read_npx_wide_middle - works - multiple panels",
   {
+    skip_on_cran()
+
     # variables that apply to all tests
     olink_platform <- "Target 48"
     n_panels <- 3L
@@ -8758,6 +8804,8 @@ test_that(
 test_that(
   "read_npx_wide_middle - message - non-unique sample id",
   {
+    skip_on_cran()
+
     # variables that apply to all tests
     olink_platform <- "Target 48"
     data_type <- "NPX"
@@ -8951,6 +8999,8 @@ test_that(
 test_that(
   "read_npx_wide_middle - error - uneven number of platid and qc_warning",
   {
+    skip_on_cran()
+
     # variables that apply to all tests
     olink_platform <- "Target 48"
     data_type <- "NPX"
@@ -9062,6 +9112,8 @@ test_that(
 test_that(
   "read_npx_wide_middle - error - unidentified cols in mid matrix",
   {
+    skip_on_cran()
+
     # variables that apply to all tests
     olink_platform <- "Target 48"
     data_type <- "NPX"
@@ -9175,6 +9227,8 @@ test_that(
 test_that(
   "red_npx_wide_top_mid_long - works - single panel - single plate",
   {
+    skip_on_cran()
+
     # variables that apply to all tests
     olink_platform <- "Target 48"
     n_panels <- 1L
@@ -9908,6 +9962,8 @@ test_that(
 test_that(
   "red_npx_wide_top_mid_long - works - multiple panels - multiple plates",
   {
+    skip_on_cran()
+
     # variables that apply to all tests
     olink_platform <- "Target 48"
     n_panels <- 3L
@@ -10643,6 +10699,8 @@ test_that(
 test_that(
   "red_npx_wide_top_mid_long - works - T96 - NPXM missing panel/QC version",
   {
+    skip_on_cran()
+
     # variables that apply to all tests
     olink_platform <- "Target 96"
     n_panels <- 3L
@@ -10747,6 +10805,8 @@ test_that(
 test_that(
   "read_npx_wide_bottom - works - T48 - single panel - single plate",
   {
+    skip_on_cran()
+
     # variables that apply to all tests
     olink_platform <- "Target 48"
     n_panels <- 1L
@@ -11327,6 +11387,8 @@ test_that(
 test_that(
   "read_npx_wide_bottom - works - T48 - multiple panels - single plate",
   {
+    skip_on_cran()
+
     # variables that apply to all tests
     olink_platform <- "Target 48"
     n_panels <- 3L
@@ -11907,6 +11969,8 @@ test_that(
 test_that(
   "read_npx_wide_bottom - works - T48 - single panel - multiple plates",
   {
+    skip_on_cran()
+
     # variables that apply to all tests
     olink_platform <- "Target 48"
     n_panels <- 1L
@@ -12487,6 +12551,8 @@ test_that(
 test_that(
   "read_npx_wide_bottom - works - T48 - multiple panels - multiple plates",
   {
+    skip_on_cran()
+
     # variables that apply to all tests
     olink_platform <- "Target 48"
     n_panels <- 3L
@@ -13068,6 +13134,8 @@ test_that(
 test_that(
   "read_npx_wide_bottom - works - T96 - NPX - v3",
   {
+    skip_on_cran()
+
     # variables that apply to all tests
     olink_platform <- "Target 96"
     data_type <- "NPX"
@@ -13178,6 +13246,8 @@ test_that(
 test_that(
   "read_npx_wide_bottom - works - T96 - NPX - NPX Manager 2018",
   {
+    skip_on_cran()
+
     # variables that apply to all tests
     olink_platform <- "Target 96"
     data_type <- "NPX"
@@ -13275,6 +13345,8 @@ test_that(
 test_that(
   "read_npx_wide_bottom - error - unexpected values in V1",
   {
+    skip_on_cran()
+
     # variables that apply to all tests
     olink_platform <- "Target 48"
     n_panels <- 1L
@@ -13583,6 +13655,8 @@ test_that(
 test_that(
   "read_npx_wide_bottom - error - incorrect # of plates x QC data",
   {
+    skip_on_cran()
+
     withr::with_tempfile(
       new = "olink_wide_format",
       pattern = "test-olink-wide",
