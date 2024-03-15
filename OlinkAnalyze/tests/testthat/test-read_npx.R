@@ -137,6 +137,8 @@ test_that(
 test_that(
   "data loads correctly - long - zip",
   {
+    skip_if_not_installed("zip")
+
     withr::with_tempfile(
       new = "tmp_long_csv_zip",
       pattern = "csv-zip-long-",
@@ -205,6 +207,8 @@ test_that(
 test_that(
   "data loads correctly - long - extended v1 - zip",
   {
+    skip_if_not_installed("zip")
+
     withr::with_tempfile(
       new = "tmp_long_csv_ext_v1_zip",
       pattern = "csv-ext_v1-zip-long-",
@@ -279,6 +283,8 @@ test_that(
 test_that(
   "data loads correctly - long - extended v2 - zip",
   {
+    skip_if_not_installed("zip")
+
     withr::with_tempfile(
       new = "tmp_long_csv_ext_v2_zip",
       pattern = "csv-ext_v2-zip-long-",
