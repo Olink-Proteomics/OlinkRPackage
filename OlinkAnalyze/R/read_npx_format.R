@@ -118,7 +118,7 @@ read_npx_format <- function(file,
 
     # default variables ----
 
-    olink_broader_platform <- "qPCR" # nolint object_usage_linter
+    olink_broader_platform <- "qPCR" # nolint
 
     # filter the global variable accepted_olink_platforms to have a collection
     # of platforms and quant methods available.

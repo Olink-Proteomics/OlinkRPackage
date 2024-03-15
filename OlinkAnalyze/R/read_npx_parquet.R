@@ -59,7 +59,7 @@ read_npx_parquet <- function(file,
 
   # Check that all required parquet metadata is in place
   if (!all(olink_parquet_spec$parquet_metadata %in% names(df_olink$metadata))) {
-    missing_fields <- olink_parquet_spec$parquet_metadata[ # nolint object_usage_linter
+    missing_fields <- olink_parquet_spec$parquet_metadata[ # nolint
       !(olink_parquet_spec$parquet_metadata %in% names(df_olink$metadata))
     ]
 
@@ -81,7 +81,7 @@ read_npx_parquet <- function(file,
     names(olink_parquet_spec$parquet_metadata) == "product"
   ]
 
-  if (!(df_olink$metadata[[olink_parquet_product]] %in% olink_parquet_spec$parquet_platforms)) { # nolint object_usage_linter
+  if (!(df_olink$metadata[[olink_parquet_product]] %in% olink_parquet_spec$parquet_platforms)) { # nolint
 
     cli::cli_abort(
       c(
@@ -101,7 +101,7 @@ read_npx_parquet <- function(file,
     names(olink_parquet_spec$parquet_metadata) == "data_file_type"
   ]
 
-  if (!(df_olink$metadata[[olink_parquet_files]] %in% olink_parquet_spec$parquet_files)) { # nolint object_usage_linter
+  if (!(df_olink$metadata[[olink_parquet_files]] %in% olink_parquet_spec$parquet_files)) { # nolint
 
     cli::cli_abort(
       c(
