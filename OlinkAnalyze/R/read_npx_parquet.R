@@ -81,7 +81,7 @@ read_npx_parquet <- function(file,
     names(olink_parquet_spec$parquet_metadata) == "product"
   ]
 
-  if (!(df_olink$metadata[[olink_parquet_product]] %in% olink_parquet_spec$parquet_platforms)) { # nolint
+  if (!(df_olink$metadata[[olink_parquet_product]] %in% olink_parquet_spec$parquet_platforms)) {
 
     cli::cli_abort(
       c(
