@@ -150,7 +150,7 @@ read_flex <- function(filename) {
   
   # pivot longer
   dat<- dat |> 
-    dplyr::filter(!str_detect(SampleID, paste( "Missing Data freq.",
+    dplyr::filter(!stringr::str_detect(SampleID, paste("Missing Data freq.",
                                                "Normalization",
                                                "Assay warning",
                                                "Lowest quantifiable level",
@@ -158,12 +158,12 @@ read_flex <- function(filename) {
                                                "LLOQ",
                                                "ULOQ",
                                                "LOD", 
-                                               collapse = "|"))) |>  # remove end meta data
+                                               sep = "|"))) |>  # remove end meta data
     tidyr::pivot_longer(cols = tidyselect::starts_with("OID"),
                         names_to = "OlinkID",
                         values_to = ifelse(is_npx_data, "NPX", "Quantified_value")) |> 
     dplyr::left_join(metadata, by = c("OlinkID")) |> 
-    dplyr::left_join(meta_data_per_assay, by = "OlinkID", multiple = "all") |> 
+    dplyr::left_join(meta_data_per_assay, by = c("OlinkID", "PlateID1"), multiple = "all") |> 
     dplyr::mutate(PlateID = PlateID1) |> 
     dplyr::mutate(QC_Warning = QC_Warning1) |> 
     dplyr::select(SampleID, OlinkID,
