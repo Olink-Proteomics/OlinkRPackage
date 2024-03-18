@@ -22,11 +22,6 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          working-directory: OlinkAnalyze
-          extra-packages: devtools,lintr
-          
-      - name: install OA
-        with:
           extra-packages: any::lintr, any::devtools, local::., local::./OlinkAnalyze
           needs: lint, devtools
 
