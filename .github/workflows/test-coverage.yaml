@@ -37,7 +37,7 @@ jobs:
         
       - name: Print rout
         run: |
-          cat ${{ runner.temp }}/package
+          find ${{ runner.temp }}/package -name 'testthat.Rout*' -exec cat '{}' \;
         shell: bash
       
       - name: Show testthat output
