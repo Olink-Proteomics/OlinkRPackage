@@ -28,7 +28,7 @@ jobs:
           
       - name: install OA
         with:
-          extra-packages: any::lintr, local::., local::./OlinkAnalyze
+          extra-packages: any::lintr, any::devtools, local::., local::./OlinkAnalyze
           needs: lint, devtools
 
       - name: Lint
