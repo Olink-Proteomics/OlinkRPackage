@@ -27,9 +27,9 @@ jobs:
           extra-packages: devtools,lintr
           
       - name: install OA
-        run: |
-          pak::pkg_install(c("local::OlinkRPackage/OlinkAnalyze", "lintr", "devtools"))
-        shell: Rscript {0}
+        with:
+          extra-packages: any::lintr, local::., local::./OlinkAnalyze
+          needs: lint, devtools
 
       - name: Lint
         run: |
