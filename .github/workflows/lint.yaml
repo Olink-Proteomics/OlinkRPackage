@@ -23,12 +23,8 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          packages: any::pak
-          
-      - name: install OA
-        run: |
-          pak::pkg_install(c("local::OlinkRPackage", "local::OlinkRPackage/OlinkAnalyze", "lintr", "devtools"))
-        shell: Rscript {0}
+          working-directory: OlinkAnalyze
+          extra-packages: devtools,lintr
 
       - name: Lint
         run: |
