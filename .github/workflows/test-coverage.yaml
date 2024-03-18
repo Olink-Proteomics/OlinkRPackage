@@ -38,7 +38,9 @@ jobs:
       - name: Print rout
         run: |
           ls -lh ${{ runner.temp }}/package
+          ls -lh ${{ runner.temp }}/package/OlinkAnalyze
           find ${{ runner.temp }}/package -name 'testthat.Rout*' -exec cat '{}' \;
+          find ${{ runner.temp }}/package -name 'covr_trace_*' -exec cat '{}' \;
         shell: bash
       
       - name: Show testthat output
