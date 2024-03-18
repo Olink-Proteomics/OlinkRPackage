@@ -32,8 +32,14 @@ jobs:
             clean = FALSE,
             install_path = file.path(normalizePath(Sys.getenv("RUNNER_TEMP"), winslash = "/"), "package")
           )
+          print(file.path(normalizePath(Sys.getenv("RUNNER_TEMP"), winslash = "/"), "package"))
         shell: Rscript {0}
-
+        
+      - name: Print rout
+        run: |
+          cat ${{ runner.temp }}/package
+        shell: bash
+      
       - name: Show testthat output
         if: always()
         run: |
