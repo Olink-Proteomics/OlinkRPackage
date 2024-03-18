@@ -15,20 +15,25 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 2
-
+      
       - uses: r-lib/actions/setup-r@v2
         with:
           use-public-rspm: true
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::lintr, any::devtools, local::., local::./OlinkAnalyze
-          needs: lint, devtools
+          extra-packages: any::pak
+          
+      - name: install OA
+        run: |
+          pak::pkg_install(c("local::OlinkAnalyze", "lintr", "devtools"))
+        shell: Rscript {0}
 
       - name: Lint
         run: |
+          options(lintr.github_annotation_project_dir = "OlinkAnalyze")
           devtools::load_all(path = "OlinkAnalyze")
-          lintr::lint_package()
+          lintr::lint_package(path = "OlinkAnalyze")
         shell: Rscript {0}
         env:
           LINTR_ERROR_ON_LINT: true
