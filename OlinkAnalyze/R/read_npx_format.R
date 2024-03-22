@@ -496,7 +496,9 @@ read_npx_format_get_format <- function(df,
 
   }
 
-  # Check if the detected file format matches the customer input ----
+  # Checks ----
+
+  ## Check if the detected file format matches the customer input ----
 
   if (!is.null(long_format)) {
 
@@ -544,6 +546,22 @@ read_npx_format_get_format <- function(df,
     # if long_format input is NULL then set it from what we auto-detected
     is_long_format <- detected_long_format
     data_cells <- data_cells
+
+  }
+
+  ## Check that long format data do not have NA colnames ----
+
+  if (is_long_format == TRUE
+      && any(is.na(as.character(df[1L,])))) {
+
+    cli::cli_abort(
+      message = c(
+        "x" = "`NA` column names in long format file: {.file {file}}!",
+        "i" = "Please inspect the input file!"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
 
   }
 
