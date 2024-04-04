@@ -3,30 +3,80 @@
 \name{read_npx}
 \alias{read_npx}
 \alias{read_NPX}
-\title{Function to read NPX data into long format}
+\title{Read NPX, Ct or absolute quantification data in R.}
 \usage{
-read_npx(filename)
+read_npx(
+  filename,
+  out_df = "tibble",
+  sep = NULL,
+  long_format = NULL,
+  olink_platform = NULL,
+  data_type = NULL,
+  .ignore_files = c("README.txt"),
+  quiet = TRUE
+)
 
-read_NPX(filename)
+read_NPX(
+  filename,
+  out_df = "tibble",
+  sep = NULL,
+  long_format = NULL,
+  olink_platform = NULL,
+  data_type = NULL,
+  .ignore_files = c("README.txt"),
+  quiet = TRUE
+)
 }
 \arguments{
-\item{filename}{Path to Olink Software output file.}
+\item{filename}{Path to Olink software output file in wide or long format.
+Expecting file extensions `csv`, `txt`, `xls`, `xlsx`, `parquet` or `zip`.}
+
+\item{out_df}{The class of output data frame. One of `tibble` (default) or
+`arrow` for ArrowObject.}
+
+\item{sep}{Character separator of delimited input file. One of `NULL` for
+auto-detection (default), `,` for comma or `;` for semicolon. Used only for
+delimited output files from Olink software.}
+
+\item{long_format}{Boolean marking format of input file. One of `NULL`
+(default) for auto-detection, `TRUE` for long format files or `FALSE` for
+wide format files.}
+
+\item{olink_platform}{Olink platform used to generate the input file.
+One of `NULL` (default), `Explore 3072`, `Explore HT`, `Target 96`,
+`Target 48`, `Flex` or `Focus`.}
+
+\item{data_type}{Quantification method of the input data. One of `NULL`
+(default), `NPX`, `Quantified` or `Ct`.}
+
+\item{.ignore_files}{Character vector of files included in the zip-compressed
+Olink software output files that should be ignored. Applies only to
+zip-compressed input files. `c("README.txt")` (default).}
+
+\item{quiet}{Boolean to print a confirmation message when reading the input
+file. Applies to excel or delimited input only. `TRUE` (default) to not print
+and `FALSE` to print.}
 }
 \value{
-A "tibble" in long format.
+Tibble or ArrowObject with Olink data in long format.
 }
 \description{
-Imports an NPX or QUANT file exported from Olink Software.
-No alterations to the output format is allowed.
+Imports an NPX, Ct or Quantification file exported from Olink software.
+
+\strong{Note:} Do not modify the Olink software output file prior to
+importing it with `read_npx()` as it might fail.
 }
 \examples{
 \donttest{
-
 file <- system.file("extdata",
-                    "Example_NPX_Data.csv",
+                    "Example_NPX_Data2_1.csv",
                     package = "OlinkAnalyze")
-read_NPX(file)
 
+read_NPX(filename = file,
+         sep = NULL)
+
+read_NPX(filename = file,
+         sep = ";")
 }
 
 }
@@ -46,6 +96,7 @@ Klev Diamanti;
 \keyword{Explore}
 \keyword{Explore;}
 \keyword{Flex;}
+\keyword{Focus}
 \keyword{HT;}
 \keyword{NPX;}
 \keyword{Olink}

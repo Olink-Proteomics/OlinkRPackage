@@ -3,39 +3,41 @@
 \name{read_npx_delim}
 \alias{read_npx_delim}
 \alias{read_npx_csv}
-\title{Help function to read in Olink data from comma or semicolon delimited files.}
+\title{Help function to read NPX, Ct or absolute quantification data from semicolon-
+or comma-delimited Olink software output files in R.}
 \usage{
 read_npx_delim(file, out_df = "arrow", sep = NULL)
 
 read_npx_csv(file, out_df = "arrow", sep = NULL)
 }
 \arguments{
-\item{file}{Path to Olink software output in txt or csv.}
+\item{file}{Path to Olink software output delimited file in wide or long
+format. Expecting file extensions `csv` or `txt`.}
 
-\item{out_df}{The class of output data frame to be returned. Accepted values
-are "tibble" and "arrow" (default).}
+\item{out_df}{The class of output data frame. One of `tibble` (default) or
+`arrow` for ArrowObject.}
 
-\item{sep}{The separator of the file: NULL (autodetect), comma (,) or
-semicolon (;).}
+\item{sep}{Character separator of delimited input file. One of `NULL` for
+auto-detection (default), `,` for comma or `;` for semicolon. Used only for
+delimited output files from Olink software.}
 }
 \value{
-An R6 class ArrowObject.
+Tibble or ArrowObject with Olink data in long format.
 }
 \description{
-Help function to read in Olink data from comma or semicolon delimited files.
+The function can handle delimited files in long and wide format.
 }
 \seealso{
-[read_npx()]
-  [read_npx_parquet()]
-  [read_npx_zip()]
+\code{\link{read_npx}}
+  \code{\link{read_npx_parquet}}
+  \code{\link{read_npx_zip}}
+  \code{\link{read_npx_excel}}
+  \code{\link{read_npx_format}}
+  \code{\link{read_npx_delim_wide}}
+  \code{\link{read_npx_delim_long}}
 }
 \author{
 Klev Diamanti;
   Christoffer Cambronero;
   Kathleen Nevola
 }
-\keyword{NPX}
-\keyword{csv}
-\keyword{delim}
-\keyword{sep}
-\keyword{txt}

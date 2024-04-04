@@ -8,22 +8,15 @@ functions is acceptable.}
 check_out_df_arg(out_df)
 }
 \arguments{
-\item{out_df}{The class of output data frame to be returned. Accepted values
-are "tibble" and "arrow".}
+\item{out_df}{The class of output data frame. One of `tibble` (default) or
+`arrow` for ArrowObject.}
 }
 \value{
-`TRUE` if the argument is as expected, and an error otherwise.
+An error if the argument is not as expected.
 }
 \description{
 Help function checking that the requested output class of the read_npx*
 functions is acceptable.
-}
-\seealso{
-[read_npx()]
-  [read_npx_delim()]
-  [read_npx_zip()]
-  [read_npx_parquet()]
-  [convert_read_npx_output()]
 }
 \author{
 Klev Diamanti

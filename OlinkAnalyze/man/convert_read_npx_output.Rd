@@ -2,23 +2,23 @@
 % Please edit documentation in R/convert_read_npx_output.R
 \name{convert_read_npx_output}
 \alias{convert_read_npx_output}
-\title{Help function converting the output data frame from the read_npx* function to
- a tibble or an ArrowObject.}
+\title{Help function converting the output data frame from a read_npx* function to a
+tibble or an ArrowObject.}
 \usage{
 convert_read_npx_output(df, out_df)
 }
 \arguments{
 \item{df}{The data frame to be converted.}
 
-\item{out_df}{The class of output data frame to be returned. Accepted values
-are "tibble" and "arrow".}
+\item{out_df}{The class of output data frame. One of `tibble` (default) or
+`arrow` for ArrowObject.}
 }
 \value{
-The data frame in the requested format.
+The data frame in the requested class.
 }
 \description{
-Help function converting the output data frame from the read_npx* function to
- a tibble or an ArrowObject.
+Help function converting the output data frame from a read_npx* function to a
+tibble or an ArrowObject.
 }
 \author{
 Klev Diamanti
