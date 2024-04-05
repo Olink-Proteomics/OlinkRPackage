@@ -1836,7 +1836,7 @@ test_that(
                           "B" = paste0("V", (ncol(df_exp_r2) + 1L)))
           ) |>
           t()
-        colnames(df_exp_r1) <- df_exp_r1[2L,]
+        colnames(df_exp_r1) <- df_exp_r1[2L, ]
         df_exp_r1 <- df_exp_r1 |>
           dplyr::as_tibble() |>
           dplyr::slice_head(n = 1L)

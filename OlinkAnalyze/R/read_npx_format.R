@@ -551,8 +551,12 @@ read_npx_format_get_format <- function(df,
 
   ## Check that long format data do not have NA colnames ----
 
-  if (is_long_format == TRUE
-      && any(is.na(as.character(df[1L,])))) {
+  check_na_colname <- df[1L, ] |>
+    as.character() |>
+    is.na() |>
+    any() && (is_long_format == TRUE)
+
+  if (check_na_colname) {
 
     cli::cli_abort(
       message = c(
