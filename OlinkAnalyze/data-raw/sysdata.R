@@ -65,5 +65,5 @@ usethis::use_data(accepted_olink_platforms,
                   olink_wide_bottom_matrix,
                   overwrite = TRUE,
                   internal = TRUE,
-                  compress = "gzip",
+                  compress = "xz",
                   version = 2L)
