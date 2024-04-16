@@ -62,7 +62,7 @@ rm(manifest_data1_file)
 ## load npx_data1 ----
 
 npx_data1_file <- system.file("extdata",
-                              "npx_data1_original.xlsx",
+                              "npx_data1.xlsx",
                               package = "OlinkAnalyze",
                               mustWork = TRUE)
 
@@ -203,6 +203,6 @@ stopifnot(
 if (npx_data1_eq == TRUE) {
   usethis::use_data(npx_data1,
                     overwrite = TRUE,
-                    compress = "gzip",
+                    compress = "xz",
                     version = 2L)
 }

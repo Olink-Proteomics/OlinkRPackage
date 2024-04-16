@@ -204,6 +204,6 @@ stopifnot(
 if (npx_data2_eq == TRUE) {
   usethis::use_data(npx_data2,
                     overwrite = TRUE,
-                    compress = "gzip",
+                    compress = "xz",
                     version = 2L)
 }
