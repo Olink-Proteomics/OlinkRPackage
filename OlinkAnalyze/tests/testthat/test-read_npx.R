@@ -147,7 +147,8 @@ test_that(
 
         # get the npx data file
         expect_no_error(
-          object = npx_file <- system.file("extdata", "npx_data_v3.zip",
+          object = npx_file <- system.file("extdata",
+                                           "npx_data_long_zip.zip",
                                            package = "OlinkAnalyze",
                                            mustWork = TRUE)
         )
