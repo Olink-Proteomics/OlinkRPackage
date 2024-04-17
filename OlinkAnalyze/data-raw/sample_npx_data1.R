@@ -19,7 +19,7 @@
 ## load manifest ----
 
 manifest_data1_file <- system.file("extdata",
-                                   "npx_data1_meta_original.csv",
+                                   "npx_data1_meta.csv",
                                    package = "OlinkAnalyze",
                                    mustWork = TRUE)
 
