@@ -26,7 +26,8 @@ manifest_data1_file <- system.file("extdata",
 manifest_data1 <- read.delim(
   file = manifest_data1_file,
   header = TRUE,
-  sep = ";"
+  sep = ";",
+  na.strings = c("", "NA")
 )
 
 ## modify manifest ----
