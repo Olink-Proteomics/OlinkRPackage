@@ -79,7 +79,8 @@ test_that(
 
         # get the npx data file
         expect_no_error(
-          object = npx_file <- system.file("extdata", "Example_NPX_Data2_1.csv",
+          object = npx_file <- system.file("extdata",
+                                           "npx_data_long_csv.csv",
                                            package = "OlinkAnalyze",
                                            mustWork = TRUE)
         )
@@ -97,7 +98,6 @@ test_that(
           object = npx_df <- read_NPX(filename = tmp_long_csv,
                                       out_df = "tibble")
         )
-
         expect_no_condition(
           object = npx_arrow <- read_NPX(filename = tmp_long_csv,
                                          out_df = "arrow")
@@ -110,23 +110,26 @@ test_that(
                failure_message = "failed to read long csv in arrow")
 
         # check that data set has correct number of rows and columns
-        expect_equal(object = nrow(npx_df), expected = 1L)
-        expect_equal(object = ncol(npx_df), expected = 13L)
-        expect_equal(object = nrow(npx_arrow), expected = 1L)
-        expect_equal(object = ncol(npx_arrow), expected = 13L)
+        expected_rows <- 1000L
+        expected_cols <- 16L
+        expect_equal(object = nrow(npx_df), expected = expected_rows)
+        expect_equal(object = ncol(npx_df), expected = expected_cols)
+        expect_equal(object = nrow(npx_arrow), expected = expected_rows)
+        expect_equal(object = ncol(npx_arrow), expected = expected_cols)
 
         # check that dataset has the correct column names
+        expected_colnames <- c("SampleID", "Index", "OlinkID", "UniProt",
+                               "Assay", "MissingFreq", "Panel", "Panel_Lot_Nr",
+                               "PlateID", "QC_Warning", "LOD", "NPX",
+                               "Normalization", "Assay_Warning", "Sample_Type",
+                               "ExploreVersion")
         expect_identical(
           object = colnames(npx_df),
-          expected = c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
-                       "MissingFreq", "Panel", "Panel_Lot_Nr", "PlateID",
-                       "QC_Warning", "LOD", "NPX", "Normalization")
+          expected = expected_colnames
         )
         expect_identical(
           object = names(npx_arrow),
-          expected = c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
-                       "MissingFreq", "Panel", "Panel_Lot_Nr", "PlateID",
-                       "QC_Warning", "LOD", "NPX", "Normalization")
+          expected = expected_colnames
         )
 
       }
@@ -166,7 +169,6 @@ test_that(
           object = npx_df <- read_NPX(filename = tmp_long_csv_zip,
                                       out_df = "tibble")
         )
-
         expect_no_condition(
           object = npx_arrow <- read_NPX(filename = tmp_long_csv_zip,
                                          out_df = "arrow")
@@ -179,25 +181,26 @@ test_that(
                failure_message = "failed to read long zip csv in arrow")
 
         # check that data set has correct number of rows and columns
-        expect_equal(object = nrow(npx_df), expected = 1000L)
-        expect_equal(object = ncol(npx_df), expected = 16L)
-        expect_equal(object = nrow(npx_arrow), expected = 1000L)
-        expect_equal(object = ncol(npx_arrow), expected = 16L)
+        expected_rows <- 1000L
+        expected_cols <- 16L
+        expect_equal(object = nrow(npx_df), expected = expected_rows)
+        expect_equal(object = ncol(npx_df), expected = expected_cols)
+        expect_equal(object = nrow(npx_arrow), expected = expected_rows)
+        expect_equal(object = ncol(npx_arrow), expected = expected_cols)
 
         # check that dataset has the correct column names
+        expected_colnames <- c("SampleID", "Index", "OlinkID", "UniProt",
+                               "Assay", "MissingFreq", "Panel", "Panel_Lot_Nr",
+                               "PlateID", "QC_Warning", "LOD", "NPX",
+                               "Normalization", "Assay_Warning", "Sample_Type",
+                               "ExploreVersion")
         expect_identical(
           object = colnames(npx_df),
-          expected = c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
-                       "MissingFreq", "Panel", "Panel_Lot_Nr", "PlateID",
-                       "QC_Warning", "LOD", "NPX", "Normalization",
-                       "Assay_Warning", "Sample_Type", "ExploreVersion")
+          expected = expected_colnames
         )
         expect_identical(
           object = names(npx_arrow),
-          expected = c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
-                       "MissingFreq", "Panel", "Panel_Lot_Nr", "PlateID",
-                       "QC_Warning", "LOD", "NPX", "Normalization",
-                       "Assay_Warning", "Sample_Type", "ExploreVersion")
+          expected = expected_colnames
         )
 
       }
