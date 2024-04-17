@@ -866,8 +866,9 @@ read_npx_wide_top <- function(df,
 
   ## check df_top_oid ----
 
-  # no NAs are allowed in df_top_oid
-  if (any(is.na(df_top_oid))) {
+  # no NAs are allowed in df_top_oid in any column other than "Uniprot ID"
+  # the latter because the assay NT-proBNP does not have a Uniprot ID
+  if (any(is.na(dplyr::select(df_top_oid, -dplyr::all_of("Uniprot ID"))))) {
 
     cli::cli_abort(
       message = c(

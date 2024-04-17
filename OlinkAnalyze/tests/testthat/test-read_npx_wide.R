@@ -7010,7 +7010,7 @@ test_that(
         # modify dt_top_wide intrduce NA cells to test
         df_rand$list_df_wide$df_top_wide <- df_rand$list_df_wide$df_top_wide |>
           dplyr::mutate(
-            V2 = dplyr::if_else(.data[["V2"]] %in% "Uniprot1",
+            V2 = dplyr::if_else(.data[["V2"]] %in% "Assay1",
                                 NA_character_,
                                 .data[["V2"]])
           )
@@ -7042,14 +7042,19 @@ test_that(
         df_rand$list_df_wide$df_top_wide <- df_rand$list_df_wide$df_top_wide |>
           dplyr::mutate(
             V2 = dplyr::if_else(
-              .data[["V2"]] %in% paste0(c("Assay", "Uniprot"), 1L),
+              .data[["V2"]] %in% "Assay1",
               NA_character_,
               .data[["V2"]]
             ),
             V3 = dplyr::if_else(
-              .data[["V3"]] %in% paste0(c("Assay", "Uniprot"), 2L),
+              .data[["V3"]] %in% "Assay2",
               NA_character_,
               .data[["V3"]]
+            ),
+            V4 = dplyr::if_else(
+              .data[["V4"]] %in% "Assay3",
+              NA_character_,
+              .data[["V4"]]
             )
           )
 
@@ -7062,7 +7067,7 @@ test_that(
                                      file = olink_wide_format,
                                      olink_platform = olink_platform,
                                      format_spec = format_spec),
-          regexp = "Identified 4 empty cells!"
+          regexp = "Identified 3 empty cells!"
         )
 
       }
