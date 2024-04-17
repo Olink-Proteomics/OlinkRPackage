@@ -209,6 +209,91 @@ test_that(
 )
 
 test_that(
+  "data loads correctly - wide - xlsx",
+  {
+    withr::with_tempfile(
+      new = "tmp_wide_xlsx",
+      pattern = "xlsx-wide-",
+      fileext = ".xlsx",
+      code = {
+
+        # get the npx data file
+        expect_no_error(
+          object = npx_file <- system.file("extdata",
+                                           "npx_data1.xlsx",
+                                           package = "OlinkAnalyze",
+                                           mustWork = TRUE)
+        )
+
+        # check that the variable was created
+        expect_true(object = exists("npx_file"))
+
+        # check that xlsx file can by copied without issues
+        expect_no_condition(
+          object = file.copy(npx_file, tmp_wide_xlsx)
+        )
+
+        # check that data load fails because we cannot determine platform
+        expect_error(
+          object = read_NPX(filename = tmp_wide_xlsx,
+                            out_df = "tibble"),
+          regexp = "Unable to recognize the Olink platform from the input file"
+        )
+
+        # check that data can be loaded
+        expect_message(
+          object = expect_warning(
+            object = npx_df <- read_NPX(filename = tmp_wide_xlsx,
+                                        olink_platform = "Target 96",
+                                        out_df = "tibble"),
+            regexp = "Unable to recognize the Olink platform from the input"
+          ),
+          regexp = "Identified 2 duplicates!"
+        )
+        expect_message(
+          object = expect_warning(
+            object = npx_arrow <- read_NPX(filename = tmp_wide_xlsx,
+                                           olink_platform = "Target 96",
+                                           out_df = "arrow"),
+            regexp = "Unable to recognize the Olink platform from the input"
+          ),
+          regexp = "Identified 2 duplicates!"
+        )
+
+        # check that data frame exists
+        expect(ok = exists("npx_df"),
+               failure_message = "failed to read wide xlsx in tibble")
+        expect(ok = exists("npx_arrow"),
+               failure_message = "failed to read wide xlsx in arrow")
+
+        # check that data set has correct number of rows and columns
+        expected_rows <- 176640L
+        expected_cols <- 12L
+        expect_equal(object = nrow(npx_df), expected = expected_rows)
+        expect_equal(object = ncol(npx_df), expected = expected_cols)
+        expect_equal(object = nrow(npx_arrow), expected = expected_rows)
+        expect_equal(object = ncol(npx_arrow), expected = expected_cols)
+
+        # check that dataset has the correct column names
+        expected_colnames <- c("SampleID", "NPX", "Panel", "Assay", "UniProt",
+                               "OlinkID", "Panel_Version", "PlateID",
+                               "QC_Warning", "LOD", "MissingFreq",
+                               "Olink NPX Signature Version")
+        expect_identical(
+          object = colnames(npx_df),
+          expected = expected_colnames
+        )
+        expect_identical(
+          object = names(npx_arrow),
+          expected = expected_colnames
+        )
+
+      }
+    )
+  }
+)
+
+test_that(
   "data does not load - unrecognizable file extension",
   {
     withr::with_tempfile(
