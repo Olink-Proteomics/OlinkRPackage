@@ -1518,37 +1518,17 @@ test_that(
         expect_true(object = file.exists(excel_wide))
 
         # read_npx_format_get_format throws warn with long_format = TRUE
-        expect_warning(
-          object = df_npx_true <- read_npx_format_get_format(
-            df = df,
-            file = excel_wide,
-            long_format = TRUE,
-            quant_methods = c("NPX", "Ct", "Quantified")
+        expect_error(
+          object = expect_warning(
+            object = read_npx_format_get_format(
+              df = df,
+              file = excel_wide,
+              long_format = TRUE,
+              quant_methods = c("NPX", "Ct", "Quantified")
+            ),
+            regexp = "Based on `long_format` we were expecting \"long\" format"
           ),
-          regexp = "Based on `long_format` we were expecting \"long\" format"
-        )
-
-        # check that object exists
-        expect_true(object = exists("df_npx_true"))
-
-        # check that it contains the correct elements
-        expect_equal(
-          object = names(df_npx_true),
-          expected = c("is_long_format", "data_cells")
-        )
-
-        # check that it is the correct format
-        expect_equal(
-          object = df_npx_true$is_long_format,
-          expected = TRUE
-        )
-
-        # check that the output string is NULL
-        expect_equal(
-          object = df_npx_true$data_cells,
-          expected = df_synthetic$list_df_wide$df_wide |>
-            dplyr::slice_head(n = 1L) |>
-            as.character()
+          regexp = "`NA` column names in long format file"
         )
 
       }
@@ -1770,6 +1750,115 @@ test_that(
             quant_methods = c("NPX", "Ct", "Quantified")
           ),
           regexp = "Unable to recognize the format of the input file"
+        )
+
+      }
+    )
+
+    ## wide input ----
+
+    withr::with_tempfile(
+      new = "excel_wide",
+      pattern = "test_excel_wide",
+      fileext = ".xlsx",
+      code = {
+
+        # modify df wide
+        df <- df_synthetic$list_df_wide$df_wide |>
+          dplyr::slice_head(
+            n = 2L
+          ) |>
+          dplyr::mutate(
+            V1 = dplyr::if_else(.data[["V1"]] == "NPX",
+                                "Wrong_Name",
+                                .data[["V1"]])
+          )
+
+        # write a dummy file
+        writeLines("foo", excel_wide)
+
+        #check that file exists
+        expect_true(object = file.exists(excel_wide))
+
+        # read_npx_format_get_format throws warn with long_format = TRUE
+        expect_error(
+          object = df_npx_true <- read_npx_format_get_format(
+            df = df,
+            file = excel_wide,
+            long_format = NULL,
+            quant_methods = c("NPX", "Ct", "Quantified")
+          ),
+          regexp = "Unable to recognize the format of the input file"
+        )
+
+      }
+    )
+
+  }
+)
+
+test_that(
+  "read_npx_excel_format - error - long format with NA colnames",
+  {
+    skip_on_cran()
+
+    # get wide synthetic data
+    df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
+                                            data_type = "NPX",
+                                            n_panels = 1L,
+                                            n_assays = 45L,
+                                            n_samples = 88L,
+                                            show_dev_int_ctrl = FALSE,
+                                            show_int_ctrl = FALSE,
+                                            version = 1L)
+
+    ## long input ----
+
+    withr::with_tempfile(
+      new = "excel_long",
+      pattern = "test_excel_long",
+      fileext = ".xlsx",
+      code = {
+
+        # modify df long
+        df_exp_r2 <- df_synthetic$list_df_long$df_long |>
+          dplyr::slice_head(
+            n = 2L
+          )
+        colnames(df_exp_r2) <- paste0("V", seq_len(ncol(df_exp_r2)))
+
+        df_exp_r1 <- dplyr::tibble(
+          "A" = colnames(df_synthetic$list_df_long$df_long),
+          "B" = colnames(df_exp_r2)
+        ) |>
+          dplyr::bind_rows(
+            dplyr::tibble("A" = NA_character_,
+                          "B" = paste0("V", (ncol(df_exp_r2) + 1L)))
+          ) |>
+          t()
+        colnames(df_exp_r1) <- df_exp_r1[2L, ]
+        df_exp_r1 <- df_exp_r1 |>
+          dplyr::as_tibble() |>
+          dplyr::slice_head(n = 1L)
+
+        df <- df_exp_r1 |>
+          dplyr::bind_rows(df_exp_r2)
+
+        # write a dummy file
+        writeLines("foo", excel_long)
+
+        #check that file exists
+        expect_true(object = file.exists(excel_long))
+
+        # read_npx_format_get_format throws warn with long_format = FALSE
+        expect_error(
+          object = df_npx_false <- read_npx_format_get_format(
+            df = df,
+            file = excel_long,
+            long_format = NULL,
+            quant_methods = c("NPX", "Ct", "Quantified")
+          ),
+          regexp = "`NA` column names in long format file"
         )
 
       }

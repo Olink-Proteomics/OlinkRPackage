@@ -79,7 +79,8 @@ test_that(
 
         # get the npx data file
         expect_no_error(
-          object = npx_file <- system.file("extdata", "Example_NPX_Data2_1.csv",
+          object = npx_file <- system.file("extdata",
+                                           "npx_data_long_csv.csv",
                                            package = "OlinkAnalyze",
                                            mustWork = TRUE)
         )
@@ -97,7 +98,6 @@ test_that(
           object = npx_df <- read_NPX(filename = tmp_long_csv,
                                       out_df = "tibble")
         )
-
         expect_no_condition(
           object = npx_arrow <- read_NPX(filename = tmp_long_csv,
                                          out_df = "arrow")
@@ -110,23 +110,26 @@ test_that(
                failure_message = "failed to read long csv in arrow")
 
         # check that data set has correct number of rows and columns
-        expect_equal(object = nrow(npx_df), expected = 1L)
-        expect_equal(object = ncol(npx_df), expected = 13L)
-        expect_equal(object = nrow(npx_arrow), expected = 1L)
-        expect_equal(object = ncol(npx_arrow), expected = 13L)
+        expected_rows <- 1000L
+        expected_cols <- 16L
+        expect_equal(object = nrow(npx_df), expected = expected_rows)
+        expect_equal(object = ncol(npx_df), expected = expected_cols)
+        expect_equal(object = nrow(npx_arrow), expected = expected_rows)
+        expect_equal(object = ncol(npx_arrow), expected = expected_cols)
 
         # check that dataset has the correct column names
+        expected_colnames <- c("SampleID", "Index", "OlinkID", "UniProt",
+                               "Assay", "MissingFreq", "Panel", "Panel_Lot_Nr",
+                               "PlateID", "QC_Warning", "LOD", "NPX",
+                               "Normalization", "Assay_Warning", "Sample_Type",
+                               "ExploreVersion")
         expect_identical(
           object = colnames(npx_df),
-          expected = c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
-                       "MissingFreq", "Panel", "Panel_Lot_Nr", "PlateID",
-                       "QC_Warning", "LOD", "NPX", "Normalization")
+          expected = expected_colnames
         )
         expect_identical(
           object = names(npx_arrow),
-          expected = c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
-                       "MissingFreq", "Panel", "Panel_Lot_Nr", "PlateID",
-                       "QC_Warning", "LOD", "NPX", "Normalization")
+          expected = expected_colnames
         )
 
       }
@@ -147,7 +150,8 @@ test_that(
 
         # get the npx data file
         expect_no_error(
-          object = npx_file <- system.file("extdata", "npx_data_v3.zip",
+          object = npx_file <- system.file("extdata",
+                                           "npx_data_long_zip.zip",
                                            package = "OlinkAnalyze",
                                            mustWork = TRUE)
         )
@@ -165,7 +169,6 @@ test_that(
           object = npx_df <- read_NPX(filename = tmp_long_csv_zip,
                                       out_df = "tibble")
         )
-
         expect_no_condition(
           object = npx_arrow <- read_NPX(filename = tmp_long_csv_zip,
                                          out_df = "arrow")
@@ -178,25 +181,26 @@ test_that(
                failure_message = "failed to read long zip csv in arrow")
 
         # check that data set has correct number of rows and columns
-        expect_equal(object = nrow(npx_df), expected = 1000L)
-        expect_equal(object = ncol(npx_df), expected = 16L)
-        expect_equal(object = nrow(npx_arrow), expected = 1000L)
-        expect_equal(object = ncol(npx_arrow), expected = 16L)
+        expected_rows <- 1000L
+        expected_cols <- 16L
+        expect_equal(object = nrow(npx_df), expected = expected_rows)
+        expect_equal(object = ncol(npx_df), expected = expected_cols)
+        expect_equal(object = nrow(npx_arrow), expected = expected_rows)
+        expect_equal(object = ncol(npx_arrow), expected = expected_cols)
 
         # check that dataset has the correct column names
+        expected_colnames <- c("SampleID", "Index", "OlinkID", "UniProt",
+                               "Assay", "MissingFreq", "Panel", "Panel_Lot_Nr",
+                               "PlateID", "QC_Warning", "LOD", "NPX",
+                               "Normalization", "Assay_Warning", "Sample_Type",
+                               "ExploreVersion")
         expect_identical(
           object = colnames(npx_df),
-          expected = c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
-                       "MissingFreq", "Panel", "Panel_Lot_Nr", "PlateID",
-                       "QC_Warning", "LOD", "NPX", "Normalization",
-                       "Assay_Warning", "Sample_Type", "ExploreVersion")
+          expected = expected_colnames
         )
         expect_identical(
           object = names(npx_arrow),
-          expected = c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
-                       "MissingFreq", "Panel", "Panel_Lot_Nr", "PlateID",
-                       "QC_Warning", "LOD", "NPX", "Normalization",
-                       "Assay_Warning", "Sample_Type", "ExploreVersion")
+          expected = expected_colnames
         )
 
       }
@@ -205,19 +209,18 @@ test_that(
 )
 
 test_that(
-  "data loads correctly - long - extended v1 - zip",
+  "data loads correctly - wide - xlsx",
   {
-    skip_if_not_installed("zip")
-
     withr::with_tempfile(
-      new = "tmp_long_csv_ext_v1_zip",
-      pattern = "csv-ext_v1-zip-long-",
-      fileext = ".zip",
+      new = "tmp_wide_xlsx",
+      pattern = "xlsx-wide-",
+      fileext = ".xlsx",
       code = {
 
         # get the npx data file
         expect_no_error(
-          object = npx_file <- system.file("extdata", "npx_data_ext_v1.zip",
+          object = npx_file <- system.file("extdata",
+                                           "npx_data1.xlsx",
                                            package = "OlinkAnalyze",
                                            mustWork = TRUE)
         )
@@ -227,52 +230,62 @@ test_that(
 
         # check that xlsx file can by copied without issues
         expect_no_condition(
-          object = file.copy(npx_file, tmp_long_csv_ext_v1_zip)
+          object = file.copy(npx_file, tmp_wide_xlsx)
+        )
+
+        # check that data load fails because we cannot determine platform
+        expect_error(
+          object = read_NPX(filename = tmp_wide_xlsx,
+                            out_df = "tibble"),
+          regexp = "Unable to recognize the Olink platform from the input file"
         )
 
         # check that data can be loaded
-        expect_no_condition(
-          object = npx_df <- read_NPX(filename = tmp_long_csv_ext_v1_zip,
-                                      out_df = "tibble")
+        expect_message(
+          object = expect_warning(
+            object = npx_df <- read_NPX(filename = tmp_wide_xlsx,
+                                        olink_platform = "Target 96",
+                                        out_df = "tibble"),
+            regexp = "Unable to recognize the Olink platform from the input"
+          ),
+          regexp = "Identified 2 duplicates!"
         )
-
-        expect_no_condition(
-          object = npx_arrow <- read_NPX(filename = tmp_long_csv_ext_v1_zip,
-                                         out_df = "arrow")
+        expect_message(
+          object = expect_warning(
+            object = npx_arrow <- read_NPX(filename = tmp_wide_xlsx,
+                                           olink_platform = "Target 96",
+                                           out_df = "arrow"),
+            regexp = "Unable to recognize the Olink platform from the input"
+          ),
+          regexp = "Identified 2 duplicates!"
         )
 
         # check that data frame exists
         expect(ok = exists("npx_df"),
-               failure_message = "failed to read long zip ext_v1 csv in tibble")
+               failure_message = "failed to read wide xlsx in tibble")
         expect(ok = exists("npx_arrow"),
-               failure_message = "failed to read long zip ext_v1 csv in arrow")
+               failure_message = "failed to read wide xlsx in arrow")
 
         # check that data set has correct number of rows and columns
-        expect_equal(object = nrow(npx_df), expected = 1000L)
-        expect_equal(object = ncol(npx_df), expected = 24L)
-        expect_equal(object = nrow(npx_arrow), expected = 1000L)
-        expect_equal(object = ncol(npx_arrow), expected = 24L)
+        expected_rows <- 176640L
+        expected_cols <- 12L
+        expect_equal(object = nrow(npx_df), expected = expected_rows)
+        expect_equal(object = ncol(npx_df), expected = expected_cols)
+        expect_equal(object = nrow(npx_arrow), expected = expected_rows)
+        expect_equal(object = ncol(npx_arrow), expected = expected_cols)
 
         # check that dataset has the correct column names
+        expected_colnames <- c("SampleID", "NPX", "Panel", "Assay", "UniProt",
+                               "OlinkID", "Panel_Version", "PlateID",
+                               "QC_Warning", "LOD", "MissingFreq",
+                               "Olink NPX Signature Version")
         expect_identical(
           object = colnames(npx_df),
-          expected = c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
-                       "MissingFreq", "Panel", "Panel_Lot_Nr", "PlateID",
-                       "QC_Warning", "LOD", "NPX", "Normalization",
-                       "Assay_Warning", "Sample_Type", "WellID", "IntraCV",
-                       "InterCV", "Processing_StartDate", "Processing_EndDate",
-                       "AnalyzerID", "INC_Warning", "AMP_Warning",
-                       "Count_Warning")
+          expected = expected_colnames
         )
         expect_identical(
           object = names(npx_arrow),
-          expected = c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
-                       "MissingFreq", "Panel", "Panel_Lot_Nr", "PlateID",
-                       "QC_Warning", "LOD", "NPX", "Normalization",
-                       "Assay_Warning", "Sample_Type", "WellID", "IntraCV",
-                       "InterCV", "Processing_StartDate", "Processing_EndDate",
-                       "AnalyzerID", "INC_Warning", "AMP_Warning",
-                       "Count_Warning")
+          expected = expected_colnames
         )
 
       }
@@ -281,19 +294,18 @@ test_that(
 )
 
 test_that(
-  "data loads correctly - long - extended v2 - zip",
+  "data loads correctly - wide - csv",
   {
-    skip_if_not_installed("zip")
-
     withr::with_tempfile(
-      new = "tmp_long_csv_ext_v2_zip",
-      pattern = "csv-ext_v2-zip-long-",
-      fileext = ".zip",
+      new = "tmp_wide_csv",
+      pattern = "csv-wide-",
+      fileext = ".csv",
       code = {
 
         # get the npx data file
         expect_no_error(
-          object = npx_file <- system.file("extdata", "npx_data_ext_v2.zip",
+          object = npx_file <- system.file("extdata",
+                                           "npx_data_wide_csv.csv",
                                            package = "OlinkAnalyze",
                                            mustWork = TRUE)
         )
@@ -303,50 +315,62 @@ test_that(
 
         # check that xlsx file can by copied without issues
         expect_no_condition(
-          object = file.copy(npx_file, tmp_long_csv_ext_v2_zip)
+          object = file.copy(npx_file, tmp_wide_csv)
+        )
+
+        # check that data load fails because we cannot determine platform
+        expect_error(
+          object = read_NPX(filename = tmp_wide_csv,
+                            out_df = "tibble"),
+          regexp = "Unable to recognize the Olink platform from the input file"
         )
 
         # check that data can be loaded
-        expect_no_condition(
-          object = npx_df <- read_NPX(filename = tmp_long_csv_ext_v2_zip,
-                                      out_df = "tibble")
+        expect_message(
+          object = expect_warning(
+            object = npx_df <- read_NPX(filename = tmp_wide_csv,
+                                        olink_platform = "Target 96",
+                                        out_df = "tibble"),
+            regexp = "Unable to recognize the Olink platform from the input"
+          ),
+          regexp = "Identified 2 duplicates!"
         )
-
-        expect_no_condition(
-          object = npx_arrow <- read_NPX(filename = tmp_long_csv_ext_v2_zip,
-                                         out_df = "arrow")
+        expect_message(
+          object = expect_warning(
+            object = npx_arrow <- read_NPX(filename = tmp_wide_csv,
+                                           olink_platform = "Target 96",
+                                           out_df = "arrow"),
+            regexp = "Unable to recognize the Olink platform from the input"
+          ),
+          regexp = "Identified 2 duplicates!"
         )
 
         # check that data frame exists
         expect(ok = exists("npx_df"),
-               failure_message = "failed to read long zip ext_v2 csv in tibble")
+               failure_message = "failed to read wide csv in tibble")
         expect(ok = exists("npx_arrow"),
-               failure_message = "failed to read long zip ext_v2 csv in arrow")
+               failure_message = "failed to read wide csv in arrow")
 
         # check that data set has correct number of rows and columns
-        expect_equal(object = nrow(npx_df), expected = 1000L)
-        expect_equal(object = ncol(npx_df), expected = 22L)
-        expect_equal(object = nrow(npx_arrow), expected = 1000L)
-        expect_equal(object = ncol(npx_arrow), expected = 22L)
+        expected_rows <- 29440L
+        expected_cols <- 12L
+        expect_equal(object = nrow(npx_df), expected = expected_rows)
+        expect_equal(object = ncol(npx_df), expected = expected_cols)
+        expect_equal(object = nrow(npx_arrow), expected = expected_rows)
+        expect_equal(object = ncol(npx_arrow), expected = expected_cols)
 
         # check that dataset has the correct column names
+        expected_colnames <- c("SampleID", "NPX", "Panel", "Assay", "UniProt",
+                               "OlinkID", "Panel_Version", "PlateID",
+                               "QC_Warning", "LOD", "MissingFreq",
+                               "Olink NPX Signature Version")
         expect_identical(
           object = colnames(npx_df),
-          expected = c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
-                       "MissingFreq", "Panel", "Panel_Lot_Nr", "PlateID",
-                       "QC_Warning", "LOD", "NPX", "Normalization",
-                       "Assay_Warning", "Sample_Type", "ExploreVersion",
-                       "WellID", "IntraCV", "InterCV", "Processing_StartDate",
-                       "Processing_EndDate", "AnalyzerID")
+          expected = expected_colnames
         )
         expect_identical(
           object = names(npx_arrow),
-          expected = c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
-                       "MissingFreq", "Panel", "Panel_Lot_Nr", "PlateID",
-                       "QC_Warning", "LOD", "NPX", "Normalization",
-                       "Assay_Warning", "Sample_Type", "ExploreVersion",
-                       "WellID", "IntraCV", "InterCV", "Processing_StartDate",
-                       "Processing_EndDate", "AnalyzerID")
+          expected = expected_colnames
         )
 
       }

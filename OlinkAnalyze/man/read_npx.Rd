@@ -69,7 +69,7 @@ importing it with `read_npx()` as it might fail.
 \examples{
 \donttest{
 file <- system.file("extdata",
-                    "Example_NPX_Data2_1.csv",
+                    "npx_data_long_csv.csv",
                     package = "OlinkAnalyze")
 
 read_NPX(filename = file,
