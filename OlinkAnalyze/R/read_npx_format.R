@@ -46,6 +46,9 @@
 #' @param quiet Boolean to print a confirmation message when reading the input
 #' file. Applies to excel or delimited input only. `TRUE` (default) to not print
 #' and `FALSE` to print.
+#' @param legacy Boolean to enforce returning a list containing olink_platform,
+#' data_type and long_format information together with the dataset.
+#'
 #'
 #' @return Tibble or ArrowObject with Olink data in long format.
 #'
@@ -61,7 +64,8 @@ read_npx_format <- function(file,
                             long_format = NULL,
                             olink_platform = NULL,
                             data_type = NULL,
-                            quiet = FALSE) {
+                            quiet = FALSE,
+                            legacy = FALSE) {
 
   # Check input ----
 
@@ -158,6 +162,10 @@ read_npx_format <- function(file,
 
     out_msg <- "Detected data in long format!"
 
+    # set these variables for completion
+    file_olink_platform <- NULL
+    file_quant_method <- NULL
+
   }
 
   # Message of data detection ----
@@ -173,6 +181,21 @@ read_npx_format <- function(file,
   }
 
   # return ----
+
+  # this flag is on when read_npx_legacy calls this function
+  if (legacy == TRUE) {
+    return(
+      list(
+        olink_platform = file_olink_platform,
+        long_format = file_format_check$is_long_format,
+        data_type = file_quant_method,
+        df = convert_read_npx_output( # read_npx_legacy expects tibble
+          df = list_df_read$df,
+          out_df = "tibble"
+        )
+      )
+    )
+  }
 
   if (file_format_check$is_long_format == TRUE) {
     # if data is in long format
