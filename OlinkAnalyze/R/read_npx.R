@@ -92,12 +92,8 @@ read_npx <- function(filename,
 
   # check file extension ----
 
-  # get the extension of the input file
-  f_ext <- tools::file_ext(x = filename)
-
   # check what type of label the extension of the input matches to
-  f_label <- accepted_npx_file_ext[accepted_npx_file_ext == f_ext] |>
-    names()
+  f_label <- check_file_extension(file = filename)
 
   # read data ----
 
