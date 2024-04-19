@@ -377,29 +377,3 @@ test_that(
     )
   }
 )
-
-test_that(
-  "data does not load - unrecognizable file extension",
-  {
-    withr::with_tempfile(
-      new = "tmp_unknown_file",
-      pattern = "test-random-file",
-      fileext = ".yaml",
-      code = {
-
-        # write in the file
-        writeLines("foo", tmp_unknown_file)
-
-        # check that file exists
-        expect_true(object = file.exists(tmp_unknown_file))
-
-        # check that data can be loaded
-        expect_error(
-          object = read_NPX(filename = tmp_unknown_file),
-          regexp = "Unable to recognize format from file extension!"
-        )
-
-      }
-    )
-  }
-)

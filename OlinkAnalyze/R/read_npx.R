@@ -101,51 +101,34 @@ read_npx <- function(filename,
 
   # read data ----
 
-  # if the extension of the input file was within the accepted ones it should
-  # be a scalar character
-  if (check_is_scalar_character(string = f_label, error = FALSE)) {
+  if (grepl(pattern = "excel|delim", x = f_label)) {
 
-    if (grepl(pattern = "excel|delim", x = f_label)) {
+    # Input is an excel or a delimited file
+    df_olink <- read_npx_format(file = filename,
+                                out_df = out_df,
+                                sep = sep,
+                                long_format = long_format,
+                                olink_platform = olink_platform,
+                                data_type = data_type,
+                                quiet = quiet)
 
-      # Input is an excel or a delimited file
-      df_olink <- read_npx_format(file = filename,
-                                  out_df = out_df,
-                                  sep = sep,
-                                  long_format = long_format,
-                                  olink_platform = olink_platform,
-                                  data_type = data_type,
-                                  quiet = quiet)
+  } else if (grepl(pattern = "parquet", x = f_label)) {
 
-    } else if (grepl(pattern = "parquet", x = f_label)) {
+    # Input is a parquet file
+    df_olink <- read_npx_parquet(file = filename)
 
-      # Input is a parquet file
-      df_olink <- read_npx_parquet(file = filename)
+  } else if (grepl(pattern = "compressed", x = f_label)) {
 
-    } else if (grepl(pattern = "compressed", x = f_label)) {
-
-      # Input is a zip-compressed file
-      df_olink <- read_npx_zip(
-        file = filename,
-        out_df = out_df,
-        sep = sep,
-        long_format = long_format,
-        olink_platform = olink_platform,
-        data_type = data_type,
-        .ignore_files = .ignore_files,
-        quiet = quiet
-      )
-
-    }
-
-  } else {
-
-    cli::cli_abort(
-      message = c(
-        "x" = "Unable to recognize format from file extension!",
-        "i" = "Acceptable file extensions: {accepted_npx_file_ext}"
-      ),
-      call = NULL,
-      wrap = FALSE
+    # Input is a zip-compressed file
+    df_olink <- read_npx_zip(
+      file = filename,
+      out_df = out_df,
+      sep = sep,
+      long_format = long_format,
+      olink_platform = olink_platform,
+      data_type = data_type,
+      .ignore_files = .ignore_files,
+      quiet = quiet
     )
 
   }
