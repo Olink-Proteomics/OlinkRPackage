@@ -36,6 +36,9 @@
 #' @param quiet Boolean to print a confirmation message when reading the input
 #' file. Applies to excel or delimited input only. `TRUE` (default) to not print
 #' and `FALSE` to print.
+#' @param legacy Boolean to run the legacy read_npx function. \strong{Important:
+#' applies only to wide format file from Target 96 or Target 48 with NPX
+#' Software version earlier than 1.8!}. Default is `FALSE`.
 #'
 #' @return Tibble or ArrowObject with Olink data in long format.
 #'
@@ -77,7 +80,8 @@ read_npx <- function(filename,
                      olink_platform = NULL,
                      data_type = NULL,
                      .ignore_files = c("README.txt"),
-                     quiet = TRUE) {
+                     quiet = TRUE,
+                     legacy = FALSE) {
 
   # check input ----
 
@@ -87,6 +91,9 @@ read_npx <- function(filename,
 
   # check that the requested putput df is ok
   check_out_df_arg(out_df = out_df)
+
+  check_is_scalar_boolean(bool = legacy,
+                          error = TRUE)
 
   # sep and .ignore_file are checked in the functions they target
 
@@ -98,15 +105,28 @@ read_npx <- function(filename,
   # read data ----
 
   if (grepl(pattern = "excel|delim", x = f_label)) {
-
     # Input is an excel or a delimited file
-    df_olink <- read_npx_format(file = filename,
-                                out_df = out_df,
-                                sep = sep,
-                                long_format = long_format,
-                                olink_platform = olink_platform,
-                                data_type = data_type,
-                                quiet = quiet)
+
+    # Run legacy read_npx function
+    if (legacy == TRUE) {
+
+      df_olink <- read_npx_legacy(file = filename,
+                                  out_df = out_df,
+                                  olink_platform = olink_platform,
+                                  data_type = data_type)
+
+    } else {
+
+      df_olink <- read_npx_format(file = filename,
+                                  out_df = out_df,
+                                  sep = sep,
+                                  long_format = long_format,
+                                  olink_platform = olink_platform,
+                                  data_type = data_type,
+                                  quiet = quiet,
+                                  legacy = FALSE)
+
+    }
 
   } else if (grepl(pattern = "parquet", x = f_label)) {
 
