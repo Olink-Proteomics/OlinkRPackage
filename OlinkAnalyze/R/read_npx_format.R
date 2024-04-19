@@ -73,7 +73,7 @@ read_npx_format <- function(file,
   check_file_exists(file = file,
                     error = TRUE)
 
-  # check that the requested putput df is ok
+  # check that the requested output df is ok
   check_out_df_arg(out_df = out_df)
 
   # check long format input
