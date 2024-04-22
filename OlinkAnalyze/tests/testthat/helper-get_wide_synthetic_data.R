@@ -76,3 +76,72 @@ olink_wide2long_rows <- function(n_panels,
 
   return(n_row_out)
 }
+
+# this function orders the columns
+olink_wide_oder_cols <- function(list_df_wide) {
+
+  # combine top, na, middle and bottom matrices
+  data_no_head <- list_df_wide$df_top_wide |>
+    dplyr::bind_rows(
+      list_df_wide$df_na_wide
+    ) |>
+    dplyr::bind_rows(
+      list_df_wide$df_middle_wide
+    ) |>
+    dplyr::bind_rows(
+      list_df_wide$df_na_wide
+    ) |>
+    dplyr::bind_rows(
+      list_df_wide$df_bottom_wide
+    )
+
+  # identify unique panels
+  uniq_panels <- data_no_head |>
+    dplyr::select(
+      -dplyr::all_of("V1")
+    ) |>
+    (\(.x) .x[1L,])() |>
+    as.character() |>
+    unique() |>
+    sort()
+
+  # get index of unique panels
+  pid_qc_index <- which(data_no_head[2L, ] %in% c("Plate ID", "QC Warning"))
+
+  # order assays, internal controls and deviations from internal controls based
+  # on panels. Output is the dataset ordered. It is missing V1 (SampleID) and
+  # PlateID and QC_Warning.
+  data_no_head_panel_order <- lapply(uniq_panels, function(.p) {
+    panel_index <- which(data_no_head[1L, ] == .p)
+    panel_index_move <- panel_index[!(panel_index %in% pid_qc_index)]
+
+    data_no_head |>
+      dplyr::select(
+        dplyr::all_of(panel_index_move)
+      )
+  }) |>
+    dplyr::bind_cols()
+
+  # add V1 (SampleID) and columns with PlateID and QC_Warning
+  data_no_head_ordered <- data_no_head |>
+    dplyr::select(
+      dplyr::all_of("V1")
+    ) |>
+    dplyr::bind_cols(
+      data_no_head_panel_order
+    ) |>
+    dplyr::bind_cols(
+      data_no_head |>
+        dplyr::select(
+          dplyr::all_of(pid_qc_index)
+        )
+    )
+
+  # add head
+  data_ordered <- list_df_wide$df_head_wide |>
+    dplyr::bind_rows(
+      data_no_head_ordered
+    )
+
+  return(data_ordered)
+}
