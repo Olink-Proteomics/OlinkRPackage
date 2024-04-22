@@ -1610,14 +1610,40 @@ read_npx_wide_bottom <- function(df,
       )
   })
 
-  names_in_v1 <- sapply(format_spec_bottom, \(x) (all(x$in_df))) |>
-    (\(x) x[x == TRUE])()
+  # names_in_v1 <- sapply(format_spec_bottom, \(x) (all(x$in_df))) |>
+  #   (\(x) x[x == TRUE])()
+
+  names_in_v1 <- lapply(format_spec_bottom, function(.x) {
+    .x |>
+      dplyr::mutate(
+        total_n = dplyr::n(),
+        true_n = sum(.data[["in_df"]])
+      ) |>
+      dplyr::select(
+        dplyr::all_of(c("total_n", "true_n"))
+      ) |>
+      dplyr::distinct()
+  }) |>
+    dplyr::bind_rows(
+      .id = "combo"
+    ) |>
+    dplyr::filter(
+      .data[["total_n"]] == .data[["true_n"]]
+    ) |>
+    dplyr::arrange(
+      dplyr::desc(.data[["total_n"]])
+    ) |>
+    dplyr::slice_head(
+      n = 1L
+    ) |>
+    dplyr::pull(
+      .data[["combo"]]
+    )
 
   # if none or multiple combinations match
   # or, if df$V1 is a superset of the expected columns
-  if (length(names_in_v1) != 1
-      || nrow(format_spec_bottom[[names(names_in_v1)]])
-      != length(unique(df$V1))) {
+  if (length(names_in_v1) != 1L
+      || nrow(format_spec_bottom[[names_in_v1]]) != length(unique(df$V1))) {
 
     bottom_mat_v1_expected <- sapply( # nolint
       format_spec_bottom,
@@ -1625,14 +1651,13 @@ read_npx_wide_bottom <- function(df,
         sapply(x$variable_alt_names, utils::head, 1L) |>
           cli::ansi_collapse()
       }
-    ) |>
-      cli::ansi_collapse(sep2 = ", or ", last = ", or ")
+    )
 
     cli::cli_abort(
       message = c(
         "x" = "Unexpected values in column 1 of the bottom matrix with QC data
-        in file {.file {file}}. Expected on of the combos:
-        {bottom_mat_v1_expected}",
+        in file {.file {file}}. Expected one of the combos:",
+        bottom_mat_v1_expected,
         "i" = "Has the file been modified manually?"
       ),
       call = rlang::caller_env(),
@@ -1642,7 +1667,7 @@ read_npx_wide_bottom <- function(df,
   }
 
   # clean up format_spec_bottom for downstream use
-  format_spec_bottom_df <- format_spec_bottom[[names(names_in_v1)]] |>
+  format_spec_bottom_df <- format_spec_bottom[[names_in_v1]] |>
     dplyr::select(
       -dplyr::all_of(c("variable_name", "variable_alt_names", "in_df"))
     )

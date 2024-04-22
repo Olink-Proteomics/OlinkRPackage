@@ -13247,6 +13247,117 @@ test_that(
   }
 )
 
+test_that(
+  "read_npx_wide_bottom - works - T96 - NPX - v2",
+  {
+    skip_on_cran()
+
+    # variables that apply to all tests
+    olink_platform <- "Target 96"
+    data_type <- "NPX"
+    n_panels <- 3L
+    n_assays <- 92L
+    n_samples <- 99L
+
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = 2L
+    )
+
+    # column names of each subset of data
+    col_names <- sapply(df_rand$list_df_long$df_top_long,
+                        function(x) x$col_index)
+    col_names <- col_names[which(lapply(col_names, length) != 0L)]
+    names(col_names) <- strsplit(x = names(col_names), split = "_") |>
+      lapply(function(x) paste(x[x != "df"], collapse = "_")) |>
+      unlist()
+    names(col_names) <- paste0("df_top_", names(col_names))
+
+    # plate panel combos
+    df_plate_panel <- df_rand$list_df_long$df_oid_long |>
+      dplyr::select(
+        dplyr::all_of(c("col_index", "Panel"))
+      ) |>
+      dplyr::distinct() |>
+      dplyr::bind_rows(
+        df_rand$list_df_long$df_int_ctrl_long |>
+          dplyr::select(
+            dplyr::all_of(c("col_index", "Panel"))
+          ) |>
+          dplyr::distinct()
+      ) |>
+      dplyr::left_join(
+        df_rand$list_df_long$df_plate_long |>
+          dplyr::select(
+            dplyr::all_of(c("PlateID", "Panel"))
+          ) |>
+          dplyr::distinct(),
+        by = "Panel",
+        relationship = "many-to-many"
+      )
+
+    # check bottom df
+    withr::with_tempfile(
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
+      fileext = ".xlsx",
+      code = {
+
+        # write empty-ish file
+        writeLines("foo", olink_wide_format)
+
+        # check that function runs
+        expect_no_condition(
+          object = df_out <- read_npx_wide_bottom(
+            df = df_rand$list_df_wide$df_bottom_wide,
+            file = olink_wide_format,
+            olink_platform = olink_platform,
+            data_type = data_type,
+            col_names = col_names,
+            format_spec = get_format_spec(data_type = data_type),
+            df_plate_panel = df_plate_panel
+          )
+        )
+
+        # check that output match
+        expect_identical(
+          object = colnames(df_out$df_bottom_oid) |> sort(),
+          expected = colnames(df_rand$list_df_long$df_bottom_long$df_oid) |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_oid,
+          expected = df_rand$list_df_long$df_bottom_long$df_oid |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out$df_bottom_oid))
+            )
+        )
+
+        expect_identical(
+          object = colnames(df_out$df_bottom_int_ctrl) |> sort(),
+          expected = df_rand$list_df_long$df_bottom_long$df_int_ctrl |>
+            colnames() |>
+            sort()
+        )
+        expect_identical(
+          object = df_out$df_bottom_int_ctrl,
+          expected = df_rand$list_df_long$df_bottom_long$df_int_ctrl |>
+            dplyr::select(
+              dplyr::all_of(colnames(df_out$df_bottom_int_ctrl))
+            )
+        )
+
+      }
+    )
+  }
+)
+
 # T96 NPX data from 2018 with NPX Manager
 test_that(
   "read_npx_wide_bottom - works - T96 - NPX - NPX Manager 2018",
