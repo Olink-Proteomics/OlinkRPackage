@@ -1649,14 +1649,16 @@ read_npx_wide_bottom <- function(df,
       format_spec_bottom,
       function(x) {
         sapply(x$variable_alt_names, utils::head, 1L) |>
-          cli::ansi_collapse()
+          cli::ansi_collapse() |>
+          (\(.x) paste("*", .x))()
       }
     )
 
     cli::cli_abort(
       message = c(
         "x" = "Unexpected values in column 1 of the bottom matrix with QC data
-        in file {.file {file}}. Expected one of the combos:",
+        in file {.file {file}}.",
+        "Expected one of the combos:",
         bottom_mat_v1_expected,
         "i" = "Has the file been modified manually?"
       ),
