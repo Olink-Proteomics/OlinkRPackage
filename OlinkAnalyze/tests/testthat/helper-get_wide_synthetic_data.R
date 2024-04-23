@@ -78,7 +78,7 @@ olink_wide2long_rows <- function(n_panels,
 }
 
 # this function orders the columns
-olink_wide_oder_cols <- function(list_df_wide) {
+olink_wide_order_cols <- function(list_df_wide) {
 
   # combine top, na, middle and bottom matrices
   data_no_head <- list_df_wide$df_top_wide |>
@@ -105,22 +105,63 @@ olink_wide_oder_cols <- function(list_df_wide) {
     unique() |>
     sort()
 
-  # get index of unique panels
-  pid_qc_index <- which(data_no_head[2L, ] %in% c("Plate ID", "QC Warning"))
+  # order
+  # - assays and internal controls grouped by panel
+  # - plate_id grouped by panel
+  # - qc_warning grouped by panel
+  # - inc and det deviation from internal controls grouped by panel
 
-  # order assays, internal controls and deviations from internal controls based
-  # on panels. Output is the dataset ordered. It is missing V1 (SampleID) and
-  # PlateID and QC_Warning.
-  data_no_head_panel_order <- lapply(uniq_panels, function(.p) {
-    panel_index <- which(data_no_head[1L, ] == .p)
-    panel_index_move <- panel_index[!(panel_index %in% pid_qc_index)]
-
-    data_no_head |>
-      dplyr::select(
-        dplyr::all_of(panel_index_move)
-      )
+  assay_int_ctrl_index <- lapply(uniq_panels, function(.p) {
+    # get assay index (columns containing assays)
+    assay_index <- which(data_no_head[1L, ] == .p
+                         & grepl("^OID", data_no_head[4L, ]))
+    # get internal controls index (columns containing internal controls)
+    int_ctrl_index <- which(data_no_head[1L, ] == .p
+                            & grepl("Inc Ctrl|Det Ctrl|Ext Ctrl",
+                                    data_no_head[2L, ]))
+    return(c(assay_index, int_ctrl_index))
   }) |>
-    dplyr::bind_cols()
+    unlist()
+
+  plate_id_index <- lapply(uniq_panels, function(.p) {
+    # get plate_id index (columns containing plate_id)
+    pid_index <- which(data_no_head[1L, ] == .p
+                       & data_no_head[2L, ] == "Plate ID")
+    return(pid_index)
+  }) |>
+    unlist()
+
+  qc_warning_index <- lapply(uniq_panels, function(.p) {
+    # get qc_warning index (columns containing qc_warning)
+    qc_warn_index <- which(data_no_head[1L, ] == .p
+                           & data_no_head[2L, ] == "QC Warning")
+    return(qc_warn_index)
+  }) |>
+    unlist()
+
+  dev_int_ctrl_index <- lapply(uniq_panels, function(.p) {
+    # get deviation from internal controls index (columns containing deviations from
+    # internal controls) - Incubation Control
+    dev_int_ctrl_inc_index <- which(
+      data_no_head[1L, ] == .p
+      & data_no_head[2L, ] == "QC Deviation from median"
+      & grepl("^Inc Ctrl", data_no_head[3L, ])
+    )
+    # get deviation from internal controls index (columns containing deviations from
+    # internal controls) - Detection Control
+    dev_int_ctrl_det_index <- which(
+      data_no_head[1L, ] == .p
+      & data_no_head[2L, ] == "QC Deviation from median"
+      & grepl("^Det Ctrl", data_no_head[3L, ])
+    )
+    return(c(dev_int_ctrl_inc_index, dev_int_ctrl_det_index))
+  }) |>
+    unlist()
+
+  index_order <- c(assay_int_ctrl_index,
+                   plate_id_index,
+                   qc_warning_index,
+                   dev_int_ctrl_index)
 
   # add V1 (SampleID) and columns with PlateID and QC_Warning
   data_no_head_ordered <- data_no_head |>
@@ -128,12 +169,9 @@ olink_wide_oder_cols <- function(list_df_wide) {
       dplyr::all_of("V1")
     ) |>
     dplyr::bind_cols(
-      data_no_head_panel_order
-    ) |>
-    dplyr::bind_cols(
       data_no_head |>
         dplyr::select(
-          dplyr::all_of(pid_qc_index)
+          dplyr::all_of(index_order)
         )
     )
 
