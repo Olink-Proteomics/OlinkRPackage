@@ -85,14 +85,16 @@ df_wide_combos <- lapply(seq_len(nrow(df_wide_summary)), function(i) {
 
 # generate a dataset for each combination
 df_wide_combos$df <- lapply(seq_len(nrow(df_wide_combos)), function(i) {
-  olink_wide_synthetic(olink_platform = df_wide_combos$olink_platform[i],
-                       data_type = df_wide_combos$data_type[i],
-                       n_panels = df_wide_combos$n_panels[i],
-                       n_assays = df_wide_combos$n_assays[i],
-                       n_samples = df_wide_combos$n_samples[i],
-                       show_dev_int_ctrl = df_wide_combos$show_dev_int_ctrl[i],
-                       show_int_ctrl = df_wide_combos$show_int_ctrl[i],
-                       version = df_wide_combos$version[i])
+  olink_wide_synthetic(
+    olink_platform = df_wide_combos$olink_platform[i],
+    data_type = df_wide_combos$data_type[i],
+    n_panels = df_wide_combos$n_panels[i],
+    n_assays = df_wide_combos$n_assays[i],
+    n_samples = df_wide_combos$n_samples[i],
+    show_dev_int_ctrl = df_wide_combos$show_dev_int_ctrl[i],
+    show_int_ctrl = df_wide_combos$show_int_ctrl[i],
+    version = df_wide_combos$version[i]
+  )
 })
 
 # modify df_wide_combos to shorten file names

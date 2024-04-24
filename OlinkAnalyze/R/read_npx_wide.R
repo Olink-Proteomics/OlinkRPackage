@@ -819,9 +819,6 @@ read_npx_wide_top <- function(df,
     dplyr::filter(
       is.na(.data[["OlinkID"]])
       & .data[["Assay"]] %in% unlist(format_spec$top_matrix_assay_int_ctrl)
-    ) |>
-    dplyr::select(
-      -dplyr::any_of(c("Uniprot ID", "OlinkID", "Unit"))
     )
 
   # extract deviation from internal controls from Assay column

@@ -247,9 +247,6 @@ olink_wide_top_long <- function(df) {
       & grepl(pattern = "ctrl",
               x = .data[["Assay"]],
               ignore.case = TRUE)
-    ) |>
-    dplyr::select(
-      -dplyr::any_of(c("Uniprot ID", "OlinkID", "Unit"))
     )
 
   df_plate <- df |>
