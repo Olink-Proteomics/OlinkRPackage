@@ -4,11 +4,13 @@
 \alias{check_all_na_assays}
 \title{Help function to identify Olink assays with all quantified values NA.}
 \usage{
-check_all_na_assays(df, column_name_df)
+check_all_na_assays(df, name_mask)
 }
 \arguments{
-\item{df}{An arrow object containing columns "OlinkID" and
-either "NPX" or "Quantified_value"}
+\item{df}{A tibble or an arrow object containing columns "OlinkID" and
+either "NPX", "Quantified_value" or "Ct"}
+
+\item{name_mask}{A list of matched column names, the output of `check_npx_col_names` function.}
 }
 \value{
 A character vector containing

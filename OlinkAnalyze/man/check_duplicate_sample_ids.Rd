@@ -4,10 +4,12 @@
 \alias{check_duplicate_sample_ids}
 \title{Help function checking for duplicate sample IDs in data}
 \usage{
-check_duplicate_sample_ids(df)
+check_duplicate_sample_ids(df, name_mask)
 }
 \arguments{
 \item{df}{An arrow object containing the columns "SampleID" and "OlinkID".}
+
+\item{name_mask}{A list of matched column names. This is the output of `check_npx_col_names` function.}
 }
 \value{
 Invisible NULL.
