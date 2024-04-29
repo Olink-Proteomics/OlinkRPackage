@@ -4,14 +4,24 @@
 #'  Simon Forsberg
 #'  Masoumeh Sheikhi
 #'
-#' @param df An arrow object containing columns "OlinkID" and
-#' either "NPX" or "Quantified_value"
+#' @param df A tibble or an arrow object containing columns "OlinkID" and
+#' either "NPX", "Quantified_value" or "Ct"
+#'
+#' @param name_mask A list of matched column names, the output of `check_npx_col_names` function.
 #'
 #' @return A character vector containing
 #' Olink ID of assays with all quantified values NA,
 #' otherwise returns `character(0)`.
 
-check_all_na_assays <- function(df, column_name_df) {
+check_all_na_assays <- function(df, name_mask) {
+
+  # required columns: olink_id and quant
+  # this seems redundant in presence of name_mask that is the output of check_npx_col_names
+  # if the olinkid of npx or their equivalent is missing, check_npx_col_names will through an error
+  check_columns(df,
+                col_list = list(name_mask$olink_id,
+                                name_mask$quant))
+
 
   # Identify assays with only NAs
   all_nas <-
@@ -19,16 +29,16 @@ check_all_na_assays <- function(df, column_name_df) {
     dplyr::select(
       dplyr::all_of(
         c(
-        column_name_df$olink_id,
-        column_name_df$quant
+        name_mask$olink_id,
+        name_mask$quant
         )
       )
     ) |>
     dplyr::group_by(
-      .data[[column_name_df$olink_id]]
+      .data[[name_mask$olink_id]]
     ) |>
     dplyr::mutate(
-      is_na = ifelse(is.na(.data[[column_name_df$quant]]), 1L, 0L)
+      is_na = ifelse(is.na(.data[[name_mask$quant]]), 1L, 0L)
     ) |>
     dplyr::summarise(
       n = dplyr::n(),
@@ -39,14 +49,14 @@ check_all_na_assays <- function(df, column_name_df) {
       n == n_na
       )  |>
     dplyr::pull(
-      .data[[column_name_df$olink_id]],
+      .data[[name_mask$olink_id]],
       as_vector = TRUE
     )
 
   # Issue warning if any assays with only NAs are found
   if (length(all_nas) > 0L) {
     cli::cli_warn(c(
-      x = "{all_nas} ha{?s/ve} {column_name_df$quant} = NA for all samples."))
+      x = "{all_nas} ha{?s/ve} {name_mask$quant} = NA for all samples."))
   }
 
   return(all_nas)

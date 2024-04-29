@@ -11,6 +11,7 @@
 #' and values are current column names.
 #'
 #' @return A list of matched column names based on the preferred names.
+#'
 #' @details This function checks if the preferred column names are present in the data. If the
 #' preferred names are provided, it updates the column names according to the provided preferences.
 #' Otherwise, it uses the existing column names in the dataset.

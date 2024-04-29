@@ -1,4 +1,4 @@
-## code to prepare `column_name_dict` dataset goes here
+## code to prepare `column_name_dict` dataset
 
 column_name_dict <- list(
   sample_id = c("SampleID", "sampleid", "sample_id"),
