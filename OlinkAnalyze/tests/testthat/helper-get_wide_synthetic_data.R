@@ -183,3 +183,69 @@ olink_wide_order_cols <- function(list_df_wide) {
 
   return(data_ordered)
 }
+
+# transform expected long df to match legacy output
+expected_vs_legacy_df_prep <- function(long_expected,
+                                       long_legacy,
+                                       olink_platform) {
+  # modify df_synthetic long
+  rename_lookup <- c("Plate_LOD" = "PlateLOD",
+                     "Plate_LOD" = "Plate LOD",
+                     "Plate_LOD" = "Plate_LOD",
+                     "Plate_LQL" = "PlateLQL",
+                     "Plate_LQL" = "Plate LQL",
+                     "Plate_LQL" = "Plate_LQL")
+
+  df_expected <- long_expected |>
+    dplyr::rename(
+      dplyr::any_of(rename_lookup)
+    ) |>
+    dplyr::select(
+      dplyr::any_of(colnames(long_legacy))
+    ) |>
+    dplyr::mutate(
+      dplyr::across(
+        dplyr::any_of(c("MissingFreq", "LOD", "NPX", "Quantified_value",
+                        "QC Deviation Det Ctrl",
+                        "QC Deviation Inc Ctrl",
+                        "Plate_LQL", "Plate_LOD", "LLOQ", "ULOQ")),
+        ~ as.numeric(.x)
+      ),
+      Panel = stringr::str_replace_all(
+        string = .data[["Panel"]],
+        pattern = olink_platform,
+        replacement = ""
+      ) |>
+        stringr::str_squish()
+    ) |>
+    dplyr::arrange(
+      .data[["OlinkID"]], .data[["Assay"]], .data[["SampleID"]]
+    )
+
+  df_legacy <- long_legacy |>
+    dplyr::select(
+      -dplyr::all_of("Index")
+    ) |>
+    dplyr::mutate(
+      dplyr::across(
+        dplyr::all_of(c("MissingFreq")),
+        ~ as.numeric(.x)
+      ),
+      UniProt = dplyr::if_else(grepl("Ctrl", .data[["OlinkID"]]),
+                               NA_character_,
+                               .data[["UniProt"]]),
+      OlinkID = dplyr::if_else(grepl("Ctrl", .data[["OlinkID"]]),
+                               NA_character_,
+                               .data[["OlinkID"]])
+    ) |>
+    dplyr::arrange(
+      .data[["OlinkID"]], .data[["Assay"]], .data[["SampleID"]]
+    )
+
+  return(
+    list(
+      df_expected = df_expected,
+      df_legacy = df_legacy
+    )
+  )
+}
