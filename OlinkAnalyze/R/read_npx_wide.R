@@ -1607,9 +1607,6 @@ read_npx_wide_bottom <- function(df,
       )
   })
 
-  # names_in_v1 <- sapply(format_spec_bottom, \(x) (all(x$in_df))) |>
-  #   (\(x) x[x == TRUE])()
-
   names_in_v1 <- lapply(format_spec_bottom, function(.x) {
     .x |>
       dplyr::mutate(

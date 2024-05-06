@@ -100,7 +100,7 @@ olink_wide_order_cols <- function(list_df_wide) {
     dplyr::select(
       -dplyr::all_of("V1")
     ) |>
-    (\(.x) .x[1L,])() |>
+    (\(.x) .x[1L, ])() |>
     as.character() |>
     unique() |>
     sort()
@@ -140,15 +140,15 @@ olink_wide_order_cols <- function(list_df_wide) {
     unlist()
 
   dev_int_ctrl_index <- lapply(uniq_panels, function(.p) {
-    # get deviation from internal controls index (columns containing deviations from
-    # internal controls) - Incubation Control
+    # get deviation from internal controls index (columns containing deviations
+    # from internal controls) - Incubation Control
     dev_int_ctrl_inc_index <- which(
       data_no_head[1L, ] == .p
       & data_no_head[2L, ] == "QC Deviation from median"
       & grepl("^Inc Ctrl", data_no_head[3L, ])
     )
-    # get deviation from internal controls index (columns containing deviations from
-    # internal controls) - Detection Control
+    # get deviation from internal controls index (columns containing deviations
+    # from internal controls) - Detection Control
     dev_int_ctrl_det_index <- which(
       data_no_head[1L, ] == .p
       & data_no_head[2L, ] == "QC Deviation from median"
