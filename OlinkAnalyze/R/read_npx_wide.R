@@ -777,7 +777,7 @@ read_npx_wide_top <- function(df,
   # transpose df to long ----
 
   df_t <- t(df) # transpose the wide df
-  colnames(df_t) <- df_t[1, ] # add colnames
+  colnames(df_t) <- df_t[1L, ] # add colnames
   df_t <- df_t |>
     dplyr::as_tibble(
       rownames = "col_index"
@@ -1448,19 +1448,22 @@ red_npx_wide_top_mid_long <- function(df_top_list,
 #' @author
 #'   Klev Diamanti
 #'
+#' @param df Bottom matrix of Olink dataset in wide format \var{df_bottom}.
+#' @param file Path to Olink software output file in wide or long format.
+#' Expecting file extensions `csv`, `txt`, `xls`, or `xlsx`.
 #' @param data_type The quantification in which the data comes in. Expecting one
 #' of "NPX", "Quantified" or "Ct".
 #' @param olink_platform Olink platform used to generate the input file.
 #' One of `Target 96`, `Target 48`, `Flex` or `Focus`.
 #'
-#' @return List of tibbles with two columns each. Columns contain unique and
-#' alternative expected names for V1 of each row of the bottom matrix in an
-#' Olink wide file.
+#' @return Tibble with the bottom matrix specifications for the Olink wide file.
 #'
 #' @seealso
 #'   \code{\link{read_npx_wide_bottom}}
 #'
-read_npx_wide_bottom_version <- function(data_type,
+read_npx_wide_bottom_version <- function(df,
+                                         file,
+                                         data_type,
                                          olink_platform) {
 
   # extract all possible variable names from the global matrix
@@ -1507,81 +1510,8 @@ read_npx_wide_bottom_version <- function(data_type,
 
   }
 
-  return(list_bottom_v)
-}
-
-#' Convert the bottom matrix from Olink dataset in wide format to long.
-#'
-#' @description
-#' Use chunks of columns from `read_npx_wide_top` to covert the bottom matrix
-#' \var{df_bottom} into a long format tibble.
-#'
-#' @author
-#'   Klev Diamanti
-#'
-#' @param df Bottom matrix of Olink dataset in wide format \var{df_bottom}.
-#' @param file Path to Olink software output file in wide or long format.
-#' Expecting file extensions `csv`, `txt`, `xls`, or `xlsx`.
-#' @param olink_platform Olink platform used to generate the input file.
-#' One of `Target 96`, `Target 48`, `Flex` or `Focus`.
-#' @param data_type Quantification method of the input data. One of `NPX`,
-#' `Quantified` or `Ct`.
-#' @param col_names Names list of character vectors containing column names from
-#' each chunk of columns \var{df_top} was split on in function.
-#' @param format_spec A tibble derived from \var{olink_wide_spec} in the local
-#' environment containing the expected format of the Olink wide file based on
-#' the \var{olink_platform} and \var{data_type}.
-#' @param df_plate_panel Tibble with unique combinations of panels and plates
-#' from the combination of top and middle data frames.
-#'
-#' @return A tibble with the bottom matrix of an Olink wide file in long format.
-#'
-#' @seealso
-#'   \code{\link{read_npx_wide}}
-#'   \code{\link{read_npx_wide_split_row}}
-#'   \code{\link{read_npx_wide_npxs_version}}
-#'   \code{\link{read_npx_wide_top}}
-#'   \code{\link{read_npx_wide_middle}}
-#'
-read_npx_wide_bottom <- function(df,
-                                 file,
-                                 olink_platform,
-                                 data_type,
-                                 col_names,
-                                 format_spec,
-                                 df_plate_panel) {
-  # check input ----
-
-  check_is_tibble(df = df,
-                  error = TRUE)
-
-  check_file_exists(file = file,
-                    error = TRUE)
-
-  check_olink_platform(x = olink_platform,
-                       broader_platform = "qPCR")
-
-  check_olink_data_type(x = data_type,
-                        broader_platform = "qPCR")
-
-  check_is_list(lst = col_names,
-                error = TRUE)
-
-  sapply(col_names, function(x) check_is_character(string = x, error = TRUE))
-
-  check_is_tibble(df = format_spec,
-                  error = TRUE)
-
-  check_is_tibble(df = df_plate_panel,
-                  error = TRUE)
-
-  # get first column options ----
-
   # list with all possible combinations
-  format_spec_bottom <- read_npx_wide_bottom_version(
-    data_type = data_type,
-    olink_platform = olink_platform
-  )
+  format_spec_bottom <- list_bottom_v
 
   # check first column ----
 
@@ -1662,8 +1592,88 @@ read_npx_wide_bottom <- function(df,
 
   }
 
+  format_spec_bottom[[names_in_v1]] <- format_spec_bottom[[names_in_v1]] |>
+    dplyr::mutate(
+      version = .env[["names_in_v1"]]
+    )
+
+  return(format_spec_bottom[[names_in_v1]])
+}
+
+#' Convert the bottom matrix from Olink dataset in wide format to long.
+#'
+#' @description
+#' Use chunks of columns from `read_npx_wide_top` to covert the bottom matrix
+#' \var{df_bottom} into a long format tibble.
+#'
+#' @author
+#'   Klev Diamanti
+#'
+#' @param df Bottom matrix of Olink dataset in wide format \var{df_bottom}.
+#' @param file Path to Olink software output file in wide or long format.
+#' Expecting file extensions `csv`, `txt`, `xls`, or `xlsx`.
+#' @param olink_platform Olink platform used to generate the input file.
+#' One of `Target 96`, `Target 48`, `Flex` or `Focus`.
+#' @param data_type Quantification method of the input data. One of `NPX`,
+#' `Quantified` or `Ct`.
+#' @param col_names Names list of character vectors containing column names from
+#' each chunk of columns \var{df_top} was split on in function.
+#' @param format_spec A tibble derived from \var{olink_wide_spec} in the local
+#' environment containing the expected format of the Olink wide file based on
+#' the \var{olink_platform} and \var{data_type}.
+#' @param df_plate_panel Tibble with unique combinations of panels and plates
+#' from the combination of top and middle data frames.
+#'
+#' @return A tibble with the bottom matrix of an Olink wide file in long format.
+#'
+#' @seealso
+#'   \code{\link{read_npx_wide}}
+#'   \code{\link{read_npx_wide_split_row}}
+#'   \code{\link{read_npx_wide_npxs_version}}
+#'   \code{\link{read_npx_wide_top}}
+#'   \code{\link{read_npx_wide_middle}}
+#'
+read_npx_wide_bottom <- function(df,
+                                 file,
+                                 olink_platform,
+                                 data_type,
+                                 col_names,
+                                 format_spec,
+                                 df_plate_panel) {
+  # check input ----
+
+  check_is_tibble(df = df,
+                  error = TRUE)
+
+  check_file_exists(file = file,
+                    error = TRUE)
+
+  check_olink_platform(x = olink_platform,
+                       broader_platform = "qPCR")
+
+  check_olink_data_type(x = data_type,
+                        broader_platform = "qPCR")
+
+  check_is_list(lst = col_names,
+                error = TRUE)
+
+  sapply(col_names, function(x) check_is_character(string = x, error = TRUE))
+
+  check_is_tibble(df = format_spec,
+                  error = TRUE)
+
+  check_is_tibble(df = df_plate_panel,
+                  error = TRUE)
+
+  # get first column options ----
+
   # clean up format_spec_bottom for downstream use
-  format_spec_bottom_df <- format_spec_bottom[[names_in_v1]] |>
+  format_spec_bottom_df <- read_npx_wide_bottom_version(
+    df = df,
+    file = file,
+    data_type = data_type,
+    olink_platform = olink_platform
+  ) |>
     dplyr::select(
       -dplyr::all_of(c("variable_name", "variable_alt_names", "in_df"))
     )
