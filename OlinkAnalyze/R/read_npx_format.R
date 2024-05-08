@@ -57,6 +57,7 @@
 #'   \code{\link{read_npx_format_get_format}}
 #'   \code{\link{read_npx_format_get_platform}}
 #'   \code{\link{read_npx_format_get_quant}}
+#'   \code{\link{read_npx_legacy}}
 #'
 read_npx_format <- function(file,
                             out_df = "arrow",
