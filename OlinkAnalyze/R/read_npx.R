@@ -36,9 +36,9 @@
 #' @param quiet Boolean to print a confirmation message when reading the input
 #' file. Applies to excel or delimited input only. `TRUE` (default) to not print
 #' and `FALSE` to print.
-#' @param legacy Boolean to run the legacy read_npx function. \strong{Important:
-#' applies only to wide format file from Target 96 or Target 48 with NPX
-#' Software version earlier than 1.8!}. Default is `FALSE`.
+#' @param legacy Boolean to run the legacy version of the read_npx function.
+#' \strong{Important: applies only to wide format file from Target 96 or Target
+#' 48 with NPX Software version earlier than 1.8!}. Default is `FALSE`.
 #'
 #' @return Tibble or ArrowObject with Olink data in long format.
 #'
@@ -113,7 +113,8 @@ read_npx <- function(filename,
       df_olink <- read_npx_legacy(file = filename,
                                   out_df = out_df,
                                   olink_platform = olink_platform,
-                                  data_type = data_type)
+                                  data_type = data_type,
+                                  quiet = quiet)
 
     } else {
 

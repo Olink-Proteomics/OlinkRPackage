@@ -377,3 +377,64 @@ test_that(
     )
   }
 )
+
+test_that(
+  "data loads correctly - legacy - wide - xlsx",
+  {
+    withr::with_tempfile(
+      new = "tmp_wide_xlsx",
+      pattern = "xlsx-wide-",
+      fileext = ".xlsx",
+      code = {
+
+        # get the npx data file
+        expect_no_error(
+          object = npx_file <- system.file("extdata",
+                                           "npx_data1.xlsx",
+                                           package = "OlinkAnalyze",
+                                           mustWork = TRUE)
+        )
+
+        # check that the variable was created
+        expect_true(object = exists("npx_file"))
+
+        # check that xlsx file can by copied without issues
+        expect_no_condition(
+          object = file.copy(npx_file, tmp_wide_xlsx)
+        )
+
+        # check that data can be loaded
+        expect_warning(
+          object = npx_df <- read_NPX(filename = tmp_wide_xlsx,
+                                      olink_platform = "Target 96",
+                                      out_df = "tibble",
+                                      long_format = FALSE,
+                                      data_type = "NPX",
+                                      legacy = TRUE,
+                                      quiet = TRUE),
+          regexp = "Unable to recognize the Olink platform from the input"
+        )
+
+        # check that data frame exists
+        expect(ok = exists("npx_df"),
+               failure_message = "failed to read wide xlsx in tibble")
+
+        # check that data set has correct number of rows and columns
+        expected_rows <- 176640L
+        expected_cols <- 12L
+        expect_equal(object = nrow(npx_df), expected = expected_rows)
+        expect_equal(object = ncol(npx_df), expected = expected_cols)
+
+        # check that dataset has the correct column names
+        expected_colnames <- c("SampleID", "Index", "OlinkID", "UniProt",
+                               "Assay", "MissingFreq", "Panel", "Panel_Version",
+                               "PlateID", "QC_Warning", "LOD", "NPX")
+        expect_identical(
+          object = colnames(npx_df),
+          expected = expected_colnames
+        )
+
+      }
+    )
+  }
+)

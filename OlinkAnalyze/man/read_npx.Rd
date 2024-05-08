@@ -59,9 +59,9 @@ zip-compressed input files. `c("README.txt")` (default).}
 file. Applies to excel or delimited input only. `TRUE` (default) to not print
 and `FALSE` to print.}
 
-\item{legacy}{Boolean to run the legacy read_npx function. \strong{Important:
-applies only to wide format file from Target 96 or Target 48 with NPX
-Software version earlier than 1.8!}. Default is `FALSE`.}
+\item{legacy}{Boolean to run the legacy version of the read_npx function.
+\strong{Important: applies only to wide format file from Target 96 or Target
+48 with NPX Software version earlier than 1.8!}. Default is `FALSE`.}
 }
 \value{
 Tibble or ArrowObject with Olink data in long format.
