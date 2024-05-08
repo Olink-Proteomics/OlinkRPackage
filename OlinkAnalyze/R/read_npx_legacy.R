@@ -1,3 +1,38 @@
+#' Help function utilizing functions from `read_npx_format` and `read_npx_wide`
+#' to streamline `read_npx_legacy`
+#'
+#' @author Klev Diamanti
+#'
+#' @param file Path to Olink software output file in wide format. Expecting file
+#' extensions `csv`, `xls`, or `xlsx`.
+#' @param out_df The class of output data frame. One of `tibble` (default) or
+#' `arrow` for ArrowObject.
+#' @param olink_platform Olink platform used to generate the input file.
+#' One of `NULL` (default), `Target 96` or `Target 48`.
+#' @param data_type Quantification method of the input data. One of `NULL`
+#' (default), `NPX` or `Quantified`.
+#' @param data_type_no_accept Character vector of data types that should be
+#' rejected. Default: `Ct`.
+#'
+#' @return A list of objects containing the following:
+#' \itemize{
+#' \item \strong{olink_platform}: auto-detected Olink platform. One of
+#' `Target 96` or `Target 48`.
+#' \item \strong{long_format}: auto-detected Olink format. Should always be
+#' `FALSE`.
+#' \item \strong{data_type}: auto-detected Olink data type. One of
+#' `NPX` or `Quantified`.
+#' \item \strong{df_split}: list of 2 tibbles. Top matrix from the Olink wide
+#' file, and middle combined with bottom matrix.
+#' \item \strong{npxs_v}: Olink NPX software version.
+#' \item \strong{bottom_mat_v}: bottom matrix version based on
+#' \var{olink_wide_bottom_matrix}.
+#' \item \strong{format_spec}: specifications of the wide format based on
+#' \var{olink_wide_spec}.
+#' \item \strong{accept_platforms}: accepted Olink platforms and some
+#' specifications, derived from \var{accepted_olink_platforms}.
+#' }
+#'
 read_npx_legacy_help <- function(file,
                                  out_df,
                                  olink_platform = NULL,
@@ -114,6 +149,20 @@ read_npx_legacy_help <- function(file,
     df = df_split$df_head
   )
 
+  # get bottom matrix version ----
+
+  bottm_mat_v <- read_npx_wide_bottom_version(
+    df = df_split$df_bottom,
+    file = file,
+    data_type = list_format$data_type,
+    olink_platform = list_format$olink_platform
+  ) |>
+    dplyr::pull(
+      .data[["version"]]
+    ) |>
+    unique() |>
+    as.integer()
+
   # modify variables ----
 
   # combine df_mid with df_bottom
@@ -146,6 +195,7 @@ read_npx_legacy_help <- function(file,
       data_type = list_format$data_type,
       df_split = df_split,
       npxs_v = npxs_v,
+      bottom_mat_v = bottm_mat_v,
       format_spec = format_spec,
       accept_platforms = accept_platforms |>
         dplyr::filter(
@@ -155,6 +205,237 @@ read_npx_legacy_help <- function(file,
   )
 }
 
+#' Help function ensuring `read_npx_legacy` works
+#'
+#' @author Klev Diamanti
+#'
+#' @param file Path to Olink software output file in wide format. Expecting file
+#' extensions `csv`, `xls`, or `xlsx`.
+#' @param df_top Top matrix of Olink dataset in wide format.
+#' @param olink_platform Olink platform used to generate the input file.
+#' One of `NULL` (default), `Target 96` or `Target 48`.
+#' @param data_type Quantification method of the input data. One of `NULL`
+#' (default), `NPX` or `Quantified`.
+#' @param bottom_mat_v Version of the rows in the bottom matrix of the Olink
+#' file in wide format based on the local environment variable
+#' \var{olink_wide_bottom_matrix}.
+#'
+#' @return `NULL` unless unsupported file is detected.
+#'
+read_npx_legacy_check <- function(file,
+                                  df_top,
+                                  data_type,
+                                  olink_platform,
+                                  bottom_mat_v) {
+  # check input ----
+
+  check_is_arrow_or_tibble(df = df_top,
+                           error = TRUE)
+
+  check_olink_data_type(x = data_type,
+                        broader_platform = "qPCR")
+
+  # help vars ----
+
+  format_spec <- olink_wide_spec |> # nolint
+    dplyr::filter(
+      .data[["data_type"]] == .env[["data_type"]]
+    )
+
+  # test columns are sorted ----
+
+  # Expected order of panels, assays, int ctrl, plate_id, qc_warning and
+  # deviations from int ctrl:
+  # - assay + int ctrl per panel
+  # - plate_id per panel
+  # - qc_warning per panel
+  # - inc and det ctrl per panel
+
+  df_top_t <- t(df_top) # transpose the wide df
+  colnames(df_top_t) <- df_top_t[1L, ] # add colnames
+  df_top_t <- df_top_t |>
+    # convert to tibble
+    dplyr::as_tibble(
+      rownames = "col_index"
+    ) |>
+    # remove first row becuase it contained colnames
+    dplyr::slice(
+      2L:dplyr::n()
+    ) |>
+    # remove unnecessary columns
+    dplyr::select(
+      -dplyr::any_of(
+        c("col_index", "Unit")
+      )
+    ) |>
+    # create a new column to mark the type of entry.
+    # this is used to mark:
+    # - assays as "assay"
+    # - internal controls as "int_ctrl"
+    # - plate_id and qc_warning as "pid_qc"
+    # - deviations from internal controls as "dev_int_ctrl"
+    dplyr::mutate(
+      assay_type = dplyr::case_when(
+        !is.na(.data[["OlinkID"]]) ~ "assay",
+        .data[["Assay"]] %in% unlist(format_spec$top_matrix_assay_int_ctrl) ~
+          "int_ctrl",
+        .data[["Assay"]] %in% unlist(format_spec$top_matrix_assay_dev_int_ctrl)
+        & .data[["Uniprot ID"]] %in%
+          unlist(format_spec$top_matrix_uniprot_dev_int_ctrl) ~ "dev_int_ctrl",
+        .data[["Assay"]] %in% unlist(format_spec$top_matrix_assay_labels) ~
+          "pid_qc",
+        TRUE ~ NA_character_,
+        .default = NA_character_
+      )
+    ) |>
+    dplyr::select(
+      dplyr::all_of(
+        c("Panel", "assay_type")
+      )
+    ) |>
+    dplyr::distinct()
+
+  # get number of panels
+  n_panel <- df_top_t |>
+    dplyr::filter(
+      .data[["assay_type"]] == "assay"
+    ) |>
+    dplyr::pull(
+      .data[["Panel"]]
+    ) |>
+    unique() |>
+    length()
+
+  # reconstruct the column "assay_type" from df_top_t to make sure it matches
+  assay_type_expected <- c("assay")
+  if ("int_ctrl" %in% df_top_t$assay_type) {
+    assay_type_expected <- c(assay_type_expected, "int_ctrl")
+  }
+  assay_type_expected <- rep(assay_type_expected, times = n_panel)
+  assay_type_expected <- c(assay_type_expected,
+                           rep("pid_qc", times = n_panel))
+  if ("dev_int_ctrl" %in% df_top_t$assay_type) {
+    assay_type_expected <- c(assay_type_expected,
+                             rep("dev_int_ctrl", times = n_panel))
+  }
+
+  if (!identical(df_top_t$assay_type, assay_type_expected)) {
+
+    cli::cli_abort(
+      message = c(
+        "x" = "Columns of the wide file {.file {file}} should be sorted!",
+        "i" = "Expected:",
+        "i" = "- {.val {c(\"Assays\", \"Internal controls\")}} for each panel",
+        "i" = "- {.val {\"Plate ID\"}} for each panel",
+        "i" = "- {.val {\"QC Warning\"}} for each panel",
+        "i" = "- {.val {\"QC Deviation from median\"}} for each panel",
+        "i" = "Consider disabling the {.arg legacy} argument!"
+      ),
+      call = NULL,
+      wrap = TRUE
+    )
+
+  }
+
+  # check if dev int ctrl are accompanied by int ctrl ----
+
+  dev_incl_int_ctrl <- any("dev_int_ctrl" %in% df_top_t$assay_type) &&
+    !("int_ctrl" %in% df_top_t$assay_type)
+
+  if (dev_incl_int_ctrl) {
+
+    cli::cli_abort(
+      message = c(
+        "x" = "File {.file {file}} contains {.val {\"QC Deviation from
+        median\"}} but lacks {.val {\"Internal controls\"}}!",
+        "i" = "When {.val {\"QC Deviation from median\"}} are reported, then
+        {.val {\"Internal controls\"}} are required too!",
+        "i" = "Consider disabling the {.arg legacy} argument!"
+      ),
+      call = NULL,
+      wrap = TRUE
+    )
+
+  }
+
+  # check for unsupported file versions (NPX T48 v2 or NPX T96 v3) ----
+
+  is_npx_t48_v2 <- olink_platform == "Target 48" &&
+    data_type == "NPX" && bottom_mat_v == 2L
+  is_npx_t96_v3 <- olink_platform == "Target 96" &&
+    data_type == "NPX" && bottom_mat_v == 3L
+
+  if (is_npx_t48_v2 || is_npx_t96_v3) {
+
+    cli::cli_abort(
+      message = c(
+        "x" = "File {.file {file}} contains bottom matrix with unsupported
+        labels!",
+        "i" = "Consider disabling the {.arg legacy} argument!"
+      ),
+      call = NULL,
+      wrap = TRUE
+    )
+
+  }
+
+}
+
+#' Olink legacy function for reading NPX or absolute quantification data in wide
+#' format into R from Target 48 or Target 96.
+#'
+#' @description
+#' This implementation of read_NPX does not cover the latest versions of Olink
+#' files in wide format. Specifically, it supports:
+#' \itemize{
+#' \item \strong{Target 96} output files in wide format \strong{(T96 reports
+#' only NPX)} with the bottom matrix containing one of the following
+#' combinations of rows:
+#' \itemize{
+#' \item `Missing Data freq.` and `LOD`.
+#' \item `Missing Data freq.`, `LOD` and `Normalization`.
+#' }
+#' \item \strong{Target 48} output files in wide format \strong{NPX} with the
+#' bottom matrix containing the following rows: `Missing Data freq.`, `LOD` and
+#' `Normalization`.
+#' \item \strong{Target 48} output files in wide format \strong{absolute
+#' Quantification} with the bottom matrix containing the following rows:
+#' `Assay warning`, `LLOQ`, `Lowest quantifiable level`, `Missing Data freq.`,
+#' `Normalization`, `PlateLOD` and `ULOQ`.
+#' }
+#'
+#' This function would accept data exported in wide format from Olink NPX
+#' Signature 1.7.1 or earlier, or NPX Manager.
+#'
+#' @author
+#'   Klev Diamanti;
+#'   Kathleen Nevola;
+#'   Pascal Pucholt;
+#'   Christoffer Cambronero;
+#'   Boxi Zhang;
+#'   Olof Mansson;
+#'   Marianne Sandin
+#'
+#' @param file Path to Olink software output file in wide format. Expecting file
+#' extensions `csv`, `xls`, or `xlsx`.
+#' @param out_df The class of output data frame. One of `tibble` (default) or
+#' `arrow` for ArrowObject.
+#' @param olink_platform Olink platform used to generate the input file.
+#' One of `NULL` (default), `Target 96` or `Target 48`.
+#' @param data_type Quantification method of the input data. One of `NULL`
+#' (default), `NPX` or `Quantified`.
+#' @param quiet Boolean to print a confirmation message when reading the input
+#' file. `TRUE` (default) to not print
+#' and `FALSE` to print.
+#'
+#' @return Tibble or ArrowObject with Olink data in long format.
+#'
+#' @seealso
+#'   \code{\link{read_npx_format_read}}
+#'   \code{\link{read_npx_format_get_format}}
+#'   \code{\link{read_npx_format_get_platform}}
+#'   \code{\link{read_npx_format_get_quant}}
+#'
 read_npx_legacy <- function(file,
                             out_df = "tibble",
                             olink_platform = NULL,
@@ -178,6 +459,14 @@ read_npx_legacy <- function(file,
                                          olink_platform = olink_platform,
                                          data_type = data_type,
                                          data_type_no_accept = c("Ct"))
+
+  # additional checks of the input data ----
+
+  read_npx_legacy_check(file = file,
+                        df_top = df_format_list$df_split$df_top,
+                        data_type = df_format_list$data_type,
+                        olink_platform = df_format_list$olink_platform,
+                        bottom_mat_v = df_format_list$bottom_mat_v)
 
   # Check if the data type is NPX or absolute concentration ----
 
@@ -385,6 +674,8 @@ read_npx_legacy <- function(file,
   panel_list <- list()  ## combination of panel data and QC
   assay_name_list <- list()
   panel_list_long <- list()
+
+  # wide to long ----
 
   # Construct a list of tibbles that match the long format
   for (i in seq_len(nr_panel)) {

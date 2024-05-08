@@ -3650,3 +3650,216 @@ test_that(
     )
   }
 )
+
+test_that(
+  "read_npx_legacy - error - wrong order of cols",
+  {
+    ## Target 48 NPX, w dev int ctrl, w int ctrl, 1 plate, v1 ----
+
+    withr::with_tempfile(
+      new = "file_wide_xlsx",
+      pattern = "test_long",
+      fileext = ".xlsx",
+      code = {
+
+        # get wide synthetic data
+        df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
+                                                data_type = "NPX",
+                                                n_panels = 3L,
+                                                n_assays = 45L,
+                                                n_samples = 88L,
+                                                show_dev_int_ctrl = TRUE,
+                                                show_int_ctrl = TRUE,
+                                                version = 1L)
+
+        # write in excel
+        writexl::write_xlsx(
+          x = df_synthetic$list_df_wide$df_wide,
+          path = file_wide_xlsx,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # check that function works
+        expect_error(
+          object = read_npx_legacy(
+            file = file_wide_xlsx,
+            out_df = "tibble",
+            olink_platform = NULL,
+            data_type = NULL,
+            quiet = FALSE
+          ),
+          regexp = "should be sorted!"
+        )
+      }
+    )
+
+    ## Target 48 NPX, no dev int ctrl, w int ctrl, 1 plate, v1 ----
+
+    withr::with_tempfile(
+      new = "file_wide_xlsx",
+      pattern = "test_long",
+      fileext = ".xlsx",
+      code = {
+
+        # get wide synthetic data
+        df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
+                                                data_type = "NPX",
+                                                n_panels = 3L,
+                                                n_assays = 45L,
+                                                n_samples = 88L,
+                                                show_dev_int_ctrl = FALSE,
+                                                show_int_ctrl = TRUE,
+                                                version = 1L)
+
+        # write in excel
+        writexl::write_xlsx(
+          x = df_synthetic$list_df_wide$df_wide,
+          path = file_wide_xlsx,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # check that function works
+        expect_error(
+          object = read_npx_legacy(
+            file = file_wide_xlsx,
+            out_df = "tibble",
+            olink_platform = NULL,
+            data_type = NULL,
+            quiet = FALSE
+          ),
+          regexp = "should be sorted!"
+        )
+      }
+    )
+  }
+)
+
+test_that(
+  "read_npx_legacy - error - dev int ctrl but no int ctrl",
+  {
+    withr::with_tempfile(
+      new = "file_wide_xlsx",
+      pattern = "test_long",
+      fileext = ".xlsx",
+      code = {
+
+        # get wide synthetic data
+        df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
+                                                data_type = "NPX",
+                                                n_panels = 1L,
+                                                n_assays = 45L,
+                                                n_samples = 88L,
+                                                show_dev_int_ctrl = TRUE,
+                                                show_int_ctrl = FALSE,
+                                                version = 1L)
+
+        # write in excel
+        writexl::write_xlsx(
+          x = df_synthetic$list_df_wide$df_wide,
+          path = file_wide_xlsx,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # check that function works
+        expect_error(
+          object = read_npx_legacy(
+            file = file_wide_xlsx,
+            out_df = "tibble",
+            olink_platform = NULL,
+            data_type = NULL,
+            quiet = FALSE
+          ),
+          regexp = "but lacks"
+        )
+      }
+    )
+  }
+)
+
+test_that(
+  "read_npx_legacy - error - bottom matrix unsupported version",
+  {
+    # T48 NPX v2 ----
+
+    withr::with_tempfile(
+      new = "file_wide_xlsx",
+      pattern = "test_long",
+      fileext = ".xlsx",
+      code = {
+
+        # get wide synthetic data
+        df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
+                                                data_type = "NPX",
+                                                n_panels = 1L,
+                                                n_assays = 45L,
+                                                n_samples = 88L,
+                                                show_dev_int_ctrl = FALSE,
+                                                show_int_ctrl = FALSE,
+                                                version = 2L)
+
+        # write in excel
+        writexl::write_xlsx(
+          x = df_synthetic$list_df_wide$df_wide,
+          path = file_wide_xlsx,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # check that function works
+        expect_error(
+          object = read_npx_legacy(
+            file = file_wide_xlsx,
+            out_df = "tibble",
+            olink_platform = NULL,
+            data_type = NULL,
+            quiet = FALSE
+          ),
+          regexp = "contains bottom matrix with unsupported labels"
+        )
+      }
+    )
+
+    # T96 NPX v3 ----
+
+    withr::with_tempfile(
+      new = "file_wide_xlsx",
+      pattern = "test_long",
+      fileext = ".xlsx",
+      code = {
+
+        # get wide synthetic data
+        df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 96",
+                                                data_type = "NPX",
+                                                n_panels = 1L,
+                                                n_assays = 92L,
+                                                n_samples = 88L,
+                                                show_dev_int_ctrl = FALSE,
+                                                show_int_ctrl = FALSE,
+                                                version = 3L)
+
+        # write in excel
+        writexl::write_xlsx(
+          x = df_synthetic$list_df_wide$df_wide,
+          path = file_wide_xlsx,
+          col_names = FALSE,
+          format_headers = FALSE
+        )
+
+        # check that function works
+        expect_error(
+          object = read_npx_legacy(
+            file = file_wide_xlsx,
+            out_df = "tibble",
+            olink_platform = NULL,
+            data_type = NULL,
+            quiet = FALSE
+          ),
+          regexp = "contains bottom matrix with unsupported labels"
+        )
+      }
+    )
+  }
+)
