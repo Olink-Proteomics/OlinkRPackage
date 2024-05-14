@@ -1,5 +1,27 @@
 # This script creates reference results for usage in the unit tests
 
+# read NPX ----
+
+npx_data_parquet <- OlinkAnalyze::read_NPX(
+  filename = "inst/extdata/npx_data_ext.parquet"
+)
+
+npx_data_long_csv <- OlinkAnalyze::read_NPX(
+  filename = "inst/extdata/npx_data_long_csv.csv"
+)
+
+npx_data_long_zip <- OlinkAnalyze::read_NPX(
+  filename = "inst/extdata/npx_data_long_zip.zip"
+)
+
+npx_data1 <- OlinkAnalyze::read_NPX(
+  filename = "inst/extdata/npx_data1.xlsx"
+)
+
+npx_data2 <- OlinkAnalyze::read_NPX(
+  filename = "inst/extdata/npx_data2.xlsx"
+)
+
 # t-test ----
 
 # unpaired t-test
@@ -655,6 +677,12 @@ rm(
 # Wrap up the results ----
 
 reference_results <- list(
+  npx_data_parquet = npx_data_parquet,
+  npx_data_long_csv = npx_data_long_csv,
+  npx_data_long_zip = npx_data_long_zip,
+  npx_data1 = npx_data1,
+  npx_data2 = npx_data2,
+
   t_test = t_test,
   t_test_paired = t_test_paired,
 
@@ -695,9 +723,15 @@ reference_results <- list(
   preprocessing_dim_red_miss = preprocessing_dim_red_miss
 )
 
-saveRDS(
-  reference_results,
-  file = "tests/data/reference_results/reference_results.rds",
-  version = 2L,
-  compress = "gzip"
-)
+i_want_to_override <- FALSE
+
+if (i_want_to_override == TRUE) {
+  saveRDS(
+    reference_results,
+    file = "tests/data/reference_results/reference_results.rds",
+    version = 2L,
+    compress = "gzip"
+  )
+} else {
+  message("Certain to override? Set \"i_want_to_override = TRUE\"")
+}
