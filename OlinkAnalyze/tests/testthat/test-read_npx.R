@@ -302,7 +302,8 @@ test_that(
         lst_df <- expected_vs_legacy_df_prep(
           long_expected = npx_df,
           long_legacy = ref_res$npx_data2,
-          olink_platform = "Target 96")
+          olink_platform = "Target 96"
+        )
 
         # check identical to reference
         # making some harmless minor modifications to enable the match
@@ -408,7 +409,8 @@ test_that(
         lst_df <- expected_vs_legacy_df_prep(
           long_expected = npx_df,
           long_legacy = ref_res$npx_data1,
-          olink_platform = "Target 96")
+          olink_platform = "Target 96"
+        )
 
         # check identical to reference
         # making some harmless minor modifications to enable the match
