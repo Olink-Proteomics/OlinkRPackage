@@ -511,6 +511,35 @@ test_that(
           expected = expected_colnames
         )
 
+        ## check that it matches reference results
+        expect_identical(
+          object = dim(npx_df),
+          expected = dim(ref_res$npx_data1)
+        )
+
+        # check that excel and csv are identical
+        # check that the correct values are returned
+        lst_df <- expected_vs_legacy_df_prep(
+          long_expected = npx_df,
+          long_legacy = ref_res$npx_data1,
+          olink_platform = "Target 96"
+        )
+
+        # check identical to reference
+        # making some harmless minor modifications to enable the match
+        expect_equal(
+          object = lst_df$df_expected |>
+            dplyr::mutate(
+              Panel = toupper(.data[["Panel"]])
+            ),
+          expected = lst_df$df_legacy |>
+            dplyr::mutate(
+              Panel_Version = NA_character_,
+              Panel = toupper(.data[["Panel"]])
+            ),
+          tolerance = 1e-4
+        )
+
       }
     )
   }
