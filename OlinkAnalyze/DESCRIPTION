@@ -1,7 +1,7 @@
 Type: Package
 Package: OlinkAnalyze
 Title: Facilitate Analysis of Proteomic Data from Olink
-Version: 3.4.1
+Version: 3.7.0
 Authors@R: c(
     person("Kathleen", "Nevola", , "biostattools@olink.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-5183-6444", Github = "kathy-nevola")),
@@ -55,7 +55,7 @@ Description: A collection of functions to facilitate analysis of proteomic
 License: AGPL (>= 3)
 Config/testthat/edition: 3
 Config/testthat/parallel: true
-Config/testthat/start-first: read_npx_wide
+Config/testthat/start-first: read_npx_l*, read_npx_w*
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.3.1

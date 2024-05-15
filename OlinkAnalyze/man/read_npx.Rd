@@ -13,7 +13,8 @@ read_npx(
   olink_platform = NULL,
   data_type = NULL,
   .ignore_files = c("README.txt"),
-  quiet = TRUE
+  quiet = TRUE,
+  legacy = FALSE
 )
 
 read_NPX(
@@ -24,7 +25,8 @@ read_NPX(
   olink_platform = NULL,
   data_type = NULL,
   .ignore_files = c("README.txt"),
-  quiet = TRUE
+  quiet = TRUE,
+  legacy = FALSE
 )
 }
 \arguments{
@@ -56,6 +58,10 @@ zip-compressed input files. `c("README.txt")` (default).}
 \item{quiet}{Boolean to print a confirmation message when reading the input
 file. Applies to excel or delimited input only. `TRUE` (default) to not print
 and `FALSE` to print.}
+
+\item{legacy}{Boolean to run the legacy version of the read_npx function.
+\strong{Important: applies only to wide format file from Target 96 or Target
+48 with NPX Software version earlier than 1.8!}. Default is `FALSE`.}
 }
 \value{
 Tibble or ArrowObject with Olink data in long format.

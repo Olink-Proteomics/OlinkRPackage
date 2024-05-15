@@ -777,7 +777,7 @@ read_npx_wide_top <- function(df,
   # transpose df to long ----
 
   df_t <- t(df) # transpose the wide df
-  colnames(df_t) <- df_t[1, ] # add colnames
+  colnames(df_t) <- df_t[1L, ] # add colnames
   df_t <- df_t |>
     dplyr::as_tibble(
       rownames = "col_index"
@@ -819,9 +819,6 @@ read_npx_wide_top <- function(df,
     dplyr::filter(
       is.na(.data[["OlinkID"]])
       & .data[["Assay"]] %in% unlist(format_spec$top_matrix_assay_int_ctrl)
-    ) |>
-    dplyr::select(
-      -dplyr::any_of(c("Uniprot ID", "OlinkID", "Unit"))
     )
 
   # extract deviation from internal controls from Assay column
@@ -1451,19 +1448,22 @@ red_npx_wide_top_mid_long <- function(df_top_list,
 #' @author
 #'   Klev Diamanti
 #'
+#' @param df Bottom matrix of Olink dataset in wide format \var{df_bottom}.
+#' @param file Path to Olink software output file in wide or long format.
+#' Expecting file extensions `csv`, `txt`, `xls`, or `xlsx`.
 #' @param data_type The quantification in which the data comes in. Expecting one
 #' of "NPX", "Quantified" or "Ct".
 #' @param olink_platform Olink platform used to generate the input file.
 #' One of `Target 96`, `Target 48`, `Flex` or `Focus`.
 #'
-#' @return List of tibbles with two columns each. Columns contain unique and
-#' alternative expected names for V1 of each row of the bottom matrix in an
-#' Olink wide file.
+#' @return Tibble with the bottom matrix specifications for the Olink wide file.
 #'
 #' @seealso
 #'   \code{\link{read_npx_wide_bottom}}
 #'
-read_npx_wide_bottom_version <- function(data_type,
+read_npx_wide_bottom_version <- function(df,
+                                         file,
+                                         data_type,
                                          olink_platform) {
 
   # extract all possible variable names from the global matrix
@@ -1510,7 +1510,94 @@ read_npx_wide_bottom_version <- function(data_type,
 
   }
 
-  return(list_bottom_v)
+  # list with all possible combinations
+  format_spec_bottom <- list_bottom_v
+
+  # check first column ----
+
+  # check that column "V1" exists in the df
+  check_columns(df = df, col_list = list("V1"))
+
+  # check that at least one of the alternatives combinations of names
+  # contains all names in V1
+  format_spec_bottom <- lapply(format_spec_bottom, function(x) {
+    name_in_df <- lapply(x$variable_alt_names,
+                         \(y) (y[y %in% df$V1])) |>
+      lapply(\(y) (ifelse(length(y) == 0L, NA_character_, y))) |>
+      unlist()
+
+    x |>
+      dplyr::mutate(
+        variable_name_in_df = name_in_df,
+        in_df = dplyr::if_else(
+          is.na(.data[["variable_name_in_df"]]),
+          FALSE,
+          TRUE
+        )
+      )
+  })
+
+  names_in_v1 <- lapply(format_spec_bottom, function(.x) {
+    .x |>
+      dplyr::mutate(
+        total_n = dplyr::n(),
+        true_n = sum(.data[["in_df"]])
+      ) |>
+      dplyr::select(
+        dplyr::all_of(c("total_n", "true_n"))
+      ) |>
+      dplyr::distinct()
+  }) |>
+    dplyr::bind_rows(
+      .id = "combo"
+    ) |>
+    dplyr::filter(
+      .data[["total_n"]] == .data[["true_n"]]
+    ) |>
+    dplyr::arrange(
+      dplyr::desc(.data[["total_n"]])
+    ) |>
+    dplyr::slice_head(
+      n = 1L
+    ) |>
+    dplyr::pull(
+      .data[["combo"]]
+    )
+
+  # if none or multiple combinations match
+  # or, if df$V1 is a superset of the expected columns
+  if (length(names_in_v1) != 1L
+      || nrow(format_spec_bottom[[names_in_v1]]) != length(unique(df$V1))) {
+
+    bottom_mat_v1_expected <- sapply( # nolint
+      format_spec_bottom,
+      function(x) {
+        sapply(x$variable_alt_names, utils::head, 1L) |>
+          cli::ansi_collapse() |>
+          (\(.x) paste("*", .x))()
+      }
+    )
+
+    cli::cli_abort(
+      message = c(
+        "x" = "Unexpected values in column 1 of the bottom matrix with QC data
+        in file {.file {file}}.",
+        "Expected one of the combos:",
+        bottom_mat_v1_expected,
+        "i" = "Has the file been modified manually?"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
+  }
+
+  format_spec_bottom[[names_in_v1]] <- format_spec_bottom[[names_in_v1]] |>
+    dplyr::mutate(
+      version = .env[["names_in_v1"]]
+    )
+
+  return(format_spec_bottom[[names_in_v1]])
 }
 
 #' Convert the bottom matrix from Olink dataset in wide format to long.
@@ -1580,69 +1667,13 @@ read_npx_wide_bottom <- function(df,
 
   # get first column options ----
 
-  # list with all possible combinations
-  format_spec_bottom <- read_npx_wide_bottom_version(
+  # clean up format_spec_bottom for downstream use
+  format_spec_bottom_df <- read_npx_wide_bottom_version(
+    df = df,
+    file = file,
     data_type = data_type,
     olink_platform = olink_platform
-  )
-
-  # check first column ----
-
-  # check that column "V1" exists in the df
-  check_columns(df = df, col_list = list("V1"))
-
-  # check that at least one of the alternatives combinations of names
-  # contains all names in V1
-  format_spec_bottom <- lapply(format_spec_bottom, function(x) {
-    name_in_df <- lapply(x$variable_alt_names,
-                         \(y) (y[y %in% df$V1])) |>
-      lapply(\(y) (ifelse(length(y) == 0L, NA_character_, y))) |>
-      unlist()
-
-    x |>
-      dplyr::mutate(
-        variable_name_in_df = name_in_df,
-        in_df = dplyr::if_else(
-          is.na(.data[["variable_name_in_df"]]),
-          FALSE,
-          TRUE
-        )
-      )
-  })
-
-  names_in_v1 <- sapply(format_spec_bottom, \(x) (all(x$in_df))) |>
-    (\(x) x[x == TRUE])()
-
-  # if none or multiple combinations match
-  # or, if df$V1 is a superset of the expected columns
-  if (length(names_in_v1) != 1
-      || nrow(format_spec_bottom[[names(names_in_v1)]])
-      != length(unique(df$V1))) {
-
-    bottom_mat_v1_expected <- sapply( # nolint
-      format_spec_bottom,
-      function(x) {
-        sapply(x$variable_alt_names, utils::head, 1L) |>
-          cli::ansi_collapse()
-      }
-    ) |>
-      cli::ansi_collapse(sep2 = ", or ", last = ", or ")
-
-    cli::cli_abort(
-      message = c(
-        "x" = "Unexpected values in column 1 of the bottom matrix with QC data
-        in file {.file {file}}. Expected on of the combos:
-        {bottom_mat_v1_expected}",
-        "i" = "Has the file been modified manually?"
-      ),
-      call = rlang::caller_env(),
-      wrap = FALSE
-    )
-
-  }
-
-  # clean up format_spec_bottom for downstream use
-  format_spec_bottom_df <- format_spec_bottom[[names(names_in_v1)]] |>
+  ) |>
     dplyr::select(
       -dplyr::all_of(c("variable_name", "variable_alt_names", "in_df"))
     )

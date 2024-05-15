@@ -36,6 +36,9 @@
 #' @param quiet Boolean to print a confirmation message when reading the input
 #' file. Applies to excel or delimited input only. `TRUE` (default) to not print
 #' and `FALSE` to print.
+#' @param legacy Boolean to run the legacy version of the read_npx function.
+#' \strong{Important: applies only to wide format file from Target 96 or Target
+#' 48 with NPX Software version earlier than 1.8!}. Default is `FALSE`.
 #'
 #' @return Tibble or ArrowObject with Olink data in long format.
 #'
@@ -77,7 +80,8 @@ read_npx <- function(filename,
                      olink_platform = NULL,
                      data_type = NULL,
                      .ignore_files = c("README.txt"),
-                     quiet = TRUE) {
+                     quiet = TRUE,
+                     legacy = FALSE) {
 
   # check input ----
 
@@ -88,64 +92,60 @@ read_npx <- function(filename,
   # check that the requested putput df is ok
   check_out_df_arg(out_df = out_df)
 
+  check_is_scalar_boolean(bool = legacy,
+                          error = TRUE)
+
   # sep and .ignore_file are checked in the functions they target
 
   # check file extension ----
 
-  # get the extension of the input file
-  f_ext <- tools::file_ext(x = filename)
-
   # check what type of label the extension of the input matches to
-  f_label <- accepted_npx_file_ext[accepted_npx_file_ext == f_ext] |>
-    names()
+  f_label <- check_file_extension(file = filename)
 
   # read data ----
 
-  # if the extension of the input file was within the accepted ones it should
-  # be a scalar character
-  if (check_is_scalar_character(string = f_label, error = FALSE)) {
+  if (grepl(pattern = "excel|delim", x = f_label)) {
+    # Input is an excel or a delimited file
 
-    if (grepl(pattern = "excel|delim", x = f_label)) {
+    # Run legacy read_npx function
+    if (legacy == TRUE) {
 
-      # Input is an excel or a delimited file
+      df_olink <- read_npx_legacy(file = filename,
+                                  out_df = out_df,
+                                  olink_platform = olink_platform,
+                                  data_type = data_type,
+                                  quiet = quiet)
+
+    } else {
+
       df_olink <- read_npx_format(file = filename,
                                   out_df = out_df,
                                   sep = sep,
                                   long_format = long_format,
                                   olink_platform = olink_platform,
                                   data_type = data_type,
-                                  quiet = quiet)
-
-    } else if (grepl(pattern = "parquet", x = f_label)) {
-
-      # Input is a parquet file
-      df_olink <- read_npx_parquet(file = filename)
-
-    } else if (grepl(pattern = "compressed", x = f_label)) {
-
-      # Input is a zip-compressed file
-      df_olink <- read_npx_zip(
-        file = filename,
-        out_df = out_df,
-        sep = sep,
-        long_format = long_format,
-        olink_platform = olink_platform,
-        data_type = data_type,
-        .ignore_files = .ignore_files,
-        quiet = quiet
-      )
+                                  quiet = quiet,
+                                  legacy = FALSE)
 
     }
 
-  } else {
+  } else if (grepl(pattern = "parquet", x = f_label)) {
 
-    cli::cli_abort(
-      message = c(
-        "x" = "Unable to recognize format from file extension!",
-        "i" = "Acceptable file extensions: {accepted_npx_file_ext}"
-      ),
-      call = NULL,
-      wrap = FALSE
+    # Input is a parquet file
+    df_olink <- read_npx_parquet(file = filename)
+
+  } else if (grepl(pattern = "compressed", x = f_label)) {
+
+    # Input is a zip-compressed file
+    df_olink <- read_npx_zip(
+      file = filename,
+      out_df = out_df,
+      sep = sep,
+      long_format = long_format,
+      olink_platform = olink_platform,
+      data_type = data_type,
+      .ignore_files = .ignore_files,
+      quiet = quiet
     )
 
   }

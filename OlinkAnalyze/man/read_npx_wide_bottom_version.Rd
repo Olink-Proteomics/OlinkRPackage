@@ -4,9 +4,14 @@
 \alias{read_npx_wide_bottom_version}
 \title{Additional checks of the bottom matrix of Olink dataset in wide format.}
 \usage{
-read_npx_wide_bottom_version(data_type, olink_platform)
+read_npx_wide_bottom_version(df, file, data_type, olink_platform)
 }
 \arguments{
+\item{df}{Bottom matrix of Olink dataset in wide format \var{df_bottom}.}
+
+\item{file}{Path to Olink software output file in wide or long format.
+Expecting file extensions `csv`, `txt`, `xls`, or `xlsx`.}
+
 \item{data_type}{The quantification in which the data comes in. Expecting one
 of "NPX", "Quantified" or "Ct".}
 
@@ -14,9 +19,7 @@ of "NPX", "Quantified" or "Ct".}
 One of `Target 96`, `Target 48`, `Flex` or `Focus`.}
 }
 \value{
-List of tibbles with two columns each. Columns contain unique and
-alternative expected names for V1 of each row of the bottom matrix in an
-Olink wide file.
+Tibble with the bottom matrix specifications for the Olink wide file.
 }
 \description{
 The rows included in the bottom matrix have evolved through the years. For us

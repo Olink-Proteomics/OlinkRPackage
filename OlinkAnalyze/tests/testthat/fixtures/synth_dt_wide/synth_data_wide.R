@@ -247,9 +247,6 @@ olink_wide_top_long <- function(df) {
       & grepl(pattern = "ctrl",
               x = .data[["Assay"]],
               ignore.case = TRUE)
-    ) |>
-    dplyr::select(
-      -dplyr::any_of(c("Uniprot ID", "OlinkID", "Unit"))
     )
 
   df_plate <- df |>
@@ -763,26 +760,15 @@ olink_wide_bottom <- function(olink_platform,
     )
 
   # Plate LOD v2
-  df_plate_lod_v2 <- matrix(
-    data = rnorm(n = (nrow(plates) * n_panels * (n_assays + n_int_ctrl))),
-    nrow = nrow(plates),
-    ncol = ((n_assays + n_int_ctrl) * n_panels),
-    dimnames = list(
-      rep(x = "PlateLOD", times = nrow(plates)),
-      paste0("V", 2L:(((n_assays + n_int_ctrl) * n_panels) + 1L))
-    )
-  ) |>
-    dplyr::as_tibble(
-      rownames = "V1"
-    ) |>
-    dplyr::bind_cols(
-      plates
-    ) |>
+  df_plate_lod_v2 <- df_plate_lod |>
     dplyr::mutate(
-      dplyr::across(
-        dplyr::everything(),
-        ~ as.character(.x)
-      )
+      V1 = "PlateLOD"
+    )
+
+  # Plate LOD v3
+  df_plate_lod_v3 <- df_plate_lod |>
+    dplyr::mutate(
+      V1 = "Plate_LOD"
     )
 
   df_plate_specific <- df_assay_warn |>
@@ -795,11 +781,15 @@ olink_wide_bottom <- function(olink_platform,
     dplyr::bind_rows(
       df_plate_lod_v2
     ) |>
+    dplyr::bind_rows(
+      df_plate_lod_v3
+    ) |>
     dplyr::filter(
       .data[["V1"]] %in% format_spec_bottom$variable_alt_names
     ) |>
     remove_all_na_cols()
-  rm(df_assay_warn, df_low_quant_lvl, df_plate_lod, df_plate_lod_v2)
+  rm(df_assay_warn, df_low_quant_lvl, df_plate_lod,
+     df_plate_lod_v2, df_plate_lod_v3)
 
   ## plate shared variables ----
 
@@ -833,6 +823,12 @@ olink_wide_bottom <- function(olink_platform,
   df_max_lod_v2 <- df_lod |>
     dplyr::mutate(
       V1 = "MaxLOD"
+    )
+
+  # Max LOD v3
+  df_max_lod_v3 <- df_lod |>
+    dplyr::mutate(
+      V1 = "Max_LOD"
     )
 
   # LLOQ
@@ -916,6 +912,9 @@ olink_wide_bottom <- function(olink_platform,
       df_max_lod_v2
     ) |>
     dplyr::bind_rows(
+      df_max_lod_v3
+    ) |>
+    dplyr::bind_rows(
       df_lloq
     ) |>
     dplyr::bind_rows(
@@ -931,7 +930,8 @@ olink_wide_bottom <- function(olink_platform,
       .data[["V1"]] %in% format_spec_bottom$variable_alt_names
     ) |>
     remove_all_na_cols()
-  rm(df_lod, df_max_lod, df_max_lod_v2, df_lloq, df_uloq, df_miss_freq, df_norm)
+  rm(df_lod, df_max_lod, df_max_lod_v2, df_max_lod_v3, df_lloq, df_uloq,
+     df_miss_freq, df_norm)
 
   # return ----
 

@@ -1,7 +1,7 @@
 ## code to prepare internal dataset goes here
 ## based on https://r-pkgs.org/data.html#sec-data-sysdata
 
-# Specifictions for top matrix of Olink wide format datasets ----
+# Specifications for top matrix of Olink wide format data sets ----
 
 olink_wide_spec <- dplyr::tibble(
   data_type = c(

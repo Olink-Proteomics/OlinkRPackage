@@ -12,7 +12,8 @@ read_npx_format(
   long_format = NULL,
   olink_platform = NULL,
   data_type = NULL,
-  quiet = FALSE
+  quiet = FALSE,
+  legacy = FALSE
 )
 }
 \arguments{
@@ -40,6 +41,9 @@ One of `NULL` (default), `Explore 3072`, `Explore HT`, `Target 96`,
 \item{quiet}{Boolean to print a confirmation message when reading the input
 file. Applies to excel or delimited input only. `TRUE` (default) to not print
 and `FALSE` to print.}
+
+\item{legacy}{Boolean to enforce returning a list containing olink_platform,
+data_type and long_format information together with the dataset.}
 }
 \value{
 Tibble or ArrowObject with Olink data in long format.
@@ -67,6 +71,7 @@ respectively.
   \code{\link{read_npx_format_get_format}}
   \code{\link{read_npx_format_get_platform}}
   \code{\link{read_npx_format_get_quant}}
+  \code{\link{read_npx_legacy}}
 }
 \author{
 Klev Diamanti;

@@ -389,6 +389,359 @@ test_that(
 
       }
     )
+
+    ## legacy ----
+
+    ### T48 NPX ----
+
+    withr::with_tempfile(
+      new = "excel_long",
+      pattern = "test_long",
+      fileext = ".xlsx",
+      code = {
+
+        data_type <- "NPX"
+        olink_platform <- "Target 48"
+
+        # df_synthetic_legacy
+        df_synthetic_legacy <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = 3L,
+          n_assays = 45L,
+          n_samples = 99L,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 2L
+        )
+
+        # write in csv
+        writexl::write_xlsx(x = df_synthetic_legacy$list_df_long$df_long,
+                            path = excel_long,
+                            col_names = TRUE,
+                            format_headers = FALSE)
+
+        #check that file exists
+        expect_true(object = file.exists(excel_long))
+
+        # check that read_npx_format works
+        expect_message(
+          object = list_out_v1 <- read_npx_format(
+            file = excel_long,
+            out_df = "tibble",
+            sep = NULL,
+            long_format = NULL,
+            olink_platform = NULL,
+            data_type = NULL,
+            quiet = FALSE,
+            legacy = TRUE
+          ),
+          regexp = "Detected data in long format"
+        )
+
+        # modify list_out_v1
+        list_out_v1$df <- list_out_v1$df |>
+          dplyr::mutate(
+            dplyr::across(
+              dplyr::everything(),
+              ~ as.character(.x)
+            )
+          )
+
+        # check if df identical
+        expect_identical(
+          object = list_out_v1,
+          expected = list(
+            olink_platform = NULL,
+            long_format = TRUE,
+            data_type = NULL,
+            df = df_synthetic_legacy$list_df_long$df_long
+          )
+        )
+
+      }
+    )
+
+    ### T48 Quantified ----
+
+    withr::with_tempfile(
+      new = "excel_long",
+      pattern = "test_long",
+      fileext = ".xlsx",
+      code = {
+
+        data_type <- "Quantified"
+        olink_platform <- "Target 48"
+
+        # df_synthetic_legacy
+        df_synthetic_legacy <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = 3L,
+          n_assays = 45L,
+          n_samples = 99L,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 0L
+        )
+
+        # write in csv
+        writexl::write_xlsx(x = df_synthetic_legacy$list_df_long$df_long,
+                            path = excel_long,
+                            col_names = TRUE,
+                            format_headers = FALSE)
+
+        #check that file exists
+        expect_true(object = file.exists(excel_long))
+
+        # check that read_npx_format works
+        expect_message(
+          object = list_out_v1 <- read_npx_format(
+            file = excel_long,
+            out_df = "tibble",
+            sep = NULL,
+            long_format = NULL,
+            olink_platform = NULL,
+            data_type = NULL,
+            quiet = FALSE,
+            legacy = TRUE
+          ),
+          regexp = "Detected data in long format"
+        )
+
+        # modify list_out_v1
+        list_out_v1$df <- list_out_v1$df |>
+          dplyr::mutate(
+            dplyr::across(
+              dplyr::everything(),
+              ~ as.character(.x)
+            )
+          )
+
+        # check if df identical
+        expect_identical(
+          object = list_out_v1,
+          expected = list(
+            olink_platform = NULL,
+            long_format = TRUE,
+            data_type = NULL,
+            df = df_synthetic_legacy$list_df_long$df_long
+          )
+        )
+
+      }
+    )
+
+    ### T48 Ct ----
+
+    withr::with_tempfile(
+      new = "excel_long",
+      pattern = "test_long",
+      fileext = ".xlsx",
+      code = {
+
+        data_type <- "Ct"
+        olink_platform <- "Target 48"
+
+        # df_synthetic_legacy
+        df_synthetic_legacy <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = 3L,
+          n_assays = 45L,
+          n_samples = 99L,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 0L
+        )
+
+        # write in csv
+        writexl::write_xlsx(x = df_synthetic_legacy$list_df_long$df_long,
+                            path = excel_long,
+                            col_names = TRUE,
+                            format_headers = FALSE)
+
+        #check that file exists
+        expect_true(object = file.exists(excel_long))
+
+        # check that read_npx_format works
+        expect_message(
+          object = list_out_v1 <- read_npx_format(
+            file = excel_long,
+            out_df = "tibble",
+            sep = NULL,
+            long_format = NULL,
+            olink_platform = NULL,
+            data_type = NULL,
+            quiet = FALSE,
+            legacy = TRUE
+          ),
+          regexp = "Detected data in long format"
+        )
+
+        # modify list_out_v1
+        list_out_v1$df <- list_out_v1$df |>
+          dplyr::mutate(
+            dplyr::across(
+              dplyr::everything(),
+              ~ as.character(.x)
+            )
+          )
+
+        # check if df identical
+        expect_identical(
+          object = list_out_v1,
+          expected = list(
+            olink_platform = NULL,
+            long_format = TRUE,
+            data_type = NULL,
+            df = df_synthetic_legacy$list_df_long$df_long
+          )
+        )
+
+      }
+    )
+
+    ### T96 NPX ----
+
+    withr::with_tempfile(
+      new = "excel_long",
+      pattern = "test_long",
+      fileext = ".xlsx",
+      code = {
+
+        data_type <- "NPX"
+        olink_platform <- "Target 96"
+
+        # df_synthetic_legacy
+        df_synthetic_legacy <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = 3L,
+          n_assays = 92L,
+          n_samples = 99L,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 2L
+        )
+
+        # write in csv
+        writexl::write_xlsx(x = df_synthetic_legacy$list_df_long$df_long,
+                            path = excel_long,
+                            col_names = TRUE,
+                            format_headers = FALSE)
+
+        #check that file exists
+        expect_true(object = file.exists(excel_long))
+
+        # check that read_npx_format works
+        expect_message(
+          object = list_out_v1 <- read_npx_format(
+            file = excel_long,
+            out_df = "tibble",
+            sep = NULL,
+            long_format = NULL,
+            olink_platform = NULL,
+            data_type = NULL,
+            quiet = FALSE,
+            legacy = TRUE
+          ),
+          regexp = "Detected data in long format"
+        )
+
+        # modify list_out_v1
+        list_out_v1$df <- list_out_v1$df |>
+          dplyr::mutate(
+            dplyr::across(
+              dplyr::everything(),
+              ~ as.character(.x)
+            )
+          )
+
+        # check if df identical
+        expect_identical(
+          object = list_out_v1,
+          expected = list(
+            olink_platform = NULL,
+            long_format = TRUE,
+            data_type = NULL,
+            df = df_synthetic_legacy$list_df_long$df_long
+          )
+        )
+
+      }
+    )
+
+    ### T96 Ct ----
+
+    withr::with_tempfile(
+      new = "excel_long",
+      pattern = "test_long",
+      fileext = ".xlsx",
+      code = {
+
+        data_type <- "Ct"
+        olink_platform <- "Target 96"
+
+        # df_synthetic_legacy
+        df_synthetic_legacy <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = 3L,
+          n_assays = 92L,
+          n_samples = 99L,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 0L
+        )
+
+        # write in csv
+        writexl::write_xlsx(x = df_synthetic_legacy$list_df_long$df_long,
+                            path = excel_long,
+                            col_names = TRUE,
+                            format_headers = FALSE)
+
+        #check that file exists
+        expect_true(object = file.exists(excel_long))
+
+        # check that read_npx_format works
+        expect_message(
+          object = list_out_v1 <- read_npx_format(
+            file = excel_long,
+            out_df = "tibble",
+            sep = NULL,
+            long_format = NULL,
+            olink_platform = NULL,
+            data_type = NULL,
+            quiet = FALSE,
+            legacy = TRUE
+          ),
+          regexp = "Detected data in long format"
+        )
+
+        # modify list_out_v1
+        list_out_v1$df <- list_out_v1$df |>
+          dplyr::mutate(
+            dplyr::across(
+              dplyr::everything(),
+              ~ as.character(.x)
+            )
+          )
+
+        # check if df identical
+        expect_identical(
+          object = list_out_v1,
+          expected = list(
+            olink_platform = NULL,
+            long_format = TRUE,
+            data_type = NULL,
+            df = df_synthetic_legacy$list_df_long$df_long
+          )
+        )
+
+      }
+    )
+
   }
 )
 
@@ -817,6 +1170,364 @@ test_that(
 
       }
     )
+
+    ## legacy ----
+
+    ### T48 NPX ----
+
+    withr::with_tempfile(
+      new = "excel_wide",
+      pattern = "test_wide",
+      fileext = ".xlsx",
+      code = {
+
+        data_type <- "NPX"
+        olink_platform <- "Target 48"
+
+        # df_synthetic_legacy
+        df_synthetic_legacy <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = 3L,
+          n_assays = 45L,
+          n_samples = 99L,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 2L
+        )
+
+        # write in csv
+        writexl::write_xlsx(x = df_synthetic_legacy$list_df_wide$df_wide,
+                            path = excel_wide,
+                            col_names = FALSE,
+                            format_headers = FALSE)
+
+        #check that file exists
+        expect_true(object = file.exists(excel_wide))
+
+        # check that read_npx_format works
+        expect_message(
+          object = list_out_v1 <- read_npx_format(
+            file = excel_wide,
+            out_df = "tibble",
+            sep = NULL,
+            long_format = NULL,
+            olink_platform = NULL,
+            data_type = NULL,
+            quiet = FALSE,
+            legacy = TRUE
+          ),
+          regexp = paste0("Detected \"", data_type, "\" data from \"Olink ",
+                          olink_platform, "\" in wide format")
+        )
+
+        # modify list_out_v1
+        list_out_v1$df <- list_out_v1$df |>
+          dplyr::mutate(
+            dplyr::across(
+              dplyr::everything(),
+              ~ as.character(.x)
+            )
+          )
+
+        # check if df identical
+        expect_identical(
+          object = list_out_v1,
+          expected = list(
+            olink_platform = olink_platform,
+            long_format = FALSE,
+            data_type = data_type,
+            df = df_synthetic_legacy$list_df_wide$df_wide
+          )
+        )
+
+      }
+    )
+
+    ### T48 Quantified ----
+
+    withr::with_tempfile(
+      new = "excel_wide",
+      pattern = "test_wide",
+      fileext = ".xlsx",
+      code = {
+
+        data_type <- "Quantified"
+        olink_platform <- "Target 48"
+
+        # df_synthetic_legacy
+        df_synthetic_legacy <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = 3L,
+          n_assays = 45L,
+          n_samples = 99L,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 0L
+        )
+
+        # write in csv
+        writexl::write_xlsx(x = df_synthetic_legacy$list_df_wide$df_wide,
+                            path = excel_wide,
+                            col_names = FALSE,
+                            format_headers = FALSE)
+
+        #check that file exists
+        expect_true(object = file.exists(excel_wide))
+
+        # check that read_npx_format works
+        expect_message(
+          object = list_out_v1 <- read_npx_format(
+            file = excel_wide,
+            out_df = "tibble",
+            sep = NULL,
+            long_format = NULL,
+            olink_platform = NULL,
+            data_type = NULL,
+            quiet = FALSE,
+            legacy = TRUE
+          ),
+          regexp = paste0("Detected \"", data_type, "\" data from \"Olink ",
+                          olink_platform, "\" in wide format")
+        )
+
+        # modify list_out_v1
+        list_out_v1$df <- list_out_v1$df |>
+          dplyr::mutate(
+            dplyr::across(
+              dplyr::everything(),
+              ~ as.character(.x)
+            )
+          )
+
+        # check if df identical
+        expect_identical(
+          object = list_out_v1,
+          expected = list(
+            olink_platform = olink_platform,
+            long_format = FALSE,
+            data_type = data_type,
+            df = df_synthetic_legacy$list_df_wide$df_wide
+          )
+        )
+
+      }
+    )
+
+    ### T48 Ct ----
+
+    withr::with_tempfile(
+      new = "excel_wide",
+      pattern = "test_wide",
+      fileext = ".xlsx",
+      code = {
+
+        data_type <- "Ct"
+        olink_platform <- "Target 48"
+
+        # df_synthetic_legacy
+        df_synthetic_legacy <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = 3L,
+          n_assays = 45L,
+          n_samples = 99L,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 0L
+        )
+
+        # write in csv
+        writexl::write_xlsx(x = df_synthetic_legacy$list_df_wide$df_wide,
+                            path = excel_wide,
+                            col_names = FALSE,
+                            format_headers = FALSE)
+
+        #check that file exists
+        expect_true(object = file.exists(excel_wide))
+
+        # check that read_npx_format works
+        expect_message(
+          object = list_out_v1 <- read_npx_format(
+            file = excel_wide,
+            out_df = "tibble",
+            sep = NULL,
+            long_format = NULL,
+            olink_platform = NULL,
+            data_type = NULL,
+            quiet = FALSE,
+            legacy = TRUE
+          ),
+          regexp = paste0("Detected \"", data_type, "\" data from \"Olink ",
+                          olink_platform, "\" in wide format")
+        )
+
+        # modify list_out_v1
+        list_out_v1$df <- list_out_v1$df |>
+          dplyr::mutate(
+            dplyr::across(
+              dplyr::everything(),
+              ~ as.character(.x)
+            )
+          )
+
+        # check if df identical
+        expect_identical(
+          object = list_out_v1,
+          expected = list(
+            olink_platform = olink_platform,
+            long_format = FALSE,
+            data_type = data_type,
+            df = df_synthetic_legacy$list_df_wide$df_wide
+          )
+        )
+
+      }
+    )
+
+    ### T96 NPX ----
+
+    withr::with_tempfile(
+      new = "excel_wide",
+      pattern = "test_wide",
+      fileext = ".xlsx",
+      code = {
+
+        data_type <- "NPX"
+        olink_platform <- "Target 96"
+
+        # df_synthetic_legacy
+        df_synthetic_legacy <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = 3L,
+          n_assays = 92L,
+          n_samples = 99L,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 2L
+        )
+
+        # write in csv
+        writexl::write_xlsx(x = df_synthetic_legacy$list_df_wide$df_wide,
+                            path = excel_wide,
+                            col_names = FALSE,
+                            format_headers = FALSE)
+
+        #check that file exists
+        expect_true(object = file.exists(excel_wide))
+
+        # check that read_npx_format works
+        expect_message(
+          object = list_out_v1 <- read_npx_format(
+            file = excel_wide,
+            out_df = "tibble",
+            sep = NULL,
+            long_format = NULL,
+            olink_platform = NULL,
+            data_type = NULL,
+            quiet = FALSE,
+            legacy = TRUE
+          ),
+          regexp = paste0("Detected \"", data_type, "\" data from \"Olink ",
+                          olink_platform, "\" in wide format")
+        )
+
+        # modify list_out_v1
+        list_out_v1$df <- list_out_v1$df |>
+          dplyr::mutate(
+            dplyr::across(
+              dplyr::everything(),
+              ~ as.character(.x)
+            )
+          )
+
+        # check if df identical
+        expect_identical(
+          object = list_out_v1,
+          expected = list(
+            olink_platform = olink_platform,
+            long_format = FALSE,
+            data_type = data_type,
+            df = df_synthetic_legacy$list_df_wide$df_wide
+          )
+        )
+
+      }
+    )
+
+    ### T96 Ct ----
+
+    withr::with_tempfile(
+      new = "excel_wide",
+      pattern = "test_wide",
+      fileext = ".xlsx",
+      code = {
+
+        data_type <- "Ct"
+        olink_platform <- "Target 96"
+
+        # df_synthetic_legacy
+        df_synthetic_legacy <- get_wide_synthetic_data(
+          olink_platform = olink_platform,
+          data_type = data_type,
+          n_panels = 3L,
+          n_assays = 92L,
+          n_samples = 99L,
+          show_dev_int_ctrl = FALSE,
+          show_int_ctrl = FALSE,
+          version = 0L
+        )
+
+        # write in csv
+        writexl::write_xlsx(x = df_synthetic_legacy$list_df_wide$df_wide,
+                            path = excel_wide,
+                            col_names = FALSE,
+                            format_headers = FALSE)
+
+        #check that file exists
+        expect_true(object = file.exists(excel_wide))
+
+        # check that read_npx_format works
+        expect_message(
+          object = list_out_v1 <- read_npx_format(
+            file = excel_wide,
+            out_df = "tibble",
+            sep = NULL,
+            long_format = NULL,
+            olink_platform = NULL,
+            data_type = NULL,
+            quiet = FALSE,
+            legacy = TRUE
+          ),
+          regexp = paste0("Detected \"", data_type, "\" data from \"Olink ",
+                          olink_platform, "\" in wide format")
+        )
+
+        # modify list_out_v1
+        list_out_v1$df <- list_out_v1$df |>
+          dplyr::mutate(
+            dplyr::across(
+              dplyr::everything(),
+              ~ as.character(.x)
+            )
+          )
+
+        # check if df identical
+        expect_identical(
+          object = list_out_v1,
+          expected = list(
+            olink_platform = olink_platform,
+            long_format = FALSE,
+            data_type = data_type,
+            df = df_synthetic_legacy$list_df_wide$df_wide
+          )
+        )
+
+      }
+    )
+
   }
 )
 

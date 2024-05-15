@@ -48,3 +48,50 @@ check_file_exists <- function(file,
   }
 
 }
+
+#' Help function checking if file extension is acceptable.
+#'
+#' @author Klev Diamanti
+#'
+#' @param file Path to the file.
+#'
+#' @return The type of the file extension based on the global variable
+#' `accepted_npx_file_ext`
+#'
+check_file_extension <- function(file) {
+  # check input ----
+
+  check_is_scalar_character(string = file,
+                            error = TRUE)
+
+  # get file extension ----
+
+  # get the extension of the input file
+  f_ext <- tools::file_ext(x = file)
+
+  # check what type of label the extension of the input matches to
+  f_label <- accepted_npx_file_ext[accepted_npx_file_ext == f_ext] |>
+    names()
+
+  # check if file extension is applicable ----
+
+  # if the extension of the input file was within the accepted ones it should
+  # be a scalar character
+  if (!check_is_scalar_character(string = f_label, error = FALSE)) {
+
+    cli::cli_abort(
+      message = c(
+        "x" = "Unable to recognize the extension of the file {.file {file}}!",
+        "i" = "Expected on of {.val {accepted_npx_file_ext}}!"
+      ),
+      call = NULL,
+      wrap = FALSE
+    )
+
+  }
+
+  # return ----
+
+  return(f_label)
+
+}

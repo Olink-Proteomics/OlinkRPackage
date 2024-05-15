@@ -67,11 +67,11 @@ accepted_olink_platforms <- dplyr::tibble(
   ),
   quant_type = list(
     c("relative", "absolute", "relative"),
-    c("relative", "absolute"),
+    c("relative", "absolute", "relative"),
     c("relative", "relative"),
     c("relative"),
     c("relative"),
-    c("relative", "absolute")
+    c("relative", "absolute", "relative")
   ),
   base_index = c(
     NA_integer_,
