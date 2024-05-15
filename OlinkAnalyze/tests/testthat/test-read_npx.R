@@ -276,7 +276,7 @@ test_that(
                failure_message = "failed to read wide xlsx in arrow")
 
         # check that data set has correct number of rows and columns
-        expected_rows <- 194304L
+        expected_rows <- 32384L
         expected_cols <- 12L
         expect_equal(object = nrow(npx_df), expected = expected_rows)
         expect_equal(object = ncol(npx_df), expected = expected_cols)
@@ -383,7 +383,7 @@ test_that(
                failure_message = "failed to read wide xlsx in arrow")
 
         # check that data set has correct number of rows and columns
-        expected_rows <- 176640L
+        expected_rows <- 29440L
         expected_cols <- 12L
         expect_equal(object = nrow(npx_df), expected = expected_rows)
         expect_equal(object = ncol(npx_df), expected = expected_cols)
@@ -517,7 +517,7 @@ test_that(
 )
 
 test_that(
-  "data loads correctly - legacy - wide - xlsx",
+  "data loads correctly - legacy - wide - npx_data1 - xlsx",
   {
     withr::with_tempfile(
       new = "tmp_wide_xlsx",
@@ -558,7 +558,7 @@ test_that(
                failure_message = "failed to read wide xlsx in tibble")
 
         # check that data set has correct number of rows and columns
-        expected_rows <- 176640L
+        expected_rows <- 29440L
         expected_cols <- 12L
         expect_equal(object = nrow(npx_df), expected = expected_rows)
         expect_equal(object = ncol(npx_df), expected = expected_cols)
@@ -570,6 +570,27 @@ test_that(
         expect_identical(
           object = colnames(npx_df),
           expected = expected_colnames
+        )
+
+        ## check that it matches reference results
+        expect_identical(
+          object = dim(npx_df),
+          expected = dim(ref_res$npx_data1)
+        )
+
+        expect_equal(
+          object = npx_df |>
+            dplyr::arrange(
+              .data[["OlinkID"]], .data[["Assay"]], .data[["SampleID"]]
+            ),
+          expected = ref_res$npx_data1 |>
+            dplyr::select(
+              dplyr::all_of(colnames(npx_df))
+            ) |>
+            dplyr::arrange(
+              .data[["OlinkID"]], .data[["Assay"]], .data[["SampleID"]]
+            ),
+          tolerance = 1e-4
         )
 
       }
