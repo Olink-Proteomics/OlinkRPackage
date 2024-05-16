@@ -1,20 +1,48 @@
-## code to prepare `column_name_dict` dataset
+## code to prepare internal dataset `column_name_dict` goes here
+## based on https://r-pkgs.org/data.html#sec-data-sysdata
+
+## alternative names for columns of Olink files
 
 column_name_dict <- list(
-  sample_id = c("SampleID", "sampleid", "sample_id"),
-  sample_type = c("Sample_Type", "SampleType",
-                  "sample_type", "sampletype", NA_character_),
-  olink_id = c("OlinkID", "OID",
-               "olinkid", "oid", "olink_id"),
-  plate_id = c("PlateID","plateid", "plate_id"),
-  qc_warning = c("QC_Warning", "SampleQC",
-                 "qc_warning", "sample_qc"),
-  lod = c("LOD", "Plate LOD", "Plate_LOD", "Max LOD", "Max_LOD",
-          "lod", "plate lod", "plate_lod", "max lod", "max_lod",
-                  "PlateLOD", "MaxLOD", NA_character_),
-  quant = c("NPX", "Ct", "Quantified", "Quantified_value",
-            "npx", "ct", "quantified", "quantified_value")
+  sample_id = c("SampleID",
+                "sampleid",
+                "sample_id"),
+  sample_type = c("Sample_Type",
+                  "SampleType",
+                  "sample_type",
+                  "sampletype",
+                  NA_character_),
+  olink_id = c("OlinkID",
+               "OID",
+               "olinkid",
+               "oid",
+               "olink_id"),
+  plate_id = c("PlateID",
+               "plateid",
+               "plate_id"),
+  qc_warning = c("QC_Warning",
+                 "SampleQC",
+                 "qc_warning",
+                 "sample_qc"),
+  lod = c("LOD",
+          "lod",
+          "Plate LOD",
+          "Plate_LOD",
+          "PlateLOD",
+          "plate lod",
+          "plate_lod",
+          "Max LOD",
+          "Max_LOD",
+          "MaxLOD",
+          "max lod",
+          "max_lod",
+          NA_character_),
+  quant = c("NPX",
+            "npx",
+            "Ct",
+            "ct",
+            "Quantified",
+            "Quantified_value",
+            "quantified",
+            "quantified_value")
 )
-
-# Save the dictionary as an R data object
-usethis::use_data(column_name_dict, overwrite = TRUE)
