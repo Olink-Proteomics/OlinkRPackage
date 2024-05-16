@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 options(tibble.print_min = 4L, tibble.print_max = 4L)
 ```
 
-Olink® Analyze is an R package that provides a versatile toolbox to enable fast and easy handling of Olink® NPX data for your proteomics research. Olink® Analyze provides functions for using Olink data, including functions for importing Olink® NPX datasets exported from the NPX Manager, as well as quality control (QC) plot functions and functions for various statistical tests. This package is meant to provide a convenient pipeline for your Olink NPX data analysis.
+Olink® Analyze is an R package that provides a versatile toolbox to enable fast and easy handling of Olink® NPX data for your proteomics research. Olink® Analyze provides functions for using Olink data, including functions for importing Olink® NPX datasets, as well as quality control (QC) plot functions and functions for various statistical tests. This package is meant to provide a convenient pipeline for your Olink NPX data analysis.
 
 # Installation 
 
@@ -112,11 +112,11 @@ The package contains two test data files named npx_data1 and npx_data2. These ar
 
 ## Read NPX data (read_NPX)
 
-The read_NPX function imports an NPX file of wide format that has been exported from Olink® NPX Manager and converts the data into the (preferred by R) long format. The wide format is the most common way Olink® delivers data for Olink® Target 96, however, for data analysis a long format is preferred. No prior alterations to the output of the NPX Manager should be made for this function to work as expected.
+The read_NPX function imports an NPX file of wide format that has been exported from Olink® and converts the data into the (preferred by R) long format. The wide format is the most common way Olink® delivers data for Olink® Target 96, however, for data analysis a long format is preferred. No prior alterations to the NPX output file should be made for this function to work as expected.
 
 ### Function arguments
 
-* filename: Path to the NPX Manager output file.
+* filename: Path to the NPX output file.
 
 ```{r message=FALSE, eval=FALSE}
 data <- read_NPX("~/NPX_file_location.xlsx")
