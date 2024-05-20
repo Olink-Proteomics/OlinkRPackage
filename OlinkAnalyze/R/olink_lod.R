@@ -43,8 +43,7 @@ olink_lod <- function(data, lod_file_path = NA, lod_method = "NCLOD"){
 olink_fixed_lod <- function(data, lod_file){
   lod_data <- lod_file |> 
     dplyr::filter(.data[["DataAnalysisRefID"]] %in% data$DataAnalysisRefID) |> 
-    dplyr::select(c("OlinkID","DataAnalysisRefID", "LodNPX", "LodCount", "LodMethod")) |> 
-    dplyr::select(-dplyr::all_of(c("DataAnalysisRefID")))
+    dplyr::select(c("OlinkID","DataAnalysisRefID", "LodNPX", "LodCount", "LodMethod"))
     
 }
 
@@ -67,7 +66,7 @@ olink_nc_lod <- function(data) {
   }
   
   lod_data <- lod_data |> 
-    dplyr::group_by(dplyr::pick(dplyr::all_of("OlinkID"))) |> 
+    dplyr::group_by(dplyr::pick(dplyr::all_of(c("OlinkID", "DataAnalysisRefID")))) |> 
     dplyr::summarise(MaxCount = max(.data[["Count"]]),
                      LodNPX = median(.data[["PCNormalizedNPX"]], na.rm = TRUE) +
                        max(
@@ -109,7 +108,7 @@ pc_norm_count <- function(data, lod_data){
     dplyr::select("SampleID", "Panel", "Block", "SampleType", "ExtCount")
     
   data <- data |> 
-    dplyr::left_join(lod_data, by = c("OlinkID")) |> 
+    dplyr::left_join(lod_data, by = c("OlinkID", "DataAnalysisRefID")) |> 
     dplyr::left_join(pc_median, by = c("OlinkID")) |> 
     dplyr::left_join(ext_count, by = c("SampleID", "Panel", "Block", "SampleType")) 
     # Convert count LOD to PC norm NPX
