@@ -4,7 +4,7 @@
 #' @param lod_file_path location of lod file from Olink (only needed if lod_method = "FixedLOD")
 #' @param lod_method method for calculating LOD using either "FixedLOD" or negative controls ("NCLOD")
 #'
-#' @return
+#' @return A dataframe with 2 additional columns, LOD and PCNormalizedLOD. When Normalization = "Plate Control", LOD and PCNormalizedLOD are equivalent
 #' @export
 #'
 #' @examples

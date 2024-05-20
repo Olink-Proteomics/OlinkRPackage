@@ -13,6 +13,9 @@ olink_lod(data, lod_file_path = NA, lod_method = "NCLOD")
 
 \item{lod_method}{method for calculating LOD using either "FixedLOD" or negative controls ("NCLOD")}
 }
+\value{
+A dataframe with 2 additional columns, LOD and PCNormalizedLOD. When Normalization = "Plate Control", LOD and PCNormalizedLOD are equivalent
+}
 \description{
 Calculate LOD using Negative Controls or Fixed LOD
 }
