@@ -2,6 +2,10 @@
 ## based on https://r-pkgs.org/data.html#sec-data-sysdata
 
 ## alternative names for columns of Olink files
+##
+## IMPORTANT:
+## presence of NA in the vector of alternative names indicates that the column
+## can be missing
 
 column_name_dict <- list(
   sample_id = c("SampleID",
