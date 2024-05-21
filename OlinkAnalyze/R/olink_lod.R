@@ -7,7 +7,6 @@
 #' @return A dataframe with 2 additional columns, LOD and PCNormalizedLOD. When Normalization = "Plate Control", LOD and PCNormalizedLOD are equivalent
 #' @export
 #'
-#' @examples
 olink_lod <- function(data, lod_file_path = NULL, lod_method = "NCLOD"){
 
   # store original column names of `data` to restore them later

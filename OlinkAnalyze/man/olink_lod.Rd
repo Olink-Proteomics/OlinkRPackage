@@ -4,7 +4,7 @@
 \alias{olink_lod}
 \title{Calculate LOD using Negative Controls or Fixed LOD}
 \usage{
-olink_lod(data, lod_file_path = NA, lod_method = "NCLOD")
+olink_lod(data, lod_file_path = NULL, lod_method = "NCLOD")
 }
 \arguments{
 \item{data}{npx data file}
