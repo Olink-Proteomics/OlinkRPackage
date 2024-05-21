@@ -23,7 +23,6 @@ jobs:
   Install_arrow_for_mac:
     needs: matrix_prep
     strategy: 
-      fail-fast: false
       matrix:
         config: 
           - {os: mac-latest,   r: 'release'}
