@@ -15,19 +15,6 @@ frame. Read the `description` for further information.}
 }
 \value{
 A list of matched column names based on the preferred names.
-
-#' @examples
-\donttest{
-file <- system.file("extdata",
-                    "npx_data_long_csv.csv",
-                    package = "OlinkAnalyze")
-
-read_NPX(filename = file,
-         sep = NULL)
-
-read_NPX(filename = file,
-         sep = ";")
-}
 }
 \description{
 OlinkAnalyze uses pre-defined names of columns of data frames to perform
@@ -55,6 +42,42 @@ The argument `preferred_names` is a named character vector with internal
 column names as names and column names of the current data set as values.
 Names of the input vector can be one or more of the following: `sample_id`,
 `sample_type`, `olink_id`, `plate_id`, `qc_warning`, `lod`, `quant`.
+}
+\examples{
+\donttest{
+file <- system.file("extdata",
+                    "npx_data_ext.parquet",
+                     package = "OlinkAnalyze")
+df <- read_npx(filename = file)
+
+# run df as is
+OlinkAnalyze:::check_npx_col_names(df = df)
+
+# SampleType missing
+df |>
+  dplyr::select(
+    -dplyr::all_of("SampleType")
+  ) |>
+  OlinkAnalyze:::check_npx_col_names()
+
+# use PCNormalizedNPX instead on NPX
+OlinkAnalyze:::check_npx_col_names(
+  df = df,
+  preferred_names = c("quant" = "PCNormalizedNPX")
+)
+
+# use PCNormalizedNPX instead on NPX, and PlateLOD instead of LOD
+df |>
+  dplyr::mutate(
+    LOD = 1L,
+    PlateLOD = 2L
+  ) |>
+  OlinkAnalyze:::check_npx_col_names(
+    preferred_names = c("quant" = "PCNormalizedNPX",
+                        "lod" = "PlateLOD")
+  )
+}
+
 }
 \author{
 Klev Diamanti

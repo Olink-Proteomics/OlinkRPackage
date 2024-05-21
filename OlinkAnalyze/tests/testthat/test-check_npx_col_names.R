@@ -43,7 +43,7 @@ test_that(
       LOD = rnorm(4L)
     )
 
-    # missing SampleType
+    # missing SampleType ----
 
     expect_equal(
       object = df |>
@@ -62,7 +62,7 @@ test_that(
       )
     )
 
-    # missing LOD
+    # missing LOD ----
 
     expect_equal(
       object = df |>
@@ -81,7 +81,7 @@ test_that(
       )
     )
 
-    # missing LOD and SampleType
+    # missing LOD and SampleType ----
 
     expect_equal(
       object = df |>
@@ -104,59 +104,242 @@ test_that(
 test_that(
   "check_npx_col_names - works - preferred_names",
   {
+    df <- arrow::arrow_table(
+      SampleID = c("A", "B", "C", "D"),
+      OlinkID = rep("OID12345", 4L),
+      SampleType = rep("SAMPLE", 4L),
+      NPX = rnorm(4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L),
+      LOD = rnorm(4L)
+    )
+
     # one column name ----
+
+    expect_equal(
+      object = df |>
+        dplyr::rename(
+          "IamSampleName" = "SampleID"
+        ) |>
+        dplyr::compute() |>
+        check_npx_col_names(
+          preferred_names = c("sample_id" = "IamSampleName")
+        ),
+      expected = list(
+        sample_type = "SampleType",
+        olink_id = "OlinkID",
+        plate_id = "PlateID",
+        qc_warning = "QC_Warning",
+        lod = "LOD",
+        quant = "NPX",
+        sample_id = "IamSampleName"
+      )
+    )
 
     # multiple column names ----
 
+    expect_equal(
+      object = df |>
+        dplyr::rename(
+          "IamSampleName" = "SampleID",
+          "IamSampleType" = "SampleType",
+          "IamPlateIdentifier" = "PlateID",
+          "IamOlinkIdentifier" = "OlinkID"
+        ) |>
+        dplyr::compute() |>
+        check_npx_col_names(
+          preferred_names = c("sample_id" = "IamSampleName",
+                              "sample_type" = "IamSampleType",
+                              "plate_id" = "IamPlateIdentifier",
+                              "olink_id" = "IamOlinkIdentifier")
+        ),
+      expected = list(
+        qc_warning = "QC_Warning",
+        lod = "LOD",
+        quant = "NPX",
+        sample_id = "IamSampleName",
+        sample_type = "IamSampleType",
+        plate_id = "IamPlateIdentifier",
+        olink_id = "IamOlinkIdentifier"
+      )
+    )
+
     # break ties (multiple matches) ----
+
+    expect_equal(
+      object = df |>
+        dplyr::rename(
+          "IamSampleName" = "SampleID",
+          "IamSampleType" = "SampleType"
+        ) |>
+        dplyr::collect() |>
+        dplyr::mutate(
+          PlateLOD = rnorm(4L),
+          MaxLOD = rnorm(4L),
+          Quantified_value = rnorm(4L)
+        ) |>
+        check_npx_col_names(
+          preferred_names = c("sample_id" = "IamSampleName",
+                              "sample_type" = "IamSampleType",
+                              "lod" = "PlateLOD",
+                              "quant" = "Quantified_value")
+        ),
+      expected = list(
+        olink_id = "OlinkID",
+        plate_id = "PlateID",
+        qc_warning = "QC_Warning",
+        sample_id = "IamSampleName",
+        sample_type = "IamSampleType",
+        lod = "PlateLOD",
+        quant = "Quantified_value"
+      )
+    )
   }
 )
 
-# Test that function issues warning when multiple names for a column exist
-# but preferred_names is not provided
-test_that("multiple column names associated with lod",
-          {
-            df <- arrow::arrow_table(
-              SampleID = c("A", "B", "C", "D"),
-              OlinkID = rep("OID12345", 4),
-              NPX = rnorm(4),
-              PlateID = rep("plate1", 4),
-              QC_Warning = rep("Pass", 4),
-              PlateLOD = rnorm(4),
-              MaxLOD = rnorm(4)
-            )
+test_that(
+  "check_npx_col_names - error - preferred_names val not in data frame colname",
+  {
+    df <- arrow::arrow_table(
+      SampleID = c("A", "B", "C", "D"),
+      OlinkID = rep("OID12345", 4L),
+      SampleType = rep("SAMPLE", 4L),
+      NPX = rnorm(4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L),
+      LOD = rnorm(4L)
+    )
 
-            expect_error(check_npx_col_names(df),
-                         "There are multiple column names associated with: lod")
-          })
+    # one non existing column column name ----
 
-# Test that function issues warning when multiple names for a column exist
-# and preferred_names is provided
-test_that("PlateLOD is provided for lod",
-          {
-            df <- arrow::arrow_table(
-              SampleID = c("A", "B", "C", "D"),
-              OlinkID = rep("OID12345", 4),
-              NPX = rnorm(4),
-              PlateID = rep("plate1", 4),
-              QC_Warning = rep("Pass", 4),
-              PlateLOD = rnorm(4),
-              MaxLOD = rnorm(4)
-            )
+    expect_error(
+      object = df |>
+        check_npx_col_names(
+          preferred_names = c("sample_id" = "IamSampleName")
+        ),
+      regexp = "Some of the values of \"preferred_names\" are not detected in"
+    )
 
-            result <- list(
-              sample_id = "SampleID",
-              olink_id = "OlinkID",
-              plate_id = "PlateID",
-              qc_warning = "QC_Warning",
-              quant = "NPX",
-              lod = "PlateLOD"
-            )
+    # multiple non existing column column names ----
 
-            expect_equal(check_npx_col_names(df, preferred_names = c(lod = "PlateLOD")),
-                         result)
-          })
+    expect_error(
+      object = df |>
+        check_npx_col_names(
+          preferred_names = c("sample_id" = "IamSampleName",
+                              "lod" = "PlateLOD",
+                              "sample_type" = "IamSampleType")
+        ),
+      regexp = "Some of the values of \"preferred_names\" are not detected in"
+    )
+  }
+)
+
+test_that(
+  "check_npx_col_names - error - ties (multiple matches)",
+  {
+    df <- arrow::arrow_table(
+      SampleID = c("A", "B", "C", "D"),
+      OlinkID = rep("OID12345", 4L),
+      SampleType = rep("SAMPLE", 4L),
+      NPX = rnorm(4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L),
+      LOD = rnorm(4L)
+    )
+
+    # one column with multiple matches ----
+
+    expect_error(
+      object = df |>
+        dplyr::collect() |>
+        dplyr::mutate(
+          PlateLOD = rnorm(4L)
+        ) |>
+        check_npx_col_names(),
+      regexp = "There are multiple column names associated with the following k"
+    )
+
+    # mutiple columns with multiple matches ----
+
+    expect_error(
+      object = df |>
+        dplyr::collect() |>
+        dplyr::mutate(
+          PlateLOD = rnorm(4L),
+          Quantified_value = rnorm(4L)
+        ) |>
+        check_npx_col_names(),
+      regexp = "There are multiple column names associated with the following k"
+    )
+  }
+)
+
+test_that(
+  "check_npx_col_names - error - no match for non-nullable columns",
+  {
+    df <- arrow::arrow_table(
+      SampleID = c("A", "B", "C", "D"),
+      OlinkID = rep("OID12345", 4L),
+      SampleType = rep("SAMPLE", 4L),
+      NPX = rnorm(4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L),
+      LOD = rnorm(4L)
+    )
+
+    # one column with no matches ----
+
+    expect_error(
+      object = df |>
+        dplyr::rename(
+          "IamSampleName" = "SampleID"
+        ) |>
+        dplyr::compute() |>
+        check_npx_col_names(),
+      regexp = "There are no column names associated with the following key"
+    )
+
+    # mutiple columns with no matches ----
+
+    expect_error(
+      object = df |>
+        dplyr::rename(
+          "IamSampleName" = "SampleID",
+          "IamSampleType" = "SampleType"
+        ) |>
+        dplyr::compute() |>
+        check_npx_col_names(),
+      regexp = "There are no column names associated with the following key"
+    )
+  }
+)
 
 # check_npx_update_col_names ----
 
+# working cases are covered by tests on check_npx_col_names
+# here we will check only the errors
 
+test_that(
+  "check_npx_update_col_names - error - no match for non-nullable columns",
+  {
+    # one name not in column_name_dict ----
+
+    expect_error(
+      object = check_npx_update_col_names(
+        preferred_names = c("sample_id_wrong" = "SampleID")
+      ),
+      regexp = "Unexpected name in"
+    )
+
+    # multiple names not in column_name_dict ----
+
+    expect_error(
+      object = check_npx_update_col_names(
+        preferred_names = c("sample_id_wrong" = "SampleID",
+                            "wrong_sample_type" = "SampleType",
+                            "lod2" = "LOD")
+      ),
+      regexp = "Unexpected names in"
+    )
+  }
+)

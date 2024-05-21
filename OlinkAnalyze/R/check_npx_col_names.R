@@ -38,18 +38,41 @@
 #'
 #' @return A list of matched column names based on the preferred names.
 #'
-#' #' @examples
+#' @examples
 #' \donttest{
 #' file <- system.file("extdata",
-#'                     "npx_data_long_csv.csv",
-#'                     package = "OlinkAnalyze")
+#'                     "npx_data_ext.parquet",
+#'                      package = "OlinkAnalyze")
+#' df <- read_npx(filename = file)
 #'
-#' read_NPX(filename = file,
-#'          sep = NULL)
+#' # run df as is
+#' OlinkAnalyze:::check_npx_col_names(df = df)
 #'
-#' read_NPX(filename = file,
-#'          sep = ";")
+#' # SampleType missing
+#' df |>
+#'   dplyr::select(
+#'     -dplyr::all_of("SampleType")
+#'   ) |>
+#'   OlinkAnalyze:::check_npx_col_names()
+#'
+#' # use PCNormalizedNPX instead on NPX
+#' OlinkAnalyze:::check_npx_col_names(
+#'   df = df,
+#'   preferred_names = c("quant" = "PCNormalizedNPX")
+#' )
+#'
+#' # use PCNormalizedNPX instead on NPX, and PlateLOD instead of LOD
+#' df |>
+#'   dplyr::mutate(
+#'     LOD = 1L,
+#'     PlateLOD = 2L
+#'   ) |>
+#'   OlinkAnalyze:::check_npx_col_names(
+#'     preferred_names = c("quant" = "PCNormalizedNPX",
+#'                         "lod" = "PlateLOD")
+#'   )
 #' }
+#'
 check_npx_col_names <- function(df,
                                 preferred_names = NULL) {
 
@@ -115,11 +138,22 @@ check_npx_col_names <- function(df,
 
   if (any(column_name_multi > 1L)) {
 
+    column_name_multi_lst <- column_name_df[column_name_multi > 1L]
+    column_name_multi_prnt <- lapply( #nolint
+      seq_along(column_name_multi_lst),
+      function(i) {
+        paste0("* \"", names(column_name_multi_lst[i]), "\": ",
+               cli::ansi_collapse(x = unlist(column_name_multi_lst[i])))
+      }
+    ) |>
+      unlist()
+
     cli::cli_abort(
-      c("x" = "There are multiple column names associated with the key
-      {.val {names(column_name_df[column_name_multi > 1L])}}",
-        "i" = "Please use {.val preferred_names} to select unique column
-      names."),
+      c("x" = "There are multiple column names associated with the following
+        key(s):",
+        column_name_multi_prnt,
+        "i" = "Please use {.val preferred_names} to break ties of column
+        names."),
       call = rlang::caller_env()
     )
   }
@@ -129,9 +163,9 @@ check_npx_col_names <- function(df,
   if (any(column_name_multi == 0L)) {
 
     cli::cli_abort(
-      c("x" = "There are no column names associated with the key
-        {.val {names(column_name_df[column_name_multi == 0L]}",
-        "i" = "Please use {.val preferred_names} to select unique column
+      c("x" = "There are no column names associated with the following key(s):",
+        paste0("* \"", names(column_name_df[column_name_multi == 0L]), "\""),
+        "i" = "Please use {.val preferred_names} to select the correct column
       names."),
       call = rlang::caller_env()
     )
@@ -186,7 +220,7 @@ check_npx_update_col_names <- function(preferred_names) {
                                                 names(column_name_dict))]
 
     cli::cli_abort(
-      c("x" = "Unexpected name{?s} in argument {.val preferred_names}:
+      c("x" = "Unexpected name{?s} in {.val preferred_names}:
         {.val {missing_names}}!",
         "i" = "Expected one or more of the following names:
         {names(column_name_dict)}"),
