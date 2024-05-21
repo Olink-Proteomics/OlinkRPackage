@@ -8,143 +8,227 @@
 #' @export
 #'
 #' @examples
-olink_lod <- function(data, lod_file_path = NA, lod_method = "NCLOD"){
+olink_lod <- function(data, lod_file_path = NULL, lod_method = "NCLOD"){
+
+  # store original column names of `data` to restore them later
   original_columns <- names(data)
-  
-  
-  if (lod_method == "FixedLOD"){
-    if(missing(lod_file_path)){
-      stop("lod_file_path must be specified for lod_method \"FixedLOD\"")
+
+  # check the type of LOD calculation to perform and compute or extract:
+  # LodNPX, LODCount and LodMethod
+
+  lod_methods <- list(fix_lod = "FixedLOD",
+                      nc_lod = "NCLOD")
+
+  if (lod_method == lod_methods$fix_lod) {
+
+    if(missing(lod_file_path)) {
+      stop(paste0("lod_file_path must be specified for lod_method = \"",
+                  lod_methods$fix_lod, "\""))
     }
-    lod_file <- read.table(lod_file_path, sep = ";", header = TRUE)
-    lod_data <- olink_fixed_lod(data, lod_file)
+
+    lod_file <- read.table(file = lod_file_path, sep = ";", header = TRUE)
+    lod_data <- olink_fixed_lod(data_analysis_ref_id = data$DataAnalysisRefID,
+                                lod_file = lod_file)
+
+  } else if (lod_method == lod_methods$nc_lod) {
+
+    lod_data <- olink_nc_lod(data = data)
+
+  } else {
+
+    stop(paste0("lod_method must be one of \"", lod_methods$fix_lod, "\" or \"",
+                lod_methods$nc_lod, "\""))
+
   }
-  if (lod_method == "NCLOD"){
-    lod_data <- olink_nc_lod(data)
-  }
-  
-  if(!(lod_method %in% c("FixedLOD", "NCLOD"))){
-    stop("lod_method must be one of \"FixedLOD\" or \"NCLOD\"")
-  }
-  
+
   # If NPX is intensity normalized, than intensity normalize LOD
-  data<-int_norm_count(data, lod_data) |> 
-    mutate(LOD = ifelse(.data[["Normalization"]] ==  "Intensity",
-                        .data[["LOD"]],
-                        ifelse(.data[["Normalization"]] == "Plate control",
-                               .data[["PCNormalizedLOD"]],
-                               NA)))
-  
-  data<-data |> 
-    dplyr::select(c(original_columns, "LOD", "PCNormalizedLOD"))
+  data <- int_norm_count(
+    data = data,
+    lod_data = lod_data
+  ) |>
+    dplyr::mutate(
+      LOD = dplyr::case_match(
+        .data[["Normalization"]],
+        "Intensity" ~ .data[["LOD"]],
+        "Plate control" ~ .data[["PCNormalizedLOD"]],
+        .default = NA_real_
+      )
+    ) |>
+    dplyr::select(
+      dplyr::all_of(
+        c(original_columns, "LOD", "PCNormalizedLOD")
+      )
+    )
+
   return(data)
 }
 
-olink_fixed_lod <- function(data, lod_file){
-  lod_data <- lod_file |> 
-    dplyr::filter(.data[["DataAnalysisRefID"]] %in% data$DataAnalysisRefID) |> 
-    dplyr::select(c("OlinkID","DataAnalysisRefID", "LodNPX", "LodCount", "LodMethod"))
-    
+# extract LodNPX, LODCount and LodMethods from reference file
+olink_fixed_lod <- function(data_analysis_ref_id, lod_file) {
+
+  lod_file |>
+    dplyr::filter(
+      .data[["DataAnalysisRefID"]] %in% data_analysis_ref_id
+    ) |>
+    dplyr::select(
+      dplyr::all_of(
+        c("OlinkID", "DataAnalysisRefID", "LodNPX", "LodCount", "LodMethod")
+      )
+    )
+
 }
 
-
+# compute LodNPX, LODCount and LodMethods from NCs
 olink_nc_lod <- function(data) {
   # Calculate LOD in counts and NPX
-  
-  lod_data<-data |> 
+
+  # rows from NC
+  lod_data <- data |>
     dplyr::filter(
-      .data[["SampleType"]] == "NEGATIVE_CONTROL",
-      .data[["AssayQC"]] == "PASS",
-      .data[["SampleQC"]] == "PASS",
-      .data[["AssayType"]] == "assay",
-      !is.na(.data[["NPX"]])
+      .data[["SampleType"]] == "NEGATIVE_CONTROL"
+      & .data[["AssayQC"]] == "PASS"
+      & .data[["SampleQC"]] == "PASS"
+      & .data[["AssayType"]] == "assay"
+      & !is.na(.data[["NPX"]])
     )
-  
-  if(length(unique(lod_data$SampleID)) < 10){
-    stop("Insufficient Negative Control data to calculate LOD. 
-         At least 10 Negative Controls are required to calculate LOD from Negative Controls.")
+
+  # check that we have at least 10 NCs
+  if(length(unique(lod_data$SampleID)) < 10L){
+    stop("At least 10 Negative Controls are required to calculate LOD from Negative Controls.")
   }
-  
-  lod_data <- lod_data |> 
-    dplyr::group_by(dplyr::pick(dplyr::all_of(c("OlinkID", "DataAnalysisRefID")))) |> 
-    dplyr::summarise(MaxCount = max(.data[["Count"]]),
-                     LodNPX = median(.data[["PCNormalizedNPX"]], na.rm = TRUE) +
-                       max(
-                         0.2, 3 * sd(.data[["PCNormalizedNPX"]], na.rm = TRUE) 
-                       ),
-                     LodCount = max(
-                       150, max(.data[["Count"]] * 2)
-                     )) |> 
-    dplyr::mutate(LodMethod = dplyr::case_when(
-      .data[["MaxCount"]] > 150 ~ "lod_npx", 
-      TRUE ~ "lod_count"
-    )) |> 
-    dplyr::ungroup() |> 
-    dplyr::select(-dplyr::all_of(c("MaxCount"))) 
-  
+
+  # compute LOD
+  lod_data <- lod_data |>
+    # LOD is comnputed per assay and lot of reagents
+    dplyr::group_by(
+      dplyr::pick(
+        dplyr::all_of(
+          c("OlinkID", "DataAnalysisRefID")
+        )
+      )
+    ) |>
+    # compute LOD on counts and NPX
+    dplyr::summarise(
+      MaxCount = max(.data[["Count"]], na.rm = TRUE),
+      LodNPX = median(.data[["PCNormalizedNPX"]], na.rm = TRUE) +
+        max(0.2, 3L * sd(.data[["PCNormalizedNPX"]], na.rm = TRUE)),
+      LodCount = max(150L, max(.data[["Count"]] * 2L, na.rm = TRUE))
+    ) |>
+    dplyr::mutate(
+      LodMethod = dplyr::if_else(
+        .data[["MaxCount"]] > 150L, "lod_npx", "lod_count"
+      )
+    ) |>
+    dplyr::ungroup() |>
+    dplyr::select(
+      -dplyr::all_of(
+        c("MaxCount")
+      )
+    )
+
   return(lod_data)
-                                     
-  
+
 }
-
-
-
 
 pc_norm_count <- function(data, lod_data){
   # Calculate PC median for normalization
-  
-  pc_median <- data |>  
-  dplyr::group_by(dplyr::pick(dplyr::all_of("OlinkID"))) |> 
-  dplyr::summarise(PCMedian = 
-                  median(.data[["ExtNPX"]][.data[["SampleType"]] == "PLATE_CONTROL"], na.rm = TRUE)) |> 
-    dplyr::select("OlinkID", "PCMedian")
-  if(nrow(pc_median) == 0){
-  stop("Insufficient Plate Control data for normalization of LOD.")
+
+  pc_median <- data |>
+    dplyr::group_by(
+      dplyr::pick(
+        dplyr::all_of("OlinkID")
+      )
+    ) |>
+    dplyr::summarise(
+      PCMedian = median(.data[["ExtNPX"]][.data[["SampleType"]] == "PLATE_CONTROL"],
+                        na.rm = TRUE)
+    ) |>
+    dplyr::select(
+      dplyr::all_of(
+        c("OlinkID", "PCMedian")
+      )
+    )
+
+  if(nrow(pc_median) == 0L){
+    stop("Insufficient Plate Control data for normalization of LOD.")
   }
+
   # Calculate ExtCount for normalization
-  ext_count <- data |> 
-    dplyr::filter(.data[["AssayType"]] == "ext_ctrl") |> 
-    dplyr::mutate(ExtCount = .data[["Count"]]) |> 
-    dplyr::select("SampleID", "Panel", "Block", "SampleType", "ExtCount")
-    
-  data <- data |> 
-    dplyr::left_join(lod_data, by = c("OlinkID", "DataAnalysisRefID")) |> 
-    dplyr::left_join(pc_median, by = c("OlinkID")) |> 
-    dplyr::left_join(ext_count, by = c("SampleID", "Panel", "Block", "SampleType")) 
-    # Convert count LOD to PC norm NPX
-    
-  data <- data |> 
-    dplyr::mutate(PCNormalizedLOD = ifelse(!is.na(.data[["NPX"]]),
-                             ifelse(.data[["LodMethod"]] == "lod_npx",
-                                    .data[["LodNPX"]],
-                                    log2(.data[["LodCount"]] / .data[["ExtCount"]]) - .data[["PCMedian"]]
-                              ), NA))
+  ext_count <- data |>
+    dplyr::filter(
+      .data[["AssayType"]] == "ext_ctrl"
+    ) |>
+    dplyr::select(
+      dplyr::all_of(
+        c("SampleID", "Panel", "Block", "SampleType", "ExtCount" = "Count")
+      )
+    )
+
+  data <- data |>
+    dplyr::left_join(
+      lod_data,
+      by = c("OlinkID", "DataAnalysisRefID")
+    ) |>
+    dplyr::left_join(
+      pc_median,
+      by = c("OlinkID")
+    ) |>
+    dplyr::left_join(
+      ext_count,
+      by = c("SampleID", "Panel", "Block", "SampleType")
+    )
+
+  # Convert count LOD to PC norm NPX
+
+  data <- data |>
+    dplyr::mutate(
+      PCNormalizedLOD = dplyr::case_when(
+        is.na(.data[["NPX"]]) ~ NA_real_,
+        !is.na(.data[["NPX"]]) & .data[["LodMethod"]] == "lod_npx" ~
+        .data[["LodNPX"]],
+        TRUE ~ log2(.data[["LodCount"]] / .data[["ExtCount"]]) - .data[["PCMedian"]],
+        .default = NA_real_
+      )
+    )
+
   return(data)
 }
-
-
 
 int_norm_count <- function(data, lod_data){
+
   data <- pc_norm_count(data, lod_data)
-  plate_median <- data |> 
-    dplyr::filter(.data[["SampleType"]] =="SAMPLE") |> 
-    dplyr::group_by(dplyr::pick(dplyr::all_of("OlinkID"))) |> 
-    dplyr::summarise(PlateMedianNPX = median(.data[["PCNormalizedNPX"]])) |> 
-    dplyr::select("OlinkID", "PlateMedianNPX")
-    
-  if(nrow(plate_median) == 0){
+
+  plate_median <- data |>
+    dplyr::filter(
+      .data[["SampleType"]] =="SAMPLE"
+    ) |>
+    dplyr::group_by(
+      dplyr::pick(
+        dplyr::all_of("OlinkID")
+      )
+    ) |>
+    dplyr::summarise(
+      PlateMedianNPX = median(.data[["PCNormalizedNPX"]], na.rm = TRUE)
+    ) |>
+    dplyr::ungroup() |>
+    dplyr::select(
+      dplyr::all_of(
+        c("OlinkID", "PlateMedianNPX"))
+    )
+
+  if(nrow(plate_median) == 0L){
     stop("Insufficient data for intensity normalization of LOD.")
   }
-  
-  data <- data |> 
-    dplyr::left_join(plate_median, by = "OlinkID") |> 
-    dplyr::mutate(LOD = .data[["PCNormalizedLOD"]] - .data[["PlateMedianNPX"]])
+
+  data <- data |>
+    dplyr::left_join(
+      plate_median,
+      by = "OlinkID"
+    ) |>
+    dplyr::mutate(
+      LOD = .data[["PCNormalizedLOD"]] - .data[["PlateMedianNPX"]]
+    )
+
   return(data)
-  
+
 }
-
-
-
-
-
-  
