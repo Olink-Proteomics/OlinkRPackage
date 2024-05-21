@@ -1,0 +1,30 @@
+---
+title: "Integrating LOD into Explore data"
+output: 
+  html_vignette:
+    toc: true
+    toc_depth: 3
+vignette: >
+  %\VignetteIndexEntry{Integrating LOD into Explore data}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+date: 'Compiled: `r format(Sys.Date(), "%B %d, %Y")`'
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  tidy = FALSE,
+  tidy.opts = list(width.cutoff = 95),
+  fig.width = 6,
+  fig.height = 3,
+  message = FALSE,
+  warning = FALSE,
+  time_it = TRUE,
+  fig.align = "center"
+)
+```
