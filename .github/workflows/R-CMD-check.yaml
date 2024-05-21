@@ -20,20 +20,6 @@ jobs:
           filter: '[?runOn==`${{ github.event_name }}` || runOn==`always`]'
           # addInclude: true
   
-  Install_arrow_for_mac:
-    needs: matrix_prep
-    strategy: 
-      matrix:
-        config: 
-          - {os: mac-latest,   r: 'release'}
-    
-    runs-on: ${{ matrix.config.os }}
-    timeout-minutes: 120  
-    
-    - name: Install Arrow
-      run: |
-        install.packages("arrow", repos = c("https://apache.r-universe.dev"))
-      shell: Rscript{0}
       
   R-CMD-check:
     needs: matrix_prep
