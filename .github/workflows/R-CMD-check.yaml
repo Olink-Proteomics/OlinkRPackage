@@ -62,7 +62,7 @@ jobs:
           working-directory: OlinkAnalyze
           extra-packages: any::rcmdcheck, pillar
           
-      - name: Install Matrix from source
+      - name: Install Matrix from source 
         run: |
           install.packages("Matrix", type="source", repos='http://cran.us.r-project.org')
         shell: Rscript {0}
@@ -152,3 +152,60 @@ jobs:
         with:
           name: ${{ runner.os }}-r${{ matrix.config.r }}-results
           path: "check"
+          
+  R-CMD-check-mac:
+    needs: matrix_prep
+    strategy:      
+      fail-fast: false    
+      matrix: 
+        config:
+          - {os: macOS-latest,   r: 'release'}
+  
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120       
+
+    name: ${{ matrix.os }} (${{ matrix.r }})
+
+    env:
+      R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
+      _R_CHECK_FORCE_SUGGESTS_: false
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: ${{ matrix.r }}
+          use-public-rspm: true            
+
+      - uses: r-lib/actions/setup-pandoc@v2
+        with:
+          pandoc-version: '2.18'      
+          
+      - name: Set BioC version
+        run: |
+          install.packages("remotes")
+          forenv <- paste("R_BIOC_VERSION=", as.character(remotes::bioc_version()), sep = "")
+          write(forenv, file = Sys.getenv("GITHUB_ENV"), append = TRUE) # Store current value to ENV          
+        shell: Rscript {0}
+      
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          working-directory: OlinkAnalyze
+          extra-packages: any::rcmdcheck, pillar
+          
+      - name: Install Matrix from source 
+        run: |
+          install.packages("Matrix", type="source", repos='http://cran.us.r-project.org')
+        shell: Rscript {0}
+        
+      - name: Install arrow from runiverse 
+        run: |
+          install.packages('arrow', repos = c('https://apache.r-universe.dev', 'https://cloud.r-project.org'))
+        shell: Rscript {0}
+
+      - uses: r-lib/actions/check-r-package@v2
+        with:
+          working-directory: OlinkAnalyze   
