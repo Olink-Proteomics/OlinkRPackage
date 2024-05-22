@@ -19,3 +19,18 @@ A dataframe with 2 additional columns, LOD and PCNormalizedLOD. When Normalizati
 \description{
 Calculate LOD using Negative Controls or Fixed LOD
 }
+\examples{
+
+\dontrun{
+  \donttest{
+    # Estimate LOD from negative controls
+    npx_data_lod_NC <– olink_lod(data = npx_data,  lod_method = "NCLOD")
+
+    # Estimate LOD from fixed LOD
+    npx_data_lod_Fixed <– olink_lod(data = npx_data,
+                                    lod_file_path = "path/to/lod_file",
+                                    lod_method = "FixedLOD")
+  }
+}
+
+}
