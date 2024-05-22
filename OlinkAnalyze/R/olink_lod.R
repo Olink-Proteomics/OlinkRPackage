@@ -1,10 +1,14 @@
 #' Calculate LOD using Negative Controls or Fixed LOD
 #'
 #' @param data npx data file
-#' @param lod_file_path location of lod file from Olink (only needed if lod_method = "FixedLOD")
-#' @param lod_method method for calculating LOD using either "FixedLOD" or negative controls ("NCLOD")
+#' @param lod_file_path location of lod file from Olink. Only needed if
+#' lod_method = "FixedLOD". Default `NULL`.
+#' @param lod_method method for calculating LOD using either "FixedLOD" or
+#' negative controls ("NCLOD"). Default `NCLOD`.
 #'
-#' @return A dataframe with 2 additional columns, LOD and PCNormalizedLOD. When Normalization = "Plate Control", LOD and PCNormalizedLOD are equivalent
+#' @return A dataframe with 2 additional columns, LOD and PCNormalizedLOD. When
+#' `Normalization = "Plate Control"`, LOD and PCNormalizedLOD are identical.
+#'
 #' @export
 #'
 olink_lod <- function(data, lod_file_path = NULL, lod_method = "NCLOD"){
@@ -78,7 +82,7 @@ olink_fixed_lod <- function(data_analysis_ref_id, lod_file) {
 }
 
 # compute LodNPX, LODCount and LodMethods from NCs
-olink_nc_lod <- function(data) {
+olink_nc_lod <- function(data, min_num_nc = 10L) {
   # Calculate LOD in counts and NPX
 
   # rows from NC
@@ -91,9 +95,10 @@ olink_nc_lod <- function(data) {
       & !is.na(.data[["NPX"]])
     )
 
-  # check that we have at least 10 NCs
-  if(length(unique(lod_data$SampleID)) < 10L){
-    stop("At least 10 Negative Controls are required to calculate LOD from Negative Controls.")
+  # check that we have at least `min_num_nc` NCs
+  if(length(unique(lod_data$SampleID)) < min_num_nc){
+    stop(paste("At least", min_num_nc, "Negative Controls are required to",
+               "calculate LOD from Negative Controls."))
   }
 
   # compute LOD
@@ -159,7 +164,8 @@ pc_norm_count <- function(data, lod_data){
     ) |>
     dplyr::select(
       dplyr::all_of(
-        c("SampleID", "Panel", "Block", "SampleType", "ExtCount" = "Count")
+        c("SampleID", "WellID", "Panel", "Block", "SampleType", "PlateID",
+          "ExtCount" = "Count")
       )
     )
 
@@ -174,7 +180,7 @@ pc_norm_count <- function(data, lod_data){
     ) |>
     dplyr::left_join(
       ext_count,
-      by = c("SampleID", "Panel", "Block", "SampleType")
+      by = c("SampleID", "WellID", "Panel", "Block", "SampleType", "PlateID")
     )
 
   # Convert count LOD to PC norm NPX
@@ -184,7 +190,7 @@ pc_norm_count <- function(data, lod_data){
       PCNormalizedLOD = dplyr::case_when(
         is.na(.data[["NPX"]]) ~ NA_real_,
         !is.na(.data[["NPX"]]) & .data[["LodMethod"]] == "lod_npx" ~
-        .data[["LodNPX"]],
+          .data[["LodNPX"]],
         TRUE ~ log2(.data[["LodCount"]] / .data[["ExtCount"]]) - .data[["PCMedian"]],
         .default = NA_real_
       )
