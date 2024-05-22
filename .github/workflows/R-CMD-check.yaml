@@ -52,6 +52,13 @@ jobs:
           forenv <- paste("R_BIOC_VERSION=", as.character(remotes::bioc_version()), sep = "")
           write(forenv, file = Sys.getenv("GITHUB_ENV"), append = TRUE) # Store current value to ENV
         shell: Rscript {0}
+        
+      - name: Install arrow from runiverse for Mac OSX
+        run: |
+          if (Sys.info()[['sysname']] == "Darwin") {
+            install.packages('arrow', repos = c('https://apache.r-universe.dev', 'https://cloud.r-project.org'))
+          }
+        shell: Rscript {0}
       
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
