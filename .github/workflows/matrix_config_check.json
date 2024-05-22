@@ -21,7 +21,22 @@
    },
    {
       "os": "ubuntu-20.04",
+      "r": "4.0.0",
+      "runOn": "pull_request"
+   },
+   {
+      "os": "ubuntu-20.04",
+      "r": "4.1.0",
+      "runOn": "pull_request"
+   },
+   {
+      "os": "ubuntu-20.04",
       "r": "4.2.0",
+      "runOn": "pull_request"
+   },
+   {
+      "os": "ubuntu-20.04",
+      "r": "4.3.0",
       "runOn": "pull_request"
    }
 ]
