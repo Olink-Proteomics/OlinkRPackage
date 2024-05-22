@@ -58,8 +58,9 @@ jobs:
       - name: Install Matrix from source
         run: |
           if (getRversion() < "4.4.0") {
+            install.packages("pak")
             install.packages("lattice")
-            install.packages("https://cran.r-project.org/src/contrib/Archive/Matrix/Matrix_1.6-5.tar.gz", repos = NULL, type = "source")
+            pak::pkg_install("https://cran.r-project.org/src/contrib/Archive/Matrix/Matrix_1.6-5.tar.gz")
           }
         shell: Rscript {0}
 
