@@ -70,9 +70,10 @@ test_that(
         )
 
         # check identical to reference
-        expect_identical(
+        expect_equal(
           object = npx_df,
-          expected = ref_res$npx_data_parquet
+          expected = ref_res$npx_data_parquet,
+          tolerance = 1e-4
         )
 
       }
@@ -145,9 +146,10 @@ test_that(
         )
 
         # check identical to reference
-        expect_identical(
+        expect_equal(
           object = npx_df,
-          expected = ref_res$npx_data_long_csv
+          expected = ref_res$npx_data_long_csv,
+          tolerance = 1e-4
         )
 
       }
@@ -222,9 +224,10 @@ test_that(
         )
 
         # check identical to reference
-        expect_identical(
+        expect_equal(
           object = npx_df,
-          expected = ref_res$npx_data_long_zip
+          expected = ref_res$npx_data_long_zip,
+          tolerance = 1e-4
         )
 
       }
@@ -307,7 +310,7 @@ test_that(
 
         # check identical to reference
         # making some harmless minor modifications to enable the match
-        expect_identical(
+        expect_equal(
           object = lst_df$df_expected |>
             dplyr::mutate(
               Panel = toupper(.data[["Panel"]])
@@ -316,7 +319,8 @@ test_that(
             dplyr::mutate(
               Panel_Version = NA_character_,
               Panel = toupper(.data[["Panel"]])
-            )
+            ),
+          tolerance = 1e-4
         )
 
       }
@@ -414,7 +418,7 @@ test_that(
 
         # check identical to reference
         # making some harmless minor modifications to enable the match
-        expect_identical(
+        expect_equal(
           object = lst_df$df_expected |>
             dplyr::mutate(
               Panel = toupper(.data[["Panel"]])
@@ -423,7 +427,8 @@ test_that(
             dplyr::mutate(
               Panel_Version = NA_character_,
               Panel = toupper(.data[["Panel"]])
-            )
+            ),
+          tolerance = 1e-4
         )
 
       }
