@@ -27,4 +27,101 @@ knitr::opts_chunk$set(
   time_it = TRUE,
   fig.align = "center"
 )
+
+library(OlinkAnalyze)
+library(dplyr)
+
 ```
+
+## Introduction
+
+This vignette describes how to use Olink® Analyze to integrate Limit of Detection (LOD) into Explore HT and Explore 3072 datasets. Although it is recommended to use all Explore data in downstream analyses, LOD information can be useful when performing technical evaluations of a dataset.
+
+In this vignette, you will learn how to use `olink_lod()` to add LOD information to your Explore dataset.
+
+
+## Integrating LOD
+
+Limit of Detection (LOD) is a metric that indicates the lowest measurable value of a protein. LOD can be helpful when performing technical evaluations of NPX datasets, such as calculating CVs. 
+
+LOD can be added to Explore NPX datasets using `olink_lod()`. This function can incorporate LOD into an Explore dataset based on either an NPX dataset’s negative controls or using predetermined fixed LOD values, which Olink Support can provide upon request. The default LOD calculation method for Explore NPX data is based off of a dataset's negative controls. 
+
+In both normalization methods, an LOD and PCNormalizedLOD column are integrated into the dataset. If an NPX file is PC normalized, the LOD and PCNormalizedLOD columns will contain identical values. If an NPX file is intensity normalized, the intensity normalized LOD will be reported in the LOD column and the PC normalized LOD will be reported in the PCNormalizedLOD column. An Explore dataset's NPX or PCNormalizedNPX values should be compared against the LODs that are integrated using the `olink_lod()` function.  
+
+## Setup Explore datasets
+
+Explore datasets are standard Olink® Explore HT and Explore 3072 NPX tables. They can be loaded using the `read_NPX()` function with default Olink Software Explore NPX parquet files as input.
+
+
+```{r dataset_generation, eval = FALSE, message=FALSE, warning=FALSE}
+data <- read_NPX("~/NPX_file1_location.parquet")
+```
+
+
+## Integrating Negative Control LOD
+
+The negative control (NC) LOD method requires at least 10 negative controls in a dataset. Negative control data is available in the standard exported Explore HT and Explore 3072 NPX parquet files. 
+
+A negative control will not contribute to the count of the minimum required NCs if either of the following apply:
+
+ + The negative control contains an assay QC warning across all assays, excluding Olink's internal control assays
+ + The negative control does not pass sample QC criteria (sample QC failure or warning) in all Explore HT blocks or all Explore 3072 panels
+
+For each assay, the median NPX is calculated for all negative controls present in a project. For Explore 3072, overlapping assays are assessed separately, within their respective panels. The LOD for each assay is then calculated as the assay's median negative control NPX value plus 0.2 Standard Deviations. 
+
+
+The resulting LOD is the PC normalized negative control LOD. In the event that the Explore dataset is intensity normalized, an intensity normalization adjustment factor is applied and the resulting intensity normalized LOD is reported in the LOD column and the PC normalized LOD is reported in the PCNormalizedLOD column. 
+
+
+```{r NCLOD_example, eval = FALSE, message=FALSE, warning=FALSE}
+# Integrating negative control LOD for intensity normalized data
+explore_npx <- read_NPX("~/NPX_data1.parquet")
+olink_lod(explore_npx, lod_method = "NCLOD")
+```
+
+## Integrating Fixed LOD
+
+The fixed LOD method uses fixed LOD values that have been calculated on negative controls used in Olink validation runs using the method described above for negative control LOD. The fixed LOD data is available in an external CSV file which can be provided by Olink Support (support\@olink.com). The fixed LOD values reported in this CSV file are the PC normalized LODs. 
+
+The fixed LOD file is read into the `olink_lod()` function to be integrated into an Explore dataset. In the event that the Explore dataset is intensity normalized, an intensity normalization adjustment factor is applied and the resulting intensity normalized LOD is reported in the LOD column and the PC normalized LOD is reported in the PCNormalizedLOD column. 
+
+```{r FixedLOD, eval = FALSE, message=FALSE, warning=FALSE}
+# Reading in Fixed LOD filepath into R environment - note that these are NOT real fixed LOD values
+fixedLOD_filepath <- "~/ExploreHT_fixedLOD.csv"
+
+# Integrating Fixed LOD for intensity normalized data
+explore_npx <- read_NPX("~/NPX_data1.parquet")
+olink_lod(explore_npx, lod_file_path = fixedLOD_filepath, lod_method = "FixedLOD")
+```
+
+
+## Adjusting LOD for Intensity Normalized Data 
+
+If an Explore dataset is intensity normalized, a normalization adjustment factor is applied to the PC normalized LOD within the `olink_lod()` function. 
+
+For each assay, this adjustment factor is calculated as the median NPX of all samples (excluding Olink's external controls) within each plate. For Explore 3072, overlapping assays are assessed separately, within their respective panels. The intensity normalized negative control LOD is calculated by subtracting this adjustment factor from the PC normalized negative control LOD. 
+
+The intensity normalization LOD adjustment is applied to both the negative control and fixed LOD methods. 
+
+## Export Explore Data with LOD
+Explore data with LOD data can be exported using arrow::write_parquet to export Explore data as a parquet file in long  format. 
+
+```{r explore_npx_export, eval = FALSE, message=FALSE, warning=FALSE}
+# Exporting Explore data with LOD information as a parquet file
+explore_npx_NC_LOD <- explore_npx %>% 
+  olink_lod(lod_method = "NCLOD") %>%
+  arrow::write_parquet(, file = "NPX_data_NC_LOD.parquet")
+```
+
+
+## Contact Us
+
+We are always happy to help. Email us with any questions:
+
+-   biostat\@olink.com for statistical services and general stats questions
+
+-   biostattools\@olink.com for Olink Analyze and Shiny app support
+
+-   support\@olink.com for Olink lab product and technical support
+
+-   info\@olink.com for more information
