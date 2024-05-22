@@ -262,7 +262,7 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           working-directory: OlinkAnalyze
-          extra-packages: any::rcmdcheck, pillar
+          extra-packages: any::rcmdcheck, pillar, Matrix=?ignore-before-r=4.4.0
           
 
       - uses: r-lib/actions/check-r-package@v2
