@@ -67,6 +67,7 @@ jobs:
         with:
           working-directory: OlinkAnalyze
           extra-packages: any::rcmdcheck, pillar #noteit
+          upgrade: FALSE
           
       - name: Install arrow from runiverse for Mac OSX
         run: |
