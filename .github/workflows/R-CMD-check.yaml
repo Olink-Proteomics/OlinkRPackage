@@ -59,6 +59,7 @@ jobs:
         run: |
           if (getRversion() < "4.4.0") {
             remotes::install_version("Matrix", version = "1.6-5", repos = "http://cran.us.r-project.org")
+            install.packages('MatrixModels')
           }
         shell: Rscript {0}
 
