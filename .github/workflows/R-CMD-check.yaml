@@ -58,7 +58,7 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           working-directory: OlinkAnalyze
-          extra-packages: any::rcmdcheck, pillar, url::https://cran.r-project.org/src/contrib/Archive/Matrix/Matrix_1.6-5.tar.gz #noteit
+          extra-packages: any::rcmdcheck, pillar, url::https://cran.r-project.org/src/contrib/Archive/Matrix/Matrix_1.6-5.tar.gz, url::https://bioconductor.org/packages/release/bioc/src/contrib/ggtree_3.12.0.tar.gz #noteit
           
       - name: Install arrow from runiverse for Mac OSX
         run: |
