@@ -63,7 +63,7 @@ jobs:
           # cache-version: 11
           # cache: true
           # pak-version: stable
-          # dependencies: "all"
+          dependencies: "all"
           
       - name: Install arrow from runiverse for Mac OSX
         run: |
