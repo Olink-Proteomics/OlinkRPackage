@@ -65,8 +65,12 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           working-directory: OlinkAnalyze
+          packages: any::lattice, url::https://cran.r-project.org/src/contrib/Archive/Matrix/Matrix_1.6-5.tar.gz
           extra-packages: any::rcmdcheck, pillar #noteit
-          upgrade: "FALSE"
+          # cache-version: 11
+          # cache: true
+          # pak-version: stable
+          # dependencies: "all"
           
       - name: Install arrow from runiverse for Mac OSX
         run: |
