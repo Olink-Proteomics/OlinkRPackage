@@ -215,7 +215,8 @@ jobs:
         with:
           working-directory: OlinkAnalyze   
           
-  R-CMD-check-4.2:
+  
+  R-CMD-check-4v2:
     needs: matrix_prep
     strategy:      
       fail-fast: false    
