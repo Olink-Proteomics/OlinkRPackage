@@ -140,7 +140,7 @@ pc_norm_count <- function(data, lod_data){
   pc_median <- data |>
     dplyr::group_by(
       dplyr::pick(
-        dplyr::all_of("OlinkID")
+        dplyr::all_of(c("OlinkID", "PlateID"))
       )
     ) |>
     dplyr::summarise(
@@ -149,7 +149,7 @@ pc_norm_count <- function(data, lod_data){
     ) |>
     dplyr::select(
       dplyr::all_of(
-        c("OlinkID", "PCMedian")
+        c("OlinkID", "PlateID", "PCMedian")
       )
     )
 
@@ -176,7 +176,7 @@ pc_norm_count <- function(data, lod_data){
     ) |>
     dplyr::left_join(
       pc_median,
-      by = c("OlinkID")
+      by = c("OlinkID", "PlateID")
     ) |>
     dplyr::left_join(
       ext_count,
