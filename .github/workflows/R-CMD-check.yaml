@@ -54,11 +54,6 @@ jobs:
           forenv <- paste("R_BIOC_VERSION=", as.character(remotes::bioc_version()), sep = "")
           write(forenv, file = Sys.getenv("GITHUB_ENV"), append = TRUE) # Store current value to ENV          
         shell: Rscript {0}
-
-      - uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          working-directory: OlinkAnalyze
-          extra-packages: any::rcmdcheck, pillar #noteit
           
       - name: Install Matrix from source
         run: |
@@ -66,6 +61,11 @@ jobs:
             remotes::install_version("Matrix", version = "1.6-5", repos = "http://cran.us.r-project.org")
           }
         shell: Rscript {0}
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          working-directory: OlinkAnalyze
+          extra-packages: any::rcmdcheck, pillar #noteit
           
       - name: Install arrow from runiverse for Mac OSX
         run: |
