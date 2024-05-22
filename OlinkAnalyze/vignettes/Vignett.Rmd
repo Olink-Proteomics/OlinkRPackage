@@ -262,6 +262,51 @@ A tibble of NPX data in long format containing normalized NPX values, including 
 * Project: Name given from the dataframe of origin.
 * Adj_factor: Adjustment factor, i.e. how much was added to or subtracted from the original NPX value.
 
+## Integrating Explore NPX LOD (olink_lod) 
+
+The olink_lod function adds LOD information to an Explore HT or Explore 3072 NPX dataframe. This function can incorporate LOD based on either an Explore dataset’s negative controls or using predetermined fixed LOD values, which can be provided by Olink’s Support team in an external file upon request. The default LOD calculation method is based off of the negative controls. If an NPX file is intensity normalized, both intensity normalized and PC normalized LODs are provided. 
+
+### Function arguments
+ 
+ + data: Explore HT or Explore 3072 tibble/data frame in parquet file format such as produced by the read_NPX function.
+ + lod_file_path: Path to fixed LOD file provided by Olink Support. This is only applicable if using the fixed LOD method. 
+ + lod_method: String of LOD method name. Must be either "NCLOD" (default) or "FixedLOD". 
+ 
+```{r NCLOD_example, eval = F, echo = T}
+# Integrating negative control LOD into Explore NPX dataset
+olink_lod(explore_npx, lod_method = "NCLOD")
+
+# Integrating fixed LOD into Explore NPX dataset - note that these are NOT real fixed LOD values
+fixedLOD_filepath <- "~/ExploreHT_fixedLOD.csv"
+olink_lod(explore_npx, lod_file_path = fixedLOD_filepath, lod_method = "FixedLOD")
+```
+
+### Function output
+
+A tibble with the following columns:
+
++ **SampleID** _\<chr\>_: Sample names or IDs.
++ **SampleType** _\<chr\>_: Sample type. Indicates whether a sample is a study sample or a type of Olink control sample. 
++ **WellID** _\<chr\>_: Well location in the plate.
++ **PlateID** _\<chr\>_: Name of the plate.
++ **DataAnalysisRefID** _\<chr\>_: Version of the panel (Explore 3072) or block (Explore HT). A new panel or block version might include some different or improved assays.
++ **OlinkID** _\<chr\>_: Unique ID for each assay assigned by Olink. In case the assay is included in more than one panels it will have a different OlinkID in each one.
++ **UniProt** _\<chr\>_: UniProt ID.
++ **Assay** _\<chr\>_: Common gene name for the assay.
++ **AssayType** _\<chr\>_: Assay type. Indicates whether an assay is a panel assay or an Olink control assay.
++ **Panel** _\<chr\>_: Olink Panel that samples ran on. Read more about Olink Panels here: https://olink.com/products-services/.
++ **Block** _\<chr\>_: Olink Block that samples ran on. 
++ **Count** *<int>*: Raw counts generated during sequencing. 
++ **ExtNPX** *<num*: Extension normalized NPX value that is used in NPX calculation. Read more about ExtNPX here: https://olink.com/faq/how-is-the-npx-value-calculated-in-explore/
++ **NPX** *<num>*: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log2 scale. The majority of the functions of this package use NPX values for calculations. If Explore data is PC normalized, NPX reflects the PC normalized value. If Explore data is intensity normalized NPX, NPX reflects the intensity normalized value. Read more about NPX here: https://olink.com/faq/what-is-npx/.
++ **Normalization** _\<chr\>_: The normalization method used.
++ **PCNormalizedNPX** *<num>*: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log2 scale. The majority of the functions of this package use NPX values for calculations. Regardless of normalization method, this column always reflects PC normalized NPX values. Read more about NPX here: https://olink.com/faq/what-is-npx/.
++ **AssayQC** _\<chr\>_:Indicates whether an assay contains a QC warning.
++ **SampleQC** _\<chr\>_: Indicates whether a sample contains a QC warning within a block.
++ **ExploreVersion** _\<chr\>_: The version of the Explore software library that was used to produce the data file.
++ **LOD** _\<num\>_: LOD added by olink_lod function. If Explore dataset is intensity normalized, this will reflect the intensity normalized LOD. If Explore dataset is PC normalized, this will reflect the PC normalized LOD. 
++ **PCNormalizedLOD** _\<chr\>_: LOD added by olink_lod function. This will always reflect the PC normalized LOD, regardless of the normalization method applied to the Explore dataset.
+
 # Statistical analysis
 
 ## T-test analysis (olink_ttest)
