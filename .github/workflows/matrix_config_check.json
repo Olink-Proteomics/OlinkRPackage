@@ -31,12 +31,12 @@
    },
    {
       "os": "ubuntu-22.04",
-      "r": "4.2.0",
+      "r": "4.2.3",
       "runOn": "pull_request"
    },
    {
       "os": "ubuntu-22.04",
-      "r": "4.3.0",
+      "r": "4.3.3",
       "runOn": "pull_request"
    }
 ]
