@@ -57,6 +57,12 @@ jobs:
         with:
           working-directory: OlinkAnalyze
           extra-packages: any::rcmdcheck
+      
+      - name: Sanity check
+        if: matrix.os == 'macOS-latest'
+        run: |
+          print("I am good!")
+        shell: Rscript {0}
           
       - name: Install arrow from runiverse for Mac OSX
         run: |
