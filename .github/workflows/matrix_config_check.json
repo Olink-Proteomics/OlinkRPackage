@@ -15,22 +15,27 @@
       "runOn": "always"
    },
    {
-      "os": "ubuntu-20.04",
+      "os": "ubuntu-22.04",
+      "r": "release",
+      "runOn": "always"
+   },
+   {
+      "os": "ubuntu-22.04",
       "r": "devel",
       "runOn": "pull_request"
    },
    {
-      "os": "ubuntu-20.04",
+      "os": "ubuntu-22.04",
       "r": "4.1.0",
       "runOn": "pull_request"
    },
    {
-      "os": "ubuntu-20.04",
+      "os": "ubuntu-22.04",
       "r": "4.2.0",
       "runOn": "pull_request"
    },
    {
-      "os": "ubuntu-20.04",
+      "os": "ubuntu-22.04",
       "r": "4.3.0",
       "runOn": "pull_request"
    }
