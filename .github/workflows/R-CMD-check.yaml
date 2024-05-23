@@ -252,16 +252,10 @@ jobs:
           write(forenv, file = Sys.getenv("GITHUB_ENV"), append = TRUE) # Store current value to ENV          
         shell: Rscript {0}
 
-      - name: Install Matrix from source 
-        run: |
-          install.packages("lattice")
-          install.packages("https://cran.r-project.org/src/contrib/Archive/Matrix/Matrix_1.6-2.tar.gz", type = "source", repos = NULL)
-        shell: Rscript {0}
-      
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           working-directory: OlinkAnalyze
-          extra-packages: any::rcmdcheck, pillar, Matrix=?ignore-before-r=4.4.0
+          extra-packages: any::rcmdcheck, pillar, url::https://cran.r-project.org/src/contrib/Archive/Matrix/Matrix_1.6-5.tar.gz
           
 
       - uses: r-lib/actions/check-r-package@v2
