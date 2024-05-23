@@ -1,0 +1,28 @@
+ARG  R_VERSION=4.4.0
+FROM ghcr.io/rocker-org/tidyverse:${R_VERSION}
+
+# System libs
+RUN apt-get update \
+  && apt-get install -y libglpk40 \
+    libxt6 \
+    texlive-latex-base \
+    texlive-fonts-recommended \
+    texlive-fonts-extra \
+    texlive-latex-extra \
+  && rm -rf /var/lib/apt/lists/*
+
+# R packages
+RUN install2.r --error \
+  --deps TRUE \
+  --skipinstalled \
+  pak \
+  rcmdcheck \
+  lintr \
+  lme4 \
+  && rm -rf /tmp/downloaded_packages
+
+COPY OlinkAnalyze/DESCRIPTION /src/DESCRIPTION
+
+RUN R -e "pak::local_install_dev_deps(root = '/src', dependencies = TRUE)"
+
+ENTRYPOINT ["R", "--vanilla"]
