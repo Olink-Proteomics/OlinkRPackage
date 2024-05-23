@@ -23,9 +23,8 @@ A dataframe with 2 additional columns, LOD and PCNormalizedLOD. When
 Calculate LOD using Negative Controls or Fixed LOD
 }
 \examples{
-
-\dontrun{
-  \donttest{
+\dontrun{ 
+   \donttest{
   try({ # This will fail if the files do not exist.
 
   # Import NPX data
