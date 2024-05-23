@@ -214,7 +214,6 @@ jobs:
       - uses: r-lib/actions/check-r-package@v2
         with:
           working-directory: OlinkAnalyze   
-          
   
   R-CMD-check-4v2:
     needs: matrix_prep
@@ -252,11 +251,10 @@ jobs:
           forenv <- paste("R_BIOC_VERSION=", as.character(remotes::bioc_version()), sep = "")
           write(forenv, file = Sys.getenv("GITHUB_ENV"), append = TRUE) # Store current value to ENV          
         shell: Rscript {0}
-      
 
       - name: Install Matrix from source 
         run: |
-          install.packages("https://cran.r-project.org/src/contrib/Archive/Matrix/Matrix_1.6-5.tar.gz", type="source", repos=NULL)
+          install.packages("https://cran.r-project.org/src/contrib/Archive/Matrix/Matrix_1.6-2.tar.gz", type = "source", repos = NULL)
         shell: Rscript {0}
       
       - uses: r-lib/actions/setup-r-dependencies@v2
