@@ -255,7 +255,7 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           working-directory: OlinkAnalyze
-          extra-packages: any::rcmdcheck, pillar, url::https://cran.r-project.org/src/contrib/Archive/Matrix/Matrix_1.6-5.tar.gz
+          extra-packages: any::rcmdcheck, pillar, url::https://cran.r-project.org/src/contrib/Archive/Matrix/Matrix_1.6-5.tar.gz, url::https://bioconductor.org/packages/3.16/bioc/src/contrib/ggtree_3.6.2.tar.gz
           
 
       - uses: r-lib/actions/check-r-package@v2
