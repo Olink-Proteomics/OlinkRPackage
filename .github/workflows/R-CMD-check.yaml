@@ -22,19 +22,14 @@ jobs:
       
   R-CMD-check:
     needs: matrix_prep
-    strategy:      
-      fail-fast: false    
-      matrix:
-        config:
-          - {os: windows-latest, r: 'release'}
-          - {os: ubuntu-20.04, r: 'release'}
-          - {os: ubuntu-20.04, r: 'devel'}
-          - {os: macOS-latest,   r: 'release'}
+    strategy:
+      fail-fast: false
+      matrix: ${{fromJson(needs.matrix_prep.outputs.matrix)}}
   
-    runs-on: ${{ matrix.config.os }}
-    timeout-minutes: 120       
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
 
-    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+    name: ${{ matrix.os }} (${{ matrix.r }})
 
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
@@ -46,8 +41,8 @@ jobs:
 
       - uses: r-lib/actions/setup-r@v2
         with:
-          r-version: ${{ matrix.config.r }}
-          use-public-rspm: true            
+          r-version: ${{ matrix.r }}
+          use-public-rspm: true
 
       - uses: r-lib/actions/setup-pandoc@v2
         with:
@@ -71,9 +66,9 @@ jobs:
           extra-packages: any::rcmdcheck, pillar
           
       - name: Install arrow from r-universe
-        if: matrix.config.os == 'macOS-latest'
+        if: matrix.os == 'macOS-latest'
         run: |
-          install.packages('arrow', repos = c('https://apache.r-universe.dev', 'https://cloud.r-project.org'))
+          install.packages('arrow', repos = c('https://apache.r-universe.dev'))
         shell: Rscript {0}
 
       - uses: r-lib/actions/check-r-package@v2
