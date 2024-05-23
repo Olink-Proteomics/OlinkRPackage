@@ -54,7 +54,7 @@ Explore datasets are standard Olink® Explore HT and Explore 3072 NPX tables. Th
 
 
 ```{r dataset_generation, eval = FALSE, message=FALSE, warning=FALSE}
-data <- read_NPX("~/NPX_file1_location.parquet")
+explore_npx <- read_NPX("~/Explore_NPX_file.parquet")
 ```
 
 
@@ -75,7 +75,7 @@ The resulting LOD is the PC normalized negative control LOD. In the event that t
 
 ```{r NCLOD_example, eval = FALSE, message=FALSE, warning=FALSE}
 # Integrating negative control LOD for intensity normalized data
-explore_npx <- read_NPX("~/NPX_data1.parquet")
+explore_npx <- read_NPX("~/Explore_NPX_file.parquet")
 olink_lod(explore_npx, lod_method = "NCLOD")
 ```
 
@@ -90,7 +90,7 @@ The fixed LOD file is read into the `olink_lod()` function to be integrated into
 fixedLOD_filepath <- "~/ExploreHT_fixedLOD.csv"
 
 # Integrating Fixed LOD for intensity normalized data
-explore_npx <- read_NPX("~/NPX_data1.parquet")
+explore_npx <- read_NPX("~/Explore_NPX_file.parquet")
 olink_lod(explore_npx, lod_file_path = fixedLOD_filepath, lod_method = "FixedLOD")
 ```
 
@@ -108,6 +108,8 @@ Explore data with LOD data can be exported using arrow::write_parquet to export 
 
 ```{r explore_npx_export, eval = FALSE, message=FALSE, warning=FALSE}
 # Exporting Explore data with LOD information as a parquet file
+explore_npx <- read_NPX("~/Explore_NPX_file.parquet")
+
 explore_npx_NC_LOD <- explore_npx %>% 
   olink_lod(lod_method = "NCLOD") %>%
   arrow::write_parquet(, file = "NPX_data_NC_LOD.parquet")
