@@ -209,7 +209,7 @@ int_norm_count <- function(data, lod_data){
     ) |>
     dplyr::group_by(
       dplyr::pick(
-        dplyr::all_of("OlinkID")
+        dplyr::all_of(c("OlinkID", "PlateID"))
       )
     ) |>
     dplyr::summarise(
@@ -218,7 +218,7 @@ int_norm_count <- function(data, lod_data){
     dplyr::ungroup() |>
     dplyr::select(
       dplyr::all_of(
-        c("OlinkID", "PlateMedianNPX"))
+        c("OlinkID", "PlateID", "PlateMedianNPX"))
     )
 
   if(nrow(plate_median) == 0L){
@@ -228,7 +228,7 @@ int_norm_count <- function(data, lod_data){
   data <- data |>
     dplyr::left_join(
       plate_median,
-      by = "OlinkID"
+      by = c("OlinkID", "PlateID")
     ) |>
     dplyr::mutate(
       LOD = .data[["PCNormalizedLOD"]] - .data[["PlateMedianNPX"]]
