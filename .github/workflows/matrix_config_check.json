@@ -38,5 +38,10 @@
       "os": "ubuntu-22.04",
       "r": "4.3.0",
       "runOn": "pull_request"
+   },
+   {
+      "os": "ubuntu-22.04",
+      "r": "4.4.0",
+      "runOn": "pull_request"
    }
 ]
