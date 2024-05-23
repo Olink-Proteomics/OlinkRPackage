@@ -65,16 +65,16 @@ jobs:
           install.packages("Matrix", type="source", repos='http://cran.us.r-project.org')
         shell: Rscript {0}
         
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          working-directory: OlinkAnalyze
+          extra-packages: any::rcmdcheck, pillar
+          
       - name: Install arrow from r-universe
         if: matrix.config.os == 'macOS-latest'
         run: |
           install.packages('arrow', repos = c('https://apache.r-universe.dev', 'https://cloud.r-project.org'))
         shell: Rscript {0}
-      
-      - uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          working-directory: OlinkAnalyze
-          extra-packages: any::rcmdcheck, pillar
 
       - uses: r-lib/actions/check-r-package@v2
         with:
