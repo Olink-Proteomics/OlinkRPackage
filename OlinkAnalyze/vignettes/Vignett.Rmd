@@ -306,6 +306,9 @@ A tibble with the following columns:
 + **ExploreVersion** _\<chr\>_: The version of the Explore software library that was used to produce the data file.
 + **LOD** *<num>*: LOD added by olink_lod function. If Explore dataset is intensity normalized, this will reflect the intensity normalized LOD. If Explore dataset is PC normalized, this will reflect the PC normalized LOD. 
 + **PCNormalizedLOD** *<num>*: LOD added by olink_lod function. This will always reflect the PC normalized LOD, regardless of the normalization method applied to the Explore dataset.
++ **LOD** *<num>*: LOD added by olink_lod function. If Explore dataset is intensity normalized, this will reflect the intensity normalized LOD. If Explore dataset is PC normalized, this will reflect the PC normalized LOD. 
++ **PCNormalizedLOD** *<num>*: LOD added by olink_lod function. This will always reflect the PC normalized LOD, regardless of the normalization method applied to the Explore dataset.
+
 
 # Statistical analysis
 
