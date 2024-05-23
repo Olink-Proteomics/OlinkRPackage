@@ -194,7 +194,8 @@ pc_norm_count <- function(data, lod_data){
         TRUE ~ log2(.data[["LodCount"]] / .data[["ExtCount"]]) - .data[["PCMedian"]],
         .default = NA_real_
       )
-    )
+    ) |> 
+    dplyr::mutate(LOD = PCNormalizedLOD)
 
   return(data)
 }
@@ -202,10 +203,11 @@ pc_norm_count <- function(data, lod_data){
 int_norm_count <- function(data, lod_data){
 
   data <- pc_norm_count(data, lod_data)
-
-  plate_median <- data |>
-    dplyr::filter(
-      .data[["SampleType"]] =="SAMPLE"
+  
+  if(any(data[["Normalization"]]=="Intensity")){
+    plate_median <- data |>
+      dplyr::filter(
+        .data[["SampleType"]] =="SAMPLE"
     ) |>
     dplyr::group_by(
       dplyr::pick(
@@ -233,6 +235,7 @@ int_norm_count <- function(data, lod_data){
     dplyr::mutate(
       LOD = .data[["PCNormalizedLOD"]] - .data[["PlateMedianNPX"]]
     )
+  }
 
   return(data)
 
