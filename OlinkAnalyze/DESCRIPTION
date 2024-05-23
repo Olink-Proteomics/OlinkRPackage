@@ -1,7 +1,7 @@
 Type: Package
 Package: OlinkAnalyze
 Title: Facilitate Analysis of Proteomic Data from Olink
-Version: 3.7.0
+Version: 3.8.0
 Authors@R: c(
     person("Kathleen", "Nevola", , "biostattools@olink.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-5183-6444", Github = "kathy-nevola")),
@@ -41,8 +41,10 @@ Authors@R: c(
            comment = c(Github = "olofmansson")),
     person("Ola", "Caster", role = "ctb",
            comment = c(Github = "OlaCaster")),
-    person("Kristyn", "Chin", role = "ctb",
+    person("Kristyn", "Chin", role = "aut",
             comment = c(Github = "kristynchin-olink")),
+    person("Danai", "Topouza", role = "ctb",
+            comment = c(Github = "dtopouza")),  
     person("Olink", role = c("cph", "fnd"))
   )
 Description: A collection of functions to facilitate analysis of proteomic
@@ -111,5 +113,5 @@ VignetteBuilder:
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 URL: https://olink.com/ https://github.com/Olink-Proteomics/OlinkRPackage 
