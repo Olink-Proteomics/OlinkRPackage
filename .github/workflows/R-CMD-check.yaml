@@ -61,7 +61,6 @@ jobs:
       - name: Install arrow from runiverse for Mac OSX
         run: |
           if (Sys.info()[['sysname']] == "Darwin") {
-            remove.packages('arrow')
             install.packages('arrow', repos = c('https://apache.r-universe.dev'))
           }
         shell: Rscript {0}
