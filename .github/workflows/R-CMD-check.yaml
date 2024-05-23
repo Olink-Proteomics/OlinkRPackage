@@ -61,14 +61,7 @@ jobs:
       - name: Sanity check
         if: matrix.os == 'macOS-latest'
         run: |
-          print("I am good!")
-        shell: Rscript {0}
-          
-      - name: Install arrow from runiverse for Mac OSX
-        run: |
-          if (Sys.info()[['sysname']] == "Darwin") {
-            install.packages('arrow', repos = c('https://apache.r-universe.dev'))
-          }
+          install.packages('arrow', repos = c('https://apache.r-universe.dev'))
         shell: Rscript {0}
 
       - uses: r-lib/actions/check-r-package@v2
