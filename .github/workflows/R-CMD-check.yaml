@@ -54,13 +54,6 @@ jobs:
           forenv <- paste("R_BIOC_VERSION=", as.character(remotes::bioc_version()), sep = "")
           write(forenv, file = Sys.getenv("GITHUB_ENV"), append = TRUE) # Store current value to ENV
         shell: Rscript {0}
-        
-      - name: Install clusterProfiler
-        run: |
-          install.packages("BiocManager")
-          install.packages("pak")
-          pak::pkg_install("clusterProfiler")
-        shell: Rscript {0}
       
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
