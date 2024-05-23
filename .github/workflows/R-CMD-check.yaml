@@ -254,6 +254,7 @@ jobs:
 
       - name: Install Matrix from source 
         run: |
+          install.packages("lattice")
           install.packages("https://cran.r-project.org/src/contrib/Archive/Matrix/Matrix_1.6-2.tar.gz", type = "source", repos = NULL)
         shell: Rscript {0}
       
