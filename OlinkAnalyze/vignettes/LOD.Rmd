@@ -1,5 +1,5 @@
 ---
-title: "Calculating LOD from Olink(R) Explore data"
+title: "Calculating LOD from Olink® Explore data"
 output: 
   html_vignette:
     toc: true
