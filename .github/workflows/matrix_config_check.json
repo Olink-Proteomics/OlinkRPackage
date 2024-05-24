@@ -20,7 +20,7 @@
       "runOn": "always"
    },
    {
-      "os": "ubuntu-20.04",
+      "os": "ubuntu-22.04",
       "r": "devel",
       "runOn": "pull_request"
    }
