@@ -11,7 +11,7 @@
 #'
 #' @export
 #' @examples
-#' \dontrun{ 
+#' \dontrun{
 #'    \donttest{
 #'   try({ # This will fail if the files do not exist.
 #'
@@ -19,13 +19,13 @@
 #'     npx_data <- read_NPX("path/to/npx_file")
 #'
 #'   # Estimate LOD from negative controls
-#'     npx_data_lod_NC <– olink_lod(data = npx_data,  lod_method = "NCLOD")
+#'     npx_data_lod_NC <- olink_lod(data = npx_data,  lod_method = "NCLOD")
 #'
 #'   # Estimate LOD from fixed LOD
 #'   ## Locate the fixed LOD file
 #'     lod_file_path <- "path/to/lod_file"
 #'
-#'     npx_data_lod_Fixed <– olink_lod(data = npx_data,
+#'     npx_data_lod_Fixed <- olink_lod(data = npx_data,
 #'                                     lod_file_path = lod_file_path,
 #'                                     lod_method = "FixedLOD")
 #'      })
