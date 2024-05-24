@@ -8,7 +8,7 @@
 #'
 #' @return A dataframe with 2 additional columns, LOD and PCNormalizedLOD. When
 #' `Normalization = "Plate Control"`, LOD and PCNormalizedLOD are identical.
-#'
+#' 
 #' @export
 #'
 olink_lod <- function(data, lod_file_path = NULL, lod_method = "NCLOD"){
@@ -50,11 +50,14 @@ olink_lod <- function(data, lod_file_path = NULL, lod_method = "NCLOD"){
     lod_data = lod_data
   ) |>
     dplyr::mutate(
-      LOD = dplyr::case_match(
-        .data[["Normalization"]],
-        "Intensity" ~ .data[["LOD"]],
-        "Plate control" ~ .data[["PCNormalizedLOD"]],
-        .default = NA_real_
+      LOD = dplyr::if_else(
+        .data[["Normalization"]] == "Intensity",
+        .data[["LOD"]],
+        dplyr::if_else(
+          .data[["Normalization"]] == "Plate control",
+          .data[["PCNormalizedLOD"]],
+          NA_real_
+        )
       )
     ) |>
     dplyr::select(
@@ -105,11 +108,7 @@ olink_nc_lod <- function(data, min_num_nc = 10L) {
   lod_data <- lod_data |>
     # LOD is comnputed per assay and lot of reagents
     dplyr::group_by(
-      dplyr::pick(
-        dplyr::all_of(
-          c("OlinkID", "DataAnalysisRefID")
-        )
-      )
+      OlinkID, DataAnalysisRefID
     ) |>
     # compute LOD on counts and NPX
     dplyr::summarise(
@@ -139,9 +138,7 @@ pc_norm_count <- function(data, lod_data){
 
   pc_median <- data |>
     dplyr::group_by(
-      dplyr::pick(
-        dplyr::all_of(c("OlinkID", "PlateID"))
-      )
+      OlinkID
     ) |>
     dplyr::summarise(
       PCMedian = median(.data[["ExtNPX"]][.data[["SampleType"]] == "PLATE_CONTROL"],
@@ -203,16 +200,14 @@ pc_norm_count <- function(data, lod_data){
 int_norm_count <- function(data, lod_data){
 
   data <- pc_norm_count(data, lod_data)
-  
+
   if(any(data[["Normalization"]]=="Intensity")){
     plate_median <- data |>
       dplyr::filter(
         .data[["SampleType"]] =="SAMPLE"
     ) |>
     dplyr::group_by(
-      dplyr::pick(
-        dplyr::all_of(c("OlinkID", "PlateID"))
-      )
+      OlinkID, PlateID
     ) |>
     dplyr::summarise(
       PlateMedianNPX = median(.data[["PCNormalizedNPX"]], na.rm = TRUE)
@@ -237,6 +232,6 @@ int_norm_count <- function(data, lod_data){
     )
   }
 
-  return(data)
+return(data)
 
 }
