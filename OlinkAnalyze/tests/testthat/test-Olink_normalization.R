@@ -240,6 +240,9 @@ test_that("missing Normalization column", {
 # Test that df1 and df2 are normalized similarly
 
 test_that("df1 and df2 same normalization", {
+  skip_if_not(condition = getRversion() >= "4.2.0",
+              message = "Skipping for R < 4.2.0")
+
   # different normalization with expected values in Normalization column
   expect_warning(
     olink_normalization(df1 = {
