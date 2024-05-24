@@ -19,6 +19,7 @@ RUN install2.r --error \
   rcmdcheck \
   lintr \
   lme4 \
+  bspm \
   && rm -rf /tmp/downloaded_packages
 
 COPY OlinkAnalyze/DESCRIPTION /src/DESCRIPTION
