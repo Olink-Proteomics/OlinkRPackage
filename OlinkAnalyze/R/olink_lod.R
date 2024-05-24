@@ -8,7 +8,7 @@
 #'
 #' @export
 #'
-#' #' @importFrom dplyr case_match pick
+#' @importFrom dplyr case_match pick
 #'
 olink_lod <- function(data, lod_file_path = NULL, lod_method = "NCLOD"){
 
