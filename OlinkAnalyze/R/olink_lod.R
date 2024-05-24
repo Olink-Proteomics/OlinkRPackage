@@ -8,7 +8,7 @@
 #'
 #' @export
 #'
-#' @importFrom dplyr case_match pick
+#' @importFrom dplyr pick
 #'
 olink_lod <- function(data, lod_file_path = NULL, lod_method = "NCLOD"){
 
@@ -49,11 +49,14 @@ olink_lod <- function(data, lod_file_path = NULL, lod_method = "NCLOD"){
     lod_data = lod_data
   ) |>
     dplyr::mutate(
-      LOD = dplyr::case_match(
-        .data[["Normalization"]],
-        "Intensity" ~ .data[["LOD"]],
-        "Plate control" ~ .data[["PCNormalizedLOD"]],
-        .default = NA_real_
+      LOD = dplyr::if_else(
+        .data[["Normalization"]] == "Intensity",
+        .data[["LOD"]],
+        dplyr::if_else(
+          .data[["Normalization"]] == "Plate control",
+          .data[["PCNormalizedLOD"]],
+          NA_real_
+        )
       )
     ) |>
     dplyr::select(
