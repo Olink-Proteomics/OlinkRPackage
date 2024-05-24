@@ -102,7 +102,7 @@ Suggests:
     rmarkdown,
     scales,
     systemfonts,
-    testthat (>= 3.2.0),
+    testthat (>= 3.0.0),
     umap,
     vdiffr
 VignetteBuilder: 
