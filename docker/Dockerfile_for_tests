@@ -15,7 +15,7 @@ RUN apt-get update \
 RUN install2.r --error \
   --deps TRUE \
   --skipinstalled \
-  pak \
+  devtools \
   rcmdcheck \
   lintr \
   lme4 \
@@ -24,6 +24,6 @@ RUN install2.r --error \
 
 COPY OlinkAnalyze/DESCRIPTION /src/DESCRIPTION
 
-RUN R -e "pak::local_install_dev_deps(root = '/src', dependencies = TRUE)"
+RUN R -e "devtools::install_dev_deps(pkg = '/src', dependencies = TRUE)"
 
 ENTRYPOINT ["R", "--vanilla"]
