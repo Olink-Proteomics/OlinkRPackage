@@ -8,8 +8,6 @@
 #'
 #' @export
 #'
-#' @importFrom dplyr pick
-#'
 olink_lod <- function(data, lod_file_path = NULL, lod_method = "NCLOD"){
 
   # store original column names of `data` to restore them later
@@ -106,11 +104,7 @@ olink_nc_lod <- function(data) {
   lod_data <- lod_data |>
     # LOD is comnputed per assay and lot of reagents
     dplyr::group_by(
-      dplyr::pick(
-        dplyr::all_of(
-          c("OlinkID", "DataAnalysisRefID")
-        )
-      )
+      OlinkID, DataAnalysisRefID
     ) |>
     # compute LOD on counts and NPX
     dplyr::summarise(
@@ -140,9 +134,7 @@ pc_norm_count <- function(data, lod_data){
 
   pc_median <- data |>
     dplyr::group_by(
-      dplyr::pick(
-        dplyr::all_of("OlinkID")
-      )
+      OlinkID
     ) |>
     dplyr::summarise(
       PCMedian = median(.data[["ExtNPX"]][.data[["SampleType"]] == "PLATE_CONTROL"],
@@ -190,7 +182,7 @@ pc_norm_count <- function(data, lod_data){
       PCNormalizedLOD = dplyr::case_when(
         is.na(.data[["NPX"]]) ~ NA_real_,
         !is.na(.data[["NPX"]]) & .data[["LodMethod"]] == "lod_npx" ~
-        .data[["LodNPX"]],
+          .data[["LodNPX"]],
         TRUE ~ log2(.data[["LodCount"]] / .data[["ExtCount"]]) - .data[["PCMedian"]],
         .default = NA_real_
       )
@@ -205,35 +197,33 @@ int_norm_count <- function(data, lod_data){
 
   plate_median <- data |>
     dplyr::filter(
-      .data[["SampleType"]] =="SAMPLE"
+      .data[["SampleType"]] == "SAMPLE"
     ) |>
     dplyr::group_by(
-      dplyr::pick(
-        dplyr::all_of("OlinkID")
-      )
-    ) |>
-    dplyr::summarise(
-      PlateMedianNPX = median(.data[["PCNormalizedNPX"]], na.rm = TRUE)
-    ) |>
-    dplyr::ungroup() |>
-    dplyr::select(
-      dplyr::all_of(
-        c("OlinkID", "PlateMedianNPX"))
-    )
+      OlinkID
+  ) |>
+  dplyr::summarise(
+    PlateMedianNPX = median(.data[["PCNormalizedNPX"]], na.rm = TRUE)
+  ) |>
+  dplyr::ungroup() |>
+  dplyr::select(
+    dplyr::all_of(
+      c("OlinkID", "PlateMedianNPX"))
+  )
 
-  if(nrow(plate_median) == 0L){
-    stop("Insufficient data for intensity normalization of LOD.")
-  }
+if(nrow(plate_median) == 0L){
+  stop("Insufficient data for intensity normalization of LOD.")
+}
 
-  data <- data |>
-    dplyr::left_join(
-      plate_median,
-      by = "OlinkID"
-    ) |>
-    dplyr::mutate(
-      LOD = .data[["PCNormalizedLOD"]] - .data[["PlateMedianNPX"]]
-    )
+data <- data |>
+  dplyr::left_join(
+    plate_median,
+    by = "OlinkID"
+  ) |>
+  dplyr::mutate(
+    LOD = .data[["PCNormalizedLOD"]] - .data[["PlateMedianNPX"]]
+  )
 
-  return(data)
+return(data)
 
 }
