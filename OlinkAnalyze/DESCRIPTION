@@ -44,7 +44,7 @@ Authors@R: c(
     person("Kristyn", "Chin", role = "aut",
             comment = c(Github = "kristynchin-olink")),
     person("Danai", "Topouza", role = "ctb",
-            comment = c(Github = "dtopouza")),  
+            comment = c(Github = "dtopouza", ORCID = "0000-0002-6897-9281")),  
     person("Olink", role = c("cph", "fnd"))
   )
 Description: A collection of functions to facilitate analysis of proteomic
