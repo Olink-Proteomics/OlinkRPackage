@@ -38,5 +38,3 @@ jobs:
         with:
           name: docker-r${{ matrix.config.r }}-check-results
           path: check
-
-
