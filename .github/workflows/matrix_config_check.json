@@ -15,6 +15,11 @@
       "runOn": "always"
    },
    {
+      "os": "ubuntu-22.04",
+      "r": "release",
+      "runOn": "always"
+   },
+   {
       "os": "ubuntu-20.04",
       "r": "devel",
       "runOn": "pull_request"
