@@ -1,5 +1,0 @@
-   {
-      "os": "macOS-latest",
-      "r": "release",
-      "runOn": "pull_request"
-   },
