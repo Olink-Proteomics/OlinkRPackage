@@ -22,6 +22,8 @@ RUN install2.r --error \
   bspm \
   && rm -rf /tmp/downloaded_packages
 
+ENV _R_CHECK_FORCE_SUGGESTS_=FALSE
+
 COPY OlinkAnalyze/DESCRIPTION /src/DESCRIPTION
 
 RUN R -e "devtools::install_dev_deps(pkg = '/src', dependencies = TRUE)"
