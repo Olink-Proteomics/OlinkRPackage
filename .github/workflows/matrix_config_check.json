@@ -23,5 +23,20 @@
       "os": "ubuntu-22.04",
       "r": "devel",
       "runOn": "pull_request"
+   },
+   {
+      "os": "ubuntu-22.04",
+      "r": "4.1.3",
+      "runOn": "pull_request"
+   },
+   {
+      "os": "ubuntu-22.04",
+      "r": "4.2.3",
+      "runOn": "pull_request"
+   },
+   {
+      "os": "ubuntu-22.04",
+      "r": "4.3.3",
+      "runOn": "pull_request"
    }
 ]
