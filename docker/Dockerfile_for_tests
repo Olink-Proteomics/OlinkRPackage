@@ -23,6 +23,11 @@ RUN install2.r --error \
   bspm \
   && rm -rf /tmp/downloaded_packages
 
+RUN install2.r --error \
+  --deps TRUE \
+  arrow \
+  && rm -rf /tmp/downloaded_packages
+
 ENV _R_CHECK_FORCE_SUGGESTS_=FALSE
 
 COPY OlinkAnalyze/DESCRIPTION /src/DESCRIPTION
