@@ -19,19 +19,15 @@ RUN install2.r --error \
   rcmdcheck \
   lintr \
   lme4 \
-  arrow \
   bspm \
   && rm -rf /tmp/downloaded_packages
 
-RUN install2.r --error \
-  --deps TRUE \
-  arrow \
-  && rm -rf /tmp/downloaded_packages
+RUN R -e "install.packages('arrow', dependencies = TRUE)"
 
 ENV _R_CHECK_FORCE_SUGGESTS_=FALSE
 
 COPY OlinkAnalyze/DESCRIPTION /src/DESCRIPTION
 
-RUN R -e "devtools::install_dev_deps(pkg = '/src', dependencies = TRUE, upgrade = 'always')"
+RUN R -e "devtools::install_dev_deps(pkg = '/src', dependencies = TRUE)"
 
 ENTRYPOINT ["R", "--vanilla"]
