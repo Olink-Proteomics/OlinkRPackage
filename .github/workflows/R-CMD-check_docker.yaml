@@ -30,7 +30,7 @@ jobs:
       - 
         name: Arrow version
         run: |
-          echo "packageVersion('arrow')" | docker run -i
+          echo "packageVersion('arrow')" | docker run -i -v "$(pwd)/OlinkAnalyze":/OA -v "$(pwd)/check":/check oa:latest
           
         shell: Rscript {0}
       - 
