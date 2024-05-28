@@ -4,7 +4,8 @@ on:
       - 'main'
       - 'develop'
       - 'optimization_develop'
-
+      - 'optimization_develop_earlier_r_versions'
+      
 name: R-CMD-check-docker
 
 jobs:
