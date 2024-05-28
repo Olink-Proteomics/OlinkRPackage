@@ -27,6 +27,14 @@ jobs:
           file: docker/Dockerfile_for_tests
           load: true
           build-args: R_VERSION=${{matrix.r_version}}
+      - 
+        name: Arrow version
+        run: |
+          packageVersion("arrow")
+      - 
+        name: Session Info
+        run: |
+          sessioninfo::session_info()
       -
         name: Run rcmdcheck
         run: |
