@@ -1,4 +1,9 @@
-on: [pull_request]
+on:
+  push:
+    branches:
+      - 'main'
+      - 'develop'
+      - 'optimization_develop'
 
 name: R-CMD-check-docker
 
