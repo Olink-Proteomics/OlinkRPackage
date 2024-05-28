@@ -12,11 +12,6 @@ on:
       - 'main'
       - 'develop'
       - 'optimization_develop'
-  push:
-    branches:
-      - 'main'
-      - 'develop'
-      - 'optimization_develop'
 
 name: R-CMD-check-hard
 
