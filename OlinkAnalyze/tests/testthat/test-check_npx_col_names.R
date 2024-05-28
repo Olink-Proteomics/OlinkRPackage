@@ -33,7 +33,7 @@ test_that(
 test_that(
   "check_npx_col_names - works - nullable columns are ok",
   {
-    df <- arrow::arrow_table(
+    df <- dplyr::tibble(
       SampleID = c("A", "B", "C", "D"),
       OlinkID = rep("OID12345", 4L),
       SampleType = rep("SAMPLE", 4L),
@@ -50,7 +50,6 @@ test_that(
         dplyr::select(
           -dplyr::all_of("SampleType")
         ) |>
-        dplyr::compute() |>
         check_npx_col_names(),
       expected = list(
         sample_id = "SampleID",
@@ -88,7 +87,6 @@ test_that(
         dplyr::select(
           -dplyr::all_of(c("SampleType", "LOD"))
         ) |>
-        dplyr::compute() |>
         check_npx_col_names(),
       expected = list(
         sample_id = "SampleID",
