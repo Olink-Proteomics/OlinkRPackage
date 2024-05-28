@@ -1,11 +1,11 @@
 ---
-title: "Calculating LOD from Olink® Explore data"
+title: "Calculating LOD from Olink® Explore data" 
 output: 
   html_vignette:
     toc: true
     toc_depth: 3
 vignette: >
-  %\VignetteIndexEntry{Calculating LOD from Explore data}
+  %\VignetteIndexEntry{Calculating LOD from Olink® Explore data}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 date: 'Compiled: `r format(Sys.Date(), "%B %d, %Y")`'
@@ -13,6 +13,7 @@ editor_options:
   markdown: 
     wrap: 72
 ---
+![](../man/figures/small_logo.png)
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -33,24 +34,56 @@ library(dplyr)
 
 ```
 
+
 ## Introduction
 
-This tutorial describes how to use Olink® Analyze to integrate Limit of Detection (LOD) into Explore HT and Explore 384/3072 datasets. Although it is recommended to use all Explore data in downstream analyses, LOD information can be useful when performing technical evaluations of a dataset.
+This tutorial describes how to use Olink® Analyze to integrate Limit of Detection (LOD) into Olink® Explore HT and Olink® Explore 384/3072 datasets. Although it is recommended to use all Olink Explore data in downstream analyses, LOD information can be useful when performing technical evaluations of a dataset.
 
-In this tutorial, you will learn how to use `olink_lod()` to add LOD information to your Explore dataset. Note that Olink Analyze does not contain example Explore HT or Explore 384/3072 datasets within the package, so external data will be necessary for the code below to work. All file paths should be replaced with a path to your data and fixed LOD reference file (if applicable).
+In this tutorial, you will learn how to use `olink_lod()` to add LOD information to your Olink Explore dataset. Note that Olink Analyze does not contain example Olink Explore HT or Olink Explore 384/3072 datasets within the package, so external data will be necessary for the code below to work. All file paths should be replaced with a path to your data and fixed LOD reference file (if applicable).
 
 
 ## Integrating LOD
 
-Limit of Detection (LOD) is a metric that indicates the lowest measurable value of a protein. LOD can be helpful when performing technical evaluations of NPX datasets, such as calculating CVs. As a note, LOD less important in downstream statistical analyses as values under LOD typically converge across groups. As such, including data below LOD is unlikely to increase the risk of false positive discoveries. Furthermore, data below LOD can be instrumental in downstream analyses such as biomarker discovery as a protein may be well expressed in one group and not measured in another group. In this case, this protein can be a strong biomarker candidate for specific grops.
+Limit of Detection (LOD) is a metric that indicates the lowest measurable value of a protein. LOD can be helpful when performing technical evaluations of NPX datasets, such as calculating CVs. As a note, LOD is less important in downstream statistical analyses as values under LOD typically converge across groups. As such, including data below LOD is unlikely to increase the risk of false positive discoveries. Furthermore, data below LOD can be instrumental in downstream analyses such as biomarker discovery as a protein may be well expressed in one group and not measured in another group. In this case, this protein can be a strong biomarker candidate for specific groups.
 
-LOD can be added to Explore NPX datasets using `olink_lod()`. This function can calculate LOD from an NPX dataset using the dataset's negative controls or a list of predetermined fixed LOD values (supplied by Olink Support upon request). As the default setting, `olink_lod()` will calculate LOD using a dataset's negative controls. 
+LOD can be added to Olink Explore NPX datasets using `olink_lod()`. This function can calculate LOD from an NPX dataset using the dataset's negative controls or a list of predetermined fixed LOD values (supplied by Olink Support upon request). As the default setting, `olink_lod()` will calculate LOD using a dataset's negative controls. 
 
-Olink Explore data is commonly delivered plate control (PC) normalized or intensity normalized (the normalization type employed is indicated in the NPX file column Normalization), where the latter is dependent on that the analyzed samples are randomized. These are reported in the two respective columns PCNormalizedNPX and NPX. Please notice that for PC normalized datasets the content in these two columns will be identical, while for intensity normalized datsets the NPX column will include the intensity normalized values. Similarly, the `olink_lod()` function adds two columns to your dataset; PCNormalizedLOD and LOD respectively. For a PC normalized dataset the content in these two columns will be identical, while for an intensity normalized dataset the LOD column will include LOD values based on the intensity normalized NPX values.
+Olink Explore data is commonly delivered plate control (PC) normalized or intensity normalized (the normalization type employed is indicated in the NPX file column Normalization), where the latter is dependent on that the analyzed samples are randomized. These are reported in the two respective columns PCNormalizedNPX and NPX. Please notice that for PC normalized datasets the content in these two columns will be identical, while for intensity normalized datasets the NPX column will include the intensity normalized values. Similarly, the `olink_lod()` function adds two columns to your dataset; PCNormalizedLOD and LOD respectively. For a PC normalized dataset the content in these two columns will be identical, while for an intensity normalized dataset the LOD column will include LOD values based on the intensity normalized NPX values. Examples of results for plate control and intensity normalization are shown in the tables below.
 
-## Import Explore datasets
+```{r, echo=FALSE}
+set.seed(1234)
+table1<-npx_data1 |> 
+  head() |> 
+  dplyr::select(-c(Index, MissingFreq, Panel_Version, QC_Warning, Subject, Treatment, Site, Time, Project, Panel, PlateID)) |>
+  dplyr::mutate(Count = round(NPX * (100+sample(seq(-5,15), size = 1)))) |> 
+  dplyr::mutate(SampleType = "SAMPLE") |> 
+  dplyr::mutate(Normalization = "Plate control") |> 
+  dplyr::mutate(NPX = round(NPX,digits = 2)) |> 
+  dplyr::mutate(LOD = round(LOD, digits = 2)) |> 
+  dplyr::mutate(PCNormalizedNPX = NPX) |> 
+  dplyr::mutate(PCNormalizedLOD = LOD) |> 
+  dplyr::select(SampleID, SampleType, OlinkID, UniProt, Assay, Count, NPX, Normalization, PCNormalizedNPX, LOD, PCNormalizedLOD) 
 
-Explore datasets are standard Olink® Explore HT and Explore 384/3072 NPX tables. They can be loaded into an R session using the `read_NPX()` function with default Olink Software Explore NPX parquet files as input.
+table1 |> 
+  knitr::kable(caption = "Example results from Plate Control Normalized Project") |> 
+  kableExtra::kable_styling(font_size = 10)
+
+table1 |>  
+  dplyr::mutate(Normalization = "Intensity") |> 
+  dplyr::mutate(NPX = round(NPX,digits = 2)) |> 
+  dplyr::mutate(LOD = round(LOD, digits = 2)) |> 
+  dplyr::mutate(PCNormalizedNPX = round(NPX + 4.16, digits = 2))|> 
+  dplyr::mutate(PCNormalizedLOD = round(LOD + 4.16, digits = 2)) |> 
+  dplyr::select(SampleID, SampleType, OlinkID, UniProt, Assay, Count, NPX, Normalization, PCNormalizedNPX, LOD, PCNormalizedLOD) |> 
+  knitr::kable(caption = "Example results from Intensity Normalized Project") |> 
+  kableExtra::kable_styling(font_size = 10)
+
+```
+
+
+## Import Olink Explore datasets
+
+Olink Explore datasets are standard Olink Explore HT and Olink Explore 384/3072 NPX tables. The `read_NPX()` function can be used to import an NPX file in parquet form as generated by Olink® NPX Explore Software. More information on using `read_NPX()` can be found in [the Olink Analyze Overview tutorial](Vignett.html).
 
 
 ```{r dataset_generation, eval = FALSE, message=FALSE, warning=FALSE}
@@ -60,12 +93,12 @@ explore_npx <- read_NPX("~/Explore_NPX_file.parquet")
 
 ## Integrating Negative Control LOD
 
-The negative control (NC) LOD method requires at least 10 negative controls in a dataset. Negative control data is available in the standard exported Explore HT and Explore 384/3072 NPX parquet files. NCs can be identified throught the SampleID and SampleType columns.
+The negative control (NC) LOD method requires at least 10 negative controls in a dataset. Negative control data is available in the standard exported Explore HT and Explore 384/3072 NPX parquet files. NCs can be identified through the SampleID and SampleType columns.
 
 A negative control will not contribute to the minimum number of required NCs if either of the following apply:
 
  + The negative control contains an assay QC warning across all assays, excluding Olink's internal control assays
- + The negative control does not pass sample QC criteria (sample QC failure or warning) in all Explore HT blocks or all Explore 3072 panels
+ + The negative control does not pass sample QC criteria (sample QC failure or warning) in all of the data (i.e. all Explore HT blocks, all Explore 3072 panels, or all Explore 384 panels that were measured)
 
 Negative controls are used to calculate LOD from either PC normalized NPX or counts. For assays with more than 150 counts in one of the negative controls, LOD is calculated using the median PC normalized NPX and adding 3 standard deviations, or 0.2 NPX whichever is larger. For assays with fewer than 150 counts in all negative controls, LOD is calculated using the count values which are then converted into PC normalized NPX. 
 
@@ -81,7 +114,7 @@ olink_lod(explore_npx, lod_method = "NCLOD")
 
 ## Integrating Fixed LOD
 
-The fixed LOD method uses fixed LOD values that have been calculated on negative controls used in Olink validation runs using the method described above for negative control LOD. The fixed LOD data is available in an external CSV file which can be provided by Olink Support (support\@olink.com). The fixed LOD values reported in this CSV file are the PC normalized LODs. 
+The fixed LOD method uses fixed LOD values that have been calculated on negative controls used in Olink reference runs using the method described above for negative control LOD. These values are specific to the Data Analysis Reference ID, which can be found in your dataset. The fixed LOD data is available in an external CSV file which can be provided by Olink Support (support\@olink.com). The fixed LOD values reported in this CSV file are the PC normalized LODs. 
 
 The fixed LOD file is read into the `olink_lod()` function to be integrated into an Explore dataset. In the event that the Explore dataset is intensity normalized, an intensity normalization adjustment factor is applied and the resulting intensity normalized LOD is reported in the LOD column and the PC normalized LOD is reported in the PCNormalizedLOD column. 
 
@@ -94,24 +127,24 @@ explore_npx <- read_NPX("~/Explore_NPX_file.parquet")
 olink_lod(explore_npx, lod_file_path = fixedLOD_filepath, lod_method = "FixedLOD")
 ```
 
-## When to use Fixed LOC vs NC LOD
-For smaller sized studies (<10 NCs) we recommend using fixed LOD to integrate LOD values into your NPX dataset, as LOD calculations on fewer NCs may provide non-accurate values. However, it is important to keep in mind that fixed LOD values are not specific to your project, rather these values are generated by Olink during product validation. 
+## When to use Fixed LOD vs NC LOD
+For smaller sized studies (<10 NCs) we recommend using fixed LOD to integrate LOD values into your NPX dataset, as LOD calculations on fewer NCs may provide non-accurate values. However, it is important to keep in mind that fixed LOD values are not specific to your project, rather these values are generated by Olink when a new lot of reagents is released. 
 
 For larger projects we recommend calculating LOD from NC to obtain LOD values that are specific to your project. However, this requires that the dataset has at least 10 NCs with passing SampleQC. 
 
 ## Adjusting LOD for Intensity Normalized Data 
 
-If an Explore dataset is intensity normalized, a normalization adjustment factor is applied to the PC normalized LOD within the `olink_lod()` function. 
+If an Olink Explore dataset is intensity normalized, a normalization adjustment factor is applied to the PC normalized LOD within the `olink_lod()` function. 
 
-For each assay, this adjustment factor is calculated as the median NPX of all samples (excluding Olink's external controls) within each plate. For Explore 3072, overlapping assays are assessed separately, within their respective panels. The intensity normalized negative control LOD is calculated by subtracting this adjustment factor from the PC normalized negative control LOD. 
+For each assay, this adjustment factor is calculated as the median NPX of all samples (excluding Olink's external controls) within each plate. For Olink Explore 3072, overlapping assays are assessed separately, within their respective panels. The intensity normalized negative control LOD is calculated by subtracting this adjustment factor from the PC normalized negative control LOD. 
 
 The intensity normalization LOD adjustment is applied to both the negative control and fixed LOD methods. 
 
 ## Export Olink Explore Data with LOD
-Explore data with LOD data can be exported using arrow::write_parquet to export Olink Explore data as a parquet file in long format. 
+Olink Explore data with LOD data can be exported using arrow::write_parquet to export Olink Explore data as a parquet file in long format. 
 
 ```{r explore_npx_export, eval = FALSE, message=FALSE, warning=FALSE}
-# Exporting Explore data with LOD information as a parquet file
+# Exporting Olink Explore data with LOD information as a parquet file
 explore_npx <- read_NPX("Path_to/Explore_NPX_file.parquet")
 
 explore_npx_NC_LOD <- explore_npx %>% 
@@ -131,3 +164,17 @@ We are always happy to help. Email us with any questions:
 -   support\@olink.com for Olink lab product and technical support
 
 -   info\@olink.com for more information
+
+## Legal Disclaimer
+
+© 2024 Olink Proteomics AB.
+
+Olink products and services are For Research Use Only and not for Use in Diagnostic Procedures.
+
+All information in this document is subject to change without notice. This document is not intended to convey any warranties, representations and/or recommendations of any kind, unless such warranties, representations and/or recommendations are explicitly stated.
+
+Olink assumes no liability arising from a prospective reader’s actions based on this document.
+
+OLINK, NPX, PEA, PROXIMITY EXTENSION, INSIGHT and the Olink logotype are trademarks registered, or pending registration, by Olink Proteomics AB. All third-party trademarks are the property of their respective owners.
+
+Olink products and assay methods are covered by several patents and patent applications https://www.olink.com/patents/.
