@@ -61,7 +61,7 @@ LazyData: true
 RoxygenNote: 7.3.1
 Depends: R (>= 4.2.0)
 Imports: 
-    arrow,
+    arrow (>= 14.0.0),
     cli,
     dplyr,
     readxl,
