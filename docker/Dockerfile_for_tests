@@ -27,6 +27,6 @@ ENV _R_CHECK_FORCE_SUGGESTS_=FALSE
 
 COPY OlinkAnalyze/DESCRIPTION /src/DESCRIPTION
 
-RUN R -e "devtools::install_dev_deps(pkg = '/src', dependencies = TRUE)"
+RUN R -e "devtools::install_dev_deps(pkg = '/src', dependencies = TRUE, upgrade = 'always')"
 
 ENTRYPOINT ["R", "--vanilla"]
