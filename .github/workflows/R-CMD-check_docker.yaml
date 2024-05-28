@@ -30,11 +30,13 @@ jobs:
       - 
         name: Arrow version
         run: |
-          Rscript -e "packageVersion(\"arrow\")"
+          Rscript -e packageVersion(\"arrow\")
+        shell: Rscript {0}
       - 
         name: Session Info
         run: |
-          Rscript -e "sessioninfo::session_info()""
+          Rscript -e sessioninfo::session_info()
+        shell: Rscript {0}
       -
         name: Run rcmdcheck
         run: |
