@@ -27,17 +27,6 @@ jobs:
           file: docker/Dockerfile_for_tests
           load: true
           build-args: R_VERSION=${{matrix.r_version}}
-      - 
-        name: Arrow version
-        run: |
-          echo "packageVersion('arrow')" | docker run -i -v "$(pwd)/OlinkAnalyze":/OA -v "$(pwd)/check":/check oa:latest
-          
-        shell: Rscript {0}
-      - 
-        name: Session Info
-        run: |
-          sessioninfo::session_info()
-        shell: Rscript {0}
       -
         name: Run rcmdcheck
         run: |
