@@ -6,11 +6,6 @@ on:
       - 'main'
       - 'develop'
       - 'optimization_develop'
-  pull_request:
-    branches:
-      - 'main'
-      - 'develop'
-      - 'optimization_develop'
 
 name: lint
 
