@@ -15,9 +15,8 @@ ARG r_profile=.Rprofile
 RUN if [ "$R_VERSION" = "4.2.3" ]; then \
       echo "Setting up repos for R 4.2.3 on 2023-11-30"; \
       echo "options(repos = c(" > "$r_profile"; \
-      echo "  binary = \"https://p3m.dev/cran/__linux__/jammy/2023-12-01\"," >> "$r_profile"; \
-      echo "  source = \"https://p3m.dev/cran/__linux__/2023-12-01\"," >> "$r_profile"; \
-      echo "  CRAN = \"https://cloud.r-project.org\"" >> "$r_profile"; \
+      echo "  CRAN = "https://packagemanager.posit.co/cran/__linux__/jammy/2023-12-01\"," >> "$r_profile"; \
+      echo "  source = \"https://cloud.r-project.org\"" >> "$r_profile"; \
       echo "))" >> "$r_profile"; \
     else \
       echo "Argument not provided"; \
