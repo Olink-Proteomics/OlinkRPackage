@@ -28,7 +28,7 @@ ARG r_profile=.Rprofile
 RUN if [ "$R_VERSION" = "4.1.3" ] || [ "$R_VERSION" = "4.2.3" ]; then \
       echo "Setting up snapshot for R 4.2.3 on 2023-12-01"; \
       echo "options(repos = c(" > "$r_profile"; \
-      echo "  CRAN = \"https://packagemanager.posit.co/cran/__linux__/jammy/2023-11-07\"" >> "$r_profile"; \
+      echo "  CRAN = \"https://packagemanager.posit.co/cran/__linux__/jammy/2023-11-17\"" >> "$r_profile"; \
       echo "))" >> "$r_profile"; \
     else \
       echo "Argument not provided"; \
