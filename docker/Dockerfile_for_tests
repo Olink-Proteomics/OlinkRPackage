@@ -43,7 +43,7 @@ RUN R -e "devtools::install_dev_deps(pkg = '/src', dependencies = TRUE)"
 RUN if [ "$R_VERSION" = "4.1.3" ] || [ "$R_VERSION" = "4.2.3" ]; then \
   echo "Installing packages from snapshot for R 4.1.3 and 4.2.3"; \
   R -e "devtools::install_version(package = 'arrow', version = '14.0.0', dependencies = TRUE, repos = 'https://packagemanager.posit.co/cran/__linux__/jammy/2023-11-17')"; \
-  R -e "devtools::install_version(package = 'cli', version = '3.5.0', dependencies = TRUE, repos = 'https://packagemanager.posit.co/cran/__linux__/jammy/2022-12-21')"; \
+  R -e "devtools::install_version(package = 'cli', version = '3.6.1', dependencies = TRUE, repos = 'https://packagemanager.posit.co/cran/__linux__/jammy/2023-03-24')"; \
 else \
   echo "Argument not provided"; \
 fi

@@ -62,7 +62,7 @@ RoxygenNote: 7.3.1
 Depends: R (>= 4.1.3)
 Imports: 
     arrow (>= 14.0.0),
-    cli (>= 3.5.0),
+    cli (>= 3.6.1),
     dplyr,
     readxl,
     rlang,
