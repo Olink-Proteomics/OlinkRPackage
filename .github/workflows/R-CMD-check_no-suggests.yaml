@@ -7,7 +7,7 @@
 # never used to avoid accidentally restoring a cache containing a suggested
 # dependency.
 on:
-  push:
+  pull_request:
     branches:
       - 'main'
       - 'develop'
