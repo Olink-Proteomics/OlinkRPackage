@@ -159,7 +159,6 @@ We are always happy to help. Email us with any questions:
 
 -   biostat\@olink.com for statistical services and general stats questions
 
--   biostattools\@olink.com for Olink Analyze and Shiny app support
 
 -   support\@olink.com for Olink lab product and technical support
 
