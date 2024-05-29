@@ -59,7 +59,7 @@ Config/testthat/start-first: read_npx_l*, read_npx_w*
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.3.1
-Depends: R (>= 4.2.3)
+Depends: R (>= 4.2.0)
 Imports: 
     arrow (>= 14.0.0),
     cli (>= 3.6.1),
