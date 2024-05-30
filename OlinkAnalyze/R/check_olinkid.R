@@ -29,9 +29,9 @@ check_olinkid <- function(df, col_names) {
   # warning if there is any invalid Olink ID
   if (length(invalid_oid) > 0L) {
     cli::cli_warn(
-      c(
-        "x" = "Unrecognized Olink ID{?s} detected: {invalid_oid}"),
-        call = rlang::caller_env())
+      c("x" = "Unrecognized Olink ID{?s} detected: {invalid_oid}"),
+      call = rlang::caller_env()
+    )
   }
 
   return(invalid_oid)
