@@ -35,8 +35,8 @@ jobs:
         with:
           push: false
           tags: oa:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
           file: docker/Dockerfile_for_tests
           load: true
           build-args: R_VERSION=${{matrix.r_version}}

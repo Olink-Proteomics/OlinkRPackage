@@ -2,7 +2,9 @@ ARG  R_VERSION=4.4.0
 FROM ghcr.io/rocker-org/tidyverse:${R_VERSION}
 
 # System libs
-RUN apt-get update \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+  apt-get update \
+  && apt-get upgrade -y \
   && apt-get install -y libglpk40 \
     libxt6 \
     texlive-latex-base \
