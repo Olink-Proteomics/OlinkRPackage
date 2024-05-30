@@ -2,19 +2,18 @@
 #'
 #' @author Masoumeh Sheikhi
 #'
-#' @param df An arrow object containing the columns "SampleID" and "OlinkID".
-#' @param name_mask A list of matched column names. This is the output of `check_npx_col_names` function.
+#' @param df A tibble or an arrow object containing the columns "SampleID" and "OlinkID".
+#' @param col_names A list of matched column names. This is the output of `check_npx_col_names` function.
 #'
-#' @return Invisible NULL.
 
 ### Is it necessary to return anything here?
 
-check_duplicate_sample_ids <- function(df, name_mask) {
+check_duplicate_sample_ids <- function(df, col_names) {
 
   # required columns: olink_id and sample_id
   check_columns(df,
-                col_list = list(name_mask$sample_id,
-                                name_mask$olink_id))
+                col_list = list(col_names$sample_id,
+                                col_names$olink_id))
 
 
   # replace this chunck with check_columns and dictionary functions
@@ -52,9 +51,9 @@ check_duplicate_sample_ids <- function(df, name_mask) {
   # Select relevant columns
   sample_summary <- df  |>
     dplyr::select(dplyr::all_of(c(
-      name_mask$sample_id,
-      name_mask$olink_id)))  |>
-    dplyr::group_by(.data[[name_mask$sample_id]], .data[[name_mask$olink_id]]) |>
+      col_names$sample_id,
+      col_names$olink_id)))  |>
+    dplyr::group_by(.data[[col_names$sample_id]], .data[[col_names$olink_id]]) |>
     dplyr::summarise(freq = dplyr::n(), .groups = "drop") |>
     dplyr::collect()
 
@@ -62,7 +61,8 @@ check_duplicate_sample_ids <- function(df, name_mask) {
   duplicates <- character(0L)
   duplicates <- sample_summary |>
     dplyr::filter(freq > 1) |>
-    dplyr::pull(.data[[name_mask$sample_id]])
+    dplyr::collect() |>
+    dplyr::pull(.data[[col_names$sample_id]]) # as_vector = TRUE ???
 
   # Warn if duplicates are found
   if (length(duplicates) > 0L) {
@@ -70,5 +70,4 @@ check_duplicate_sample_ids <- function(df, name_mask) {
       "x" = "Duplicate sample ID{?s} detected:
       {duplicates}"))
   }
-  return(invisible(NULL))
 }
