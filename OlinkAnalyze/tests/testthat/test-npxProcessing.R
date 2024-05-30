@@ -70,6 +70,9 @@ test_that("Assays with NA are removed in NPX check", {
 })
 
 test_that("No error if missing data from 1st OID",{
+  skip_if_not(condition = getRversion() >= "4.2.0",
+              message = "Skipping for R < 4.2.0")
+
   expect_no_error(suppressWarnings(suppressWarnings(npx_data1.uniqIDs %>%
     mutate(QC_Warning = ifelse(OlinkID == "OID01216" & stringr::str_detect(SampleID, "2"),
                                "Warn", QC_Warning)) %>%

@@ -18,7 +18,7 @@
   </clipPath>
 </defs>
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
-<rect x='0.00' y='0.00' width='720.00' height='576.00' style='stroke-width: 1.07; stroke: #FFFFFF; fill: #FFFFFF;' />
+<rect x='-0.000000000000064' y='0.00' width='720.00' height='576.00' style='stroke-width: 1.07; stroke: #FFFFFF; fill: #FFFFFF;' />
 </g>
 <defs>
   <clipPath id='cpMjkuMjR8MzE4LjM2fDQ0LjI3fDU0My41MA=='>
@@ -431,14 +431,14 @@
 <polyline points='26.50,83.20 29.24,83.20 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
 <text x='326.24' y='568.03' text-anchor='middle' style='font-size: 12.00px; fill: #737373; font-family: sans;' textLength='83.39px' lengthAdjust='spacingAndGlyphs'>Sample Median</text>
 <text transform='translate(13.74,293.89) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; fill: #737373; font-family: sans;' textLength='21.34px' lengthAdjust='spacingAndGlyphs'>IQR</text>
-<rect x='634.20' y='262.76' width='80.32' height='62.25' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
-<text x='639.68' y='277.75' style='font-size: 12.00px; fill: #737373; font-family: sans;' textLength='69.36px' lengthAdjust='spacingAndGlyphs'>QC_Warning</text>
-<rect x='639.68' y='284.97' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
-<circle cx='648.32' cy='293.61' r='3.02' style='stroke-width: 0.71; stroke: #077183; fill: #077183;' />
-<rect x='639.68' y='302.25' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
-<circle cx='648.32' cy='310.89' r='3.02' style='stroke-width: 0.71; stroke: #FF51B8; fill: #FF51B8;' />
-<text x='662.93' y='296.91' style='font-size: 9.60px; fill: #737373; font-family: sans;' textLength='21.35px' lengthAdjust='spacingAndGlyphs'>Pass</text>
-<text x='662.93' y='314.19' style='font-size: 9.60px; fill: #737373; font-family: sans;' textLength='35.75px' lengthAdjust='spacingAndGlyphs'>Warning</text>
+<rect x='634.20' y='263.01' width='80.32' height='61.75' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<text x='639.68' y='277.99' style='font-size: 12.00px; fill: #737373; font-family: sans;' textLength='69.36px' lengthAdjust='spacingAndGlyphs'>QC_Warning</text>
+<rect x='639.68' y='284.72' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<circle cx='648.32' cy='293.36' r='3.02' style='stroke-width: 0.71; stroke: #077183; fill: #077183;' />
+<rect x='639.68' y='302.00' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<circle cx='648.32' cy='310.64' r='3.02' style='stroke-width: 0.71; stroke: #FF51B8; fill: #FF51B8;' />
+<text x='662.44' y='296.66' style='font-size: 9.60px; fill: #737373; font-family: sans;' textLength='21.35px' lengthAdjust='spacingAndGlyphs'>Pass</text>
+<text x='662.44' y='313.94' style='font-size: 9.60px; fill: #737373; font-family: sans;' textLength='35.75px' lengthAdjust='spacingAndGlyphs'>Warning</text>
 <text x='29.24' y='15.39' style='font-size: 14.40px; fill: #737373; font-family: sans;' textLength='152.88px' lengthAdjust='spacingAndGlyphs'>QC plot with coloroption</text>
 </g>
 </svg>

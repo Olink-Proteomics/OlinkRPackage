@@ -170,5 +170,8 @@ test_that("# in SampleID", {
 # No warning for extra column ----------------
 
 test_that("extra column", {
+  skip_if_not(condition = getRversion() >= "4.2.0",
+              message = "Skipping for R < 4.2.0")
+
   expect_no_warning(read_NPX(testthat::test_path("refs/mock_sampleID_hashes.csv")))
 })
