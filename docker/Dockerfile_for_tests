@@ -15,6 +15,7 @@ RUN apt-get update \
 RUN install2.r --error \
   --deps TRUE \
   --skipinstalled \
+  --ncpus -1 \
   devtools \
   rcmdcheck \
   lintr \
