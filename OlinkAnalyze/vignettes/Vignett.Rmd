@@ -264,7 +264,7 @@ A tibble of NPX data in long format containing normalized NPX values, including 
 
 ## Integrating Explore NPX LOD (olink_lod) 
 
-The olink_lod function adds LOD information to an Explore HT or Explore 3072 NPX dataframe. This function can incorporate LOD based on either an Explore dataset’s negative controls or using predetermined fixed LOD values, which can be provided by Olink’s Support team in an external file upon request. The default LOD calculation method is based off of the negative controls. If an NPX file is intensity normalized, both intensity normalized and PC normalized LODs are provided. 
+The olink_lod function adds LOD information to an Explore HT or Explore 3072 NPX dataframe. This function can incorporate LOD based on either an Explore dataset's negative controls or using predetermined fixed LOD values, which can be provided by Olink’s Support team in an external file upon request. The default LOD calculation method is based off of the negative controls. If an NPX file is intensity normalized, both intensity normalized and PC normalized LODs are provided. 
 
 ### Function arguments
  
@@ -299,7 +299,7 @@ A tibble with the following columns:
 + **Panel** _\<chr\>_: Olink Panel that samples ran on. Read more about Olink Panels here: https://olink.com/products-services/.
 + **Block** _\<chr\>_: Olink Block that samples ran on. 
 + **Count** *<int>*: Raw counts generated during sequencing. 
-+ **ExtNPX** *<num*: Extension normalized NPX value that is used in NPX calculation. Read more about ExtNPX here: https://olink.com/faq/how-is-the-npx-value-calculated-in-explore/
++ **ExtNPX** *<num>*: Extension normalized NPX value that is used in NPX calculation. Read more about ExtNPX here: https://olink.com/faq/how-is-the-npx-value-calculated-in-explore/
 + **NPX** *<num>*: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log2 scale. The majority of the functions of this package use NPX values for calculations. If Explore data is PC normalized, NPX reflects the PC normalized value. If Explore data is intensity normalized NPX, NPX reflects the intensity normalized value. Read more about NPX here: https://olink.com/faq/what-is-npx/.
 + **Normalization** _\<chr\>_: The normalization method used.
 + **PCNormalizedNPX** *<num>*: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log2 scale. The majority of the functions of this package use NPX values for calculations. Regardless of normalization method, this column always reflects PC normalized NPX values. Read more about NPX here: https://olink.com/faq/what-is-npx/.
