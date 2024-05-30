@@ -2,26 +2,82 @@
 % Please edit documentation in R/check_npx_col_names.R
 \name{check_npx_col_names}
 \alias{check_npx_col_names}
-\title{Check and update column names}
+\title{Check, update and define column names used in downstream analyses.}
 \usage{
 check_npx_col_names(df, preferred_names = NULL)
 }
 \arguments{
-\item{df}{An arrow object to check and update column names.}
+\item{df}{A tibble or and arrow object from `read_npx`.}
 
-\item{preferred_names}{A named list where names are desired column names
-and values are current column names.}
+\item{preferred_names}{A named character vector where names are internal
+column names and values are column names to be selected from current data
+frame. Read the `description` for further information.}
 }
 \value{
 A list of matched column names based on the preferred names.
 }
 \description{
-This function checks the column names of Olink data and updates them if specified.
+OlinkAnalyze uses pre-defined names of columns of data frames to perform
+downstream analyses. At the same time, different Olink platforms are capable
+of exporting data with different quantification approaches. This function
+aims to instruct each function of OlinkAnalyze on the column it should be
+using for the downstream analysis. This should be seamless for data exported
+from Olink Software and imported to R using the read_npx function.
+
+However, in certain cases the columns of interest might be named differently.
+This function allows assigning custom-named columns of a data frame to
+internally expected variables that will in turn instruct Olink Analyze
+functions to use them for downstream analysis. For example, if one has
+transformed the existing NPX value and has stored the result in a new column
+called NPX_2, then they can assign this new name to the internal variable
+`quant` to inform the package that in the downstream analysis `NPX_2` should
+be used. See example 1.
+
+Similarly, in case of multiple matches (e.g. the data frame contains both
+columns `NPX` and `Quantified_value`) the ties will need to be resolved by
+the user using the argument `preferred_names` from this function.  See
+example 2.
+
+The argument `preferred_names` is a named character vector with internal
+column names as names and column names of the current data set as values.
+Names of the input vector can be one or more of the following: `sample_id`,
+`sample_type`, `olink_id`, `plate_id`, `qc_warning`, `lod`, `quant`.
 }
-\details{
-This function checks if the preferred column names are present in the data. If the
-preferred names are provided, it updates the column names according to the provided preferences.
-Otherwise, it uses the existing column names in the dataset.
+\examples{
+\donttest{
+file <- system.file("extdata",
+                    "npx_data_ext.parquet",
+                     package = "OlinkAnalyze")
+df <- read_npx(filename = file)
+
+# run df as is
+OlinkAnalyze:::check_npx_col_names(df = df)
+
+# SampleType missing
+df |>
+  dplyr::select(
+    -dplyr::all_of("SampleType")
+  ) |>
+  OlinkAnalyze:::check_npx_col_names()
+
+# use PCNormalizedNPX instead on NPX
+OlinkAnalyze:::check_npx_col_names(
+  df = df,
+  preferred_names = c("quant" = "PCNormalizedNPX")
+)
+
+# use PCNormalizedNPX instead on NPX, and PlateLOD instead of LOD
+df |>
+  dplyr::mutate(
+    LOD = 1L,
+    PlateLOD = 2L
+  ) |>
+  OlinkAnalyze:::check_npx_col_names(
+    preferred_names = c("quant" = "PCNormalizedNPX",
+                        "lod" = "PlateLOD")
+  )
+}
+
 }
 \author{
 Klev Diamanti

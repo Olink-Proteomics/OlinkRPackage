@@ -4,13 +4,16 @@
 \alias{check_olinkid}
 \title{Help function checking whether df contains recognized OIDs}
 \usage{
-check_olinkid(df)
+check_olinkid(df, col_names)
 }
 \arguments{
-\item{df}{An arrow object}
+\item{df}{A tibble or an arrow object containing containing column "OlinkID"}
+
+\item{col_names}{A list of matched column names.
+This is the output of `check_npx_col_names` function.}
 }
 \value{
-A character vector indicating the invalid OlinkIDs
+A character vector including the invalid Olink IDs
 }
 \description{
 Help function checking whether df contains recognized OIDs
