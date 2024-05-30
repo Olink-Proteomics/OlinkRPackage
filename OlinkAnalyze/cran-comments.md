@@ -1,6 +1,6 @@
 ## Release Summary
 
-This release contains extending the functionality of to existing functions (from version 3.6.2) to new data. This version also contains improvements to tutorials for clarity.
+This release contains new functionality and tutorials related to LOD.
 
 ## R CMD check results
 
