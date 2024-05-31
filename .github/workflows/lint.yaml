@@ -6,6 +6,7 @@ on:
       - 'main'
       - 'develop'
       - 'optimization_develop'
+      - 'optimization_main'
 
 name: lint
 

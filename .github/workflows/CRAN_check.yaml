@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - 'main'
+      - 'optimization_main'
   push:
     branches:
       - 'CRAN*'

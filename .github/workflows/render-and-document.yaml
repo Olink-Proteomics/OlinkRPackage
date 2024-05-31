@@ -4,6 +4,7 @@ on:
   push:
     branches-ignore:
       - 'main'
+      - 'optimization_main'
 
 name: render-and-document
 
