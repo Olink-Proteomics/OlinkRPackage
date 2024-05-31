@@ -47,7 +47,7 @@ jobs:
       -
         name: Upload check results
         if: failure()
-        uses: actions/upload-artifact@main
+        uses: actions/upload-artifact@v4
         with:
           name: docker-r${{ matrix.config.r }}-check-results
           path: check
