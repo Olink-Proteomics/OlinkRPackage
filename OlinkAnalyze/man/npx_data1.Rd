@@ -3,9 +3,10 @@
 \docType{data}
 \name{npx_data1}
 \alias{npx_data1}
-\title{NPX Data in Long format}
+\title{NPX Data in Long format.}
 \format{
-In addition to standard read_NPX() columns, this dataset also contains columns:
+In addition to standard read_NPX() columns, this dataset also
+contains columns:
 \describe{
   \item{Subject}{Subject Identifier}
   \item{Treatment}{ Treated or Untreated}
@@ -18,12 +19,15 @@ In addition to standard read_NPX() columns, this dataset also contains columns:
 npx_data1
 }
 \description{
-Data is generated randomly to demonstrate use of functions in this package.
+This is a synthetic dataset aiming to use-cases of functions from this
+package.
 }
 \details{
 A tibble with 29,440 rows and 17 columns.
-Dataset npx_data1 is an Olink NPX data file (tibble) in long format with 158 unique Sample ID's 
-(including 2 repeats each of control samples: CONTROL_SAMPLE_AS 1 CONTROL_SAMPLE_AS 2). 
-The data also contains 1104 assays (uniquely identified using OlinkID) over 2 Panels.
+
+`npx_data1` is an Olink NPX data file (tibble) in long format with 158 unique
+Sample ID's (including 2 repeats each of control samples:
+CONTROL_SAMPLE_AS 1 CONTROL_SAMPLE_AS 2). The data also contains 1104 assays
+(uniquely identified using OlinkID) over 2 Panels.
 }
 \keyword{datasets}

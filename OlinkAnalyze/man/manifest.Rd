@@ -17,9 +17,10 @@ This dataset  contains columns:
 manifest
 }
 \description{
-Sample manifest is generated randomly to demonstrate use of functions in this package.
+Synthetic sample manifest to demonstrate use of functions in this package.
 }
 \details{
-A tibble with 138 rows and 4 columns. This manifest contains 26 example subjects, with 6 visits and 2 sites.
+A tibble with 138 rows and 4 columns. This manifest contains 26 example
+subjects, with 6 visits and 2 sites.
 }
 \keyword{datasets}

@@ -1,110 +1,126 @@
-#' Helper function to read in Olink Explore parquet output files
+#' Help function to read NPX data from long format parquet Olink software output
+#' files in R.
 #'
-#' @param filename Path to Olink Software parquet output file.
+#' @author
+#'   Klev Diamanti;
+#'   Kathleen Nevola;
+#'   Pascal Pucholt
 #'
-#' @return A "tibble" in long format. Some of the columns are:
-#' \itemize{
-#'    \item{SampleID:} Sample ID
-#'    \item{OlinkID:} Olink ID
-#'    \item{UniProt:} UniProt ID
-#'    \item{Assay:} Protein symbol
-#'    \item{PlateID:} Plate ID
-#'    \item{Count:} Counts from sequences
-#'    \item{ExtNPX:} External control normalized counts
-#'    \item{NPX:} Normalized Protein Expression
-#' }
-#' Additional columns may be present or missing depending on the platform
+#' @param file Path to Olink software output parquet file in long format.
+#' Expecting file extension `parquet`.
+#' @param out_df The class of output data frame. One of `tibble` (default) or
+#' `arrow` for ArrowObject.
 #'
-#' @keywords NPX
+#' @return Tibble or ArrowObject with Olink data in long format.
 #'
-#' @examples
-#' \donttest{
-#' file <- system.file("extdata", "Example_NPX_Data.csv", package = "OlinkAnalyze")
-#' read_NPX(file)
-#' }
+#' @seealso
+#'   \code{\link{read_npx}}
+#'   \code{\link{read_npx_zip}}
+#'   \code{\link{read_npx_excel}}
+#'   \code{\link{read_npx_format}}
+#'   \code{\link{read_npx_delim}}
 #'
-#' @importFrom magrittr %>%
-#' @importFrom dplyr as_tibble select
-#'
+read_npx_parquet <- function(file,
+                             out_df = "arrow") {
 
-read_npx_parquet <- function (filename) {
+  # Read parquet file ----
 
-  if(!requireNamespace("arrow", quietly = TRUE) ) {
-    stop("Reading parquet files requires the arrow package.
-         Please install arrow before continuing.
+  # check if file exists
+  check_file_exists(file = file,
+                    error = TRUE)
 
-         install.packages(\"arrow\")")
-  }
+  # check that the requested output df is ok
+  check_out_df_arg(out_df = out_df)
 
-  # pointer to parquet file
-  parquet_file <- arrow::open_dataset(
-    sources = filename
-  )
+  # tryCatch in case reading the file fails
+  tryCatch(
+    {
 
-  # Check that all required parquet metadata is in place
-  olink_parquet_metadata <- c("DataFileType",
-                              "Product")
-  if (!all(olink_parquet_metadata %in% names(parquet_file$metadata))) {
-
-    stop(
-      paste("Missing required fileds",
-            paste(
-              paste0("\"", olink_parquet_metadata, "\""),
-              collapse = " and "),
-            "in parquet file's metadata."
-            )
+      df_olink <- arrow::open_dataset(
+        sources = file
       )
 
-  }
+    }, error = function(msg) {
 
-  # We allow only Olink Explore HT parquet files for now
-  # If other platforms are to be reported as parquet too, we have to add
-  # them to this array
-  olink_platforms <- c("ExploreHT")
-  if (!(parquet_file$metadata$Product %in% olink_platforms)) {
-
-    stop("Only \"Olink Explore HT\" parquet files are currently supported.")
-
-  }
-
-
-  # Check if it is an NPX file
-  olink_files <- c("NPX File",
-                   "Extended NPX File",
-                   "CLI Data Export File",
-                   "Internal CLI Data Export File",
-                   "R Package Export File")
-  if (parquet_file$metadata$DataFileType %in% olink_files) {
-
-    # Check that required columns are present
-    required_cols <- c("SampleID",
-                       "OlinkID",
-                       "UniProt",
-                       "Assay",
-                       "Panel",
-                       "PlateID",
-                       "SampleQC",
-                       "NPX")
-
-    missing_cols <- setdiff(required_cols,
-                            names(parquet_file))
-
-    if(length(missing_cols) != 0) {
-
-      stop(paste("The following columns are missing:",
-                 paste(missing_cols, collapse = ", ")))
+      cli::cli_abort(
+        c(
+          "x" = "Unable to read parquet file: {.file {file}}",
+          "i" = "Check the file is in parquet format and potential file
+          corruption."
+        ),
+        call = rlang::caller_env(),
+        wrap = FALSE
+      )
 
     }
+  )
 
-  } else {
+  # Check metadata ----
 
-    stop("Only \"NPX\" parquet files are currently supported.")
+  # Check that all required parquet metadata is in place
+  if (!all(olink_parquet_spec$parquet_metadata %in% names(df_olink$metadata))) {
+    missing_fields <- olink_parquet_spec$parquet_metadata[ # nolint
+      !(olink_parquet_spec$parquet_metadata %in% names(df_olink$metadata))
+    ]
+
+    cli::cli_abort(
+      c(
+        "x" = "Missing required field{?s} in metadata:
+        {missing_fields}"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
 
   }
 
-  df_npx <- parquet_file %>%
-    dplyr::collect() %>%
-    dplyr::as_tibble()
+  # Check specific fields of metadata ----
 
-  return(df_npx)
+  # Product
+  olink_parquet_product <- olink_parquet_spec$parquet_metadata[
+    names(olink_parquet_spec$parquet_metadata) == "product"
+  ]
+
+  if (!(df_olink$metadata[[olink_parquet_product]] %in% olink_parquet_spec$parquet_platforms)) { # nolint
+
+    cli::cli_abort(
+      c(
+        "x" = "Unsupported product:
+        {.val {df_olink$metadata[[olink_parquet_product]]}}",
+        "i" = "Metadata field {.val {olink_parquet_product}} expects:
+        {olink_parquet_spec$parquet_platforms}"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
+  }
+
+  # Data file type
+  olink_parquet_files <- olink_parquet_spec$parquet_metadata[
+    names(olink_parquet_spec$parquet_metadata) == "data_file_type"
+  ]
+
+  if (!(df_olink$metadata[[olink_parquet_files]] %in% olink_parquet_spec$parquet_files)) { # nolint
+
+    cli::cli_abort(
+      c(
+        "x" = "Unsupported file:
+        {.val {df_olink$metadata[[olink_parquet_files]]}}",
+        "i" = "Metadata field {.val {olink_parquet_files}} expects:
+        {olink_parquet_spec$parquet_files}"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
+  }
+
+  # Return ----
+
+  # if needed convert the object to the requested output
+  df_olink <- convert_read_npx_output(df = df_olink,
+                                      out_df = out_df)
+
+  return(df_olink)
 }

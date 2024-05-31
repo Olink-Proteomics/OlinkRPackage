@@ -2,35 +2,34 @@
 % Please edit documentation in R/read_npx_parquet.R
 \name{read_npx_parquet}
 \alias{read_npx_parquet}
-\title{Helper function to read in Olink Explore parquet output files}
+\title{Help function to read NPX data from long format parquet Olink software output
+files in R.}
 \usage{
-read_npx_parquet(filename)
+read_npx_parquet(file, out_df = "arrow")
 }
 \arguments{
-\item{filename}{Path to Olink Software parquet output file.}
+\item{file}{Path to Olink software output parquet file in long format.
+Expecting file extension `parquet`.}
+
+\item{out_df}{The class of output data frame. One of `tibble` (default) or
+`arrow` for ArrowObject.}
 }
 \value{
-A "tibble" in long format. Some of the columns are:
-\itemize{
-   \item{SampleID:} Sample ID
-   \item{OlinkID:} Olink ID
-   \item{UniProt:} UniProt ID
-   \item{Assay:} Protein symbol
-   \item{PlateID:} Plate ID
-   \item{Count:} Counts from sequences
-   \item{ExtNPX:} External control normalized counts
-   \item{NPX:} Normalized Protein Expression
-}
-Additional columns may be present or missing depending on the platform
+Tibble or ArrowObject with Olink data in long format.
 }
 \description{
-Helper function to read in Olink Explore parquet output files
+Help function to read NPX data from long format parquet Olink software output
+files in R.
 }
-\examples{
-\donttest{
-file <- system.file("extdata", "Example_NPX_Data.csv", package = "OlinkAnalyze")
-read_NPX(file)
+\seealso{
+\code{\link{read_npx}}
+  \code{\link{read_npx_zip}}
+  \code{\link{read_npx_excel}}
+  \code{\link{read_npx_format}}
+  \code{\link{read_npx_delim}}
 }
-
+\author{
+Klev Diamanti;
+  Kathleen Nevola;
+  Pascal Pucholt
 }
-\keyword{NPX}
