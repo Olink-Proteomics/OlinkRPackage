@@ -4,11 +4,9 @@ on:
   pull_request:
     branches:
       - 'main'
-      - 'optimization_main'
   push:
     branches:
       - 'CRAN*'
-      - 'optimization_develop_read_npx_to_main'
 
 name: CRAN checks
 
