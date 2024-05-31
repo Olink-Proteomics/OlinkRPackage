@@ -6,6 +6,7 @@ on:
       - 'main'
       - 'develop'
       - 'optimization_develop'
+      - 'optimization_main'
 
 name: test-coverage
 
@@ -14,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 2
 
@@ -47,7 +48,7 @@ jobs:
         
       - name: Upload test results
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-test-failures
           path: ${{ runner.temp }}/package
