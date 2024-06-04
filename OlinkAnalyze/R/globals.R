@@ -17,6 +17,5 @@ utils::globalVariables(unique(c(
   "umapX_low", "umapY_high", "umapY_low", "LX", "LY", "PCX", "PCY", "rowname", "Normalization", "Quantified_value", "v1",
   "v2", "v", "v_name", "duplicateID", "SampleID_df1", "name", "data", "normalize_to", "PlateID1", "QC_Warning1", "V1", "V2",
   "cols", "ID", "AssayQC", "AssayType", "Block", "DataAnalysisRefID", "ExploreVersion", "ExtNPX", "PCNormalizedNPX", "SampleQC", "SampleType", "WellID",
-  "Max LOD", "Plate LOD", "Plate_LOD", "Normalization_df1", "Normalization_df2",   "Max_LOD", "maxLOD", "plateLOD",
-  ".env", ".data"
+  "Max LOD", "Plate LOD", "Plate_LOD", "Normalization_df1", "Normalization_df2",   "Max_LOD", "maxLOD", "plateLOD", ".env", ".data", "PCNormalizedLOD"
 )))
