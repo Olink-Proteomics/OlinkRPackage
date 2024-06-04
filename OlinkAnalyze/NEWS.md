@@ -7,7 +7,7 @@
 ## Bug Fixes
 * Removed outdated reference to NPX Manager (#354, @dtopouza)
 * Removed mention of Welch's t-test in Mann Whitney documentation (#354, @dtopouza)
-
+* Assays that include apostrophes will now be read in correctly from long format csvs (#381, @kathy-nevola)
 
 # Olink Analyze 3.7.0
 ## Minor Changes
