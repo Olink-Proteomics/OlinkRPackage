@@ -24,7 +24,7 @@ test_that("check_olinkid returns invalid Olink IDs", {
                 "OID123456",
                 "OID1234",
                 "12345",
-                "NA"), ## does not work for NA_real
+                "NA"),
     SampleType = rep("SAMPLE", 5),
     NPX = rnorm(5),
     PlateID = rep("plate1", 5),
