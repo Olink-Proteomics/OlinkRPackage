@@ -2,6 +2,7 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 [![R-CMD-check](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/R-CMD-check.yaml)
+[![](https://img.shields.io/badge/DOI-10.32614/CRAN.package.OlinkAnalyze-1f57b6?style=flat&link=https://doi.org/10.32614/CRAN.package.OlinkAnalyze)](https://doi.org/10.32614/CRAN.package.OlinkAnalyze)
 
 # Olink® Analyze
 
