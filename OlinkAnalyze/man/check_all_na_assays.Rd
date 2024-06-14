@@ -10,7 +10,8 @@ check_all_na_assays(df, col_names)
 \item{df}{A tibble or an arrow object containing columns "OlinkID" and
 either "NPX", "Quantified_value" or "Ct"}
 
-\item{col_names}{A list of matched column names, the output of `check_npx_col_names` function.}
+\item{col_names}{A list of matched column names,
+the output of `check_npx_col_names` function.}
 }
 \value{
 A character vector containing
