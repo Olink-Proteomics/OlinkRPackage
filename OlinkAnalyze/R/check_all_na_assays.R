@@ -7,7 +7,8 @@
 #' @param df A tibble or an arrow object containing columns "OlinkID" and
 #' either "NPX", "Quantified_value" or "Ct"
 #'
-#' @param col_names A list of matched column names, the output of `check_npx_col_names` function.
+#' @param col_names A list of matched column names,
+#' the output of `check_npx_col_names` function.
 #'
 #' @return A character vector containing
 #' Olink ID of assays with all quantified values NA,
@@ -15,23 +16,13 @@
 
 check_all_na_assays <- function(df, col_names) {
 
-  # required columns: olink_id and quant
-  # this seems redundant in presence of col_names that is the output of check_npx_col_names
-  # if the olinkid of npx or their equivalent is missing, check_npx_col_names will through an error
-  check_columns(df,
-                col_list = list(col_names$olink_id,
-                                col_names$quant))
-
-
   # Identify assays with only NAs
   all_nas <-
     df |>
     dplyr::select(
       dplyr::all_of(
-        c(
-        col_names$olink_id,
-        col_names$quant
-        )
+        c(col_names$olink_id,
+          col_names$quant)
       )
     ) |>
     dplyr::group_by(
@@ -47,16 +38,17 @@ check_all_na_assays <- function(df, col_names) {
     )  |>
     dplyr::filter(
       n == n_na
-      )  |>
+    ) |>
     dplyr::collect() |>
-    dplyr::pull(
-      .data[[col_names$olink_id]]) # ,as_vector = TRUE
+    dplyr::pull(.data[[col_names$olink_id]]
+    )
 
 
   # Issue warning if any assays with only NAs are found
   if (length(all_nas) > 0L) {
     cli::cli_warn(c(
-      x = "{all_nas} ha{?s/ve} {col_names$quant} = NA for all samples."))
+      x = "{all_nas} ha{?s/ve} {col_names$quant} = NA for all samples."
+    ))
   }
 
   return(all_nas)

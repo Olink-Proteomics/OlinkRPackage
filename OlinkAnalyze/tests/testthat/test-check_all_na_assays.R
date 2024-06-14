@@ -1,37 +1,54 @@
 #' Tests for check_all_na_assays function
 #'
 
-test_that("all NA values are detected", {
+test_that("assay has all-NA values and is detected", {
   df <- arrow::arrow_table(
     SampleID = c("A", "B", "A", "B"),
-    OlinkID = c("OID12345", "OID12345", "OID23456", "OID23456"),
+    OlinkID = c("OID12345",
+                "OID12345",
+                "OID23456",
+                "OID23456"),
     NPX = c(NA_real_, NA_real_, 1.2, 1.3)
   )
-  column_name_df <-  list(quant = "NPX", olink_id = "OlinkID" )
+  col_names <-  list(quant = "NPX", olink_id = "OlinkID")
+  result <- suppressWarnings(check_all_na_assays(df, col_names = col_names))
 
-  expect_warning(check_all_na_assays(df, column_name_df = column_name_df),
+  expect_warning(check_all_na_assays(df, col_names = col_names),
                  "OID12345 has NPX = NA for all samples.")
-  expect_equal(suppressWarnings(check_all_na_assays(df, column_name_df = column_name_df)), "OID12345")
+  expect_equal(result,
+               "OID12345")
 
 })
 
-test_that("no NA values are detected", {
-  df <- arrow::arrow_table(
+test_that("assay has some but not all NAs and is not detected", {
+  df <- tibble::tibble(
     SampleID = c("A", "B", "A", "B"),
-    OlinkID = c("OID12345", "OID12345", "OID23456", "OID23456"),
-    NPX = c(1.1, 1.2, 1.3, 1.4)
+    OlinkID = c("OID12345",
+                "OID12345",
+                "OID23456",
+                "OID23456"),
+    NPX = c(1.1, 1.2, 1.3, NA_real_)
   )
-  column_name_df <-  list(quant = "NPX", olink_id = "OlinkID" )
+  col_names <-  list(quant = "NPX", olink_id = "OlinkID")
+  result <- suppressWarnings(check_all_na_assays(df, col_names = col_names))
 
-  expect_equal(check_all_na_assays(df, column_name_df = column_name_df), character(0))
+  expect_equal(result,
+               character(0))
 })
 
-test_that("some NA values are detected correctly", {
+
+test_that("no NA value exists, nothing detected.", {
   df <- arrow::arrow_table(
     SampleID = c("A", "B", "A", "B"),
-    OlinkID = c("OID12345", "OID12345", "OID23456", "OID23456"),
-    NPX = c(1.1, rep(NA_real_, 3))
+    OlinkID = c("OID12345",
+                "OID12345",
+                "OID23456",
+                "OID23456"),
+    NPX = rnorm(4)
   )
-  column_name_df <-  list(quant = "NPX", olink_id = "OlinkID" )
-  expect_equal(suppressWarnings(check_all_na_assays(df, column_name_df = column_name_df)), "OID23456")
+  col_names <- list(quant = "NPX", olink_id = "OlinkID")
+  result <- suppressWarnings(check_all_na_assays(df, col_names = col_names))
+
+  expect_equal(result,
+               character(0))
 })
