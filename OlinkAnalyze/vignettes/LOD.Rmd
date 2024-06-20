@@ -95,10 +95,7 @@ explore_npx <- read_NPX("~/Explore_NPX_file.parquet")
 
 The negative control (NC) LOD method requires at least 10 negative controls in a dataset. Negative control data is available in the standard exported Explore HT and Explore 384/3072 NPX parquet files. NCs can be identified through the SampleID and SampleType columns.
 
-A negative control will not contribute to the minimum number of required NCs if either of the following apply:
-
- + The negative control contains an assay QC warning across all assays, excluding Olink's internal control assays
- + The negative control does not pass sample QC criteria (sample QC failure or warning) in all of the data (i.e. all Explore HT blocks, all Explore 3072 panels, or all Explore 384 panels that were measured)
+A negative control will not contribute to the minimum number of required NCs if the negative control does not pass sample QC criteria (sample QC failure or warning) in all of the data (i.e. all Explore HT blocks, all Explore 3072 panels, or all Explore 384 panels that were measured)
 
 Negative controls are used to calculate LOD from either PC normalized NPX or counts. For assays with more than 150 counts in one of the negative controls, LOD is calculated using the median PC normalized NPX and adding 3 standard deviations, or 0.2 NPX whichever is larger. For assays with fewer than 150 counts in all negative controls, LOD is calculated using the count values which are then converted into PC normalized NPX. 
 
