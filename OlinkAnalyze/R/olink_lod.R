@@ -113,7 +113,6 @@ olink_nc_lod <- function(data, min_num_nc = 10L) {
   lod_data <- data |>
     dplyr::filter(
       .data[["SampleType"]] == "NEGATIVE_CONTROL"
-      & .data[["AssayQC"]] == "PASS"
       & .data[["SampleQC"]] == "PASS"
       & .data[["AssayType"]] == "assay"
       & !is.na(.data[["NPX"]])
