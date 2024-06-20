@@ -38,7 +38,7 @@ olink_lod <- function(data, lod_file_path = NULL, lod_method = "NCLOD"){
   original_columns <- names(data)
 
   # check the type of LOD calculation to perform and compute or extract:
-  # LodNPX, LODCount and LodMethod
+  # LODNPX, LODCount and LODMethod
 
   lod_methods <- list(fix_lod = "FixedLOD",
                       nc_lod = "NCLOD")
@@ -90,7 +90,7 @@ olink_lod <- function(data, lod_file_path = NULL, lod_method = "NCLOD"){
   return(data)
 }
 
-# extract LodNPX, LODCount and LodMethods from reference file
+# extract LODNPX, LODCount and LODMethods from reference file
 olink_fixed_lod <- function(data_analysis_ref_id, lod_file) {
 
   lod_file |>
@@ -99,13 +99,13 @@ olink_fixed_lod <- function(data_analysis_ref_id, lod_file) {
     ) |>
     dplyr::select(
       dplyr::all_of(
-        c("OlinkID", "DataAnalysisRefID", "LodNPX", "LodCount", "LodMethod")
+        c("OlinkID", "DataAnalysisRefID", "LODNPX", "LODCount", "LODMethod")
       )
     )
 
 }
 
-# compute LodNPX, LODCount and LodMethods from NCs
+# compute LODNPX, LODCount and LODMethods from NCs
 olink_nc_lod <- function(data, min_num_nc = 10L) {
   # Calculate LOD in counts and NPX
 
@@ -134,12 +134,12 @@ olink_nc_lod <- function(data, min_num_nc = 10L) {
     # compute LOD on counts and NPX
     dplyr::summarise(
       MaxCount = max(.data[["Count"]], na.rm = TRUE),
-      LodNPX = median(.data[["PCNormalizedNPX"]], na.rm = TRUE) +
+      LODNPX = median(.data[["PCNormalizedNPX"]], na.rm = TRUE) +
         max(0.2, 3L * sd(.data[["PCNormalizedNPX"]], na.rm = TRUE)),
-      LodCount = max(150L, max(.data[["Count"]] * 2L, na.rm = TRUE))
+      LODCount = max(150L, max(.data[["Count"]] * 2L, na.rm = TRUE))
     ) |>
     dplyr::mutate(
-      LodMethod = dplyr::if_else(
+      LODMethod = dplyr::if_else(
         .data[["MaxCount"]] > 150L, "lod_npx", "lod_count"
       )
     ) |>
@@ -207,9 +207,9 @@ pc_norm_count <- function(data, lod_data){
     dplyr::mutate(
       PCNormalizedLOD = dplyr::case_when(
         is.na(.data[["NPX"]]) ~ NA_real_,
-        !is.na(.data[["NPX"]]) & .data[["LodMethod"]] == "lod_npx" ~
-          .data[["LodNPX"]],
-        TRUE ~ log2(.data[["LodCount"]] / .data[["ExtCount"]]) - .data[["PCMedian"]],
+        !is.na(.data[["NPX"]]) & .data[["LODMethod"]] == "lod_npx" ~
+          .data[["LODNPX"]],
+        TRUE ~ log2(.data[["LODCount"]] / .data[["ExtCount"]]) - .data[["PCMedian"]],
         .default = NA_real_
       )
     ) |> 
