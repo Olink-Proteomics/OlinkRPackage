@@ -46,7 +46,7 @@ olink_lod <- function(data, lod_file_path = NULL, lod_method = "NCLOD"){
       rename("FixedLOD" = "LOD",
              "FixedPCNormalizedLOD" = "PCNormalizedLOD")
     
-    data <- full_join(data_nc, data_fixed,by =  names(data))
+    data <- dplyr::full_join(data_nc, data_fixed,by =  names(data))
     
   }else{
     data<- olink_lod_internal(data = data, 
