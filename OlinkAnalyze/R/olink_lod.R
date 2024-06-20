@@ -159,7 +159,7 @@ pc_norm_count <- function(data, lod_data){
 
   pc_median <- data |>
     dplyr::group_by(
-      OlinkID
+      OlinkID, PlateID
     ) |>
     dplyr::summarise(
       PCMedian = median(.data[["ExtNPX"]][.data[["SampleType"]] == "PLATE_CONTROL"],
