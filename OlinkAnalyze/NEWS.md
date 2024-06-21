@@ -1,4 +1,8 @@
-# Olink Analyze 3.8.0
+# Olink Analyze 3.8.1
+## Bug Fixes 
+* update to outdated URL in LOD tutorial
+
+# Olink Analyze 3.8.1
 ## Minor Changes
 * Function support for calculating LOD for Explore data (#355, @kathy-nevola, @klevdiamanti, @leiliuC)
 * Tutorial and documentation for calculating LOD for Explore data (#364, @MasoumehSheikh, @kristynchin-olink, #388, @kathy-nevola, @amrita-kar)
