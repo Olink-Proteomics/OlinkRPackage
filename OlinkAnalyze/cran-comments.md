@@ -1,6 +1,6 @@
 ## Release Summary
 
-This release contains new functionality and tutorials related to LOD.
+This release updates the URL that had changed in Olink Analyze 3.8.0.
 
 ## R CMD check results
 
