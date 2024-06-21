@@ -4,6 +4,8 @@ output:
   html_vignette:
     toc: true
     toc_depth: 3
+    includes:
+      in_header: ../man/figures/logo.html
 vignette: >
   %\VignetteIndexEntry{Calculating LOD from Olink® Explore data}
   %\VignetteEncoding{UTF-8}
@@ -13,7 +15,6 @@ editor_options:
   markdown: 
     wrap: 72
 ---
-![](../man/figures/small_logo.png)
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -39,7 +40,7 @@ library(dplyr)
 
 This tutorial describes how to use Olink® Analyze to integrate Limit of Detection (LOD) into Olink® Explore HT and Olink® Explore 384/3072 datasets. Although it is recommended to use all Olink Explore data in downstream analyses, LOD information can be useful when performing technical evaluations of a dataset.
 
-In this tutorial, you will learn how to use `olink_lod()` to add LOD information to your Olink Explore dataset. Note that Olink Analyze does not contain example Olink Explore HT or Olink Explore 384/3072 datasets within the package, so external data will be necessary for the code below to work. All file paths should be replaced with a path to your data and fixed LOD reference file (if applicable).
+In this tutorial, you will learn how to use `olink_lod()` to add LOD information to your Olink Explore dataset. Note that Olink Analyze does not contain example Olink Explore HT or Olink Explore 384/3072 datasets within the package, so external data will be necessary for the code below to work. The external data should contain internal and external controls for proper calculation and normalization. All file paths should be replaced with a path to your data and fixed LOD reference file (if applicable).
 
 
 ## Integrating LOD
@@ -48,7 +49,7 @@ Limit of Detection (LOD) is a metric that indicates the lowest measurable value 
 
 LOD can be added to Olink Explore NPX datasets using `olink_lod()`. This function can calculate LOD from an NPX dataset using the dataset's negative controls or a list of predetermined fixed LOD values (available in the Document Download Center at [olink.com](olink.com)). As the default setting, `olink_lod()` will calculate LOD using a dataset's negative controls. 
 
-Olink Explore data is commonly delivered plate control (PC) normalized or intensity normalized (the normalization type employed is indicated in the NPX file column Normalization), where the latter is dependent on that the analyzed samples are randomized. These are reported in the two respective columns PCNormalizedNPX and NPX. Please notice that for PC normalized datasets the content in these two columns will be identical, while for intensity normalized datasets the NPX column will include the intensity normalized values. Similarly, the `olink_lod()` function adds two columns to your dataset; PCNormalizedLOD and LOD respectively. For a PC normalized dataset the content in these two columns will be identical, while for an intensity normalized dataset the LOD column will include LOD values based on the intensity normalized NPX values. Examples of results for plate control and intensity normalization are shown in the tables below.
+Olink Explore data is commonly delivered plate control (PC) normalized or intensity normalized (the normalization type employed is indicated in the NPX file column Normalization), where the latter is dependent on that the analyzed samples are randomized. These are reported in the two respective columns PCNormalizedNPX and NPX. Please notice that for PC normalized datasets the content in these two columns will be identical, while for intensity normalized datasets the NPX column will include the intensity normalized values. Similarly, the `olink_lod()` function adds two columns to your dataset; PCNormalizedLOD and LOD respectively. For a PC normalized dataset the content in these two columns will be identical, while for an intensity normalized dataset the LOD column will contain intensity normalized LOD values. Examples of results for plate control and intensity normalization are shown in the tables below.
 
 ```{r, echo=FALSE}
 set.seed(1234)
@@ -62,7 +63,7 @@ table1<-npx_data1 |>
   dplyr::mutate(LOD = round(LOD, digits = 2)) |> 
   dplyr::mutate(PCNormalizedNPX = NPX) |> 
   dplyr::mutate(PCNormalizedLOD = LOD) |> 
-  dplyr::select(SampleID, SampleType, OlinkID, UniProt, Assay, Count, NPX, Normalization, PCNormalizedNPX, LOD, PCNormalizedLOD) 
+  dplyr::select(SampleID, SampleType, OlinkID, UniProt, Assay, Count, NPX,  PCNormalizedNPX,Normalization, LOD, PCNormalizedLOD) 
 
 table1 |> 
   knitr::kable(caption = "Example results from Plate Control Normalized Project") |> 
@@ -70,11 +71,9 @@ table1 |>
 
 table1 |>  
   dplyr::mutate(Normalization = "Intensity") |> 
-  dplyr::mutate(NPX = round(NPX,digits = 2)) |> 
-  dplyr::mutate(LOD = round(LOD, digits = 2)) |> 
-  dplyr::mutate(PCNormalizedNPX = round(NPX + 4.16, digits = 2))|> 
-  dplyr::mutate(PCNormalizedLOD = round(LOD + 4.16, digits = 2)) |> 
-  dplyr::select(SampleID, SampleType, OlinkID, UniProt, Assay, Count, NPX, Normalization, PCNormalizedNPX, LOD, PCNormalizedLOD) |> 
+  dplyr::mutate(NPX = round(NPX + 4.16,digits = 2)) |> 
+  dplyr::mutate(LOD = round(LOD + 4.16, digits = 2)) |> 
+  dplyr::select(SampleID, SampleType, OlinkID, UniProt, Assay, Count, NPX,  PCNormalizedNPX,Normalization, LOD, PCNormalizedLOD) |> 
   knitr::kable(caption = "Example results from Intensity Normalized Project") |> 
   kableExtra::kable_styling(font_size = 10)
 
@@ -95,10 +94,7 @@ explore_npx <- read_NPX("~/Explore_NPX_file.parquet")
 
 The negative control (NC) LOD method requires at least 10 negative controls in a dataset. Negative control data is available in the standard exported Explore HT and Explore 384/3072 NPX parquet files. NCs can be identified through the SampleID and SampleType columns.
 
-A negative control will not contribute to the minimum number of required NCs if either of the following apply:
-
- + The negative control contains an assay QC warning across all assays, excluding Olink's internal control assays
- + The negative control does not pass sample QC criteria (sample QC failure or warning) in all of the data (i.e. all Explore HT blocks, all Explore 3072 panels, or all Explore 384 panels that were measured)
+A negative control will not contribute to the minimum number of required NCs if the negative control does not pass sample QC criteria (sample QC failure or warning) in all of the data (i.e. all Explore HT blocks, all Explore 3072 panels, or all Explore 384 panels that were measured)
 
 Negative controls are used to calculate LOD from either PC normalized NPX or counts. For assays with more than 150 counts in one of the negative controls, LOD is calculated using the median PC normalized NPX and adding 3 standard deviations, or 0.2 NPX whichever is larger. For assays with fewer than 150 counts in all negative controls, LOD is calculated using the count values which are then converted into PC normalized NPX. 
 
