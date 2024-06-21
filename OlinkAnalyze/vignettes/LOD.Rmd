@@ -49,7 +49,7 @@ Limit of Detection (LOD) is a metric that indicates the lowest measurable value 
 
 LOD can be added to Olink Explore NPX datasets using `olink_lod()`. This function can calculate LOD from an NPX dataset using the dataset's negative controls or a list of predetermined fixed LOD values (available in the Document Download Center at [olink.com](olink.com)). As the default setting, `olink_lod()` will calculate LOD using a dataset's negative controls. 
 
-Olink Explore data is commonly delivered plate control (PC) normalized or intensity normalized (the normalization type employed is indicated in the NPX file column Normalization), where the latter is dependent on that the analyzed samples are randomized. These are reported in the two respective columns PCNormalizedNPX and NPX. Please notice that for PC normalized datasets the content in these two columns will be identical, while for intensity normalized datasets the NPX column will include the intensity normalized values. Similarly, the `olink_lod()` function adds two columns to your dataset; PCNormalizedLOD and LOD respectively. For a PC normalized dataset the content in these two columns will be identical, while for an intensity normalized dataset the LOD column will include LOD values based on the intensity normalized NPX values. Examples of results for plate control and intensity normalization are shown in the tables below.
+Olink Explore data is commonly delivered plate control (PC) normalized or intensity normalized (the normalization type employed is indicated in the NPX file column Normalization), where the latter is dependent on that the analyzed samples are randomized. These are reported in the two respective columns PCNormalizedNPX and NPX. Please notice that for PC normalized datasets the content in these two columns will be identical, while for intensity normalized datasets the NPX column will include the intensity normalized values. Similarly, the `olink_lod()` function adds two columns to your dataset; PCNormalizedLOD and LOD respectively. For a PC normalized dataset the content in these two columns will be identical, while for an intensity normalized dataset the LOD column will contain intensity normalized LOD values. Examples of results for plate control and intensity normalization are shown in the tables below.
 
 ```{r, echo=FALSE}
 set.seed(1234)
@@ -63,7 +63,7 @@ table1<-npx_data1 |>
   dplyr::mutate(LOD = round(LOD, digits = 2)) |> 
   dplyr::mutate(PCNormalizedNPX = NPX) |> 
   dplyr::mutate(PCNormalizedLOD = LOD) |> 
-  dplyr::select(SampleID, SampleType, OlinkID, UniProt, Assay, Count, NPX, Normalization, PCNormalizedNPX, LOD, PCNormalizedLOD) 
+  dplyr::select(SampleID, SampleType, OlinkID, UniProt, Assay, Count, NPX,  PCNormalizedNPX,Normalization, LOD, PCNormalizedLOD) 
 
 table1 |> 
   knitr::kable(caption = "Example results from Plate Control Normalized Project") |> 
@@ -71,11 +71,9 @@ table1 |>
 
 table1 |>  
   dplyr::mutate(Normalization = "Intensity") |> 
-  dplyr::mutate(NPX = round(NPX,digits = 2)) |> 
-  dplyr::mutate(LOD = round(LOD, digits = 2)) |> 
-  dplyr::mutate(PCNormalizedNPX = round(NPX + 4.16, digits = 2))|> 
-  dplyr::mutate(PCNormalizedLOD = round(LOD + 4.16, digits = 2)) |> 
-  dplyr::select(SampleID, SampleType, OlinkID, UniProt, Assay, Count, NPX, Normalization, PCNormalizedNPX, LOD, PCNormalizedLOD) |> 
+  dplyr::mutate(NPX = round(NPX + 4.16,digits = 2)) |> 
+  dplyr::mutate(LOD = round(LOD + 4.16, digits = 2)) |> 
+  dplyr::select(SampleID, SampleType, OlinkID, UniProt, Assay, Count, NPX,  PCNormalizedNPX,Normalization, LOD, PCNormalizedLOD) |> 
   knitr::kable(caption = "Example results from Intensity Normalized Project") |> 
   kableExtra::kable_styling(font_size = 10)
 
