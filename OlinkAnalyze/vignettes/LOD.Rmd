@@ -172,4 +172,4 @@ Olink assumes no liability arising from a prospective reader’s actions based o
 
 OLINK, NPX, PEA, PROXIMITY EXTENSION, INSIGHT and the Olink logotype are trademarks registered, or pending registration, by Olink Proteomics AB. All third-party trademarks are the property of their respective owners.
 
-Olink products and assay methods are covered by several patents and patent applications https://www.olink.com/patents/.
+Olink products and assay methods are covered by several patents and patent applications https://olink.com/patents/.
