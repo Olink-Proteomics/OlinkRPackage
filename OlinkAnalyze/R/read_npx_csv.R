@@ -33,6 +33,7 @@ read_npx_csv <- function(filename) {
     file = filename,
     header = TRUE,
     sep = ";",
+    quote = "",
     stringsAsFactors = FALSE,
     na.strings = c("NA", ""),
     comment.char = ""

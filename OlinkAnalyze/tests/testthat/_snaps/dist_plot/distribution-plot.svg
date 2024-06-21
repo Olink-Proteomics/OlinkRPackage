@@ -210,14 +210,14 @@
 <polyline points='31.84,81.98 34.58,81.98 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
 <text x='328.91' y='568.03' text-anchor='middle' style='font-size: 12.00px; fill: #737373; font-family: sans;' textLength='46.70px' lengthAdjust='spacingAndGlyphs'>Samples</text>
 <text transform='translate(13.74,293.89) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; fill: #737373; font-family: sans;' textLength='24.68px' lengthAdjust='spacingAndGlyphs'>NPX</text>
-<rect x='634.20' y='271.40' width='80.32' height='44.97' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
-<text x='639.68' y='286.39' style='font-size: 12.00px; fill: #737373; font-family: sans;' textLength='69.36px' lengthAdjust='spacingAndGlyphs'>QC_Warning</text>
-<rect x='639.68' y='293.61' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
-<polyline points='648.32,309.16 648.32,306.57 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt; stroke-linejoin: miter;' />
-<polyline points='648.32,297.93 648.32,295.34 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt; stroke-linejoin: miter;' />
-<rect x='641.84' y='297.93' width='12.96' height='8.64' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt; stroke-linejoin: miter; fill: #00C7E1;' />
-<polyline points='641.84,302.25 654.80,302.25 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt; stroke-linejoin: miter;' />
-<text x='662.93' y='305.55' style='font-size: 9.60px; fill: #737373; font-family: sans;' textLength='21.35px' lengthAdjust='spacingAndGlyphs'>Pass</text>
+<rect x='634.20' y='271.65' width='80.32' height='44.47' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<text x='639.68' y='286.63' style='font-size: 12.00px; fill: #737373; font-family: sans;' textLength='69.36px' lengthAdjust='spacingAndGlyphs'>QC_Warning</text>
+<rect x='639.68' y='293.36' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<polyline points='648.32,308.91 648.32,306.32 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt; stroke-linejoin: miter;' />
+<polyline points='648.32,297.68 648.32,295.09 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt; stroke-linejoin: miter;' />
+<rect x='641.84' y='297.68' width='12.96' height='8.64' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt; stroke-linejoin: miter; fill: #00C7E1;' />
+<polyline points='641.84,302.00 654.80,302.00 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt; stroke-linejoin: miter;' />
+<text x='662.44' y='305.30' style='font-size: 9.60px; fill: #737373; font-family: sans;' textLength='21.35px' lengthAdjust='spacingAndGlyphs'>Pass</text>
 <text x='34.58' y='15.39' style='font-size: 14.40px; fill: #737373; font-family: sans;' textLength='99.25px' lengthAdjust='spacingAndGlyphs'>Distribution plot</text>
 </g>
 </svg>
