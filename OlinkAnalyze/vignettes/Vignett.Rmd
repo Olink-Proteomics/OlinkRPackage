@@ -264,12 +264,12 @@ A tibble of NPX data in long format containing normalized NPX values, including 
 
 ## Integrating Explore NPX LOD (olink_lod) 
 
-The olink_lod function adds LOD information to an Explore HT or Explore 3072 NPX dataframe. This function can incorporate LOD based on either an Explore dataset's negative controls or using predetermined fixed LOD values, which can be downloaded from the Document Download Center at [olink.com](olink.com). The default LOD calculation method is based off of the negative controls. If an NPX file is intensity normalized, both intensity normalized and PC normalized LODs are provided. 
+The olink_lod function adds LOD information to an Explore HT or Explore 3072 NPX dataframe. This function can incorporate LOD based on either an Explore dataset's negative controls or using predetermined fixed LOD values, which can be downloaded from the Document Download Center at [olink.com](https://olink.com). The default LOD calculation method is based off of the negative controls. If an NPX file is intensity normalized, both intensity normalized and PC normalized LODs are provided. 
 
 ### Function arguments
  
  + data: Explore HT or Explore 3072 tibble/data frame in parquet file format such as produced by the read_NPX function.
- + lod_file_path: Path to fixed LOD file provided by Olink Support. This is only applicable if using the fixed LOD method. 
+ + lod_file_path: Path to fixed LOD file from Olink website. This is only applicable if using the fixed LOD method. 
  + lod_method: String of LOD method name. Must be either "NCLOD" (default) or "FixedLOD". 
  
 ```{r NCLOD_example, eval = F, echo = T}
