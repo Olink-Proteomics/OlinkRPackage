@@ -1,3 +1,7 @@
+# Olink Analyze 3.8.2
+## Bug Fixes 
+* update to URL hyperlink in LOD tutorial to include https
+
 # Olink Analyze 3.8.1
 ## Bug Fixes 
 * update to outdated URL in LOD tutorial

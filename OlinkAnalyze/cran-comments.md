@@ -1,6 +1,6 @@
 ## Release Summary
 
-This release updates the URL that had changed in Olink Analyze 3.8.0.
+This release updates the URL hyperlinks from Olink Analyze 3.8.1 to include https.
 
 ## R CMD check results
 
