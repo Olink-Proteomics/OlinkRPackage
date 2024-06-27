@@ -1,3 +1,8 @@
+# Olink Analyze 3.8.2
+## Bug Fixes 
+* update to URL hyperlink in LOD tutorial to include https
+* data with Plate_LQL and PlateLQL columns in long format will now be supported (#392, @klevdiamanti)
+
 # Olink Analyze 3.8.1
 ## Bug Fixes 
 * update to outdated URL in LOD tutorial
