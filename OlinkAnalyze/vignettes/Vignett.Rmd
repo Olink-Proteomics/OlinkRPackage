@@ -269,7 +269,7 @@ The olink_lod function adds LOD information to an Explore HT or Explore 3072 NPX
 ### Function arguments
  
  + data: Explore HT or Explore 3072 tibble/data frame in parquet file format such as produced by the read_NPX function.
- + lod_file_path: Path to fixed LOD file provided by Olink Support. This is only applicable if using the fixed LOD method. 
+ + lod_file_path: Path to fixed LOD file from Olink website. This is only applicable if using the fixed LOD method. 
  + lod_method: String of LOD method name. Must be either "NCLOD" (default) or "FixedLOD". 
  
 ```{r NCLOD_example, eval = F, echo = T}
