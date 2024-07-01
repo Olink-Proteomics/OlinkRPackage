@@ -7,9 +7,11 @@
 check_duplicate_sample_ids(df, col_names)
 }
 \arguments{
-\item{df}{A tibble or an arrow object containing the columns "SampleID" and "OlinkID".}
+\item{df}{A tibble or an arrow object containing
+the columns "SampleID" and "OlinkID".}
 
-\item{col_names}{A list of matched column names. This is the output of `check_npx_col_names` function.}
+\item{col_names}{A list of matched column names.
+This is the output of `check_npx_col_names` function.}
 }
 \description{
 Help function checking for duplicate sample IDs in data
