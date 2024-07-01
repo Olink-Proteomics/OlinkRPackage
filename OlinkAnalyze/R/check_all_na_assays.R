@@ -33,16 +33,18 @@ check_all_na_assays <- function(df, col_names) {
     ) |>
     dplyr::summarise(
       n = dplyr::n(),
-      n_na = sum(is_na),
+      n_na = sum(is_na), #nolint
+      # no linting because it should be .data[["is_na"]]
+      # but summarise(n_na = sum(.data[["is_na"]])) does not work
+      # with arrow objects
       .groups = "drop"
-    )  |>
+    ) |>
     dplyr::filter(
-      n == n_na
+      .data[["n"]] == .data[["n_na"]]
     ) |>
     dplyr::collect() |>
     dplyr::pull(.data[[col_names$olink_id]]
     )
-
 
   # Issue warning if any assays with only NAs are found
   if (length(all_nas) > 0L) {
