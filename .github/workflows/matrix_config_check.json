@@ -27,6 +27,6 @@
    {
       "os": "ubuntu-24.04",
       "r": "release",
-      "runOn": "push"
+      "runOn": "pull_request"
    }
 ]
