@@ -577,13 +577,16 @@ test_that(
 
         # check that data can be loaded
         expect_warning(
-          object = npx_df <- read_NPX(filename = tmp_wide_xlsx,
-                                      olink_platform = "Target 96",
-                                      out_df = "tibble",
-                                      long_format = FALSE,
-                                      data_type = "NPX",
-                                      legacy = TRUE,
-                                      quiet = TRUE),
+          object = expect_warning(
+            object = npx_df <- read_NPX(filename = tmp_wide_xlsx,
+                                        olink_platform = "Target 96",
+                                        out_df = "tibble",
+                                        long_format = FALSE,
+                                        data_type = "NPX",
+                                        legacy = TRUE,
+                                        quiet = TRUE),
+            regexp = "You are using the function read_npx_legacy"
+          ),
           regexp = "Unable to recognize the Olink platform from the input"
         )
 

@@ -441,6 +441,14 @@ read_npx_legacy <- function(file,
                             olink_platform = NULL,
                             data_type = NULL,
                             quiet = TRUE) {
+  cli::cli_warn(
+    c("You are using the function read_npx_legacy()!",
+      "This function imports Olink data in wide format from MS Excel files
+      exported by \"Olink NPX Manager\" or \"Olink NPX Signature\" version
+      earlier than 1.8.0, but fails for data exported from more recent software
+      versions.")
+  )
+
   # check input ----
 
   check_is_scalar_boolean(bool = quiet,
