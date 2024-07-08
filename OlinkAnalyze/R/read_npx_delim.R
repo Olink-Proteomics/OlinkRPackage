@@ -89,6 +89,8 @@ read_npx_delim <- function(file,
 
   # additional checks ----
 
+  # only one column
+
   if (length(names(df_olink)) == 1L) {
 
     cli::cli_warn(
@@ -101,6 +103,10 @@ read_npx_delim <- function(file,
     )
 
   }
+
+  # top row is as expected for the corresponding format
+
+  read_npx_format_colnames(df = df_olink, file = file)
 
   # convert df class ----
 
