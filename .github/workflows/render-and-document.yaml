@@ -11,7 +11,7 @@ name: render-and-document
 jobs:
   render-and-document:
     name: render-and-document
-    runs-on: ubuntu-latest
+    runs-on: se-ua2-lin28
     timeout-minutes: 60        
     env:
       GITHUB_PAT: ${{ secrets.PAT }}
