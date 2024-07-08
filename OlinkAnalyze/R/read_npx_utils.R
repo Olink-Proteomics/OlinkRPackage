@@ -251,8 +251,10 @@ read_npx_format_colnames <- function(df,
       dplyr::slice_head(n = 1L) |>
       dplyr::collect()
 
-    if (ncol(df_row_1) < 3L
-        || ((sum(is.na(df_row_1)) + sum(df_row_1 == "", na.rm = TRUE)) != 0L)) {
+    num_of_cells_with_vals <- ncol(df_row_1) -
+      sum(is.na(df_row_1)) - sum(df_row_1 == "", na.rm = TRUE)
+
+    if (ncol(df_row_1) < 3L || num_of_cells_with_vals != 2L) {
 
       cli::cli_abort(
         message = c(
