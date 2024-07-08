@@ -87,6 +87,10 @@ read_npx_excel <- function(file,
 
   }
 
+  # top row is as expected for the corresponding format
+
+  read_npx_format_colnames(df = df_olink, file = file)
+
   # if needed convert the object to the requested output
   df_olink <- convert_read_npx_output(df = df_olink,
                                       out_df = out_df)
