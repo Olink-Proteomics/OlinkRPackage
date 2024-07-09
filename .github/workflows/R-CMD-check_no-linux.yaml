@@ -55,7 +55,7 @@ jobs:
           extra-packages: any::rcmdcheck
       -
         name: Install arrow from r-universe
-        if: matrix.os == 'macOS-latest'
+        if: matrix.config.os == 'macos-latest'
         run: |
           install.packages('arrow', repos = c('https://apache.r-universe.dev'))
         shell: Rscript {0}
