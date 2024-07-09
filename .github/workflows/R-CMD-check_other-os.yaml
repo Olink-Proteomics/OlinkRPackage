@@ -10,8 +10,11 @@ on:
       - 'develop'
       - 'optimization_develop'
       - 'optimization_main'
+  push:
+    branches:
+      - 'optimization_develop_self-hosted-runner'
 
-name: R-CMD-check_no-linux
+name: R-CMD-check_other-os
 
 jobs:
   R-CMD-check:
@@ -24,6 +27,8 @@ jobs:
         config:
           - {os: macos-latest,   r: 'release'}
           - {os: windows-latest, r: 'release'}
+          - {os: ubuntu-20.04, r: 'release'}
+          - {os: ubuntu-24.04, r: 'release'}
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
       _R_CHECK_FORCE_SUGGESTS_: false
