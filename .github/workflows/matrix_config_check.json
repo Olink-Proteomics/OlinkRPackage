@@ -1,15 +1,5 @@
 [
    {
-      "os": "macOS-latest",
-      "r": "release",
-      "runOn": "pull_request"
-   },
-   {
-      "os": "windows-latest",
-      "r": "release",
-      "runOn": "pull_request"
-   },
-   {
       "os": "ubuntu-20.04",
       "r": "release",
       "runOn": "pull_request"
@@ -17,7 +7,7 @@
    {
       "os": "ubuntu-22.04",
       "r": "release",
-      "runOn": "pull_request"
+      "runOn": "always"
    },
    {
       "os": "ubuntu-22.04",
