@@ -13,25 +13,23 @@ on:
       - 'develop'
       - 'optimization_develop'
       - 'optimization_main'
+  push:
+    branches:
+      - 'optimization_develop_self-hosted-runner'
 
 name: R-CMD-check-hard
 
 jobs:
   R-CMD-check:
-    runs-on: ${{ matrix.config.os }}
-
-    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
-
+    runs-on: se-ua2-lin28
     strategy:
       fail-fast: false
       matrix:
         config:
-          - {os: ubuntu-latest, r: 'release'}
-
+          - {r: 'release'}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
-
     steps:
       - uses: actions/checkout@v4
 
