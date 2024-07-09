@@ -10,6 +10,9 @@ on:
       - 'develop'
       - 'optimization_develop'
       - 'optimization_main'
+  push:
+    branches:
+      - 'optimization_develop_self-hosted-runner'
 
 name: R-CMD-check_no-linux
 
