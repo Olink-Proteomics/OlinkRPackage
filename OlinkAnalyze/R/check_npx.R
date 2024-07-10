@@ -1,3 +1,63 @@
+#' @description
+#' This function performs various checks on NPX data, including checking
+#' column names,validating Olink IDs, identifying assays with all NA values,
+#' and detecting duplicate sample IDs.
+#'
+#' @author
+#' Masoumeh Sheikhi
+#'
+#' @param df A data frame containing the Olink data to be checked.
+#' @param preferred_names A named character vector where names are internal
+#' column names and values are column names to be selected from current data
+#' frame.
+#'
+#' @return A list containing the following elements:
+#' \itemize{
+#'   \item{col_names}{A list of column names based on the preferred names.}
+#'   \item{invalid_oids}{A character vector of invalid Olink IDs.}
+#'   \item{all_na_assays}{A character vector of assays with all NA values.}
+#'   \item{duplicate_sample_ids}{A character vector of duplicate sample IDs.}
+#' }
+#'
+#' @examples
+#' \dontrun{
+#' result <- suppressWarnings(check_npx(npx_data1))
+#' }
+
+check_npx <- function(df = df, preferred_names = NULL) {
+
+  # check input
+  check_is_arrow_or_tibble(df,
+                           error = TRUE)
+
+  # column names
+  col_names <- check_npx_col_names(df = df,
+                                   preferred_names = preferred_names)
+
+  # check Olink IDs
+  invalid_oids <- check_npx_olinkid(df = df,
+                                    col_names = col_names)
+
+  # assays with all NA values
+  all_na_assays <- check_npx_all_na_assays(df = df,
+                                           col_names = col_names)
+
+  # duplicate sample IDs
+  duplicate_sample_ids <- check_npx_duplicate_sample_ids(df = df,
+                                                         col_names = col_names)
+
+  # return results
+  return(list(
+    col_names = col_names,
+    invalid_oids = invalid_oids,
+    all_na_assays = all_na_assays,
+    duplicate_sample_ids = duplicate_sample_ids
+  ))
+
+}
+
+
+# check_npx_col_names ----
 #' Check, update and define column names used in downstream analyses.
 #'
 #' @description
@@ -28,7 +88,7 @@
 #' `sample_type`, `olink_id`, `plate_id`, `qc_warning`, `lod`, `quant`.
 #'
 #' @author
-#'  Klev Diamanti
+#'  Klev Diamanti;
 #'  Masoumeh Sheikhi
 #'
 #' @param df A tibble or and arrow object from `read_npx`.
@@ -239,4 +299,149 @@ check_npx_update_col_names <- function(preferred_names) {
                                      column_name_dict_change)
 
   return(column_name_dict_updated)
+}
+
+# check_npx_olinkid ----
+
+#' Help function checking whether df contains invalid Olink IDs
+#'
+#' @author
+#'  Masoumeh Sheikhi
+#'
+#' @param df A tibble or an arrow object containing containing column "OlinkID"
+#' @param col_names A list of matched column names.
+#' This is the output of `check_npx_col_names` function.
+#'
+#' @return A character vector including invalid Olink IDs
+#'
+
+check_npx_olinkid <- function(df, col_names) {
+
+  # extract invalid Olink IDs
+  invalid_oid <- df  |>
+    dplyr::distinct(.data[[col_names$olink_id]])  |>
+    dplyr::filter(stringr::str_detect(.data[[col_names$olink_id]],
+                                      "^OID[0-9]{5}$",
+                                      negate = TRUE))  |>
+    dplyr::collect() |>
+    dplyr::pull(.data[[col_names$olink_id]])
+
+  # warning if there is any invalid Olink ID
+  if (length(invalid_oid) > 0L) {
+    cli::cli_warn(
+      c("x" = "Unrecognized Olink ID{?s} detected: {invalid_oid}"),
+      call = rlang::caller_env()
+    )
+  }
+
+  return(invalid_oid)
+}
+
+# check_npx_all_na_assays ----
+
+#' Help function to identify Olink assays with all quantified values NA.
+#'
+#' @author
+#'  Simon Forsberg;
+#'  Masoumeh Sheikhi
+#'
+#' @param df A tibble or an arrow object containing columns "OlinkID" and
+#' either "NPX", "Quantified_value" or "Ct"
+#'
+#' @param col_names A list of matched column names,
+#' the output of `check_npx_col_names` function.
+#'
+#' @return A character vector containing
+#' Olink ID of assays with all quantified values NA,
+#' otherwise returns `character(0)`.
+
+check_npx_all_na_assays <- function(df, col_names) {
+
+  # Identify assays with only NAs
+  all_nas <-
+    df |>
+    dplyr::select(
+      dplyr::all_of(
+        c(col_names$olink_id,
+          col_names$quant)
+      )
+    ) |>
+    dplyr::group_by(
+      .data[[col_names$olink_id]]
+    ) |>
+    dplyr::mutate(
+      is_na = ifelse(is.na(.data[[col_names$quant]]), 1L, 0L)
+    ) |>
+    dplyr::summarise(
+      n = dplyr::n(),
+      n_na = sum(is_na), #nolint
+      # no linting because it should be .data[["is_na"]]
+      # but summarise(n_na = sum(.data[["is_na"]])) does not work
+      # with arrow objects
+      .groups = "drop"
+    ) |>
+    dplyr::filter(
+      .data[["n"]] == .data[["n_na"]]
+    ) |>
+    dplyr::collect() |>
+    dplyr::pull(.data[[col_names$olink_id]]
+    )
+
+  # Issue warning if any assays with only NAs are found
+  if (length(all_nas) > 0L) {
+    cli::cli_warn(c(
+      x = "{all_nas} ha{?s/ve} {col_names$quant} = NA for all samples."
+    ))
+  }
+
+  return(all_nas)
+}
+
+# check_npx_duplicate_sample_ids ----
+
+#' Help function checking for duplicate sample IDs in data
+#'
+#' @author
+#'  Masoumeh Sheikhi
+#'
+#' @param df A tibble or an arrow object containing
+#' the columns "SampleID" and "OlinkID".
+#' @param col_names A list of matched column names.
+#' This is the output of `check_npx_col_names` function.
+#'
+#' @return A character vector of duplicate sample IDs found in the data.
+
+check_npx_duplicate_sample_ids <- function(df, col_names) {
+
+  # Select relevant columns
+  sample_summary <- df  |>
+    dplyr::select(dplyr::all_of(c(
+      col_names$sample_id,
+      col_names$olink_id
+    ))) |>
+    dplyr::group_by(
+      .data[[col_names$sample_id]],
+      .data[[col_names$olink_id]]
+    ) |>
+    dplyr::summarise(freq = dplyr::n(),
+                     .groups = "drop") |>
+    dplyr::collect()
+
+  # Find duplicates
+  duplicates <- character(0L)
+  duplicates <- sample_summary |>
+    dplyr::filter(.data[["freq"]] > 1) |>
+    dplyr::collect() |>
+    dplyr::pull(.data[[col_names$sample_id]]) |>
+    unique()
+
+  # Warn if duplicates are found
+  if (length(duplicates) > 0L) {
+    cli::cli_warn(c(
+      "x" = "Duplicate sample ID{?s} detected:
+      {duplicates}"
+    ))
+  }
+
+  return(duplicates)
 }
