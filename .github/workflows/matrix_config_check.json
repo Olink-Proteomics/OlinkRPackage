@@ -7,6 +7,6 @@
    {
       "os": "ubuntu-22.04",
       "r": "devel",
-      "runOn": "pull_request"
+      "runOn": "always"
    }
 ]
