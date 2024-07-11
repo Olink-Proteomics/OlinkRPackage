@@ -139,6 +139,36 @@ A tibble in long format containing:
 * LOD: Limit of detection (LOD) is the minimum level of an individual protein that can be measured. LOD is defined as 3 times the standard deviation over background.
 * NPX: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX here: [https://olink.com/faq/what-is-npx/](https://olink.com/faq/what-is-npx/).
 
+
+## Read multiple NPX data files (read_NPX)
+
+In order to import multiple NPX data files at once, the read_NPX function can be used in combination with the list.files, lapply and dplyr::bind_rows functions, as seen below. The *pattern* argument of the list.files function specifies the NPX file format (*.csv*, *.parquet*, or either). This method requires that all NPX files are stored in the same folder and have identical column names. No prior alterations to the NPX output file should be made for this method to work as expected.
+
+
+```{r message=FALSE, eval=FALSE}
+# Read in multiple NPX files in .csv format
+data <-  list.files(path = "path/to/dir/with/NPX/files",
+                    pattern = "csv$",
+                    full.names = TRUE) |>
+         lapply(OlinkAnalyze::read_NPX)  |>
+         dplyr::bind_rows()
+
+# Read in multiple NPX files in .parquet format
+data <-  list.files(path = "path/to/dir/with/NPX/files",
+                    pattern = "parquet$",
+                    full.names = TRUE) |>
+         lapply(OlinkAnalyze::read_NPX)  |>
+         dplyr::bind_rows()
+
+# Read in multiple NPX files in either format
+data <-  list.files(path = "path/to/dir/with/NPX/files",  
+                    pattern = "parquet$|csv$",          
+                    full.names = TRUE) |>
+         lapply(OlinkAnalyze::read_NPX)  |>
+         dplyr::bind_rows()
+```  
+
+
 ## Randomize samples on plate (olink_plate_randomizer)
 
 The olink_plate_randomizer function randomly assigns samples to a plate well with the option to keep the same individuals on the same plate. Olink® does not recommend to force balance based on other clinical variables. 
