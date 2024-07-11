@@ -412,10 +412,8 @@ npx_data1 %>%
 Another way to determine if bridging decreased variability between
 projects is to calculate the CV of the control samples across both projects before and after bridging, as shown in Figure 7. The CV after normalization is expected to be smaller than the CV prior to normalization, as shown in Figure 7. 
 
-Note that the CV calculation formula differs for [Target
-96](https://olink.com/faq/how-is-cv-calculated/) and
-[Explore](https://olink.com/faq/how-is-cv-in-the-analysis-report-calculated-for-olink-explore/)
-projects.
+Note that the CV calculation formula differs for Olink Target
+96 and Olink Explore products. More information of CV calculation can be found in the [Olink FAQ](https://olink.com/knowledge/faq)
 
 ```{r CV_calculation, fig.cap= f7}
 
