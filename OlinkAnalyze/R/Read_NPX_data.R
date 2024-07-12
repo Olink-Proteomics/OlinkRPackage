@@ -284,6 +284,11 @@ read_NPX_explore <- function(filename) {
       dplyr::mutate(Panel = trimws(Panel, which = "right")) %>%
       dplyr::select(-Panel_Start, -Panel_End)
   }
+  if ("Quantified_value" %in% names(out)){
+    message("QUANT data detected. Some downstream functions may not be supported.")
+    out <- out %>%
+      mutate(Quantified_value = as.numeric(Quantified_value))
+  }
 
   return(out)
 
