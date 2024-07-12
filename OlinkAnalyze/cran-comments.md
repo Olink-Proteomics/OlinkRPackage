@@ -1,6 +1,6 @@
 ## Release Summary
 
-This release contains new functionality and tutorials related to LOD.
+This release updates the URL hyperlinks from Olink Analyze 3.8.1 to include https.
 
 ## R CMD check results
 

@@ -89,8 +89,9 @@ olink_lod_internal <- function(data, lod_file_path = NULL, lod_method = "NCLOD")
                 lod_methods$nc_lod, "\"", "or \"Both\""))
     
   }
-  
-  # If NPX is intensity normalized, than intensity normalize LOD
+
+
+  # If NPX is intensity normalized, then intensity normalize LOD
   data <- int_norm_count(
     data = data,
     lod_data = lod_data

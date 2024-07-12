@@ -1,7 +1,16 @@
-# Olink Analyze 3.8.0
+# Olink Analyze 3.8.2
+## Bug Fixes 
+* update to URL hyperlink in LOD tutorial to include https
+* data with Plate_LQL and PlateLQL columns in long format will now be supported (#392, @klevdiamanti)
+
+# Olink Analyze 3.8.1
+## Bug Fixes 
+* update to outdated URL in LOD tutorial
+
+# Olink Analyze 3.8.1
 ## Minor Changes
 * Function support for calculating LOD for Explore data (#355, @kathy-nevola, @klevdiamanti, @leiliuC)
-* Tutorial and documentation for calculating LOD for Explore data (#364, @MasoumehSheikh, @kristynchin-olink)
+* Tutorial and documentation for calculating LOD for Explore data (#364, @MasoumehSheikh, @kristynchin-olink, #388, @kathy-nevola, @amrita-kar)
 * Addition of Danai Topouza as contributor and Kristyn Chin as author (previously contributor) (#365, @kathy-nevola)
 
 ## Bug Fixes
