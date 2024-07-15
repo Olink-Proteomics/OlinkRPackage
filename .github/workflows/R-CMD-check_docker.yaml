@@ -5,12 +5,15 @@ on:
       - 'develop'
       - 'optimization_develop'
       - 'optimization_main'
+  push:
+    branches:
+      - 'optimization_develop_self-hosted-runner'
 
 name: R-CMD-check-docker
 
 jobs:
   R-CMD-check-docker:
-    runs-on: ubuntu-latest
+    runs-on: se-ua2-lin28
     strategy:
       fail-fast: false
       matrix:
