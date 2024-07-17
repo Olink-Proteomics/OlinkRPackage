@@ -8,7 +8,7 @@ check_npx_all_na_assays(df, col_names)
 }
 \arguments{
 \item{df}{A tibble or an arrow object containing columns \emph{OlinkID} and
-the quantification column Ct, NPX or Quantified # nolint}
+the quantification column `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep = ", ", last = " or ")` # nolint}
 
 \item{col_names}{A list of matched column names. This is the output of the
 \emph{check_npx_col_names} function.}
@@ -23,5 +23,5 @@ samples \emph{NA}.
 }
 \author{
 Simon Forsberg;
-Masoumeh Sheikhi
+ Masoumeh Sheikhi
 }

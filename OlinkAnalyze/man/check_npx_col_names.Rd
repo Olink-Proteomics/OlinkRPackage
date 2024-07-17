@@ -42,7 +42,7 @@ example 4.
 The argument \emph{preferred_names} is a named character vector with internal
 column names as names and column names of the current data set as values.
 Names of the input vector can be one or more of the following:
-sample_id, sample_type, olink_id, plate_id, qc_warning, lod, and quant
+`r cli::ansi_collapse(x = names(column_name_dict))`
 }
 \examples{
 \donttest{
@@ -85,5 +85,5 @@ npx_df |>
 }
 \author{
 Klev Diamanti;
-Masoumeh Sheikhi
+ Masoumeh Sheikhi
 }

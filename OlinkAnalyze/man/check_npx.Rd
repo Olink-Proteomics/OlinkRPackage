@@ -16,12 +16,12 @@ frame. Read the \emph{description} for further information.}
 \value{
 A list containing the following elements:
 \itemize{
-\item{col_names}{List of column names from the input data frame marking the
-columns to be used in downstream analyses.}
-\item{oid_invalid}{Character vector of invalid Olink IDs.}
-\item{assay_na}{Character vector of assays with all samples having
-\code{NA} values.}
-\item{sample_id_dups}{Character vector of duplicate sample IDs.}
+  \item{col_names}{List of column names from the input data frame marking the
+  columns to be used in downstream analyses.}
+  \item{oid_invalid}{Character vector of invalid Olink IDs.}
+  \item{assay_na}{Character vector of assays with all samples having
+  `NA` values.}
+  \item{sample_id_dups}{Character vector of duplicate sample IDs.}
 }
 }
 \description{
@@ -54,7 +54,7 @@ example 4.
 The argument \emph{preferred_names} is a named character vector with internal
 column names as names and column names of the current data set as values.
 Names of the input vector can be one or more of the following:
-sample_id, sample_type, olink_id, plate_id, qc_warning, lod, and quant
+`r cli::ansi_collapse(x = names(column_name_dict))`
 }
 \examples{
 \dontrun{
