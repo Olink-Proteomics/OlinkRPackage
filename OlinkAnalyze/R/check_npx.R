@@ -375,7 +375,7 @@ check_npx_update_col_names <- function(preferred_names) {
         "i" = "Expected one or more of the following names:
         {names(column_name_dict)}"),
       call = rlang::caller_env(),
-      wrap = NULL
+      wrap = FALSE
     )
 
   }
