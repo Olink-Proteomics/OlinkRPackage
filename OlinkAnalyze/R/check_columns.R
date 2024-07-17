@@ -1,11 +1,13 @@
 #' Check that an input tibble or arrow object contains the required columns.
 #'
 #' @description
-#' `check_columns` checks if the input tibble or arrow object `data` contains
-#' all of the columns in \var{col_list}.
+#' Checks if the input tibble or arrow object \var{df} contains all of the
+#' columns in \var{col_list}.
 #'
+#' @details
 #' \var{col_list} might contain also vectors of characters as elements. In this
-#' case one of the characters in the vector is expected to be present.
+#' case one of the characters in the vector is expected to be present. See
+#' examples.
 #'
 #' @author
 #'   Klev Diamanti
@@ -138,7 +140,7 @@ check_columns <- function(df,
         one of the vectors of required columns: { missing_one }!",
         "i" = "Please make sure they are part of the input dataset."
       ),
-      call = NULL,
+      call = rlang::caller_env(),
       wrap = FALSE
       )
 

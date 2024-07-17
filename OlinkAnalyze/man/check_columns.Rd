@@ -20,11 +20,13 @@ vector.}
 Nothing or an error message if any column is missing.
 }
 \description{
-`check_columns` checks if the input tibble or arrow object `data` contains
-all of the columns in \var{col_list}.
-
+Checks if the input tibble or arrow object \var{df} contains all of the
+columns in \var{col_list}.
+}
+\details{
 \var{col_list} might contain also vectors of characters as elements. In this
-case one of the characters in the vector is expected to be present.
+case one of the characters in the vector is expected to be present. See
+examples.
 }
 \examples{
 \dontrun{
@@ -67,8 +69,8 @@ check_columns(df = tmp_data,
 }
 \author{
 Klev Diamanti
-  Albin Lundin
-  Lei Conze
-  Pascal Pucholt
-  Gil Henriques
+Albin Lundin
+Lei Conze
+Pascal Pucholt
+Gil Henriques
 }
