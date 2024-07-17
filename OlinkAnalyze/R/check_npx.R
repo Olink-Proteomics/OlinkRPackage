@@ -275,7 +275,8 @@ check_npx_col_names <- function(df,
       cli::cli_abort(
         c("x" = "Some of the values of {.val preferred_names} are not detected
           in the column names of the input data set {.val df}."),
-        call = rlang::caller_env()
+        call = rlang::caller_env(),
+        wrap = FALSE
       )
 
     }
@@ -303,7 +304,8 @@ check_npx_col_names <- function(df,
         column_name_multi_prnt,
         "i" = "Please use {.val preferred_names} to break ties of column
         names."),
-      call = rlang::caller_env()
+      call = rlang::caller_env(),
+      wrap = FALSE
     )
   }
 
@@ -316,7 +318,8 @@ check_npx_col_names <- function(df,
         paste0("* \"", names(column_name_df[column_name_multi == 0L]), "\""),
         "i" = "Please use {.val preferred_names} to select the correct column
       names."),
-      call = rlang::caller_env()
+      call = rlang::caller_env(),
+      wrap = FALSE
     )
   }
 
