@@ -50,6 +50,8 @@
 #'   \item{sample_id_dups}{Character vector of duplicate sample IDs.}
 #' }
 #'
+#' @export
+#'
 #' @examples
 #' \dontrun{
 #' # Example 0: Use npx_data1 to check that check_npx works
