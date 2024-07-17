@@ -11,7 +11,7 @@ check_file_extension(file)
 }
 \value{
 The type of the file extension based on the global variable
-`accepted_npx_file_ext`
+\code{accepted_npx_file_ext}
 }
 \description{
 Help function checking if file extension is acceptable.
