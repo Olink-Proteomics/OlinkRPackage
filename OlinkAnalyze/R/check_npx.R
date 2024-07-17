@@ -8,7 +8,7 @@
 #' @author
 #' Masoumeh Sheikhi
 #'
-#' @param df Data frame containing the Olink data to be checked.
+#' @param df A tibble or and arrow object from `read_npx`.
 #' @param preferred_names A named character vector where names are internal
 #' column names and values are column names to be selected from the input data
 #' frame.
