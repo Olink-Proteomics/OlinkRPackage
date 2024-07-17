@@ -23,14 +23,14 @@
 #' `PCNormalizedNPX` should be used. See example 3.
 #'
 #' Similarly, in case of multiple matches (e.g. the data frame contains both
-#' columns `NPX` and `Quantified_value`) the ties will need to be resolved by
+#' columns `LOD` and `PlateLOD`) the ties will need to be resolved by
 #' the user using the argument `preferred_names` from this function.  See
-#' example 2.
+#' example 4.
 #'
 #' The argument `preferred_names` is a named character vector with internal
 #' column names as names and column names of the current data set as values.
-#' Names of the input vector can be one or more of the following: `sample_id`,
-#' `sample_type`, `olink_id`, `plate_id`, `qc_warning`, `lod`, `quant`.
+#' Names of the input vector can be one or more of the following:
+#' `r cli::ansi_collapse(x = names(column_name_dict))`
 #'
 #' @author
 #' Masoumeh Sheikhi
@@ -155,14 +155,14 @@ check_npx <- function(df = df,
 #' `PCNormalizedNPX` should be used. See example 3.
 #'
 #' Similarly, in case of multiple matches (e.g. the data frame contains both
-#' columns `NPX` and `Quantified_value`) the ties will need to be resolved by
+#' columns `LOD` and `PlateLOD`) the ties will need to be resolved by
 #' the user using the argument `preferred_names` from this function.  See
-#' example 2.
+#' example 4.
 #'
 #' The argument `preferred_names` is a named character vector with internal
 #' column names as names and column names of the current data set as values.
-#' Names of the input vector can be one or more of the following: `sample_id`,
-#' `sample_type`, `olink_id`, `plate_id`, `qc_warning`, `lod`, `quant`.
+#' Names of the input vector can be one or more of the following:
+#' `r cli::ansi_collapse(x = names(column_name_dict))`
 #'
 #' @author
 #'  Klev Diamanti;
