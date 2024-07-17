@@ -23,7 +23,9 @@
 #'
 #' @examples
 #' \dontrun{
-#' result <- suppressWarnings(check_npx(npx_data1))
+#' check_npx_result <- OlinkAnalyze::npx_data1 |>
+#'   OlinkAnalyze::check_npx() |>
+#'   suppressWarnings()
 #' }
 
 check_npx <- function(df = df, preferred_names = NULL) {
