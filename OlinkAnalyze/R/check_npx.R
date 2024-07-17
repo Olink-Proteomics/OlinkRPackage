@@ -16,11 +16,11 @@
 #' However, in certain cases the columns of interest might be named differently.
 #' This function allows assigning custom-named columns of a data frame to
 #' internally expected variables that will in turn instruct Olink Analyze
-#' functions to use them for downstream analysis. For example, if one has
-#' transformed the existing NPX value and has stored the result in a new column
-#' called `NPX_2`, then they can assign this new name to the internal variable
-#' `quant` to inform the package that in the downstream analysis `NPX_2` should
-#' be used. See example 1.
+#' functions to use them for downstream analysis. For example, if one wished to
+#' use the column `PCNormalizedNPX` for their analysis instead of the column
+#' `NPX`, then they can assign this new name to the internal variable
+#' `quant` to inform the package that in the downstream analysis
+#' `PCNormalizedNPX` should be used. See example 3.
 #'
 #' Similarly, in case of multiple matches (e.g. the data frame contains both
 #' columns `NPX` and `Quantified_value`) the ties will need to be resolved by
@@ -148,11 +148,11 @@ check_npx <- function(df = df,
 #' However, in certain cases the columns of interest might be named differently.
 #' This function allows assigning custom-named columns of a data frame to
 #' internally expected variables that will in turn instruct Olink Analyze
-#' functions to use them for downstream analysis. For example, if one has
-#' transformed the existing NPX value and has stored the result in a new column
-#' called `NPX_2`, then they can assign this new name to the internal variable
-#' `quant` to inform the package that in the downstream analysis `NPX_2` should
-#' be used. See example 1.
+#' functions to use them for downstream analysis. For example, if one wished to
+#' use the column `PCNormalizedNPX` for their analysis instead of the column
+#' `NPX`, then they can assign this new name to the internal variable
+#' `quant` to inform the package that in the downstream analysis
+#' `PCNormalizedNPX` should be used. See example 3.
 #'
 #' Similarly, in case of multiple matches (e.g. the data frame contains both
 #' columns `NPX` and `Quantified_value`) the ties will need to be resolved by
