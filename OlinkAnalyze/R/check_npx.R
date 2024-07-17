@@ -75,9 +75,7 @@ check_npx <- function(df = df,
 
 }
 
-
-# check_npx_col_names ----
-#' Check, update and define column names used in downstream analyses.
+#' Check, update and define column names used in downstream analyses
 #'
 #' @description
 #' OlinkAnalyze uses pre-defined names of columns of data frames to perform
