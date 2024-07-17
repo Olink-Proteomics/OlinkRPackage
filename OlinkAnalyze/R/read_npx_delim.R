@@ -9,7 +9,7 @@
 #'   Christoffer Cambronero;
 #'   Kathleen Nevola
 #'
-#' @param filename Path to Olink software output delimited file in wide or long
+#' @param file Path to Olink software output delimited file in wide or long
 #' format. Expecting file extensions
 #' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("delim", names(accepted_npx_file_ext))], sep = ", ", last = " or ")`. # nolint
 #' @param out_df The class of output data frame. One of "tibble" (default) or
