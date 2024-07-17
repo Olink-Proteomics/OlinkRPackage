@@ -5,13 +5,40 @@
 #' column names, validating Olink identifiers, identifying assays with `NA`
 #' values for all samples and detecting duplicate sample identifiers.
 #'
+#' @details
+#' OlinkAnalyze uses pre-defined names of columns of data frames to perform
+#' downstream analyses. At the same time, different Olink platforms export data
+#' with different column names (e.g. different protein quantification metric).
+#' This function aims to instruct each function of OlinkAnalyze on the column it
+#' should be using for the downstream analysis. This should be seamless for data
+#' exported from Olink Software and imported to R using the read_npx function.
+#'
+#' However, in certain cases the columns of interest might be named differently.
+#' This function allows assigning custom-named columns of a data frame to
+#' internally expected variables that will in turn instruct Olink Analyze
+#' functions to use them for downstream analysis. For example, if one has
+#' transformed the existing NPX value and has stored the result in a new column
+#' called `NPX_2`, then they can assign this new name to the internal variable
+#' `quant` to inform the package that in the downstream analysis `NPX_2` should
+#' be used. See example 1.
+#'
+#' Similarly, in case of multiple matches (e.g. the data frame contains both
+#' columns `NPX` and `Quantified_value`) the ties will need to be resolved by
+#' the user using the argument `preferred_names` from this function.  See
+#' example 2.
+#'
+#' The argument `preferred_names` is a named character vector with internal
+#' column names as names and column names of the current data set as values.
+#' Names of the input vector can be one or more of the following: `sample_id`,
+#' `sample_type`, `olink_id`, `plate_id`, `qc_warning`, `lod`, `quant`.
+#'
 #' @author
 #' Masoumeh Sheikhi
 #'
 #' @param df A tibble or and arrow object from `read_npx`.
 #' @param preferred_names A named character vector where names are internal
 #' column names and values are column names to be selected from the input data
-#' frame.
+#' frame. Read the `description` for further information.
 #'
 #' @return A list containing the following elements:
 #' \itemize{
