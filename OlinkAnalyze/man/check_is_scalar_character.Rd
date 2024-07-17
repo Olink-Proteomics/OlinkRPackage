@@ -7,21 +7,21 @@
 check_is_scalar_character(string, error = FALSE)
 }
 \arguments{
-\item{string}{Input to check.}
+\item{string}{String variable to check.}
 
-\item{error}{Boolean to return error or a boolean (default).}
+\item{error}{Return error or a boolean (default = FALSE).}
 }
 \value{
 Boolean if the variable is a character vector of length 1 or not, and
-an error if `error = TRUE`.
+an error if "error = TRUE".
 }
 \description{
 Help function checking if a variable is a character vector of length 1.
 }
 \seealso{
-[check_is_scalar_boolean()]
-  [check_is_scalar_integer()]
-  [check_is_scalar_numeric()]
+\code{\link{check_is_scalar_boolean}}
+\code{\link{check_is_scalar_integer}}
+\code{\link{check_is_scalar_numeric}}
 }
 \author{
 Klev Diamanti
