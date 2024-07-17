@@ -3,7 +3,7 @@
 \name{read_npx_legacy}
 \alias{read_npx_legacy}
 \title{Olink legacy function for reading NPX or absolute quantification data in wide
-format into R from Target 48 or Target 96.}
+format into R from qPCR Olink products.}
 \usage{
 read_npx_legacy(
   file,
@@ -15,20 +15,23 @@ read_npx_legacy(
 }
 \arguments{
 \item{file}{Path to Olink software output file in wide format. Expecting file
-extensions `csv`, `xls`, or `xlsx`.}
+extensions
+xls, xlsx, csv or txt. # nolint}
 
-\item{out_df}{The class of output data frame. One of `tibble` (default) or
-`arrow` for ArrowObject.}
+\item{out_df}{The class of output data frame. One of "tibble" (default) or
+"arrow" for ArrowObject.}
 
 \item{olink_platform}{Olink platform used to generate the input file.
-One of `NULL` (default), `Target 96` or `Target 48`.}
+One of \code{NULL} (default),
+Target 48 and Target 96. # nolint}
 
-\item{data_type}{Quantification method of the input data. One of `NULL`
-(default), `NPX` or `Quantified`.}
+\item{data_type}{Quantification method of the input data. One of \code{NULL}
+(default),
+Ct, NPX or Quantified. # nolint}
 
 \item{quiet}{Boolean to print a confirmation message when reading the input
-file. `TRUE` (default) to not print
-and `FALSE` to print.}
+file. Applies to excel or delimited input only. "TRUE" (default) to not print
+and "FALSE" to print.}
 }
 \value{
 Tibble or ArrowObject with Olink data in long format.
@@ -41,16 +44,15 @@ files in wide format. Specifically, it supports:
 only NPX)} with the bottom matrix containing one of the following
 combinations of rows:
 \itemize{
-\item `Missing Data freq.` and `LOD`.
-\item `Missing Data freq.`, `LOD` and `Normalization`.
+\item Missing Data freq. and LOD. # nolint
+\item Missing Data freq., LOD, and Normalization. # nolint
 }
 \item \strong{Target 48} output files in wide format \strong{NPX} with the
-bottom matrix containing the following rows: `Missing Data freq.`, `LOD` and
-`Normalization`.
+bottom matrix containing the following rows:
+Missing Data freq., Normalization, and LOD. # nolint
 \item \strong{Target 48} output files in wide format \strong{absolute
 Quantification} with the bottom matrix containing the following rows:
-`Assay warning`, `LLOQ`, `Lowest quantifiable level`, `Missing Data freq.`,
-`Normalization`, `PlateLOD` and `ULOQ`.
+Assay warning, LLOQ, Lowest quantifiable level, Missing Data freq., Normalization, Plate_LOD, and ULOQ. # nolint
 }
 
 This function would accept data exported in wide format from Olink NPX
@@ -58,16 +60,16 @@ Signature 1.7.1 or earlier, or NPX Manager.
 }
 \seealso{
 \code{\link{read_npx_format_read}}
-  \code{\link{read_npx_format_get_format}}
-  \code{\link{read_npx_format_get_platform}}
-  \code{\link{read_npx_format_get_quant}}
+\code{\link{read_npx_format_get_format}}
+\code{\link{read_npx_format_get_platform}}
+\code{\link{read_npx_format_get_quant}}
 }
 \author{
 Klev Diamanti;
-  Kathleen Nevola;
-  Pascal Pucholt;
-  Christoffer Cambronero;
-  Boxi Zhang;
-  Olof Mansson;
-  Marianne Sandin
+Kathleen Nevola;
+Pascal Pucholt;
+Christoffer Cambronero;
+Boxi Zhang;
+Olof Mansson;
+Marianne Sandin
 }

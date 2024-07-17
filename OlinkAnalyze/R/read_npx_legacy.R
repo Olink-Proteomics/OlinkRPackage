@@ -1,27 +1,31 @@
-#' Help function utilizing functions from `read_npx_format` and `read_npx_wide`
-#' to streamline `read_npx_legacy`
+#' Help function utilizing functions from \code{\link{read_npx_format}} and
+#' \code{\link{read_npx_wide}} to streamline \code{\link{read_npx_legacy}}
 #'
-#' @author Klev Diamanti
+#' @author
+#'   Klev Diamanti
 #'
 #' @param file Path to Olink software output file in wide format. Expecting file
-#' extensions `csv`, `xls`, or `xlsx`.
-#' @param out_df The class of output data frame. One of `tibble` (default) or
-#' `arrow` for ArrowObject.
+#' extensions
+#' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))], sep = ", ", last = " or ")`. # nolint
+#' @param out_df The class of output data frame. One of "tibble" (default) or
+#' "arrow" for ArrowObject.
 #' @param olink_platform Olink platform used to generate the input file.
-#' One of `NULL` (default), `Target 96` or `Target 48`.
+#' One of `NULL` (default),
+#' `r accepted_olink_platforms |> dplyr::filter(.data[["broader_platform"]] == "qPCR" & grepl("Target", .data[["name"]])) |> dplyr::pull(.data[["name"]]) |> cli::ansi_collapse(last = " or ")`. # nolint
 #' @param data_type Quantification method of the input data. One of `NULL`
-#' (default), `NPX` or `Quantified`.
+#' (default),
+#' `r accepted_olink_platforms |> dplyr::filter(.data[["quant_method"]] != "Ct") |> dplyr::pull(.data[["quant_method"]]) |> unlist() |> unique() |> sort() |> cli::ansi_collapse(last = " or ")`. # nolint
 #' @param data_type_no_accept Character vector of data types that should be
-#' rejected. Default: `Ct`.
+#' rejected (default = "Ct").
 #'
 #' @return A list of objects containing the following:
 #' \itemize{
 #' \item \strong{olink_platform}: auto-detected Olink platform. One of
-#' `Target 96` or `Target 48`.
+#' `r accepted_olink_platforms |> dplyr::filter(.data[["broader_platform"]] == "qPCR" & grepl("Target", .data[["name"]])) |> dplyr::pull(.data[["name"]]) |> cli::ansi_collapse(last = " or ")`. # nolint
 #' \item \strong{long_format}: auto-detected Olink format. Should always be
-#' `FALSE`.
+#' "FALSE".
 #' \item \strong{data_type}: auto-detected Olink data type. One of
-#' `NPX` or `Quantified`.
+#' `r accepted_olink_platforms |> dplyr::filter(.data[["quant_method"]] != "Ct") |> dplyr::pull(.data[["quant_method"]]) |> unlist() |> unique() |> sort() |> cli::ansi_collapse(last = " or ")`. # nolint
 #' \item \strong{df_split}: list of 2 tibbles. Top matrix from the Olink wide
 #' file, and middle combined with bottom matrix.
 #' \item \strong{npxs_v}: Olink NPX software version.
@@ -205,17 +209,21 @@ read_npx_legacy_help <- function(file,
   )
 }
 
-#' Help function ensuring `read_npx_legacy` works
+#' Help function ensuring \code{\link{read_npx_legacy}} works
 #'
-#' @author Klev Diamanti
+#' @author
+#'   Klev Diamanti
 #'
 #' @param file Path to Olink software output file in wide format. Expecting file
-#' extensions `csv`, `xls`, or `xlsx`.
+#' extensions
+#' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))], sep = ", ", last = " or ")`. # nolint
 #' @param df_top Top matrix of Olink dataset in wide format.
 #' @param olink_platform Olink platform used to generate the input file.
-#' One of `NULL` (default), `Target 96` or `Target 48`.
+#' One of `NULL` (default),
+#' `r accepted_olink_platforms |> dplyr::filter(.data[["broader_platform"]] == "qPCR" & grepl("Target", .data[["name"]])) |> dplyr::pull(.data[["name"]]) |> cli::ansi_collapse(last = " or ")`. # nolint
 #' @param data_type Quantification method of the input data. One of `NULL`
-#' (default), `NPX` or `Quantified`.
+#' (default),
+#' `r accepted_olink_platforms |> dplyr::filter(.data[["quant_method"]] != "Ct") |> dplyr::pull(.data[["quant_method"]]) |> unlist() |> unique() |> sort() |> cli::ansi_collapse(last = " or ")`. # nolint
 #' @param bottom_mat_v Version of the rows in the bottom matrix of the Olink
 #' file in wide format based on the local environment variable
 #' \var{olink_wide_bottom_matrix}.
@@ -382,7 +390,7 @@ read_npx_legacy_check <- function(file,
 }
 
 #' Olink legacy function for reading NPX or absolute quantification data in wide
-#' format into R from Target 48 or Target 96.
+#' format into R from qPCR Olink products.
 #'
 #' @description
 #' This implementation of read_NPX does not cover the latest versions of Olink
@@ -392,16 +400,15 @@ read_npx_legacy_check <- function(file,
 #' only NPX)} with the bottom matrix containing one of the following
 #' combinations of rows:
 #' \itemize{
-#' \item `Missing Data freq.` and `LOD`.
-#' \item `Missing Data freq.`, `LOD` and `Normalization`.
+#' \item `r olink_wide_bottom_matrix |> dplyr::filter(.data[["olink_platform"]] == "Target 96" & .data[["version"]] <= 1L) |> dplyr::pull(.data[["variable_name"]]) |> cli::ansi_collapse()`. # nolint
+#' \item `r olink_wide_bottom_matrix |> dplyr::filter(.data[["olink_platform"]] == "Target 96" & .data[["version"]] %in% c(0L, 2L)) |> dplyr::pull(.data[["variable_name"]]) |> cli::ansi_collapse()`. # nolint
 #' }
 #' \item \strong{Target 48} output files in wide format \strong{NPX} with the
-#' bottom matrix containing the following rows: `Missing Data freq.`, `LOD` and
-#' `Normalization`.
+#' bottom matrix containing the following rows:
+#' `r olink_wide_bottom_matrix |> dplyr::filter(.data[["olink_platform"]] == "Target 48" & .data[["data_type"]] == "NPX" & .data[["version"]] <= 1L) |> dplyr::pull(.data[["variable_name"]]) |> cli::ansi_collapse()`. # nolint
 #' \item \strong{Target 48} output files in wide format \strong{absolute
 #' Quantification} with the bottom matrix containing the following rows:
-#' `Assay warning`, `LLOQ`, `Lowest quantifiable level`, `Missing Data freq.`,
-#' `Normalization`, `PlateLOD` and `ULOQ`.
+#' `r olink_wide_bottom_matrix |> dplyr::filter(.data[["olink_platform"]] == "Target 48" & .data[["data_type"]] == "Quantified") |> dplyr::pull(.data[["variable_name"]]) |> cli::ansi_collapse()`. # nolint
 #' }
 #'
 #' This function would accept data exported in wide format from Olink NPX
@@ -417,16 +424,19 @@ read_npx_legacy_check <- function(file,
 #'   Marianne Sandin
 #'
 #' @param file Path to Olink software output file in wide format. Expecting file
-#' extensions `csv`, `xls`, or `xlsx`.
-#' @param out_df The class of output data frame. One of `tibble` (default) or
-#' `arrow` for ArrowObject.
+#' extensions
+#' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))], sep = ", ", last = " or ")`. # nolint
+#' @param out_df The class of output data frame. One of "tibble" (default) or
+#' "arrow" for ArrowObject.
 #' @param olink_platform Olink platform used to generate the input file.
-#' One of `NULL` (default), `Target 96` or `Target 48`.
+#' One of `NULL` (default),
+#' `r accepted_olink_platforms |> dplyr::filter(.data[["broader_platform"]] == "qPCR" & grepl("Target", .data[["name"]])) |> dplyr::pull(.data[["name"]]) |> cli::ansi_collapse(last = " or ")`. # nolint
 #' @param data_type Quantification method of the input data. One of `NULL`
-#' (default), `NPX` or `Quantified`.
+#' (default),
+#' `r accepted_olink_platforms |> dplyr::filter(.data[["quant_method"]] != "Ct") |> dplyr::pull(.data[["quant_method"]]) |> unlist() |> unique() |> sort() |> cli::ansi_collapse(last = " or ")`. # nolint
 #' @param quiet Boolean to print a confirmation message when reading the input
-#' file. `TRUE` (default) to not print
-#' and `FALSE` to print.
+#' file. Applies to excel or delimited input only. "TRUE" (default) to not print
+#' and "FALSE" to print.
 #'
 #' @return Tibble or ArrowObject with Olink data in long format.
 #'
