@@ -2,8 +2,8 @@
 #'
 #' @description
 #' This function performs various checks on NPX data, including checking
-#' column names,validating Olink IDs, identifying assays with all NA values,
-#' and detecting duplicate sample IDs.
+#' column names, validating Olink identifiers, identifying assays with `NA`
+#' values for all samples and detecting duplicate sample identifiers.
 #'
 #' @author
 #' Masoumeh Sheikhi
