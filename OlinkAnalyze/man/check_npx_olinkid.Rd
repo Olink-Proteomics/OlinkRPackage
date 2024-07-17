@@ -2,21 +2,23 @@
 % Please edit documentation in R/check_npx.R
 \name{check_npx_olinkid}
 \alias{check_npx_olinkid}
-\title{Help function checking whether df contains invalid Olink IDs}
+\title{Help function checking whether df contains invalid Olink identifiers}
 \usage{
 check_npx_olinkid(df, col_names)
 }
 \arguments{
-\item{df}{A tibble or an arrow object containing containing column "OlinkID"}
+\item{df}{A tibble or an arrow object containing containing column
+\emph{OlinkID}.}
 
-\item{col_names}{A list of matched column names.
-This is the output of `check_npx_col_names` function.}
+\item{col_names}{A list of matched column names. This is the output of the
+\emph{check_npx_col_names} function.}
 }
 \value{
-A character vector including invalid Olink IDs
+A character vector with invalid OlinkIDs.
 }
 \description{
-Help function checking whether df contains invalid Olink IDs
+This function checks if Olink identifiers (\emph{OlinkID}) match the pattern
+of a prefix "OID" followed by 5 integer numbers.
 }
 \author{
 Masoumeh Sheikhi

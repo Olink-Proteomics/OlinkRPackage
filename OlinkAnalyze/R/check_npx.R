@@ -397,20 +397,22 @@ check_npx_update_col_names <- function(preferred_names) {
 
 }
 
-# check_npx_olinkid ----
-
-#' Help function checking whether df contains invalid Olink IDs
+#' Help function checking whether df contains invalid Olink identifiers
+#'
+#' @description
+#' This function checks if Olink identifiers (\emph{OlinkID}) match the pattern
+#' of a prefix "OID" followed by 5 integer numbers.
 #'
 #' @author
 #'  Masoumeh Sheikhi
 #'
-#' @param df A tibble or an arrow object containing containing column "OlinkID"
-#' @param col_names A list of matched column names.
-#' This is the output of `check_npx_col_names` function.
+#' @param df A tibble or an arrow object containing containing column
+#' \emph{OlinkID}.
+#' @param col_names A list of matched column names. This is the output of the
+#' \emph{check_npx_col_names} function.
 #'
-#' @return A character vector including invalid Olink IDs
+#' @return A character vector with invalid OlinkIDs.
 #'
-
 check_npx_olinkid <- function(df, col_names) {
 
   # extract invalid Olink IDs
