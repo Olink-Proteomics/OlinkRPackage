@@ -145,29 +145,32 @@ check_npx <- function(df = df,
 #'
 #' @examples
 #' \donttest{
-#' file <- system.file("extdata",
-#'                     "npx_data_ext.parquet",
-#'                      package = "OlinkAnalyze")
-#' df <- read_npx(filename = file)
+#' # read NPX data
+#' npx_file <- system.file("extdata",
+#'                         "npx_data_ext.parquet",
+#'                         package = "OlinkAnalyze")
+#' npx_df <- OlinkAnalyze::read_npx(filename = npx_file)
 #'
-#' # run df as is
-#' OlinkAnalyze:::check_npx_col_names(df = df)
+#' # Example 1: run df as is
+#' OlinkAnalyze:::check_npx_col_names(df = npx_df)
 #'
-#' # SampleType missing
-#' df |>
+#' # Example 2: SampleType missing from data frame
+#' npx_df |>
 #'   dplyr::select(
-#'     -dplyr::all_of("SampleType")
+#'     -dplyr::all_of(
+#'       c("SampleType")
+#'     )
 #'   ) |>
 #'   OlinkAnalyze:::check_npx_col_names()
 #'
-#' # use PCNormalizedNPX instead on NPX
+#' # Example 3: Use PCNormalizedNPX instead on NPX
 #' OlinkAnalyze:::check_npx_col_names(
-#'   df = df,
+#'   df = npx_df,
 #'   preferred_names = c("quant" = "PCNormalizedNPX")
 #' )
 #'
-#' # use PCNormalizedNPX instead on NPX, and PlateLOD instead of LOD
-#' df |>
+#' # Example 4: Use PCNormalizedNPX instead on NPX, and PlateLOD instead of LOD
+#' npx_df |>
 #'   dplyr::mutate(
 #'     LOD = 1L,
 #'     PlateLOD = 2L
