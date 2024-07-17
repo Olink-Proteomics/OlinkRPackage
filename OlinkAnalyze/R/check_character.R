@@ -3,7 +3,7 @@
 #' @author
 #'   Klev Diamanti
 #'
-#' @param string String variable to check.
+#' @param string String to check.
 #' @param error Return error or a boolean (default = FALSE).
 #'
 #' @return Boolean if the variable is a character vector or not, and an error if
@@ -54,7 +54,7 @@ check_is_character <- function(string,
 #' @author
 #'   Klev Diamanti
 #'
-#' @param string String variable to check.
+#' @param string String vector to check.
 #' @param error Return error or a boolean (default = FALSE).
 #'
 #' @return Boolean if the variable is a character vector of length 1 or not, and

@@ -7,7 +7,7 @@
 check_is_character(string, error = FALSE)
 }
 \arguments{
-\item{string}{String variable to check.}
+\item{string}{String to check.}
 
 \item{error}{Return error or a boolean (default = FALSE).}
 }

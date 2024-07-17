@@ -7,7 +7,7 @@
 check_is_scalar_character(string, error = FALSE)
 }
 \arguments{
-\item{string}{String variable to check.}
+\item{string}{String vector to check.}
 
 \item{error}{Return error or a boolean (default = FALSE).}
 }

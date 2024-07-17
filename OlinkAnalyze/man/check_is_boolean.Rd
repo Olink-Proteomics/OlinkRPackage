@@ -7,7 +7,7 @@
 check_is_boolean(bool, error = FALSE)
 }
 \arguments{
-\item{bool}{Boolean variable to check.}
+\item{bool}{Boolean to check.}
 
 \item{error}{Return error or a boolean (default = FALSE).}
 }

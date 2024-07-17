@@ -3,7 +3,7 @@
 #' @author
 #'   Klev Diamanti
 #'
-#' @param bool Boolean variable to check.
+#' @param bool Boolean to check.
 #' @param error Return error or a boolean (default = FALSE).
 #'
 #' @return Boolean if the variable is a boolean vector or not, and an error if
@@ -50,7 +50,7 @@ check_is_boolean <- function(bool,
 #' @author
 #'   Klev Diamanti
 #'
-#' @param bool Boolean variable to check.
+#' @param bool Boolean vector to check.
 #' @param error Return error or a boolean (default = FALSE).
 #'
 #' @return Boolean if the variable is a boolean vector of length 1 or not, and
