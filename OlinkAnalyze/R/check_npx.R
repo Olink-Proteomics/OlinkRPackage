@@ -114,19 +114,19 @@ check_npx <- function(df = df,
   # check Olink IDs
   check_npx_out_lst$oid_invalid <- check_npx_olinkid(
     df = df,
-    col_names = col_names
+    col_names = check_npx_out_lst$col_names
   )
 
   # assays with all NA values
   check_npx_out_lst$assay_na <- check_npx_all_na_assays(
     df = df,
-    col_names = col_names
+    col_names = check_npx_out_lst$col_names
   )
 
   # duplicate sample IDs
   check_npx_out_lst$sample_id_dups <- check_npx_duplicate_sample_ids(
     df = df,
-    col_names = col_names
+    col_names = check_npx_out_lst$col_names
   )
 
   # return results ----
@@ -424,7 +424,8 @@ check_npx_olinkid <- function(df,
     dplyr::filter(
       stringr::str_detect(string = .data[[col_names$olink_id]],
                           pattern = "^OID[0-9]{5}$",
-                          negate = TRUE))  |>
+                          negate = TRUE)
+    )  |>
     dplyr::collect() |>
     dplyr::pull(
       .data[[col_names$olink_id]]
@@ -446,24 +447,24 @@ check_npx_olinkid <- function(df,
   return(invalid_oid)
 }
 
-# check_npx_all_na_assays ----
-
-#' Help function to identify Olink assays with all quantified values NA.
+#' Help function to identify Olink assays with all quantified values \emph{NA}
+#'
+#' @description
+#' This function checks if there are assays with the quantified values for all
+#' samples \emph{NA}.
 #'
 #' @author
 #'  Simon Forsberg;
 #'  Masoumeh Sheikhi
 #'
-#' @param df A tibble or an arrow object containing columns "OlinkID" and
-#' either "NPX", "Quantified_value" or "Ct"
+#' @param df A tibble or an arrow object containing columns \emph{OlinkID} and
+#' the quantification column `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep = ", ", last = " or ")` # nolint
+#' @param col_names A list of matched column names. This is the output of the
+#' \emph{check_npx_col_names} function.
 #'
-#' @param col_names A list of matched column names,
-#' the output of `check_npx_col_names` function.
+#' @return A character vector containing OlinkIDs of assays with quantified
+#' values \emph{NA} for all samples, otherwise returns \emph{character(0)}.
 #'
-#' @return A character vector containing
-#' Olink ID of assays with all quantified values NA,
-#' otherwise returns `character(0)`.
-
 check_npx_all_na_assays <- function(df, col_names) {
 
   # Identify assays with only NAs

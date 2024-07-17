@@ -2,26 +2,26 @@
 % Please edit documentation in R/check_npx.R
 \name{check_npx_all_na_assays}
 \alias{check_npx_all_na_assays}
-\title{Help function to identify Olink assays with all quantified values NA.}
+\title{Help function to identify Olink assays with all quantified values \emph{NA}}
 \usage{
 check_npx_all_na_assays(df, col_names)
 }
 \arguments{
-\item{df}{A tibble or an arrow object containing columns "OlinkID" and
-either "NPX", "Quantified_value" or "Ct"}
+\item{df}{A tibble or an arrow object containing columns \emph{OlinkID} and
+the quantification column Ct, NPX or Quantified}
 
-\item{col_names}{A list of matched column names,
-the output of `check_npx_col_names` function.}
+\item{col_names}{A list of matched column names. This is the output of the
+\emph{check_npx_col_names} function.}
 }
 \value{
-A character vector containing
-Olink ID of assays with all quantified values NA,
-otherwise returns `character(0)`.
+A character vector containing OlinkIDs of assays with quantified
+values \emph{NA} for all samples, otherwise returns \emph{character(0)}.
 }
 \description{
-Help function to identify Olink assays with all quantified values NA.
+This function checks if there are assays with the quantified values for all
+samples \emph{NA}.
 }
 \author{
 Simon Forsberg;
- Masoumeh Sheikhi
+Masoumeh Sheikhi
 }
