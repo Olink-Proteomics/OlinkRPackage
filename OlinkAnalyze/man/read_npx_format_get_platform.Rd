@@ -16,17 +16,19 @@ read_npx_format_get_platform(
 file.}
 
 \item{file}{Path to Olink software output file in wide or long format.
-Expecting file extensions `csv`, `txt`, `xls`, or `xlsx`.}
+Expecting file extensions
+xls, xlsx, csv or txt. # nolint}
 
 \item{olink_platform}{Olink platform used to generate the input file.
-One of `NULL` (default), `Target 96`, `Target 48`, `Flex` or `Focus`.}
+One of \code{NULL} (default),
+Target 48, Flex, Target 96 or Focus. # nolint}
 
 \item{olink_platforms_wide}{Tibble with rows corresponding to qPCR platforms
 extracted from \var{accepted_olink_platforms} from the local environment.}
 }
 \value{
-The name of the Olink platform. One of `Target 96`, `Target 48`,
-`Flex` or `Focus`.
+The name of the Olink platform. One of
+Target 48, Flex, Target 96 or Focus. # nolint
 }
 \description{
 This function uses the panel name from Olink software files in wide format to
@@ -35,9 +37,9 @@ represents.
 }
 \seealso{
 \code{\link{read_npx_format}}
-  \code{\link{read_npx_format_read}}
-  \code{\link{read_npx_format_get_format}}
-  \code{\link{read_npx_format_get_quant}}
+\code{\link{read_npx_format_read}}
+\code{\link{read_npx_format_get_format}}
+\code{\link{read_npx_format_get_quant}}
 }
 \author{
 Klev Diamanti

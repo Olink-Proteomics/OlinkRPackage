@@ -5,19 +5,22 @@
 #' This function processes Olink software excel or delimited files regardless of
 #' data type, platform or format.
 #'
-#' \strong{Olink software excel files} with the suffix `xlsx` or `xls` are
-#' imported in R by the function `read_npx_excel`.
+#' \strong{Olink software excel files} with the extension
+#' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("excel", names(accepted_npx_file_ext))], sep = ", ", last = " or ")`. # nolint
+#' are imported in R by the function \code{\link{read_npx_excel}}.
 #'
-#' \strong{Olink software delimited files} with suffix `csv` or `txt` are
-#' imported in R by the function `read_npx_delim` or `read_npx_csv`.
+#' \strong{Olink software delimited files} with suffix
+#' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("delim", names(accepted_npx_file_ext))], sep = ", ", last = " or ")`. # nolint
+#' are imported in R by the functions \code{\link{read_npx_delim}} or
+#' \code{\link{read_npx_csv}}.
 #'
 #' Files in wide format are subsequently handled by the function
-#' `read_npx_wide`.
+#' \code{\link{read_npx_wide}}.
 #'
 #' \strong{Olink software files in wide format} always originate from the Olink
-#' qPCR platforms, and are further processed by `read_npx_get_platform` and
-#' `read_npx_get_quant` to determine the data type and Olink platform,
-#' respectively.
+#' qPCR platforms, and are further processed by
+#' \code{\link{read_npx_get_platform}} and \code{\link{read_npx_get_quant}} to
+#' determine the data type and Olink platform, respectively.
 #'
 #' @author
 #'   Klev Diamanti;
@@ -29,23 +32,25 @@
 #'   Marianne Sandin
 #'
 #' @param file Path to Olink software output file in wide or long format.
-#' Expecting file extensions `csv`, `txt`, `xls`, or `xlsx`.
-#' @param out_df The class of output data frame. One of `tibble` (default) or
-#' `arrow` for ArrowObject.
+#' Expecting file extensions
+#' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))], sep = ", ", last = " or ")`. # nolint
+#' @param out_df The class of output data frame. One of "tibble" (default) or
+#' "arrow" for ArrowObject.
 #' @param sep Character separator of delimited input file. One of `NULL` for
-#' auto-detection (default), `,` for comma or `;` for semicolon. Used only for
+#' auto-detection (default), "," for comma or ";" for semicolon. Used only for
 #' delimited output files from Olink software.
 #' @param long_format Boolean marking format of input file. One of `NULL`
-#' (default) for auto-detection, `TRUE` for long format files or `FALSE` for
+#' (default) for auto-detection, "TRUE" for long format files or "FALSE" for
 #' wide format files.
 #' @param olink_platform Olink platform used to generate the input file.
-#' One of `NULL` (default), `Explore 3072`, `Explore HT`, `Target 96`,
-#' `Target 48`, `Flex` or `Focus`.
+#' One of `NULL` (default),
+#' `r cli::ansi_collapse(x = accepted_olink_platforms$name, last = " or ")`.
 #' @param data_type Quantification method of the input data. One of `NULL`
-#' (default), `NPX`, `Quantified` or `Ct`.
+#' (default),
+#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(last = " or ")`. # nolint
 #' @param quiet Boolean to print a confirmation message when reading the input
-#' file. Applies to excel or delimited input only. `TRUE` (default) to not print
-#' and `FALSE` to print.
+#' file. Applies to excel or delimited input only. "TRUE" (default) to not print
+#' and "FALSE" to print.
 #' @param legacy Boolean to enforce returning a list containing olink_platform,
 #' data_type and long_format information together with the dataset.
 #'
@@ -53,6 +58,7 @@
 #' @return Tibble or ArrowObject with Olink data in long format.
 #'
 #' @seealso
+#'   \code{\link{read_npx}}
 #'   \code{\link{read_npx_format_read}}
 #'   \code{\link{read_npx_format_get_format}}
 #'   \code{\link{read_npx_format_get_platform}}
@@ -234,11 +240,14 @@ read_npx_format <- function(file,
 #' This function reads Olink software excel or delimited files regardless of
 #' data type, platform or format.
 #'
-#' \strong{Olink software excel files} with the suffix `xlsx` or `xls` are
-#' imported in R by the function `read_npx_excel`.
+#' \strong{Olink software excel files} with the extension
+#' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("excel", names(accepted_npx_file_ext))], sep = ", ", last = " or ")`. # nolint
+#' are imported in R by the function \code{\link{read_npx_excel}}.
 #'
-#' \strong{Olink software delimited files} with suffix `csv` or `txt` are
-#' imported in R by the function `read_npx_delim` or `read_npx_csv`.
+#' \strong{Olink software delimited files} with suffix
+#' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("delim", names(accepted_npx_file_ext))], sep = ", ", last = " or ")`. # nolint
+#' are imported in R by the functions \code{\link{read_npx_delim}} or
+#' \code{\link{read_npx_csv}}.
 #'
 #' \itemize{
 #' \item Files in long format are read with the column row as column names.
@@ -253,9 +262,10 @@ read_npx_format <- function(file,
 #'   Klev Diamanti
 #'
 #' @param file Path to Olink software output file in wide or long format.
-#' Expecting file extensions `csv`, `txt`, `xls`, or `xlsx`.
+#' Expecting file extensions
+#' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))], sep = ", ", last = " or ")`. # nolint
 #' @param sep Character separator of delimited input file. One of `NULL` for
-#' auto-detection (default), `,` for comma or `;` for semicolon. Used only for
+#' auto-detection (default), "," for comma or ";" for semicolon. Used only for
 #' delimited output files from Olink software.
 #' @param read_n Number of top rows to read.
 #'
@@ -314,7 +324,7 @@ read_npx_format_read <- function(file,
         "x" = "Unable to recognize format from file extension of
         {.file {file}}!"
       ),
-      call = NULL,
+      call = rlang::caller_env(),
       wrap = FALSE
     )
 
@@ -400,9 +410,10 @@ read_npx_format_read <- function(file,
 #' @param df A tibble containing the first \var{read_n} rows of the input Olink
 #' file.
 #' @param file Path to Olink software output file in wide or long format.
-#' Expecting file extensions `csv`, `txt`, `xls`, or `xlsx`.
+#' Expecting file extensions
+#' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))], sep = ", ", last = " or ")`. # nolint
 #' @param long_format Boolean marking format of input file. One of `NULL`
-#' (default) for auto-detection, `TRUE` for long format files or `FALSE` for
+#' (default) for auto-detection, "TRUE" for long format files or "FALSE" for
 #' wide format files.
 #' @param quant_methods Character vector with the Olink protein quantification
 #' methods extracted from \var{accepted_olink_platforms$quant_method} in the
@@ -414,7 +425,7 @@ read_npx_format_read <- function(file,
 #' long (`TRUE`) or wide (`FALSE`) format.
 #' \item A character vector (\var{data_cells}) from the input file which allows
 #' detection of the quantification method. Used in function
-#' `read_npx_get_quant`.
+#' \code{\link{read_npx_get_quant}}.
 #' }
 #'
 #' @seealso
@@ -619,14 +630,16 @@ read_npx_format_get_format <- function(df,
 #' @param df A tibble containing the first \var{read_n} rows of the input Olink
 #' file.
 #' @param file Path to Olink software output file in wide or long format.
-#' Expecting file extensions `csv`, `txt`, `xls`, or `xlsx`.
+#' Expecting file extensions
+#' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))], sep = ", ", last = " or ")`. # nolint
 #' @param olink_platform Olink platform used to generate the input file.
-#' One of `NULL` (default), `Target 96`, `Target 48`, `Flex` or `Focus`.
+#' One of `NULL` (default),
+#' `r accepted_olink_platforms |> dplyr::filter(.data[["broader_platform"]] == "qPCR") |> dplyr::pull(.data[["name"]]) |> cli::ansi_collapse(last = " or ")`. # nolint
 #' @param olink_platforms_wide Tibble with rows corresponding to qPCR platforms
 #' extracted from \var{accepted_olink_platforms} from the local environment.
 #'
-#' @return The name of the Olink platform. One of `Target 96`, `Target 48`,
-#' `Flex` or `Focus`.
+#' @return The name of the Olink platform. One of
+#' `r accepted_olink_platforms |> dplyr::filter(.data[["broader_platform"]] == "qPCR") |> dplyr::pull(.data[["name"]]) |> cli::ansi_collapse(last = " or ")`. # nolint
 #'
 #' @seealso
 #'   \code{\link{read_npx_format}}
@@ -790,18 +803,21 @@ read_npx_format_get_platform <- function(df,
 #'   Klev Diamanti
 #'
 #' @param file Path to Olink software output file in wide or long format.
-#' Expecting file extensions `csv`, `txt`, `xls`, or `xlsx`.
+#' Expecting file extensions
+#' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))], sep = ", ", last = " or ")`. # nolint
 #' @param data_type Quantification method of the input data. One of `NULL`
-#' (default), `NPX`, `Quantified` or `Ct`.
-#' @param data_cells A character vector with the contents of the cell A2 from
-#' the Olink software file in wide format indicating the quantification method.
+#' (default),
+#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(last = " or ")`. # nolint
+#' @param data_cells A character vector with the contents of the cell \emph{A2}
+#' from the Olink software file in wide format indicating the quantification
+#' method.
 #' @param quant_methods_expected Character vector with the Olink protein
 #' quantification methods extracted from \var{accepted_olink_platforms} from the
 #' local environment filtered for the Olink platform detected in function
-#' `read_npx_format_get_platform`.
+#' \code{\link{read_npx_format_get_platform}}.
 #'
-#' @return The name of the quantification method. One of `NPX`, `Quantified` or
-#' `Ct`.
+#' @return The name of the quantification method. One of
+#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(last = " or ")`. # nolint
 #'
 #' @seealso
 #'   \code{\link{read_npx_format}}

@@ -11,10 +11,11 @@ read_npx_format_get_format(df, file, long_format = NULL, quant_methods)
 file.}
 
 \item{file}{Path to Olink software output file in wide or long format.
-Expecting file extensions `csv`, `txt`, `xls`, or `xlsx`.}
+Expecting file extensions
+xls, xlsx, csv or txt. # nolint}
 
-\item{long_format}{Boolean marking format of input file. One of `NULL`
-(default) for auto-detection, `TRUE` for long format files or `FALSE` for
+\item{long_format}{Boolean marking format of input file. One of \code{NULL}
+(default) for auto-detection, "TRUE" for long format files or "FALSE" for
 wide format files.}
 
 \item{quant_methods}{Character vector with the Olink protein quantification
@@ -25,10 +26,10 @@ local environment.}
 A list with two elements:
 \itemize{
 \item A scalar boolean (\var{is_long_format}) marking if the input file is in
-long (`TRUE`) or wide (`FALSE`) format.
+long (\code{TRUE}) or wide (\code{FALSE}) format.
 \item A character vector (\var{data_cells}) from the input file which allows
 detection of the quantification method. Used in function
-`read_npx_get_quant`.
+\code{\link{read_npx_get_quant}}.
 }
 }
 \description{
@@ -44,9 +45,9 @@ input as the correct answer.
 }
 \seealso{
 \code{\link{read_npx_format}}
-  \code{\link{read_npx_format_read}}
-  \code{\link{read_npx_format_get_platform}}
-  \code{\link{read_npx_format_get_quant}}
+\code{\link{read_npx_format_read}}
+\code{\link{read_npx_format_get_platform}}
+\code{\link{read_npx_format_get_quant}}
 }
 \author{
 Klev Diamanti
