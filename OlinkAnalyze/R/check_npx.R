@@ -101,8 +101,13 @@ check_npx <- function(df = df,
   check_is_arrow_or_tibble(df = df,
                            error = TRUE)
 
-  check_is_character(string = preferred_names,
-                     error = TRUE)
+  # if not NULL, preferred_names is checked
+  if (!is.null(preferred_names)) {
+
+    check_is_character(string = preferred_names,
+                       error = TRUE)
+
+  }
 
   # check functions ----
 
