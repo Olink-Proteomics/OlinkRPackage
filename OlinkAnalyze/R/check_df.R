@@ -4,11 +4,10 @@
 #'   Klev Diamanti
 #'
 #' @param df Data frame to check.
-#' @param error `TRUE` to return an error if \var{df} is not an arrow object;
-#' `FALSE` (default) to return a boolean.
+#' @param error Return error or a boolean (default = FALSE).
 #'
 #' @return A scalar boolean if the object is an arrow object or not, and an
-#' error if \var{error} = `TRUE`.
+#' error if "error = TRUE".
 #'
 #' @seealso
 #'   \code{\link{check_is_tibble}}
@@ -55,11 +54,10 @@ check_is_arrow_object <- function(df,
 #'   Klev Diamanti
 #'
 #' @param df Data frame to check.
-#' @param error `TRUE` to return an error if \var{df} is not a tibble; `FALSE`
-#' (default) to return a boolean.
+#' @param error Return error or a boolean (default = FALSE).
 #'
 #' @return A scalar boolean if the object is a tibble or not, and an error if
-#' \var{error} = `TRUE`.
+#' "error = TRUE".
 #'
 #' @seealso
 #'   \code{\link{check_is_arrow_object}}
@@ -106,11 +104,10 @@ check_is_tibble <- function(df,
 #'   Klev Diamanti
 #'
 #' @param df Data frame to check.
-#' @param error `TRUE` to return an error if \var{df} is not a tibble or an
-#' arrow object; `FALSE` (default) to return a boolean.
+#' @param error Return error or a boolean (default = FALSE).
 #'
 #' @return A scalar boolean if the object is a tibble or an arrow object or not,
-#' and an error if \var{error} = `TRUE`.
+#' and an error if "error = TRUE".
 #'
 #' @seealso
 #'   \code{\link{check_is_arrow_object}}
