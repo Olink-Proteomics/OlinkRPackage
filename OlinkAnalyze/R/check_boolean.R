@@ -1,6 +1,7 @@
 #' Help function checking if a variable is a boolean vector.
 #'
-#' @author Klev Diamanti
+#' @author
+#'   Klev Diamanti
 #'
 #' @param bool Boolean variable to check.
 #' @param error Return error or a boolean (default).
@@ -46,7 +47,8 @@ check_is_boolean <- function(bool,
 
 #' Help function checking if a variable is a boolean vector of length 1.
 #'
-#' @author Klev Diamanti
+#' @author
+#'   Klev Diamanti
 #'
 #' @param bool Boolean variable to check.
 #' @param error Return error or a boolean (default).
