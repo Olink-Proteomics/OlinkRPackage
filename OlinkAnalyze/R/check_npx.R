@@ -101,14 +101,6 @@ check_npx <- function(df = df,
   check_is_arrow_or_tibble(df = df,
                            error = TRUE)
 
-  # if not NULL, preferred_names is checked
-  if (!is.null(preferred_names)) {
-
-    check_is_character(string = preferred_names,
-                       error = TRUE)
-
-  }
-
   # check functions ----
 
   check_npx_out_lst <- list()
@@ -389,6 +381,8 @@ check_npx_update_col_names <- function(preferred_names) {
   # Merge the entries to a new updated dictionary
   column_name_dict_updated <- append(column_name_dict_keep,
                                      column_name_dict_change)
+
+  # return ----
 
   return(column_name_dict_updated)
 }
