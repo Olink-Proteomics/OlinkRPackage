@@ -1,3 +1,5 @@
+#' Check NPX data format
+#'
 #' @description
 #' This function performs various checks on NPX data, including checking
 #' column names,validating Olink IDs, identifying assays with all NA values,
