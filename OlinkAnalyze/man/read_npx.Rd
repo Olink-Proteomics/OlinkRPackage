@@ -38,15 +38,15 @@ xls, xlsx, csv, txt, parquet or zip.}
 "arrow" for ArrowObject.}
 
 \item{sep}{Character separator of delimited input file. One of \code{NULL} for
-auto-detection (default), \verb{,} for comma or \verb{;} for semicolon. Used only for
+auto-detection (default), "," for comma or ";" for semicolon. Used only for
 delimited output files from Olink software.}
 
 \item{long_format}{Boolean marking format of input file. One of \code{NULL}
-(default) for auto-detection, \code{TRUE} for long format files or \code{FALSE} for
+(default) for auto-detection, "TRUE" for long format files or "FALSE" for
 wide format files.}
 
 \item{olink_platform}{Olink platform used to generate the input file.
-One of
+One of \code{NULL} (default),
 Target 48, Flex, Target 96, Explore 3072, Explore HT or Focus.}
 
 \item{data_type}{Quantification method of the input data. One of \code{NULL}
@@ -73,7 +73,7 @@ Imports a file exported from Olink software that quantifies proteins in NPX,
 Ct or absolute Quantification.
 
 \strong{Note:} Do not modify the Olink software output file prior to
-importing it with "read_npx()" as it might fail.
+importing it with \code{\link{read_npx}} as it might fail.
 }
 \examples{
 \donttest{

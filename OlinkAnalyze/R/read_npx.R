@@ -5,7 +5,7 @@
 #' Ct or absolute Quantification.
 #'
 #' \strong{Note:} Do not modify the Olink software output file prior to
-#' importing it with "read_npx()" as it might fail.
+#' importing it with \code{\link{read_npx}} as it might fail.
 #'
 #' @author
 #'   Klev Diamanti;
@@ -22,13 +22,13 @@
 #' @param out_df The class of output data frame. One of "tibble" (default) or
 #' "arrow" for ArrowObject.
 #' @param sep Character separator of delimited input file. One of `NULL` for
-#' auto-detection (default), `,` for comma or `;` for semicolon. Used only for
+#' auto-detection (default), "," for comma or ";" for semicolon. Used only for
 #' delimited output files from Olink software.
 #' @param long_format Boolean marking format of input file. One of `NULL`
-#' (default) for auto-detection, `TRUE` for long format files or `FALSE` for
+#' (default) for auto-detection, "TRUE" for long format files or "FALSE" for
 #' wide format files.
 #' @param olink_platform Olink platform used to generate the input file.
-#' One of
+#' One of `NULL` (default),
 #' `r cli::ansi_collapse(x = accepted_olink_platforms$name, last = " or ")`.
 #' @param data_type Quantification method of the input data. One of `NULL`
 #' (default),
