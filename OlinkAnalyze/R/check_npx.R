@@ -113,7 +113,8 @@ check_npx <- function(df = df,
 #' column names and values are column names to be selected from current data
 #' frame. Read the `description` for further information.
 #'
-#' @return A list of matched column names based on the preferred names.
+#' @return List of column names from the input data frame marking the columns to
+#' be used in downstream analyses.
 #'
 #' @examples
 #' \donttest{
