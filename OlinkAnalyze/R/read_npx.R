@@ -1,10 +1,11 @@
 #' Read NPX, Ct or absolute quantification data in R.
 #'
 #' @description
-#' Imports an NPX, Ct or Quantification file exported from Olink software.
+#' Imports a file exported from Olink software that quantifies proteins in NPX,
+#' Ct or absolute Quantification.
 #'
 #' \strong{Note:} Do not modify the Olink software output file prior to
-#' importing it with `read_npx()` as it might fail.
+#' importing it with "read_npx()" as it might fail.
 #'
 #' @author
 #'   Klev Diamanti;
@@ -16,9 +17,10 @@
 #'   Marianne Sandin
 #'
 #' @param filename Path to Olink software output file in wide or long format.
-#' Expecting file extensions `csv`, `txt`, `xls`, `xlsx`, `parquet` or `zip`.
-#' @param out_df The class of output data frame. One of `tibble` (default) or
-#' `arrow` for ArrowObject.
+#' Expecting file extensions
+#' `r cli::ansi_collapse(x = accepted_npx_file_ext, sep = ", ", last = " or ")`.
+#' @param out_df The class of output data frame. One of "tibble" (default) or
+#' "arrow" for ArrowObject.
 #' @param sep Character separator of delimited input file. One of `NULL` for
 #' auto-detection (default), `,` for comma or `;` for semicolon. Used only for
 #' delimited output files from Olink software.
@@ -26,19 +28,20 @@
 #' (default) for auto-detection, `TRUE` for long format files or `FALSE` for
 #' wide format files.
 #' @param olink_platform Olink platform used to generate the input file.
-#' One of `NULL` (default), `Explore 3072`, `Explore HT`, `Target 96`,
-#' `Target 48`, `Flex` or `Focus`.
+#' One of
+#' `r cli::ansi_collapse(x = accepted_olink_platforms$name, last = " or ")`.
 #' @param data_type Quantification method of the input data. One of `NULL`
-#' (default), `NPX`, `Quantified` or `Ct`.
+#' (default),
+#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(last = " or ")`. # nolint
 #' @param .ignore_files Character vector of files included in the zip-compressed
 #' Olink software output files that should be ignored. Applies only to
-#' zip-compressed input files. `c("README.txt")` (default).
+#' zip-compressed input files (default = \emph{c("README.txt")}).
 #' @param quiet Boolean to print a confirmation message when reading the input
-#' file. Applies to excel or delimited input only. `TRUE` (default) to not print
-#' and `FALSE` to print.
+#' file. Applies to excel or delimited input only. "TRUE" (default) to not print
+#' and "FALSE" to print.
 #' @param legacy Boolean to run the legacy version of the read_npx function.
-#' \strong{Important: applies only to wide format file from Target 96 or Target
-#' 48 with NPX Software version earlier than 1.8!}. Default is `FALSE`.
+#' \strong{Important: should be used only to wide format files from Target 96 or
+#' Target 48 with NPX Software version earlier than 1.8!} (default "FALSE").
 #'
 #' @return Tibble or ArrowObject with Olink data in long format.
 #'

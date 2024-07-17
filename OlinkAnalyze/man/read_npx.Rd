@@ -31,46 +31,49 @@ read_NPX(
 }
 \arguments{
 \item{filename}{Path to Olink software output file in wide or long format.
-Expecting file extensions `csv`, `txt`, `xls`, `xlsx`, `parquet` or `zip`.}
+Expecting file extensions
+xls, xlsx, csv, txt, parquet or zip.}
 
-\item{out_df}{The class of output data frame. One of `tibble` (default) or
-`arrow` for ArrowObject.}
+\item{out_df}{The class of output data frame. One of "tibble" (default) or
+"arrow" for ArrowObject.}
 
-\item{sep}{Character separator of delimited input file. One of `NULL` for
-auto-detection (default), `,` for comma or `;` for semicolon. Used only for
+\item{sep}{Character separator of delimited input file. One of \code{NULL} for
+auto-detection (default), \verb{,} for comma or \verb{;} for semicolon. Used only for
 delimited output files from Olink software.}
 
-\item{long_format}{Boolean marking format of input file. One of `NULL`
-(default) for auto-detection, `TRUE` for long format files or `FALSE` for
+\item{long_format}{Boolean marking format of input file. One of \code{NULL}
+(default) for auto-detection, \code{TRUE} for long format files or \code{FALSE} for
 wide format files.}
 
 \item{olink_platform}{Olink platform used to generate the input file.
-One of `NULL` (default), `Explore 3072`, `Explore HT`, `Target 96`,
-`Target 48`, `Flex` or `Focus`.}
+One of
+Target 48, Flex, Target 96, Explore 3072, Explore HT or Focus.}
 
-\item{data_type}{Quantification method of the input data. One of `NULL`
-(default), `NPX`, `Quantified` or `Ct`.}
+\item{data_type}{Quantification method of the input data. One of \code{NULL}
+(default),
+Ct, NPX or Quantified. # nolint}
 
 \item{.ignore_files}{Character vector of files included in the zip-compressed
 Olink software output files that should be ignored. Applies only to
-zip-compressed input files. `c("README.txt")` (default).}
+zip-compressed input files (default = \emph{c("README.txt")}).}
 
 \item{quiet}{Boolean to print a confirmation message when reading the input
-file. Applies to excel or delimited input only. `TRUE` (default) to not print
-and `FALSE` to print.}
+file. Applies to excel or delimited input only. "TRUE" (default) to not print
+and "FALSE" to print.}
 
 \item{legacy}{Boolean to run the legacy version of the read_npx function.
-\strong{Important: applies only to wide format file from Target 96 or Target
-48 with NPX Software version earlier than 1.8!}. Default is `FALSE`.}
+\strong{Important: should be used only to wide format files from Target 96 or
+Target 48 with NPX Software version earlier than 1.8!} (default "FALSE").}
 }
 \value{
 Tibble or ArrowObject with Olink data in long format.
 }
 \description{
-Imports an NPX, Ct or Quantification file exported from Olink software.
+Imports a file exported from Olink software that quantifies proteins in NPX,
+Ct or absolute Quantification.
 
 \strong{Note:} Do not modify the Olink software output file prior to
-importing it with `read_npx()` as it might fail.
+importing it with "read_npx()" as it might fail.
 }
 \examples{
 \donttest{
@@ -88,12 +91,12 @@ read_NPX(filename = file,
 }
 \author{
 Klev Diamanti;
-  Kathleen Nevola;
-  Pascal Pucholt;
-  Christoffer Cambronero;
-  Boxi Zhang;
-  Olof Mansson;
-  Marianne Sandin
+Kathleen Nevola;
+Pascal Pucholt;
+Christoffer Cambronero;
+Boxi Zhang;
+Olof Mansson;
+Marianne Sandin
 }
 \keyword{1536;}
 \keyword{3072;}
