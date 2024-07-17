@@ -8,28 +8,29 @@ check_npx_update_col_names(preferred_names)
 }
 \arguments{
 \item{preferred_names}{A named character vector where names are internal
-column names and values are column names to be selected from current data
-frame. Read the `description` for further information.}
+column names and values are column names to be selected from the input data
+frame. Read the \emph{description} for further information.}
 }
 \value{
-`column_name_dict` updated based on `preferred_names`.
+\emph{column_name_dict} updated based on \emph{preferred_names}.
 }
 \description{
 OlinkAnalyze uses pre-defined names of columns of data frames to perform
 downstream analyses. However, in certain cases the columns of interest might
 be named differently. The aim of this function is to assign custom-named
 columns of a data frame to internally expected variables that will in turn
-enable analysis of Olink data. For example, if one has transformed the
-existing NPX value and has stored the result in a new column called NPX_2,
-then they can assign this new name to the internal variable `quant` to inform
-the package that in the downstream analysis `NPX_2` should be used.
+enable analysis of Olink data. For example, if one wished to #' use the
+column \emph{PCNormalizedNPX} for their analysis instead of the column
+\emph{NPX}, then they can assign this new name to the internal variable
+\emph{quant} to inform the package that in the downstream analysis
+\emph{PCNormalizedNPX} should be used.
 
 This function takes as input a named character vector with internal column
 names as names and column names of the current data set as values. Names of
-the input vector can be one or more of the following: `sample_id`,
-`sample_type`, `olink_id`, `plate_id`, `qc_warning`, `lod`, `quant`.
+the input vector can be one or more of the following:
+sample_id, sample_type, olink_id, plate_id, qc_warning, lod, and quant
 }
 \author{
 Klev Diamanti
- Masoumeh Sheikhi
+Masoumeh Sheikhi
 }

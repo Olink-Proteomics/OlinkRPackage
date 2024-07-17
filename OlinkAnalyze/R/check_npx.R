@@ -2,7 +2,7 @@
 #'
 #' @description
 #' This function performs various checks on NPX data, including checking
-#' column names, validating Olink identifiers, identifying assays with `NA`
+#' column names, validating Olink identifiers, identifying assays with \emph{NA}
 #' values for all samples and detecting duplicate sample identifiers.
 #'
 #' @details
@@ -17,17 +17,17 @@
 #' This function allows assigning custom-named columns of a data frame to
 #' internally expected variables that will in turn instruct Olink Analyze
 #' functions to use them for downstream analysis. For example, if one wished to
-#' use the column `PCNormalizedNPX` for their analysis instead of the column
-#' `NPX`, then they can assign this new name to the internal variable
-#' `quant` to inform the package that in the downstream analysis
-#' `PCNormalizedNPX` should be used. See example 3.
+#' use the column \emph{PCNormalizedNPX} for their analysis instead of the
+#' column \emph{NPX}, then they can assign this new name to the internal
+#' variable \emph{quant} to inform the package that in the downstream analysis
+#' \emph{PCNormalizedNPX} should be used. See example 3.
 #'
 #' Similarly, in case of multiple matches (e.g. the data frame contains both
-#' columns `LOD` and `PlateLOD`) the ties will need to be resolved by
-#' the user using the argument `preferred_names` from this function.  See
+#' columns \emph{LOD} and \emph{PlateLOD}) the ties will need to be resolved by
+#' the user using the argument \emph{preferred_names} from this function.  See
 #' example 4.
 #'
-#' The argument `preferred_names` is a named character vector with internal
+#' The argument \emph{preferred_names} is a named character vector with internal
 #' column names as names and column names of the current data set as values.
 #' Names of the input vector can be one or more of the following:
 #' `r cli::ansi_collapse(x = names(column_name_dict))`
@@ -35,10 +35,10 @@
 #' @author
 #' Masoumeh Sheikhi
 #'
-#' @param df A tibble or and arrow object from `read_npx`.
+#' @param df A tibble or and arrow object from \emph{read_npx}.
 #' @param preferred_names A named character vector where names are internal
 #' column names and values are column names to be selected from the input data
-#' frame. Read the `description` for further information.
+#' frame. Read the \emph{description} for further information.
 #'
 #' @return A list containing the following elements:
 #' \itemize{
@@ -149,17 +149,17 @@ check_npx <- function(df = df,
 #' This function allows assigning custom-named columns of a data frame to
 #' internally expected variables that will in turn instruct Olink Analyze
 #' functions to use them for downstream analysis. For example, if one wished to
-#' use the column `PCNormalizedNPX` for their analysis instead of the column
-#' `NPX`, then they can assign this new name to the internal variable
-#' `quant` to inform the package that in the downstream analysis
-#' `PCNormalizedNPX` should be used. See example 3.
+#' use the column \emph{PCNormalizedNPX} for their analysis instead of the
+#' column \emph{NPX}, then they can assign this new name to the internal
+#' variable \emph{quant} to inform the package that in the downstream analysis
+#' \emph{PCNormalizedNPX} should be used. See example 3.
 #'
 #' Similarly, in case of multiple matches (e.g. the data frame contains both
-#' columns `LOD` and `PlateLOD`) the ties will need to be resolved by
-#' the user using the argument `preferred_names` from this function.  See
+#' columns \emph{LOD} and \emph{PlateLOD}) the ties will need to be resolved by
+#' the user using the argument \emph{preferred_names} from this function.  See
 #' example 4.
 #'
-#' The argument `preferred_names` is a named character vector with internal
+#' The argument \emph{preferred_names} is a named character vector with internal
 #' column names as names and column names of the current data set as values.
 #' Names of the input vector can be one or more of the following:
 #' `r cli::ansi_collapse(x = names(column_name_dict))`
@@ -168,10 +168,10 @@ check_npx <- function(df = df,
 #'  Klev Diamanti;
 #'  Masoumeh Sheikhi
 #'
-#' @param df A tibble or and arrow object from `read_npx`.
+#' @param df A tibble or and arrow object from \emph{read_npx}.
 #' @param preferred_names A named character vector where names are internal
-#' column names and values are column names to be selected from current data
-#' frame. Read the `description` for further information.
+#' column names and values are column names to be selected from the input data
+#' frame. Read the \emph{description} for further information.
 #'
 #' @return List of column names from the input data frame marking the columns to
 #' be used in downstream analyses.
@@ -330,32 +330,34 @@ check_npx_col_names <- function(df,
 #' downstream analyses. However, in certain cases the columns of interest might
 #' be named differently. The aim of this function is to assign custom-named
 #' columns of a data frame to internally expected variables that will in turn
-#' enable analysis of Olink data. For example, if one has transformed the
-#' existing NPX value and has stored the result in a new column called NPX_2,
-#' then they can assign this new name to the internal variable `quant` to inform
-#' the package that in the downstream analysis `NPX_2` should be used.
+#' enable analysis of Olink data. For example, if one wished to #' use the
+#' column \emph{PCNormalizedNPX} for their analysis instead of the column
+#' \emph{NPX}, then they can assign this new name to the internal variable
+#' \emph{quant} to inform the package that in the downstream analysis
+#' \emph{PCNormalizedNPX} should be used.
 #'
 #' This function takes as input a named character vector with internal column
 #' names as names and column names of the current data set as values. Names of
-#' the input vector can be one or more of the following: `sample_id`,
-#' `sample_type`, `olink_id`, `plate_id`, `qc_warning`, `lod`, `quant`.
+#' the input vector can be one or more of the following:
+#' `r cli::ansi_collapse(x = names(column_name_dict))`
 #'
 #' @author
 #'  Klev Diamanti
 #'  Masoumeh Sheikhi
 #'
 #' @param preferred_names A named character vector where names are internal
-#' column names and values are column names to be selected from current data
-#' frame. Read the `description` for further information.
+#' column names and values are column names to be selected from the input data
+#' frame. Read the \emph{description} for further information.
 #'
-#' @return `column_name_dict` updated based on `preferred_names`.
+#' @return \emph{column_name_dict} updated based on \emph{preferred_names}.
 #'
 check_npx_update_col_names <- function(preferred_names) {
 
   # check input ----
 
   # Check if preferred_names is character
-  check_is_character(preferred_names, error = TRUE)
+  check_is_character(string = preferred_names,
+                     error = TRUE)
 
   # check for names not matching expected ----
 
