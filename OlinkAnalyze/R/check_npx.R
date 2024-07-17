@@ -15,10 +15,12 @@
 #'
 #' @return A list containing the following elements:
 #' \itemize{
-#'   \item{col_names}{A list of column names based on the preferred names.}
-#'   \item{invalid_oids}{A character vector of invalid Olink IDs.}
-#'   \item{all_na_assays}{A character vector of assays with all NA values.}
-#'   \item{duplicate_sample_ids}{A character vector of duplicate sample IDs.}
+#'   \item{col_names}{List of column names from the input data frame marking the
+#'   columns to be used in downstream analyses.}
+#'   \item{oid_invalid}{Character vector of invalid Olink IDs.}
+#'   \item{assay_na}{Character vector of assays with all samples having
+#'   `NA` values.}
+#'   \item{sample_id_dups}{Character vector of duplicate sample IDs.}
 #' }
 #'
 #' @examples
@@ -53,9 +55,9 @@ check_npx <- function(df = df, preferred_names = NULL) {
   # return results
   return(list(
     col_names = col_names,
-    invalid_oids = invalid_oids,
-    all_na_assays = all_na_assays,
-    duplicate_sample_ids = duplicate_sample_ids
+    oid_invalid = invalid_oids,
+    assay_na = all_na_assays,
+    sample_id_dups = duplicate_sample_ids
   ))
 
 }
