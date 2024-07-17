@@ -71,7 +71,7 @@ read_npx_legacy_help <- function(file,
         "x" = "{.fn read_npx_legacy} accepts only wide format files!",
         "i" = "Detected long format!"
       ),
-      call = NULL,
+      call = rlang::caller_env(),
       wrap = FALSE
     )
 
@@ -92,7 +92,7 @@ read_npx_legacy_help <- function(file,
         {.val {accept_platforms$name}}!",
         "i" = "Detected {.val {list_format$olink_platform}}!"
       ),
-      call = NULL,
+      call = rlang::caller_env(),
       wrap = FALSE
     )
 
@@ -119,7 +119,7 @@ read_npx_legacy_help <- function(file,
         on {.val {list_format$olink_platform}}!",
         "i" = "Detected {.val {list_format$data_type}}!"
       ),
-      call = NULL,
+      call = rlang::caller_env(),
       wrap = FALSE
     )
 
@@ -331,7 +331,7 @@ read_npx_legacy_check <- function(file,
         "i" = "- {.val {\"QC Deviation from median\"}} for each panel",
         "i" = "Consider disabling the {.arg legacy} argument!"
       ),
-      call = NULL,
+      call = rlang::caller_env(),
       wrap = TRUE
     )
 
@@ -352,7 +352,7 @@ read_npx_legacy_check <- function(file,
         {.val {\"Internal controls\"}} are required too!",
         "i" = "Consider disabling the {.arg legacy} argument!"
       ),
-      call = NULL,
+      call = rlang::caller_env(),
       wrap = TRUE
     )
 
@@ -373,7 +373,7 @@ read_npx_legacy_check <- function(file,
         labels!",
         "i" = "Consider disabling the {.arg legacy} argument!"
       ),
-      call = NULL,
+      call = rlang::caller_env(),
       wrap = TRUE
     )
 
