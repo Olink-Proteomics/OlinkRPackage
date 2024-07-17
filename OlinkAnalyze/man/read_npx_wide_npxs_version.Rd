@@ -19,11 +19,11 @@ wide format.
 }
 \seealso{
 \code{\link{read_npx_wide}}
-  \code{\link{read_npx_wide_split_row}}
-  \code{\link{read_npx_wide_npxs_version}}
-  \code{\link{read_npx_wide_top}}
-  \code{\link{read_npx_wide_middle}}
-  \code{\link{read_npx_wide_bottom}}
+\code{\link{read_npx_wide_split_row}}
+\code{\link{read_npx_wide_npxs_version}}
+\code{\link{read_npx_wide_top}}
+\code{\link{read_npx_wide_middle}}
+\code{\link{read_npx_wide_bottom}}
 }
 \author{
 Klev Diamanti

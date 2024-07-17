@@ -7,11 +7,11 @@
 check_npx_col_names(df, preferred_names = NULL)
 }
 \arguments{
-\item{df}{A tibble or and arrow object from `read_npx`.}
+\item{df}{A tibble or and arrow object from \code{read_npx}.}
 
 \item{preferred_names}{A named character vector where names are internal
 column names and values are column names to be selected from current data
-frame. Read the `description` for further information.}
+frame. Read the \code{description} for further information.}
 }
 \value{
 A list of matched column names based on the preferred names.
@@ -30,18 +30,18 @@ internally expected variables that will in turn instruct Olink Analyze
 functions to use them for downstream analysis. For example, if one has
 transformed the existing NPX value and has stored the result in a new column
 called NPX_2, then they can assign this new name to the internal variable
-`quant` to inform the package that in the downstream analysis `NPX_2` should
+\code{quant} to inform the package that in the downstream analysis \code{NPX_2} should
 be used. See example 1.
 
 Similarly, in case of multiple matches (e.g. the data frame contains both
-columns `NPX` and `Quantified_value`) the ties will need to be resolved by
-the user using the argument `preferred_names` from this function.  See
+columns \code{NPX} and \code{Quantified_value}) the ties will need to be resolved by
+the user using the argument \code{preferred_names} from this function.  See
 example 2.
 
-The argument `preferred_names` is a named character vector with internal
+The argument \code{preferred_names} is a named character vector with internal
 column names as names and column names of the current data set as values.
-Names of the input vector can be one or more of the following: `sample_id`,
-`sample_type`, `olink_id`, `plate_id`, `qc_warning`, `lod`, `quant`.
+Names of the input vector can be one or more of the following: \code{sample_id},
+\code{sample_type}, \code{olink_id}, \code{plate_id}, \code{qc_warning}, \code{lod}, \code{quant}.
 }
 \examples{
 \donttest{
@@ -81,5 +81,5 @@ df |>
 }
 \author{
 Klev Diamanti
- Masoumeh Sheikhi
+Masoumeh Sheikhi
 }

@@ -10,8 +10,8 @@ convert_read_npx_output(df, out_df)
 \arguments{
 \item{df}{The data frame to be converted.}
 
-\item{out_df}{The class of output data frame. One of `tibble` (default) or
-`arrow` for ArrowObject.}
+\item{out_df}{The class of output data frame. One of \code{tibble} (default) or
+\code{arrow} for ArrowObject.}
 }
 \value{
 The data frame in the requested class.

@@ -9,10 +9,10 @@ read_npx_parquet(file, out_df = "arrow")
 }
 \arguments{
 \item{file}{Path to Olink software output parquet file in long format.
-Expecting file extension `parquet`.}
+Expecting file extension \code{parquet}.}
 
-\item{out_df}{The class of output data frame. One of `tibble` (default) or
-`arrow` for ArrowObject.}
+\item{out_df}{The class of output data frame. One of \code{tibble} (default) or
+\code{arrow} for ArrowObject.}
 }
 \value{
 Tibble or ArrowObject with Olink data in long format.
@@ -23,13 +23,13 @@ files in R.
 }
 \seealso{
 \code{\link{read_npx}}
-  \code{\link{read_npx_zip}}
-  \code{\link{read_npx_excel}}
-  \code{\link{read_npx_format}}
-  \code{\link{read_npx_delim}}
+\code{\link{read_npx_zip}}
+\code{\link{read_npx_excel}}
+\code{\link{read_npx_format}}
+\code{\link{read_npx_delim}}
 }
 \author{
 Klev Diamanti;
-  Kathleen Nevola;
-  Pascal Pucholt
+Kathleen Nevola;
+Pascal Pucholt
 }

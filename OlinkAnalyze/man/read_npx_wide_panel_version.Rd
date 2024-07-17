@@ -7,7 +7,7 @@
 read_npx_wide_panel_version(df)
 }
 \arguments{
-\item{df}{A tibble containing the column `Panel`.}
+\item{df}{A tibble containing the column \code{Panel}.}
 }
 \value{
 Same tibble as input with additional column Panel_Version.

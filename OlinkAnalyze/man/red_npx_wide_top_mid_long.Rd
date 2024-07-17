@@ -8,13 +8,13 @@ red_npx_wide_top_mid_long(df_top_list, df_middle_list, data_type, format_spec)
 }
 \arguments{
 \item{df_top_list}{List of data frames from the top matrix. Output of
-function `read_npx_wide_top`.}
+function \code{read_npx_wide_top}.}
 
 \item{df_middle_list}{List of data frames from the middle matrix. Output of
-function `read_npx_wide_middle`.}
+function \code{read_npx_wide_middle}.}
 
-\item{data_type}{Quantification method of the input data. One of `NPX`,
-`Quantified` or `Ct`.}
+\item{data_type}{Quantification method of the input data. One of \code{NPX},
+\code{Quantified} or \code{Ct}.}
 
 \item{format_spec}{A tibble derived from \var{olink_wide_spec} in the local
 environment containing the expected format of the Olink wide file based on
@@ -25,12 +25,12 @@ Tibble in long format combining the top and middle matrices.
 }
 \description{
 Combined corresponding chunks of columns from the top and middle matrix
-that were computed from `read_npx_wide_top` and `read_npx_wide_middle`,
+that were computed from \code{read_npx_wide_top} and \code{read_npx_wide_middle},
 respectively.
 }
 \seealso{
 \code{\link{read_npx_wide_top}}
-  \code{\link{read_npx_wide_middle}}
+\code{\link{read_npx_wide_middle}}
 }
 \author{
 Klev Diamanti

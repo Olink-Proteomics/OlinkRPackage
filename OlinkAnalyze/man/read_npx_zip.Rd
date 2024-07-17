@@ -18,33 +18,33 @@ read_npx_zip(
 }
 \arguments{
 \item{file}{Path to Olink software output zip-compressed file in wide or long
-format. Expecting file extension `zip`.}
+format. Expecting file extension \code{zip}.}
 
-\item{out_df}{The class of output data frame. One of `tibble` (default) or
-`arrow` for ArrowObject.}
+\item{out_df}{The class of output data frame. One of \code{tibble} (default) or
+\code{arrow} for ArrowObject.}
 
-\item{sep}{Character separator of delimited input file. One of `NULL` for
-auto-detection (default), `,` for comma or `;` for semicolon. Used only for
+\item{sep}{Character separator of delimited input file. One of \code{NULL} for
+auto-detection (default), \verb{,} for comma or \verb{;} for semicolon. Used only for
 delimited output files from Olink software.}
 
-\item{long_format}{Boolean marking format of input file. One of `NULL`
-(default) for auto-detection, `TRUE` for long format files or `FALSE` for
+\item{long_format}{Boolean marking format of input file. One of \code{NULL}
+(default) for auto-detection, \code{TRUE} for long format files or \code{FALSE} for
 wide format files.}
 
 \item{olink_platform}{Olink platform used to generate the input file.
-One of `NULL` (default), `Explore 3072`, `Explore HT`, `Target 96`,
-`Target 48`, `Flex` or `Focus`.}
+One of \code{NULL} (default), \verb{Explore 3072}, \verb{Explore HT}, \verb{Target 96},
+\verb{Target 48}, \code{Flex} or \code{Focus}.}
 
-\item{data_type}{Quantification method of the input data. One of `NULL`
-(default), `NPX`, `Quantified` or `Ct`.}
+\item{data_type}{Quantification method of the input data. One of \code{NULL}
+(default), \code{NPX}, \code{Quantified} or \code{Ct}.}
 
 \item{.ignore_files}{Character vector of files included in the zip-compressed
 Olink software output files that should be ignored. Applies only to
-zip-compressed input files. `c("README.txt")` (default).}
+zip-compressed input files. \code{c("README.txt")} (default).}
 
 \item{quiet}{Boolean to print a confirmation message when reading the input
-file. Applies to excel or delimited input only. `TRUE` (default) to not print
-and `FALSE` to print.}
+file. Applies to excel or delimited input only. \code{TRUE} (default) to not print
+and \code{FALSE} to print.}
 }
 \value{
 Tibble or ArrowObject with Olink data in long format.
@@ -60,9 +60,9 @@ Olink data file, \strong{none or one} checksum file and
 
 \itemize{
 \item \strong{Olink file} exported by Olink software in wide or long format.
-Expecting file extensions `csv`, `txt`, `xls`, `xlsx`, `parquet` or `zip`.
+Expecting file extensions \code{csv}, \code{txt}, \code{xls}, \code{xlsx}, \code{parquet} or \code{zip}.
 This file is subsequently provided as input to \code{\link{read_npx}}.
-\item \strong{checksum file} named `MD5_checksum.txt` or`checksum_sha256.txt`
+\item \strong{checksum file} named \code{MD5_checksum.txt} or\code{checksum_sha256.txt}
 depending on the checksum algorithm. The file contains only one line with the
 checksum string of characters.
 \item \strong{File(s) to be ignored} from the zip file. These files can be
@@ -71,13 +71,13 @@ named as a character vector in the argument \var{.ignore_files}.
 }
 \seealso{
 \code{\link{read_npx}}
-  \code{\link{read_npx_parquet}}
-  \code{\link{read_npx_excel}}
-  \code{\link{read_npx_format}}
-  \code{\link{read_npx_delim}}
+\code{\link{read_npx_parquet}}
+\code{\link{read_npx_excel}}
+\code{\link{read_npx_format}}
+\code{\link{read_npx_delim}}
 }
 \author{
 Klev Diamanti;
-  Kathleen Nevola;
-  Pascal Pucholt
+Kathleen Nevola;
+Pascal Pucholt
 }

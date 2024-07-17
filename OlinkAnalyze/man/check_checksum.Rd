@@ -19,7 +19,7 @@ NULL or an error if the files could not be opened or if checksum did
 not match.
 }
 \description{
-Runs only if `MD5_checksum.txt` or `checksum_sha256.txt` are present in the
+Runs only if \code{MD5_checksum.txt} or \code{checksum_sha256.txt} are present in the
 input zip-compressed file. This function does not check if the
 \var{checksum_file} is in acceptable format.
 }

@@ -10,7 +10,7 @@ read_npx_wide_check_top(df, file, format_spec)
 \item{df}{Top matrix of Olink datasets in wide format \var{df_top}.}
 
 \item{file}{Path to Olink software output file in wide or long format.
-Expecting file extensions `csv`, `txt`, `xls`, or `xlsx`.}
+Expecting file extensions \code{csv}, \code{txt}, \code{xls}, or \code{xlsx}.}
 
 \item{format_spec}{A tibble derived from \var{olink_wide_spec} in the local
 environment containing the expected format of the Olink wide file based on
