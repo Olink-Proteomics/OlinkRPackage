@@ -352,8 +352,12 @@ check_npx_col_names <- function(df,
 #'
 check_npx_update_col_names <- function(preferred_names) {
 
+  # check input ----
+
   # Check if preferred_names is character
   check_is_character(preferred_names, error = TRUE)
+
+  # check for names not matching expected ----
 
   # Check valid names
   if (!all(names(preferred_names) %in% names(column_name_dict))) {
@@ -368,10 +372,13 @@ check_npx_update_col_names <- function(preferred_names) {
         {.val {missing_names}}!",
         "i" = "Expected one or more of the following names:
         {names(column_name_dict)}"),
-      call = rlang::caller_env()
+      call = rlang::caller_env(),
+      wrap = NULL
     )
 
   }
+
+  # update column names ----
 
   # Do not update entries that are not specified in `preferred_names`
   column_name_dict_keep <- column_name_dict[setdiff(x = names(column_name_dict),
@@ -385,6 +392,7 @@ check_npx_update_col_names <- function(preferred_names) {
   # return ----
 
   return(column_name_dict_updated)
+
 }
 
 # check_npx_olinkid ----
