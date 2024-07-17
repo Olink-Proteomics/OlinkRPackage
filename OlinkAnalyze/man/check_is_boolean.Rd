@@ -9,7 +9,7 @@ check_is_boolean(bool, error = FALSE)
 \arguments{
 \item{bool}{Boolean variable to check.}
 
-\item{error}{Return error or a boolean (default).}
+\item{error}{Return error or a boolean (default = FALSE).}
 }
 \value{
 Boolean if the variable is a boolean vector or not, and an error if
