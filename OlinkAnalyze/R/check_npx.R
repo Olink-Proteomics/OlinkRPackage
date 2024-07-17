@@ -8,9 +8,9 @@
 #' @author
 #' Masoumeh Sheikhi
 #'
-#' @param df A data frame containing the Olink data to be checked.
+#' @param df Data frame containing the Olink data to be checked.
 #' @param preferred_names A named character vector where names are internal
-#' column names and values are column names to be selected from current data
+#' column names and values are column names to be selected from the input data
 #' frame.
 #'
 #' @return A list containing the following elements:
