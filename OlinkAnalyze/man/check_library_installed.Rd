@@ -7,16 +7,16 @@
 check_library_installed(libraries, error = FALSE)
 }
 \arguments{
-\item{libraries}{A character vector of R libraries.}
+\item{libraries}{Character vector of R libraries.}
 
-\item{error}{Boolean to return error or a boolean (default).}
+\item{error}{Return error or a boolean (default = FALSE).}
 }
 \value{
 Boolean if the library is installed or not, and an error if
-`error = TRUE`.
+"error = TRUE".
 }
 \description{
-Help function to check if suggested libraries are installed when required.
+Checks whether a collection of R libraries is available.
 }
 \author{
 Klev Diamanti
