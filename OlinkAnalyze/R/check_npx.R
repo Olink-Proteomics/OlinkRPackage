@@ -416,6 +416,8 @@ check_npx_update_col_names <- function(preferred_names) {
 check_npx_olinkid <- function(df,
                               col_names) {
 
+  # identify Olink identifiers ----
+
   # extract invalid Olink IDs
   invalid_oid <- df |>
     dplyr::distinct(
@@ -430,6 +432,8 @@ check_npx_olinkid <- function(df,
     dplyr::pull(
       .data[[col_names$olink_id]]
     )
+
+  # warning if there are invalid Olink identifiers ----
 
   # warning if there is any invalid Olink ID
   if (length(invalid_oid) > 0L) {
