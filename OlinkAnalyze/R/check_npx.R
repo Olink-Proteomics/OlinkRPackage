@@ -29,36 +29,49 @@
 #'   OlinkAnalyze::check_npx() |>
 #'   suppressWarnings()
 #' }
+#'
+check_npx <- function(df = df,
+                      preferred_names = NULL) {
 
-check_npx <- function(df = df, preferred_names = NULL) {
+  # check input ----
 
-  # check input
-  check_is_arrow_or_tibble(df,
+  check_is_arrow_or_tibble(df = df,
                            error = TRUE)
 
+  check_is_character(string = preferred_names,
+                     error = TRUE)
+
+  # check functions ----
+
+  check_npx_out_lst <- list()
+
   # column names
-  col_names <- check_npx_col_names(df = df,
-                                   preferred_names = preferred_names)
+  check_npx_out_lst$col_names <- check_npx_col_names(
+    df = df,
+    preferred_names = preferred_names
+  )
 
   # check Olink IDs
-  invalid_oids <- check_npx_olinkid(df = df,
-                                    col_names = col_names)
+  check_npx_out_lst$oid_invalid <- check_npx_olinkid(
+    df = df,
+    col_names = col_names
+  )
 
   # assays with all NA values
-  all_na_assays <- check_npx_all_na_assays(df = df,
-                                           col_names = col_names)
+  check_npx_out_lst$assay_na <- check_npx_all_na_assays(
+    df = df,
+    col_names = col_names
+  )
 
   # duplicate sample IDs
-  duplicate_sample_ids <- check_npx_duplicate_sample_ids(df = df,
-                                                         col_names = col_names)
+  check_npx_out_lst$sample_id_dups <- check_npx_duplicate_sample_ids(
+    df = df,
+    col_names = col_names
+  )
 
-  # return results
-  return(list(
-    col_names = col_names,
-    oid_invalid = invalid_oids,
-    assay_na = all_na_assays,
-    sample_id_dups = duplicate_sample_ids
-  ))
+  # return results ----
+
+  return(check_npx_out_lst)
 
 }
 
