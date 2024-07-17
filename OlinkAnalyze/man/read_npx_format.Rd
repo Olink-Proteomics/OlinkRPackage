@@ -68,8 +68,9 @@ Files in wide format are subsequently handled by the function
 
 \strong{Olink software files in wide format} always originate from the Olink
 qPCR platforms, and are further processed by
-\code{\link{read_npx_get_platform}} and \code{\link{read_npx_get_quant}} to
-determine the data type and Olink platform, respectively.
+\code{\link{read_npx_format_get_format}} and
+\code{\link{read_npx_format_get_quant}} to determine the data type and Olink
+platform, respectively.
 }
 \seealso{
 \code{\link{read_npx}}

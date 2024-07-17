@@ -29,7 +29,7 @@ A list with two elements:
 long (\code{TRUE}) or wide (\code{FALSE}) format.
 \item A character vector (\var{data_cells}) from the input file which allows
 detection of the quantification method. Used in function
-\code{\link{read_npx_get_quant}}.
+\code{\link{read_npx_format_get_quant}}.
 }
 }
 \description{

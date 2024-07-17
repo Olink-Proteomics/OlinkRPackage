@@ -15,8 +15,8 @@ read_npx_format_get_platform(
 \item{df}{A tibble containing the first \var{read_n} rows of the input Olink
 file.}
 
-\item{file}{Path to Olink software output file in wide or long format.
-Expecting file extensions
+\item{file}{Path to Olink software output file in wide format. Expecting file
+extensions
 xls, xlsx, csv or txt. # nolint}
 
 \item{olink_platform}{Olink platform used to generate the input file.

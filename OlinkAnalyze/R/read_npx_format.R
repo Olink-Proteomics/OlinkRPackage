@@ -19,8 +19,9 @@
 #'
 #' \strong{Olink software files in wide format} always originate from the Olink
 #' qPCR platforms, and are further processed by
-#' \code{\link{read_npx_get_platform}} and \code{\link{read_npx_get_quant}} to
-#' determine the data type and Olink platform, respectively.
+#' \code{\link{read_npx_format_get_format}} and
+#' \code{\link{read_npx_format_get_quant}} to determine the data type and Olink
+#' platform, respectively.
 #'
 #' @author
 #'   Klev Diamanti;
@@ -425,7 +426,7 @@ read_npx_format_read <- function(file,
 #' long (`TRUE`) or wide (`FALSE`) format.
 #' \item A character vector (\var{data_cells}) from the input file which allows
 #' detection of the quantification method. Used in function
-#' \code{\link{read_npx_get_quant}}.
+#' \code{\link{read_npx_format_get_quant}}.
 #' }
 #'
 #' @seealso
@@ -629,8 +630,8 @@ read_npx_format_get_format <- function(df,
 #'
 #' @param df A tibble containing the first \var{read_n} rows of the input Olink
 #' file.
-#' @param file Path to Olink software output file in wide or long format.
-#' Expecting file extensions
+#' @param file Path to Olink software output file in wide format. Expecting file
+#' extensions
 #' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))], sep = ", ", last = " or ")`. # nolint
 #' @param olink_platform Olink platform used to generate the input file.
 #' One of `NULL` (default),
@@ -802,8 +803,8 @@ read_npx_format_get_platform <- function(df,
 #' @author
 #'   Klev Diamanti
 #'
-#' @param file Path to Olink software output file in wide or long format.
-#' Expecting file extensions
+#' @param file Path to Olink software output file in wide format. Expecting file
+#' extensions
 #' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))], sep = ", ", last = " or ")`. # nolint
 #' @param data_type Quantification method of the input data. One of `NULL`
 #' (default),
