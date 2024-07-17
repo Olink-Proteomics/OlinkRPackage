@@ -2,22 +2,22 @@
 % Please edit documentation in R/check_npx.R
 \name{check_npx_duplicate_sample_ids}
 \alias{check_npx_duplicate_sample_ids}
-\title{Help function checking for duplicate sample IDs in data}
+\title{Help function checking for duplicate sample identifiers in data.}
 \usage{
 check_npx_duplicate_sample_ids(df, col_names)
 }
 \arguments{
-\item{df}{A tibble or an arrow object containing
-the columns "SampleID" and "OlinkID".}
+\item{df}{A tibble or an arrow object containing the columns \emph{SampleID}
+and \emph{OlinkID}.}
 
-\item{col_names}{A list of matched column names.
-This is the output of `check_npx_col_names` function.}
+\item{col_names}{A list of matched column names. This is the output of the
+\emph{check_npx_col_names} function.}
 }
 \value{
-A character vector of duplicate sample IDs found in the data.
+A character vector of duplicate SampleIDs found in the data.
 }
 \description{
-Help function checking for duplicate sample IDs in data
+This function checks if there are duplicate sample identifiers for any assay.
 }
 \author{
 Masoumeh Sheikhi

@@ -511,20 +511,21 @@ check_npx_all_na_assays <- function(df, col_names) {
   return(all_nas)
 }
 
-# check_npx_duplicate_sample_ids ----
-
-#' Help function checking for duplicate sample IDs in data
+#' Help function checking for duplicate sample identifiers in data.
+#'
+#' @description
+#' This function checks if there are duplicate sample identifiers for any assay.
 #'
 #' @author
 #'  Masoumeh Sheikhi
 #'
-#' @param df A tibble or an arrow object containing
-#' the columns "SampleID" and "OlinkID".
-#' @param col_names A list of matched column names.
-#' This is the output of `check_npx_col_names` function.
+#' @param df A tibble or an arrow object containing the columns \emph{SampleID}
+#' and \emph{OlinkID}.
+#' @param col_names A list of matched column names. This is the output of the
+#' \emph{check_npx_col_names} function.
 #'
-#' @return A character vector of duplicate sample IDs found in the data.
-
+#' @return A character vector of duplicate SampleIDs found in the data.
+#'
 check_npx_duplicate_sample_ids <- function(df, col_names) {
 
   # Select relevant columns

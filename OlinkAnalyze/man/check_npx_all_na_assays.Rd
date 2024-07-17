@@ -8,7 +8,7 @@ check_npx_all_na_assays(df, col_names)
 }
 \arguments{
 \item{df}{A tibble or an arrow object containing columns \emph{OlinkID} and
-the quantification column Ct, NPX or Quantified}
+the quantification column Ct, NPX or Quantified # nolint}
 
 \item{col_names}{A list of matched column names. This is the output of the
 \emph{check_npx_col_names} function.}
