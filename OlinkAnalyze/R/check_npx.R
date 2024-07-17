@@ -79,18 +79,18 @@ check_npx <- function(df = df,
 #'
 #' @description
 #' OlinkAnalyze uses pre-defined names of columns of data frames to perform
-#' downstream analyses. At the same time, different Olink platforms are capable
-#' of exporting data with different quantification approaches. This function
-#' aims to instruct each function of OlinkAnalyze on the column it should be
-#' using for the downstream analysis. This should be seamless for data exported
-#' from Olink Software and imported to R using the read_npx function.
+#' downstream analyses. At the same time, different Olink platforms export data
+#' with different column names (e.g. different protein quantification metric).
+#' This function aims to instruct each function of OlinkAnalyze on the column it
+#' should be using for the downstream analysis. This should be seamless for data
+#' exported from Olink Software and imported to R using the read_npx function.
 #'
 #' However, in certain cases the columns of interest might be named differently.
 #' This function allows assigning custom-named columns of a data frame to
 #' internally expected variables that will in turn instruct Olink Analyze
 #' functions to use them for downstream analysis. For example, if one has
 #' transformed the existing NPX value and has stored the result in a new column
-#' called NPX_2, then they can assign this new name to the internal variable
+#' called `NPX_2`, then they can assign this new name to the internal variable
 #' `quant` to inform the package that in the downstream analysis `NPX_2` should
 #' be used. See example 1.
 #'
