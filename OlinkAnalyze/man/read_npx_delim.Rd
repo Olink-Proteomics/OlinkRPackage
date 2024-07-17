@@ -11,15 +11,16 @@ read_npx_delim(file, out_df = "arrow", sep = NULL)
 read_npx_csv(file, out_df = "arrow", sep = NULL)
 }
 \arguments{
-\item{file}{Path to Olink software output delimited file in wide or long
-format. Expecting file extensions `csv` or `txt`.}
+\item{out_df}{The class of output data frame. One of "tibble" (default) or
+"arrow" for ArrowObject.}
 
-\item{out_df}{The class of output data frame. One of `tibble` (default) or
-`arrow` for ArrowObject.}
-
-\item{sep}{Character separator of delimited input file. One of `NULL` for
-auto-detection (default), `,` for comma or `;` for semicolon. Used only for
+\item{sep}{Character separator of delimited input file. One of \code{NULL} for
+auto-detection (default), "," for comma or ";" for semicolon. Used only for
 delimited output files from Olink software.}
+
+\item{filename}{Path to Olink software output delimited file in wide or long
+format. Expecting file extensions
+csv and txt. # nolint}
 }
 \value{
 Tibble or ArrowObject with Olink data in long format.
@@ -29,15 +30,15 @@ The function can handle delimited files in long and wide format.
 }
 \seealso{
 \code{\link{read_npx}}
-  \code{\link{read_npx_parquet}}
-  \code{\link{read_npx_zip}}
-  \code{\link{read_npx_excel}}
-  \code{\link{read_npx_format}}
-  \code{\link{read_npx_delim_wide}}
-  \code{\link{read_npx_delim_long}}
+\code{\link{read_npx_parquet}}
+\code{\link{read_npx_zip}}
+\code{\link{read_npx_excel}}
+\code{\link{read_npx_format}}
+\code{\link{read_npx_delim_wide}}
+\code{\link{read_npx_delim_long}}
 }
 \author{
 Klev Diamanti;
-  Christoffer Cambronero;
-  Kathleen Nevola
+Christoffer Cambronero;
+Kathleen Nevola
 }
