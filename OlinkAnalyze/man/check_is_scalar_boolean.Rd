@@ -7,21 +7,21 @@
 check_is_scalar_boolean(bool, error = FALSE)
 }
 \arguments{
-\item{bool}{Input to check.}
+\item{bool}{Boolean variable to check.}
 
-\item{error}{Boolean to return error or a boolean (default).}
+\item{error}{Return error or a boolean (default).}
 }
 \value{
 Boolean if the variable is a boolean vector of length 1 or not, and
-an error if `error = TRUE`.
+an error if "error = TRUE".
 }
 \description{
 Help function checking if a variable is a boolean vector of length 1.
 }
 \seealso{
-[check_is_scalar_character()]
-  [check_is_scalar_integer()]
-  [check_is_scalar_numeric()]
+\code{\link{check_is_scalar_character}}
+\code{\link{check_is_scalar_integer}}
+\code{\link{check_is_scalar_numeric}}
 }
 \author{
 Klev Diamanti
