@@ -67,11 +67,11 @@ Imports:
     dbplyr,
     dplyr,
     duckdb,
-    readxl,
     rlang,
     stringr,
     tidyr
 Suggests: 
+    readxl,
     testthat (>= 3.0.0),
     withr,
     writexl,

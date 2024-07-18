@@ -4,7 +4,7 @@ test_that(
   "read_npx_legacy_help - works",
   {
     skip_on_cran()
-    skip_if_not_installed("writexl")
+    skip_if_not_installed(pkg = c("writexl", "readxl"))
 
     # Target 48 NPX ----
 
@@ -716,7 +716,7 @@ test_that(
 test_that(
   "read_npx_legacy - works - T48 - single panel",
   {
-    skip_if_not_installed("writexl")
+    skip_if_not_installed(pkg = c("writexl", "readxl"))
 
     olink_platform <- "Target 48"
     n_panels <- 1L
@@ -1465,7 +1465,7 @@ test_that(
 test_that(
   "read_npx_legacy - works - T48 - multiple panels",
   {
-    skip_if_not_installed("writexl")
+    skip_if_not_installed(pkg = c("writexl", "readxl"))
 
     olink_platform <- "Target 48"
     n_panels <- 3L
@@ -2214,7 +2214,7 @@ test_that(
 test_that(
   "read_npx_legacy - works - T96 - single panel",
   {
-    skip_if_not_installed("writexl")
+    skip_if_not_installed(pkg = c("writexl", "readxl"))
 
     olink_platform <- "Target 96"
     data_type <- "NPX"
@@ -2963,7 +2963,7 @@ test_that(
 test_that(
   "read_npx_legacy - works - T96 - multiple panels",
   {
-    skip_if_not_installed("writexl")
+    skip_if_not_installed(pkg = c("writexl", "readxl"))
 
     olink_platform <- "Target 96"
     data_type <- "NPX"
@@ -3712,7 +3712,7 @@ test_that(
 test_that(
   "read_npx_legacy - error - wrong order of cols",
   {
-    skip_if_not_installed("writexl")
+    skip_if_not_installed(pkg = c("writexl", "readxl"))
 
     ## Target 48 NPX, w dev int ctrl, w int ctrl, 1 plate, v1 ----
 
@@ -3805,7 +3805,7 @@ test_that(
 test_that(
   "read_npx_legacy - error - dev int ctrl but no int ctrl",
   {
-    skip_if_not_installed("writexl")
+    skip_if_not_installed(pkg = c("writexl", "readxl"))
 
     withr::with_tempfile(
       new = "file_wide_xlsx",
@@ -3853,7 +3853,7 @@ test_that(
 test_that(
   "read_npx_legacy - error - bottom matrix unsupported version",
   {
-    skip_if_not_installed("writexl")
+    skip_if_not_installed(pkg = c("writexl", "readxl"))
 
     # T48 NPX v2 ----
 

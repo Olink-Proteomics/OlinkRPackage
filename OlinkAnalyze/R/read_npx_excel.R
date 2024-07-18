@@ -33,6 +33,11 @@ read_npx_excel <- function(file,
   # check that the requested output df is ok
   check_out_df_arg(out_df = out_df)
 
+  # check if readxl is available ----
+
+  check_library_installed(libraries = "readxl",
+                          error = TRUE)
+
   # read data ----
 
   # tryCatch in case reading the delimited file fails
