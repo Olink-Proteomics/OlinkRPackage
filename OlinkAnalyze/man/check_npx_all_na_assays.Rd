@@ -7,14 +7,14 @@
 check_npx_all_na_assays(df, col_names)
 }
 \arguments{
-\item{df}{A tibble or an arrow object containing columns \emph{OlinkID} and
+\item{df}{A tibble or an arrow object containing columns \var{OlinkID} and
 the quantification column `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep = ", ", last = " or ")` # nolint}
 
 \item{col_names}{A list of matched column names. This is the output of the
-\emph{check_npx_col_names} function.}
+\var{check_npx_col_names} function.}
 }
 \value{
-A character vector containing OlinkIDs of assays with quantified
+A character vector containing \var{OlinkID} of assays with quantified
 values \emph{NA} for all samples, otherwise returns \emph{character(0)}.
 }
 \description{

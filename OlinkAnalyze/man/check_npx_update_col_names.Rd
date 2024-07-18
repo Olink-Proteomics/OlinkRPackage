@@ -12,7 +12,7 @@ column names and values are column names to be selected from the input data
 frame. Read the \emph{description} for further information.}
 }
 \value{
-\emph{column_name_dict} updated based on \emph{preferred_names}.
+\var{column_name_dict} updated based on \var{preferred_names}.
 }
 \description{
 OlinkAnalyze uses pre-defined names of columns of data frames to perform
@@ -20,10 +20,10 @@ downstream analyses. However, in certain cases the columns of interest might
 be named differently. The aim of this function is to assign custom-named
 columns of a data frame to internally expected variables that will in turn
 enable analysis of Olink data. For example, if one wished to #' use the
-column \emph{PCNormalizedNPX} for their analysis instead of the column
-\emph{NPX}, then they can assign this new name to the internal variable
-\emph{quant} to inform the package that in the downstream analysis
-\emph{PCNormalizedNPX} should be used.
+column \var{PCNormalizedNPX} for their analysis instead of the column
+\var{NPX}, then they can assign this new name to the internal variable
+\var{quant} to inform the package that in the downstream analysis
+\var{PCNormalizedNPX} should be used.
 
 This function takes as input a named character vector with internal column
 names as names and column names of the current data set as values. Names of

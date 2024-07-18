@@ -8,16 +8,16 @@ check_npx_olinkid(df, col_names)
 }
 \arguments{
 \item{df}{A tibble or an arrow object containing containing column
-\emph{OlinkID}.}
+\var{OlinkID}.}
 
 \item{col_names}{A list of matched column names. This is the output of the
-\emph{check_npx_col_names} function.}
+\var{check_npx_col_names} function.}
 }
 \value{
-A character vector with invalid OlinkIDs.
+A character vector with invalid \var{OlinkID}.
 }
 \description{
-This function checks if Olink identifiers (\emph{OlinkID}) match the pattern
+This function checks if Olink identifiers (\var{OlinkID}) match the pattern
 of a prefix "OID" followed by 5 integer numbers.
 }
 \author{

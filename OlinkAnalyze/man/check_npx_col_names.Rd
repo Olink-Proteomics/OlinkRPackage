@@ -7,7 +7,7 @@
 check_npx_col_names(df, preferred_names = NULL)
 }
 \arguments{
-\item{df}{A tibble or and arrow object from \emph{read_npx}.}
+\item{df}{A tibble or and arrow object from \code{\link{read_npx}}.}
 
 \item{preferred_names}{A named character vector where names are internal
 column names and values are column names to be selected from the input data
@@ -29,17 +29,17 @@ However, in certain cases the columns of interest might be named differently.
 This function allows assigning custom-named columns of a data frame to
 internally expected variables that will in turn instruct Olink Analyze
 functions to use them for downstream analysis. For example, if one wished to
-use the column \emph{PCNormalizedNPX} for their analysis instead of the
-column \emph{NPX}, then they can assign this new name to the internal
-variable \emph{quant} to inform the package that in the downstream analysis
-\emph{PCNormalizedNPX} should be used. See example 3.
+use the column \var{PCNormalizedNPX} for their analysis instead of the
+column \var{NPX}, then they can assign this new name to the internal
+variable \var{quant} to inform the package that in the downstream analysis
+\var{PCNormalizedNPX} should be used. See example 3.
 
 Similarly, in case of multiple matches (e.g. the data frame contains both
-columns \emph{LOD} and \emph{PlateLOD}) the ties will need to be resolved by
-the user using the argument \emph{preferred_names} from this function.  See
+columns \var{LOD} and \var{PlateLOD}) the ties will need to be resolved by
+the user using the argument \var{preferred_names} from this function.  See
 example 4.
 
-The argument \emph{preferred_names} is a named character vector with internal
+The argument \var{preferred_names} is a named character vector with internal
 column names as names and column names of the current data set as values.
 Names of the input vector can be one or more of the following:
 `r cli::ansi_collapse(x = names(column_name_dict))`

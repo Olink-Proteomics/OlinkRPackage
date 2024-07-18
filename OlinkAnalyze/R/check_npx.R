@@ -17,25 +17,25 @@
 #' This function allows assigning custom-named columns of a data frame to
 #' internally expected variables that will in turn instruct Olink Analyze
 #' functions to use them for downstream analysis. For example, if one wished to
-#' use the column \emph{PCNormalizedNPX} for their analysis instead of the
-#' column \emph{NPX}, then they can assign this new name to the internal
-#' variable \emph{quant} to inform the package that in the downstream analysis
-#' \emph{PCNormalizedNPX} should be used. See example 3.
+#' use the column \var{PCNormalizedNPX} for their analysis instead of the
+#' column \var{NPX}, then they can assign this new name to the internal
+#' variable \var{quant} to inform the package that in the downstream analysis
+#' \var{PCNormalizedNPX} should be used. See example 3.
 #'
 #' Similarly, in case of multiple matches (e.g. the data frame contains both
-#' columns \emph{LOD} and \emph{PlateLOD}) the ties will need to be resolved by
-#' the user using the argument \emph{preferred_names} from this function.  See
+#' columns \var{LOD} and \var{PlateLOD}) the ties will need to be resolved by
+#' the user using the argument \var{preferred_names} from this function.  See
 #' example 4.
 #'
-#' The argument \emph{preferred_names} is a named character vector with internal
+#' The argument \var{preferred_names} is a named character vector with internal
 #' column names as names and column names of the current data set as values.
 #' Names of the input vector can be one or more of the following:
 #' `r cli::ansi_collapse(x = names(column_name_dict))`
 #'
 #' @author
-#' Masoumeh Sheikhi
+#'   Masoumeh Sheikhi
 #'
-#' @param df A tibble or and arrow object from \emph{read_npx}.
+#' @param df A tibble or and arrow object from \code{\link{read_npx}}.
 #' @param preferred_names A named character vector where names are internal
 #' column names and values are column names to be selected from the input data
 #' frame. Read the \emph{description} for further information.
@@ -44,10 +44,10 @@
 #' \itemize{
 #'   \item{col_names}{List of column names from the input data frame marking the
 #'   columns to be used in downstream analyses.}
-#'   \item{oid_invalid}{Character vector of invalid Olink IDs.}
+#'   \item{oid_invalid}{Character vector of invalid \var{OlinkID}.}
 #'   \item{assay_na}{Character vector of assays with all samples having
-#'   `NA` values.}
-#'   \item{sample_id_dups}{Character vector of duplicate sample IDs.}
+#'   \emph{NA} values.}
+#'   \item{sample_id_dups}{Character vector of duplicate \var{SampleID}.}
 #' }
 #'
 #' @export
@@ -151,17 +151,17 @@ check_npx <- function(df = df,
 #' This function allows assigning custom-named columns of a data frame to
 #' internally expected variables that will in turn instruct Olink Analyze
 #' functions to use them for downstream analysis. For example, if one wished to
-#' use the column \emph{PCNormalizedNPX} for their analysis instead of the
-#' column \emph{NPX}, then they can assign this new name to the internal
-#' variable \emph{quant} to inform the package that in the downstream analysis
-#' \emph{PCNormalizedNPX} should be used. See example 3.
+#' use the column \var{PCNormalizedNPX} for their analysis instead of the
+#' column \var{NPX}, then they can assign this new name to the internal
+#' variable \var{quant} to inform the package that in the downstream analysis
+#' \var{PCNormalizedNPX} should be used. See example 3.
 #'
 #' Similarly, in case of multiple matches (e.g. the data frame contains both
-#' columns \emph{LOD} and \emph{PlateLOD}) the ties will need to be resolved by
-#' the user using the argument \emph{preferred_names} from this function.  See
+#' columns \var{LOD} and \var{PlateLOD}) the ties will need to be resolved by
+#' the user using the argument \var{preferred_names} from this function.  See
 #' example 4.
 #'
-#' The argument \emph{preferred_names} is a named character vector with internal
+#' The argument \var{preferred_names} is a named character vector with internal
 #' column names as names and column names of the current data set as values.
 #' Names of the input vector can be one or more of the following:
 #' `r cli::ansi_collapse(x = names(column_name_dict))`
@@ -170,7 +170,7 @@ check_npx <- function(df = df,
 #'  Klev Diamanti;
 #'  Masoumeh Sheikhi
 #'
-#' @param df A tibble or and arrow object from \emph{read_npx}.
+#' @param df A tibble or and arrow object from \code{\link{read_npx}}.
 #' @param preferred_names A named character vector where names are internal
 #' column names and values are column names to be selected from the input data
 #' frame. Read the \emph{description} for further information.
@@ -333,10 +333,10 @@ check_npx_col_names <- function(df,
 #' be named differently. The aim of this function is to assign custom-named
 #' columns of a data frame to internally expected variables that will in turn
 #' enable analysis of Olink data. For example, if one wished to #' use the
-#' column \emph{PCNormalizedNPX} for their analysis instead of the column
-#' \emph{NPX}, then they can assign this new name to the internal variable
-#' \emph{quant} to inform the package that in the downstream analysis
-#' \emph{PCNormalizedNPX} should be used.
+#' column \var{PCNormalizedNPX} for their analysis instead of the column
+#' \var{NPX}, then they can assign this new name to the internal variable
+#' \var{quant} to inform the package that in the downstream analysis
+#' \var{PCNormalizedNPX} should be used.
 #'
 #' This function takes as input a named character vector with internal column
 #' names as names and column names of the current data set as values. Names of
@@ -351,7 +351,7 @@ check_npx_col_names <- function(df,
 #' column names and values are column names to be selected from the input data
 #' frame. Read the \emph{description} for further information.
 #'
-#' @return \emph{column_name_dict} updated based on \emph{preferred_names}.
+#' @return \var{column_name_dict} updated based on \var{preferred_names}.
 #'
 check_npx_update_col_names <- function(preferred_names) {
 
@@ -402,18 +402,18 @@ check_npx_update_col_names <- function(preferred_names) {
 #' Help function checking whether df contains invalid Olink identifiers
 #'
 #' @description
-#' This function checks if Olink identifiers (\emph{OlinkID}) match the pattern
+#' This function checks if Olink identifiers (\var{OlinkID}) match the pattern
 #' of a prefix "OID" followed by 5 integer numbers.
 #'
 #' @author
 #'  Masoumeh Sheikhi
 #'
 #' @param df A tibble or an arrow object containing containing column
-#' \emph{OlinkID}.
+#' \var{OlinkID}.
 #' @param col_names A list of matched column names. This is the output of the
-#' \emph{check_npx_col_names} function.
+#' \var{check_npx_col_names} function.
 #'
-#' @return A character vector with invalid OlinkIDs.
+#' @return A character vector with invalid \var{OlinkID}.
 #'
 check_npx_olinkid <- function(df,
                               col_names) {
@@ -463,12 +463,12 @@ check_npx_olinkid <- function(df,
 #'  Simon Forsberg;
 #'  Masoumeh Sheikhi
 #'
-#' @param df A tibble or an arrow object containing columns \emph{OlinkID} and
+#' @param df A tibble or an arrow object containing columns \var{OlinkID} and
 #' the quantification column `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep = ", ", last = " or ")` # nolint
 #' @param col_names A list of matched column names. This is the output of the
-#' \emph{check_npx_col_names} function.
+#' \var{check_npx_col_names} function.
 #'
-#' @return A character vector containing OlinkIDs of assays with quantified
+#' @return A character vector containing \var{OlinkID} of assays with quantified
 #' values \emph{NA} for all samples, otherwise returns \emph{character(0)}.
 #'
 check_npx_all_na_assays <- function(df, col_names) {
@@ -521,12 +521,12 @@ check_npx_all_na_assays <- function(df, col_names) {
 #' @author
 #'  Masoumeh Sheikhi
 #'
-#' @param df A tibble or an arrow object containing the columns \emph{SampleID}
-#' and \emph{OlinkID}.
+#' @param df A tibble or an arrow object containing the columns \var{SampleID}
+#' and \var{OlinkID}.
 #' @param col_names A list of matched column names. This is the output of the
-#' \emph{check_npx_col_names} function.
+#' \var{check_npx_col_names} function.
 #'
-#' @return A character vector of duplicate SampleIDs found in the data.
+#' @return A character vector of duplicate \var{SampleID} found in the data.
 #'
 check_npx_duplicate_sample_ids <- function(df, col_names) {
 

@@ -7,14 +7,14 @@
 check_npx_duplicate_sample_ids(df, col_names)
 }
 \arguments{
-\item{df}{A tibble or an arrow object containing the columns \emph{SampleID}
-and \emph{OlinkID}.}
+\item{df}{A tibble or an arrow object containing the columns \var{SampleID}
+and \var{OlinkID}.}
 
 \item{col_names}{A list of matched column names. This is the output of the
-\emph{check_npx_col_names} function.}
+\var{check_npx_col_names} function.}
 }
 \value{
-A character vector of duplicate SampleIDs found in the data.
+A character vector of duplicate \var{SampleID} found in the data.
 }
 \description{
 This function checks if there are duplicate sample identifiers for any assay.
