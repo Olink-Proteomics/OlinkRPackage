@@ -469,11 +469,6 @@ check_npx_olinkid <- function(df,
 #'
 check_npx_all_na_assays <- function(df, col_names) {
 
-  # check if duckdb and dbplyr are installed
-  check_library_installed(libraries = c("duckdb", "dbplyr"),
-                          error = TRUE)
-  # they are needed when we use arrow::to_duckdb()
-
   # Identify assays with only NAs
   all_nas <- df |>
     dplyr::select(

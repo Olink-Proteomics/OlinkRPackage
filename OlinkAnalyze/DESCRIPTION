@@ -64,14 +64,14 @@ Depends: R (>= 4.1.0)
 Imports: 
     arrow (>= 14.0.0),
     cli (>= 3.6.1),
+    dbplyr,
     dplyr,
+    duckdb,
     readxl,
     rlang,
     stringr,
     tidyr
 Suggests: 
-    dbplyr,
-    duckdb,
     testthat (>= 3.0.0),
     withr,
     writexl,

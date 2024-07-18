@@ -568,9 +568,6 @@ test_that(
 test_that(
   "check_npx_all_na_assays - warning - arrow - all-NA assay captured",
   {
-    skip_if_not_installed(pkg = "duckdb")
-    skip_if_not_installed(pkg = "dbplyr")
-
     df <- arrow::arrow_table(
       SampleID = c("A", "B", "A", "B"),
       OlinkID = c("OID12345",
@@ -603,9 +600,6 @@ test_that(
 test_that(
   "check_npx_all_na_assays - works - arrow - no assay has all NAs",
   {
-    skip_if_not_installed(pkg = "duckdb")
-    skip_if_not_installed(pkg = "dbplyr")
-
     df <- arrow::arrow_table(
       SampleID = c("A", "B", "A", "B"),
       OlinkID = c("OID12345",
