@@ -7,14 +7,18 @@
 check_olink_data_type(x, broader_platform = NULL)
 }
 \arguments{
-\item{x}{The name of the Olink data type. One of `NPX`, `Quantified` or `Ct`.}
+\item{x}{The name of the Olink data type. One of
+Ct, NPX or Quantified. # nolint}
 
-\item{broader_platform}{Name of the broader Olink platform. One of `qPCR` or
-`NGS`.}
+\item{broader_platform}{Name of the broader Olink platform. One of
+qPCR and NGS. # nolint}
 }
 \value{
-Nothing if data_type is ok, otherwise an error.
+\code{NULL} if data_type is ok, otherwise an error.
 }
 \description{
 Help function checking that the Olink data_type is acceptable.
+}
+\author{
+Klev Diamanti
 }
