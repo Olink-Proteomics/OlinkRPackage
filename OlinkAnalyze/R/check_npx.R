@@ -42,12 +42,12 @@
 #'
 #' @return A list containing the following elements:
 #' \itemize{
-#'   \item{col_names}{List of column names from the input data frame marking the
-#'   columns to be used in downstream analyses.}
-#'   \item{oid_invalid}{Character vector of invalid \var{OlinkID}.}
-#'   \item{assay_na}{Character vector of assays with all samples having
-#'   \emph{NA} values.}
-#'   \item{sample_id_dups}{Character vector of duplicate \var{SampleID}.}
+#'   \item \strong{col_names} List of column names from the input data frame
+#'   marking the columns to be used in downstream analyses.
+#'   \item \strong{oid_invalid} Character vector of invalid \var{OlinkID}.
+#'   \item \strong{assay_na} Character vector of assays with all samples having
+#'   \emph{NA} values.
+#'   \item \strong{sample_id_dups} Character vector of duplicate \var{SampleID}.
 #' }
 #'
 #' @export
@@ -441,7 +441,7 @@ check_npx_olinkid <- function(df,
   if (length(invalid_oid) > 0L) {
     cli::cli_warn(c(
       "Unrecognized OlinkID{?s} detected: {invalid_oid}"
-      ))
+    ))
   }
 
   # return ----
@@ -469,9 +469,13 @@ check_npx_olinkid <- function(df,
 #'
 check_npx_all_na_assays <- function(df, col_names) {
 
+  # check if duckdb and dbplyr are installed
+  check_library_installed(libraries = c("duckdb", "dbplyr"),
+                          error = TRUE)
+  # they are needed when we use arrow::to_duckdb()
+
   # Identify assays with only NAs
-  all_nas <-
-    df |>
+  all_nas <- df |>
     dplyr::select(
       dplyr::all_of(
         c(col_names$olink_id,
@@ -482,27 +486,26 @@ check_npx_all_na_assays <- function(df, col_names) {
       .data[[col_names$olink_id]]
     ) |>
     dplyr::mutate(
-      is_na = ifelse(is.na(.data[[col_names$quant]]), 1L, 0L)
+      is_na = dplyr::if_else(is.na(.data[[col_names$quant]]), 1L, 0L)
     ) |>
+    arrow::to_duckdb() |>
     dplyr::summarise(
       n = dplyr::n(),
-      n_na = sum(is_na), #nolint
-      # no linting because it should be .data[["is_na"]]
-      # but summarise(n_na = sum(.data[["is_na"]])) does not work
-      # with arrow objects
+      n_na = sum(.data[["is_na"]], na.rm = TRUE),
       .groups = "drop"
     ) |>
     dplyr::filter(
       .data[["n"]] == .data[["n_na"]]
     ) |>
     dplyr::collect() |>
-    dplyr::pull(.data[[col_names$olink_id]]
+    dplyr::pull(
+      .data[[col_names$olink_id]]
     )
 
   # Issue warning if any assays with only NAs are found
   if (length(all_nas) > 0L) {
     cli::cli_warn(c(
-      x = "{all_nas} ha{?s/ve} {col_names$quant} = NA for all samples."
+      "{all_nas} ha{?s/ve} {col_names$quant} = NA for all samples."
     ))
   }
 
