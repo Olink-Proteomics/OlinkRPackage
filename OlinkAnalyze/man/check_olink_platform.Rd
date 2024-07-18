@@ -7,15 +7,18 @@
 check_olink_platform(x, broader_platform = NULL)
 }
 \arguments{
-\item{x}{The name of the Olink platform. One of `Explore 3072`, `Explore HT`,
-`Target 96`, `Target 48`, `Flex` or `Focus`.}
+\item{x}{The name of the Olink platform. One of
+Target 48, Flex, Target 96, Explore 3072, Explore HT or Focus.}
 
-\item{broader_platform}{Name of the broader Olink platform. One of `qPCR` or
-`NGS`.}
+\item{broader_platform}{Name of the broader Olink platform. One of
+qPCR and NGS. # nolint}
 }
 \value{
-Nothing if platform is ok, otherwise an error.
+\code{NULL} if platform is ok, otherwise an error.
 }
 \description{
 Help function checking that the olink_platform is acceptable.
+}
+\author{
+Klev Diamanti
 }

@@ -7,21 +7,21 @@
 check_is_integer(int, error = FALSE)
 }
 \arguments{
-\item{int}{Input to check.}
+\item{int}{Integer to check.}
 
-\item{error}{Boolean to return error or a boolean (default).}
+\item{error}{Return error or a boolean (default = FALSE).}
 }
 \value{
 Boolean if the variable is an integer vector or not, and an error if
-`error = TRUE`.or.
+"error = TRUE".
 }
 \description{
 Help function checking if a variable is an integer vector.
 }
 \seealso{
-[check_is_boolean()]
-  [check_is_character()]
-  [check_is_numeric()]
+\code{\link{check_is_boolean}}
+\code{\link{check_is_character}}
+\code{\link{check_is_numeric}}
 }
 \author{
 Klev Diamanti

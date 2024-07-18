@@ -7,11 +7,15 @@
 check_olink_broader_platform(x)
 }
 \arguments{
-\item{x}{Name of the broader Olink platform. One of `qPCR` or `NGS`.}
+\item{x}{Name of the broader Olink platform. One of
+qPCR and NGS. # nolint}
 }
 \value{
-Nothing if broader Olink platform is ok, otherwise an error.
+\code{NULL} if broader Olink platform is ok, otherwise an error.
 }
 \description{
 Help function checking that the broader Olink platform is acceptable.
+}
+\author{
+Klev Diamanti
 }

@@ -2,17 +2,19 @@
 % Please edit documentation in R/read_npx_delim.R
 \name{read_npx_delim_long}
 \alias{read_npx_delim_long}
-\title{Help function to read NPX, Ct or absolute quantification data from semicolon-
-or comma-delimited Olink software output files in R.}
+\title{Help function to read long format
+Ct, NPX or Quantified # nolint
+data from delimited file exported from Olink software.}
 \usage{
 read_npx_delim_long(file, sep = NULL)
 }
 \arguments{
 \item{file}{Path to Olink software output delimited file in long format.
-Expecting file extensions `csv` or `txt`.}
+Expecting file extensions
+csv and txt. # nolint}
 
-\item{sep}{Character separator of delimited input file. One of `NULL` for
-auto-detection (default), `,` for comma or `;` for semicolon. Used only for
+\item{sep}{Character separator of delimited input file. One of \code{NULL} for
+auto-detection (default), "," for comma or ";" for semicolon. Used only for
 delimited output files from Olink software.}
 }
 \value{
@@ -23,10 +25,10 @@ The function can handle delimited files in long format.
 }
 \seealso{
 \code{\link{read_npx_delim_wide}}
-  \code{\link{read_npx_delim}}
+\code{\link{read_npx_delim}}
 }
 \author{
 Klev Diamanti;
-  Christoffer Cambronero;
-  Kathleen Nevola
+Christoffer Cambronero;
+Kathleen Nevola
 }

@@ -9,19 +9,18 @@ check_is_arrow_or_tibble(df, error = FALSE)
 \arguments{
 \item{df}{Data frame to check.}
 
-\item{error}{`TRUE` to return an error if \var{df} is not a tibble or an
-arrow object; `FALSE` (default) to return a boolean.}
+\item{error}{Return error or a boolean (default = FALSE).}
 }
 \value{
 A scalar boolean if the object is a tibble or an arrow object or not,
-and an error if \var{error} = `TRUE`.
+and an error if "error = TRUE".
 }
 \description{
 Help function checking if a data frame is a tibble or an arrow object.
 }
 \seealso{
 \code{\link{check_is_arrow_object}}
-  \code{\link{check_is_tibble}}
+\code{\link{check_is_tibble}}
 }
 \author{
 Klev Diamanti

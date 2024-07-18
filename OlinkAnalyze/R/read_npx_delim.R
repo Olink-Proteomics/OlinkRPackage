@@ -10,11 +10,12 @@
 #'   Kathleen Nevola
 #'
 #' @param file Path to Olink software output delimited file in wide or long
-#' format. Expecting file extensions `csv` or `txt`.
-#' @param out_df The class of output data frame. One of `tibble` (default) or
-#' `arrow` for ArrowObject.
+#' format. Expecting file extensions
+#' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("delim", names(accepted_npx_file_ext))], sep = ", ", last = " or ")`. # nolint
+#' @param out_df The class of output data frame. One of "tibble" (default) or
+#' "arrow" for ArrowObject.
 #' @param sep Character separator of delimited input file. One of `NULL` for
-#' auto-detection (default), `,` for comma or `;` for semicolon. Used only for
+#' auto-detection (default), "," for comma or ";" for semicolon. Used only for
 #' delimited output files from Olink software.
 #'
 #' @return Tibble or ArrowObject with Olink data in long format.
@@ -122,8 +123,9 @@ read_npx_delim <- function(file,
 #' @rdname read_npx_delim
 read_npx_csv <- read_npx_delim
 
-#' Help function to read NPX, Ct or absolute quantification data from semicolon-
-#' or comma-delimited Olink software output files in R.
+#' Help function to read long format
+#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(last = " or ")` # nolint
+#' data from delimited file exported from Olink software.
 #'
 #' @description
 #' The function can handle delimited files in long format.
@@ -134,9 +136,10 @@ read_npx_csv <- read_npx_delim
 #'   Kathleen Nevola
 #'
 #' @param file Path to Olink software output delimited file in long format.
-#' Expecting file extensions `csv` or `txt`.
+#' Expecting file extensions
+#' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("delim", names(accepted_npx_file_ext))], sep = ", ", last = " or ")`. # nolint
 #' @param sep Character separator of delimited input file. One of `NULL` for
-#' auto-detection (default), `,` for comma or `;` for semicolon. Used only for
+#' auto-detection (default), "," for comma or ";" for semicolon. Used only for
 #' delimited output files from Olink software.
 #'
 #' @return Tibble or ArrowObject with Olink data in long format.
@@ -173,8 +176,9 @@ read_npx_delim_long <- function(file,
 
 }
 
-#' Help function to read NPX, Ct or absolute quantification data from semicolon-
-#' or comma-delimited Olink software output files in R.
+#' Help function to read wide format
+#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(last = " or ")` # nolint
+#' data from delimited file exported from Olink software.
 #'
 #' @description
 #' The function can handle delimited files in wide format.
@@ -183,12 +187,13 @@ read_npx_delim_long <- function(file,
 #'   Klev Diamanti
 #'
 #' @param file Path to Olink software output delimited file in wide format.
-#' Expecting file extensions `csv` or `txt`.
+#' Expecting file extensions
+#' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("delim", names(accepted_npx_file_ext))], sep = ", ", last = " or ")`. # nolint
 #' @param sep Character separator of delimited input file. One of `NULL` for
-#' auto-detection (default), `,` for comma or `;` for semicolon. Used only for
+#' auto-detection (default), "," for comma or ";" for semicolon. Used only for
 #' delimited output files from Olink software.
 #'
-#' @return An R6 class ArrowObject or tibble.
+#' @return Tibble or ArrowObject with Olink data in wide format.
 #'
 #' @seealso
 #'   \code{\link{read_npx_delim_long}}
@@ -232,13 +237,14 @@ read_npx_delim_wide <- function(file,
 #' @author
 #'   Klev Diamanti
 #'
-#' @param file Path to Olink software output delimited file in wide or long
-#' format. Expecting file extensions `csv` or `txt`.
+#' @param file Path to Olink software output delimited file in wide format.
+#' Expecting file extensions
+#' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("delim", names(accepted_npx_file_ext))], sep = ", ", last = " or ")`. # nolint
 #' @param sep Character separator of delimited input file. One of `NULL` for
-#' auto-detection (default), `,` for comma or `;` for semicolon. Used only for
+#' auto-detection (default), "," for comma or ";" for semicolon. Used only for
 #' delimited output files from Olink software.
 #'
-#' @return The file separator comma `,` or semicolon `;`.
+#' @return The file separator comma "," or semicolon ";".
 #'
 #' @seealso
 #'   \code{\link{read_npx_delim_long}}
@@ -291,10 +297,11 @@ check_field_separator <- function(file,
 #' @author
 #'   Klev Diamanti
 #'
-#' @param file Path to Olink software output delimited file in wide or long
-#' format. Expecting file extensions `csv` or `txt`.
+#' @param file Path to Olink software output delimited file in wide format.
+#' Expecting file extensions
+#' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("delim", names(accepted_npx_file_ext))], sep = ", ", last = " or ")`. # nolint
 #'
-#' @return The file separator comma `,` or semicolon `;`.
+#' @return The file separator comma "," or semicolon ";".
 #'
 #' @seealso
 #'   \code{\link{read_npx_delim_long}}

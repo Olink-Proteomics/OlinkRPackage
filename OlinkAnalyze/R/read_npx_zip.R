@@ -12,11 +12,13 @@
 #'
 #' \itemize{
 #' \item \strong{Olink file} exported by Olink software in wide or long format.
-#' Expecting file extensions `csv`, `txt`, `xls`, `xlsx`, `parquet` or `zip`.
+#' Expecting file extensions
+#' `r cli::ansi_collapse(x = accepted_npx_file_ext, last = " or ")`.
 #' This file is subsequently provided as input to \code{\link{read_npx}}.
-#' \item \strong{checksum file} named `MD5_checksum.txt` or`checksum_sha256.txt`
-#' depending on the checksum algorithm. The file contains only one line with the
-#' checksum string of characters.
+#' \item \strong{checksum file} One of
+#' `r cli::ansi_collapse(x = accepted_checksum_files, last = " or ")` depending
+#' on the checksum algorithm. The file contains only one line with the checksum
+#' string of characters.
 #' \item \strong{File(s) to be ignored} from the zip file. These files can be
 #' named as a character vector in the argument \var{.ignore_files}.
 #' }
@@ -27,26 +29,28 @@
 #'   Pascal Pucholt
 #'
 #' @param file Path to Olink software output zip-compressed file in wide or long
-#' format. Expecting file extension `zip`.
-#' @param out_df The class of output data frame. One of `tibble` (default) or
-#' `arrow` for ArrowObject.
+#' format. Expecting file extension
+#' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("compress", names(accepted_npx_file_ext))], last = " or ")`. # nolint
+#' @param out_df The class of output data frame. One of "tibble" (default) or
+#' "arrow" for ArrowObject.
 #' @param sep Character separator of delimited input file. One of `NULL` for
-#' auto-detection (default), `,` for comma or `;` for semicolon. Used only for
+#' auto-detection (default), "," for comma or ";" for semicolon. Used only for
 #' delimited output files from Olink software.
 #' @param long_format Boolean marking format of input file. One of `NULL`
-#' (default) for auto-detection, `TRUE` for long format files or `FALSE` for
+#' (default) for auto-detection, "TRUE" for long format files or "FALSE" for
 #' wide format files.
 #' @param olink_platform Olink platform used to generate the input file.
-#' One of `NULL` (default), `Explore 3072`, `Explore HT`, `Target 96`,
-#' `Target 48`, `Flex` or `Focus`.
+#' One of `NULL` (default),
+#' `r cli::ansi_collapse(x = accepted_olink_platforms$name, last = " or ")`.
 #' @param data_type Quantification method of the input data. One of `NULL`
-#' (default), `NPX`, `Quantified` or `Ct`.
+#' (default),
+#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(last = " or ")`. # nolint
 #' @param .ignore_files Character vector of files included in the zip-compressed
 #' Olink software output files that should be ignored. Applies only to
-#' zip-compressed input files. `c("README.txt")` (default).
+#' zip-compressed input files. (default = c("README.txt")).
 #' @param quiet Boolean to print a confirmation message when reading the input
-#' file. Applies to excel or delimited input only. `TRUE` (default) to not print
-#' and `FALSE` to print.
+#' file. Applies to excel or delimited input only. "TRUE" (default) to not print
+#' and "FALSE" to print.
 #'
 #' @return Tibble or ArrowObject with Olink data in long format.
 #'
@@ -343,8 +347,9 @@ get_npx_file <- function(files,
 #' checksum of the Olink data file from the input zip-compressed file.
 #'
 #' @description
-#' Runs only if `MD5_checksum.txt` or `checksum_sha256.txt` are present in the
-#' input zip-compressed file. This function does not check if the
+#' Runs only if one of
+#' `r cli::ansi_collapse(x = accepted_checksum_files, last = " or ")` are
+#' present in the input zip-compressed file. This function does not check if the
 #' \var{checksum_file} is in acceptable format.
 #'
 #' @author
@@ -355,8 +360,8 @@ get_npx_file <- function(files,
 #' @param npx_file Extracted file from the zip-compressed file that contains the
 #' Olink data file from Olink software.
 #'
-#' @return NULL or an error if the files could not be opened or if checksum did
-#' not match.
+#' @return `NULL` or an error if the files could not be opened or if checksum
+#' did not match.
 #'
 check_checksum <- function(checksum_file,
                            npx_file) {

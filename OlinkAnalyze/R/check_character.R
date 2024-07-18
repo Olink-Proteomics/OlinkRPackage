@@ -1,17 +1,18 @@
 #' Help function checking if a variable is a character vector.
 #'
-#' @author Klev Diamanti
+#' @author
+#'   Klev Diamanti
 #'
-#' @param string Input to check.
-#' @param error Boolean to return error or a boolean (default).
+#' @param string String to check.
+#' @param error Return error or a boolean (default = FALSE).
 #'
 #' @return Boolean if the variable is a character vector or not, and an error if
-#' `error = TRUE`.
+#' "error = TRUE".
 #'
 #' @seealso
-#'   [check_is_boolean()]
-#'   [check_is_integer()]
-#'   [check_is_numeric()]
+#'   \code{\link{check_is_boolean}}
+#'   \code{\link{check_is_integer}}
+#'   \code{\link{check_is_numeric}}
 #'
 check_is_character <- function(string,
                                error = FALSE) {
@@ -50,18 +51,19 @@ check_is_character <- function(string,
 
 #' Help function checking if a variable is a character vector of length 1.
 #'
-#' @author Klev Diamanti
+#' @author
+#'   Klev Diamanti
 #'
-#' @param string Input to check.
-#' @param error Boolean to return error or a boolean (default).
+#' @param string String vector to check.
+#' @param error Return error or a boolean (default = FALSE).
 #'
 #' @return Boolean if the variable is a character vector of length 1 or not, and
-#' an error if `error = TRUE`.
+#' an error if "error = TRUE".
 #'
 #' @seealso
-#'   [check_is_scalar_boolean()]
-#'   [check_is_scalar_integer()]
-#'   [check_is_scalar_numeric()]
+#'   \code{\link{check_is_scalar_boolean}}
+#'   \code{\link{check_is_scalar_integer}}
+#'   \code{\link{check_is_scalar_numeric}}
 #'
 check_is_scalar_character <- function(string,
                                       error = FALSE) {

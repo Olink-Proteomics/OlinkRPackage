@@ -7,21 +7,21 @@
 check_is_character(string, error = FALSE)
 }
 \arguments{
-\item{string}{Input to check.}
+\item{string}{String to check.}
 
-\item{error}{Boolean to return error or a boolean (default).}
+\item{error}{Return error or a boolean (default = FALSE).}
 }
 \value{
 Boolean if the variable is a character vector or not, and an error if
-`error = TRUE`.
+"error = TRUE".
 }
 \description{
 Help function checking if a variable is a character vector.
 }
 \seealso{
-[check_is_boolean()]
-  [check_is_integer()]
-  [check_is_numeric()]
+\code{\link{check_is_boolean}}
+\code{\link{check_is_integer}}
+\code{\link{check_is_numeric}}
 }
 \author{
 Klev Diamanti

@@ -2,31 +2,34 @@
 % Please edit documentation in R/read_npx_legacy.R
 \name{read_npx_legacy_check}
 \alias{read_npx_legacy_check}
-\title{Help function ensuring `read_npx_legacy` works}
+\title{Help function ensuring \code{\link{read_npx_legacy}} works}
 \usage{
 read_npx_legacy_check(file, df_top, data_type, olink_platform, bottom_mat_v)
 }
 \arguments{
 \item{file}{Path to Olink software output file in wide format. Expecting file
-extensions `csv`, `xls`, or `xlsx`.}
+extensions
+xls, xlsx, csv or txt. # nolint}
 
 \item{df_top}{Top matrix of Olink dataset in wide format.}
 
-\item{data_type}{Quantification method of the input data. One of `NULL`
-(default), `NPX` or `Quantified`.}
+\item{data_type}{Quantification method of the input data. One of \code{NULL}
+(default),
+Ct, NPX or Quantified. # nolint}
 
 \item{olink_platform}{Olink platform used to generate the input file.
-One of `NULL` (default), `Target 96` or `Target 48`.}
+One of \code{NULL} (default),
+Target 48 and Target 96. # nolint}
 
 \item{bottom_mat_v}{Version of the rows in the bottom matrix of the Olink
 file in wide format based on the local environment variable
 \var{olink_wide_bottom_matrix}.}
 }
 \value{
-`NULL` unless unsupported file is detected.
+\code{NULL} unless unsupported file is detected.
 }
 \description{
-Help function ensuring `read_npx_legacy` works
+Help function ensuring \code{\link{read_npx_legacy}} works
 }
 \author{
 Klev Diamanti

@@ -238,6 +238,8 @@ test_that(
 test_that(
   "data loads correctly - wide - npx_data2 - xlsx",
   {
+    skip_if_not_installed(pkg = "readxl")
+
     withr::with_tempfile(
       new = "tmp_wide_xlsx",
       pattern = "xlsx-wide-",
@@ -331,6 +333,8 @@ test_that(
 test_that(
   "data loads correctly - wide - npx_data1 - xlsx",
   {
+    skip_if_not_installed(pkg = "readxl")
+
     withr::with_tempfile(
       new = "tmp_wide_xlsx",
       pattern = "xlsx-wide-",
@@ -553,6 +557,8 @@ test_that(
 test_that(
   "data loads correctly - legacy - wide - npx_data1 - xlsx",
   {
+    skip_if_not_installed(pkg = "readxl")
+
     withr::with_tempfile(
       new = "tmp_wide_xlsx",
       pattern = "xlsx-wide-",
