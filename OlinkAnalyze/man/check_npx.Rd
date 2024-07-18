@@ -16,12 +16,12 @@ frame. Read the \emph{description} for further information.}
 \value{
 A list containing the following elements:
 \itemize{
-  \item{col_names}{List of column names from the input data frame marking the
-  columns to be used in downstream analyses.}
-  \item{oid_invalid}{Character vector of invalid \var{OlinkID}.}
-  \item{assay_na}{Character vector of assays with all samples having
-  \emph{NA} values.}
-  \item{sample_id_dups}{Character vector of duplicate \var{SampleID}.}
+  \item \strong{col_names} List of column names from the input data frame
+  marking the columns to be used in downstream analyses.
+  \item \strong{oid_invalid} Character vector of invalid \var{OlinkID}.
+  \item \strong{assay_na} Character vector of assays with all samples having
+  \emph{NA} values.
+  \item \strong{sample_id_dups} Character vector of duplicate \var{SampleID}.
 }
 }
 \description{
