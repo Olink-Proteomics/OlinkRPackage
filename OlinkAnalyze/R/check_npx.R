@@ -455,6 +455,13 @@ check_npx_olinkid <- function(df,
 #' This function checks if there are assays with the quantified values for all
 #' samples \emph{NA}.
 #'
+#' @details
+#' We have added the tags importFrom for "dbplyr" and "duckdb" because
+#' "devtools::check()" would complain with a note that the two libraries are
+#' imported bu never used. To avoid that we used solutions taken from here:
+#' 1. https://github.com/hadley/r-pkgs/issues/203
+#' 2. https://github.com/pbs-software/pbs-modelling/issues/95
+#'
 #' @author
 #'  Simon Forsberg;
 #'  Masoumeh Sheikhi
@@ -466,6 +473,9 @@ check_npx_olinkid <- function(df,
 #'
 #' @return A character vector containing \var{OlinkID} of assays with quantified
 #' values \emph{NA} for all samples, otherwise returns \emph{character(0)}.
+#'
+#' @importFrom duckdb duckdb
+#' @importFrom dbplyr memdb_frame
 #'
 check_npx_all_na_assays <- function(df, col_names) {
 
