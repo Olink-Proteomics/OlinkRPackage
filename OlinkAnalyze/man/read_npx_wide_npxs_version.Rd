@@ -8,7 +8,7 @@ wide format.}
 read_npx_wide_npxs_version(df)
 }
 \arguments{
-\item{df}{Head matrix of Olink datasets in wide format \var{df_head}.}
+\item{df}{Head matrix of Olink dataset in wide format \var{df_head}.}
 }
 \value{
 The version of the NPX Signature software.
@@ -19,11 +19,11 @@ wide format.
 }
 \seealso{
 \code{\link{read_npx_wide}}
-  \code{\link{read_npx_wide_split_row}}
-  \code{\link{read_npx_wide_npxs_version}}
-  \code{\link{read_npx_wide_top}}
-  \code{\link{read_npx_wide_middle}}
-  \code{\link{read_npx_wide_bottom}}
+\code{\link{read_npx_wide_split_row}}
+\code{\link{read_npx_wide_npxs_version}}
+\code{\link{read_npx_wide_top}}
+\code{\link{read_npx_wide_middle}}
+\code{\link{read_npx_wide_bottom}}
 }
 \author{
 Klev Diamanti
