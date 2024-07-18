@@ -439,13 +439,9 @@ check_npx_olinkid <- function(df,
 
   # warning if there is any invalid Olink ID
   if (length(invalid_oid) > 0L) {
-
-    cli::cli_warn(
-      c("x" = "Unrecognized Olink ID{?s} detected: {invalid_oid}"),
-      call = rlang::caller_env(),
-      wrap = FALSE
-    )
-
+    cli::cli_warn(c(
+      "Unrecognized OlinkID{?s} detected: {invalid_oid}"
+      ))
   }
 
   # return ----
@@ -555,8 +551,7 @@ check_npx_duplicate_sample_ids <- function(df, col_names) {
   # Warn if duplicates are found
   if (length(duplicates) > 0L) {
     cli::cli_warn(c(
-      "x" = "Duplicate sample ID{?s} detected:
-      {duplicates}"
+      "Duplicate SampleID{?s} detected: {duplicates}"
     ))
   }
 
