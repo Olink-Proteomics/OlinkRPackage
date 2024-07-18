@@ -70,6 +70,8 @@ Imports:
     stringr,
     tidyr
 Suggests: 
+    dbplyr,
+    duckdb,
     testthat (>= 3.0.0),
     withr,
     writexl,
