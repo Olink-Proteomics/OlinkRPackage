@@ -5,13 +5,13 @@
 \alias{manifest}
 \title{Example Sample Manifest}
 \format{
-This dataset  contains columns:
+This dataset contains columns:
 \describe{
-  \item{SubjectID}{Subject Identifier, A-Z}
-  \item{Visit}{Visit Number, 1-6}
-  \item{SampleID}{138 unique sample IDs}
-  \item{Site}{Site1 or Site2}
-  }
+\item{SubjectID}{Subject Identifier, A-Z}
+\item{Visit}{Visit Number, 1-6}
+\item{SampleID}{138 unique sample IDs}
+\item{Site}{Site1 or Site2}
+}
 }
 \usage{
 manifest

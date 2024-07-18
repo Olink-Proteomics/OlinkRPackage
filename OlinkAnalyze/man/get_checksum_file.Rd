@@ -20,8 +20,8 @@ contents of a zip-compressed file.
 }
 \seealso{
 \code{\link{read_npx_zip}}
-  \code{\link{get_npx_file}}
-  \code{\link{check_checksum}}
+\code{\link{get_npx_file}}
+\code{\link{check_checksum}}
 }
 \author{
 Klev Diamanti

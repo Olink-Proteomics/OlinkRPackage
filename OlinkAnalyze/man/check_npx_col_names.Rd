@@ -84,6 +84,6 @@ npx_df |>
 
 }
 \author{
-Klev Diamanti;
- Masoumeh Sheikhi
+Klev Diamanti
+Masoumeh Sheikhi
 }

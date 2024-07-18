@@ -7,9 +7,10 @@
 #'   Pascal Pucholt
 #'
 #' @param file Path to Olink software output parquet file in long format.
-#' Expecting file extension `parquet`.
-#' @param out_df The class of output data frame. One of `tibble` (default) or
-#' `arrow` for ArrowObject.
+#' Expecting file extension
+#' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("parquet", names(accepted_npx_file_ext))], sep = ", ", last = " or ")`. # nolint
+#' @param out_df The class of output data frame. One of "tibble" (default) or
+#' "arrow" for ArrowObject.
 #'
 #' @return Tibble or ArrowObject with Olink data in long format.
 #'

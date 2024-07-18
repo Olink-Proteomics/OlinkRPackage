@@ -32,5 +32,5 @@ the input vector can be one or more of the following:
 }
 \author{
 Klev Diamanti
- Masoumeh Sheikhi
+Masoumeh Sheikhi
 }

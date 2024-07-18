@@ -1,14 +1,15 @@
 #' Help function checking if file exists.
 #'
-#' @author Klev Diamanti
-#'
-#' @param file Path to the file.
-#' @param error Boolean to return error or a boolean (default).
+#' @author
+#'   Klev Diamanti
 #'
 #' @description
-#' Only one file at a time!
+#' Check \strong{only one file at a time} if it exists.
 #'
-#' @return Boolean if the file exists or not, and an error if `error = TRUE`.
+#' @param file Path to file.
+#' @param error Return error or a boolean (default = FALSE).
+#'
+#' @return Boolean if the file exists or not, and an error if "error = TRUE".
 #'
 check_file_exists <- function(file,
                               error = FALSE) {
@@ -51,14 +52,20 @@ check_file_exists <- function(file,
 
 #' Help function checking if file extension is acceptable.
 #'
-#' @author Klev Diamanti
+#' @author
+#'   Klev Diamanti
 #'
-#' @param file Path to the file.
+#' @description
+#' Use variable \var{accepted_npx_file_ext} to check if extension of the input
+#' file is acceptable.
+#'
+#' @param file Path to file.
 #'
 #' @return The type of the file extension based on the global variable
-#' `accepted_npx_file_ext`
+#' \var{accepted_npx_file_ext}.
 #'
 check_file_extension <- function(file) {
+
   # check input ----
 
   check_is_scalar_character(string = file,
@@ -84,7 +91,7 @@ check_file_extension <- function(file) {
         "x" = "Unable to recognize the extension of the file {.file {file}}!",
         "i" = "Expected on of {.val {accepted_npx_file_ext}}!"
       ),
-      call = NULL,
+      call = rlang::caller_env(),
       wrap = FALSE
     )
 

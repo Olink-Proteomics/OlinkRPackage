@@ -2,8 +2,8 @@
 % Please edit documentation in R/read_npx_legacy.R
 \name{read_npx_legacy_help}
 \alias{read_npx_legacy_help}
-\title{Help function utilizing functions from `read_npx_format` and `read_npx_wide`
-to streamline `read_npx_legacy`}
+\title{Help function utilizing functions from \code{\link{read_npx_format}} and
+\code{\link{read_npx_wide}} to streamline \code{\link{read_npx_legacy}}}
 \usage{
 read_npx_legacy_help(
   file,
@@ -15,29 +15,32 @@ read_npx_legacy_help(
 }
 \arguments{
 \item{file}{Path to Olink software output file in wide format. Expecting file
-extensions `csv`, `xls`, or `xlsx`.}
+extensions
+xls, xlsx, csv or txt. # nolint}
 
-\item{out_df}{The class of output data frame. One of `tibble` (default) or
-`arrow` for ArrowObject.}
+\item{out_df}{The class of output data frame. One of "tibble" (default) or
+"arrow" for ArrowObject.}
 
 \item{olink_platform}{Olink platform used to generate the input file.
-One of `NULL` (default), `Target 96` or `Target 48`.}
+One of \code{NULL} (default),
+Target 48 and Target 96. # nolint}
 
-\item{data_type}{Quantification method of the input data. One of `NULL`
-(default), `NPX` or `Quantified`.}
+\item{data_type}{Quantification method of the input data. One of \code{NULL}
+(default),
+Ct, NPX or Quantified. # nolint}
 
 \item{data_type_no_accept}{Character vector of data types that should be
-rejected. Default: `Ct`.}
+rejected (default = "Ct").}
 }
 \value{
 A list of objects containing the following:
 \itemize{
 \item \strong{olink_platform}: auto-detected Olink platform. One of
-`Target 96` or `Target 48`.
+Target 48 and Target 96. # nolint
 \item \strong{long_format}: auto-detected Olink format. Should always be
-`FALSE`.
+"FALSE".
 \item \strong{data_type}: auto-detected Olink data type. One of
-`NPX` or `Quantified`.
+Ct, NPX or Quantified. # nolint
 \item \strong{df_split}: list of 2 tibbles. Top matrix from the Olink wide
 file, and middle combined with bottom matrix.
 \item \strong{npxs_v}: Olink NPX software version.
@@ -50,8 +53,8 @@ specifications, derived from \var{accepted_olink_platforms}.
 }
 }
 \description{
-Help function utilizing functions from `read_npx_format` and `read_npx_wide`
-to streamline `read_npx_legacy`
+Help function utilizing functions from \code{\link{read_npx_format}} and
+\code{\link{read_npx_wide}} to streamline \code{\link{read_npx_legacy}}
 }
 \author{
 Klev Diamanti

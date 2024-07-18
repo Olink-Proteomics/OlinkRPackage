@@ -7,10 +7,10 @@
 read_npx_wide_panel_version(df)
 }
 \arguments{
-\item{df}{A tibble containing the column `Panel`.}
+\item{df}{A tibble containing the column \var{Panel}.}
 }
 \value{
-Same tibble as input with additional column Panel_Version.
+Same tibble as input with additional column \var{Panel_Version}.
 }
 \description{
 Help function to extract Panel_Version from Panel column.

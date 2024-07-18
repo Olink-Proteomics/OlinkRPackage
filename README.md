@@ -5,6 +5,9 @@
 [![R-CMD-check](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/R-CMD-check.yaml)
 [![lint](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/lint.yaml/badge.svg)](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/lint.yaml)
 [![codecov.io](https://codecov.io/gh/r-lib/lintr/branch/main/graphs/badge.svg)](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/test-coverage.yaml)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/OlinkAnalyze)](https://CRAN.R-project.org/package=OlinkAnalyze)
+[![](https://img.shields.io/badge/DOI-10.32614/CRAN.package.OlinkAnalyze-1f57b6?style=flat&link=https://doi.org/10.32614/CRAN.package.OlinkAnalyze)](https://doi.org/10.32614/CRAN.package.OlinkAnalyze)
 <!-- badges: end -->
 
 # Olink® Analyze

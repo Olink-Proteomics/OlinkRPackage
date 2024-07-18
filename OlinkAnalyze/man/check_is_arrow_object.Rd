@@ -9,19 +9,18 @@ check_is_arrow_object(df, error = FALSE)
 \arguments{
 \item{df}{Data frame to check.}
 
-\item{error}{`TRUE` to return an error if \var{df} is not an arrow object;
-`FALSE` (default) to return a boolean.}
+\item{error}{Return error or a boolean (default = FALSE).}
 }
 \value{
 A scalar boolean if the object is an arrow object or not, and an
-error if \var{error} = `TRUE`.
+error if "error = TRUE".
 }
 \description{
 Help function checking if a data frame is an R6 ArrowObject.
 }
 \seealso{
 \code{\link{check_is_tibble}}
-  \code{\link{check_is_arrow_or_tibble}}
+\code{\link{check_is_arrow_or_tibble}}
 }
 \author{
 Klev Diamanti

@@ -7,21 +7,21 @@
 check_is_boolean(bool, error = FALSE)
 }
 \arguments{
-\item{bool}{Input to check.}
+\item{bool}{Boolean to check.}
 
-\item{error}{Boolean to return error or a boolean (default).}
+\item{error}{Return error or a boolean (default = FALSE).}
 }
 \value{
 Boolean if the variable is a boolean vector or not, and an error if
-`error = TRUE`.
+"error = TRUE".
 }
 \description{
 Help function checking if a variable is a boolean vector.
 }
 \seealso{
-[check_is_character()]
-  [check_is_integer()]
-  [check_is_numeric()]
+\code{\link{check_is_character}}
+\code{\link{check_is_integer}}
+\code{\link{check_is_numeric}}
 }
 \author{
 Klev Diamanti
