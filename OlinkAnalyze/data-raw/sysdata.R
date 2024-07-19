@@ -52,6 +52,15 @@ olink_wide_bottom_mat_spec_fil <- system.file("data-raw",
 source(olink_wide_bottom_mat_spec_fil)
 rm(olink_wide_bottom_mat_spec_fil)
 
+# column_name_dict.R ----
+
+column_name_dict_file <- system.file("data-raw",
+                                     "column_name_dict.R",
+                                     package = "OlinkAnalyze",
+                                     mustWork = TRUE)
+source(column_name_dict_file)
+rm(column_name_dict_file)
+
 # save to R/syssata.rda ----
 
 usethis::use_data(accepted_olink_platforms,
@@ -63,6 +72,7 @@ usethis::use_data(accepted_olink_platforms,
                   accepted_npx_file_ext,
                   read_npx_df_output,
                   olink_wide_bottom_matrix,
+                  column_name_dict,
                   overwrite = TRUE,
                   internal = TRUE,
                   compress = "xz",

@@ -6,12 +6,13 @@
 #'   Christoffer Cambronero;
 #'   Kathleen Nevola
 #'
-#' @param file Path to Olink software output excel file in wide or long
-#' format. Expecting file extensions `xlsx` or `xls`.
-#' @param out_df The class of output data frame. One of `tibble` (default) or
-#' `arrow` for ArrowObject.
+#' @param file Path to Olink software output excel file in wide or long format.
+#' Expecting file extensions
+#' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("excel", names(accepted_npx_file_ext))], sep = ", ", last = " or ")`. # nolint
+#' @param out_df The class of output data frame. One of "tibble" (default) or
+#' "arrow" for ArrowObject.
 #'
-#' @return Tibble or ArrowObject with Olink data in long format.
+#' @return Tibble or ArrowObject with Olink data in wide or long format.
 #'
 #' @seealso
 #'   \code{\link{read_npx}}
@@ -31,6 +32,11 @@ read_npx_excel <- function(file,
 
   # check that the requested output df is ok
   check_out_df_arg(out_df = out_df)
+
+  # check if readxl is available ----
+
+  check_library_installed(libraries = "readxl",
+                          error = TRUE)
 
   # read data ----
 
@@ -86,6 +92,10 @@ read_npx_excel <- function(file,
     )
 
   }
+
+  # top row is as expected for the corresponding format
+
+  read_npx_format_colnames(df = df_olink, file = file)
 
   # if needed convert the object to the requested output
   df_olink <- convert_read_npx_output(df = df_olink,

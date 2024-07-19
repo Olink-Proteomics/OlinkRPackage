@@ -8,14 +8,15 @@ Olink software output files in R.}
 read_npx_excel(file, out_df = "arrow")
 }
 \arguments{
-\item{file}{Path to Olink software output excel file in wide or long
-format. Expecting file extensions `xlsx` or `xls`.}
+\item{file}{Path to Olink software output excel file in wide or long format.
+Expecting file extensions
+xls and xlsx. # nolint}
 
-\item{out_df}{The class of output data frame. One of `tibble` (default) or
-`arrow` for ArrowObject.}
+\item{out_df}{The class of output data frame. One of "tibble" (default) or
+"arrow" for ArrowObject.}
 }
 \value{
-Tibble or ArrowObject with Olink data in long format.
+Tibble or ArrowObject with Olink data in wide or long format.
 }
 \description{
 Help function to read NPX, Ct or absolute quantification data from excel
@@ -23,13 +24,13 @@ Olink software output files in R.
 }
 \seealso{
 \code{\link{read_npx}}
-  \code{\link{read_npx_parquet}}
-  \code{\link{read_npx_zip}}
-  \code{\link{read_npx_format}}
-  \code{\link{read_npx_delim}}
+\code{\link{read_npx_parquet}}
+\code{\link{read_npx_zip}}
+\code{\link{read_npx_format}}
+\code{\link{read_npx_delim}}
 }
 \author{
 Klev Diamanti;
-  Christoffer Cambronero;
-  Kathleen Nevola
+Christoffer Cambronero;
+Kathleen Nevola
 }

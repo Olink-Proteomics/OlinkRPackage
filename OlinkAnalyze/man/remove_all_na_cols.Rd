@@ -17,3 +17,6 @@ The same data frame as input without all-NA columns.
 Utility function removing columns with all values NA from a tibble or an
 arrow object.
 }
+\author{
+Klev Diamanti
+}

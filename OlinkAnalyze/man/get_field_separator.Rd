@@ -7,11 +7,12 @@
 get_field_separator(file)
 }
 \arguments{
-\item{file}{Path to Olink software output delimited file in wide or long
-format. Expecting file extensions `csv` or `txt`.}
+\item{file}{Path to Olink software output delimited file in wide format.
+Expecting file extensions
+csv and txt. # nolint}
 }
 \value{
-The file separator comma `,` or semicolon `;`.
+The file separator comma "," or semicolon ";".
 }
 \description{
 This function uses the first line of the provided file to determine the
@@ -22,8 +23,8 @@ on the same line.
 }
 \seealso{
 \code{\link{read_npx_delim_long}}
-  \code{\link{read_npx_delim_wide}}
-  \code{\link{read_npx_delim}}
+\code{\link{read_npx_delim_wide}}
+\code{\link{read_npx_delim}}
 }
 \author{
 Klev Diamanti

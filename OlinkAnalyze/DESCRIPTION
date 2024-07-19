@@ -58,17 +58,20 @@ Config/testthat/parallel: true
 Config/testthat/start-first: read_npx_l*, read_npx_w*
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
+Roxygen: list(markdown = TRUE)
 Depends: R (>= 4.1.0)
 Imports: 
     arrow (>= 14.0.0),
     cli (>= 3.6.1),
+    dbplyr,
     dplyr,
-    readxl,
+    duckdb,
     rlang,
     stringr,
     tidyr
 Suggests: 
+    readxl,
     testthat (>= 3.0.0),
     withr,
     writexl,

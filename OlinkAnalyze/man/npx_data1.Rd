@@ -5,15 +5,15 @@
 \alias{npx_data1}
 \title{NPX Data in Long format.}
 \format{
-In addition to standard read_NPX() columns, this dataset also
+In addition to standard read_npx() columns, this dataset also
 contains columns:
 \describe{
-  \item{Subject}{Subject Identifier}
-  \item{Treatment}{ Treated or Untreated}
-  \item{Site}{Site indicator, 5 unique values}
-  \item{Time}{Baseline, Week.6 and Week.12}
-  \item{Project}{Project ID number}
-  }
+\item{Subject}{Subject Identifier}
+\item{Treatment}{ Treated or Untreated}
+\item{Site}{Site indicator, 5 unique values}
+\item{Time}{Baseline, Week.6 and Week.12}
+\item{Project}{Project ID number}
+}
 }
 \usage{
 npx_data1
@@ -25,9 +25,9 @@ package.
 \details{
 A tibble with 29,440 rows and 17 columns.
 
-`npx_data1` is an Olink NPX data file (tibble) in long format with 158 unique
-Sample ID's (including 2 repeats each of control samples:
-CONTROL_SAMPLE_AS 1 CONTROL_SAMPLE_AS 2). The data also contains 1104 assays
-(uniquely identified using OlinkID) over 2 Panels.
+\var{npx_data1} is an Olink NPX data file (tibble) in long format with 158
+unique Sample identifiers (including 2 repeats each of control samples:
+CONTROL_SAMPLE_AS 1 and CONTROL_SAMPLE_AS 2). The data also contains 1104
+assays uniquely identified using OlinkID over 2 Olink Panels.
 }
 \keyword{datasets}
