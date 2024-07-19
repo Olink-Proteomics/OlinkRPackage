@@ -10,10 +10,11 @@ read_npx_wide_split_row(df, file, data_type, format_spec)
 \item{df}{A tibble containing the full Olink dataset in wide format.}
 
 \item{file}{Path to Olink software output file in wide or long format.
-Expecting file extensions `csv`, `txt`, `xls`, or `xlsx`.}
+Expecting file extensions
+xls, xlsx, csv or txt. # nolint}
 
-\item{data_type}{Quantification method of the input data. One of `NPX`,
-`Quantified` or `Ct`.}
+\item{data_type}{Quantification method of the input data. One of
+Ct, NPX or Quantified. # nolint}
 
 \item{format_spec}{A tibble derived from \var{olink_wide_spec} in the local
 environment containing the expected format of the Olink wide file based on
@@ -23,10 +24,10 @@ the \var{olink_platform} and \var{data_type}.}
 A named list of tibbles containing the sub-matrices of the Olink wide
 format file split on:
 \itemize{
-  \item \strong{Head matrix} as \var{df_head}
-  \item \strong{Top matrix} as \var{df_top}
-  \item \strong{Middle} as \var{df_mid}
-  \item \strong{Bottom matrix} as \var{df_bottom}
+\item \strong{Head matrix} as \var{df_head}
+\item \strong{Top matrix} as \var{df_top}
+\item \strong{Middle} as \var{df_mid}
+\item \strong{Bottom matrix} as \var{df_bottom}
 }
 }
 \description{
@@ -37,32 +38,32 @@ downstream to assemble a long data frame.
 
 Specifically:
 \itemize{
-  \item \strong{Head matrix} consists of the first 2 rows of the wide
-  dataset. This matrix contains the project name, the NPX Signature version
-  that was used to generate the wide dataset and the quantification method.
-  \item \strong{Top matrix} consists of the next 4 or 5 rows of the wide
-  dataset, depending on the quantification method. This matrix contains data
-  on assays, panels, columns with plate identifiers, columns with sample QC
-  warnings and column with deviations from the internal controls. Note that
-  not all the columns are present in all datasets and for all quantification
-  methods. The local environment variable \var{olink_wide_spec} marks all
-  the expected configurations.
-  \item \strong{Middle matrix} is marked by rows with all columns `NA` above
-  and below. This matrix contains sample identifiers, quantification
-  measurements for all assays, plate identifiers, sample QC warnings and
-  deviations from the internal controls.
-  \item \strong{Bottom matrix} is located below the middle matrix and
-  contains information of LOD, missing frequency, assay warning and data
-  normalization approach. Note that this matrix is not available for all
-  quantification methods.
+\item \strong{Head matrix} consists of the first 2 rows of the wide
+dataset. This matrix contains the project name, the NPX Signature version
+that was used to generate the wide dataset and the quantification method.
+\item \strong{Top matrix} consists of the next 4 or 5 rows of the wide
+dataset, depending on the quantification method. This matrix contains data
+on assays, panels, columns with plate identifiers, columns with sample QC
+warnings and column with deviations from the internal controls. Note that
+not all the columns are present in all datasets and for all quantification
+methods. The local environment variable \var{olink_wide_spec} marks all
+the expected configurations.
+\item \strong{Middle matrix} is marked by rows with all columns "NA: above
+and below. This matrix contains sample identifiers, quantification
+measurements for all assays, plate identifiers, sample QC warnings and
+deviations from the internal controls.
+\item \strong{Bottom matrix} is located below the middle matrix and
+contains information of LOD, missing frequency, assay warning and data
+normalization approach. Note that this matrix is not available for all
+quantification methods.
 }
 }
 \seealso{
 \code{\link{read_npx_wide}}
-  \code{\link{read_npx_wide_npxs_version}}
-  \code{\link{read_npx_wide_top}}
-  \code{\link{read_npx_wide_middle}}
-  \code{\link{read_npx_wide_bottom}}
+\code{\link{read_npx_wide_npxs_version}}
+\code{\link{read_npx_wide_top}}
+\code{\link{read_npx_wide_middle}}
+\code{\link{read_npx_wide_bottom}}
 }
 \author{
 Klev Diamanti

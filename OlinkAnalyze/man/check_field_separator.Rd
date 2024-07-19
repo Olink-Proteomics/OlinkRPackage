@@ -8,15 +8,16 @@ software.}
 check_field_separator(file, sep = NULL)
 }
 \arguments{
-\item{file}{Path to Olink software output delimited file in wide or long
-format. Expecting file extensions `csv` or `txt`.}
+\item{file}{Path to Olink software output delimited file in wide format.
+Expecting file extensions
+csv and txt. # nolint}
 
-\item{sep}{Character separator of delimited input file. One of `NULL` for
-auto-detection (default), `,` for comma or `;` for semicolon. Used only for
+\item{sep}{Character separator of delimited input file. One of \code{NULL} for
+auto-detection (default), "," for comma or ";" for semicolon. Used only for
 delimited output files from Olink software.}
 }
 \value{
-The file separator comma `,` or semicolon `;`.
+The file separator comma "," or semicolon ";".
 }
 \description{
 Help function to check and get the separator of a delimited file from Olink
@@ -24,8 +25,8 @@ software.
 }
 \seealso{
 \code{\link{read_npx_delim_long}}
-  \code{\link{read_npx_delim_wide}}
-  \code{\link{read_npx_delim}}
+\code{\link{read_npx_delim_wide}}
+\code{\link{read_npx_delim}}
 }
 \author{
 Klev Diamanti

@@ -18,13 +18,15 @@ read_npx_wide_bottom(
 \item{df}{Bottom matrix of Olink dataset in wide format \var{df_bottom}.}
 
 \item{file}{Path to Olink software output file in wide or long format.
-Expecting file extensions `csv`, `txt`, `xls`, or `xlsx`.}
+Expecting file extensions
+xls, xlsx, csv or txt. # nolint}
 
 \item{olink_platform}{Olink platform used to generate the input file.
-One of `Target 96`, `Target 48`, `Flex` or `Focus`.}
+One of
+Target 48, Flex, Target 96 or Focus. # nolint}
 
-\item{data_type}{Quantification method of the input data. One of `NPX`,
-`Quantified` or `Ct`.}
+\item{data_type}{Quantification method of the input data. One of
+Ct, NPX or Quantified. # nolint}
 
 \item{col_names}{Names list of character vectors containing column names from
 each chunk of columns \var{df_top} was split on in function.}
@@ -40,15 +42,15 @@ from the combination of top and middle data frames.}
 A tibble with the bottom matrix of an Olink wide file in long format.
 }
 \description{
-Use chunks of columns from `read_npx_wide_top` to covert the bottom matrix
-\var{df_bottom} into a long format tibble.
+Use chunks of columns from \code{\link{read_npx_wide_top}} to covert the
+bottom matrix \var{df_bottom} into a long format tibble.
 }
 \seealso{
 \code{\link{read_npx_wide}}
-  \code{\link{read_npx_wide_split_row}}
-  \code{\link{read_npx_wide_npxs_version}}
-  \code{\link{read_npx_wide_top}}
-  \code{\link{read_npx_wide_middle}}
+\code{\link{read_npx_wide_split_row}}
+\code{\link{read_npx_wide_npxs_version}}
+\code{\link{read_npx_wide_top}}
+\code{\link{read_npx_wide_middle}}
 }
 \author{
 Klev Diamanti

@@ -10,10 +10,12 @@ read_npx_wide_top(df, file, olink_platform, format_spec)
 \item{df}{Top matrix of Olink dataset in wide format \var{df_top}.}
 
 \item{file}{Path to Olink software output file in wide or long format.
-Expecting file extensions `csv`, `txt`, `xls`, or `xlsx`.}
+Expecting file extensions
+xls, xlsx, csv or txt. # nolint}
 
 \item{olink_platform}{Olink platform used to generate the input file.
-One of `Target 96`, `Target 48`, `Flex` or `Focus`.}
+One of
+Target 48, Flex, Target 96 or Focus. # nolint}
 
 \item{format_spec}{A tibble derived from \var{olink_wide_spec} in the local
 environment containing the expected format of the Olink wide file based on
@@ -22,12 +24,12 @@ the \var{olink_platform} and \var{data_type}.}
 \value{
 A list of data frames from top matrix in long format:
 \itemize{
-  \item Data frame containing Olink assays \var{df_top_oid}
-  \item Data frame containing plate identifiers \var{df_top_pid}
-  \item Data frame containing QC warnings \var{df_top_qc_warn}
-  \item Data frame containing internal control assays \var{df_top_int_ctrl}
-  \item Data frame containing deviation from internal control assays
-  \var{df_top_dev_int_ctrl}
+\item Data frame containing Olink assays \var{df_top_oid}
+\item Data frame containing plate identifiers \var{df_top_pid}
+\item Data frame containing QC warnings \var{df_top_qc_warn}
+\item Data frame containing internal control assays \var{df_top_int_ctrl}
+\item Data frame containing deviation from internal control assays
+\var{df_top_dev_int_ctrl}
 }
 }
 \description{
@@ -37,10 +39,10 @@ chunks from \var{df_mid} to convert the wide dataset into a long one.
 }
 \seealso{
 \code{\link{read_npx_wide}}
-  \code{\link{read_npx_wide_split_row}}
-  \code{\link{read_npx_wide_npxs_version}}
-  \code{\link{read_npx_wide_middle}}
-  \code{\link{read_npx_wide_bottom}}
+\code{\link{read_npx_wide_split_row}}
+\code{\link{read_npx_wide_npxs_version}}
+\code{\link{read_npx_wide_middle}}
+\code{\link{read_npx_wide_bottom}}
 }
 \author{
 Klev Diamanti

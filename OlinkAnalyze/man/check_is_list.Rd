@@ -9,11 +9,11 @@ check_is_list(lst, error = FALSE)
 \arguments{
 \item{lst}{List to check.}
 
-\item{error}{Boolean to return error or a boolean (default).}
+\item{error}{Return error or a boolean (default = FALSE).}
 }
 \value{
 Boolean if the object is a list or not, and an error if
-`error = TRUE`.
+"error = TRUE".
 }
 \description{
 Help function to check if the variable is a list.

@@ -1,6 +1,9 @@
 #' Utility function removing columns with all values NA from a tibble or an
 #' arrow object.
 #'
+#' @author
+#'   Klev Diamanti
+#'
 #' @param df A tibble or an arrow object.
 #'
 #' @return The same data frame as input without all-NA columns.

@@ -13,23 +13,26 @@ read_npx_format_get_quant(
 )
 }
 \arguments{
-\item{file}{Path to Olink software output file in wide or long format.
-Expecting file extensions `csv`, `txt`, `xls`, or `xlsx`.}
+\item{file}{Path to Olink software output file in wide format. Expecting file
+extensions
+xls, xlsx, csv or txt. # nolint}
 
-\item{data_type}{Quantification method of the input data. One of `NULL`
-(default), `NPX`, `Quantified` or `Ct`.}
+\item{data_type}{Quantification method of the input data. One of \code{NULL}
+(default),
+Ct, NPX or Quantified. # nolint}
 
-\item{data_cells}{A character vector with the contents of the cell A2 from
-the Olink software file in wide format indicating the quantification method.}
+\item{data_cells}{A character vector with the contents of the cell \emph{A2}
+from the Olink software file in wide format indicating the quantification
+method.}
 
 \item{quant_methods_expected}{Character vector with the Olink protein
 quantification methods extracted from \var{accepted_olink_platforms} from the
 local environment filtered for the Olink platform detected in function
-`read_npx_format_get_platform`.}
+\code{\link{read_npx_format_get_platform}}.}
 }
 \value{
-The name of the quantification method. One of `NPX`, `Quantified` or
-`Ct`.
+The name of the quantification method. One of
+Ct, NPX or Quantified. # nolint
 }
 \description{
 This function uses information from the cell A2 from Olink software files in
@@ -38,9 +41,9 @@ dataset contains.
 }
 \seealso{
 \code{\link{read_npx_format}}
-  \code{\link{read_npx_format_read}}
-  \code{\link{read_npx_format_get_format}}
-  \code{\link{read_npx_format_get_platform}}
+\code{\link{read_npx_format_read}}
+\code{\link{read_npx_format_get_format}}
+\code{\link{read_npx_format_get_platform}}
 }
 \author{
 Klev Diamanti

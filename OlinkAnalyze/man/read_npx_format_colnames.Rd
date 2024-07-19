@@ -11,10 +11,11 @@ read_npx_format_colnames(df, file)
 \item{df}{Tibble or ArrowObject with Olink data in wide or long format.}
 
 \item{file}{Path to Olink software output file in wide or long format.
-Expecting file extensions `csv`, `txt`, `xls`, `xlsx`, `parquet` or `zip`.}
+Expecting file extensions
+xls, xlsx, csv, txt, parquet or zip.}
 }
 \value{
-Error is file contains problematic column names. `NULL` otherwise.
+Error is file contains problematic column names. \code{NULL} otherwise.
 }
 \description{
 Help function checking whether a data set contains NA or empty strings on

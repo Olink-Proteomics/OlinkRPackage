@@ -1,12 +1,13 @@
 #' Help function to check if the variable is a list.
 #'
-#' @author Klev Diamanti
+#' @author
+#'   Klev Diamanti
 #'
 #' @param lst List to check.
-#' @param error Boolean to return error or a boolean (default).
+#' @param error Return error or a boolean (default = FALSE).
 #'
 #' @return Boolean if the object is a list or not, and an error if
-#' `error = TRUE`.
+#' "error = TRUE".
 #'
 check_is_list <- function(lst,
                           error = FALSE) {

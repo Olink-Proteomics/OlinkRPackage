@@ -1,10 +1,11 @@
 #' Help function checking that the requested output class of the read_npx*
 #' functions is acceptable.
 #'
-#' @author Klev Diamanti
+#' @author
+#'   Klev Diamanti
 #'
-#' @param out_df The class of output data frame. One of `tibble` (default) or
-#' `arrow` for ArrowObject.
+#' @param out_df The class of output data frame. One of "tibble" (default) or
+#' "arrow" for ArrowObject.
 #'
 #' @return An error if the argument is not as expected.
 #'
@@ -37,8 +38,8 @@ check_out_df_arg <- function(out_df) {
 #'   Klev Diamanti
 #'
 #' @param df The data frame to be converted.
-#' @param out_df The class of output data frame. One of `tibble` (default) or
-#' `arrow` for ArrowObject.
+#' @param out_df The class of output data frame. One of "tibble" (default) or
+#' "arrow" for ArrowObject.
 #'
 #' @return The data frame in the requested class.
 #'
@@ -79,13 +80,16 @@ convert_read_npx_output <- function(df,
 
 #' Help function checking that the olink_platform is acceptable.
 #'
-#' @param x The name of the Olink platform. One of `Explore 3072`, `Explore HT`,
-#' `Target 96`, `Target 48`, `Flex` or `Focus`.
-#' @param broader_platform Name of the broader Olink platform. One of `qPCR` or
-#' `NGS`.
+#' @author
+#'   Klev Diamanti
+#'
+#' @param x The name of the Olink platform. One of
+#' `r cli::ansi_collapse(x = accepted_olink_platforms$name, last = " or ")`.
+#' @param broader_platform Name of the broader Olink platform. One of
+#' `r cli::ansi_collapse(x = unique(accepted_olink_platforms$broader_platform), last = " or ")`. # nolint
 #'
 #' @return
-#' Nothing if platform is ok, otherwise an error.
+#' `NULL` if platform is ok, otherwise an error.
 #'
 check_olink_platform <- function(x,
                                  broader_platform = NULL) {
@@ -94,6 +98,7 @@ check_olink_platform <- function(x,
 
   check_is_scalar_character(string = x,
                             error = TRUE)
+
   if (!is.null(broader_platform)) {
     check_olink_broader_platform(x = broader_platform)
   }
@@ -131,12 +136,16 @@ check_olink_platform <- function(x,
 
 #' Help function checking that the Olink data_type is acceptable.
 #'
-#' @param x The name of the Olink data type. One of `NPX`, `Quantified` or `Ct`.
-#' @param broader_platform Name of the broader Olink platform. One of `qPCR` or
-#' `NGS`.
+#' @author
+#'   Klev Diamanti
+#'
+#' @param x The name of the Olink data type. One of
+#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(last = " or ")`. # nolint
+#' @param broader_platform Name of the broader Olink platform. One of
+#' `r cli::ansi_collapse(x = unique(accepted_olink_platforms$broader_platform), last = " or ")`. # nolint
 #'
 #' @return
-#' Nothing if data_type is ok, otherwise an error.
+#' `NULL` if data_type is ok, otherwise an error.
 #'
 check_olink_data_type <- function(x,
                                   broader_platform = NULL) {
@@ -145,6 +154,7 @@ check_olink_data_type <- function(x,
 
   check_is_scalar_character(string = x,
                             error = TRUE)
+
   if (!is.null(broader_platform)) {
     check_olink_broader_platform(x = broader_platform)
   }
@@ -190,10 +200,14 @@ check_olink_data_type <- function(x,
 
 #' Help function checking that the broader Olink platform is acceptable.
 #'
-#' @param x Name of the broader Olink platform. One of `qPCR` or `NGS`.
+#' @author
+#'   Klev Diamanti
+#'
+#' @param x Name of the broader Olink platform. One of
+#' `r cli::ansi_collapse(x = unique(accepted_olink_platforms$broader_platform), last = " or ")`. # nolint
 #'
 #' @return
-#' Nothing if broader Olink platform is ok, otherwise an error.
+#' `NULL` if broader Olink platform is ok, otherwise an error.
 #'
 check_olink_broader_platform <- function(x) {
 
@@ -224,11 +238,13 @@ check_olink_broader_platform <- function(x) {
 #' Help function checking whether a data set contains NA or empty strings on
 #' its column names
 #'
-#' @author Klev Diamanti
+#' @author
+#'   Klev Diamanti
 #'
 #' @param df Tibble or ArrowObject with Olink data in wide or long format.
 #' @param file Path to Olink software output file in wide or long format.
-#' Expecting file extensions `csv`, `txt`, `xls`, `xlsx`, `parquet` or `zip`.
+#' Expecting file extensions
+#' `r cli::ansi_collapse(x = accepted_npx_file_ext, sep = ", ", last = " or ")`.
 #'
 #' @return Error is file contains problematic column names. `NULL` otherwise.
 #'

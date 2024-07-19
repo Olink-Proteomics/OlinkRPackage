@@ -8,8 +8,8 @@ functions is acceptable.}
 check_out_df_arg(out_df)
 }
 \arguments{
-\item{out_df}{The class of output data frame. One of `tibble` (default) or
-`arrow` for ArrowObject.}
+\item{out_df}{The class of output data frame. One of "tibble" (default) or
+"arrow" for ArrowObject.}
 }
 \value{
 An error if the argument is not as expected.
