@@ -10,7 +10,7 @@
 * Danai Topouza's role has been changed from contributor to author (#415, @kathy-nevola)
 
 ## Bug Fixes
-* URLs in tutorials have been updated to direct to updated olink.com locations (#402,  @kathy-nevola)
+* URLs in tutorials will now direct to updated olink.com locations (#402,  @kathy-nevola)
 * Instructions to export parquet files with LOD have been updated (#408, @kathy-nevola)
 
 # Olink Analyze 3.8.2
