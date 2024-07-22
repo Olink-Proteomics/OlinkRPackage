@@ -68,7 +68,7 @@ this protein can be a strong biomarker candidate for specific groups.
 LOD can be added to Olink Explore NPX datasets using `olink_lod()`. This
 function can calculate LOD from an NPX dataset using the dataset's
 negative controls or a list of predetermined fixed LOD values (available
-in the Document Download Center at [olink.com](https://olink.com/)). As
+in the Document Download Center at [olink.com](https://olink.com/knowledge/documents)). As
 the default setting, `olink_lod()` will calculate LOD using a dataset's
 negative controls.
 
@@ -85,6 +85,7 @@ PC normalized dataset the content in these two columns will be
 identical, while for an intensity normalized dataset the LOD column will
 contain intensity normalized LOD values. Examples of results for plate
 control and intensity normalization are shown in the tables below.
+
 
 ```{r, echo=FALSE}
 set.seed(1234)
@@ -166,7 +167,7 @@ described above for negative control LOD. These values are specific to
 the Data Analysis Reference ID, which can be found in your dataset. The
 fixed LOD data is available in an external CSV file which can be
 downloaded from the Document Download Center at
-[olink.com](https://olink.com/). The fixed LOD values reported in this
+[olink.com](https://olink.com/knowledge/documents). The fixed LOD values reported in this
 CSV file are the PC normalized LODs.
 
 The fixed LOD file is read into the `olink_lod()` function to be
@@ -175,6 +176,7 @@ dataset is intensity normalized, an intensity normalization adjustment
 factor is applied and the resulting intensity normalized LOD is reported
 in the LOD column and the PC normalized LOD is reported in the
 PCNormalizedLOD column.
+
 
 ```{r FixedLOD, eval = FALSE, message=FALSE, warning=FALSE}
 # Reading in Fixed LOD file path into R environment
@@ -272,5 +274,4 @@ OLINK, NPX, PEA, PROXIMITY EXTENSION, INSIGHT and the Olink logotype are
 trademarks registered, or pending registration, by Olink Proteomics AB.
 All third-party trademarks are the property of their respective owners.
 
-Olink products and assay methods are covered by several patents and
-patent applications <https://olink.com/patents/>.
+Olink products and assay methods are covered by several patents and patent applications https://olink.com/legal/patents.
