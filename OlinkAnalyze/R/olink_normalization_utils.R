@@ -143,7 +143,7 @@ olink_norm_check_input_cols <- function(lst_df) {
   lst_col_miss <- lst_col_miss[nchar(lst_col_miss) > 0L]
 
   # error message if there are missing columns
-  if (!all(unlist(lapply(lst_col_miss, nchar)) == 0)) {
+  if (!all(sapply(lst_col_miss, nchar) == 0)) {
     cli::cli_abort(
       c(
         "x" = "{cli::qty(lst_col_miss)} Dataset{?s} with missing column(s):",
