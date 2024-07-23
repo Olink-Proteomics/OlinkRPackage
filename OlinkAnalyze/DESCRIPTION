@@ -63,6 +63,7 @@ Depends:
 Imports:
     broom,
     car,
+    cli,
     dplyr,
     emmeans,
     forcats,
@@ -85,8 +86,7 @@ Imports:
     tidyr,
     tidyselect,
     tools,
-    utils,
-    zip
+    utils
 Suggests: 
     arrow,
     clusterProfiler,
@@ -106,7 +106,8 @@ Suggests:
     systemfonts,
     testthat (>= 3.0.0),
     umap,
-    vdiffr
+    vdiffr,
+    zip
 VignetteBuilder: 
   kableExtra,
   knitr
