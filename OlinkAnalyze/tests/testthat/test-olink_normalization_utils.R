@@ -224,7 +224,7 @@ test_that(
       regexp = "Datasets with missing column"
     )
 
-    # one df missing cols ----
+    # one df missing cols v1 ----
 
     expect_error(
       object = olink_norm_check_input_cols(
@@ -232,9 +232,24 @@ test_that(
           "p1" = npx_data1 |>
             dplyr::select(
               -dplyr::all_of(c("NPX"))
-            )
-          ,
+            ),
           "p2" = npx_data2
+        ) |>
+          lapply(dplyr::mutate, Normalization = "Intensity")
+      ),
+      regexp = "Dataset with missing column"
+    )
+
+    # one df missing cols v2 ----
+
+    expect_error(
+      object = olink_norm_check_input_cols(
+        lst_df = list(
+          "p1" = npx_data1,
+          "p2" = npx_data2 |>
+            dplyr::select(
+              -dplyr::all_of(c("NPX"))
+            )
         ) |>
           lapply(dplyr::mutate, Normalization = "Intensity")
       ),
