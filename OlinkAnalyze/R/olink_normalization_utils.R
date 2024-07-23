@@ -140,15 +140,14 @@ olink_norm_check_input_cols <- function(lst_df) {
         # collapse all missing column names for error printing
         cli::ansi_collapse(sep = "; ", sep2 = "; ", last = "; ")
     })
-  col_miss <- paste0("* ", names(lst_col_miss), ": ", unlist(lst_col_miss))
-  col_miss <- col_miss[nchar(lst_col_miss) > 0L]
+  lst_col_miss <- lst_col_miss[nchar(lst_col_miss) > 0L]
 
   # error message if there are missing columns
   if (!all(unlist(lapply(lst_col_miss, nchar)) == 0)) {
     cli::cli_abort(
       c(
-        "x" = "{cli::qty(col_miss)} Dataset{?s} with missing column(s):",
-        col_miss,
+        "x" = "{cli::qty(lst_col_miss)} Dataset{?s} with missing column(s):",
+        paste0("* ", names(lst_col_miss), ": ", unlist(lst_col_miss)),
         "i" = "The missing columns are separated by semicolon (;)."
       ),
       call = rlang::caller_env(),
