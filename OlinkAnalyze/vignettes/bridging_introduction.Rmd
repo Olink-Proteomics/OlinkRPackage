@@ -69,10 +69,12 @@ library(kableExtra)
 ```{r brnrtab, message=FALSE, echo=FALSE}
 data.frame(Platform = c("Target 96",
                          "Explore 384 Cardiometabolic, Inflammation, Neurology, and Oncology",
-                        "Explore 384 Cardiometabolic II, Inflammation II, Neurology II, and Oncology II"),
+                        "Explore 384 Cardiometabolic II, Inflammation II, Neurology II, and Oncology II",
+                        "Explore HT"),
            BridgingSamples = c("8-16",
                                "8-16",
-                              "16-24")) %>%
+                              "16-24",
+                              "24-32")) %>%
   kbl(booktabs = TRUE,
       digits = 2,
       caption = "Table 1. Recommended number of bridging samples for Olink platforms") %>%
@@ -412,10 +414,8 @@ npx_data1 %>%
 Another way to determine if bridging decreased variability between
 projects is to calculate the CV of the control samples across both projects before and after bridging, as shown in Figure 7. The CV after normalization is expected to be smaller than the CV prior to normalization, as shown in Figure 7. 
 
-Note that the CV calculation formula differs for [Target
-96](https://olink.com/faq/how-is-cv-calculated/) and
-[Explore](https://olink.com/faq/how-is-cv-in-the-analysis-report-calculated-for-olink-explore/)
-projects.
+Note that the CV calculation formula differs for Olink Target
+96 and Olink Explore products. More information of CV calculation can be found in the [Olink FAQ](https://olink.com/knowledge/faq)
 
 ```{r CV_calculation, fig.cap= f7}
 
