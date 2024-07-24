@@ -10,14 +10,14 @@ olink_lod(data, lod_file_path = NULL, lod_method = "NCLOD")
 \item{data}{npx data file}
 
 \item{lod_file_path}{location of lod file from Olink. Only needed if
-lod_method = "FixedLOD". Default `NULL`.}
+lod_method = "FixedLOD". Default \code{NULL}.}
 
 \item{lod_method}{method for calculating LOD using either "FixedLOD" or
-negative controls ("NCLOD"). Default `NCLOD`.}
+negative controls ("NCLOD"). Default \code{NCLOD}.}
 }
 \value{
 A dataframe with 2 additional columns, LOD and PCNormalizedLOD. When
-`Normalization = "Plate Control"`, LOD and PCNormalizedLOD are identical.
+\code{Normalization = "Plate Control"}, LOD and PCNormalizedLOD are identical.
 }
 \description{
 Calculate LOD using Negative Controls or Fixed LOD

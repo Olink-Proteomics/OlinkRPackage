@@ -19,10 +19,10 @@ for normalization.}
 
 \item{norm_mode}{Character string indicating the type of normalization to be
 performed. Expecting one of
-`r cli::ansi_collapse(x = OlinkAnalyze:::olink_norm_modes, sep2 = " or ", last = " or ")`. # nolint}
+bridge, subset or ref_median. # nolint}
 }
 \value{
-`NULL` if no warning or error.
+\code{NULL} if no warning or error.
 }
 \description{
 This function takes as input a two named lists of character vectors with

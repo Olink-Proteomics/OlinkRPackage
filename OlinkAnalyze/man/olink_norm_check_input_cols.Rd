@@ -10,7 +10,7 @@ olink_norm_check_input_cols(lst_df)
 \item{lst_df}{Named list of datasets to be normalized.}
 }
 \value{
-`NULL` if no warning or error.
+\code{NULL} if no warning or error.
 }
 \description{
 This function takes as input a named list of datasets and checks if their
