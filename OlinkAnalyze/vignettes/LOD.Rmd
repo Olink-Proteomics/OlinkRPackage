@@ -68,8 +68,7 @@ this protein can be a strong biomarker candidate for specific groups.
 LOD can be added to Olink Explore NPX datasets using `olink_lod()`. This
 function can calculate LOD from an NPX dataset using the dataset's
 negative controls or a list of predetermined fixed LOD values (available
-in the Document Download Center at [olink.com](https://olink.com/)). As
-the default setting, `olink_lod()` will calculate LOD using a dataset's
+in the Document Download Center at [olink.com](https://olink.com/knowledge/documents)). As the default setting, `olink_lod()` will calculate LOD using a dataset's
 negative controls.
 
 Olink Explore data is commonly delivered plate control (PC) normalized
@@ -85,6 +84,7 @@ PC normalized dataset the content in these two columns will be
 identical, while for an intensity normalized dataset the LOD column will
 contain intensity normalized LOD values. Examples of results for plate
 control and intensity normalization are shown in the tables below.
+
 
 ```{r, echo=FALSE}
 set.seed(1234)
@@ -146,6 +146,7 @@ assays with fewer than 150 counts in all negative controls, LOD is
 calculated using the count values which are then converted into PC
 normalized NPX.
 
+
 ------------------------------------------------------------------------
 
 #### *A note on calculating LOD from counts*
@@ -170,6 +171,7 @@ converted NPX values should not be used as LOD values for these assays.*
 
 ------------------------------------------------------------------------
 
+
 The resulting LOD is the PC normalized negative control LOD. In the
 event that the Explore dataset is intensity normalized, an intensity
 normalization adjustment factor is applied and the resulting intensity
@@ -190,7 +192,7 @@ described above for negative control LOD. These values are specific to
 the Data Analysis Reference ID, which can be found in your dataset. The
 fixed LOD data is available in an external CSV file which can be
 downloaded from the Document Download Center at
-[olink.com](https://olink.com/). The fixed LOD values reported in this
+[olink.com](https://olink.com/knowledge/documents). The fixed LOD values reported in this
 CSV file are the PC normalized LODs.
 
 The fixed LOD file is read into the `olink_lod()` function to be
@@ -249,8 +251,21 @@ long format.
 explore_npx <- read_NPX("Path_to/Explore_NPX_file.parquet")
 
 explore_npx_NC_LOD <- explore_npx %>% 
-  olink_lod(lod_method = "NCLOD") %>%
-  arrow::write_parquet(, file = "NPX_data_NC_LOD.parquet")
+  olink_lod(lod_method = "NCLOD")
+
+# Add metadata for export
+df <- explore_npx_NC_LOD |> 
+  arrow::as_arrow_table()
+
+df$metadata$FileVersion <- "NA"
+df$metadata$ExploreVersion <- "NA"
+df$metadata$ProjectName <- "NA"
+df$metadata$SampleMatrix <- "NA"
+df$metadata$DataFileType <- "Olink Analyze Export File"
+df$metadata$ProductType <- "ExploreHT" # "ExploreHT" or "Explore3072"
+df$metadata$Product <- "ExploreHT" # "ExploreHT" or "Explore3072"
+
+arrow::write_parquet(x = df, sink = "path_to_output.parquet")
 ```
 
 ## Contact Us
@@ -283,5 +298,4 @@ OLINK, NPX, PEA, PROXIMITY EXTENSION, INSIGHT and the Olink logotype are
 trademarks registered, or pending registration, by Olink Proteomics AB.
 All third-party trademarks are the property of their respective owners.
 
-Olink products and assay methods are covered by several patents and
-patent applications <https://olink.com/patents/>.
+Olink products and assay methods are covered by several patents and patent applications https://olink.com/legal/patents.
