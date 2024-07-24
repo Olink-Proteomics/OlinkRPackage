@@ -177,6 +177,8 @@ test_that(
 test_that(
   "olink_norm_check_input_cols - Normalization col - 3+ datasets",
   {
+    skip_if_not_installed("arrow")
+
     # df 1 and 2 do not have Normalization col ----
 
     expect_error(
@@ -247,6 +249,8 @@ test_that(
 test_that(
   "olink_norm_check_input_cols - error - missing cols",
   {
+    skip_if_not_installed("arrow")
+
     # 2 df missing cols v1 ----
 
     expect_error(
@@ -356,6 +360,8 @@ test_that(
 test_that(
   "olink_norm_check_input_cols - error - different quant methdos",
   {
+    skip_if_not_installed("arrow")
+
     # 2 df with different quant method ----
 
     expect_error(
@@ -401,6 +407,8 @@ test_that(
 test_that(
   "olink_norm_check_input_cols - error - missing non-required cols",
   {
+    skip_if_not_installed("arrow")
+
     # df 1 missing 1 col ----
 
     expect_warning(
@@ -480,6 +488,596 @@ test_that(
           lapply(dplyr::mutate, Normalization = "Intensity")
       ),
       regexp = "Columns not present across datasets"
+    )
+
+  }
+)
+
+# Test olink_norm_check_input_samples ----
+
+test_that(
+  "olink_norm_check_input_samples - works - 1 dataset",
+  {
+    skip_if_not_installed("arrow")
+
+    # one df - no reference samples ----
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = olink_norm_check_input_samples(
+            lst_df_samples = list(
+              "p1" = unique(npx_data1$SampleID)
+            ),
+            norm_mode = "ref_median"
+          )
+        )
+      )
+    )
+
+    # one df - with reference samples ----
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = olink_norm_check_input_samples(
+            lst_df_samples = list(
+              "p1" = unique(npx_data1$SampleID)
+            ),
+            lst_ref_samples = list(
+              "p1" = c("A1", "A2", "A3", "A4", "A5", "A6")
+            ),
+            norm_mode = "ref_median"
+          )
+        )
+      )
+    )
+
+    # one df - with reference samples not in df ----
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = olink_norm_check_input_samples(
+            lst_df_samples = list(
+              "p1" = unique(npx_data1$SampleID)
+            ),
+            lst_ref_samples = list(
+              "p1" = c("A111", "A222", "A333", "A444", "A555", "A666")
+            ),
+            norm_mode = "ref_median"
+          )
+        )
+      )
+    )
+
+    # one df - no reference samples - arrow ----
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = olink_norm_check_input_samples(
+            lst_df_samples = list(
+              "p1" = npx_data1 |>
+                arrow::as_arrow_table() |>
+                dplyr::pull(.data[["SampleID"]], as_vector = TRUE) |>
+                unique()
+            ),
+            lst_ref_samples = list(
+              "p1" = NULL
+            ),
+            norm_mode = "ref_median"
+          )
+        )
+      )
+    )
+
+  }
+)
+
+test_that(
+  "olink_norm_check_input_samples - works - 2 datasets",
+  {
+    skip_if_not_installed("arrow")
+
+    # bridge norm - reference samples in datasets ----
+
+    ref_samples_bridge <- intersect(x = npx_data1$SampleID,
+                                    y = npx_data2$SampleID) |>
+      (\(x) x[!grepl(pattern = "CONTROL_SAMPLE", x = x, fixed = TRUE)])()
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = olink_norm_check_input_samples(
+            lst_df_samples = list(
+              "p1" = unique(npx_data1$SampleID),
+              "p2" = npx_data2 |>
+                arrow::as_arrow_table() |>
+                dplyr::pull(.data[["SampleID"]], as_vector = TRUE) |>
+                unique()
+            ),
+            lst_ref_samples = list(
+              "p1" = ref_samples_bridge,
+              "p2" = ref_samples_bridge
+            ),
+            norm_mode = "bridge"
+          )
+        )
+      )
+    )
+
+    # subset norm - reference samples in datasets ----
+
+    ref_samples_subset_1 <- npx_data1 |>
+      dplyr::filter(
+        !grepl(pattern = "CONTROL_SAMPLE",
+               x = .data[["SampleID"]],
+               fixed = TRUE)
+        & .data[["QC_Warning"]] == "Pass"
+      ) |>
+      dplyr::pull(
+        .data[["SampleID"]]
+      ) |>
+      unique()
+    ref_samples_subset_2 <- npx_data2 |>
+      dplyr::filter(
+        !grepl(pattern = "CONTROL_SAMPLE",
+               x = .data[["SampleID"]],
+               fixed = TRUE)
+        & .data[["QC_Warning"]] == "Pass"
+      ) |>
+      dplyr::pull(
+        .data[["SampleID"]]
+      ) |>
+      unique()
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = olink_norm_check_input_samples(
+            lst_df_samples = list(
+              "p1" = unique(npx_data1$SampleID),
+              "p2" = npx_data2 |>
+                arrow::as_arrow_table() |>
+                dplyr::pull(.data[["SampleID"]], as_vector = TRUE) |>
+                unique()
+            ),
+            lst_ref_samples = list(
+              "p1" = ref_samples_subset_1,
+              "p2" = ref_samples_subset_2
+            ),
+            norm_mode = "subset"
+          )
+        )
+      )
+    )
+
+  }
+)
+
+test_that(
+  "olink_norm_check_input_samples - error - missing samples",
+  {
+    skip_if_not_installed("arrow")
+
+    # bridge norm ----
+
+    ref_samples_bridge <- intersect(x = npx_data1$SampleID,
+                                    y = npx_data2$SampleID) |>
+      (\(x) x[!grepl(pattern = "CONTROL_SAMPLE", x = x, fixed = TRUE)])()
+
+    ## reference samples not in datasets v1 ----
+
+    expect_error(
+      object = olink_norm_check_input_samples(
+        lst_df_samples = list(
+          "p1" = unique(npx_data1$SampleID),
+          "p2" = npx_data2 |>
+            arrow::as_arrow_table() |>
+            dplyr::pull(.data[["SampleID"]], as_vector = TRUE) |>
+            unique()
+        ),
+        lst_ref_samples = list(
+          "p1" = c(ref_samples_bridge[1L:12L],
+                   paste0(ref_samples_bridge[13L:16L], "_not_here")),
+          "p2" = ref_samples_bridge
+        ),
+        norm_mode = "bridge"
+      ),
+      regexp = "B37_not_here, B45_not_here, B63_not_here, and B75_not_here"
+    )
+
+    ## reference samples not in datasets v2 ----
+
+    expect_error(
+      object = olink_norm_check_input_samples(
+        lst_df_samples = list(
+          "p1" = unique(npx_data1$SampleID),
+          "p2" = npx_data2 |>
+            arrow::as_arrow_table() |>
+            dplyr::pull(.data[["SampleID"]], as_vector = TRUE) |>
+            unique()
+        ),
+        lst_ref_samples = list(
+          "p1" = c(ref_samples_bridge[1L:12L],
+                   paste0(ref_samples_bridge[13L:16L], "_not_here")),
+          "p2" = c(paste0(ref_samples_bridge[1L:2L], "_not_here"),
+                   ref_samples_bridge[3L:12L])
+        ),
+        norm_mode = "bridge"
+      ),
+      regexp = "A13_not_here and A29_not_here"
+    )
+
+    ## reference samples not in datasets v3 ----
+
+    expect_error(
+      object = olink_norm_check_input_samples(
+        lst_df_samples = list(
+          "p1" = unique(npx_data1$SampleID),
+          "p2" = npx_data2 |>
+            arrow::as_arrow_table() |>
+            dplyr::pull(.data[["SampleID"]], as_vector = TRUE) |>
+            unique()
+        ),
+        lst_ref_samples = list(
+          "p1" = ref_samples_bridge,
+          "p2" = c(paste0(ref_samples_bridge[1L:2L], "_not_here"),
+                   ref_samples_bridge[3L:12L])
+        ),
+        norm_mode = "bridge"
+      ),
+      regexp = "A13_not_here and A29_not_here"
+    )
+
+    # subset norm ----
+
+    ref_samples_subset_1 <- npx_data1 |>
+      dplyr::filter(
+        !grepl(pattern = "CONTROL_SAMPLE",
+               x = .data[["SampleID"]],
+               fixed = TRUE)
+        & .data[["QC_Warning"]] == "Pass"
+      ) |>
+      dplyr::pull(
+        .data[["SampleID"]]
+      ) |>
+      unique()
+    ref_samples_subset_2 <- npx_data2 |>
+      dplyr::filter(
+        !grepl(pattern = "CONTROL_SAMPLE",
+               x = .data[["SampleID"]],
+               fixed = TRUE)
+        & .data[["QC_Warning"]] == "Pass"
+      ) |>
+      dplyr::pull(
+        .data[["SampleID"]]
+      ) |>
+      unique()
+
+    ## reference samples not in datasets v1 ----
+
+    expect_error(
+      object = olink_norm_check_input_samples(
+        lst_df_samples = list(
+          "p1" = unique(npx_data1$SampleID),
+          "p2" = npx_data2 |>
+            arrow::as_arrow_table() |>
+            dplyr::pull(.data[["SampleID"]], as_vector = TRUE) |>
+            unique()
+        ),
+        lst_ref_samples = list(
+          "p1" = c(ref_samples_subset_1[1L:50L],
+                   paste0(ref_samples_subset_1[51L:60L], "_not_here"),
+                   ref_samples_subset_1[61L:156L]),
+          "p2" = ref_samples_subset_2
+        ),
+        norm_mode = "subset"
+      ),
+      regexp = "A52_not_here, A53_not_here, A54_not_here, A55_not_here, A56_not"
+    )
+
+    ## reference samples not in datasets v2 ----
+
+    expect_error(
+      object = olink_norm_check_input_samples(
+        lst_df_samples = list(
+          "p1" = unique(npx_data1$SampleID),
+          "p2" = npx_data2 |>
+            arrow::as_arrow_table() |>
+            dplyr::pull(.data[["SampleID"]], as_vector = TRUE) |>
+            unique()
+        ),
+        lst_ref_samples = list(
+          "p1" = c(ref_samples_subset_1[1L:50L],
+                   paste0(ref_samples_subset_1[51L:60L], "_not_here"),
+                   ref_samples_subset_1[61L:156L]),
+          "p2" = c(paste0(ref_samples_subset_2[1L:50L], "_not_here"),
+                   ref_samples_subset_2)
+        ),
+        norm_mode = "subset"
+      ),
+      regexp = "A52_not_here, A53_not_here, A54_not_here, A55_not_here, A56_not"
+    )
+
+    ## reference samples not in datasets v3 ----
+
+    expect_error(
+      object = olink_norm_check_input_samples(
+        lst_df_samples = list(
+          "p1" = unique(npx_data1$SampleID),
+          "p2" = npx_data2 |>
+            arrow::as_arrow_table() |>
+            dplyr::pull(.data[["SampleID"]], as_vector = TRUE) |>
+            unique()
+        ),
+        lst_ref_samples = list(
+          "p1" = ref_samples_subset_1,
+          "p2" = c(paste0(ref_samples_subset_2[1L:50L], "_not_here"),
+                   ref_samples_subset_2)
+        ),
+        norm_mode = "subset"
+      ),
+      regexp = "C44_not_here, C45_not_here, C46_not_here, C47_not_here, C48_not"
+    )
+
+  }
+)
+
+test_that(
+  "olink_norm_check_input_samples - error - duplicate samples",
+  {
+    skip_if_not_installed("arrow")
+
+    # bridge norm ----
+
+    ref_samples_bridge <- intersect(x = npx_data1$SampleID,
+                                    y = npx_data2$SampleID) |>
+      (\(x) x[!grepl(pattern = "CONTROL_SAMPLE", x = x, fixed = TRUE)])()
+
+    ## duplicate reference samples in datasets v1 ----
+
+    expect_error(
+      object = olink_norm_check_input_samples(
+        lst_df_samples = list(
+          "p1" = unique(npx_data1$SampleID),
+          "p2" = npx_data2 |>
+            arrow::as_arrow_table() |>
+            dplyr::pull(.data[["SampleID"]], as_vector = TRUE) |>
+            unique()
+        ),
+        lst_ref_samples = list(
+          "p1" = c(ref_samples_bridge[1L:2L],
+                   ref_samples_bridge),
+          "p2" = ref_samples_bridge
+        ),
+        norm_mode = "bridge"
+      ),
+      regexp = "* p1: A13 and A29"
+    )
+
+    ## duplicate reference samples in datasets v2 ----
+
+    expect_error(
+      object = olink_norm_check_input_samples(
+        lst_df_samples = list(
+          "p1" = unique(npx_data1$SampleID),
+          "p2" = npx_data2 |>
+            arrow::as_arrow_table() |>
+            dplyr::pull(.data[["SampleID"]], as_vector = TRUE) |>
+            unique()
+        ),
+        lst_ref_samples = list(
+          "p1" = ref_samples_bridge,
+          "p2" = c(ref_samples_bridge[1L:2L],
+                   ref_samples_bridge)
+        ),
+        norm_mode = "bridge"
+      ),
+      regexp = "* p2: A13 and A29"
+    )
+
+    # subset norm ----
+
+    ref_samples_subset_1 <- npx_data1 |>
+      dplyr::filter(
+        !grepl(pattern = "CONTROL_SAMPLE",
+               x = .data[["SampleID"]],
+               fixed = TRUE)
+        & .data[["QC_Warning"]] == "Pass"
+      ) |>
+      dplyr::pull(
+        .data[["SampleID"]]
+      ) |>
+      unique()
+    ref_samples_subset_2 <- npx_data2 |>
+      dplyr::filter(
+        !grepl(pattern = "CONTROL_SAMPLE",
+               x = .data[["SampleID"]],
+               fixed = TRUE)
+        & .data[["QC_Warning"]] == "Pass"
+      ) |>
+      dplyr::pull(
+        .data[["SampleID"]]
+      ) |>
+      unique()
+
+    ## reference samples not in datasets v1 ----
+
+    expect_error(
+      object = olink_norm_check_input_samples(
+        lst_df_samples = list(
+          "p1" = unique(npx_data1$SampleID),
+          "p2" = npx_data2 |>
+            arrow::as_arrow_table() |>
+            dplyr::pull(.data[["SampleID"]], as_vector = TRUE) |>
+            unique()
+        ),
+        lst_ref_samples = list(
+          "p1" = c(ref_samples_subset_1[1L:50L],
+                   ref_samples_subset_1),
+          "p2" = ref_samples_subset_2
+        ),
+        norm_mode = "subset"
+      ),
+      regexp = "* p1: A1, A2, A3, A4, A5, A6, A7, A8, A9, A10,"
+    )
+
+    ## reference samples not in datasets v2 ----
+
+    expect_error(
+      object = olink_norm_check_input_samples(
+        lst_df_samples = list(
+          "p1" = unique(npx_data1$SampleID),
+          "p2" = npx_data2 |>
+            arrow::as_arrow_table() |>
+            dplyr::pull(.data[["SampleID"]], as_vector = TRUE) |>
+            unique()
+        ),
+        lst_ref_samples = list(
+          "p1" = c(ref_samples_subset_1[1L:50L],
+                   ref_samples_subset_1),
+          "p2" = c(ref_samples_subset_2[1L:50L],
+                   ref_samples_subset_2)
+        ),
+        norm_mode = "subset"
+      ),
+      regexp = "* p2: C1, C2, C3, C4, C5, C6, C7, C8, C9, C10,"
+    )
+
+  }
+)
+
+test_that(
+  "olink_norm_check_input_samples - error - uneven number of bridge samples",
+  {
+    skip_if_not_installed("arrow")
+
+    # bridge norm ----
+
+    ref_samples_bridge <- intersect(x = npx_data1$SampleID,
+                                    y = npx_data2$SampleID) |>
+      (\(x) x[!grepl(pattern = "CONTROL_SAMPLE", x = x, fixed = TRUE)])()
+
+    ## uneven bridge samples in datasets v1 ----
+
+    expect_error(
+      object = olink_norm_check_input_samples(
+        lst_df_samples = list(
+          "p1" = unique(npx_data1$SampleID),
+          "p2" = npx_data2 |>
+            arrow::as_arrow_table() |>
+            dplyr::pull(.data[["SampleID"]], as_vector = TRUE) |>
+            unique()
+        ),
+        lst_ref_samples = list(
+          "p1" = head(x = ref_samples_bridge, 10L),
+          "p2" = ref_samples_bridge
+        ),
+        norm_mode = "bridge"
+      ),
+      regexp = "There are 10 bridge samples for dataset `p1` and 16 bridge samp"
+    )
+
+    ## duplicate reference samples in datasets v2 ----
+
+    expect_error(
+      object = olink_norm_check_input_samples(
+        lst_df_samples = list(
+          "p1" = unique(npx_data1$SampleID),
+          "p2" = npx_data2 |>
+            arrow::as_arrow_table() |>
+            dplyr::pull(.data[["SampleID"]], as_vector = TRUE) |>
+            unique()
+        ),
+        lst_ref_samples = list(
+          "p1" = ref_samples_bridge,
+          "p2" = head(x = ref_samples_bridge, -5L)
+        ),
+        norm_mode = "bridge"
+      ),
+      regexp = "There are 16 bridge samples for dataset `p1` and 11 bridge samp"
+    )
+
+  }
+)
+
+test_that(
+  "olink_norm_check_input_samples - error - no or too many datasets",
+  {
+    skip_if_not_installed("arrow")
+
+    # no df samples ----
+
+    expect_error(
+      object = olink_norm_check_input_samples(
+        lst_df_samples = list(),
+        lst_ref_samples = list(),
+        norm_mode = "ref_median"
+      ),
+      regexp = "No sets of samples provided in `lst_df_samples`!"
+    )
+
+    # too many df samples ----
+
+    expect_error(
+      object = olink_norm_check_input_samples(
+        lst_df_samples = list(
+          "p1" = unique(npx_data1$SampleID),
+          "p2" = unique(npx_data2$SampleID),
+          "p3" = unique(npx_data1$SampleID)
+        ),
+        lst_ref_samples = list(),
+        norm_mode = "ref_median"
+      ),
+      regexp = "More than 2 sets of samples provided in `lst_df_samples`!"
+    )
+
+  }
+)
+
+test_that(
+  "olink_norm_check_input_samples - error - uneven df-ref samples",
+  {
+    skip_if_not_installed("arrow")
+
+    # uneven sample vectors v1 ----
+
+    expect_error(
+      object = olink_norm_check_input_samples(
+        lst_df_samples = list(
+          "p1" = unique(npx_data1$SampleID),
+          "p2" = unique(npx_data2$SampleID)
+        ),
+        lst_ref_samples = list(
+          "p1" = intersect(x = npx_data1$SampleID,
+                           y = npx_data2$SampleID) |>
+            (\(x) x[!grepl(pattern = "CONTROL_SAMPLE", x = x, fixed = TRUE)])()
+        ),
+        norm_mode = "bridge"
+      ),
+      regexp = "Number of sample vectors in `lst_df_samples` differs from the n"
+    )
+
+    # uneven sample vectors v2 ----
+
+    expect_error(
+      object = olink_norm_check_input_samples(
+        lst_df_samples = list(
+          "p1" = unique(npx_data1$SampleID),
+          "p2" = unique(npx_data2$SampleID)
+        ),
+        lst_ref_samples = list(
+          "p1" = intersect(x = npx_data1$SampleID,
+                           y = npx_data2$SampleID) |>
+            (\(x) x[!grepl(pattern = "CONTROL_SAMPLE", x = x, fixed = TRUE)])(),
+          "p2" = c("A", "B", "C"),
+          "p3" = character(0L)
+        ),
+        norm_mode = "bridge"
+      ),
+      regexp = "Number of sample vectors in `lst_df_samples` differs from the n"
     )
 
   }

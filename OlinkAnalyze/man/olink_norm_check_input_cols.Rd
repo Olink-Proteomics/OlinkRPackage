@@ -62,6 +62,7 @@ OlinkAnalyze:::olink_norm_check_input_cols(
      })
   )
 }
+
 }
 \author{
 Klev Diamanti

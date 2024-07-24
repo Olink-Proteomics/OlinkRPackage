@@ -57,6 +57,7 @@
 #'      })
 #'   )
 #' }
+#'
 olink_norm_check_input_cols <- function(lst_df) {
   # check required columns ----
 
@@ -143,7 +144,7 @@ olink_norm_check_input_cols <- function(lst_df) {
   lst_col_miss <- lst_col_miss[nchar(lst_col_miss) > 0L]
 
   # error message if there are missing columns
-  if (!all(sapply(lst_col_miss, nchar) == 0)) {
+  if (!all(sapply(lst_col_miss, nchar) == 0L)) {
     cli::cli_abort(
       c(
         "x" = "{cli::qty(lst_col_miss)} Dataset{?s} with missing column(s):",
@@ -228,4 +229,205 @@ olink_norm_check_input_cols <- function(lst_df) {
 
   }
 
+}
+
+#' Check reference samples to be used for normalization
+#'
+#' @description
+#' This function takes as input a two named lists of character vectors with
+#' matching names and checks the validity of the reference samples. In case of 1
+#' set of df samples, then all checks are skipped as reference median
+#' normalization is to be performed.
+#'
+#' @author
+#'   Klev Diamanti
+#'
+#' @param lst_df_samples Named list of all sample identifiers from datasets to
+#' be normalized.
+#' @param lst_ref_samples Named list of reference sample identifiers to be used
+#' for normalization.
+#' @param norm_mode Character string indicating the type of normalization to be
+#' performed. Expecting one of
+#' `r cli::ansi_collapse(x = OlinkAnalyze:::olink_norm_modes, sep2 = " or ", last = " or ")`. # nolint
+#'
+#' @return `NULL` if no warning or error.
+#'
+#' @examples
+#' \donttest{
+#' # Reference median normalization
+#' OlinkAnalyze:::olink_norm_check_input_samples(
+#'   lst_df_samples = list(
+#'     "p1" = unique(npx_data1$SampleID)
+#'   ),
+#'   norm_mode = "ref_median"
+#' )
+#'
+#' # Bridge normalization
+#' ref_samples_bridge <- intersect(x = npx_data1$SampleID,
+#'                                 y = npx_data2$SampleID) |>
+#'   (\(x) x[!grepl(pattern = "CONTROL_SAMPLE", x = x, fixed = TRUE)])()
+#'
+#' OlinkAnalyze:::olink_norm_check_input_samples(
+#'   lst_df_samples = list(
+#'     "p1" = unique(npx_data1$SampleID),
+#'     "p2" = unique(npx_data2$SampleID)
+#'   ),
+#'   lst_ref_samples = list(
+#'     "p1" = ref_samples_bridge,
+#'     "p2" = ref_samples_bridge
+#'   ),
+#'   norm_mode = "bridge"
+#' )
+#'
+#' # Subset normalization
+#' ref_samples_subset_1 <- npx_data1 |>
+#'   dplyr::filter(
+#'     !grepl(pattern = "CONTROL_SAMPLE",
+#'            x = .data[["SampleID"]],
+#'            fixed = TRUE)
+#'     & .data[["QC_Warning"]] == "Pass"
+#'   ) |>
+#'   dplyr::pull(
+#'     .data[["SampleID"]]
+#'   ) |>
+#'   unique()
+#' ref_samples_subset_2 <- npx_data2 |>
+#'   dplyr::filter(
+#'     !grepl(pattern = "CONTROL_SAMPLE",
+#'            x = .data[["SampleID"]],
+#'            fixed = TRUE)
+#'     & .data[["QC_Warning"]] == "Pass"
+#'   ) |>
+#'   dplyr::pull(
+#'     .data[["SampleID"]]
+#'   ) |>
+#'   unique()
+#'
+#' OlinkAnalyze:::olink_norm_check_input_samples(
+#'   lst_df_samples = list(
+#'     "p1" = unique(npx_data1$SampleID),
+#'     "p2" = unique(npx_data2$SampleID)
+#'   ),
+#'   lst_ref_samples = list(
+#'     "p1" = ref_samples_subset_1,
+#'     "p2" = ref_samples_subset_2
+#'   ),
+#'   norm_mode = "subset"
+#' )
+#' }
+#'
+olink_norm_check_input_samples <- function(lst_df_samples,
+                                           lst_ref_samples = NULL,
+                                           norm_mode) {
+  # check only if there are 2 datasets or more because if only one is provided,
+  # it means that we are performing a reference median normalization and in this
+  # case reference samples are not uneccessary.
+  if (length(lst_df_samples) == 2L && length(lst_ref_samples) == 2L) {
+    ## missing samples ----
+
+    # find samples in lst_ref_samples that are not present in the dataset
+    miss_samples <- lapply(names(lst_df_samples), function(n_df) {
+      setdiff(
+        x = lst_ref_samples[[n_df]],
+        y = lst_df_samples[[n_df]]
+      ) |>
+        cli::ansi_collapse()
+    }) |>
+      unlist()
+    names(miss_samples) <- names(lst_df_samples)
+    # remove instances with no missing samples
+    miss_samples <- miss_samples[nchar(miss_samples) > 0L]
+
+    # error message if there are missing samples
+    if (!all(sapply(miss_samples, nchar) == 0L)) {
+      cli::cli_abort(
+        c(
+          "x" = "Normalization sample(s) missing from {cli::qty(miss_samples)}
+        dataset{?s}:",
+          paste0("* ", names(miss_samples), ": ", unlist(miss_samples)),
+          "i" = "Sample identifiers are separated by comma (,)."
+        ),
+        call = rlang::caller_env(),
+        wrap = FALSE
+      )
+    }
+
+    ## duplicate samples ----
+
+    # check that there are no duplicate sample identifiers within vectors of
+    # lst_ref_samples
+    if (lst_ref_samples |> lapply(duplicated) |> sapply(any) |> any()) {
+      # get duplicated samples
+      lst_sample_dups <- lst_ref_samples |>
+        lapply(duplicated) |>
+        sapply(any) |>
+        (\(x) {
+          lst_ref_samples[x] |>
+            lapply(function(y) {
+              y[duplicated(y)] |>
+                unique() |>
+                cli::ansi_collapse()
+            })
+        })()
+
+      # error message for duplicated samples
+      cli::cli_abort(
+        c(
+          "x" = "Duplicated reference sample identifier(s) detected in
+          {cli::qty(lst_sample_dups)} vector{?s}:",
+          paste0("* ", names(lst_sample_dups), ": ", unlist(lst_sample_dups)),
+          "i" = "Expected no duplicates."
+        ),
+        call = rlang::caller_env(),
+        wrap = FALSE
+      )
+    }
+
+    ## equal number of bridge samples ----
+
+    # check the number of samples is equal if bridge normalization
+    if (tolower(norm_mode) == olink_norm_modes$bridge
+        && sapply(lst_ref_samples, length) |> unique() |> length() != 1L) {
+      # error message for uneven number of bridge samples
+      cli::cli_abort(
+        c(
+          "x" = "There are {length(lst_ref_samples[[1L]])} bridge samples for
+          dataset {.var {names(lst_ref_samples)[1L]}} and
+          {length(lst_ref_samples[[2L]])} bridge samples for dataset
+          {.var {names(lst_ref_samples)[2L]}}!",
+          "i" = "Expected the same number of samples."
+        ),
+        call = rlang::caller_env(),
+        wrap = FALSE
+      )
+    }
+
+  } else if (length(lst_df_samples) == 2L && length(lst_ref_samples) != 2L) {
+
+    # if lst_df_samples is 2 but lst_ref_samples is anything else then
+    # lst_df_samples and lst_ref_samples do not match
+    cli::cli_abort(
+      c(
+        "x" = "Number of sample vectors in {.var lst_df_samples} differs from
+        the number of reference sample vectors in {.var lst_ref_samples}!",
+        "i" = "Expected equal number of vectors of samples."
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
+  } else if (length(lst_df_samples) != 1L) {
+
+    # if 0 or more than 2 datasets are provided
+    cli::cli_abort(
+      c(
+        "x" = "{cli::qty(lst_df_samples)} {?No/One/More than 2} set{?s} of
+        samples provided in {.var lst_df_samples}!",
+        "i" = "Expected 1 or 2 sets."
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
+  }
 }
