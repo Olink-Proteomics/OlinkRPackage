@@ -19,3 +19,9 @@ utils::globalVariables(unique(c(
   "cols", "ID", "AssayQC", "AssayType", "Block", "DataAnalysisRefID", "ExploreVersion", "ExtNPX", "PCNormalizedNPX", "SampleQC", "SampleType", "WellID",
   "Max LOD", "Plate LOD", "Plate_LOD", "Normalization_df1", "Normalization_df2",   "Max_LOD", "maxLOD", "plateLOD", ".env", ".data", "PCNormalizedLOD"
 )))
+
+olink_norm_modes <- list(
+  "bridge" = "bridge",
+  "subset" = "subset",
+  "ref_median" = "ref_median"
+)
