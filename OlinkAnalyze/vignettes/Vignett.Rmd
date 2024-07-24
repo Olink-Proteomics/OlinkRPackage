@@ -150,7 +150,10 @@ In order to import multiple NPX data files at once, the read_NPX function can be
 data <-  list.files(path = "path/to/dir/with/NPX/files",
                     pattern = "csv$",
                     full.names = TRUE) |>
-         lapply(OlinkAnalyze::read_NPX)  |>
+         lapply(FUN = function(x){
+    OlinkAnalyze::read_NPX(x) |> 
+      dplyr::mutate(File = x) # Optionally add additional columns to add file identifiers
+      }  |>
          dplyr::bind_rows()
 
 # Read in multiple NPX files in .parquet format
