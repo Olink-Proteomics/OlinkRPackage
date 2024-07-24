@@ -46,7 +46,7 @@ olink_umap_plot(
 
 \item{outlierDefY}{The number standard deviations along the UMAP dimension plotted on the y-axis that defines an outlier. See also 'Details"}
 
-\item{outlierLines}{Draw dashed lines at +/-outlierDef\link{X,Y} standard deviations from the mean of the plotted PCs (default FALSE)}
+\item{outlierLines}{Draw dashed lines at +/- outlierDefX and outlierDefY standard deviations from the mean of the plotted PCs (default FALSE)}
 
 \item{label_outliers}{Use ggrepel to label samples lying outside the limits set by the outlierLines (default TRUE)}
 
@@ -66,7 +66,7 @@ Unique sample names are required and imputation by the median is done for assays
 \details{
 The plot is printed, and a list of ggplot objects is returned. \cr\cr
 If byPanel = TRUE, the data processing (imputation of missing values etc) and subsequent UMAP is performed separately per panel. A faceted plot is printed, while the individual ggplot objects are returned. \cr\cr
-The arguments outlierDefX and outlierDefY can be used to identify outliers in the UMAP results. Samples more than +/-outlierDef\link{X,Y} standard deviations from the mean of the plotted UMAP component will be labelled. Both arguments have to be specified.
+The arguments outlierDefX and outlierDefY can be used to identify outliers in the UMAP results. Samples more than +/- outlierDefX and outlierDefY standard deviations from the mean of the plotted UMAP component will be labelled. Both arguments have to be specified.
 NOTE: UMAP is a non-linear data transformation that might not accurately preserve the properties of the data. Distances in the UMAP plane should therefore be interpreted with caution.
 }
 \examples{
