@@ -154,7 +154,7 @@ data <-  list.files(path = "path/to/dir/with/NPX/files",
     OlinkAnalyze::read_NPX(x) |> 
       dplyr::mutate(File = x) # Optionally add additional columns to add file identifiers
       }  |>
-         dplyr::bind_rows()
+         dplyr::bind_rows() # optional to return a single data frame of all files instead of a list of data frames
 
 # Read in multiple NPX files in .parquet format
 data <-  list.files(path = "path/to/dir/with/NPX/files",
