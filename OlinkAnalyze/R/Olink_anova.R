@@ -106,8 +106,19 @@ olink_anova <- function(df,
     stop('The df and variable arguments need to be specified.')
   }
 
-  withCallingHandlers({
+  # Stop if control assays have not been removed
+  ctrl_types <- c("amp_ctrl", "ext_ctrl", "inc_ctrl")
 
+  if ("AssayType" %in% names(df)) {
+    if (any(ctrl_types %in% df$AssayType)) {
+      stop('Control assays have not been removed from the dataset.\n  Assays with AssayType != "assay" should be excluded.')
+    }
+  } else if (any(str_detect(df$Assay, "control"))) {
+    stop('Control assays have not been removed from the dataset.\n  Assays with "control" in their Assay field should be excluded.')
+  }
+  
+  withCallingHandlers({
+    
     #Filtering on valid OlinkID
     df <- df %>%
       dplyr::filter(stringr::str_detect(OlinkID,
@@ -443,9 +454,19 @@ olink_anova_posthoc <- function(df,
     stop("All effect terms must be included in the variable argument or model formula.")
   }
 
+  # Stop if control assays have not been removed
+  ctrl_types <- c("amp_ctrl", "ext_ctrl", "inc_ctrl")
 
+  if ("AssayType" %in% names(df)) {
+    if (any(ctrl_types %in% df$AssayType)) {
+      stop('Control assays have not been removed from the dataset.\n  Assays with AssayType != "assay" should be excluded.')
+    }
+  } else if (any(str_detect(df$Assay, "control"))) {
+    stop('Control assays have not been removed from the dataset.\n  Assays with "control" in their Assay field should be excluded.')
+  }
+  
   withCallingHandlers({
-
+    
     #Filtering on valid OlinkID
     df <- df %>%
       dplyr::filter(stringr::str_detect(OlinkID,

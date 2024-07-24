@@ -5,6 +5,34 @@ load(refRes_file)
 #Load data with hidden/excluded assays (all NPX=NA)
 load(file = '../data/npx_data_format221010.RData')
 
+# Remove assays with NPX == NA from npx_data_format221010 for testing
+npx_data_format221010_no_NA <- npx_data_format221010 |>
+  dplyr::filter(!is.na(NPX))
+
+# Add dummy Extension control assays
+extension_control <- npx_data_format221010_no_NA |>
+  dplyr::filter(str_detect(Assay, "Incubation control")) |>
+  dplyr::mutate(Assay = gsub("Incubation", "Extension", Assay)) |>
+  dplyr::mutate(UniProt = gsub("INC", "EXT", UniProt))
+
+npx_data_format221010_ext_ctrl <- rbind(
+  npx_data_format221010_no_NA,
+  extension_control
+)
+
+# Add AssayType
+npx_data_format221010_AssayType <- npx_data_format221010_ext_ctrl |>
+  mutate(AssayType = case_when(
+    str_detect(Assay, "Incubation control") ~ "inc_ctrl",
+    str_detect(Assay, "Amplification control") ~ "amp_ctrl",
+    str_detect(Assay, "Extension control") ~ "ext_ctrl",
+    TRUE ~ "assay"
+  ))
+
+# Remove control assays from npx_data_format221010 for warning tests
+npx_data_format221010_no_ctrl <- npx_data_format221010 |>
+  dplyr::filter(!str_detect(Assay, "control"))
+
 #Run olink_anova
 anova_results_1_site <- olink_anova(npx_data1, 'Site') %>%
   mutate(id = as.character(OlinkID)) %>%
@@ -52,8 +80,11 @@ test_that("olink_anova function works", {
   expect_equal(ncol(anova_results_1_siteTime), 12)
 
   expect_error(olink_anova(npx_data1,)) ##no input data
-
-  expect_warning(olink_anova(npx_data_format221010, 'treatment2')) # data with all NPX=NA for some assays
+  
+  expect_warning(olink_anova(npx_data_format221010_no_ctrl, 'treatment2')) # data with all NPX=NA for some assays
+  
+  expect_error(olink_anova(npx_data_format221010_AssayType, variable = "Site")) # Assay controls not removed, AssayType present
+  expect_error(olink_anova(npx_data_format221010_ext_ctrl, variable = "Site")) # Assay controls not removed, no AssayType
 })
 
 test_that("olink_anova_posthoc function works", {
@@ -69,5 +100,13 @@ test_that("olink_anova_posthoc function works", {
   expect_equal(nrow(anova_posthoc_1_time), 30)
   expect_equal(anova_posthoc_1_time %>% ncol(), 11)
 
-  expect_warning(olink_anova_posthoc(npx_data_format221010, variable = 'treatment2', effect = 'treatment2')) # data with all NPX=NA for some assays
+  expect_warning(olink_anova_posthoc(npx_data_format221010_no_ctrl, variable = 'treatment2', effect = 'treatment2')) # data with all NPX=NA for some assays
+
+  expect_error(olink_anova_posthoc(npx_data_format221010_AssayType, 
+                                   variable = 'Site', 
+                                   effect = 'Site')) # Assay controls not removed, AssayType present
+  expect_error(olink_anova_posthoc(npx_data_format221010_ext_ctrl, 
+                                   variable = 'Site', 
+                                   effect = 'Site')) # Assay controls not removed, no AssayType
+  
 })
