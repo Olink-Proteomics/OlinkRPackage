@@ -16,12 +16,15 @@ lod_method = "FixedLOD". Default `NULL`.}
 negative controls ("NCLOD"), or both ("Both"). Default `NCLOD`.}
 }
 \value{
-A dataframe with 2 additional columns, LOD and PCNormalizedLOD if `lod_method` is FixedLOD or NCLOD. When
-`Normalization = "Plate Control"`, LOD and PCNormalizedLOD are identical. If `lod_method` is "Both", 4 additional columns will be added: 
- + NCLOD - LOD calculated from negative controls and normalized based on normalization column
- + NCPCNormalizedLOD - PC Normalized LOD calculated from negative controls
- + FixedLOD - LOD calculated from fixed LOD file and normalized based on normalization column
- + FixedPCNormalizedLOD - PC Normalized LOD calculated from fixed LOD file
+A dataframe with 2 additional columns, LOD and PCNormalizedLOD if `lod_method` is FixedLOD or NCLOD. When `Normalization = "Plate Control"`, LOD and PCNormalizedLOD are identical. 
+
+If `lod_method` is "Both", 4 additional columns will be added: 
+ \itemize{
+   \item NCLOD - LOD calculated from negative controls and normalized based on normalization column
+   \item NCPCNormalizedLOD - PC Normalized LOD calculated from negative controls
+   \item FixedLOD - LOD calculated from fixed LOD file and normalized based on normalization column
+   \item FixedPCNormalizedLOD - PC Normalized LOD calculated from fixed LOD file
+   }
 }
 \description{
 Calculate LOD using Negative Controls or Fixed LOD
