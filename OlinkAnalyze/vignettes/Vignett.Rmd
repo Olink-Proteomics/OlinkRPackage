@@ -140,6 +140,39 @@ A tibble in long format containing:
 * NPX: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX in the Olink [FAQ](https://olink.com/knowledge/faq)(Search "What is NPX?") or in Olink's Data normalization and standardization [white paper](https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/05-white%20paper%20for%20website/1096-olink-data-normalization-white-paper.pdf).
 
 
+
+## Read multiple NPX data files (read_NPX)
+
+In order to import multiple NPX data files at once, the read_NPX function can be used in combination with the list.files, lapply and dplyr::bind_rows functions, as seen below. The *pattern* argument of the list.files function specifies the NPX file format (*.csv*, *.parquet*, or either). This method requires that all NPX files are stored in the same folder and have identical column names. No prior alterations to the NPX output file should be made for this method to work as expected.
+
+
+```{r message=FALSE, eval=FALSE}
+# Read in multiple NPX files in .csv format
+data <-  list.files(path = "path/to/dir/with/NPX/files",
+                    pattern = "csv$",
+                    full.names = TRUE) |>
+         lapply(FUN = function(x){
+    OlinkAnalyze::read_NPX(x) |> 
+      dplyr::mutate(File = x) # Optionally add additional columns to add file identifiers
+      }  |>
+         dplyr::bind_rows() # optional to return a single data frame of all files instead of a list of data frames
+
+# Read in multiple NPX files in .parquet format
+data <-  list.files(path = "path/to/dir/with/NPX/files",
+                    pattern = "parquet$",
+                    full.names = TRUE) |>
+         lapply(OlinkAnalyze::read_NPX)  |>
+         dplyr::bind_rows()
+
+# Read in multiple NPX files in either format
+data <-  list.files(path = "path/to/dir/with/NPX/files",  
+                    pattern = "parquet$|csv$",          
+                    full.names = TRUE) |>
+         lapply(OlinkAnalyze::read_NPX)  |>
+         dplyr::bind_rows()
+```  
+
+
 ## Randomize samples on plate (olink_plate_randomizer)
 
 The olink_plate_randomizer function randomly assigns samples to a plate well with the option to keep the same individuals on the same plate. Olink® does not recommend to force balance based on other clinical variables. 
