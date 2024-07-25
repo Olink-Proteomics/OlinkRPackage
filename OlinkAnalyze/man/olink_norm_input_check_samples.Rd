@@ -4,11 +4,7 @@
 \alias{olink_norm_input_check_samples}
 \title{Check reference samples to be used for normalization}
 \usage{
-olink_norm_input_check_samples(
-  lst_df_samples,
-  lst_ref_samples = NULL,
-  norm_mode
-)
+olink_norm_input_check_samples(lst_df_samples, lst_ref_samples, norm_mode)
 }
 \arguments{
 \item{lst_df_samples}{Named list of all sample identifiers from datasets to

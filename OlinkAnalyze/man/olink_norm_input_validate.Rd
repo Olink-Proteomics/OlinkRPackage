@@ -6,10 +6,10 @@
 \usage{
 olink_norm_input_validate(
   df1,
-  df2 = NULL,
+  df2,
   overlapping_samples_df1,
-  overlapping_samples_df2 = NULL,
-  reference_medians = NULL
+  overlapping_samples_df2,
+  reference_medians
 )
 }
 \arguments{

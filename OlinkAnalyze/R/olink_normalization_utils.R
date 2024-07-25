@@ -35,10 +35,10 @@
 #' determined from the input, otherwise see details.
 #'
 olink_norm_input_validate <- function(df1,
-                                      df2 = NULL,
+                                      df2,
                                       overlapping_samples_df1,
-                                      overlapping_samples_df2 = NULL,
-                                      reference_medians = NULL) {
+                                      overlapping_samples_df2,
+                                      reference_medians) {
   # check inputs ----
 
   ## check df1 ----
@@ -455,7 +455,7 @@ olink_norm_input_check_df_cols <- function(lst_df) {
 #' }
 #'
 olink_norm_input_check_samples <- function(lst_df_samples,
-                                           lst_ref_samples = NULL,
+                                           lst_ref_samples,
                                            norm_mode) {
 
   if (!(length(lst_df_samples) %in% c(1L, 2L))) {
