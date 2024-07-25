@@ -201,15 +201,16 @@ values that are specific to your project. However, this requires that
 the dataset has at least 10 NCs with passing SampleQC.
 
 ## Integrating Both NC LOD and Fixed LOD
-There is also the option to calculate both NC LOD and Fixed LOD for a data file by setting lod_method to “Both”. The resulting data will have 4 additional columns where the columns will start with NC or Fixed to indicate the method used to calculate LOD, followed by LOD or PCNormalizedLOD as explained above. An example of the file format is shown below. Note that these columns will not automatically be recognized by other functions within Olink Analyze that use LOD (for example `olink_bridgeselector()`). To use these functions, the LOD value to be used should have "LOD" as the column name.
+
+There is also the option to calculate both NC LOD and Fixed LOD for a data file by setting lod_method to “Both”. The resulting data will have 4 additional columns, starting with NC or Fixed to indicate the method used to calculate LOD, followed by LOD or PCNormalizedLOD as explained above. An example of the file format is shown below. Note that these columns will not automatically be recognized by other functions within Olink Analyze that use LOD (for example `olink_bridgeselector()`). To use these functions, the LOD value to be used should have "LOD" as the column name.
 
 ```{r, echo=FALSE}
 table1 |>  
   dplyr::mutate(Normalization = "Intensity") |> 
-  dplyr::mutate(NPX = round(NPX,digits = 2)) |> 
-  dplyr::mutate(LOD = round(LOD, digits = 2)) |> 
-  dplyr::mutate(PCNormalizedNPX = round(NPX + 4.16, digits = 2))|> 
-  dplyr::mutate(PCNormalizedLOD = round(LOD + 4.16, digits = 2)) |>
+  dplyr::mutate(PCNormalizedNPX = round(NPX,digits = 2)) |> 
+  dplyr::mutate(PCNormalizedLOD = round(LOD, digits = 2)) |> 
+  dplyr::mutate(NPX = round(NPX + 4.16, digits = 2))|> 
+  dplyr::mutate(LOD = round(LOD + 4.16, digits = 2)) |>
   dplyr::rename(FixedLOD = LOD,
                 FixedPCNormalizedLOD = PCNormalizedLOD) |> 
   dplyr::mutate(NCLOD = FixedLOD - 2.34,
