@@ -113,7 +113,7 @@ olink_anova <- function(df,
     if (any(ctrl_types %in% df$AssayType)) {
       stop('Control assays have not been removed from the dataset.\n  Assays with AssayType != "assay" should be excluded.')
     }
-  } else if (any(str_detect(df$Assay, "control"))) {
+  } else if (any(str_detect(df$Assay, regex("control|ctrl", ignore_case = TRUE)))) {
     stop('Control assays have not been removed from the dataset.\n  Assays with "control" in their Assay field should be excluded.')
   }
   
@@ -461,7 +461,7 @@ olink_anova_posthoc <- function(df,
     if (any(ctrl_types %in% df$AssayType)) {
       stop('Control assays have not been removed from the dataset.\n  Assays with AssayType != "assay" should be excluded.')
     }
-  } else if (any(str_detect(df$Assay, "control"))) {
+  } else if (any(str_detect(df$Assay, regex("control|ctrl", ignore_case = TRUE)))) {
     stop('Control assays have not been removed from the dataset.\n  Assays with "control" in their Assay field should be excluded.')
   }
   
