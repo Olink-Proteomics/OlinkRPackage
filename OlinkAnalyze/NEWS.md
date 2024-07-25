@@ -7,6 +7,7 @@
 * Instructions for importing multiple NPX files has been added to the overview tutorial (#403, @dtopouza)
 * Additional background information was added to the LOD tutorial to clarify how LOD is calculated from counts (#404, @kathy-nevola)
 * LOD can now be calculated using fixed LOD, negative controls, or both methods (#390, @kathy-nevola)
+* An error message will now appear when running anova and control assays are present (#416, @dtopouza)
 * Danai Topouza's role has been changed from contributor to author (#415, @kathy-nevola)
 
 ## Bug Fixes
