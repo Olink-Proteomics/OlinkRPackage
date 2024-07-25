@@ -1,3 +1,129 @@
+#' Validate inputs of normalization function
+#'
+#' @description
+#' This function takes as input some of the inputs of the Olink normalization
+#' function and checks the validity of the input.
+#'
+#' @details
+#' Depending on the input the function will return:
+#' \itemize{
+#' \item \strong{Error}: if the required components are lacking from the input
+#' or if the normalization cannot be performed.
+#' \item \strong{Warning}: if the normalization can be determined but extra
+#' inputs are provided. This will be followed by a message and the type of
+#' normalization to be performed.
+#' \item \strong{Message}: Information about the type of
+#' normalization to be performed.
+#' }
+#'
+#' \strong{Note} that input are passed directly from the main
+#' \code{\link{olink_normalization}} function.
+#'
+#' @author
+#'   Klev Diamanti
+#'
+#' @param df1 First dataset to be used in normalization (required).
+#' @param df2 Second dataset to be used in normalization.
+#' @param overlapping_samples_df1 Samples to be used for adjustment factor
+#' calculation in df1 (required).
+#' @param overlapping_samples_df2 Samples to be used for adjustment factor
+#' calculation in df2.
+#' @param reference_medians Dataset with columns "OlinkID" and "Reference_NPX".
+#' Used for reference median normalization.
+#'
+#' @return Scalar character from \var{olink_norm_modes} if normalization can be
+#' determined from the input, otherwise see details.
+#'
+olink_norm_input_validate <- function(df1,
+                                      df2 = NULL,
+                                      overlapping_samples_df1,
+                                      overlapping_samples_df2 = NULL,
+                                      reference_medians = NULL) {
+  # check inputs ----
+
+  ## check df1 ----
+
+  # in any case df1 should be a tibble, data.frame or ArrowObject
+  v_df1 <- ifelse(!missing(df1), # nolint
+                  TRUE,
+                  FALSE)
+
+  ## check df2 ----
+
+  v_df2 <- ifelse(!is.null(df2), # nolint
+                  TRUE,
+                  FALSE)
+
+  ## check overlapping_samples_df1 ----
+
+  v_overlap_samples_df1 <- ifelse(!missing(overlapping_samples_df1), # nolint
+                                  TRUE,
+                                  FALSE)
+
+  ## check overlapping_samples_df2 ----
+
+  v_overlap_samples_df2 <- ifelse(!is.null(overlapping_samples_df2), # nolint
+                                  TRUE,
+                                  FALSE)
+
+  ## check reference_medians ----
+
+  v_reference_medians <- ifelse(!is.null(reference_medians), # nolint
+                                TRUE,
+                                FALSE)
+
+  # get normalization mode ----
+
+  # use the bits from the v_* variables above to check for errors or warnings in
+  # the user input. this will be determined from the data frame
+  # olink_norm_mode_combos which contains all combinations of the 5 variables.
+  olink_norm_mode_row <- olink_norm_mode_combos |>
+    dplyr::filter(
+      .data[["df1"]] == .env[["v_df1"]]
+      & .data[["df2"]] == .env[["v_df2"]]
+      & .data[["overlapping_samples_df1"]] == .env[["v_overlap_samples_df1"]]
+      & .data[["overlapping_samples_df2"]] == .env[["v_overlap_samples_df2"]]
+      & .data[["reference_medians"]] == .env[["v_reference_medians"]]
+    )
+
+  error_msg_row <- olink_norm_mode_row$error_msg[1L]
+  warning_msg_row <- olink_norm_mode_row$warning_msg[1L]
+  inform_msg_row <- olink_norm_mode_row$inform_msg[1L]
+  norm_mode_row <- olink_norm_mode_row$norm_mode[1L]
+
+  # errors, warnings or messages ----
+
+  # if there is an error, throw it and exit
+  if (!is.na(error_msg_row)) {
+
+    cli::cli_abort(
+      message = c(
+        "x" = error_msg_row,
+        "i" = "Check function help for examples."
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
+  } else {
+
+    # in case there is a warning from the use input
+    if (!is.na(warning_msg_row)) {
+      cli::cli_warn(message = warning_msg_row)
+    }
+
+    # inform what type of normalization we will perform
+    if (!is.na(inform_msg_row)) {
+      cli::cli_inform(message = inform_msg_row)
+    }
+
+    # return the type of normalization to perform
+    return(norm_mode_row)
+
+  }
+
+}
+
 #' Check columns of a list of datasets to be normalized.
 #'
 #' @description
@@ -15,7 +141,7 @@
 #' @examples
 #' \donttest{
 #' # One dataset
-#' OlinkAnalyze:::olink_norm_check_input_cols(
+#' OlinkAnalyze:::olink_norm_input_check_df_cols(
 #'   lst_df = list(
 #'     "p1" = npx_data1
 #'   ) |>
@@ -28,7 +154,7 @@
 #'   )
 #'
 #' # Two datasets
-#' OlinkAnalyze:::olink_norm_check_input_cols(
+#' OlinkAnalyze:::olink_norm_input_check_df_cols(
 #'   lst_df = list(
 #'     "p1" = npx_data1,
 #'     "p2" = npx_data2
@@ -42,7 +168,7 @@
 #'   )
 #'
 #' # Multiple datasets
-#' OlinkAnalyze:::olink_norm_check_input_cols(
+#' OlinkAnalyze:::olink_norm_input_check_df_cols(
 #'   lst_df = list(
 #'     "p1" = npx_data1,
 #'     "p2" = npx_data2,
@@ -58,7 +184,7 @@
 #'   )
 #' }
 #'
-olink_norm_check_input_cols <- function(lst_df) {
+olink_norm_input_check_df_cols <- function(lst_df) {
   # check required columns ----
 
   # this is a list of columns that are expected to be present in one or all
@@ -255,9 +381,21 @@ olink_norm_check_input_cols <- function(lst_df) {
 #' @examples
 #' \donttest{
 #' # Reference median normalization
-#' OlinkAnalyze:::olink_norm_check_input_samples(
+#' OlinkAnalyze:::olink_norm_input_check_samples(
 #'   lst_df_samples = list(
 #'     "p1" = unique(npx_data1$SampleID)
+#'   ),
+#'   lst_ref_samples = list(
+#'     "p1" = npx_data1 |>
+#'       dplyr::filter(
+#'         !grepl(pattern = "CONTROL_SAMPLE",
+#'         x = .data[["SampleID"]],
+#'         fixed = TRUE)
+#'       ) |>
+#'       dplyr::pull(.data[["SampleID"]]) |>
+#'       unique() |>
+#'       sort() |>
+#'       head(n = 6L)
 #'   ),
 #'   norm_mode = "ref_median"
 #' )
@@ -267,7 +405,7 @@ olink_norm_check_input_cols <- function(lst_df) {
 #'                                 y = npx_data2$SampleID) |>
 #'   (\(x) x[!grepl(pattern = "CONTROL_SAMPLE", x = x, fixed = TRUE)])()
 #'
-#' OlinkAnalyze:::olink_norm_check_input_samples(
+#' OlinkAnalyze:::olink_norm_input_check_samples(
 #'   lst_df_samples = list(
 #'     "p1" = unique(npx_data1$SampleID),
 #'     "p2" = unique(npx_data2$SampleID)
@@ -303,7 +441,7 @@ olink_norm_check_input_cols <- function(lst_df) {
 #'   ) |>
 #'   unique()
 #'
-#' OlinkAnalyze:::olink_norm_check_input_samples(
+#' OlinkAnalyze:::olink_norm_input_check_samples(
 #'   lst_df_samples = list(
 #'     "p1" = unique(npx_data1$SampleID),
 #'     "p2" = unique(npx_data2$SampleID)
@@ -316,13 +454,40 @@ olink_norm_check_input_cols <- function(lst_df) {
 #' )
 #' }
 #'
-olink_norm_check_input_samples <- function(lst_df_samples,
+olink_norm_input_check_samples <- function(lst_df_samples,
                                            lst_ref_samples = NULL,
                                            norm_mode) {
-  # check only if there are 2 datasets or more because if only one is provided,
-  # it means that we are performing a reference median normalization and in this
-  # case reference samples are not uneccessary.
-  if (length(lst_df_samples) == 2L && length(lst_ref_samples) == 2L) {
+
+  if (!(length(lst_df_samples) %in% c(1L, 2L))) {
+    # if 0 or more than 2 datasets are provided
+    cli::cli_abort(
+      c(
+        "x" = "{cli::qty(lst_df_samples)} {?No/One/More than 2} set{?s} of
+        samples provided in {.var lst_df_samples}!",
+        "i" = "Expected 1 or 2 sets."
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+  }
+
+  if (!(length(lst_ref_samples) %in% c(1L, 2L))) {
+    # if 0 or more than 2 sample sets are provided
+    cli::cli_abort(
+      c(
+        "x" = "{cli::qty(lst_ref_samples)} {?No/One/More than 2} set{?s} of
+        samples provided in {.var lst_ref_samples}!",
+        "i" = "Expected 1 or 2 sets."
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+  }
+
+  # check only if there are 1 or 2 datasets provided. if yes, it means that we
+  # are performing a reference median, bridge or subset normalization and in
+  # this case reference samples should be checked.
+  if (length(lst_df_samples) == length(lst_ref_samples)) {
     ## missing samples ----
 
     # find samples in lst_ref_samples that are not present in the dataset
@@ -402,7 +567,7 @@ olink_norm_check_input_samples <- function(lst_df_samples,
       )
     }
 
-  } else if (length(lst_df_samples) == 2L && length(lst_ref_samples) != 2L) {
+  } else {
 
     # if lst_df_samples is 2 but lst_ref_samples is anything else then
     # lst_df_samples and lst_ref_samples do not match
@@ -411,19 +576,6 @@ olink_norm_check_input_samples <- function(lst_df_samples,
         "x" = "Number of sample vectors in {.var lst_df_samples} differs from
         the number of reference sample vectors in {.var lst_ref_samples}!",
         "i" = "Expected equal number of vectors of samples."
-      ),
-      call = rlang::caller_env(),
-      wrap = FALSE
-    )
-
-  } else if (length(lst_df_samples) != 1L) {
-
-    # if 0 or more than 2 datasets are provided
-    cli::cli_abort(
-      c(
-        "x" = "{cli::qty(lst_df_samples)} {?No/One/More than 2} set{?s} of
-        samples provided in {.var lst_df_samples}!",
-        "i" = "Expected 1 or 2 sets."
       ),
       call = rlang::caller_env(),
       wrap = FALSE

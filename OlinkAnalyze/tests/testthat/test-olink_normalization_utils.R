@@ -1,14 +1,599 @@
-# Test olink_norm_check_input_cols ----
+# Test olink_norm_input_validate ----
+
+# NOTE: we will try all possible combinations of inputs
+
+## df1 is missing ----
 
 test_that(
-  "olink_norm_check_input_cols - Normalization col - 1 dataset",
+  "olink_norm_input_validate - error - df1=0, df2=0, s1=0, s2=0, rm=0",
+  {
+    expect_error(
+      object = olink_norm_input_validate(
+        df2 = NULL,
+        overlapping_samples_df2 = NULL,
+        reference_medians = NULL
+      ),
+      regexp = "Required `df1` is missing!"
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_validate - error - df1=0, df2=0, s1=0, s2=0, rm=1",
+  {
+    expect_error(
+      object = olink_norm_input_validate(
+        df2 = NULL,
+        overlapping_samples_df2 = NULL,
+        reference_medians = dplyr::tibble(
+          "OlinkID" = c("OID12345", "OID23456", "OID34567", "OID45678"),
+          "Reference_NPX" = c(0.1, 0.1, 0.2, 0.3)
+        )
+      ),
+      regexp = "Required `df1` is missing!"
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_validate - error - df1=0, df2=0, s1=0, s2=1, rm=0",
+  {
+    expect_error(
+      object = olink_norm_input_validate(
+        df2 = NULL,
+        overlapping_samples_df2 = c("A", "B", "C", "D"),
+        reference_medians = NULL
+      ),
+      regexp = "Required `df1` is missing!"
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_validate - error - df1=0, df2=0, s1=0, s2=1, rm=1",
+  {
+    expect_error(
+      object = olink_norm_input_validate(
+        df2 = NULL,
+        overlapping_samples_df2 = c("A", "B", "C", "D"),
+        reference_medians = dplyr::tibble(
+          "OlinkID" = c("OID12345", "OID23456", "OID34567", "OID45678"),
+          "Reference_NPX" = c(0.1, 0.1, 0.2, 0.3)
+        )
+      ),
+      regexp = "Required `df1` is missing!"
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_validate - error - df1=0, df2=0, s1=1, s2=0, rm=0",
+  {
+    expect_error(
+      object = olink_norm_input_validate(
+        df2 = NULL,
+        overlapping_samples_df1 = c("E", "F", "G", "H"),
+        overlapping_samples_df2 = NULL,
+        reference_medians = NULL
+      ),
+      regexp = "Required `df1` is missing!"
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_validate - error - df1=0, df2=0, s1=1, s2=0, rm=1",
+  {
+    expect_error(
+      object = olink_norm_input_validate(
+        df2 = NULL,
+        overlapping_samples_df1 = c("E", "F", "G", "H"),
+        overlapping_samples_df2 = NULL,
+        reference_medians = dplyr::tibble(
+          "OlinkID" = c("OID12345", "OID23456", "OID34567", "OID45678"),
+          "Reference_NPX" = c(0.1, 0.1, 0.2, 0.3)
+        )
+      ),
+      regexp = "Required `df1` is missing!"
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_validate - error - df1=0, df2=0, s1=1, s2=1, rm=0",
+  {
+    expect_error(
+      object = olink_norm_input_validate(
+        df2 = NULL,
+        overlapping_samples_df1 = c("E", "F", "G", "H"),
+        overlapping_samples_df2 = c("A", "B", "C", "D"),
+        reference_medians = NULL
+      ),
+      regexp = "Required `df1` is missing!"
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_validate - error - df1=0, df2=0, s1=1, s2=1, rm=1",
+  {
+    expect_error(
+      object = olink_norm_input_validate(
+        df2 = NULL,
+        overlapping_samples_df1 = c("E", "F", "G", "H"),
+        overlapping_samples_df2 = c("A", "B", "C", "D"),
+        reference_medians = dplyr::tibble(
+          "OlinkID" = c("OID12345", "OID23456", "OID34567", "OID45678"),
+          "Reference_NPX" = c(0.1, 0.1, 0.2, 0.3)
+        )
+      ),
+      regexp = "Required `df1` is missing!"
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_validate - error - df1=0, df2=1, s1=0, s2=0, rm=0",
+  {
+    expect_error(
+      object = olink_norm_input_validate(
+        df2 = npx_data2,
+        overlapping_samples_df2 = NULL,
+        reference_medians = NULL
+      ),
+      regexp = "Required `df1` is missing!"
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_validate - error - df1=0, df2=1, s1=0, s2=0, rm=1",
+  {
+    expect_error(
+      object = olink_norm_input_validate(
+        df2 = npx_data2,
+        overlapping_samples_df2 = NULL,
+        reference_medians = dplyr::tibble(
+          "OlinkID" = c("OID12345", "OID23456", "OID34567", "OID45678"),
+          "Reference_NPX" = c(0.1, 0.1, 0.2, 0.3)
+        )
+      ),
+      regexp = "Required `df1` is missing!"
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_validate - error - df1=0, df2=1, s1=0, s2=1, rm=0",
+  {
+    expect_error(
+      object = olink_norm_input_validate(
+        df2 = npx_data2,
+        overlapping_samples_df2 = c("A", "B", "C", "D"),
+        reference_medians = NULL
+      ),
+      regexp = "Required `df1` is missing!"
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_validate - error - df1=0, df2=1, s1=0, s2=1, rm=1",
+  {
+    expect_error(
+      object = olink_norm_input_validate(
+        df2 = npx_data2,
+        overlapping_samples_df2 = c("A", "B", "C", "D"),
+        reference_medians = dplyr::tibble(
+          "OlinkID" = c("OID12345", "OID23456", "OID34567", "OID45678"),
+          "Reference_NPX" = c(0.1, 0.1, 0.2, 0.3)
+        )
+      ),
+      regexp = "Required `df1` is missing!"
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_validate - error - df1=0, df2=1, s1=1, s2=0, rm=0",
+  {
+    expect_error(
+      object = olink_norm_input_validate(
+        df2 = npx_data2,
+        overlapping_samples_df1 = c("E", "F", "G", "H"),
+        overlapping_samples_df2 = NULL,
+        reference_medians = NULL
+      ),
+      regexp = "Required `df1` is missing!"
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_validate - error - df1=0, df2=1, s1=1, s2=0, rm=1",
+  {
+    expect_error(
+      object = olink_norm_input_validate(
+        df2 = npx_data2,
+        overlapping_samples_df1 = c("E", "F", "G", "H"),
+        overlapping_samples_df2 = NULL,
+        reference_medians = dplyr::tibble(
+          "OlinkID" = c("OID12345", "OID23456", "OID34567", "OID45678"),
+          "Reference_NPX" = c(0.1, 0.1, 0.2, 0.3)
+        )
+      ),
+      regexp = "Required `df1` is missing!"
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_validate - error - df1=0, df2=1, s1=1, s2=1, rm=0",
+  {
+    expect_error(
+      object = olink_norm_input_validate(
+        df2 = npx_data2,
+        overlapping_samples_df1 = c("E", "F", "G", "H"),
+        overlapping_samples_df2 = c("A", "B", "C", "D"),
+        reference_medians = NULL
+      ),
+      regexp = "Required `df1` is missing!"
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_validate - error - df1=0, df2=1, s1=1, s2=1, rm=1",
+  {
+    expect_error(
+      object = olink_norm_input_validate(
+        df2 = npx_data2,
+        overlapping_samples_df1 = c("E", "F", "G", "H"),
+        overlapping_samples_df2 = c("A", "B", "C", "D"),
+        reference_medians = dplyr::tibble(
+          "OlinkID" = c("OID12345", "OID23456", "OID34567", "OID45678"),
+          "Reference_NPX" = c(0.1, 0.1, 0.2, 0.3)
+        )
+      ),
+      regexp = "Required `df1` is missing!"
+    )
+  }
+)
+
+## df1 is present ----
+
+test_that(
+  "olink_norm_input_validate - df1=1, df2=0, s1=0, s2=0, rm=0",
+  {
+    expect_error(
+      object = olink_norm_input_validate(
+        df1 = npx_data1,
+        df2 = NULL,
+        overlapping_samples_df2 = NULL,
+        reference_medians = NULL
+      ),
+      regexp = paste("When `df1` is provided, either `df2` or",
+                     "`reference_medians` is required")
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_validate - df1=1, df2=0, s1=0, s2=0, rm=1",
+  {
+    expect_error(
+      object = olink_norm_input_validate(
+        df1 = npx_data1,
+        df2 = NULL,
+        overlapping_samples_df2 = NULL,
+        reference_medians = dplyr::tibble(
+          "OlinkID" = c("OID12345", "OID23456", "OID34567", "OID45678"),
+          "Reference_NPX" = c(0.1, 0.1, 0.2, 0.3)
+        )
+      ),
+      regexp = paste("When `df1` and `reference_medians` are provided,",
+                     "`overlapping_samples_df1` is required!")
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_validate - df1=1, df2=0, s1=0, s2=1, rm=0",
+  {
+    expect_error(
+      object = olink_norm_input_validate(
+        df1 = npx_data1,
+        df2 = NULL,
+        overlapping_samples_df2 = c("A", "B", "C", "D"),
+        reference_medians = NULL
+      ),
+      regexp = paste("When `df1` is provided, either `df2` or",
+                     "`reference_medians` is required")
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_validate - df1=1, df2=0, s1=0, s2=1, rm=1",
+  {
+    expect_error(
+      object = olink_norm_input_validate(
+        df1 = npx_data1,
+        df2 = NULL,
+        overlapping_samples_df2 = c("A", "B", "C", "D"),
+        reference_medians = dplyr::tibble(
+          "OlinkID" = c("OID12345", "OID23456", "OID34567", "OID45678"),
+          "Reference_NPX" = c(0.1, 0.1, 0.2, 0.3)
+        )
+      ),
+      regexp = paste("When `df1` and `reference_medians` are provided,",
+                     "`overlapping_samples_df1` is required!")
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_validate - df1=1, df2=0, s1=1, s2=0, rm=0",
+  {
+    expect_error(
+      object = olink_norm_input_validate(
+        df1 = npx_data1,
+        df2 = NULL,
+        overlapping_samples_df1 = c("E", "F", "G", "H"),
+        overlapping_samples_df2 = NULL,
+        reference_medians = NULL
+      ),
+      regexp = paste("When `df1` is provided, either `df2` or",
+                     "`reference_medians` is required")
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_validate - df1=1, df2=0, s1=1, s2=0, rm=1",
+  {
+    expect_message(
+      object = norm_mode <- olink_norm_input_validate(
+        df1 = npx_data1,
+        df2 = NULL,
+        overlapping_samples_df1 = c("E", "F", "G", "H"),
+        overlapping_samples_df2 = NULL,
+        reference_medians = dplyr::tibble(
+          "OlinkID" = c("OID12345", "OID23456", "OID34567", "OID45678"),
+          "Reference_NPX" = c(0.1, 0.1, 0.2, 0.3)
+        )
+      ),
+      regexp = "Reference median normalization will be performed!"
+    )
+
+    expect_equal(
+      object = norm_mode,
+      expected = olink_norm_modes$ref_median
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_validate - df1=1, df2=0, s1=1, s2=1, rm=0",
+  {
+    expect_error(
+      object = olink_norm_input_validate(
+        df1 = npx_data1,
+        df2 = NULL,
+        overlapping_samples_df1 = c("E", "F", "G", "H"),
+        overlapping_samples_df2 = c("A", "B", "C", "D"),
+        reference_medians = NULL
+      ),
+      regexp = paste("When `df1` is provided, either `df2` or",
+                     "`reference_medians` is required")
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_validate - df1=1, df2=0, s1=1, s2=1, rm=1",
+  {
+    expect_message(
+      object = expect_warning(
+        object = norm_mode <- olink_norm_input_validate(
+          df1 = npx_data1,
+          df2 = NULL,
+          overlapping_samples_df1 = c("E", "F", "G", "H"),
+          overlapping_samples_df2 = c("A", "B", "C", "D"),
+          reference_medians = dplyr::tibble(
+            "OlinkID" = c("OID12345", "OID23456", "OID34567", "OID45678"),
+            "Reference_NPX" = c(0.1, 0.1, 0.2, 0.3)
+          )
+        ),
+        regexp = "`overlapping_samples_df2` will be ignored"
+      ),
+      regexp = "Reference median normalization will be performed!"
+    )
+
+    expect_equal(
+      object = norm_mode,
+      expected = olink_norm_modes$ref_median
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_validate - df1=1, df2=1, s1=0, s2=0, rm=0",
+  {
+    expect_error(
+      object = olink_norm_input_validate(
+        df1 = npx_data1,
+        df2 = npx_data2,
+        overlapping_samples_df2 = NULL,
+        reference_medians = NULL
+      ),
+      regexp = paste("When `df1` and `df2` are provided, at least",
+                     "`overlapping_samples_df1` is required!")
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_validate - df1=1, df2=1, s1=0, s2=0, rm=1",
+  {
+    expect_error(
+      object = olink_norm_input_validate(
+        df1 = npx_data1,
+        df2 = npx_data2,
+        overlapping_samples_df2 = NULL,
+        reference_medians = dplyr::tibble(
+          "OlinkID" = c("OID12345", "OID23456", "OID34567", "OID45678"),
+          "Reference_NPX" = c(0.1, 0.1, 0.2, 0.3)
+        )
+      ),
+      regexp =  paste("When `df1` and `df2` are provided, at least",
+                      "`overlapping_samples_df1` is required!")
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_validate - df1=1, df2=1, s1=0, s2=1, rm=0",
+  {
+    expect_error(
+      object = olink_norm_input_validate(
+        df1 = npx_data1,
+        df2 = npx_data2,
+        overlapping_samples_df2 = c("A", "B", "C", "D"),
+        reference_medians = NULL
+      ),
+      regexp =  paste("When `df1` and `df2` are provided, at least",
+                      "`overlapping_samples_df1` is required!")
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_validate - df1=1, df2=1, s1=0, s2=1, rm=1",
+  {
+    expect_error(
+      object = olink_norm_input_validate(
+        df1 = npx_data1,
+        df2 = npx_data2,
+        overlapping_samples_df2 = c("A", "B", "C", "D"),
+        reference_medians = dplyr::tibble(
+          "OlinkID" = c("OID12345", "OID23456", "OID34567", "OID45678"),
+          "Reference_NPX" = c(0.1, 0.1, 0.2, 0.3)
+        )
+      ),
+      regexp =  paste("When `df1` and `df2` are provided, at least",
+                      "`overlapping_samples_df1` is required!")
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_validate - df1=1, df2=1, s1=1, s2=0, rm=0",
+  {
+    expect_message(
+      object = norm_mode <- olink_norm_input_validate(
+        df1 = npx_data1,
+        df2 = npx_data2,
+        overlapping_samples_df1 = c("E", "F", "G", "H"),
+        overlapping_samples_df2 = NULL,
+        reference_medians = NULL
+      ),
+      regexp = "Bridge normalization will be performed!"
+    )
+
+    expect_equal(
+      object = norm_mode,
+      expected = olink_norm_modes$bridge
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_validate - df1=1, df2=1, s1=1, s2=0, rm=1",
+  {
+    expect_message(
+      object = expect_warning(
+        object = norm_mode <- olink_norm_input_validate(
+          df1 = npx_data1,
+          df2 = npx_data2,
+          overlapping_samples_df1 = c("E", "F", "G", "H"),
+          overlapping_samples_df2 = NULL,
+          reference_medians = dplyr::tibble(
+            "OlinkID" = c("OID12345", "OID23456", "OID34567", "OID45678"),
+            "Reference_NPX" = c(0.1, 0.1, 0.2, 0.3)
+          )
+        ),
+        regexp = "`reference_medians` will be ignored"
+      ),
+      regexp = "Bridge normalization will be performed!"
+    )
+
+    expect_equal(
+      object = norm_mode,
+      expected = olink_norm_modes$bridge
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_validate - df1=1, df2=1, s1=1, s2=1, rm=0",
+  {
+    expect_message(
+      object = norm_mode <- olink_norm_input_validate(
+        df1 = npx_data1,
+        df2 = npx_data2,
+        overlapping_samples_df1 = c("E", "F", "G", "H"),
+        overlapping_samples_df2 = c("A", "B", "C", "D"),
+        reference_medians = NULL
+      ),
+      regexp = "Subset normalization will be performed!"
+    )
+
+    expect_equal(
+      object = norm_mode,
+      expected = olink_norm_modes$subset
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_validate - df1=1, df2=1, s1=1, s2=1, rm=1",
+  {
+    expect_message(
+      object = expect_warning(
+        object = norm_mode <- olink_norm_input_validate(
+          df1 = npx_data1,
+          df2 = npx_data2,
+          overlapping_samples_df1 = c("E", "F", "G", "H"),
+          overlapping_samples_df2 = c("A", "B", "C", "D"),
+          reference_medians = dplyr::tibble(
+            "OlinkID" = c("OID12345", "OID23456", "OID34567", "OID45678"),
+            "Reference_NPX" = c(0.1, 0.1, 0.2, 0.3)
+          )
+        ),
+        regexp = "`reference_medians` will be ignored"
+      ),
+      regexp = "Subset normalization will be performed!"
+    )
+
+    expect_equal(
+      object = norm_mode,
+      expected = olink_norm_modes$subset
+    )
+  }
+)
+
+# Test olink_norm_input_check_df_cols ----
+
+test_that(
+  "olink_norm_input_check_df_cols - Normalization col - 1 dataset",
   {
     skip_if_not_installed("arrow")
 
     # df does not have Normalization col ----
 
     expect_warning(
-      object = olink_norm_check_input_cols(
+      object = olink_norm_input_check_df_cols(
         lst_df = list(
           "p1" = npx_data1
         ) |>
@@ -25,7 +610,7 @@ test_that(
     # df does not have Normalization col - arrow ----
 
     expect_warning(
-      object = olink_norm_check_input_cols(
+      object = olink_norm_input_check_df_cols(
         lst_df = list(
           "p1" = npx_data1
         ) |>
@@ -45,7 +630,7 @@ test_that(
     expect_no_error(
       object = expect_no_warning(
         object = expect_no_message(
-          object = olink_norm_check_input_cols(
+          object = olink_norm_input_check_df_cols(
             lst_df = list(
               "p1" = npx_data1
             ) |>
@@ -65,7 +650,7 @@ test_that(
     expect_no_error(
       object = expect_no_warning(
         object = expect_no_message(
-          object = olink_norm_check_input_cols(
+          object = olink_norm_input_check_df_cols(
             lst_df = list(
               "p1" = npx_data1
             ) |>
@@ -84,14 +669,14 @@ test_that(
 )
 
 test_that(
-  "olink_norm_check_input_cols - Normalization col - 2 datasets",
+  "olink_norm_input_check_df_cols - Normalization col - 2 datasets",
   {
     skip_if_not_installed("arrow")
 
     # no df has Normalization col ----
 
     expect_warning(
-      object = olink_norm_check_input_cols(
+      object = olink_norm_input_check_df_cols(
         lst_df = list(
           "p1" = npx_data1,
           "p2" = npx_data2
@@ -111,7 +696,7 @@ test_that(
     expect_no_error(
       object = expect_no_warning(
         object = expect_no_message(
-          object = olink_norm_check_input_cols(
+          object = olink_norm_input_check_df_cols(
             lst_df = list(
               "p1" = npx_data1,
               "p2" = npx_data2
@@ -132,7 +717,7 @@ test_that(
     expect_no_error(
       object = expect_no_warning(
         object = expect_no_message(
-          object = olink_norm_check_input_cols(
+          object = olink_norm_input_check_df_cols(
             lst_df = list(
               "p1" = npx_data1 |>
                 dplyr::mutate(Normalization = "Intensity"),
@@ -147,7 +732,7 @@ test_that(
     # one df has Normalization col ----
 
     expect_error(
-      object = olink_norm_check_input_cols(
+      object = olink_norm_input_check_df_cols(
         lst_df = list(
           "p1" = npx_data1 |>
             dplyr::mutate(Normalization = "Intensity"),
@@ -160,7 +745,7 @@ test_that(
     # one df has Normalization col - arrow ----
 
     expect_error(
-      object = olink_norm_check_input_cols(
+      object = olink_norm_input_check_df_cols(
         lst_df = list(
           "p1" = npx_data1 |>
             dplyr::mutate(Normalization = "Intensity") |>
@@ -175,14 +760,14 @@ test_that(
 )
 
 test_that(
-  "olink_norm_check_input_cols - Normalization col - 3+ datasets",
+  "olink_norm_input_check_df_cols - Normalization col - 3+ datasets",
   {
     skip_if_not_installed("arrow")
 
     # df 1 and 2 do not have Normalization col ----
 
     expect_error(
-      object = olink_norm_check_input_cols(
+      object = olink_norm_input_check_df_cols(
         lst_df = list("p1" = OlinkAnalyze::npx_data1 |>
                         arrow::as_arrow_table(),
                       "p2" = OlinkAnalyze::npx_data2,
@@ -197,7 +782,7 @@ test_that(
     # df 1 does not have Normalization col ----
 
     expect_error(
-      object = olink_norm_check_input_cols(
+      object = olink_norm_input_check_df_cols(
         lst_df = list("p1" = OlinkAnalyze::npx_data1,
                       "p2" = OlinkAnalyze::npx_data2 |>
                         dplyr::mutate(Normalization = "Intensity") |>
@@ -215,7 +800,7 @@ test_that(
     expect_no_error(
       object = expect_no_warning(
         object = expect_no_message(
-          object = olink_norm_check_input_cols(
+          object = olink_norm_input_check_df_cols(
             lst_df = list("p1" = OlinkAnalyze::npx_data1 |>
                             dplyr::mutate(Normalization = "Plate control"),
                           "p2" = OlinkAnalyze::npx_data2 |>
@@ -233,7 +818,7 @@ test_that(
     # no df has Normalization col ----
 
     expect_warning(
-      object = olink_norm_check_input_cols(
+      object = olink_norm_input_check_df_cols(
         lst_df = list("p1" = OlinkAnalyze::npx_data1,
                       "p2" = OlinkAnalyze::npx_data2 |>
                         arrow::as_arrow_table(),
@@ -247,14 +832,14 @@ test_that(
 )
 
 test_that(
-  "olink_norm_check_input_cols - error - missing cols",
+  "olink_norm_input_check_df_cols - error - missing cols",
   {
     skip_if_not_installed("arrow")
 
     # 2 df missing cols v1 ----
 
     expect_error(
-      object = olink_norm_check_input_cols(
+      object = olink_norm_input_check_df_cols(
         lst_df = list(
           "p1" = npx_data1 |>
             dplyr::select(
@@ -274,7 +859,7 @@ test_that(
     # 2 df missing cols v2 ----
 
     expect_error(
-      object = olink_norm_check_input_cols(
+      object = olink_norm_input_check_df_cols(
         lst_df = list(
           "p1" = npx_data1 |>
             dplyr::select(
@@ -294,7 +879,7 @@ test_that(
     # one df missing cols v1 ----
 
     expect_error(
-      object = olink_norm_check_input_cols(
+      object = olink_norm_input_check_df_cols(
         lst_df = list(
           "p1" = npx_data1 |>
             dplyr::select(
@@ -311,7 +896,7 @@ test_that(
     # one df missing cols v2 ----
 
     expect_error(
-      object = olink_norm_check_input_cols(
+      object = olink_norm_input_check_df_cols(
         lst_df = list(
           "p1" = npx_data1,
           "p2" = npx_data2 |>
@@ -328,7 +913,7 @@ test_that(
     # multiple df missing cols ----
 
     expect_error(
-      object = olink_norm_check_input_cols(
+      object = olink_norm_input_check_df_cols(
         lst_df = list(
           "p1" = OlinkAnalyze::npx_data1 |>
             dplyr::select(
@@ -358,14 +943,14 @@ test_that(
 )
 
 test_that(
-  "olink_norm_check_input_cols - error - different quant methdos",
+  "olink_norm_input_check_df_cols - error - different quant methdos",
   {
     skip_if_not_installed("arrow")
 
     # 2 df with different quant method ----
 
     expect_error(
-      object = olink_norm_check_input_cols(
+      object = olink_norm_input_check_df_cols(
         lst_df = list(
           "p1" = npx_data1 |>
             dplyr::rename(
@@ -382,7 +967,7 @@ test_that(
     # multiple df with different quant method ----
 
     expect_error(
-      object = olink_norm_check_input_cols(
+      object = olink_norm_input_check_df_cols(
         lst_df = list(
           "p1" = npx_data1 |>
             dplyr::rename(
@@ -405,14 +990,14 @@ test_that(
 )
 
 test_that(
-  "olink_norm_check_input_cols - error - missing non-required cols",
+  "olink_norm_input_check_df_cols - error - missing non-required cols",
   {
     skip_if_not_installed("arrow")
 
     # df 1 missing 1 col ----
 
     expect_warning(
-      object = olink_norm_check_input_cols(
+      object = olink_norm_input_check_df_cols(
         lst_df = list(
           "p1" = npx_data1 |>
             dplyr::select(
@@ -429,7 +1014,7 @@ test_that(
     # df 1 missing 2 col & df 2 missing 1 col ----
 
     expect_warning(
-      object = olink_norm_check_input_cols(
+      object = olink_norm_input_check_df_cols(
         lst_df = list(
           "p1" = npx_data1 |>
             dplyr::select(
@@ -451,7 +1036,7 @@ test_that(
     expect_no_error(
       object = expect_no_warning(
         object = expect_no_message(
-          object = olink_norm_check_input_cols(
+          object = olink_norm_input_check_df_cols(
             lst_df = list(
               "p1" = npx_data1 |>
                 dplyr::select(
@@ -468,7 +1053,7 @@ test_that(
     # multiple df missing non-required cols ----
 
     expect_warning(
-      object = olink_norm_check_input_cols(
+      object = olink_norm_input_check_df_cols(
         lst_df = list(
           "p1" = npx_data1 |>
             dplyr::select(
@@ -493,78 +1078,33 @@ test_that(
   }
 )
 
-# Test olink_norm_check_input_samples ----
+# Test olink_norm_input_check_samples ----
 
 test_that(
-  "olink_norm_check_input_samples - works - 1 dataset",
+  "olink_norm_input_check_samples - works - 1 dataset",
   {
     skip_if_not_installed("arrow")
 
-    # one df - no reference samples ----
+    # one df - with 6 reference samples ----
 
     expect_no_error(
       object = expect_no_warning(
         object = expect_no_message(
-          object = olink_norm_check_input_samples(
-            lst_df_samples = list(
-              "p1" = unique(npx_data1$SampleID)
-            ),
-            norm_mode = "ref_median"
-          )
-        )
-      )
-    )
-
-    # one df - with reference samples ----
-
-    expect_no_error(
-      object = expect_no_warning(
-        object = expect_no_message(
-          object = olink_norm_check_input_samples(
+          object = olink_norm_input_check_samples(
             lst_df_samples = list(
               "p1" = unique(npx_data1$SampleID)
             ),
             lst_ref_samples = list(
-              "p1" = c("A1", "A2", "A3", "A4", "A5", "A6")
-            ),
-            norm_mode = "ref_median"
-          )
-        )
-      )
-    )
-
-    # one df - with reference samples not in df ----
-
-    expect_no_error(
-      object = expect_no_warning(
-        object = expect_no_message(
-          object = olink_norm_check_input_samples(
-            lst_df_samples = list(
-              "p1" = unique(npx_data1$SampleID)
-            ),
-            lst_ref_samples = list(
-              "p1" = c("A111", "A222", "A333", "A444", "A555", "A666")
-            ),
-            norm_mode = "ref_median"
-          )
-        )
-      )
-    )
-
-    # one df - no reference samples - arrow ----
-
-    expect_no_error(
-      object = expect_no_warning(
-        object = expect_no_message(
-          object = olink_norm_check_input_samples(
-            lst_df_samples = list(
               "p1" = npx_data1 |>
-                arrow::as_arrow_table() |>
-                dplyr::pull(.data[["SampleID"]], as_vector = TRUE) |>
-                unique()
-            ),
-            lst_ref_samples = list(
-              "p1" = NULL
+                dplyr::filter(
+                  !grepl(pattern = "CONTROL_SAMPLE",
+                         x = .data[["SampleID"]],
+                         fixed = TRUE)
+                ) |>
+                dplyr::pull(.data[["SampleID"]]) |>
+                unique() |>
+                sort() |>
+                head(n = 6L)
             ),
             norm_mode = "ref_median"
           )
@@ -572,11 +1112,36 @@ test_that(
       )
     )
 
+    # one df - with all reference samples ----
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = olink_norm_input_check_samples(
+            lst_df_samples = list(
+              "p1" = unique(npx_data1$SampleID)
+            ),
+            lst_ref_samples = list(
+              "p1" = npx_data1 |>
+                dplyr::filter(
+                  !grepl(pattern = "CONTROL_SAMPLE",
+                         x = .data[["SampleID"]],
+                         fixed = TRUE)
+                ) |>
+                dplyr::pull(.data[["SampleID"]]) |>
+                unique() |>
+                sort()
+            ),
+            norm_mode = "ref_median"
+          )
+        )
+      )
+    )
   }
 )
 
 test_that(
-  "olink_norm_check_input_samples - works - 2 datasets",
+  "olink_norm_input_check_samples - works - 2 datasets",
   {
     skip_if_not_installed("arrow")
 
@@ -589,7 +1154,7 @@ test_that(
     expect_no_error(
       object = expect_no_warning(
         object = expect_no_message(
-          object = olink_norm_check_input_samples(
+          object = olink_norm_input_check_samples(
             lst_df_samples = list(
               "p1" = unique(npx_data1$SampleID),
               "p2" = npx_data2 |>
@@ -635,7 +1200,7 @@ test_that(
     expect_no_error(
       object = expect_no_warning(
         object = expect_no_message(
-          object = olink_norm_check_input_samples(
+          object = olink_norm_input_check_samples(
             lst_df_samples = list(
               "p1" = unique(npx_data1$SampleID),
               "p2" = npx_data2 |>
@@ -657,7 +1222,7 @@ test_that(
 )
 
 test_that(
-  "olink_norm_check_input_samples - error - missing samples",
+  "olink_norm_input_check_samples - error - missing samples",
   {
     skip_if_not_installed("arrow")
 
@@ -670,7 +1235,7 @@ test_that(
     ## reference samples not in datasets v1 ----
 
     expect_error(
-      object = olink_norm_check_input_samples(
+      object = olink_norm_input_check_samples(
         lst_df_samples = list(
           "p1" = unique(npx_data1$SampleID),
           "p2" = npx_data2 |>
@@ -691,7 +1256,7 @@ test_that(
     ## reference samples not in datasets v2 ----
 
     expect_error(
-      object = olink_norm_check_input_samples(
+      object = olink_norm_input_check_samples(
         lst_df_samples = list(
           "p1" = unique(npx_data1$SampleID),
           "p2" = npx_data2 |>
@@ -713,7 +1278,7 @@ test_that(
     ## reference samples not in datasets v3 ----
 
     expect_error(
-      object = olink_norm_check_input_samples(
+      object = olink_norm_input_check_samples(
         lst_df_samples = list(
           "p1" = unique(npx_data1$SampleID),
           "p2" = npx_data2 |>
@@ -759,7 +1324,7 @@ test_that(
     ## reference samples not in datasets v1 ----
 
     expect_error(
-      object = olink_norm_check_input_samples(
+      object = olink_norm_input_check_samples(
         lst_df_samples = list(
           "p1" = unique(npx_data1$SampleID),
           "p2" = npx_data2 |>
@@ -781,7 +1346,7 @@ test_that(
     ## reference samples not in datasets v2 ----
 
     expect_error(
-      object = olink_norm_check_input_samples(
+      object = olink_norm_input_check_samples(
         lst_df_samples = list(
           "p1" = unique(npx_data1$SampleID),
           "p2" = npx_data2 |>
@@ -804,7 +1369,7 @@ test_that(
     ## reference samples not in datasets v3 ----
 
     expect_error(
-      object = olink_norm_check_input_samples(
+      object = olink_norm_input_check_samples(
         lst_df_samples = list(
           "p1" = unique(npx_data1$SampleID),
           "p2" = npx_data2 |>
@@ -826,7 +1391,7 @@ test_that(
 )
 
 test_that(
-  "olink_norm_check_input_samples - error - duplicate samples",
+  "olink_norm_input_check_samples - error - duplicate samples",
   {
     skip_if_not_installed("arrow")
 
@@ -839,7 +1404,7 @@ test_that(
     ## duplicate reference samples in datasets v1 ----
 
     expect_error(
-      object = olink_norm_check_input_samples(
+      object = olink_norm_input_check_samples(
         lst_df_samples = list(
           "p1" = unique(npx_data1$SampleID),
           "p2" = npx_data2 |>
@@ -860,7 +1425,7 @@ test_that(
     ## duplicate reference samples in datasets v2 ----
 
     expect_error(
-      object = olink_norm_check_input_samples(
+      object = olink_norm_input_check_samples(
         lst_df_samples = list(
           "p1" = unique(npx_data1$SampleID),
           "p2" = npx_data2 |>
@@ -906,7 +1471,7 @@ test_that(
     ## reference samples not in datasets v1 ----
 
     expect_error(
-      object = olink_norm_check_input_samples(
+      object = olink_norm_input_check_samples(
         lst_df_samples = list(
           "p1" = unique(npx_data1$SampleID),
           "p2" = npx_data2 |>
@@ -927,7 +1492,7 @@ test_that(
     ## reference samples not in datasets v2 ----
 
     expect_error(
-      object = olink_norm_check_input_samples(
+      object = olink_norm_input_check_samples(
         lst_df_samples = list(
           "p1" = unique(npx_data1$SampleID),
           "p2" = npx_data2 |>
@@ -950,7 +1515,7 @@ test_that(
 )
 
 test_that(
-  "olink_norm_check_input_samples - error - uneven number of bridge samples",
+  "olink_norm_input_check_samples - error - uneven number of bridge samples",
   {
     skip_if_not_installed("arrow")
 
@@ -963,7 +1528,7 @@ test_that(
     ## uneven bridge samples in datasets v1 ----
 
     expect_error(
-      object = olink_norm_check_input_samples(
+      object = olink_norm_input_check_samples(
         lst_df_samples = list(
           "p1" = unique(npx_data1$SampleID),
           "p2" = npx_data2 |>
@@ -983,7 +1548,7 @@ test_that(
     ## duplicate reference samples in datasets v2 ----
 
     expect_error(
-      object = olink_norm_check_input_samples(
+      object = olink_norm_input_check_samples(
         lst_df_samples = list(
           "p1" = unique(npx_data1$SampleID),
           "p2" = npx_data2 |>
@@ -1004,14 +1569,14 @@ test_that(
 )
 
 test_that(
-  "olink_norm_check_input_samples - error - no or too many datasets",
+  "olink_norm_input_check_samples - error - no or too many df sample sets",
   {
     skip_if_not_installed("arrow")
 
     # no df samples ----
 
     expect_error(
-      object = olink_norm_check_input_samples(
+      object = olink_norm_input_check_samples(
         lst_df_samples = list(),
         lst_ref_samples = list(),
         norm_mode = "ref_median"
@@ -1022,7 +1587,7 @@ test_that(
     # too many df samples ----
 
     expect_error(
-      object = olink_norm_check_input_samples(
+      object = olink_norm_input_check_samples(
         lst_df_samples = list(
           "p1" = unique(npx_data1$SampleID),
           "p2" = unique(npx_data2$SampleID),
@@ -1038,14 +1603,54 @@ test_that(
 )
 
 test_that(
-  "olink_norm_check_input_samples - error - uneven df-ref samples",
+  "olink_norm_input_check_samples - error - no or too many ref sample sets",
+  {
+    skip_if_not_installed("arrow")
+
+    # no ref samples ----
+
+    expect_error(
+      object = olink_norm_input_check_samples(
+        lst_df_samples = list(
+          "p1" = unique(npx_data1$SampleID),
+          "p2" = unique(npx_data2$SampleID)
+        ),
+        lst_ref_samples = list(),
+        norm_mode = "ref_median"
+      ),
+      regexp = "No sets of samples provided in `lst_ref_samples`!"
+    )
+
+    # too many ref samples ----
+
+    expect_error(
+      object = olink_norm_input_check_samples(
+        lst_df_samples = list(
+          "p1" = unique(npx_data1$SampleID),
+          "p2" = unique(npx_data2$SampleID)
+        ),
+        lst_ref_samples = list(
+          "p1" = c("A", "B"),
+          "p2" = c("A", "B"),
+          "p3" = c("A", "B")
+        ),
+        norm_mode = "ref_median"
+      ),
+      regexp = "More than 2 sets of samples provided in `lst_ref_samples`!"
+    )
+
+  }
+)
+
+test_that(
+  "olink_norm_input_check_samples - error - uneven df-ref samples",
   {
     skip_if_not_installed("arrow")
 
     # uneven sample vectors v1 ----
 
     expect_error(
-      object = olink_norm_check_input_samples(
+      object = olink_norm_input_check_samples(
         lst_df_samples = list(
           "p1" = unique(npx_data1$SampleID),
           "p2" = unique(npx_data2$SampleID)
@@ -1063,17 +1668,15 @@ test_that(
     # uneven sample vectors v2 ----
 
     expect_error(
-      object = olink_norm_check_input_samples(
+      object = olink_norm_input_check_samples(
         lst_df_samples = list(
-          "p1" = unique(npx_data1$SampleID),
-          "p2" = unique(npx_data2$SampleID)
+          "p1" = unique(npx_data1$SampleID)
         ),
         lst_ref_samples = list(
           "p1" = intersect(x = npx_data1$SampleID,
                            y = npx_data2$SampleID) |>
             (\(x) x[!grepl(pattern = "CONTROL_SAMPLE", x = x, fixed = TRUE)])(),
-          "p2" = c("A", "B", "C"),
-          "p3" = character(0L)
+          "p2" = c("A", "B", "C")
         ),
         norm_mode = "bridge"
       ),
