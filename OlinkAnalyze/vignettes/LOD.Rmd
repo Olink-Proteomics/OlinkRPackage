@@ -68,8 +68,7 @@ this protein can be a strong biomarker candidate for specific groups.
 LOD can be added to Olink Explore NPX datasets using `olink_lod()`. This
 function can calculate LOD from an NPX dataset using the dataset's
 negative controls or a list of predetermined fixed LOD values (available
-in the Document Download Center at [olink.com](https://olink.com/knowledge/documents)). As
-the default setting, `olink_lod()` will calculate LOD using a dataset's
+in the Document Download Center at [olink.com](https://olink.com/knowledge/documents)). As the default setting, `olink_lod()` will calculate LOD using a dataset's
 negative controls.
 
 Olink Explore data is commonly delivered plate control (PC) normalized
@@ -147,6 +146,30 @@ assays with fewer than 150 counts in all negative controls, LOD is
 calculated using the count values which are then converted into PC
 normalized NPX.
 
+
+------------------------------------------------------------------------
+
+#### *A note on calculating LOD from counts*
+
+*Some assays will use count values as the LOD because the assay receives
+very few counts in the negative controls. For the convenience of data
+processing, the LOD in count values are converted to NPX values in the
+`olink_lod()` function. The LOD value for this assay (in
+counts) will become many LOD values in NPX (as extension control counts
+will vary across all samples). This is due to the fact that minor changes on the counts scale can result in significant changes on the NPX scale when working with small counts.
+The reason for this is that NPX is a relative scale, which is calculated by dividing the counts of the assay by the counts of the extension control. For example,
+given that the extension control values remain constant, if a count
+value were to change from 1 count to 2 counts, this would be a change of
+1 NPX, while a change from 1000 counts to 1001 counts would be
+negligible on the NPX scale.*
+
+*Furthermore, due to the low number of counts, the NPX values calculated
+from these counts do not correlate to true background levels. The
+converted NPX values should not be used as LOD values for these assays.*
+
+------------------------------------------------------------------------
+
+
 The resulting LOD is the PC normalized negative control LOD. In the
 event that the Explore dataset is intensity normalized, an intensity
 normalization adjustment factor is applied and the resulting intensity
@@ -176,7 +199,6 @@ dataset is intensity normalized, an intensity normalization adjustment
 factor is applied and the resulting intensity normalized LOD is reported
 in the LOD column and the PC normalized LOD is reported in the
 PCNormalizedLOD column.
-
 
 ```{r FixedLOD, eval = FALSE, message=FALSE, warning=FALSE}
 # Reading in Fixed LOD file path into R environment
