@@ -2,7 +2,7 @@
 #'
 #' @param data npx data file
 #' @param lod_file_path location of lod file from Olink. Only needed if
-#' lod_method = "FixedLOD". Default `NULL`.
+#' lod_method = "FixedLOD" or "Both". Default `NULL`.
 #' @param lod_method method for calculating LOD using either "FixedLOD" or
 #' negative controls ("NCLOD"), or both ("Both"). Default `NCLOD`.
 #'
@@ -41,6 +41,24 @@
 #' }
 #'
 olink_lod <- function(data, lod_file_path = NULL, lod_method = "NCLOD"){
+  # lod_method must be one of options
+  if(!lod_method %in% c("NCLOD", "FixedLOD", "Both")){
+    stop("`lod_method` must be one of \"NCLOD\", \"FixedLOD\", or \"Both\"")
+  }
+  
+  # If lod method is both or fixed you need the file
+  if(missing(lod_file_path) & lod_method %in% c("Both", "FixedLOD")) {
+    stop(paste0("`lod_file_path` must be specified for lod_method = \"",
+                lod_method, "\""))
+  }
+  
+  req_columns <- c("SampleType", "OlinkID", "DataAnalysisRefID", "SampleQC", "AssayType", "NPX")
+  missingcols <- setdiff(req_columns, names(data))
+  if (length(missingcols) != 0){
+    stop(paste0("Required column(s) not found: ", paste0(missingcols, collapse = ", ")))
+  }
+  
+  
   if (lod_method == "Both"){
     data_nc <- olink_lod_internal(data, lod_file_path, lod_method = "NCLOD") |> 
       rename("NCLOD" = "LOD",
@@ -72,11 +90,6 @@ olink_lod_internal <- function(data, lod_file_path = NULL, lod_method = "NCLOD")
                       nc_lod = "NCLOD")
   
   if (lod_method == lod_methods$fix_lod) {
-    
-    if(missing(lod_file_path)) {
-      stop(paste0("lod_file_path must be specified for lod_method = \"",
-                  lod_methods$fix_lod, "\""))
-    }
     
     lod_file <- read.table(file = lod_file_path, sep = ";", header = TRUE)
     lod_data <- olink_fixed_lod(data_analysis_ref_id = data$DataAnalysisRefID,

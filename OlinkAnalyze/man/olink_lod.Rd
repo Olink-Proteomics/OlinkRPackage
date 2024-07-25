@@ -10,7 +10,7 @@ olink_lod(data, lod_file_path = NULL, lod_method = "NCLOD")
 \item{data}{npx data file}
 
 \item{lod_file_path}{location of lod file from Olink. Only needed if
-lod_method = "FixedLOD". Default `NULL`.}
+lod_method = "FixedLOD" or "Both". Default `NULL`.}
 
 \item{lod_method}{method for calculating LOD using either "FixedLOD" or
 negative controls ("NCLOD"), or both ("Both"). Default `NCLOD`.}
