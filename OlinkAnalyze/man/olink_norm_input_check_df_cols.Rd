@@ -10,7 +10,8 @@ olink_norm_input_check_df_cols(lst_df)
 \item{lst_df}{Named list of datasets to be normalized.}
 }
 \value{
-\code{NULL} if no warning or error.
+Named list of vectors with the required column names for each dataset
+in \var{lst_df} if no error.
 }
 \description{
 This function takes as input a named list of datasets and checks if their

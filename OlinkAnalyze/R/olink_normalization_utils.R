@@ -274,7 +274,8 @@ olink_norm_input_class <- function(df1,
 #'
 #' @param lst_df Named list of datasets to be normalized.
 #'
-#' @return `NULL` if no warning or error.
+#' @return Named list of vectors with the required column names for each dataset
+#' in \var{lst_df} if no error.
 #'
 #' @examples
 #' \donttest{
@@ -492,6 +493,10 @@ olink_norm_input_check_df_cols <- function(lst_df) {
     }
 
   }
+
+  # return list of required colnames ----
+
+  return(lst_req_col)
 
 }
 

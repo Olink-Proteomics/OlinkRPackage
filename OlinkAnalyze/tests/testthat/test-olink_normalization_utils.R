@@ -804,7 +804,7 @@ test_that(
     # df does not have Normalization col ----
 
     expect_warning(
-      object = olink_norm_input_check_df_cols(
+      object = lst_col <- olink_norm_input_check_df_cols(
         lst_df = list(
           "p1" = npx_data1
         ) |>
@@ -818,10 +818,28 @@ test_that(
       regexp = "Dataset \"p1\" does not contain a column named"
     )
 
+    expect_identical(
+      object = lst_col,
+      expected = list(
+        "p1" = list(
+          sample_id = "SampleID",
+          olink_id = "OlinkID",
+          uniprot = "UniProt",
+          assay = "Assay",
+          panel = "Panel",
+          panel_version = "Panel_Version",
+          plate_id = "PlateID",
+          qc_warn = "QC_Warning",
+          quant = "NPX",
+          normalization = character(0L)
+        )
+      )
+    )
+
     # df does not have Normalization col - arrow ----
 
     expect_warning(
-      object = olink_norm_input_check_df_cols(
+      object = lst_col <- olink_norm_input_check_df_cols(
         lst_df = list(
           "p1" = npx_data1
         ) |>
@@ -836,12 +854,30 @@ test_that(
       regexp = "Dataset \"p1\" does not contain a column named"
     )
 
+    expect_identical(
+      object = lst_col,
+      expected = list(
+        "p1" = list(
+          sample_id = "SampleID",
+          olink_id = "OlinkID",
+          uniprot = "UniProt",
+          assay = "Assay",
+          panel = "Panel",
+          panel_version = "Panel_Version",
+          plate_id = "PlateID",
+          qc_warn = "QC_Warning",
+          quant = "NPX",
+          normalization = character(0L)
+        )
+      )
+    )
+
     # df has Normalization col ----
 
     expect_no_error(
       object = expect_no_warning(
         object = expect_no_message(
-          object = olink_norm_input_check_df_cols(
+          object = lst_col <- olink_norm_input_check_df_cols(
             lst_df = list(
               "p1" = npx_data1
             ) |>
@@ -856,12 +892,30 @@ test_that(
       )
     )
 
+    expect_identical(
+      object = lst_col,
+      expected = list(
+        "p1" = list(
+          sample_id = "SampleID",
+          olink_id = "OlinkID",
+          uniprot = "UniProt",
+          assay = "Assay",
+          panel = "Panel",
+          panel_version = "Panel_Version",
+          plate_id = "PlateID",
+          qc_warn = "QC_Warning",
+          quant = "NPX",
+          normalization = "Normalization"
+        )
+      )
+    )
+
     # df has Normalization col - arrow ----
 
     expect_no_error(
       object = expect_no_warning(
         object = expect_no_message(
-          object = olink_norm_input_check_df_cols(
+          object = lst_col <- olink_norm_input_check_df_cols(
             lst_df = list(
               "p1" = npx_data1
             ) |>
@@ -876,6 +930,24 @@ test_that(
         )
       )
     )
+
+    expect_identical(
+      object = lst_col,
+      expected = list(
+        "p1" = list(
+          sample_id = "SampleID",
+          olink_id = "OlinkID",
+          uniprot = "UniProt",
+          assay = "Assay",
+          panel = "Panel",
+          panel_version = "Panel_Version",
+          plate_id = "PlateID",
+          qc_warn = "QC_Warning",
+          quant = "NPX",
+          normalization = "Normalization"
+        )
+      )
+    )
   }
 )
 
@@ -887,7 +959,7 @@ test_that(
     # no df has Normalization col ----
 
     expect_warning(
-      object = olink_norm_input_check_df_cols(
+      object = lst_col <- olink_norm_input_check_df_cols(
         lst_df = list(
           "p1" = npx_data1,
           "p2" = npx_data2
@@ -902,12 +974,42 @@ test_that(
       regexp = "Datasets \"p1\" and \"p2\" do not contain a column named"
     )
 
+    expect_identical(
+      object = lst_col,
+      expected = list(
+        "p1" = list(
+          sample_id = "SampleID",
+          olink_id = "OlinkID",
+          uniprot = "UniProt",
+          assay = "Assay",
+          panel = "Panel",
+          panel_version = "Panel_Version",
+          plate_id = "PlateID",
+          qc_warn = "QC_Warning",
+          quant = "NPX",
+          normalization = character(0L)
+        ),
+        "p2" = list(
+          sample_id = "SampleID",
+          olink_id = "OlinkID",
+          uniprot = "UniProt",
+          assay = "Assay",
+          panel = "Panel",
+          panel_version = "Panel_Version",
+          plate_id = "PlateID",
+          qc_warn = "QC_Warning",
+          quant = "NPX",
+          normalization = character(0L)
+        )
+      )
+    )
+
     # both df have same Normalization col ----
 
     expect_no_error(
       object = expect_no_warning(
         object = expect_no_message(
-          object = olink_norm_input_check_df_cols(
+          object = lst_col <- olink_norm_input_check_df_cols(
             lst_df = list(
               "p1" = npx_data1,
               "p2" = npx_data2
@@ -923,12 +1025,42 @@ test_that(
       )
     )
 
+    expect_identical(
+      object = lst_col,
+      expected = list(
+        "p1" = list(
+          sample_id = "SampleID",
+          olink_id = "OlinkID",
+          uniprot = "UniProt",
+          assay = "Assay",
+          panel = "Panel",
+          panel_version = "Panel_Version",
+          plate_id = "PlateID",
+          qc_warn = "QC_Warning",
+          quant = "NPX",
+          normalization = "Normalization"
+        ),
+        "p2" = list(
+          sample_id = "SampleID",
+          olink_id = "OlinkID",
+          uniprot = "UniProt",
+          assay = "Assay",
+          panel = "Panel",
+          panel_version = "Panel_Version",
+          plate_id = "PlateID",
+          qc_warn = "QC_Warning",
+          quant = "NPX",
+          normalization = "Normalization"
+        )
+      )
+    )
+
     # both df have different Normalization col ----
 
     expect_no_error(
       object = expect_no_warning(
         object = expect_no_message(
-          object = olink_norm_input_check_df_cols(
+          object = lst_col <- olink_norm_input_check_df_cols(
             lst_df = list(
               "p1" = npx_data1 |>
                 dplyr::mutate(Normalization = "Intensity"),
@@ -940,7 +1072,37 @@ test_that(
       )
     )
 
-    # one df has Normalization col ----
+    expect_identical(
+      object = lst_col,
+      expected = list(
+        "p1" = list(
+          sample_id = "SampleID",
+          olink_id = "OlinkID",
+          uniprot = "UniProt",
+          assay = "Assay",
+          panel = "Panel",
+          panel_version = "Panel_Version",
+          plate_id = "PlateID",
+          qc_warn = "QC_Warning",
+          quant = "NPX",
+          normalization = "Normalization"
+        ),
+        "p2" = list(
+          sample_id = "SampleID",
+          olink_id = "OlinkID",
+          uniprot = "UniProt",
+          assay = "Assay",
+          panel = "Panel",
+          panel_version = "Panel_Version",
+          plate_id = "PlateID",
+          qc_warn = "QC_Warning",
+          quant = "NPX",
+          normalization = "Normalization"
+        )
+      )
+    )
+
+    # ERROR - one df has Normalization col ----
 
     expect_error(
       object = olink_norm_input_check_df_cols(
@@ -953,7 +1115,7 @@ test_that(
       regexp = "Dataset \"p2\" does not contain a column named \"Normalization"
     )
 
-    # one df has Normalization col - arrow ----
+    # ERROR - one df has Normalization col - arrow ----
 
     expect_error(
       object = olink_norm_input_check_df_cols(
@@ -975,7 +1137,7 @@ test_that(
   {
     skip_if_not_installed("arrow")
 
-    # df 1 and 2 do not have Normalization col ----
+    # ERROR - df 1 and 2 do not have Normalization col ----
 
     expect_error(
       object = olink_norm_input_check_df_cols(
@@ -990,7 +1152,7 @@ test_that(
       regexp = "Datasets \"p1\" and \"p2\" do not contain a column named"
     )
 
-    # df 1 does not have Normalization col ----
+    # ERROR - df 1 does not have Normalization col ----
 
     expect_error(
       object = olink_norm_input_check_df_cols(
@@ -1011,7 +1173,7 @@ test_that(
     expect_no_error(
       object = expect_no_warning(
         object = expect_no_message(
-          object = olink_norm_input_check_df_cols(
+          object = lst_col <- olink_norm_input_check_df_cols(
             lst_df = list("p1" = OlinkAnalyze::npx_data1 |>
                             dplyr::mutate(Normalization = "Plate control"),
                           "p2" = OlinkAnalyze::npx_data2 |>
@@ -1026,10 +1188,64 @@ test_that(
       )
     )
 
+    expect_identical(
+      object = lst_col,
+      expected = list(
+        "p1" = list(
+          sample_id = "SampleID",
+          olink_id = "OlinkID",
+          uniprot = "UniProt",
+          assay = "Assay",
+          panel = "Panel",
+          panel_version = "Panel_Version",
+          plate_id = "PlateID",
+          qc_warn = "QC_Warning",
+          quant = "NPX",
+          normalization = "Normalization"
+        ),
+        "p2" = list(
+          sample_id = "SampleID",
+          olink_id = "OlinkID",
+          uniprot = "UniProt",
+          assay = "Assay",
+          panel = "Panel",
+          panel_version = "Panel_Version",
+          plate_id = "PlateID",
+          qc_warn = "QC_Warning",
+          quant = "NPX",
+          normalization = "Normalization"
+        ),
+        "p3" = list(
+          sample_id = "SampleID",
+          olink_id = "OlinkID",
+          uniprot = "UniProt",
+          assay = "Assay",
+          panel = "Panel",
+          panel_version = "Panel_Version",
+          plate_id = "PlateID",
+          qc_warn = "QC_Warning",
+          quant = "NPX",
+          normalization = "Normalization"
+        ),
+        "p4" = list(
+          sample_id = "SampleID",
+          olink_id = "OlinkID",
+          uniprot = "UniProt",
+          assay = "Assay",
+          panel = "Panel",
+          panel_version = "Panel_Version",
+          plate_id = "PlateID",
+          qc_warn = "QC_Warning",
+          quant = "NPX",
+          normalization = "Normalization"
+        )
+      )
+    )
+
     # no df has Normalization col ----
 
     expect_warning(
-      object = olink_norm_input_check_df_cols(
+      object = lst_col <- olink_norm_input_check_df_cols(
         lst_df = list("p1" = OlinkAnalyze::npx_data1,
                       "p2" = OlinkAnalyze::npx_data2 |>
                         arrow::as_arrow_table(),
@@ -1037,6 +1253,60 @@ test_that(
                       "p4" = OlinkAnalyze::npx_data2)
       ),
       regexp = "Datasets \"p1\", \"p2\", \"p3\", and \"p4\" do not contain a"
+    )
+
+    expect_identical(
+      object = lst_col,
+      expected = list(
+        "p1" = list(
+          sample_id = "SampleID",
+          olink_id = "OlinkID",
+          uniprot = "UniProt",
+          assay = "Assay",
+          panel = "Panel",
+          panel_version = "Panel_Version",
+          plate_id = "PlateID",
+          qc_warn = "QC_Warning",
+          quant = "NPX",
+          normalization = character(0L)
+        ),
+        "p2" = list(
+          sample_id = "SampleID",
+          olink_id = "OlinkID",
+          uniprot = "UniProt",
+          assay = "Assay",
+          panel = "Panel",
+          panel_version = "Panel_Version",
+          plate_id = "PlateID",
+          qc_warn = "QC_Warning",
+          quant = "NPX",
+          normalization = character(0L)
+        ),
+        "p3" = list(
+          sample_id = "SampleID",
+          olink_id = "OlinkID",
+          uniprot = "UniProt",
+          assay = "Assay",
+          panel = "Panel",
+          panel_version = "Panel_Version",
+          plate_id = "PlateID",
+          qc_warn = "QC_Warning",
+          quant = "NPX",
+          normalization = character(0L)
+        ),
+        "p4" = list(
+          sample_id = "SampleID",
+          olink_id = "OlinkID",
+          uniprot = "UniProt",
+          assay = "Assay",
+          panel = "Panel",
+          panel_version = "Panel_Version",
+          plate_id = "PlateID",
+          qc_warn = "QC_Warning",
+          quant = "NPX",
+          normalization = character(0L)
+        )
+      )
     )
 
   }
