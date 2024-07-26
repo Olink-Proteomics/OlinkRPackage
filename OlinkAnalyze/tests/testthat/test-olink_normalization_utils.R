@@ -583,6 +583,217 @@ test_that(
   }
 )
 
+# Test olink_norm_input_class ----
+
+test_that(
+  "olink_norm_input_class - error - df1",
+  {
+    skip_if_not_installed("arrow")
+
+    expect_error(
+      object = olink_norm_input_class(
+        df1 = c(1L, 2L)
+      ),
+      regexp = "`df1` should be a tibble or an R6 ArrowObject"
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_class - df2",
+  {
+    skip_if_not_installed("arrow")
+
+    expect_error(
+      object = olink_norm_input_class(
+        df1 = npx_data1,
+        df2 = c("A", "B"),
+        overlapping_samples_df1 = c("A", "B", "C"),
+        norm_mode = olink_norm_modes$bridge
+      ),
+      regexp = "`df2` should be a tibble or an R6 ArrowObject"
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_class - error - overlapping_samples_df1",
+  {
+    skip_if_not_installed("arrow")
+
+    expect_error(
+      object = olink_norm_input_class(
+        df1 = npx_data1,
+        overlapping_samples_df1 = TRUE
+      ),
+      regexp = "`overlapping_samples_df1` should be a character vector"
+    )
+
+    expect_error(
+      object = olink_norm_input_class(
+        df1 = npx_data1 |>
+          arrow::as_arrow_table(),
+        overlapping_samples_df1 = TRUE
+      ),
+      regexp = "`overlapping_samples_df1` should be a character vector"
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_class - overlapping_samples_df2",
+  {
+    skip_if_not_installed("arrow")
+
+    expect_error(
+      object = olink_norm_input_class(
+        df1 = npx_data1,
+        df2 = npx_data2,
+        overlapping_samples_df1 = c("A", "B", "C"),
+        overlapping_samples_df2 = 1L,
+        df1_project_nr = "P1",
+        df2_project_nr = "P2",
+        reference_project = "P1",
+        norm_mode = olink_norm_modes$subset
+      ),
+      regexp = "`overlapping_samples_df2` should be a character vector"
+    )
+
+    expect_error(
+      object = olink_norm_input_class(
+        df1 = npx_data1 |>
+          arrow::as_arrow_table(),
+        df2 = npx_data2 |>
+          arrow::as_arrow_table(),
+        df1_project_nr = "P1",
+        df2_project_nr = "P2",
+        reference_project = "P1",
+        overlapping_samples_df1 = c("A", "B", "C"),
+        overlapping_samples_df2 = npx_data1,
+        norm_mode = olink_norm_modes$subset
+      ),
+      regexp = "`overlapping_samples_df2` should be a character vector"
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_class - df*_project_nr & reference_project",
+  {
+    skip_if_not_installed("arrow")
+
+    ## df1_project_nr ----
+
+    expect_error(
+      object = olink_norm_input_class(
+        df1 = npx_data1,
+        df2 = npx_data2,
+        overlapping_samples_df1 = c("A", "B", "C"),
+        overlapping_samples_df2 = c("A", "B", "C"),
+        df1_project_nr = TRUE,
+        df2_project_nr = "P2",
+        reference_project = "P1",
+        norm_mode = olink_norm_modes$subset
+      ),
+      regexp = "`df1_project_nr` should be a character vector"
+    )
+
+    ## df2_project_nr ----
+
+    expect_error(
+      object = olink_norm_input_class(
+        df1 = npx_data1,
+        df2 = npx_data2,
+        overlapping_samples_df1 = c("A", "B", "C"),
+        overlapping_samples_df2 = c("A", "B", "C"),
+        df1_project_nr = "P1",
+        df2_project_nr = 1L,
+        reference_project = "P1",
+        norm_mode = olink_norm_modes$subset
+      ),
+      regexp = "`df2_project_nr` should be a character vector"
+    )
+
+    ## reference_project ----
+
+    expect_error(
+      object = olink_norm_input_class(
+        df1 = npx_data1,
+        df2 = npx_data2,
+        overlapping_samples_df1 = c("A", "B", "C"),
+        overlapping_samples_df2 = c("A", "B", "C"),
+        df1_project_nr = "P1",
+        df2_project_nr = "P2",
+        reference_project = npx_data2 |>
+          arrow::as_arrow_table(),
+        norm_mode = olink_norm_modes$subset
+      ),
+      regexp = "`reference_project` should be a character vector"
+    )
+
+    ## reference project not in df*_project_nr ----
+
+    expect_error(
+      object = olink_norm_input_class(
+        df1 = npx_data1,
+        df2 = npx_data2,
+        overlapping_samples_df1 = c("A", "B", "C"),
+        overlapping_samples_df2 = c("A", "B", "C"),
+        df1_project_nr = "P1",
+        df2_project_nr = "P2",
+        reference_project = "P3",
+        norm_mode = olink_norm_modes$subset
+      ),
+      regexp = "`reference_project` should be one of \"P1\" or \"P2\"!"
+    )
+
+    ## df1_project_nr == df2_project_nr ----
+
+    expect_error(
+      object = olink_norm_input_class(
+        df1 = npx_data1,
+        df2 = npx_data2,
+        overlapping_samples_df1 = c("A", "B", "C"),
+        overlapping_samples_df2 = c("A", "B", "C"),
+        df1_project_nr = "P1",
+        df2_project_nr = "P1",
+        reference_project = "P1",
+        norm_mode = olink_norm_modes$subset
+      ),
+      regexp = paste("Values of `df1_project_nr` and `df2_project_nr` should",
+                     "be different!")
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_class - reference_medians",
+  {
+    skip_if_not_installed("arrow")
+
+    expect_error(
+      object = olink_norm_input_class(
+        df1 = npx_data1,
+        overlapping_samples_df1 = c("A", "B", "C"),
+        reference_medians = 1L,
+        norm_mode = olink_norm_modes$ref_median
+      ),
+      regexp = "`reference_medians` should be a tibble or an R6 ArrowObject"
+    )
+
+    expect_error(
+      object = olink_norm_input_class(
+        df1 = npx_data1 |>
+          arrow::as_arrow_table(),
+        overlapping_samples_df1 = c("A", "B", "C"),
+        reference_medians = TRUE,
+        norm_mode = olink_norm_modes$ref_median
+      ),
+      regexp = "`reference_medians` should be a tibble or an R6 ArrowObject"
+    )
+  }
+)
+
 # Test olink_norm_input_check_df_cols ----
 
 test_that(

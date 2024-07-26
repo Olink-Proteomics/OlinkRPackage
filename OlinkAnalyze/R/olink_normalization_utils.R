@@ -124,6 +124,144 @@ olink_norm_input_validate <- function(df1,
 
 }
 
+#' Check classes of input in olink_normalization function
+#'
+#' @description
+#' Check if \var{df1}, \var{df2} and/or \var{reference_medians} are tibble or
+#' ArrowDataset datsets; if \var{overlapping_samples_df1} and/or
+#' \var{overlapping_samples_df2} are charatcer vectors; and if
+#' \var{df1_project_nr}, \var{df2_project_nr} and/or \var{reference_project} are
+#' scalar character vectors.
+#'
+#' @author
+#'   Klev Diamanti
+#'
+#' @param df1 First dataset to be used in normalization (required).
+#' @param df2 Second dataset to be used in normalization.
+#' @param overlapping_samples_df1 Samples to be used for adjustment factor
+#' calculation in df1 (required).
+#' @param overlapping_samples_df2 Samples to be used for adjustment factor
+#' calculation in df2.
+#' @param df1_project_nr Project name of first dataset (df1).
+#' @param df2_project_nr Project name of first dataset (df2).
+#' @param reference_project Project name of reference_project. Should be one of
+#' \var{df1_project_nr} or \var{df2_project_nr}. Indicates the project to which
+#' the other project is adjusted to.
+#' @param reference_medians Dataset with columns "OlinkID" and "Reference_NPX".
+#' Used for reference median normalization.
+#' @param norm_mode Scalar character from \var{olink_norm_modes} with the
+#' normalization to be performed. Output from
+#' \code{\link{olink_norm_input_validate}}.
+#'
+#' @return `NULL` unless there is an error
+#'
+olink_norm_input_class <- function(df1,
+                                   df2,
+                                   overlapping_samples_df1,
+                                   overlapping_samples_df2,
+                                   df1_project_nr,
+                                   df2_project_nr,
+                                   reference_project,
+                                   reference_medians,
+                                   norm_mode) {
+  # help functions ----
+
+  check_is_tibble_arrow <- function(df) {
+    if (!inherits(x = df, what = c("tbl_df", "ArrowObject"))) {
+      cli::cli_abort(
+        message = c(
+          "x" = "{.arg {rlang::caller_arg(df)}} should be a tibble or an R6
+        ArrowObject"
+        ),
+        call = rlang::caller_env(),
+        wrap = FALSE
+      )
+    }
+  }
+
+  check_is_character <- function(string,
+                                 scalar = FALSE) {
+    if (scalar == TRUE) {
+      if (!rlang::is_scalar_character(string)) {
+        cli::cli_abort(
+          message = c(
+            "x" = "{.arg {rlang::caller_arg(string)}} should be a character
+          vector of length 1."
+          ),
+          call = rlang::caller_env(),
+          wrap = FALSE
+        )
+      }
+    } else {
+      if (!rlang::is_character(string)) {
+        cli::cli_abort(
+          message = c(
+            "x" = "{.arg {rlang::caller_arg(string)}} should be a character
+          vector."
+          ),
+          call = rlang::caller_env(),
+          wrap = FALSE
+        )
+      }
+    }
+  }
+
+  # check inputs ----
+
+  # check those taht should always be there
+  check_is_tibble_arrow(df = df1)
+  check_is_character(string = overlapping_samples_df1,
+                     scalar = FALSE)
+
+  ## check per norm_mode ----
+
+  if (norm_mode == olink_norm_modes$ref_median) {
+    # if reference median
+    check_is_tibble_arrow(df = reference_medians)
+  } else {
+    # if bridge or subset
+    check_is_tibble_arrow(df = df2)
+    check_is_character(string = df1_project_nr,
+                       scalar = TRUE)
+    check_is_character(string = df2_project_nr,
+                       scalar = TRUE)
+    check_is_character(string = reference_project,
+                       scalar = TRUE)
+
+    # if subset
+    if (norm_mode == olink_norm_modes$subset) {
+      check_is_character(string = overlapping_samples_df2,
+                         scalar = FALSE)
+    }
+  }
+
+  ## check reference_project equals to df1_project_nr OR df2_project_nr ----
+
+  if (!(reference_project %in% c(df1_project_nr, df2_project_nr))) {
+    cli::cli_abort(
+      message = c(
+        "x" = "{.arg reference_project} should be one of {.val {df1_project_nr}}
+        or {.val {df2_project_nr}}!"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+  }
+
+  ## check that df1_project_nr != df2_project_nr ----
+
+  if (df1_project_nr == df2_project_nr) {
+    cli::cli_abort(
+      message = c(
+        "x" = "Values of {.arg df1_project_nr} and {.arg df2_project_nr} should
+        be different!"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+  }
+}
+
 #' Check columns of a list of datasets to be normalized.
 #'
 #' @description
