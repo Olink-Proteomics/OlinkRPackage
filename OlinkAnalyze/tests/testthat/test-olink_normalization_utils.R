@@ -2166,3 +2166,159 @@ test_that(
 
   }
 )
+
+# Test olink_norm_input_ref_medians ----
+
+test_that(
+  "olink_norm_input_ref_medians - check cols",
+  {
+    skip_if_not_installed("arrow")
+
+    ## no error - tibble ----
+
+    expect_no_warning(
+      object = expect_no_message(
+        object = expect_no_error(
+          object = olink_norm_input_ref_medians(
+            reference_medians = dplyr::tibble(
+              "OlinkID" = c("OID12345", "OID23456", "OID34567", "OID45678"),
+              "Reference_NPX" = c(1.1, 0.4, 0.3, 2)
+            )
+          )
+        )
+      )
+    )
+
+    ## no error - arrow ----
+
+    expect_no_warning(
+      object = expect_no_message(
+        object = expect_no_error(
+          object = olink_norm_input_ref_medians(
+            reference_medians = arrow::arrow_table(
+              "OlinkID" = c("OID12345", "OID23456", "OID34567", "OID45678"),
+              "Reference_NPX" = c(1.1, 0.4, 0.3, 2)
+            )
+          )
+        )
+      )
+    )
+
+    ## ERROR - additional columns ----
+
+    expect_error(
+      object = olink_norm_input_ref_medians(
+        reference_medians = dplyr::tibble(
+          "OlinkID" = c("OID12345", "OID23456", "OID34567", "OID45678"),
+          "Reference_NPX" = c(1.1, 0.4, 0.3, 2),
+          "I_Am_Extra" = c("a", "b", "c", "d")
+        )
+      ),
+      regexp = paste("`reference_medians` should have",
+                     length(olink_norm_ref_median_cols), "columns!")
+    )
+
+    ## no error - arrow ----
+
+    expect_error(
+      object = olink_norm_input_ref_medians(
+        reference_medians = arrow::arrow_table(
+          "OlinkID" = c("OID12345", "OID23456", "OID34567", "OID45678")
+        )
+      ),
+      regexp = paste("`reference_medians` should have",
+                     length(olink_norm_ref_median_cols), "columns!")
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_ref_medians - check class",
+  {
+    skip_if_not_installed("arrow")
+
+    ## ERROR - OlinkID
+
+    expect_error(
+      object = olink_norm_input_ref_medians(
+        reference_medians = dplyr::tibble(
+          "OlinkID" = c("OID12345", "OID23456", "OID34567", "OID45678") |>
+            as.factor(),
+          "Reference_NPX" = c(1.1, 0.4, 0.3, 2)
+        )
+      ),
+      regexp = "Column \"OlinkID\" of `reference_medians` has the wrong"
+    )
+
+    ## error - Reference_NPX
+
+    expect_error(
+      object = olink_norm_input_ref_medians(
+        reference_medians = dplyr::tibble(
+          "OlinkID" = c("OID12345", "OID23456", "OID34567", "OID45678"),
+          "Reference_NPX" = c(1L, 4L, 3L, 2L)
+        )
+      ),
+      regexp = "Column \"Reference_NPX\" of `reference_medians` has the wrong"
+    )
+
+    ## error - both OlinkID and Reference_NPX
+
+    expect_error(
+      object = olink_norm_input_ref_medians(
+        reference_medians = dplyr::tibble(
+          "OlinkID" = c("OID12345", "OID23456", "OID34567", "OID45678") |>
+            as.factor(),
+          "Reference_NPX" = c(1L, 4L, 3L, 2L)
+        )
+      ),
+      regexp = paste("Columns \"OlinkID\" and \"Reference_NPX\" of",
+                     "`reference_medians` have the wrong")
+    )
+
+  }
+)
+
+test_that(
+  "olink_norm_input_ref_medians - check OID duplicates",
+  {
+    skip_if_not_installed("arrow")
+
+    ## ERROR - 1 duplicate
+
+    expect_error(
+      object = olink_norm_input_ref_medians(
+        reference_medians = dplyr::tibble(
+          "OlinkID" = c("OID12345", "OID12345", "OID34567", "OID45678"),
+          "Reference_NPX" = c(1.1, 0.4, 0.3, 2)
+        )
+      ),
+      regexp = "Found 1 duplicated assay in `reference_medians`: \"OID12345\""
+    )
+
+    ## error - 1 duplicate many times
+
+    expect_error(
+      object = olink_norm_input_ref_medians(
+        reference_medians = dplyr::tibble(
+          "OlinkID" = c("OID12345", "OID12345", "OID12345", "OID45678"),
+          "Reference_NPX" = c(1.1, 0.4, 0.3, 2)
+        )
+      ),
+      regexp = "Found 1 duplicated assay in `reference_medians`: \"OID12345\""
+    )
+
+    ## error - many duplicates
+
+    expect_error(
+      object = olink_norm_input_ref_medians(
+        reference_medians = dplyr::tibble(
+          "OlinkID" = c("OID12345", "OID12345", "OID45678", "OID45678"),
+          "Reference_NPX" = c(1.1, 0.4, 0.3, 2)
+        )
+      ),
+      regexp = "Found 2 duplicated assays in `reference_medians`: \"OID12345\""
+    )
+
+  }
+)

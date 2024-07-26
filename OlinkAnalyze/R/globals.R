@@ -26,6 +26,12 @@ olink_norm_modes <- list(
   "ref_median" = "ref_median"
 )
 
+olink_norm_ref_median_cols <- dplyr::tibble(
+  cols = c("OlinkID", "Reference_NPX"),
+  class = c("character", "numeric"),
+  name = c("olink_id", "ref_med")
+)
+
 olink_norm_mode_combos <- expand.grid(df1 = c(FALSE, TRUE),
             df2 = c(FALSE, TRUE),
             overlapping_samples_df1 = c(FALSE, TRUE),

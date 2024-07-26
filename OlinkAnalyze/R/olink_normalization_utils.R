@@ -726,3 +726,114 @@ olink_norm_input_check_samples <- function(lst_df_samples,
 
   }
 }
+
+#' Check datasets of \var{reference_medians}
+#'
+#' @author
+#'   Klev Diamanti
+#'
+#' @param reference_medians Dataset with columns "OlinkID" and "Reference_NPX".
+#' Used for reference median normalization.
+#'
+#' @return `NULL` otherwise error.
+#'
+olink_norm_input_ref_medians <- function(reference_medians) {
+
+  # check columns ----
+
+  if (!identical(x = sort(names(reference_medians)),
+                 y = sort(olink_norm_ref_median_cols$cols))) {
+
+    cli::cli_abort(
+      c(
+        "x" = "{.arg reference_medians} should have
+        {length(olink_norm_ref_median_cols)} columns!",
+        "i" = "Expected: {.val {unlist(olink_norm_ref_median_cols)}}"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
+  }
+
+  # check class ----
+
+  ref_med_class <- sapply(
+    seq_len(nrow(olink_norm_ref_median_cols)),
+    function(i) {
+      reference_medians |>
+        dplyr::select(
+          dplyr::all_of(
+            olink_norm_ref_median_cols$cols[i]
+          )
+        ) |>
+        dplyr::collect() |>
+        dplyr::pull(
+          .data[[olink_norm_ref_median_cols$cols[i]]]
+        ) |>
+        (\(x) inherits(x = x, what = olink_norm_ref_median_cols$class[i]))()
+    }
+  )
+  names(ref_med_class) <- olink_norm_ref_median_cols$cols
+
+  if (any(ref_med_class == FALSE)) {
+
+    wrong_class <- names(ref_med_class)[ref_med_class == FALSE] # nolint
+
+    cli::cli_abort(
+      c(
+        "x" = "{cli::qty(wrong_class)} Column{?s} {.val {wrong_class}} of
+        {.arg reference_medians} {?has/have} the wrong class!",
+        "i" = "Expected:",
+        olink_norm_ref_median_cols |>
+          dplyr::mutate(
+            x = paste0("* ", .data[["cols"]], ": ", .data[["class"]])
+          ) |>
+          dplyr::pull(.data[["x"]])
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
+  }
+
+  # check duplicates ----
+
+  oid_name <- olink_norm_ref_median_cols |>
+    dplyr::filter(
+      .data[["name"]] == "olink_id"
+    ) |>
+    dplyr::pull(
+      .data[["cols"]]
+    )
+  oid_dups <- reference_medians |>
+    dplyr::count(
+      .data[[oid_name]]
+    ) |>
+    dplyr::filter(
+      .data[["n"]] > 1L
+    ) |>
+    dplyr::select(
+      dplyr::all_of(oid_name)
+    ) |>
+    dplyr::collect() |>
+    dplyr::pull(
+      .data[[oid_name]]
+    ) |>
+    unique()
+
+  if (length(oid_dups) > 0L) {
+
+    cli::cli_abort(
+      c(
+        "x" = "Found {length(oid_dups)} duplicated {cli::qty(oid_dups)}
+        assay{?s} in {.arg reference_medians}: {.val {oid_dups}}.",
+        "i" = "Expected no duplicates!"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
+  }
+
+}
