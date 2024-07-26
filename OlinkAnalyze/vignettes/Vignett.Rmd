@@ -298,7 +298,7 @@ A tibble of NPX data in long format containing normalized NPX values, including 
 
 ## Integrating Explore NPX LOD (olink_lod) 
 
-The olink_lod function adds LOD information to an Explore HT or Explore 3072 NPX dataframe. This function can incorporate LOD based on either an Explore dataset's negative controls or using predetermined fixed LOD values, which can be downloaded from the Document Download Center at [olink.com](https://olink.com/knowledge/documents). The default LOD calculation method is based off of the negative controls. If an NPX file is intensity normalized, both intensity normalized and PC normalized LODs are provided. 
+The olink_lod function adds LOD information to an Explore HT or Explore 3072 NPX dataframe. This function can incorporate LOD based on either an Explore dataset's negative controls or using predetermined fixed LOD values, which can be downloaded from the Document Download Center at [olink.com](https://olink.com/knowledge/documents), or using both methods. The default LOD calculation method is based off of the negative controls. If an NPX file is intensity normalized, both intensity normalized and PC normalized LODs are provided. 
 
 ### Function arguments
  
