@@ -837,3 +837,230 @@ olink_norm_input_ref_medians <- function(reference_medians) {
   }
 
 }
+
+#' Check \var{datasets} and \var{reference_medians} for unexpected Olink
+#' identifiers or excluded assays
+#'
+#' @param lst_df Named list of datasets to be normalized.
+#' @param reference_medians Dataset with columns "OlinkID" and "Reference_NPX".
+#' Used for reference median normalization.
+#' @param lst_cols Named list of vectors with the required column names for each
+#' dataset in \var{lst_df}.
+#'
+#' @return A names list containing \var{lst_df} and \var{reference_medians}
+#' stripped from unexpected Olink identifiers or excluded assays
+#'
+olink_norm_input_clean_assays <- function(lst_df,
+                                          reference_medians,
+                                          lst_cols) {
+  # help functions ----
+
+  # remove all assays that do not match the pattern and that have NA for OlinkID
+  check_oid <- function(df, col_name) {
+    df |>
+      dplyr::filter(
+        grepl(
+          pattern = "^OID\\d{5}$",
+          x = .data[[col_name]]
+        )
+      )
+  }
+
+  # help variables ----
+
+  lst_out <- list()
+
+  # remove assays ----
+
+  ## remove non-OID assays ----
+
+  ### remove from input df ----
+
+  lst_df_oid <- lapply(names(lst_df), function(l_name) {
+    check_oid(df = lst_df[[l_name]],
+              col_name = lst_cols[[l_name]]$olink_id)
+  })
+  names(lst_df_oid) <- names(lst_df)
+  lst_out$lst_df <- lst_df_oid
+
+  # message to inform the user
+
+  # first find the removed assays
+  oid_removed <- lapply(names(lst_df), function(l_name) {
+    # OlinkID in the original dataset
+    oid_orig <- lst_df[[l_name]] |>
+      dplyr::select(
+        dplyr::all_of(lst_cols[[l_name]]$olink_id)
+      ) |>
+      dplyr::distinct() |>
+      dplyr::collect() |>
+      dplyr::pull(
+        .data[[lst_cols[[l_name]]$olink_id]]
+      )
+    # OlinkID in the cleaned dataset
+    oid_out <- lst_df_oid[[l_name]] |>
+      dplyr::select(
+        dplyr::all_of(lst_cols[[l_name]]$olink_id)
+      ) |>
+      dplyr::distinct() |>
+      dplyr::collect() |>
+      dplyr::pull(
+        .data[[lst_cols[[l_name]]$olink_id]]
+      )
+    setdiff(x = oid_orig,
+            y = oid_out) |>
+      cli::ansi_collapse()
+  })
+  names(oid_removed) <- names(lst_df)
+  # remove entries with no missing assays
+  oid_removed <- oid_removed[sapply(oid_removed, nchar) > 0L]
+
+  # message to user
+  if (length(oid_removed) > 0L) {
+    cli::cli_inform(
+      c("Assay(s) from the following input {cli::qty(oid_removed)} dataset{?s}
+      have been excluded from normalization:",
+        paste0("* ", names(oid_removed), ": ", unlist(oid_removed)),
+        "i" = "Lacking the pattern \"OID\" followed by 5 digits."
+      )
+    )
+  }
+
+  ### remove from reference medians ----
+
+  if (!is.null(reference_medians)) {
+    reference_medians_out <- check_oid(df = reference_medians,
+                                       col_name = "OlinkID")
+    lst_out$reference_medians <- reference_medians_out
+
+    # error message to use that all assays were removed
+    if (nrow(lst_out$reference_medians) == 0L) {
+      cli::cli_abort(
+        c(
+          "x" = "All assays were removed from input {.arg reference_medians}!",
+          "i" = "No assay identifiers matched the pattern \"OID\" followed by 5
+          digits."
+        ),
+        call = rlang::caller_env(),
+        wrap = FALSE
+      )
+    }
+
+    # message to inform the user
+
+    # first find the removed assays
+    oid_ref_med_orig <- reference_medians |>
+      dplyr::select(
+        dplyr::all_of("OlinkID")
+      ) |>
+      dplyr::distinct() |>
+      dplyr::collect() |>
+      dplyr::pull(
+        .data[["OlinkID"]]
+      )
+    # OlinkID in the cleaned reference_medians
+    oid_ref_med_out <- reference_medians_out |>
+      dplyr::select(
+        dplyr::all_of("OlinkID")
+      ) |>
+      dplyr::distinct() |>
+      dplyr::collect() |>
+      dplyr::pull(
+        .data[["OlinkID"]]
+      )
+    oid_ref_med_removed <- setdiff(x = oid_ref_med_orig,
+                                   y = oid_ref_med_out) |>
+      cli::ansi_collapse()
+
+    # message to user
+    if (nchar(oid_ref_med_removed) > 0L) {
+      cli::cli_inform(
+        "Assay(s) from the reference median dataset have been excluded from
+      normalization: {oid_ref_med_removed}.",
+        "i" = "Lacking the pattern \"OID\" followed by 5 digits."
+      )
+    }
+  } else {
+    lst_out$reference_medians <- NULL
+  }
+
+  ## remove excluded assays ----
+
+  excluded_assay_flag <- "EXCLUDED"
+
+  lst_df_excluded <- lapply(names(lst_df_oid), function(l_name) {
+    if (length(lst_cols[[l_name]]$normalization) > 0L) {
+      lst_df_oid[[l_name]] |>
+        dplyr::filter(
+          .data[[lst_cols[[l_name]]$normalization]] != excluded_assay_flag
+        )
+    } else {
+      lst_df_oid[[l_name]]
+    }
+  })
+  names(lst_df_excluded) <- names(lst_df_oid)
+  lst_out$lst_df <- lst_df_excluded
+
+  # check that df's have still rows
+  if (any(sapply(lst_out$lst_df, nrow) == 0L)) {
+    no_row_df <- names(lst_out$lst_df)[sapply(lst_out$lst_df, nrow) == 0L] # nolint
+
+    cli::cli_abort(
+      c(
+        "x" = "All assays were removed from {cli::qty(no_row_df)} dataset{?s}
+        {.val {no_row_df}}!",
+        "i" = "No assay identifiers matched the pattern \"OID\" followed by 5
+          digits, or assays were marked as \"{excluded_assay_flag}\""
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+  }
+
+  # message to inform the user
+
+  # first find the removed assays
+  oid_excluded <- lapply(names(lst_df_oid), function(l_name) {
+    # OlinkID in the original dataset
+    oid_orig <- lst_df_oid[[l_name]] |>
+      dplyr::select(
+        dplyr::all_of(lst_cols[[l_name]]$olink_id)
+      ) |>
+      dplyr::distinct() |>
+      dplyr::collect() |>
+      dplyr::pull(
+        .data[[lst_cols[[l_name]]$olink_id]]
+      )
+    # OlinkID in the cleaned dataset
+    oid_out <- lst_df_excluded[[l_name]] |>
+      dplyr::select(
+        dplyr::all_of(lst_cols[[l_name]]$olink_id)
+      ) |>
+      dplyr::distinct() |>
+      dplyr::collect() |>
+      dplyr::pull(
+        .data[[lst_cols[[l_name]]$olink_id]]
+      )
+    setdiff(x = oid_orig,
+            y = oid_out) |>
+      cli::ansi_collapse()
+  })
+  names(oid_excluded) <- names(lst_df_oid)
+  # remove entries with no missing assays
+  oid_excluded <- oid_excluded[sapply(oid_excluded, nchar) > 0L]
+
+  # message to user
+  if (length(oid_excluded) > 0L) {
+    cli::cli_inform(
+      c("Assay(s) from the following input {cli::qty(oid_excluded)} dataset{?s}
+      have been excluded from normalization:",
+        paste0("* ", names(oid_excluded), ": ", unlist(oid_excluded)),
+        "i" = "Were marked as \"{excluded_assay_flag}\"."
+      )
+    )
+  }
+
+  # return ----
+
+  return(lst_out)
+}

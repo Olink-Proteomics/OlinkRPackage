@@ -2322,3 +2322,1044 @@ test_that(
 
   }
 )
+
+# Test olink_norm_input_clean_assays ----
+
+test_that(
+  "olink_norm_input_clean_assays - works - invalid OID in df*",
+  {
+    skip_if_not_installed("arrow")
+
+    ## all assays start with OID in 1 df ----
+
+    lst_df_v0 <- list(
+      "p1" = npx_data1
+    )
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = lst_out <- olink_norm_input_clean_assays(
+            lst_df = lst_df_v0,
+            reference_medians = NULL,
+            lst_cols = list(
+              "p1" = list(olink_id = "OlinkID",
+                          normalization = character(0L))
+            )
+          )
+        )
+      )
+    )
+
+    expect_identical(object = lst_out$lst_df,
+                     expected = lst_df_v0)
+
+    ## 1 assay does not start with OID in 1 df ----
+
+    lst_df_v2 <- list(
+      "p1" = npx_data1 |>
+        dplyr::mutate(
+          OlinkID = dplyr::if_else(.data[["OlinkID"]] == "OID01307",
+                                   "OID1234",
+                                   .data[["OlinkID"]])
+        )
+    )
+
+    expect_message(
+      object = lst_out <- olink_norm_input_clean_assays(
+        lst_df = lst_df_v2,
+        reference_medians = NULL,
+        lst_cols = list(
+          "p1" = list(olink_id = "OlinkID",
+                      normalization = character(0L))
+        )
+      ),
+      regexp = "* p1: OID1234"
+    )
+
+    expect_identical(object = lst_out$lst_df$p1,
+                     expected = lst_df_v2$p1 |>
+                       dplyr::filter(.data[["OlinkID"]] != "OID1234"))
+
+    ## multiple assays do not start with OID in 1 df ----
+
+    lst_df_v3 <- list(
+      "p1" = lst_out <- npx_data1 |>
+        dplyr::mutate(
+          OlinkID = dplyr::case_match(
+            .data[["OlinkID"]],
+            "OID00471" ~ "OID00471A",
+            "OID00472" ~ "OID00471B",
+            "OID00474" ~ "OID00471C",
+            "OID00475" ~ "OID00471D",
+            "OID00476" ~ "OID00471E",
+            "OID00477" ~ "OID0047",
+            "OID00478" ~ "OID00471#",
+            "OID00479" ~ "OID00471&",
+            .default = .data[["OlinkID"]]
+          )
+        )
+    )
+
+    expect_message(
+      object = lst_out <- olink_norm_input_clean_assays(
+        lst_df = lst_df_v3,
+        reference_medians = NULL,
+        lst_cols = list(
+          "p1" = list(olink_id = "OlinkID",
+                      normalization = character(0L))
+        )
+      ),
+      regexp = paste("* p1: OID00471A, OID00471B, OID00471C, OID00471D,",
+                     "OID00471E, OID0047, OID00471#, and OID00471&")
+    )
+
+    expect_identical(object = lst_out$lst_df$p1,
+                     expected = lst_df_v3$p1 |>
+                       dplyr::filter(
+                         !(.data[["OlinkID"]] %in% c("OID00471A", "OID00471B",
+                                                     "OID00471C", "OID00471D",
+                                                     "OID00471E", "OID0047",
+                                                     "OID00471#", "OID00471&"))
+                       ))
+
+    ## all assays start with OID in 2 df ----
+
+    lst_df_v4 <- list(
+      "p1" = npx_data1,
+      "p2" = npx_data2
+    )
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = lst_out <- olink_norm_input_clean_assays(
+            lst_df = lst_df_v4,
+            reference_medians = NULL,
+            lst_cols = list(
+              "p1" = list(olink_id = "OlinkID",
+                          normalization = character(0L)),
+              "p2" = list(olink_id = "OlinkID",
+                          normalization = character(0L))
+            )
+          )
+        )
+      )
+    )
+
+    expect_identical(object = lst_out$lst_df,
+                     expected = lst_df_v4)
+
+    ## 1 assay does not start with OID in 1 df ----
+
+    lst_df_v5 <- list(
+      "p1" = npx_data1 |>
+        dplyr::mutate(
+          OlinkID = dplyr::if_else(.data[["OlinkID"]] == "OID01307",
+                                   "OID1234",
+                                   .data[["OlinkID"]])
+        ),
+      "p2" = npx_data2 |>
+        dplyr::mutate(
+          OlinkID = dplyr::if_else(.data[["OlinkID"]] == "OID01224",
+                                   "OID01224B",
+                                   .data[["OlinkID"]])
+        )
+    )
+
+    expect_message(
+      object = lst_out <- olink_norm_input_clean_assays(
+        lst_df = lst_df_v5,
+        reference_medians = NULL,
+        lst_cols = list(
+          "p1" = list(olink_id = "OlinkID",
+                      normalization = character(0L)),
+          "p2" = list(olink_id = "OlinkID",
+                      normalization = character(0L))
+        )
+      ),
+      regexp = "* p2: OID01224B"
+    )
+
+    lst_df_v5$p1 <- lst_df_v5$p1 |>
+      dplyr::filter(.data[["OlinkID"]] != "OID1234")
+    lst_df_v5$p2 <- lst_df_v5$p2 |>
+      dplyr::filter(.data[["OlinkID"]] != "OID01224B")
+
+    expect_identical(object = lst_out$lst_df,
+                     expected = lst_df_v5)
+
+    # multiple assays do not start with OID in 2 df ----
+
+    lst_df_v6 <- list(
+      "p1" = npx_data1 |>
+        dplyr::mutate(
+          OlinkID = dplyr::case_match(
+            .data[["OlinkID"]],
+            "OID00471" ~ "OID00471A",
+            "OID00472" ~ "OID00471B",
+            "OID00474" ~ "OID00471C",
+            "OID00475" ~ "OID00471D",
+            "OID00476" ~ "OID00471E",
+            "OID00477" ~ "OID0047",
+            "OID00478" ~ "OID00471#",
+            "OID00479" ~ "OID00471&",
+            .default = .data[["OlinkID"]]
+          )
+        ),
+      "p2" = npx_data2 |>
+        dplyr::mutate(
+          OlinkID = dplyr::case_match(
+            .data[["OlinkID"]],
+            "OID01301" ~ "OID01301A",
+            "OID01302" ~ "OID01302B",
+            "OID01303" ~ "OID01303C",
+            "OID01304" ~ "OID01304D",
+            "OID01305" ~ "OID01305E",
+            "OID01306" ~ "OID0130",
+            "OID01307" ~ "OID01307#",
+            .default = .data[["OlinkID"]]
+          )
+        )
+    )
+
+    expect_message(
+      object = lst_out <- olink_norm_input_clean_assays(
+        lst_df = lst_df_v6,
+        reference_medians = NULL,
+        lst_cols = list(
+          "p1" = list(olink_id = "OlinkID",
+                      normalization = character(0L)),
+          "p2" = list(olink_id = "OlinkID",
+                      normalization = character(0L))
+        )
+      ),
+      regexp = paste("* p2: OID01301A, OID01302B, OID01303C, OID01304D,",
+                     "OID01305E, OID0130, and OID01307#")
+    )
+
+    lst_df_v6$p1 <- lst_df_v6$p1 |>
+      dplyr::filter(
+        !(.data[["OlinkID"]] %in% c("OID00471A", "OID00471B", "OID00471C",
+                                    "OID00471D", "OID00471E", "OID0047",
+                                    "OID00471#", "OID00471&"))
+      )
+    lst_df_v6$p2 <- lst_df_v6$p2 |>
+      dplyr::filter(
+        !(.data[["OlinkID"]] %in% c("OID01301A", "OID01302B", "OID01303C",
+                                    "OID01304D", "OID01305E", "OID0130",
+                                    "OID01307#"))
+      )
+
+    expect_identical(object = lst_out$lst_df,
+                     expected = lst_df_v6)
+
+    # arrow datasets - 1 assay in each df ----
+
+    lst_df_v7 <- list(
+      "p1" = npx_data1 |>
+        dplyr::mutate(
+          OlinkID = dplyr::if_else(.data[["OlinkID"]] == "OID01307",
+                                   "OID1234",
+                                   .data[["OlinkID"]])
+        ) |>
+        arrow::as_arrow_table(),
+      "p2" = npx_data2 |>
+        dplyr::mutate(
+          OlinkID = dplyr::if_else(.data[["OlinkID"]] == "OID01224",
+                                   "OID01224B",
+                                   .data[["OlinkID"]])
+        ) |>
+        arrow::as_arrow_table()
+    )
+
+    expect_message(
+      object = lst_out <- olink_norm_input_clean_assays(
+        lst_df = lst_df_v7,
+        reference_medians = NULL,
+        lst_cols = list(
+          "p1" = list(olink_id = "OlinkID",
+                      normalization = character(0L)),
+          "p2" = list(olink_id = "OlinkID",
+                      normalization = character(0L))
+        )
+      ),
+      regexp = "* p2: OID01224B"
+    )
+
+    lst_df_v7$p1 <- lst_df_v7$p1 |>
+      dplyr::filter(.data[["OlinkID"]] != "OID1234") |>
+      dplyr::collect()
+    lst_df_v7$p2 <- lst_df_v7$p2 |>
+      dplyr::filter(.data[["OlinkID"]] != "OID01224B") |>
+      dplyr::collect()
+
+    expect_identical(object = lst_out$lst_df |>
+                       lapply(dplyr::collect),
+                     expected = lst_df_v7)
+
+    # multiple datasets ----
+
+    lst_df_v8 <- list(
+      "p1" = npx_data1 |>
+        dplyr::mutate(
+          OlinkID = dplyr::if_else(.data[["OlinkID"]] == "OID01307",
+                                   "OID1234",
+                                   .data[["OlinkID"]])
+        ),
+      "p2" = npx_data2 |>
+        dplyr::mutate(
+          OlinkID = dplyr::if_else(.data[["OlinkID"]] == "OID01224",
+                                   "OID01224B",
+                                   .data[["OlinkID"]])
+        ),
+      "p3" = npx_data1,
+      "p4" = npx_data2 |>
+        dplyr::mutate(
+          OlinkID = dplyr::if_else(.data[["OlinkID"]] == "OID01301",
+                                   "OID01301B",
+                                   .data[["OlinkID"]])
+        )
+    )
+
+    expect_message(
+      object = lst_out <- olink_norm_input_clean_assays(
+        lst_df = lst_df_v8,
+        reference_medians = NULL,
+        lst_cols = list(
+          "p1" = list(olink_id = "OlinkID",
+                      normalization = character(0L)),
+          "p2" = list(olink_id = "OlinkID",
+                      normalization = character(0L)),
+          "p3" = list(olink_id = "OlinkID",
+                      normalization = character(0L)),
+          "p4" = list(olink_id = "OlinkID",
+                      normalization = character(0L))
+        )
+      ),
+      regexp = "* p4: OID01301B"
+    )
+
+    lst_df_v8$p1 <- lst_df_v8$p1 |>
+      dplyr::filter(.data[["OlinkID"]] != "OID1234")
+    lst_df_v8$p2 <- lst_df_v8$p2 |>
+      dplyr::filter(.data[["OlinkID"]] != "OID01224B")
+    lst_df_v8$p4 <- lst_df_v8$p4 |>
+      dplyr::filter(.data[["OlinkID"]] != "OID01301B")
+
+    expect_identical(object = lst_out$lst_df,
+                     expected = lst_df_v8)
+
+  }
+)
+
+test_that(
+  "olink_norm_input_clean_assays - works - invalid OID in reference_medians",
+  {
+    skip_if_not_installed("arrow")
+
+    ## all assays start with OID in reference_medians ----
+
+    reference_medians_v0 <- npx_data1 |>
+      dplyr::select(
+        dplyr::all_of("OlinkID")
+      ) |>
+      dplyr::distinct() |>
+      dplyr::mutate(
+        Reference_NPX = 0.1
+      )
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = lst_out <- olink_norm_input_clean_assays(
+            lst_df = list(
+              "p1" = npx_data1
+            ),
+            reference_medians = reference_medians_v0,
+            lst_cols = list(
+              "p1" = list(olink_id = "OlinkID",
+                          normalization = character(0L))
+            )
+          )
+        )
+      )
+    )
+
+    expect_identical(
+      object = lst_out$reference_medians,
+      expected = reference_medians_v0
+    )
+
+    ## 1 assay does not start with OID in reference_medians ----
+
+    reference_medians_v1 <- npx_data1 |>
+      dplyr::select(
+        dplyr::all_of("OlinkID")
+      ) |>
+      dplyr::distinct() |>
+      dplyr::mutate(
+        Reference_NPX = 0.1,
+        OlinkID = dplyr::if_else(.data[["OlinkID"]] == "OID01307",
+                                 "OID1234",
+                                 .data[["OlinkID"]])
+      )
+
+    expect_message(
+      object = lst_out <- olink_norm_input_clean_assays(
+        lst_df = list(
+          "p1" = npx_data1
+        ),
+        reference_medians = reference_medians_v1,
+        lst_cols = list(
+          "p1" = list(olink_id = "OlinkID",
+                      normalization = character(0L))
+        )
+      ),
+      regexp = paste("from the reference median dataset have been excluded",
+                     "from normalization: OID1234")
+    )
+
+    expect_identical(
+      object = lst_out$reference_medians,
+      expected = reference_medians_v1 |>
+        dplyr::filter(.data[["OlinkID"]] != "OID1234")
+    )
+
+    ## multiple assays do not start with OID in reference_medians----
+
+    reference_medians_v2 <- npx_data1 |>
+      dplyr::select(
+        dplyr::all_of("OlinkID")
+      ) |>
+      dplyr::distinct() |>
+      dplyr::mutate(
+        Reference_NPX = 0.1,
+        OlinkID = dplyr::case_match(
+          .data[["OlinkID"]],
+          "OID00471" ~ "OID00471A",
+          "OID00472" ~ "OID00471B",
+          "OID00474" ~ "OID00471C",
+          "OID00475" ~ "OID00471D",
+          "OID00476" ~ "OID00471E",
+          "OID00477" ~ "OID0047",
+          "OID00478" ~ "OID00471#",
+          "OID00479" ~ "OID00471&",
+          .default = .data[["OlinkID"]]
+        )
+      )
+
+    expect_message(
+      object = lst_out <- olink_norm_input_clean_assays(
+        lst_df = list(
+          "p1" = npx_data1
+        ),
+        reference_medians = reference_medians_v2,
+        lst_cols = list(
+          "p1" = list(olink_id = "OlinkID",
+                      normalization = character(0L))
+        )
+      ),
+      regexp = paste("from the reference median dataset have been excluded",
+                     "from normalization: OID00471A,")
+    )
+
+    expect_identical(
+      object = lst_out$reference_medians,
+      expected = reference_medians_v2 |>
+        dplyr::filter(
+          !(.data[["OlinkID"]] %in% c("OID00471A", "OID00471B", "OID00471C",
+                                      "OID00471D", "OID00471E", "OID0047",
+                                      "OID00471#", "OID00471&"))
+        )
+    )
+
+    ## arrow - 1 assays with wrong OID ----
+
+    reference_medians_v3 <- npx_data1 |>
+      dplyr::select(
+        dplyr::all_of("OlinkID")
+      ) |>
+      dplyr::distinct() |>
+      dplyr::mutate(
+        Reference_NPX = 0.1,
+        OlinkID = dplyr::if_else(.data[["OlinkID"]] == "OID01307",
+                                 "OID1234",
+                                 .data[["OlinkID"]])
+      ) |>
+      arrow::as_arrow_table()
+
+    expect_message(
+      object = lst_out <- olink_norm_input_clean_assays(
+        lst_df = list(
+          "p1" = npx_data1
+        ),
+        reference_medians = reference_medians_v3,
+        lst_cols = list(
+          "p1" = list(olink_id = "OlinkID",
+                      normalization = character(0L))
+        )
+      ),
+      regexp = paste("from the reference median dataset have been excluded",
+                     "from normalization: OID1234")
+    )
+
+    expect_identical(
+      object = lst_out$reference_medians |>
+        dplyr::collect(),
+      expected = reference_medians_v3 |>
+        dplyr::filter(
+          .data[["OlinkID"]] != "OID1234"
+        ) |>
+        dplyr::collect()
+    )
+
+  }
+)
+
+test_that(
+  "olink_norm_input_clean_assays - error - all OID removed reference_medians",
+  {
+    skip_if_not_installed("arrow")
+
+    expect_error(
+      object = olink_norm_input_clean_assays(
+        lst_df = list(
+          "p1" = npx_data1
+        ),
+        reference_medians = npx_data1 |>
+          dplyr::select(
+            dplyr::all_of("OlinkID")
+          ) |>
+          dplyr::distinct() |>
+          dplyr::mutate(
+            Reference_NPX = 0.1,
+            OlinkID = paste0(.data[["OlinkID"]], "X")
+          ),
+        lst_cols = list(
+          "p1" = list(olink_id = "OlinkID",
+                      normalization = character(0L))
+        )
+      ),
+      regexp = "All assays were removed from input `reference_medians`!"
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_clean_assays - works - no excluded assays",
+  {
+    skip_if_not_installed("arrow")
+
+    # 1 df ----
+
+    lst_df_v0 <- list(
+      "p1" = npx_data1 |>
+        dplyr::mutate(
+          Normalization = "Intensity"
+        )
+    )
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = lst_out <- olink_norm_input_clean_assays(
+            lst_df = lst_df_v0,
+            reference_medians = NULL,
+            lst_cols = list(
+              "p1" = list(olink_id = "OlinkID",
+                          normalization = "Normalization")
+            )
+          )
+        )
+      )
+    )
+
+    expect_identical(
+      object = lst_out$lst_df,
+      expected = lst_df_v0
+    )
+
+    # 1 df arrow ----
+
+    lst_df_v1 <- list(
+      "p1" = npx_data1 |>
+        dplyr::mutate(
+          Normalization = "Intensity"
+        ) |>
+        arrow::as_arrow_table()
+    )
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = lst_out <- olink_norm_input_clean_assays(
+            lst_df = lst_df_v1,
+            reference_medians = NULL,
+            lst_cols = list(
+              "p1" = list(olink_id = "OlinkID",
+                          normalization = "Normalization")
+            )
+          )
+        )
+      )
+    )
+
+    expect_identical(
+      object = lst_out$lst_df |>
+        lapply(dplyr::collect),
+      expected = lst_df_v1 |>
+        lapply(dplyr::collect)
+    )
+
+    # 2 df ----
+
+    lst_df_v2 <- list(
+      "p1" = npx_data1 |>
+        dplyr::mutate(
+          Normalization = "Intensity"
+        ),
+      "p2" = npx_data2 |>
+        dplyr::mutate(
+          Normalization = "Intensity"
+        )
+    )
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = lst_out <- olink_norm_input_clean_assays(
+            lst_df = lst_df_v2,
+            reference_medians = NULL,
+            lst_cols = list(
+              "p1" = list(olink_id = "OlinkID",
+                          normalization = "Normalization"),
+              "p2" = list(olink_id = "OlinkID",
+                          normalization = "Normalization")
+            )
+          )
+        )
+      )
+    )
+
+    expect_identical(
+      object = lst_out$lst_df,
+      expected = lst_df_v2
+    )
+
+    # 2 df arrow ----
+
+    lst_df_v3 <- list(
+      "p1" = npx_data1 |>
+        dplyr::mutate(
+          Normalization = "Intensity"
+        ) |>
+        arrow::as_arrow_table(),
+      "p2" = npx_data2 |>
+        dplyr::mutate(
+          Normalization = "Intensity"
+        ) |>
+        arrow::as_arrow_table()
+    )
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = lst_out <- olink_norm_input_clean_assays(
+            lst_df = lst_df_v3,
+            reference_medians = NULL,
+            lst_cols = list(
+              "p1" = list(olink_id = "OlinkID",
+                          normalization = "Normalization"),
+              "p2" = list(olink_id = "OlinkID",
+                          normalization = "Normalization")
+            )
+          )
+        )
+      )
+    )
+
+    expect_identical(
+      object = lst_out$lst_df |>
+        lapply(dplyr::collect),
+      expected = lst_df_v3 |>
+        lapply(dplyr::collect)
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_clean_assays - works - excluded assays in df*",
+  {
+    skip_if_not_installed("arrow")
+
+    ## 1 excluded assay in 1 df ----
+
+    lst_df_v0 <- list(
+      "p1" = npx_data1 |>
+        dplyr::mutate(
+          Normalization = dplyr::if_else(.data[["OlinkID"]] == "OID01307",
+                                         "EXCLUDED",
+                                         "Intensity")
+        )
+    )
+
+    expect_message(
+      object = lst_out <- olink_norm_input_clean_assays(
+        lst_df = lst_df_v0,
+        reference_medians = NULL,
+        lst_cols = list(
+          "p1" = list(olink_id = "OlinkID",
+                      normalization = "Normalization")
+        )
+      ),
+      regexp = "* p1: OID01307"
+    )
+
+    lst_df_v0$p1 <- lst_df_v0$p1 |>
+      dplyr::filter(.data[["Normalization"]] != "EXCLUDED")
+
+    expect_identical(
+      object = lst_out$lst_df,
+      expected = lst_df_v0
+    )
+
+    ## multiple excluded assays in 1 df ----
+
+    lst_df_v1 <- list(
+      "p1" = npx_data1 |>
+        dplyr::mutate(
+          Normalization = dplyr::if_else(
+            .data[["OlinkID"]] %in% c("OID00471", "OID00472", "OID00474",
+                                      "OID00475", "OID00476", "OID00477",
+                                      "OID00478", "OID00479"),
+            "EXCLUDED",
+            "Intensity"
+          )
+        )
+    )
+
+    expect_message(
+      object = lst_out <- olink_norm_input_clean_assays(
+        lst_df = lst_df_v1,
+        reference_medians = NULL,
+        lst_cols = list(
+          "p1" = list(olink_id = "OlinkID",
+                      normalization = "Normalization")
+        )
+      ),
+      regexp = paste("p1: OID00471, OID00472, OID00474, OID00475, OID00476")
+    )
+
+    lst_df_v1$p1 <- lst_df_v1$p1 |>
+      dplyr::filter(.data[["Normalization"]] != "EXCLUDED")
+
+    expect_identical(
+      object = lst_out$lst_df,
+      expected = lst_df_v1
+    )
+
+    ## 1 excluded assay in the other df ----
+
+    lst_df_v2 <- list(
+      "p1" = npx_data1 |>
+        dplyr::mutate(
+          Normalization = "Intensity"
+        ),
+      "p2" = npx_data2 |>
+        dplyr::mutate(
+          Normalization = dplyr::if_else(.data[["OlinkID"]] == "OID01224",
+                                         "EXCLUDED",
+                                         "Intensity")
+        )
+    )
+
+    expect_message(
+      object = lst_out <- olink_norm_input_clean_assays(
+        lst_df = lst_df_v2,
+        reference_medians = NULL,
+        lst_cols = list(
+          "p1" = list(olink_id = "OlinkID",
+                      normalization = "Normalization"),
+          "p2" = list(olink_id = "OlinkID",
+                      normalization = "Normalization")
+        )
+      ),
+      regexp = "* p2: OID01224"
+    )
+
+    lst_df_v2$p1 <- lst_df_v2$p1 |>
+      dplyr::filter(.data[["Normalization"]] != "EXCLUDED")
+    lst_df_v2$p2 <- lst_df_v2$p2 |>
+      dplyr::filter(.data[["Normalization"]] != "EXCLUDED")
+
+    expect_identical(
+      object = lst_out$lst_df,
+      expected = lst_df_v2
+    )
+
+    # multiple excluded assays in 2 df ----
+
+    lst_df_v3 <- list(
+      "p1" = npx_data1 |>
+        dplyr::mutate(
+          Normalization = dplyr::if_else(
+            .data[["OlinkID"]] %in% c("OID00471", "OID00472", "OID00474",
+                                      "OID00475", "OID00476", "OID00477",
+                                      "OID00478", "OID00479"),
+            "EXCLUDED",
+            "Intensity"
+          )
+        ),
+      "p2" = npx_data2 |>
+        dplyr::mutate(
+          Normalization = dplyr::if_else(
+            .data[["OlinkID"]] %in% c("OID01269", "OID01270", "OID01271",
+                                      "OID01272", "OID01273", "OID01274",
+                                      "OID01275", "OID01276"),
+
+            "EXCLUDED",
+            "Plate control"
+          )
+        )
+    )
+
+    expect_message(
+      object = lst_out <- olink_norm_input_clean_assays(
+        lst_df = lst_df_v3,
+        reference_medians = NULL,
+        lst_cols = list(
+          "p1" = list(olink_id = "OlinkID",
+                      normalization = "Normalization"),
+          "p2" = list(olink_id = "OlinkID",
+                      normalization = "Normalization")
+        )
+      ),
+      regexp = "* p2: OID01269, OID01270, OID01271, OID01272"
+    )
+
+    lst_df_v3$p1 <- lst_df_v3$p1 |>
+      dplyr::filter(.data[["Normalization"]] != "EXCLUDED")
+    lst_df_v3$p2 <- lst_df_v3$p2 |>
+      dplyr::filter(.data[["Normalization"]] != "EXCLUDED")
+
+    expect_identical(
+      object = lst_out$lst_df,
+      expected = lst_df_v3
+    )
+
+    # multiple excluded assays in 2 df - arrow ----
+
+    lst_df_v4 <- list(
+      "p1" = npx_data1 |>
+        dplyr::mutate(
+          Normalization = dplyr::if_else(
+            .data[["OlinkID"]] %in% c("OID00471", "OID00472", "OID00474",
+                                      "OID00475", "OID00476", "OID00477",
+                                      "OID00478", "OID00479"),
+            "EXCLUDED",
+            "Intensity"
+          )
+        ) |>
+        arrow::as_arrow_table(),
+      "p2" = npx_data2 |>
+        dplyr::mutate(
+          Normalization = dplyr::if_else(
+            .data[["OlinkID"]] %in% c("OID01269", "OID01270", "OID01271",
+                                      "OID01272", "OID01273", "OID01274",
+                                      "OID01275", "OID01276"),
+
+            "EXCLUDED",
+            "Plate control"
+          )
+        ) |>
+        arrow::as_arrow_table()
+    )
+
+    expect_message(
+      object = lst_out <- olink_norm_input_clean_assays(
+        lst_df = lst_df_v4,
+        reference_medians = NULL,
+        lst_cols = list(
+          "p1" = list(olink_id = "OlinkID",
+                      normalization = "Normalization"),
+          "p2" = list(olink_id = "OlinkID",
+                      normalization = "Normalization")
+        )
+      ),
+      regexp = "* p2: OID01269, OID01270, OID01271, OID01272"
+    )
+
+    lst_df_v4$p1 <- lst_df_v4$p1 |>
+      dplyr::filter(.data[["Normalization"]] != "EXCLUDED") |>
+      dplyr::collect()
+    lst_df_v4$p2 <- lst_df_v4$p2 |>
+      dplyr::filter(.data[["Normalization"]] != "EXCLUDED") |>
+      dplyr::collect()
+
+    expect_identical(
+      object = lst_out$lst_df |>
+        lapply(dplyr::collect),
+      expected = lst_df_v4
+    )
+
+    # multiple datasets ----
+
+    lst_df_v5 <- list(
+      "p1" = npx_data1 |>
+        dplyr::mutate(
+          Normalization = dplyr::if_else(
+            .data[["OlinkID"]] %in% c("OID00471", "OID00472", "OID00474",
+                                      "OID00475", "OID00476", "OID00477",
+                                      "OID00478", "OID00479"),
+            "EXCLUDED",
+            "Intensity"
+          )
+        ),
+      "p2" = npx_data2 |>
+        dplyr::mutate(
+          Normalization = dplyr::if_else(
+            .data[["OlinkID"]] %in% c("OID01269", "OID01270", "OID01271",
+                                      "OID01272", "OID01273", "OID01274",
+                                      "OID01275", "OID01276"),
+
+            "EXCLUDED",
+            "Plate control"
+          )
+        ),
+      "p3" = npx_data1 |>
+        arrow::as_arrow_table(),
+      "p4" = npx_data2 |>
+        dplyr::mutate(
+          Normalization = dplyr::if_else(
+            .data[["OlinkID"]] %in% c("OID01269", "OID01270", "OID01271"),
+            "EXCLUDED",
+            "Intensity"
+          )
+        ) |>
+        arrow::as_arrow_table()
+    )
+
+    expect_message(
+      object = lst_out <- olink_norm_input_clean_assays(
+        lst_df = lst_df_v5,
+        reference_medians = NULL,
+        lst_cols = list(
+          "p1" = list(olink_id = "OlinkID",
+                      normalization = "Normalization"),
+          "p2" = list(olink_id = "OlinkID",
+                      normalization = "Normalization"),
+          "p3" = list(olink_id = "OlinkID"),
+          "p4" = list(olink_id = "OlinkID",
+                      normalization = "Normalization")
+        )
+      ),
+      regexp = "* p4: OID01269, OID01270, and OID01271"
+    )
+
+    lst_df_v5$p1 <- lst_df_v5$p1 |>
+      dplyr::filter(.data[["Normalization"]] != "EXCLUDED")
+    lst_df_v5$p2 <- lst_df_v5$p2 |>
+      dplyr::filter(.data[["Normalization"]] != "EXCLUDED")
+    lst_df_v5$p3 <- lst_df_v5$p3 |>
+      dplyr::collect()
+    lst_df_v5$p4 <- lst_df_v5$p4 |>
+      dplyr::filter(.data[["Normalization"]] != "EXCLUDED") |>
+      dplyr::collect()
+
+    expect_identical(
+      object = lst_out$lst_df |>
+        lapply(dplyr::collect),
+      expected = lst_df_v5
+    )
+
+    ## 1 df does not contain normalization column ----
+
+    lst_df_v6 <- list(
+      "p1" = npx_data1 |>
+        dplyr::mutate(
+          Normalization = "Intensity"
+        ),
+      "p2" = npx_data2
+    )
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = lst_out <- olink_norm_input_clean_assays(
+            lst_df = lst_df_v6,
+            reference_medians = NULL,
+            lst_cols = list(
+              "p1" = list(olink_id = "OlinkID",
+                          normalization = "Normalization"),
+              "p2" = list(olink_id = "OlinkID")
+            )
+          )
+        )
+      )
+    )
+
+    lst_df_v6$p1 <- lst_df_v6$p1 |>
+      dplyr::filter(.data[["Normalization"]] != "EXCLUDED")
+
+    expect_identical(
+      object = lst_out$lst_df |>
+        lapply(dplyr::collect),
+      expected = lst_df_v6
+    )
+
+  }
+)
+
+test_that(
+  "olink_norm_input_clean_assays - error - all OID removed df*",
+  {
+    skip_if_not_installed("arrow")
+
+    # 1 empty df ----
+
+    expect_error(
+      object = olink_norm_input_clean_assays(
+        lst_df = list(
+          "p1" = npx_data1 |>
+            dplyr::mutate(
+              Normalization = "EXCLUDED"
+            )
+        ),
+        reference_medians = NULL,
+        lst_cols = list(
+          "p1" = list(olink_id = "OlinkID",
+                      normalization = "Normalization")
+        )
+      ),
+      regexp = "All assays were removed from dataset \"p1\"!"
+    )
+
+    # multiple empty df ----
+
+    expect_error(
+      object = olink_norm_input_clean_assays(
+        lst_df = list(
+          "p1" = npx_data1 |>
+            dplyr::mutate(
+              Normalization = "EXCLUDED"
+            ),
+          "p2" = npx_data2 |>
+            dplyr::mutate(
+              OlinkID = paste0(.data[["OlinkID"]], "X"),
+              Normalization = "Intensity"
+            )
+        ),
+        reference_medians = NULL,
+        lst_cols = list(
+          "p1" = list(olink_id = "OlinkID",
+                      normalization = "Normalization"),
+          "p2" = list(olink_id = "OlinkID",
+                      normalization = "Normalization")
+        )
+      ) |>
+        suppressMessages(),
+      regexp = "All assays were removed from datasets \"p1\" and \"p2\"!"
+    )
+  }
+)
