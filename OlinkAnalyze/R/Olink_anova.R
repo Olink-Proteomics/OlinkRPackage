@@ -107,14 +107,20 @@ olink_anova <- function(df,
   }
 
   # Stop if control assays have not been removed
-  ctrl_types <- c("amp_ctrl", "ext_ctrl", "inc_ctrl")
-
   if ("AssayType" %in% names(df)) {
-    if (any(ctrl_types %in% df$AssayType)) {
-      stop('Control assays have not been removed from the dataset.\n  Assays with AssayType != "assay" should be excluded.')
+    if (any(df$AssayType != "assay")) {
+      ctrl_assays <- df |>
+        dplyr::filter(AssayType != "assay")
+      
+      stop(paste0('Control assays have not been removed from the dataset.\n  Assays with AssayType != "assay" should be excluded.\n  The following control assays were found:\n  ',
+                  paste(strwrap(toString(unique(ctrl_assays$Assay)), width = 80), collapse = "\n")))
     }
   } else if (any(str_detect(df$Assay, regex("control|ctrl", ignore_case = TRUE)))) {
-    stop('Control assays have not been removed from the dataset.\n  Assays with "control" in their Assay field should be excluded.')
+    ctrl_assays <- df |>
+      dplyr::filter(str_detect(df$Assay, regex("control|ctrl", ignore_case = TRUE)))
+    
+    stop(paste0('Control assays have not been removed from the dataset.\n  Assays with "control" in their Assay field should be excluded.\n  The following control assays were found:\n  ',
+                paste(strwrap(toString(unique(ctrl_assays$Assay)), width = 80), collapse = "\n")))
   }
   
   withCallingHandlers({
@@ -455,14 +461,20 @@ olink_anova_posthoc <- function(df,
   }
 
   # Stop if control assays have not been removed
-  ctrl_types <- c("amp_ctrl", "ext_ctrl", "inc_ctrl")
-
   if ("AssayType" %in% names(df)) {
-    if (any(ctrl_types %in% df$AssayType)) {
-      stop('Control assays have not been removed from the dataset.\n  Assays with AssayType != "assay" should be excluded.')
+    if (any(df$AssayType != "assay")) {
+      ctrl_assays <- df |>
+        dplyr::filter(AssayType != "assay")
+      
+      stop(paste0('Control assays have not been removed from the dataset.\n  Assays with AssayType != "assay" should be excluded.\n  The following control assays were found:\n  ',
+                  paste(strwrap(toString(unique(ctrl_assays$Assay)), width = 80), collapse = "\n")))
     }
   } else if (any(str_detect(df$Assay, regex("control|ctrl", ignore_case = TRUE)))) {
-    stop('Control assays have not been removed from the dataset.\n  Assays with "control" in their Assay field should be excluded.')
+    ctrl_assays <- df |>
+      dplyr::filter(str_detect(df$Assay, regex("control|ctrl", ignore_case = TRUE)))
+    
+    stop(paste0('Control assays have not been removed from the dataset.\n  Assays with "control" in their Assay field should be excluded.\n  The following control assays were found:\n  ',
+                paste(strwrap(toString(unique(ctrl_assays$Assay)), width = 80), collapse = "\n")))
   }
   
   withCallingHandlers({
