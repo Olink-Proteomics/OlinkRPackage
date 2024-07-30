@@ -3363,3 +3363,376 @@ test_that(
     )
   }
 )
+
+# Test olink_norm_input_assay_overlap ----
+
+test_that(
+  "olink_norm_input_assay_overlap - works - all assays shared",
+  {
+    skip_if_not_installed("arrow")
+
+    # 1 df and reference medians ----
+
+    lst_df_v0 <- list(
+      "p1" = npx_data1
+    )
+    reference_medians_v0 <- npx_data1 |>
+      dplyr::select(
+        dplyr::all_of("OlinkID")
+      ) |>
+      dplyr::distinct() |>
+      dplyr::mutate(
+        Reference_NPX = 0.1
+      )
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = lst_out <- olink_norm_input_assay_overlap(
+            lst_df = lst_df_v0,
+            reference_medians = reference_medians_v0,
+            lst_cols = list(
+              "p1" = list(olink_id = "OlinkID")
+            )
+          )
+        )
+      )
+    )
+
+    expect_identical(
+      object = lst_out$lst_df,
+      expected = lst_df_v0
+    )
+    expect_identical(
+      object = lst_out$reference_medians,
+      expected = reference_medians_v0
+    )
+
+    # 2 df ----
+
+    lst_df_v1 <- list(
+      "p1" = npx_data1,
+      "p2" = npx_data2
+    )
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = lst_out <- olink_norm_input_assay_overlap(
+            lst_df = lst_df_v1,
+            reference_medians = NULL,
+            lst_cols = list(
+              "p1" = list(olink_id = "OlinkID"),
+              "p2" = list(olink_id = "OlinkID")
+            )
+          )
+        )
+      )
+    )
+
+    expect_identical(
+      object = lst_out$lst_df,
+      expected = lst_df_v1
+    )
+
+    # multiple df ----
+
+    lst_df_v2 <- list(
+      "p1" = npx_data1,
+      "p2" = npx_data2,
+      "p3" = npx_data1,
+      "p4" = npx_data2
+    )
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = lst_out <- olink_norm_input_assay_overlap(
+            lst_df = lst_df_v2,
+            reference_medians = NULL,
+            lst_cols = list(
+              "p1" = list(olink_id = "OlinkID"),
+              "p2" = list(olink_id = "OlinkID"),
+              "p3" = list(olink_id = "OlinkID"),
+              "p4" = list(olink_id = "OlinkID")
+            )
+          )
+        )
+      )
+    )
+
+    expect_identical(
+      object = lst_out$lst_df,
+      expected = lst_df_v2
+    )
+
+  }
+)
+
+test_that(
+  "olink_norm_input_assay_overlap - works - non-shared assays",
+  {
+    skip_if_not_installed("arrow")
+
+    # 1 df and reference_medians - 1 non-shared assay in df ----
+
+    lst_df_v0 <- list(
+      "p1" = npx_data1 |>
+        dplyr::filter(
+          .data[["OlinkID"]] != "OID00471"
+        )
+    )
+    reference_medians_v0 <- npx_data1 |>
+      dplyr::select(
+        dplyr::all_of("OlinkID")
+      ) |>
+      dplyr::distinct() |>
+      dplyr::mutate(
+        Reference_NPX = 0.1
+      )
+
+    expect_warning(
+      object = lst_out <- olink_norm_input_assay_overlap(
+        lst_df = lst_df_v0,
+        reference_medians = reference_medians_v0,
+        lst_cols = list(
+          "p1" = list(olink_id = "OlinkID")
+        )
+      ),
+      regexp = "Assay \"OID00471\" not shared across input dataset"
+    )
+
+    expect_identical(
+      object = lst_out$lst_df,
+      expected = lst_df_v0
+    )
+    expect_identical(
+      object = lst_out$reference_medians,
+      expected = reference_medians_v0 |>
+        dplyr::filter(
+          .data[["OlinkID"]] != "OID00471"
+        )
+    )
+
+    # 1 df and reference_medians - 1 non-shared assay in reference_medians ----
+
+    lst_df_v1 <- list(
+      "p1" = npx_data1
+    )
+    reference_medians_v1 <- npx_data1 |>
+      dplyr::filter(
+        .data[["OlinkID"]] != "OID00471"
+      ) |>
+      dplyr::select(
+        dplyr::all_of("OlinkID")
+      ) |>
+      dplyr::distinct() |>
+      dplyr::mutate(
+        Reference_NPX = 0.1
+      )
+
+    expect_warning(
+      object = lst_out <- olink_norm_input_assay_overlap(
+        lst_df = lst_df_v1,
+        reference_medians = reference_medians_v1,
+        lst_cols = list(
+          "p1" = list(olink_id = "OlinkID")
+        )
+      ),
+      regexp = "Assay \"OID00471\" not shared across input dataset"
+    )
+
+    expect_identical(
+      object = lst_out$lst_df,
+      expected = lapply(lst_df_v1, function(x) {
+        x |>
+          dplyr::filter(
+            .data[["OlinkID"]] != "OID00471"
+          )
+      })
+    )
+    expect_identical(
+      object = lst_out$reference_medians,
+      expected = reference_medians_v1
+    )
+
+    # 1 df and reference_medians - non-shared assays in both ----
+
+    lst_df_v2 <- list(
+      "p1" = npx_data1 |>
+        dplyr::filter(
+          !(.data[["OlinkID"]] %in% c("OID00471", "OID00472",
+                                      "OID00474", "OID00475"))
+        )
+    )
+    reference_medians_v2 <- npx_data1 |>
+      dplyr::filter(
+        !(.data[["OlinkID"]] %in% c("OID00479", "OID00480", "OID00481"))
+      ) |>
+      dplyr::select(
+        dplyr::all_of("OlinkID")
+      ) |>
+      dplyr::distinct() |>
+      dplyr::mutate(
+        Reference_NPX = 0.1
+      )
+
+    expect_warning(
+      object = lst_out <- olink_norm_input_assay_overlap(
+        lst_df = lst_df_v2,
+        reference_medians = reference_medians_v2,
+        lst_cols = list(
+          "p1" = list(olink_id = "OlinkID")
+        )
+      ),
+      regexp = paste("Assays \"OID00471\", \"OID00472\", \"OID00474\",",
+                     "\"OID00475\", \"OID00479\", \"OID00480\", and",
+                     "\"OID00481\" not shared across input dataset")
+    )
+
+    expect_identical(
+      object = lst_out$lst_df,
+      expected = lapply(lst_df_v2, function(x) {
+        x |>
+          dplyr::filter(
+            !(.data[["OlinkID"]] %in% c("OID00471", "OID00472",
+                                        "OID00474", "OID00475",
+                                        "OID00479", "OID00480",
+                                        "OID00481"))
+          )
+      })
+    )
+    expect_identical(
+      object = lst_out$reference_medians,
+      expected = reference_medians_v1 |>
+        dplyr::filter(
+          !(.data[["OlinkID"]] %in% c("OID00471", "OID00472",
+                                      "OID00474", "OID00475",
+                                      "OID00479", "OID00480",
+                                      "OID00481"))
+        )
+    )
+
+    # 2 df - 1 non-shared assay in df ----
+
+    lst_df_v3 <- list(
+      "p1" = npx_data1 |>
+        dplyr::filter(
+          .data[["OlinkID"]] != "OID00471"
+        ),
+      "p2" = npx_data2
+    )
+
+    expect_warning(
+      object = lst_out <- olink_norm_input_assay_overlap(
+        lst_df = lst_df_v3,
+        reference_medians = NULL,
+        lst_cols = list(
+          "p1" = list(olink_id = "OlinkID"),
+          "p2" = list(olink_id = "OlinkID")
+        )
+      ),
+      regexp = paste("Assay \"OID00471\" not shared across input dataset")
+    )
+
+    expect_identical(
+      object = lst_out$lst_df,
+      expected = lapply(lst_df_v3, function(x) {
+        x |>
+          dplyr::filter(
+            .data[["OlinkID"]] != "OID00471"
+          )
+      })
+    )
+
+    # 2 df - multiple non-shared assay in df ----
+
+    lst_df_v4 <- list(
+      "p1" = npx_data1 |>
+        dplyr::filter(
+          !(.data[["OlinkID"]] %in% c("OID01300", "OID01301",
+                                      "OID01302", "OID01303"))
+        ),
+      "p2" = npx_data2 |>
+        dplyr::filter(
+          !(.data[["OlinkID"]] %in% c("OID01282", "OID01283",
+                                      "OID01284", "OID01285"))
+        )
+    )
+
+    expect_warning(
+      object = lst_out <- olink_norm_input_assay_overlap(
+        lst_df = lst_df_v4,
+        reference_medians = NULL,
+        lst_cols = list(
+          "p1" = list(olink_id = "OlinkID"),
+          "p2" = list(olink_id = "OlinkID")
+        )
+      ),
+      regexp = paste("Assays \"OID01300\", \"OID01301\", \"OID01302\",",
+                     "\"OID01303\", \"OID01282\", \"OID01283\"")
+    )
+
+    expect_identical(
+      object = lst_out$lst_df,
+      expected = lapply(lst_df_v4, function(x) {
+        x |>
+          dplyr::filter(
+            !(.data[["OlinkID"]] %in% c("OID01300", "OID01301",
+                                        "OID01302", "OID01303",
+                                        "OID01282", "OID01283",
+                                        "OID01284", "OID01285"))
+          )
+      })
+    )
+
+    # multiple df - multiple non-shared assay in df ----
+
+    lst_df_v5 <- list(
+      "p1" = npx_data1 |>
+        dplyr::filter(
+          !(.data[["OlinkID"]] %in% c("OID01300", "OID01301",
+                                      "OID01302", "OID01303"))
+        ),
+      "p2" = npx_data2 |>
+        dplyr::filter(
+          !(.data[["OlinkID"]] %in% c("OID01282", "OID01283",
+                                      "OID01284", "OID01285"))
+        ),
+      "p3" = npx_data1,
+      "p4" = npx_data2 |>
+        dplyr::filter(
+          .data[["OlinkID"]] != "OID05124"
+        )
+    )
+
+    expect_warning(
+      object = lst_out <- olink_norm_input_assay_overlap(
+        lst_df = lst_df_v5,
+        reference_medians = NULL,
+        lst_cols = list(
+          "p1" = list(olink_id = "OlinkID"),
+          "p2" = list(olink_id = "OlinkID"),
+          "p3" = list(olink_id = "OlinkID"),
+          "p4" = list(olink_id = "OlinkID")
+        )
+      ),
+      regexp = paste("Assays \"OID01300\", \"OID01301\", \"OID01302\",",
+                     "\"OID01303\", \"OID01282\", \"OID01283\"")
+    )
+
+    expect_identical(
+      object = lst_out$lst_df,
+      expected = lapply(lst_df_v5, function(x) {
+        x |>
+          dplyr::filter(
+            !(.data[["OlinkID"]] %in% c("OID01300", "OID01301",
+                                        "OID01302", "OID01303",
+                                        "OID01282", "OID01283",
+                                        "OID01284", "OID01285",
+                                        "OID05124"))
+          )
+      })
+    )
+  }
+)

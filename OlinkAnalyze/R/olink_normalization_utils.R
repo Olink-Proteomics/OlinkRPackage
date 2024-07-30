@@ -841,13 +841,16 @@ olink_norm_input_ref_medians <- function(reference_medians) {
 #' Check \var{datasets} and \var{reference_medians} for unexpected Olink
 #' identifiers or excluded assays
 #'
+#' @author
+#'   Klev Diamanti
+#'
 #' @param lst_df Named list of datasets to be normalized.
 #' @param reference_medians Dataset with columns "OlinkID" and "Reference_NPX".
 #' Used for reference median normalization.
 #' @param lst_cols Named list of vectors with the required column names for each
 #' dataset in \var{lst_df}.
 #'
-#' @return A names list containing \var{lst_df} and \var{reference_medians}
+#' @return A named list containing \var{lst_df} and \var{reference_medians}
 #' stripped from unexpected Olink identifiers or excluded assays
 #'
 olink_norm_input_clean_assays <- function(lst_df,
@@ -1062,5 +1065,122 @@ olink_norm_input_clean_assays <- function(lst_df,
 
   # return ----
 
+  return(lst_out)
+}
+
+#' Check \var{datasets} and \var{reference_medians} for Olink identifiers not
+#' shared across datasets.
+#'
+#' @author
+#'   Klev Diamanti
+#'
+#' @param lst_df Named list of datasets to be normalized.
+#' @param reference_medians Dataset with columns "OlinkID" and "Reference_NPX".
+#' Used for reference median normalization.
+#' @param lst_cols Named list of vectors with the required column names for each
+#' dataset in \var{lst_df}.
+#'
+#' @return A named list containing \var{lst_df} and \var{reference_medians}
+#' will assays shared across all datasets.
+#'
+olink_norm_input_assay_overlap <- function(lst_df,
+                                           reference_medians,
+                                           lst_cols) {
+  # help variables
+  lst_out <- list()
+
+  # get unique OID for each dataset
+  lst_df_oid <- lapply(names(lst_df), function(l_name) {
+    lst_df[[l_name]] |>
+      dplyr::select(
+        dplyr::all_of(lst_cols[[l_name]]$olink_id)
+      ) |>
+      dplyr::distinct() |>
+      dplyr::collect() |>
+      dplyr::pull(
+        .data[[lst_cols[[l_name]]$olink_id]]
+      )
+  })
+  names(lst_df_oid) <- names(lst_df)
+
+  # add reference medians to lst_df_oid, if available
+  if (!is.null(reference_medians)) {
+    lst_df_oid$reference_medians <- reference_medians |>
+      dplyr::select(
+        dplyr::all_of("OlinkID")
+      ) |>
+      dplyr::distinct() |>
+      dplyr::collect() |>
+      dplyr::pull(
+        .data[["OlinkID"]]
+      )
+  }
+
+  # check for non-shared OIDs
+  oid_combos_miss <- expand.grid(X = names(lst_df_oid),
+                                 Y = names(lst_df_oid)) |>
+    dplyr::as_tibble() |>
+    dplyr::filter(
+      .data[["X"]] != .data[["Y"]]
+    ) |>
+    dplyr::rowwise() |>
+    dplyr::mutate(
+      Z = setdiff(x = lst_df_oid[[.data[["X"]]]],
+                  y = lst_df_oid[[.data[["Y"]]]]) |>
+        list()
+    ) |>
+    dplyr::ungroup() |>
+    dplyr::mutate(
+      L = sapply(.data[["Z"]], length),
+      M = sapply(.data[["Z"]], cli::ansi_collapse),
+      M = paste0("In ", .data[["X"]], " & not in ", .data[["Y"]], ": ",
+                 .data[["M"]])
+    ) |>
+    dplyr::filter(
+      .data[["L"]] != 0L
+    )
+  oid_removed <- oid_combos_miss$Z |> unlist() |> unique()
+
+  # remove non-shared assays and throw a warning message about it
+  if (nrow(oid_combos_miss) > 0L) {
+
+    # remove non-shared assays
+    lst_out$lst_df <- lapply(names(lst_df), function(l_name) {
+      lst_df[[l_name]] |>
+        dplyr::filter(
+          !(.data[[lst_cols[[l_name]]$olink_id]] %in% oid_removed)
+        )
+    })
+    names(lst_out$lst_df) <- names(lst_df)
+
+    # remove from reference_medians too, if available
+    if (!is.null(reference_medians)) {
+      lst_out$reference_medians <- reference_medians |>
+        dplyr::filter(
+          !(.data[["OlinkID"]] %in% oid_removed)
+        )
+    }
+
+    # warning message
+    cli::cli_warn(
+      c(
+        "Assay{?s} {.val {oid_removed}} not shared across input dataset(s):",
+        dplyr::pull(oid_combos_miss, .data[["M"]]),
+        "i" = "{cli::qty(oid_removed)} Assay{?s} will be removed from
+        normalization."
+      ),
+      wrap = FALSE
+    )
+  } else {
+
+    # if all assays shared, return original datasets
+    lst_out <- list(
+      lst_df = lst_df,
+      reference_medians = reference_medians
+    )
+
+  }
+
+  # return
   return(lst_out)
 }
