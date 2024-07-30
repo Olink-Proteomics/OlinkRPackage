@@ -342,6 +342,9 @@ olink_norm_input_check_df_cols <- function(lst_df) {
     plate_id = "PlateID",
     qc_warn = c("QC_Warning", "SampleQC"),
     quant = c("Ct", "NPX", "Quantified_value"),
+    lod = c("LOD",
+            "Plate LOD", "Plate_LOD", "PlateLOD",
+            "Max LOD", "Max_LOD", "MaxLOD"),
     normalization = "Normalization"
   )
 
@@ -352,7 +355,7 @@ olink_norm_input_check_df_cols <- function(lst_df) {
 
   ## normalization can be missing from both datasets ----
 
-  # we only tolerate "Normalization" missing from all datasets, otherwise it is
+  # we tolerate "Normalization" missing from all datasets, otherwise it is
   # an error
   col_norm <- lapply(lst_req_col, function(x) x$normalization) |>
     unlist()
@@ -379,6 +382,27 @@ olink_norm_input_check_df_cols <- function(lst_df) {
     )
   }
 
+  ## lod can be missing from datasets or have multiple matches (PlateLOD) ----
+
+  col_lod <- lapply(lst_req_col, function(x) x$lod) |>
+    lapply(function(x) {
+      x[length(x) > 1L] |>
+        cli::ansi_collapse()
+    }) |>
+    unlist()
+  col_lod <- col_lod[nchar(col_lod) > 0L]
+
+  if (!identical(unname(col_lod), character(0L))) {
+    cli::cli_inform(
+      c(
+        "{cli::qty(names(col_lod))} Dataset{?s} {.val {names(col_lod)}}
+        {cli::qty(names(col_lod))} {?contains/contain} multiple columns matching
+        {.var LOD}: {.val {required_cols$lod}}.",
+        "i" = "They will be all adjusted"
+      )
+    )
+  }
+
   ## check for missing columns ----
 
   # identify missing column names from the set of required_cols and prepare the
@@ -388,9 +412,9 @@ olink_norm_input_check_df_cols <- function(lst_df) {
       length(r_col) == 1L
     })
   }) |>
-    # remove normalization as it was checked above
+    # remove lod and normalization as it was checked above
     lapply(function(sub_lst) {
-      sub_lst[names(sub_lst) != "normalization"]
+      sub_lst[!(names(sub_lst) %in% c("lod", "normalization"))]
     }) |>
     # remove all elements that have no missing value
     lapply(function(sub_lst) {
@@ -1183,4 +1207,84 @@ olink_norm_input_assay_overlap <- function(lst_df,
 
   # return
   return(lst_out)
+}
+
+#' Check \var{datasets} and \var{reference_medians} for Olink identifiers not
+#' shared across datasets.
+#'
+#' @author
+#'   Klev Diamanti;
+#'   Kathleen Nevola
+#'
+#' @param lst_df Named list of datasets to be normalized.
+#' @param lst_cols Named list of vectors with the required column names for each
+#' dataset in \var{lst_df}.
+#'
+#' @return `NULL` if all assays are normalized with the same approach.
+#'
+olink_norm_input_norm_method <- function(lst_df,
+                                         lst_cols) {
+  all_norm_present <- lst_cols |>
+    sapply(function(x) !identical(x = x$normalization, y = character(0L))) |>
+    all()
+
+  if (all_norm_present && length(lst_df) == 2L) {
+
+    lst_df_norm <- lapply(names(lst_df), function(l_name) {
+      select_cols <- c(lst_cols[[l_name]]$olink_id,
+                       lst_cols[[l_name]]$normalization)
+      names(select_cols) <- c("olink_id", l_name)
+      lst_df[[l_name]] |>
+        # EXCLUDED assays have been removed already in
+        # olink_norm_input_clean_assays
+        dplyr::select(
+          dplyr::all_of(select_cols)
+        ) |>
+        dplyr::distinct() |>
+        dplyr::collect()
+    })
+    names(lst_df_norm) <- names(lst_df)
+
+    oid_norm_diff <- lst_df_norm[[1L]] |>
+      # we assume that there are no duplicated assays within df and that assays
+      # were normalized with the same approach within df
+      dplyr::inner_join(
+        lst_df_norm[[2L]],
+        by = "olink_id",
+        relationship = "one-to-one"
+      ) |>
+      dplyr::filter(
+        .data[[names(lst_df_norm)[1L]]] != .data[[names(lst_df_norm)[2L]]]
+      ) |>
+      dplyr::pull(
+        .data[["olink_id"]]
+      )
+
+    if (!identical(oid_norm_diff, character(0L))) {
+      cli::cli_warn(
+        c(
+          "{length(oid_norm_diff)} {cli::qty(oid_norm_diff)} assay{?s} not
+          normalized with the same approach: {.val {oid_norm_diff}}",
+          "i" = "Consider renormalizing!"
+        )
+      )
+    }
+
+  } else if (length(lst_df) != 2L) {
+    cli::cli_abort(
+      c(
+        "x" = "Unable to check if all assays were normalized with the same
+        approach!",
+        "i" = "Can apply only to 2 datasets."
+      )
+    )
+  } else {
+    cli::cli_abort(
+      c(
+        "x" = "Unable to check if all assays were normalized with the same
+        approach!",
+        "i" = "Column {.var {\"Normalization\"}} not present in all datasets."
+      )
+    )
+  }
 }

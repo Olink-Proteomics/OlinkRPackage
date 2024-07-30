@@ -831,6 +831,7 @@ test_that(
           plate_id = "PlateID",
           qc_warn = "QC_Warning",
           quant = "NPX",
+          lod = "LOD",
           normalization = character(0L)
         )
       )
@@ -867,6 +868,7 @@ test_that(
           plate_id = "PlateID",
           qc_warn = "QC_Warning",
           quant = "NPX",
+          lod = "LOD",
           normalization = character(0L)
         )
       )
@@ -905,6 +907,7 @@ test_that(
           plate_id = "PlateID",
           qc_warn = "QC_Warning",
           quant = "NPX",
+          lod = "LOD",
           normalization = "Normalization"
         )
       )
@@ -944,6 +947,7 @@ test_that(
           plate_id = "PlateID",
           qc_warn = "QC_Warning",
           quant = "NPX",
+          lod = "LOD",
           normalization = "Normalization"
         )
       )
@@ -987,6 +991,7 @@ test_that(
           plate_id = "PlateID",
           qc_warn = "QC_Warning",
           quant = "NPX",
+          lod = "LOD",
           normalization = character(0L)
         ),
         "p2" = list(
@@ -999,6 +1004,7 @@ test_that(
           plate_id = "PlateID",
           qc_warn = "QC_Warning",
           quant = "NPX",
+          lod = "LOD",
           normalization = character(0L)
         )
       )
@@ -1038,6 +1044,7 @@ test_that(
           plate_id = "PlateID",
           qc_warn = "QC_Warning",
           quant = "NPX",
+          lod = "LOD",
           normalization = "Normalization"
         ),
         "p2" = list(
@@ -1050,6 +1057,7 @@ test_that(
           plate_id = "PlateID",
           qc_warn = "QC_Warning",
           quant = "NPX",
+          lod = "LOD",
           normalization = "Normalization"
         )
       )
@@ -1085,6 +1093,7 @@ test_that(
           plate_id = "PlateID",
           qc_warn = "QC_Warning",
           quant = "NPX",
+          lod = "LOD",
           normalization = "Normalization"
         ),
         "p2" = list(
@@ -1097,6 +1106,7 @@ test_that(
           plate_id = "PlateID",
           qc_warn = "QC_Warning",
           quant = "NPX",
+          lod = "LOD",
           normalization = "Normalization"
         )
       )
@@ -1201,6 +1211,7 @@ test_that(
           plate_id = "PlateID",
           qc_warn = "QC_Warning",
           quant = "NPX",
+          lod = "LOD",
           normalization = "Normalization"
         ),
         "p2" = list(
@@ -1213,6 +1224,7 @@ test_that(
           plate_id = "PlateID",
           qc_warn = "QC_Warning",
           quant = "NPX",
+          lod = "LOD",
           normalization = "Normalization"
         ),
         "p3" = list(
@@ -1225,6 +1237,7 @@ test_that(
           plate_id = "PlateID",
           qc_warn = "QC_Warning",
           quant = "NPX",
+          lod = "LOD",
           normalization = "Normalization"
         ),
         "p4" = list(
@@ -1237,6 +1250,7 @@ test_that(
           plate_id = "PlateID",
           qc_warn = "QC_Warning",
           quant = "NPX",
+          lod = "LOD",
           normalization = "Normalization"
         )
       )
@@ -1268,6 +1282,7 @@ test_that(
           plate_id = "PlateID",
           qc_warn = "QC_Warning",
           quant = "NPX",
+          lod = "LOD",
           normalization = character(0L)
         ),
         "p2" = list(
@@ -1280,6 +1295,7 @@ test_that(
           plate_id = "PlateID",
           qc_warn = "QC_Warning",
           quant = "NPX",
+          lod = "LOD",
           normalization = character(0L)
         ),
         "p3" = list(
@@ -1292,6 +1308,7 @@ test_that(
           plate_id = "PlateID",
           qc_warn = "QC_Warning",
           quant = "NPX",
+          lod = "LOD",
           normalization = character(0L)
         ),
         "p4" = list(
@@ -1304,11 +1321,79 @@ test_that(
           plate_id = "PlateID",
           qc_warn = "QC_Warning",
           quant = "NPX",
+          lod = "LOD",
           normalization = character(0L)
         )
       )
     )
 
+  }
+)
+
+test_that(
+  "olink_norm_input_check_df_cols - message - multiple LOD columns",
+  {
+    skip_if_not_installed("arrow")
+
+    # only df1 has Plate_LOD and LOD ----
+
+    expect_warning(
+      object = expect_message(
+        object = olink_norm_input_check_df_cols(
+          lst_df = list(
+            "p1" = npx_data1 |>
+              dplyr::mutate(
+                Plate_LOD = LOD
+              ),
+            "p2" = npx_data2
+          ) |>
+            lapply(dplyr::mutate, Normalization = "Intensity")
+        ),
+        regexp = "Dataset \"p1\" contains multiple columns matching `LOD`"
+      ),
+      regexp = "* p2: Plate_LOD"
+    )
+
+    # df1 and df2 have Plate_LOD and LOD ----
+
+    expect_message(
+      object = olink_norm_input_check_df_cols(
+        lst_df = list(
+          "p1" = npx_data1 |>
+            dplyr::mutate(
+              Plate_LOD = LOD
+            ),
+          "p2" = npx_data2 |>
+            dplyr::mutate(
+              Plate_LOD = LOD
+            )
+        ) |>
+          lapply(dplyr::mutate, Normalization = "Intensity")
+      ),
+      regexp = "Datasets \"p1\" and \"p2\" contain multiple columns matching"
+    )
+
+    # df1 and df2 have different LODs ----
+
+    expect_warning(
+      object = expect_message(
+        object = olink_norm_input_check_df_cols(
+          lst_df = list(
+            "p1" = npx_data1 |>
+              dplyr::mutate(
+                PlateLOD = LOD
+              ),
+            "p2" = npx_data2 |>
+              dplyr::mutate(
+                MaxLOD = LOD
+              )
+          ) |>
+            lapply(dplyr::mutate, Normalization = "Intensity")
+        ),
+        regexp = "Datasets \"p1\" and \"p2\" contain multiple columns matching"
+      ),
+      regexp = "* p1: MaxLOD"
+    )
   }
 )
 
@@ -3733,6 +3818,238 @@ test_that(
                                         "OID05124"))
           )
       })
+    )
+  }
+)
+
+# Test olink_norm_input_norm_method ----
+
+test_that(
+  "olink_norm_input_norm_method - works - all assays normalized similarly",
+  {
+    skip_if_not_installed("arrow")
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = olink_norm_input_norm_method(
+            lst_df = list(
+              "p1" = npx_data1 |>
+                dplyr::mutate(
+                  Normalization = "Intensity"
+                ),
+              "p2" = npx_data2 |>
+                dplyr::mutate(
+                  Normalization = "Intensity"
+                )
+            ),
+            lst_cols = list(
+              "p1" = list(olink_id = "OlinkID",
+                          normalization = "Normalization"),
+              "p2" = list(olink_id = "OlinkID",
+                          normalization = "Normalization")
+            )
+          )
+        )
+      )
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_norm_method - error - assays normalized differently",
+  {
+    skip_if_not_installed("arrow")
+
+    # 1 assay in one dataset ----
+
+    expect_warning(
+      object = olink_norm_input_norm_method(
+        lst_df = list(
+          "p1" = npx_data1 |>
+            dplyr::mutate(
+              Normalization = dplyr::if_else(
+                .data[["OlinkID"]] == "OID00471",
+                "Plate control",
+                "Intensity"
+              )
+            ),
+          "p2" = npx_data2 |>
+            dplyr::mutate(
+              Normalization = "Intensity"
+            )
+        ),
+        lst_cols = list(
+          "p1" = list(olink_id = "OlinkID",
+                      normalization = "Normalization"),
+          "p2" = list(olink_id = "OlinkID",
+                      normalization = "Normalization")
+        )
+      ),
+      regexp = "1 assay not normalized with the same approach: \"OID00471\""
+    )
+
+    # 1 assay in each dataset ----
+
+    expect_warning(
+      object = olink_norm_input_norm_method(
+        lst_df = list(
+          "p1" = npx_data1 |>
+            dplyr::mutate(
+              Normalization = dplyr::if_else(
+                .data[["OlinkID"]] == "OID00471",
+                "Plate control",
+                "Intensity"
+              )
+            ),
+          "p2" = npx_data2 |>
+            dplyr::mutate(
+              Normalization = dplyr::if_else(
+                .data[["OlinkID"]] == "OID01293",
+                "Plate control",
+                "Intensity"
+              )
+            )
+        ),
+        lst_cols = list(
+          "p1" = list(olink_id = "OlinkID",
+                      normalization = "Normalization"),
+          "p2" = list(olink_id = "OlinkID",
+                      normalization = "Normalization")
+        )
+      ),
+      regexp = paste("2 assays not normalized with the same approach:",
+                     "\"OID01293\" and \"OID00471\"")
+    )
+
+    # some assays in each dataset ----
+
+    expect_warning(
+      object = olink_norm_input_norm_method(
+        lst_df = list(
+          "p1" = npx_data1 |>
+            dplyr::mutate(
+              Normalization = dplyr::if_else(
+                .data[["OlinkID"]] %in% c("OID00471", "OID00472",
+                                          "OID00474", "OID00475"),
+                "Plate control",
+                "Intensity"
+              )
+            ),
+          "p2" = npx_data2 |>
+            dplyr::mutate(
+              Normalization = dplyr::if_else(
+                .data[["OlinkID"]] %in% c("OID01300", "OID01301",
+                                          "OID01302", "OID01303"),
+                "Plate control",
+                "Intensity"
+              )
+            )
+        ),
+        lst_cols = list(
+          "p1" = list(olink_id = "OlinkID",
+                      normalization = "Normalization"),
+          "p2" = list(olink_id = "OlinkID",
+                      normalization = "Normalization")
+        )
+      ),
+      regexp = paste("8 assays not normalized with the same approach:",
+                     "\"OID01300\", \"OID01301\", \"OID01302\", \"OID01303\",",
+                     "\"OID00471\", \"OID00472\", \"OID00474\", and",
+                     "\"OID00475\"")
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_norm_method - error - too many or too few datasets",
+  {
+    skip_if_not_installed("arrow")
+
+    expect_error(
+      object = olink_norm_input_norm_method(
+        lst_df = list(
+          "p1" = npx_data1 |>
+            dplyr::mutate(
+              Normalization = "Intensity"
+            )
+        ),
+        lst_cols = list(
+          "p1" = list(olink_id = "OlinkID",
+                      normalization = "Normalization")
+        )
+      ),
+      regexp = paste("Can apply only to 2 datasets")
+    )
+
+    expect_error(
+      object = olink_norm_input_norm_method(
+        lst_df = list(
+          "p1" = npx_data1 |>
+            dplyr::mutate(
+              Normalization = "Intensity"
+            ),
+          "p2" = npx_data2 |>
+            dplyr::mutate(
+              Normalization = "Intensity"
+            ),
+          "p3" = npx_data2 |>
+            dplyr::mutate(
+              Normalization = "Intensity"
+            )
+        ),
+        lst_cols = list(
+          "p1" = list(olink_id = "OlinkID",
+                      normalization = "Normalization"),
+          "p2" = list(olink_id = "OlinkID",
+                      normalization = "Normalization"),
+          "p3" = list(olink_id = "OlinkID",
+                      normalization = "Normalization")
+        )
+      ),
+      regexp = paste("Can apply only to 2 datasets")
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_norm_method - error - not all df have Normalization",
+  {
+    skip_if_not_installed("arrow")
+
+    expect_error(
+      object = olink_norm_input_norm_method(
+        lst_df = list(
+          "p1" = npx_data1,
+          "p2" = npx_data2
+        ),
+        lst_cols = list(
+          "p1" = list(olink_id = "OlinkID",
+                      normalization = character(0L)),
+          "p2" = list(olink_id = "OlinkID",
+                      normalization = character(0L))
+        )
+      ),
+      regexp = "Column `Normalization` not present in all datasets."
+    )
+
+    expect_error(
+      object = olink_norm_input_norm_method(
+        lst_df = list(
+          "p1" = npx_data1,
+          "p2" = npx_data2 |>
+            dplyr::mutate(
+              Normalization = "Intensity"
+            )
+        ),
+        lst_cols = list(
+          "p1" = list(olink_id = "OlinkID",
+                      normalization = character(0L)),
+          "p2" = list(olink_id = "OlinkID",
+                      normalization = "Normalization")
+        )
+      ),
+      regexp = "Column `Normalization` not present in all datasets."
     )
   }
 )
