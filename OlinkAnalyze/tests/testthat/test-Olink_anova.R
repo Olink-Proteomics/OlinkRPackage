@@ -11,7 +11,7 @@ npx_data_format221010_no_NA <- npx_data_format221010 |>
 
 # Add dummy Extension control assays
 extension_control <- npx_data_format221010_no_NA |>
-  dplyr::filter(str_detect(Assay, "Incubation control")) |>
+  dplyr::filter(stringr::str_detect(Assay, "Incubation control")) |>
   dplyr::mutate(Assay = gsub("Incubation", "Extension", Assay)) |>
   dplyr::mutate(UniProt = gsub("INC", "EXT", UniProt))
 
@@ -22,10 +22,10 @@ npx_data_format221010_ext_ctrl <- rbind(
 
 # Add AssayType
 npx_data_format221010_AssayType <- npx_data_format221010_ext_ctrl |>
-  mutate(AssayType = case_when(
-    str_detect(Assay, "Incubation control") ~ "inc_ctrl",
-    str_detect(Assay, "Amplification control") ~ "amp_ctrl",
-    str_detect(Assay, "Extension control") ~ "ext_ctrl",
+  dplyr::mutate(AssayType = dplyr::case_when(
+    stringr::str_detect(Assay, "Incubation control") ~ "inc_ctrl",
+    stringr::str_detect(Assay, "Amplification control") ~ "amp_ctrl",
+    stringr::str_detect(Assay, "Extension control") ~ "ext_ctrl",
     TRUE ~ "assay"
   ))
 
@@ -33,19 +33,44 @@ npx_data_format221010_AssayType <- npx_data_format221010_ext_ctrl |>
 npx_data_format221010_no_ctrl <- npx_data_format221010 |>
   dplyr::filter(!str_detect(Assay, "control"))
 
+# Add sample controls for testing
+# Without SampleType column, we can use npx_data1
+npx_data1_sample_controls <- npx_data1
+
+# With SampleType column
+sample_type_col <- rbind(
+  matrix(nrow = 10, ncol = 1, data = "PLATE_CONTROL"),
+  matrix(nrow = 4, ncol = 1, data = "NEGATIVE_CONTROL"),
+  matrix(nrow = 6, ncol = 1, data = "SAMPLE_CONTROL"),
+  matrix(
+    nrow = nrow(npx_data_format221010_no_ctrl) - 20,
+    ncol = 1, data = "SAMPLE"
+  )
+)
+
+npx_data_format221010_sample_controls <- npx_data_format221010_no_ctrl |>
+  dplyr::mutate(SampleType = sample(sample_type_col))
+
+# Remove sample controls from npx_data1 to preserve test results
+npx_data1 <- npx_data1 |>
+  dplyr::filter(!stringr::str_detect(npx_data1$SampleID, 
+                                     stringr::regex("control|ctrl", 
+                                                    ignore_case = TRUE)))
+
+
 #Run olink_anova
 anova_results_1_site <- olink_anova(npx_data1, 'Site') %>%
-  mutate(id = as.character(OlinkID)) %>%
-  arrange(id) %>%
-  select(-id)
+  dplyr::mutate(id = as.character(OlinkID)) %>%
+  dplyr::arrange(id) %>%
+  dplyr::select(-id)
 anova_results_1_time <- olink_anova(npx_data1, 'Time') %>%
-  mutate(id = as.character(OlinkID)) %>%
-  arrange(id) %>%
-  select(-id)
+  dplyr::mutate(id = as.character(OlinkID)) %>%
+  dplyr::arrange(id) %>%
+  dplyr::select(-id)
 anova_results_1_siteTime <- olink_anova(npx_data1, c('Site', 'Time')) %>%
-  mutate(id = as.character(OlinkID)) %>%
-  arrange(id, term) %>% #Since OlinkID is not unique here (=> ties), term is used to break the ties
-  select(-id)
+  dplyr::mutate(id = as.character(OlinkID)) %>%
+  dplyr::arrange(id, term) %>% #Since OlinkID is not unique here (=> ties), term is used to break the ties
+  dplyr::select(-id)
 
 #Run olink_anova_posthoc
 anova_posthoc_1_site <- olink_anova_posthoc(npx_data1,
@@ -54,10 +79,10 @@ anova_posthoc_1_site <- olink_anova_posthoc(npx_data1,
                                                 head(10) %>%
                                                 dplyr::pull(OlinkID)},
                                             effect = 'Site') %>%
-  mutate(id = as.character(OlinkID)) %>%
-  arrange(id, contrast) %>% #Since OlinkID is not unique here (=> ties), contrast is used to break the ties
-  mutate(contrast = as.character(contrast)) %>% # In R 3.6.1 we get factors, but reference is characters
-  select(-id)
+  dplyr::mutate(id = as.character(OlinkID)) %>%
+  dplyr::arrange(id, contrast) %>% #Since OlinkID is not unique here (=> ties), contrast is used to break the ties
+  dplyr::mutate(contrast = as.character(contrast)) %>% # In R 3.6.1 we get factors, but reference is characters
+  dplyr::select(-id)
 
 
 anova_posthoc_1_time <- olink_anova_posthoc(npx_data1,
@@ -66,10 +91,10 @@ anova_posthoc_1_time <- olink_anova_posthoc(npx_data1,
                                                 head(10) %>%
                                                 dplyr::pull(OlinkID)},
                                             effect = 'Time') %>%
-  mutate(id = as.character(OlinkID)) %>%
-  arrange(id, contrast) %>% #Just for consistency. Not actually needed in this case
-  mutate(contrast = as.character(contrast)) %>% # In R 3.6.1 we get factors, but reference is characters
-  select(-id)
+  dplyr::mutate(id = as.character(OlinkID)) %>%
+  dplyr::arrange(id, contrast) %>% #Just for consistency. Not actually needed in this case
+  dplyr::mutate(contrast = as.character(contrast)) %>% # In R 3.6.1 we get factors, but reference is characters
+  dplyr::select(-id)
 
 test_that("olink_anova function works", {
   expect_equal(anova_results_1_site, ref_results$anova_results_1_site)  ##result equal to testfile
@@ -85,7 +110,10 @@ test_that("olink_anova function works", {
   
   expect_error(olink_anova(npx_data_format221010_AssayType, variable = "Site")) # Assay controls not removed, AssayType present
   expect_error(olink_anova(npx_data_format221010_ext_ctrl, variable = "Site")) # Assay controls not removed, no AssayType
-})
+  expect_error(olink_anova(npx_data_format221010_sample_controls, variable = "Site")) # Sample controls not removed, SampleType present
+  expect_error(olink_anova(npx_data1_sample_controls, variable = "Site")) # Sample controls not removed, no AssayType
+  
+  })
 
 test_that("olink_anova_posthoc function works", {
   expect_equal(anova_posthoc_1_site, ref_results$anova_posthoc_1_site) ## result equal to testfile - posthoc
@@ -108,5 +136,11 @@ test_that("olink_anova_posthoc function works", {
   expect_error(olink_anova_posthoc(npx_data_format221010_ext_ctrl, 
                                    variable = 'Site', 
                                    effect = 'Site')) # Assay controls not removed, no AssayType
+  expect_error(olink_anova_posthoc(npx_data_format221010_sample_controls, 
+                                   variable = 'Site', 
+                                   effect = 'Site')) # Sample controls not removed, SampleType present
+  expect_error(olink_anova_posthoc(npx_data1_sample_controls, 
+                                   variable = 'Site', 
+                                   effect = 'Site')) # Sample controls not removed, no SampleType
   
 })
