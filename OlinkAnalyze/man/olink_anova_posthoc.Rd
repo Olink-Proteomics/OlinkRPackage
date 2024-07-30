@@ -74,7 +74,7 @@ mean NPX at mean(numerical variable) versus mean NPX at mean(numerical variable)
 
 library(dplyr)
 
-npx_df <- npx_data1 \%>\% filter(!grepl('control',SampleID, ignore.case = TRUE))
+npx_df <- npx_data1 \%>\% filter(!grepl('control|ctrl',SampleID, ignore.case = TRUE))
 
 #Two-way ANOVA, one main effect (Site) covariate.
 #Results in model NPX~Treatment*Time+Site.

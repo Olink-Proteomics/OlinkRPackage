@@ -26,12 +26,12 @@
 #' \donttest{
 #'
 #' library(dplyr)
-#'
-#' anova_results <- olink_anova(npx_data1, variable = "Site")
+#' npx_df <- npx_data1 %>% filter(!grepl('control|ctrl',SampleID, ignore.case = TRUE))
+#' anova_results <- olink_anova(npx_df, variable = "Site")
 #' significant_assays <- anova_results %>%
 #'     filter(Threshold == 'Significant') %>%
 #'     pull(OlinkID)
-#' olink_boxplot(npx_data1,
+#' olink_boxplot(npx_df,
 #'               variable = "Site",
 #'               olinkid_list = significant_assays,
 #'               verbose = TRUE,

@@ -56,7 +56,7 @@
 #'
 #' library(dplyr)
 #'
-#' npx_df <- npx_data1 %>% filter(!grepl('control',SampleID, ignore.case = TRUE))
+#' npx_df <- npx_data1 %>% filter(!grepl('control|ctrl',SampleID, ignore.case = TRUE))
 #'
 #' #One-way ANOVA, no covariates.
 #' #Results in a model NPX~Time
@@ -140,8 +140,8 @@ olink_anova <- function(df,
     ctrl_samples <- df |>
       dplyr::filter(stringr::str_detect(df$SampleID, stringr::regex("control|ctrl", ignore_case = TRUE)))
     
-    stop(paste0(
-      'Control samples have not been removed from the dataset.\n  Samples with "control" or "ctrl" in their SampleID field should be excluded.\n  The following ', length(unique(ctrl_samples$SampleID)), " control samples were found:\n  ",
+    warning(paste0(
+      'Potential control samples detected in input data.\n  Samples with "control" or "ctrl" in their SampleID field were flagged as potential control samples. If these samples are controls they should be excluded.\n  The following ', length(unique(ctrl_samples$SampleID)), " potential control samples were found:\n  ",
       paste(strwrap(toString(unique(ctrl_samples$SampleID)), width = 80), collapse = "\n")
     ))
   }
@@ -391,7 +391,7 @@ olink_anova <- function(df,
 #'
 #' library(dplyr)
 #'
-#' npx_df <- npx_data1 %>% filter(!grepl('control',SampleID, ignore.case = TRUE))
+#' npx_df <- npx_data1 %>% filter(!grepl('control|ctrl',SampleID, ignore.case = TRUE))
 #'
 #' #Two-way ANOVA, one main effect (Site) covariate.
 #' #Results in model NPX~Treatment*Time+Site.
@@ -521,8 +521,8 @@ if ("SampleType" %in% names(df)) {
   ctrl_samples <- df |>
     dplyr::filter(stringr::str_detect(df$SampleID, stringr::regex("control|ctrl", ignore_case = TRUE)))
 
-  stop(paste0(
-    'Control samples have not been removed from the dataset.\n  Samples with "control" or "ctrl" in their SampleID field should be excluded.\n  The following ', length(unique(ctrl_samples$SampleID)), " control samples were found:\n  ",
+  warning(paste0(
+    'Potential control samples detected in input data.\n  Samples with "control" or "ctrl" in their SampleID field were flagged as potential control samples. If these samples are controls they should be excluded.\n  The following ', length(unique(ctrl_samples$SampleID)), " potential control samples were found:\n  ",
     paste(strwrap(toString(unique(ctrl_samples$SampleID)), width = 80), collapse = "\n")
   ))
 }

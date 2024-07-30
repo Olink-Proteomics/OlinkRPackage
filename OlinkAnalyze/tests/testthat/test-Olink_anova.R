@@ -111,7 +111,7 @@ test_that("olink_anova function works", {
   expect_error(olink_anova(npx_data_format221010_AssayType, variable = "Site")) # Assay controls not removed, AssayType present
   expect_error(olink_anova(npx_data_format221010_ext_ctrl, variable = "Site")) # Assay controls not removed, no AssayType
   expect_error(olink_anova(npx_data_format221010_sample_controls, variable = "Site")) # Sample controls not removed, SampleType present
-  expect_error(olink_anova(npx_data1_sample_controls, variable = "Site")) # Sample controls not removed, no AssayType
+  expect_warning(olink_anova(npx_data1_sample_controls, variable = "Site")) # Sample controls not removed, no SampleType
   
   })
 
@@ -139,7 +139,7 @@ test_that("olink_anova_posthoc function works", {
   expect_error(olink_anova_posthoc(npx_data_format221010_sample_controls, 
                                    variable = 'Site', 
                                    effect = 'Site')) # Sample controls not removed, SampleType present
-  expect_error(olink_anova_posthoc(npx_data1_sample_controls, 
+  expect_warning(olink_anova_posthoc(npx_data1_sample_controls, 
                                    variable = 'Site', 
                                    effect = 'Site')) # Sample controls not removed, no SampleType
   
