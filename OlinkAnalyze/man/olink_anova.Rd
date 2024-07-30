@@ -57,6 +57,8 @@ The function handles both factor and numerical variables and/or covariates. \cr\
 Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a message if verbose = TRUE).
 Character columns in the input dataframe are automatically converted to factors (specified in a message if verbose = TRUE).
 Numerical variables are not converted to factors.
+Control samples (SampleType is not "SAMPLE, or SampleID contains "control" or "ctrl") should be removed before using this function.
+Control assays (AssayType is not "assay", or Assay contains "control" or "ctrl") should be removed before using this function.
 If a numerical variable is to be used as a factor, this conversion needs to be done on the dataframe before the function call. \cr\cr
 Crossed analysis, i.e. A*B formula notation, is inferred from the variable argument in the following cases: \cr
 \itemize{
