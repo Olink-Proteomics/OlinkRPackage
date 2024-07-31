@@ -33,24 +33,6 @@ npx_data_format221010_AssayType <- npx_data_format221010_ext_ctrl |>
 npx_data_format221010_no_ctrl <- npx_data_format221010 |>
   dplyr::filter(!str_detect(Assay, "control"))
 
-# Add sample controls for testing
-# Without SampleType column, we can use npx_data1
-npx_data1_sample_controls <- npx_data1
-
-# With SampleType column
-sample_type_col <- rbind(
-  matrix(nrow = 10, ncol = 1, data = "PLATE_CONTROL"),
-  matrix(nrow = 4, ncol = 1, data = "NEGATIVE_CONTROL"),
-  matrix(nrow = 6, ncol = 1, data = "SAMPLE_CONTROL"),
-  matrix(
-    nrow = nrow(npx_data_format221010_no_ctrl) - 20,
-    ncol = 1, data = "SAMPLE"
-  )
-)
-
-npx_data_format221010_sample_controls <- npx_data_format221010_no_ctrl |>
-  dplyr::mutate(SampleType = sample(sample_type_col))
-
 # Remove sample controls from npx_data1 to preserve test results
 npx_data1 <- npx_data1 |>
   dplyr::filter(!stringr::str_detect(npx_data1$SampleID, 
