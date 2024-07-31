@@ -962,7 +962,7 @@ A list of objects of class *ggplot* (silently returned). Plots are also printed 
 The olink_boxplot function is used to generate boxplots of NPX values stratified on a variable for a given list of proteins. olink_boxplot uses the functions *ggplot* and *geom_boxplot* of the R library *ggplot2*.
 
 
-In order to annotate the plot with ANOVA posthoc analysis results, control samples (SampleType is not "SAMPLE, or SampleID contains "control" or "ctrl") and control assays (AssayType is not "assay", or Assay contains "control" or "ctrl") should be removed.
+In order to annotate the plot with ANOVA posthoc analysis results, control samples and control assays (AssayType is not "assay", or Assay contains "control" or "ctrl") should be removed.
 
 ### Function arguments
 
