@@ -1,3 +1,263 @@
+#' Check inputs of \code{\link{olink_normalization}} function.
+#'
+#' @description
+#' This function is a wrapper of multiple help functions which check the inputs
+#' of the \code{\link{olink_normalization}} function.
+#'
+#' @details
+#' The following checks are performed:
+#'  - \code{\link{olink_norm_input_validate}}:
+#'    - Determines the normalization to be performed by intersecting inputs with
+#'    internal global variable `olink_norm_mode_combos`.
+#'    - Returns the type of normalization to be performed from
+#'    `olink_norm_modes`.
+#'    - Message with the normalization type.
+#'    - Error message is thrown in input is invalid.
+#'  - \code{\link{olink_norm_input_class}}:
+#'    - Checks if all inputs are of the expected class:
+#'      - `df1`, `df2` and `reference_medians`: Tibble or R6 ArrowObject
+#'      - `overlapping_samples_df1`, `overlapping_samples_df2`,
+#'      `df1_project_nr`, `df2_project_nr` and `reference_project`: Character
+#'      vector
+#'    - Also checks the validity of names of project and reference project.
+#'  - \code{\link{olink_norm_input_check_df_cols}}:
+#'    - Detects the column names of input datasets `df1` and `df2` to allow for
+#'    alternative names.
+#'    - Warning if `Normalization` column missing from all datasets.
+#'    - Warning if `LOD` is missing or if there are multiple `LOD` columns.
+#'    - Warning if
+#'    - Error if required columns are missing.
+#'    - Error not all input datasets have or lack `Normalization` column.
+#'    - Error if input datasets have been quantified with different methods.
+#'  - \code{\link{olink_norm_input_ref_medians}}:
+#'    - Checks validity of datasets containing `reference_medians`.
+#'    - Error if required columns are missing based on
+#'    `olink_norm_ref_median_cols`.
+#'    - Error if columns are not of the correct class bases on
+#'    `olink_norm_ref_median_cols`.
+#'    - Error if there duplicate assay identifiers.
+#'  - \code{\link{olink_norm_input_check_samples}}:
+#'    - Check character vectors of reference sample identifiers for:
+#'      - Being present in `df1` and/or `df2`.
+#'      - Duplicate identifiers.
+#'  - \code{\link{olink_norm_input_clean_assays}}:
+#'    - Returns a named list with the updated `df1`, `df2` and/or
+#'    `reference_medians`.
+#'    - Removes assays that are not of the format OID followed by 5 digits.
+#'    - Removes assays that are marked with `Normalization = EXCLUDED`.
+#'  - \code{\link{olink_norm_input_assay_overlap}}:
+#'    - Returns a named list with the updated `df1`, `df2` and/or
+#'    `reference_medians`.
+#'    - Remove assays not shared between `df1` and `df2`, or between `df1` and
+#'    `reference_medians`.
+#'  - \code{\link{olink_norm_input_norm_method}}:
+#'    - Check if all assays in `df1` and `df2` have been originally normalized
+#'    with the same method "Intensity" or "Plate control".
+#'    - Warning is thrown if not.
+#'
+#' @author
+#'   Klev Diamanti
+#'
+#' @param df1 First dataset to be used in normalization (required).
+#' @param df2 Second dataset to be used in normalization.
+#' @param overlapping_samples_df1 Samples to be used for adjustment factor
+#' calculation in df1 (required).
+#' @param overlapping_samples_df2 Samples to be used for adjustment factor
+#' calculation in df2.
+#' @param df1_project_nr Project name of first dataset (df1).
+#' @param df2_project_nr Project name of first dataset (df2).
+#' @param reference_project Project name of reference_project. Should be one of
+#' \var{df1_project_nr} or \var{df2_project_nr}. Indicates the project to which
+#' the other project is adjusted to.
+#' @param reference_medians Dataset with columns "OlinkID" and "Reference_NPX".
+#' Used for reference median normalization.
+#'
+#' @return Named list of updated inputs to use for normalization:
+#'  - `df1`: dataset df1.
+#'  - `df2`: `NULL` if reference median normalization, or dataset df2.
+#'  - `overlapping_samples_df1`: character vector of reference samples from df1.
+#'  - `overlapping_samples_df2`: `NULL` if reference median normalization, or
+#'  character vector of reference samples from df1.
+#'  - `df1_project_nr`: name of df1 project.
+#'  - `df2_project_nr`: `NULL` if reference median normalization, or name of df2
+#'  project.
+#'  - `reference_project`: `NULL` if reference median normalization, or name of
+#'  reference project.
+#'  - `reference_medians`: `NULL` if bridge or subset normalization, or dataset
+#'  with reference_medians.
+#'  - `df1_cols`: column names of df1 to use downstream.
+#'  - `df2_cols`: `NULL` if reference median normalization, or column names of
+#'  df2 to use downstream.
+#'  - `norm_mode`: one of `r cli::ansi_collapse(x = unlist(olink_norm_modes))`
+#'  indicating the normalization to be performed.
+#'
+olink_norm_input_check <- function(df1,
+                                   df2,
+                                   overlapping_samples_df1,
+                                   overlapping_samples_df2,
+                                   df1_project_nr,
+                                   df2_project_nr,
+                                   reference_project,
+                                   reference_medians) {
+  # Validate the normalization input ----
+
+  norm_mode <- olink_norm_input_validate(
+    df1 = df1,
+    df2 = df2,
+    overlapping_samples_df1 = overlapping_samples_df1,
+    overlapping_samples_df2 = overlapping_samples_df2,
+    reference_medians = reference_medians
+  )
+
+  # Check that input classes are correct ----
+
+  olink_norm_input_class(
+    df1 = df1,
+    df2 = df2,
+    overlapping_samples_df1 = overlapping_samples_df1,
+    overlapping_samples_df2 = overlapping_samples_df2,
+    df1_project_nr = df1_project_nr,
+    df2_project_nr = df2_project_nr,
+    reference_project = reference_project,
+    reference_medians = reference_medians,
+    norm_mode = norm_mode
+  )
+
+  # Check column names ----
+
+  if (norm_mode == olink_norm_modes$ref_median) {
+    # reference median normalization
+
+    # check columns of df1
+    lst_df <- list(df1)
+    names(lst_df) <- df1_project_nr
+    lst_cols <- olink_norm_input_check_df_cols(lst_df = lst_df)
+
+    # list of samples
+    lst_ref_samples <- list(overlapping_samples_df1)
+    names(lst_ref_samples) <- df1_project_nr
+
+    # check reference_medians
+    olink_norm_input_ref_medians(reference_medians = reference_medians)
+
+  } else {
+
+    # bridge or subset normalization
+
+    reference_medians <- NULL
+
+    lst_df <- list(df1, df2)
+    names(lst_df) <- c(df1_project_nr, df2_project_nr)
+    lst_cols <- olink_norm_input_check_df_cols(lst_df = lst_df)
+
+    if (norm_mode == olink_norm_modes$bridge) {
+      # bridge normalization
+      lst_ref_samples <- list(overlapping_samples_df1, overlapping_samples_df1)
+    } else if (norm_mode == olink_norm_modes$subset) {
+      # subset normalization
+      lst_ref_samples <- list(overlapping_samples_df1, overlapping_samples_df2)
+    }
+    names(lst_ref_samples) <- c(df1_project_nr, df2_project_nr)
+
+  }
+
+  # Check samples ----
+
+  # extract all unique sample identifiers
+  lst_df_samples <- lapply(names(lst_cols), function(l_col) {
+    lst_df[[l_col]] |>
+      dplyr::select(
+        dplyr::all_of(
+          lst_cols[[l_col]]$sample_id
+        )
+      ) |>
+      dplyr::distinct() |>
+      dplyr::collect() |>
+      dplyr::pull(
+        .data[[lst_cols[[l_col]]$sample_id]]
+      )
+  })
+  names(lst_df_samples) <- names(lst_cols)
+
+  olink_norm_input_check_samples(
+    lst_df_samples = lst_df_samples,
+    lst_ref_samples = lst_ref_samples,
+    norm_mode = norm_mode
+  )
+
+  # Clean assays ----
+
+  # clear df and reference_medians from excluded assays and assays not shared
+  # across all inputs
+  lst_df_clean_assays <- olink_norm_input_clean_assays(
+    lst_df = lst_df,
+    reference_medians = reference_medians,
+    lst_cols = lst_cols
+  )
+  lst_df <- lst_df_clean_assays$lst_df
+  reference_medians <- lst_df_clean_assays$reference_medians
+
+  # Check assays shared across inputs ----
+
+  # check if all assays from input are in all datasets, and remove them if not
+  lst_df_overlap_assay <- olink_norm_input_assay_overlap(
+    lst_df = lst_df_clean_assays$lst_df,
+    reference_medians = lst_df_clean_assays$reference_medians,
+    lst_cols = lst_cols
+  )
+  lst_df <- lst_df_overlap_assay$lst_df
+  reference_medians <- lst_df_overlap_assay$reference_medians
+
+  # Check normalization approach ----
+
+  all_norm_present <- lst_cols |>
+    sapply(function(x) !identical(x = x$normalization, y = character(0L))) |>
+    all()
+
+  if (all_norm_present && length(lst_df) == 2L) {
+    olink_norm_input_norm_method(
+      lst_df = lst_df,
+      lst_cols = lst_cols
+    )
+  }
+
+  # return to normalize ----
+
+  lst_out <- list(
+    df1 = NULL,
+    df2 = NULL,
+    overlapping_samples_df1 = NULL,
+    overlapping_samples_df2 = NULL,
+    df1_project_nr = NULL,
+    df2_project_nr = NULL,
+    reference_project = NULL,
+    reference_medians = NULL,
+    df1_cols = NULL,
+    df2_cols = NULL,
+    norm_mode = NULL
+  )
+
+  lst_out$df1 <- lst_df[[df1_project_nr]]
+  lst_out$overlapping_samples_df1 <- overlapping_samples_df1
+  lst_out$df1_project_nr <- df1_project_nr
+  lst_out$df1_cols <- lst_cols[[df1_project_nr]]
+  lst_out$norm_mode <- norm_mode
+  if (norm_mode %in% c(olink_norm_modes$subset, olink_norm_modes$bridge)) {
+    lst_out$df2 <- lst_df[[df2_project_nr]]
+    lst_out$reference_project <- reference_project
+    lst_out$df2_cols <- lst_cols[[df2_project_nr]]
+    lst_out$df2_project_nr <- df2_project_nr
+    if (norm_mode == olink_norm_modes$subset) {
+      lst_out$overlapping_samples_df2 <- overlapping_samples_df2
+    }
+  } else if (norm_mode %in% olink_norm_modes$ref_median) {
+    lst_out$reference_medians <- reference_medians
+  }
+
+  return(lst_out)
+
+}
+
 #' Validate inputs of normalization function
 #'
 #' @description
@@ -212,6 +472,8 @@ olink_norm_input_class <- function(df1,
   check_is_tibble_arrow(df = df1)
   check_is_character(string = overlapping_samples_df1,
                      scalar = FALSE)
+  check_is_character(string = df1_project_nr,
+                     scalar = TRUE)
 
   ## check per norm_mode ----
 
@@ -221,8 +483,6 @@ olink_norm_input_class <- function(df1,
   } else {
     # if bridge or subset
     check_is_tibble_arrow(df = df2)
-    check_is_character(string = df1_project_nr,
-                       scalar = TRUE)
     check_is_character(string = df2_project_nr,
                        scalar = TRUE)
     check_is_character(string = reference_project,
@@ -237,28 +497,30 @@ olink_norm_input_class <- function(df1,
 
   ## check reference_project equals to df1_project_nr OR df2_project_nr ----
 
-  if (!(reference_project %in% c(df1_project_nr, df2_project_nr))) {
-    cli::cli_abort(
-      message = c(
-        "x" = "{.arg reference_project} should be one of {.val {df1_project_nr}}
-        or {.val {df2_project_nr}}!"
-      ),
-      call = rlang::caller_env(),
-      wrap = FALSE
-    )
-  }
+  if (norm_mode != olink_norm_modes$ref_median) {
+    if (!(reference_project %in% c(df1_project_nr, df2_project_nr))) {
+      cli::cli_abort(
+        message = c(
+          "x" = "{.arg reference_project} should be one of
+          {.val {df1_project_nr}} or {.val {df2_project_nr}}!"
+        ),
+        call = rlang::caller_env(),
+        wrap = FALSE
+      )
+    }
 
-  ## check that df1_project_nr != df2_project_nr ----
+    ## check that df1_project_nr != df2_project_nr ----
 
-  if (df1_project_nr == df2_project_nr) {
-    cli::cli_abort(
-      message = c(
-        "x" = "Values of {.arg df1_project_nr} and {.arg df2_project_nr} should
-        be different!"
-      ),
-      call = rlang::caller_env(),
-      wrap = FALSE
-    )
+    if (df1_project_nr == df2_project_nr) {
+      cli::cli_abort(
+        message = c(
+          "x" = "Values of {.arg df1_project_nr} and {.arg df2_project_nr}
+          should be different!"
+        ),
+        call = rlang::caller_env(),
+        wrap = FALSE
+      )
+    }
   }
 }
 

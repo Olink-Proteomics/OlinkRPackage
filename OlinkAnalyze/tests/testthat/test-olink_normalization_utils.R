@@ -1,3 +1,527 @@
+# Test olink_norm_input_check ----
+
+test_that(
+  "olink_norm_input_check - works - bridge normalization",
+  {
+    skip_if_not_installed("arrow")
+
+    # no normalization column ----
+
+    bridge_samples <- intersect(x = npx_data1$SampleID,
+                                y = npx_data2$SampleID) |>
+      (\(x) x[!grepl(pattern = "CONTROL_SAMPLE", x = x)])()
+
+    expect_warning(
+      object = expect_message(
+        object = lst_check_out <- olink_norm_input_check(
+          df1 = npx_data1,
+          df2 = npx_data2,
+          overlapping_samples_df1 = bridge_samples,
+          overlapping_samples_df2 = NULL,
+          df1_project_nr = "20200001",
+          df2_project_nr = "20200002",
+          reference_project = "20200001",
+          reference_medians = NULL
+        ),
+        regexp = "Bridge normalization will be performed!"
+      ),
+      regexp = paste("Datasets \"20200001\" and \"20200002\" do not contain",
+                     "a column named \"Normalization\"")
+    )
+
+    expect_identical(
+      object = lst_check_out,
+      expected = list(
+        df1 = npx_data1,
+        df2 = npx_data2,
+        overlapping_samples_df1 = bridge_samples,
+        overlapping_samples_df2 = NULL,
+        df1_project_nr = "20200001",
+        df2_project_nr = "20200002",
+        reference_project = "20200001",
+        reference_medians = NULL,
+        df1_cols = list(sample_id = "SampleID",
+                        olink_id = "OlinkID",
+                        uniprot = "UniProt",
+                        assay = "Assay",
+                        panel = "Panel",
+                        panel_version = "Panel_Version",
+                        plate_id = "PlateID",
+                        qc_warn = "QC_Warning",
+                        quant = "NPX",
+                        lod = "LOD",
+                        normalization = character(0L)),
+        df2_cols = list(sample_id = "SampleID",
+                        olink_id = "OlinkID",
+                        uniprot = "UniProt",
+                        assay = "Assay",
+                        panel = "Panel",
+                        panel_version = "Panel_Version",
+                        plate_id = "PlateID",
+                        qc_warn = "QC_Warning",
+                        quant = "NPX",
+                        lod = "LOD",
+                        normalization = character(0L)),
+        norm_mode = olink_norm_modes$bridge
+      )
+    )
+
+    # with normalization column ----
+
+    bridge_samples <- intersect(x = npx_data1$SampleID,
+                                y = npx_data2$SampleID) |>
+      (\(x) x[!grepl(pattern = "CONTROL_SAMPLE", x = x)])()
+
+    expect_message(
+      object = lst_check_out <- olink_norm_input_check(
+        df1 = npx_data1 |>
+          dplyr::mutate(
+            Normalization = "Intensity"
+          ),
+        df2 = npx_data2 |>
+          dplyr::mutate(
+            Normalization = "Intensity"
+          ),
+        overlapping_samples_df1 = bridge_samples,
+        overlapping_samples_df2 = NULL,
+        df1_project_nr = "20200001",
+        df2_project_nr = "20200002",
+        reference_project = "20200001",
+        reference_medians = NULL
+      ),
+      regexp = "Bridge normalization will be performed!"
+    )
+
+    expect_identical(
+      object = lst_check_out,
+      expected = list(
+        df1 = npx_data1 |>
+          dplyr::mutate(
+            Normalization = "Intensity"
+          ),
+        df2 = npx_data2 |>
+          dplyr::mutate(
+            Normalization = "Intensity"
+          ),
+        overlapping_samples_df1 = bridge_samples,
+        overlapping_samples_df2 = NULL,
+        df1_project_nr = "20200001",
+        df2_project_nr = "20200002",
+        reference_project = "20200001",
+        reference_medians = NULL,
+        df1_cols = list(sample_id = "SampleID",
+                        olink_id = "OlinkID",
+                        uniprot = "UniProt",
+                        assay = "Assay",
+                        panel = "Panel",
+                        panel_version = "Panel_Version",
+                        plate_id = "PlateID",
+                        qc_warn = "QC_Warning",
+                        quant = "NPX",
+                        lod = "LOD",
+                        normalization = "Normalization"),
+        df2_cols = list(sample_id = "SampleID",
+                        olink_id = "OlinkID",
+                        uniprot = "UniProt",
+                        assay = "Assay",
+                        panel = "Panel",
+                        panel_version = "Panel_Version",
+                        plate_id = "PlateID",
+                        qc_warn = "QC_Warning",
+                        quant = "NPX",
+                        lod = "LOD",
+                        normalization = "Normalization"),
+        norm_mode = olink_norm_modes$bridge
+      )
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_check - works - intensity (subset all samples) norm",
+  {
+    skip_if_not_installed("arrow")
+
+    # no normalization column ----
+
+    expect_warning(
+      object = expect_message(
+        object = lst_check_out <- olink_norm_input_check(
+          df1 = npx_data1,
+          df2 = npx_data2,
+          overlapping_samples_df1 = unique(npx_data1$SampleID),
+          overlapping_samples_df2 = unique(npx_data2$SampleID),
+          df1_project_nr = "20200001",
+          df2_project_nr = "20200002",
+          reference_project = "20200001",
+          reference_medians = NULL
+        ),
+        regexp = "Subset normalization will be performed!"
+      ),
+      regexp = paste("Datasets \"20200001\" and \"20200002\" do not contain",
+                     "a column named \"Normalization\"")
+    )
+
+    expect_identical(
+      object = lst_check_out,
+      expected = list(
+        df1 = npx_data1,
+        df2 = npx_data2,
+        overlapping_samples_df1 = unique(npx_data1$SampleID),
+        overlapping_samples_df2 = unique(npx_data2$SampleID),
+        df1_project_nr = "20200001",
+        df2_project_nr = "20200002",
+        reference_project = "20200001",
+        reference_medians = NULL,
+        df1_cols = list(sample_id = "SampleID",
+                        olink_id = "OlinkID",
+                        uniprot = "UniProt",
+                        assay = "Assay",
+                        panel = "Panel",
+                        panel_version = "Panel_Version",
+                        plate_id = "PlateID",
+                        qc_warn = "QC_Warning",
+                        quant = "NPX",
+                        lod = "LOD",
+                        normalization = character(0L)),
+        df2_cols = list(sample_id = "SampleID",
+                        olink_id = "OlinkID",
+                        uniprot = "UniProt",
+                        assay = "Assay",
+                        panel = "Panel",
+                        panel_version = "Panel_Version",
+                        plate_id = "PlateID",
+                        qc_warn = "QC_Warning",
+                        quant = "NPX",
+                        lod = "LOD",
+                        normalization = character(0L)),
+        norm_mode = olink_norm_modes$subset
+      )
+    )
+
+    # with normalization column ----
+
+    expect_message(
+      object = lst_check_out <- olink_norm_input_check(
+        df1 = npx_data1 |>
+          dplyr::mutate(
+            Normalization = "Intensity"
+          ),
+        df2 = npx_data2 |>
+          dplyr::mutate(
+            Normalization = "Intensity"
+          ),
+        overlapping_samples_df1 = unique(npx_data1$SampleID),
+        overlapping_samples_df2 = unique(npx_data2$SampleID),
+        df1_project_nr = "20200001",
+        df2_project_nr = "20200002",
+        reference_project = "20200001",
+        reference_medians = NULL
+      ),
+      regexp = "Subset normalization will be performed!"
+    )
+
+    expect_identical(
+      object = lst_check_out,
+      expected = list(
+        df1 = npx_data1 |>
+          dplyr::mutate(
+            Normalization = "Intensity"
+          ),
+        df2 = npx_data2 |>
+          dplyr::mutate(
+            Normalization = "Intensity"
+          ),
+        overlapping_samples_df1 = unique(npx_data1$SampleID),
+        overlapping_samples_df2 = unique(npx_data2$SampleID),
+        df1_project_nr = "20200001",
+        df2_project_nr = "20200002",
+        reference_project = "20200001",
+        reference_medians = NULL,
+        df1_cols = list(sample_id = "SampleID",
+                        olink_id = "OlinkID",
+                        uniprot = "UniProt",
+                        assay = "Assay",
+                        panel = "Panel",
+                        panel_version = "Panel_Version",
+                        plate_id = "PlateID",
+                        qc_warn = "QC_Warning",
+                        quant = "NPX",
+                        lod = "LOD",
+                        normalization = "Normalization"),
+        df2_cols = list(sample_id = "SampleID",
+                        olink_id = "OlinkID",
+                        uniprot = "UniProt",
+                        assay = "Assay",
+                        panel = "Panel",
+                        panel_version = "Panel_Version",
+                        plate_id = "PlateID",
+                        qc_warn = "QC_Warning",
+                        quant = "NPX",
+                        lod = "LOD",
+                        normalization = "Normalization"),
+        norm_mode = olink_norm_modes$subset
+      )
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_check - works - subset normalization",
+  {
+    skip_if_not_installed("arrow")
+
+    npx_df2_samples <- c("C6", "C21", "C28", "C50", "C19", "D5",
+                         "A30", "C52", "D77", "D3", "D16", "C72",
+                         "A52", "D67", "C77", "C22", "D62", "D39",
+                         "C34", "C13")
+
+    # no normalization column ----
+
+    expect_warning(
+      object = expect_message(
+        object = lst_check_out <- olink_norm_input_check(
+          df1 = npx_data1,
+          df2 = npx_data2,
+          overlapping_samples_df1 = unique(npx_data1$SampleID),
+          overlapping_samples_df2 = npx_df2_samples,
+          df1_project_nr = "20200001",
+          df2_project_nr = "20200002",
+          reference_project = "20200001",
+          reference_medians = NULL
+        ),
+        regexp = "Subset normalization will be performed!"
+      ),
+      regexp = paste("Datasets \"20200001\" and \"20200002\" do not contain",
+                     "a column named \"Normalization\"")
+    )
+
+    expect_identical(
+      object = lst_check_out,
+      expected = list(
+        df1 = npx_data1,
+        df2 = npx_data2,
+        overlapping_samples_df1 = unique(npx_data1$SampleID),
+        overlapping_samples_df2 = npx_df2_samples,
+        df1_project_nr = "20200001",
+        df2_project_nr = "20200002",
+        reference_project = "20200001",
+        reference_medians = NULL,
+        df1_cols = list(sample_id = "SampleID",
+                        olink_id = "OlinkID",
+                        uniprot = "UniProt",
+                        assay = "Assay",
+                        panel = "Panel",
+                        panel_version = "Panel_Version",
+                        plate_id = "PlateID",
+                        qc_warn = "QC_Warning",
+                        quant = "NPX",
+                        lod = "LOD",
+                        normalization = character(0L)),
+        df2_cols = list(sample_id = "SampleID",
+                        olink_id = "OlinkID",
+                        uniprot = "UniProt",
+                        assay = "Assay",
+                        panel = "Panel",
+                        panel_version = "Panel_Version",
+                        plate_id = "PlateID",
+                        qc_warn = "QC_Warning",
+                        quant = "NPX",
+                        lod = "LOD",
+                        normalization = character(0L)),
+        norm_mode = olink_norm_modes$subset
+      )
+    )
+
+    # with normalization column ----
+
+    expect_message(
+      object = lst_check_out <- olink_norm_input_check(
+        df1 = npx_data1 |>
+          dplyr::mutate(
+            Normalization = "Intensity"
+          ),
+        df2 = npx_data2 |>
+          dplyr::mutate(
+            Normalization = "Intensity"
+          ),
+        overlapping_samples_df1 = unique(npx_data1$SampleID),
+        overlapping_samples_df2 = npx_df2_samples,
+        df1_project_nr = "20200001",
+        df2_project_nr = "20200002",
+        reference_project = "20200001",
+        reference_medians = NULL
+      ),
+      regexp = "Subset normalization will be performed!"
+    )
+
+    expect_identical(
+      object = lst_check_out,
+      expected = list(
+        df1 = npx_data1 |>
+          dplyr::mutate(
+            Normalization = "Intensity"
+          ),
+        df2 = npx_data2 |>
+          dplyr::mutate(
+            Normalization = "Intensity"
+          ),
+        overlapping_samples_df1 = unique(npx_data1$SampleID),
+        overlapping_samples_df2 = npx_df2_samples,
+        df1_project_nr = "20200001",
+        df2_project_nr = "20200002",
+        reference_project = "20200001",
+        reference_medians = NULL,
+        df1_cols = list(sample_id = "SampleID",
+                        olink_id = "OlinkID",
+                        uniprot = "UniProt",
+                        assay = "Assay",
+                        panel = "Panel",
+                        panel_version = "Panel_Version",
+                        plate_id = "PlateID",
+                        qc_warn = "QC_Warning",
+                        quant = "NPX",
+                        lod = "LOD",
+                        normalization = "Normalization"),
+        df2_cols = list(sample_id = "SampleID",
+                        olink_id = "OlinkID",
+                        uniprot = "UniProt",
+                        assay = "Assay",
+                        panel = "Panel",
+                        panel_version = "Panel_Version",
+                        plate_id = "PlateID",
+                        qc_warn = "QC_Warning",
+                        quant = "NPX",
+                        lod = "LOD",
+                        normalization = "Normalization"),
+        norm_mode = olink_norm_modes$subset
+      )
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_check - works - reference median normalization",
+  {
+    skip_if_not_installed("arrow")
+
+    npx_df1_samples <- npx_data1$SampleID |>
+      unique() |>
+      sort() |>
+      head(10L)
+    ref_median_df <- npx_data2 |>
+      dplyr::filter(
+        .data[["OlinkID"]] %in% unique(npx_data1$OlinkID)
+      ) |>
+      dplyr::select(
+        dplyr::all_of("OlinkID")
+      ) |>
+      dplyr::distinct() |>
+      dplyr::mutate(
+        Reference_NPX = rnorm(n = dplyr::row_number())
+      )
+
+    # no normalization column ----
+
+    expect_warning(
+      object = expect_message(
+        object = lst_check_out <- olink_norm_input_check(
+          df1 = npx_data1,
+          df2 = NULL,
+          overlapping_samples_df1 = npx_df1_samples,
+          overlapping_samples_df2 = NULL,
+          df1_project_nr = "20200001",
+          df2_project_nr = NULL,
+          reference_project = NULL,
+          reference_medians = ref_median_df
+        ),
+        regexp = "Reference median normalization will be performed!"
+      ),
+      regexp = paste("Dataset \"20200001\" does not contain a column named",
+                     "\"Normalization\"")
+    )
+
+    expect_identical(
+      object = lst_check_out,
+      expected = list(
+        df1 = npx_data1,
+        df2 = NULL,
+        overlapping_samples_df1 = npx_df1_samples,
+        overlapping_samples_df2 = NULL,
+        df1_project_nr = "20200001",
+        df2_project_nr = NULL,
+        reference_project = NULL,
+        reference_medians = ref_median_df,
+        df1_cols = list(sample_id = "SampleID",
+                        olink_id = "OlinkID",
+                        uniprot = "UniProt",
+                        assay = "Assay",
+                        panel = "Panel",
+                        panel_version = "Panel_Version",
+                        plate_id = "PlateID",
+                        qc_warn = "QC_Warning",
+                        quant = "NPX",
+                        lod = "LOD",
+                        normalization = character(0L)),
+        df2_cols = NULL,
+        norm_mode = olink_norm_modes$ref_median
+      )
+    )
+
+    # with normalization column ----
+
+    expect_message(
+      object = lst_check_out <- olink_norm_input_check(
+        df1 = npx_data1 |>
+          dplyr::mutate(
+            Normalization = "Plate control"
+          ) |>
+          arrow::as_arrow_table(),
+        df2 = NULL,
+        overlapping_samples_df1 = npx_df1_samples,
+        overlapping_samples_df2 = NULL,
+        df1_project_nr = "20200001",
+        df2_project_nr = NULL,
+        reference_project = NULL,
+        reference_medians = ref_median_df
+      ),
+      regexp = "Reference median normalization will be performed!"
+    )
+
+    lst_check_out$df1 <- dplyr::as_tibble(lst_check_out$df1)
+
+    expect_identical(
+      object = lst_check_out,
+      expected = list(
+        df1 = npx_data1 |>
+          dplyr::mutate(
+            Normalization = "Plate control"
+          ),
+        df2 = NULL,
+        overlapping_samples_df1 = npx_df1_samples,
+        overlapping_samples_df2 = NULL,
+        df1_project_nr = "20200001",
+        df2_project_nr = NULL,
+        reference_project = NULL,
+        reference_medians = ref_median_df,
+        df1_cols = list(sample_id = "SampleID",
+                        olink_id = "OlinkID",
+                        uniprot = "UniProt",
+                        assay = "Assay",
+                        panel = "Panel",
+                        panel_version = "Panel_Version",
+                        plate_id = "PlateID",
+                        qc_warn = "QC_Warning",
+                        quant = "NPX",
+                        lod = "LOD",
+                        normalization = "Normalization"),
+        df2_cols = NULL,
+        norm_mode = olink_norm_modes$ref_median
+      )
+    )
+  }
+)
+
 # Test olink_norm_input_validate ----
 
 # NOTE: we will try all possible combinations of inputs
@@ -609,6 +1133,7 @@ test_that(
         df1 = npx_data1,
         df2 = c("A", "B"),
         overlapping_samples_df1 = c("A", "B", "C"),
+        df1_project_nr = "P1",
         norm_mode = olink_norm_modes$bridge
       ),
       regexp = "`df2` should be a tibble or an R6 ArrowObject"
@@ -636,6 +1161,32 @@ test_that(
         overlapping_samples_df1 = TRUE
       ),
       regexp = "`overlapping_samples_df1` should be a character vector"
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_class - error - df1_project_nr",
+  {
+    skip_if_not_installed("arrow")
+
+    expect_error(
+      object = olink_norm_input_class(
+        df1 = npx_data1,
+        overlapping_samples_df1 = c("A", "B", "C"),
+        df1_project_nr = 1L
+      ),
+      regexp = "`df1_project_nr` should be a character vector"
+    )
+
+    expect_error(
+      object = olink_norm_input_class(
+        df1 = npx_data1 |>
+          arrow::as_arrow_table(),
+        overlapping_samples_df1 = c("A", "B", "C"),
+        df1_project_nr = npx_data2
+      ),
+      regexp = "`df1_project_nr` should be a character vector"
     )
   }
 )
@@ -775,6 +1326,7 @@ test_that(
       object = olink_norm_input_class(
         df1 = npx_data1,
         overlapping_samples_df1 = c("A", "B", "C"),
+        df1_project_nr = "P1",
         reference_medians = 1L,
         norm_mode = olink_norm_modes$ref_median
       ),
@@ -786,10 +1338,49 @@ test_that(
         df1 = npx_data1 |>
           arrow::as_arrow_table(),
         overlapping_samples_df1 = c("A", "B", "C"),
+        df1_project_nr = "P1",
         reference_medians = TRUE,
         norm_mode = olink_norm_modes$ref_median
       ),
       regexp = "`reference_medians` should be a tibble or an R6 ArrowObject"
+    )
+
+    # If reference median normalization we do not check df2_project_nr and
+    # reference_project
+
+    # example 1: df2_project_nr == df1_project_nr
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = olink_norm_input_class(
+            df1 = npx_data1 |>
+              arrow::as_arrow_table(),
+            overlapping_samples_df1 = c("A", "B", "C"),
+            df1_project_nr = "P1",
+            df2_project_nr = "P1",
+            reference_medians = npx_data1,
+            norm_mode = olink_norm_modes$ref_median
+          )
+        )
+      ),
+    )
+
+    # example 2: reference_project not in c(df1_project_nr, df2_project_nr)
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = olink_norm_input_class(
+            df1 = npx_data1 |>
+              arrow::as_arrow_table(),
+            overlapping_samples_df1 = c("A", "B", "C"),
+            df1_project_nr = "P1",
+            df2_project_nr = "P2",
+            reference_project = "P3",
+            reference_medians = npx_data1,
+            norm_mode = olink_norm_modes$ref_median
+          )
+        )
+      ),
     )
   }
 )
