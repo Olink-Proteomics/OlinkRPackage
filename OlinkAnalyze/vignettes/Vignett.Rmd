@@ -384,7 +384,7 @@ The olink_anova is a wrapper function that performs an ANOVA F-test for each ass
 
 Samples with missing variable information or factor levels are excluded from the analysis. Character columns in the input data frame are converted to factors. The automatic handling of the data from above is announced by a message if the flag *verbose=TRUE*.
 
-Control samples (SampleType is not "SAMPLE, or SampleID contains "control" or "ctrl") and control assays (AssayType is not "assay", or Assay contains "control" or "ctrl") should be removed before using this function.
+Control samples and control assays (AssayType is not "assay", or Assay contains "control" or "ctrl") should be removed before using this function.
 
 Crossed/interaction analysis, i.e. A*B formula notation, is inferred from the variable argument in the following cases: 
 
