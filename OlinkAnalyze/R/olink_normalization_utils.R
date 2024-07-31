@@ -12,25 +12,26 @@
 #'    - Returns the type of normalization to be performed from
 #'    `olink_norm_modes`.
 #'    - Message with the normalization type.
-#'    - Error message is thrown in input is invalid.
+#'    - Error message if input is invalid.
 #'  - \code{\link{olink_norm_input_class}}:
 #'    - Checks if all inputs are of the expected class:
-#'      - `df1`, `df2` and `reference_medians`: Tibble or R6 ArrowObject
+#'      - `df1`, `df2` and `reference_medians`: tibble or R6 ArrowObject
 #'      - `overlapping_samples_df1`, `overlapping_samples_df2`,
 #'      `df1_project_nr`, `df2_project_nr` and `reference_project`: Character
 #'      vector
 #'    - Also checks the validity of names of project and reference project.
+#'    - Error if invalid input classes are detected.
 #'  - \code{\link{olink_norm_input_check_df_cols}}:
 #'    - Detects the column names of input datasets `df1` and `df2` to allow for
 #'    alternative names.
+#'    - Returns named list of column names to use downstream.
 #'    - Warning if `Normalization` column missing from all datasets.
 #'    - Warning if `LOD` is missing or if there are multiple `LOD` columns.
-#'    - Warning if
 #'    - Error if required columns are missing.
-#'    - Error not all input datasets have or lack `Normalization` column.
+#'    - Error if not all input datasets have or lack `Normalization` column.
 #'    - Error if input datasets have been quantified with different methods.
 #'  - \code{\link{olink_norm_input_ref_medians}}:
-#'    - Checks validity of datasets containing `reference_medians`.
+#'    - Checks validity of dataset containing `reference_medians`.
 #'    - Error if required columns are missing based on
 #'    `olink_norm_ref_median_cols`.
 #'    - Error if columns are not of the correct class bases on
@@ -603,6 +604,7 @@ olink_norm_input_check_df_cols <- function(lst_df) {
     panel_version = c("Panel_Lot_Nr", "Panel_Version", "DataAnalysisRefID"),
     plate_id = "PlateID",
     qc_warn = c("QC_Warning", "SampleQC"),
+    assay_warn = c("Assay_Warning", "AssayQC"),
     quant = c("Ct", "NPX", "Quantified_value"),
     lod = c("LOD",
             "Plate LOD", "Plate_LOD", "PlateLOD",
@@ -675,8 +677,10 @@ olink_norm_input_check_df_cols <- function(lst_df) {
     })
   }) |>
     # remove lod and normalization as it was checked above
+    # we allow assay_warn to be missing but we want to match it to reference
+    # df in normalization
     lapply(function(sub_lst) {
-      sub_lst[!(names(sub_lst) %in% c("lod", "normalization"))]
+      sub_lst[!(names(sub_lst) %in% c("lod", "normalization", "assay_warn"))]
     }) |>
     # remove all elements that have no missing value
     lapply(function(sub_lst) {

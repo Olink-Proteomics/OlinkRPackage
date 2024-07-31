@@ -73,33 +73,34 @@ internal global variable \code{olink_norm_mode_combos}.
 \item Returns the type of normalization to be performed from
 \code{olink_norm_modes}.
 \item Message with the normalization type.
-\item Error message is thrown in input is invalid.
+\item Error message if input is invalid.
 }
 \item \code{\link{olink_norm_input_class}}:
 \itemize{
 \item Checks if all inputs are of the expected class:
 \itemize{
-\item \code{df1}, \code{df2} and \code{reference_medians}: Tibble or R6 ArrowObject
+\item \code{df1}, \code{df2} and \code{reference_medians}: tibble or R6 ArrowObject
 \item \code{overlapping_samples_df1}, \code{overlapping_samples_df2},
 \code{df1_project_nr}, \code{df2_project_nr} and \code{reference_project}: Character
 vector
 }
 \item Also checks the validity of names of project and reference project.
+\item Error if invalid input classes are detected.
 }
 \item \code{\link{olink_norm_input_check_df_cols}}:
 \itemize{
 \item Detects the column names of input datasets \code{df1} and \code{df2} to allow for
 alternative names.
+\item Returns named list of column names to use downstream.
 \item Warning if \code{Normalization} column missing from all datasets.
 \item Warning if \code{LOD} is missing or if there are multiple \code{LOD} columns.
-\item Warning if
 \item Error if required columns are missing.
-\item Error not all input datasets have or lack \code{Normalization} column.
+\item Error if not all input datasets have or lack \code{Normalization} column.
 \item Error if input datasets have been quantified with different methods.
 }
 \item \code{\link{olink_norm_input_ref_medians}}:
 \itemize{
-\item Checks validity of datasets containing \code{reference_medians}.
+\item Checks validity of dataset containing \code{reference_medians}.
 \item Error if required columns are missing based on
 \code{olink_norm_ref_median_cols}.
 \item Error if columns are not of the correct class bases on
