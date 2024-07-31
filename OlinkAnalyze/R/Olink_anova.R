@@ -5,7 +5,7 @@
 #'Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a message if verbose = TRUE).
 #'Character columns in the input dataframe are automatically converted to factors (specified in a message if verbose = TRUE).
 #'Numerical variables are not converted to factors.
-#'Control samples (SampleType is not "SAMPLE, or SampleID contains "control" or "ctrl") should be removed before using this function.
+#'Control samples should be removed before using this function.
 #'Control assays (AssayType is not "assay", or Assay contains "control" or "ctrl") should be removed before using this function.
 #'If a numerical variable is to be used as a factor, this conversion needs to be done on the dataframe before the function call. \cr\cr
 #'Crossed analysis, i.e. A*B formula notation, is inferred from the variable argument in the following cases: \cr
@@ -330,7 +330,7 @@ olink_anova <- function(df,
 #'Performs a post hoc ANOVA test using emmeans::emmeans with Tukey p-value adjustment per assay (by OlinkID) for each panel at confidence level 0.95.
 #'See \code{olink_anova} for details of input notation. \cr\cr
 #'The function handles both factor and numerical variables and/or covariates.
-#'Control samples (SampleType is not "SAMPLE, or SampleID contains "control" or "ctrl") should be removed before using this function.
+#'Control samples should be removed before using this function.
 #'Control assays (AssayType is not "assay", or Assay contains "control" or "ctrl") should be removed before using this function.
 #'The posthoc test for a numerical variable compares the difference in means of the outcome variable (default: NPX) for 1 standard deviation difference in the numerical variable, e.g.
 #'mean NPX at mean(numerical variable) versus mean NPX at mean(numerical variable) + 1*SD(numerical variable).
