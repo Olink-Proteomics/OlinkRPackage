@@ -125,26 +125,6 @@ olink_anova <- function(df,
                 paste(strwrap(toString(unique(ctrl_assays$Assay)), width = 80), collapse = "\n")))
   }
   
-  # Stop if external controls (samples) have not been removed
-  if ("SampleType" %in% names(df)) {
-    if (any(df$SampleType != "SAMPLE")) {
-      ctrl_samples <- df |>
-        dplyr::filter(SampleType != "SAMPLE")
-      
-      stop(paste0(
-        'Control samples have not been removed from the dataset.\n  Samples with SampleType != "SAMPLE" should be excluded.\n  The following ', length(unique(ctrl_samples$SampleID)), " control samples were found:\n  ",
-        paste(strwrap(toString(unique(ctrl_samples$SampleID)), width = 80), collapse = "\n")
-      ))
-    }
-  } else if (any(stringr::str_detect(df$SampleID, stringr::regex("control|ctrl", ignore_case = TRUE)))) {
-    ctrl_samples <- df |>
-      dplyr::filter(stringr::str_detect(df$SampleID, stringr::regex("control|ctrl", ignore_case = TRUE)))
-    
-    warning(paste0(
-      'Potential control samples detected in input data.\n  Samples with "control" or "ctrl" in their SampleID field were flagged as potential control samples. If these samples are controls they should be excluded.\n  The following ', length(unique(ctrl_samples$SampleID)), " potential control samples were found:\n  ",
-      paste(strwrap(toString(unique(ctrl_samples$SampleID)), width = 80), collapse = "\n")
-    ))
-  }
   
   withCallingHandlers({
     
@@ -506,26 +486,6 @@ olink_anova_posthoc <- function(df,
     ))
   }
 
-# Stop if external controls (samples) have not been removed
-if ("SampleType" %in% names(df)) {
-  if (any(df$SampleType != "SAMPLE")) {
-    ctrl_samples <- df |>
-      dplyr::filter(SampleType != "SAMPLE")
-
-    stop(paste0(
-      'Control samples have not been removed from the dataset.\n  Samples with SampleType != "SAMPLE" should be excluded.\n  The following ', length(unique(ctrl_samples$SampleID)), " control samples were found:\n  ",
-      paste(strwrap(toString(unique(ctrl_samples$SampleID)), width = 80), collapse = "\n")
-    ))
-  }
-} else if (any(stringr::str_detect(df$SampleID, stringr::regex("control|ctrl", ignore_case = TRUE)))) {
-  ctrl_samples <- df |>
-    dplyr::filter(stringr::str_detect(df$SampleID, stringr::regex("control|ctrl", ignore_case = TRUE)))
-
-  warning(paste0(
-    'Potential control samples detected in input data.\n  Samples with "control" or "ctrl" in their SampleID field were flagged as potential control samples. If these samples are controls they should be excluded.\n  The following ', length(unique(ctrl_samples$SampleID)), " potential control samples were found:\n  ",
-    paste(strwrap(toString(unique(ctrl_samples$SampleID)), width = 80), collapse = "\n")
-  ))
-}
   
   withCallingHandlers({
     
