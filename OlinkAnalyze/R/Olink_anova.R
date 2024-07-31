@@ -5,6 +5,8 @@
 #'Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a message if verbose = TRUE).
 #'Character columns in the input dataframe are automatically converted to factors (specified in a message if verbose = TRUE).
 #'Numerical variables are not converted to factors.
+#'Control samples should be removed before using this function.
+#'Control assays (AssayType is not "assay", or Assay contains "control" or "ctrl") should be removed before using this function.
 #'If a numerical variable is to be used as a factor, this conversion needs to be done on the dataframe before the function call. \cr\cr
 #'Crossed analysis, i.e. A*B formula notation, is inferred from the variable argument in the following cases: \cr
 #'\itemize{
@@ -54,7 +56,7 @@
 #'
 #' library(dplyr)
 #'
-#' npx_df <- npx_data1 %>% filter(!grepl('control',SampleID, ignore.case = TRUE))
+#' npx_df <- npx_data1 %>% filter(!grepl('control|ctrl',SampleID, ignore.case = TRUE))
 #'
 #' #One-way ANOVA, no covariates.
 #' #Results in a model NPX~Time
@@ -106,8 +108,26 @@ olink_anova <- function(df,
     stop('The df and variable arguments need to be specified.')
   }
 
+  # Stop if internal controls (assays) have not been removed
+  if ("AssayType" %in% names(df)) {
+    if (any(df$AssayType != "assay")) {
+      ctrl_assays <- df |>
+        dplyr::filter(AssayType != "assay")
+      
+      stop(paste0('Control assays have not been removed from the dataset.\n  Assays with AssayType != "assay" should be excluded.\n  The following ', length(unique(ctrl_assays$Assay)) ,' control assays were found:\n  ',
+                  paste(strwrap(toString(unique(ctrl_assays$Assay)), width = 80), collapse = "\n")))
+    }
+  } else if (any(stringr::str_detect(df$Assay, stringr::regex("control|ctrl", ignore_case = TRUE)))) {
+    ctrl_assays <- df |>
+      dplyr::filter(stringr::str_detect(df$Assay, stringr::regex("control|ctrl", ignore_case = TRUE)))
+    
+    stop(paste0('Control assays have not been removed from the dataset.\n  Assays with "control" in their Assay field should be excluded.\n  The following ', length(unique(ctrl_assays$Assay)) ,' control assays were found:\n  ',
+                paste(strwrap(toString(unique(ctrl_assays$Assay)), width = 80), collapse = "\n")))
+  }
+  
+  
   withCallingHandlers({
-
+    
     #Filtering on valid OlinkID
     df <- df %>%
       dplyr::filter(stringr::str_detect(OlinkID,
@@ -259,7 +279,7 @@ olink_anova <- function(df,
 
 
     if(!is.null(covariates) & any(grepl(":", covariates))){
-      covariate_filter_string <- covariates[str_detect(covariates, ':')]
+      covariate_filter_string <- covariates[stringr::str_detect(covariates, ':')]
       covariate_filter_string <- sub("(.*)\\:(.*)$", "\\2:\\1", covariate_filter_string)
       covariate_filter_string <- c(covariates, covariate_filter_string)
 
@@ -310,6 +330,8 @@ olink_anova <- function(df,
 #'Performs a post hoc ANOVA test using emmeans::emmeans with Tukey p-value adjustment per assay (by OlinkID) for each panel at confidence level 0.95.
 #'See \code{olink_anova} for details of input notation. \cr\cr
 #'The function handles both factor and numerical variables and/or covariates.
+#'Control samples should be removed before using this function.
+#'Control assays (AssayType is not "assay", or Assay contains "control" or "ctrl") should be removed before using this function.
 #'The posthoc test for a numerical variable compares the difference in means of the outcome variable (default: NPX) for 1 standard deviation difference in the numerical variable, e.g.
 #'mean NPX at mean(numerical variable) versus mean NPX at mean(numerical variable) + 1*SD(numerical variable).
 #'
@@ -349,7 +371,7 @@ olink_anova <- function(df,
 #'
 #' library(dplyr)
 #'
-#' npx_df <- npx_data1 %>% filter(!grepl('control',SampleID, ignore.case = TRUE))
+#' npx_df <- npx_data1 %>% filter(!grepl('control|ctrl',SampleID, ignore.case = TRUE))
 #'
 #' #Two-way ANOVA, one main effect (Site) covariate.
 #' #Results in model NPX~Treatment*Time+Site.
@@ -443,9 +465,30 @@ olink_anova_posthoc <- function(df,
     stop("All effect terms must be included in the variable argument or model formula.")
   }
 
+  # Stop if internal controls (assays) have not been removed
+  if ("AssayType" %in% names(df)) {
+    if (any(df$AssayType != "assay")) {
+      ctrl_assays <- df |>
+        dplyr::filter(AssayType != "assay")
+      
+      stop(paste0(
+        'Control assays have not been removed from the dataset.\n  Assays with AssayType != "assay" should be excluded.\n  The following ', length(unique(ctrl_assays$Assay)), " control assays were found:\n  ",
+        paste(strwrap(toString(unique(ctrl_assays$Assay)), width = 80), collapse = "\n")
+      ))
+    }
+  } else if (any(stringr::str_detect(df$Assay, stringr::regex("control|ctrl", ignore_case = TRUE)))) {
+    ctrl_assays <- df |>
+      dplyr::filter(stringr::str_detect(df$Assay, stringr::regex("control|ctrl", ignore_case = TRUE)))
+    
+    stop(paste0(
+      'Control assays have not been removed from the dataset.\n  Assays with "control" in their Assay field should be excluded.\n  The following ', length(unique(ctrl_assays$Assay)), " control assays were found:\n  ",
+      paste(strwrap(toString(unique(ctrl_assays$Assay)), width = 80), collapse = "\n")
+    ))
+  }
 
+  
   withCallingHandlers({
-
+    
     #Filtering on valid OlinkID
     df <- df %>%
       dplyr::filter(stringr::str_detect(OlinkID,

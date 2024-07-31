@@ -418,6 +418,8 @@ The olink_anova is a wrapper function that performs an ANOVA F-test for each ass
 
 Samples with missing variable information or factor levels are excluded from the analysis. Character columns in the input data frame are converted to factors. The automatic handling of the data from above is announced by a message if the flag *verbose=TRUE*.
 
+Control samples and control assays (AssayType is not "assay", or Assay contains "control" or "ctrl") should be removed before using this function.
+
 Crossed/interaction analysis, i.e. A*B formula notation, is inferred from the variable argument in the following cases: 
 
 * c('A','B')
@@ -440,14 +442,23 @@ Adjusted p-values are calculated using the function *p.adjust* from the R librar
 * verbose: Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 
 ```{r message=FALSE, eval=FALSE}
+# Remove control samples and assays
+npx_data1_no_controls <- npx_data1 |>
+  filter(!str_detect(SampleID,
+                     regex("control|ctrl", 
+                           ignore_case = TRUE))) |>
+  filter(!str_detect(Assay, 
+                     regex("control|ctrl", 
+                           ignore_case = TRUE)))
+  
 # One-way ANOVA, no covariates
-anova_results_oneway <- olink_anova(df = npx_data1, 
+anova_results_oneway <- olink_anova(df = npx_data1_no_controls, 
                                     variable = 'Site')
 # Two-way ANOVA, no covariates
-anova_results_twoway <- olink_anova(df = npx_data1, 
+anova_results_twoway <- olink_anova(df = npx_data1_no_controls, 
                                     variable = c('Site', 'Time'))
 # One-way ANOVA, Treatment as covariates
-anova_results_oneway <- olink_anova(df = npx_data1, 
+anova_results_oneway <- olink_anova(df = npx_data1_no_controls, 
                                     variable = 'Site',
                                     covariates = 'Treatment')
 ```
@@ -475,6 +486,8 @@ olink_anova_posthoc performs a post-hoc ANOVA test using the function *emmeans* 
 
 The function handles both factor and numerical variables and/or covariates. The post-hoc test for a numerical variable compares the difference in means of the outcome variable (default: NPX) for 1 standard deviation (SD) difference in the numerical variable, e.g. mean NPX at mean (numerical variable) versus mean NPX at mean (numerical variable) + 1*SD (numerical variable).
 
+Control samples and control assays (AssayType is not "assay", or Assay contains "control" or "ctrl") should be removed before using this function.
+
 ### Function arguments
 
 * df: NPX data frame in long format should minimally contain protein name (Assay), OlinkID, UniProt, Panel and an outcome factor with at least 3 levels.
@@ -488,13 +501,13 @@ The function handles both factor and numerical variables and/or covariates. The 
 
 ```{r message=FALSE, eval=FALSE}
 # calculate the p-value for the ANOVA
-anova_results_oneway <- olink_anova(df = npx_data1, 
+anova_results_oneway <- olink_anova(df = npx_data1_no_controls, 
                                     variable = 'Site')
 # extracting the significant proteins
 anova_results_oneway_significant <- anova_results_oneway %>%
   filter(Threshold == 'Significant') %>%
   pull(OlinkID)
-anova_posthoc_oneway_results <- olink_anova_posthoc(df = npx_data1,
+anova_posthoc_oneway_results <- olink_anova_posthoc(df = npx_data1_no_controls,
                                                     olinkid_list = anova_results_oneway_significant,
                                                     variable = 'Site',
                                                     effect = 'Site')
@@ -982,6 +995,9 @@ A list of objects of class *ggplot* (silently returned). Plots are also printed 
 
 The olink_boxplot function is used to generate boxplots of NPX values stratified on a variable for a given list of proteins. olink_boxplot uses the functions *ggplot* and *geom_boxplot* of the R library *ggplot2*.
 
+
+In order to annotate the plot with ANOVA posthoc analysis results, control samples and control assays (AssayType is not "assay", or Assay contains "control" or "ctrl") should be removed.
+
 ### Function arguments
 
 * df: NPX data frame in long format should minimally contain protein name (Assay), OlinkID, UniProt and a grouping variable.
@@ -993,19 +1009,28 @@ The olink_boxplot function is used to generate boxplots of NPX values stratified
 * number_of_proteins_per_plot: Number of boxplots to include in the facets plot. Default 6.
 
 ```{r message=FALSE}
-plot <- npx_data1 %>%
+# Remove control samples and assays
+npx_data1_no_controls <- npx_data1 |>
+  filter(!str_detect(SampleID,
+                     regex("control|ctrl", 
+                           ignore_case = TRUE))) |>
+  filter(!str_detect(Assay, 
+                     regex("control|ctrl", 
+                           ignore_case = TRUE)))
+
+plot <- npx_data1_no_controls %>%
   na.omit() %>% # removing missing values which exists for Site
   olink_boxplot(variable = "Site", 
                 olinkid_list = c("OID00488", "OID01276"),
                 number_of_proteins_per_plot  = 2)
 plot[[1]]
 
-anova_posthoc_results<-npx_data1 %>% 
+anova_posthoc_results<-npx_data1_no_controls %>% 
   olink_anova_posthoc(olinkid_list = c("OID00488", "OID01276"),
                       variable = 'Site',
                       effect = 'Site')
 
-plot2 <- npx_data1 %>%
+plot2 <- npx_data1_no_controls %>%
   na.omit() %>% # removing missing values which exists for Site
   olink_boxplot(variable = "Site", 
                 olinkid_list = c("OID00488", "OID01276"),
