@@ -225,34 +225,51 @@ olink_norm_input_check <- function(df1,
   # return to normalize ----
 
   lst_out <- list(
-    df1 = NULL,
-    df2 = NULL,
-    overlapping_samples_df1 = NULL,
-    overlapping_samples_df2 = NULL,
-    df1_project_nr = NULL,
-    df2_project_nr = NULL,
-    reference_project = NULL,
+    ref_df = NULL,
+    ref_samples = NULL,
+    ref_name = NULL,
+    ref_cols = NULL,
+    not_ref_df = NULL,
+    not_ref_samples = NULL,
+    not_ref_name = NULL,
+    not_ref_cols = NULL,
     reference_medians = NULL,
-    df1_cols = NULL,
-    df2_cols = NULL,
     norm_mode = NULL
   )
 
-  lst_out$df1 <- lst_df[[df1_project_nr]]
-  lst_out$overlapping_samples_df1 <- overlapping_samples_df1
-  lst_out$df1_project_nr <- df1_project_nr
-  lst_out$df1_cols <- lst_cols[[df1_project_nr]]
+  # set normalization mode
   lst_out$norm_mode <- norm_mode
-  if (norm_mode %in% c(olink_norm_modes$subset, olink_norm_modes$bridge)) {
-    lst_out$df2 <- lst_df[[df2_project_nr]]
-    lst_out$reference_project <- reference_project
-    lst_out$df2_cols <- lst_cols[[df2_project_nr]]
-    lst_out$df2_project_nr <- df2_project_nr
-    if (norm_mode == olink_norm_modes$subset) {
-      lst_out$overlapping_samples_df2 <- overlapping_samples_df2
-    }
-  } else if (norm_mode %in% olink_norm_modes$ref_median) {
+
+  if (norm_mode %in% olink_norm_modes$ref_median) {
+    # reference median normalization
+    lst_out$ref_name <- df1_project_nr
+    lst_out$ref_samples <- overlapping_samples_df1
+    lst_out$ref_df <- lst_df[[lst_out$ref_name]]
+    lst_out$ref_cols <- lst_cols[[lst_out$ref_name]]
     lst_out$reference_medians <- reference_medians
+  } else if (norm_mode %in% c(olink_norm_modes$subset,
+                              olink_norm_modes$bridge)) {
+    # bridge or subset normalization
+    if (reference_project == df1_project_nr) {
+      lst_out$ref_name <- df1_project_nr
+      lst_out$not_ref_name <- df2_project_nr
+      lst_out$ref_samples <- overlapping_samples_df1
+    } else {
+      lst_out$ref_name <- df2_project_nr
+      lst_out$not_ref_name <- df1_project_nr
+      lst_out$ref_samples <- overlapping_samples_df2
+    }
+    lst_out$ref_df <- lst_df[[lst_out$ref_name]]
+    lst_out$ref_cols <- lst_cols[[lst_out$ref_name]]
+    lst_out$not_ref_df <- lst_df[[lst_out$not_ref_name]]
+    lst_out$not_ref_cols <- lst_cols[[lst_out$not_ref_name]]
+    if (norm_mode == olink_norm_modes$subset) {
+      if (reference_project == df1_project_nr) {
+        lst_out$not_ref_samples <- overlapping_samples_df2
+      } else {
+        lst_out$not_ref_samples <- overlapping_samples_df1
+      }
+    }
   }
 
   return(lst_out)
