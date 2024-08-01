@@ -64,9 +64,8 @@ olink_normalization_median_ref <- function(exploreht_df,
     dplyr::rename("SampleID" = "SampleID_df1")
   
   
-  # Creating a concatenated OlinkID which contains HT and 3K OlinkID - necessary 
-  # for unique OlinkIDs
-  # NEED TO GET A CUSTOMER-FACING MAPPING FUNCTION - FOR NOW USING INTERNAL SOURCES
+  # Creating a concatenated OlinkID which contains HT and 3K OlinkID - necessary for unique OlinkIDs
+  #### NEED TO GET A CUSTOMER-FACING MAPPING FUNCTION - FOR NOW USING INTERNAL SOURCES
   map_oid <- npxexplorer::oid_map |> # this is the olink_ids_match_3k_ht.csv file
     mutate(OlinkID_HT_3K = paste(olink_id_ht, olink_id_3k, sep = "_")) |>
     select(olink_id_ht, olink_id_3k, OlinkID_HT_3K)
@@ -90,7 +89,133 @@ olink_normalization_median_ref <- function(exploreht_df,
               by = c("OlinkID" = "olink_id_3k")) |>
     mutate(OlinkID = OlinkID_HT_3K) |>
     select(-OlinkID_HT_3K, -olink_id_ht)
+  
+  ############################################################################
+  ############################################################################
+  ### OLINK NORM INPUT CHECKING - TEST FOR OLINK_NORM_INPUT_CHECK FUNCTION ###
+  
+  # Check 1 - olink_norm_input_validate
+  norm_mode <- olink_norm_input_validate(
+    df1 = exploreht_df,
+    df2 = explore3072_df,
+    overlapping_samples_df1 = bridge_samples$DF1,
+    overlapping_samples_df2 = NULL,
+    reference_medians = NULL)
 
+  if (norm_mode != "bridge") {
+    stop(norm_mode)
+  }
+
+  # Check 2 - olink_norm_input_class - will return error if invalid
+  olink_norm_input_class(
+    df1 = exploreht_df,
+    df2 = explore3072_df,
+    overlapping_samples_df1 = bridge_samples$DF1,
+    overlapping_samples_df2 = NULL,
+    df1_project_nr = exploreht_name,
+    df2_project_nr = explore3072_name,
+    reference_project = exploreht_name,
+    reference_medians = NULL,
+    norm_mode = norm_mode
+  )
+  
+  # Check 3 - olink_norm_input_check_df_cols
+  if (norm_mode == olink_norm_modes$ref_median) {
+    # reference median normalization
+    
+    # check columns of df1
+    lst_df <- list(df1)
+    names(lst_df) <- df1_project_nr
+    lst_cols <- olink_norm_input_check_df_cols(lst_df = lst_df)
+    
+    # list of samples
+    lst_ref_samples <- list(overlapping_samples_df1)
+    names(lst_ref_samples) <- df1_project_nr
+    
+    # check reference_medians
+    olink_norm_input_ref_medians(reference_medians = reference_medians)
+    
+  } else {
+    
+    # bridge or subset normalization
+    
+    reference_medians <- NULL
+    
+    lst_df <- list(exploreht_df, explore3072_df)
+    names(lst_df) <- c(exploreht_name, explore3072_name)
+    lst_cols <- olink_norm_input_check_df_cols(lst_df = lst_df)
+    
+    if (norm_mode == olink_norm_modes$bridge) {
+      # bridge normalization
+      lst_ref_samples <- list(bridge_samples$DF1, bridge_samples$DF1)
+    } else if (norm_mode == olink_norm_modes$subset) {
+      # subset normalization
+      lst_ref_samples <- list(bridge_samples$DF1, NULL)
+    }
+    names(lst_ref_samples) <- c(exploreht_name, explore3072_name)
+    
+  }
+  
+  # Check 4 - olink_norm_input_check_samples 
+  # extract all unique sample identifiers
+  lst_df_samples <- lapply(names(lst_cols), function(l_col) {
+    lst_df[[l_col]] |>
+      dplyr::select(
+        dplyr::all_of(
+          lst_cols[[l_col]]$sample_id
+        )
+      ) |>
+      dplyr::distinct() |>
+      dplyr::collect() |>
+      dplyr::pull(
+        .data[[lst_cols[[l_col]]$sample_id]]
+      )
+  })
+  names(lst_df_samples) <- names(lst_cols)
+  
+  olink_norm_input_check_samples(
+    lst_df_samples = lst_df_samples,
+    lst_ref_samples = lst_ref_samples,
+    norm_mode = norm_mode
+  )
+  
+  # Check 5 - olink_norm_input_clean_assays --- NEED TO ADJUST
+  # Currently map OlinkID as [HT OID]_[3K OID], not recognized as a valid OID format
+  
+  # clear df and reference_medians from excluded assays and assays not shared
+  # across all inputs
+  
+  ###
+  # Temporarily changing to be able to get through other checks
+  # lst_df$reference <- lst_df$reference |> mutate(OlinkID = substr(OlinkID, 1, 8))
+  # lst_df$new <- lst_df$new |> mutate(OlinkID = substr(OlinkID, 1, 8))
+  ###
+  
+  lst_df_clean_assays <- olink_norm_input_clean_assays(
+    lst_df = lst_df,
+    reference_medians = reference_medians,
+    lst_cols = lst_cols
+  )
+  lst_df <- lst_df_clean_assays$lst_df
+  reference_medians <- lst_df_clean_assays$reference_medians
+  
+  # Check 6 - olink_norm_input_assay_overlap --- NEED TO ADJUST
+  # Currently map OlinkID as [HT OID]_[3K OID], not recognized as a valid OID format
+  
+  # Check assays shared across inputs ----
+  
+  # check if all assays from input are in all datasets, and remove them if not
+  lst_df_overlap_assay <- olink_norm_input_assay_overlap(
+    lst_df = lst_df_clean_assays$lst_df,
+    reference_medians = lst_df_clean_assays$reference_medians,
+    lst_cols = lst_cols
+  )
+  lst_df <- lst_df_overlap_assay$lst_df
+  reference_medians <- lst_df_overlap_assay$reference_medians
+  
+  
+  ############################################################################
+  ############################################################################
   
   # bridge normalize the two data frames
   norm_df <- olink_normalization(
