@@ -63,7 +63,7 @@ Depends:
 Imports:
     broom,
     car,
-    cli,
+    cli (>= 3.6.2),
     dplyr (>= 1.1.1),
     emmeans,
     forcats,
