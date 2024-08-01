@@ -774,7 +774,7 @@ olink_norm_input_check_df_cols <- function(lst_df) {
     if (nrow(df_non_req_col) > 0L) {
       cli::cli_warn(
         c(
-          "x" = "{cli::qty(df_non_req_col$n_df)} Column{?s} not present across
+          "{cli::qty(df_non_req_col$n_df)} Column{?s} not present across
           datasets:",
           paste0("* ", df_non_req_col$n_df, ": ", df_non_req_col$prnt_msg),
           "i" = "Columns will be added with {.val {NA}} values."
