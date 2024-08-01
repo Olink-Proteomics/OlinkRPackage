@@ -1,5 +1,6 @@
 # Test olink_normalization_2 ----
 
+
 # this tests also all functions called norm_internal_* except from
 # "norm_internal_rename_cols". Namely:
 # - norm_internal_assay_median
@@ -15,6 +16,7 @@
 # function from OlinkAnalyze 3.8.2
 ref_norm_res_file <- test_path("..", "data", "ref_results_norm.rds")
 ref_norm_res <- readRDS(file = ref_norm_res_file)
+rm(ref_norm_res_file)
 
 test_that(
   "olink_normalization_2 - works - bridge normalization",
