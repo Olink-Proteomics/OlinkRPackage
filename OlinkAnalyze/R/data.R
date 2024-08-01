@@ -55,3 +55,25 @@
 #'   }
 #'      
 "manifest"
+
+
+#' A file to map OlinkIDs in Explore 3072 to OlinkIDs in Explore HT
+#'
+#' 
+#'
+#'
+#' A tibble with 2920 rows and 7 columns. 
+#' 
+#' 
+#' @format This dataset  contains columns:
+#' \describe{
+#'   \item{Gene}{the gene name of the assay}
+#'   \item{OlinkID}{the OlinkID in Explore HT}
+#'   \item{OlinkID_Explore384}{the OlinkID in Explore 384}
+#'   \item{UniProt}{the UniProt ID in Explore HT}
+#'   \item{Block}{the block in Explore HT}
+#'   \item{Panel_Explore384}{the panel in Explore 384}
+#'   \item{Block_Explore384}{the block in Explore HT}
+#'   }
+#'      
+"mapping"
