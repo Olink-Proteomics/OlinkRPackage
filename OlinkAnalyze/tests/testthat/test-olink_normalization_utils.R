@@ -87,7 +87,7 @@ test_that(
         overlapping_samples_df2 = NULL,
         df1_project_nr = "20200001",
         df2_project_nr = "20200002",
-        reference_project = "20200001",
+        reference_project = "20200002",
         reference_medians = NULL
       ),
       regexp = "Bridge normalization will be performed!"
@@ -96,12 +96,12 @@ test_that(
     expect_identical(
       object = lst_check_out,
       expected = list(
-        ref_df = npx_data1 |>
+        ref_df = npx_data2 |>
           dplyr::mutate(
             Normalization = "Intensity"
           ),
         ref_samples = bridge_samples,
-        ref_name = "20200001",
+        ref_name = "20200002",
         ref_cols = list(sample_id = "SampleID",
                         olink_id = "OlinkID",
                         uniprot = "UniProt",
@@ -114,12 +114,12 @@ test_that(
                         quant = "NPX",
                         lod = "LOD",
                         normalization = "Normalization"),
-        not_ref_df = npx_data2 |>
+        not_ref_df = npx_data1 |>
           dplyr::mutate(
             Normalization = "Intensity"
           ),
         not_ref_samples = NULL,
-        not_ref_name = "20200002",
+        not_ref_name = "20200001",
         not_ref_cols = list(sample_id = "SampleID",
                             olink_id = "OlinkID",
                             uniprot = "UniProt",
@@ -218,7 +218,7 @@ test_that(
         overlapping_samples_df2 = unique(npx_data2$SampleID),
         df1_project_nr = "20200001",
         df2_project_nr = "20200002",
-        reference_project = "20200001",
+        reference_project = "20200002",
         reference_medians = NULL
       ),
       regexp = "Subset normalization will be performed!"
@@ -227,12 +227,12 @@ test_that(
     expect_identical(
       object = lst_check_out,
       expected = list(
-        ref_df = npx_data1 |>
+        ref_df = npx_data2 |>
           dplyr::mutate(
             Normalization = "Intensity"
           ),
-        ref_samples = unique(npx_data1$SampleID),
-        ref_name = "20200001",
+        ref_samples = unique(npx_data2$SampleID),
+        ref_name = "20200002",
         ref_cols = list(sample_id = "SampleID",
                         olink_id = "OlinkID",
                         uniprot = "UniProt",
@@ -245,12 +245,12 @@ test_that(
                         quant = "NPX",
                         lod = "LOD",
                         normalization = "Normalization"),
-        not_ref_df = npx_data2 |>
+        not_ref_df = npx_data1 |>
           dplyr::mutate(
             Normalization = "Intensity"
           ),
-        not_ref_samples = unique(npx_data2$SampleID),
-        not_ref_name = "20200002",
+        not_ref_samples = unique(npx_data1$SampleID),
+        not_ref_name = "20200001",
         not_ref_cols = list(sample_id = "SampleID",
                             olink_id = "OlinkID",
                             uniprot = "UniProt",
@@ -354,7 +354,7 @@ test_that(
         overlapping_samples_df2 = npx_df2_samples,
         df1_project_nr = "20200001",
         df2_project_nr = "20200002",
-        reference_project = "20200001",
+        reference_project = "20200002",
         reference_medians = NULL
       ),
       regexp = "Subset normalization will be performed!"
@@ -363,12 +363,12 @@ test_that(
     expect_identical(
       object = lst_check_out,
       expected = list(
-        ref_df = npx_data1 |>
+        ref_df = npx_data2 |>
           dplyr::mutate(
             Normalization = "Intensity"
           ),
-        ref_samples = unique(npx_data1$SampleID),
-        ref_name = "20200001",
+        ref_samples = npx_df2_samples,
+        ref_name = "20200002",
         ref_cols = list(sample_id = "SampleID",
                         olink_id = "OlinkID",
                         uniprot = "UniProt",
@@ -381,12 +381,12 @@ test_that(
                         quant = "NPX",
                         lod = "LOD",
                         normalization = "Normalization"),
-        not_ref_df = npx_data2 |>
+        not_ref_df = npx_data1 |>
           dplyr::mutate(
             Normalization = "Intensity"
           ),
-        not_ref_samples = npx_df2_samples,
-        not_ref_name = "20200002",
+        not_ref_samples = unique(npx_data1$SampleID),
+        not_ref_name = "20200001",
         not_ref_cols = list(sample_id = "SampleID",
                             olink_id = "OlinkID",
                             uniprot = "UniProt",

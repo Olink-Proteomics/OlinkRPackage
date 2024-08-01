@@ -253,11 +253,9 @@ olink_norm_input_check <- function(df1,
     if (reference_project == df1_project_nr) {
       lst_out$ref_name <- df1_project_nr
       lst_out$not_ref_name <- df2_project_nr
-      lst_out$ref_samples <- overlapping_samples_df1
     } else {
       lst_out$ref_name <- df2_project_nr
       lst_out$not_ref_name <- df1_project_nr
-      lst_out$ref_samples <- overlapping_samples_df2
     }
     lst_out$ref_df <- lst_df[[lst_out$ref_name]]
     lst_out$ref_cols <- lst_cols[[lst_out$ref_name]]
@@ -265,10 +263,14 @@ olink_norm_input_check <- function(df1,
     lst_out$not_ref_cols <- lst_cols[[lst_out$not_ref_name]]
     if (norm_mode == olink_norm_modes$subset) {
       if (reference_project == df1_project_nr) {
+        lst_out$ref_samples <- overlapping_samples_df1
         lst_out$not_ref_samples <- overlapping_samples_df2
       } else {
+        lst_out$ref_samples <- overlapping_samples_df2
         lst_out$not_ref_samples <- overlapping_samples_df1
       }
+    } else if (norm_mode == olink_norm_modes$bridge) {
+      lst_out$ref_samples <- overlapping_samples_df1
     }
   }
 
