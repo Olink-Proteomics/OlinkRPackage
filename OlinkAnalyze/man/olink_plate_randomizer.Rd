@@ -39,10 +39,10 @@ olink_plate_randomizer(
 A "tibble" including SampleID, SubjectID etc. assigned to well positions.
 Columns include same columns as Manifest with additional columns:
 \itemize{
-   \item{plate:} Plate number
-   \item{column:} Column on the plate
-   \item{row:} Row on the plate
-   \item{well:} Well location on the plate
+\item{plate:} Plate number
+\item{column:} Column on the plate
+\item{row:} Row on the plate
+\item{well:} Well location on the plate
 }
 }
 \description{

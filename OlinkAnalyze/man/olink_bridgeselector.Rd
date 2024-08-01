@@ -17,16 +17,16 @@ olink_bridgeselector(df, sampleMissingFreq, n)
 A "tibble" with sample IDs and mean NPX for a defined number of bridging samples. Columns include:
 
 \itemize{
-  \item{SampleID:} Sample ID
-  \item{PercAssaysBelowLOD:} Percent of Assays that are below LOD for the sample
-  \item{MeanNPX:} Mean NPX for the sample
+\item{SampleID:} Sample ID
+\item{PercAssaysBelowLOD:} Percent of Assays that are below LOD for the sample
+\item{MeanNPX:} Mean NPX for the sample
 }
 }
 \description{
 The bridge selection function will select a number of bridge samples based on the input data. It selects samples with
 good detection, which passes QC and cover a good range of the data. If possible, Olink recommends 8-16 bridge samples.
-When running the selector, Olink recommends starting at sampleMissingFreq = 0.10 which represents a maximum of 10\%
-data below LOD per sample. If there are not enough samples output, increase to 20\%. \cr\cr
+When running the selector, Olink recommends starting at sampleMissingFreq = 0.10 which represents a maximum of 10\\%
+data below LOD per sample. If there are not enough samples output, increase to 20\\%. \cr\cr
 The function accepts NPX Excel files with data < LOD replaced.
 }
 \examples{

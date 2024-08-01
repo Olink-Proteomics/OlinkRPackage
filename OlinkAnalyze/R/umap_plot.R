@@ -5,7 +5,7 @@
 #'
 #' The plot is printed, and a list of ggplot objects is returned. \cr\cr
 #' If byPanel = TRUE, the data processing (imputation of missing values etc) and subsequent UMAP is performed separately per panel. A faceted plot is printed, while the individual ggplot objects are returned. \cr\cr
-#' The arguments outlierDefX and outlierDefY can be used to identify outliers in the UMAP results. Samples more than +/-outlierDef[X,Y] standard deviations from the mean of the plotted UMAP component will be labelled. Both arguments have to be specified.
+#' The arguments outlierDefX and outlierDefY can be used to identify outliers in the UMAP results. Samples more than +/- outlierDefX and outlierDefY standard deviations from the mean of the plotted UMAP component will be labelled. Both arguments have to be specified.
 #' NOTE: UMAP is a non-linear data transformation that might not accurately preserve the properties of the data. Distances in the UMAP plane should therefore be interpreted with caution.
 #'
 #' @param df data frame in long format with Sample Id, NPX and column of choice for colors
@@ -19,7 +19,7 @@
 #' @param byPanel Perform the UMAP per panel (default FALSE)
 #' @param outlierDefX The number standard deviations along the UMAP dimension plotted on the x-axis that defines an outlier. See also 'Details"
 #' @param outlierDefY The number standard deviations along the UMAP dimension plotted on the y-axis that defines an outlier. See also 'Details"
-#' @param outlierLines Draw dashed lines at +/-outlierDef[X,Y] standard deviations from the mean of the plotted PCs (default FALSE)
+#' @param outlierLines Draw dashed lines at +/- outlierDefX and outlierDefY standard deviations from the mean of the plotted PCs (default FALSE)
 #' @param label_outliers Use ggrepel to label samples lying outside the limits set by the outlierLines (default TRUE)
 #' @param quiet Logical. If TRUE, the resulting plot is not printed
 #' @param verbose Logical. Whether warnings about the number of samples and/or assays dropped or imputed should be printed to the console.

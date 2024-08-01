@@ -38,19 +38,19 @@ Also takes ':' or '*' notation.}
 A "tibble" containing the results of fitting the linear mixed effects model to every protein by OlinkID, ordered by ascending p-value.
 Columns include:
 \itemize{
- \item{Assay:} "character" Protein symbol
- \item{OlinkID:} "character" Olink specific ID
- \item{UniProt:} "character" UniProt ID
- \item{Panel:} "character" Name of Olink Panel
- \item{term:} "character" term in model
- \item{sumsq:} "numeric" sum of square
- \item{meansq:} "numeric" mean of square
- \item{NumDF:} "integer" numerator of degrees of freedom
- \item{DenDF:} "numeric" denominator of decrees of freedom
- \item{statistic:} "numeric" value of the statistic
- \item{p.value:} "numeric" nominal p-value
- \item{Adjusted_pval:} "numeric" adjusted p-value for the test (Benjamini&Hochberg)
- \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
+\item{Assay:} "character" Protein symbol
+\item{OlinkID:} "character" Olink specific ID
+\item{UniProt:} "character" UniProt ID
+\item{Panel:} "character" Name of Olink Panel
+\item{term:} "character" term in model
+\item{sumsq:} "numeric" sum of square
+\item{meansq:} "numeric" mean of square
+\item{NumDF:} "integer" numerator of degrees of freedom
+\item{DenDF:} "numeric" denominator of decrees of freedom
+\item{statistic:} "numeric" value of the statistic
+\item{p.value:} "numeric" nominal p-value
+\item{Adjusted_pval:} "numeric" adjusted p-value for the test (Benjamini&Hochberg)
+\item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
 }
 }
 \description{

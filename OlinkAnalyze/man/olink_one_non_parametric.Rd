@@ -28,17 +28,17 @@ A tibble containing the Kruskal-Wallis Test or Friedman Test results for every p
 
 Columns include:
 \itemize{
- \item{Assay:} "character" Protein symbol
- \item{OlinkID:} "character" Olink specific ID
- \item{UniProt:} "character" UniProt ID
- \item{Panel:} "character" Name of Olink Panel
- \item{term:} "character" term in model
- \item{df:} "numeric" degrees of freedom
- \item{method:} "character" which method was used
- \item{statistic:} "named numeric" the value of the test statistic with a name describing it
- \item{p.value:} "numeric" p-value for the test
- \item{Adjusted_pval:} "numeric" adjusted p-value for the test (Benjamini&Hochberg)
- \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
+\item{Assay:} "character" Protein symbol
+\item{OlinkID:} "character" Olink specific ID
+\item{UniProt:} "character" UniProt ID
+\item{Panel:} "character" Name of Olink Panel
+\item{term:} "character" term in model
+\item{df:} "numeric" degrees of freedom
+\item{method:} "character" which method was used
+\item{statistic:} "named numeric" the value of the test statistic with a name describing it
+\item{p.value:} "numeric" p-value for the test
+\item{Adjusted_pval:} "numeric" adjusted p-value for the test (Benjamini&Hochberg)
+\item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
 }
 }
 \description{

@@ -9,7 +9,8 @@ test_that("Data loads correctly with 'read_NPX()'", {
 
   # load manifest 1
   df_2_2 <- read_NPX(system.file("extdata", "Example_NPX_Data2_1.csv", package = "OlinkAnalyze", mustWork = TRUE))
-  if (requireNamespace("openssl", quietly = TRUE)) {
+  if (requireNamespace("openssl", quietly = TRUE)
+      & requireNamespace("zip", quietly = TRUE)) {
     npx_file_v3 <- system.file("extdata", "npx_data_v3.zip", package = "OlinkAnalyze", mustWork = TRUE)
     df_v3 <- read_NPX(filename = npx_file_v3)
     npx_file_ext_v1 <- system.file("extdata", "npx_data_ext_v1.zip", package = "OlinkAnalyze", mustWork = TRUE)
@@ -25,7 +26,8 @@ test_that("Data loads correctly with 'read_NPX()'", {
   #NPX read ok?
   expect(exists("df_1"), failure_message = "read_NPX failed on dataset 1")
   expect_s3_class(df_1, class = "tbl_df")
-  if (requireNamespace("openssl", quietly = TRUE)) {
+  if (requireNamespace("openssl", quietly = TRUE)
+      & requireNamespace("zip", quietly = TRUE)) {
     expect(exists("df_v3"), failure_message = "read_NPX failed on dataset v3")
     expect(exists("df_ext_v1"), failure_message = "read_NPX failed on extended dataset v1")
     expect(exists("df_ext_v2"), failure_message = "read_NPX failed on extended dataset v2")
@@ -35,7 +37,8 @@ test_that("Data loads correctly with 'read_NPX()'", {
   }
 
   #NPX zip read ok?
-  if (requireNamespace("openssl", quietly = TRUE)) {
+  if (requireNamespace("openssl", quietly = TRUE)
+      & requireNamespace("zip", quietly = TRUE)) {
     zip_npx_file_fail_1 <- system.file("extdata", "Example_NPX_Data_zip.zip", package = "OlinkAnalyze", mustWork = TRUE)
     expect_error(read_NPX(filename = zip_npx_file_fail_1), "Checksum of NPX file does not match the one from \"MD5_checksum.txt\"! Loss of data?")
 
@@ -56,7 +59,8 @@ test_that("Data loads correctly with 'read_NPX()'", {
   #Correct number of cols and rows?
   expect_equal(nrow(df_1), 29440)
   expect_equal(ncol(df_1), 12)
-  if (requireNamespace("openssl", quietly = TRUE)) {
+  if (requireNamespace("openssl", quietly = TRUE)
+      & requireNamespace("zip", quietly = TRUE)) {
     expect_equal(nrow(df_2), 11772)
     expect_equal(ncol(df_2), 14)
     expect_equal(nrow(df_v3), 1000)
@@ -80,7 +84,8 @@ test_that("Data loads correctly with 'read_NPX()'", {
                    c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
                      "MissingFreq", "Panel","Panel_Lot_Nr", "PlateID", "QC_Warning", "LOD",
                      "NPX", "Normalization"))
-  if (requireNamespace("openssl", quietly = TRUE)) {
+  if (requireNamespace("openssl", quietly = TRUE)
+      & requireNamespace("zip", quietly = TRUE)) {
     expect_identical(colnames(df_2),
                      c("SampleID", "Index", "OlinkID", "UniProt", "Assay",
                        "MissingFreq", "Panel","Panel_Lot_Nr", "PlateID", "QC_Warning", "LOD",

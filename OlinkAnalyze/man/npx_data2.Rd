@@ -7,12 +7,12 @@
 \format{
 In addition to standard read_NPX() columns, this dataset also contains columns:
 \describe{
-  \item{Subject}{Subject Identifier}
-  \item{Treatment}{Treated or Untreated}
-  \item{Site}{Site indicator, 5 unique values}
-  \item{Time}{Baseline, Week.6 and Week.12}
-  \item{Project}{Project ID number}
-  }
+\item{Subject}{Subject Identifier}
+\item{Treatment}{Treated or Untreated}
+\item{Site}{Site indicator, 5 unique values}
+\item{Time}{Baseline, Week.6 and Week.12}
+\item{Project}{Project ID number}
+}
 }
 \usage{
 npx_data2

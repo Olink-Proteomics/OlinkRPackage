@@ -28,15 +28,15 @@ Tibble of posthoc tests for specified effect, arranged by ascending adjusted p-v
 
 Columns include:
 \itemize{
- \item{Assay:} "character" Protein symbol
- \item{OlinkID:} "character" Olink specific ID
- \item{UniProt:} "character" UniProt ID
- \item{Panel:} "character" Name of Olink Panel
- \item{term:} "character" term in model
- \item{contrast:} "character" the groups that were compared
- \item{estimate:} "numeric" the value of the test statistic with a name describing it
- \item{Adjusted_pval:} "numeric" adjusted p-value for the test
- \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
+\item{Assay:} "character" Protein symbol
+\item{OlinkID:} "character" Olink specific ID
+\item{UniProt:} "character" UniProt ID
+\item{Panel:} "character" Name of Olink Panel
+\item{term:} "character" term in model
+\item{contrast:} "character" the groups that were compared
+\item{estimate:} "numeric" the value of the test statistic with a name describing it
+\item{Adjusted_pval:} "numeric" adjusted p-value for the test
+\item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
 }
 }
 \description{

@@ -12,14 +12,14 @@ read_npx_parquet(filename)
 \value{
 A "tibble" in long format. Some of the columns are:
 \itemize{
-   \item{SampleID:} Sample ID
-   \item{OlinkID:} Olink ID
-   \item{UniProt:} UniProt ID
-   \item{Assay:} Protein symbol
-   \item{PlateID:} Plate ID
-   \item{Count:} Counts from sequences
-   \item{ExtNPX:} External control normalized counts
-   \item{NPX:} Normalized Protein Expression
+\item{SampleID:} Sample ID
+\item{OlinkID:} Olink ID
+\item{UniProt:} UniProt ID
+\item{Assay:} Protein symbol
+\item{PlateID:} Plate ID
+\item{Count:} Counts from sequences
+\item{ExtNPX:} External control normalized counts
+\item{NPX:} Normalized Protein Expression
 }
 Additional columns may be present or missing depending on the platform
 }
