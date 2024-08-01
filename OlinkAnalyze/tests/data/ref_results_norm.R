@@ -217,7 +217,7 @@ lst_norm$bridge_norm$no_lod <- olink_normalization(
 
 ### df1_multiple_lod + df2_multiple_lod ----
 
-lst_norm$bridge_norm$df1_multiple_lod <- olink_normalization(
+lst_norm$bridge_norm$multiple_lod <- olink_normalization(
   df1 = lst_df$df1_multiple_lod,
   df2 = lst_df$df2_multiple_lod,
   overlapping_samples_df1 = lst_sample$bridge_samples,
@@ -280,7 +280,7 @@ lst_norm$subset_norm$no_lod <- olink_normalization(
 
 ### df1_multiple_lod + df2_multiple_lod ----
 
-lst_norm$subset_norm$df1_multiple_lod <- olink_normalization(
+lst_norm$subset_norm$multiple_lod <- olink_normalization(
   df1 = lst_df$df1_multiple_lod,
   df2 = lst_df$df2_multiple_lod,
   overlapping_samples_df1 = lst_sample$df1_subset,
@@ -344,7 +344,7 @@ lst_norm$intensity_norm$no_lod <- olink_normalization(
 
 ### df1_multiple_lod + df2_multiple_lod ----
 
-lst_norm$intensity_norm$df1_multiple_lod <- olink_normalization(
+lst_norm$intensity_norm$multiple_lod <- olink_normalization(
   df1 = lst_df$df1_multiple_lod,
   df2 = lst_df$df2_multiple_lod,
   overlapping_samples_df1 = lst_sample$df1_all,
@@ -420,7 +420,7 @@ lst_norm$ref_med_norm$no_lod <- olink_normalization(
 
 ### df1_multiple_lod ----
 
-lst_norm$ref_med_norm$df1_multiple_lod <- olink_normalization(
+lst_norm$ref_med_norm$multiple_lod <- olink_normalization(
   df1 = lst_df$df1_multiple_lod,
   overlapping_samples_df1 = lst_sample$df1_subset,
   reference_medians = lst_df$ref_med
