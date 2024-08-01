@@ -143,15 +143,15 @@ olink_norm_input_check <- function(df1,
 
   } else {
 
-    # bridge or subset normalization
-
+    # bridge, subset, or 3K-HT median normalization
     reference_medians <- NULL
 
     lst_df <- list(df1, df2)
     names(lst_df) <- c(df1_project_nr, df2_project_nr)
     lst_cols <- olink_norm_input_check_df_cols(lst_df = lst_df)
 
-    if (norm_mode == olink_norm_modes$bridge) {
+    if (norm_mode %in% c(olink_norm_modes$bridge, 
+                         olink_norm_modes$median_norm_3k_ht)) {
       # bridge normalization
       lst_ref_samples <- list(overlapping_samples_df1, overlapping_samples_df1)
     } else if (norm_mode == olink_norm_modes$subset) {
@@ -193,7 +193,8 @@ olink_norm_input_check <- function(df1,
   lst_df_clean_assays <- olink_norm_input_clean_assays(
     lst_df = lst_df,
     reference_medians = reference_medians,
-    lst_cols = lst_cols
+    lst_cols = lst_cols, 
+    norm_mode = norm_mode
   )
   lst_df <- lst_df_clean_assays$lst_df
   reference_medians <- lst_df_clean_assays$reference_medians
@@ -248,8 +249,9 @@ olink_norm_input_check <- function(df1,
     lst_out$ref_cols <- lst_cols[[lst_out$ref_name]]
     lst_out$reference_medians <- reference_medians
   } else if (norm_mode %in% c(olink_norm_modes$subset,
-                              olink_norm_modes$bridge)) {
-    # bridge or subset normalization
+                              olink_norm_modes$bridge,
+                              olink_norm_modes$median_norm_3k_ht)) {
+    # bridge, subset, or 3K-HT median normalization
     if (reference_project == df1_project_nr) {
       lst_out$ref_name <- df1_project_nr
       lst_out$not_ref_name <- df2_project_nr
@@ -269,7 +271,8 @@ olink_norm_input_check <- function(df1,
         lst_out$ref_samples <- overlapping_samples_df2
         lst_out$not_ref_samples <- overlapping_samples_df1
       }
-    } else if (norm_mode == olink_norm_modes$bridge) {
+    } else if (norm_mode %in% c(olink_norm_modes$bridge,
+                                olink_norm_modes$median_norm_3k_ht)) {
       lst_out$ref_samples <- overlapping_samples_df1
     }
   }
@@ -319,6 +322,7 @@ olink_norm_input_validate <- function(df1,
                                       overlapping_samples_df1,
                                       overlapping_samples_df2,
                                       reference_medians) {
+  
   # check inputs ----
 
   ## check df1 ----
@@ -351,6 +355,38 @@ olink_norm_input_validate <- function(df1,
   v_reference_medians <- ifelse(!is.null(reference_medians), # nolint
                                 TRUE,
                                 FALSE)
+  
+  ## check if 3K-HT bridging ----
+  
+  # check if DF1 is an Explore HT data frame
+  df1_exploreht_flag <- ifelse(df1 |>
+                                 select(Panel) |> 
+                                 distinct() |> 
+                                 na.omit() |> 
+                                 pull() %in% "Explore_HT",
+                               TRUE,
+                               FALSE)
+  
+  # check if DF2 is an Explore 3072 data frame
+  df2_explore3k_flag <- ifelse(all(df2 |> 
+                                     select(Panel) |>
+                                     distinct() |>
+                                     na.omit() |>
+                                     pull() %in% 
+                                     c("Cardiometabolic", "Cardiometabolic_II",
+                                       "Inflammation", "Inflammation_II",
+                                       "Neurology", "Neurology_II",
+                                       "Oncology", "Oncology_II")),
+                               TRUE,
+                               FALSE)
+  
+  v_explore3k_exploreht <- ifelse(
+    df1_exploreht_flag == TRUE & df2_explore3k_flag == TRUE, # nolint
+    TRUE,
+    FALSE)
+  
+  rm(df1_exploreht_flag)
+  rm(df2_explore3k_flag)
 
   # get normalization mode ----
 
@@ -364,6 +400,7 @@ olink_norm_input_validate <- function(df1,
       & .data[["overlapping_samples_df1"]] == .env[["v_overlap_samples_df1"]]
       & .data[["overlapping_samples_df2"]] == .env[["v_overlap_samples_df2"]]
       & .data[["reference_medians"]] == .env[["v_reference_medians"]]
+      & .data[["explore3k_exploreht_flag"]] == .env[["v_explore3k_exploreht"]]
     )
 
   error_msg_row <- olink_norm_mode_row$error_msg[1L]
@@ -1164,10 +1201,14 @@ olink_norm_input_ref_medians <- function(reference_medians) {
 #'
 olink_norm_input_clean_assays <- function(lst_df,
                                           reference_medians,
-                                          lst_cols) {
+                                          lst_cols, 
+                                          norm_mode) {
   # help functions ----
 
   # remove all assays that do not match the pattern and that have NA for OlinkID
+  
+  # checking for all normalization types except 3K-HT median normalization
+  if (norm_mode != olink_norm_modes$median) {
   check_oid <- function(df, col_name) {
     df |>
       dplyr::filter(
@@ -1177,7 +1218,18 @@ olink_norm_input_clean_assays <- function(lst_df,
         )
       )
   }
-
+  } else {
+    check_oid <- function(df, col_name) {
+      df |>
+        dplyr::filter(
+          grepl(
+            pattern = "^OID\\d{5}_OID\\d{5}$",
+            x = .data[[col_name]]
+          )
+        )
+    }
+  }
+  
   # help variables ----
 
   lst_out <- list()
@@ -1228,16 +1280,30 @@ olink_norm_input_clean_assays <- function(lst_df,
   oid_removed <- oid_removed[sapply(oid_removed, nchar) > 0L]
 
   # message to user
-  if (length(oid_removed) > 0L) {
-    cli::cli_inform(
-      c("Assay(s) from the following input {cli::qty(oid_removed)} dataset{?s}
-      have been excluded from normalization:",
-        paste0("* ", names(oid_removed), ": ", unlist(oid_removed)),
-        "i" = "Lacking the pattern \"OID\" followed by 5 digits."
+  
+  if (norm_mode != olink_norm_modes$median_norm_3k_ht) {
+    if (length(oid_removed) > 0L) {
+      cli::cli_inform(
+        c("Assay(s) from the following input {cli::qty(oid_removed)} dataset{?s}
+        have been excluded from normalization:",
+          paste0("* ", names(oid_removed), ": ", unlist(oid_removed)),
+          "i" = "Lacking the pattern \"OID\" followed by 5 digits."
+        )
       )
-    )
+    }
+  } else {
+    if (length(oid_removed) > 0L) {
+      cli::cli_inform(
+        c("Assay(s) from the following input {cli::qty(oid_removed)} dataset{?s}
+        have been excluded from normalization:",
+          paste0("* ", names(oid_removed), ": ", unlist(oid_removed)),
+          "i" = "Lacking the pattern \"OID\" followed by 5 digits, an
+           underscore, then \"OID\" followed by 5 digits."
+        )
+      )
+    }
   }
-
+  
   ### remove from reference medians ----
 
   if (!is.null(reference_medians)) {

@@ -190,7 +190,7 @@ olink_normalization_2 <- function(df1,
                                   df2_project_nr = "P2",
                                   reference_project = "P1",
                                   reference_medians = NULL) {
-
+  
   # check input ----
   lst_check <- olink_norm_input_check(
     df1 = df1,
@@ -202,12 +202,12 @@ olink_normalization_2 <- function(df1,
     reference_project = reference_project,
     reference_medians = reference_medians
   )
-
+  
   # normalize ----
-
+  
   if (lst_check$norm_mode == olink_norm_modes$ref_median) {
     ## reference median normalization ----
-
+    
     df_norm <- norm_internal_reference_median(
       ref_df = lst_check$ref_df,
       ref_samples = lst_check$ref_samples,
@@ -215,10 +215,10 @@ olink_normalization_2 <- function(df1,
       ref_cols = lst_check$ref_cols,
       reference_medians = lst_check$reference_medians
     )
-
+    
   } else {
     ## rename non-reference columns to reference columns ----
-
+    
     # update selected colnames of not_ref_df based on colnames of ref_df
     lst_check$not_ref_df <- norm_internal_rename_cols(
       ref_cols = lst_check$ref_cols,
@@ -233,12 +233,13 @@ olink_normalization_2 <- function(df1,
     )[[1L]] |>
       suppressWarnings() |>
       suppressMessages()
-
+    
     ## normalize bridge or subest ----
-
-    if (lst_check$norm_mode == olink_norm_modes$bridge) {
+    
+    if (lst_check$norm_mode %in% c(olink_norm_modes$bridge,
+                                   olink_norm_modes$median_norm_3k_ht)) {
       # bridge normalization ----
-
+      
       df_norm <- norm_internal_bridge(
         ref_df = lst_check$ref_df,
         ref_samples = lst_check$ref_samples,
@@ -248,10 +249,10 @@ olink_normalization_2 <- function(df1,
         not_ref_name = lst_check$not_ref_name,
         not_ref_cols = lst_check$not_ref_cols
       )
-
+      
     } else if (lst_check$norm_mode == olink_norm_modes$subset) {
       # subset normalization ----
-
+      
       df_norm <- norm_internal_subset(
         ref_df = lst_check$ref_df,
         ref_samples = lst_check$ref_samples,
@@ -264,7 +265,7 @@ olink_normalization_2 <- function(df1,
       )
     }
   }
-
+  
   return(df_norm)
 }
 
@@ -292,10 +293,10 @@ olink_normalization_2 <- function(df1,
 norm_internal_rename_cols <- function(ref_cols,
                                       not_ref_cols,
                                       not_ref_df) {
-
+  
   # only these columns can be updated to the reference df
   cols_to_update <- c("panel_version", "qc_warn", "assay_warn")
-
+  
   # tibble with 2 columns, one from reference and the other one from the
   # non-reference df. Used next to rename all columns of non-reference df
   # according to the ones from reference.
@@ -321,14 +322,14 @@ norm_internal_rename_cols <- function(ref_cols,
     }
   }) |>
     dplyr::bind_rows()
-
+  
   # rename columns from non-reference df
   not_ref_df <- not_ref_df |>
     dplyr::rename_with(
       .fn = ~ df_nonref_cols_rename$ref,
       .cols = dplyr::all_of(df_nonref_cols_rename$non_ref)
     )
-
+  
   return(not_ref_df)
 }
 
@@ -408,11 +409,11 @@ norm_internal_reference_median <- function(ref_df,
                                            ref_cols,
                                            reference_medians) {
   # calculate adjustment factors ----
-
+  
   # named vector to join ref_df to reference_medians
   join_by <- "OlinkID"
   names(join_by) <- ref_cols$olink_id
-
+  
   adj_fct_df <- norm_internal_assay_median(
     df = ref_df,
     samples = ref_samples,
@@ -435,9 +436,9 @@ norm_internal_reference_median <- function(ref_df,
         c(ref_cols$olink_id, "Adj_factor")
       )
     )
-
+  
   # normalize dataset ----
-
+  
   df_norm <- norm_internal_adjust_not_ref(
     df = ref_df,
     name = ref_name,
@@ -445,9 +446,9 @@ norm_internal_reference_median <- function(ref_df,
     adj_fct_df = adj_fct_df,
     adj_fct_cols = ref_cols
   )
-
+  
   # return ----
-
+  
   return(df_norm)
 }
 
@@ -478,7 +479,7 @@ norm_internal_bridge <- function(ref_df,
                                  not_ref_name,
                                  not_ref_cols) {
   # calculate adjustment factors ----
-
+  
   adj_fct_df <- ref_df |>
     # add project name for ref_df
     dplyr::mutate(
@@ -526,9 +527,9 @@ norm_internal_bridge <- function(ref_df,
                                   0,
                                   .data[["Adj_factor"]])
     )
-
+  
   # normalize datasets ----
-
+  
   df_norm <- norm_internal_adjust(
     ref_df = ref_df,
     ref_name = ref_name,
@@ -538,9 +539,9 @@ norm_internal_bridge <- function(ref_df,
     not_ref_cols = not_ref_cols,
     adj_fct_df = adj_fct_df
   )
-
+  
   # return ----
-
+  
   return(df_norm)
 }
 
@@ -579,7 +580,7 @@ norm_internal_subset <- function(ref_df,
                                  not_ref_name,
                                  not_ref_cols) {
   # calculate adjustment factors ----
-
+  
   adj_fct_df <- dplyr::bind_rows(
     # ref_df
     norm_internal_assay_median(df = ref_df,
@@ -609,9 +610,9 @@ norm_internal_subset <- function(ref_df,
         c(ref_cols$olink_id, "Adj_factor")
       )
     )
-
+  
   # normalize datasets ----
-
+  
   df_norm <- norm_internal_adjust(
     ref_df = ref_df,
     ref_name = ref_name,
@@ -621,9 +622,9 @@ norm_internal_subset <- function(ref_df,
     not_ref_cols = not_ref_cols,
     adj_fct_df = adj_fct_df
   )
-
+  
   # return ----
-
+  
   return(df_norm)
 }
 
@@ -726,7 +727,7 @@ norm_internal_adjust_not_ref <- function(df,
   # named vector to join dfs
   join_by <- adj_fct_cols$olink_id
   names(join_by) <- cols$olink_id
-
+  
   # adjust non reference df
   df |>
     dplyr::left_join(
