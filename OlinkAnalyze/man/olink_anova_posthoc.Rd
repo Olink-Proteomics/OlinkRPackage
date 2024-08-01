@@ -64,6 +64,8 @@ Columns include:
 Performs a post hoc ANOVA test using emmeans::emmeans with Tukey p-value adjustment per assay (by OlinkID) for each panel at confidence level 0.95.
 See \code{olink_anova} for details of input notation. \cr\cr
 The function handles both factor and numerical variables and/or covariates.
+Control samples should be removed before using this function.
+Control assays (AssayType is not "assay", or Assay contains "control" or "ctrl") should be removed before using this function.
 The posthoc test for a numerical variable compares the difference in means of the outcome variable (default: NPX) for 1 standard deviation difference in the numerical variable, e.g.
 mean NPX at mean(numerical variable) versus mean NPX at mean(numerical variable) + 1*SD(numerical variable).
 }
@@ -72,7 +74,7 @@ mean NPX at mean(numerical variable) versus mean NPX at mean(numerical variable)
 
 library(dplyr)
 
-npx_df <- npx_data1 \%>\% filter(!grepl('control',SampleID, ignore.case = TRUE))
+npx_df <- npx_data1 \%>\% filter(!grepl('control|ctrl',SampleID, ignore.case = TRUE))
 
 #Two-way ANOVA, one main effect (Site) covariate.
 #Results in model NPX~Treatment*Time+Site.

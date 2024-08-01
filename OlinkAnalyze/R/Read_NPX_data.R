@@ -75,8 +75,10 @@ read_NPX_explore <- function(filename) {
   # Check that all column names are present
   # We have had 5 column names versions so far: 1, 1.1 and 2, 2.1, and 3
   # please add newer versions to the list chronologically
-  header_standard <- c("SampleID", "OlinkID", "UniProt", "Assay",
-                       "Panel", "PlateID", "QC_Warning", "NPX")
+  header_base <- c("SampleID", "OlinkID", "UniProt", "Assay",
+                       "Panel", "PlateID", "NPX")
+  
+  header_standard <- c(header_base, "QC_Warning")
 
   header_quant_standard <- c("SampleID", "OlinkID", "UniProt", "Assay",
                        "Panel", "PlateID", "QC_Warning")
@@ -189,7 +191,41 @@ read_NPX_explore <- function(filename) {
                              "PlateLOD",
                              "QC.Deviation.Inc.Ctrl",
                              "QC.Deviation.Det.Ctrl",
-                             "Olink.NPX.Signature.Version")
+                             "Olink.NPX.Signature.Version"),
+    "header_csv_hp" = c(header_base,
+                        "SampleType",
+                        "WellID",
+                        "DataAnalysisRefID",
+                        "AssayType",
+                        "Block",
+                        "Counts",
+                        "ExtNPX",
+                        "Normalization",
+                        "PCNormalizedNPX",
+                        "AssayQC",
+                        "SampleQC",
+                        "SoftwareVersion",
+                        "SoftwareName"),
+    "header_ext_csv_hp" = c(header_base,
+                            "SampleType",
+                            "WellID",
+                            "DataAnalysisRefID",
+                            "AssayType",
+                            "Block",
+                            "Counts",
+                            "ExtNPX",
+                            "Normalization",
+                            "PCNormalizedNPX",
+                            "AssayQC",
+                            "SampleQC",
+                            "SoftwareVersion",
+                            "SoftwareName",
+                            "IntraCV",
+                            "InterCV",
+                            "SampleBlockQCWarn",
+                            "SampleBlockQCFail",
+                            "BlockQCFail",
+                            "AssayQCWarn")
 
   )
 
@@ -246,6 +282,11 @@ read_NPX_explore <- function(filename) {
       dplyr::mutate(Panel = paste("Olink", Panel_Start, Panel_End)) %>%
       dplyr::mutate(Panel = trimws(Panel, which = "right")) %>%
       dplyr::select(-Panel_Start, -Panel_End)
+  }
+  if ("Quantified_value" %in% names(out)){
+    message("QUANT data detected. Some downstream functions may not be supported.")
+    out <- out %>%
+      mutate(Quantified_value = as.numeric(Quantified_value))
   }
 
   return(out)
