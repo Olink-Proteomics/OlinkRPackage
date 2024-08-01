@@ -5,7 +5,7 @@
 \title{Check \var{datasets} and \var{reference_medians} for unexpected Olink
 identifiers or excluded assays}
 \usage{
-olink_norm_input_clean_assays(lst_df, reference_medians, lst_cols)
+olink_norm_input_clean_assays(lst_df, reference_medians, lst_cols, norm_mode)
 }
 \arguments{
 \item{lst_df}{Named list of datasets to be normalized.}

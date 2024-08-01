@@ -55,7 +55,7 @@ with reference_medians.
 \item \code{df1_cols}: column names of df1 to use downstream.
 \item \code{df2_cols}: \code{NULL} if reference median normalization, or column names of
 df2 to use downstream.
-\item \code{norm_mode}: one of bridge, subset, and ref_median
+\item \code{norm_mode}: one of bridge, subset, ref_median, and median_norm_3k_ht
 indicating the normalization to be performed.
 }
 }
