@@ -259,7 +259,8 @@ overlap_samples_df2_df3 <- list("DF1" = sample(x = unique(npx_df2$SampleID),
 overlap_samples_df12_df4 <- list("DF1" = sample(x = c(unique(npx_df1$SampleID),
                                                       unique(npx_df2$SampleID)),
                                                 size = 100,
-                                                replace = FALSE),
+                                                replace = FALSE) |>
+                                   unique(),
                                  "DF2" = sample(x = unique(npx_df4$SampleID),
                                                 size = 40,
                                                 replace = FALSE))
