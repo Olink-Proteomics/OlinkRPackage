@@ -1,7 +1,3 @@
-source("globals.R")
-source("olink_normalization_utils.R")
-
-
 ### Median normalization - base taken from olink_normalization_n, olink_normalization_bridge
 
 #' Median normalization of all proteins between two NPX projects.
