@@ -83,7 +83,7 @@
 #'   (\(x) x[!grepl("^CONTROL_SAMPLE", x)])()
 #'
 #' # normalize
-#' olink_normalization_2(
+#' olink_normalization(
 #'   df1 = npx_df1,
 #'   df2 = npx_df2,
 #'   overlapping_samples_df1 = overlap_samples,
@@ -137,7 +137,7 @@
 #' df2_subset <- sample(x = df2_samples, size = 20L)
 #'
 #' # normalize
-#' olink_normalization_2(
+#' olink_normalization(
 #'   df1 = npx_df1,
 #'   df2 = npx_df2,
 #'   overlapping_samples_df1 = df1_subset,
@@ -148,7 +148,7 @@
 #' )
 #'
 #' # special case of subset normalization using all samples
-#' olink_normalization_2(
+#' olink_normalization(
 #'   df1 = npx_df1,
 #'   df2 = npx_df2,
 #'   overlapping_samples_df1 = df1_samples,
@@ -175,21 +175,21 @@
 #'   )
 #'
 #' # normalize
-#' olink_normalization_2(
+#' olink_normalization(
 #'   df1 = npx_df1,
 #'   overlapping_samples_df1 = df1_subset,
 #'   reference_medians = ref_med_df
 #' )
 #' }
 #'
-olink_normalization_2 <- function(df1,
-                                  df2 = NULL,
-                                  overlapping_samples_df1,
-                                  overlapping_samples_df2 = NULL,
-                                  df1_project_nr = "P1",
-                                  df2_project_nr = "P2",
-                                  reference_project = "P1",
-                                  reference_medians = NULL) {
+olink_normalization <- function(df1,
+                                df2 = NULL,
+                                overlapping_samples_df1,
+                                overlapping_samples_df2 = NULL,
+                                df1_project_nr = "P1",
+                                df2_project_nr = "P2",
+                                reference_project = "P1",
+                                reference_medians = NULL) {
 
   # check input ----
   lst_check <- olink_norm_input_check(

@@ -1,4 +1,4 @@
-# Test olink_normalization_2 ----
+# Test olink_normalization ----
 
 
 # this tests also all functions called norm_internal_* except from
@@ -14,18 +14,20 @@
 
 # load normalized datasets generated with the original olink_normalization
 # function from OlinkAnalyze 3.8.2
-ref_norm_res_file <- test_path("..", "data", "ref_results_norm.rds")
-ref_norm_res <- readRDS(file = ref_norm_res_file)
-rm(ref_norm_res_file)
+get_ref_norm_res <- function() {
+  ref_norm_res_file <- test_path("..", "data", "ref_results_norm.rds")
+  readRDS(file = ref_norm_res_file)
+}
+ref_norm_res <- get_ref_norm_res()
 
 test_that(
-  "olink_normalization_2 - works - bridge normalization",
+  "olink_normalization - works - bridge normalization",
   {
     ### bridge normalization - no norm column ----
 
     expect_warning(
       object = expect_message(
-        object = bridge_no_norm <- olink_normalization_2(
+        object = bridge_no_norm <- olink_normalization(
           df1 = ref_norm_res$lst_df$df1_no_norm,
           df2 = ref_norm_res$lst_df$df2_no_norm,
           overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
@@ -51,7 +53,7 @@ test_that(
     ### bridge normalization - with norm column ----
 
     expect_message(
-      object = bridge_norm <- olink_normalization_2(
+      object = bridge_norm <- olink_normalization(
         df1 = ref_norm_res$lst_df$df1_norm,
         df2 = ref_norm_res$lst_df$df2_norm,
         overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
@@ -74,7 +76,7 @@ test_that(
     ### bridge normalization - no lod column ----
 
     expect_message(
-      object = bridge_no_lod <- olink_normalization_2(
+      object = bridge_no_lod <- olink_normalization(
         df1 = ref_norm_res$lst_df$df1_no_lod,
         df2 = ref_norm_res$lst_df$df2_no_lod,
         overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
@@ -98,7 +100,7 @@ test_that(
 
     expect_message(
       object = expect_message(
-        object = bridge_multiple_lod <- olink_normalization_2(
+        object = bridge_multiple_lod <- olink_normalization(
           df1 = ref_norm_res$lst_df$df1_multiple_lod,
           df2 = ref_norm_res$lst_df$df2_multiple_lod,
           overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
@@ -123,13 +125,13 @@ test_that(
 )
 
 test_that(
-  "olink_normalization_2 - works - intensity normalization",
+  "olink_normalization - works - intensity normalization",
   {
     ### intensity normalization - no norm column ----
 
     expect_warning(
       object = expect_message(
-        object = intensity_no_norm <- olink_normalization_2(
+        object = intensity_no_norm <- olink_normalization(
           df1 = ref_norm_res$lst_df$df1_no_norm,
           df2 = ref_norm_res$lst_df$df2_no_norm,
           overlapping_samples_df1 = ref_norm_res$lst_sample$df1_all,
@@ -156,7 +158,7 @@ test_that(
     ### intensity normalization - with norm column ----
 
     expect_message(
-      object = intensity_norm <- olink_normalization_2(
+      object = intensity_norm <- olink_normalization(
         df1 = ref_norm_res$lst_df$df1_norm,
         df2 = ref_norm_res$lst_df$df2_norm,
         overlapping_samples_df1 = ref_norm_res$lst_sample$df1_all,
@@ -180,7 +182,7 @@ test_that(
     ### intensity normalization - no lod column ----
 
     expect_message(
-      object = intensity_no_lod <- olink_normalization_2(
+      object = intensity_no_lod <- olink_normalization(
         df1 = ref_norm_res$lst_df$df1_no_lod,
         df2 = ref_norm_res$lst_df$df2_no_lod,
         overlapping_samples_df1 = ref_norm_res$lst_sample$df1_all,
@@ -205,7 +207,7 @@ test_that(
 
     expect_message(
       object = expect_message(
-        object = intensity_multiple_lod <- olink_normalization_2(
+        object = intensity_multiple_lod <- olink_normalization(
           df1 = ref_norm_res$lst_df$df1_multiple_lod,
           df2 = ref_norm_res$lst_df$df2_multiple_lod,
           overlapping_samples_df1 = ref_norm_res$lst_sample$df1_all,
@@ -231,13 +233,13 @@ test_that(
 )
 
 test_that(
-  "olink_normalization_2 - works - subset normalization",
+  "olink_normalization - works - subset normalization",
   {
     ### subset normalization - no norm column ----
 
     expect_warning(
       object = expect_message(
-        object = subset_no_norm <- olink_normalization_2(
+        object = subset_no_norm <- olink_normalization(
           df1 = ref_norm_res$lst_df$df1_no_norm,
           df2 = ref_norm_res$lst_df$df2_no_norm,
           overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
@@ -264,7 +266,7 @@ test_that(
     ### subset normalization - with norm column ----
 
     expect_message(
-      object = subset_norm <- olink_normalization_2(
+      object = subset_norm <- olink_normalization(
         df1 = ref_norm_res$lst_df$df1_norm,
         df2 = ref_norm_res$lst_df$df2_norm,
         overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
@@ -288,7 +290,7 @@ test_that(
     ### subset normalization - no lod column ----
 
     expect_message(
-      object = subset_no_lod <- olink_normalization_2(
+      object = subset_no_lod <- olink_normalization(
         df1 = ref_norm_res$lst_df$df1_no_lod,
         df2 = ref_norm_res$lst_df$df2_no_lod,
         overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
@@ -313,7 +315,7 @@ test_that(
 
     expect_message(
       object = expect_message(
-        object = subset_multiple_lod <- olink_normalization_2(
+        object = subset_multiple_lod <- olink_normalization(
           df1 = ref_norm_res$lst_df$df1_multiple_lod,
           df2 = ref_norm_res$lst_df$df2_multiple_lod,
           overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
@@ -339,13 +341,13 @@ test_that(
 )
 
 test_that(
-  "olink_normalization_2 - works - reference median normalization",
+  "olink_normalization - works - reference median normalization",
   {
     ### reference median normalization - no norm column ----
 
     expect_warning(
       object = expect_message(
-        object = ref_med_no_norm <- olink_normalization_2(
+        object = ref_med_no_norm <- olink_normalization(
           df1 = ref_norm_res$lst_df$df1_no_norm,
           overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
           df1_project_nr = "df1_no_norm",
@@ -369,7 +371,7 @@ test_that(
     ### reference median normalization - with norm column ----
 
     expect_message(
-      object = ref_med_norm <- olink_normalization_2(
+      object = ref_med_norm <- olink_normalization(
         df1 = ref_norm_res$lst_df$df1_norm,
         overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
         df1_project_nr = "df1_norm",
@@ -390,7 +392,7 @@ test_that(
     ### reference median normalization - no lod column ----
 
     expect_message(
-      object = ref_med_no_lod <- olink_normalization_2(
+      object = ref_med_no_lod <- olink_normalization(
         df1 = ref_norm_res$lst_df$df1_no_lod,
         overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
         df1_project_nr = "df1_no_lod",
@@ -412,7 +414,7 @@ test_that(
 
     expect_message(
       object = expect_message(
-        object = ref_med_multiple_lod <- olink_normalization_2(
+        object = ref_med_multiple_lod <- olink_normalization(
           df1 = ref_norm_res$lst_df$df1_multiple_lod,
           overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
           df1_project_nr = "df1_multiple_lod",
