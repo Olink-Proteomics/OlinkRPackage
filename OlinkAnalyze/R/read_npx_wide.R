@@ -7,12 +7,12 @@
 #' @param df A tibble containing the full Olink dataset in wide format.
 #' @param file Path to Olink software output file in wide or long format.
 #' Expecting file extensions
-#' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))], last = " or ")`. # nolint
+#' `r accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
 #' @param olink_platform Olink platform used to generate the input file.
 #' One of
-#' `r accepted_olink_platforms |> dplyr::filter(.data[["broader_platform"]] == "qPCR") |> dplyr::pull(.data[["name"]]) |> cli::ansi_collapse(last = " or ")`. # nolint
+#' `r accepted_olink_platforms |> dplyr::filter(.data[["broader_platform"]] == "qPCR") |> dplyr::pull(.data[["name"]]) |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
 #' @param data_type Quantification method of the input data. One of
-#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(last = " or ")`. # nolint
+#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
 #'
 #' @return Tibble with Olink data in long format.
 #'
@@ -196,9 +196,9 @@ read_npx_wide <- function(df,
 #' @param df A tibble containing the full Olink dataset in wide format.
 #' @param file Path to Olink software output file in wide or long format.
 #' Expecting file extensions
-#' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))], last = " or ")`. # nolint
+#' `r accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
 #' @param data_type Quantification method of the input data. One of
-#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(last = " or ")`. # nolint
+#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
 #' @param format_spec A tibble derived from \var{olink_wide_spec} in the local
 #' environment containing the expected format of the Olink wide file based on
 #' the \var{olink_platform} and \var{data_type}.
@@ -437,7 +437,7 @@ read_npx_wide_npxs_version <- function(df) {
 #' @param df Top matrix of Olink datasets in wide format \var{df_top}.
 #' @param file Path to Olink software output file in wide or long format.
 #' Expecting file extensions
-#' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))], last = " or ")`. # nolint
+#' `r accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
 #' @param format_spec A tibble derived from \var{olink_wide_spec} in the local
 #' environment containing the expected format of the Olink wide file based on
 #' the \var{olink_platform} and \var{data_type}.
@@ -736,10 +736,10 @@ read_npx_wide_check_top <- function(df,
 #' @param df Top matrix of Olink dataset in wide format \var{df_top}.
 #' @param file Path to Olink software output file in wide or long format.
 #' Expecting file extensions
-#' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))], last = " or ")`. # nolint
+#' `r accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
 #' @param olink_platform Olink platform used to generate the input file.
 #' One of
-#' `r accepted_olink_platforms |> dplyr::filter(.data[["broader_platform"]] == "qPCR") |> dplyr::pull(.data[["name"]]) |> cli::ansi_collapse(last = " or ")`. # nolint
+#' `r accepted_olink_platforms |> dplyr::filter(.data[["broader_platform"]] == "qPCR") |> dplyr::pull(.data[["name"]]) |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
 #' @param format_spec A tibble derived from \var{olink_wide_spec} in the local
 #' environment containing the expected format of the Olink wide file based on
 #' the \var{olink_platform} and \var{data_type}.
@@ -930,8 +930,8 @@ read_npx_wide_top <- function(df,
           "x" = "Expected equal number of
           {unlist(format_spec$top_matrix_assay_labels) |>
           sapply(\\(x) paste0(\"`\", x, \"`\")) |>
-          cli::ansi_collapse(last = \" and \")} columns in the top matrix with
-          the assay data in file {.file {file}}!",
+          cli::ansi_collapse()} columns in the top matrix with the assay data in
+          file {.file {file}}!",
           "i" = "Has the file been modified manually?"
         ),
         call = rlang::caller_env(),
@@ -980,9 +980,9 @@ read_npx_wide_top <- function(df,
 #' @param df Middle matrix of Olink dataset in wide format \var{df_mid}.
 #' @param file Path to Olink software output file in wide or long format.
 #' Expecting file extensions
-#' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))], last = " or ")`. # nolint
+#' `r accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
 #' @param data_type Quantification method of the input data. One of
-#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(last = " or ")`. # nolint
+#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
 #' @param col_names Names list of character vectors containing column names from
 #' each chunk of columns \var{df_top} was split on in function.
 #' \code{\link{read_npx_wide_top}}.
@@ -1287,7 +1287,7 @@ read_npx_wide_panel_version <- function(df) {
 #' @param df_middle_list List of data frames from the middle matrix. Output of
 #' function \code{\link{read_npx_wide_middle}}.
 #' @param data_type Quantification method of the input data. One of
-#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(last = " or ")`. # nolint
+#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
 #' @param format_spec A tibble derived from \var{olink_wide_spec} in the local
 #' environment containing the expected format of the Olink wide file based on
 #' the \var{olink_platform} and \var{data_type}.
@@ -1458,12 +1458,12 @@ red_npx_wide_top_mid_long <- function(df_top_list,
 #' @param df Bottom matrix of Olink dataset in wide format \var{df_bottom}.
 #' @param file Path to Olink software output file in wide or long format.
 #' Expecting file extensions
-#' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))], last = " or ")`. # nolint
+#' `r accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
 #' @param data_type Quantification method of the input data. One of
-#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(last = " or ")`. # nolint
+#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
 #' @param olink_platform Olink platform used to generate the input file.
 #' One of
-#' `r accepted_olink_platforms |> dplyr::filter(.data[["broader_platform"]] == "qPCR") |> dplyr::pull(.data[["name"]]) |> cli::ansi_collapse(last = " or ")`. # nolint
+#' `r accepted_olink_platforms |> dplyr::filter(.data[["broader_platform"]] == "qPCR") |> dplyr::pull(.data[["name"]]) |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
 #'
 #' @return Tibble with the bottom matrix specifications for the Olink wide file.
 #'
@@ -1621,12 +1621,12 @@ read_npx_wide_bottom_version <- function(df,
 #' @param df Bottom matrix of Olink dataset in wide format \var{df_bottom}.
 #' @param file Path to Olink software output file in wide or long format.
 #' Expecting file extensions
-#' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))], last = " or ")`. # nolint
+#' `r accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
 #' @param olink_platform Olink platform used to generate the input file.
 #' One of
-#' `r accepted_olink_platforms |> dplyr::filter(.data[["broader_platform"]] == "qPCR") |> dplyr::pull(.data[["name"]]) |> cli::ansi_collapse(last = " or ")`. # nolint
+#' `r accepted_olink_platforms |> dplyr::filter(.data[["broader_platform"]] == "qPCR") |> dplyr::pull(.data[["name"]]) |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
 #' @param data_type Quantification method of the input data. One of
-#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(last = " or ")`. # nolint
+#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
 #' @param col_names Names list of character vectors containing column names from
 #' each chunk of columns \var{df_top} was split on in function.
 #' @param format_spec A tibble derived from \var{olink_wide_spec} in the local
