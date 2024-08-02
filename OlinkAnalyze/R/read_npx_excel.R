@@ -8,7 +8,7 @@
 #'
 #' @param file Path to Olink software output excel file in wide or long format.
 #' Expecting file extensions
-#' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("excel", names(accepted_npx_file_ext))], sep = ", ", last = " or ")`. # nolint
+#' `r accepted_npx_file_ext[grepl("excel", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
 #' @param out_df The class of output data frame. One of "tibble" (default) or
 #' "arrow" for ArrowObject.
 #'

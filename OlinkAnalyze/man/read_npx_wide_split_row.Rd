@@ -11,10 +11,10 @@ read_npx_wide_split_row(df, file, data_type, format_spec)
 
 \item{file}{Path to Olink software output file in wide or long format.
 Expecting file extensions
-xls, xlsx, csv or txt. # nolint}
+xls, xlsx, csv, or txt. # nolint}
 
 \item{data_type}{Quantification method of the input data. One of
-Ct, NPX or Quantified. # nolint}
+Ct, NPX, or Quantified. # nolint}
 
 \item{format_spec}{A tibble derived from \var{olink_wide_spec} in the local
 environment containing the expected format of the Olink wide file based on

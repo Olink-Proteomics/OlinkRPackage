@@ -8,10 +8,10 @@ check_olink_platform(x, broader_platform = NULL)
 }
 \arguments{
 \item{x}{The name of the Olink platform. One of
-Target 48, Flex, Target 96, Explore 3072, Explore HT or Focus.}
+Target 48, Flex, Target 96, Explore 3072, Explore HT, or Focus. # nolint}
 
 \item{broader_platform}{Name of the broader Olink platform. One of
-qPCR and NGS. # nolint}
+qPCR or NGS. # nolint}
 }
 \value{
 \code{NULL} if platform is ok, otherwise an error.

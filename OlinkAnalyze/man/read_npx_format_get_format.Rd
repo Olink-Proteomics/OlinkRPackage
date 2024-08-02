@@ -12,7 +12,7 @@ file.}
 
 \item{file}{Path to Olink software output file in wide or long format.
 Expecting file extensions
-xls, xlsx, csv or txt. # nolint}
+xls, xlsx, csv, or txt. # nolint}
 
 \item{long_format}{Boolean marking format of input file. One of \code{NULL}
 (default) for auto-detection, "TRUE" for long format files or "FALSE" for

@@ -32,7 +32,7 @@ read_NPX(
 \arguments{
 \item{filename}{Path to Olink software output file in wide or long format.
 Expecting file extensions
-xls, xlsx, csv, txt, parquet or zip.}
+xls, xlsx, csv, txt, parquet, or zip. # nolint}
 
 \item{out_df}{The class of output data frame. One of "tibble" (default) or
 "arrow" for ArrowObject.}
@@ -47,11 +47,11 @@ wide format files.}
 
 \item{olink_platform}{Olink platform used to generate the input file.
 One of \code{NULL} (default),
-Target 48, Flex, Target 96, Explore 3072, Explore HT or Focus.}
+Target 48, Flex, Target 96, Explore 3072, Explore HT, or Focus. # nolint}
 
 \item{data_type}{Quantification method of the input data. One of \code{NULL}
 (default),
-Ct, NPX or Quantified. # nolint}
+Ct, NPX, or Quantified. # nolint}
 
 \item{.ignore_files}{Character vector of files included in the zip-compressed
 Olink software output files that should be ignored. Applies only to

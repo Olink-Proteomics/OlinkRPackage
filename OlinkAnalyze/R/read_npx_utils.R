@@ -68,6 +68,7 @@ convert_read_npx_output <- function(df,
       message = c(
         "x" = "Unexpected input data frame {.arg {rlang::caller_arg(df)}}!",
         "i" = "Expecting: { cli::ansi_collapse(x = read_npx_df_output,
+                                               sep2 = \" or \",
                                                last = \", or \") }"
       ),
       call = rlang::caller_env(),
@@ -84,9 +85,9 @@ convert_read_npx_output <- function(df,
 #'   Klev Diamanti
 #'
 #' @param x The name of the Olink platform. One of
-#' `r cli::ansi_collapse(x = accepted_olink_platforms$name, last = " or ")`.
+#' `r cli::ansi_collapse(x = accepted_olink_platforms$name, sep2 = " or ", last = ", or ")`. # nolint
 #' @param broader_platform Name of the broader Olink platform. One of
-#' `r cli::ansi_collapse(x = unique(accepted_olink_platforms$broader_platform), last = " or ")`. # nolint
+#' `r unique(accepted_olink_platforms$broader_platform) |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
 #'
 #' @return
 #' `NULL` if platform is ok, otherwise an error.
@@ -140,9 +141,9 @@ check_olink_platform <- function(x,
 #'   Klev Diamanti
 #'
 #' @param x The name of the Olink data type. One of
-#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(last = " or ")`. # nolint
+#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
 #' @param broader_platform Name of the broader Olink platform. One of
-#' `r cli::ansi_collapse(x = unique(accepted_olink_platforms$broader_platform), last = " or ")`. # nolint
+#' `r unique(accepted_olink_platforms$broader_platform) |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
 #'
 #' @return
 #' `NULL` if data_type is ok, otherwise an error.
@@ -204,7 +205,7 @@ check_olink_data_type <- function(x,
 #'   Klev Diamanti
 #'
 #' @param x Name of the broader Olink platform. One of
-#' `r cli::ansi_collapse(x = unique(accepted_olink_platforms$broader_platform), last = " or ")`. # nolint
+#' `r unique(accepted_olink_platforms$broader_platform) |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
 #'
 #' @return
 #' `NULL` if broader Olink platform is ok, otherwise an error.
@@ -244,7 +245,7 @@ check_olink_broader_platform <- function(x) {
 #' @param df Tibble or ArrowObject with Olink data in wide or long format.
 #' @param file Path to Olink software output file in wide or long format.
 #' Expecting file extensions
-#' `r cli::ansi_collapse(x = accepted_npx_file_ext, sep = ", ", last = " or ")`.
+#' `r cli::ansi_collapse(x = accepted_npx_file_ext, sep2 = " or ", last = ", or ")`. # nolint
 #'
 #' @return Error is file contains problematic column names. `NULL` otherwise.
 #'

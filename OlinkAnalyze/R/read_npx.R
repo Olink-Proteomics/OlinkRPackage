@@ -18,7 +18,7 @@
 #'
 #' @param filename Path to Olink software output file in wide or long format.
 #' Expecting file extensions
-#' `r cli::ansi_collapse(x = accepted_npx_file_ext, sep = ", ", last = " or ")`.
+#' `r cli::ansi_collapse(x = accepted_npx_file_ext, sep2 = " or ", last = ", or ")`. # nolint
 #' @param out_df The class of output data frame. One of "tibble" (default) or
 #' "arrow" for ArrowObject.
 #' @param sep Character separator of delimited input file. One of `NULL` for
@@ -29,10 +29,10 @@
 #' wide format files.
 #' @param olink_platform Olink platform used to generate the input file.
 #' One of `NULL` (default),
-#' `r cli::ansi_collapse(x = accepted_olink_platforms$name, last = " or ")`.
+#' `r cli::ansi_collapse(x = accepted_olink_platforms$name, sep2 = " or ", last = ", or ")`. # nolint
 #' @param data_type Quantification method of the input data. One of `NULL`
 #' (default),
-#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(last = " or ")`. # nolint
+#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
 #' @param .ignore_files Character vector of files included in the zip-compressed
 #' Olink software output files that should be ignored. Applies only to
 #' zip-compressed input files (default = \emph{c("README.txt")}).
