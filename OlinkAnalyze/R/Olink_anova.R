@@ -223,7 +223,7 @@ olink_anova <- function(df,
         dplyr::summarise(n_levels = dplyr::n_distinct(!!rlang::ensym(effect), na.rm = TRUE)) |>
         dplyr::ungroup() |>
         dplyr::filter(n_levels > 1) |>
-        nrow(.)
+        nrow()
 
       if (number_of_samples_w_more_than_one_level > 0) {
         stop(paste0("There are ",
@@ -291,12 +291,10 @@ olink_anova <- function(df,
       dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) |> #Exclude assays that have all NA:s
       dplyr::filter(!(OlinkID %in% nas_in_var)) |>
       dplyr::group_by(Assay, OlinkID, UniProt, Panel) |>
-      dplyr::do(generics::tidy(car::Anova(stats::lm(as.formula(formula_string),
-                            data=.,
-                            contrasts = sapply(fact.vars,function(x) return(contr.sum),
-                                               simplify = FALSE)),type=3))) |>
-
-      dplyr::ungroup() |>
+      dplyr::group_modify(~ internal_anova(x = .x,
+          formula_string = formula_string,
+          fact.vars = fact.vars))|>
+      dplyr::ungroup()|> 
       dplyr::filter(!term %in% c('(Intercept)','Residuals')) |>
       dplyr::mutate(covariates = term %in% covariate_filter_string) |>
       dplyr::group_by(covariates) |>
@@ -629,5 +627,21 @@ olink_anova_posthoc <- function(df,
     if (grepl(x = w, pattern = glob2rx("*contains implicit NA, consider using*")))
       invokeRestart("muffleWarning")
   })
+}
+
+
+
+#' Internal Anova function
+#'
+#' @param x grouped data frame
+#' @param formula_string anova formula
+#'
+#' @return anova results
+#'
+internal_anova <- function(x, formula_string, fact.vars){
+  generics::tidy(car::Anova(stats::lm(as.formula(formula_string),
+                       data=x,
+                       contrasts = sapply(fact.vars,function(x) return(contr.sum),
+                                          simplify = FALSE)),type=3))
 }
 
