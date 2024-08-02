@@ -19,7 +19,7 @@ read_npx_format(
 \arguments{
 \item{file}{Path to Olink software output file in wide or long format.
 Expecting file extensions
-xls, xlsx, csv or txt. # nolint}
+xls, xlsx, csv, or txt. # nolint}
 
 \item{out_df}{The class of output data frame. One of "tibble" (default) or
 "arrow" for ArrowObject.}
@@ -34,11 +34,11 @@ wide format files.}
 
 \item{olink_platform}{Olink platform used to generate the input file.
 One of \code{NULL} (default),
-Target 48, Flex, Target 96, Explore 3072, Explore HT or Focus.}
+Target 48, Flex, Target 96, Explore 3072, Explore HT, or Focus. # nolint}
 
 \item{data_type}{Quantification method of the input data. One of \code{NULL}
 (default),
-Ct, NPX or Quantified. # nolint}
+Ct, NPX, or Quantified. # nolint}
 
 \item{quiet}{Boolean to print a confirmation message when reading the input
 file. Applies to excel or delimited input only. "TRUE" (default) to not print
@@ -55,11 +55,11 @@ This function processes Olink software excel or delimited files regardless of
 data type, platform or format.
 
 \strong{Olink software excel files} with the extension
-xls and xlsx. # nolint
+xls or xlsx. # nolint
 are imported in R by the function \code{\link{read_npx_excel}}.
 
 \strong{Olink software delimited files} with suffix
-csv and txt. # nolint
+csv or txt. # nolint
 are imported in R by the functions \code{\link{read_npx_delim}} or
 \code{\link{read_npx_csv}}.
 
