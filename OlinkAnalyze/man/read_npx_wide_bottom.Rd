@@ -19,14 +19,14 @@ read_npx_wide_bottom(
 
 \item{file}{Path to Olink software output file in wide or long format.
 Expecting file extensions
-xls, xlsx, csv or txt. # nolint}
+xls, xlsx, csv, or txt. # nolint}
 
 \item{olink_platform}{Olink platform used to generate the input file.
 One of
-Target 48, Flex, Target 96 or Focus. # nolint}
+Target 48, Flex, Target 96, or Focus. # nolint}
 
 \item{data_type}{Quantification method of the input data. One of
-Ct, NPX or Quantified. # nolint}
+Ct, NPX, or Quantified. # nolint}
 
 \item{col_names}{Names list of character vectors containing column names from
 each chunk of columns \var{df_top} was split on in function.}

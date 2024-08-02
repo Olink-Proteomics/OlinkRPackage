@@ -8,10 +8,10 @@ check_olink_data_type(x, broader_platform = NULL)
 }
 \arguments{
 \item{x}{The name of the Olink data type. One of
-Ct, NPX or Quantified. # nolint}
+Ct, NPX, or Quantified. # nolint}
 
 \item{broader_platform}{Name of the broader Olink platform. One of
-qPCR and NGS. # nolint}
+qPCR or NGS. # nolint}
 }
 \value{
 \code{NULL} if data_type is ok, otherwise an error.

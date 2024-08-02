@@ -3,7 +3,7 @@
 \name{read_npx_delim_long}
 \alias{read_npx_delim_long}
 \title{Help function to read long format
-Ct, NPX or Quantified # nolint
+Ct, NPX, or Quantified # nolint
 data from delimited file exported from Olink software.}
 \usage{
 read_npx_delim_long(file, sep = NULL)
@@ -11,7 +11,7 @@ read_npx_delim_long(file, sep = NULL)
 \arguments{
 \item{file}{Path to Olink software output delimited file in long format.
 Expecting file extensions
-csv and txt. # nolint}
+csv or txt. # nolint}
 
 \item{sep}{Character separator of delimited input file. One of \code{NULL} for
 auto-detection (default), "," for comma or ";" for semicolon. Used only for

@@ -11,11 +11,11 @@ read_npx_wide_top(df, file, olink_platform, format_spec)
 
 \item{file}{Path to Olink software output file in wide or long format.
 Expecting file extensions
-xls, xlsx, csv or txt. # nolint}
+xls, xlsx, csv, or txt. # nolint}
 
 \item{olink_platform}{Olink platform used to generate the input file.
 One of
-Target 48, Flex, Target 96 or Focus. # nolint}
+Target 48, Flex, Target 96, or Focus. # nolint}
 
 \item{format_spec}{A tibble derived from \var{olink_wide_spec} in the local
 environment containing the expected format of the Olink wide file based on

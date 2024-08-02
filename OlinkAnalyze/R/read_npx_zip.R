@@ -13,12 +13,12 @@
 #' \itemize{
 #' \item \strong{Olink file} exported by Olink software in wide or long format.
 #' Expecting file extensions
-#' `r cli::ansi_collapse(x = accepted_npx_file_ext, last = " or ")`.
+#' `r cli::ansi_collapse(x = accepted_npx_file_ext, sep2 = " or ", last = ", or ")`. # nolint
 #' This file is subsequently provided as input to \code{\link{read_npx}}.
 #' \item \strong{checksum file} One of
-#' `r cli::ansi_collapse(x = accepted_checksum_files, last = " or ")` depending
-#' on the checksum algorithm. The file contains only one line with the checksum
-#' string of characters.
+#' `r cli::ansi_collapse(x = accepted_checksum_files, sep2 = " or ", last = ", or ")` # nolint
+#' depending on the checksum algorithm. The file contains only one line with the
+#' checksum string of characters.
 #' \item \strong{File(s) to be ignored} from the zip file. These files can be
 #' named as a character vector in the argument \var{.ignore_files}.
 #' }
@@ -30,7 +30,7 @@
 #'
 #' @param file Path to Olink software output zip-compressed file in wide or long
 #' format. Expecting file extension
-#' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("compress", names(accepted_npx_file_ext))], last = " or ")`. # nolint
+#' `r accepted_npx_file_ext[grepl("compress", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
 #' @param out_df The class of output data frame. One of "tibble" (default) or
 #' "arrow" for ArrowObject.
 #' @param sep Character separator of delimited input file. One of `NULL` for
@@ -41,10 +41,10 @@
 #' wide format files.
 #' @param olink_platform Olink platform used to generate the input file.
 #' One of `NULL` (default),
-#' `r cli::ansi_collapse(x = accepted_olink_platforms$name, last = " or ")`.
+#' `r cli::ansi_collapse(x = accepted_olink_platforms$name, sep2 = " or ", last = ", or ")`. # nolint
 #' @param data_type Quantification method of the input data. One of `NULL`
 #' (default),
-#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(last = " or ")`. # nolint
+#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
 #' @param .ignore_files Character vector of files included in the zip-compressed
 #' Olink software output files that should be ignored. Applies only to
 #' zip-compressed input files. (default = c("README.txt")).
@@ -244,6 +244,7 @@ get_checksum_file <- function(files) {
         "x" = "The compressed file contains too many checksum files!",
         "i" = "The compressed input file should contain {.strong only} one
           checksum file: { cli::ansi_collapse(x = accepted_checksum_files,
+                                              sep2 = \" or \",
                                               last = \", or \") }."
       ),
       call = rlang::caller_env(),
@@ -311,6 +312,7 @@ get_npx_file <- function(files,
         file with extension:
         {cli::ansi_collapse(x =
       accepted_npx_file_ext[!(accepted_npx_file_ext %in% excl_file_ext)],
+        sep2 = \" or \",
         last = \", or \")}."
       ),
       call = rlang::caller_env(),
@@ -348,9 +350,9 @@ get_npx_file <- function(files,
 #'
 #' @description
 #' Runs only if one of
-#' `r cli::ansi_collapse(x = accepted_checksum_files, last = " or ")` are
-#' present in the input zip-compressed file. This function does not check if the
-#' \var{checksum_file} is in acceptable format.
+#' `r cli::ansi_collapse(x = accepted_checksum_files, sep2 = " or ", last = ", or ")` # nolint
+#' are present in the input zip-compressed file. This function does not check if
+#' the \var{checksum_file} is in acceptable format.
 #'
 #' @author
 #'   Klev Diamanti

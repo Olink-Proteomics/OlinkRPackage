@@ -34,11 +34,11 @@ wide format files.}
 
 \item{olink_platform}{Olink platform used to generate the input file.
 One of \code{NULL} (default),
-Target 48, Flex, Target 96, Explore 3072, Explore HT or Focus.}
+Target 48, Flex, Target 96, Explore 3072, Explore HT, or Focus. # nolint}
 
 \item{data_type}{Quantification method of the input data. One of \code{NULL}
 (default),
-Ct, NPX or Quantified. # nolint}
+Ct, NPX, or Quantified. # nolint}
 
 \item{.ignore_files}{Character vector of files included in the zip-compressed
 Olink software output files that should be ignored. Applies only to
@@ -63,12 +63,12 @@ Olink data file, \strong{none or one} checksum file and
 \itemize{
 \item \strong{Olink file} exported by Olink software in wide or long format.
 Expecting file extensions
-xls, xlsx, csv, txt, parquet or zip.
+xls, xlsx, csv, txt, parquet, or zip. # nolint
 This file is subsequently provided as input to \code{\link{read_npx}}.
 \item \strong{checksum file} One of
-MD5_checksum.txt and checksum_sha256.txt depending
-on the checksum algorithm. The file contains only one line with the checksum
-string of characters.
+MD5_checksum.txt or checksum_sha256.txt # nolint
+depending on the checksum algorithm. The file contains only one line with the
+checksum string of characters.
 \item \strong{File(s) to be ignored} from the zip file. These files can be
 named as a character vector in the argument \var{.ignore_files}.
 }
