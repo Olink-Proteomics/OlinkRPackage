@@ -467,7 +467,7 @@ check_npx_olinkid <- function(df,
 #'  Masoumeh Sheikhi
 #'
 #' @param df A tibble or an arrow object containing columns \var{OlinkID} and
-#' the quantification column `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(last = ", or ")` # nolint
+#' the quantification column `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep2 = " or ", last = ", or ")` # nolint
 #' @param col_names A list of matched column names. This is the output of the
 #' \var{check_npx_col_names} function.
 #'
