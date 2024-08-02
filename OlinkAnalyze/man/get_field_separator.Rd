@@ -9,7 +9,7 @@ get_field_separator(file)
 \arguments{
 \item{file}{Path to Olink software output delimited file in wide format.
 Expecting file extensions
-csv and txt. # nolint}
+csv or txt. # nolint}
 }
 \value{
 The file separator comma "," or semicolon ";".

@@ -13,7 +13,7 @@ read_npx_csv(file, out_df = "arrow", sep = NULL)
 \arguments{
 \item{file}{Path to Olink software output delimited file in wide or long
 format. Expecting file extensions
-csv and txt. # nolint}
+csv or txt. # nolint}
 
 \item{out_df}{The class of output data frame. One of "tibble" (default) or
 "arrow" for ArrowObject.}

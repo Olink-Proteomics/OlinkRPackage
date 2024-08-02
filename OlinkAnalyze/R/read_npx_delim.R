@@ -11,7 +11,7 @@
 #'
 #' @param file Path to Olink software output delimited file in wide or long
 #' format. Expecting file extensions
-#' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("delim", names(accepted_npx_file_ext))], sep = ", ", last = " or ")`. # nolint
+#' `r accepted_npx_file_ext[grepl("delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
 #' @param out_df The class of output data frame. One of "tibble" (default) or
 #' "arrow" for ArrowObject.
 #' @param sep Character separator of delimited input file. One of `NULL` for
@@ -124,7 +124,7 @@ read_npx_delim <- function(file,
 read_npx_csv <- read_npx_delim
 
 #' Help function to read long format
-#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(last = " or ")` # nolint
+#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep2 = " or ", last = ", or ")` # nolint
 #' data from delimited file exported from Olink software.
 #'
 #' @description
@@ -137,7 +137,7 @@ read_npx_csv <- read_npx_delim
 #'
 #' @param file Path to Olink software output delimited file in long format.
 #' Expecting file extensions
-#' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("delim", names(accepted_npx_file_ext))], sep = ", ", last = " or ")`. # nolint
+#' `r accepted_npx_file_ext[grepl("delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
 #' @param sep Character separator of delimited input file. One of `NULL` for
 #' auto-detection (default), "," for comma or ";" for semicolon. Used only for
 #' delimited output files from Olink software.
@@ -177,7 +177,7 @@ read_npx_delim_long <- function(file,
 }
 
 #' Help function to read wide format
-#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(last = " or ")` # nolint
+#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep2 = " or ", last = ", or ")` # nolint
 #' data from delimited file exported from Olink software.
 #'
 #' @description
@@ -188,7 +188,7 @@ read_npx_delim_long <- function(file,
 #'
 #' @param file Path to Olink software output delimited file in wide format.
 #' Expecting file extensions
-#' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("delim", names(accepted_npx_file_ext))], sep = ", ", last = " or ")`. # nolint
+#' `r accepted_npx_file_ext[grepl("delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
 #' @param sep Character separator of delimited input file. One of `NULL` for
 #' auto-detection (default), "," for comma or ";" for semicolon. Used only for
 #' delimited output files from Olink software.
@@ -239,7 +239,7 @@ read_npx_delim_wide <- function(file,
 #'
 #' @param file Path to Olink software output delimited file in wide format.
 #' Expecting file extensions
-#' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("delim", names(accepted_npx_file_ext))], sep = ", ", last = " or ")`. # nolint
+#' `r accepted_npx_file_ext[grepl("delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
 #' @param sep Character separator of delimited input file. One of `NULL` for
 #' auto-detection (default), "," for comma or ";" for semicolon. Used only for
 #' delimited output files from Olink software.
@@ -299,7 +299,7 @@ check_field_separator <- function(file,
 #'
 #' @param file Path to Olink software output delimited file in wide format.
 #' Expecting file extensions
-#' `r cli::ansi_collapse(x = accepted_npx_file_ext[grepl("delim", names(accepted_npx_file_ext))], sep = ", ", last = " or ")`. # nolint
+#' `r accepted_npx_file_ext[grepl("delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
 #'
 #' @return The file separator comma "," or semicolon ";".
 #'
