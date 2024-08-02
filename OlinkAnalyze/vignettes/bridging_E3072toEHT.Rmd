@@ -43,11 +43,20 @@ library(kableExtra)
 
 ## Bridge Sample Selection
 
+
+## Workflow Overview
+
+Olink Explore 3072 to Olink Explore HT bridging required harmonized Explore 3072 data and Explore HT data which has at least XX overlapping bridge samples. The assays from Explore 3072 are matched to the corresponding assays in Explore HT and evaluated to determine if the assay is bridgeable. In parallel the assay is normalized using quantile-quantile normalization and normalization using the median of paired differences. The result is an adjusted Explore 3072 dataset with three additional columns: a flag which indicates if the assay is bridgeable and, if so, which normalization method performs better, and the NPX values from each of the normalization methods. 
+
+A visual representation of the workflow is shown below.
+
+![Schematic of Explore 3072 to Explore HT Bridging Workflow](../man/figures/Bridging schematic for Tutorial.png)
+
+Note that regardless of the bridging recommendation, NPX values will be available for both normalization methods. 
+
 ## Import NPX files
 
-The input datasets are standard Olink^®^ NPX^TM^ tables. They can be loaded
-using `read_NPX()` function with default Olink Software NPX file as
-input.
+To normalize Explore 3072 data to Explore HT data, first the two datasets are read into R using `read_NPX()`. If more that two datasets are being normalized, all Explore 3072 studies should be normalized together prior to normalizing between products. One Explore HT study should be chosen as the reference dataset. The bridge samples should have the same Sample IDs in both platforms. The input datasets are standard Olink^®^ NPX^TM^ tables. They can be loaded using `read_NPX()` function with default Olink Software NPX file as input, as shown below.
 
 ```{r message=FALSE, eval=FALSE, echo = TRUE}
 data_E3072 <- read_NPX("~/NPX_Explore3072_location.parquet") # Could also be a CSV file
@@ -58,7 +67,17 @@ data_EHT <- read_NPX("~/NPX_ExploreHT_location.parquet")
 
 ## Normalization
 
-### Is the Assay Bridgeable
+### Determining bridging recommendations
+There are four criteria that are used to determine if an assay is bridgable and what normalization method should be used:
+
+* Is there a linear relationship between products? WORDS
+* Are the NPX ranges in the two products similar? WORDS
+* Are the distributions between products the same shape? WORDS
+* Are there sufficient counts in both products? WORDS
+
+If all of these criteria are met then the assay is considered bridgable. Note that bridgable assays will differ between projects based on the expression of bridge samples in the studies.
+
+
 
 ### Normalization using the median of paired differences
 
@@ -68,7 +87,24 @@ data_EHT <- read_NPX("~/NPX_ExploreHT_location.parquet")
 
 ## Evaluating the quality of bridging
 
-## Export Normalized Data
+## Exporting Normalized Data
+The normalized Explore 3072 data can be exported using `arrow::write_parquet()` to create a long format Olink Explore file.
+
+```{r, eval=FALSE}
+df <- normalized_data |>
+    dplyr::filter(Project == "Explore_3072_NAME") |>
+    arrow::as_arrow_table()
+
+df$metadata$FileVersion <- "NA"
+df$metadata$ExploreVersion <- "NA"
+df$metadata$ProjectName <- "NA"
+df$metadata$SampleMatrix <- "NA"
+df$metadata$DataFileType <- "Olink Analyze Export File"
+df$metadata$ProductType <- "Explore3072"
+df$metadata$Product <- "Explore3072"
+arrow::write_parquet(x = df, sink = "path_to_output.parquet")
+```
+
 
 ## FAQs
 
