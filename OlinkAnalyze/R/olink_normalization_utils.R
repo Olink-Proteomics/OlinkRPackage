@@ -355,38 +355,6 @@ olink_norm_input_validate <- function(df1,
   v_reference_medians <- ifelse(!is.null(reference_medians), # nolint
                                 TRUE,
                                 FALSE)
-  
-  ## check if 3K-HT bridging ----
-  
-  # check if DF1 is an Explore HT data frame
-  df1_exploreht_flag <- ifelse(df1 |>
-                                 select(Panel) |> 
-                                 distinct() |> 
-                                 na.omit() |> 
-                                 pull() %in% "Explore_HT",
-                               TRUE,
-                               FALSE)
-  
-  # check if DF2 is an Explore 3072 data frame
-  df2_explore3k_flag <- ifelse(all(df2 |> 
-                                     select(Panel) |>
-                                     distinct() |>
-                                     na.omit() |>
-                                     pull() %in% 
-                                     c("Cardiometabolic", "Cardiometabolic_II",
-                                       "Inflammation", "Inflammation_II",
-                                       "Neurology", "Neurology_II",
-                                       "Oncology", "Oncology_II")),
-                               TRUE,
-                               FALSE)
-  
-  v_explore3k_exploreht <- ifelse(
-    df1_exploreht_flag == TRUE & df2_explore3k_flag == TRUE, # nolint
-    TRUE,
-    FALSE)
-  
-  rm(df1_exploreht_flag)
-  rm(df2_explore3k_flag)
 
   # get normalization mode ----
 
@@ -400,7 +368,6 @@ olink_norm_input_validate <- function(df1,
       & .data[["overlapping_samples_df1"]] == .env[["v_overlap_samples_df1"]]
       & .data[["overlapping_samples_df2"]] == .env[["v_overlap_samples_df2"]]
       & .data[["reference_medians"]] == .env[["v_reference_medians"]]
-      & .data[["explore3k_exploreht_flag"]] == .env[["v_explore3k_exploreht"]]
     )
 
   error_msg_row <- olink_norm_mode_row$error_msg[1L]
@@ -433,7 +400,37 @@ olink_norm_input_validate <- function(df1,
     if (!is.na(inform_msg_row)) {
       cli::cli_inform(message = inform_msg_row)
     }
-
+    
+    # modifying norm_mode_row to median_norm_3k_ht from bridging, if applicable
+    if (olink_norm_mode_row$norm_mode == olink_norm_modes$bridge) {
+      
+      # detect if DF1 is HT data from panels
+      df1_ht <- ifelse(df1 |>
+                         select(Panel) |> 
+                         distinct() |> 
+                         na.omit() |> 
+                         pull() %in% c("Explore HT", "Explore_HT"),
+                       TRUE,
+                       FALSE)
+      
+      # detect if DF2 is 3K data from panels
+      df2_3k <- ifelse(all(df2 |>
+                         select(Panel) |> 
+                         distinct() |> 
+                         na.omit() |> 
+                         pull() %in% 
+                         c("Cardiometabolic", "Cardiometabolic_II",
+                           "Inflammation", "Inflammation_II",
+                           "Neurology", "Neurology_II",
+                           "Oncology", "Oncology_II")),
+                        TRUE,
+                        FALSE)
+      
+      if(df1_ht == TRUE & df2_3k == TRUE) {
+        norm_mode_row <- olink_norm_modes$median_norm_3k_ht
+      }
+    }
+    
     # return the type of normalization to perform
     return(norm_mode_row)
 

@@ -46,7 +46,7 @@ olink_normalization_median_ref <- function(exploreht_df,
   update_sampleid <- dplyr::bind_cols(bridge_samples) |>
     dplyr::rename("SampleID_df1" = "DF1",
                   "SampleID_df2" = "DF2")
-  
+
   
   # change the SampleID of the non-reference data frame to match the bridging
   # samples from the reference data frame. This is done because the
@@ -77,16 +77,14 @@ olink_normalization_median_ref <- function(exploreht_df,
     left_join(map_oid,
               relationship = "many-to-many",
               by = c("OlinkID" = "OlinkID_ExploreHT")) |>
-    mutate(OlinkID_Original = OlinkID,
-           OlinkID = OlinkID_HT_3K) |>
+    mutate(OlinkID = OlinkID_HT_3K) |>
     select(-OlinkID_HT_3K, -OlinkID_Explore384)
   
   explore3072_df <- explore3072_df |>
     left_join(map_oid, 
               relationship = "many-to-many",
               by = c("OlinkID" = "OlinkID_Explore384")) |>
-    mutate(OlinkID_Original = OlinkID,
-           OlinkID = OlinkID_HT_3K) |>
+    mutate(OlinkID = OlinkID_HT_3K) |>
     select(-OlinkID_HT_3K, -OlinkID_ExploreHT)
  
   # bridge normalize the two data frames
@@ -116,7 +114,8 @@ olink_normalization_median_ref <- function(exploreht_df,
   # switch back both reference and non-reference projects to original
   # OlinkIDs, with both HT and 3K OlinkIDs
   norm_df <- norm_df |>
-    dplyr::left_join(map_oid, by = c('OlinkID' = 'OlinkID_HT_3K'))
+    dplyr::left_join(map_oid, by = c('OlinkID' = 'OlinkID_HT_3K')) |>
+    select(-OlinkID)
   rm(map_oid)
   
   return(norm_df)
