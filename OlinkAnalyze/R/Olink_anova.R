@@ -635,9 +635,10 @@ olink_anova_posthoc <- function(df,
 #'
 #' @param x grouped data frame
 #' @param formula_string anova formula
+#' @param fact.vars variables in factor form
 #'
 #' @return anova results
-#'
+#' @noRd
 internal_anova <- function(x, formula_string, fact.vars){
   generics::tidy(car::Anova(stats::lm(as.formula(formula_string),
                        data=x,
