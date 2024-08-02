@@ -63,7 +63,7 @@ Roxygen: list(markdown = TRUE)
 Depends: R (>= 4.1.0)
 Imports: 
     arrow (>= 14.0.0),
-    cli (>= 3.6.1),
+    cli (>= 3.6.2),
     dbplyr,
     dplyr,
     duckdb,
