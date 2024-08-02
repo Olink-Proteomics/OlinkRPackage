@@ -20,9 +20,9 @@ did not match.
 }
 \description{
 Runs only if one of
-MD5_checksum.txt and checksum_sha256.txt are
-present in the input zip-compressed file. This function does not check if the
-\var{checksum_file} is in acceptable format.
+MD5_checksum.txt or checksum_sha256.txt # nolint
+are present in the input zip-compressed file. This function does not check if
+the \var{checksum_file} is in acceptable format.
 }
 \author{
 Klev Diamanti
