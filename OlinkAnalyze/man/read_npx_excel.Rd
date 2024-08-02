@@ -10,7 +10,7 @@ read_npx_excel(file, out_df = "arrow")
 \arguments{
 \item{file}{Path to Olink software output excel file in wide or long format.
 Expecting file extensions
-xls and xlsx. # nolint}
+xls or xlsx. # nolint}
 
 \item{out_df}{The class of output data frame. One of "tibble" (default) or
 "arrow" for ArrowObject.}
