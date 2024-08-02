@@ -426,9 +426,10 @@ check_npx_olinkid <- function(df,
       .data[[col_names$olink_id]]
     )  |>
     dplyr::filter(
-      stringr::str_detect(string = .data[[col_names$olink_id]],
-                          pattern = "^OID[0-9]{5}$",
-                          negate = TRUE)
+      !grepl(
+        pattern = "^OID\\d{5}$",
+        x = .data[[col_names$olink_id]]
+      )
     )  |>
     dplyr::collect() |>
     dplyr::pull(
