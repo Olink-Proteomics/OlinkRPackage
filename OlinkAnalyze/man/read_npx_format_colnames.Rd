@@ -12,7 +12,7 @@ read_npx_format_colnames(df, file)
 
 \item{file}{Path to Olink software output file in wide or long format.
 Expecting file extensions
-xls, xlsx, csv, txt, parquet or zip.}
+xls, xlsx, csv, txt, parquet, or zip. # nolint}
 }
 \value{
 Error is file contains problematic column names. \code{NULL} otherwise.
