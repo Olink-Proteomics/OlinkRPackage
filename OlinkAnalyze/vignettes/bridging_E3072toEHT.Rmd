@@ -43,20 +43,42 @@ library(kableExtra)
 
 ## Bridge Sample Selection
 
-
 ## Workflow Overview
 
-Olink Explore 3072 to Olink Explore HT bridging required harmonized Explore 3072 data and Explore HT data which has at least XX overlapping bridge samples. The assays from Explore 3072 are matched to the corresponding assays in Explore HT and evaluated to determine if the assay is bridgeable. In parallel the assay is normalized using quantile-quantile normalization and normalization using the median of paired differences. The result is an adjusted Explore 3072 dataset with three additional columns: a flag which indicates if the assay is bridgeable and, if so, which normalization method performs better, and the NPX values from each of the normalization methods. 
+Olink Explore 3072 to Olink Explore HT bridging required harmonized
+Explore 3072 data and Explore HT data which has at least XX overlapping
+bridge samples. The assays from Explore 3072 are matched to the
+corresponding assays in Explore HT and evaluated to determine if the
+assay is bridgeable. In parallel the assay is normalized using
+quantile-quantile normalization and normalization using the median of
+paired differences. The result is an adjusted Explore 3072 dataset with
+three additional columns:
+
+-   a flag which indicates if the assay is bridgeable and, if so, which
+    normalization method performs better
+
+-   NPX values for normalization using the median of paired differences
+
+-   NPX values using quantile-quantile normalization
 
 A visual representation of the workflow is shown below.
 
-![Schematic of Explore 3072 to Explore HT Bridging Workflow](../man/figures/Bridging schematic for Tutorial.png)
+![Schematic of Explore 3072 to Explore HT Bridging
+Workflow](../man/figures/Bridging%20schematic%20for%20Tutorial.png)
 
-Note that regardless of the bridging recommendation, NPX values will be available for both normalization methods. 
+Note that regardless of the bridging recommendation, NPX values will be
+available for both normalization methods.
 
 ## Import NPX files
 
-To normalize Explore 3072 data to Explore HT data, first the two datasets are read into R using `read_NPX()`. If more that two datasets are being normalized, all Explore 3072 studies should be normalized together prior to normalizing between products. One Explore HT study should be chosen as the reference dataset. The bridge samples should have the same Sample IDs in both platforms. The input datasets are standard Olink^®^ NPX^TM^ tables. They can be loaded using `read_NPX()` function with default Olink Software NPX file as input, as shown below.
+To normalize Explore 3072 data to Explore HT data, first the two
+datasets are read into R using `read_NPX()`. If more that two datasets
+are being normalized, all Explore 3072 studies should be normalized
+together prior to normalizing between products. One Explore HT study
+should be chosen as the reference dataset. The bridge samples should
+have the same Sample IDs in both platforms. The input datasets are
+standard Olink^®^ NPX^TM^ tables. They can be loaded using `read_NPX()`
+function with default Olink Software NPX file as input, as shown below.
 
 ```{r message=FALSE, eval=FALSE, echo = TRUE}
 data_E3072 <- read_NPX("~/NPX_Explore3072_location.parquet") # Could also be a CSV file
@@ -68,16 +90,40 @@ data_EHT <- read_NPX("~/NPX_ExploreHT_location.parquet")
 ## Normalization
 
 ### Determining bridging recommendations
-There are four criteria that are used to determine if an assay is bridgable and what normalization method should be used:
 
-* Is there a linear relationship between products? WORDS
-* Are the NPX ranges in the two products similar? WORDS
-* Are the distributions between products the same shape? WORDS
-* Are there sufficient counts in both products? WORDS
+There are four criteria that are used to determine if an assay is
+bridgeable and what normalization method should be used:
 
-If all of these criteria are met then the assay is considered bridgable. Note that bridgable assays will differ between projects based on the expression of bridge samples in the studies.
+-   Is there a linear relationship between products?
+-   Are the NPX ranges in the two products similar?
+-   Are there sufficient counts in both products?
+-   Are the distributions between products the same shape?
 
+An overview of these criteria is visualized below.
 
+![Criteria to determine the recommended bridging method for an assay (if any)](../man/figures/assay_bridgeability.png)
+
+Prior to assessment, outlier bridge samples are excluded. A sample is considered an outlier if the NPX value is more than 3 * the interquartile range above or below the median on either platform. 
+
+After assessment, an assay is considered bridgeable if it meets the first three criteria. The fourth criteria determines which normalizaiton method is recommended for bridging. If all four criteria are met than the recommended method is normalization using the median of paired differences. If only the first three criteria are met then quantile-quantile normalization is recommended. If any of the first three criteria are not met than bridging is not recommended for that assay. Note that bridgeable assays
+will differ between projects based on the expression of bridge samples
+in the studies.
+
+#### Assessing linearity across products
+
+To determine if there is a linear relationship between products for an assay, the linear coefficient of determination is calculated using Pearson correlation. In this correlation counts below 10 are excluded due to lack of signal. The R^2 value is calculated and an assay is considered to have a linear relationship across products if the R^2 value is above the cutoff. The default cutoff is set to R^2 > 0.8.
+
+#### Assessing similarity of NPX ranges
+
+To determine if the NPX ranges are similar across products, the difference in NPX values from the 10% to 90% quantile is calculated for each platform, excluding data points with counts less than 10. If the difference in range between platforms is greater than the cutoff than the ranges are not considered similar across platforms. By default, the cutoff is a difference of less than 1 NPX between platforms.
+
+#### Assessing if there are sufficient counts.
+
+To determine if there are sufficient counts in an assay for bridging, the median number of counts ***platform*** is calculated, excluding counts less than 10. If the median number of counts is less than the cutoff than the assay does not have sufficient counts to be used for bridging. The default cutoff is a median of greater than 150 counts.
+
+#### Assessing similarity of NPX distribution across products
+
+If the three criteria outlined above are met than the assay is considered bridgeable. Otherwise, bridging is not recommended for that assay. If an assay is bridgeable the similarity of the NPX distribution is used to determine which method is recommended for bridging. The Kolmogorov-Smirnov test, or KS test, is used to assess the similarity of two distributions by calculating the distances between the NPX distributions for each product. If the distance is above the cutoff than quantile-quantile normalization is recommended. If the distance is less than the cutoff than normalization using the median of paired differences is recommended. By default this cutoff difference is set to 0.2.
 
 ### Normalization using the median of paired differences
 
@@ -88,7 +134,9 @@ If all of these criteria are met then the assay is considered bridgable. Note th
 ## Evaluating the quality of bridging
 
 ## Exporting Normalized Data
-The normalized Explore 3072 data can be exported using `arrow::write_parquet()` to create a long format Olink Explore file.
+
+The normalized Explore 3072 data can be exported using
+`arrow::write_parquet()` to create a long format Olink Explore file.
 
 ```{r, eval=FALSE}
 df <- normalized_data |>
@@ -105,13 +153,11 @@ df$metadata$Product <- "Explore3072"
 arrow::write_parquet(x = df, sink = "path_to_output.parquet")
 ```
 
-
 ## FAQs
 
 ### Correlation Assays
 
 ### Downstream Analysis
-
 
 ## Contact Us
 
@@ -145,4 +191,3 @@ All third-party trademarks are the property of their respective owners.
 
 Olink products and assay methods are covered by several patents and
 patent applications <https://olink.com/legal/patents>.
-
