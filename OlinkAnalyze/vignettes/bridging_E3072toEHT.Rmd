@@ -63,8 +63,11 @@ three additional columns:
 
 A visual representation of the workflow is shown below.
 
-![Schematic of Explore 3072 to Explore HT Bridging
-Workflow](../man/figures/Bridging_schematic.png)
+```{r, fig.cap= fcap, echo = FALSE, out.width="100%"}
+knitr::include_graphics("../man/figures/Bridging_schematic.png")
+fcap <- "Schematic of Explore 3072 to Explore HT Bridging Workflow"
+```
+
 
 Note that regardless of the bridging recommendation, NPX values will be
 available for both normalization methods.
@@ -100,12 +103,15 @@ bridgeable and what normalization method should be used:
 -   Are the distributions between products the same shape?
 
 An overview of these criteria is visualized below.
+```{r, fig.cap= fcap, echo = FALSE, out.width="100%"}
+knitr::include_graphics("../man/figures/assay_bridgeability.png")
+fcap <- "Criteria to determine the bridging recommendation for an assay"
+```
 
-![Criteria to determine the recommended bridging method for an assay (if any)](../man/figures/assay_bridgeability.png)
 
-Prior to assessment, outlier bridge samples are excluded. A sample is considered an outlier if the NPX value is more than 3 * the interquartile range above or below the median on either platform. 
+Prior to assessment, outlier bridge samples are excluded. A sample is considered an outlier if the NPX value is more than 3 times the interquartile range above or below the median on either platform. 
 
-After assessment, an assay is considered bridgeable if it meets the first three criteria. The fourth criteria determines which normalizaiton method is recommended for bridging. If all four criteria are met than the recommended method is normalization using the median of paired differences. If only the first three criteria are met then quantile-quantile normalization is recommended. If any of the first three criteria are not met than bridging is not recommended for that assay. Note that bridgeable assays
+After assessment, an assay is considered bridgeable if it meets the first three criteria. The fourth criteria determines which normalization method is recommended for bridging. If all four criteria are met than the recommended method is normalization using the median of paired differences. If only the first three criteria are met then quantile-quantile normalization is recommended. If any of the first three criteria are not met than bridging is not recommended for that assay. Note that bridgeable assays
 will differ between projects based on the expression of bridge samples
 in the studies.
 
