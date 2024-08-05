@@ -144,10 +144,17 @@ olink_pal <- function(alpha = 1, coloroption = NULL) {
 
 
 olink_color_discrete <- function(..., alpha = 1, coloroption = NULL) {
-
-  ggplot2::discrete_scale(aesthetics = "colour", 
-                          scale_name = deprecated(),
+  # Add support for older and newer versions of ggplot
+  if (utils::packageVersion("ggplot2")< "3.5.0"){
+      ggplot2::discrete_scale(aesthetics = "colour", 
+                          scale_name = "olink",
                           palette = olink_pal(alpha, coloroption), ...)
+  } else{
+    ggplot2::discrete_scale(aesthetics = "colour", 
+                            palette = olink_pal(alpha, coloroption), ...)
+  }
+
+
 }
 
 
@@ -204,9 +211,14 @@ olink_color_gradient <- function(..., alpha = 1, coloroption = NULL) {
 #' @importFrom ggplot2 discrete_scale
 
 olink_fill_discrete <- function(..., alpha = 1, coloroption = NULL) {
-  ggplot2::discrete_scale(aesthetics = "fill", 
-                          scale_name = deprecated(),
+  if (utils::packageVersion("ggplot2")< "3.5.0"){
+  ggplot2::discrete_scale(aesthetics = "fill",
+                          scale_name =  "olink",
                           palette = olink_pal(alpha, coloroption), ...)
+  } else {
+    ggplot2::discrete_scale(aesthetics = "fill", 
+                            palette = olink_pal(alpha, coloroption), ...)
+  }
 }
 
 #' Olink fill scale for continuous ggplots
