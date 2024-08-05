@@ -64,7 +64,7 @@ three additional columns:
 A visual representation of the workflow is shown below.
 
 ```{r, fig.cap= fcap, echo = FALSE, out.width="100%"}
-knitr::include_graphics("../man/figures/Bridging_schematic.png")
+knitr::include_graphics(normalizePath("../man/figures/Bridging_schematic.png"), error = FALSE)
 fcap <- "Schematic of Explore 3072 to Explore HT Bridging Workflow"
 ```
 
@@ -104,7 +104,7 @@ bridgeable and what normalization method should be used:
 
 An overview of these criteria is visualized below.
 ```{r, fig.cap= fcap, echo = FALSE, out.width="100%"}
-knitr::include_graphics("../man/figures/assay_bridgeability.png")
+knitr::include_graphics(normalizePath("../man/figures/assay_bridgeability.png"), error = FALSE)
 fcap <- "Criteria to determine the bridging recommendation for an assay"
 ```
 
