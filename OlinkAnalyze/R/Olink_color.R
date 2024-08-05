@@ -145,7 +145,9 @@ olink_pal <- function(alpha = 1, coloroption = NULL) {
 
 olink_color_discrete <- function(..., alpha = 1, coloroption = NULL) {
 
-  ggplot2::discrete_scale(aesthetics = "colour", palette = olink_pal(alpha, coloroption), ...)
+  ggplot2::discrete_scale(aesthetics = "colour", 
+                          scale_name = deprecated(),
+                          palette = olink_pal(alpha, coloroption), ...)
 }
 
 
@@ -203,6 +205,7 @@ olink_color_gradient <- function(..., alpha = 1, coloroption = NULL) {
 
 olink_fill_discrete <- function(..., alpha = 1, coloroption = NULL) {
   ggplot2::discrete_scale(aesthetics = "fill", 
+                          scale_name = deprecated(),
                           palette = olink_pal(alpha, coloroption), ...)
 }
 
