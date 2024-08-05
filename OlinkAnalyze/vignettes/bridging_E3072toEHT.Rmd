@@ -64,7 +64,7 @@ three additional columns:
 A visual representation of the workflow is shown below.
 
 ![Schematic of Explore 3072 to Explore HT Bridging
-Workflow](../man/figures/Bridging%20schematic%20for%20Tutorial.png)
+Workflow](../man/figures/Bridging_%20_schematic.png)
 
 Note that regardless of the bridging recommendation, NPX values will be
 available for both normalization methods.
