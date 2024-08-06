@@ -74,7 +74,7 @@ mean NPX at mean(numerical variable) versus mean NPX at mean(numerical variable)
 
 library(dplyr)
 
-npx_df <- npx_data1 \%>\% filter(!grepl('control|ctrl',SampleID, ignore.case = TRUE))
+npx_df <- npx_data1 |> filter(!grepl('control|ctrl',SampleID, ignore.case = TRUE))
 
 #Two-way ANOVA, one main effect (Site) covariate.
 #Results in model NPX~Treatment*Time+Site.
@@ -86,10 +86,10 @@ anova_results <- olink_anova(df = npx_df,
 #on the interaction effect Treatment:Time with covariate Site.
 
 #Filtering out significant and relevant results.
-significant_assays <- anova_results \%>\%
-filter(Threshold == 'Significant' & term == 'Treatment:Time') \%>\%
-select(OlinkID) \%>\%
-distinct() \%>\%
+significant_assays <- anova_results |>
+filter(Threshold == 'Significant' & term == 'Treatment:Time') |>
+select(OlinkID) |>
+distinct() |>
 pull()
 
 #Posthoc, all pairwise comparisons
