@@ -84,9 +84,11 @@ overlapping between Explore 3072 and HT. Each overlapping assay undergoes
 a series of checks that evaluate the number of counts, correlation, and 
 difference of NPX ranges between the two datasets. If an assay has enough counts
 and comparable metrics between the two datasets, it is determined to be suitable
-for bridging (referred to as a "bridgeable" assay). Depending on the NPX 
-distribution of each bridgeable assay in the two datasets, the assay is
-normalized using either median normalization or **QQ normalization**.
+for bridging (referred to as a "bridgeable assay"). The set of "bridgable 
+assays" across platforms will vary from dataset to dataset, based on the samples
+present within the studies. Depending on the NPX distribution of each bridgeable
+assay in the two datasets, the assay is normalized using either median 
+normalization or **QQ normalization**.
 
 Product bridging between an Explore 3072 and an Explore HT NPX dataset
 requires **40-60 bridging samples**. Bridging samples are shared samples among
