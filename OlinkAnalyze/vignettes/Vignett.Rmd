@@ -99,12 +99,12 @@ The package contains two test data files named npx_data1 and npx_data2. These ar
 * **UniProt** _\<chr\>_: UniProt ID.
 * **Assay** _\<chr\>_: Common gene name for the assay.
 * **MissingFreq** _\<dbl\>_: Missing frequency for the OlinkID, i.e. frequency of samples with NPX value below limit of detection (LOD).
-* **Panel** _\<chr\>_: Olink Panel that samples ran on. Read more about Olink Panels here: [https://olink.com/products-services/](https://olink.com/products-services/).
+* **Panel** _\<chr\>_: Olink Panel that samples ran on. Read more about Olink Panels here: [https://olink.com/products/compare](https://olink.com/products/compare).
 * **Panel_Version** _\<chr\>_: Version of the panel. A new panel version might include some different or improved assays.
 * **PlateID** _\<chr\>_: Name of the plate.
-* **QC_Warning** _\<chr\>_: Indication whether the sample passed Olink QC. Read more here: [https://olink.com/faq/how-is-quality-control-of-the-data-performed/](https://olink.com/faq/how-is-quality-control-of-the-data-performed/).
+* **QC_Warning** _\<chr\>_: Indication whether the sample passed Olink QC. More information about Olink quality control metrics can be found in our [FAQ](https://olink.com/knowledge/faq) by searching "Quality control".
 * **LOD** _\<dbl\>_: Limit of detection (LOD) is the minimum level of an individual protein that can be measured. LOD is defined as 3 times the standard deviation over background.
-* **NPX** _\<dbl\>_: Normalized Protein eXpression, is Olink®’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX here: [https://olink.com/faq/what-is-npx/](https://olink.com/faq/what-is-npx/).
+* **NPX** _\<dbl\>_: Normalized Protein eXpression, is Olink®’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX in the Olink [FAQ](https://olink.com/knowledge/faq) (Search "What is NPX?") or in Olink's Data normalization and standardization [white paper](https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/05-white%20paper%20for%20website/1096-olink-data-normalization-white-paper.pdf).
 
 **Note:** There are 5 additional variables in the sample datasets npx_data1 and npx_data2 that include clinical or other information, namely: Subject _\<chr\>_, Treatment _\<chr\>_, Site _\<chr\>_, Time _\<chr\>_, Project _\<chr\>_.
 
@@ -132,12 +132,46 @@ A tibble in long format containing:
 * UniProt: UniProt ID.
 * Assay: Common gene name for the assay.
 * MissingFreq: Missing frequency for the OlinkID, i.e. frequency of samples with NPX value below limit of detection (LOD).
-* Panel: Olink Panel that samples ran on. Read more about Olink Panels here: [https://olink.com/products-services/](https://olink.com/products-services/).
+* Panel: Olink Panel that samples ran on. Read more about Olink Panels here: [https://olink.com/products/compare](https://olink.com/products/compare)
 * Panel_Version: Version of the panel. A new panel version might include some different or improved assays.
 * PlateID: Name of the plate.
-* QC_Warning: Indication whether the sample passed Olink QC. Read more here: [https://olink.com/faq/how-is-quality-control-of-the-data-performed/](https://olink.com/faq/how-is-quality-control-of-the-data-performed/).  
+* QC_Warning: Indication whether the sample passed Olink QC. More information about Olink quality control metrics can be found in our [FAQ](https://olink.com/knowledge/faq) (Search "Quality control"). 
 * LOD: Limit of detection (LOD) is the minimum level of an individual protein that can be measured. LOD is defined as 3 times the standard deviation over background.
-* NPX: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX here: [https://olink.com/faq/what-is-npx/](https://olink.com/faq/what-is-npx/).
+* NPX: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX in the Olink [FAQ](https://olink.com/knowledge/faq)(Search "What is NPX?") or in Olink's Data normalization and standardization [white paper](https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/05-white%20paper%20for%20website/1096-olink-data-normalization-white-paper.pdf).
+
+
+
+## Read multiple NPX data files (read_NPX)
+
+In order to import multiple NPX data files at once, the read_NPX function can be used in combination with the list.files, lapply and dplyr::bind_rows functions, as seen below. The *pattern* argument of the list.files function specifies the NPX file format (*.csv*, *.parquet*, or either). This method requires that all NPX files are stored in the same folder and have identical column names. No prior alterations to the NPX output file should be made for this method to work as expected.
+
+
+```{r message=FALSE, eval=FALSE}
+# Read in multiple NPX files in .csv format
+data <-  list.files(path = "path/to/dir/with/NPX/files",
+                    pattern = "csv$",
+                    full.names = TRUE) |>
+         lapply(FUN = function(x){
+    OlinkAnalyze::read_NPX(x) |> 
+      dplyr::mutate(File = x) # Optionally add additional columns to add file identifiers
+      }  |>
+         dplyr::bind_rows() # optional to return a single data frame of all files instead of a list of data frames
+
+# Read in multiple NPX files in .parquet format
+data <-  list.files(path = "path/to/dir/with/NPX/files",
+                    pattern = "parquet$",
+                    full.names = TRUE) |>
+         lapply(OlinkAnalyze::read_NPX)  |>
+         dplyr::bind_rows()
+
+# Read in multiple NPX files in either format
+data <-  list.files(path = "path/to/dir/with/NPX/files",  
+                    pattern = "parquet$|csv$",          
+                    full.names = TRUE) |>
+         lapply(OlinkAnalyze::read_NPX)  |>
+         dplyr::bind_rows()
+```  
+
 
 ## Randomize samples on plate (olink_plate_randomizer)
 
@@ -253,18 +287,18 @@ A tibble of NPX data in long format containing normalized NPX values, including 
 * UniProt: UniProt ID.
 * Assay: Common gene name for the assay.
 * MissingFreq: Missing frequency for the OlinkID, i.e. frequency of samples with NPX value below limit of detection (LOD).
-* Panel: Olink Panel that samples ran on. Read more about Olink Panels here: [https://olink.com/products-services/](https://olink.com/products-services/).
+* Panel: Olink Panel that samples ran on.Read more about Olink Panels here: [https://olink.com/products/compare](https://olink.com/products/compare).
 * Panel_Version: Version of the panel. A new panel version might include some different or improved assays.
 * PlateID: Name of the plate.
-* QC_Warning: Indication whether the sample passed Olink QC. Read more here: [https://olink.com/faq/how-is-quality-control-of-the-data-performed/](https://olink.com/faq/how-is-quality-control-of-the-data-performed/). 
+* QC_Warning: Indication whether the sample passed Olink QC. More information about Olink quality control metrics can be found in our [FAQ](https://olink.com/knowledge/faq) (Search "Quality control")
 * LOD: Limit of detection (LOD) is the minimum level of an individual protein that can be measured. LOD is defined as 3 times the standard deviation over background.
-* NPX: Normalized Protein eXpression, is Olink®’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX here: [https://olink.com/faq/what-is-npx/](https://olink.com/faq/what-is-npx/).
+* NPX: Normalized Protein eXpression, is Olink®’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX in the Olink [FAQ](https://olink.com/knowledge/faq) (Search "What is NPX?") or in Olink's Data normalization and standardization [white paper](https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/05-white%20paper%20for%20website/1096-olink-data-normalization-white-paper.pdf).
 * Project: Name given from the dataframe of origin.
 * Adj_factor: Adjustment factor, i.e. how much was added to or subtracted from the original NPX value.
 
 ## Integrating Explore NPX LOD (olink_lod) 
 
-The olink_lod function adds LOD information to an Explore HT or Explore 3072 NPX dataframe. This function can incorporate LOD based on either an Explore dataset's negative controls or using predetermined fixed LOD values, which can be downloaded from the Document Download Center at [olink.com](https://olink.com). The default LOD calculation method is based off of the negative controls. If an NPX file is intensity normalized, both intensity normalized and PC normalized LODs are provided. 
+The olink_lod function adds LOD information to an Explore HT or Explore 3072 NPX dataframe. This function can incorporate LOD based on either an Explore dataset's negative controls or using predetermined fixed LOD values, which can be downloaded from the Document Download Center at [olink.com](https://olink.com/knowledge/documents), or using both methods. The default LOD calculation method is based off of the negative controls. If an NPX file is intensity normalized, both intensity normalized and PC normalized LODs are provided. 
 
 ### Function arguments
  
@@ -296,13 +330,13 @@ A tibble with the following columns:
 + **UniProt** _\<chr\>_: UniProt ID.
 + **Assay** _\<chr\>_: Common gene name for the assay.
 + **AssayType** _\<chr\>_: Assay type. Indicates whether an assay is a panel assay or an Olink control assay.
-+ **Panel** _\<chr\>_: Olink Panel that samples ran on. Read more about Olink Panels here: https://olink.com/products-services/.
++ **Panel** _\<chr\>_: Olink Panel that samples ran on. Read more about Olink Panels here: [https://olink.com/products/compare](https://olink.com/products/compare).
 + **Block** _\<chr\>_: Olink Block that samples ran on. 
 + **Count** *<int>*: Raw counts generated during sequencing. 
-+ **ExtNPX** *<num>*: Extension normalized NPX value that is used in NPX calculation. Read more about ExtNPX here: https://olink.com/faq/how-is-the-npx-value-calculated-in-explore/
-+ **NPX** *<num>*: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log2 scale. The majority of the functions of this package use NPX values for calculations. If Explore data is PC normalized, NPX reflects the PC normalized value. If Explore data is intensity normalized NPX, NPX reflects the intensity normalized value. Read more about NPX here: https://olink.com/faq/what-is-npx/.
++ **ExtNPX** *<num>*: Extension normalized NPX value that is used in NPX calculation. Read more about ExtNPX in the [Olink FAQ]((https://olink.com/knowledge/faq)). (Search "extension normalized")
++ **NPX** *<num>*: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log2 scale. The majority of the functions of this package use NPX values for calculations. If Explore data is PC normalized, NPX reflects the PC normalized value. If Explore data is intensity normalized NPX, NPX reflects the intensity normalized value. Read more about NPX in the Olink [FAQ](https://olink.com/knowledge/faq) (Search "What is NPX?") or in Olink's Data normalization and standardization [white paper](https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/05-white%20paper%20for%20website/1096-olink-data-normalization-white-paper.pdf).
 + **Normalization** _\<chr\>_: The normalization method used.
-+ **PCNormalizedNPX** *<num>*: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log2 scale. The majority of the functions of this package use NPX values for calculations. Regardless of normalization method, this column always reflects PC normalized NPX values. Read more about NPX here: https://olink.com/faq/what-is-npx/.
++ **PCNormalizedNPX** *<num>*: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log2 scale. The majority of the functions of this package use NPX values for calculations. Regardless of normalization method, this column always reflects PC normalized NPX values. Read more about NPX in the Olink [FAQ](https://olink.com/knowledge/faq) (Search "plate control normalization") or in Olink's Data normalization and standardization [white paper](https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/05-white%20paper%20for%20website/1096-olink-data-normalization-white-paper.pdf).
 + **AssayQC** _\<chr\>_:Indicates whether an assay contains a QC warning.
 + **SampleQC** _\<chr\>_: Indicates whether a sample contains a QC warning within a block.
 + **ExploreVersion** _\<chr\>_: The version of the Explore software library that was used to produce the data file.
@@ -384,6 +418,8 @@ The olink_anova is a wrapper function that performs an ANOVA F-test for each ass
 
 Samples with missing variable information or factor levels are excluded from the analysis. Character columns in the input data frame are converted to factors. The automatic handling of the data from above is announced by a message if the flag *verbose=TRUE*.
 
+Control samples and control assays (AssayType is not "assay", or Assay contains "control" or "ctrl") should be removed before using this function.
+
 Crossed/interaction analysis, i.e. A*B formula notation, is inferred from the variable argument in the following cases: 
 
 * c('A','B')
@@ -406,14 +442,23 @@ Adjusted p-values are calculated using the function *p.adjust* from the R librar
 * verbose: Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 
 ```{r message=FALSE, eval=FALSE}
+# Remove control samples and assays
+npx_data1_no_controls <- npx_data1 |>
+  filter(!str_detect(SampleID,
+                     regex("control|ctrl", 
+                           ignore_case = TRUE))) |>
+  filter(!str_detect(Assay, 
+                     regex("control|ctrl", 
+                           ignore_case = TRUE)))
+  
 # One-way ANOVA, no covariates
-anova_results_oneway <- olink_anova(df = npx_data1, 
+anova_results_oneway <- olink_anova(df = npx_data1_no_controls, 
                                     variable = 'Site')
 # Two-way ANOVA, no covariates
-anova_results_twoway <- olink_anova(df = npx_data1, 
+anova_results_twoway <- olink_anova(df = npx_data1_no_controls, 
                                     variable = c('Site', 'Time'))
 # One-way ANOVA, Treatment as covariates
-anova_results_oneway <- olink_anova(df = npx_data1, 
+anova_results_oneway <- olink_anova(df = npx_data1_no_controls, 
                                     variable = 'Site',
                                     covariates = 'Treatment')
 ```
@@ -441,6 +486,8 @@ olink_anova_posthoc performs a post-hoc ANOVA test using the function *emmeans* 
 
 The function handles both factor and numerical variables and/or covariates. The post-hoc test for a numerical variable compares the difference in means of the outcome variable (default: NPX) for 1 standard deviation (SD) difference in the numerical variable, e.g. mean NPX at mean (numerical variable) versus mean NPX at mean (numerical variable) + 1*SD (numerical variable).
 
+Control samples and control assays (AssayType is not "assay", or Assay contains "control" or "ctrl") should be removed before using this function.
+
 ### Function arguments
 
 * df: NPX data frame in long format should minimally contain protein name (Assay), OlinkID, UniProt, Panel and an outcome factor with at least 3 levels.
@@ -454,13 +501,13 @@ The function handles both factor and numerical variables and/or covariates. The 
 
 ```{r message=FALSE, eval=FALSE}
 # calculate the p-value for the ANOVA
-anova_results_oneway <- olink_anova(df = npx_data1, 
+anova_results_oneway <- olink_anova(df = npx_data1_no_controls, 
                                     variable = 'Site')
 # extracting the significant proteins
 anova_results_oneway_significant <- anova_results_oneway %>%
   filter(Threshold == 'Significant') %>%
   pull(OlinkID)
-anova_posthoc_oneway_results <- olink_anova_posthoc(df = npx_data1,
+anova_posthoc_oneway_results <- olink_anova_posthoc(df = npx_data1_no_controls,
                                                     olinkid_list = anova_results_oneway_significant,
                                                     variable = 'Site',
                                                     effect = 'Site')
@@ -948,6 +995,9 @@ A list of objects of class *ggplot* (silently returned). Plots are also printed 
 
 The olink_boxplot function is used to generate boxplots of NPX values stratified on a variable for a given list of proteins. olink_boxplot uses the functions *ggplot* and *geom_boxplot* of the R library *ggplot2*.
 
+
+In order to annotate the plot with ANOVA posthoc analysis results, control samples and control assays (AssayType is not "assay", or Assay contains "control" or "ctrl") should be removed.
+
 ### Function arguments
 
 * df: NPX data frame in long format should minimally contain protein name (Assay), OlinkID, UniProt and a grouping variable.
@@ -959,19 +1009,28 @@ The olink_boxplot function is used to generate boxplots of NPX values stratified
 * number_of_proteins_per_plot: Number of boxplots to include in the facets plot. Default 6.
 
 ```{r message=FALSE}
-plot <- npx_data1 %>%
+# Remove control samples and assays
+npx_data1_no_controls <- npx_data1 |>
+  filter(!str_detect(SampleID,
+                     regex("control|ctrl", 
+                           ignore_case = TRUE))) |>
+  filter(!str_detect(Assay, 
+                     regex("control|ctrl", 
+                           ignore_case = TRUE)))
+
+plot <- npx_data1_no_controls %>%
   na.omit() %>% # removing missing values which exists for Site
   olink_boxplot(variable = "Site", 
                 olinkid_list = c("OID00488", "OID01276"),
                 number_of_proteins_per_plot  = 2)
 plot[[1]]
 
-anova_posthoc_results<-npx_data1 %>% 
+anova_posthoc_results<-npx_data1_no_controls %>% 
   olink_anova_posthoc(olinkid_list = c("OID00488", "OID01276"),
                       variable = 'Site',
                       effect = 'Site')
 
-plot2 <- npx_data1 %>%
+plot2 <- npx_data1_no_controls %>%
   na.omit() %>% # removing missing values which exists for Site
   olink_boxplot(variable = "Site", 
                 olinkid_list = c("OID00488", "OID01276"),

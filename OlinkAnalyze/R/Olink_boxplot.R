@@ -13,7 +13,6 @@
 #' @param ... coloroption passed to specify color order
 #'
 #' @return A list of objects of class “ggplot” (the actual ggplot object is entry 1 in the list). Box and whisker plot of NPX (y-axis) by variable (x-axis) for each Assay
-#' @importFrom magrittr %>%
 #' @importFrom dplyr filter mutate select
 #' @importFrom stringr str_detect
 #' @importFrom tidyr unite
@@ -26,12 +25,12 @@
 #' \donttest{
 #'
 #' library(dplyr)
-#'
-#' anova_results <- olink_anova(npx_data1, variable = "Site")
-#' significant_assays <- anova_results %>%
-#'     filter(Threshold == 'Significant') %>%
+#' npx_df <- npx_data1 |> filter(!grepl('control|ctrl',SampleID, ignore.case = TRUE))
+#' anova_results <- olink_anova(npx_df, variable = "Site")
+#' significant_assays <- anova_results |>
+#'     filter(Threshold == 'Significant') |>
 #'     pull(OlinkID)
-#' olink_boxplot(npx_data1,
+#' olink_boxplot(npx_df,
 #'               variable = "Site",
 #'               olinkid_list = significant_assays,
 #'               verbose = TRUE,
@@ -87,9 +86,9 @@ olink_boxplot <- function(df,
   
 
   #Filtering on valid OlinkID
-  df <- df %>%
+  df <- df |>
     dplyr::filter(stringr::str_detect(OlinkID,
-                                      "OID[0-9]{5}")) %>% 
+                                      "OID[0-9]{5}")) |> 
     dplyr::filter(!(OlinkID %in% npx_check$all_nas)) 
 
   #Column setup
@@ -146,16 +145,16 @@ olink_boxplot <- function(df,
     assays_for_plotting <- olinkid_list[c(from_protein:(to_protein-1))]
 
 
-    npx_for_plotting <- df %>%
-      dplyr::filter(OlinkID %in% assays_for_plotting) %>%
-      dplyr::mutate(OlinkID = factor(OlinkID, levels = assays_for_plotting)) %>%
-      dplyr::select(OlinkID, UniProt, Assay, NPX, eval(variable)) %>%
-      with(., .[order(OlinkID),]) %>%
-      tidyr::unite(c(Assay, OlinkID), col = 'Name_OID', sep = ' ', remove = FALSE) %>%
+    npx_for_plotting <- df |>
+      dplyr::filter(OlinkID %in% assays_for_plotting) |>
+      dplyr::mutate(OlinkID = factor(OlinkID, levels = assays_for_plotting)) |>
+      dplyr::select(OlinkID, UniProt, Assay, NPX, eval(variable)) |>
+      arrange(OlinkID) |>
+      tidyr::unite(c(Assay, OlinkID), col = 'Name_OID', sep = ' ', remove = FALSE) |>
       dplyr::mutate(Name_OID = forcats::as_factor(Name_OID))
 
     if(is.null(posthoc_results) && is.null(ttest_results)) {
-      boxplot <- npx_for_plotting %>%
+      boxplot <- npx_for_plotting |>
         ggplot2::ggplot(ggplot2::aes(y = NPX,
                                      !!x_variable[[1]])) +
         ggplot2::geom_boxplot(ggplot2::aes(fill = !!fill_variable[[1]])) +
@@ -167,55 +166,55 @@ olink_boxplot <- function(df,
 
     } else if (!is.null(posthoc_results) && is.null(ttest_results)){
 
-      star.info <- data.frame(x.vals = levels(npx_for_plotting %>%
-                                                dplyr::pull(eval(variable)) %>%
+      star.info <- data.frame(x.vals = levels(npx_for_plotting |>
+                                                dplyr::pull(eval(variable)) |>
                                                 addNA()),
-                              id = 1:length(levels(npx_for_plotting %>%
-                                                     dplyr::pull(eval(variable)) %>%
-                                                     addNA()))) %>%
+                              id = 1:length(levels(npx_for_plotting |>
+                                                     dplyr::pull(eval(variable)) |>
+                                                     addNA()))) |>
         dplyr::mutate(x.vals = replace(x.vals, is.na(x.vals), "NA"))
 
-      posthoc.results_temp <- posthoc_results %>%
-        dplyr::filter(OlinkID %in% assays_for_plotting) %>%
-        tidyr::unite(c(Assay, OlinkID), col = 'Name_OID', sep = ' ', remove = FALSE) %>%
+      posthoc.results_temp <- posthoc_results |>
+        dplyr::filter(OlinkID %in% assays_for_plotting) |>
+        tidyr::unite(c(Assay, OlinkID), col = 'Name_OID', sep = ' ', remove = FALSE) |>
         dplyr::mutate(Name_OID = forcats::as_factor(Name_OID))
 
-      scale_inf <- npx_for_plotting %>%
-        dplyr::group_by(Name_OID) %>%
-        dplyr::summarise(maxNPX = max(NPX), rangeNPX = diff(range(NPX))) %>%
+      scale_inf <- npx_for_plotting |>
+        dplyr::group_by(Name_OID) |>
+        dplyr::summarise(maxNPX = max(NPX), rangeNPX = diff(range(NPX))) |>
         dplyr::ungroup()
 
-      line.data <- posthoc.results_temp %>%
-        dplyr::left_join(scale_inf, by = "Name_OID") %>%
+      line.data <- posthoc.results_temp |>
+        dplyr::left_join(scale_inf, by = "Name_OID") |>
         dplyr::mutate(C1=sapply(strsplit(as.character(contrast)," - "),function(x) x[1]),
-                      C2=sapply(strsplit(as.character(contrast)," - "),function(x) x[2])) %>%
-        dplyr::group_by(Name_OID, contrast) %>%
-        dplyr::mutate(c.sort=min(C1,C2)) %>%
-        dplyr::mutate(p.value=paste0(myRound(Adjusted_pval)," Contrast: ", contrast)) %>%
-        dplyr::ungroup() %>%
-        dplyr::group_by(Name_OID) %>%
-        dplyr::arrange(c.sort) %>%
-        dplyr::mutate(rowNum=n():1) %>%
-        dplyr::ungroup() %>%
-        dplyr::mutate(y.anchor = maxNPX + rowNum * rangeNPX *(.5)/max(rowNum)) %>%
-        dplyr::select(Name_OID,contrast,Adjusted_pval,C1,C2,p.value,Threshold,c.sort,y.anchor) %>%
-        tidyr::pivot_longer(-c(Name_OID,Threshold,contrast,Adjusted_pval,p.value,c.sort,y.anchor),names_to="tmp",values_to = "x.vals") %>%
+                      C2=sapply(strsplit(as.character(contrast)," - "),function(x) x[2])) |>
+        dplyr::group_by(Name_OID, contrast) |>
+        dplyr::mutate(c.sort=min(C1,C2)) |>
+        dplyr::mutate(p.value=paste0(myRound(Adjusted_pval)," Contrast: ", contrast)) |>
+        dplyr::ungroup() |>
+        dplyr::group_by(Name_OID) |>
+        dplyr::arrange(c.sort) |>
+        dplyr::mutate(rowNum=n():1) |>
+        dplyr::ungroup() |>
+        dplyr::mutate(y.anchor = maxNPX + rowNum * rangeNPX *(.5)/max(rowNum)) |>
+        dplyr::select(Name_OID,contrast,Adjusted_pval,C1,C2,p.value,Threshold,c.sort,y.anchor) |>
+        tidyr::pivot_longer(-c(Name_OID,Threshold,contrast,Adjusted_pval,p.value,c.sort,y.anchor),names_to="tmp",values_to = "x.vals") |>
         dplyr::mutate(Star = dplyr::case_when(Adjusted_pval <0.05 & Adjusted_pval > 0.01 ~ "*",
                                               Adjusted_pval <= 0.01 & Adjusted_pval > 0.005 ~ "**",
                                               Adjusted_pval <= 0.005  ~ "***",
-                                              Adjusted_pval >= 0.05 ~ NA_character_)) %>%
-        dplyr::left_join(star.info, by = "x.vals") %>%
-        dplyr::group_by(contrast,Name_OID) %>%
-        dplyr::mutate(x.m = sum(id)/2) %>%
-        dplyr::ungroup() %>%
+                                              Adjusted_pval >= 0.05 ~ NA_character_)) |>
+        dplyr::left_join(star.info, by = "x.vals") |>
+        dplyr::group_by(contrast,Name_OID) |>
+        dplyr::mutate(x.m = sum(id)/2) |>
+        dplyr::ungroup() |>
         dplyr::filter(Threshold=="Significant")
 
-      boxplot <- npx_for_plotting %>%
+      boxplot <- npx_for_plotting |>
         ggplot2::ggplot(ggplot2::aes(y = NPX,
                                      x = !!rlang::ensym(variable))) +
         ggplot2::geom_boxplot(ggplot2::aes(fill = !!rlang::ensym(variable))) +
         ggplot2::geom_line(data=line.data, ggplot2::aes(x = x.vals, y = y.anchor, group = p.value)) +
-        ggplot2::geom_text(data=line.data %>% dplyr::filter(tmp == "C1"), ggplot2::aes(group = p.value, x = x.m, y = y.anchor+0.1, label = Star)) +
+        ggplot2::geom_text(data=line.data |> dplyr::filter(tmp == "C1"), ggplot2::aes(group = p.value, x = x.m, y = y.anchor+0.1, label = Star)) +
         OlinkAnalyze::set_plot_theme() +
         OlinkAnalyze::olink_fill_discrete(...) +
         ggplot2::theme(axis.ticks.x = element_blank(),
@@ -224,58 +223,58 @@ olink_boxplot <- function(df,
 
     } else if (is.null(posthoc_results) && !is.null(ttest_results)){
 
-      star.info <- data.frame(x.vals = npx_for_plotting %>%
-                                dplyr::pull(eval(variable)) %>%
+      star.info <- data.frame(x.vals = npx_for_plotting |>
+                                dplyr::pull(eval(variable)) |>
                                 unique(),
-                              id = 1:length(npx_for_plotting %>%
-                                              dplyr::pull(eval(variable)) %>%
-                                              unique())) %>%
+                              id = 1:length(npx_for_plotting |>
+                                              dplyr::pull(eval(variable)) |>
+                                              unique())) |>
         dplyr::mutate(x.vals = replace(x.vals, is.na(x.vals), "NA"))
 
-      ttest_results_temp <- ttest_results %>%
-        dplyr::filter(OlinkID %in% assays_for_plotting) %>%
-        tidyr::unite(c(Assay, OlinkID), col = 'Name_OID', sep = ' ', remove = FALSE) %>%
+      ttest_results_temp <- ttest_results |>
+        dplyr::filter(OlinkID %in% assays_for_plotting) |>
+        tidyr::unite(c(Assay, OlinkID), col = 'Name_OID', sep = ' ', remove = FALSE) |>
         dplyr::mutate(Name_OID = forcats::as_factor(Name_OID))
 
-      scale_inf <- npx_for_plotting %>%
-        dplyr::group_by(Name_OID) %>%
-        dplyr::summarise(maxNPX = max(NPX), rangeNPX = diff(range(NPX))) %>%
+      scale_inf <- npx_for_plotting |>
+        dplyr::group_by(Name_OID) |>
+        dplyr::summarise(maxNPX = max(NPX), rangeNPX = diff(range(NPX))) |>
         dplyr::ungroup()
 
-      ttest_variable <- npx_for_plotting %>%
-        dplyr::select(!!rlang::ensym(variable)) %>%
-        unique() %>%
-        na.omit() %>%
+      ttest_variable <- npx_for_plotting |>
+        dplyr::select(!!rlang::ensym(variable)) |>
+        unique() |>
+        na.omit() |>
         dplyr::pull(!!rlang::ensym(variable))
 
-      line.data <- ttest_results_temp %>%
-        dplyr::select(Name_OID, Assay, OlinkID, UniProt, Panel, Adjusted_pval,Threshold) %>%
+      line.data <- ttest_results_temp |>
+        dplyr::select(Name_OID, Assay, OlinkID, UniProt, Panel, Adjusted_pval,Threshold) |>
         dplyr::mutate(C1 = ttest_variable[1],
-                      C2 = ttest_variable[2]) %>%
-        dplyr::left_join(scale_inf, by = "Name_OID") %>%
-        dplyr::group_by(Name_OID) %>%
-        dplyr::mutate(c.sort=min(C1,C2)) %>%
-        dplyr::ungroup() %>%
-        dplyr::mutate(y.anchor = maxNPX + rangeNPX *(.2)) %>%
-        dplyr::select(Name_OID,Adjusted_pval,C1,C2,Threshold,c.sort,y.anchor) %>%
-        tidyr::pivot_longer(-c(Name_OID, Threshold, Adjusted_pval, c.sort, y.anchor), names_to = "tmp", values_to = "x.vals") %>%
+                      C2 = ttest_variable[2]) |>
+        dplyr::left_join(scale_inf, by = "Name_OID") |>
+        dplyr::group_by(Name_OID) |>
+        dplyr::mutate(c.sort=min(C1,C2)) |>
+        dplyr::ungroup() |>
+        dplyr::mutate(y.anchor = maxNPX + rangeNPX *(.2)) |>
+        dplyr::select(Name_OID,Adjusted_pval,C1,C2,Threshold,c.sort,y.anchor) |>
+        tidyr::pivot_longer(-c(Name_OID, Threshold, Adjusted_pval, c.sort, y.anchor), names_to = "tmp", values_to = "x.vals") |>
         dplyr::mutate(Star = case_when(Adjusted_pval <0.05 & Adjusted_pval > 0.01 ~ "*",
                                        Adjusted_pval <= 0.01 & Adjusted_pval > 0.005 ~ "**",
                                        Adjusted_pval <= 0.005  ~ "***",
-                                       Adjusted_pval >= 0.05 ~ NA_character_)) %>%
-        dplyr::left_join(star.info, by = "x.vals") %>%
-        dplyr::group_by(Name_OID) %>%
-        dplyr::mutate(x.m = sum(id)/2) %>%
-        dplyr::ungroup() %>%
+                                       Adjusted_pval >= 0.05 ~ NA_character_)) |>
+        dplyr::left_join(star.info, by = "x.vals") |>
+        dplyr::group_by(Name_OID) |>
+        dplyr::mutate(x.m = sum(id)/2) |>
+        dplyr::ungroup() |>
         dplyr::filter(Threshold=="Significant")
 
-      boxplot <- npx_for_plotting %>%
+      boxplot <- npx_for_plotting |>
         ggplot2::ggplot(ggplot2::aes(y = NPX,
                                      x = !!rlang::ensym(variable))) +
         ggplot2::geom_boxplot(aes(fill = !!rlang::ensym(variable))) +
 
         ggplot2::geom_line(data=line.data, ggplot2::aes(x = x.vals, y = y.anchor, group = Name_OID )) +
-        ggplot2::geom_text(data=line.data %>% dplyr::filter(tmp == "C1"),aes(group = Name_OID , x = x.m, y = y.anchor+0.1, label = Star)) +
+        ggplot2::geom_text(data=line.data |> dplyr::filter(tmp == "C1"),aes(group = Name_OID , x = x.m, y = y.anchor+0.1, label = Star)) +
         OlinkAnalyze::set_plot_theme() +
         OlinkAnalyze::olink_fill_discrete(...) +
         ggplot2::theme(axis.ticks.x = element_blank(),

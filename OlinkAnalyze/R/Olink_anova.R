@@ -5,6 +5,8 @@
 #'Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a message if verbose = TRUE).
 #'Character columns in the input dataframe are automatically converted to factors (specified in a message if verbose = TRUE).
 #'Numerical variables are not converted to factors.
+#'Control samples should be removed before using this function.
+#'Control assays (AssayType is not "assay", or Assay contains "control" or "ctrl") should be removed before using this function.
 #'If a numerical variable is to be used as a factor, this conversion needs to be done on the dataframe before the function call. \cr\cr
 #'Crossed analysis, i.e. A*B formula notation, is inferred from the variable argument in the following cases: \cr
 #'\itemize{
@@ -54,7 +56,7 @@
 #'
 #' library(dplyr)
 #'
-#' npx_df <- npx_data1 %>% filter(!grepl('control',SampleID, ignore.case = TRUE))
+#' npx_df <- npx_data1 |> filter(!grepl('control|ctrl',SampleID, ignore.case = TRUE))
 #'
 #' #One-way ANOVA, no covariates.
 #' #Results in a model NPX~Time
@@ -106,10 +108,28 @@ olink_anova <- function(df,
     stop('The df and variable arguments need to be specified.')
   }
 
+  # Stop if internal controls (assays) have not been removed
+  if ("AssayType" %in% names(df)) {
+    if (any(df$AssayType != "assay")) {
+      ctrl_assays <- df |>
+        dplyr::filter(AssayType != "assay")
+      
+      stop(paste0('Control assays have not been removed from the dataset.\n  Assays with AssayType != "assay" should be excluded.\n  The following ', length(unique(ctrl_assays$Assay)) ,' control assays were found:\n  ',
+                  paste(strwrap(toString(unique(ctrl_assays$Assay)), width = 80), collapse = "\n")))
+    }
+  } else if (any(stringr::str_detect(df$Assay, stringr::regex("control|ctrl", ignore_case = TRUE)))) {
+    ctrl_assays <- df |>
+      dplyr::filter(stringr::str_detect(df$Assay, stringr::regex("control|ctrl", ignore_case = TRUE)))
+    
+    stop(paste0('Control assays have not been removed from the dataset.\n  Assays with "control" in their Assay field should be excluded.\n  The following ', length(unique(ctrl_assays$Assay)) ,' control assays were found:\n  ',
+                paste(strwrap(toString(unique(ctrl_assays$Assay)), width = 80), collapse = "\n")))
+  }
+  
+  
   withCallingHandlers({
-
+    
     #Filtering on valid OlinkID
-    df <- df %>%
+    df <- df |>
       dplyr::filter(stringr::str_detect(OlinkID,
                                  "OID[0-9]{5}"))
 
@@ -176,13 +196,13 @@ olink_anova <- function(df,
 
     for(effect in single_fixed_effects){
 
-      current_nas <- df %>%
-        dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>% #Exclude assays that have all NA:s
-        dplyr::group_by(OlinkID, !!rlang::ensym(effect)) %>%
-        dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(NPX))) %>%
-        dplyr::ungroup() %>%
-        dplyr::filter(n == n_na) %>%
-        dplyr::distinct(OlinkID) %>%
+      current_nas <- df |>
+        dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) |> #Exclude assays that have all NA:s
+        dplyr::group_by(OlinkID, !!rlang::ensym(effect)) |>
+        dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(NPX))) |>
+        dplyr::ungroup() |>
+        dplyr::filter(n == n_na) |>
+        dplyr::distinct(OlinkID) |>
         dplyr::pull(OlinkID)
 
 
@@ -198,12 +218,12 @@ olink_anova <- function(df,
                 call. = FALSE)
       }
 
-      number_of_samples_w_more_than_one_level <- df %>%
-        dplyr::group_by(SampleID) %>%
-        dplyr::summarise(n_levels = dplyr::n_distinct(!!rlang::ensym(effect), na.rm = TRUE)) %>%
-        dplyr::ungroup() %>%
-        dplyr::filter(n_levels > 1) %>%
-        nrow(.)
+      number_of_samples_w_more_than_one_level <- df |>
+        dplyr::group_by(SampleID) |>
+        dplyr::summarise(n_levels = dplyr::n_distinct(!!rlang::ensym(effect), na.rm = TRUE)) |>
+        dplyr::ungroup() |>
+        dplyr::filter(n_levels > 1) |>
+        nrow()
 
       if (number_of_samples_w_more_than_one_level > 0) {
         stop(paste0("There are ",
@@ -259,7 +279,7 @@ olink_anova <- function(df,
 
 
     if(!is.null(covariates) & any(grepl(":", covariates))){
-      covariate_filter_string <- covariates[str_detect(covariates, ':')]
+      covariate_filter_string <- covariates[stringr::str_detect(covariates, ':')]
       covariate_filter_string <- sub("(.*)\\:(.*)$", "\\2:\\1", covariate_filter_string)
       covariate_filter_string <- c(covariates, covariate_filter_string)
 
@@ -267,35 +287,33 @@ olink_anova <- function(df,
       covariate_filter_string <- covariates
     }
 
-    p.val <- df %>%
-      dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>% #Exclude assays that have all NA:s
-      dplyr::filter(!(OlinkID %in% nas_in_var)) %>%
-      dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
-      dplyr::do(generics::tidy(car::Anova(stats::lm(as.formula(formula_string),
-                            data=.,
-                            contrasts = sapply(fact.vars,function(x) return(contr.sum),
-                                               simplify = FALSE)),type=3))) %>%
-
-      dplyr::ungroup() %>%
-      dplyr::filter(!term %in% c('(Intercept)','Residuals')) %>%
-      dplyr::mutate(covariates = term %in% covariate_filter_string) %>%
-      dplyr::group_by(covariates) %>%
-      dplyr::mutate(Adjusted_pval = p.adjust(p.value,method="fdr")) %>%
-      dplyr::mutate(Threshold  = ifelse(Adjusted_pval<0.05,"Significant","Non-significant")) %>%
+    p.val <- df |>
+      dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) |> #Exclude assays that have all NA:s
+      dplyr::filter(!(OlinkID %in% nas_in_var)) |>
+      dplyr::group_by(Assay, OlinkID, UniProt, Panel) |>
+      dplyr::group_modify(~ internal_anova(x = .x,
+          formula_string = formula_string,
+          fact.vars = fact.vars))|>
+      dplyr::ungroup()|> 
+      dplyr::filter(!term %in% c('(Intercept)','Residuals')) |>
+      dplyr::mutate(covariates = term %in% covariate_filter_string) |>
+      dplyr::group_by(covariates) |>
+      dplyr::mutate(Adjusted_pval = p.adjust(p.value,method="fdr")) |>
+      dplyr::mutate(Threshold  = ifelse(Adjusted_pval<0.05,"Significant","Non-significant")) |>
       dplyr::mutate(Adjusted_pval = ifelse(covariates,NA,Adjusted_pval),
-             Threshold = ifelse(covariates,NA,Threshold)) %>%
-      dplyr::ungroup() %>%
-      dplyr::select(-covariates) %>%
-      dplyr::mutate(meansq=sumsq/df) %>%
+             Threshold = ifelse(covariates,NA,Threshold)) |>
+      dplyr::ungroup() |>
+      dplyr::select(-covariates) |>
+      dplyr::mutate(meansq=sumsq/df) |>
       dplyr::select(Assay,OlinkID,UniProt,Panel,term,df,sumsq,
-                    meansq,statistic,p.value,Adjusted_pval,Threshold) %>%
+                    meansq,statistic,p.value,Adjusted_pval,Threshold) |>
       dplyr::arrange(Adjusted_pval)
 
 
     if(return.covariates){
       return(p.val)
     } else{
-      return(p.val %>%
+      return(p.val |>
                dplyr::filter(!term%in%covariate_filter_string))
     }
 
@@ -310,6 +328,8 @@ olink_anova <- function(df,
 #'Performs a post hoc ANOVA test using emmeans::emmeans with Tukey p-value adjustment per assay (by OlinkID) for each panel at confidence level 0.95.
 #'See \code{olink_anova} for details of input notation. \cr\cr
 #'The function handles both factor and numerical variables and/or covariates.
+#'Control samples should be removed before using this function.
+#'Control assays (AssayType is not "assay", or Assay contains "control" or "ctrl") should be removed before using this function.
 #'The posthoc test for a numerical variable compares the difference in means of the outcome variable (default: NPX) for 1 standard deviation difference in the numerical variable, e.g.
 #'mean NPX at mean(numerical variable) versus mean NPX at mean(numerical variable) + 1*SD(numerical variable).
 #'
@@ -349,7 +369,7 @@ olink_anova <- function(df,
 #'
 #' library(dplyr)
 #'
-#' npx_df <- npx_data1 %>% filter(!grepl('control',SampleID, ignore.case = TRUE))
+#' npx_df <- npx_data1 |> filter(!grepl('control|ctrl',SampleID, ignore.case = TRUE))
 #'
 #' #Two-way ANOVA, one main effect (Site) covariate.
 #' #Results in model NPX~Treatment*Time+Site.
@@ -361,10 +381,10 @@ olink_anova <- function(df,
 #' #on the interaction effect Treatment:Time with covariate Site.
 #'
 #' #Filtering out significant and relevant results.
-#' significant_assays <- anova_results %>%
-#' filter(Threshold == 'Significant' & term == 'Treatment:Time') %>%
-#' select(OlinkID) %>%
-#' distinct() %>%
+#' significant_assays <- anova_results |>
+#' filter(Threshold == 'Significant' & term == 'Treatment:Time') |>
+#' select(OlinkID) |>
+#' distinct() |>
 #' pull()
 #'
 #' #Posthoc, all pairwise comparisons
@@ -443,18 +463,39 @@ olink_anova_posthoc <- function(df,
     stop("All effect terms must be included in the variable argument or model formula.")
   }
 
+  # Stop if internal controls (assays) have not been removed
+  if ("AssayType" %in% names(df)) {
+    if (any(df$AssayType != "assay")) {
+      ctrl_assays <- df |>
+        dplyr::filter(AssayType != "assay")
+      
+      stop(paste0(
+        'Control assays have not been removed from the dataset.\n  Assays with AssayType != "assay" should be excluded.\n  The following ', length(unique(ctrl_assays$Assay)), " control assays were found:\n  ",
+        paste(strwrap(toString(unique(ctrl_assays$Assay)), width = 80), collapse = "\n")
+      ))
+    }
+  } else if (any(stringr::str_detect(df$Assay, stringr::regex("control|ctrl", ignore_case = TRUE)))) {
+    ctrl_assays <- df |>
+      dplyr::filter(stringr::str_detect(df$Assay, stringr::regex("control|ctrl", ignore_case = TRUE)))
+    
+    stop(paste0(
+      'Control assays have not been removed from the dataset.\n  Assays with "control" in their Assay field should be excluded.\n  The following ', length(unique(ctrl_assays$Assay)), " control assays were found:\n  ",
+      paste(strwrap(toString(unique(ctrl_assays$Assay)), width = 80), collapse = "\n")
+    ))
+  }
 
+  
   withCallingHandlers({
-
+    
     #Filtering on valid OlinkID
-    df <- df %>%
+    df <- df |>
       dplyr::filter(stringr::str_detect(OlinkID,
                                  "OID[0-9]{5}"))
 
     if(is.null(olinkid_list)){
-      olinkid_list <- df %>%
-        dplyr::select(OlinkID) %>%
-        dplyr::distinct() %>%
+      olinkid_list <- df |>
+        dplyr::select(OlinkID) |>
+        dplyr::distinct() |>
         dplyr::pull()
     }
 
@@ -547,37 +588,37 @@ olink_anova_posthoc <- function(df,
       e_form <- as.formula(paste0("pairwise~", paste(effect,collapse="+")))
     }
 
-    anova_posthoc_results <- df %>%
-      dplyr::filter(OlinkID %in% olinkid_list) %>%
-      dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>% #Exclude assays that have all NA:s
-      dplyr::mutate(OlinkID = factor(OlinkID, levels = olinkid_list)) %>%
-      dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
+    anova_posthoc_results <- df |>
+      dplyr::filter(OlinkID %in% olinkid_list) |>
+      dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) |> #Exclude assays that have all NA:s
+      dplyr::mutate(OlinkID = factor(OlinkID, levels = olinkid_list)) |>
+      dplyr::group_by(Assay, OlinkID, UniProt, Panel) |>
       dplyr::do(data.frame(emmeans::emmeans(stats::lm(as.formula(formula_string),data=.),
                                     specs=e_form,
                                     cov.reduce = function(x) round(c(mean(x),mean(x)+sd(x)),4),
                             infer=c(TRUE,TRUE),
                             adjust=post_hoc_padjust_method)[[c("contrasts","emmeans")[1+as.numeric(mean_return)]]],
-                    stringsAsFactors=FALSE)) %>%
-      dplyr::ungroup() %>%
-      dplyr::mutate(term=paste(effect,collapse=":"))  %>%
+                    stringsAsFactors=FALSE)) |>
+      dplyr::ungroup() |>
+      dplyr::mutate(term=paste(effect,collapse=":"))  |>
       dplyr::rename(conf.low=lower.CL,
              conf.high=upper.CL)
 
     if(mean_return){
-      anova_posthoc_results <- anova_posthoc_results %>%
+      anova_posthoc_results <- anova_posthoc_results |>
         dplyr::select(all_of(c("Assay", "OlinkID", "UniProt", "Panel", "term",
                                effect, "emmean", "conf.low", "conf.high")))
     } else if(!mean_return){
-      anova_posthoc_results <- anova_posthoc_results %>%
-        dplyr::rename(Adjusted_pval = p.value) %>%
-        dplyr::arrange(Adjusted_pval) %>%
+      anova_posthoc_results <- anova_posthoc_results |>
+        dplyr::rename(Adjusted_pval = p.value) |>
+        dplyr::arrange(Adjusted_pval) |>
         dplyr::mutate(Threshold = if_else(Adjusted_pval < 0.05,
                                    'Significant',
-                                   'Non-significant')) %>%
+                                   'Non-significant')) |>
         dplyr::select(tidyselect::any_of(c("Assay", "OlinkID", "UniProt", "Panel", "term",  "contrast", effect, "estimate",
                       "conf.low", "conf.high", "Adjusted_pval","Threshold")))
 
-      if(post_hoc_padjust_method=="none") anova_posthoc_results <- anova_posthoc_results %>% rename(pvalue=Adjusted_pval)
+      if(post_hoc_padjust_method=="none") anova_posthoc_results <- anova_posthoc_results |> rename(pvalue=Adjusted_pval)
     }
 
     return(anova_posthoc_results)
@@ -586,5 +627,22 @@ olink_anova_posthoc <- function(df,
     if (grepl(x = w, pattern = glob2rx("*contains implicit NA, consider using*")))
       invokeRestart("muffleWarning")
   })
+}
+
+
+
+#' Internal Anova function
+#'
+#' @param x grouped data frame
+#' @param formula_string anova formula
+#' @param fact.vars variables in factor form
+#'
+#' @return anova results
+#' @noRd
+internal_anova <- function(x, formula_string, fact.vars){
+  generics::tidy(car::Anova(stats::lm(as.formula(formula_string),
+                       data=x,
+                       contrasts = sapply(fact.vars,function(x) return(contr.sum),
+                                          simplify = FALSE)),type=3))
 }
 

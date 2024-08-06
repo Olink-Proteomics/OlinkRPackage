@@ -1,3 +1,20 @@
+# Olink Analyze 3.9.0
+## Minor Changes
+* Explore HT recommended bridging samples have been added to Introduction to Bridging tutorial (#409, @kathy-nevola)
+* Support for CSVs with SampleQC column was added to read_NPX (#406, @kathy-nevola)
+* Support for Olink Analyze Export parquets was added to read_NPX (#408, @kathy-nevola)
+* Quantitative value csvs will now give a warning about limited support for Quant data (#406, @kathy-nevola)
+* Instructions for importing multiple NPX files has been added to the overview tutorial (#403, @dtopouza)
+* Additional background information was added to the LOD tutorial to clarify how LOD is calculated from counts (#404, @kathy-nevola)
+* LOD can now be calculated using fixed LOD, negative controls, or both methods (#390, @kathy-nevola)
+* An error message will now appear when running anova and control assays are present (#416, @dtopouza)
+* Danai Topouza's role has been changed from contributor to author (#415, @kathy-nevola)
+
+## Bug Fixes
+* URLs in tutorials will now direct to updated olink.com locations (#402,  @kathy-nevola)
+* Instructions to export parquet files with LOD have been updated (#408, @kathy-nevola)
+* removed scale_name argument when ggplot2 3.5+ is installed (#421, @kathy-nevola)
+
 # Olink Analyze 3.8.2
 ## Bug Fixes 
 * update to URL hyperlink in LOD tutorial to include https
