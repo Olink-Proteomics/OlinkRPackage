@@ -99,7 +99,7 @@ bridgeable and what normalization method should be used:
 
 -   Is there a linear relationship between products?
 -   Are the NPX ranges in the two products similar?
--   Are there sufficient counts in both products?
+-   Are there sufficient counts in the Explore HT data?
 -   Are the distributions between products the same shape?
 
 An overview of these criteria is visualized below.
@@ -125,7 +125,7 @@ To determine if the NPX ranges are similar across products, the difference in NP
 
 #### Assessing if there are sufficient counts.
 
-To determine if there are sufficient counts in an assay for bridging, the median number of counts ***platform*** is calculated, excluding counts less than 10. If the median number of counts is less than the cutoff than the assay does not have sufficient counts to be used for bridging. The default cutoff is a median of greater than 150 counts.
+To determine if there are sufficient counts in an assay for bridging, the median number of counts from Explore HT is calculated, excluding counts less than 10. If the median number of counts is less than the cutoff than the assay does not have sufficient counts to be used for bridging. The default cutoff is a median of greater than 150 counts.
 
 #### Assessing similarity of NPX distribution across products
 
