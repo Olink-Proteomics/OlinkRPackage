@@ -74,6 +74,21 @@ data_EHT <- read_NPX("~/NPX_ExploreHT_location.parquet")
 
 ### Correlation Assays
 
+Both the Explore 3072 and Explore HT platforms contain correlation assays in 
+their biomarker portfolios. In Explore 3072, these present as overlapping assays 
+across panels. In Explore HT, these are overlapping assays across blocks. 
+The correlation assays are included for QC purposes, and allow users to evaluate 
+data performance across panels in the case of Explore 3072 and across blocks 
+in the case of Explore HT. 
+
+Within each platform, the correlation assays contain unique OlinkID values for each 
+of their corresponding panels and blocks in Explore 3072 and Explore HT, 
+respectively. It should be noted that the correlation assays themselves differ
+between each platform. For more information on overlapping assays, you can 
+access the [Olink FAQ page](https://olink.com/knowledge/faq). 
+
+Explore 3072 to Explore HT bridging generates and returns adjusted values for all data points corresponding to each of the Explore 3072 correlation assays. *For bridging purposes, only the Block 5 data points from Explore HT's  correlation assays are used as reference values. For downstream analysis, it is recommended to include the data from all instances of the correlation assays, barring any clear outliers.* 
+
 ### Downstream Analysis
 
 
