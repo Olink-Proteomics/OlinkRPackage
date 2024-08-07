@@ -87,7 +87,11 @@ respectively. It should be noted that the correlation assays themselves differ
 between each platform. For more information on overlapping assays, you can 
 access the [Olink FAQ page](https://olink.com/knowledge/faq). 
 
-Explore 3072 to Explore HT bridging generates and returns adjusted values for all data points corresponding to each of the Explore 3072 correlation assays. *For bridging purposes, only the Block 5 data points from Explore HT's  correlation assays are used as reference values. For downstream analysis, it is recommended to include the data from all instances of the correlation assays, barring any clear outliers.* 
+Explore 3072 to Explore HT bridging generates and returns adjusted values for all 
+data points corresponding to each of the Explore 3072 correlation assays. *For 
+bridging purposes, only the Block 5 data points from Explore HT's  correlation assays 
+are used as reference values. For downstream analysis, it is recommended to include 
+the data from all instances of the correlation assays, barring any clear outliers.* 
 
 ### Downstream Analysis
 
