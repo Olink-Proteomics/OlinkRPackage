@@ -62,7 +62,26 @@ data_EHT <- read_NPX("~/NPX_ExploreHT_location.parquet")
 
 ### Normalization using the median of paired differences
 
-### Quantile-Quantile Normalization
+If it is expected that both the kind of distribution and the equal variance per test between runs are the same, then the normalization using the median of paired differences will be preferred. The normalization using the median of paired differences based on the bridge samples is performed in the following steps:
+
+  1. For each assay and the Explore 3072 project, calculate the pairwise difference for each of the overlapping samples with the Explore HT project.
+  
+  2. Estimate the normalization factor of each assay by finding the median of the pairwise differences.
+  
+  3: Use the assay-specific normalization factor for each assay to normalize each data point from Explore 3072 to Explore HT.
+
+### Quantile-Quantile normalization
+
+Since Explore HT and Explore 3072 are two distinct products and the assays differ considerably between products, some of the assays exist in corresponding but distinct NPX spaces. For those assays, a Quantile-Quantile normalization will be favored. The normalization using the Quantile-Quantile Normalization based on the bridge samples is performed in the following steps:
+
+  1. For each assay of Explore 3072, calculate the empirical distribution function.
+  
+  2. Map the empirical distribution function from Explore 3072 to the Explore HT space using the quantiles.
+  
+  3. Construct a spline regression model using the sorted Explore 3072 data and the mapped Explore 3072 data along with the anchor points of the spline function.
+  
+  4. Use the spline regression model to predict all the data points from Explore 3072 to Explore HT.
+
 
 ### Function Output
 
