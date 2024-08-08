@@ -41,6 +41,64 @@ library(kableExtra)
 
 ## Introduction
 
+Individual Olink® NPX datasets are normalized using either plate control
+normalization or intensity normalization methods. In the case when a study is 
+separated into multiple batches, an additional normalization step is needed to 
+allow the data to be comparable, since NPX is a relative measurement. The 
+following tutorial is designed to give you an overview of the Olink® bridging 
+procedure for combining datasets from Explore 3072 and Explore HT products.
+
+### Within- and between-product bridging
+
+The joint analysis of two or more Olink® NPX datasets run on the same Olink® 
+product often requires an additional batch correction step to
+remove technical variation, which is referred to as overlapping sample 
+reference normalization, bridge normalization, or just simply bridging. For more
+information on within-product bridging, see the [Introduction to Bridging 
+tutorial](https://cran.r-project.org/web/packages/OlinkAnalyze/vignettes/bridging_introduction.html).
+
+
+Explore 3072 and Explore HT are both Olink® platforms that use PEA technology
+combined with next generation sequencing to calculate NPX for thousands of 
+proteins. Since many of the assays profiled in Explore 3072 are also found on 
+Explore HT, bridging data across products enables increased power in studies 
+consisting of both 3072 and HT datasets, rather than limiting these studies to 
+meta-analysis. However, these products differ in the number of assays measured 
+and in the **antibodies and reagents used**, which means that normalization 
+cannot be performed in the same way that within-product bridging is performed.
+
+In the case where a study consists of separate batches run in both the Olink® 
+Explore 3072 and the Explore HT platforms, an additional batch correction
+step is required to allow data from these two platforms to be analyzed together, 
+which is referred to as **product bridging, or Explore 3072 to HT bridging**.
+
+### Considerations for product bridging
+
+Product bridging allows the NPX values of an Olink® Explore 3072 project to be 
+normalized and made comparable to the NPX values of an Olink® Explore HT project. This
+process is one-directional, and normalizing Explore HT NPX values to Explore 
+3072 is not supported. 
+
+The product bridging normalization uses the **~3000** assays that are
+overlapping between Explore 3072 and HT. Each overlapping assay undergoes 
+a series of checks that evaluate the number of counts, correlation, and 
+difference of NPX ranges between the two datasets. If an assay has enough counts
+and comparable metrics between the two datasets, it is determined to be suitable
+for bridging (referred to as a "bridgeable assay"). The set of "bridgable 
+assays" across platforms will vary from dataset to dataset, based on the samples
+present within the studies. Depending on the NPX distribution of each bridgeable
+assay in the two datasets, the assay is normalized using either median 
+normalization or **QQ normalization**.
+
+Product bridging between an Explore 3072 and an Explore HT NPX dataset
+requires **40-60 bridging samples**. Bridging samples are shared samples among
+datasets - that is that samples that are analyzed in both datasets. Olink® NPX
+datasets without shared samples should not be combined using the bridging 
+approach described below. Before starting bridging, it is important to check if 
+the same sample IDs were assigned to the bridging samples. More information on 
+bridge sample selection can be found in the [selecting bridging samples section](https://cran.r-project.org/web/packages/OlinkAnalyze/vignettes/bridging_introduction.html#selecting-bridging-samples)
+of the Introduction to Bridging tutorial.
+
 ## Bridge Sample Selection
 
 ## Import NPX files
