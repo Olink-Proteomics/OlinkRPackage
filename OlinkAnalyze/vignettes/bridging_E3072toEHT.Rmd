@@ -42,58 +42,60 @@ library(kableExtra)
 
 ## Introduction
 
-Individual Olink® NPX^TM^ datasets are normalized using either plate
-control normalization or intensity normalization methods. In the case
-when a study is separated into multiple batches, an additional
-normalization step is needed to allow the data to be comparable, since
-NPX is a relative measurement. The following tutorial is designed to
-give you an overview of the Olink® bridging procedure for combining
-datasets from Explore 3072 and Explore HT products.
+Individual Olink® NPX^TM^ data sets are generally normalized using
+either plate control normalization or intensity normalization methods.
+Since NPX is a relative measurement, in the case when a study is
+separated into multiple batches, an additional normalization step is
+needed to allow the data to be comparable. The following tutorial is
+designed to give you an overview of the Olink bridging procedure for
+combining data sets from Olink® Explore 3072 and Olink® Explore HT
+products.
 
 ### Within- and between-product bridging
 
-The joint analysis of two or more Olink® NPX datasets run on the same
-Olink® product often requires an additional batch correction step to
-remove technical variation, which is referred to as overlapping sample
+The joint analysis of two or more NPX datasets run on the same Olink
+product often requires an additional batch correction step to remove
+technical variation, which is referred to as overlapping sample
 reference normalization, bridge normalization, or just simply bridging.
 For more information on within-product bridging, see the [Introduction
 to Bridging
 tutorial](https://cran.r-project.org/web/packages/OlinkAnalyze/vignettes/bridging_introduction.html).
 
-Explore 3072 and Explore HT are both Olink® platforms that use PEA
+Olink Explore 3072 and Olink Explore HT are both products that use PEA
 technology combined with next generation sequencing to calculate NPX for
-thousands of proteins. Since many of the assays profiled in Explore 3072
-are also found on Explore HT, bridging data across products enables
-increased power in studies consisting of both 3072 and HT datasets,
-rather than limiting these studies to meta-analysis. However, these
-products differ in the number of assays measured and in the **antibodies
-and reagents used**, which means that normalization cannot be performed
-in the same way that within-product bridging is performed.
+thousands of proteins. Since many of the assays profiled in Olink
+Explore 3072 are also found on Olink Explore HT, bridging data across
+products enables increased power in studies consisting of both Explore
+3072 and Explore HT data sets, rather than limiting these studies to
+meta-analysis. However, these products differ in the number of assays
+measured and in the **antibodies and reagents used**, which means that
+normalization cannot be performed in the same way that within-product
+bridging is performed.
 
-In the case where a study consists of separate batches run in both the
-Olink® Explore 3072 and the Explore HT platforms, an additional batch
-correction step is required to allow data from these two platforms to be
-analyzed together, which is referred to as **product bridging, or
-Explore 3072 to HT bridging**.
+In the case where a study consists of separate batches run on Olink
+Explore 3072 and Olink Explore HT, an additional batch correction step
+is required to allow data from these two products to be analyzed
+together, which is referred to as between-**product bridging, or Olink
+Explore 3072 to Olink Explore HT bridging**.
 
-### Considerations for product bridging
+### Considerations for between-product bridging
 
-Product bridging allows the NPX values of an Olink® Explore 3072 project
-to be normalized and made comparable to the NPX values of an Olink®
+Product bridging allows the NPX values of an Olink Explore 3072 project
+to be normalized and made comparable to the NPX values of an Olink
 Explore HT project. This process is one-directional, and normalizing
-Explore HT NPX values to Explore 3072 is not supported.
+Olink Explore HT NPX values to Olink Explore 3072 is not supported.
 
 The product bridging normalization uses the **\~3000** assays that are
-overlapping between Explore 3072 and HT. Each overlapping assay
-undergoes a series of checks that evaluate the number of counts,
-correlation, and difference of NPX ranges between the two datasets. If
-an assay has enough counts and comparable metrics between the two
-datasets, it is determined to be suitable for bridging (referred to as a
-"bridgeable assay"). The set of "bridgable assays" across platforms will
-vary from dataset to dataset, based on the samples present within the
-studies. Depending on the NPX distribution of each bridgeable assay in
-the two datasets, the assay is normalized using either median
-normalization or **QQ normalization**.
+overlapping between Olink Explore 3072 and Olink Explore HT. Each
+overlapping assay undergoes a series of checks that evaluate the number
+of counts, correlation, and difference of NPX ranges between the two
+data sets. If an assay has enough counts and comparable metrics between
+the two data sets, it is determined to be suitable for bridging
+(referred to as a "bridgeable assay"). The set of "bridgeable assays"
+across platforms will vary from data set to datas et, based on the
+samples present within the studies. Depending on the NPX distribution of
+each bridgeable assay in the two data sets, the assay is normalized
+using either median normalization or **QQ normalization**.
 
 Product bridging between an Explore 3072 and an Explore HT NPX dataset
 requires **40-60 bridging samples**. Bridging samples are shared samples
@@ -112,14 +114,14 @@ Prior to running the second study, bridging samples must be selected
 from the Explore 3072 study and be added to the Explore HT study. These
 samples can be selected using the `olink_bridgeselector()` function in
 Olink Analyze. The bridge selection function will select a number of
-bridge samples based on the reference data. This function selects
-samples which passes QC. External controls are not selected as bridge
-samples as they are not necessarily representative of the study and
-therefore may not cover the dynamic range of assays that would be
-expressed within the samples. Note that due to naming convention
-differences, it is necessary to exclude the control samples using either
-`SampleType == "SAMPLE"` if available or `stringr::str_detect()` as
-shown below.
+bridge samples based on the expression in Olink Explore 3072. This
+function selects samples which passes QC and does not include external
+control samples. External controls are not selected as bridge samples as
+they are not necessarily representative of the study and therefore may
+not cover the dynamic range of assays that would be expressed within the
+samples. Note that due to naming convention differences, it is necessary
+to exclude the control samples using either `SampleType == "SAMPLE"` if
+available or `stringr::str_detect()` as shown below.
 
 To select samples across the range of the data, the samples are ordered
 by mean NPX value and selected across this range. In the case where LOD
@@ -140,14 +142,14 @@ bridge_Samples<- npx_data1 %>%
   # Excluding control samples. Naming convention may differ.
   dplyr::filter((stringr::str_detect(SampleID, "CONTROL", negate = TRUE))) %>%
   olink_bridgeselector(sampleMissingFreq = 0.1,
-                     n = 16)
+                     n = 45)
 ```
 
-```{r bridge_sample_selection}
+```{r bridge_sample_selection, echo=FALSE}
 npx_data1 %>% 
   filter((stringr::str_detect(SampleID, "CONTROL", negate = TRUE))) %>%
   olink_bridgeselector(sampleMissingFreq = 0.1,
-                     n = 16) %>%
+                     n = 45) %>%
   kableExtra::kbl(booktabs = TRUE,
       digits = 2,
       caption = "Table 2. Selected Bridging Samples") %>%
@@ -162,19 +164,22 @@ by generating a PCA plot with the following code and make sure that the
 bridge samples are evenly dispersed among the other samples, as shown in
 Figure 1.
 
+```{r fig_cap, include=FALSE}
+f1<- "Figure 1. PCA plot of bridging samples and other samples in npx_data1. Control samples are excluded from the PCA plot."
+```
+
 ```{r bridge_sample_selection_example_pca, fig.cap= f1}
 npx_data1 %>% 
   filter(!str_detect(SampleID, 'CONT')) %>%
   mutate(Bridge = ifelse(SampleID %in% bridge_Samples$SampleID, "Bridge", "Sample")) %>% 
   olink_pca_plot(color_g = "Bridge")
-f1<- "Figure 1. PCA plot of bridging samples and other samples in npx_data1. Control samples are excluded from the PCA plot."
 
 ```
 
 ## Workflow Overview
 
 Olink Explore 3072 to Olink Explore HT bridging required harmonized
-Explore 3072 data and Explore HT data which has at least **XX**
+Explore 3072 data and Explore HT data which has at least **40 to 60**
 overlapping bridge samples. For studies containing multiple batches of
 Explore 3072 data, the Explore 3072 data sets should be bridged using
 within product bridging as detailed in the Introduction to bridging
@@ -182,7 +187,7 @@ tutorial prior to performing between product bridging.
 
 The assays from Explore 3072 are matched to the corresponding assays in
 Explore HT and evaluated to determine if the assay is bridgeable. In
-parallel the assay is normalized using **quantile-quantile
+parallel, the assays are normalized using **quantile-quantile
 normalization** and normalization using the median of paired
 differences. The result is an adjusted Explore 3072 dataset with three
 additional columns:
@@ -206,14 +211,13 @@ available for both normalization methods.
 
 ## Import NPX files
 
-To normalize Explore 3072 data to Explore HT data, first the two
-datasets are read into R using `read_NPX()`. If more that two data sets
-are being normalized, all Explore 3072 studies should be normalized
-together prior to normalizing between products. One Explore HT study
-should be chosen as the reference data set. The bridge samples should
-have the same Sample IDs in both platforms. The input data sets are
-standard Olink NPX tables. They can be loaded using `read_NPX()`
-function with default Olink Software NPX file as input, as shown below.
+To normalize Explore 3072 data to Explore HT data, first the two data
+sets are read into R using `read_NPX()`. If more that two data sets are
+being normalized, all Explore 3072 studies should be normalized together
+prior to normalizing between products. In the case of multiple Explore
+HT studies, only one Explore HT study should be chosen as the reference
+data set. The data can be loaded using `read_NPX()` function with
+default Olink Software NPX file as input, as shown below.
 
 ```{r message=FALSE, eval=FALSE, echo = TRUE}
 data_E3072 <- read_NPX("~/NPX_Explore3072_location.parquet") # Could also be a CSV file
@@ -223,16 +227,15 @@ data_EHT <- read_NPX("~/NPX_ExploreHT_location.parquet")
 ## Checking input datasets and bridging samples
 
 First, confirm that there are overlapping sample IDs within the study.
-It is important that the sample IDs are the same in both NPX files as
-shown in Table 3. Note that while external controls may share the same
-SampleID in both datasets, theses samples should not be treated as
-bridging samples. External control samples often share the same naming
-convention across datasets but may represent different samples due to
-reagent batch differences. Additionally, external control samples are
-unlikely to cover the dynamic range of assays expressed in the study
-samples.
+The bridge samples should have the same Sample IDs in both platforms.
+Note that if external controls share the same SampleID in both data
+sets, these samples should not be included in the list of bridging
+samples. External control samples often share the same naming convention
+across data sets but may represent different samples due to reagent
+batch differences. Appending the project name to the end of the control
+samples can ensure unique Sample IDs.
 
-```{r, eval= FALSE}
+```{r, echo = FALSE}
 data.frame(SampleID = intersect(npx_data1$SampleID, npx_data2$SampleID)) %>%
   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_SAMPLE"))
 ```
@@ -247,18 +250,6 @@ data.frame(SampleID = intersect(npx_data1$SampleID, npx_data2$SampleID)) %>%
   kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE,
                 position = "center", latex_options = "HOLD_position")
 ```
-
-Use a PCA plot as shown in Figure 3 to visualize sample-to-sample
-distance before bridging. Typically the project dataset accounts for
-most of the observed variation within the combined datasets at this
-point. Control samples are removed from the PCA plot because they are
-not expected to be representative of the rest of the dataset, and
-therefore the variation between sample and control samples could skew
-the PCA, making it more challenging to see differences between projects.
-Additional, the PCA function does not support multiple samples with the
-same SampleID, which is also why the bridging samples in the second
-project are appended with "\_new". In Figure 3, data1 and data2 separate
-along PC1, indicating batch differences between the two datasets.
 
 ```{r pca1, message=FALSE, fig.cap=f3}
 #### Extract bridging samples
@@ -291,14 +282,11 @@ OlinkAnalyze::olink_pca_plot(df          = npx_before_br,
 
 ## Normalization
 
-We can use `olink_normalization_bridge_product()` function to bridge two
-datasets. The bridging procedure is to first calculate **the median of
-the paired NPX differences** per assay between the bridging samples as
-adjustment factor then use these adjustment factors to adjust NPX values
-between two datasets. In this process, one dataset is considered the
-reference dataset (`df1`) and its NPX values remain unaltered. The other
-dataset is considered the new dataset (`df2`) and is adjusted to the
-reference dataset based on the adjustment factors.
+The `olink_normalization_bridge_product()` function is used to determine
+which assays are bridgeable and to bridge across products as described
+in the Workflow Overview and in the sections below. Within this function
+the bridging recommendations for each assay are determined and the NPX
+values are normalized using the two methods described below.
 
 ```{r eval=FALSE}
 # Find shared samples
@@ -326,9 +314,44 @@ There are four criteria that are used to determine if an assay is
 bridgeable and what normalization method should be used:
 
 -   Is there a linear relationship between products?
+    -   **Assessing linearity across products:** To determine if there
+        is a linear relationship between products for an assay, the
+        linear coefficient of determination is calculated using Pearson
+        correlation. In this correlation counts below 10 are excluded
+        due to lack of signal. The R^2^ value is calculated and an assay
+        is considered to have a linear relationship across products if
+        the R^2^ value is above the cutoff. The default cutoff is set to
+        R^2^ \> 0.8.
 -   Are the NPX ranges in the two products similar?
+    -   **Assessing similarity of NPX ranges:** To determine if the NPX
+        ranges are similar across products, the difference in NPX values
+        from the 10% to 90% quantile is calculated for each platform,
+        excluding data points with counts less than 10. If the
+        difference in range between platforms is greater than the cutoff
+        than the ranges are not considered similar across platforms. By
+        default, the cutoff is set to a difference of less than 1 NPX
+        between platforms.
 -   Are there sufficient counts in the Explore HT data?
+    -   **Assessing if there are sufficient counts:** To determine if
+        there are sufficient counts in an assay for bridging, the median
+        number of counts from Explore HT is calculated, excluding counts
+        less than 10. If the median number of counts is less than the
+        cutoff than the assay does not have sufficient counts to be used
+        for bridging. The default cutoff is set to 150 counts.
 -   Are the distributions between products the same shape?
+    -   **Assessing similarity of NPX distribution across products:** If
+        the three criteria outlined above are met than the assay is
+        considered bridgeable. Otherwise, bridging is not recommended
+        for that assay. If an assay is bridgeable, the similarity of the
+        NPX distribution is used to determine which method is
+        recommended for bridging. The Kolmogorov-Smirnov test, or KS
+        test, is used to assess the similarity of two distributions by
+        calculating the distances between the NPX distributions for each
+        product. If the distance is above the cutoff than
+        quantile-quantile normalization is recommended. If the distance
+        is less than the cutoff than normalization using the median of
+        paired differences is recommended. By default this cutoff
+        difference is set to 0.2.
 
 An overview of these criteria is visualized below.
 
@@ -350,46 +373,6 @@ quantile-quantile normalization is recommended. If any of the first
 three criteria are not met than bridging is not recommended for that
 assay. Note that bridgeable assays will differ between projects based on
 the expression of bridge samples in the studies.
-
-#### Assessing linearity across products
-
-To determine if there is a linear relationship between products for an
-assay, the linear coefficient of determination is calculated using
-Pearson correlation. In this correlation counts below 10 are excluded
-due to lack of signal. The R^2^ value is calculated and an assay is
-considered to have a linear relationship across products if the R^2^
-value is above the cutoff. The default cutoff is set to R^2^ \> 0.8.
-
-#### Assessing similarity of NPX ranges
-
-To determine if the NPX ranges are similar across products, the
-difference in NPX values from the 10% to 90% quantile is calculated for
-each platform, excluding data points with counts less than 10. If the
-difference in range between platforms is greater than the cutoff than
-the ranges are not considered similar across platforms. By default, the
-cutoff is set to a difference of less than 1 NPX between platforms.
-
-#### Assessing if there are sufficient counts.
-
-To determine if there are sufficient counts in an assay for bridging,
-the median number of counts from Explore HT is calculated, excluding
-counts less than 10. If the median number of counts is less than the
-cutoff than the assay does not have sufficient counts to be used for
-bridging. The default cutoff is set to 150 counts.
-
-#### Assessing similarity of NPX distribution across products
-
-If the three criteria outlined above are met than the assay is
-considered bridgeable. Otherwise, bridging is not recommended for that
-assay. If an assay is bridgeable, the similarity of the NPX distribution
-is used to determine which method is recommended for bridging. The
-Kolmogorov-Smirnov test, or KS test, is used to assess the similarity of
-two distributions by calculating the distances between the NPX
-distributions for each product. If the distance is above the cutoff than
-quantile-quantile normalization is recommended. If the distance is less
-than the cutoff than normalization using the median of paired
-differences is recommended. By default this cutoff difference is set to
-0.2.
 
 ### Normalization using the median of paired differences
 
@@ -433,14 +416,18 @@ performed in the following steps:
 
 ### Function Output
 
-The output from `olink_normalization_bridge()` function is a NPX table
-with adjusted NPX value in the column `NPX`, as shown in Table 4.
-`olink_normalization_bridge()` creates a new column `Project` to
-distinguish between reference dataset from the other dataset. It is up
-to the user to define which dataset is the reference dataset and specify
-the names of the bridge samples. The resulting dataset will contain the
-reference dataset, which will be identical to the input reference data,
-with adjustment factors of 0, and the newly bridged dataset.
+The output from `olink_normalization_bridge_product()` function is a
+dataframe with concatenated data from the two products and additional
+columns including adjusted NPX values, bridging recommendations, mapping
+information, and project names. The adjusted NPX values are notated in
+the columns `MedianAdjustedNPX` and `QQNormalizedNPX`. For each assay a
+recommendation is listed in the `BridgingRecommendation` column and
+lists what method, if any should be used for that assay. Additional
+columns including `OlinkID_HT` and `OlinkID_3072` map the assays across
+products and the `Project` column lists the name of the project based on
+the `exploreht_name` and `explore3072_name` arguements. The resulting
+dataset will contain the Explore HT data set, which will be identical to
+the input reference data and the newly bridged Explore 3072 data set.
 
 ```{r norm_data_table , echo = FALSE}
 npx_br_data %>% 
@@ -455,13 +442,11 @@ npx_br_data %>%
 
 ## Evaluating the quality of bridging
 
-use PCA plot to check whether bridging normalization has effect in
-correcting batch effects (Figure 8). In the example below, it is clear
-that before bridging samples from data 1 and 2 are divided into separate
-clusters due to the batch effects (Figure 3), but after bridging they
-are shown as one cluster in the PCA plot (Figure 8). Bridging
-normalization has sufficiently removed the batch effects between two
-data sets.
+PCA is used to assess the quality of bridging by determining if the
+sample controls SCs) and bridging samples appear closer after bridging.
+Two PCAs can be generated, one containing the SCs and one containing the
+bridging samples. Prior to bridging there will be a noticeable
+separation between products which should decrease after bridging.
 
 ```{r pca2, message=FALSE, fig.cap= f8}
 ## After bridging
