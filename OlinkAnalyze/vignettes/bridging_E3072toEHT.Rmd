@@ -250,15 +250,16 @@ convention across data sets but may represent different samples due to
 reagent batch differences. Appending the project name to the end of the
 control samples can ensure unique Sample IDs.
 
-```{r, echo = FALSE}
-data.frame(SampleID = intersect(npx_data1$SampleID, npx_data2$SampleID)) %>%
-  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_SAMPLE"))
+```{r, echo=FALSE}
+overlapping_sample_list <- intersect(data_3k$SampleID, data_ht$SampleID)
 ```
 
 ```{r, echo=FALSE}
 
-data.frame(SampleID = intersect(npx_data1$SampleID, npx_data2$SampleID)) %>%
-  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_SAMPLE")) %>% #Remove control samples
+data_ht |> 
+  dplyr::filter(SampleID %in% overlapping_sample_list) |> 
+  dplyr::filter(SampleType == "SAMPLE") |>  #Remove control samples
+  select(SampleID) |> 
   kableExtra::kbl(booktabs = TRUE,
       digits = 2,
       caption = "Table 3. Overlapping Bridge Samples") %>%
@@ -269,25 +270,7 @@ data.frame(SampleID = intersect(npx_data1$SampleID, npx_data2$SampleID)) %>%
 ```{r pca1, message=FALSE, fig.cap=f3}
 #### Extract bridging samples
 
-overlapping_samples <-  data.frame(SampleID = intersect(npx_1$SampleID, npx_2$SampleID)) %>%  
-  filter(!str_detect(SampleID, "CONTROL_SAMPLE")) %>% #Remove control samples
-  pull(SampleID)
 
-npx_before_br <- npx_data1 %>%
-  dplyr::filter(!str_detect(SampleID, "CONTROL_SAMPLE")) %>% #Remove control samples
-  dplyr::mutate(Type = if_else(SampleID %in% overlapping_samples,
-                        paste0("data1 Bridge"),
-                        paste0("data1 Sample"))) %>%
-  rbind({
-    npx_data2 %>%
-      filter(!str_detect(SampleID, "CONTROL_SAMPLE")) %>% #Remove control samples %>% 
-      mutate(Type = if_else(SampleID %in% overlapping_samples,
-                            paste0("data2 Bridge"),
-                            paste0("data2 Sample"))) %>%
-      mutate(SampleID = if_else(SampleID %in% overlapping_samples,
-                                paste0(SampleID, "_new"),
-                                SampleID))
-  })
 
 ### PCA plot
 OlinkAnalyze::olink_pca_plot(df          = npx_before_br,
