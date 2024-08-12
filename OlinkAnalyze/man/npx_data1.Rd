@@ -22,8 +22,8 @@ Data is generated randomly to demonstrate use of functions in this package.
 }
 \details{
 A tibble with 29,440 rows and 17 columns.
-Dataset npx_data1 is an Olink NPX data file (tibble) in long format with 158 unique Sample ID's 
-(including 2 repeats each of control samples: CONTROL_SAMPLE_AS 1 CONTROL_SAMPLE_AS 2). 
+Dataset npx_data1 is an Olink NPX data file (tibble) in long format with 158 unique Sample ID's
+(including 2 repeats each of control samples: CONTROL_SAMPLE_AS 1 CONTROL_SAMPLE_AS 2).
 The data also contains 1104 assays (uniquely identified using OlinkID) over 2 Panels.
 }
 \keyword{datasets}
