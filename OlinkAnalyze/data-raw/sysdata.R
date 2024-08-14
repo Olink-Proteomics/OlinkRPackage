@@ -19,17 +19,8 @@ source(system.file("data-raw",
 # save to R/R/sysdata.rda ----
 
 usethis::use_data(e3k_eHT_mapping,
-                  overwrite = TRUE,
-                  internal = TRUE,
-                  compress = "xz",
-                  version = 2L)
-usethis::use_data(data_ht,
-                  overwrite = TRUE,
-                  internal = TRUE,
-                  compress = "xz",
-                  version = 2L)
-
-usethis::use_data(data_3k,
+                  data_ht,
+                  data_3k,
                   overwrite = TRUE,
                   internal = TRUE,
                   compress = "xz",
