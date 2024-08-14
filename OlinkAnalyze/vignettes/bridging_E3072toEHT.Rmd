@@ -51,6 +51,28 @@ designed to give you an overview of the Olink bridging procedure for
 combining data sets from Olink® Explore 3072 and Olink® Explore HT
 products.
 
+### Important Terminology
+
+-   **Within-product bridging** – Normalization of two or more studies
+    run on the same Olink product using overlapping samples
+
+-   **Between-product bridging** - Normalization of two or more studies
+    from different Olink products (for example, Olink Explore 3072 and
+    Olink Explore HT) using overlapping samples
+
+-   **Batch** – Studies run at the same time, fully randomized, and
+    using the same set of reagents are known as a batch. Studies that
+    are not randomized or are run at different times or using different
+    reagents require additional normalization.
+
+-   **Batch effect/correction** – As NPX is a relative quantification,
+    overall NPX values may shift between batches. This can result in
+    separation of batches which can be corrected for using normalization
+    or accounted for within a statistical model
+
+-   **Bridge samples** – Overlapping samples run on two or more batches
+    that are used as references to facilitate normalization
+
 ### Within- and between-product bridging
 
 The joint analysis of two or more NPX datasets run on the same Olink
