@@ -136,11 +136,10 @@ using either median normalization or quantile smoothing.
 
 Product bridging between an Explore 3072 and an Explore HT NPX data set
 requires **40-60 bridging samples**. Bridging samples are shared samples
-among data sets - that is that samples that are analyzed in both
-data sets. Olink® NPX data sets without shared samples should not be
-combined using the bridging approach described below. More information
-on bridge sample selection can be found in the [selecting bridging
-samples
+among data sets - that is that samples that are analyzed in both data
+sets. Olink® NPX data sets without shared samples should not be combined
+using the bridging approach described below. More information on bridge
+sample selection can be found in the [selecting bridging samples
 section](https://cran.r-project.org/web/packages/OlinkAnalyze/vignettes/bridging_introduction.html#selecting-bridging-samples)
 of the Introduction to Bridging tutorial.
 
@@ -171,11 +170,14 @@ parallel, the assays are normalized using quantile smoothing and
 normalization using the median of paired differences. The result is an
 adjusted Explore 3072 data set with three additional columns:
 
--   `BridgingRecommendation`: a flag which indicates if the assay is bridgeable and, if so, which normalization method is recommended
+-   `BridgingRecommendation`: a flag which indicates if the assay is
+    bridgeable and, if so, which normalization method is recommended
 
--   `MedianCenteredNPX`: NPX values after normalization using the median of paired differences
+-   `MedianCenteredNPX`: NPX values after normalization using the median
+    of paired differences
 
--   `QSNormalizedNPX`: NPX values after normalization using quantile smoothing
+-   `QSNormalizedNPX`: NPX values after normalization using quantile
+    smoothing
 
 A visual representation of the workflow is shown below.
 
@@ -299,65 +301,71 @@ olink_normalization_bridge_product(exploreht_df,
 
 ### Determining bridging recommendations
 
-For an assay to be bridgeable across products it must either have signal in both products or be primarily background signal in both products. Bridging noise 
-into signal or signal into noise can negatively impact downstream statistical 
-analysis. To determine if an assay is bridgeable, the following criteria are 
-considered:
+For an assay to be bridgeable across products it must either have signal
+in both products or be primarily background signal in both products.
+Bridging noise into signal or signal into noise can negatively impact
+downstream statistical analysis. To determine if an assay is bridgeable,
+the following criteria are considered:
 
 -   Is there a linear relationship between products?
     -   **Assessing linearity across products:** To determine if there
         is a linear relationship between products for an assay, the
-        linear coefficient of determination (R^2^) is calculated using Pearson
-        correlation. R^2^ is a measure of how much of the variation in the data is
-        explained by the linear function compared to just using the mean.In this
-        correlation, counts below 10 are excluded
-        due to lack of signal. The R^2^ value is calculated and an assay
-        is considered to have a linear relationship across products if
-        the R^2^ value is above the cutoff. A higher R^2^ value indicates,
-        that for both products, the assay is in the linear range. 
-        Conversely, a low R2 means that either one or both assays are in 
-        background. The default cutoff is set to R^2^ \> 0.8 indicating that at
-        least 80% of the variation in the data is explained by the linear function.
+        linear coefficient of determination (R^2^) is calculated using
+        Pearson correlation. R^2^ is a measure of how much of the
+        variation in the data is explained by the linear function
+        compared to just using the mean.In this correlation, counts
+        below 10 are excluded due to lack of signal. The R^2^ value is
+        calculated and an assay is considered to have a linear
+        relationship across products if the R^2^ value is above the
+        cutoff. A higher R^2^ value indicates, that for both products,
+        the assay is in the linear range. Conversely, a low R2 means
+        that either one or both assays are in background. The default
+        cutoff is set to R^2^ \> 0.8 indicating that at least 80% of the
+        variation in the data is explained by the linear function.
 -   Are the NPX ranges in the two products similar?
     -   **Assessing similarity of NPX ranges:** To determine if the NPX
         ranges are similar across products, the difference in NPX values
         from the 10% to 90% quantile is calculated for each product,
         excluding data points with counts less than 10. If the
-        difference in range of NPX between products is greater than the cutoff
-        than the ranges are not considered similar across products. Since the 
-        NPX values are calculated on the same samples, it is expected that an 
-        increase in 1 NPX in one product would correspond to an increase of 
-        1 NPX in the other product. If the ranges are not similar, this suggests
-        that 1 NPX is not equivalent across products. By default, the cutoff is 
-        set to a difference of less than 1 NPX between products.
+        difference in range of NPX between products is greater than the
+        cutoff than the ranges are not considered similar across
+        products. Since the NPX values are calculated on the same
+        samples, it is expected that an increase in 1 NPX in one product
+        would correspond to an increase of 1 NPX in the other product.
+        If the ranges are not similar, this suggests that 1 NPX is not
+        equivalent across products. By default, the cutoff is set to a
+        difference of less than 1 NPX between products.
 -   Are there sufficient counts in the Explore HT data?
-    -   **Assessing if there are sufficient counts:** An assay's absolute level 
-    of counts is important to consider as the instruments used to generate NPX 
-    values have an inherent noise level. To determine if
-    there are sufficient counts in an assay for bridging, the median
-    number of counts from Explore HT is calculated, excluding data
-    points with less than 10 counts. If the median number of counts is less 
-    than the cutoff than the assay does not have sufficient counts to be used 
-    for bridging. The default cutoff is set to 150 counts, which is based on 
-    the count quality control metrics for Explore products.
-        
-For assays that are bridgeable, the shape of the NPX distribution is compared between the two products
--   **Assessing similarity of NPX distribution across products:** If
-        the three criteria outlined above are met then the assay is
-        considered bridgeable. Otherwise, bridging is not recommended
-        for that assay. If an assay is bridgeable, the similarity of the
-        NPX distribution is used to determine which method is
-        recommended for bridging. The Kolmogorov-Smirnov test, or KS
-        test, is used to assess the similarity of two distributions by
-        calculating the KS statistic, which is based on the empirical cumulative
-        distribution function (ECDF). Counts below 10 are excluded and the 
-        largest difference seen in the ECDF becomes the KS statistic. If the KS
-        statistic is above the cutoff the distributions are considered to 
-        have different shapes. In this case, 
-        a median shift is not sufficient to normalized the data and 
-        quantile smoothing is recommended. If the distance is less than the
-        cutoff then normalization using the median of paired differences
-        is recommended. By default this cutoff difference is set to 0.2.
+    -   **Assessing if there are sufficient counts:** An assay's
+        absolute level of counts is important to consider as the
+        instruments used to generate NPX values have an inherent noise
+        level. To determine if there are sufficient counts in an assay
+        for bridging, the median number of counts from Explore HT is
+        calculated, excluding data points with less than 10 counts. If
+        the median number of counts is less than the cutoff than the
+        assay does not have sufficient counts to be used for bridging.
+        The default cutoff is set to 150 counts, which is based on the
+        count quality control metrics for Explore products.
+
+For assays that are bridgeable, the shape of the NPX distribution is
+compared between the two products:
+
+-   **Assessing similarity of NPX distribution across products:** If the
+    three criteria outlined above are met then the assay is considered
+    bridgeable. Otherwise, bridging is not recommended for that assay.
+    If an assay is bridgeable, the similarity of the NPX distribution is
+    used to determine which method is recommended for bridging. The
+    Kolmogorov-Smirnov test, or KS test, is used to assess the
+    similarity of two distributions by calculating the KS statistic,
+    which is based on the empirical cumulative distribution function
+    (ECDF). Counts below 10 are excluded and the largest difference seen
+    in the ECDF becomes the KS statistic. If the KS statistic is above
+    the cutoff the distributions are considered to have different
+    shapes. In this case, a median shift is not sufficient to normalized
+    the data and quantile smoothing is recommended. If the distance is
+    less than the cutoff then normalization using the median of paired
+    differences is recommended. By default this cutoff difference is set
+    to 0.2.
 
 An overview of these criteria is visualized below.
 
@@ -402,17 +410,41 @@ following steps:
 
 Since Explore HT and Explore 3072 are two distinct products and the
 assays differ considerably between products, some of the assays exist in
-corresponding but distinct NPX spaces. For those assays, the median of paired differences is insufficient for bridging as it only considers one anchor point (the median/50% quantile). Instead, quantile smoothing (QS) using multiple anchor points (5%, 10%, 25%, 50%, 75%, 90% and 95% quantiles) is favored to map the Explore 3072 data to the Explore HT distribution. The normalization using QS uses bridge samples to perform the following steps:
+corresponding but distinct NPX spaces. For those assays, the median of
+paired differences is insufficient for bridging as it only considers one
+anchor point (the median/50% quantile). Instead, quantile smoothing (QS)
+using multiple anchor points (5%, 10%, 25%, 50%, 75%, 90% and 95%
+quantiles) is favored to map the Explore 3072 data to the Explore HT
+distribution. The normalization using QS uses bridge samples to perform
+the following steps:
 
 1.  Each data point of the samples from Explore 3072 is mapped to the
-equivalent space in Explore HT using an empirical cumulative distribution
-function. An empirical cumulative distribution function is a probability model which uses the observed data, in this case the NPX values of the bridge samples for an assay, to create a step function which interpolates linearly between the available data points. 
+    equivalent space in Explore HT using an empirical cumulative
+    distribution function. An empirical cumulative distribution function
+    is a probability model which uses the observed data, in this case
+    the NPX values of the bridge samples for an assay, to create a step
+    function which interpolates linearly between the available data
+    points.
 
-2.  The empirical distribution function is used to map the datapoints from Explore 3072 to the Explore HT space using the specified quantiles. At this point all data points from the bridge samples have NPX values that are normalized to the data points in Explore HT.
+2.  The empirical distribution function is used to map the data points
+    from Explore 3072 to the Explore HT space using the specified
+    quantiles. At this point all data points from the bridge samples
+    have NPX values that are normalized to the data points in Explore
+    HT.
 
-3.  To normalize the remaining data a spline regression model is constructed using the sorted Explore 3072 data and the mapped Explore 3072 data along with the anchor points of the spline function. A spline regression model divides a data set at the quantiles and uses the quantile as an anchor point or knot. Then a model is generated to fit the points between each anchor point.
+3.  To normalize the remaining data a spline regression model is
+    constructed using the sorted Explore 3072 data and the mapped
+    Explore 3072 data along with the anchor points of the spline
+    function. A spline regression model divides a data set at the
+    quantiles and uses the quantile as an anchor point or knot. Then a
+    model is generated to fit the points between each anchor point.
 
-4.  The spline regression model is then used to predict all the data points from Explore 3072 to Explore HT. The spline regression model results in a combination of linear regression models within intervals. The Explore 3072 NPX values are input as the x value within the corresponding interval, which results in a y value equivalent to the Explore HT NPX value.
+4.  The spline regression model is then used to predict all the data
+    points from Explore 3072 to Explore HT. The spline regression model
+    results in a combination of linear regression models within
+    intervals. The Explore 3072 NPX values are input as the x value
+    within the corresponding interval, which results in a y value
+    equivalent to the Explore HT NPX value.
 
 ### Function Output
 
@@ -493,12 +525,19 @@ arrow::write_parquet(x = df, sink = "path_to_output.parquet")
 
 ### Overlapping Assays within products
 
-Both the Explore 3072 and Explore HT products contain assays that appear multiple times in the product, known as overlapping assays or correlation assays. In Explore 3072, these present as overlapping assays across panels. In Explore HT, these are overlapping assays across blocks. These assays are included for QC purposes and allow users to evaluate data performance across panels in Explore 3072 and across blocks in Explore HT.
+Both the Explore 3072 and Explore HT products contain assays that appear
+multiple times in the product, known as overlapping assays or
+correlation assays. In Explore 3072, these present as overlapping assays
+across panels. In Explore HT, these are overlapping assays across
+blocks. These assays are included for QC purposes and allow users to
+evaluate data performance across panels in Explore 3072 and across
+blocks in Explore HT.
 
-Within each product, the assays contain unique OlinkID
-values for each of their corresponding panels and blocks in Explore 3072
-and Explore HT, respectively. It should be noted that the overlapping
-assays themselves differ between each product and that these assays differ from the overlapping assays *across* products. For more information on
+Within each product, the assays contain unique OlinkID values for each
+of their corresponding panels and blocks in Explore 3072 and Explore HT,
+respectively. It should be noted that the overlapping assays themselves
+differ between each product and that these assays differ from the
+overlapping assays *across* products. For more information on
 overlapping assays, you can access the [Olink FAQ
 page](https://olink.com/knowledge/faq) and search overlapping assays.
 
