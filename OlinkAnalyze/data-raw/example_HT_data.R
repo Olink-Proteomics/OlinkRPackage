@@ -41,7 +41,7 @@ assays <- data.frame(OlinkID = assays_map$OlinkID[1:100],
 # Combine data
 data <- expand.grid(samples$SampleID, assays$OlinkID)
 names(data) <- c("SampleID", "OlinkID")
-
+oids <- sample(assays$OlinkID, 5)
 data <- data |>
   dplyr::left_join(samples) |>
   dplyr::left_join(assays)
@@ -54,6 +54,7 @@ data <-data |>
                       ifelse(SampleType != "NEGATIVE_CONTROL",
                              rnorm(length(c(plate_control_IDs, control_sampleIDs)), sd = 2, mean = 0),
                              rnorm(length(negative_control_ids), sd = 1, mean = -1)))) |>
+  dplyr::mutate(NPX = ifelse(OlinkID %in% oids, rnorm(n = length(sampleIDs), sd = 0.5, mean = 0), NPX)) |>
   dplyr::ungroup() |>
   dplyr::mutate(PCNormalizedNPX = NPX) |>
   dplyr::mutate(Count = sample(x = 1:1000, size = nrow(data), replace = TRUE)) |>
