@@ -405,11 +405,11 @@ olink_norm_input_validate <- function(df1,
     if (olink_norm_mode_row$norm_mode == olink_norm_modes$bridge) {
       
       # detect if DF1 is HT data from panels
-      df1_ht <- ifelse(df1 |>
+      df1_ht <- ifelse(all(df1 |>
                          select(Panel) |> 
                          distinct() |> 
                          na.omit() |> 
-                         pull() %in% c("Explore HT", "Explore_HT"),
+                         pull() %in% c("Explore HT", "Explore_HT")),
                        TRUE,
                        FALSE)
       

@@ -103,3 +103,48 @@ olink_norm_mode_combos <- expand.grid(df1 = c(FALSE, TRUE),
     .data[["overlapping_samples_df2"]],
     .data[["reference_medians"]]
   )
+
+
+# add a concatenated version of the 3K-HT OlinkIDs to the reference and non-
+# reference data frames. This is done because the OlinkAnalyze::olink_normalization 
+# function requires unique, overlapping OlinkIDs. This approach allows us to
+# create unique IDs even with the repeated correlation assays in HT and 3K.
+
+map_oid_ht_3k <- function(explore_df) {
+  
+  OlinkIDMapping <- load("../inst/extdata/OlinkIDMapping.rds")
+  
+  oid_ht_3k_mapping <- OlinkIDMapping |>
+    rename(OlinkID_ExploreHT = OlinkID) |>
+    mutate(OlinkID_HT_3K = paste(OlinkID_ExploreHT, OlinkID_Explore384, sep = "_")) |>
+    select(OlinkID_ExploreHT, OlinkID_Explore384, OlinkID_HT_3K)
+  
+  if (all(explore_df |> distinct(Panel) |> pull() |> na.omit() %in% c("Explore_HT", "Explore HT"))) {
+    
+    explore_df_linkedOID <- explore_df |>
+      left_join(oid_ht_3k_mapping,
+                relationship = "many-to-many",
+                by = c("OlinkID" = "OlinkID_ExploreHT")) |>
+      mutate(OlinkID = OlinkID_HT_3K) |>
+      select(-OlinkID_HT_3K, -OlinkID_Explore384)
+    
+  } else if (all(explore_df |> distinct(Panel) |> pull() |> na.omit() %in% c("Cardiometabolic", "Cardiometabolic_II",
+                                                                             "Inflammation", "Inflammation_II",
+                                                                             "Neurology", "Neurology_II",
+                                                                             "Oncology", "Oncology_II"))) {
+    explore_df_linkedOID <- explore_df |>
+      left_join(oid_ht_3k_mapping,
+                relationship = "many-to-many",
+                by = c("OlinkID" = "OlinkID_Explore384")) |>
+      mutate(OlinkID = OlinkID_HT_3K) |>
+      select(-OlinkID_HT_3K, -OlinkID_ExploreHT)
+    
+  } else {
+    
+    explore_df_linkedOID <- explore_df
+    print("The provided data frame is not an Explore HT or Explore 384 data frame. No changes made.")
+    
+  }
+  
+  return(explore_df_linkedOID)
+}
