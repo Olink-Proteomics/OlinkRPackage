@@ -64,6 +64,14 @@ data <-data |>
   mutate(PCNormalizedNPX = NPX) |> 
   mutate(Count = sample(x = 1:1000, size = nrow(data), replace = TRUE))
 
+### modifying NPX range for 3K OID20054 to mark as 'not bridgeable' in bridgeable func
+data <- data |> 
+  mutate(NPX = if_else(
+    OlinkID == "OID20054", 
+    jitter(NPX, factor = 1, amount = 2), 
+    NPX)
+    )
+
 data_3k <- data
 
 olink_pca_plot(data_3k, color_g = "SampleType")
