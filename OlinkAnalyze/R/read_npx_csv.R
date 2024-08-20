@@ -29,30 +29,8 @@
 
 read_npx_csv <- function(filename) {
 
-  df_npx <- read.table(
-    file = filename,
-    header = TRUE,
-    sep = ";",
-    quote = "",
-    stringsAsFactors = FALSE,
-    na.strings = c("NA", ""),
-    comment.char = ""
-  )
-
-  # if only one column in the data, try "," as delimiter
-  if (is.data.frame(df_npx) &&
-      ncol(df_npx) == 1L) {
-
-    df_npx <- read.table(
-      file = filename,
-      header = TRUE,
-      sep = ",",
-      quote = "",
-      stringsAsFactors = FALSE,
-      na.strings = c("NA", "")
-    )
-
-  }
+  df_npx <- data.table::fread(file=filename,
+                              data.table=FALSE)
 
   # if this fails too, then throw an error
   if (is.data.frame(df_npx) &&
