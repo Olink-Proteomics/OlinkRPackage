@@ -86,7 +86,8 @@ Imports:
     tidyselect,
     tools,
     utils,
-    zip
+    zip,
+    data.table
 Suggests: 
     arrow,
     clusterProfiler,

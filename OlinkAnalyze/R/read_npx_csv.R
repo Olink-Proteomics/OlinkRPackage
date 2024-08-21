@@ -29,8 +29,10 @@
 
 read_npx_csv <- function(filename) {
 
-  df_npx <- data.table::fread(file=filename,
-                              data.table=FALSE)
+  df_npx <- data.table::fread(file = filename,
+                              header = TRUE,
+                              stringsAsFactors = FALSE,
+                              data.table = FALSE)
 
   # if this fails too, then throw an error
   if (is.data.frame(df_npx) &&
@@ -47,18 +49,18 @@ read_npx_csv <- function(filename) {
 
   if ("NPX" %in% colnames(df_npx)) {
     df_npx <- df_npx %>%
-      mutate(NPX = as.numeric(NPX))
+      dplyr::mutate(NPX = as.numeric(NPX))
   }
 
   if ("Quantified_value" %in% colnames(df_npx)) {
     df_npx <- df_npx %>%
-      mutate(Quantified_value = as.numeric(Quantified_value))
+      dplyr::mutate(Quantified_value = as.numeric(Quantified_value))
   }
 
   if ("MissingFreq" %in% colnames(df_npx)) {
     if (any(grepl("%", df_npx$MissingFreq))) {
     df_npx <- df_npx %>%
-      mutate(MissingFreq = as.numeric(gsub("%", "", MissingFreq)) / 100)
+      dplyr::mutate(MissingFreq = as.numeric(gsub("%", "", MissingFreq)) / 100)
     }
   }
 
