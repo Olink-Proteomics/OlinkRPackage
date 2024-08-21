@@ -1,3 +1,7 @@
+# Olink Analyze 3.9.1
+## Bug Fix
+* Extra set of parentheses removed from vignette
+
 # Olink Analyze 3.9.0
 ## Minor Changes
 * Explore HT recommended bridging samples have been added to Introduction to Bridging tutorial (#409, @kathy-nevola)
