@@ -216,7 +216,8 @@ SampleID of `Sample_1_Aliquot_1` in the first batch and
 should look as the following.
 
 ```{r, echo = FALSE}
-overlap_sample_list <-list("DF1" = c("A1", "A2", "A3", "Sample_1_Aliquot_1"),                            "DF2" = c("A1", "A2", "A3",  "Sample_1_Aliquot_2")) 
+overlap_sample_list <-list("DF1" = c("A1", "A2", "A3", "Sample_1_Aliquot_1"),
+                           "DF2" = c("A1", "A2", "A3",  "Sample_1_Aliquot_2")) 
 ```
 
 Note that external controls should not be included in the list of
@@ -277,7 +278,7 @@ in the Workflow Overview and in the sections below. Within this function
 the bridging recommendations for each assay are determined and the NPX
 values are normalized using the two methods described below.
 
-```{r eval=FALSE}
+```{r, eval=FALSE}
 # Find shared samples
 npx_1 <- data_EHT %>%
   mutate(Project = "data1") 
@@ -459,7 +460,7 @@ the `exploreht_name` and `explore3072_name` arguments. The resulting
 data set will contain the Explore HT data set, which will be identical
 to the input reference data and the newly bridged Explore 3072 data set.
 
-```{r post_bridging_3k_data , echo = FALSE}
+```{r, post_bridging_3k_data , echo=FALSE, eval=FALSE}
 npx_br_data %>% 
   head(10) %>% 
   kableExtra::kbl(booktabs = TRUE,
@@ -478,7 +479,7 @@ Two PCAs can be generated, one containing the SCs and one containing the
 bridging samples. Prior to bridging there will be a noticeable
 separation between products which should decrease after bridging.
 
-```{r pca2, message=FALSE, fig.cap= f8}
+```{r pca2, message=FALSE, fig.cap= f8, eval=FALSE}
 ## After bridging
 
 ### Keep the data following BridgingRecommendation
