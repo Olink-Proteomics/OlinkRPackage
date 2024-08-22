@@ -32,6 +32,8 @@ read_npx_csv <- function(filename) {
   df_npx <- data.table::fread(file = filename,
                               header = TRUE,
                               stringsAsFactors = FALSE,
+                              na.strings = c("NA", ""),
+                              check.names = TRUE,
                               data.table = FALSE)
 
   # if this fails too, then throw an error
