@@ -215,7 +215,7 @@ SampleID of `Sample_1_Aliquot_1` in the first batch and
 `Sample_1_Aliquot_2` in the second batch, then the overlap sample list
 should look as the following.
 
-```{r, echo = FALSE}
+```{r, echo=FALSE}
 overlap_sample_list <-list("DF1" = c("A1", "A2", "A3", "Sample_1_Aliquot_1"),
                            "DF2" = c("A1", "A2", "A3",  "Sample_1_Aliquot_2")) 
 ```
@@ -227,7 +227,7 @@ convention across data sets but may represent different samples due to
 reagent batch differences. Appending the project name to the end of the
 control samples can ensure unique Sample IDs.
 
-```{r, echo = TRUE, eval=FALSE}
+```{r, echo=TRUE, eval=FALSE}
 data.frame(SampleID = intersect(data_E3072$SampleID, data_EHT$SampleID)) %>%
   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_SAMPLE"))
 ```
@@ -242,7 +242,7 @@ data.frame(SampleID = intersect(data_E3072$SampleID, data_EHT$SampleID)) %>%
                 position = "center", latex_options = "HOLD_position")
 ```
 
-```{r pca1, message=FALSE, fig.cap=f3, eval=FALSE}
+```{r, message=FALSE, fig.cap=f3, eval=FALSE}
 #### Extract bridging samples
 
 overlapping_samples <-  data.frame(SampleID = intersect(data_E3072$SampleID, data_EHT$SampleID)) %>%  
@@ -368,7 +368,7 @@ compared between the two products:
 
 An overview of these criteria is visualized below.
 
-```{r, fig.cap= fcap, eval = TRUE, echo = FALSE, out.width="100%"}
+```{r, fig.cap= fcap, eval=TRUE, echo=FALSE, out.width="100%"}
 knitr::include_graphics(normalizePath("../man/figures/assay_bridgeability.png"), error = FALSE)
 fcap <- "Criteria to determine the bridging recommendation for an assay"
 ```
