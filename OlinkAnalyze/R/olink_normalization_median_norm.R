@@ -56,17 +56,17 @@ olink_normalization_median_norm <- function(exploreht_df,
 
   # detect if explore3072_df is 3K data from panels
   df2_3k_check <- ifelse(all(explore3072_df |>
-                             select(Panel) |>
-                             distinct() |>
-                             na.omit() |>
-                             pull() %in% c(
-                               "Cardiometabolic", "Cardiometabolic_II",
-                               "Inflammation", "Inflammation_II",
-                               "Neurology", "Neurology_II",
-                               "Oncology", "Oncology_II")
-                             ),
-                         TRUE,
-                         FALSE)
+                               select(Panel) |>
+                               distinct() |>
+                               na.omit() |>
+                               pull() %in% c(
+                                 "Cardiometabolic", "Cardiometabolic_II",
+                                 "Inflammation", "Inflammation_II",
+                                 "Neurology", "Neurology_II",
+                                 "Oncology", "Oncology_II")
+  ),
+  TRUE,
+  FALSE)
 
   if (df1_ht_check != TRUE) {
     stop("exploreht_df must be an Explore HT dataset.")
@@ -102,11 +102,7 @@ olink_normalization_median_norm <- function(exploreht_df,
 
   # Identifying overlapping assays between HT and 3K datasets
   overlapping_assays <- intersect(exploreht_df$OlinkID, explore3072_df$OlinkID)
-  
-  # Mutating Explore HT block to character to allow for row_bind 
-  exploreht_df   <- exploreht_df |> 
-    mutate(Block = as.character(Block))
-  
+
   # bridge normalize the two data frames
   norm_df <- olink_normalization(
     df1 = exploreht_df |> filter(OlinkID %in% overlapping_assays),
@@ -127,7 +123,7 @@ olink_normalization_median_norm <- function(exploreht_df,
       !is.na(SampleID_df2) & Project == exploreht_name ~ SampleID,
       !is.na(SampleID_df2) & Project != exploreht_name ~ SampleID_df2,
       TRUE ~ NA_character_)
-      ) |>
+    ) |>
     dplyr::select(-SampleID) |>
     dplyr::rename("SampleID" = "SampleID_df2")
 
@@ -135,16 +131,13 @@ olink_normalization_median_norm <- function(exploreht_df,
 
   # switch back both reference and non-reference projects to original
   # OlinkIDs, with both HT and 3K OlinkIDs
-  #
-  # Note that adjustments made to NPX column - need to report NPX as original
-  # units - duplicate the adjusted NPX as MedianCenteredNPX
-  # To return NPX to original units, subtract Adj_factor
   norm_df <- norm_df |>
-    mutate(OlinkID_HT = substr(OlinkID, 1, 8),
-           OlinkID_3072 = substr(OlinkID, 10, 18)) |>
-    mutate(MedianCenteredNPX = NPX) |> # Duplicate adjusted NPX as new column
-    mutate(NPX = NPX - Adj_factor) |>  # Return NPX to original value
-    select(-OlinkID, -Adj_factor)
+    mutate(OlinkIDconcat = OlinkID) |>
+    mutate(OlinkID = if_else(Panel == "Explore HT",
+                             substr(OlinkIDconcat, 1, 8),
+                             substr(OlinkIDconcat, 10, 18))) |>
+    mutate(MedianCenteredNPX = NPX + Adj_factor) |>
+    select(-Adj_factor)
 
   return(norm_df)
 }

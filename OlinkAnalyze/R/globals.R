@@ -105,6 +105,12 @@ olink_norm_mode_combos <- expand.grid(df1 = c(FALSE, TRUE),
   )
 
 
+oid_ht_3k_mapping <- mapping |>
+  rename(OlinkID_ExploreHT = OlinkID) |>
+  mutate(OlinkID_HT_3K = paste(OlinkID_ExploreHT, OlinkID_Explore384, sep = "_")) |>
+  select(OlinkID_ExploreHT, OlinkID_Explore384, OlinkID_HT_3K)
+
+
 # add a concatenated version of the 3K-HT OlinkIDs to the reference and non-
 # reference data frames. This is done because the OlinkAnalyze::olink_normalization 
 # function requires unique, overlapping OlinkIDs. This approach allows us to
@@ -112,32 +118,27 @@ olink_norm_mode_combos <- expand.grid(df1 = c(FALSE, TRUE),
 
 map_oid_ht_3k <- function(explore_df) {
   
-  OlinkIDMapping <- load("../inst/extdata/OlinkIDMapping.rds")
-  
-  oid_ht_3k_mapping <- OlinkIDMapping |>
-    rename(OlinkID_ExploreHT = OlinkID) |>
-    mutate(OlinkID_HT_3K = paste(OlinkID_ExploreHT, OlinkID_Explore384, sep = "_")) |>
-    select(OlinkID_ExploreHT, OlinkID_Explore384, OlinkID_HT_3K)
-  
   if (all(explore_df |> distinct(Panel) |> pull() |> na.omit() %in% c("Explore_HT", "Explore HT"))) {
     
     explore_df_linkedOID <- explore_df |>
-      left_join(oid_ht_3k_mapping,
+      inner_join(oid_ht_3k_mapping,
                 relationship = "many-to-many",
                 by = c("OlinkID" = "OlinkID_ExploreHT")) |>
       mutate(OlinkID = OlinkID_HT_3K) |>
-      select(-OlinkID_HT_3K, -OlinkID_Explore384)
+      select(-OlinkID_HT_3K, -OlinkID_Explore384) |>
+      distinct()
     
   } else if (all(explore_df |> distinct(Panel) |> pull() |> na.omit() %in% c("Cardiometabolic", "Cardiometabolic_II",
                                                                              "Inflammation", "Inflammation_II",
                                                                              "Neurology", "Neurology_II",
                                                                              "Oncology", "Oncology_II"))) {
     explore_df_linkedOID <- explore_df |>
-      left_join(oid_ht_3k_mapping,
+      inner_join(oid_ht_3k_mapping,
                 relationship = "many-to-many",
                 by = c("OlinkID" = "OlinkID_Explore384")) |>
       mutate(OlinkID = OlinkID_HT_3K) |>
-      select(-OlinkID_HT_3K, -OlinkID_ExploreHT)
+      select(-OlinkID_HT_3K, -OlinkID_ExploreHT) |>
+      distinct()
     
   } else {
     
