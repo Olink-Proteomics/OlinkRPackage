@@ -33,7 +33,6 @@
 #' @importFrom tools file_ext md5sum file_path_sans_ext
 #' @importFrom dplyr pull filter
 #' @importFrom stringr str_detect str_replace
-#' @importFrom zip unzip
 #'
 
 read_npx_zip <- function(filename) {
@@ -43,6 +42,13 @@ read_npx_zip <- function(filename) {
          Please install package \"openssl\" before continuing.
 
          install.packages(\"openssl\")")
+  }
+
+  if(!requireNamespace("zip", quietly = TRUE)){
+    stop("Importing compressed Olink datasets requires the \"zip\" package.
+         Please install package \"zip\" before continuing.
+
+         install.packages(\"zip\")")
   }
 
   # **** Prep ****
