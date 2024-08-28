@@ -2025,8 +2025,7 @@ test_that(
           "p1" = npx_data1 |>
             dplyr::select(
               -dplyr::all_of(c("SampleID"))
-            ) |>
-            arrow::as_arrow_table(),
+            ),
           "p2" = npx_data2 |>
             dplyr::select(
               -dplyr::all_of(c("OlinkID", "PlateID"))
@@ -2049,8 +2048,7 @@ test_that(
           "p2" = npx_data2 |>
             dplyr::select(
               -dplyr::all_of(c("QC_Warning"))
-            ) |>
-            arrow::as_arrow_table()
+            )
         ) |>
           lapply(dplyr::mutate, Normalization = "Intensity")
       ),
@@ -2066,8 +2064,7 @@ test_that(
             dplyr::select(
               -dplyr::all_of(c("NPX"))
             ),
-          "p2" = npx_data2 |>
-            arrow::as_arrow_table()
+          "p2" = npx_data2
         ) |>
           lapply(dplyr::mutate, Normalization = "Intensity")
       ),
@@ -2083,8 +2080,7 @@ test_that(
           "p2" = npx_data2 |>
             dplyr::select(
               -dplyr::all_of(c("NPX"))
-            ) |>
-            arrow::as_arrow_table()
+            )
         ) |>
           lapply(dplyr::mutate, Normalization = "Intensity")
       ),
@@ -2103,8 +2099,7 @@ test_that(
           "p2" = OlinkAnalyze::npx_data2 |>
             dplyr::select(
               -dplyr::all_of(c("Panel", "Panel_Version"))
-            ) |>
-            arrow::as_arrow_table(),
+            ),
           "p3" = OlinkAnalyze::npx_data1 |>
             dplyr::select(
               -dplyr::all_of(c("Assay", "UniProt"))
@@ -2112,8 +2107,7 @@ test_that(
           "p4" = OlinkAnalyze::npx_data2 |>
             dplyr::select(
               -dplyr::all_of(c("QC_Warning"))
-            ) |>
-            arrow::as_arrow_table()
+            )
         ) |>
           lapply(dplyr::mutate, Normalization = "Intensity")
       ),
