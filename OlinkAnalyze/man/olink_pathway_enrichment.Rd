@@ -33,37 +33,37 @@ olink_pathway_enrichment(
 A data frame of enrichment results.
 Columns for ORA include:
 \itemize{
- \item{ID:} "character" Pathway ID from MSigDB
- \item{Description:} "character" Description of Pathway from MSigDB
- \item{GeneRatio:} "character" ratio of input proteins that are annotated in a term
- \item{BgRatio:} "character" ratio of all genes that are annotated in this term
- \item{pvalue:} "numeric" p-value of enrichment
- \item{p.adjust:} "numeric" Adjusted p-value (Benjamini-Hochberg)
- \item{qvalue:} "numeric" false discovery rate, the estimated probability that the normalized enrichment score represents
- a false positive finding
- \item{geneID:} "character" list of input proteins (Gene Symbols) annotated in a term delimited by "/"
- \item{Count:} "integer" Number of input proteins that are annotated in a term
+\item{ID:} "character" Pathway ID from MSigDB
+\item{Description:} "character" Description of Pathway from MSigDB
+\item{GeneRatio:} "character" ratio of input proteins that are annotated in a term
+\item{BgRatio:} "character" ratio of all genes that are annotated in this term
+\item{pvalue:} "numeric" p-value of enrichment
+\item{p.adjust:} "numeric" Adjusted p-value (Benjamini-Hochberg)
+\item{qvalue:} "numeric" false discovery rate, the estimated probability that the normalized enrichment score represents
+a false positive finding
+\item{geneID:} "character" list of input proteins (Gene Symbols) annotated in a term delimited by "/"
+\item{Count:} "integer" Number of input proteins that are annotated in a term
 }
 
 Columns for GSEA:
 \itemize{
- \item{ID:} "character" Pathway ID from MSigDB
- \item{Description:} "character" Description of Pathway from MSigDB
- \item{setSize:} "integer" ratio of input proteins that are annotated in a term
- \item{enrichmentScore:} "numeric" Enrichment score, degree to which a gene set is over-represented at the top or
- bottom of the ranked list of genes
- \item{NES:} "numeric" Normalized Enrichment Score, normalized to account for differences in gene set size and in
- correlations between gene sets and expression data sets. NES can be used to compare analysis results
- across gene sets.
- \item{pvalue:} "numeric" p-value of enrichment
- \item{p.adjust:} "numeric" Adjusted p-value (Benjamini-Hochberg)
- \item{qvalue:} "numeric" false discovery rate, the estimated probability that the normalized enrichment score represents
- a false positive finding
- \item{rank:} "numeric" the position in the ranked list where the maximum enrichment score occurred
- \item{leading_edge:} "character" contains tags, list, and signal. Tags gives an indication of the percentage of genes
- contributing to the enrichment score. List gives an indication of where in the list the enrichment
- score is obtained. Signal represents the enrichment signal strength and combines the tag and list.
- \item{core_enrichment:} "character" list of input proteins (Gene Symbols) annotated in a term delimited by "/"
+\item{ID:} "character" Pathway ID from MSigDB
+\item{Description:} "character" Description of Pathway from MSigDB
+\item{setSize:} "integer" ratio of input proteins that are annotated in a term
+\item{enrichmentScore:} "numeric" Enrichment score, degree to which a gene set is over-represented at the top or
+bottom of the ranked list of genes
+\item{NES:} "numeric" Normalized Enrichment Score, normalized to account for differences in gene set size and in
+correlations between gene sets and expression data sets. NES can be used to compare analysis results
+across gene sets.
+\item{pvalue:} "numeric" p-value of enrichment
+\item{p.adjust:} "numeric" Adjusted p-value (Benjamini-Hochberg)
+\item{qvalue:} "numeric" false discovery rate, the estimated probability that the normalized enrichment score represents
+a false positive finding
+\item{rank:} "numeric" the position in the ranked list where the maximum enrichment score occurred
+\item{leading_edge:} "character" contains tags, list, and signal. Tags gives an indication of the percentage of genes
+contributing to the enrichment score. List gives an indication of where in the list the enrichment
+score is obtained. Signal represents the enrichment signal strength and combines the tag and list.
+\item{core_enrichment:} "character" list of input proteins (Gene Symbols) annotated in a term delimited by "/"
 }
 }
 \description{
@@ -73,7 +73,7 @@ This function performs enrichment analysis based on statistical test results and
 MSigDB is subset if the  ontology argument is KEGG, GO, or Reactome. test_results must contain estimates for all assays.
 Posthoc results can be used but should be filtered for one contrast to improve interpretability.
 Alternative statistical results can be used as input as long as they include the columns
- "OlinkID", "Assay", and "estimate". A column named "Adjusted_pal" is also needed for ORA. Any statistical results that contains one estimate per protein will work as long as the estimates are comparable to each other.
+"OlinkID", "Assay", and "estimate". A column named "Adjusted_pal" is also needed for ORA. Any statistical results that contains one estimate per protein will work as long as the estimates are comparable to each other.
 
 clusterProfiler is originally developed by Guangchuang Yu at the School of Basic Medical Sciences at Southern Medical University.
 
@@ -86,14 +86,14 @@ doi: 10.1016/j.xinn.2021.100141
 \strong{A few notes on Pathway Enrichment with Olink Data}
 
 It is important to note that sometimes the proteins that are assayed in Olink Panels
- are related to specific biological areas and therefore do not represent an unbiased overview of the proteome as a whole.
- Pathways can only interpreted based on the background/context they came from. For this reason, an estimate for all assays measured must
- be provided. Furthermore, certain pathways cannot come up based on Olink's  coverage in this area.  Additionally,
-  if only the Inflammation panel was run, then the available pathways would be given based on a background
-  of proteins related to inflammation. Both ORA and GSEA can provide mechanistic and disease related insight and are best to use when
-  trying to uncover pathways/annotations of interest. It is recommended to only use pathway enrichment for hypothesis generating data, which
-  is more well suited for data on the Explore platform or on multiple Target 96 panels. For smaller lists of proteins it may be more informative to use biological annotation in directed research,
-  to discover which significant assay are related to keywords of interest.
+are related to specific biological areas and therefore do not represent an unbiased overview of the proteome as a whole.
+Pathways can only interpreted based on the background/context they came from. For this reason, an estimate for all assays measured must
+be provided. Furthermore, certain pathways cannot come up based on Olink's  coverage in this area.  Additionally,
+if only the Inflammation panel was run, then the available pathways would be given based on a background
+of proteins related to inflammation. Both ORA and GSEA can provide mechanistic and disease related insight and are best to use when
+trying to uncover pathways/annotations of interest. It is recommended to only use pathway enrichment for hypothesis generating data, which
+is more well suited for data on the Explore platform or on multiple Target 96 panels. For smaller lists of proteins it may be more informative to use biological annotation in directed research,
+to discover which significant assay are related to keywords of interest.
 }
 \examples{
 \donttest{
