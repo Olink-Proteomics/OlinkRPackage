@@ -59,12 +59,6 @@ jobs:
         with:
           working-directory: OlinkAnalyze
           extra-packages: any::rcmdcheck, pillar
-          
-      # - name: Install arrow from r-universe
-      #   if: matrix.os == 'macOS-latest'
-      #   run: |
-      #     install.packages('arrow', repos = c('https://apache.r-universe.dev'))
-      #   shell: Rscript {0}
 
       - uses: r-lib/actions/check-r-package@v2
         with:
