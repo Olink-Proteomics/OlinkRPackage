@@ -1,5 +1,7 @@
 # Generating Example HT Data
 
+set.seed(1234)
+
 # sample identifiers
 sample_id <- c(paste0("Sample_", LETTERS[1L:26L]),
                paste0("Sample_A", LETTERS[1L:26L]),
@@ -48,39 +50,60 @@ df_assays <- dplyr::tibble(
   Panel = "Explore HT",
   Block = eHT_e3072_mapping$Block_HT[1L:100L]
 )
+sample_oid <- sample(x = df_assays$OlinkID, size = 5L, replace = FALSE)
 
-# Combine data
-data <- expand.grid(samples$SampleID, assays$OlinkID)
-names(data) <- c("SampleID", "OlinkID")
-oids <- sample(assays$OlinkID, 5)
-data <- data |>
-  dplyr::left_join(samples) |>
-  dplyr::left_join(assays)
-
-# Generate NPX
-set.seed(1234)
-data <-data |>
-  dplyr::group_by(OlinkID, SampleType) |>
-  dplyr::mutate(NPX = ifelse(SampleType == "SAMPLE", rnorm(n = length(sampleIDs), sd = 3, mean = 1),
-                      ifelse(SampleType != "NEGATIVE_CONTROL",
-                             rnorm(length(c(plate_control_IDs, control_sampleIDs)), sd = 2, mean = 0),
-                             rnorm(length(negative_control_ids), sd = 1, mean = -1)))) |>
-  dplyr::mutate(NPX = ifelse(OlinkID %in% oids, rnorm(n = length(sampleIDs), sd = 0.5, mean = 0), NPX)) |>
+# Combine data and generate NPX dataset
+data_ht <- tidyr::expand_grid(
+  SampleID = df_samples$SampleID,
+  OlinkID = df_assays$OlinkID
+) |>
+  as.data.frame() |>
+  dplyr::left_join(
+    df_samples,
+    by = "SampleID",
+    relationship = "many-to-one"
+  ) |>
+  dplyr::left_join(
+    df_assays,
+    by = "OlinkID",
+    relationship = "many-to-one"
+  ) |>
+  dplyr::group_by(
+    dplyr::pick(
+      dplyr::all_of(
+        c("OlinkID", "SampleType")
+      )
+    )
+  ) |>
+  dplyr::mutate(
+    NPX = ifelse(
+      .data[["SampleType"]] == "SAMPLE",
+      rnorm(n = length(sample_id), sd = 3, mean = 1),
+      ifelse(
+        .data[["SampleType"]] == "NEGATIVE_CONTROL",
+        rnorm(length(sample_id_nc), sd = 1, mean = -1),
+        rnorm(length(c(sample_id_pc, sample_id_ctrl)), sd = 2, mean = 0)
+      )
+    ),
+    NPX = ifelse(
+      .data[["OlinkID"]] %in% sample_oid,
+      rnorm(n = length(sample_id), sd = 0.5, mean = 0),
+      .data[["NPX"]]
+    )
+  ) |>
   dplyr::ungroup() |>
-  dplyr::mutate(PCNormalizedNPX = NPX) |>
-  dplyr::mutate(Count = sample(x = 1:1000, size = nrow(data), replace = TRUE)) |>
-  dplyr::mutate(Count = ifelse(OlinkID %in% assays_map$OlinkID[5], sample(x = 1:150, size = nrow(samples), replace = TRUE), Count))
+  dplyr::mutate(
+    PCNormalizedNPX = .data[["NPX"]],
+    Count = ifelse(
+      OlinkID %in% eHT_e3072_mapping$OlinkID_HT[5L],
+      sample(x = 1L:150L, size = nrow(df_samples), replace = TRUE),
+      sample(x = 1L:1000, size = dplyr::n(), replace = TRUE)
+      ),
+    Normalization = "Plate control",
+    AssayQC = "PASS",
+    SampleQC = "PASS"
+  ) |>
+  dplyr::as_tibble()
 
-data |>  dplyr::filter(OlinkID %in% assays_map$OlinkID[5]) |> dplyr::group_by(OlinkID) |> dplyr::summarise(median = median(Count))
-data <- data |>
-  dplyr::mutate(Normalization = "Plate control",
-         AssayQC = "PASS",
-         SampleQC = "PASS")
-data_ht <- data
-
-
-
-
-
-
-
+rm(df_assays, df_samples,
+   sample_id, sample_id_ctrl, sample_id_nc, sample_id_pc, sample_oid)
