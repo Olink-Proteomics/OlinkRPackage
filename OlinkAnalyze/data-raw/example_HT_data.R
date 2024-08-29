@@ -40,13 +40,14 @@ df_samples <- dplyr::tibble(
 )
 
 # Generate assays
-assays_map <- readRDS("../OlinkAnalyze/inst/extdata/OlinkIDMapping.rds")
-assays <- data.frame(OlinkID = assays_map$OlinkID[1:100],
-                     UniProt = assays_map$UniProt[1:100],
-                     Assay = assays_map$Gene[1:100],
-                     AssayType = rep("assay", times = 100),
-                     Panel = "Explore HT",
-                     Block = assays_map$Block[1:100])
+df_assays <- dplyr::tibble(
+  OlinkID = eHT_e3072_mapping$OlinkID_HT[1L:100L],
+  UniProt = eHT_e3072_mapping$UniProt[1L:100L],
+  Assay = eHT_e3072_mapping$Assay[1L:100L],
+  AssayType = rep(x = "assay", times = 100L),
+  Panel = "Explore HT",
+  Block = eHT_e3072_mapping$Block_HT[1L:100L]
+)
 
 # Combine data
 data <- expand.grid(samples$SampleID, assays$OlinkID)
