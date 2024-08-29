@@ -12,24 +12,33 @@ sample_id_ctrl <- paste0("CONTROL_SAMPLE_", 1L:4L)
 sample_id_pc <- paste0("PLATE_CONTROL_", 1L:6L)
 sample_id_nc <- paste0("NEGATIVE_CONTROL_", 1L:6L)
 
-samples<-data.frame(SampleID = c(sampleIDs,
-                                 control_sampleIDs,
-                                 plate_control_IDs,
-                                 negative_control_ids),
-                    SampleType = c(rep("SAMPLE", times = length(sampleIDs)),
-                                   rep("SAMPLE_CONTROL", times = length(control_sampleIDs)),
-                                   rep("PLATE_CONTROL", times = length(plate_control_IDs)),
-                                   rep("NEGATIVE_CONTROL", times = length(negative_control_ids))),
-                    WellID = rep(paste0(rep(LETTERS[1:8], each = 12), rep(1:12, times = 8)), times = 2),
-                    PlateID = c(rep("Plate1", times = length(sampleIDs)/2),
-                                rep("Plate2", times = length(sampleIDs)/2),
-                                rep("Plate1", times = length(control_sampleIDs)/2),
-                                rep("Plate2", times = length(control_sampleIDs)/2),
-                                rep("Plate1", times = length(plate_control_IDs)/2),
-                                rep("Plate2", times = length(plate_control_IDs)/2),
-                                rep("Plate1", times = length(negative_control_ids)/2),
-                                rep("Plate2", times = length(negative_control_ids)/2)
-                    ))
+df_samples <- dplyr::tibble(
+  SampleID = c(sample_id,
+               sample_id_ctrl,
+               sample_id_pc,
+               sample_id_nc),
+  SampleType = c(rep(x = "SAMPLE", times = length(sample_id)),
+                 rep(x = "SAMPLE_CONTROL", times = length(sample_id_ctrl)),
+                 rep(x = "PLATE_CONTROL", times = length(sample_id_pc)),
+                 rep(x = "NEGATIVE_CONTROL", times = length(sample_id_nc))),
+  WellID = rep(
+    x = paste0(
+      rep(x = LETTERS[1L:8L], each = 12L),
+      rep(x = 1L:12L, times = 8L)
+    ),
+    times = 2L
+  ),
+  PlateID = c(rep(x = "Plate1", times = length(sample_id) / 2L),
+              rep(x = "Plate2", times = length(sample_id) / 2L),
+              rep(x = "Plate1", times = length(sample_id_ctrl) / 2L),
+              rep(x = "Plate2", times = length(sample_id_ctrl) / 2L),
+              rep(x = "Plate1", times = length(sample_id_pc) / 2L),
+              rep(x = "Plate2", times = length(sample_id_pc) / 2L),
+              rep(x = "Plate1", times = length(sample_id_nc) / 2L),
+              rep(x = "Plate2", times = length(sample_id_nc) / 2L)
+  )
+)
+
 # Generate assays
 assays_map <- readRDS("../OlinkAnalyze/inst/extdata/OlinkIDMapping.rds")
 assays <- data.frame(OlinkID = assays_map$OlinkID_Explore384[1:100],
