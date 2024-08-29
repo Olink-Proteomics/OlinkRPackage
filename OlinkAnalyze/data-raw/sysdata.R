@@ -27,7 +27,7 @@ rm(data_3k_file)
 
 # save to R/R/sysdata.rda ----
 
-usethis::use_data(e3k_eHT_mapping,
+usethis::use_data(eHT_e3072_mapping,
                   data_ht,
                   data_3k,
                   overwrite = TRUE,
