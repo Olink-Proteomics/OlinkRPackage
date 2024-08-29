@@ -17,7 +17,7 @@ A "tibble" in long format. Columns include:
 \item{OlinkIDconcat:} Concatenated Olink Explore HT and Explore 3072 IDs
 \item{OlinkID_HT:} Olink ID HT
 \item{OlinkID_E3072:} Olink ID Explore 3072
-\item{Gene:} Assay HT
+\item{Assay:} Assay HT
 \item{Bridgeable:} Bridging Flag
 }
 Additional columns may be present or missing depending on the platform
@@ -28,9 +28,8 @@ No alterations to the output format is allowed.
 }
 \examples{
 \donttest{
-test_file <- '../tests/data/bridgeable_data.rda'
-load(test_file)
-results <- bridgeable(data_Explore384 = data_3k, data_HT = data_ht)
+results <- OlinkAnalyze:::bridgeable(data_Explore384 = OlinkAnalyze:::data_3k,
+                                     data_HT = OlinkAnalyze:::data_ht)
 }
 
 }
