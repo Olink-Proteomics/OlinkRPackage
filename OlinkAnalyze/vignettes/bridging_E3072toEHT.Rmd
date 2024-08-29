@@ -251,12 +251,13 @@ reagent batch differences. Appending the project name to the end of the
 control samples can ensure unique Sample IDs.
 
 ```{r, echo=FALSE}
-overlapping_sample_list <- intersect(data_3k$SampleID, data_ht$SampleID)
+overlapping_sample_list <- intersect(OlinkAnalyze:::data_3k$SampleID,
+                                     OlinkAnalyze:::data_ht$SampleID)
 ```
 
 ```{r, echo=FALSE}
 
-data_ht |> 
+OlinkAnalyze:::data_ht |> 
   dplyr::filter(SampleID %in% overlapping_sample_list) |> 
   dplyr::filter(SampleType == "SAMPLE") |>  #Remove control samples
   select(SampleID) |> 
