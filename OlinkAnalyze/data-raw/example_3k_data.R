@@ -50,58 +50,55 @@ df_assays <- dplyr::tibble(
 )
 
 # Combine data
-data <- expand.grid(samples$SampleID, assays$OlinkID)
-names(data) <- c("SampleID", "OlinkID")
-
-data <- data |>
-  left_join(samples) |>
-  left_join(assays)
-
-
-
-data <- data |>
-  mutate(Normalization = "Plate control",
-         AssayQC = "PASS",
-         SampleQC = "PASS")
-
-
-# Generate NPX
-set.seed(1234)
-data <-data |>
-  group_by(OlinkID, SampleType) |>
-  mutate(NPX = ifelse(SampleType == "SAMPLE", rnorm(n = length(sampleIDs), sd = 3, mean = 2),
-                      ifelse(SampleType != "NEGATIVE_CONTROL",
-                             rnorm(length(c(plate_control_IDs, control_sampleIDs)), sd = 2, mean = 1),
-                             rnorm(length(negative_control_ids), sd = 1, mean = -2)))) |>
-  ungroup() |>
-  mutate(PCNormalizedNPX = NPX) |>
-  mutate(Count = sample(x = 1:1000, size = nrow(data), replace = TRUE))
-
-### modifying NPX range for 3K OID20054 to mark as 'not bridgeable' in bridgeable func
-data <- data |>
-  mutate(NPX = if_else(
-    OlinkID == "OID20054",
-    jitter(NPX, factor = 1, amount = 2),
-    NPX)
+data_3k <- tidyr::expand_grid(
+  SampleID = df_samples$SampleID,
+  OlinkID = df_assays$OlinkID
+) |>
+  as.data.frame() |>
+  dplyr::left_join(
+    df_samples,
+    by = "SampleID",
+    relationship = "many-to-one"
+  ) |>
+  dplyr::left_join(
+    df_assays,
+    by = "OlinkID",
+    relationship = "many-to-one"
+  ) |>
+  dplyr::group_by(
+    dplyr::pick(
+      dplyr::all_of(
+        c("OlinkID", "SampleType")
+      )
     )
+  ) |>
+  dplyr::mutate(
+    NPX = ifelse(
+      .data[["SampleType"]] == "SAMPLE",
+      rnorm(n = length(sample_id), sd = 3, mean = 2),
+      ifelse(
+        .data[["SampleType"]] == "NEGATIVE_CONTROL",
+        rnorm(length(sample_id_nc), sd = 1, mean = -2),
+        rnorm(length(c(sample_id_pc, sample_id_ctrl)), sd = 2, mean = 1)
+      )
+    )
+  ) |>
+  dplyr::ungroup() |>
+  dplyr::mutate(
+    PCNormalizedNPX = .data[["NPX"]],
+    Count = sample(x = 1:1000, size = dplyr::n(), replace = TRUE),
+    Normalization = "Plate control",
+    AssayQC = "PASS",
+    SampleQC = "PASS"
+  ) |>
+  dplyr::as_tibble() |>
+  # modifying NPX range for 3K OID20054 to mark as 'not bridgeable'
+  dplyr::mutate(
+    NPX = dplyr::if_else(
+      .data[["OlinkID"]] == "OID20054",
+      jitter(NPX, factor = 1, amount = 2),
+      .data[["NPX"]])
+  )
 
-data_3k <- data
-
-olink_pca_plot(data_3k, color_g = "SampleType")
-
-data_3k_renamed<- data_3k |>
-  rename("OlinkID_Explore384" = OlinkID) |>
-  left_join(assays_map[c(2,3)]) |>
-  mutate(SampleID = paste0(SampleID,"3k")) |>
-  mutate(Project = "Explore 3072") |>
-  select(-Block)
-
-
-data_ht_renamed <- data_ht |>
-  mutate(Project = "Explore HT") |>
-  select(-Block)
-
-data <- bind_rows(data_3k_renamed, data_ht_renamed)
-
-data |>
-  olink_pca_plot(color_g = "Project")
+rm(df_assays, df_samples,
+   sample_id, sample_id_ctrl, sample_id_nc, sample_id_pc)
