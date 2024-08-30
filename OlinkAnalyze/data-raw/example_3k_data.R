@@ -35,8 +35,7 @@ df_samples <- dplyr::tibble(
               rep(x = "Plate1", times = length(sample_id_pc) / 2L),
               rep(x = "Plate2", times = length(sample_id_pc) / 2L),
               rep(x = "Plate1", times = length(sample_id_nc) / 2L),
-              rep(x = "Plate2", times = length(sample_id_nc) / 2L)
-  )
+              rep(x = "Plate2", times = length(sample_id_nc) / 2L))
 )
 
 # Generate assays
@@ -97,7 +96,8 @@ data_3k <- tidyr::expand_grid(
     NPX = dplyr::if_else(
       .data[["OlinkID"]] == "OID20054",
       jitter(NPX, factor = 1, amount = 2),
-      .data[["NPX"]])
+      .data[["NPX"]]
+    )
   )
 
 rm(df_assays, df_samples,
