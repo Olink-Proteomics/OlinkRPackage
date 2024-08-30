@@ -27,7 +27,7 @@ npx_df_test <- OlinkAnalyze::npx_data1 |>
   dplyr::mutate(Sample_type = "Sample") |>
   dplyr::select(SampleID, Sample_type, Index, OlinkID, UniProt, Assay,
                 MissingFreq, Panel_Version, PlateID, QC_Warning, LOD, NPX,
-                Subject) |>
+                Subject, Panel) |>
   dplyr::mutate(Normalization = "Intensity") # adding Normalization to avoid warning
 
 # Bridge normalization ----
@@ -61,7 +61,8 @@ normalization_results.bridged <-
     project_ref_name = '20200001') |>
   dplyr::filter(SampleID %in% sampleSubset) |>
   dplyr::select(-Normalization) |> # removing Normalization to match instance from ref_results
-  dplyr::select(SampleID, dplyr::everything())
+  dplyr::select(SampleID, dplyr::everything()) |>
+  suppressMessages()
 
 ## Bridge example with hidden/excluded assays ----
 
@@ -93,7 +94,8 @@ npxBridged <-
                           "DF2" = overlap_samples_na),
     project_1_name = 'P1',
     project_2_name = 'P2',
-    project_ref_name = 'P1')
+    project_ref_name = 'P1') |>
+  suppressMessages()
 
 npxBridged_proj2ref <-
   olink_normalization_bridge(
@@ -103,7 +105,8 @@ npxBridged_proj2ref <-
                           "DF2" = overlap_samples_na),
     project_1_name = 'P1',
     project_2_name = 'P2',
-    project_ref_name = 'P2')
+    project_ref_name = 'P2') |>
+  suppressMessages()
 
 # Subset and Intensity normalization ----
 
@@ -128,7 +131,8 @@ normalization_results.intensity <-
     project_ref_name = 'P1'
   ) |>
   dplyr::filter(SampleID %in% sampleSubset) |>
-  dplyr::select(-Normalization) # removing Normalization to match instance from ref_results
+  dplyr::select(-Normalization) |> # removing Normalization to match instance from ref_results
+  suppressMessages()
 
 ## Subset ----
 
@@ -157,7 +161,8 @@ normalization_results.subset <-
     project_ref_name = '20200001'
   ) |>
   dplyr::filter(SampleID %in% sampleSubset) |>
-  dplyr::select(-Normalization) # removing Normalization to match instance from ref_results
+  dplyr::select(-Normalization) |> # removing Normalization to match instance from ref_results
+  suppressMessages()
 
 # Multi-project normalization ----
 
@@ -190,7 +195,8 @@ normalization_results.bridged_n <-
   olink_normalization_n(norm_schema = norm_schema_bridge.n) |>
   dplyr::filter(SampleID %in% sampleSubset) |>
   dplyr::select(-Normalization) |> # removing Normalization to match instance from ref_results
-  dplyr::select(SampleID:Time, Project, Panel, Adj_factor) # rearranging to match reference bridge
+  dplyr::select(SampleID:Time, Project, Panel, Adj_factor) |> # rearranging to match reference bridge
+  suppressMessages()
 
 ### Bridge normalization with excluded assays ----
 
@@ -206,7 +212,8 @@ norm_schema_npxBridged.n <- dplyr::tibble(
   normalize_to       = c(NA_character_, "1")
 )
 npxBridged.n <-
-  olink_normalization_n(norm_schema = norm_schema_npxBridged.n)
+  olink_normalization_n(norm_schema = norm_schema_npxBridged.n) |>
+  suppressMessages()
 
 norm_schema_npxBridged_proj2ref.n <- dplyr::tibble(
   order              = c(2, 1),
@@ -220,7 +227,8 @@ norm_schema_npxBridged_proj2ref.n <- dplyr::tibble(
   normalize_to       = c("1", NA_character_)
 )
 npxBridged_proj2ref.n <-
-  olink_normalization_n(norm_schema = norm_schema_npxBridged_proj2ref.n)
+  olink_normalization_n(norm_schema = norm_schema_npxBridged_proj2ref.n) |>
+  suppressMessages()
 
 ## Subset/Intensity normalization ----
 
@@ -251,7 +259,8 @@ normalization_results.intensity_n <-
   olink_normalization_n(norm_schema = norm_schema_intensity.n) |>
   dplyr::filter(SampleID %in% sampleSubset) |>
   dplyr::select(-Normalization) |> # removing Normalization to match instance from ref_results
-  dplyr::select(SampleID:Time, Project, Panel, Adj_factor) # rearranging to match reference bridge
+  dplyr::select(SampleID:Time, Project, Panel, Adj_factor) |> # rearranging to match reference bridge
+  suppressMessages()
 
 ### Subset ----
 
@@ -280,7 +289,8 @@ normalization_results.subset_n <-
   olink_normalization_n(norm_schema = norm_schema_subset.n) |>
   dplyr::filter(SampleID %in% sampleSubset) |>
   dplyr::select(-Normalization) |> # removing Normalization to match instance from ref_results
-  dplyr::select(SampleID:Time, Project, Panel, Adj_factor) # rearranging to match reference bridge
+  dplyr::select(SampleID:Time, Project, Panel, Adj_factor) |> # rearranging to match reference bridge
+  suppressMessages()
 
 ## Multi-project mixed normalization ----
 
@@ -352,12 +362,14 @@ normalization_results.multi <-
                   }) |>
   dplyr::filter(SampleID_tmp %in% sampleSubset) |>
   dplyr::select(-SampleID_tmp) |>
-  dplyr::arrange(Project, Panel, OlinkID, SampleID)
+  dplyr::arrange(Project, Panel, OlinkID, SampleID) |>
+  suppressMessages()
 
 ### Advanced  multi-project normalization example ----
 
 normalization_results.complex_n <-
-  olink_normalization_n(norm_schema = complex_npx_data)
+  olink_normalization_n(norm_schema = complex_npx_data) |>
+  suppressMessages()
 
 # Test that function works ----
 
@@ -369,7 +381,7 @@ test_that("olink_normalization bridge standalone function works",
             #   one from missing column "Sample_Type" in df2
             #   one from missing columns "Treatment,Site,Time,Project,Panel" in df1
             expect_warning(
-              expect_warning(
+              expect_message(
                 olink_normalization_bridge(project_1_df = npx_df_test,
                                            project_2_df = npx_df2,
                                            bridge_samples = list("DF1" = overlap_samples,
@@ -977,42 +989,44 @@ test_that("missing Normalization column works", {
 
   # Warning when both df1 and df2 are lacking column "Normalization" ----
   expect_warning(
-    olink_normalization_bridge(project_1_df = npx_data1,
-                               project_2_df = npx_data2,
-                               bridge_samples = list("DF1" = overlap_samples,
-                                                     "DF2" = overlap_samples),
-                               project_1_name = '20200001',
-                               project_2_name = '20200002',
-                               project_ref_name = '20200001'),
-    "Variable \"Normalization\" not present in df1 and df2")
+    expect_message(
+      olink_normalization_bridge(project_1_df = npx_data1,
+                                 project_2_df = npx_data2,
+                                 bridge_samples = list("DF1" = overlap_samples,
+                                                       "DF2" = overlap_samples),
+                                 project_1_name = '20200001',
+                                 project_2_name = '20200002',
+                                 project_ref_name = '20200001')
+    ))
 
   expect_warning(
-    olink_normalization_n(
-      norm_schema = dplyr::tibble(
-        order              = c(1, 2),
-        name               = c("20200001", "20200002"),
-        data               = list("20200001" =
-                                    {
-                                      npx_data1 |>
-                                        dplyr::select(-Project)
-                                    },
-                                  "20200002" =
-                                    {
-                                      npx_data2 |>
-                                        dplyr::select(-Project)
-                                    }),
-        samples            = list("20200001" = NA_character_,
-                                  "20200002" = list("DF1" = overlap_samples,
-                                                    "DF2" = overlap_samples)),
-        normalization_type = c(NA_character_, "Bridge"),
-        normalize_to       = c(NA_character_, "1")
+    expect_message(
+      olink_normalization_n(
+        norm_schema = dplyr::tibble(
+          order              = c(1, 2),
+          name               = c("20200001", "20200002"),
+          data               = list("20200001" =
+                                      {
+                                        npx_data1 |>
+                                          dplyr::select(-Project)
+                                      },
+                                    "20200002" =
+                                      {
+                                        npx_data2 |>
+                                          dplyr::select(-Project)
+                                      }),
+          samples            = list("20200001" = NA_character_,
+                                    "20200002" = list("DF1" = overlap_samples,
+                                                      "DF2" = overlap_samples)),
+          normalization_type = c(NA_character_, "Bridge"),
+          normalize_to       = c(NA_character_, "1")
+        )
       )
-    ),
-    "Variable \"Normalization\" not present in df1 and df2")
+    ))
 
   # conly df1 contains column "Normalization" ----
-  expect_warning(
-    expect_warning(
+  expect_error(
+    expect_message(
       olink_normalization_bridge(project_1_df =
                                    {
                                      npx_data1 |>
@@ -1023,13 +1037,11 @@ test_that("missing Normalization column works", {
                                                        "DF2" = overlap_samples),
                                  project_1_name = '20200001',
                                  project_2_name = '20200002',
-                                 project_ref_name = '20200001'),
-      "Variable \"Normalization\" not present in df2."),
-    "The following columns are found in df1 but not df2"
-  )
+                                 project_ref_name = '20200001')
+    ))
 
-  expect_warning(
-    expect_warning(
+  expect_error(
+    expect_message(
       olink_normalization_n(
         norm_schema = dplyr::tibble(
           order              = c(1, 2),
@@ -1051,14 +1063,11 @@ test_that("missing Normalization column works", {
           normalization_type = c(NA_character_, "Bridge"),
           normalize_to       = c(NA_character_, "1")
         )
-      ),
-      "Variable \"Normalization\" not present in df2."),
-    "The following columns are found in df1 but not df2"
-  )
+      )))
 
   # 2 Warnings if only df2 contains column "Normalization" ----
-  expect_warning(
-    expect_warning(
+  expect_error(
+    expect_message(
       olink_normalization_bridge(project_1_df = npx_data1,
                                  project_2_df =
                                    {
@@ -1069,13 +1078,10 @@ test_that("missing Normalization column works", {
                                                        "DF2" = overlap_samples),
                                  project_1_name = '20200001',
                                  project_2_name = '20200002',
-                                 project_ref_name = '20200001'),
-      "Variable \"Normalization\" not present in df1."),
-    "The following columns are found in df2 but not df1"
-  )
+                                 project_ref_name = '20200001')))
 
-  expect_warning(
-    expect_warning(
+  expect_error(
+    expect_message(
       olink_normalization_n(
         norm_schema = dplyr::tibble(
           order              = c(1, 2),
@@ -1097,10 +1103,7 @@ test_that("missing Normalization column works", {
           normalization_type = c(NA_character_, "Bridge"),
           normalize_to       = c(NA_character_, "1")
         )
-      ),
-      "Variable \"Normalization\" not present in df1."),
-    "The following columns are found in df2 but not df1"
-  )
+      )))
 }
 )
 
@@ -1112,198 +1115,106 @@ test_that("df1 and df2 same normalization", {
 
   # different normalization with expected values in Normalization column ----
   expect_warning(
-    olink_normalization_bridge(project_1_df =
-                                 {
-                                   npx_data1 |>
-                                     dplyr::mutate(Normalization = "Intensity")
-                                 },
-                               project_2_df =
-                                 {
-                                   npx_data2 |>
-                                     dplyr::mutate(Normalization = "Plate control")
-                                 },
-                               bridge_samples = list("DF1" = overlap_samples,
-                                                     "DF2" = overlap_samples),
-                               project_1_name = '20200001',
-                               project_2_name = '20200002',
-                               project_ref_name = '20200001'),
-    "There are 184 assays not normalized with the same approach. Consider renormalizing.")
+    expect_message(
+      olink_normalization_bridge(project_1_df =
+                                   {
+                                     npx_data1 |>
+                                       dplyr::mutate(Normalization = "Intensity")
+                                   },
+                                 project_2_df =
+                                   {
+                                     npx_data2 |>
+                                       dplyr::mutate(Normalization = "Plate control")
+                                   },
+                                 bridge_samples = list("DF1" = overlap_samples,
+                                                       "DF2" = overlap_samples),
+                                 project_1_name = '20200001',
+                                 project_2_name = '20200002',
+                                 project_ref_name = '20200001')
+    ))
 
   expect_warning(
-    olink_normalization_n(
-      norm_schema = dplyr::tibble(
-        order              = c(1, 2),
-        name               = c("20200001", "20200002"),
-        data               = list("20200001" =
-                                    {
-                                      npx_data1 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(Normalization = "Intensity")
-                                    },
-                                  "20200002" =
-                                    {
-                                      npx_data2 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(Normalization = "Plate control")
-                                    }),
-        samples            = list("20200001" = NA_character_,
-                                  "20200002" = list("DF1" = overlap_samples,
-                                                    "DF2" = overlap_samples)),
-        normalization_type = c(NA_character_, "Bridge"),
-        normalize_to       = c(NA_character_, "1")
+    expect_message(
+      olink_normalization_n(
+        norm_schema = dplyr::tibble(
+          order              = c(1, 2),
+          name               = c("20200001", "20200002"),
+          data               = list("20200001" =
+                                      {
+                                        npx_data1 |>
+                                          dplyr::select(-Project) |>
+                                          dplyr::mutate(Normalization = "Intensity")
+                                      },
+                                    "20200002" =
+                                      {
+                                        npx_data2 |>
+                                          dplyr::select(-Project) |>
+                                          dplyr::mutate(Normalization = "Plate control")
+                                      }),
+          samples            = list("20200001" = NA_character_,
+                                    "20200002" = list("DF1" = overlap_samples,
+                                                      "DF2" = overlap_samples)),
+          normalization_type = c(NA_character_, "Bridge"),
+          normalize_to       = c(NA_character_, "1")
+        )
       )
-    ),
-    "There are 184 assays not normalized with the same approach. Consider renormalizing.")
+    ))
 
   # For future use ----
   # different normalization with unexpected values in Normalization column
   # currently we do not check values in this column, but in the future we might
   expect_warning(
-    olink_normalization_bridge(project_1_df =
-                                 {
-                                   npx_data1 |>
-                                     dplyr::mutate(Normalization = "A")
-                                 },
-                               project_2_df =
-                                 {
-                                   npx_data2 |>
-                                     dplyr::mutate(Normalization = "B")
-                                 },
-                               bridge_samples = list("DF1" = overlap_samples,
-                                                     "DF2" = overlap_samples),
-                               project_1_name = '20200001',
-                               project_2_name = '20200002',
-                               project_ref_name = '20200001'),
-    "There are 184 assays not normalized with the same approach. Consider renormalizing.")
+    expect_message(
+      olink_normalization_bridge(project_1_df =
+                                   {
+                                     npx_data1 |>
+                                       dplyr::mutate(Normalization = "A")
+                                   },
+                                 project_2_df =
+                                   {
+                                     npx_data2 |>
+                                       dplyr::mutate(Normalization = "B")
+                                   },
+                                 bridge_samples = list("DF1" = overlap_samples,
+                                                       "DF2" = overlap_samples),
+                                 project_1_name = '20200001',
+                                 project_2_name = '20200002',
+                                 project_ref_name = '20200001')
+    )
+  )
 
   expect_warning(
-    olink_normalization_n(
-      norm_schema = dplyr::tibble(
-        order              = c(1, 2),
-        name               = c("20200001", "20200002"),
-        data               = list("20200001" =
-                                    {
-                                      npx_data1 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(Normalization = "A")
-                                    },
-                                  "20200002" =
-                                    {
-                                      npx_data2 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(Normalization = "B")
-                                    }),
-        samples            = list("20200001" = NA_character_,
-                                  "20200002" = list("DF1" = overlap_samples,
-                                                    "DF2" = overlap_samples)),
-        normalization_type = c(NA_character_, "Bridge"),
-        normalize_to       = c(NA_character_, "1")
-      )
-    ),
-    "There are 184 assays not normalized with the same approach. Consider renormalizing.")
-
-  # test that assays have identical Normalization column between the two
-  # datasets
-  expect_warning(
-    olink_normalization_n(
-      norm_schema = dplyr::tibble(
-        order              = c(1, 2),
-        name               = c("20200001", "20200002"),
-        data               = list("20200001" =
-                                    {
-                                      npx_data1 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(
-                                          Normalization = dplyr::if_else(OlinkID %in% c("OID01216", "OID01217"),
-                                                                         "Plate control",
-                                                                         "Intensity")
-                                        )
-                                    },
-                                  "20200002" =
-                                    {
-                                      npx_data2 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(Normalization = "Intensity")
-                                    }),
-        samples            = list("20200001" = NA_character_,
-                                  "20200002" = list("DF1" = overlap_samples,
-                                                    "DF2" = overlap_samples)),
-        normalization_type = c(NA_character_, "Bridge"),
-        normalize_to       = c(NA_character_, "1")
-      )
-    ),
-    "Assays OID01216 and OID01217 are not normalized with the same approach.")
-
-  # test that assays have identical Normalization column between the two
-  # datasets
-  expect_warning(
-    olink_normalization_n(
-      norm_schema = dplyr::tibble(
-        order              = c(1, 2),
-        name               = c("20200001", "20200002"),
-        data               = list("20200001" =
-                                    {
-                                      npx_data1 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(
-                                          Normalization = dplyr::if_else(OlinkID %in% { npx_data1$OlinkID |> unique() |> head(11) },
-                                                                         "Plate control",
-                                                                         "Intensity")
-                                        )
-                                    },
-                                  "20200002" =
-                                    {
-                                      npx_data2 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(Normalization = "Intensity")
-                                    }),
-        samples            = list("20200001" = NA_character_,
-                                  "20200002" = list("DF1" = overlap_samples,
-                                                    "DF2" = overlap_samples)),
-        normalization_type = c(NA_character_, "Bridge"),
-        normalize_to       = c(NA_character_, "1")
-      )
-    ),
-    "There are 11 assays not normalized with the same approach. Consider renormalizing.")
-
-  # it should work if all assays are normalized the same way
-  expect_no_warning(
-    olink_normalization_n(
-      norm_schema = dplyr::tibble(
-        order              = c(1, 2),
-        name               = c("20200001", "20200002"),
-        data               = list("20200001" =
-                                    {
-                                      npx_data1 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(
-                                          Normalization = dplyr::if_else(OlinkID %in% c("OID01216", "OID01217"),
-                                                                         "Plate control",
-                                                                         "Intensity")
-                                        )
-                                    },
-                                  "20200002" =
-                                    {
-                                      npx_data2 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(
-                                          Normalization = dplyr::if_else(OlinkID %in% c("OID01216", "OID01217"),
-                                                                         "Plate control",
-                                                                         "Intensity")
-                                        )
-                                    }),
-        samples            = list("20200001" = NA_character_,
-                                  "20200002" = list("DF1" = overlap_samples,
-                                                    "DF2" = overlap_samples)),
-        normalization_type = c(NA_character_, "Bridge"),
-        normalize_to       = c(NA_character_, "1")
+    expect_message(
+      olink_normalization_n(
+        norm_schema = dplyr::tibble(
+          order              = c(1, 2),
+          name               = c("20200001", "20200002"),
+          data               = list("20200001" =
+                                      {
+                                        npx_data1 |>
+                                          dplyr::select(-Project) |>
+                                          dplyr::mutate(Normalization = "A")
+                                      },
+                                    "20200002" =
+                                      {
+                                        npx_data2 |>
+                                          dplyr::select(-Project) |>
+                                          dplyr::mutate(Normalization = "B")
+                                      }),
+          samples            = list("20200001" = NA_character_,
+                                    "20200002" = list("DF1" = overlap_samples,
+                                                      "DF2" = overlap_samples)),
+          normalization_type = c(NA_character_, "Bridge"),
+          normalize_to       = c(NA_character_, "1")
+        )
       )
     )
   )
 
-  # check that EXCLUDED assays are ignored
-  expect_no_warning(
-    expect_no_error(
+  # test that assays have identical Normalization column between the two
+  # datasets
+  expect_warning(
+    expect_message(
       olink_normalization_n(
         norm_schema = dplyr::tibble(
           order              = c(1, 2),
@@ -1314,7 +1225,74 @@ test_that("df1 and df2 same normalization", {
                                           dplyr::select(-Project) |>
                                           dplyr::mutate(
                                             Normalization = dplyr::if_else(OlinkID %in% c("OID01216", "OID01217"),
-                                                                           "EXCLUDED",
+                                                                           "Plate control",
+                                                                           "Intensity")
+                                          )
+                                      },
+                                    "20200002" =
+                                      {
+                                        npx_data2 |>
+                                          dplyr::select(-Project) |>
+                                          dplyr::mutate(Normalization = "Intensity")
+                                      }),
+          samples            = list("20200001" = NA_character_,
+                                    "20200002" = list("DF1" = overlap_samples,
+                                                      "DF2" = overlap_samples)),
+          normalization_type = c(NA_character_, "Bridge"),
+          normalize_to       = c(NA_character_, "1")
+        )
+      )
+    )
+  )
+
+  # test that assays have identical Normalization column between the two
+  # datasets
+  expect_warning(
+    expect_message(
+      olink_normalization_n(
+        norm_schema = dplyr::tibble(
+          order              = c(1, 2),
+          name               = c("20200001", "20200002"),
+          data               = list("20200001" =
+                                      {
+                                        npx_data1 |>
+                                          dplyr::select(-Project) |>
+                                          dplyr::mutate(
+                                            Normalization = dplyr::if_else(OlinkID %in% { npx_data1$OlinkID |> unique() |> head(11) },
+                                                                           "Plate control",
+                                                                           "Intensity")
+                                          )
+                                      },
+                                    "20200002" =
+                                      {
+                                        npx_data2 |>
+                                          dplyr::select(-Project) |>
+                                          dplyr::mutate(Normalization = "Intensity")
+                                      }),
+          samples            = list("20200001" = NA_character_,
+                                    "20200002" = list("DF1" = overlap_samples,
+                                                      "DF2" = overlap_samples)),
+          normalization_type = c(NA_character_, "Bridge"),
+          normalize_to       = c(NA_character_, "1")
+        )
+      )
+    )
+  )
+
+  # it should work if all assays are normalized the same way
+  expect_no_warning(
+    expect_message(
+      olink_normalization_n(
+        norm_schema = dplyr::tibble(
+          order              = c(1, 2),
+          name               = c("20200001", "20200002"),
+          data               = list("20200001" =
+                                      {
+                                        npx_data1 |>
+                                          dplyr::select(-Project) |>
+                                          dplyr::mutate(
+                                            Normalization = dplyr::if_else(OlinkID %in% c("OID01216", "OID01217"),
+                                                                           "Plate control",
                                                                            "Intensity")
                                           )
                                       },
@@ -1337,6 +1315,45 @@ test_that("df1 and df2 same normalization", {
       )
     )
   )
+
+  # check that EXCLUDED assays are ignored
+  expect_warning(
+    expect_message(
+      expect_message(
+        olink_normalization_n(
+          norm_schema = dplyr::tibble(
+            order              = c(1, 2),
+            name               = c("20200001", "20200002"),
+            data               = list("20200001" =
+                                        {
+                                          npx_data1 |>
+                                            dplyr::select(-Project) |>
+                                            dplyr::mutate(
+                                              Normalization = dplyr::if_else(OlinkID %in% c("OID01216", "OID01217"),
+                                                                             "EXCLUDED",
+                                                                             "Intensity")
+                                            )
+                                        },
+                                      "20200002" =
+                                        {
+                                          npx_data2 |>
+                                            dplyr::select(-Project) |>
+                                            dplyr::mutate(
+                                              Normalization = dplyr::if_else(OlinkID %in% c("OID01216", "OID01217"),
+                                                                             "Plate control",
+                                                                             "Intensity")
+                                            )
+                                        }),
+            samples            = list("20200001" = NA_character_,
+                                      "20200002" = list("DF1" = overlap_samples,
+                                                        "DF2" = overlap_samples)),
+            normalization_type = c(NA_character_, "Bridge"),
+            normalize_to       = c(NA_character_, "1")
+          )
+        )
+      )
+    )
+  )
 }
 )
 
@@ -1352,6 +1369,7 @@ test_that("Different columns in dfs can be normalized",{
                                                   project_2_name = 'P2',
                                                   project_ref_name = 'P1') |>
     suppressWarnings() |>
+    suppressMessages() |>
     dplyr::filter(SampleID %in% sampleSubset)
 
   # Columns are as expected
@@ -1378,7 +1396,7 @@ test_that("Different columns in dfs can be normalized",{
   col_notdf1 <- setdiff(colnames(mismatch_col_norm),
                         colnames(npx_df_test)
   ) |>
-    stringr::str_remove("Adj_factor")
+    (\(x) x[x != "Adj_factor"])()
 
   expect_equal(
     {
