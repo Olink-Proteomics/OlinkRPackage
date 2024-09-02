@@ -1109,7 +1109,8 @@ olink_norm_input_check_samples <- function(lst_df_samples,
     ## equal number of bridge samples ----
 
     # check the number of samples is equal if bridge normalization
-    if (tolower(norm_mode) == olink_norm_modes$bridge
+    if (tolower(norm_mode) %in% c(olink_norm_modes$bridge,
+                                  olink_norm_modes$norm_ht_3k)
         && sapply(lst_ref_samples, length) |> unique() |> length() != 1L) {
       # error message for uneven number of bridge samples
       cli::cli_abort(
