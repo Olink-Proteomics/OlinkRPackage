@@ -102,7 +102,12 @@ data_ht <- tidyr::expand_grid(
     AssayQC = "PASS",
     SampleQC = "PASS"
   ) |>
-  dplyr::as_tibble()
+  dplyr::as_tibble() |>
+  # add DAR ID
+  dplyr::mutate(
+    DataAnalysisRefID = paste0("DAR00", dplyr::cur_group_id()),
+    .by = dplyr::all_of(c("Block"))
+  )
 
 rm(df_assays, df_samples,
    sample_id, sample_id_ctrl, sample_id_nc, sample_id_pc, sample_oid)

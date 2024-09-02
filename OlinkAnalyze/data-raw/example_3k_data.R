@@ -91,6 +91,11 @@ data_3k <- tidyr::expand_grid(
     SampleQC = "PASS"
   ) |>
   dplyr::as_tibble() |>
+  # add DAR ID
+  dplyr::mutate(
+    DataAnalysisRefID = paste0("DAR00", dplyr::cur_group_id()),
+    .by = dplyr::all_of(c("Panel", "Block"))
+  ) |>
   # modifying NPX range for 3K OID20054 to mark as 'not bridgeable'
   dplyr::mutate(
     NPX = dplyr::if_else(
