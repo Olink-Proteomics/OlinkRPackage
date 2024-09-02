@@ -2,7 +2,8 @@
 olink_norm_modes <- list(
   "bridge" = "bridge",
   "subset" = "subset",
-  "ref_median" = "ref_median"
+  "ref_median" = "ref_median",
+  "norm_ht_3k" = "norm_ht_3k"
 )
 
 # pre-populated dataset with column names and classes that the reference medians
