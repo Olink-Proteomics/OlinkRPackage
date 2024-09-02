@@ -33,3 +33,6 @@ originate from Olink Explore HT and Olink Explore 3072, it will return
 norm_ht_3k. In any other case an error is
 thrown.
 }
+\author{
+Klev Diamanti
+}
