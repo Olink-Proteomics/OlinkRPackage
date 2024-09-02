@@ -102,13 +102,15 @@ olink_norm_input_check <- function(df1,
                                    reference_medians) {
   # Validate the normalization input ----
 
-  norm_mode <- olink_norm_input_validate(
+  norm_valid <- olink_norm_input_validate(
     df1 = df1,
     df2 = df2,
     overlapping_samples_df1 = overlapping_samples_df1,
     overlapping_samples_df2 = overlapping_samples_df2,
     reference_medians = reference_medians
   )
+  norm_mode <- norm_valid$norm_mode
+  norm_msg <- norm_valid$norm_msg
 
   # Check that input classes are correct ----
 
@@ -169,6 +171,17 @@ olink_norm_input_check <- function(df1,
 
   }
 
+  # Update normalization message ----
+
+  # Update the message to inform what type of normalization we will perform
+  if (norm_mode == olink_norm_modes$norm_ht_3k) {
+    norm_msg <- gsub(
+      pattern = "Bridge",
+      replacement = "Cross-product",
+      x = norm_msg
+    )
+  }
+
   # Check samples ----
 
   # extract all unique sample identifiers
@@ -205,31 +218,38 @@ olink_norm_input_check <- function(df1,
   lst_df <- lst_df_clean_assays$lst_df
   reference_medians <- lst_df_clean_assays$reference_medians
 
-  # Check assays shared across inputs ----
+  # Checks that do not apply to 3k-HT normalization ----
 
-  # check if all assays from input are in all datasets, and remove them if not
-  lst_df_overlap_assay <- olink_norm_input_assay_overlap(
-    lst_df = lst_df_clean_assays$lst_df,
-    reference_medians = lst_df_clean_assays$reference_medians,
-    lst_cols = lst_cols
-  )
-  lst_df <- lst_df_overlap_assay$lst_df
-  reference_medians <- lst_df_overlap_assay$reference_medians
+  if (norm_mode != olink_norm_modes$norm_ht_3k) {
+    # Check assays shared across inputs ----
 
-  # Check normalization approach ----
-
-  all_norm_present <- lst_cols |>
-    sapply(function(x) !identical(x = x$normalization, y = character(0L))) |>
-    all()
-
-  if (all_norm_present && length(lst_df) == 2L) {
-    olink_norm_input_norm_method(
-      lst_df = lst_df,
+    # check if all assays from input are in all datasets, and remove them if not
+    lst_df_overlap_assay <- olink_norm_input_assay_overlap(
+      lst_df = lst_df_clean_assays$lst_df,
+      reference_medians = lst_df_clean_assays$reference_medians,
       lst_cols = lst_cols
     )
+    lst_df <- lst_df_overlap_assay$lst_df
+    reference_medians <- lst_df_overlap_assay$reference_medians
+
+    # Check normalization approach ----
+
+    all_norm_present <- lst_cols |>
+      sapply(function(x) !identical(x = x$normalization, y = character(0L))) |>
+      all()
+
+    if (all_norm_present && length(lst_df) == 2L) {
+      olink_norm_input_norm_method(
+        lst_df = lst_df,
+        lst_cols = lst_cols
+      )
+    }
   }
 
   # return to normalize ----
+
+  # message to inform user
+  cli::cli_inform(message = norm_msg)
 
   lst_out <- list(
     ref_df = NULL,
@@ -255,7 +275,8 @@ olink_norm_input_check <- function(df1,
     lst_out$ref_cols <- lst_cols[[lst_out$ref_name]]
     lst_out$reference_medians <- reference_medians
   } else if (norm_mode %in% c(olink_norm_modes$subset,
-                              olink_norm_modes$bridge)) {
+                              olink_norm_modes$bridge,
+                              olink_norm_modes$norm_ht_3k)) {
     # bridge or subset normalization
     if (reference_project == df1_project_nr) {
       lst_out$ref_name <- df1_project_nr
@@ -276,7 +297,8 @@ olink_norm_input_check <- function(df1,
         lst_out$ref_samples <- overlapping_samples_df2
         lst_out$not_ref_samples <- overlapping_samples_df1
       }
-    } else if (norm_mode == olink_norm_modes$bridge) {
+    } else if (norm_mode %in% c(olink_norm_modes$bridge,
+                                olink_norm_modes$norm_ht_3k)) {
       lst_out$ref_samples <- overlapping_samples_df1
     }
   }
@@ -399,13 +421,13 @@ olink_norm_input_validate <- function(df1,
       cli::cli_warn(message = warning_msg_row)
     }
 
-    # inform what type of normalization we will perform
-    if (!is.na(inform_msg_row)) {
-      cli::cli_inform(message = inform_msg_row)
-    }
-
     # return the type of normalization to perform
-    return(norm_mode_row)
+    return(
+      list(
+        norm_mode = norm_mode_row,
+        norm_msg = inform_msg_row
+      )
+    )
 
   }
 
@@ -818,6 +840,9 @@ olink_norm_input_check_df_cols <- function(lst_df) {
 
 #' Check the type of bridge normalization
 #'
+#' @author
+#'   Klev Diamanti
+#'
 #' @description
 #' A function to check whether we are to perform simple bridge normalization, or
 #' cross-platform (Olink Explore 3072 - Olink Explore HT) normalization.
@@ -860,7 +885,7 @@ olink_norm_input_cross_product <- function(lst_df,
     } else if (all(u_oid %in% eHT_e3072_mapping$OlinkID_HT)) {
       return("HT")
     } else {
-      return(NA_character_)
+      return("other")
     }
   })
   names(lst_product) <- names(lst_df)
@@ -875,7 +900,7 @@ olink_norm_input_cross_product <- function(lst_df,
   # the other one probably T96, T48, which we do not normalize.
   lst_prod_uniq <- lst_product |> unique() |> sort()
   if (length(lst_prod_uniq) == 1L
-      && all(lst_prod_uniq %in% c("3k", NA_character_))) {
+      && all(lst_prod_uniq %in% c("3k", "other"))) {
     norm_mode <- olink_norm_modes$bridge
   } else if (identical(x = lst_prod_uniq, y = c("3k", "HT"))) {
     norm_mode <- olink_norm_modes$norm_ht_3k
