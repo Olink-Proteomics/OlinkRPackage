@@ -143,7 +143,7 @@ olink_norm_input_check <- function(df1,
 
   } else {
 
-    # bridge or subset normalization
+    # bridge, subset, or 3K-HT normalization
 
     reference_medians <- NULL
 
@@ -151,8 +151,15 @@ olink_norm_input_check <- function(df1,
     names(lst_df) <- c(df1_project_nr, df2_project_nr)
     lst_cols <- olink_norm_input_check_df_cols(lst_df = lst_df)
 
-    if (norm_mode == olink_norm_modes$bridge) {
-      # bridge normalization
+    if (norm_mode %in% c(olink_norm_modes$bridge,
+                         olink_norm_modes$norm_ht_3k)) {
+      # check if it is 3k-HT normalization, or simple bridge normalization
+      norm_mode <- olink_norm_input_cross_product(
+        lst_df = lst_df,
+        lst_cols = lst_cols,
+        reference_project = reference_project
+      )
+      # bridge or 3k-HT normalization normalization
       lst_ref_samples <- list(overlapping_samples_df1, overlapping_samples_df1)
     } else if (norm_mode == olink_norm_modes$subset) {
       # subset normalization
@@ -806,6 +813,105 @@ olink_norm_input_check_df_cols <- function(lst_df) {
   # return list of required colnames ----
 
   return(lst_req_col)
+
+}
+
+#' Check the type of bridge normalization
+#'
+#' @description
+#' A function to check whether we are to perform simple bridge normalization, or
+#' cross-platform (Olink Explore 3072 - Olink Explore HT) normalization.
+#'
+#' The function uses the internal dataset \var{eHT_e3072_mapping} to determine
+#' the product source of each dataset. If both datasets originate from the same
+#' Olink product, then it will return
+#' `r OlinkAnalyze:::olink_norm_modes$bridge`. If the datasets to be normalized
+#' originate from Olink Explore HT and Olink Explore 3072, it will return
+#' `r OlinkAnalyze:::olink_norm_modes$norm_ht_3k`. In any other case an error is
+#' thrown.
+#'
+#' @param lst_df Named list of datasets to be normalized.
+#' @param lst_cols Named list of vectors with the required column names for each
+#' dataset in \var{lst_df}.
+#' @param reference_project Project name of reference_project. Should be one of
+#' \var{df1_project_nr} or \var{df2_project_nr}. Indicates the project to which
+#' the other project is adjusted to.
+#'
+#' @return Character string indicating the type of normalization to be
+#' performed. Expecting one of
+#' `r cli::ansi_collapse(x = OlinkAnalyze:::olink_norm_modes, sep2 = " or ", last = " or ")`. # nolint
+#'
+olink_norm_input_cross_product <- function(lst_df,
+                                           lst_cols,
+                                           reference_project) {
+
+  # check and correct norm_mode if needed ----
+
+  # check if each df comes from a different olink product
+  lst_product <- sapply(names(lst_df), function(d_name) {
+    # get unique olink assay identifiers
+    u_oid <- lst_df[[d_name]] |>
+      dplyr::pull(
+        .data[[lst_cols[[d_name]]$olink_id]]
+      ) |>
+      unique()
+    if (all(u_oid %in% eHT_e3072_mapping$OlinkID_E3072)) {
+      return("3k")
+    } else if (all(u_oid %in% eHT_e3072_mapping$OlinkID_HT)) {
+      return("HT")
+    } else {
+      return(NA_character_)
+    }
+  })
+  names(lst_product) <- names(lst_df)
+
+  # if all elements of the array contain the same product, it is simple
+  # bridge normalization. In case of 3k-3k bridging lst_product should contain
+  # only "3k" as element. For other olink products, all elements should be
+  # NA_character.
+  # If more than one products are in the vector, then it should be exclusively
+  # 3k and HT.
+  # In any other case (e.g. 3k and NA_character) means that one df is 3k, but
+  # the other one probably T96, T48, which we do not normalize.
+  lst_prod_uniq <- lst_product |> unique() |> sort()
+  if (length(lst_prod_uniq) == 1L
+      && all(lst_prod_uniq %in% c("3k", NA_character_))) {
+    norm_mode <- olink_norm_modes$bridge
+  } else if (identical(x = lst_prod_uniq, y = c("3k", "HT"))) {
+    norm_mode <- olink_norm_modes$norm_ht_3k
+  } else {
+    cli::cli_abort(
+      c(
+        "x" = "Unexpected datasets to be bridge normalized!",
+        "i" = "Only nomalization within the same Olink product, and between
+        Olink Explore 3072 and Olink Explore HT is permitted!"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+  }
+
+  # check if reference dataset is HT if cross-product normalization ----
+
+  if (norm_mode == olink_norm_modes$norm_ht_3k
+      && names(lst_product)[names(lst_product) == "HT"] != reference_project) {
+
+    cli::cli_abort(
+      c(
+        "x" = "Incorrect reference project!",
+        "i" = "When normalizing between Olink Explore 3072 and Olink Explore
+        HT, the latter should be set as reference project in
+        {.arg reference_project}!"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
+  }
+
+  # return ----
+
+  return(norm_mode)
 
 }
 
