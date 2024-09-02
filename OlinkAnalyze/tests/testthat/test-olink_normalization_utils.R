@@ -882,8 +882,8 @@ test_that(
 test_that(
   "olink_norm_input_validate - df1=1, df2=0, s1=1, s2=0, rm=1",
   {
-    expect_message(
-      object = norm_mode <- olink_norm_input_validate(
+    expect_no_condition(
+      object = norm_valid <- olink_norm_input_validate(
         df1 = npx_data1,
         df2 = NULL,
         overlapping_samples_df1 = c("E", "F", "G", "H"),
@@ -892,13 +892,15 @@ test_that(
           "OlinkID" = c("OID12345", "OID23456", "OID34567", "OID45678"),
           "Reference_NPX" = c(0.1, 0.1, 0.2, 0.3)
         )
-      ),
-      regexp = "Reference median normalization will be performed!"
+      )
     )
 
     expect_equal(
-      object = norm_mode,
-      expected = olink_norm_modes$ref_median
+      object = norm_valid,
+      expected = list(
+        norm_mode = olink_norm_modes$ref_median,
+        norm_msg = "Reference median normalization will be performed!"
+      )
     )
   }
 )
@@ -923,26 +925,26 @@ test_that(
 test_that(
   "olink_norm_input_validate - df1=1, df2=0, s1=1, s2=1, rm=1",
   {
-    expect_message(
-      object = expect_warning(
-        object = norm_mode <- olink_norm_input_validate(
-          df1 = npx_data1,
-          df2 = NULL,
-          overlapping_samples_df1 = c("E", "F", "G", "H"),
-          overlapping_samples_df2 = c("A", "B", "C", "D"),
-          reference_medians = dplyr::tibble(
-            "OlinkID" = c("OID12345", "OID23456", "OID34567", "OID45678"),
-            "Reference_NPX" = c(0.1, 0.1, 0.2, 0.3)
-          )
-        ),
-        regexp = "`overlapping_samples_df2` will be ignored"
+    expect_warning(
+      object = norm_valid <- olink_norm_input_validate(
+        df1 = npx_data1,
+        df2 = NULL,
+        overlapping_samples_df1 = c("E", "F", "G", "H"),
+        overlapping_samples_df2 = c("A", "B", "C", "D"),
+        reference_medians = dplyr::tibble(
+          "OlinkID" = c("OID12345", "OID23456", "OID34567", "OID45678"),
+          "Reference_NPX" = c(0.1, 0.1, 0.2, 0.3)
+        )
       ),
-      regexp = "Reference median normalization will be performed!"
+      regexp = "`overlapping_samples_df2` will be ignored"
     )
 
     expect_equal(
-      object = norm_mode,
-      expected = olink_norm_modes$ref_median
+      object = norm_valid,
+      expected = list(
+        norm_mode = olink_norm_modes$ref_median,
+        norm_msg = "Reference median normalization will be performed!"
+      )
     )
   }
 )
@@ -1020,20 +1022,22 @@ test_that(
 test_that(
   "olink_norm_input_validate - df1=1, df2=1, s1=1, s2=0, rm=0",
   {
-    expect_message(
-      object = norm_mode <- olink_norm_input_validate(
+    expect_no_condition(
+      object = norm_valid <- olink_norm_input_validate(
         df1 = npx_data1,
         df2 = npx_data2,
         overlapping_samples_df1 = c("E", "F", "G", "H"),
         overlapping_samples_df2 = NULL,
         reference_medians = NULL
-      ),
-      regexp = "Bridge normalization will be performed!"
+      )
     )
 
     expect_equal(
-      object = norm_mode,
-      expected = olink_norm_modes$bridge
+      object = norm_valid,
+      expected = list(
+        norm_mode = olink_norm_modes$bridge,
+        norm_msg = "Bridge normalization will be performed!"
+      )
     )
   }
 )
@@ -1041,26 +1045,26 @@ test_that(
 test_that(
   "olink_norm_input_validate - df1=1, df2=1, s1=1, s2=0, rm=1",
   {
-    expect_message(
-      object = expect_warning(
-        object = norm_mode <- olink_norm_input_validate(
-          df1 = npx_data1,
-          df2 = npx_data2,
-          overlapping_samples_df1 = c("E", "F", "G", "H"),
-          overlapping_samples_df2 = NULL,
-          reference_medians = dplyr::tibble(
-            "OlinkID" = c("OID12345", "OID23456", "OID34567", "OID45678"),
-            "Reference_NPX" = c(0.1, 0.1, 0.2, 0.3)
-          )
-        ),
-        regexp = "`reference_medians` will be ignored"
+    expect_warning(
+      object = norm_valid <- olink_norm_input_validate(
+        df1 = npx_data1,
+        df2 = npx_data2,
+        overlapping_samples_df1 = c("E", "F", "G", "H"),
+        overlapping_samples_df2 = NULL,
+        reference_medians = dplyr::tibble(
+          "OlinkID" = c("OID12345", "OID23456", "OID34567", "OID45678"),
+          "Reference_NPX" = c(0.1, 0.1, 0.2, 0.3)
+        )
       ),
-      regexp = "Bridge normalization will be performed!"
+      regexp = "`reference_medians` will be ignored"
     )
 
     expect_equal(
-      object = norm_mode,
-      expected = olink_norm_modes$bridge
+      object = norm_valid,
+      expected = list(
+        norm_mode = olink_norm_modes$bridge,
+        norm_msg = "Bridge normalization will be performed!"
+      )
     )
   }
 )
@@ -1068,20 +1072,22 @@ test_that(
 test_that(
   "olink_norm_input_validate - df1=1, df2=1, s1=1, s2=1, rm=0",
   {
-    expect_message(
-      object = norm_mode <- olink_norm_input_validate(
+    expect_no_condition(
+      object = norm_valid <- olink_norm_input_validate(
         df1 = npx_data1,
         df2 = npx_data2,
         overlapping_samples_df1 = c("E", "F", "G", "H"),
         overlapping_samples_df2 = c("A", "B", "C", "D"),
         reference_medians = NULL
-      ),
-      regexp = "Subset normalization will be performed!"
+      )
     )
 
     expect_equal(
-      object = norm_mode,
-      expected = olink_norm_modes$subset
+      object = norm_valid,
+      expected = list(
+        norm_mode = olink_norm_modes$subset,
+        norm_msg = "Subset normalization will be performed!"
+      )
     )
   }
 )
@@ -1089,26 +1095,26 @@ test_that(
 test_that(
   "olink_norm_input_validate - df1=1, df2=1, s1=1, s2=1, rm=1",
   {
-    expect_message(
-      object = expect_warning(
-        object = norm_mode <- olink_norm_input_validate(
-          df1 = npx_data1,
-          df2 = npx_data2,
-          overlapping_samples_df1 = c("E", "F", "G", "H"),
-          overlapping_samples_df2 = c("A", "B", "C", "D"),
-          reference_medians = dplyr::tibble(
-            "OlinkID" = c("OID12345", "OID23456", "OID34567", "OID45678"),
-            "Reference_NPX" = c(0.1, 0.1, 0.2, 0.3)
-          )
-        ),
-        regexp = "`reference_medians` will be ignored"
+    expect_warning(
+      object = norm_valid <- olink_norm_input_validate(
+        df1 = npx_data1,
+        df2 = npx_data2,
+        overlapping_samples_df1 = c("E", "F", "G", "H"),
+        overlapping_samples_df2 = c("A", "B", "C", "D"),
+        reference_medians = dplyr::tibble(
+          "OlinkID" = c("OID12345", "OID23456", "OID34567", "OID45678"),
+          "Reference_NPX" = c(0.1, 0.1, 0.2, 0.3)
+        )
       ),
-      regexp = "Subset normalization will be performed!"
+      regexp = "`reference_medians` will be ignored"
     )
 
     expect_equal(
-      object = norm_mode,
-      expected = olink_norm_modes$subset
+      object = norm_valid,
+      expected = list(
+        norm_mode = olink_norm_modes$subset,
+        norm_msg = "Subset normalization will be performed!"
+      )
     )
   }
 )
