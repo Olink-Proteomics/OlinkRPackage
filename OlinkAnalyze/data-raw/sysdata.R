@@ -1,6 +1,6 @@
 # mapping.R ----
 
-e3k_eHT_mapping_file <- system.file("data-raw",
+e3k_eHT_mapping_file <- system.file("data-raw", # nolint
                                     "mapping.R",
                                     package = "OlinkAnalyze",
                                     mustWork = TRUE)

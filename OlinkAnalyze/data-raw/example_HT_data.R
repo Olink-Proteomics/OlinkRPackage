@@ -37,8 +37,7 @@ df_samples <- dplyr::tibble(
               rep(x = "Plate1", times = length(sample_id_pc) / 2L),
               rep(x = "Plate2", times = length(sample_id_pc) / 2L),
               rep(x = "Plate1", times = length(sample_id_nc) / 2L),
-              rep(x = "Plate2", times = length(sample_id_nc) / 2L)
-  )
+              rep(x = "Plate2", times = length(sample_id_nc) / 2L))
 )
 
 # Generate assays
@@ -98,12 +97,17 @@ data_ht <- tidyr::expand_grid(
       OlinkID %in% eHT_e3072_mapping$OlinkID_HT[5L],
       sample(x = 1L:150L, size = nrow(df_samples), replace = TRUE),
       sample(x = 1L:1000, size = dplyr::n(), replace = TRUE)
-      ),
+    ),
     Normalization = "Plate control",
     AssayQC = "PASS",
     SampleQC = "PASS"
   ) |>
-  dplyr::as_tibble()
+  dplyr::as_tibble() |>
+  # add DAR ID
+  dplyr::mutate(
+    DataAnalysisRefID = paste0("DAR00", dplyr::cur_group_id()),
+    .by = dplyr::all_of(c("Block"))
+  )
 
 rm(df_assays, df_samples,
    sample_id, sample_id_ctrl, sample_id_nc, sample_id_pc, sample_oid)
