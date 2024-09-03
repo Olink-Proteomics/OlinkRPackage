@@ -27,7 +27,7 @@ olink_normalization_qs <- function(exploreht_df,
                                    exploreht_name = "reference",
                                    explore3072_name = "new") {
   map_oid_ht_3k <- function(explore_df) {
-    oid_ht_3k_mapping <- OlinkAnalyze::eHT_e3072_mapping
+    oid_ht_3k_mapping <- OlinkAnalyze:::eHT_e3072_mapping
 
     oid_ht_3k_mapping <- oid_ht_3k_mapping |>
       dplyr::mutate(
