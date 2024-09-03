@@ -26,19 +26,19 @@ olink_normalization_qs <- function(exploreht_df,
                                    bridge_samples,
                                    exploreht_name = "reference",
                                    explore3072_name = "new") {
-
   map_oid_ht_3k <- function(explore_df) {
-    oid_ht_3k_mapping <- eHT_e3072_mapping
+    oid_ht_3k_mapping <- OlinkAnalyze::eHT_e3072_mapping
 
     oid_ht_3k_mapping <- oid_ht_3k_mapping |>
-      mutate(OlinkID_HT_3K = paste(.data[["OlinkID_HT"]],
-                                   .data[["OlinkID_E3072"]], sep = "_")) |>
-      select(.data[["OlinkID_HT"]], .data[["OlinkID_E3072"]],
-             .data[["OlinkID_HT_3K"]])
+      dplyr::mutate(
+        OlinkID_HT_3K = paste(.data[["OlinkID_HT"]],
+                              .data[["OlinkID_E3072"]], sep = "_")) |>
+      dplyr::select(.data[["OlinkID_HT"]], .data[["OlinkID_E3072"]],
+                    .data[["OlinkID_HT_3K"]])
 
     if (all(explore_df |>
-            distinct(Panel) |>
-            pull() |>
+            dplyr::distinct(Panel) |>
+            dplyr::pull() |>
             na.omit() %in% c("Explore_HT", "Explore HT"))) {
       explore_df_linked_oid <- explore_df |>
         dplyr::filter(
@@ -47,16 +47,16 @@ olink_normalization_qs <- function(exploreht_df,
           stringr::str_detect(string = .data[["AssayType"]],
                               pattern = "assay")
         ) |>
-        inner_join(oid_ht_3k_mapping,
-                   relationship = "many-to-many",
-                   by = c("OlinkID" = "OlinkID_HT")
+        dplyr::inner_join(oid_ht_3k_mapping,
+                          relationship = "many-to-many",
+                          by = c("OlinkID" = "OlinkID_HT")
         ) |>
-        mutate(OlinkID = .data[["OlinkID_HT_3K"]]) |>
-        select(-.data[["OlinkID_HT_3K"]], -.data[["OlinkID_E3072"]]) |>
-        distinct()
+        dplyr::mutate(OlinkID = .data[["OlinkID_HT_3K"]]) |>
+        dplyr::select(-.data[["OlinkID_HT_3K"]], -.data[["OlinkID_E3072"]]) |>
+        dplyr::distinct()
     } else if (all(explore_df |>
-                   distinct(Panel) |>
-                   pull() |>
+                   dplyr::distinct(Panel) |>
+                   dplyr::pull() |>
                    na.omit() %in% c(
                      "Cardiometabolic", "Cardiometabolic_II",
                      "Inflammation", "Inflammation_II",
@@ -74,12 +74,13 @@ olink_normalization_qs <- function(exploreht_df,
                    relationship = "many-to-many",
                    by = c("OlinkID" = "OlinkID_E3072")
         ) |>
-        mutate(OlinkID = .data[["OlinkID_HT_3K"]]) |>
-        select(-.data[["OlinkID_HT_3K"]], -.data[["OlinkID_HT"]]) |>
-        distinct()
+        dplyr::mutate(OlinkID = .data[["OlinkID_HT_3K"]]) |>
+        dplyr::select(-.data[["OlinkID_HT_3K"]], -.data[["OlinkID_HT"]]) |>
+        dplyr::distinct()
     } else {
       explore_df_linked_oid <- explore_df
-      print("The provided data frame is not an Explore HT or Explore 384 data frame. No changes made.")
+      print("The provided data frame is not an Explore HT or Explore 384 data
+            frame. No changes made.")
     }
 
     return(explore_df_linked_oid)
@@ -104,7 +105,8 @@ olink_normalization_qs <- function(exploreht_df,
 
     #Quantiles of 3k mapped to quantiles of HT
     mapped_3k <- stats::quantile(model_data_joined$NPX_ht,
-      sort(stats::ecdf(model_data_joined$NPX_3k)(model_data_joined$NPX_3k))
+                                 sort(stats::ecdf(model_data_joined$NPX_3k)
+                                      (model_data_joined$NPX_3k))
     )
     npx_3k <- sort(unique(model_data_joined$NPX_3k))
 
@@ -190,7 +192,11 @@ olink_normalization_qs <- function(exploreht_df,
   df_ht_3k_w_ecdf <- dplyr::bind_rows(all_ht, ecdf_transform) |>
     dplyr::mutate(OlinkID_ExploreHT = substr(OlinkID, 1, 8),
                   OlinkID_Explore3K = substr(OlinkID, 10, 18)) |>
-    dplyr::rename(OlinkID_concat = OlinkID)
+    dplyr::rename(OlinkID_concat = OlinkID) |>
+    dplyr::select(.data[["SampleID"]],
+                  .data[["Project"]],
+                  .data[["OlinkID_concat"]],
+                  .data[["QSNormalizedNPX"]])
 
   return(df_ht_3k_w_ecdf)
 }
