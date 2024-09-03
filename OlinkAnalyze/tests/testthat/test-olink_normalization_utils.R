@@ -140,6 +140,97 @@ test_that(
 )
 
 test_that(
+  "olink_norm_input_check - works - cross-platform normalization",
+  {
+    skip_if_not_installed("arrow")
+
+    bridge_samples <- intersect(x = data_3k$SampleID,
+                                y = data_ht$SampleID) |>
+      (\(x) x[!grepl(pattern = "CONTROL", x = x)])() |>
+      sort() |>
+      head(20L)
+
+    expect_message(
+      object = lst_check_out <- olink_norm_input_check(
+        df1 = data_3k,
+        df2 = data_ht,
+        overlapping_samples_df1 = bridge_samples,
+        overlapping_samples_df2 = NULL,
+        df1_project_nr = "3K",
+        df2_project_nr = "HT",
+        reference_project = "HT",
+        reference_medians = NULL
+      ),
+      regexp = "Cross-product normalization will be performed!"
+    )
+
+    expect_identical(
+      object = lst_check_out,
+      expected = list(
+        ref_df = data_ht |>
+          dplyr::rename(
+            "OlinkID_HT" = "OlinkID"
+          ) |>
+          dplyr::left_join(
+            eHT_e3072_mapping |>
+              dplyr::select(
+                dplyr::all_of(
+                  c("OlinkID_HT", "OlinkID")
+                )
+              ),
+            by = "OlinkID_HT",
+            relationship = "many-to-one"
+          ),
+        ref_samples = bridge_samples,
+        ref_name = "HT",
+        ref_cols = list(sample_id = "SampleID",
+                        olink_id = "OlinkID",
+                        uniprot = "UniProt",
+                        assay = "Assay",
+                        panel = "Panel",
+                        panel_version = "DataAnalysisRefID",
+                        plate_id = "PlateID",
+                        qc_warn = "SampleQC",
+                        assay_warn = "AssayQC",
+                        quant = "NPX",
+                        lod = character(0),
+                        normalization = "Normalization"),
+        not_ref_df = data_3k |>
+          dplyr::rename(
+            "OlinkID_E3072" = "OlinkID"
+          ) |>
+          dplyr::left_join(
+            eHT_e3072_mapping |>
+              dplyr::select(
+                dplyr::all_of(
+                  c("OlinkID_E3072", "OlinkID")
+                )
+              ),
+            by = "OlinkID_E3072",
+            relationship = "many-to-one"
+          ),
+        not_ref_samples = NULL,
+        not_ref_name = "3K",
+        not_ref_cols = list(sample_id = "SampleID",
+                            olink_id = "OlinkID",
+                            uniprot = "UniProt",
+                            assay = "Assay",
+                            panel = "Panel",
+                            panel_version = "DataAnalysisRefID",
+                            plate_id = "PlateID",
+                            qc_warn = "SampleQC",
+                            assay_warn = "AssayQC",
+                            quant = "NPX",
+                            lod = character(0),
+                            normalization = "Normalization"),
+        reference_medians = NULL,
+        norm_mode = olink_norm_modes$norm_ht_3k
+      )
+    )
+  }
+)
+
+test_that(
   "olink_norm_input_check - works - intensity (subset all samples) norm",
   {
     skip_if_not_installed("arrow")
@@ -2265,6 +2356,191 @@ test_that(
   }
 )
 
+# Test olink_norm_input_cross_product ----
+
+test_that(
+  "olink_norm_input_cross_product - works - bridge normalization",
+  {
+    skip_if_not_installed("arrow")
+
+    # 3k - 3k ----
+
+    expect_no_condition(
+      object = lst_cross_prod_out_3k <- olink_norm_input_cross_product(
+        lst_df = list(
+          "3K_1" = data_3k,
+          "3K_2" = data_3k
+        ),
+        lst_cols = list(
+          "3K_1" = list(olink_id = "OlinkID"),
+          "3K_2" = list(olink_id = "OlinkID")
+        ),
+        reference_project = "3K_1"
+      )
+    )
+
+    expect_identical(
+      object = lst_cross_prod_out_3k,
+      expected = list(
+        norm_mode = olink_norm_modes$bridge,
+        lst_df = list(
+          "3K_1" = data_3k,
+          "3K_2" = data_3k
+        )
+      )
+    )
+
+    # T96 - T96 ----
+
+    expect_no_condition(
+      object = lst_cross_prod_out_t96 <- olink_norm_input_cross_product(
+        lst_df = list(
+          "p1" = npx_data1,
+          "p2" = npx_data2
+        ),
+        lst_cols = list(
+          "p1" = list(olink_id = "OlinkID"),
+          "p2" = list(olink_id = "OlinkID")
+        ),
+        reference_project = "p1"
+      )
+    )
+
+    expect_identical(
+      object = lst_cross_prod_out_t96,
+      expected = list(
+        norm_mode = olink_norm_modes$bridge,
+        lst_df = list(
+          "p1" = npx_data1,
+          "p2" = npx_data2
+        )
+      )
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_cross_product - works - cross-product normalization",
+  {
+    skip_if_not_installed("arrow")
+
+    expect_no_condition(
+      object = lst_cross_prod_out <- olink_norm_input_cross_product(
+        lst_df = list(
+          "3K" = data_3k,
+          "HT" = data_ht
+        ),
+        lst_cols = list(
+          "3K" = list(olink_id = "OlinkID"),
+          "HT" = list(olink_id = "OlinkID")
+        ),
+        reference_project = "HT"
+      )
+    )
+
+    expect_identical(
+      object = lst_cross_prod_out,
+      expected = list(
+        norm_mode = olink_norm_modes$norm_ht_3k,
+        lst_df = list(
+          "3K" = data_3k |>
+            dplyr::rename(
+              "OlinkID_E3072" = "OlinkID"
+            ) |>
+            dplyr::left_join(
+              eHT_e3072_mapping |>
+                dplyr::select(
+                  dplyr::all_of(
+                    c("OlinkID_E3072", "OlinkID")
+                  )
+                ),
+              by = "OlinkID_E3072",
+              relationship = "many-to-one"
+            ),
+          "HT" = data_ht |>
+            dplyr::rename(
+              "OlinkID_HT" = "OlinkID"
+            ) |>
+            dplyr::left_join(
+              eHT_e3072_mapping |>
+                dplyr::select(
+                  dplyr::all_of(
+                    c("OlinkID_HT", "OlinkID")
+                  )
+                ),
+              by = "OlinkID_HT",
+              relationship = "many-to-one"
+            )
+        )
+      )
+    )
+
+  }
+)
+
+test_that(
+  "olink_norm_input_cross_product - error - unexpected normalization",
+  {
+    skip_if_not_installed("arrow")
+
+    # 3k - T96
+
+    expect_error(
+      object = olink_norm_input_cross_product(
+        lst_df = list(
+          "3K" = data_3k,
+          "T96" = npx_data1
+        ),
+        lst_cols = list(
+          "3K" = list(olink_id = "OlinkID"),
+          "T96" = list(olink_id = "OlinkID")
+        ),
+        reference_project = "3K"
+      ),
+      regexp = "Unexpected datasets to be bridge normalized!"
+    )
+
+    # HT - T96
+
+    expect_error(
+      object = olink_norm_input_cross_product(
+        lst_df = list(
+          "HT" = data_ht,
+          "T96" = npx_data1
+        ),
+        lst_cols = list(
+          "HT" = list(olink_id = "OlinkID"),
+          "T96" = list(olink_id = "OlinkID")
+        ),
+        reference_project = "T96"
+      ),
+      regexp = "Unexpected datasets to be bridge normalized!"
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_cross_product - error - incorrect reference project",
+  {
+    skip_if_not_installed("arrow")
+
+    expect_error(
+      object = olink_norm_input_cross_product(
+        lst_df = list(
+          "3K" = data_3k,
+          "HT" = data_ht
+        ),
+        lst_cols = list(
+          "3K" = list(olink_id = "OlinkID"),
+          "HT" = list(olink_id = "OlinkID")
+        ),
+        reference_project = "3K"
+      ),
+      regexp = "Incorrect reference project!"
+    )
+  }
+)
+
 # Test olink_norm_input_check_samples ----
 
 test_that(
@@ -2354,6 +2630,35 @@ test_that(
               "p2" = ref_samples_bridge
             ),
             norm_mode = "bridge"
+          )
+        )
+      )
+    )
+
+    # cross-platform norm - reference samples in datasets ----
+
+    ref_samples_bridge_3k_ht <- intersect(x = data_3k$SampleID,
+                                          y = data_ht$SampleID) |>
+      (\(x) x[!grepl(pattern = "CONTROL", x = x, fixed = TRUE)])() |>
+      sort() |>
+      head(16L)
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = olink_norm_input_check_samples(
+            lst_df_samples = list(
+              "p1" = unique(data_3k$SampleID),
+              "p2" = data_ht |>
+                arrow::as_arrow_table() |>
+                dplyr::pull(.data[["SampleID"]], as_vector = TRUE) |>
+                unique()
+            ),
+            lst_ref_samples = list(
+              "p1" = ref_samples_bridge_3k_ht,
+              "p2" = ref_samples_bridge_3k_ht
+            ),
+            norm_mode = "norm_ht_3k"
           )
         )
       )
@@ -3051,7 +3356,8 @@ test_that(
             lst_cols = list(
               "p1" = list(olink_id = "OlinkID",
                           normalization = character(0L))
-            )
+            ),
+            norm_mode = olink_norm_modes$bridge
           )
         )
       )
@@ -3078,7 +3384,8 @@ test_that(
         lst_cols = list(
           "p1" = list(olink_id = "OlinkID",
                       normalization = character(0L))
-        )
+        ),
+        norm_mode = olink_norm_modes$bridge
       ),
       regexp = "* p1: OID1234"
     )
@@ -3114,7 +3421,8 @@ test_that(
         lst_cols = list(
           "p1" = list(olink_id = "OlinkID",
                       normalization = character(0L))
-        )
+        ),
+        norm_mode = olink_norm_modes$bridge
       ),
       regexp = paste("* p1: OID00471A, OID00471B, OID00471C, OID00471D,",
                      "OID00471E, OID0047, OID00471#, and OID00471&")
@@ -3147,7 +3455,8 @@ test_that(
                           normalization = character(0L)),
               "p2" = list(olink_id = "OlinkID",
                           normalization = character(0L))
-            )
+            ),
+            norm_mode = olink_norm_modes$bridge
           )
         )
       )
@@ -3182,7 +3491,8 @@ test_that(
                       normalization = character(0L)),
           "p2" = list(olink_id = "OlinkID",
                       normalization = character(0L))
-        )
+        ),
+        norm_mode = olink_norm_modes$bridge
       ),
       regexp = "* p2: OID01224B"
     )
@@ -3238,7 +3548,8 @@ test_that(
                       normalization = character(0L)),
           "p2" = list(olink_id = "OlinkID",
                       normalization = character(0L))
-        )
+        ),
+        norm_mode = olink_norm_modes$bridge
       ),
       regexp = paste("* p2: OID01301A, OID01302B, OID01303C, OID01304D,",
                      "OID01305E, OID0130, and OID01307#")
@@ -3288,7 +3599,8 @@ test_that(
                       normalization = character(0L)),
           "p2" = list(olink_id = "OlinkID",
                       normalization = character(0L))
-        )
+        ),
+        norm_mode = olink_norm_modes$bridge
       ),
       regexp = "* p2: OID01224B"
     )
@@ -3341,7 +3653,8 @@ test_that(
                       normalization = character(0L)),
           "p4" = list(olink_id = "OlinkID",
                       normalization = character(0L))
-        )
+        ),
+        norm_mode = olink_norm_modes$bridge
       ),
       regexp = "* p4: OID01301B"
     )
@@ -3356,6 +3669,92 @@ test_that(
     expect_identical(object = lst_out$lst_df,
                      expected = lst_df_v8)
 
+  }
+)
+
+test_that(
+  "olink_norm_input_clean_assays - works - invalid OID in df*",
+  {
+    skip_if_not_installed("arrow")
+
+    ## all assays start with OID12345_OID12345 in 1 df ----
+
+    lst_df_v0 <- list(
+      "p1" = data_3k |>
+        dplyr::rename(
+          "OlinkID_E3072" = "OlinkID"
+        ) |>
+        dplyr::left_join(
+          eHT_e3072_mapping |>
+            dplyr::select(
+              dplyr::all_of(
+                c("OlinkID", "OlinkID_E3072")
+              )
+            ),
+          by = "OlinkID_E3072",
+          relationship = "many-to-one"
+        )
+    )
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = lst_out <- olink_norm_input_clean_assays(
+            lst_df = lst_df_v0,
+            reference_medians = NULL,
+            lst_cols = list(
+              "p1" = list(olink_id = "OlinkID",
+                          normalization = character(0L))
+            ),
+            norm_mode = olink_norm_modes$norm_ht_3k
+          )
+        )
+      )
+    )
+
+    expect_identical(object = lst_out$lst_df,
+                     expected = lst_df_v0)
+
+    ## 1 assay does not start with OID in 1 df ----
+
+    lst_df_v2 <- list(
+      "p1" = data_3k |>
+        dplyr::rename(
+          "OlinkID_E3072" = "OlinkID"
+        ) |>
+        dplyr::left_join(
+          eHT_e3072_mapping |>
+            dplyr::select(
+              dplyr::all_of(
+                c("OlinkID", "OlinkID_E3072")
+              )
+            ),
+          by = "OlinkID_E3072",
+          relationship = "many-to-one"
+        ) |>
+        dplyr::mutate(
+          OlinkID = dplyr::if_else(.data[["OlinkID"]] == "OID40770_OID20117",
+                                   "OID40770_OID2011",
+                                   .data[["OlinkID"]])
+        )
+    )
+
+    expect_message(
+      object = lst_out <- olink_norm_input_clean_assays(
+        lst_df = lst_df_v2,
+        reference_medians = NULL,
+        lst_cols = list(
+          "p1" = list(olink_id = "OlinkID",
+                      normalization = character(0L))
+        ),
+        norm_mode = olink_norm_modes$norm_ht_3k
+      ),
+      regexp = "* p1: OID40770_OID2011"
+    )
+
+    expect_identical(object = lst_out$lst_df$p1,
+                     expected = lst_df_v2$p1 |>
+                       dplyr::filter(.data[["OlinkID"]] != "OID40770_OID2011"))
   }
 )
 
@@ -3386,7 +3785,8 @@ test_that(
             lst_cols = list(
               "p1" = list(olink_id = "OlinkID",
                           normalization = character(0L))
-            )
+            ),
+            norm_mode = olink_norm_modes$ref_median
           )
         )
       )
@@ -3420,7 +3820,8 @@ test_that(
         lst_cols = list(
           "p1" = list(olink_id = "OlinkID",
                       normalization = character(0L))
-        )
+        ),
+        norm_mode = olink_norm_modes$ref_median
       ),
       regexp = paste("from the reference median dataset have been excluded",
                      "from normalization: OID1234")
@@ -3464,7 +3865,8 @@ test_that(
         lst_cols = list(
           "p1" = list(olink_id = "OlinkID",
                       normalization = character(0L))
-        )
+        ),
+        norm_mode = olink_norm_modes$ref_median
       ),
       regexp = paste("from the reference median dataset have been excluded",
                      "from normalization: OID00471A,")
@@ -3504,7 +3906,8 @@ test_that(
         lst_cols = list(
           "p1" = list(olink_id = "OlinkID",
                       normalization = character(0L))
-        )
+        ),
+        norm_mode = olink_norm_modes$ref_median
       ),
       regexp = paste("from the reference median dataset have been excluded",
                      "from normalization: OID1234")
@@ -3545,7 +3948,8 @@ test_that(
         lst_cols = list(
           "p1" = list(olink_id = "OlinkID",
                       normalization = character(0L))
-        )
+        ),
+        norm_mode = olink_norm_modes$subset
       ),
       regexp = "All assays were removed from input `reference_medians`!"
     )
@@ -3575,7 +3979,8 @@ test_that(
             lst_cols = list(
               "p1" = list(olink_id = "OlinkID",
                           normalization = "Normalization")
-            )
+            ),
+            norm_mode = olink_norm_modes$bridge
           )
         )
       )
@@ -3605,7 +4010,8 @@ test_that(
             lst_cols = list(
               "p1" = list(olink_id = "OlinkID",
                           normalization = "Normalization")
-            )
+            ),
+            norm_mode = olink_norm_modes$bridge
           )
         )
       )
@@ -3642,7 +4048,8 @@ test_that(
                           normalization = "Normalization"),
               "p2" = list(olink_id = "OlinkID",
                           normalization = "Normalization")
-            )
+            ),
+            norm_mode = olink_norm_modes$bridge
           )
         )
       )
@@ -3679,7 +4086,8 @@ test_that(
                           normalization = "Normalization"),
               "p2" = list(olink_id = "OlinkID",
                           normalization = "Normalization")
-            )
+            ),
+            norm_mode = olink_norm_modes$bridge
           )
         )
       )
@@ -3717,7 +4125,8 @@ test_that(
         lst_cols = list(
           "p1" = list(olink_id = "OlinkID",
                       normalization = "Normalization")
-        )
+        ),
+        norm_mode = olink_norm_modes$bridge
       ),
       regexp = "* p1: OID01307"
     )
@@ -3752,7 +4161,8 @@ test_that(
         lst_cols = list(
           "p1" = list(olink_id = "OlinkID",
                       normalization = "Normalization")
-        )
+        ),
+        norm_mode = olink_norm_modes$bridge
       ),
       regexp = paste("p1: OID00471, OID00472, OID00474, OID00475, OID00476")
     )
@@ -3789,7 +4199,8 @@ test_that(
                       normalization = "Normalization"),
           "p2" = list(olink_id = "OlinkID",
                       normalization = "Normalization")
-        )
+        ),
+        norm_mode = olink_norm_modes$bridge
       ),
       regexp = "* p2: OID01224"
     )
@@ -3839,7 +4250,8 @@ test_that(
                       normalization = "Normalization"),
           "p2" = list(olink_id = "OlinkID",
                       normalization = "Normalization")
-        )
+        ),
+        norm_mode = olink_norm_modes$bridge
       ),
       regexp = "* p2: OID01269, OID01270, OID01271, OID01272"
     )
@@ -3891,7 +4303,8 @@ test_that(
                       normalization = "Normalization"),
           "p2" = list(olink_id = "OlinkID",
                       normalization = "Normalization")
-        )
+        ),
+        norm_mode = olink_norm_modes$bridge
       ),
       regexp = "* p2: OID01269, OID01270, OID01271, OID01272"
     )
@@ -3958,7 +4371,8 @@ test_that(
           "p3" = list(olink_id = "OlinkID"),
           "p4" = list(olink_id = "OlinkID",
                       normalization = "Normalization")
-        )
+        ),
+        norm_mode = olink_norm_modes$bridge
       ),
       regexp = "* p4: OID01269, OID01270, and OID01271"
     )
@@ -3999,7 +4413,8 @@ test_that(
               "p1" = list(olink_id = "OlinkID",
                           normalization = "Normalization"),
               "p2" = list(olink_id = "OlinkID")
-            )
+            ),
+            norm_mode = olink_norm_modes$bridge
           )
         )
       )
@@ -4036,7 +4451,8 @@ test_that(
         lst_cols = list(
           "p1" = list(olink_id = "OlinkID",
                       normalization = "Normalization")
-        )
+        ),
+        norm_mode = olink_norm_modes$bridge
       ),
       regexp = "All assays were removed from dataset \"p1\"!"
     )
@@ -4062,7 +4478,8 @@ test_that(
                       normalization = "Normalization"),
           "p2" = list(olink_id = "OlinkID",
                       normalization = "Normalization")
-        )
+        ),
+        norm_mode = olink_norm_modes$bridge
       ) |>
         suppressMessages(),
       regexp = "All assays were removed from datasets \"p1\" and \"p2\"!"
