@@ -102,9 +102,9 @@ The package contains two test data files named npx_data1 and npx_data2. These ar
 * **Panel** _\<chr\>_: Olink Panel that samples ran on. Read more about Olink Panels here: [https://olink.com/products/compare](https://olink.com/products/compare).
 * **Panel_Version** _\<chr\>_: Version of the panel. A new panel version might include some different or improved assays.
 * **PlateID** _\<chr\>_: Name of the plate.
-* **QC_Warning** _\<chr\>_: Indication whether the sample passed Olink QC. More information about Olink quality control metrics can be found in our [FAQ](https://olink.com/knowledge/faq) by searching "Quality control".
+* **QC_Warning** _\<chr\>_: Indication whether the sample passed Olink QC. More information about Olink quality control metrics can be found in our [FAQ](https://olink.com/knowledge/faq/) by searching "Quality control".
 * **LOD** _\<dbl\>_: Limit of detection (LOD) is the minimum level of an individual protein that can be measured. LOD is defined as 3 times the standard deviation over background.
-* **NPX** _\<dbl\>_: Normalized Protein eXpression, is Olink®’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX in the Olink [FAQ](https://olink.com/knowledge/faq) (Search "What is NPX?") or in Olink's Data normalization and standardization [white paper](https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/05-white%20paper%20for%20website/1096-olink-data-normalization-white-paper.pdf).
+* **NPX** _\<dbl\>_: Normalized Protein eXpression, is Olink®’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX in the Olink [FAQ](https://olink.com/knowledge/faq/) (Search "What is NPX?") or in Olink's Data normalization and standardization [white paper](https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/05-white%20paper%20for%20website/1096-olink-data-normalization-white-paper.pdf).
 
 **Note:** There are 5 additional variables in the sample datasets npx_data1 and npx_data2 that include clinical or other information, namely: Subject _\<chr\>_, Treatment _\<chr\>_, Site _\<chr\>_, Time _\<chr\>_, Project _\<chr\>_.
 
@@ -135,9 +135,9 @@ A tibble in long format containing:
 * Panel: Olink Panel that samples ran on. Read more about Olink Panels here: [https://olink.com/products/compare](https://olink.com/products/compare)
 * Panel_Version: Version of the panel. A new panel version might include some different or improved assays.
 * PlateID: Name of the plate.
-* QC_Warning: Indication whether the sample passed Olink QC. More information about Olink quality control metrics can be found in our [FAQ](https://olink.com/knowledge/faq) (Search "Quality control"). 
+* QC_Warning: Indication whether the sample passed Olink QC. More information about Olink quality control metrics can be found in our [FAQ](https://olink.com/knowledge/faq/) (Search "Quality control"). 
 * LOD: Limit of detection (LOD) is the minimum level of an individual protein that can be measured. LOD is defined as 3 times the standard deviation over background.
-* NPX: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX in the Olink [FAQ](https://olink.com/knowledge/faq)(Search "What is NPX?") or in Olink's Data normalization and standardization [white paper](https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/05-white%20paper%20for%20website/1096-olink-data-normalization-white-paper.pdf).
+* NPX: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX in the Olink [FAQ](https://olink.com/knowledge/faq/)(Search "What is NPX?") or in Olink's Data normalization and standardization [white paper](https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/05-white%20paper%20for%20website/1096-olink-data-normalization-white-paper.pdf).
 
 
 
@@ -290,9 +290,9 @@ A tibble of NPX data in long format containing normalized NPX values, including 
 * Panel: Olink Panel that samples ran on.Read more about Olink Panels here: [https://olink.com/products/compare](https://olink.com/products/compare).
 * Panel_Version: Version of the panel. A new panel version might include some different or improved assays.
 * PlateID: Name of the plate.
-* QC_Warning: Indication whether the sample passed Olink QC. More information about Olink quality control metrics can be found in our [FAQ](https://olink.com/knowledge/faq) (Search "Quality control")
+* QC_Warning: Indication whether the sample passed Olink QC. More information about Olink quality control metrics can be found in our [FAQ](https://olink.com/knowledge/faq/) (Search "Quality control")
 * LOD: Limit of detection (LOD) is the minimum level of an individual protein that can be measured. LOD is defined as 3 times the standard deviation over background.
-* NPX: Normalized Protein eXpression, is Olink®’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX in the Olink [FAQ](https://olink.com/knowledge/faq) (Search "What is NPX?") or in Olink's Data normalization and standardization [white paper](https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/05-white%20paper%20for%20website/1096-olink-data-normalization-white-paper.pdf).
+* NPX: Normalized Protein eXpression, is Olink®’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX in the Olink [FAQ](https://olink.com/knowledge/faq/) (Search "What is NPX?") or in Olink's Data normalization and standardization [white paper](https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/05-white%20paper%20for%20website/1096-olink-data-normalization-white-paper.pdf).
 * Project: Name given from the dataframe of origin.
 * Adj_factor: Adjustment factor, i.e. how much was added to or subtracted from the original NPX value.
 
@@ -333,10 +333,10 @@ A tibble with the following columns:
 + **Panel** _\<chr\>_: Olink Panel that samples ran on. Read more about Olink Panels here: [https://olink.com/products/compare](https://olink.com/products/compare).
 + **Block** _\<chr\>_: Olink Block that samples ran on. 
 + **Count** *<int>*: Raw counts generated during sequencing. 
-+ **ExtNPX** *<num>*: Extension normalized NPX value that is used in NPX calculation. Read more about ExtNPX in the [Olink FAQ]((https://olink.com/knowledge/faq)). (Search "extension normalized")
-+ **NPX** *<num>*: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log2 scale. The majority of the functions of this package use NPX values for calculations. If Explore data is PC normalized, NPX reflects the PC normalized value. If Explore data is intensity normalized NPX, NPX reflects the intensity normalized value. Read more about NPX in the Olink [FAQ](https://olink.com/knowledge/faq) (Search "What is NPX?") or in Olink's Data normalization and standardization [white paper](https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/05-white%20paper%20for%20website/1096-olink-data-normalization-white-paper.pdf).
++ **ExtNPX** *<num>*: Extension normalized NPX value that is used in NPX calculation. Read more about ExtNPX in the [Olink FAQ]((https://olink.com/knowledge/faq/)). (Search "extension normalized")
++ **NPX** *<num>*: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log2 scale. The majority of the functions of this package use NPX values for calculations. If Explore data is PC normalized, NPX reflects the PC normalized value. If Explore data is intensity normalized NPX, NPX reflects the intensity normalized value. Read more about NPX in the Olink [FAQ](https://olink.com/knowledge/faq/) (Search "What is NPX?") or in Olink's Data normalization and standardization [white paper](https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/05-white%20paper%20for%20website/1096-olink-data-normalization-white-paper.pdf).
 + **Normalization** _\<chr\>_: The normalization method used.
-+ **PCNormalizedNPX** *<num>*: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log2 scale. The majority of the functions of this package use NPX values for calculations. Regardless of normalization method, this column always reflects PC normalized NPX values. Read more about NPX in the Olink [FAQ](https://olink.com/knowledge/faq) (Search "plate control normalization") or in Olink's Data normalization and standardization [white paper](https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/05-white%20paper%20for%20website/1096-olink-data-normalization-white-paper.pdf).
++ **PCNormalizedNPX** *<num>*: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log2 scale. The majority of the functions of this package use NPX values for calculations. Regardless of normalization method, this column always reflects PC normalized NPX values. Read more about NPX in the Olink [FAQ](https://olink.com/knowledge/faq/) (Search "plate control normalization") or in Olink's Data normalization and standardization [white paper](https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/05-white%20paper%20for%20website/1096-olink-data-normalization-white-paper.pdf).
 + **AssayQC** _\<chr\>_:Indicates whether an assay contains a QC warning.
 + **SampleQC** _\<chr\>_: Indicates whether a sample contains a QC warning within a block.
 + **ExploreVersion** _\<chr\>_: The version of the Explore software library that was used to produce the data file.
