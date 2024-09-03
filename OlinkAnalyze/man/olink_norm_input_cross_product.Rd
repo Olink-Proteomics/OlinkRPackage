@@ -18,8 +18,9 @@ the other project is adjusted to.}
 }
 \value{
 Character string indicating the type of normalization to be
-performed. Expecting one of
+performed. One of
 bridge, subset, ref_median or norm_ht_3k. # nolint
+And the updated list of datasets in case of cross-platform normalization.
 }
 \description{
 A function to check whether we are to perform simple bridge normalization, or
