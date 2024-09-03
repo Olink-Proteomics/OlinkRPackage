@@ -39,7 +39,7 @@ bridgeable <- function(data_Explore384,
   # create unique IDs even with the repeated correlation assays in HT and 3K.
 
   map_oid_ht_3k <- function(explore_df) {
-    oid_ht_3k_mapping <- eHT_e3072_mapping
+    oid_ht_3k_mapping <- OlinkAnalyze:::eHT_e3072_mapping
 
     oid_ht_3k_mapping <- oid_ht_3k_mapping |>
       mutate(OlinkID_HT_3K = paste(.data[["OlinkID_HT"]],
@@ -49,13 +49,13 @@ bridgeable <- function(data_Explore384,
 
     if (all(explore_df |>
             distinct(Panel) |>
-            pull() |> 
+            pull() |>
             na.omit() %in% c("Explore_HT", "Explore HT"))) {
       explore_df_linked_oid <- explore_df |>
         dplyr::filter(
-          stringr::str_detect(string = .data[["SampleType"]], 
+          stringr::str_detect(string = .data[["SampleType"]],
                               pattern = "SAMPLE"),
-          stringr::str_detect(string = .data[["AssayType"]], 
+          stringr::str_detect(string = .data[["AssayType"]],
                               pattern = "assay")
         ) |>
         inner_join(oid_ht_3k_mapping,
@@ -121,8 +121,9 @@ bridgeable <- function(data_Explore384,
       dplyr::reframe(outlier_removal_iqr(dplyr::pick(everything()),
                                          iqr_value = 3)) |>
       dplyr::group_by(.data[["Gene"]]) |>
-      dplyr::mutate(R2_lm = stats::cor(x = .data[["NPX_3k"]][.data[["Count_ht"]] > 10],
-                                       y = .data[["NPX_ht"]][.data[["Count_ht"]] > 10])^2) |>
+      filter(.data[["Count_3k"]] > 10, .data[["Count_ht"]] > 10) |>
+      dplyr::mutate(R2_lm = stats::cor(x = .data[["NPX_3k"]],
+                                       y = .data[["NPX_ht"]])^2) |>
       dplyr::ungroup() |>
       dplyr::distinct()
 
@@ -140,9 +141,10 @@ bridgeable <- function(data_Explore384,
       dplyr::reframe(outlier_removal_iqr(dplyr::pick(everything()),
                                          iqr_value = 3)) |>
       dplyr::group_by(.data[["Gene"]], .data[["ids"]]) |>
+      filter(.data[["Count_3k"]] > 10, .data[["Count_ht"]] > 10) |>
       summarise(
-        ks = ks.test(.data[["NPX_ht"]][.data[["Count_ht"]] > 10],
-                     .data[["NPX_3k"]][.data[["Count_ht"]] > 10])$statistic,
+        ks = ks.test(.data[["NPX_ht"]],
+                     .data[["NPX_3k"]])$statistic,
         .groups = "keep"
       ) |>
       dplyr::ungroup() |>
@@ -152,7 +154,7 @@ bridgeable <- function(data_Explore384,
   }
 
 
-  e3k_eHT_mapping <- eHT_e3072_mapping
+  e3k_eHT_mapping <- OlinkAnalyze:::eHT_e3072_mapping
 
   data_Explore384 <- data_Explore384 |>
     dplyr::filter(
@@ -202,17 +204,17 @@ bridgeable <- function(data_Explore384,
     na.omit() |>
     dplyr::group_by(.data[["ids"]]) |>
     dplyr::mutate(
-      range_ht = quantile(.data[["NPX_ht"]][.data[["Count_ht"]] > 10], 
+      range_ht = quantile(.data[["NPX_ht"]][.data[["Count_ht"]] > 10],
                           probs = 0.9) -
         quantile(.data[["NPX_ht"]][.data[["Count_ht"]] > 10],
                  probs = 0.1), # using 10% to 90% quantiles for checking range /IQR
-      range_3k = quantile(.data[["NPX_3k"]][.data[["Count_ht"]] > 10],
+      range_3k = quantile(.data[["NPX_3k"]][.data[["Count_3k"]] > 10],
                           probs = 0.9) -
-        quantile(.data[["NPX_3k"]][.data[["Count_ht"]] > 10],
+        quantile(.data[["NPX_3k"]][.data[["Count_3k"]] > 10],
                  probs = 0.1),
       range_diff = abs(.data[["range_ht"]] - .data[["range_3k"]]),
       iqr_ht = IQR(.data[["NPX_ht"]]), iqr_3k = IQR(.data[["NPX_3k"]]),
-      median_count_3k = median(.data[["Count_3k"]][.data[["Count_ht"]] > 10],
+      median_count_3k = median(.data[["Count_3k"]][.data[["Count_3k"]] > 10],
                                na.rm = TRUE), # if count less than 10 in 1 sample that assay is dropped
       median_count_ht = median(.data[["Count_ht"]][.data[["Count_ht"]] > 10],
                                na.rm = TRUE), # if count less than 10 in 1 sample that assay is dropped
@@ -264,7 +266,7 @@ bridgeable <- function(data_Explore384,
                   .data[["OlinkID_E3072"]],
                   .data[["Bridgeable"]]) |>
     dplyr::distinct() |>
-    dplyr::inner_join(ks, 
+    dplyr::inner_join(ks,
                       by = c("OlinkID_HT" = "OlinkID",
                              "OlinkID_E3072" = "OlinkID_Explore384"))
 
@@ -278,11 +280,11 @@ bridgeable <- function(data_Explore384,
   message(paste0("Generating bridging recommendation table"))
   bridge_table <- bridge_table |>
     dplyr::mutate(Bridgeable = case_when(
-      .data[["Bridgeable"]] == "Yes" & ks < 0.2 ~ "Median Centered",
+      .data[["Bridgeable"]] == "Yes" & ks <= 0.2 ~ "Median Centered",
       .data[["Bridgeable"]] == "Yes" & ks > 0.2 ~ "Quantile Smoothing",
       .default = as.character(.data[["Bridgeable"]])
     )) |>
-    dplyr::left_join(concat_ids, 
+    dplyr::left_join(concat_ids,
                      by = c("OlinkID_HT" = "OlinkID",
                             "OlinkID_E3072" = "OlinkID_Explore384")) |>
     dplyr::rename(

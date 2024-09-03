@@ -1,9 +1,5 @@
-#Load test data
-test_file <- '../data/bridgeable_data.rda'
-load(test_file)
-rm(e3k_eHT_mapping) # Use mapping file called inside bridgeable()
-
 # Run bridgeable()
+set.seed(1)
 results <- bridgeable(data_Explore384 = data_3k, data_HT = data_ht)
 
 #results |> group_by(BridgingRecommendation) |> tally()
@@ -20,15 +16,19 @@ test_that("bridgeable function works", {
                  dplyr::filter(BridgingRecommendation == "Median Centered") |>
                  unique() |>
                  nrow(),59)
-  
+
   expect_equal(results |>
                  dplyr::filter(BridgingRecommendation == "Quantile Smoothing") |>
                  unique() |>
                  nrow(),40)
-  
+
   expect_equal(results |>
                  dplyr::filter(BridgingRecommendation == "Not Bridgeable") |>
                  unique() |>
                  nrow(),1)
-  
+  expect_equal(results |>
+                 dplyr::filter(OlinkID_concat == "OID41012_OID20054") |>
+                 unique() |>
+                 dplyr::pull(BridgingRecommendation),"Not Bridgeable")
+
 })
