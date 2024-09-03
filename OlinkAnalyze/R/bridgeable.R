@@ -136,8 +136,6 @@ bridgeable <- function(data_Explore384,
 
     data_out <- data |>
       dplyr::group_by(.data[["Gene"]], .data[["ids"]]) |>
-      # dplyr::group_modify(~outlier_removal_iqr(.x, iqr_value = 3)) |>
-      # purrr::modify(~., outlier_removal_iqr(~., iqr_value = 3)) |>
       dplyr::reframe(outlier_removal_iqr(dplyr::pick(everything()),
                                          iqr_value = 3)) |>
       dplyr::group_by(.data[["Gene"]], .data[["ids"]]) |>
@@ -293,9 +291,6 @@ bridgeable <- function(data_Explore384,
       Assay = .data[["Gene"]]
     ) |>
     dplyr::select(.data[["OlinkID_concat"]],
-                  .data[["OlinkID_HT"]],
-                  .data[["OlinkID_E3072"]],
-                  .data[["Assay"]],
                   .data[["BridgingRecommendation"]])
 
   return(bridge_table)
