@@ -1,11 +1,11 @@
 # mapping.R ----
 
-e3k_eHT_mapping_file <- system.file("data-raw", # nolint
-                                    "mapping.R",
-                                    package = "OlinkAnalyze",
-                                    mustWork = TRUE)
-source(e3k_eHT_mapping_file)
-rm(e3k_eHT_mapping_file)
+eHT_e3072_mapping_file <- system.file("data-raw",
+                                      "mapping.R",
+                                      package = "OlinkAnalyze",
+                                      mustWork = TRUE)
+source(eHT_e3072_mapping_file)
+rm(eHT_e3072_mapping_file)
 
 # example HT data ----
 
@@ -25,11 +25,23 @@ data_3k_file <- system.file("data-raw",
 source(data_3k_file)
 rm(data_3k_file)
 
-# save to R/R/sysdata.rda ----
+# read in normalization utilities ----
+
+normalization_utilities_file <- system.file("data-raw",
+                                            "normalization_utils.R",
+                                            package = "OlinkAnalyze",
+                                            mustWork = TRUE)
+source(normalization_utilities_file)
+rm(normalization_utilities_file)
+
+# save to R/sysdata.rda ----
 
 usethis::use_data(eHT_e3072_mapping,
                   data_ht,
                   data_3k,
+                  olink_norm_mode_combos,
+                  olink_norm_ref_median_cols,
+                  olink_norm_modes,
                   overwrite = TRUE,
                   internal = TRUE,
                   compress = "xz",
