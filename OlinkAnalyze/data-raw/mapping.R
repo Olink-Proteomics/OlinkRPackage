@@ -1,11 +1,11 @@
 # code to prepare `mapping` dataset goes here
 # Raw data is generated here:
 
-eHT_e3072_mapping_rds <- system.file("extdata",
+eHT_e3072_mapping_rds <- system.file("extdata", # nolint
                                      "OlinkIDMapping.rds",
                                      package = "OlinkAnalyze",
                                      mustWork = TRUE)
-eHT_e3072_mapping <- readRDS(file = eHT_e3072_mapping_rds) |>
+eHT_e3072_mapping <- readRDS(file = eHT_e3072_mapping_rds) |> #nolint
   dplyr::rename(
     "Assay" = "Gene",
     "OlinkID_HT" = "OlinkID",
