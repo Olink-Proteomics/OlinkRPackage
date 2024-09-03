@@ -941,7 +941,7 @@ olink_norm_input_cross_product <- function(lst_df,
     # add combined OlinkID to HT dataset
     l_ht_name <- names(lst_product)[lst_product == "HT"]
     l_ht_oid_rename <- paste0(lst_cols[[l_ht_name]]$olink_id, "_HT")
-    ht_3k_map_ht_rename <- setNames(
+    ht_3k_map_ht_rename <- stats::setNames(
       object = c("OlinkID_HT", "OlinkID"),
       nm = c("OlinkID_HT", lst_cols[[l_ht_name]]$olink_id)
     )
@@ -956,14 +956,14 @@ olink_norm_input_cross_product <- function(lst_df,
               ht_3k_map_ht_rename
             )
           ),
-        by = setNames(object = "OlinkID_HT", nm = l_ht_oid_rename),
+        by = stats::setNames(object = "OlinkID_HT", nm = l_ht_oid_rename),
         relationship = "many-to-one"
       )
 
     # add combined OlinkID to 3k dataset
     l_3k_name <- names(lst_product)[lst_product == "3k"]
     l_3k_oid_rename <- paste0(lst_cols[[l_3k_name]]$olink_id, "_E3072")
-    ht_3k_map_3k_rename <- setNames(
+    ht_3k_map_3k_rename <- stats::setNames(
       object = c("OlinkID_E3072", "OlinkID"),
       nm = c("OlinkID_E3072", lst_cols[[l_3k_name]]$olink_id)
     )
@@ -978,7 +978,7 @@ olink_norm_input_cross_product <- function(lst_df,
               ht_3k_map_3k_rename
             )
           ),
-        by = setNames(object = "OlinkID_E3072", nm = l_3k_oid_rename),
+        by = stats::setNames(object = "OlinkID_E3072", nm = l_3k_oid_rename),
         relationship = "many-to-one"
       )
 
