@@ -156,11 +156,13 @@ olink_norm_input_check <- function(df1,
     if (norm_mode %in% c(olink_norm_modes$bridge,
                          olink_norm_modes$norm_ht_3k)) {
       # check if it is 3k-HT normalization, or simple bridge normalization
-      norm_mode <- olink_norm_input_cross_product(
+      norm_cross_product <- olink_norm_input_cross_product(
         lst_df = lst_df,
         lst_cols = lst_cols,
         reference_project = reference_project
       )
+      norm_mode <- norm_cross_product$norm_mode
+      lst_df <- norm_cross_product$lst_df
       # bridge or 3k-HT normalization normalization
       lst_ref_samples <- list(overlapping_samples_df1, overlapping_samples_df1)
     } else if (norm_mode == olink_norm_modes$subset) {
@@ -213,37 +215,34 @@ olink_norm_input_check <- function(df1,
   lst_df_clean_assays <- olink_norm_input_clean_assays(
     lst_df = lst_df,
     reference_medians = reference_medians,
-    lst_cols = lst_cols
+    lst_cols = lst_cols,
+    norm_mode = norm_mode
   )
   lst_df <- lst_df_clean_assays$lst_df
   reference_medians <- lst_df_clean_assays$reference_medians
 
-  # Checks that do not apply to 3k-HT normalization ----
+  # Check assays shared across inputs ----
 
-  if (norm_mode != olink_norm_modes$norm_ht_3k) {
-    # Check assays shared across inputs ----
+  # check if all assays from input are in all datasets, and remove them if not
+  lst_df_overlap_assay <- olink_norm_input_assay_overlap(
+    lst_df = lst_df_clean_assays$lst_df,
+    reference_medians = lst_df_clean_assays$reference_medians,
+    lst_cols = lst_cols
+  )
+  lst_df <- lst_df_overlap_assay$lst_df
+  reference_medians <- lst_df_overlap_assay$reference_medians
 
-    # check if all assays from input are in all datasets, and remove them if not
-    lst_df_overlap_assay <- olink_norm_input_assay_overlap(
-      lst_df = lst_df_clean_assays$lst_df,
-      reference_medians = lst_df_clean_assays$reference_medians,
+  # Check normalization approach ----
+
+  all_norm_present <- lst_cols |>
+    sapply(function(x) !identical(x = x$normalization, y = character(0L))) |>
+    all()
+
+  if (all_norm_present && length(lst_df) == 2L) {
+    olink_norm_input_norm_method(
+      lst_df = lst_df,
       lst_cols = lst_cols
     )
-    lst_df <- lst_df_overlap_assay$lst_df
-    reference_medians <- lst_df_overlap_assay$reference_medians
-
-    # Check normalization approach ----
-
-    all_norm_present <- lst_cols |>
-      sapply(function(x) !identical(x = x$normalization, y = character(0L))) |>
-      all()
-
-    if (all_norm_present && length(lst_df) == 2L) {
-      olink_norm_input_norm_method(
-        lst_df = lst_df,
-        lst_cols = lst_cols
-      )
-    }
   }
 
   # return to normalize ----
@@ -863,8 +862,9 @@ olink_norm_input_check_df_cols <- function(lst_df) {
 #' the other project is adjusted to.
 #'
 #' @return Character string indicating the type of normalization to be
-#' performed. Expecting one of
+#' performed. One of
 #' `r cli::ansi_collapse(x = OlinkAnalyze:::olink_norm_modes, sep2 = " or ", last = " or ")`. # nolint
+#' And the updated list of datasets in case of cross-platform normalization.
 #'
 olink_norm_input_cross_product <- function(lst_df,
                                            lst_cols,
@@ -934,9 +934,64 @@ olink_norm_input_cross_product <- function(lst_df,
 
   }
 
+  # update Olink assay identifiers if cross product normalization ----
+
+  if (norm_mode == olink_norm_modes$norm_ht_3k) {
+
+    # add combined OlinkID to HT dataset
+    l_ht_name <- names(lst_product)[lst_product == "HT"]
+    l_ht_oid_rename <- paste0(lst_cols[[l_ht_name]]$olink_id, "_HT")
+    ht_3k_map_ht_rename <- setNames(
+      object = c("OlinkID_HT", "OlinkID"),
+      nm = c("OlinkID_HT", lst_cols[[l_ht_name]]$olink_id)
+    )
+    lst_df[[l_ht_name]] <- lst_df[[l_ht_name]] |>
+      dplyr::rename(
+        !!l_ht_oid_rename := lst_cols[[l_ht_name]]$olink_id
+      ) |>
+      dplyr::left_join(
+        eHT_e3072_mapping |>
+          dplyr::select(
+            dplyr::all_of(
+              ht_3k_map_ht_rename
+            )
+          ),
+        by = setNames(object = "OlinkID_HT", nm = l_ht_oid_rename),
+        relationship = "many-to-one"
+      )
+
+    # add combined OlinkID to 3k dataset
+    l_3k_name <- names(lst_product)[lst_product == "3k"]
+    l_3k_oid_rename <- paste0(lst_cols[[l_3k_name]]$olink_id, "_E3072")
+    ht_3k_map_3k_rename <- setNames(
+      object = c("OlinkID_E3072", "OlinkID"),
+      nm = c("OlinkID_E3072", lst_cols[[l_3k_name]]$olink_id)
+    )
+    lst_df[[l_3k_name]] <- lst_df[[l_3k_name]] |>
+      dplyr::rename(
+        !!l_3k_oid_rename := lst_cols[[l_3k_name]]$olink_id
+      ) |>
+      dplyr::left_join(
+        eHT_e3072_mapping |>
+          dplyr::select(
+            dplyr::all_of(
+              ht_3k_map_3k_rename
+            )
+          ),
+        by = setNames(object = "OlinkID_E3072", nm = l_3k_oid_rename),
+        relationship = "many-to-one"
+      )
+
+  }
+
   # return ----
 
-  return(norm_mode)
+  return(
+    list(
+      norm_mode = norm_mode,
+      lst_df = lst_df
+    )
+  )
 
 }
 
@@ -1290,24 +1345,38 @@ olink_norm_input_ref_medians <- function(reference_medians) {
 #' Used for reference median normalization.
 #' @param lst_cols Named list of vectors with the required column names for each
 #' dataset in \var{lst_df}.
+#' @param norm_mode Character string indicating the type of normalization to be
+#' performed. Expecting one of
+#' `r cli::ansi_collapse(x = OlinkAnalyze:::olink_norm_modes, sep2 = " or ", last = " or ")`. # nolint
 #'
 #' @return A named list containing \var{lst_df} and \var{reference_medians}
 #' stripped from unexpected Olink identifiers or excluded assays
 #'
 olink_norm_input_clean_assays <- function(lst_df,
                                           reference_medians,
-                                          lst_cols) {
+                                          lst_cols,
+                                          norm_mode) {
   # help functions ----
 
   # remove all assays that do not match the pattern and that have NA for OlinkID
-  check_oid <- function(df, col_name) {
-    df |>
-      dplyr::filter(
-        grepl(
-          pattern = "^OID\\d{5}$",
-          x = .data[[col_name]]
+  check_oid <- function(df, col_name, norm_mode) {
+    if (norm_mode == olink_norm_modes$norm_ht_3k) {
+      df |>
+        dplyr::filter(
+          grepl(
+            pattern = "^OID\\d{5}_OID\\d{5}$",
+            x = .data[[col_name]]
+          )
         )
-      )
+    } else {
+      df |>
+        dplyr::filter(
+          grepl(
+            pattern = "^OID\\d{5}$",
+            x = .data[[col_name]]
+          )
+        )
+    }
   }
 
   # help variables ----
@@ -1322,7 +1391,8 @@ olink_norm_input_clean_assays <- function(lst_df,
 
   lst_df_oid <- lapply(names(lst_df), function(l_name) {
     check_oid(df = lst_df[[l_name]],
-              col_name = lst_cols[[l_name]]$olink_id)
+              col_name = lst_cols[[l_name]]$olink_id,
+              norm_mode = norm_mode)
   })
   names(lst_df_oid) <- names(lst_df)
   lst_out$lst_df <- lst_df_oid
@@ -1374,7 +1444,8 @@ olink_norm_input_clean_assays <- function(lst_df,
 
   if (!is.null(reference_medians)) {
     reference_medians_out <- check_oid(df = reference_medians,
-                                       col_name = "OlinkID")
+                                       col_name = "OlinkID",
+                                       norm_mode = norm_mode)
     lst_out$reference_medians <- reference_medians_out
 
     # error message to use that all assays were removed
