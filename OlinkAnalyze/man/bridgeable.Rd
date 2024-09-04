@@ -23,13 +23,13 @@ A "tibble" in long format. Columns include:
 Additional columns may be present or missing depending on the platform
 }
 \description{
-Imports an Explore 384 and a Explore HT NPX file exported from Olink Software.
+Imports an Explore 384 and Explore HT NPX file exported from Olink Software
 No alterations to the output format is allowed.
 }
 \examples{
 \donttest{
-results <- OlinkAnalyze:::bridgeable(data_Explore384 = OlinkAnalyze:::data_3k,
-                                     data_HT = OlinkAnalyze:::data_ht)
+results <- bridgeable(data_Explore384 = data_3k,
+data_HT = OlinkAnalyze:::data_ht)
 }
 
 }
