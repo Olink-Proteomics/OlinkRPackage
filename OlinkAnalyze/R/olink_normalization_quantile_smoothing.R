@@ -86,7 +86,6 @@ olink_normalization_qs <- function(exploreht_df,
     return(explore_df_linked_oid)
   }
 
-
   ecdf_transform_npx <- function(data = data) {
 
     # Outlier removal based on low counts threshold, think the trimodal assays
@@ -98,16 +97,15 @@ olink_normalization_qs <- function(exploreht_df,
       preds <- data |>
         dplyr::select(SampleID)
 
-      preds$preds <- NA
+      preds$QSNormalizedNPX <- NA
 
       return(preds)
     }
 
     #Quantiles of 3k mapped to quantiles of HT
-    mapped_3k <- stats::quantile(model_data_joined$NPX_ht,
-                                 sort(stats::ecdf(model_data_joined$NPX_3k)
-                                      (model_data_joined$NPX_3k))
-    )
+
+    mapped_3k <- stats::quantile(model_data_joined$NPX_ht, sort(stats::ecdf(
+      model_data_joined$NPX_3k)(model_data_joined$NPX_3k)))
     npx_3k <- sort(unique(model_data_joined$NPX_3k))
 
     #The quantile points used for adapting the nonelinear spline
@@ -116,6 +114,9 @@ olink_normalization_qs <- function(exploreht_df,
 
     #The nonlinear model
     spline_model <- lm(mapped_3k ~ splines::ns(npx_3k, knots = knots_npx3k))
+
+    # explore3072_df_tmp <- explore3072_df |>
+    #   dplyr::filter(OlinkID %in% unique(model_data_joined$OlinkID))
 
     #Output (just making sure that correct points are output)
     newdata <- as.data.frame(c(explore3072_df$NPX))
@@ -178,8 +179,9 @@ olink_normalization_qs <- function(exploreht_df,
 
   ecdf_transform <- model_data_joined |>
     dplyr::group_by(OlinkID) |>
-    dplyr::reframe(ecdf_transform_npx(dplyr::pick(everything()))) |>
-    dplyr::ungroup() |>
+    group_modify(~ecdf_transform_npx(data = .x)) |>
+    # dplyr::reframe(ecdf_transform_npx(dplyr::pick(everything()))) |>
+    # dplyr::ungroup() |>
     dplyr::mutate(Project = explore3072_name)
 
   # TODO : check with median normalized NPX, should it be the NPX value or NA??

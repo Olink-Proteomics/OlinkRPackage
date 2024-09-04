@@ -1,57 +1,38 @@
-#Load test data
-load("../data/qs_normalized_testing.rds")
+overlap_samples <- intersect(data_ht|>
+                               dplyr::filter(SampleType == "SAMPLE") |>
+                               dplyr::pull(SampleID) |>
+                               unique(),
+                             data_3k |>
+                               dplyr::filter(SampleType == "SAMPLE") |>
+                               dplyr::pull(SampleID) |>
+                               unique())
 
-# Run QS test()
-ecdf_transform_npx <- function(data = data) {
+bridge_samples <- list("DF_ht" = overlap_samples, "DF_3k" = overlap_samples)
+rm(overlap_samples)
+results <- olink_normalization_qs(exploreht_df = data_ht,
+                                  explore3072_df = data_3k,
+                                  bridge_samples = bridge_samples)
+results$QSNormalizedNPX <- round(results$QSNormalizedNPX, 2)
 
-  # Outlier removal based on low counts threshold, think the trimodal assays
-  model_data_joined <- data |> dplyr::filter(Count > 10)
-
-  # If number of datapoints are < 24, no spline is fitted
-  if (nrow(model_data_joined) < 24) {
-
-    preds <- data |>
-      dplyr::select(SampleID)
-
-    preds$preds <- NA
-
-    return(preds)
-  }
-
-  #Quantiles of 3k mapped to quantiles of HT
-  mapped_3k <- stats::quantile(model_data_joined$NPX_ht,
-                               sort(
-                                 stats::ecdf(model_data_joined$NPX_3k)
-                                 (model_data_joined$NPX_3k))
-  )
-  npx_3k <- sort(unique(model_data_joined$NPX_3k))
-
-  #The quantile points used for adapting the nonelinear spline
-  knots_npx3k <- stats::quantile(npx_3k, probs = c(0.05, 0.1, 0.25, 0.5, 0.75,
-                                                   0.9, 0.95))
-
-  #The nonlinear model
-  spline_model <- lm(mapped_3k ~ splines::ns(npx_3k, knots = knots_npx3k))
-
-  #Output (just making sure that correct points are output)
-  newdata <- as.data.frame(c(data$NPX_3k))
-  colnames(newdata) <- "npx_3k"
-  preds <- as.data.frame(stats::predict(spline_model, newdata = newdata))
-  colnames(preds) <- "QSNormalizedNPX"
-  preds$SampleID <- data$SampleID
-
-  return(preds)
+test_that("quantile smoothing normalization is accurate", {
+  expect_identical(head(results),
+                   tibble(SampleID = rep("Sample_A", 6),
+                              Project = rep("reference", 6),
+                              OlinkID_concat = c("OID40770_OID20117",
+                                                 "OID40835_OID31162",
+                                                 "OID40981_OID30796",
+                                                 "OID40986_OID20052",
+                                                 "OID41012_OID20054",
+                                                 "OID41032_OID20118"),
+                              QSNormalizedNPX = c(3.17, -1.61, -1.01, 2.57,
+                                                  0.1, -0.09)))
+  # expect_identical(results |>
+  #                    dplyr::filter(SampleID == "Sample_CT",
+  #                                  Project == "new",
+  #                                  OlinkID_concat == "OID42135_OID21255") |>
+  #                    unique() |>
+  #                    dplyr::pull(QSNormalizedNPX), -3.35)
 }
+)
 
-ecdf_transform <- data |>
-  dplyr::group_by(OlinkID) |>
-  dplyr::reframe(ecdf_transform_npx(pick(everything()))) |>
-  dplyr::ungroup() |>
-  dplyr::select(OlinkID, SampleID, QSNormalizedNPX)
-
-check_func <- ecdf_transform |>
-  dplyr::inner_join(ecdf_transform_verification, by = c("OlinkID", "SampleID"))
-
-testthat::expect_equal(check_func$QSNormalizedNPX,
-                       check_func$preds_verification)
 
