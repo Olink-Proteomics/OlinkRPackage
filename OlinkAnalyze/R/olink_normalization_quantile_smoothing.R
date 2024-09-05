@@ -171,11 +171,11 @@ olink_normalization_qs <- function(exploreht_df,
     dplyr::distinct()
 
   ecdf_transform <- model_data_joined |>
-    # dplyr::group_by(OlinkID) |>
-    # group_modify(~ecdf_transform_npx(data = .x)) |>
-    dplyr::reframe(ecdf_transform_npx(dplyr::pick(everything()))) |>
-    # dplyr::ungroup() |>
-    dplyr::mutate(Project = explore3072_name)
+    dplyr::reframe(ecdf_transform_npx(data = model_data_joined),
+                   by = OlinkID) |>
+    dplyr::mutate(Project = explore3072_name) |>
+    dplyr::ungroup() |>
+    dplyr::select(-by)
 
   all_ht <- exploreht_df |>
     dplyr::mutate(QSNormalizedNPX = NPX) |>
