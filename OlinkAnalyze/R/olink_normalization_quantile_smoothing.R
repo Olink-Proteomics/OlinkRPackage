@@ -30,9 +30,9 @@ olink_normalization_qs <- function(exploreht_df,
     oid_ht_3k_mapping <- OlinkAnalyze:::eHT_e3072_mapping
 
     oid_ht_3k_mapping <- oid_ht_3k_mapping |>
-      dplyr::mutate(
-        OlinkID_HT_3K = paste(.data[["OlinkID_HT"]],
-                              .data[["OlinkID_E3072"]], sep = "_")) |>
+      dplyr::mutate(OlinkID_HT_3K = paste(.data[["OlinkID_HT"]],
+                                          .data[["OlinkID_E3072"]],
+                                          sep = "_")) |>
       dplyr::select(.data[["OlinkID_HT"]], .data[["OlinkID_E3072"]],
                     .data[["OlinkID_HT_3K"]])
 
@@ -47,22 +47,18 @@ olink_normalization_qs <- function(exploreht_df,
           stringr::str_detect(string = .data[["AssayType"]],
                               pattern = "assay")
         ) |>
-        dplyr::inner_join(oid_ht_3k_mapping,
-                          relationship = "many-to-many",
-                          by = c("OlinkID" = "OlinkID_HT")
-        ) |>
+        dplyr::inner_join(oid_ht_3k_mapping, relationship = "many-to-many",
+                          by = c("OlinkID" = "OlinkID_HT")) |>
         dplyr::mutate(OlinkID = .data[["OlinkID_HT_3K"]]) |>
         dplyr::select(-.data[["OlinkID_HT_3K"]], -.data[["OlinkID_E3072"]]) |>
         dplyr::distinct()
     } else if (all(explore_df |>
                    dplyr::distinct(Panel) |>
                    dplyr::pull() |>
-                   na.omit() %in% c(
-                     "Cardiometabolic", "Cardiometabolic_II",
-                     "Inflammation", "Inflammation_II",
-                     "Neurology", "Neurology_II",
-                     "Oncology", "Oncology_II"
-                   ))) {
+                   na.omit() %in% c("Cardiometabolic", "Cardiometabolic_II",
+                                    "Inflammation", "Inflammation_II",
+                                    "Neurology", "Neurology_II",
+                                    "Oncology", "Oncology_II"))) {
       explore_df_linked_oid <- explore_df |>
         dplyr::filter(
           stringr::str_detect(string = .data[["SampleType"]],
@@ -70,10 +66,8 @@ olink_normalization_qs <- function(exploreht_df,
           stringr::str_detect(string = .data[["AssayType"]],
                               pattern = "assay")
         ) |>
-        inner_join(oid_ht_3k_mapping,
-                   relationship = "many-to-many",
-                   by = c("OlinkID" = "OlinkID_E3072")
-        ) |>
+        inner_join(oid_ht_3k_mapping, relationship = "many-to-many",
+                   by = c("OlinkID" = "OlinkID_E3072")) |>
         dplyr::mutate(OlinkID = .data[["OlinkID_HT_3K"]]) |>
         dplyr::select(-.data[["OlinkID_HT_3K"]], -.data[["OlinkID_HT"]]) |>
         dplyr::distinct()
@@ -104,8 +98,9 @@ olink_normalization_qs <- function(exploreht_df,
 
     #Quantiles of 3k mapped to quantiles of HT
 
-    mapped_3k <- stats::quantile(model_data_joined$NPX_ht, sort(stats::ecdf(
-      model_data_joined$NPX_3k)(model_data_joined$NPX_3k)))
+    mapped_3k <- stats::quantile(model_data_joined$NPX_ht,
+                                 sort(stats::ecdf(model_data_joined$NPX_3k)
+                                      (model_data_joined$NPX_3k)))
     npx_3k <- sort(unique(model_data_joined$NPX_3k))
 
     #The quantile points used for adapting the nonelinear spline
@@ -115,15 +110,13 @@ olink_normalization_qs <- function(exploreht_df,
     #The nonlinear model
     spline_model <- lm(mapped_3k ~ splines::ns(npx_3k, knots = knots_npx3k))
 
-    # explore3072_df_tmp <- explore3072_df |>
-    #   dplyr::filter(OlinkID %in% unique(model_data_joined$OlinkID))
-
     #Output (just making sure that correct points are output)
     newdata <- as.data.frame(c(explore3072_df$NPX))
     colnames(newdata) <- "npx_3k"
     preds <- as.data.frame(stats::predict(spline_model, newdata = newdata))
     colnames(preds) <- "QSNormalizedNPX"
     preds$SampleID <- explore3072_df$SampleID
+    preds$OlinkID <- explore3072_df$OlinkID
 
     return(preds)
   }
@@ -178,13 +171,12 @@ olink_normalization_qs <- function(exploreht_df,
     dplyr::distinct()
 
   ecdf_transform <- model_data_joined |>
-    dplyr::group_by(OlinkID) |>
-    group_modify(~ecdf_transform_npx(data = .x)) |>
-    # dplyr::reframe(ecdf_transform_npx(dplyr::pick(everything()))) |>
+    # dplyr::group_by(OlinkID) |>
+    # group_modify(~ecdf_transform_npx(data = .x)) |>
+    dplyr::reframe(ecdf_transform_npx(dplyr::pick(everything()))) |>
     # dplyr::ungroup() |>
     dplyr::mutate(Project = explore3072_name)
 
-  # TODO : check with median normalized NPX, should it be the NPX value or NA??
   all_ht <- exploreht_df |>
     dplyr::mutate(QSNormalizedNPX = NPX) |>
     dplyr::select(all_of(c("SampleID", "OlinkID", "QSNormalizedNPX"))) |>
