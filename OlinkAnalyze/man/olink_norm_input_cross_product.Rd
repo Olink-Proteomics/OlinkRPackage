@@ -2,7 +2,7 @@
 % Please edit documentation in R/olink_normalization_utils.R
 \name{olink_norm_input_cross_product}
 \alias{olink_norm_input_cross_product}
-\title{Check the type of bridge normalization}
+\title{Check if bridge or cross-platform normalization}
 \usage{
 olink_norm_input_cross_product(lst_df, lst_cols, reference_project)
 }

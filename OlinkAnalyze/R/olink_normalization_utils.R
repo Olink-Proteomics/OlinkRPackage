@@ -903,7 +903,7 @@ olink_norm_input_check_df_cols <- function(lst_df) {
 
 }
 
-#' Check the type of bridge normalization
+#' Check if bridge or cross-platform normalization
 #'
 #' @author
 #'   Klev Diamanti
