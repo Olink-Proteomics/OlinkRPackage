@@ -2427,14 +2427,14 @@ test_that(
     expect_no_condition(
       object = lst_cross_prod_out <- olink_norm_input_cross_product(
         lst_df = list(
-          "3K" = data_3k,
-          "HT" = data_ht
+          "p1" = data_3k,
+          "p2" = data_ht
         ),
         lst_cols = list(
-          "3K" = list(olink_id = "OlinkID"),
-          "HT" = list(olink_id = "OlinkID")
+          "p1" = list(olink_id = "OlinkID"),
+          "p2" = list(olink_id = "OlinkID")
         ),
-        reference_project = "HT"
+        reference_project = "p2"
       )
     )
 
@@ -2443,7 +2443,7 @@ test_that(
       expected = list(
         norm_mode = olink_norm_modes$norm_ht_3k,
         lst_df = list(
-          "3K" = data_3k |>
+          "p1" = data_3k |>
             dplyr::rename(
               "OlinkID_E3072" = "OlinkID"
             ) |>
@@ -2457,7 +2457,7 @@ test_that(
               by = "OlinkID_E3072",
               relationship = "many-to-one"
             ),
-          "HT" = data_ht |>
+          "p2" = data_ht |>
             dplyr::rename(
               "OlinkID_HT" = "OlinkID"
             ) |>

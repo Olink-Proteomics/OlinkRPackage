@@ -919,7 +919,7 @@ olink_norm_input_cross_product <- function(lst_df,
   # check if reference dataset is HT if cross-product normalization ----
 
   if (norm_mode == olink_norm_modes$norm_ht_3k
-      && names(lst_product)[names(lst_product) == "HT"] != reference_project) {
+      && names(lst_product)[lst_product == "HT"] != reference_project) {
 
     cli::cli_abort(
       c(
