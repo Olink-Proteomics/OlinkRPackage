@@ -831,6 +831,72 @@ olink_norm_input_check_df_cols <- function(lst_df) {
 
   }
 
+  # check that column classes of datasets match ----
+
+  # we need to check if classes of columns of the datasets to be normalized
+  # match each other. This is to ensure that when we do bind_rows, there is no
+  # error.
+
+  lst_class <- lapply(names(lst_df), function(l_name) {
+    lst_df[[l_name]] |>
+      dplyr::select(
+        dplyr::all_of(
+          unlist(lst_req_col[[l_name]])
+        )
+      ) |>
+      dplyr::collect() |>
+      sapply(class)
+  })
+  names(lst_class) <- names(lst_df)
+  # find shared names across all datasets
+  lst_class_shared <- Reduce(f = intersect, x = lapply(lst_class, names))
+  # check classes across shared columns
+  lst_class_non_match <- lst_class |>
+    lapply(function(x) x[names(x) %in% lst_class_shared]) |>
+    as.data.frame() |>
+    tibble::rownames_to_column(
+      var = "df_name"
+    ) |>
+    dplyr::as_tibble() |>
+    tidyr::pivot_longer(
+      cols = -dplyr::all_of(c("df_name")),
+      names_to = "df",
+      values_to = "class"
+    ) |>
+    dplyr::group_by(
+      dplyr::pick(
+        dplyr::all_of("df_name")
+      )
+    ) |>
+    dplyr::summarise(
+      n = unique(.data[["class"]]) |> length(),
+      .groups = "drop"
+    ) |>
+    dplyr::filter(
+      .data[["n"]] > 1L
+    ) |>
+    dplyr::mutate(
+      alt_names = required_cols[.data[["df_name"]]] |>
+        sapply(cli::ansi_collapse, sep2 = ", or ", last = ", or ")
+    )
+
+  # error message if non matching classes
+  if (nrow(lst_class_non_match) != 0L) {
+    cli::cli_abort(
+      c(
+        "x" = "{cli::qty(lst_class_non_match$df_name)} Column{?s} with
+        non-matching classes:",
+        paste0("* \"", lst_class_non_match$df_name,
+               "\" with alternative names: ",
+               lst_class_non_match$alt_names),
+        "i" = "Column classes should be identical between datasets to be
+        normalized."
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+  }
+
   # return list of required colnames ----
 
   return(lst_req_col)

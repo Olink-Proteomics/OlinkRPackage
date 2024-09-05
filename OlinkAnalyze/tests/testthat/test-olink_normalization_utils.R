@@ -2356,6 +2356,50 @@ test_that(
   }
 )
 
+test_that(
+  "olink_norm_input_check_df_cols - error - non-matching col classes",
+  {
+    skip_if_not_installed("arrow")
+
+    # 1 non-matching col ----
+
+    expect_error(
+      object = olink_norm_input_check_df_cols(
+        lst_df = list(
+          "p1" = npx_data1 |>
+            dplyr::mutate(
+              SampleID = as.factor(.data[["SampleID"]])
+            ),
+          "p2" = npx_data2 |>
+            arrow::as_arrow_table()
+        ) |>
+          lapply(dplyr::mutate, Normalization = "Intensity")
+      ),
+      regexp = "Column with non-matching classes"
+    )
+
+    # 3 non-matching cols ----
+
+    expect_error(
+      object = olink_norm_input_check_df_cols(
+        lst_df = list(
+          "p1" = npx_data1 |>
+            dplyr::mutate(
+              SampleID = as.factor(.data[["SampleID"]])
+            ),
+          "p2" = npx_data2 |>
+            dplyr::mutate(
+              NPX = as.character(.data[["NPX"]])
+            ) |>
+            arrow::as_arrow_table()
+        ) |>
+          lapply(dplyr::mutate, Normalization = "Intensity")
+      ),
+      regexp = "Columns with non-matching classes"
+    )
+  }
+)
+
 # Test olink_norm_input_cross_product ----
 
 test_that(
