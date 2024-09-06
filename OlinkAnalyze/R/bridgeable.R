@@ -195,15 +195,15 @@ bridgeable <- function(data_Explore384,
     na.omit() |>
     dplyr::group_by(.data[["ids"]]) |>
     dplyr::mutate(range_ht =
-                    quantile(.data[["NPX_ht"]][.data[["Count_ht"]] > 10],
+                    stats::quantile(.data[["NPX_ht"]][.data[["Count_ht"]] > 10],
                              probs = 0.9) -
-                    quantile(.data[["NPX_ht"]][.data[["Count_ht"]] > 10],
+                    stats::quantile(.data[["NPX_ht"]][.data[["Count_ht"]] > 10],
                              probs = 0.1),
                   # using 10% to 90% quantiles for checking range /IQR
-                  range_3k = quantile(.data[["NPX_3k"]][.data[["Count_3k"]] >
+                  range_3k = stats::quantile(.data[["NPX_3k"]][.data[["Count_3k"]] >
                                                           10],
                                       probs = 0.9) -
-                    quantile(.data[["NPX_3k"]][.data[["Count_3k"]] > 10],
+                    stats::quantile(.data[["NPX_3k"]][.data[["Count_3k"]] > 10],
                              probs = 0.1),
                   range_diff = abs(.data[["range_ht"]] - .data[["range_3k"]]),
                   iqr_ht = IQR(.data[["NPX_ht"]]),
