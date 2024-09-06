@@ -13,8 +13,10 @@
 #' be normalized to each other. The input datasets should be exported from Olink
 #' software and should not be altered prior to importing them to this function.
 #'
-#' @param data_Explore384 A Explore384 NPX file
-#' @param data_HT An Explore HT NPX file
+#' @param data_HT Olink Explore HT dataset to be used for normalization
+#' (required).
+#' @param data_Explore384 Olink Explore 3072 dataset to be used for
+#' normalization (required).
 #'
 #' @return A "tibble" in long format with the following columns:
 #' \itemize{
