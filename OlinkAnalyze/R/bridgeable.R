@@ -1,7 +1,17 @@
-#' Function to find bridgeable assays from 3K to HT
+#' Identify if assays shared between Olink Explore 3072 and Olink Explore HT are
+#' can be bridged
 #'
-#' Imports an Explore 384 and Explore HT NPX file exported from Olink Software
-#' No alterations to the output format is allowed.
+#' @author
+#'   Amrita Kar
+#'   Marianne Sandin
+#'   Danai G. Topouza
+#'   Klev Diamanti
+#'
+#' @description
+#' The function uses a dataset from Olink Explore 3072 and a datasets from Olink
+#' Explore HT, and examines if the matched assays between the two products can
+#' be normalized to each other. The input datasets should be exported from Olink
+#' software and should not be altered prior to importing them to this function.
 #'
 #' @param data_Explore384 A Explore384 NPX file
 #' @param data_HT An Explore HT NPX file
@@ -15,7 +25,9 @@
 #'    \item{Bridgeable:} Bridging Flag
 #' }
 #' Additional columns may be present or missing depending on the platform
+#'
 #' @keywords NPX Bridging
+#'
 #' @examples
 #' \donttest{
 #' results <- OlinkAnalyze:::bridgeable(
@@ -24,11 +36,6 @@
 #' )
 #' }
 #'
-#' @author Amrita Kar
-#' @author Marianne Sandin
-#' @author Danai G. Topouza
-
-
 bridgeable <- function(data_Explore384,
                        data_HT) {
   # add a concatenated version of the 3K-HT OlinkIDs to the reference and non-
