@@ -5,7 +5,7 @@
 \title{Check \var{datasets} and \var{reference_medians} for unexpected Olink
 identifiers or excluded assays}
 \usage{
-olink_norm_input_clean_assays(lst_df, reference_medians, lst_cols)
+olink_norm_input_clean_assays(lst_df, reference_medians, lst_cols, norm_mode)
 }
 \arguments{
 \item{lst_df}{Named list of datasets to be normalized.}
@@ -15,6 +15,10 @@ Used for reference median normalization.}
 
 \item{lst_cols}{Named list of vectors with the required column names for each
 dataset in \var{lst_df}.}
+
+\item{norm_mode}{Character string indicating the type of normalization to be
+performed. Expecting one of
+bridge, subset, ref_median or norm_ht_3k. # nolint}
 }
 \value{
 A named list containing \var{lst_df} and \var{reference_medians}
