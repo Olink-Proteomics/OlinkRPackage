@@ -37,7 +37,7 @@ bridgeable <- function(data_Explore384,
   # create unique IDs even with the repeated correlation assays in HT and 3K.
 
   map_oid_ht_3k <- function(explore_df) {
-    oid_ht_3k_mapping <- OlinkAnalyze:::eHT_e3072_mapping
+    oid_ht_3k_mapping <- eHT_e3072_mapping
 
     oid_ht_3k_mapping <- oid_ht_3k_mapping |>
       dplyr::mutate(OlinkID_HT_3K =
@@ -144,7 +144,7 @@ bridgeable <- function(data_Explore384,
   }
 
 
-  e3k_eHT_mapping <- OlinkAnalyze:::eHT_e3072_mapping
+  e3k_eHT_mapping <- eHT_e3072_mapping
 
   data_Explore384 <- data_Explore384 |>
     dplyr::filter(
