@@ -2,29 +2,32 @@
 % Please edit documentation in R/bridgeable.R
 \name{bridgeable}
 \alias{bridgeable}
-\title{Function to find bridgeable assays from 3K to HT}
+\title{Identify if assays shared between Olink Explore 3072 and Olink Explore HT are
+can be bridged}
 \usage{
 bridgeable(data_Explore384, data_HT)
 }
 \arguments{
-\item{data_Explore384}{A Explore384 NPX file}
+\item{data_Explore384}{Olink Explore 3072 dataset to be used for
+normalization (required).}
 
-\item{data_HT}{An Explore HT NPX file}
+\item{data_HT}{Olink Explore HT dataset to be used for normalization
+(required).}
 }
 \value{
-A "tibble" in long format. Columns include:
+A "tibble" in long format with the following columns:
 \itemize{
-\item{OlinkIDconcat:} Concatenated Olink Explore HT and Explore 3072 IDs
-\item{OlinkID_HT:} Olink ID HT
-\item{OlinkID_E3072:} Olink ID Explore 3072
-\item{Assay:} Assay HT
-\item{Bridgeable:} Bridging Flag
+\item{OlinkID:} Underscore-separated Olink identifiers of matching assays
+between Olink Explore HT and Olink Explore 3072.
+\item{IsBridgeable:} A boolean flag indicating whether the matching assays
+are considered as bridgeable or not.
 }
-Additional columns may be present or missing depending on the platform
 }
 \description{
-Imports an Explore 384 and Explore HT NPX file exported from Olink Software
-No alterations to the output format is allowed.
+The function uses a dataset from Olink Explore 3072 and a datasets from Olink
+Explore HT, and examines if the matched assays between the two products can
+be normalized to each other. The input datasets should be exported from Olink
+software and should not be altered prior to importing them to this function.
 }
 \examples{
 \donttest{
@@ -37,10 +40,9 @@ results <- OlinkAnalyze:::bridgeable(
 }
 \author{
 Amrita Kar
-
 Marianne Sandin
-
 Danai G. Topouza
+Klev Diamanti
 }
 \keyword{Bridging}
 \keyword{NPX}
