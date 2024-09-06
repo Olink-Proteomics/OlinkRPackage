@@ -28,8 +28,10 @@ No alterations to the output format is allowed.
 }
 \examples{
 \donttest{
-results <- bridgeable(data_Explore384 = data_3k,
-data_HT = OlinkAnalyze:::data_ht)
+results <- OlinkAnalyze:::bridgeable(
+  data_Explore384 = OlinkAnalyze:::data_3k,
+  data_HT = OlinkAnalyze:::data_ht
+)
 }
 
 }
