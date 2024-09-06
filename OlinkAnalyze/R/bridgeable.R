@@ -16,15 +16,13 @@
 #' @param data_Explore384 A Explore384 NPX file
 #' @param data_HT An Explore HT NPX file
 #'
-#' @return A "tibble" in long format. Columns include:
+#' @return A "tibble" in long format with the following columns:
 #' \itemize{
-#'    \item{OlinkIDconcat:} Concatenated Olink Explore HT and Explore 3072 IDs
-#'    \item{OlinkID_HT:} Olink ID HT
-#'    \item{OlinkID_E3072:} Olink ID Explore 3072
-#'    \item{Assay:} Assay HT
-#'    \item{Bridgeable:} Bridging Flag
+#'    \item{OlinkID:} Underscore-separated Olink identifiers of matching assays
+#'    between Olink Explore HT and Olink Explore 3072.
+#'    \item{IsBridgeable:} A boolean flag indicating whether the matching assays
+#'    are considered as bridgeable or not.
 #' }
-#' Additional columns may be present or missing depending on the platform
 #'
 #' @keywords NPX Bridging
 #'
