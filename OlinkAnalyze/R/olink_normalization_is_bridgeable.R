@@ -158,7 +158,7 @@ olink_normalization_is_bridgeable <- function(data_Explore384,
                        names_glue = "{.value}_{Platform}") |>
     dplyr::group_by(.data[["OlinkID"]]) |>
     # Drop assays with count < 10
-    dplyr::filter(.data[["Count_3k"]] > 10 & .data[["Count_3k"]] > 10) |>
+    dplyr::filter(.data[["Count_3k"]] > 10 & .data[["Count_ht"]] > 10) |>
     dplyr::mutate(range_ht =
                     stats::quantile(.data[["NPX_ht"]],
                                     probs = 0.9) -
