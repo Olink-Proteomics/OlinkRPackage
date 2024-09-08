@@ -1,38 +1,18 @@
-#' Identify if assays shared between Olink Explore 3072 and Olink Explore HT are
-#' can be bridged
+#' Function to find bridgeable assays from 3K to HT
 #'
-#' @author
-#'   Amrita Kar
-#'   Marianne Sandin
-#'   Danai G. Topouza
-#'   Klev Diamanti
+#' Imports an Explore 384 and Explore HT NPX file exported from Olink Software
+#' No alterations to the output format is allowed.
 #'
-#' @description
-#' The function uses a dataset from Olink Explore 3072 and a datasets from Olink
-#' Explore HT, and examines if the matched assays between the two products can
-#' be normalized to each other. The input datasets should be exported from Olink
-#' software and should not be altered prior to importing them to this function.
+#' @param data_Explore384 A Explore384 NPX file
+#' @param data_HT An Explore HT NPX file
 #'
-#' @param data_HT Olink Explore HT dataset to be used for normalization
-#' (required).
-#' @param data_Explore384 Olink Explore 3072 dataset to be used for
-#' normalization (required).
-#'
-#' @return A "tibble" in long format with the following columns:
+#' @return A "tibble" in long format. Columns include:
 #' \itemize{
-<<<<<<< HEAD:OlinkAnalyze/R/bridgeable.R
-#'    \item{OlinkID:} Underscore-separated Olink identifiers of matching assays
-#'    between Olink Explore HT and Olink Explore 3072.
-#'    \item{IsBridgeable:} A boolean flag indicating whether the matching assays
-#'    are considered as bridgeable or not.
-=======
 #'    \item{OlinkID_concat:} Concatenated Olink Explore HT and Explore 3072 IDs
 #'    \item{Bridgeable:} Bridging Flag
->>>>>>> 52c0f61618323ec5e3ba1cb416552cd66a826d0a:OlinkAnalyze/R/olink_normalization_is_bridgeable.R
 #' }
-#'
+#' Additional columns may be present or missing depending on the platform
 #' @keywords NPX Bridging
-#'
 #' @examples
 #' \donttest{
 #' results <- OlinkAnalyze:::olink_normalization_is_bridgeable(
@@ -41,10 +21,6 @@
 #' )
 #' }
 #'
-<<<<<<< HEAD:OlinkAnalyze/R/bridgeable.R
-bridgeable <- function(data_Explore384,
-                       data_HT) {
-=======
 #' @author Amrita Kar
 #' @author Marianne Sandin
 #' @author Danai G. Topouza
@@ -55,19 +31,14 @@ olink_normalization_is_bridgeable <- function(data_Explore384,
 
   set.seed(123)
 
->>>>>>> 52c0f61618323ec5e3ba1cb416552cd66a826d0a:OlinkAnalyze/R/olink_normalization_is_bridgeable.R
   # add a concatenated version of the 3K-HT OlinkIDs to the reference and non-
   # reference data frames. This is done because the olink_normalization
   # function requires unique, overlapping OlinkIDs. This approach allows us to
   # create unique IDs even with the repeated correlation assays in HT and 3K.
 
   map_oid_ht_3k <- function(explore_df) {
-<<<<<<< HEAD:OlinkAnalyze/R/bridgeable.R
-    oid_ht_3k_mapping <- eHT_e3072_mapping |>
-=======
 
-    oid_ht_3k_mapping <- OlinkAnalyze:::eHT_e3072_mapping |>
->>>>>>> 52c0f61618323ec5e3ba1cb416552cd66a826d0a:OlinkAnalyze/R/olink_normalization_is_bridgeable.R
+    oid_ht_3k_mapping <- eHT_e3072_mapping |>
       dplyr::mutate(OlinkID_HT_3K =
                       paste(.data[["OlinkID_HT"]],
                             .data[["OlinkID_E3072"]], sep = "_")) |>
@@ -162,52 +133,6 @@ olink_normalization_is_bridgeable <- function(data_Explore384,
   }
 
 
-<<<<<<< HEAD:OlinkAnalyze/R/bridgeable.R
-  data_Explore384 <- data_Explore384 |>
-    dplyr::filter(
-      stringr::str_detect(string = .data[["SampleType"]], pattern = "SAMPLE"),
-      stringr::str_detect(string = .data[["AssayType"]], pattern = "assay")
-    ) |>
-    map_oid_ht_3k() |>
-    dplyr::mutate(OlinkID_Explore384 = substr(.data[["OlinkID"]], 10, 18)) |>
-    dplyr::rename(
-      Gene = .data[["Assay"]],
-      NPX_3k = .data[["NPX"]],
-      ids = .data[["OlinkID"]]
-    ) |>
-    dplyr::select(.data[["SampleID"]],
-                  .data[["ids"]],
-                  .data[["OlinkID_Explore384"]],
-                  .data[["NPX_3k"]],
-                  .data[["Count"]]) |>
-    dplyr::rename(Count_3k = .data[["Count"]]) |>
-    distinct()
-
-  # Count refers to HT counts
-  data_HT <- data_HT |>
-    dplyr::filter(
-      stringr::str_detect(string = .data[["SampleType"]], pattern = "SAMPLE"),
-      stringr::str_detect(string = .data[["AssayType"]], pattern = "assay")
-    ) |>
-    map_oid_ht_3k() |>
-    dplyr::rename(
-      Gene = .data[["Assay"]],
-      NPX_ht = .data[["NPX"]],
-      ids = .data[["OlinkID"]]
-    ) |>
-    dplyr::mutate(OlinkID = substr(.data[["ids"]], 1, 8)) |>
-    dplyr::select(.data[["SampleID"]],
-                  .data[["Gene"]],
-                  .data[["OlinkID"]],
-                  .data[["ids"]],
-                  .data[["UniProt"]],
-                  .data[["NPX_ht"]],
-                  .data[["Count"]]) |>
-    dplyr::mutate(Count_ht = .data[["Count"]]) |>
-    distinct()
-
-=======
->>>>>>> 52c0f61618323ec5e3ba1cb416552cd66a826d0a:OlinkAnalyze/R/olink_normalization_is_bridgeable.R
   data_mapped <- data_Explore384 |>
     map_oid_ht_3k() |>
     dplyr::filter(.data[["SampleID"]] %in% data_HT$SampleID) |> # Sample IDs must match
@@ -282,11 +207,7 @@ olink_normalization_is_bridgeable <- function(data_Explore384,
   # Adding type of normalization
   ks <- ks_results(data = data_mapped)
 
-<<<<<<< HEAD:OlinkAnalyze/R/bridgeable.R
   bridge_table <- eHT_e3072_mapping |>
-=======
-  bridge_table <- OlinkAnalyze:::eHT_e3072_mapping |>
->>>>>>> 52c0f61618323ec5e3ba1cb416552cd66a826d0a:OlinkAnalyze/R/olink_normalization_is_bridgeable.R
     dplyr::mutate(Bridgeable =
                     dplyr::if_else(.data[["OlinkID"]] %in%
                                      not_bridgeable, "Not Bridgeable",
