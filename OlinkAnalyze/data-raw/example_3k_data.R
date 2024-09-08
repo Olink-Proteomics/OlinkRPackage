@@ -35,8 +35,7 @@ df_samples <- dplyr::tibble(
               rep(x = "Plate1", times = length(sample_id_pc) / 2L),
               rep(x = "Plate2", times = length(sample_id_pc) / 2L),
               rep(x = "Plate1", times = length(sample_id_nc) / 2L),
-              rep(x = "Plate2", times = length(sample_id_nc) / 2L)
-  )
+              rep(x = "Plate2", times = length(sample_id_nc) / 2L))
 )
 
 # Generate assays
@@ -92,12 +91,18 @@ data_3k <- tidyr::expand_grid(
     SampleQC = "PASS"
   ) |>
   dplyr::as_tibble() |>
+  # add DAR ID
+  dplyr::mutate(
+    DataAnalysisRefID = paste0("DAR00", dplyr::cur_group_id()),
+    .by = dplyr::all_of(c("Panel", "Block"))
+  ) |>
   # modifying NPX range for 3K OID20054 to mark as 'not bridgeable'
   dplyr::mutate(
     NPX = dplyr::if_else(
       .data[["OlinkID"]] == "OID20054",
       jitter(NPX, factor = 1, amount = 2),
-      .data[["NPX"]])
+      .data[["NPX"]]
+    )
   )
 
 rm(df_assays, df_samples,

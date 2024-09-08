@@ -22,7 +22,8 @@ eHT_e3072_mapping <- readRDS(file = eHT_e3072_mapping_rds) |>
     dplyr::ends_with("_E3072")
   ) |>
   dplyr::mutate(
-    OlinkID = paste(.data[["OlinkID_HT"]], .data[["OlinkID_E3072"]], sep = "_")
+    OlinkID = paste(.data[["OlinkID_HT"]], .data[["OlinkID_E3072"]], sep = "_"),
+    Block_HT = as.character(.data[["Block_HT"]])
   ) |>
   dplyr::as_tibble()
 rm(eHT_e3072_mapping_rds)
