@@ -618,9 +618,14 @@ norm_internal_cross_product <- function(ref_df,
   # integrate normalization approaches ----
 
   # to be filled in
-  # combines df_norm_can_bridge, df_norm_bridge and df_norm_qq
+  # combines df_is_bridgeable, df_norm_bridge and df_norm_qq
   # stores the outcome in df_norm
-  df_norm <- df_norm_bridge
+  df_norm <- df_norm_bridge |>
+    dplyr::left_join(
+      df_is_bridgeable,
+      by = ref_cols$olink_id,
+      relationship = "many-to-one"
+    )
 
   # return ----
 
