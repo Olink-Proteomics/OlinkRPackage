@@ -296,12 +296,12 @@ olink_normalization_bridgeable <- function(lst_df,
     # normalization) and QQ normalization (quantile smoothing)
     dplyr::mutate(
       BridgingRecommendation = dplyr::case_when(
-        is.na(.data[["IsBridgeable"]]) ~ "Non Bridgeable",
+        is.na(.data[["IsBridgeable"]]) ~ "NotBridgeable",
         .data[["IsBridgeable"]] == TRUE &
-          .data[["ks_stat"]] <= 0.2 ~ "Median Centered",
+          .data[["ks_stat"]] <= 0.2 ~ "MedianCentering",
         .data[["IsBridgeable"]] == TRUE &
-          .data[["ks_stat"]] > 0.2 ~ "Quantile Smoothing",
-        .data[["IsBridgeable"]] == FALSE ~ "Non Bridgeable",
+          .data[["ks_stat"]] > 0.2 ~ "QuantileSmoothing",
+        .data[["IsBridgeable"]] == FALSE ~ "NotBridgeable",
         TRUE ~ NA_character_,
         .default = NA_character_
       )

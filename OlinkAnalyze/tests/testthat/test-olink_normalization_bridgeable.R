@@ -43,7 +43,7 @@ test_that(
     expect_equal(
       object = is_bridgeable_result |>
         dplyr::filter(
-          .data[["BridgingRecommendation"]] == "Median Centered"
+          .data[["BridgingRecommendation"]] == "MedianCentering"
         ) |>
         dplyr::distinct() |>
         nrow(),
@@ -53,7 +53,7 @@ test_that(
     expect_equal(
       object = is_bridgeable_result |>
         dplyr::filter(
-          .data[["BridgingRecommendation"]] == "Quantile Smoothing"
+          .data[["BridgingRecommendation"]] == "QuantileSmoothing"
         ) |>
         dplyr::distinct() |>
         nrow(),
@@ -63,7 +63,7 @@ test_that(
     expect_equal(
       object = is_bridgeable_result |>
         dplyr::filter(
-          .data[["BridgingRecommendation"]] == "Non Bridgeable"
+          .data[["BridgingRecommendation"]] == "NotBridgeable"
         ) |>
         dplyr::distinct() |>
         nrow(),
@@ -79,7 +79,7 @@ test_that(
         dplyr::pull(
           .data[["BridgingRecommendation"]]
         ),
-      expected = "Non Bridgeable"
+      expected = "NotBridgeable"
     )
   }
 )
