@@ -33,6 +33,27 @@ Explore HT, and examines if the matched assays between the two products can
 be normalized to each other. The input datasets should be exported from Olink
 software and should not be altered prior to importing them to this function.
 }
+\details{
+All processes below assume that the first element from \var{lst_df} is the
+reference dataset (e.g. Olink Explore HT), and the other element of the list
+is the non-reference dataset (e.g. Olink Explore 3072). The input datasets
+\strong{have to be pre-processed} by \code{\link{olink_norm_input_check}}
+which will take care of mapping of assay identifiers and various checks.
+Also, the input datasets should exclusively contain datapoints from bridge
+samples. When this function is called from the function
+\code{\link{olink_normalization}}, then the list is created seamlessly in the
+background, and the datasets have been already processed by
+\code{\link{olink_norm_input_check}}.
+
+The input \var{ref_cols} is a named list masking column names of the
+reference dataset. This list is generated automatically from
+\code{\link{olink_norm_input_check}} when it is called from
+\code{\link{olink_normalization}}. In addition,
+\code{\link{olink_normalization}} has also utilized
+\code{\link{norm_internal_rename_cols}} to rename the columns of the
+non-reference dataset according to the ones of the reference dataset, hence
+all column names should match.
+}
 \examples{
 \donttest{
 # check input datasets

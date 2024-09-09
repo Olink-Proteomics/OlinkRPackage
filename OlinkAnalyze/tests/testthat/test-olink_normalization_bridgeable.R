@@ -20,7 +20,6 @@ test_that(
       regexp = "Cross-product normalization will be performed!"
     )
 
-
     lst_df <- list(
       data_explore_check$ref_df,
       data_explore_check$not_ref_df

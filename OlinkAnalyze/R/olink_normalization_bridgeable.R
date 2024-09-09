@@ -13,6 +13,27 @@
 #' be normalized to each other. The input datasets should be exported from Olink
 #' software and should not be altered prior to importing them to this function.
 #'
+#' @details
+#' All processes below assume that the first element from \var{lst_df} is the
+#' reference dataset (e.g. Olink Explore HT), and the other element of the list
+#' is the non-reference dataset (e.g. Olink Explore 3072). The input datasets
+#' \strong{have to be pre-processed} by \code{\link{olink_norm_input_check}}
+#' which will take care of mapping of assay identifiers and various checks.
+#' Also, the input datasets should exclusively contain datapoints from bridge
+#' samples. When this function is called from the function
+#' \code{\link{olink_normalization}}, then the list is created seamlessly in the
+#' background, and the datasets have been already processed by
+#' \code{\link{olink_norm_input_check}}.
+#'
+#' The input \var{ref_cols} is a named list masking column names of the
+#' reference dataset. This list is generated automatically from
+#' \code{\link{olink_norm_input_check}} when it is called from
+#' \code{\link{olink_normalization}}. In addition,
+#' \code{\link{olink_normalization}} has also utilized
+#' \code{\link{norm_internal_rename_cols}} to rename the columns of the
+#' non-reference dataset according to the ones of the reference dataset, hence
+#' all column names should match.
+#'
 #' @param lst_df A named list of the 2 input datasets. First element should be
 #' the reference dataset from Olink Explore HT and the second element should
 #' originate from Olink Explore 3072.
@@ -72,37 +93,33 @@
 olink_normalization_bridgeable <- function(lst_df,
                                            ref_cols,
                                            seed = 1) {
-  # NOTE: ----
-  # all processes below assume that the first element from lst_df is the
-  # reference datasets (e.g. Olink Explore HT), and the other element of the
-  # list is the non-reference datasets (e.g. Olink Explore 3072). If the input
-  # datasets have gone through the internal function olink_norm_input_check,
-  # then this should be take care of seamlessly.
-  # Also because the datasets have gone through olink_norm_input_check, we have
-  # already checked that bridge samples are in both datasets and they have the
-  # same names.
-
   # help vars ----
 
   set.seed(seed = seed)
 
+  # variables to mark outliers, filter counts and calculate outlier limits
   iqr_sd <- 3L # nolint
   min_datapoint_cnt <- 10L # nolint
   med_cnt <- 150L # nolint
+
   # column names from each product quantification to allow computations
   quant_names <- paste(ref_cols$quant, names(lst_df), sep = "_")
 
   # cleanup input datasets ----
 
-  lst_df_combo <- lapply(
+  lst_df_clean <- lapply(
     lst_df,
     function(l_df) {
       l_df |>
         dplyr::filter(
+          # only customer samples
           .data[["SampleType"]] == "SAMPLE"
+          # remove interal control assays
           & .data[["AssayType"]] == "assay"
+          # remove datapoints with very few counts
           & .data[["Count"]] > .env[["min_datapoint_cnt"]]
         ) |>
+        # keep only relevant columns (e.g. SampleID, OlinkID, NPX, Count)
         dplyr::select(
           dplyr::all_of(
             c(
@@ -118,13 +135,13 @@ olink_normalization_bridgeable <- function(lst_df,
 
   # append the two datasets to each other ----
 
-  df_combo <- lst_df_combo |>
+  df_combo <- lst_df_clean |>
     # append the datasets to each other
     dplyr::bind_rows(
       .id = "df_name"
     ) |>
-    # pivot to wider so that there is one entry for each concatenated OlinkID
-    # and SampleID
+    # pivot to wider so that there is one entry for each concatenated assay and
+    # sample identifier
     tidyr::pivot_wider(
       names_from = dplyr::all_of(
         c("df_name")
@@ -137,8 +154,10 @@ olink_normalization_bridgeable <- function(lst_df,
       )
     ) |>
     # drop NA values not matching between datasets
+    # this is not intended to remove data from non-matching sample identifiers,
+    # but to remove datapoints non-matching because they were filtered out.
     tidyr::drop_na()
-  rm(lst_df_combo)
+  rm(lst_df_clean)
 
   # check range and low counts ----
 
@@ -149,9 +168,7 @@ olink_normalization_bridgeable <- function(lst_df,
 
   df_combo <- df_combo |>
     dplyr::group_by(
-      dplyr::pick(
-        c(ref_cols$olink_id)
-      )
+      .data[[ref_cols$olink_id]]
     ) |>
     dplyr::mutate(
       # quantification range
@@ -173,6 +190,7 @@ olink_normalization_bridgeable <- function(lst_df,
       )
     ) |>
     dplyr::ungroup() |>
+    # compute the actual range and the low count flag
     dplyr::mutate(
       range_diff = abs(.data[[range_names[1L]]] - .data[[range_names[2L]]]),
       low_cnt = .data[[med_cnt_names[1L]]] | .data[[med_cnt_names[2L]]]
@@ -220,7 +238,7 @@ olink_normalization_bridgeable <- function(lst_df,
       .data[["is_outlier"]] == FALSE
     )
 
-  # correlation of quantifications ----
+  # correlation of quantifications and comparison of their distributions ----
 
   df_combo <- df_combo |>
     dplyr::group_by(
@@ -265,7 +283,7 @@ olink_normalization_bridgeable <- function(lst_df,
         TRUE
       )
     ) |>
-    # add assays that might have been removed from filterings above
+    # add assays that might have been removed from filtering above
     dplyr::full_join(
       lst_df[[1L]] |>
         dplyr::select(
@@ -288,6 +306,7 @@ olink_normalization_bridgeable <- function(lst_df,
         .default = NA_character_
       )
     ) |>
+    # keep only relevant columns
     dplyr::select(
       dplyr::all_of(
         c(ref_cols$olink_id, "BridgingRecommendation")
