@@ -259,7 +259,7 @@ olink_normalization_bridgeable <- function(lst_df,
         alternative = "two.sided",
         exact = NULL,
         simulate.p.value = FALSE,
-        B = 2000
+        B = 2000L
       )$statistic
     ) |>
     dplyr::ungroup()
