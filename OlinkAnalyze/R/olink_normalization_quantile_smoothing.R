@@ -66,7 +66,7 @@ olink_normalization_qs <- function(exploreht_df,
           stringr::str_detect(string = .data[["AssayType"]],
                               pattern = "assay")
         ) |>
-        inner_join(oid_ht_3k_mapping, relationship = "many-to-many",
+        dplyr::inner_join(oid_ht_3k_mapping, relationship = "many-to-many",
                    by = c("OlinkID" = "OlinkID_E3072")) |>
         dplyr::mutate(OlinkID = .data[["OlinkID_HT_3K"]]) |>
         dplyr::select(-.data[["OlinkID_HT_3K"]], -.data[["OlinkID_HT"]]) |>
@@ -96,11 +96,12 @@ olink_normalization_qs <- function(exploreht_df,
       return(preds)
     }
 
-    #Quantiles of 3k mapped to quantiles of HT
+    #The inverse if the ECDF are the quantiles
+    ecdf_ht_inv <- function(x) {stats::quantile(model_data_joined$NPX_ht, x)}
 
-    mapped_3k <- stats::quantile(model_data_joined$NPX_ht,
-                                 sort(stats::ecdf(model_data_joined$NPX_3k)
-                                      (model_data_joined$NPX_3k)))
+    #Quantiles of 3k mapped to quantiles of HT
+    mapped_3k <- ecdf_ht_inv(environment(ecdf(model_data_joined$NPX_3k))$y)
+
     npx_3k <- sort(unique(model_data_joined$NPX_3k))
 
     #The quantile points used for adapting the nonelinear spline
@@ -150,10 +151,9 @@ olink_normalization_qs <- function(exploreht_df,
       Project = explore3072_name
     )
 
-  # Filter low count samples for both platforms
   model_explore3072_df <- explore3072_df |>
     dplyr::filter(SampleID %in% bridge_samples$DF_3k) |>
-    dplyr::filter(!(is.na(NPX))) |> # count is only observed for HT
+    dplyr::filter(!(is.na(NPX))) |>
     dplyr::rename(NPX_3k = NPX) |>
     dplyr::select(all_of(c("SampleID", "OlinkID", "NPX_3k"))) |>
     dplyr::distinct()
@@ -162,6 +162,7 @@ olink_normalization_qs <- function(exploreht_df,
     dplyr::filter(SampleID %in% bridge_samples$DF_ht) |>
     dplyr::filter(!(is.na(NPX))) |>
     dplyr::rename(NPX_ht = NPX) |>
+    # count is only observed for HT
     dplyr::select(all_of(c("SampleID", "OlinkID", "NPX_ht", "Count"))) |>
     dplyr::distinct()
 
