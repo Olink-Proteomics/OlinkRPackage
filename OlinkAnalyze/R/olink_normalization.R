@@ -570,7 +570,14 @@ norm_internal_cross_product <- function(ref_df,
   lst_df <- list(
     ref_df,
     not_ref_df
-  )
+  ) |>
+    # keep only bridge samples
+    lapply(function(l_df) {
+      l_df |>
+        dplyr::filter(
+          .data[[ref_cols$sample_id]] %in% .env[["ref_samples"]]
+        )
+    })
   names(lst_df) <- c(ref_name, not_ref_name)
 
   df_is_bridgeable <- olink_normalization_bridgeable(
