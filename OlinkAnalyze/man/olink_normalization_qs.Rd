@@ -4,44 +4,38 @@
 \alias{olink_normalization_qs}
 \title{Quantile smoothing normalization of all proteins between two NPX projects.}
 \usage{
-olink_normalization_qs(
-  exploreht_df,
-  explore3072_df,
-  bridge_samples,
-  exploreht_name = "reference",
-  explore3072_name = "new"
-)
+olink_normalization_qs(lst_df, ref_cols, bridge_samples)
 }
 \arguments{
-\item{exploreht_df}{Data frame of the first project, must be Explore HT
-data (required). (default: reference)}
+\item{lst_df}{A named list of the 2 input datasets. First element should be
+the reference dataset from Olink Explore HT and the second element should
+originate from Olink Explore 3072. (required)}
 
-\item{explore3072_df}{Data frame of the second project, must be Explore
-3072 data (required). (default : new)}
+\item{ref_cols}{A named list with the column names to use. Exported from
+olink_norm_input_check. (required)}
 
-\item{bridge_samples}{Named list of 2 arrays containing, SampleID of shared
-samples to be used for the calculation of adjustment factor. The
-names of the two arrays should be DF_ht and DF_3k corresponding to projects
-HT and 3072, respectively. Arrays should be of equal length and index of each
-entry should correspond to the same sample. (required)}
-
-\item{exploreht_name}{Name of Explore HT project (default: reference)}
-
-\item{explore3072_name}{Name of Explore 3072  project (default: new)}
+\item{bridge_samples}{Character vector of samples to be used for the
+quantile mapping. (required)}
 }
 \value{
-A "tibble" of NPX data in long format containing qs normalized NPX
-values, including adjustment factors and name of project.
+A "tibble" of Olink data in long format containing both input
+datatsets with the quantile normalized quantifications.
 }
 \description{
-Normalizes two NPX projects (data frames) using shared samples.\cr\cr
+This function uses bridge samples to map quantiles of the non-reference
+dataset to the ones of the reference dataset. Mapped quantiles are used to
+transform the quantifications of the the non-reference dataset to the
+reference.
+}
+\details{
+We need to add some details from the tutorial/education material to describr
+the function in a bit more detail.
 }
 \author{
 Amrita Kar
-
 Marianne Sandin
-
 Masoumeh Sheikhi
+Klev Diamanti
 }
 \keyword{;}
 \keyword{Normalization;}
