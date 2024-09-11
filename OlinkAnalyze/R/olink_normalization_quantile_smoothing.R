@@ -96,8 +96,11 @@ olink_normalization_qs <- function(exploreht_df,
       names = FALSE
     )
 
-    #The nonlinear model
-    spline_model <- lm(mapped_3k ~ splines::ns(notref_quant, knots = knots_npx3k))
+    # the non linear model
+    spline_model <- stats::lm(
+      formula = mapped_3k ~ splines::ns(x = notref_quant,
+                                                   knots = notref_knots)
+    )
 
     #Output (just making sure that correct points are output)
     newdata <- as.data.frame(c(explore3072_df$NPX))
