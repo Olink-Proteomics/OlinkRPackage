@@ -55,11 +55,24 @@ olink_normalization_qs <- function(exploreht_df,
       return(preds)
     }
 
-    #The inverse if the ECDF are the quantiles
-    ecdf_ht_inv <- function(x) {stats::quantile(model_data_joined$NPX_ht, x)}
-
-    #Quantiles of 3k mapped to quantiles of HT
-    mapped_3k <- ecdf_ht_inv(environment(ecdf(model_data_joined$NPX_3k))$y)
+    # quantiles of not reference quantification (e.g. NPX from 3K) mapped to
+    # quantiles of reference quantification (e.g. NPX from HT)
+    notref_ecdf <- environment(
+      fun = model_data |>
+        dplyr::pull(
+          .data[[quant_col$notref]]
+        ) |>
+        stats::ecdf()
+    )
+    # the inverse if the ECDF are the quantiles
+    mapped_3k <- model_data |>
+      dplyr::pull(
+        .data[[quant_col$ref]]
+      ) |>
+      stats::quantile(
+        probs = notref_ecdf$y,
+        names = FALSE
+      )
 
     npx_3k <- sort(unique(model_data_joined$NPX_3k))
 
