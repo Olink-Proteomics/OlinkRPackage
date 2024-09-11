@@ -66,7 +66,7 @@ olink_normalization_qs <- function(exploreht_df,
         stats::ecdf()
     )
     # the inverse if the ECDF are the quantiles
-    mapped_3k <- model_data_joined |>
+    notref_map_quantiles <- model_data_joined |>
       dplyr::pull(
         .data[[quant_col$ref]]
       ) |>
@@ -98,7 +98,7 @@ olink_normalization_qs <- function(exploreht_df,
 
     # the non linear model
     spline_model <- stats::lm(
-      formula = mapped_3k ~ splines::ns(x = notref_quant,
+      formula = notref_map_quantiles ~ splines::ns(x = notref_quant,
                                                    knots = notref_knots)
     )
 
