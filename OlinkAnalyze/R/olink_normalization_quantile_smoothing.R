@@ -44,6 +44,7 @@ olink_normalization_qs <- function(exploreht_df,
     model_data_joined <- data |>
       dplyr::filter(
         .data[[count_ref_col]] > 10L
+        & .data[["is_bridge_sample"]] == TRUE
       )
 
     # Minimal number of bridge samples required to for the function to work. If
