@@ -26,60 +26,6 @@ olink_normalization_qs <- function(exploreht_df,
                                    bridge_samples,
                                    exploreht_name = "reference",
                                    explore3072_name = "new") {
-  map_oid_ht_3k <- function(explore_df) {
-    oid_ht_3k_mapping <- OlinkAnalyze:::eHT_e3072_mapping
-
-    oid_ht_3k_mapping <- oid_ht_3k_mapping |>
-      dplyr::mutate(OlinkID_HT_3K = paste(.data[["OlinkID_HT"]],
-                                          .data[["OlinkID_E3072"]],
-                                          sep = "_")) |>
-      dplyr::select(.data[["OlinkID_HT"]], .data[["OlinkID_E3072"]],
-                    .data[["OlinkID_HT_3K"]])
-
-    if (all(explore_df |>
-            dplyr::distinct(Panel) |>
-            dplyr::pull() |>
-            na.omit() %in% c("Explore_HT", "Explore HT"))) {
-      explore_df_linked_oid <- explore_df |>
-        dplyr::filter(
-          stringr::str_detect(string = .data[["SampleType"]],
-                              pattern = "SAMPLE"),
-          stringr::str_detect(string = .data[["AssayType"]],
-                              pattern = "assay")
-        ) |>
-        dplyr::inner_join(oid_ht_3k_mapping, relationship = "many-to-many",
-                          by = c("OlinkID" = "OlinkID_HT")) |>
-        dplyr::mutate(OlinkID = .data[["OlinkID_HT_3K"]]) |>
-        dplyr::select(-.data[["OlinkID_HT_3K"]], -.data[["OlinkID_E3072"]]) |>
-        dplyr::distinct()
-    } else if (all(explore_df |>
-                   dplyr::distinct(Panel) |>
-                   dplyr::pull() |>
-                   na.omit() %in% c("Cardiometabolic", "Cardiometabolic_II",
-                                    "Inflammation", "Inflammation_II",
-                                    "Neurology", "Neurology_II",
-                                    "Oncology", "Oncology_II"))) {
-      explore_df_linked_oid <- explore_df |>
-        dplyr::filter(
-          stringr::str_detect(string = .data[["SampleType"]],
-                              pattern = "SAMPLE"),
-          stringr::str_detect(string = .data[["AssayType"]],
-                              pattern = "assay")
-        ) |>
-        dplyr::inner_join(oid_ht_3k_mapping, relationship = "many-to-many",
-                   by = c("OlinkID" = "OlinkID_E3072")) |>
-        dplyr::mutate(OlinkID = .data[["OlinkID_HT_3K"]]) |>
-        dplyr::select(-.data[["OlinkID_HT_3K"]], -.data[["OlinkID_HT"]]) |>
-        dplyr::distinct()
-    } else {
-      explore_df_linked_oid <- explore_df
-      print("The provided data frame is not an Explore HT or Explore 384 data
-            frame. No changes made.")
-    }
-
-    return(explore_df_linked_oid)
-  }
-
   ecdf_transform_npx <- function(data = data) {
 
     # Outlier removal based on low counts threshold, think the trimodal assays
