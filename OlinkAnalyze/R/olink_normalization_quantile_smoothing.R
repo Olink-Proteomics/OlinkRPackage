@@ -207,11 +207,23 @@ olink_normalization_qs <- function(lst_df,
       Project = names(lst_df)[2L]
     )
 
-  all_ht <- exploreht_df |>
-    dplyr::mutate(QSNormalizedNPX = NPX) |>
-    dplyr::select(all_of(c("SampleID", "OlinkID", "QSNormalizedNPX"))) |>
-    dplyr::distinct() |>
-    dplyr::mutate(Project = exploreht_name)
+  # ref columns for output ----
+
+  df_ref_output <- lst_df[[1L]] |>
+    dplyr::filter(
+      # only customer samples
+      .data[["SampleType"]] == "SAMPLE"
+      # remove interal control assays
+      & .data[["AssayType"]] == "assay"
+    ) |>
+    dplyr::select(
+      dplyr::all_of(
+        c("SampleID", "OlinkID", "QSNormalizedNPX" = "NPX")
+      )
+    ) |>
+    dplyr::mutate(
+      Project = names(lst_df)[1L]
+    )
 
   df_ht_3k_w_ecdf <- dplyr::bind_rows(all_ht, ecdf_transform) |>
     dplyr::mutate(OlinkID_ExploreHT = substr(OlinkID, 1, 8),
