@@ -82,7 +82,7 @@ olink_normalization_qs <- function(exploreht_df,
     # data.frame provided as input in the argument "newdata" when the
     # "spline_model" function is called. If the names fo not match, there will
     # be an error!
-    npx_3k <- model_data_joined |>
+    notref_quant <- model_data_joined |>
       dplyr::pull(
         .data[[quant_col$notref]]
       ) |>
@@ -97,11 +97,11 @@ olink_normalization_qs <- function(exploreht_df,
     )
 
     #The nonlinear model
-    spline_model <- lm(mapped_3k ~ splines::ns(npx_3k, knots = knots_npx3k))
+    spline_model <- lm(mapped_3k ~ splines::ns(notref_quant, knots = knots_npx3k))
 
     #Output (just making sure that correct points are output)
     newdata <- as.data.frame(c(explore3072_df$NPX))
-    colnames(newdata) <- "npx_3k"
+    colnames(newdata) <- "notref_quant"
     preds <- as.data.frame(stats::predict(spline_model, newdata = newdata))
     colnames(preds) <- "QSNormalizedNPX"
     preds$SampleID <- explore3072_df$SampleID
