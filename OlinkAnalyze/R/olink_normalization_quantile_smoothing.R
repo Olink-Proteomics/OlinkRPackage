@@ -167,11 +167,14 @@ olink_normalization_qs <- function(lst_df,
 
   # ecdf transformation ----
 
+  # help functions that allow masking of column names from the input datasets
+  # after the pivot_wider
   quant_col <- paste(ref_cols$quant, names(lst_df), sep = "_") |>
     as.list()
   names(quant_col) <- c("ref", "notref")
   cnt_ref_col <- paste("Count", names(lst_df[1L]), sep = "_")
 
+  # transform the data
   ecdf_transform <- df_combo |>
     # compute by assay identifier
     dplyr::group_by(
