@@ -29,6 +29,7 @@ olink_normalization_qs <- function(exploreht_df,
 
   # main QQ normalization function
   ecdf_transform_npx <- function(data,
+                                 quant_col,
                                  count_ref_col) {
 
     # Briefly:
