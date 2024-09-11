@@ -167,12 +167,33 @@ olink_normalization_qs <- function(lst_df,
     )
   rm(lst_df_clean)
 
-  ecdf_transform <- model_data_joined |>
-    dplyr::reframe(ecdf_transform_npx(data = model_data_joined),
-                   by = OlinkID) |>
-    dplyr::mutate(Project = explore3072_name) |>
-    dplyr::ungroup() |>
-    dplyr::select(-by)
+  # ecdf transformation ----
+
+  quant_col <- paste(ref_cols$quant, names(lst_df), sep = "_") |>
+    as.list()
+  names(quant_col) <- c("ref", "notref")
+  cnt_ref_col <- paste("Count", names(lst_df[1L]), sep = "_")
+
+  ecdf_transform <- df_combo |>
+    # compute by assay identifier
+    dplyr::group_by(
+      .data[[ref_cols$olink_id]]
+    ) |>
+    dplyr::mutate(
+      preds = ecdf_transform_npx(
+        data = dplyr::pick(
+          dplyr::all_of(
+            c(ref_cols$sample_id,
+              unname(unlist(quant_col)),
+              cnt_ref_col,
+              "bridge_sample")
+          )
+        ),
+        quant_col = .env[["quant_col"]],
+        count_ref_col = .env[["cnt_ref_col"]]
+      )
+    ) |>
+    dplyr::ungroup()
 
   all_ht <- exploreht_df |>
     dplyr::mutate(QSNormalizedNPX = NPX) |>
