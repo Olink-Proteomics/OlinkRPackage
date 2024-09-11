@@ -114,17 +114,32 @@ olink_normalization_qs <- function(lst_df,
     return(notref_predictions)
   }
 
-  # Creating concatenated OlinkID containing HT and 3K OlinkID that is unique
-  exploreht_df   <- map_oid_ht_3k(exploreht_df) |>
-    dplyr::filter(!is.na(OlinkID)) |>
-    dplyr::mutate(
-      Project = exploreht_name
-    )
-  explore3072_df <- map_oid_ht_3k(explore3072_df) |>
-    dplyr::filter(!is.na(OlinkID)) |>
-    dplyr::mutate(
-      Project = explore3072_name
-    )
+  # cleanup input datasets ----
+
+  # also keep relevant columns only
+  lst_df_clean <- lapply(
+    lst_df,
+    function(l_df) {
+      l_df |>
+        dplyr::filter(
+          # only customer samples
+          .data[["SampleType"]] == "SAMPLE"
+          # remove interal control assays
+          & .data[["AssayType"]] == "assay"
+        ) |>
+        # keep only relevant columns (e.g. SampleID, OlinkID, NPX, Count)
+        dplyr::select(
+          dplyr::all_of(
+            c(
+              ref_cols$sample_id,
+              ref_cols$olink_id,
+              ref_cols$quant,
+              "Count"
+            )
+          )
+        )
+    }
+  )
 
   model_explore3072_df <- explore3072_df |>
     dplyr::filter(SampleID %in% bridge_samples$DF_3k) |>
