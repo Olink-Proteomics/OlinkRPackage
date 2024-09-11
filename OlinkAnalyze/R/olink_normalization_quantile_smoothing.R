@@ -180,7 +180,7 @@ olink_normalization_qs <- function(lst_df,
       .data[[ref_cols$olink_id]]
     ) |>
     dplyr::mutate(
-      preds = ecdf_transform_npx(
+      QSNormalizedNPX = ecdf_transform_npx(
         data = dplyr::pick(
           dplyr::all_of(
             c(ref_cols$sample_id,
