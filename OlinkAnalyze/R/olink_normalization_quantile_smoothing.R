@@ -26,7 +26,15 @@ olink_normalization_qs <- function(exploreht_df,
                                    bridge_samples,
                                    exploreht_name = "reference",
                                    explore3072_name = "new") {
+
   ecdf_transform_npx <- function(data = data) {
+
+    # Briefly:
+    # Take the ECDF of the reference quantification (e.g. NPX from Olink Explore
+    # HT). The inverse of the ECDF will be in x ~ y OR
+    # ECDF(not_ref_quant) ~ ref_quant. Using this inverse, the Olink Explore 3k
+    # quantification ECDF values should be x/not_ref_quant, and the Olink
+    # Explore HT quantification values should be y/ref_quant.
 
     # Outlier removal based on low counts threshold, think the trimodal assays
     model_data_joined <- data |> dplyr::filter(Count > 10)
