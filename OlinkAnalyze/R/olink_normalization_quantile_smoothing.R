@@ -43,7 +43,7 @@ olink_normalization_qs <- function(lst_df,
     model_data_joined <- data |>
       dplyr::filter(
         .data[[count_ref_col]] > 10L
-        & .data[["is_bridge_sample"]] == TRUE
+        & .data[["bridge_sample"]] == TRUE
       )
 
     # Minimal number of bridge samples required to for the function to work. If
@@ -141,25 +141,31 @@ olink_normalization_qs <- function(lst_df,
     }
   )
 
-  model_explore3072_df <- explore3072_df |>
-    dplyr::filter(SampleID %in% bridge_samples$DF_3k) |>
-    dplyr::filter(!(is.na(NPX))) |>
-    dplyr::rename(NPX_3k = NPX) |>
-    dplyr::select(all_of(c("SampleID", "OlinkID", "NPX_3k"))) |>
-    dplyr::distinct()
+  # append the two datasets to each other ----
 
-  model_exploreht_df <- exploreht_df |>
-    dplyr::filter(SampleID %in% bridge_samples$DF_ht) |>
-    dplyr::filter(!(is.na(NPX))) |>
-    dplyr::rename(NPX_ht = NPX) |>
-    # count is only observed for HT
-    dplyr::select(all_of(c("SampleID", "OlinkID", "NPX_ht", "Count"))) |>
-    dplyr::distinct()
-
-  model_data_joined <- model_explore3072_df |>
-    dplyr::inner_join(model_exploreht_df, by = c("SampleID", "OlinkID")) |>
-    na.omit() |>
-    dplyr::distinct()
+  # this also adds
+  df_combo <- lst_df_clean |>
+    # append the datasets to each other
+    dplyr::bind_rows(
+      .id = "Project"
+    ) |>
+    # pivot to wider so that there is one entry for each concatenated assay and
+    # sample identifier
+    tidyr::pivot_wider(
+      names_from = dplyr::all_of(
+        c("Project")
+      ),
+      values_from = dplyr::all_of(
+        c(
+          ref_cols$quant,
+          "Count"
+        )
+      )
+    ) |>
+    dplyr::mutate(
+      bridge_sample = .data[[ref_cols$sample_id]] %in% .env[["bridge_samples"]]
+    )
+  rm(lst_df_clean)
 
   ecdf_transform <- model_data_joined |>
     dplyr::reframe(ecdf_transform_npx(data = model_data_joined),
