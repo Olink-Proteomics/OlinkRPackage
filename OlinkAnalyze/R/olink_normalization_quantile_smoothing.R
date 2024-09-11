@@ -59,14 +59,14 @@ olink_normalization_qs <- function(exploreht_df,
     # quantiles of not reference quantification (e.g. NPX from 3K) mapped to
     # quantiles of reference quantification (e.g. NPX from HT)
     notref_ecdf <- environment(
-      fun = model_data |>
+      fun = model_data_joined |>
         dplyr::pull(
           .data[[quant_col$notref]]
         ) |>
         stats::ecdf()
     )
     # the inverse if the ECDF are the quantiles
-    mapped_3k <- model_data |>
+    mapped_3k <- model_data_joined |>
       dplyr::pull(
         .data[[quant_col$ref]]
       ) |>
@@ -75,7 +75,19 @@ olink_normalization_qs <- function(exploreht_df,
         names = FALSE
       )
 
-    npx_3k <- sort(unique(model_data_joined$NPX_3k))
+    # numeric vector of quantifications for the non-reference dataset
+    #
+    # NOTE: this variable is used in "notref_knots" and "spline_model". We need
+    # to make sure that the name of the variable matches the column name of the
+    # data.frame provided as input in the argument "newdata" when the
+    # "spline_model" function is called. If the names fo not match, there will
+    # be an error!
+    npx_3k <- model_data_joined |>
+      dplyr::pull(
+        .data[[quant_col$notref]]
+      ) |>
+      unique() |>
+      sort()
 
     #The quantile points used for adapting the nonelinear spline
     knots_npx3k <- stats::quantile(npx_3k, probs = c(0.05, 0.1, 0.25, 0.5, 0.75,
