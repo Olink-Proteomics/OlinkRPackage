@@ -115,23 +115,6 @@ olink_normalization_qs <- function(exploreht_df,
     return(notref_predictions)
   }
 
-  # place bridge samples side by side in a data frame
-  update_sampleid <- dplyr::bind_cols(bridge_samples) |>
-    dplyr::rename("SampleID_df1" = "DF_ht",
-                  "SampleID_df2" = "DF_3k")
-
-  # change the SampleID of the non-reference data frame to match the bridging
-  # samples from the reference data frame. This is done because the
-  # OlinkAnalyze::olink_normalization function requires so.
-
-  explore3072_df <- explore3072_df |>
-    dplyr::left_join(update_sampleid, by = c("SampleID" = "SampleID_df2")) |>
-    dplyr::mutate(SampleID_df1 = dplyr::if_else(is.na(SampleID_df1),
-                                                SampleID,
-                                                SampleID_df1)) |>
-    dplyr::select(-SampleID) |>
-    dplyr::rename("SampleID" = "SampleID_df1")
-
   # Creating concatenated OlinkID containing HT and 3K OlinkID that is unique
   exploreht_df   <- map_oid_ht_3k(exploreht_df) |>
     dplyr::filter(!is.na(OlinkID)) |>
