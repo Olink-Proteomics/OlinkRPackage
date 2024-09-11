@@ -21,8 +21,7 @@
 #' @author Marianne Sandin
 #' @author Masoumeh Sheikhi
 #'
-olink_normalization_qs <- function(exploreht_df,
-                                   explore3072_df,
+olink_normalization_qs <- function(lst_df,
                                    bridge_samples,
                                    exploreht_name = "reference",
                                    explore3072_name = "new") {
