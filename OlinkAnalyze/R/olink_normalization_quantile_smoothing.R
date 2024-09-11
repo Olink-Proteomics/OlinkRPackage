@@ -22,6 +22,7 @@
 #' @author Masoumeh Sheikhi
 #'
 olink_normalization_qs <- function(lst_df,
+                                   ref_cols,
                                    bridge_samples) {
 
   # main QQ normalization function
