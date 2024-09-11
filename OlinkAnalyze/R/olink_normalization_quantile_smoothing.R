@@ -30,7 +30,8 @@ olink_normalization_qs <- function(exploreht_df,
   # main QQ normalization function
   ecdf_transform_npx <- function(data,
                                  quant_col,
-                                 count_ref_col) {
+                                 count_ref_col,
+                                 num_samples = 24L) {
 
     # Briefly:
     # Take the ECDF of the reference quantification (e.g. NPX from Olink Explore
@@ -47,7 +48,7 @@ olink_normalization_qs <- function(exploreht_df,
 
     # Minimal number of bridge samples required to for the function to work. If
     # not met, we just return NA.
-    if(nrow(model_data_joined) < 24L){
+    if(nrow(model_data_joined) < num_samples){
       return(rep(x = NA_real_, times = nrow(data)))
     }
 
