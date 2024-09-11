@@ -45,15 +45,10 @@ olink_normalization_qs <- function(exploreht_df,
         .data[[count_ref_col]] > 10L
       )
 
-    # If number of datapoints are < 24, no spline is fitted
-    if (nrow(model_data_joined) < 24) {
-
-      preds <- data |>
-        dplyr::select(SampleID)
-
-      preds$QSNormalizedNPX <- NA
-
-      return(preds)
+    # Minimal number of bridge samples required to for the function to work. If
+    # not met, we just return NA.
+    if(nrow(model_data_joined) < 24L){
+      return(rep(x = NA_real_, times = nrow(data)))
     }
 
     # quantiles of not reference quantification (e.g. NPX from 3K) mapped to
@@ -102,15 +97,20 @@ olink_normalization_qs <- function(exploreht_df,
                                                    knots = notref_knots)
     )
 
-    #Output (just making sure that correct points are output)
-    newdata <- as.data.frame(c(explore3072_df$NPX))
-    colnames(newdata) <- "notref_quant"
-    preds <- as.data.frame(stats::predict(spline_model, newdata = newdata))
-    colnames(preds) <- "QSNormalizedNPX"
-    preds$SampleID <- explore3072_df$SampleID
-    preds$OlinkID <- explore3072_df$OlinkID
+    # output - predict
+    # here we use the the input from data to predict values from all the
+    # samples, bridging and non-bridging
+    notref_predictions <- stats::predict(
+      object = spline_model,
+      newdata = data |>
+        dplyr::select(
+          dplyr::all_of(
+            c("notref_quant" = quant_col$notref)
+          )
+        )
+    )
 
-    return(preds)
+    return(notref_predictions)
   }
 
   # place bridge samples side by side in a data frame
