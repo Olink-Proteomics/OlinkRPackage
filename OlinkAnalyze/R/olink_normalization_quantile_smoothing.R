@@ -22,9 +22,7 @@
 #' @author Masoumeh Sheikhi
 #'
 olink_normalization_qs <- function(lst_df,
-                                   bridge_samples,
-                                   exploreht_name = "reference",
-                                   explore3072_name = "new") {
+                                   bridge_samples) {
 
   # main QQ normalization function
   ecdf_transform_npx <- function(data,
