@@ -225,14 +225,10 @@ olink_normalization_qs <- function(lst_df,
       Project = names(lst_df)[1L]
     )
 
-  df_ht_3k_w_ecdf <- dplyr::bind_rows(all_ht, ecdf_transform) |>
-    dplyr::mutate(OlinkID_ExploreHT = substr(OlinkID, 1, 8),
-                  OlinkID_Explore3K = substr(OlinkID, 10, 18)) |>
-    dplyr::rename(OlinkID_concat = OlinkID) |>
-    dplyr::select(.data[["SampleID"]],
-                  .data[["Project"]],
-                  .data[["OlinkID_concat"]],
-                  .data[["QSNormalizedNPX"]])
+  # output dataset ----
 
-  return(df_ht_3k_w_ecdf)
+  df_qq_norm <- df_ref_output |>
+    dplyr::bind_rows(ecdf_transform)
+
+  return(df_qq_norm)
 }
