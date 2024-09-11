@@ -195,7 +195,17 @@ olink_normalization_qs <- function(lst_df,
         count_ref_col = .env[["cnt_ref_col"]]
       )
     ) |>
-    dplyr::ungroup()
+    dplyr::ungroup() |>
+    # keep only relevant columns
+    dplyr::select(
+      dplyr::all_of(
+        c(ref_cols$sample_id, ref_cols$olink_id, "QSNormalizedNPX")
+      )
+    ) |>
+    # add column "Project"
+    dplyr::mutate(
+      Project = names(lst_df)[2L]
+    )
 
   all_ht <- exploreht_df |>
     dplyr::mutate(QSNormalizedNPX = NPX) |>
