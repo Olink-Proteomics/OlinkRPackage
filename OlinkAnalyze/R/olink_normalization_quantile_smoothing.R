@@ -89,9 +89,12 @@ olink_normalization_qs <- function(exploreht_df,
       unique() |>
       sort()
 
-    #The quantile points used for adapting the nonelinear spline
-    knots_npx3k <- stats::quantile(npx_3k, probs = c(0.05, 0.1, 0.25, 0.5, 0.75,
-                                                     0.9, 0.95))
+    # quantile points used for adapting the non linear spline
+    notref_knots <- stats::quantile(
+      x = notref_quant,
+      probs = c(0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95),
+      names = FALSE
+    )
 
     #The nonlinear model
     spline_model <- lm(mapped_3k ~ splines::ns(npx_3k, knots = knots_npx3k))
