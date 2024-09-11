@@ -27,7 +27,9 @@ olink_normalization_qs <- function(exploreht_df,
                                    exploreht_name = "reference",
                                    explore3072_name = "new") {
 
-  ecdf_transform_npx <- function(data = data) {
+  # main QQ normalization function
+  ecdf_transform_npx <- function(data,
+                                 count_ref_col) {
 
     # Briefly:
     # Take the ECDF of the reference quantification (e.g. NPX from Olink Explore
@@ -36,8 +38,11 @@ olink_normalization_qs <- function(exploreht_df,
     # quantification ECDF values should be x/not_ref_quant, and the Olink
     # Explore HT quantification values should be y/ref_quant.
 
-    # Outlier removal based on low counts threshold, think the trimodal assays
-    model_data_joined <- data |> dplyr::filter(Count > 10)
+    # remove outliers based on low counts and keep only bridge samples to model
+    model_data_joined <- data |>
+      dplyr::filter(
+        .data[[count_ref_col]] > 10L
+      )
 
     # If number of datapoints are < 24, no spline is fitted
     if (nrow(model_data_joined) < 24) {
