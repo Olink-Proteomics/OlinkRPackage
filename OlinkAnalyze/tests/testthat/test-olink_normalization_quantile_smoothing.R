@@ -87,57 +87,233 @@ test_that(
 )
 
 test_that(
-  "olink_normalization_qs - works - expected output",
+  "olink_normalization_qs - works - expected output, all bridge samples",
   {
-    overlap_samples <- intersect(data_ht |>
-                                   dplyr::filter(SampleType == "SAMPLE") |>
-                                   dplyr::pull(SampleID) |>
-                                   unique(),
-                                 data_3k |>
-                                   dplyr::filter(SampleType == "SAMPLE") |>
-                                   dplyr::pull(SampleID) |>
-                                   unique())
+    # bridge samples
+    bridge_samples <- intersect(
+      x = unique(data_ht$SampleID),
+      y = unique(data_3k$SampleID)
+    ) |>
+      (\(x) x[!grepl("CONTROL", x)])()
 
-    bridge_samples <- list("DF_ht" = overlap_samples, "DF_3k" = overlap_samples)
-    rm(overlap_samples)
-    results <- olink_normalization_qs(exploreht_df = data_ht,
-                                      explore3072_df = data_3k,
-                                      bridge_samples = bridge_samples)
-    results$QSNormalizedNPX <- round(results$QSNormalizedNPX, 2)
+    # run the internal function that check input from olink_normalization
+    expect_message(
+      object = norm_input_check <- olink_norm_input_check(
+        df1 = data_ht,
+        df2 = data_3k,
+        overlapping_samples_df1 = bridge_samples,
+        overlapping_samples_df2 = NULL,
+        df1_project_nr = "P1",
+        df2_project_nr = "P2",
+        reference_project = "P1",
+        reference_medians = NULL
+      ),
+      regexp = "Cross-product normalization will be performed!"
+    )
 
-    expect_identical(head(results),
-                     tibble(SampleID = rep("Sample_A", 6),
-                            Project = rep("reference", 6),
-                            OlinkID_concat = c("OID40770_OID20117",
-                                               "OID40835_OID31162",
-                                               "OID40981_OID30796",
-                                               "OID40986_OID20052",
-                                               "OID41012_OID20054",
-                                               "OID41032_OID20118"),
-                            QSNormalizedNPX = c(3.17, -1.61, -1.01, 2.57,
-                                                0.1, -0.09)))
-    expect_identical(results |>
-                       dplyr::filter(SampleID == "Sample_CT",
-                                     Project == "new",
-                                     OlinkID_concat == "OID42135_OID21255") |>
-                       unique() |>
-                       dplyr::pull(QSNormalizedNPX), -0.35)
+    lst_df <- list(
+      norm_input_check$ref_df,
+      norm_input_check$not_ref_df
+    )
+    names(lst_df) <- c(norm_input_check$ref_name,
+                       norm_input_check$not_ref_name)
 
-    expect_identical(results |>
-                       dplyr::filter(SampleID == "Sample_W",
-                                     Project == "new",
-                                     OlinkID_concat == "OID41486_OID31160") |>
-                       unique() |>
-                       dplyr::pull(QSNormalizedNPX), 4.71)
+    # run the function
+    expect_no_message(
+      object = expect_no_warning(
+        object = expect_no_error(
+          object = qs_norm <- olink_normalization_qs(
+            lst_df = lst_df,
+            ref_cols = norm_input_check$ref_cols,
+            bridge_samples = bridge_samples
+          )
+        )
+      )
+    )
 
-    expect_equal(results |>
-                   dplyr::filter(Project == "new") |>
-                   unique() |>
-                   nrow(), 18000)
+    # random checks
+    expect_equal(
+      object = qs_norm |>
+        dplyr::filter(
+          .data[[norm_input_check$ref_cols$sample_id]] == "Sample_A"
+          & .data[["Project"]] == norm_input_check$not_ref_name
+          & .data[[norm_input_check$ref_cols$olink_id]] %in%
+            c("OID40770_OID20117", "OID40835_OID31162", "OID40981_OID30796",
+              "OID40986_OID20052", "OID41012_OID20054", "OID41032_OID20118")
+        ) |>
+        dplyr::arrange(
+          .data[[norm_input_check$ref_cols$sample_id]],
+          .data[[norm_input_check$ref_cols$olink_id]]
+        ) |>
+        dplyr::pull(
+          .data[["QSNormalizedNPX"]]
+        ),
+      expected = c(7.46169571,  0.23983357, -2.18624459,
+                   0.09153544, -1.11978409, -1.96985158),
+      tolerance = 1e-4
+    )
 
-    expect_equal(results |>
-                   dplyr::filter(Project == "reference") |>
-                   unique() |>
-                   nrow(), 17800)
+    expect_equal(
+      object = qs_norm |>
+        dplyr::filter(
+          .data[[norm_input_check$ref_cols$sample_id]] == "Sample_CT"
+          & .data[["Project"]] == norm_input_check$not_ref_name
+          & .data[[norm_input_check$ref_cols$olink_id]] == "OID42135_OID21255"
+        ) |>
+        dplyr::pull(
+          .data[["QSNormalizedNPX"]]
+        ),
+      expected = -0.4903429,
+      tolerance = 1e-4
+    )
+
+    expect_equal(
+      object = qs_norm |>
+        dplyr::filter(
+          .data[[norm_input_check$ref_cols$sample_id]] == "Sample_W"
+          & .data[["Project"]] == norm_input_check$not_ref_name
+          & .data[[norm_input_check$ref_cols$olink_id]] == "OID41486_OID31160"
+        ) |>
+        dplyr::pull(
+          .data[["QSNormalizedNPX"]]
+        ),
+      expected = 4.110298,
+      tolerance = 1e-4
+    )
+
+    expect_identical(
+      object = qs_norm |>
+        dplyr::filter(
+          .data[["Project"]] == norm_input_check$not_ref_name
+        ) |>
+        nrow(),
+      expected = 17600L # no control samples
+    )
+
+    expect_identical(
+      object = qs_norm |>
+        dplyr::filter(
+          .data[["Project"]] == norm_input_check$ref_name
+        ) |>
+        nrow(),
+      expected = 17200L # no control samples
+    )
+  }
+)
+
+test_that(
+  "olink_normalization_qs - works - expected output, 50 bridge samples",
+  {
+    # bridge samples
+    bridge_samples <- intersect(
+      x = unique(data_ht$SampleID),
+      y = unique(data_3k$SampleID)
+    ) |>
+      (\(x) x[!grepl("CONTROL", x)])() |>
+      sort() |>
+      head(50L)
+
+    # run the internal function that check input from olink_normalization
+    expect_message(
+      object = norm_input_check <- olink_norm_input_check(
+        df1 = data_ht,
+        df2 = data_3k,
+        overlapping_samples_df1 = bridge_samples,
+        overlapping_samples_df2 = NULL,
+        df1_project_nr = "P1",
+        df2_project_nr = "P2",
+        reference_project = "P1",
+        reference_medians = NULL
+      ),
+      regexp = "Cross-product normalization will be performed!"
+    )
+
+    lst_df <- list(
+      norm_input_check$ref_df,
+      norm_input_check$not_ref_df
+    )
+    names(lst_df) <- c(norm_input_check$ref_name,
+                       norm_input_check$not_ref_name)
+
+    # run the function
+    expect_no_message(
+      object = expect_no_warning(
+        object = expect_no_error(
+          object = qs_norm <- olink_normalization_qs(
+            lst_df = lst_df,
+            ref_cols = norm_input_check$ref_cols,
+            bridge_samples = bridge_samples
+          )
+        )
+      )
+    )
+
+    # random checks
+    expect_equal(
+      object = qs_norm |>
+        dplyr::filter(
+          .data[[norm_input_check$ref_cols$sample_id]] == "Sample_A"
+          & .data[["Project"]] == norm_input_check$not_ref_name
+          & .data[[norm_input_check$ref_cols$olink_id]] %in%
+            c("OID40770_OID20117", "OID40835_OID31162", "OID40981_OID30796",
+              "OID40986_OID20052", "OID41012_OID20054", "OID41032_OID20118")
+        ) |>
+        dplyr::arrange(
+          .data[[norm_input_check$ref_cols$sample_id]],
+          .data[[norm_input_check$ref_cols$olink_id]]
+        ) |>
+        dplyr::pull(
+          .data[["QSNormalizedNPX"]]
+        ),
+      expected = c(8.3723565,  0.0999940, -1.3768421,
+                   1.8088803, -0.9480357, -1.3107725),
+      tolerance = 1e-4
+    )
+
+    expect_equal(
+      object = qs_norm |>
+        dplyr::filter(
+          .data[[norm_input_check$ref_cols$sample_id]] == "Sample_CT"
+          & .data[["Project"]] == norm_input_check$not_ref_name
+          & .data[[norm_input_check$ref_cols$olink_id]] == "OID42135_OID21255"
+        ) |>
+        dplyr::pull(
+          .data[["QSNormalizedNPX"]]
+        ),
+      expected = 0.1846259,
+      tolerance = 1e-4
+    )
+
+    expect_equal(
+      object = qs_norm |>
+        dplyr::filter(
+          .data[[norm_input_check$ref_cols$sample_id]] == "Sample_W"
+          & .data[["Project"]] == norm_input_check$not_ref_name
+          & .data[[norm_input_check$ref_cols$olink_id]] == "OID41486_OID31160"
+        ) |>
+        dplyr::pull(
+          .data[["QSNormalizedNPX"]]
+        ),
+      expected = 3.380136,
+      tolerance = 1e-4
+    )
+
+    expect_identical(
+      object = qs_norm |>
+        dplyr::filter(
+          .data[["Project"]] == norm_input_check$not_ref_name
+        ) |>
+        nrow(),
+      expected = 17600L # no control samples
+    )
+
+    expect_identical(
+      object = qs_norm |>
+        dplyr::filter(
+          .data[["Project"]] == norm_input_check$ref_name
+        ) |>
+        nrow(),
+      expected = 17200L # no control samples
+    )
   }
 )
