@@ -117,7 +117,9 @@ olink_normalization_qs <- function(lst_df,
             c("notref_quant" = quant_col$notref)
           )
         )
-    )
+    ) |>
+      # removing names of the predictions
+      unname()
 
     return(notref_predictions)
   }
