@@ -11,7 +11,7 @@ test_that(
     # run example data in the function ----
 
     # bridge samples
-    overlap_samples <- intersect(
+    bridge_samples <- intersect(
       x = unique(data_ht$SampleID),
       y = unique(data_3k$SampleID)
     ) |>
@@ -22,7 +22,7 @@ test_that(
       object = norm_input_check <- olink_norm_input_check(
         df1 = data_ht,
         df2 = data_3k,
-        overlapping_samples_df1 = overlap_samples,
+        overlapping_samples_df1 = bridge_samples,
         overlapping_samples_df2 = NULL,
         df1_project_nr = "P1",
         df2_project_nr = "P2",
@@ -40,7 +40,7 @@ test_that(
         l_df |>
           dplyr::filter(
             .data[[norm_input_check$ref_cols$sample_id]] %in%
-              .env[["overlap_samples"]]
+              .env[["bridge_samples"]]
           )
       })
     names(lst_df) <- c(norm_input_check$ref_name,
@@ -53,7 +53,7 @@ test_that(
           object = qs_norm <- olink_normalization_qs(
             lst_df = lst_df,
             ref_cols = norm_input_check$ref_cols,
-            bridge_samples = overlap_samples
+            bridge_samples = bridge_samples
           )
         )
       )
