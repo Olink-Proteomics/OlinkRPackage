@@ -249,6 +249,19 @@ olink_normalization <- function(df1,
         not_ref_cols = lst_check$not_ref_cols
       )
 
+    } else if (lst_check$norm_mode == olink_norm_modes$norm_ht_3k) {
+      # HT-3K normalization ----
+
+      df_norm <- norm_internal_cross_product(
+        ref_df = lst_check$ref_df,
+        ref_samples = lst_check$ref_samples,
+        ref_name = lst_check$ref_name,
+        ref_cols = lst_check$ref_cols,
+        not_ref_df = lst_check$not_ref_df,
+        not_ref_name = lst_check$not_ref_name,
+        not_ref_cols = lst_check$not_ref_cols
+      )
+
     } else if (lst_check$norm_mode == olink_norm_modes$subset) {
       # subset normalization ----
 
@@ -262,6 +275,7 @@ olink_normalization <- function(df1,
         not_ref_name = lst_check$not_ref_name,
         not_ref_cols = lst_check$not_ref_cols
       )
+
     }
   }
 
@@ -542,6 +556,48 @@ norm_internal_bridge <- function(ref_df,
   # return ----
 
   return(df_norm)
+}
+
+norm_internal_cross_product <- function(ref_df,
+                                        ref_samples,
+                                        ref_name,
+                                        ref_cols,
+                                        not_ref_df,
+                                        not_ref_name,
+                                        not_ref_cols) {
+  # is bridgeable ----
+
+  # to be filled in
+  # returns df_norm_can_bridge
+
+  # bridge normalize HT-3k ----
+
+  df_norm_bridge <- norm_internal_bridge(
+    ref_df = ref_df,
+    ref_samples = ref_samples,
+    ref_name = ref_name,
+    ref_cols = ref_cols,
+    not_ref_df = not_ref_df,
+    not_ref_name = not_ref_name,
+    not_ref_cols = not_ref_cols
+  )
+
+  # quantile normalize HT-3k ----
+
+  # to be filled in
+  # returns df_norm_qq
+
+  # integrate normalization approaches ----
+
+  # to be filled in
+  # combines df_norm_can_bridge, df_norm_bridge and df_norm_qq
+  # stores the outcome in df_norm
+  df_norm <- df_norm_bridge
+
+  # return ----
+
+  return(df_norm)
+
 }
 
 #' Internal subset normalization function
