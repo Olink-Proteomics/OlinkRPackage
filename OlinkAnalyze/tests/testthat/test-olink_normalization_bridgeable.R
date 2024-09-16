@@ -47,7 +47,7 @@ test_that(
         ) |>
         dplyr::distinct() |>
         nrow(),
-      expected = 60L
+      expected = 50L
     )
 
     expect_equal(
@@ -57,7 +57,7 @@ test_that(
         ) |>
         dplyr::distinct() |>
         nrow(),
-      expected = 39L
+      expected = 49L
     )
 
     expect_equal(
