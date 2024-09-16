@@ -567,8 +567,24 @@ norm_internal_cross_product <- function(ref_df,
                                         not_ref_cols) {
   # is bridgeable ----
 
-  # to be filled in
-  # returns df_norm_can_bridge
+  lst_df <- list(
+    ref_df,
+    not_ref_df
+  ) |>
+    # keep only bridge samples
+    lapply(function(l_df) {
+      l_df |>
+        dplyr::filter(
+          .data[[ref_cols$sample_id]] %in% .env[["ref_samples"]]
+        )
+    })
+  names(lst_df) <- c(ref_name, not_ref_name)
+
+  df_is_bridgeable <- olink_normalization_bridgeable(
+    lst_df = lst_df,
+    ref_cols = ref_cols
+  )
+  rm(lst_df)
 
   # bridge normalize HT-3k ----
 
@@ -582,6 +598,18 @@ norm_internal_cross_product <- function(ref_df,
     not_ref_cols = not_ref_cols
   )
 
+  # when ref and non-ref datasets are merged during bridging, assay identifiers
+  # OlinkID_HT and OlinkID_E3072 are NA. Here we fill them in.
+  df_norm_bridge <- df_norm_bridge |>
+    dplyr::group_by(
+      .data[[ref_cols$olink_id]]
+    ) |>
+    tidyr::fill(
+      dplyr::starts_with(ref_cols$olink_id),
+      .direction = "updown"
+    ) |>
+    dplyr::ungroup()
+
   # quantile normalize HT-3k ----
 
   # to be filled in
@@ -590,9 +618,14 @@ norm_internal_cross_product <- function(ref_df,
   # integrate normalization approaches ----
 
   # to be filled in
-  # combines df_norm_can_bridge, df_norm_bridge and df_norm_qq
+  # combines df_is_bridgeable, df_norm_bridge and df_norm_qq
   # stores the outcome in df_norm
-  df_norm <- df_norm_bridge
+  df_norm <- df_norm_bridge |>
+    dplyr::left_join(
+      df_is_bridgeable,
+      by = ref_cols$olink_id,
+      relationship = "many-to-one"
+    )
 
   # return ----
 
