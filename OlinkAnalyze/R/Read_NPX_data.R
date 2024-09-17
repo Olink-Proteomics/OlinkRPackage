@@ -213,7 +213,7 @@ read_NPX_explore <- function(filename) {
                             "DataAnalysisRefID",
                             "AssayType",
                             "Block",
-                            "Counts",
+                            "Count",
                             "ExtNPX",
                             "Normalization",
                             "PCNormalizedNPX",
