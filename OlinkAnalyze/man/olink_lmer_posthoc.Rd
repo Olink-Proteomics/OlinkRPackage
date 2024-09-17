@@ -77,6 +77,7 @@ The output tibble is arranged by ascending Tukey adjusted p-values.
 \donttest{
 
 library(dplyr)
+if (requireNamespace("lme4", quietly = TRUE) & requireNamespace("lmerTest", quietly = TRUE)){
 
 lmer_results <- olink_lmer(df = npx_data1,
                            variable=c("Time", 'Treatment'),
@@ -103,6 +104,7 @@ results_lmer_posthoc <- olink_lmer_posthoc(df = npx_data1,
                                            model_formula = "NPX~Time*Treatment+(1|Subject)",
                                            effect_formula = "pairwise~Treatment|Time",
                                            verbose = TRUE)
+}
 }
 
 }
