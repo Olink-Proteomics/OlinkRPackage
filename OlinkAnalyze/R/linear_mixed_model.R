@@ -72,10 +72,12 @@
 #' @export
 #' @examples
 #' \donttest{
-#' # Results in model NPX~Time*Treatment+(1|Subject)+(1|Site)
-#' lmer_results <- olink_lmer(df = npx_data1,
-#' variable=c("Time", 'Treatment'),
-#' random = c('Subject', 'Site'))
+#' if (requireNamespace("lme4", quietly = TRUE) & requireNamespace("lmerTest", quietly = TRUE)){
+#'   # Results in model NPX~Time*Treatment+(1|Subject)+(1|Site)
+#'   lmer_results <- olink_lmer(df = npx_data1,
+#'   variable=c("Time", 'Treatment'),
+#'   random = c('Subject', 'Site'))
+#' }
 #' }
 #' @importFrom magrittr %>%
 #' @importFrom dplyr n filter group_by summarise ungroup pull distinct
@@ -386,6 +388,7 @@ single_lmer <- function(data, formula_string){
 #' \donttest{
 #'
 #' library(dplyr)
+#' if (requireNamespace("lme4", quietly = TRUE) & requireNamespace("lmerTest", quietly = TRUE)){
 #'
 #' lmer_results <- olink_lmer(df = npx_data1,
 #'                            variable=c("Time", 'Treatment'),
@@ -412,6 +415,7 @@ single_lmer <- function(data, formula_string){
 #'                                            model_formula = "NPX~Time*Treatment+(1|Subject)",
 #'                                            effect_formula = "pairwise~Treatment|Time",
 #'                                            verbose = TRUE)
+#' }
 #' }
 #'
 #' @importFrom magrittr %>%
@@ -682,7 +686,7 @@ single_posthoc <- function(data, formula_string, effect, mean_return, padjust_me
 #' \donttest{
 #'
 #' library(dplyr)
-#'
+#' if (requireNamespace("lme4", quietly = TRUE) & requireNamespace("lmerTest", quietly = TRUE)){
 #' lmer_results <- olink_lmer(df = npx_data1,
 #'                            variable=c("Time", 'Treatment'),
 #'                            random = c('Subject'))
@@ -700,7 +704,9 @@ single_posthoc <- function(data, formula_string, effect, mean_return, padjust_me
 #'                                             col_variable = 'Treatment',
 #'                                             verbose=TRUE,
 #'                                             olinkid_list = assay_list,
-#'                                             number_of_proteins_per_plot = 10)}
+#'                                             number_of_proteins_per_plot = 10)
+#' }
+#' }
 #' @importFrom magrittr %>%
 #' @importFrom dplyr filter pull distinct mutate select arrange
 #' @importFrom stringr str_detect
