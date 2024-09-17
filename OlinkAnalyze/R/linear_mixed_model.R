@@ -1,36 +1,55 @@
 #'Function which performs a linear mixed model per protein
 #'
-#'Fits a linear mixed effects model for every protein (by OlinkID) in every panel, using lmerTest::lmer and stats::anova.
-#'The function handles both factor and numerical variables and/or covariates. \cr\cr
-#'Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a message if verbose = TRUE).
-#'Character columns in the input dataframe are automatically converted to factors (specified in a message if verbose = TRUE).
+#'Fits a linear mixed effects model for every protein (by OlinkID) in every
+#'panel, using lmerTest::lmer and stats::anova.
+#'The function handles both factor and numerical variables and/or
+#'covariates. \cr\cr
+#'Samples that have no variable information or missing factor levels are
+#'automatically removed from the analysis (specified in a message if verbose = TRUE).
+#'Character columns in the input dataframe are automatically converted to
+#'factors (specified in a message if verbose = TRUE).
 #'Numerical variables are not converted to factors.
-#'If a numerical variable is to be used as a factor, this conversion needs to be done on the dataframe before the function call. \cr\cr
-#'Crossed analysis, i.e. A*B formula notation, is inferred from the variable argument in the following cases: \cr
+#'If a numerical variable is to be used as a factor, this conversion needs to
+#'be done on the dataframe before the function call. \cr\cr
+#'Crossed analysis, i.e. A*B formula notation, is inferred from the variable
+#'argument in the following cases: \cr
 #'\itemize{
 #' \item c('A','B')
 #' \item c('A:B')
 #' \item c('A:B', 'B') or c('A:B', 'A')
 #'}
 #'Inference is specified in a message if verbose = TRUE. \cr
-#'For covariates, crossed analyses need to be specified explicitly, i.e. two main effects will not be expanded with a c('A','B') notation. Main effects present in the variable takes precedence. \cr
+#'For covariates, crossed analyses need to be specified explicitly, i.e. two
+#' main effects will not be expanded with a c('A','B') notation. Main effects
+#' present in the variable takes precedence. \cr
 #'The random variable only takes main effect(s). \cr
-#'The formula notation of the final model is specified in a message if verbose = TRUE. \cr\cr
-#'Output p-values are adjusted by stats::p.adjust according to the Benjamini-Hochberg method (“fdr”).
+#'The formula notation of the final model is specified in a message
+#'if verbose = TRUE. \cr\cr
+#'Output p-values are adjusted by stats::p.adjust according to the
+#'Benjamini-Hochberg method (“fdr”).
 #'Adjusted p-values are logically evaluated towards adjusted p-value<0.05.
 #'
-#' @param df NPX data frame in long format with at least protein name (Assay), OlinkID, UniProt, 1-2 variables with at least 2 levels.
+#' @param df NPX data frame in long format with at least protein
+#' name (Assay), OlinkID, UniProt, 1-2 variables with at least 2 levels.
 #' @param variable Single character value or character array.
-#' Variable(s) to test. If length > 1, the included variable names will be used in crossed analyses .
+#' Variable(s) to test. If length > 1, the included variable
+#'  names will be used in crossed analyses .
 #' Also takes ':' or '*' notation.
 #' @param outcome Character. The dependent variable. Default: NPX.
 #' @param random Single character value or character array.
-#' @param covariates Single character value or character array. Default: NULL.Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be inferred from main effects.
-#' @param model_formula (optional) Symbolic description of the model to be fitted in standard formula notation (e.g. "NPX~A*B + (1|ID)"). If provided, this will override the \code{outcome}, \code{variable} and \code{covariates} arguments. Can be a string or of class \code{stats::formula()}.
-#' @param return.covariates Boolean. Default: False. Returns results for the covariates. Note: Adjusted p-values will be NA for the covariates.
-#' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
+#' @param covariates Single character value or character array. Default: NULL.
+#' Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be inferred from main effects.
+#' @param model_formula (optional) Symbolic description of the model to be
+#' fitted in standard formula notation (e.g. "NPX~A*B + (1|ID)"). If provided,
+#' this will override the \code{outcome}, \code{variable} and \code{covariates}
+#' arguments. Can be a string or of class \code{stats::formula()}.
+#' @param return.covariates Boolean. Default: False. Returns results for the
+#' covariates. Note: Adjusted p-values will be NA for the covariates.
+#' @param verbose Boolean. Default: True. If information about removed samples,
+#'  factor conversion and final model formula is to be printed to the console.
 #'
-#' @return A "tibble" containing the results of fitting the linear mixed effects model to every protein by OlinkID, ordered by ascending p-value.
+#' @return A "tibble" containing the results of fitting the linear mixed
+#' effects model to every protein by OlinkID, ordered by ascending p-value.
 #' Columns include:
 #' \itemize{
 #'  \item{Assay:} "character" Protein symbol
@@ -44,25 +63,28 @@
 #'  \item{DenDF:} "numeric" denominator of decrees of freedom
 #'  \item{statistic:} "numeric" value of the statistic
 #'  \item{p.value:} "numeric" nominal p-value
-#'  \item{Adjusted_pval:} "numeric" adjusted p-value for the test (Benjamini&Hochberg)
-#'  \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
+#'  \item{Adjusted_pval:} "numeric" adjusted p-value for the test
+#'  (Benjamini&Hochberg)
+#'  \item{Threshold:} "character" if adjusted p-value is significant or
+#'  not (< 0.05)
 #' }
 #'
 #' @export
 #' @examples
 #' \donttest{
-#' # Results in model NPX~Time*Treatment+(1|Subject)+(1|Site)
-#' lmer_results <- olink_lmer(df = npx_data1,
-#' variable=c("Time", 'Treatment'),
-#' random = c('Subject', 'Site'))
+#' if (requireNamespace("lme4", quietly = TRUE) & requireNamespace("lmerTest", quietly = TRUE)){
+#'   # Results in model NPX~Time*Treatment+(1|Subject)+(1|Site)
+#'   lmer_results <- olink_lmer(df = npx_data1,
+#'   variable=c("Time", 'Treatment'),
+#'   random = c('Subject', 'Site'))
+#' }
 #' }
 #' @importFrom magrittr %>%
-#' @importFrom dplyr n filter group_by summarise ungroup pull distinct group_modify mutate select all_of
-#' @importFrom lmerTest lmer
+#' @importFrom dplyr n filter group_by summarise ungroup pull distinct
+#' group_modify mutate select all_of
 #' @importFrom rlang ensym
 #' @importFrom stringr str_detect str_extract
 #' @importFrom generics tidy
-#' @importFrom lme4 lmerControl
 
 olink_lmer <- function(df,
                        variable,
@@ -73,7 +95,7 @@ olink_lmer <- function(df,
                        return.covariates = FALSE,
                        verbose = TRUE
 ) {
-
+  package_check()
   if(!missing(model_formula)){
     if("formula" %in% class(model_formula)) model_formula <- deparse(model_formula) #Convert to string if is formula
     tryCatch(as.formula(model_formula),error=function(e) stop(paste0(model_formula," is not a recognized formula."))) #If cannot be coerced into formula, error
@@ -366,6 +388,7 @@ single_lmer <- function(data, formula_string){
 #' \donttest{
 #'
 #' library(dplyr)
+#' if (requireNamespace("lme4", quietly = TRUE) & requireNamespace("lmerTest", quietly = TRUE)){
 #'
 #' lmer_results <- olink_lmer(df = npx_data1,
 #'                            variable=c("Time", 'Treatment'),
@@ -393,10 +416,10 @@ single_lmer <- function(data, formula_string){
 #'                                            effect_formula = "pairwise~Treatment|Time",
 #'                                            verbose = TRUE)
 #' }
+#' }
 #'
 #' @importFrom magrittr %>%
 #' @importFrom dplyr filter group_by summarise ungroup pull distinct group_modify mutate select rename arrange
-#' @importFrom lmerTest lmer
 #' @importFrom stringr str_detect
 #' @importFrom emmeans emmeans
 
@@ -414,6 +437,7 @@ olink_lmer_posthoc <- function(df,
                                verbose = TRUE
 ){
 
+  package_check()
   if(!missing(model_formula)){
     if("formula" %in% class(model_formula)) model_formula <- deparse(model_formula) #Convert to string if is formula
     tryCatch(as.formula(model_formula),error=function(e) stop(paste0(model_formula," is not a recognized formula."))) #If cannot be coerced into formula, error
@@ -662,7 +686,7 @@ single_posthoc <- function(data, formula_string, effect, mean_return, padjust_me
 #' \donttest{
 #'
 #' library(dplyr)
-#'
+#' if (requireNamespace("lme4", quietly = TRUE) & requireNamespace("lmerTest", quietly = TRUE)){
 #' lmer_results <- olink_lmer(df = npx_data1,
 #'                            variable=c("Time", 'Treatment'),
 #'                            random = c('Subject'))
@@ -680,7 +704,9 @@ single_posthoc <- function(data, formula_string, effect, mean_return, padjust_me
 #'                                             col_variable = 'Treatment',
 #'                                             verbose=TRUE,
 #'                                             olinkid_list = assay_list,
-#'                                             number_of_proteins_per_plot = 10)}
+#'                                             number_of_proteins_per_plot = 10)
+#' }
+#' }
 #' @importFrom magrittr %>%
 #' @importFrom dplyr filter pull distinct mutate select arrange
 #' @importFrom stringr str_detect
@@ -699,6 +725,7 @@ olink_lmer_plot <- function(df,
                             verbose = FALSE,
                             ...
                             ){
+  package_check()
 
   if(missing(df) | missing(variable) | missing(x_axis_variable) | missing(random)){
     stop('The df, variable, random and x_axis_variable arguments need to be specified.')
@@ -837,4 +864,22 @@ olink_lmer_plot <- function(df,
   }
 
   return(invisible(list_of_plots))
+}
+
+package_check <- function(){
+  if(!requireNamespace("lme4", quietly = TRUE)){
+    stop("olink_lmer requires the \"lme4\" and \"lmerTest\" functions to run.
+         Please install packages before continuing.
+
+         install.packages(c(\"lme4\", \"lmerTest\"))"
+    )
+  }
+
+  if(!requireNamespace("lmerTest", quietly = TRUE)){
+    stop("olink_lmer requires the \"lme4\" and \"lmerTest\" functions to run.
+         Please install packages before continuing.
+
+         install.packages(c(\"lme4\", \"lmerTest\"))"
+    )
+  }
 }

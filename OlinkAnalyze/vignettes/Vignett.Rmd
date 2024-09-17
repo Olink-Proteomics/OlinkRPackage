@@ -750,14 +750,16 @@ Adjusted p-values are calculated using the function *p.adjust* from the R librar
 * verbose: Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 
 ```{r message=FALSE, eval=FALSE}
+if (requireNamespace("lme4", quietly = TRUE) & requireNamespace("lmerTest", quietly = TRUE)){
 # Linear mixed model with one variable.
-lmer_results_oneway <- olink_lmer(df = npx_data1, 
-                                  variable = 'Site',
-                                  random = 'Subject')
+  lmer_results_oneway <- olink_lmer(df = npx_data1, 
+                                    variable = 'Site',
+                                    random = 'Subject')
 # Linear mixed model with two variables.
-lmer_results_twoway <- olink_lmer(df = npx_data1, 
-                                  variable = c('Site', 'Treatment'),
-                                  random = 'Subject')
+  lmer_results_twoway <- olink_lmer(df = npx_data1, 
+                                    variable = c('Site', 'Treatment'),
+                                    random = 'Subject')
+}
 ```
 
 ### Function outcome
@@ -795,20 +797,22 @@ The olink_lmer_posthoc function is similar to olink_lmer but performs a post-hoc
 * verbose: Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 
 ```{r message=FALSE, eval=FALSE}
-# Linear mixed model with two variables.
-lmer_results_twoway <- olink_lmer(df = npx_data1, 
-                                  variable = c('Site', 'Treatment'),
-                                  random = 'Subject')
-# extracting the significant proteins
-lmer_results_twoway_significant <- lmer_results_twoway %>%
-  filter(Threshold == 'Significant', term == 'Treatment') %>%
-  pull(OlinkID)
-# performing post-hoc analysis
-lmer_posthoc_twoway_results <- olink_lmer_posthoc(df = npx_data1,
-                                                  olinkid_list = lmer_results_twoway_significant,
-                                                  variable = c('Site', 'Treatment'),
-                                                  random = 'Subject',
-                                                  effect = 'Treatment') 
+if (requireNamespace("lme4", quietly = TRUE) & requireNamespace("lmerTest", quietly = TRUE)){
+  # Linear mixed model with two variables.
+  lmer_results_twoway <- olink_lmer(df = npx_data1, 
+                                    variable = c('Site', 'Treatment'),
+                                    random = 'Subject')
+  # extracting the significant proteins
+  lmer_results_twoway_significant <- lmer_results_twoway %>%
+    filter(Threshold == 'Significant', term == 'Treatment') %>%
+    pull(OlinkID)
+  # performing post-hoc analysis
+  lmer_posthoc_twoway_results <- olink_lmer_posthoc(df = npx_data1,
+                                                    olinkid_list = lmer_results_twoway_significant,
+                                                    variable = c('Site', 'Treatment'),
+                                                    random = 'Subject',
+                                                    effect = 'Treatment') 
+}
 ```
 
 ### Function output
@@ -1084,13 +1088,15 @@ The function olink_lmer_plot generates a point-range plot for a given list of pr
 * verbose: Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 
 ```{r message=FALSE, fig.width= 8}
-plot <- olink_lmer_plot(df = npx_data1, 
-                        olinkid_list = c("OID01216", "OID01217"), 
-                        variable = c('Site', 'Treatment'), 
-                        x_axis_variable =  'Site',
-                        col_variable = 'Treatment',
-                        random = 'Subject')
-plot[[1]]
+if (requireNamespace("lme4", quietly = TRUE) & requireNamespace("lmerTest", quietly = TRUE)){
+  plot <- olink_lmer_plot(df = npx_data1, 
+                          olinkid_list = c("OID01216", "OID01217"), 
+                          variable = c('Site', 'Treatment'), 
+                          x_axis_variable =  'Site',
+                          col_variable = 'Treatment',
+                          random = 'Subject')
+  plot[[1]]
+}
 ```
 
 ### Function output
