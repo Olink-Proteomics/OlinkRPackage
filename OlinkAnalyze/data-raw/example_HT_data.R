@@ -6,10 +6,10 @@ set.seed(1234)
 sample_id <- c(paste0("Sample_", LETTERS[1L:26L]),
                paste0("Sample_A", LETTERS[1L:26L]),
                paste0("Sample_B", LETTERS[1L:26L]),
-               paste0("Sample_G", LETTERS[1L:26L]),
-               paste0("Sample_H", LETTERS[1L:26L]),
-               paste0("Sample_I", LETTERS[1L:26L]),
-               paste0("Sample_J", LETTERS[1L:26L]))[1L:172L]
+               paste0("Sample_C", LETTERS[1L:26L]),
+               paste0("Sample_D", LETTERS[1L:26L]),
+               paste0("Sample_E", LETTERS[1L:26L]),
+               paste0("Sample_F", LETTERS[1L:26L]))[1L:172L]
 sample_id_ctrl <- paste0("CONTROL_SAMPLE_", 1L:6L)
 sample_id_pc <- paste0("PLATE_CONTROL_", 1L:10L)
 sample_id_nc <- paste0("NEGATIVE_CONTROL_", 1L:4L)

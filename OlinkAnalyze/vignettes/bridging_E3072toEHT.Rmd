@@ -290,8 +290,14 @@ overlapping_samples <- unique(intersect(data_explore3072_samples,
 # stringr::str_detect can be used to exclude control samples based on SampleID.
 ```
 
+```{r include=FALSE}
+overlapping_samples <- unique(intersect(data_explore3072_samples,
+                                        data_exploreht_samples))[1:50]
+# Only use top 48 as overlapping samples
+```
+
 ```{r, echo=FALSE}
-matrix(overlapping_samples, ncol = 3) |>
+matrix(overlapping_samples, ncol = 4) |>
   kableExtra::kbl(booktabs = TRUE,
                   digits = 2,
                   caption = "Table 3. Overlapping bridging samples") |>
