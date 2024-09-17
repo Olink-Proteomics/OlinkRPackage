@@ -16,26 +16,35 @@ olink_lmer(
 )
 }
 \arguments{
-\item{df}{NPX data frame in long format with at least protein name (Assay), OlinkID, UniProt, 1-2 variables with at least 2 levels.}
+\item{df}{NPX data frame in long format with at least protein
+name (Assay), OlinkID, UniProt, 1-2 variables with at least 2 levels.}
 
 \item{variable}{Single character value or character array.
-Variable(s) to test. If length > 1, the included variable names will be used in crossed analyses .
+Variable(s) to test. If length > 1, the included variable
+names will be used in crossed analyses .
 Also takes ':' or '*' notation.}
 
 \item{outcome}{Character. The dependent variable. Default: NPX.}
 
 \item{random}{Single character value or character array.}
 
-\item{covariates}{Single character value or character array. Default: NULL.Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be inferred from main effects.}
+\item{covariates}{Single character value or character array. Default: NULL.
+Covariates to include. Takes ':' or '*' notation. Crossed analysis will not be inferred from main effects.}
 
-\item{model_formula}{(optional) Symbolic description of the model to be fitted in standard formula notation (e.g. "NPX~A*B + (1|ID)"). If provided, this will override the \code{outcome}, \code{variable} and \code{covariates} arguments. Can be a string or of class \code{stats::formula()}.}
+\item{model_formula}{(optional) Symbolic description of the model to be
+fitted in standard formula notation (e.g. "NPX~A*B + (1|ID)"). If provided,
+this will override the \code{outcome}, \code{variable} and \code{covariates}
+arguments. Can be a string or of class \code{stats::formula()}.}
 
-\item{return.covariates}{Boolean. Default: False. Returns results for the covariates. Note: Adjusted p-values will be NA for the covariates.}
+\item{return.covariates}{Boolean. Default: False. Returns results for the
+covariates. Note: Adjusted p-values will be NA for the covariates.}
 
-\item{verbose}{Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
+\item{verbose}{Boolean. Default: True. If information about removed samples,
+factor conversion and final model formula is to be printed to the console.}
 }
 \value{
-A "tibble" containing the results of fitting the linear mixed effects model to every protein by OlinkID, ordered by ascending p-value.
+A "tibble" containing the results of fitting the linear mixed
+effects model to every protein by OlinkID, ordered by ascending p-value.
 Columns include:
 \itemize{
 \item{Assay:} "character" Protein symbol
@@ -49,28 +58,40 @@ Columns include:
 \item{DenDF:} "numeric" denominator of decrees of freedom
 \item{statistic:} "numeric" value of the statistic
 \item{p.value:} "numeric" nominal p-value
-\item{Adjusted_pval:} "numeric" adjusted p-value for the test (Benjamini&Hochberg)
-\item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
+\item{Adjusted_pval:} "numeric" adjusted p-value for the test
+(Benjamini&Hochberg)
+\item{Threshold:} "character" if adjusted p-value is significant or
+not (< 0.05)
 }
 }
 \description{
-Fits a linear mixed effects model for every protein (by OlinkID) in every panel, using lmerTest::lmer and stats::anova.
-The function handles both factor and numerical variables and/or covariates. \cr\cr
-Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a message if verbose = TRUE).
-Character columns in the input dataframe are automatically converted to factors (specified in a message if verbose = TRUE).
+Fits a linear mixed effects model for every protein (by OlinkID) in every
+panel, using lmerTest::lmer and stats::anova.
+The function handles both factor and numerical variables and/or
+covariates. \cr\cr
+Samples that have no variable information or missing factor levels are
+automatically removed from the analysis (specified in a message if verbose = TRUE).
+Character columns in the input dataframe are automatically converted to
+factors (specified in a message if verbose = TRUE).
 Numerical variables are not converted to factors.
-If a numerical variable is to be used as a factor, this conversion needs to be done on the dataframe before the function call. \cr\cr
-Crossed analysis, i.e. A*B formula notation, is inferred from the variable argument in the following cases: \cr
+If a numerical variable is to be used as a factor, this conversion needs to
+be done on the dataframe before the function call. \cr\cr
+Crossed analysis, i.e. A*B formula notation, is inferred from the variable
+argument in the following cases: \cr
 \itemize{
 \item c('A','B')
 \item c('A:B')
 \item c('A:B', 'B') or c('A:B', 'A')
 }
 Inference is specified in a message if verbose = TRUE. \cr
-For covariates, crossed analyses need to be specified explicitly, i.e. two main effects will not be expanded with a c('A','B') notation. Main effects present in the variable takes precedence. \cr
+For covariates, crossed analyses need to be specified explicitly, i.e. two
+main effects will not be expanded with a c('A','B') notation. Main effects
+present in the variable takes precedence. \cr
 The random variable only takes main effect(s). \cr
-The formula notation of the final model is specified in a message if verbose = TRUE. \cr\cr
-Output p-values are adjusted by stats::p.adjust according to the Benjamini-Hochberg method (“fdr”).
+The formula notation of the final model is specified in a message
+if verbose = TRUE. \cr\cr
+Output p-values are adjusted by stats::p.adjust according to the
+Benjamini-Hochberg method (“fdr”).
 Adjusted p-values are logically evaluated towards adjusted p-value<0.05.
 }
 \examples{
