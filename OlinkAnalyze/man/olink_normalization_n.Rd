@@ -33,10 +33,10 @@ baseline project that does not normalize to any other. All other project
 normalize to one or more projects. The function handles projects that are
 normalized in a chain, for example:
 \itemize{
-   \item{1.} project 2 normalizes to project 1, and project 3 normalizes to
-   project 2.
-   \item{2.} project 2 normalizes to project 1, and project 3 normalizes to
-   the combined data frame of projects 1 and 2 (that is already normalized).
+\item{1.} project 2 normalizes to project 1, and project 3 normalizes to
+project 2.
+\item{2.} project 2 normalizes to project 1, and project 3 normalizes to
+the combined data frame of projects 1 and 2 (that is already normalized).
 }
 
 The function can also handle a mixed schema of bridge and subset
@@ -44,39 +44,39 @@ normalization.
 
 Specifications of the normalization schema data frame:
 \itemize{
-   \item{order:} should strictly be a numeric or integer array with unique
-   identifiers for each project. It is necessary that this array starts from
-   1 and that it contains no NAs.
-   \item{name:} should strictly be a character array with unique identifiers
-   for each project. Each entry should represent the name of the project
-   located in the same row. No NAs are allowed.
-   \item{data:} a named list of NPX data frames representing the projects to
-   be normalized. Names of the items of the list should be identical to
-   "names". No NAs are allowed.
-   \item{samples:} a two-level nested named list of sample identifiers from
-   each NPX project from "data". Names of the first level of the nested list
-   should be identical to "names" and to the names of the list from "data".
-   Projects that will be used only as reference should have their
-   corresponding element in the list as NA, while all other projects should
-   contain a named list of 2 arrays containing identifiers of samples to be
-   used for the calculation of adjustment factor. The names of the two
-   arrays should be DF1 and DF2 corresponding to the reference project and
-   the project in the current row, respectively. For bridge normalization
-   arrays should be of equal length and the index of each entry should
-   correspond to the same sample. For subset normalization arrays do not
-   need to be of equal length and the order the samples appear in does not
-   matter. DF1 might contain sample identifiers from more than one project
-   as long as the project in the current row is to be normalized to multiple
-   other projects.
-   \item{normalization_type:} a character array containing the flags "Bridge"
-   or "Subset". Projects that will be used only as reference should have
-   their corresponding element in the array as NA, while all other projects
-   should contain a flag. For the time being the flag "Median" is not
-   supported.
-   \item{normalize_to:} a character array pointing to the project this
-   project is to be normalized to. Elements of the array should be
-   exclusively from the "order" column. Elements of the array may be
-   comma-separated if the project is to be normalized to multiple projects.
+\item{order:} should strictly be a numeric or integer array with unique
+identifiers for each project. It is necessary that this array starts from
+1 and that it contains no NAs.
+\item{name:} should strictly be a character array with unique identifiers
+for each project. Each entry should represent the name of the project
+located in the same row. No NAs are allowed.
+\item{data:} a named list of NPX data frames representing the projects to
+be normalized. Names of the items of the list should be identical to
+"names". No NAs are allowed.
+\item{samples:} a two-level nested named list of sample identifiers from
+each NPX project from "data". Names of the first level of the nested list
+should be identical to "names" and to the names of the list from "data".
+Projects that will be used only as reference should have their
+corresponding element in the list as NA, while all other projects should
+contain a named list of 2 arrays containing identifiers of samples to be
+used for the calculation of adjustment factor. The names of the two
+arrays should be DF1 and DF2 corresponding to the reference project and
+the project in the current row, respectively. For bridge normalization
+arrays should be of equal length and the index of each entry should
+correspond to the same sample. For subset normalization arrays do not
+need to be of equal length and the order the samples appear in does not
+matter. DF1 might contain sample identifiers from more than one project
+as long as the project in the current row is to be normalized to multiple
+other projects.
+\item{normalization_type:} a character array containing the flags "Bridge"
+or "Subset". Projects that will be used only as reference should have
+their corresponding element in the array as NA, while all other projects
+should contain a flag. For the time being the flag "Median" is not
+supported.
+\item{normalize_to:} a character array pointing to the project this
+project is to be normalized to. Elements of the array should be
+exclusively from the "order" column. Elements of the array may be
+comma-separated if the project is to be normalized to multiple projects.
 }
 }
 \examples{
@@ -259,7 +259,8 @@ overlap_samples_df2_df3 <- list("DF1" = sample(x = unique(npx_df2$SampleID),
 overlap_samples_df12_df4 <- list("DF1" = sample(x = c(unique(npx_df1$SampleID),
                                                       unique(npx_df2$SampleID)),
                                                 size = 100,
-                                                replace = FALSE),
+                                                replace = FALSE) |>
+                                   unique(),
                                  "DF2" = sample(x = unique(npx_df4$SampleID),
                                                 size = 40,
                                                 replace = FALSE))
