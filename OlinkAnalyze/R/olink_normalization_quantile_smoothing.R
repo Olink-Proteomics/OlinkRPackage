@@ -58,7 +58,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' \donttest{\
+#' \donttest{
 #'# Bridge samples
 #' bridge_samples <- intersect(
 #' x = unique(data_ht$SampleID),
