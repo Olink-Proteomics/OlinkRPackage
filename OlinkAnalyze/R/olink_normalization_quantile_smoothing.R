@@ -56,7 +56,7 @@ olink_normalization_qs <- function(lst_df,
 
     # Minimal number of bridge samples required to for the function to work. If
     # not met, we just return NA.
-    if(nrow(model_data_joined) < num_samples){
+    if (nrow(model_data_joined) < num_samples) {
       return(rep(x = NA_real_, times = nrow(data)))
     }
 
