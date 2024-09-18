@@ -28,8 +28,52 @@ transform the quantifications of the the non-reference dataset to the
 reference.
 }
 \details{
-We need to add some details from the tutorial/education material to describr
-the function in a bit more detail.
+Individual Olink NPX projects are generally normalized using
+either plate control normalization or intensity normalization methods.
+Since NPX is a relative measurement, in the case when a study is
+separated into multiple projects, an additional normalization step is
+needed to allow the data to be comparable across projects.
+The \code{olink_normalization_qs()} performs quantile smoothing bridging
+normalization between datasets from two Olink products (for example
+Olink Explore 3072 and Olink Explore HT).
+}
+\examples{
+\dontrun{
+\donttest{\
+# Bridge samples
+bridge_samples <- intersect(
+x = unique(data_ht$SampleID),
+y = unique(data_3k$SampleID)) |>
+  (\(x) x[!grepl("CONTROL", x)])()
+
+# Run the internal function olink_norm_input_check()
+ref_col <- olink_norm_input_check (
+df1 = data_ht, df2 = data_3k,
+overlapping_samples_df1 = bridge_samples,
+overlapping_samples_df2 = NULL,
+df1_project_nr = "P1",
+df2_project_nr = "P2",
+reference_project = "P1",
+reference_medians = NULL
+)
+
+# Named list of input datasets
+lst_df <- list (
+P1 = ref_col$ref_df,
+P2 = ref_col$not_ref_df
+)
+
+ref_cols <- ref_col$ref_cols
+
+qs_result <- olink_normalization_qs (
+lst_df = lst_df,
+ref_cols = ref_cols,
+bridge_samples = bridge_samples
+)
+}
+}
+
+
 }
 \author{
 Amrita Kar
