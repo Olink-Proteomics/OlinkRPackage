@@ -224,7 +224,7 @@ olink_normalization_qs <- function(lst_df,
     dplyr::filter(
       # only customer samples
       .data[["SampleType"]] == "SAMPLE"
-      # remove interal control assays
+      # remove internal control assays
       & .data[["AssayType"]] == "assay"
     ) |>
     dplyr::select(
