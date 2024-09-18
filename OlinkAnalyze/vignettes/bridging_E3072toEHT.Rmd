@@ -352,8 +352,8 @@ ggpubr::ggarrange(pca_E3072[[1]], pca_EHT[[1]], nrow = 2)
 
 ## Normalization
 
-The `olink_normalization_bridge_product()` function is used to determine
-which assays are bridgeable and of the bridgeable assays what
+The `olink_normalization()` functionality has been expanded and can be used 
+to determine which assays are bridgeable and of the bridgeable assays what
 normalization method is advised, and to calculate normalized NPX values
 for the Explore 3072 (non-reference) project. Normalized NPX values are calculated for
 all assays across products as described in the [Workflow Overview] and in
@@ -363,19 +363,18 @@ the two methods described below.
 
 ```{r, eval=FALSE}
 # Find shared samples
-npx_1 <- data_exploreht |>
+npx_ht <- data_exploreht |>
   dplyr::mutate(Project = "data1") 
-npx_2 <- data_explore3072 |>
+npx_3072 <- data_explore3072 |>
   dplyr::mutate(Project = "data2")
 
-
-overlap_samples_list <- list("DF1" = overlap_samples,
-                             "DF2" = overlap_samples)
-npx_br_data <- olink_normalization_bridge_product(npx_1, 
-                                   npx_2,
-                                   bridge_samples = overlap_samples_list,
-                                   exploreht_name = "reference",
-                                   explore3072_name = "new")
+npx_br_data <- olink_normalization(df1 = npx_ht, 
+                                   df2 = npx_3072,
+                                   overlapping_samples_df1 =
+                                     overlap_samples_list,
+                                   df1_project_nr = "Explore HT",
+                                   df2_project_nr = "Explore 3072",
+                                   reference_project = "Explore HT")
 ```
 
 ### Determining bridging recommendations
@@ -383,8 +382,9 @@ npx_br_data <- olink_normalization_bridge_product(npx_1,
 For an assay to be bridgeable across products, it must either have signal
 in both products or be primarily background signal in both products.
 Bridging noise into signal or signal into noise can negatively impact
-downstream statistical analysis. To determine if an assay is bridgeable,
-the following criteria are considered:
+downstream statistical analysis. To determine if an assay is bridgeable, 
+the bridge samples from both products are used to assess the following
+criteria:
 
 -   Is there a linear relationship between products?
     -   **Assessing linearity across products:** To determine if there
@@ -537,10 +537,10 @@ to perform the following steps:
 
 ### Function Output
 
-The output from `olink_normalization_bridge_product()` function is a
-dataframe with concatenated data from the two products and additional
-columns including adjusted NPX values, bridging recommendations, mapping
-information, and project names. The adjusted NPX values are notated in
+The output from `olink_normalization()` function when used for between 
+product bridging is a dataframe with concatenated data from the two products 
+and additional columns including adjusted NPX values, bridging recommendations,
+mapping information, and project names. The adjusted NPX values are notated in
 the columns `MedianCenteredNPX` and `QSNormalizedNPX`. For each assay a
 recommendation is listed in the `BridgingRecommendation` column and
 lists what method, if any should be used for that assay. Additional
@@ -679,7 +679,7 @@ run.
 ### Downstream Analysis
 
 Olink Analyze statistical analysis functions default to use the data in
-the `NPX` column. This means that if the resulting data from the `olink_normalization_bridge_product()` function is used in a downstream analysis function, then the non-normalized NPX data will be used. To use the recommended normalized data, `dplyr::mutate()` can be used to reassign the NPX data. Additionally, to ensure that overlapping assays within products are analyzed individually, `OlinkID` can be temporarily assigned to the concatenated version of the OlinkIDs. This dataframe can then be used in any downstream analysis function within Olink Analyze. 
+the `NPX` column. This means that if the resulting data from the `olink_normalization()` function is used in a downstream analysis function, then the non-normalized NPX data will be used. To use the recommended normalized data, `dplyr::mutate()` can be used to reassign the NPX data. Additionally, to ensure that overlapping assays within products are analyzed individually, `OlinkID` can be temporarily assigned to the concatenated version of the OlinkIDs. This dataframe can then be used in any downstream analysis function within Olink Analyze. 
 
 Assays which are not recommended for bridging should be analyzed separately and can be combined using a meta-analysis. Depending on the study design these assays can either be excluded from the downstream analysis or the assays can be treated as non-overlapping assays.
 
