@@ -70,7 +70,7 @@ olink_normalization_qs <- function(lst_df,
         stats::ecdf()
     )
     # the inverse if the ECDF are the quantiles
-    notref_map_quantiles <- model_data_joined |>
+    notref_map_quantiles <- model_data_joined |> # nolint
       dplyr::pull(
         .data[[quant_col$ref]]
       ) |>
@@ -94,7 +94,7 @@ olink_normalization_qs <- function(lst_df,
       sort()
 
     # quantile points used for adapting the non linear spline
-    notref_knots <- stats::quantile(
+    notref_knots <- stats::quantile( # nolint
       x = notref_quant,
       probs = c(0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95),
       names = FALSE
