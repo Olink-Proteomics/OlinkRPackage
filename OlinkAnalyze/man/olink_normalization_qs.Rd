@@ -59,7 +59,7 @@ can be found in the Bridging Olink Explore 3072 to Olink Explore HT tutorial.
 }
 \examples{
 \dontrun{
-\donttest{\
+\donttest{
 # Bridge samples
 bridge_samples <- intersect(
 x = unique(data_ht$SampleID),
