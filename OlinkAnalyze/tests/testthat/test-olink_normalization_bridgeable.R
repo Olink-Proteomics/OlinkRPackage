@@ -1,5 +1,5 @@
 test_that(
-  "olink_normalization_is_bridgeable - works - 20 bridge samples",
+  "olink_normalization_is_bridgeable - works",
   {
     expect_message(
       object = data_explore_check <- olink_norm_input_check(
@@ -9,8 +9,7 @@ test_that(
           x = unique(data_3k$SampleID),
           y = unique(data_ht$SampleID)
         ) |>
-          (\(x) x[!grepl("CONTROL", x)])() |>
-          head(20L),
+          (\(x) x[!grepl("CONTROL", x)])(),
         overlapping_samples_df2 = NULL,
         df1_project_nr = "P1",
         df2_project_nr = "P2",
