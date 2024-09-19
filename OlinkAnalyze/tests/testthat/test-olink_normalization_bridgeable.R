@@ -1,5 +1,5 @@
 test_that(
-  "olink_normalization_is_bridgeable - works",
+  "olink_normalization_is_bridgeable - works - 20 bridge samples",
   {
     expect_message(
       object = data_explore_check <- olink_norm_input_check(
@@ -47,7 +47,7 @@ test_that(
         ) |>
         dplyr::distinct() |>
         nrow(),
-      expected = 60L
+      expected = 37L
     )
 
     expect_equal(
@@ -57,7 +57,7 @@ test_that(
         ) |>
         dplyr::distinct() |>
         nrow(),
-      expected = 39L
+      expected = 62L
     )
 
     expect_equal(
