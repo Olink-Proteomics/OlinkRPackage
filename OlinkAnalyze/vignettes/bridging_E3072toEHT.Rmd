@@ -253,20 +253,7 @@ data_exploreht <- OlinkAnalyze:::data_ht
 
 ## Checking input datasets and bridging samples
 
-First, confirm that there are overlapping sample IDs within the study.
-In a case where the same sample have different sample IDs in the two projects, the `overlap_sample_list`
-will contain 2 arrays of equal length where the index of each entry
-corresponds to the same sample. For example, if a sample had the
-SampleID of `Sample_1_Aliquot_1` in the first project and
-`Sample_1_Aliquot_2` in the second project, then the overlap sample list
-should look as the following.
-
-```{r eval=FALSE, include=TRUE}
-overlap_sample_list <- list("DF1" = c("A1", "A2", "A3", "Sample_1_Aliquot_1"),
-                            "DF2" = c("A1", "A2", "A3",  "Sample_1_Aliquot_2"))
-```
-
-Note that external controls should not be included in the list of
+First, confirm that there are overlapping sample IDs within the study. Note that external controls should not be included in the list of
 bridging samples, as detailed in the [Bridge Sample Selection] section
 of this tutorial. External control samples often share the same naming
 convention across data sets but may represent different samples due to
@@ -292,7 +279,7 @@ overlapping_samples <- unique(intersect(data_explore3072_samples,
 
 ```{r include=FALSE}
 overlapping_samples <- unique(intersect(data_explore3072_samples,
-                                        data_exploreht_samples))[1:50]
+                                        data_exploreht_samples))[1:48]
 # Only use top 48 as overlapping samples
 ```
 
