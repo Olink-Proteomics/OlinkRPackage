@@ -8,6 +8,16 @@ test_that(
                                   "qq_normalization_reference_result.rds")
     ref_qs_norm <- readRDS(file = ref_qs_norm_file)
 
+    data_3k_file <- test_path("..",
+                                  "data",
+                                  "data_3k.rds")
+    data_3k <- readRDS(file = data_3k_file)
+
+    data_ht_file <- test_path("..",
+                              "data",
+                              "data_ht.rds")
+    data_ht <- readRDS(file = data_ht_file)
+
     # run example data in the function ----
 
     # bridge samples

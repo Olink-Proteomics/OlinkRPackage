@@ -1,6 +1,15 @@
 test_that(
   "olink_normalization_is_bridgeable - works",
   {
+    data_3k_file <- test_path("..",
+                              "data",
+                              "data_3k.rds")
+    data_3k <- readRDS(file = data_3k_file)
+
+    data_ht_file <- test_path("..",
+                              "data",
+                              "data_ht.rds")
+    data_ht <- readRDS(file = data_ht_file)
     expect_message(
       object = data_explore_check <- olink_norm_input_check(
         df1 = data_3k,
