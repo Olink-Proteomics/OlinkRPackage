@@ -148,36 +148,36 @@ test_that(
         dplyr::pull(
           .data[["QSNormalizedNPX"]]
         ),
-      expected = c(7.46169571,  0.23983357, -2.18624459,
-                   0.09153544, -1.11978409, -1.96985158),
+      expected = c(1.3373010,  0.9455337, 0.9250129,
+                   0.0757910, -0.3936278, 4.1004279),
       tolerance = 1e-4
     )
 
     expect_equal(
       object = qs_norm |>
         dplyr::filter(
-          .data[[norm_input_check$ref_cols$sample_id]] == "Sample_CT"
+          .data[[norm_input_check$ref_cols$sample_id]] == "Sample_J"
           & .data[["Project"]] == norm_input_check$not_ref_name
           & .data[[norm_input_check$ref_cols$olink_id]] == "OID42135_OID21255"
         ) |>
         dplyr::pull(
           .data[["QSNormalizedNPX"]]
         ),
-      expected = -0.4903429,
+      expected = 1.815376,
       tolerance = 1e-4
     )
 
     expect_equal(
       object = qs_norm |>
         dplyr::filter(
-          .data[[norm_input_check$ref_cols$sample_id]] == "Sample_W"
+          .data[[norm_input_check$ref_cols$sample_id]] == "Sample_AZ"
           & .data[["Project"]] == norm_input_check$not_ref_name
           & .data[[norm_input_check$ref_cols$olink_id]] == "OID41486_OID31160"
         ) |>
         dplyr::pull(
           .data[["QSNormalizedNPX"]]
         ),
-      expected = 4.110298,
+      expected = 2.872351,
       tolerance = 1e-4
     )
 
@@ -266,36 +266,36 @@ test_that(
         dplyr::pull(
           .data[["QSNormalizedNPX"]]
         ),
-      expected = c(8.3723565,  0.0999940, -1.3768421,
-                   1.8088803, -0.9480357, -1.3107725),
+      expected = c(1.31915956,  0.76520904, 0.95169186,
+                   -0.01082492, -0.40067950, 4.05650397),
       tolerance = 1e-4
     )
 
     expect_equal(
       object = qs_norm |>
         dplyr::filter(
-          .data[[norm_input_check$ref_cols$sample_id]] == "Sample_CT"
+          .data[[norm_input_check$ref_cols$sample_id]] == "Sample_CT_3k"
           & .data[["Project"]] == norm_input_check$not_ref_name
           & .data[[norm_input_check$ref_cols$olink_id]] == "OID42135_OID21255"
         ) |>
         dplyr::pull(
           .data[["QSNormalizedNPX"]]
         ),
-      expected = 0.1846259,
+      expected = -1.066912,
       tolerance = 1e-4
     )
 
     expect_equal(
       object = qs_norm |>
         dplyr::filter(
-          .data[[norm_input_check$ref_cols$sample_id]] == "Sample_W"
+          .data[[norm_input_check$ref_cols$sample_id]] == "Sample_EW_3k"
           & .data[["Project"]] == norm_input_check$not_ref_name
           & .data[[norm_input_check$ref_cols$olink_id]] == "OID41486_OID31160"
         ) |>
         dplyr::pull(
           .data[["QSNormalizedNPX"]]
         ),
-      expected = 3.380136,
+      expected = 2.899737,
       tolerance = 1e-4
     )
 
