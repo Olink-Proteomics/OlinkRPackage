@@ -58,41 +58,41 @@ More information on quantile smoothing and between product normalization
 can be found in the Bridging Olink Explore 3072 to Olink Explore HT tutorial.
 }
 \examples{
-\dontrun{
 \donttest{
 # Bridge samples
 bridge_samples <- intersect(
-x = unique(data_ht$SampleID),
-y = unique(data_3k$SampleID)) |>
+  x = unique(OlinkAnalyze:::data_ht$SampleID),
+  y = unique(OlinkAnalyze:::data_3k$SampleID)
+) |>
   (\(x) x[!grepl("CONTROL", x)])()
 
-# Run the internal function olink_norm_input_check()
-ref_col <- olink_norm_input_check (
-df1 = data_ht, df2 = data_3k,
-overlapping_samples_df1 = bridge_samples,
-overlapping_samples_df2 = NULL,
-df1_project_nr = "P1",
-df2_project_nr = "P2",
-reference_project = "P1",
-reference_medians = NULL
+# Run the internal function olink_norm_input_check
+check_norm <- OlinkAnalyze:::olink_norm_input_check(
+  df1 = OlinkAnalyze:::data_ht,
+  df2 = OlinkAnalyze:::data_3k,
+  overlapping_samples_df1 = bridge_samples,
+  overlapping_samples_df2 = NULL,
+  df1_project_nr = "P1",
+  df2_project_nr = "P2",
+  reference_project = "P1",
+  reference_medians = NULL
 )
 
 # Named list of input datasets
-lst_df <- list (
-P1 = ref_col$ref_df,
-P2 = ref_col$not_ref_df
+lst_df <- list(
+  check_norm$ref_df,
+  check_norm$not_ref_df
 )
+names(lst_df) <- c(check_norm$ref_name, check_norm$not_ref_name)
 
-ref_cols <- ref_col$ref_cols
+ref_cols <- check_norm$ref_cols
 
-qs_result <- olink_normalization_qs (
-lst_df = lst_df,
-ref_cols = ref_cols,
-bridge_samples = bridge_samples
+qs_result <- OlinkAnalyze:::olink_normalization_qs(
+ lst_df = lst_df,
+ ref_cols = ref_cols,
+ bridge_samples = bridge_samples
 )
 }
-}
-
 
 }
 \author{
