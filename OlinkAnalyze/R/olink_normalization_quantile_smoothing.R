@@ -240,6 +240,21 @@ olink_normalization_qs <- function(lst_df,
     )
   rm(lst_df_clean)
 
+  # remove non-bridge samples from reference dataset ----
+
+  # bridge samples between the reference dataset and the non-reference dataset
+  # are used to predict the NPX values of the non-bridge samples from the
+  # non-reference dataset. For that reason the non-bridge samples from reference
+  # dataset should be removed from the QQ normalization.
+  df_combo <- df_combo |>
+    dplyr::filter(
+      # keep bridge samples
+      .data[["bridge_sample"]] == TRUE
+      # and samples in the non-reference dataset
+      | .data[[ref_cols$sample_id]] %in%
+        unique(dplyr::pull(lst_df[[2L]], .data[[ref_cols$sample_id]]))
+    )
+
   # ecdf transformation ----
 
   # help functions that allow masking of column names from the input datasets

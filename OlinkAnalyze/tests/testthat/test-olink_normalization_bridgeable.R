@@ -9,8 +9,7 @@ test_that(
           x = unique(data_3k$SampleID),
           y = unique(data_ht$SampleID)
         ) |>
-          (\(x) x[!grepl("CONTROL", x)])() |>
-          head(20L),
+          (\(x) x[!grepl("CONTROL", x)])(),
         overlapping_samples_df2 = NULL,
         df1_project_nr = "P1",
         df2_project_nr = "P2",
@@ -47,7 +46,7 @@ test_that(
         ) |>
         dplyr::distinct() |>
         nrow(),
-      expected = 60L
+      expected = 37L
     )
 
     expect_equal(
@@ -57,7 +56,7 @@ test_that(
         ) |>
         dplyr::distinct() |>
         nrow(),
-      expected = 39L
+      expected = 62L
     )
 
     expect_equal(

@@ -1,5 +1,7 @@
 # Generating Example Explore 3072 Data
 
+set.seed(1234)
+
 # sample identifiers
 sample_id <- c(paste0("Sample_", LETTERS[1L:26L]),
                paste0("Sample_A", LETTERS[1L:26L]),
@@ -8,6 +10,11 @@ sample_id <- c(paste0("Sample_", LETTERS[1L:26L]),
                paste0("Sample_D", LETTERS[1L:26L]),
                paste0("Sample_E", LETTERS[1L:26L]),
                paste0("Sample_F", LETTERS[1L:26L]))[1L:176L]
+sample_id <- dplyr::if_else(
+  nchar(sample_id) == 8L | grepl(pattern = "^Sample_A", x = sample_id),
+  sample_id,
+  paste0(sample_id, "_3k")
+)
 sample_id_ctrl <- paste0("CONTROL_SAMPLE_", 1L:4L)
 sample_id_pc <- paste0("PLATE_CONTROL_", 1L:6L)
 sample_id_nc <- paste0("NEGATIVE_CONTROL_", 1L:6L)
