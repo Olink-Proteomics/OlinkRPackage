@@ -290,7 +290,6 @@ test_that(
   }
 )
 
-
 test_that(
   "olink_normalization_qs - works - expected output, 50 bridge samples",
   {
@@ -407,4 +406,3 @@ test_that(
     )
   }
 )
-
