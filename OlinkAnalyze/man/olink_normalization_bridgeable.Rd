@@ -58,11 +58,11 @@ all column names should match.
 \donttest{
 # check input datasets
 data_explore_check <- OlinkAnalyze:::olink_norm_input_check(
-  df1 = OlinkAnalyze:::data_3k,
-  df2 = OlinkAnalyze:::data_ht,
+  df1 = OlinkAnalyze:::data_3k_small,
+  df2 = OlinkAnalyze:::data_ht_small,
   overlapping_samples_df1 = intersect(
-    x = unique(OlinkAnalyze:::data_3k$SampleID),
-    y = unique(OlinkAnalyze:::data_ht$SampleID)
+    x = unique(OlinkAnalyze:::data_3k_small$SampleID),
+    y = unique(OlinkAnalyze:::data_ht_small$SampleID)
   ) |>
     (\(x) x[!grepl("CONTROL", x)])() |>
     head(20L),
