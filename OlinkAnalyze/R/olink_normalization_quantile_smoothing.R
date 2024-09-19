@@ -250,9 +250,9 @@ olink_normalization_qs <- function(lst_df,
     dplyr::filter(
       # keep bridge samples
       .data[["bridge_sample"]] == TRUE
-      # and samples not in the reference dataset
-      | !(.data[[ref_cols$sample_id]] %in%
-            unique(dplyr::pull(lst_df[[1L]], .data[[ref_cols$sample_id]])))
+      # and samples in the non-reference dataset
+      | .data[[ref_cols$sample_id]] %in%
+        unique(dplyr::pull(lst_df[[2L]], .data[[ref_cols$sample_id]]))
     )
 
   # ecdf transformation ----
