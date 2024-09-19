@@ -1,5 +1,7 @@
 # Generating Example Explore 3072 Data
 
+set.seed(1234)
+
 # sample identifiers
 sample_id <- c(paste0("Sample_", LETTERS[1L:26L]),
                paste0("Sample_A", LETTERS[1L:26L]),
