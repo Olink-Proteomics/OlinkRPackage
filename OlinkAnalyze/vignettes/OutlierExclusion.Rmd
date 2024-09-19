@@ -69,14 +69,20 @@ Principal Component Analysis (PCA) is a dimensional reduction technique. PCA plo
 
 Regardless of what the PCA is being used for, PCA plots are great tools to get an overview of the data prior to analysis and pick up on any global trends. These samples are not necessarily outliers but might be indicative of a global difference between groups.
 
-```{r Outlier_Example, fig.cap=fcap}
+```{r Outlier_example_code, eval = FALSE}
 p1<- outlier_data |> olink_pca_plot(label_samples = T, quiet = T)
 p2<- group_data |> olink_pca_plot(color_g = "Site", quiet = T)
 ggpubr::ggarrange(p1[[1]], p2[[1]], nrow = 2, labels = "AUTO")
+
+```
+
+
+```{r Outlier_Example, echo=FALSE, fig.cap=fcap}
+knitr::include_graphics(normalizePath("../man/figures/PCA_Outlier_Fig1.png"))
 fcap <- "**Figure 1** **A.** PCA can be used to identify individual outlier samples as shown by samples A25 and A52. **B.** PCA can be used to identify difference in groups as seen by Site_D samples. This is not suggesting Site_D is an outlier, but rather that there may be a global difference between sites."
 ```
 
-\### How to use PCA plot to identify an outlier
+### How to use PCA plot to identify an outlier
 
 As shown above, PCA plots can be used to identify global differences in specific samples or sets of samples. Often times these samples can be attributed to natural variations, but sometimes these samples are outliers due to technical or sample specific issues. To determine if a sample is a true outlier and should be excluded, consider the following:
 
@@ -90,10 +96,14 @@ As shown above, PCA plots can be used to identify global differences in specific
 
 PCA plots can be generated using `olink_pca_plot()` and specifying the color for each sample using the `color_g` argument. By default the samples will be colored by QC_Warning. Prior to generating the PCA plot, the duplicate SampleIDs (often Control samples) will need to be renamed or filtered out.
 
-```{r}
+```{r PCA_treatment, eval=FALSE}
 OlinkAnalyze::npx_data1 |> 
   dplyr::filter(stringr::str_detect(SampleID, "CONTROL", negate = T)) |> # Filter duplicate SampleIDs
   olink_pca_plot(color_g = "Treatment")
+```
+
+```{r PCA_treatment_fig, echo=FALSE}
+knitr::include_graphics(normalizePath("../man/figures/PCA_Treatment.png"))
 ```
 
 In this dataset there do not appear to be any outliers in the PCA plot.
