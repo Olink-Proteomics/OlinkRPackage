@@ -76,7 +76,7 @@ data.frame(Platform = c("Target 96",
                                "8-16",
                               "16-24",
                               "16-32",
-                              "40-60")) %>%
+                              "40-64")) %>%
   kbl(booktabs = TRUE,
       digits = 2,
       caption = "Table 1. Recommended number of bridging samples for Olink platforms") %>%
