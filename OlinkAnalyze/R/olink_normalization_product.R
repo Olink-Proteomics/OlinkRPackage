@@ -293,7 +293,7 @@ olink_normalization_bridgeable <- function(lst_df,
       by = ref_cols$olink_id
     ) |>
     # decide normalization methods between median centering (bridge
-    # normalization) and QQ normalization (quantile smoothing)
+    # normalization) and QS normalization (quantile smoothing)
     dplyr::mutate(
       BridgingRecommendation = dplyr::case_when(
         is.na(.data[["IsBridgeable"]]) ~ "NotBridgeable",
@@ -416,7 +416,7 @@ olink_normalization_qs <- function(lst_df,
                                    ref_cols,
                                    bridge_samples) {
 
-  # main QQ normalization function
+  # main QS normalization function
   ecdf_transform_npx <- function(data,
                                  quant_col,
                                  count_ref_col,
@@ -564,7 +564,7 @@ olink_normalization_qs <- function(lst_df,
   # bridge samples between the reference dataset and the non-reference dataset
   # are used to predict the NPX values of the non-bridge samples from the
   # non-reference dataset. For that reason the non-bridge samples from reference
-  # dataset should be removed from the QQ normalization.
+  # dataset should be removed from the QS normalization.
   df_combo <- df_combo |>
     dplyr::filter(
       # keep bridge samples

@@ -45,7 +45,7 @@ bridgeable or not. One of "NotBridgeable", "MedianCentering", or
 "QuantileSmoothing".
 \item{MedianCenteredNPX:} NPX values adjusted based on the median of the
 pair-wise differences of NPX values between bridge samples.
-\item{QSNormalizedNPX:} NPX values adjusted based on the quantile-quantile
+\item{QSNormalizedNPX:} NPX values adjusted based on the quantile smoothing
 normalization among bridge samples.
 }
 }

@@ -35,7 +35,7 @@
 #'  medians.
 #'  - \strong{Cross-product normalization}: One of the datasets is adjusted to
 #'  another using the median of pair-wise differences of overlapping samples
-#'  (bridge samples) or quantile-quantile (QQ) normalization using overlapping
+#'  (bridge samples) or quantile smoothing using overlapping
 #'  samples as reference to adjust the distributions. Overlapping samples need
 #'  to have the same identifiers in both datasets. The two datasets are provided
 #'  as `df1` and `df2`, and the one being adjusted to is specified in the input
@@ -62,7 +62,7 @@
 #' "BridgingRecommendation" in case of cross-product normalization. The columns
 #' correspond to the project of origin based on `df1_project_nr` and
 #' `df2_project_nr`, the assay identifier in the non-reference project, the
-#' bridge-normalized quantification value, the QQ-normalized quantification
+#' bridge-normalized quantification value, the quantile smoothing-normalized quantification
 #' value, and the recommendation about which of the two normalized values is
 #' more suitable for downstream analysis.
 #'
@@ -630,7 +630,7 @@ norm_internal_bridge <- function(ref_df,
 #'    "QuantileSmoothing".
 #'    \item{MedianCenteredNPX:} NPX values adjusted based on the median of the
 #'    pair-wise differences of NPX values between bridge samples.
-#'    \item{QSNormalizedNPX:} NPX values adjusted based on the quantile-quantile
+#'    \item{QSNormalizedNPX:} NPX values adjusted based on the quantile smoothing
 #'    normalization among bridge samples.
 #' }
 #'
