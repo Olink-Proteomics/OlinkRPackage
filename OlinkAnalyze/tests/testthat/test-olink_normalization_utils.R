@@ -144,6 +144,9 @@ test_that(
   {
     skip_if_not_installed("arrow")
 
+    data_3k <- get_example_data(filename = "example_3k_data.rds")
+    data_ht <- get_example_data(filename = "example_HT_data.rds")
+
     bridge_samples <- intersect(x = data_3k$SampleID,
                                 y = data_ht$SampleID) |>
       (\(x) x[!grepl(pattern = "CONTROL", x = x)])() |>
@@ -2407,6 +2410,9 @@ test_that(
   {
     skip_if_not_installed("arrow")
 
+    data_3k <- get_example_data(filename = "example_3k_data.rds")
+    data_ht <- get_example_data(filename = "example_HT_data.rds")
+
     # 3k - 3k ----
 
     expect_no_condition(
@@ -2468,6 +2474,9 @@ test_that(
   {
     skip_if_not_installed("arrow")
 
+    data_3k <- get_example_data(filename = "example_3k_data.rds")
+    data_ht <- get_example_data(filename = "example_HT_data.rds")
+
     expect_no_condition(
       object = lst_cross_prod_out <- olink_norm_input_cross_product(
         lst_df = list(
@@ -2527,6 +2536,9 @@ test_that(
   {
     skip_if_not_installed("arrow")
 
+    data_3k <- get_example_data(filename = "example_3k_data.rds")
+    data_ht <- get_example_data(filename = "example_HT_data.rds")
+
     # 3k - T96
 
     expect_error(
@@ -2567,6 +2579,9 @@ test_that(
   "olink_norm_input_cross_product - error - incorrect reference project",
   {
     skip_if_not_installed("arrow")
+
+    data_3k <- get_example_data(filename = "example_3k_data.rds")
+    data_ht <- get_example_data(filename = "example_HT_data.rds")
 
     expect_error(
       object = olink_norm_input_cross_product(
@@ -2680,6 +2695,9 @@ test_that(
     )
 
     # cross-platform norm - reference samples in datasets ----
+
+    data_3k <- get_example_data(filename = "example_3k_data.rds")
+    data_ht <- get_example_data(filename = "example_HT_data.rds")
 
     ref_samples_bridge_3k_ht <- intersect(x = data_3k$SampleID,
                                           y = data_ht$SampleID) |>
@@ -3722,6 +3740,9 @@ test_that(
     skip_if_not_installed("arrow")
 
     ## all assays start with OID12345_OID12345 in 1 df ----
+
+    data_3k <- get_example_data(filename = "example_3k_data.rds")
+    data_ht <- get_example_data(filename = "example_HT_data.rds")
 
     lst_df_v0 <- list(
       "p1" = data_3k |>

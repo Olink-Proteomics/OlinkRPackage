@@ -210,15 +210,15 @@
 #'
 #' # get reference samples
 #' overlap_samples_product <- intersect(
-#'   x = unique(OlinkAnalyze:::data_ht$SampleID),
-#'   y = unique(OlinkAnalyze:::data_3k$SampleID)
+#'   x = unique(OlinkAnalyze:::data_ht_small$SampleID),
+#'   y = unique(OlinkAnalyze:::data_3k_small$SampleID)
 #' ) |>
 #'   (\(.) .[!grepl("CONTROL", .)])()
 #'
 #' # normalize
 #' olink_normalization(
-#'   df1 = OlinkAnalyze:::data_ht,
-#'   df2 = OlinkAnalyze:::data_3k,
+#'   df1 = OlinkAnalyze:::data_ht_small,
+#'   df2 = OlinkAnalyze:::data_3k_small,
 #'   overlapping_samples_df1 = overlap_samples_product,
 #'   df1_project_nr = "proj_ht",
 #'   df2_project_nr = "proj_3k",
