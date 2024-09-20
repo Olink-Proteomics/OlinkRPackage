@@ -116,3 +116,39 @@ data_ht <- tidyr::expand_grid(
 
 rm(df_assays, df_samples,
    sample_id, sample_id_ctrl, sample_id_nc, sample_id_pc, sample_oid)
+
+# Save to RDS
+
+data_ht_file <- "tests/data/example_HT_data.rds"
+
+if (file.exists(data_ht_file)) {
+  # if file already exists, load it and compare it to the current calculation
+  data_ht_existing <- readRDS(
+    file = data_ht_file
+  )
+
+  # if objects are identical print a relevant message
+  if (identical(x = data_ht,
+                y = data_ht_existing)) {
+    cli::cli_inform(
+      c("Your recalculated set of values is identical to the existing one!")
+    )
+  } else {
+    # if not identical print a message that this is the danger zone
+    cli::cli_alert_danger(
+      c("DANGER ZONE: ",
+        "Your recalculated set of values differs from the existing one! You may
+        delete the existing {.file {data_ht_file}} file and replace it with the
+        recalculated one if you are ABSOLUTELY CERTAIN ABOUT WHAT YOU ARE
+        DOING!")
+    )
+  }
+
+} else {
+  # if file does not exist just write a new version of it
+  saveRDS(object = data_ht,
+          file = data_ht_file,
+          ascii = FALSE,
+          version = 2L,
+          compress = "gzip")
+}
