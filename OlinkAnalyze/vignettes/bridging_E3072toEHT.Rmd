@@ -246,11 +246,6 @@ data_explore3072 <- read_NPX("~/NPX_Explore3072_location.parquet")
 data_exploreht <- read_NPX("~/NPX_ExploreHT_location.parquet")
 ```
 
-```{r include=FALSE}
-data_explore3072 <- readRDS(file = "../tests/data/example_3k_data.rds")
-data_exploreht <- readRDS(file = "../tests/data/example_HT_data.rds")
-```
-
 
 ## Checking input datasets and bridging samples
 
@@ -261,7 +256,7 @@ convention across data sets but may represent different samples due to
 reagent batch differences. Appending the project name to the end of the
 control samples can ensure unique Sample IDs.
 
-```{r, echo=TRUE}
+```{r, echo=TRUE, eval = FALSE}
 data_explore3072_samples <- data_explore3072 |>
   dplyr::filter(SampleType == "SAMPLE") |>
   dplyr::distinct(SampleID) |>
@@ -278,21 +273,17 @@ overlapping_samples <- unique(intersect(data_explore3072_samples,
 # stringr::str_detect can be used to exclude control samples based on SampleID.
 ```
 
-```{r include=FALSE}
-overlapping_samples <- unique(intersect(data_explore3072_samples,
-                                        data_exploreht_samples))
-```
-
-```{r, echo=FALSE}
-matrix(overlapping_samples, ncol = 5) |>
+```{r echo=FALSE}
+readRDS(normalizePath("../man/figures/overlapping_samples_table.rds")) |> 
   kableExtra::kbl(booktabs = TRUE,
                   digits = 2,
-                  caption = "Table 3. Overlapping bridging samples") |>
+                  caption = "Overlapping bridging samples") |>
   kableExtra::kable_styling(bootstrap_options = "striped",
                             full_width = FALSE,
                             position = "center",
                             latex_options = "HOLD_position")
 ```
+
 
 PCA plots for each dataset can be used to assess if any bridge samples are outliers in the dataset.
 
@@ -304,7 +295,7 @@ f3 <- paste0("PCA plot prior to bridging for Explore 3072 and Explore HT data.",
 ```
 
 
-```{r message=FALSE}
+```{r eval = FALSE}
 #### Extract bridging samples
 
 data_explore3072_before_br <- data_explore3072 |>
@@ -332,7 +323,8 @@ pca_EHT <- OlinkAnalyze::olink_pca_plot(df = data_exploreht_before_br,
 ```
 
 ```{r echo=FALSE, fig.cap=f3, fig.height= 8, fig.width= 6}
-ggpubr::ggarrange(pca_E3072[[1]], pca_EHT[[1]], nrow = 2)
+knitr::include_graphics(normalizePath("../man/figures/PCA_btw_product_before.png"),
+                        error = FALSE)
 
 ```
 
@@ -348,7 +340,7 @@ the sections below. Within this function, the bridging recommendations
 for each assay are determined and the NPX values are normalized using
 the two methods described below.
 
-```{r echo=TRUE}
+```{r eval = FALSE}
 # Find shared samples
 npx_ht <- data_exploreht |>
   dplyr::mutate(Project = "data1") 
@@ -435,7 +427,7 @@ compared between the two products:
 
 An overview of these criteria is visualized below.
 
-```{r, fig.cap= fcap, eval=TRUE, echo=FALSE, out.width="100%"}
+```{r echo=FALSE, fig.cap=fcap, out.width="100%"}
 knitr::include_graphics(normalizePath("../man/figures/assay_bridgeability.png"), 
                         error = FALSE)
 fcap <- paste("Criteria to determine the bridging recommendation for an assay.",
@@ -540,10 +532,8 @@ As the reference data is not altered during normalization, the
 normalized NPX values in the Explore HT data will be the same as the
 values in the NPX column which contains the non-normalized data.
 
-```{r echo=FALSE, post_bridging_3k_data , echo=FALSE}
-npx_br_data |> 
-  filter(Project == "Explore 3072") |> 
-  head(5) |> 
+```{r echo=FALSE}
+readRDS(normalizePath("../man/figures/bridging_results.rds")) |> 
   kableExtra::kbl(booktabs = TRUE,
       digits = 1,
       caption = "Table 4. First 5 rows of combined datasets after bridging.") |>
@@ -551,6 +541,7 @@ npx_br_data |>
                 position = "center", latex_options = "HOLD_position") |> 
   kableExtra::scroll_box(width = "100%")
 ```
+
 
 ## Evaluating the quality of bridging
 
@@ -566,7 +557,7 @@ f9 <- "Combined PCA of bridging samples from both platforms prior to normalizati
 ```
 
 
-```{r pca_pre_sc, echo=TRUE, fig.cap=f8, message=FALSE}
+```{r pca_pre_sc, echo=TRUE, eval = FALSE}
 ## Before Bridging
 npx_br_data |> 
   dplyr::filter(SampleType == "SAMPLE_CONTROL") |> 
@@ -575,7 +566,13 @@ npx_br_data |>
   OlinkAnalyze::olink_pca_plot(color_g = "Project")
 ```
 
-```{r pca_pre_bridge, echo=TRUE, fig.cap=f9, message=FALSE}
+```{r pca_pre_sc_fig, echo=FALSE, fig.cap=f8, message=FALSE}
+## Before Bridging
+knitr::include_graphics(normalizePath("../man/figures/SCs_pre_bridging.png"), 
+                        error = FALSE)
+```
+
+```{r pca_pre_bridge, echo=TRUE, eval=FALSE}
 ## Before Bridging
 npx_br_data |> 
   dplyr::filter(SampleType == "SAMPLE") |> 
@@ -584,11 +581,16 @@ npx_br_data |>
   dplyr:::mutate(SampleID = paste0(Project, SampleID)) |> 
   OlinkAnalyze::olink_pca_plot(color_g = "Project")
   
-  
 
 ```
 
-```{r echo=TRUE}
+```{r echo=FALSE, fig.cap=f9}
+knitr::include_graphics(normalizePath("../man/figures/bridges_pre_bridging.png"),
+                        error = FALSE)
+```
+
+
+```{r eval = FALSE}
 ## After bridging PCA
 
 ### Keep the data following BridgingRecommendation
@@ -603,7 +605,7 @@ npx_after_br_reco <- npx_br_data |>
 
 ```
 
-``` {r pca_post_SC, message=FALSE, echo = TRUE}
+``` {r pca_post_SC, eval=FALSE, echo = TRUE}
 
 ### Generate unique SampleIDs
 npx_after_br_final <- npx_after_br_reco |>
@@ -616,13 +618,24 @@ npx_after_br_final |>
   
 ```
 
-```{r echo=TRUE}
+```{r echo=FALSE}
+knitr::include_graphics(normalizePath("../man/figures/SCs_post_bridging.png"),
+                        error = FALSE)
+```
+
+
+```{r echo=TRUE, eval = FALSE}
 ### PCA plot of the data from bridging samples
 npx_after_br_reco |> 
   dplyr::filter(SampleType == "SAMPLE") |> 
   dplyr::filter(SampleID %in% overlapping_samples) |> 
   dplyr:::mutate(SampleID = paste0(Project, SampleID)) |> 
   OlinkAnalyze::olink_pca_plot(color_g = "Project")
+```
+
+```{r echo=FALSE}
+knitr::include_graphics(normalizePath("../man/figures/bridges_post_bridging.png"), 
+                        error = FALSE)
 ```
 
 ## Exporting Normalized Data
