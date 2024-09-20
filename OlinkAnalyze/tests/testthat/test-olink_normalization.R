@@ -466,8 +466,8 @@ test_that(
                    "UniProt", "Assay", "AssayType", "Panel", "Block", "NPX",
                    "PCNormalizedNPX", "Count", "Normalization", "AssayQC",
                    "SampleQC", "DataAnalysisRefID", "Project", "OlinkID_E3072",
-                   "MedianCenteredNPX", "BridgingRecommendation",
-                   "QSNormalizedNPX")
+                   "MedianCenteredNPX", "QSNormalizedNPX",
+                   "BridgingRecommendation")
     )
   }
 )
