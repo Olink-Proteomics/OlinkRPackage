@@ -1,13 +1,17 @@
-# Load example data
+# load example data ----
 data_3k_file <- test_path("..",
                           "data",
                           "data_3k.rds")
 data_3k <- readRDS(file = data_3k_file)
+rm(data_3k_file)
 
 data_ht_file <- test_path("..",
                           "data",
                           "data_ht.rds")
 data_ht <- readRDS(file = data_ht_file)
+rm(data_ht_file)
+
+# Tests ----
 
 # Test olink_norm_input_check ----
 
