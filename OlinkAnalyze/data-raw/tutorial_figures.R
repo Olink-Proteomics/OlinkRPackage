@@ -44,6 +44,9 @@ ggpubr::ggarrange(
 )
 ggplot2::ggsave(
   filename = "man/figures/PCA_Outlier_Fig1.png",
+  width = 6,
+  height = 3,
+  units = "in",
   dpi = "screen"
 )
 
@@ -60,6 +63,9 @@ OlinkAnalyze::npx_data1 |>
   )
 ggplot2::ggsave(
   filename = "man/figures/PCA_Treatment.png",
+  width = 6,
+  height = 3,
+  units = "in",
   dpi = "screen"
 )
 
@@ -74,6 +80,9 @@ OlinkAnalyze::npx_data2 |>
   ) # Specify by panel
 ggplot2::ggsave(
   filename = "man/figures/PCA_Panel.png",
+  width = 6,
+  height = 3,
+  units = "in",
   dpi = "screen"
 )
 
@@ -88,6 +97,9 @@ outlier_data |>
   )
 ggplot2::ggsave(
   filename = "man/figures/Outlier_PCA.png",
+  width = 6,
+  height = 3,
+  units = "in",
   dpi = "screen"
 )
 
@@ -102,6 +114,9 @@ outlier_data |>
   )
 ggplot2::ggsave(
   filename = "man/figures/label_samples_pca.png",
+  width = 6,
+  height = 3,
+  units = "in",
   dpi = "screen"
 )
 
@@ -119,6 +134,9 @@ outlier_data |>
   )
 ggplot2::ggsave(
   filename = "man/figures/outlier_line_pca.png",
+  width = 6,
+  height = 3,
+  units = "in",
   dpi = "screen"
 )
 
@@ -132,6 +150,9 @@ outlier_data |>
   olink_dist_plot()
 ggplot2::ggsave(
   filename = "man/figures/dist_boxplot.png",
+  width = 6,
+  height = 3,
+  units = "in",
   dpi = "screen"
 )
 
@@ -139,12 +160,15 @@ ggplot2::ggsave(
 
 group_data |>
   dplyr::filter(
-    .data[["Site"]] != "Site_E"
-  ) |> # Site E filtered out so that all samples can be seen
+    .data[["Site"]] %in% c("Site_A", "Site_D")
+  ) |> # Only look at 2 sites so that all samples can be seen
   olink_dist_plot(
     color_g = "Site"
   )
 ggplot2::ggsave(
   filename = "man/figures/site_boxplot.png",
+  width = 6,
+  height = 3,
+  units = "in",
   dpi = "screen"
 )

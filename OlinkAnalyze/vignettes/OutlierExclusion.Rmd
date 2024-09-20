@@ -226,7 +226,7 @@ NPX distribution plots can also be useful in identifying group trends, such as a
 
 ```{r, eval=FALSE}
 group_data |> 
-  dplyr::filter(Site != "Site_E") |> # Site E filtered out so that all samples can be seen
+  dplyr::filter(Site %in% c("Site_A", "Site_D")) |> # Only visualizing 2 sites to see all samples
   olink_dist_plot(color_g = "Site")
 ```
 
@@ -248,7 +248,7 @@ adjusted_data <- group_data |>
   dplyr::mutate(NPX = NPX - Median_NPX) 
 
 adjusted_data|> 
-  dplyr::filter(Site != "Site_E") |>  #Filter out Site E to see all the samples
+  dplyr::filter(Site %in% c("Site_A", "Site_D")) |> # Only visualizing 2 sites to see all samples
   olink_dist_plot(color_g = "Site")
 ```
 
