@@ -7,23 +7,23 @@ eHT_e3072_mapping_file <- system.file("data-raw",
 source(eHT_e3072_mapping_file)
 rm(eHT_e3072_mapping_file)
 
-# example HT data ----
+# example_HT_data_small.R ----
 
-data_ht_file <- system.file("data-raw",
-                            "example_HT_data.R",
+data_ht_small_file <- system.file("data-raw",
+                                  "example_HT_data_small.R",
+                                  package = "OlinkAnalyze",
+                                  mustWork = TRUE)
+source(data_ht_small_file)
+rm(data_ht_small_file)
+
+# example_3k_data_small.R ----
+
+data_3k_small_file <- system.file("data-raw",
+                            "example_3k_data_small.R",
                             package = "OlinkAnalyze",
                             mustWork = TRUE)
-source(data_ht_file)
-rm(data_ht_file)
-
-# example 3k data ----
-
-data_3k_file <- system.file("data-raw",
-                            "example_3k_data.R",
-                            package = "OlinkAnalyze",
-                            mustWork = TRUE)
-source(data_3k_file)
-rm(data_3k_file)
+source(data_3k_small_file)
+rm(data_3k_small_file)
 
 # read in normalization utilities ----
 
@@ -37,8 +37,8 @@ rm(normalization_utilities_file)
 # save to R/sysdata.rda ----
 
 usethis::use_data(eHT_e3072_mapping,
-                  data_ht,
-                  data_3k,
+                  data_ht_small,
+                  data_3k_small,
                   olink_norm_mode_combos,
                   olink_norm_ref_median_cols,
                   olink_norm_modes,

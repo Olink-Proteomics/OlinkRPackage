@@ -61,15 +61,15 @@ can be found in the Bridging Olink Explore 3072 to Olink Explore HT tutorial.
 \donttest{
 # Bridge samples
 bridge_samples <- intersect(
-  x = unique(OlinkAnalyze:::data_ht$SampleID),
-  y = unique(OlinkAnalyze:::data_3k$SampleID)
+  x = unique(OlinkAnalyze:::data_ht_small$SampleID),
+  y = unique(OlinkAnalyze:::data_3k_small$SampleID)
 ) |>
   (\(x) x[!grepl("CONTROL", x)])()
 
 # Run the internal function olink_norm_input_check
 check_norm <- OlinkAnalyze:::olink_norm_input_check(
-  df1 = OlinkAnalyze:::data_ht,
-  df2 = OlinkAnalyze:::data_3k,
+  df1 = OlinkAnalyze:::data_ht_small,
+  df2 = OlinkAnalyze:::data_3k_small,
   overlapping_samples_df1 = bridge_samples,
   overlapping_samples_df2 = NULL,
   df1_project_nr = "P1",
