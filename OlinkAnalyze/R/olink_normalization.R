@@ -633,6 +633,7 @@ norm_internal_cross_product <- function(ref_df,
     dplyr::select(
       dplyr::all_of(
         c(ref_cols$sample_id, ref_cols$olink_id, "Project",
+          # rename bridge-normalized column
           "MedianCenteredNPX" = ref_cols$quant)
       )
     )
@@ -647,8 +648,8 @@ norm_internal_cross_product <- function(ref_df,
 
   # integrate normalization approaches ----
 
-  # combines df_is_bridgeable, df_norm_bridge and df_norm_qq
-  # stores the outcome in df_norm
+  # combines the original dataset with df_is_bridgeable, df_norm_bridge and
+  # df_norm_qq, and stores the outcome in df_norm
   df_norm <- lst_df |>
     dplyr::bind_rows(
       .id = "Project"
