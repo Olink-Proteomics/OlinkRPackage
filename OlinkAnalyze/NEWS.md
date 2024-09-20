@@ -13,6 +13,7 @@
 ## Bug Fixes
 * URLs in tutorials will now direct to updated olink.com locations (#402,  @kathy-nevola)
 * Instructions to export parquet files with LOD have been updated (#408, @kathy-nevola)
+* removed scale_name argument when ggplot2 3.5+ is installed (#421, @kathy-nevola)
 
 # Olink Analyze 3.8.2
 ## Bug Fixes 

@@ -33,13 +33,38 @@
 #'  `reference_medians` need to be specified. Dataset `df1` is normalized using
 #'  the differences in median between the overlapping samples and the reference
 #'  medians.
+#'  - \strong{Cross-product normalization}: One of the datasets is adjusted to
+#'  another using the median of pair-wise differences of overlapping samples
+#'  (bridge samples) or quantile-quantile (QQ) normalization using overlapping
+#'  samples as reference to adjust the distributions. Overlapping samples need
+#'  to have the same identifiers in both datasets. The two datasets are provided
+#'  as `df1` and `df2`, and the one being adjusted to is specified in the input
+#'  `reference_project`; \strong{Note that} in cross-product normalization the
+#'  reference project is predefined, and in case the argument
+#'  `reference_project` does not match the expected reference project an error
+#'  will be returned. Overlapping samples are specified in
+#'  `overlapping_samples_df1`. Only `overlapping_samples_df1` should be provided
+#'  regardless of the dataset used as `reference_project`. This functionality
+#'  \strong{does not} modify the column with original quantification values
+#'  (e.g. NPX), instead it normalizes it with 2 different approaches in columns
+#'  "MedianCenteredNPX" and "QSNormalizedNPX", and provides a recommendation in
+#'  "BridgingRecommendation" about which of the two columns is to be used.
 #'
 #' The output dataset is `df1` if reference median normalization, or `df2`
-#' appended to `df1` if bridge or subset normalization. In either case, the
+#' appended to `df1` if bridge, subset or cross-product normalization. The
 #' output dataset contains all original columns from the original dataset(s),
-#' and the columns "Project" and "Adj_factor". The former marks the project of
-#' origin based on `df1_project_nr` and `df2_project_nr`, and the latter the
-#' adjustment factor that was applied to the non-reference dataset.
+#' and the columns:
+#' - "Project" and "Adj_factor" in case of reference median, bridge and subset
+#' normalization. The former marks the project of origin based on
+#' `df1_project_nr` and `df2_project_nr`, and the latter the adjustment factor
+#' that was applied to the non-reference dataset.
+#' - "Project", "OlinkID_E3072", "MedianCenteredNPX", "QSNormalizedNPX",
+#' "BridgingRecommendation" in case of cross-product normalization. The columns
+#' correspond to the project of origin based on `df1_project_nr` and
+#' `df2_project_nr`, the assay identifier in the non-reference project, the
+#' bridge-normalized quantification value, the QQ-normalized quantification
+#' value, and the recommendation about which of the two normalized values is
+#' more suitable for downstream analysis.
 #'
 #' @param df1 First dataset to be used for normalization (required).
 #' @param df2 Second dataset to be used for normalization. Required for bridge
@@ -179,6 +204,25 @@
 #'   df1 = npx_df1,
 #'   overlapping_samples_df1 = df1_subset,
 #'   reference_medians = ref_med_df
+#' )
+#'
+#' # cross-product normalization
+#'
+#' # get reference samples
+#' overlap_samples_product <- intersect(
+#'   x = unique(OlinkAnalyze:::data_ht$SampleID),
+#'   y = unique(OlinkAnalyze:::data_3k$SampleID)
+#' ) |>
+#'   (\(.) .[!grepl("CONTROL", .)])()
+#'
+#' # normalize
+#' olink_normalization(
+#'   df1 = OlinkAnalyze:::data_ht,
+#'   df2 = OlinkAnalyze:::data_3k,
+#'   overlapping_samples_df1 = overlap_samples_product,
+#'   df1_project_nr = "proj_ht",
+#'   df2_project_nr = "proj_3k",
+#'   reference_project = "proj_ht"
 #' )
 #' }
 #'
@@ -558,6 +602,38 @@ norm_internal_bridge <- function(ref_df,
   return(df_norm)
 }
 
+#' Internal function normalizing Olink Explore 3k to Olink Explore 3072
+#'
+#' @author
+#'   Klev Diamanti
+#'
+#' @param ref_df The reference dataset to be used in normalization (required).
+#' @param ref_samples Character vector of sample identifiers to be used for
+#' adjustment factor calculation in the reference dataset (required).
+#' @param ref_name Project name of the reference dataset (required).
+#' @param ref_cols Named list of column names in the reference dataset
+#' (required).
+#' @param not_ref_df The non-reference dataset to be used in normalization
+#' (required).
+#' @param not_ref_name Project name of the non-reference dataset (required).
+#' @param not_ref_cols Named list of column names in the non-reference dataset
+#' (required).
+#'
+#' @return Tibble or ArrowObject with a dataset with the following additional
+#' columns:
+#' \itemize{
+#'    \item{OlinkID_E3072:} Corresponding assay identifier from Olink Explore
+#'    3072.
+#'    \item{Project:} Project of origin.
+#'    \item{BridgingRecommendation:} Recommendation of whether the assay is
+#'    bridgeable or not. One of "NotBridgeable", "MedianCentering", or
+#'    "QuantileSmoothing".
+#'    \item{MedianCenteredNPX:} NPX values adjusted based on the median of the
+#'    pair-wise differences of NPX values between bridge samples.
+#'    \item{QSNormalizedNPX:} NPX values adjusted based on the quantile-quantile
+#'    normalization among bridge samples.
+#' }
+#'
 norm_internal_cross_product <- function(ref_df,
                                         ref_samples,
                                         ref_name,
@@ -565,26 +641,26 @@ norm_internal_cross_product <- function(ref_df,
                                         not_ref_df,
                                         not_ref_name,
                                         not_ref_cols) {
-  # is bridgeable ----
+  # prepare inputs ----
 
   lst_df <- list(
     ref_df,
     not_ref_df
-  ) |>
-    # keep only bridge samples
-    lapply(function(l_df) {
-      l_df |>
-        dplyr::filter(
-          .data[[ref_cols$sample_id]] %in% .env[["ref_samples"]]
-        )
-    })
+  )
   names(lst_df) <- c(ref_name, not_ref_name)
 
+  # is bridgeable ----
+
   df_is_bridgeable <- olink_normalization_bridgeable(
-    lst_df = lst_df,
+    lst_df = lst_df |> # keep only bridge samples
+      lapply(function(l_df) {
+        l_df |>
+          dplyr::filter(
+            .data[[ref_cols$sample_id]] %in% .env[["ref_samples"]]
+          )
+      }),
     ref_cols = ref_cols
   )
-  rm(lst_df)
 
   # bridge normalize HT-3k ----
 
@@ -596,11 +672,36 @@ norm_internal_cross_product <- function(ref_df,
     not_ref_df = not_ref_df,
     not_ref_name = not_ref_name,
     not_ref_cols = not_ref_cols
+  ) |>
+    # keep only relevant columns
+    dplyr::select(
+      dplyr::all_of(
+        c(ref_cols$sample_id, ref_cols$olink_id, "Project",
+          # rename bridge-normalized column
+          "MedianCenteredNPX" = ref_cols$quant)
+      )
+    )
+
+  # quantile normalize HT-3k ----
+
+  df_norm_qq <- olink_normalization_qs(
+    lst_df = lst_df,
+    ref_cols = ref_cols,
+    bridge_samples = ref_samples
   )
 
-  # when ref and non-ref datasets are merged during bridging, assay identifiers
-  # OlinkID_HT and OlinkID_E3072 are NA. Here we fill them in.
-  df_norm_bridge <- df_norm_bridge |>
+  # integrate normalization approaches ----
+
+  # combines the original dataset with df_is_bridgeable, df_norm_bridge and
+  # df_norm_qq, and stores the outcome in df_norm
+  df_norm <- lst_df |>
+    # append original datasets
+    dplyr::bind_rows(
+      .id = "Project"
+    ) |>
+    # when ref and non-ref datasets are merged during bridging, assay
+    # identifiers from each platform (e.g. OlinkID_HT and OlinkID_E3072) will be
+    # NA. Here we fill them in for completion.
     dplyr::group_by(
       .data[[ref_cols$olink_id]]
     ) |>
@@ -608,23 +709,37 @@ norm_internal_cross_product <- function(ref_df,
       dplyr::starts_with(ref_cols$olink_id),
       .direction = "updown"
     ) |>
-    dplyr::ungroup()
-
-  # quantile normalize HT-3k ----
-
-  # to be filled in
-  # returns df_norm_qq
-
-  # integrate normalization approaches ----
-
-  # to be filled in
-  # combines df_is_bridgeable, df_norm_bridge and df_norm_qq
-  # stores the outcome in df_norm
-  df_norm <- df_norm_bridge |>
+    dplyr::ungroup() |>
+    # add bridge normalized values
+    dplyr::left_join(
+      df_norm_bridge,
+      by = c(ref_cols$sample_id, ref_cols$olink_id, "Project"),
+      relationship = "one-to-one"
+    ) |>
+    # add QS values
+    dplyr::left_join(
+      df_norm_qq,
+      by = c(ref_cols$sample_id, ref_cols$olink_id, "Project"),
+      relationship = "one-to-one"
+    ) |>
+    # add bridgeable
     dplyr::left_join(
       df_is_bridgeable,
       by = ref_cols$olink_id,
       relationship = "many-to-one"
+    ) |>
+    # reorder columns
+    dplyr::select(
+      dplyr::all_of(names(ref_df)), dplyr::everything()
+    ) |>
+    # cleanup columns
+    dplyr::select(
+      -dplyr::all_of(
+        c(ref_cols$olink_id)
+      )
+    ) |>
+    dplyr::rename(
+      !!ref_cols$olink_id := "OlinkID_HT"
     )
 
   # return ----
