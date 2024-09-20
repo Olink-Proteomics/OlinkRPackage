@@ -38,16 +38,16 @@ other_samples_small <- data_3k |>
 
 ## select assays to keep ----
 
-assays_small <- data_3k |>
-  dplyr::filter(
-    .data[["AssayType"]] == "assay"
-  ) |>
-  dplyr::pull(
+assays_small <- eHT_e3072_mapping |>
+  dplyr::arrange(
     .data[["OlinkID"]]
   ) |>
-  unique() |>
-  sort() |>
-  head(2L)
+  dplyr::slice_head(
+    n = 2L
+  ) |>
+  dplyr::pull(
+    .data[["OlinkID_E3072"]]
+  )
 
 # 3k small dataset ----
 
