@@ -33,13 +33,38 @@
 #'  `reference_medians` need to be specified. Dataset `df1` is normalized using
 #'  the differences in median between the overlapping samples and the reference
 #'  medians.
+#'  - \strong{Cross-product normalization}: One of the datasets is adjusted to
+#'  another using the median of pair-wise differences of overlapping samples
+#'  (bridge samples) or quantile-quantile (QQ) normalization using overlapping
+#'  samples as reference to adjust the distributions. Overlapping samples need
+#'  to have the same identifiers in both datasets. The two datasets are provided
+#'  as `df1` and `df2`, and the one being adjusted to is specified in the input
+#'  `reference_project`; \strong{Note that} in cross-product normalization the
+#'  reference project is predefined, and in case the argument
+#'  `reference_project` does not match the expected reference project an error
+#'  will be returned. Overlapping samples are specified in
+#'  `overlapping_samples_df1`. Only `overlapping_samples_df1` should be provided
+#'  regardless of the dataset used as `reference_project`. This functionality
+#'  \strong{does not} modify the column with original quantification values
+#'  (e.g. NPX), instead it normalizes it with 2 different approaches in columns
+#'  "MedianCenteredNPX" and "QSNormalizedNPX", and provides a recommendation in
+#'  "BridgingRecommendation" about which of the two columns is to be used.
 #'
 #' The output dataset is `df1` if reference median normalization, or `df2`
-#' appended to `df1` if bridge or subset normalization. In either case, the
+#' appended to `df1` if bridge, subset or cross-product normalization. The
 #' output dataset contains all original columns from the original dataset(s),
-#' and the columns "Project" and "Adj_factor". The former marks the project of
-#' origin based on `df1_project_nr` and `df2_project_nr`, and the latter the
-#' adjustment factor that was applied to the non-reference dataset.
+#' and the columns:
+#' - "Project" and "Adj_factor" in case of reference median, bridge and subset
+#' normalization. The former marks the project of origin based on
+#' `df1_project_nr` and `df2_project_nr`, and the latter the adjustment factor
+#' that was applied to the non-reference dataset.
+#' - "Project", "OlinkID_E3072", "MedianCenteredNPX", "QSNormalizedNPX",
+#' "BridgingRecommendation" in case of cross-product normalization. The columns
+#' correspond to the project of origin based on `df1_project_nr` and
+#' `df2_project_nr`, the assay identifier in the non-reference project, the
+#' bridge-normalized quantification value, the QQ-normalized quantification
+#' value, and the recommendation about which of the two normalized values is
+#' more suitable for downstream analysis.
 #'
 #' @param df1 First dataset to be used for normalization (required).
 #' @param df2 Second dataset to be used for normalization. Required for bridge
@@ -179,6 +204,25 @@
 #'   df1 = npx_df1,
 #'   overlapping_samples_df1 = df1_subset,
 #'   reference_medians = ref_med_df
+#' )
+#'
+#' # cross-product normalization
+#'
+#' # get reference samples
+#' overlap_samples_product <- intersect(
+#'   x = unique(OlinkAnalyze:::data_ht$SampleID),
+#'   y = unique(OlinkAnalyze:::data_3k$SampleID)
+#' ) |>
+#'   (\(.) .[!grepl("CONTROL", .)])()
+#'
+#' # normalize
+#' olink_normalization(
+#'   df1 = OlinkAnalyze:::data_ht,
+#'   df2 = OlinkAnalyze:::data_3k,
+#'   overlapping_samples_df1 = overlap_samples_product,
+#'   df1_project_nr = "proj_ht",
+#'   df2_project_nr = "proj_3k",
+#'   reference_project = "df_ht"
 #' )
 #' }
 #'
