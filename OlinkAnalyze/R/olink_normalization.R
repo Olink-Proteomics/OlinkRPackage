@@ -651,11 +651,13 @@ norm_internal_cross_product <- function(ref_df,
   # combines the original dataset with df_is_bridgeable, df_norm_bridge and
   # df_norm_qq, and stores the outcome in df_norm
   df_norm <- lst_df |>
+    # append original datasets
     dplyr::bind_rows(
       .id = "Project"
     ) |>
     # when ref and non-ref datasets are merged during bridging, assay
-    # identifiers OlinkID_HT and OlinkID_E3072 are NA. Here we fill them in.
+    # identifiers from each platform (e.g. OlinkID_HT and OlinkID_E3072) will be
+    # NA. Here we fill them in for completion.
     dplyr::group_by(
       .data[[ref_cols$olink_id]]
     ) |>
