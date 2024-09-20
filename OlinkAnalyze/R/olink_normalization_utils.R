@@ -436,8 +436,8 @@ olink_norm_input_validate <- function(df1,
 #'
 #' @description
 #' Check if \var{df1}, \var{df2} and/or \var{reference_medians} are tibble or
-#' ArrowDataset datsets; if \var{overlapping_samples_df1} and/or
-#' \var{overlapping_samples_df2} are charatcer vectors; and if
+#' ArrowDataset datasets; if \var{overlapping_samples_df1} and/or
+#' \var{overlapping_samples_df2} are character vectors; and if
 #' \var{df1_project_nr}, \var{df2_project_nr} and/or \var{reference_project} are
 #' scalar character vectors.
 #'

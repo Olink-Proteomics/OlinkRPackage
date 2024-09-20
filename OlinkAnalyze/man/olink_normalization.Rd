@@ -73,7 +73,7 @@ provided as input in \code{overlapping_samples_df1} and all unique sample
 identifiers from \code{df2} are provided as input in \code{overlapping_samples_df2}.
 }
 \item \strong{Reference median normalization}: One of the datasets (\code{df1}) is
-adjusted to a predefined set of adjustement factors. This is effectively
+adjusted to a predefined set of adjustment factors. This is effectively
 subset normalization, but using differences of medians to pre-recorded
 median values. \code{df1}, \code{overlapping_samples_df1}, \code{df1_project_nr} and
 \code{reference_medians} need to be specified. Dataset \code{df1} is normalized using

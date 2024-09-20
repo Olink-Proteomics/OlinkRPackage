@@ -27,7 +27,7 @@
 #'    provided as input in `overlapping_samples_df1` and all unique sample
 #'    identifiers from `df2` are provided as input in `overlapping_samples_df2`.
 #'  - \strong{Reference median normalization}: One of the datasets (`df1`) is
-#'  adjusted to a predefined set of adjustement factors. This is effectively
+#'  adjusted to a predefined set of adjustment factors. This is effectively
 #'  subset normalization, but using differences of medians to pre-recorded
 #'  median values. `df1`, `overlapping_samples_df1`, `df1_project_nr` and
 #'  `reference_medians` need to be specified. Dataset `df1` is normalized using
