@@ -247,8 +247,8 @@ data_exploreht <- read_NPX("~/NPX_ExploreHT_location.parquet")
 ```
 
 ```{r include=FALSE}
-data_explore3072 <- OlinkAnalyze:::data_3k
-data_exploreht <- OlinkAnalyze:::data_ht
+data_explore3072 <- readRDS(file = "../tests/data/example_3k_data.rds")
+data_exploreht <- readRDS(file = "../tests/data/example_HT_data.rds")
 ```
 
 
@@ -280,12 +280,11 @@ overlapping_samples <- unique(intersect(data_explore3072_samples,
 
 ```{r include=FALSE}
 overlapping_samples <- unique(intersect(data_explore3072_samples,
-                                        data_exploreht_samples))[1:48]
-# Only use top 48 as overlapping samples
+                                        data_exploreht_samples))
 ```
 
 ```{r, echo=FALSE}
-matrix(overlapping_samples, ncol = 4) |>
+matrix(overlapping_samples, ncol = 5) |>
   kableExtra::kbl(booktabs = TRUE,
                   digits = 2,
                   caption = "Table 3. Overlapping bridging samples") |>
