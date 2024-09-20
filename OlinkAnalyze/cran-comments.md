@@ -1,6 +1,6 @@
 ## Release Summary
 
-This release provides additional functionality and documentation to Olink Analyze 3.8.3.
+This release provides additional functionality and documentation to Olink Analyze 3.9.
 
 ## R CMD check results
 
