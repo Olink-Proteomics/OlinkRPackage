@@ -672,17 +672,17 @@ norm_internal_cross_product <- function(ref_df,
       by = c(ref_cols$sample_id, ref_cols$olink_id, "Project"),
       relationship = "one-to-one"
     ) |>
-    # add bridgeable
-    dplyr::left_join(
-      df_is_bridgeable,
-      by = ref_cols$olink_id,
-      relationship = "many-to-one"
-    ) |>
     # add QS values
     dplyr::left_join(
       df_norm_qq,
       by = c(ref_cols$sample_id, ref_cols$olink_id, "Project"),
       relationship = "one-to-one"
+    ) |>
+    # add bridgeable
+    dplyr::left_join(
+      df_is_bridgeable,
+      by = ref_cols$olink_id,
+      relationship = "many-to-one"
     ) |>
     # reorder columns
     dplyr::select(
