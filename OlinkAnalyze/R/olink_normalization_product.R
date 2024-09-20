@@ -56,11 +56,11 @@
 #' \donttest{
 #' # check input datasets
 #' data_explore_check <- OlinkAnalyze:::olink_norm_input_check(
-#'   df1 = OlinkAnalyze:::data_3k,
-#'   df2 = OlinkAnalyze:::data_ht,
+#'   df1 = OlinkAnalyze:::data_3k_small,
+#'   df2 = OlinkAnalyze:::data_ht_small,
 #'   overlapping_samples_df1 = intersect(
-#'     x = unique(OlinkAnalyze:::data_3k$SampleID),
-#'     y = unique(OlinkAnalyze:::data_ht$SampleID)
+#'     x = unique(OlinkAnalyze:::data_3k_small$SampleID),
+#'     y = unique(OlinkAnalyze:::data_ht_small$SampleID)
 #'   ) |>
 #'     (\(x) x[!grepl("CONTROL", x)])() |>
 #'     head(20L),
@@ -379,15 +379,15 @@ olink_normalization_bridgeable <- function(lst_df,
 #' \donttest{
 #' # Bridge samples
 #' bridge_samples <- intersect(
-#'   x = unique(OlinkAnalyze:::data_ht$SampleID),
-#'   y = unique(OlinkAnalyze:::data_3k$SampleID)
+#'   x = unique(OlinkAnalyze:::data_ht_small$SampleID),
+#'   y = unique(OlinkAnalyze:::data_3k_small$SampleID)
 #' ) |>
 #'   (\(x) x[!grepl("CONTROL", x)])()
 #'
 #' # Run the internal function olink_norm_input_check
 #' check_norm <- OlinkAnalyze:::olink_norm_input_check(
-#'   df1 = OlinkAnalyze:::data_ht,
-#'   df2 = OlinkAnalyze:::data_3k,
+#'   df1 = OlinkAnalyze:::data_ht_small,
+#'   df2 = OlinkAnalyze:::data_3k_small,
 #'   overlapping_samples_df1 = bridge_samples,
 #'   overlapping_samples_df2 = NULL,
 #'   df1_project_nr = "P1",
