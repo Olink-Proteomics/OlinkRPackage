@@ -439,6 +439,10 @@ test_that(
 test_that(
   "olink_normalization - works - 3k-HT normalization",
   {
+    # load example data
+    data_3k <- get_example_data(filename = "example_3k_data.rds")
+    data_ht <- get_example_data(filename = "example_HT_data.rds")
+
     expect_message(
       object = ht_3k_norm <- olink_normalization(
         df1 = data_ht,
