@@ -5,27 +5,25 @@ eHT_e3072_mapping_file <- system.file("data-raw",
                                       package = "OlinkAnalyze",
                                       mustWork = TRUE)
 source(eHT_e3072_mapping_file)
-data_3k_small <- data_3k[1:100,]
 rm(eHT_e3072_mapping_file)
 
 # example HT data ----
 
-data_ht_file <- system.file("data-raw",
-                            "example_HT_data.R",
-                            package = "OlinkAnalyze",
-                            mustWork = TRUE)
-source(data_ht_file)
-data_ht_small <- data_ht[1:100,]
-rm(data_ht_file)
+data_ht_small_file <- system.file("data-raw",
+                                  "example_HT_data_small.R",
+                                  package = "OlinkAnalyze",
+                                  mustWork = TRUE)
+source(data_ht_small_file)
+rm(data_ht_small_file)
 
 # example 3k data ----
 
-data_3k_file <- system.file("data-raw",
-                            "example_3k_data.R",
-                            package = "OlinkAnalyze",
-                            mustWork = TRUE)
-source(data_3k_file)
-rm(data_3k_file)
+data_3k_small_file <- system.file("data-raw",
+                                  "example_3k_data_small.R",
+                                  package = "OlinkAnalyze",
+                                  mustWork = TRUE)
+source(data_3k_small_file)
+rm(data_3k_small_file)
 
 # read in normalization utilities ----
 
