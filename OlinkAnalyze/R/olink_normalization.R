@@ -222,7 +222,7 @@
 #'   overlapping_samples_df1 = overlap_samples_product,
 #'   df1_project_nr = "proj_ht",
 #'   df2_project_nr = "proj_3k",
-#'   reference_project = "df_ht"
+#'   reference_project = "proj_ht"
 #' )
 #' }
 #'
