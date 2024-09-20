@@ -33,6 +33,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r, echo=FALSE, eval = TRUE}
+library(OlinkAnalyze)
 library(dplyr)
 library(stringr)
 library(ggplot2)
@@ -348,7 +349,7 @@ the sections below. Within this function, the bridging recommendations
 for each assay are determined and the NPX values are normalized using
 the two methods described below.
 
-```{r, eval=FALSE}
+```{r echo=TRUE}
 # Find shared samples
 npx_ht <- data_exploreht |>
   dplyr::mutate(Project = "data1") 
@@ -358,7 +359,7 @@ npx_3072 <- data_explore3072 |>
 npx_br_data <- olink_normalization(df1 = npx_ht, 
                                    df2 = npx_3072,
                                    overlapping_samples_df1 =
-                                     overlap_samples_list,
+                                     overlapping_samples,
                                    df1_project_nr = "Explore HT",
                                    df2_project_nr = "Explore 3072",
                                    reference_project = "Explore HT")
@@ -533,19 +534,20 @@ recommendation is listed in the `BridgingRecommendation` column and
 lists what method, if any should be used for that assay. Additional
 columns including `OlinkID` and `OlinkID_E3072` map the assays across
 products and the `Project` column lists the name of the project based on
-the `exploreht_name` and `explore3072_name` arguments. The resulting
+the `df1_project_nr` and `df2_project_nr` arguments. The resulting
 data set will contain the newly bridged Explore 3072 data set. The
 reference Explore HT data will be concatenated to the Explore 3072 data.
 As the reference data is not altered during normalization, the
 normalized NPX values in the Explore HT data will be the same as the
 values in the NPX column which contains the non-normalized data.
 
-```{r eval=FALSE, include=FALSE, post_bridging_3k_data , echo=FALSE}
+```{r echo=FALSE, post_bridging_3k_data , echo=FALSE}
 npx_br_data |> 
-  head(10)
+  filter(Project == "Explore 3072") |> 
+  head(5) |> 
   kableExtra::kbl(booktabs = TRUE,
       digits = 1,
-      caption = "Table 4. First 10 rows of combined datasets after bridging.") |>
+      caption = "Table 4. First 5 rows of combined datasets after bridging.") |>
   kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE, font_size = 10, 
                 position = "center", latex_options = "HOLD_position") |> 
   kableExtra::scroll_box(width = "100%")
@@ -565,21 +567,21 @@ f9 <- "Combined PCA of bridging samples from both platforms prior to normalizati
 ```
 
 
-```{r pca_pre_sc, message=FALSE, fig.cap= f8, eval=FALSE, echo = TRUE}
+```{r pca_pre_sc, echo=TRUE, fig.cap=f8, message=FALSE}
 ## Before Bridging
 npx_br_data |> 
   dplyr::filter(SampleType == "SAMPLE_CONTROL") |> 
-  dplyr::mutate(OlinkID = paste0(OlinkID, "_", OlinkID_OlinkID_E3072)) |> 
+  dplyr::mutate(OlinkID = paste0(OlinkID, "_", OlinkID_E3072)) |> 
   dplyr:::mutate(SampleID = paste0(Project, SampleID)) |> 
   OlinkAnalyze::olink_pca_plot(color_g = "Project")
 ```
 
-```{r pca_pre_bridge, message=FALSE, fig.cap= f9, eval=FALSE, echo = TRUE}
+```{r pca_pre_bridge, echo=TRUE, fig.cap=f9, message=FALSE}
 ## Before Bridging
 npx_br_data |> 
   dplyr::filter(SampleType == "SAMPLE") |> 
   dplyr::filter(SampleID %in% overlapping_samples) |> 
-  dplyr::mutate(OlinkID = paste0(OlinkID, "_", OlinkID_OlinkID_E3072)) |> 
+  dplyr::mutate(OlinkID = paste0(OlinkID, "_", OlinkID_E3072)) |> 
   dplyr:::mutate(SampleID = paste0(Project, SampleID)) |> 
   OlinkAnalyze::olink_pca_plot(color_g = "Project")
   
@@ -587,39 +589,41 @@ npx_br_data |>
 
 ```
 
-``` {r pca_post_prep, message=FALSE, eval=FALSE, echo = TRUE}
+```{r echo=TRUE}
 ## After bridging PCA
 
 ### Keep the data following BridgingRecommendation
 npx_after_br_reco <- npx_br_data |>
   dplyr::filter(BridgingRecommendation != "Not Bridgeable") |>
   dplyr::mutate(NPX = case_when(
-    BridgingRecommendation == "MedianCenteredNPX" ~ MedianCenteredNPX,
-    BridgingRecommendation == "QSNormalizedNPX" ~ QSNormalizedNPX,
+    BridgingRecommendation == "MedianCentering" ~ MedianCenteredNPX,
+    BridgingRecommendation == "QuantileSmoothing" ~ QSNormalizedNPX,
     .default = NPX)) |>
   dplyr::filter(AssayType == "assay") |> 
-  dplyr::mutate(OlinkID = paste0(OlinkID, "_", OlinkID_OlinkID_E3072))
+  dplyr::mutate(OlinkID = paste0(OlinkID, "_", OlinkID_E3072))
 
 ```
-``` {r pca_post_SC, message=FALSE, eval=FALSE, echo = TRUE}
+
+``` {r pca_post_SC, message=FALSE, echo = TRUE}
 
 ### Generate unique SampleIDs
 npx_after_br_final <- npx_after_br_reco |>
   dplyr:::mutate(SampleID = paste0(Project, SampleID))
   
 ### PCA plot of the data from SCs
-  npx_after_br_final |> 
-    dplyr::filter(SampleType == "SAMPLE_CONTROL")) |> 
+npx_after_br_final |> 
+    dplyr::filter(SampleType == "SAMPLE_CONTROL") |> 
     OlinkAnalyze::olink_pca_plot(color_g = "Project")
   
 ```
 
-``` {r pca_post_bridge, message=FALSE, eval=FALSE, echo = TRUE}
+```{r echo=TRUE}
 ### PCA plot of the data from bridging samples
-npx_after_br_final |> 
+npx_after_br_reco |> 
   dplyr::filter(SampleType == "SAMPLE") |> 
   dplyr::filter(SampleID %in% overlapping_samples) |> 
-  OlinkAnalyze::olink_pca_plot(color_g     = "Project")
+  dplyr:::mutate(SampleID = paste0(Project, SampleID)) |> 
+  OlinkAnalyze::olink_pca_plot(color_g = "Project")
 ```
 
 ## Exporting Normalized Data
@@ -627,9 +631,9 @@ npx_after_br_final |>
 The normalized Explore 3072 data can be exported using
 `arrow::write_parquet()` to create a long format Olink Explore file.
 
-```{r, eval=FALSE}
+```{r eval = FALSE}
 df <- npx_br_data |>
-    dplyr::filter(Project == "Explore_3072_NAME") |>
+    dplyr::filter(Project == "Explore_3072") |>
     arrow::as_arrow_table()
 
 df$metadata$FileVersion <- "NA"
@@ -676,8 +680,8 @@ npx_recommended <- npx_after_br_final |>
   dplyr::mutate(NPX_original = NPX) |> 
   dplyr::filter(BridgingRecommendation != "Not Bridgeable") |>
   dplyr::mutate(NPX = case_when(
-    BridgingRecommendation == "MedianCenteredNPX" ~ MedianCenteredNPX,
-    BridgingRecommendation == "QSNormalizedNPX" ~ QSNormalizedNPX,
+    BridgingRecommendation == "MedianCentering" ~ MedianCenteredNPX,
+    BridgingRecommendation == "QuantileSmoothing" ~ QSNormalizedNPX,
     .default = NPX)) |> 
   dplyr::mutate(OlinkID_HT = OlinkID) |> 
   dplyr::mutate(OlinkID = paste0(OlinkID, "_", OlinkID_E3072))
@@ -686,13 +690,15 @@ npx_recommended <- npx_after_br_final |>
 npx_recommended <- npx_after_br_final |> 
   dplyr::mutate(NPX_original = NPX) |> 
   dplyr::mutate(NPX = case_when(
-    BridgingRecommendation == "MedianCenteredNPX" ~ MedianCenteredNPX,
-    BridgingRecommendation == "QSNormalizedNPX" ~ QSNormalizedNPX,
+    BridgingRecommendation == "MedianCentering" ~ MedianCenteredNPX,
+    BridgingRecommendation == "QuantileSmoothing" ~ QSNormalizedNPX,
     .default = NPX)) |> 
   dplyr::mutate(OlinkID_HT = OlinkID) |> 
-  dplyr::mutate(OlinkID = ifelse(BridgingRecommendation != "Not Bridgeable",
-                                 paste0(OlinkID, "_", OlinkID_E3072), # Concatenated OlinkID for bridgeable Assays
-                                 ifelse(Project == "ref", # replace with HT project name as set in function
+  dplyr::mutate(OlinkID = ifelse(BridgingRecommendation != "NotBridgeable",
+                                 paste0(OlinkID, "_", OlinkID_E3072), 
+                                 # Concatenated OlinkID for bridgeable Assays
+                                 ifelse(Project == "Explore HT", 
+                                        # replace with HT project name as set in function
                                         OlinkID, 
                                         OlinkID_E3072))
 ```
