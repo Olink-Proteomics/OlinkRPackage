@@ -38,11 +38,12 @@ p2 <- group_data |>
   )
 
 ggpubr::ggarrange(
-  p1[[1]], p2[[1]] ,
+  p1[[1]], p2[[1]],
   nrow = 1L,
   labels = "AUTO",
   legend = "bottom"
 )
+
 ggplot2::ggsave(
   filename = "man/figures/PCA_Outlier_Fig1.png",
   width = 6L,
@@ -59,9 +60,10 @@ OlinkAnalyze::npx_data1 |>
   dplyr::filter(
     !stringr::str_detect(.data[["SampleID"]], "CONTROL")
   ) |> # Filter duplicate SampleIDs
-  olink_pca_plot(
+  OlinkAnalyze::olink_pca_plot(
     color_g = "Treatment"
   )
+
 ggplot2::ggsave(
   filename = "man/figures/PCA_Treatment.png",
   width = 3L,
@@ -76,9 +78,10 @@ OlinkAnalyze::npx_data2 |>
   dplyr::filter(
     !stringr::str_detect(.data[["SampleID"]], "CONTROL")
   ) |> # Filter out control SampleIDs
-  olink_pca_plot(
+  OlinkAnalyze::olink_pca_plot(
     byPanel = TRUE
   ) # Specify by panel
+
 ggplot2::ggsave(
   filename = "man/figures/PCA_Panel.png",
   width = 4L,
@@ -93,9 +96,10 @@ outlier_data |>
   dplyr::filter(
     !stringr::str_detect(.data[["SampleID"]], "CONTROL")
   ) |> # Filter duplicate SampleIDs
-  olink_pca_plot(
+  OlinkAnalyze::olink_pca_plot(
     byPanel = TRUE
   )
+
 ggplot2::ggsave(
   filename = "man/figures/Outlier_PCA.png",
   width = 4L,
@@ -110,9 +114,10 @@ outlier_data |>
   dplyr::filter(
     !stringr::str_detect(.data[["SampleID"]], "CONTROL")
   ) |> # Filter duplicate SampleIDs
-  olink_pca_plot(
+  OlinkAnalyze::olink_pca_plot(
     label_samples = TRUE
   )
+
 ggplot2::ggsave(
   filename = "man/figures/label_samples_pca.png",
   width = 3L,
@@ -127,12 +132,13 @@ outlier_data |>
   dplyr::filter(
     !stringr::str_detect(.data[["SampleID"]], "CONTROL")
   ) |> # Filter duplicate SampleIDs
-  olink_pca_plot(
+  OlinkAnalyze::olink_pca_plot(
     outlierDefX = 3L,
     outlierDefY = 3L,
     outlierLines = TRUE,
     label_outliers = TRUE
   )
+
 ggplot2::ggsave(
   filename = "man/figures/outlier_line_pca.png",
   width = 6L,
@@ -148,7 +154,8 @@ outlier_data |>
     .data[["SampleID"]] %in% c("A25", "A52", "A1", "A2", "A3", "A5", "A15",
                                "A16", "A18", "A19", "A20")
   ) |>
-  olink_dist_plot()
+  OlinkAnalyze::olink_dist_plot()
+
 ggplot2::ggsave(
   filename = "man/figures/dist_boxplot.png",
   width = 6L,
@@ -163,9 +170,10 @@ group_data |>
   dplyr::filter(
     .data[["Site"]] %in% c("Site_A", "Site_D")
   ) |> # Only look at 2 sites so that all samples can be seen
-  olink_dist_plot(
+  OlinkAnalyze::olink_dist_plot(
     color_g = "Site"
   )
+
 ggplot2::ggsave(
   filename = "man/figures/site_boxplot.png",
   width = 6L,
@@ -177,71 +185,107 @@ ggplot2::ggsave(
 # Sample Median Adjustment ------------------------------------------------
 
 # Calculate SampleID Median NPX
-median_NPX<-group_data |>
-  dplyr::group_by(SampleID) |>
-  dplyr::summarise(Median_NPX = median(NPX))
+median_npx <- group_data |>
+  dplyr::group_by(
+    .data[["SampleID"]]
+  ) |>
+  dplyr::summarise(
+    Median_NPX = median(x = .data[["NPX"]], na.rm = TRUE),
+    .groups = "drop"
+  )
 
 # Adjust by sample median ---------------------
-adjusted_data <- group_data |>
-  dplyr::inner_join(median_NPX, by = "SampleID")|>
-  dplyr::mutate(NPX = NPX - Median_NPX)
 
-adjusted_data|>
-  dplyr::filter(Site %in% c("Site_A", "Site_D")) |> # Only visualizing 2 sites to see all samples
-  olink_dist_plot(color_g = "Site")
+adjusted_data <- group_data |>
+  dplyr::inner_join(
+    median_npx,
+    by = "SampleID",
+    relationship = "many-to-one"
+  ) |>
+  dplyr::mutate(
+    NPX = .data[["NPX"]] - .data[["Median_NPX"]]
+  )
+
+adjusted_data |>
+  dplyr::filter(
+    # Only visualizing 2 sites to see all samples
+    .data[["Site"]] %in% c("Site_A", "Site_D")
+  ) |>
+  OlinkAnalyze::olink_dist_plot(
+    color_g = "Site"
+  )
+
 ggplot2::ggsave(
   filename = "man/figures/sample_med_boxplot.png",
   width = 6L,
   height = 2L,
   units = "in",
-  dpi = "screen")
+  dpi = "screen"
+)
 
 # QC Plot -----------------------------------------------------------------
 
 outlier_data |>
-  olink_qc_plot()
+  OlinkAnalyze::olink_qc_plot()
+
 ggplot2::ggsave(
   filename = "man/figures/qc_plot.png",
   width = 6L,
   height = 2L,
   units = "in",
-  dpi = "screen")
+  dpi = "screen"
+)
 
 # QC Site -----------------------------------------------------------------
 
 group_data |>
-  olink_qc_plot(color_g = "Site")
+  OlinkAnalyze::olink_qc_plot(
+    color_g = "Site"
+  )
+
 ggplot2::ggsave(
   filename = "man/figures/qc_site_plot.png",
   width = 6L,
   height = 2L,
   units = "in",
-  dpi = "screen")
+  dpi = "screen"
+)
 
 # QC Label ----------------------------------------------------------------
 
 outlier_data |>
-  olink_qc_plot(median_outlierDef = 2, IQR_outlierDef = 4,
-                outlierLines = TRUE, label_outliers = TRUE)
+  OlinkAnalyze::olink_qc_plot(
+    median_outlierDef = 2L,
+    IQR_outlierDef = 4L,
+    outlierLines = TRUE,
+    label_outliers = TRUE
+  )
+
 ggplot2::ggsave(
   filename = "man/figures/qc_label_plot.png",
   width = 6L,
   height = 2L,
   units = "in",
-  dpi = "screen")
+  dpi = "screen"
+)
 
 # QC No lines -------------------------------------------------------------
 
 outlier_data |>
-  olink_qc_plot(median_outlierDef = 2, IQR_outlierDef = 4,
-                outlierLines = FALSE, label_outliers = TRUE)
+  OlinkAnalyze::olink_qc_plot(
+    median_outlierDef = 2L,
+    IQR_outlierDef = 4L,
+    outlierLines = FALSE,
+    label_outliers = TRUE
+  )
 
 ggplot2::ggsave(
   filename = "man/figures/qc_nolines_plot.png",
   width = 6L,
   height = 2L,
   units = "in",
-  dpi = "screen")
+  dpi = "screen"
+)
 
 # 3k to HT bridging Figures -----------------------------------------------
 
@@ -271,11 +315,11 @@ overlapping_samples <- intersect(
   x = data_explore3072_samples,
   y = data_exploreht_samples
 ) |>
-unique()
+  unique()
 
 # Overlapping samples table -----------------------------------------------
 
-matrix(overlapping_samples, ncol = 4L) |>
+matrix(data = overlapping_samples, ncol = 4L) |>
   saveRDS("man/figures/overlapping_samples_table.rds")
 
 # PCAs before bridging ----------------------------------------------------
@@ -324,6 +368,7 @@ ggpubr::ggarrange(
   nrow = 1L,
   legend = "bottom"
 )
+
 ggplot2::ggsave(
   filename = "man/figures/PCA_btw_product_before.png",
   width = 6L,
