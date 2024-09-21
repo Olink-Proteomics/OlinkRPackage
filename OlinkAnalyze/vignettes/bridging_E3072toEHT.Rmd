@@ -223,7 +223,7 @@ Data from Explore 3072 and Explore HT will be concatenated in the function expor
 Note that regardless of the bridging recommendation, NPX values will be
 available for both normalization methods. A visual representation of the between-product bridging workflow is shown below.
 
-```{r, fig.cap= fcap, eval = TRUE, echo = FALSE, out.width="100%"}
+```{r, fig.cap= fcap, eval = TRUE, echo = FALSE, out.width="50%"}
 knitr::include_graphics(normalizePath("../man/figures/Bridging_schematic.png"),
                         error = FALSE)
 fcap <- "Schematic of Explore 3072 to Explore HT Bridging Workflow"
@@ -429,8 +429,8 @@ compared between the two products:
 
 An overview of these criteria is visualized below.
 
-```{r echo=FALSE, fig.cap=fcap, out.width="100%"}
-knitr::include_graphics(normalizePath("../man/figures/assay_bridgeability.png"), 
+```{r echo=FALSE, fig.cap=fcap, out.width="50%"}
+knitr::include_graphics(normalizePath("../man/figures/assay_bridgeability.jpg"), 
                         error = FALSE)
 fcap <- paste("Criteria to determine the bridging recommendation for an assay.",
 "The assessment of linearity ensures bridging between signal in both platforms",
@@ -558,6 +558,8 @@ separation between products which should decrease after bridging.
 ```{r include=FALSE}
 f8 <- "Combined PCA of sample controls from both platforms prior to normalization."
 f9 <- "Combined PCA of bridging samples from both platforms prior to normalization."
+f10 <- "Combined PCA of sample controls from both platforms after normalization."
+f11 <- "Combined PCA of bridging samples from both platforms after normalization."
 ```
 
 
@@ -622,7 +624,7 @@ npx_after_br_final |>
   
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE, fig.cap=f10}
 knitr::include_graphics(normalizePath("../man/figures/SCs_post_bridging.png"),
                         error = FALSE)
 ```
@@ -637,7 +639,7 @@ npx_after_br_reco |>
   OlinkAnalyze::olink_pca_plot(color_g = "Project")
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE, fig.cap=f11}
 knitr::include_graphics(normalizePath("../man/figures/bridges_post_bridging.png"), 
                         error = FALSE)
 ```

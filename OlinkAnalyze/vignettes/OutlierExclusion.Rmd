@@ -236,7 +236,7 @@ knitr::include_graphics(normalizePath("../man/figures/site_boxplot.png"), error 
 
 In this case, the shift in NPX distribution could be biologically meaningful or could indicate a sample or technical issue. There are several biological cases where the total protein concentration in a sample may be larger in one group than another. However, in some cases the difference in protein concentration can also lead to skewed results, in which case it may be helpful to normalize the data for the changes in protein concentration by performing a median adjustment as shown below.
 
-```{r}
+```{r, eval=FALSE}
 # Calculate SampleID Median NPX
 median_NPX<-group_data |> 
   dplyr::group_by(SampleID) |> 
@@ -251,6 +251,11 @@ adjusted_data|>
   dplyr::filter(Site %in% c("Site_A", "Site_D")) |> # Only visualizing 2 sites to see all samples
   olink_dist_plot(color_g = "Site")
 ```
+
+```{r echo=FALSE}
+knitr::include_graphics(normalizePath("../man/figures/sample_med_boxplot.png"), error = FALSE)
+```
+
 
 ## QC Plot (IQR vs Sample Median)
 
@@ -268,35 +273,47 @@ Often there are too many samples to identify outliers using `olink_dist_plot()`.
 
 Using the outlier data from the previous plots, we can see that sample A52 has a lower sample median and sample A25 has a higher sample median in both panels. Sample A48 has the highest IQR of all samples in the Inflammation panel. However, we can see many other samples approaching the line threshold line (default of 3 standard deviation from the mean IQR or sample median), suggesting that this sample may not be a true outlier.
 
-```{r}
+```{r, eval = FALSE}
 outlier_data |> 
   olink_qc_plot()
 ```
+
+```{r echo=FALSE}
+knitr::include_graphics(normalizePath("../man/figures/qc_plot.png"), error = FALSE)
+```
+
 
 With a standard deviation of 3 and assuming a normal distribution of samples, it is expected that over 99% of the data will lie within 3 standard deviations from the mean, however depending on the groups and samples within the study, there may be global shifts which will result in one or more samples outside of the 3 SD line. These lines should be used as guidelines and not strict thresholds of outliers.
 
 Similar to what was shown in the NPX distribution plot example, the QC plot can also be used to see changes in specific groups. In the example below, the samples are colored by site and Site D appears to have samples with higher sample median. 
 
-```{r}
+```{r eval=FALSE}
 group_data |> 
   olink_qc_plot(color_g = "Site")
 ```
 
+```{r echo=FALSE}
+knitr::include_graphics(normalizePath("../man/figures/qc_site_plot.png"), error = FALSE)
+```
 
 ### Labeling outliers 
 
 
 To change the threshold and outliers that are labeled, we can use `median_outlierDef`, `IQR_outlierDef`, `outlierLines`, and `label_outliers`. These arguments will plot lines at a number of standard deviations from the mean of the sample median or IQR and label the samples outside of these lines. The values of `median_outlierDef` and `IQR_outlierDef` default to 3 and may require some manual adjustment to determine the correct number to highlight the outliers.
 
-```{r}
+```{r eval=FALSE}
 outlier_data |> 
   olink_qc_plot(median_outlierDef = 2, IQR_outlierDef = 4, 
                  outlierLines = TRUE, label_outliers = TRUE) 
 ```
 
+```{r echo=FALSE}
+knitr::include_graphics(normalizePath("../man/figures/qc_label_plot.png"), error = FALSE)
+```
+
 To remove the lines and just keep the outliers labelled `outlierLines` can be set to False.
 
-```{r}
+```{r eval = FALSE}
 outlier_data |> 
   olink_qc_plot(median_outlierDef = 2, IQR_outlierDef = 4, 
                  outlierLines = FALSE, label_outliers = TRUE) 

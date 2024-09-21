@@ -38,14 +38,15 @@ p2 <- group_data |>
   )
 
 ggpubr::ggarrange(
-  p1[[1]], p2[[1]],
-  nrow = 2L,
-  labels = "AUTO"
+  p1[[1]], p2[[1]] ,
+  nrow = 1L,
+  labels = "AUTO",
+  legend = "bottom"
 )
 ggplot2::ggsave(
   filename = "man/figures/PCA_Outlier_Fig1.png",
-  width = 6,
-  height = 3,
+  width = 6L,
+  height = 2L,
   units = "in",
   dpi = "screen"
 )
@@ -63,8 +64,8 @@ OlinkAnalyze::npx_data1 |>
   )
 ggplot2::ggsave(
   filename = "man/figures/PCA_Treatment.png",
-  width = 6,
-  height = 3,
+  width = 3,
+  height = 2,
   units = "in",
   dpi = "screen"
 )
@@ -80,7 +81,7 @@ OlinkAnalyze::npx_data2 |>
   ) # Specify by panel
 ggplot2::ggsave(
   filename = "man/figures/PCA_Panel.png",
-  width = 6,
+  width = 4,
   height = 3,
   units = "in",
   dpi = "screen"
@@ -97,7 +98,7 @@ outlier_data |>
   )
 ggplot2::ggsave(
   filename = "man/figures/Outlier_PCA.png",
-  width = 6,
+  width = 4,
   height = 3,
   units = "in",
   dpi = "screen"
@@ -114,8 +115,8 @@ outlier_data |>
   )
 ggplot2::ggsave(
   filename = "man/figures/label_samples_pca.png",
-  width = 6,
-  height = 3,
+  width = 3,
+  height = 2,
   units = "in",
   dpi = "screen"
 )
@@ -135,7 +136,7 @@ outlier_data |>
 ggplot2::ggsave(
   filename = "man/figures/outlier_line_pca.png",
   width = 6,
-  height = 3,
+  height = 2,
   units = "in",
   dpi = "screen"
 )
@@ -146,12 +147,12 @@ outlier_data |>
   dplyr::filter(
     .data[["SampleID"]] %in% c("A25", "A52", "A1", "A2", "A3", "A5", "A15",
                                "A16", "A18", "A19", "A20")
-  )|>
+  ) |>
   olink_dist_plot()
 ggplot2::ggsave(
   filename = "man/figures/dist_boxplot.png",
   width = 6,
-  height = 3,
+  height = 2,
   units = "in",
   dpi = "screen"
 )
@@ -168,12 +169,84 @@ group_data |>
 ggplot2::ggsave(
   filename = "man/figures/site_boxplot.png",
   width = 6,
-  height = 3,
+  height = 2,
   units = "in",
   dpi = "screen"
 )
 
 
+# Sample Median Adjustment ------------------------------------------------
+
+# Calculate SampleID Median NPX
+median_NPX<-group_data |>
+  dplyr::group_by(SampleID) |>
+  dplyr::summarise(Median_NPX = median(NPX))
+
+# Adjust by sample median ---------------------
+adjusted_data <- group_data |>
+  dplyr::inner_join(median_NPX, by = "SampleID")|>
+  dplyr::mutate(NPX = NPX - Median_NPX)
+
+adjusted_data|>
+  dplyr::filter(Site %in% c("Site_A", "Site_D")) |> # Only visualizing 2 sites to see all samples
+  olink_dist_plot(color_g = "Site")
+ggplot2::ggsave(
+  filename = "man/figures/sample_med_boxplot.png",
+  width = 6,
+  height = 2,
+  units = "in",
+  dpi = "screen")
+
+
+# QC Plot -----------------------------------------------------------------
+
+outlier_data |>
+  olink_qc_plot()
+ggplot2::ggsave(
+  filename = "man/figures/qc_plot.png",
+  width = 6,
+  height = 2,
+  units = "in",
+  dpi = "screen")
+
+
+# QC Site -----------------------------------------------------------------
+
+group_data |>
+  olink_qc_plot(color_g = "Site")
+ggplot2::ggsave(
+  filename = "man/figures/qc_site_plot.png",
+  width = 6,
+  height = 2,
+  units = "in",
+  dpi = "screen")
+
+
+# QC Label ----------------------------------------------------------------
+
+outlier_data |>
+  olink_qc_plot(median_outlierDef = 2, IQR_outlierDef = 4,
+                outlierLines = TRUE, label_outliers = TRUE)
+ggplot2::ggsave(
+  filename = "man/figures/qc_label_plot.png",
+  width = 6,
+  height = 2,
+  units = "in",
+  dpi = "screen")
+
+
+# QC No lines -------------------------------------------------------------
+
+outlier_data |>
+  olink_qc_plot(median_outlierDef = 2, IQR_outlierDef = 4,
+                outlierLines = FALSE, label_outliers = TRUE)
+
+ggplot2::ggsave(
+  filename = "man/figures/qc_nolines_plot.png",
+  width = 6,
+  height = 2,
+  units = "in",
+  dpi = "screen")
 
 # 3k to HT bridging Figures -----------------------------------------------
 
@@ -191,14 +264,20 @@ data_exploreht_samples <- data_exploreht |>
   dplyr::distinct(SampleID) |>
   dplyr::pull()
 
-# Overlapping figures table
+
 overlapping_samples <- unique(intersect(data_explore3072_samples,
                                         data_exploreht_samples))
+
+# Overlapping samples table -----------------------------------------------
+
 
 matrix(overlapping_samples, ncol = 4) |>
   saveRDS("man/figures/overlapping_samples_table.rds")
 
-# PCAs before bridginge
+
+# PCAs before bridging ----------------------------------------------------
+
+
 
 data_explore3072_before_br <- data_explore3072 |>
   dplyr::filter(SampleType == "SAMPLE") |>
@@ -216,24 +295,27 @@ data_exploreht_before_br <- data_exploreht |>
                                paste0("Explore HT Sample")))
 
 
-pca_E3072 <- OlinkAnalyze::olink_pca_plot(df = data_explore3072_before_br,
+pca_e3072 <- OlinkAnalyze::olink_pca_plot(df = data_explore3072_before_br,
                                           color_g = "Type",
                                           quiet = TRUE)
 
-pca_EHT <- OlinkAnalyze::olink_pca_plot(df = data_exploreht_before_br,
+pca_eht <- OlinkAnalyze::olink_pca_plot(df = data_exploreht_before_br,
                                         color_g = "Type",
                                         quiet = TRUE)
 
-ggpubr::ggarrange(pca_E3072[[1]], pca_EHT[[1]], nrow = 2)
+ggpubr::ggarrange(pca_e3072[[1]], pca_eht[[1]], nrow = 1, legend = "bottom")
 ggplot2::ggsave("man/figures/PCA_btw_product_before.png",
                 width = 6,
-                height = 8,
+                height = 2.5,
                 units = "in",
                 dpi = "screen")
 
-rm(pca_E3072, pca_EHT)
+rm(pca_e3072, pca_eht)
 
-# Normalize
+
+# Normalize products ------------------------------------------------------
+
+
 # Find shared samples
 npx_ht <- data_exploreht |>
   dplyr::mutate(Project = "data1")
@@ -249,13 +331,15 @@ npx_br_data <- olink_normalization(df1 = npx_ht,
                                    reference_project = "Explore HT")
 rm(npx_ht, npx_3072)
 
-# Bridging Table Results
+# Bridge table results ----------------------------------------------------
 npx_br_data |>
   filter(Project == "Explore 3072") |>
   head(5) |>
   saveRDS("man/figures/bridging_results.rds")
 
-# SC pre bridging
+
+
+# SC pre bridging-------------------------------------------------------
 npx_br_data |>
   dplyr::filter(SampleType == "SAMPLE_CONTROL") |>
   dplyr::mutate(OlinkID = paste0(OlinkID, "_", OlinkID_E3072)) |>
@@ -263,12 +347,12 @@ npx_br_data |>
   OlinkAnalyze::olink_pca_plot(color_g = "Project")
 
 ggplot2::ggsave("man/figures/SCs_pre_bridging.png",
-                width = 6,
-                height = 3,
+                width = 3,
+                height = 2,
                 units = "in",
                 dpi = "screen")
 
-# Bridge sample pre bridging
+# Bridge sample pre bridging ----------------------------------------------
 npx_br_data |>
   dplyr::filter(SampleType == "SAMPLE") |>
   dplyr::filter(SampleID %in% overlapping_samples) |>
@@ -277,23 +361,26 @@ npx_br_data |>
   OlinkAnalyze::olink_pca_plot(color_g = "Project")
 
 ggplot2::ggsave("man/figures/bridges_pre_bridging.png",
-                width = 6,
-                height = 3,
+                width = 3,
+                height = 2,
                 units = "in",
                 dpi = "screen")
 
 # Cleanup
 rm(data_explore3072, data_explore3072_before_br, data_explore3072_samples,
    data_exploreht, data_exploreht_before_br, data_exploreht_samples,
-   df, group_data, outlier_data)
+   group_data, outlier_data)
 
-# Recommended bridging
+# Recommended bridging data wrangling ------------------------
 npx_after_br_reco <- npx_br_data |>
   dplyr::filter(BridgingRecommendation != "Not Bridgeable") |>
-  dplyr::mutate(NPX = case_when(
-    BridgingRecommendation == "MedianCentering" ~ MedianCenteredNPX,
-    BridgingRecommendation == "QuantileSmoothing" ~ QSNormalizedNPX,
-    .default = NPX)) |>
+  dplyr::mutate(NPX =
+                  case_when(
+                            BridgingRecommendation ==
+                              "MedianCentering" ~ MedianCenteredNPX,
+                            BridgingRecommendation ==
+                              "QuantileSmoothing" ~ QSNormalizedNPX,
+                            .default = NPX)) |>
   dplyr::filter(AssayType == "assay") |>
   dplyr::mutate(OlinkID = paste0(OlinkID, "_", OlinkID_E3072))
 
@@ -301,24 +388,24 @@ npx_after_br_reco <- npx_br_data |>
 npx_after_br_final <- npx_after_br_reco |>
   dplyr:::mutate(SampleID = paste0(Project, SampleID))
 
-### PCA plot of the data from SCs
+# PCA plot of the data from SCs ------------------------------
 npx_after_br_final |>
   dplyr::filter(SampleType == "SAMPLE_CONTROL") |>
   OlinkAnalyze::olink_pca_plot(color_g = "Project")
 ggplot2::ggsave("man/figures/SCs_post_bridging.png",
-                width = 6,
-                height = 3,
+                width = 3,
+                height = 2,
                 units = "in",
                 dpi = "screen")
 
-### PCA plot of the data from bridging samples
+# PCA plot of the data from bridging samples ------------------
 npx_after_br_reco |>
   dplyr::filter(SampleType == "SAMPLE") |>
   dplyr::filter(SampleID %in% overlapping_samples) |>
   dplyr:::mutate(SampleID = paste0(Project, SampleID)) |>
   OlinkAnalyze::olink_pca_plot(color_g = "Project")
 ggplot2::ggsave("man/figures/bridges_post_bridging.png",
-                width = 6,
-                height = 3,
+                width = 3,
+                height = 2,
                 units = "in",
                 dpi = "screen")
