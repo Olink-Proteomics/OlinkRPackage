@@ -274,14 +274,16 @@ overlapping_samples <- unique(intersect(data_explore3072_samples,
 ```
 
 ```{r echo=FALSE}
-readRDS(normalizePath("../man/figures/overlapping_samples_table.rds")) |> 
-  kableExtra::kbl(booktabs = TRUE,
-                  digits = 2,
-                  caption = "Overlapping bridging samples") |>
-  kableExtra::kable_styling(bootstrap_options = "striped",
-                            full_width = FALSE,
-                            position = "center",
-                            latex_options = "HOLD_position")
+try(
+  readRDS(normalizePath("../man/figures/overlapping_samples_table.rds")) |> 
+    kableExtra::kbl(booktabs = TRUE,
+                    digits = 2,
+                    caption = "Overlapping bridging samples") |>
+    kableExtra::kable_styling(bootstrap_options = "striped",
+                              full_width = FALSE,
+                              position = "center",
+                              latex_options = "HOLD_position")
+)
 ```
 
 
@@ -533,13 +535,15 @@ normalized NPX values in the Explore HT data will be the same as the
 values in the NPX column which contains the non-normalized data.
 
 ```{r echo=FALSE}
-readRDS(normalizePath("../man/figures/bridging_results.rds")) |> 
-  kableExtra::kbl(booktabs = TRUE,
-      digits = 1,
-      caption = "Table 4. First 5 rows of combined datasets after bridging.") |>
-  kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE, font_size = 10, 
-                position = "center", latex_options = "HOLD_position") |> 
-  kableExtra::scroll_box(width = "100%")
+try( 
+  readRDS(normalizePath("../man/figures/bridging_results.rds")) |> 
+    kableExtra::kbl(booktabs = TRUE,
+        digits = 1,
+        caption = "Table 4. First 5 rows of combined datasets after bridging.") |>
+    kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE, font_size = 10, 
+                  position = "center", latex_options = "HOLD_position") |> 
+    kableExtra::scroll_box(width = "100%")
+)
 ```
 
 
