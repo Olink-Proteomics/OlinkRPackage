@@ -11,7 +11,8 @@ norm_internal_cross_product(
   ref_cols,
   not_ref_df,
   not_ref_name,
-  not_ref_cols
+  not_ref_cols,
+  norm_mode
 )
 }
 \arguments{
@@ -32,6 +33,9 @@ adjustment factor calculation in the reference dataset (required).}
 
 \item{not_ref_cols}{Named list of column names in the non-reference dataset
 (required).}
+
+\item{norm_mode}{Scalar character from \var{olink_norm_modes} with the
+normalization to be performed.}
 }
 \value{
 Tibble or ArrowObject with a dataset with the following additional
