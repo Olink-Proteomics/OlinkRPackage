@@ -6,24 +6,18 @@ eHT_e3072_mapping_rds <- system.file("extdata",
                                      package = "OlinkAnalyze",
                                      mustWork = TRUE)
 eHT_e3072_mapping <- readRDS(file = eHT_e3072_mapping_rds) |>
-  dplyr::rename(
-    "Assay" = "Gene",
-    "OlinkID_HT" = "OlinkID",
-    "OlinkID_E3072" = "OlinkID_Explore384",
-    "Block_HT" = "Block",
-    "Panel_E3072" = "Panel_Explore384",
-    "Block_E3072" = "Block_Explore384"
-  ) |>
   dplyr::select(
     dplyr::all_of(
-      c("Assay", "UniProt")
-    ),
-    dplyr::ends_with("_HT"),
-    dplyr::ends_with("_E3072")
+      c("OlinkID_ref" = "OlinkID",
+        "OlinkID_notref" = "OlinkID_Explore384")
+    )
   ) |>
   dplyr::mutate(
-    OlinkID = paste(.data[["OlinkID_HT"]], .data[["OlinkID_E3072"]], sep = "_"),
-    Block_HT = as.character(.data[["Block_HT"]])
+    OlinkID = paste(.data[["OlinkID_ref"]],
+                    .data[["OlinkID_notref"]],
+                    sep = "_"),
+    Product_ref = "HT",
+    Product_notref = "E3072"
   ) |>
   dplyr::as_tibble()
 rm(eHT_e3072_mapping_rds)
