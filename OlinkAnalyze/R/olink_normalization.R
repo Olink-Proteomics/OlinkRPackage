@@ -303,7 +303,8 @@ olink_normalization <- function(df1,
         ref_cols = lst_check$ref_cols,
         not_ref_df = lst_check$not_ref_df,
         not_ref_name = lst_check$not_ref_name,
-        not_ref_cols = lst_check$not_ref_cols
+        not_ref_cols = lst_check$not_ref_cols,
+        norm_mode = lst_check$norm_mode
       )
 
     } else if (lst_check$norm_mode == olink_norm_modes$subset) {
@@ -618,6 +619,8 @@ norm_internal_bridge <- function(ref_df,
 #' @param not_ref_name Project name of the non-reference dataset (required).
 #' @param not_ref_cols Named list of column names in the non-reference dataset
 #' (required).
+#' @param norm_mode Scalar character from \var{olink_norm_modes} with the
+#' normalization to be performed.
 #'
 #' @return Tibble or ArrowObject with a dataset with the following additional
 #' columns:
@@ -640,7 +643,8 @@ norm_internal_cross_product <- function(ref_df,
                                         ref_cols,
                                         not_ref_df,
                                         not_ref_name,
-                                        not_ref_cols) {
+                                        not_ref_cols,
+                                        norm_mode) {
   # prepare inputs ----
 
   lst_df <- list(
@@ -692,6 +696,10 @@ norm_internal_cross_product <- function(ref_df,
 
   # integrate normalization approaches ----
 
+  if (norm_mode == olink_norm_modes$norm_ht_3k) {
+    oid_notref <- "OlinkID_E3072"
+  }
+
   # combines the original dataset with df_is_bridgeable, df_norm_bridge and
   # df_norm_qq, and stores the outcome in df_norm
   df_norm <- lst_df |>
@@ -739,7 +747,8 @@ norm_internal_cross_product <- function(ref_df,
       )
     ) |>
     dplyr::rename(
-      !!ref_cols$olink_id := "OlinkID_HT"
+      !!ref_cols$olink_id := "OlinkID_ref",
+      !!oid_notref := "OlinkID_notref"
     )
 
   # return ----
