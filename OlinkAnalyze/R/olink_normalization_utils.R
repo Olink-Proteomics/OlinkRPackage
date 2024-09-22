@@ -946,10 +946,10 @@ olink_norm_input_cross_product <- function(lst_df,
         .data[[lst_cols[[d_name]]$olink_id]]
       ) |>
       unique()
-    if (all(u_oid %in% eHT_e3072_mapping$OlinkID_E3072)) {
-      return("3k")
-    } else if (all(u_oid %in% eHT_e3072_mapping$OlinkID_HT)) {
-      return("HT")
+    if (all(u_oid %in% eHT_e3072_mapping$OlinkID_ref)) {
+      return("ref")
+    } else if (all(u_oid %in% eHT_e3072_mapping$OlinkID_notref)) {
+      return("notref")
     } else {
       return("other")
     }
@@ -966,9 +966,9 @@ olink_norm_input_cross_product <- function(lst_df,
   # the other one probably T96, T48, which we do not normalize.
   lst_prod_uniq <- lst_product |> unique() |> sort()
   if (length(lst_prod_uniq) == 1L
-      && all(lst_prod_uniq %in% c("3k", "other"))) {
+      && all(lst_prod_uniq %in% c("notref", "other"))) {
     norm_mode <- olink_norm_modes$bridge
-  } else if (identical(x = lst_prod_uniq, y = c("3k", "HT"))) {
+  } else if (identical(x = lst_prod_uniq, y = c("notref", "ref"))) {
     norm_mode <- olink_norm_modes$norm_ht_3k
   } else {
     cli::cli_abort(
@@ -985,7 +985,7 @@ olink_norm_input_cross_product <- function(lst_df,
   # check if reference dataset is HT if cross-product normalization ----
 
   if (norm_mode == olink_norm_modes$norm_ht_3k
-      && names(lst_product)[lst_product == "HT"] != reference_project) {
+      && names(lst_product)[lst_product == "ref"] != reference_project) {
 
     cli::cli_abort(
       c(
@@ -1005,15 +1005,15 @@ olink_norm_input_cross_product <- function(lst_df,
   if (norm_mode == olink_norm_modes$norm_ht_3k) {
 
     # add combined OlinkID to HT dataset
-    l_ht_name <- names(lst_product)[lst_product == "HT"]
-    l_ht_oid_rename <- paste0(lst_cols[[l_ht_name]]$olink_id, "_HT")
+    l_ref_name <- names(lst_product)[lst_product == "ref"]
+    l_ref_oid_rename <- paste0(lst_cols[[l_ref_name]]$olink_id, "_ref")
     ht_3k_map_ht_rename <- stats::setNames(
-      object = c("OlinkID_HT", "OlinkID"),
-      nm = c("OlinkID_HT", lst_cols[[l_ht_name]]$olink_id)
+      object = c("OlinkID_ref", "OlinkID"),
+      nm = c("OlinkID_ref", lst_cols[[l_ref_name]]$olink_id)
     )
-    lst_df[[l_ht_name]] <- lst_df[[l_ht_name]] |>
+    lst_df[[l_ref_name]] <- lst_df[[l_ref_name]] |>
       dplyr::rename(
-        !!l_ht_oid_rename := lst_cols[[l_ht_name]]$olink_id
+        !!l_ref_oid_rename := lst_cols[[l_ref_name]]$olink_id
       ) |>
       dplyr::left_join(
         eHT_e3072_mapping |>
@@ -1022,20 +1022,21 @@ olink_norm_input_cross_product <- function(lst_df,
               ht_3k_map_ht_rename
             )
           ),
-        by = stats::setNames(object = "OlinkID_HT", nm = l_ht_oid_rename),
+        by = stats::setNames(object = "OlinkID_ref",
+                             nm = l_ref_oid_rename),
         relationship = "many-to-one"
       )
 
     # add combined OlinkID to 3k dataset
-    l_3k_name <- names(lst_product)[lst_product == "3k"]
-    l_3k_oid_rename <- paste0(lst_cols[[l_3k_name]]$olink_id, "_E3072")
+    l_notref_name <- names(lst_product)[lst_product == "notref"]
+    l_notref_oid_rename <- paste0(lst_cols[[l_notref_name]]$olink_id, "_notref")
     ht_3k_map_3k_rename <- stats::setNames(
-      object = c("OlinkID_E3072", "OlinkID"),
-      nm = c("OlinkID_E3072", lst_cols[[l_3k_name]]$olink_id)
+      object = c("OlinkID_notref", "OlinkID"),
+      nm = c("OlinkID_notref", lst_cols[[l_notref_name]]$olink_id)
     )
-    lst_df[[l_3k_name]] <- lst_df[[l_3k_name]] |>
+    lst_df[[l_notref_name]] <- lst_df[[l_notref_name]] |>
       dplyr::rename(
-        !!l_3k_oid_rename := lst_cols[[l_3k_name]]$olink_id
+        !!l_notref_oid_rename := lst_cols[[l_notref_name]]$olink_id
       ) |>
       dplyr::left_join(
         eHT_e3072_mapping |>
@@ -1044,7 +1045,8 @@ olink_norm_input_cross_product <- function(lst_df,
               ht_3k_map_3k_rename
             )
           ),
-        by = stats::setNames(object = "OlinkID_E3072", nm = l_3k_oid_rename),
+        by = stats::setNames(object = "OlinkID_notref",
+                             nm = l_notref_oid_rename),
         relationship = "many-to-one"
       )
 
