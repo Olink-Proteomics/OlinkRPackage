@@ -172,16 +172,16 @@ test_that(
       expected = list(
         ref_df = data_ht |>
           dplyr::rename(
-            "OlinkID_HT" = "OlinkID"
+            "OlinkID_ref" = "OlinkID"
           ) |>
           dplyr::left_join(
             eHT_e3072_mapping |>
               dplyr::select(
                 dplyr::all_of(
-                  c("OlinkID_HT", "OlinkID")
+                  c("OlinkID_ref", "OlinkID")
                 )
               ),
-            by = "OlinkID_HT",
+            by = "OlinkID_ref",
             relationship = "many-to-one"
           ),
         ref_samples = bridge_samples,
@@ -200,16 +200,16 @@ test_that(
                         normalization = "Normalization"),
         not_ref_df = data_3k |>
           dplyr::rename(
-            "OlinkID_E3072" = "OlinkID"
+            "OlinkID_notref" = "OlinkID"
           ) |>
           dplyr::left_join(
             eHT_e3072_mapping |>
               dplyr::select(
                 dplyr::all_of(
-                  c("OlinkID_E3072", "OlinkID")
+                  c("OlinkID_notref", "OlinkID")
                 )
               ),
-            by = "OlinkID_E3072",
+            by = "OlinkID_notref",
             relationship = "many-to-one"
           ),
         not_ref_samples = NULL,
@@ -2498,30 +2498,30 @@ test_that(
         lst_df = list(
           "p1" = data_3k |>
             dplyr::rename(
-              "OlinkID_E3072" = "OlinkID"
+              "OlinkID_notref" = "OlinkID"
             ) |>
             dplyr::left_join(
               eHT_e3072_mapping |>
                 dplyr::select(
                   dplyr::all_of(
-                    c("OlinkID_E3072", "OlinkID")
+                    c("OlinkID_notref", "OlinkID")
                   )
                 ),
-              by = "OlinkID_E3072",
+              by = "OlinkID_notref",
               relationship = "many-to-one"
             ),
           "p2" = data_ht |>
             dplyr::rename(
-              "OlinkID_HT" = "OlinkID"
+              "OlinkID_ref" = "OlinkID"
             ) |>
             dplyr::left_join(
               eHT_e3072_mapping |>
                 dplyr::select(
                   dplyr::all_of(
-                    c("OlinkID_HT", "OlinkID")
+                    c("OlinkID_ref", "OlinkID")
                   )
                 ),
-              by = "OlinkID_HT",
+              by = "OlinkID_ref",
               relationship = "many-to-one"
             )
         )
@@ -3747,16 +3747,16 @@ test_that(
     lst_df_v0 <- list(
       "p1" = data_3k |>
         dplyr::rename(
-          "OlinkID_E3072" = "OlinkID"
+          "OlinkID_notref" = "OlinkID"
         ) |>
         dplyr::left_join(
           eHT_e3072_mapping |>
             dplyr::select(
               dplyr::all_of(
-                c("OlinkID", "OlinkID_E3072")
+                c("OlinkID", "OlinkID_notref")
               )
             ),
-          by = "OlinkID_E3072",
+          by = "OlinkID_notref",
           relationship = "many-to-one"
         )
     )
@@ -3785,16 +3785,16 @@ test_that(
     lst_df_v2 <- list(
       "p1" = data_3k |>
         dplyr::rename(
-          "OlinkID_E3072" = "OlinkID"
+          "OlinkID_notref" = "OlinkID"
         ) |>
         dplyr::left_join(
           eHT_e3072_mapping |>
             dplyr::select(
               dplyr::all_of(
-                c("OlinkID", "OlinkID_E3072")
+                c("OlinkID", "OlinkID_notref")
               )
             ),
-          by = "OlinkID_E3072",
+          by = "OlinkID_notref",
           relationship = "many-to-one"
         ) |>
         dplyr::mutate(
