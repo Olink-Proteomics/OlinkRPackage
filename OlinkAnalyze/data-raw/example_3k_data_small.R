@@ -46,7 +46,7 @@ assays_small <- eHT_e3072_mapping |>
     n = 2L
   ) |>
   dplyr::pull(
-    .data[["OlinkID_E3072"]]
+    .data[["OlinkID_notref"]]
   )
 
 # 3k small dataset ----
