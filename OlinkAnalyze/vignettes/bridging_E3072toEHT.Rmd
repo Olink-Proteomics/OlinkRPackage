@@ -56,7 +56,7 @@ products.
 -   **Bridging samples** – Overlapping samples run on two or more projects
     that are used as references to enable normalization. These
     samples are selected as described in the [Introduction to Bridging
-    tutorial](https://cran.r-project.org/web/packages/OlinkAnalyze/vignettes/bridging_introduction.html)
+    tutorial](bridging_introduction.html)
     to ensure samples are of high quality and span the range of the
     data. In the case of data containing LOD, samples are also filtered
     for high detectability. Bridging samples are selected from the project
@@ -91,7 +91,7 @@ technical variation. One such method of normalizing two projects is referred to 
 normalization, bridge normalization, or just simply bridging. For more
 information on within-product bridging, see the [Introduction to
 Bridging
-tutorial](https://cran.r-project.org/web/packages/OlinkAnalyze/vignettes/bridging_introduction.html).
+tutorial](bridging_introduction.html).
 Bridging makes certain assumptions on the distributions of
 the assays, namely that we are measuring the same true biological range
 no matter the setting. If an assay displays different distributions
@@ -150,7 +150,7 @@ among data sets and, as such, are analyzed in both data sets. Olink NPX
 data sets without shared samples cannot be combined using the
 bridging approach described below. More information on bridge sample
 selection can be found in the [selecting bridging samples
-section](https://cran.r-project.org/web/packages/OlinkAnalyze/vignettes/bridging_introduction.html#selecting-bridging-samples)
+section](bridging_introduction.html#selecting-bridging-samples)
 of the Introduction to Bridging tutorial.
 
 ## Bridge Sample Selection
@@ -159,9 +159,9 @@ Prior to running a study with Explore HT, bridging samples must be selected
 from the study run with Explore 3072 and be run on the Explore HT study. These samples can
 be selected using the `olink_bridgeselector()` function in Olink Analyze
 as detailed in [the Introduction to bridging
-tutorial](https://cran.r-project.org/web/packages/OlinkAnalyze/vignettes/bridging_introduction.html#selecting-bridging-samples). The recommended number of bridge samples for within- and between- product bridging is summarized in the table below. When selecting bridge samples, the aim is to select samples that represent the dynamic range of the assay expression in the product. As such, quality control of the sample and, if available, proportion of data above LOD in the sample are considered when determining if a sample is chosen as a bridging sample. When LOD data is not available in the data export from Olink NPX software, LOD can optionally be calculated from fixed LOD or negative controls as
+tutorial](bridging_introduction.html#selecting-bridging-samples). The recommended number of bridge samples for within- and between- product bridging is summarized in the table below. When selecting bridge samples, the aim is to select samples that represent the dynamic range of the assay expression in the product. As such, quality control of the sample and, if available, proportion of data above LOD in the sample are considered when determining if a sample is chosen as a bridging sample. When LOD data is not available in the data export from Olink NPX software, LOD can optionally be calculated from fixed LOD or negative controls as
 detailed in the [Calculating LOD from Olink Explore data
-tutorial](https://cran.r-project.org/web/packages/OlinkAnalyze/vignettes/LOD.html).
+tutorial](LOD.html).
 
 ```{r brnrtab, eval=TRUE, message=FALSE, echo = FALSE}
 data.frame(Platform = c("Target 96",
@@ -197,7 +197,7 @@ data and Explore HT data which have at least 40 to 64 bridging samples. For
 studies containing multiple projects of Explore 3072 data, the Explore
 3072 data sets should be bridged using within-product bridging as
 detailed in the [Introduction to bridging
-tutorial](https://cran.r-project.org/web/packages/OlinkAnalyze/vignettes/bridging_introduction.html) or otherwise normalized together
+tutorial](bridging_introduction.html) or otherwise normalized together
 prior to performing between-product bridging.
 
 The assays from Explore 3072 are matched to the corresponding assays in
