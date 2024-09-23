@@ -16,6 +16,7 @@ BridgingRecommendation
 Bugfixes
 BugFixes
 byPanel
+Cardiometabolic
 CHL
 chr
 clusterProfiler
@@ -26,6 +27,7 @@ conf
 config
 cran
 csv
+CXCL
 Dai
 darkblue
 DenDF
@@ -36,6 +38,7 @@ displayPlateLayout
 doi
 dplyr
 dunnTest
+ECDF
 emmeans
 enrichmentScore
 ExploreVersion
@@ -52,6 +55,7 @@ Fontsize
 friedman
 FSA
 Fu
+GBP
 geneID
 GeneRatio
 genesets
@@ -67,6 +71,7 @@ Hardcoded
 Hochberg
 https
 Hu
+IDO
 interpretability
 iqr
 KEGG
@@ -79,9 +84,11 @@ LME
 lmer
 LMER
 lmerTest
+LMOD
 loadings
 LOD
 magrittr
+MAPK
 md
 MeanNPX
 meansq
@@ -152,6 +159,8 @@ SampleIDs
 sampleMissingFreq
 SampleQC
 Satterthwaite's
+SCRIB
+SCs
 sd
 setSize
 sidak
@@ -165,6 +174,7 @@ Theming
 tibble
 Tibble
 tidyselect
+TNF
 ttest
 tukey
 umap
