@@ -11,9 +11,11 @@
 * Removed redundant information from overview vignette (#458, @kathy-nevola)
 
 ## Bug Fixes
-* Extra set of parentheses removed from vignette (#430, @kathy-nevola)
 * Add support back for files with quotes to read_NPX (#431 @kathy-nevola)
 
+# Olink Analyze 3.9.1
+## Bug Fix
+* Extra set of parentheses removed from vignette (#430, @kathy-nevola)
 
 # Olink Analyze 3.9.0
 ## Minor Changes

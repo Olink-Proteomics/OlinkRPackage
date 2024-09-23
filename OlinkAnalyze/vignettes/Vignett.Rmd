@@ -202,7 +202,7 @@ A special case of subset normalization is where all samples (except control samp
 
 The olink_lod function adds LOD information to an Explore HT or Explore 3072 NPX dataframe. This function can incorporate LOD based on either an Explore dataset's negative controls or using predetermined fixed LOD values, which can be downloaded from the Document Download Center at [olink.com](https://olink.com/knowledge/documents), or using both methods. The default LOD calculation method is based off of the negative controls. If an NPX file is intensity normalized, both intensity normalized and PC normalized LODs are provided. 
 
-For more information on calculating LOD, consult the [Calculating LOD from Olink® Explore data tutorial](https://cran.r-project.org/web/packages/OlinkAnalyze/vignettes/LOD.html).
+For more information on calculating LOD, consult the [Calculating LOD from Olink® Explore data tutorial](https://cran.r-project.org/web/packages/OlinkAnalyze/vignettes/LOD.html)
 
 # Statistical analysis
 
