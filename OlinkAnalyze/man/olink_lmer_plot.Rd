@@ -55,7 +55,7 @@ See \code{olink_lmer} for details of input notation.
 \donttest{
 
 library(dplyr)
-
+if (requireNamespace("lme4", quietly = TRUE) & requireNamespace("lmerTest", quietly = TRUE)){
 lmer_results <- olink_lmer(df = npx_data1,
                            variable=c("Time", 'Treatment'),
                            random = c('Subject'))
@@ -73,5 +73,7 @@ list_of_pointrange_plots <- olink_lmer_plot(df = npx_data1,
                                             col_variable = 'Treatment',
                                             verbose=TRUE,
                                             olinkid_list = assay_list,
-                                            number_of_proteins_per_plot = 10)}
+                                            number_of_proteins_per_plot = 10)
+}
+}
 }

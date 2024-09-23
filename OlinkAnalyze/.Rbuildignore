@@ -13,3 +13,4 @@
 ^revdep$
 ^inst/WORDLIST
 ^CITATION\.cff$
+^data-raw$

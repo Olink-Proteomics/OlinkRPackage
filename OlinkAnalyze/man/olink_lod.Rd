@@ -10,21 +10,21 @@ olink_lod(data, lod_file_path = NULL, lod_method = "NCLOD")
 \item{data}{npx data file}
 
 \item{lod_file_path}{location of lod file from Olink. Only needed if
-lod_method = "FixedLOD" or "Both". Default `NULL`.}
+lod_method = "FixedLOD" or "Both". Default \code{NULL}.}
 
 \item{lod_method}{method for calculating LOD using either "FixedLOD" or
-negative controls ("NCLOD"), or both ("Both"). Default `NCLOD`.}
+negative controls ("NCLOD"), or both ("Both"). Default \code{NCLOD}.}
 }
 \value{
-A dataframe with 2 additional columns, LOD and PCNormalizedLOD if `lod_method` is FixedLOD or NCLOD. When `Normalization = "Plate Control"`, LOD and PCNormalizedLOD are identical. 
+A dataframe with 2 additional columns, LOD and PCNormalizedLOD if \code{lod_method} is FixedLOD or NCLOD. When \code{Normalization = "Plate Control"}, LOD and PCNormalizedLOD are identical.
 
-If `lod_method` is "Both", 4 additional columns will be added: 
- \itemize{
-   \item NCLOD - LOD calculated from negative controls and normalized based on normalization column
-   \item NCPCNormalizedLOD - PC Normalized LOD calculated from negative controls
-   \item FixedLOD - LOD calculated from fixed LOD file and normalized based on normalization column
-   \item FixedPCNormalizedLOD - PC Normalized LOD calculated from fixed LOD file
-   }
+If \code{lod_method} is "Both", 4 additional columns will be added:
+\itemize{
+\item NCLOD - LOD calculated from negative controls and normalized based on normalization column
+\item NCPCNormalizedLOD - PC Normalized LOD calculated from negative controls
+\item FixedLOD - LOD calculated from fixed LOD file and normalized based on normalization column
+\item FixedPCNormalizedLOD - PC Normalized LOD calculated from fixed LOD file
+}
 }
 \description{
 Calculate LOD using Negative Controls or Fixed LOD

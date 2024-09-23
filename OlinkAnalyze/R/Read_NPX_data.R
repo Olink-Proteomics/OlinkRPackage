@@ -33,9 +33,9 @@
 #' @importFrom stringr str_detect str_replace_all str_to_upper str_to_title str_replace
 #' @importFrom tidyr tibble separate gather
 #' @importFrom utils tail
-#' @importFrom zip unzip
 #' @importFrom stats na.omit
 #' @importFrom utils tail
+#' @importFrom data.table fread
 
 read_NPX <- function(filename) {
   # If the file is csv or txt read_NPX assumes Explore NPX data in long format
@@ -78,7 +78,7 @@ read_NPX_explore <- function(filename) {
   # please add newer versions to the list chronologically
   header_base <- c("SampleID", "OlinkID", "UniProt", "Assay",
                        "Panel", "PlateID", "NPX")
-  
+
   header_standard <- c(header_base, "QC_Warning")
 
   header_quant_standard <- c("SampleID", "OlinkID", "UniProt", "Assay",
@@ -213,7 +213,7 @@ read_NPX_explore <- function(filename) {
                             "DataAnalysisRefID",
                             "AssayType",
                             "Block",
-                            "Counts",
+                            "Count",
                             "ExtNPX",
                             "Normalization",
                             "PCNormalizedNPX",
