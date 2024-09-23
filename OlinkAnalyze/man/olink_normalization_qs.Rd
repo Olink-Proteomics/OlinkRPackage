@@ -19,7 +19,7 @@ quantile mapping. (required)}
 }
 \value{
 A "tibble" of Olink data in long format containing both input
-datatsets with the quantile normalized quantifications.
+datasets with the quantile normalized quantifications.
 }
 \description{
 This function uses bridge samples to map quantiles of the non-reference

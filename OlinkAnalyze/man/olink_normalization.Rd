@@ -73,7 +73,7 @@ provided as input in \code{overlapping_samples_df1} and all unique sample
 identifiers from \code{df2} are provided as input in \code{overlapping_samples_df2}.
 }
 \item \strong{Reference median normalization}: One of the datasets (\code{df1}) is
-adjusted to a predefined set of adjustement factors. This is effectively
+adjusted to a predefined set of adjustment factors. This is effectively
 subset normalization, but using differences of medians to pre-recorded
 median values. \code{df1}, \code{overlapping_samples_df1}, \code{df1_project_nr} and
 \code{reference_medians} need to be specified. Dataset \code{df1} is normalized using
@@ -81,7 +81,7 @@ the differences in median between the overlapping samples and the reference
 medians.
 \item \strong{Cross-product normalization}: One of the datasets is adjusted to
 another using the median of pair-wise differences of overlapping samples
-(bridge samples) or quantile-quantile (QQ) normalization using overlapping
+(bridge samples) or quantile smoothing using overlapping
 samples as reference to adjust the distributions. Overlapping samples need
 to have the same identifiers in both datasets. The two datasets are provided
 as \code{df1} and \code{df2}, and the one being adjusted to is specified in the input
@@ -110,7 +110,7 @@ that was applied to the non-reference dataset.
 "BridgingRecommendation" in case of cross-product normalization. The columns
 correspond to the project of origin based on \code{df1_project_nr} and
 \code{df2_project_nr}, the assay identifier in the non-reference project, the
-bridge-normalized quantification value, the QQ-normalized quantification
+bridge-normalized quantification value, the quantile smoothing-normalized quantification
 value, and the recommendation about which of the two normalized values is
 more suitable for downstream analysis.
 }

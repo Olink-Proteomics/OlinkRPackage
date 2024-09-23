@@ -1,3 +1,20 @@
+# Olink Analyze 4.0.0
+## Major Changes
+* olink_normalization can now be used for bridging Explore 3072 data to Explore HT data (#453, #452, #439, #449, #447,#446, #441, #440, #434, #422, #436, #435 @klevdiamanti, @kathy-nevola, @kristynchin-olink, @dtopouza, @amrita-kar, @MasoumehSheikh)
+* olink_normalization has undergone major changes to improve speed, reproducibility, and extending functionality (#418, @klevdiamanti, @kristynchin-olink, @MasoumehSheikh)
+
+
+## Minor Changes
+* New tutorial has been added to explain and support Explore 3072 to Explore HT bridging (#448, #428, #427, #426, #425, #424, #423, @kristynchin-olink, @boxizhang, @dtopouza, @kathy-nevola, @MasoumehSheikh)
+* Update FAQ links in tutorials with queries links (#451, @kathy-nevola)
+* Decrease package size on Mac and Linux (#445, @kathy-nevola)
+* Removed redundant information from overview vignette (#458, @kathy-nevola)
+
+## Bug Fixes
+* Extra set of parentheses removed from vignette (#430, @kathy-nevola)
+* Add support back for files with quotes to read_NPX (#431 @kathy-nevola)
+
+
 # Olink Analyze 3.9.0
 ## Minor Changes
 * Explore HT recommended bridging samples have been added to Introduction to Bridging tutorial (#409, @kathy-nevola)
