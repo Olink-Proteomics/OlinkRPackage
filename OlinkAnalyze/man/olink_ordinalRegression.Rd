@@ -32,15 +32,15 @@ The tibble is arranged by ascending p-values.
 
 Columns include:
 \itemize{
- \item{Assay:} "character" Protein symbol
- \item{OlinkID:} "character" Olink specific ID
- \item{UniProt:} "character" UniProt ID
- \item{Panel:} "character" Name of Olink Panel
- \item{term:} "character" term in model
- \item{statistic:} "numeric" value of the statistic
- \item{p.value:} "numeric" nominal p-value
- \item{Adjusted_pval:} "numeric" adjusted p-value for the test
- \item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
+\item{Assay:} "character" Protein symbol
+\item{OlinkID:} "character" Olink specific ID
+\item{UniProt:} "character" UniProt ID
+\item{Panel:} "character" Name of Olink Panel
+\item{term:} "character" term in model
+\item{statistic:} "numeric" value of the statistic
+\item{p.value:} "numeric" nominal p-value
+\item{Adjusted_pval:} "numeric" adjusted p-value for the test
+\item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
 }
 }
 \description{
