@@ -140,7 +140,7 @@ A tibble in long format containing:
 * PlateID: Name of the plate.
 * QC_Warning: Indication whether the sample passed Olink QC. More information about Olink quality control metrics can be found in our [FAQ](https://olink.com/knowledge/faq?query=quality%20control) (Search "Quality control"). 
 * LOD: Limit of detection (LOD) is the minimum level of an individual protein that can be measured. LOD is defined as 3 times the standard deviation over background.
-* NPX: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX in the Olink [FAQ](https://olink.com/knowledge/faq?query=what%20is%20npx)(Search "What is NPX?") or in Olink's Data normalization and standardization [white paper](https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/05-white%20paper%20for%20website/1096-olink-data-normalization-white-paper.pdf).
+* NPX: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX in the Olink [FAQ](https://olink.com/knowledge/faq?query=what%20is%20npx) (Search "What is NPX?") or in Olink's Data normalization and standardization [white paper](https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/05-white%20paper%20for%20website/1096-olink-data-normalization-white-paper.pdf).
 
 
 
@@ -180,19 +180,19 @@ data <-  list.files(path = "path/to/dir/with/NPX/files",
 
 The olink_plate_randomizer function randomly assigns samples to a plate well with the option to keep the same individuals on the same plate. Olink® does not recommend to force balance based on other clinical variables. 
 
-For more information on plate randomization, consult the [Plate Randomization Vignette](https://cran.r-project.org/web/packages/OlinkAnalyze/vignettes/plate_randomizer.html).
+For more information on plate randomization, consult the [Plate Randomization Vignette](plate_randomizer.html).
 
 ## Select bridge samples (olink_bridgeselector)
 
 The bridge selection function selects a number of bridge samples based on the input data. Bridge samples are used to normalize two dataframes/projects that have been ran at different time points, hence, a batch effect is expected. It select samples that fulfill certain criteria that include good detectability, passing quality control and covering a wide range of data points.
 
-For more information on bridge sample selection, consult the [Introduction to bridging Olink® NPX datasets tutorial](https://cran.r-project.org/web/packages/OlinkAnalyze/vignettes/bridging_introduction.html)
+For more information on bridge sample selection, consult the [Introduction to bridging Olink® NPX datasets tutorial](bridging_introduction.html)
 
 ## Normalizing NPX data (olink_normalization)
 
 The olink_normalization is a function used to normalize NPX values between two different dataframes/projects which have been ran at different times. Commonly, there is a shift in (mean) NPX values between runs, however, the spread of the data remains the same. This is why normalization between dataframes/projects is required. When normalization is performed, one of the two provided dataframes/projects shall be used as a reference. If two dataframes/projects from the same product have been normalized to one another, Olink® by default uses the chronologically older one as reference. The function handles four different types of normalization: 
 
-* **Bridging normalization**: One of the dataframes is adjusted to another using overlapping samples (bridge samples). The overlapping samples should have the same IDs between dataframes, and adjustment is made using the median of the paired differences between the bridge samples. The two dataframes are provided as the inputs df1 and df2, while the one being used as reference is specified by the reference_project and the overlapping samples are specified by the overlapping_samples_df1. Only overlapping_samples_df1 should be provided regardless of which dataframe is used as reference_project. For more information on bridging, consult he [Introduction to bridging Olink® NPX datasets tutorial](https://cran.r-project.org/web/packages/OlinkAnalyze/vignettes/bridging_introduction.html)
+* **Bridging normalization**: One of the dataframes is adjusted to another using overlapping samples (bridge samples). The overlapping samples should have the same IDs between dataframes, and adjustment is made using the median of the paired differences between the bridge samples. The two dataframes are provided as the inputs df1 and df2, while the one being used as reference is specified by the reference_project and the overlapping samples are specified by the overlapping_samples_df1. Only overlapping_samples_df1 should be provided regardless of which dataframe is used as reference_project. For more information on bridging, consult he [Introduction to bridging Olink® NPX datasets tutorial](bridging_introduction.html)
 * **Subset normalization**: A subset of samples is used to normalize two dataframes, one of which is used as a reference_project. Adjustment is made using the differences of medians between the sample subsets from the two dataframes. Both overlapping_samples_df1 and overlapping_samples_df2 should be provided as input. The sample IDs do not need to overlap.
 A special case of subset normalization is where all samples (except control samples and samples with QC warning) from df1 are used as input in overlapping_samples_df1 and all samples from df2 are used as input in overlapping_samples_df2. This is useful if no bridge samples was included and one can assume that the distribution of the two datasets should be very similar. 
 * **Reference median normalization**: Works only on one dataframe. This is effectively subset normalization, but using difference of medians to pre-recorded median values. df1, overlapping_samples_df1 and reference_medians need to be specified. Adjustment of df1 is made using the differences in median between the overlapping samples and the reference medians.
@@ -202,7 +202,7 @@ A special case of subset normalization is where all samples (except control samp
 
 The olink_lod function adds LOD information to an Explore HT or Explore 3072 NPX dataframe. This function can incorporate LOD based on either an Explore dataset's negative controls or using predetermined fixed LOD values, which can be downloaded from the Document Download Center at [olink.com](https://olink.com/knowledge/documents), or using both methods. The default LOD calculation method is based off of the negative controls. If an NPX file is intensity normalized, both intensity normalized and PC normalized LODs are provided. 
 
-For more information on calculating LOD, consult the [Calculating LOD from Olink® Explore data tutorial](https://cran.r-project.org/web/packages/OlinkAnalyze/vignettes/LOD.html)
+For more information on calculating LOD, consult the [Calculating LOD from Olink® Explore data tutorial](LOD.html)
 
 # Statistical analysis
 
@@ -505,7 +505,7 @@ Many other statistical functions can be found within Olink Analyze, including:
 + *olink_ordinalRegression* Function which performs an ordinal regression per protein
 + *olink_ordinalRegression_posthoc* Function which performs an ordinal regression post-hoc test per protein
 
-To learn more about these function, consult the [Olink Analyze reference manual](https://cran.r-project.org/web/packages/OlinkAnalyze/OlinkAnalyze.pdf).
+To learn more about these function, consult their help documentation using the `help()` function.
 
 ## Pathway Enrichment (olink_pathway_enrichment)
 
@@ -576,7 +576,7 @@ Generates PCA projection of all samples from NPX data along two principal compon
 
 The values are by default scaled and centered in the PCA and proteins with missing NPX values are by default removed from the corresponding assay. Unique sample names are required. Imputation by the median is done for assays with missingness <10% for multi-plate projects and <5% for single plate projects. The plot is printed, and a list of ggplot objects is returned. 
 
-More information about `olink_pca()` can be found in the [Outlier Exclusion Vignette](https://cran.r-project.org/web/packages/OlinkAnalyze/vignettes/OutlierExclusion.html).
+More information about `olink_pca()` can be found in the [Outlier Exclusion Vignette](OutlierExclusion.html).
 
 ## Uniform Manifold Approximation and Projection for Dimension Reduction (UMAP) (olink_umap_plot)
 
@@ -686,7 +686,7 @@ A list of objects of class *ggplot*.
 
 The olink_dist_plot function generates boxplots of NPX values for each sample, faceted by Olink panel. This is used as an initial QC step to identify potential outliers. olink_dist_plot uses the functions *ggplot* and *geom_boxplot* of the R library *ggplot2*.
 
-More information about `olink_dist_plot()` can be found in the [Outlier Exclusion Vignette](https://cran.r-project.org/web/packages/OlinkAnalyze/vignettes/OutlierExclusion.html).
+More information about `olink_dist_plot()` can be found in the [Outlier Exclusion Vignette](OutlierExclusion.html).
 
 
 ## Point-range plot for LMER (olink_lmer_plot)
@@ -770,7 +770,7 @@ A bar graph as a **ggplot** object.
 
 The olink_qc_plot function generates a facet plot per Panel using ggplot and ggplot2::geom_point and stats::IQR plotting IQR vs. median for all samples. This is a good first check to find out if any samples have a tendency to be classified as outliers. Horizontal dashed lines indicate +/-3 standard deviations from the mean IQR. Vertical dashed lines indicate +/-3 standard deviations from the mean sample median.
 
-More information about `olink_qc_plot()` can be found in the [Outlier Exclusion Vignette](https://cran.r-project.org/web/packages/OlinkAnalyze/vignettes/OutlierExclusion.html).
+More information about `olink_qc_plot()` can be found in the [Outlier Exclusion Vignette](OutlierExclusion.html).
 
 ## Heatmap (olink_heatmap_plot)
 
