@@ -140,7 +140,7 @@ A tibble in long format containing:
 * PlateID: Name of the plate.
 * QC_Warning: Indication whether the sample passed Olink QC. More information about Olink quality control metrics can be found in our [FAQ](https://olink.com/knowledge/faq?query=quality%20control) (Search "Quality control"). 
 * LOD: Limit of detection (LOD) is the minimum level of an individual protein that can be measured. LOD is defined as 3 times the standard deviation over background.
-* NPX: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX in the Olink [FAQ](https://olink.com/knowledge/faq?query=what%20is%20npx)(Search "What is NPX?") or in Olink's Data normalization and standardization [white paper](https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/05-white%20paper%20for%20website/1096-olink-data-normalization-white-paper.pdf).
+* NPX: Normalized Protein eXpression, is Olink’s unit of protein expression level in a log<sub>2</sub> scale. The majority of the functions of this package use NPX values for calculations. Read more about NPX in the Olink [FAQ](https://olink.com/knowledge/faq?query=what%20is%20npx) (Search "What is NPX?") or in Olink's Data normalization and standardization [white paper](https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/05-white%20paper%20for%20website/1096-olink-data-normalization-white-paper.pdf).
 
 
 
