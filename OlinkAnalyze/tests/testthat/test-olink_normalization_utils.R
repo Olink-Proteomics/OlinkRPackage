@@ -143,6 +143,8 @@ test_that(
   "olink_norm_input_check - works - cross-platform normalization",
   {
     skip_if_not_installed("arrow")
+    skip_if_not(file.exists("../data/example_3k_data.rds"))
+    skip_if_not(file.exists("../data/example_HT_data.rds"))
 
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
@@ -2409,6 +2411,8 @@ test_that(
   "olink_norm_input_cross_product - works - bridge normalization",
   {
     skip_if_not_installed("arrow")
+    skip_if_not(file.exists("../data/example_3k_data.rds"))
+    skip_if_not(file.exists("../data/example_HT_data.rds"))
 
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
@@ -2473,6 +2477,8 @@ test_that(
   "olink_norm_input_cross_product - works - cross-product normalization",
   {
     skip_if_not_installed("arrow")
+    skip_if_not(file.exists("../data/example_3k_data.rds"))
+    skip_if_not(file.exists("../data/example_HT_data.rds"))
 
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
@@ -2535,6 +2541,8 @@ test_that(
   "olink_norm_input_cross_product - error - unexpected normalization",
   {
     skip_if_not_installed("arrow")
+    skip_if_not(file.exists("../data/example_3k_data.rds"))
+    skip_if_not(file.exists("../data/example_HT_data.rds"))
 
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
@@ -2579,6 +2587,8 @@ test_that(
   "olink_norm_input_cross_product - error - incorrect reference project",
   {
     skip_if_not_installed("arrow")
+    skip_if_not(file.exists("../data/example_3k_data.rds"))
+    skip_if_not(file.exists("../data/example_HT_data.rds"))
 
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
@@ -2695,6 +2705,9 @@ test_that(
     )
 
     # cross-platform norm - reference samples in datasets ----
+
+    skip_if_not(file.exists("../data/example_3k_data.rds"))
+    skip_if_not(file.exists("../data/example_HT_data.rds"))
 
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
@@ -3738,11 +3751,13 @@ test_that(
   "olink_norm_input_clean_assays - works - invalid OID in df*",
   {
     skip_if_not_installed("arrow")
-
-    ## all assays start with OID12345_OID12345 in 1 df ----
+    skip_if_not(file.exists("../data/example_3k_data.rds"))
+    skip_if_not(file.exists("../data/example_HT_data.rds"))
 
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
+
+    ## all assays start with OID12345_OID12345 in 1 df ----
 
     lst_df_v0 <- list(
       "p1" = data_3k |>
