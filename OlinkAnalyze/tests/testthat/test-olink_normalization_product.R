@@ -190,6 +190,7 @@ test_that(
   {
     skip_if_not(file.exists("../data/example_3k_data.rds"))
     skip_if_not(file.exists("../data/example_HT_data.rds"))
+
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
 
