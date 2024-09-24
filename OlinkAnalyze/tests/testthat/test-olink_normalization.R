@@ -14,6 +14,9 @@
 
 # load normalized datasets generated with the original olink_normalization
 # function from OlinkAnalyze 3.8.2
+skip_if_not(file.exists("../data/example_3k_data.rds"))
+skip_if_not(file.exists("../data/example_HT_data.rds"))
+skip_if_not(file.exists("../data/ref_results_norm.rds"))
 get_ref_norm_res <- function() {
   ref_norm_res_file <- test_path("..", "data", "ref_results_norm.rds")
   readRDS(file = ref_norm_res_file)
@@ -24,7 +27,9 @@ test_that(
   "olink_normalization - works - bridge normalization",
   {
     ### bridge normalization - no norm column ----
-
+    skip_if_not(file.exists("../data/example_3k_data.rds"))
+    skip_if_not(file.exists("../data/example_HT_data.rds"))
+    skip_if_not(file.exists("../data/ref_results_norm.rds"))
     expect_warning(
       object = expect_message(
         object = bridge_no_norm <- olink_normalization(
@@ -128,7 +133,9 @@ test_that(
   "olink_normalization - works - intensity normalization",
   {
     ### intensity normalization - no norm column ----
-
+    skip_if_not(file.exists("../data/example_3k_data.rds"))
+    skip_if_not(file.exists("../data/example_HT_data.rds"))
+    skip_if_not(file.exists("../data/ref_results_norm.rds"))
     expect_warning(
       object = expect_message(
         object = intensity_no_norm <- olink_normalization(
@@ -236,7 +243,9 @@ test_that(
   "olink_normalization - works - subset normalization",
   {
     ### subset normalization - no norm column ----
-
+    skip_if_not(file.exists("../data/example_3k_data.rds"))
+    skip_if_not(file.exists("../data/example_HT_data.rds"))
+    skip_if_not(file.exists("../data/ref_results_norm.rds"))
     expect_warning(
       object = expect_message(
         object = subset_no_norm <- olink_normalization(
@@ -344,7 +353,9 @@ test_that(
   "olink_normalization - works - reference median normalization",
   {
     ### reference median normalization - no norm column ----
-
+    skip_if_not(file.exists("../data/example_3k_data.rds"))
+    skip_if_not(file.exists("../data/example_HT_data.rds"))
+    skip_if_not(file.exists("../data/ref_results_norm.rds"))
     expect_warning(
       object = expect_message(
         object = ref_med_no_norm <- olink_normalization(
@@ -439,6 +450,9 @@ test_that(
 test_that(
   "olink_normalization - works - 3k-HT normalization",
   {
+    skip_if_not(file.exists("../data/example_3k_data.rds"))
+    skip_if_not(file.exists("../data/example_HT_data.rds"))
+    skip_if_not(file.exists("../data/ref_results_norm.rds"))
     # load example data
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
