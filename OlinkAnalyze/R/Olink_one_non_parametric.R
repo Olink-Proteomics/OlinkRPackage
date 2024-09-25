@@ -390,14 +390,23 @@ olink_one_non_parametric_posthoc <- function(df,
         dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>% #Exclude assays where all samples have NPX=NA
         dplyr::mutate(OlinkID = factor(OlinkID, levels = olinkid_list)) %>%
         dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
-        dplyr::do(rstatix::wilcox_test(data =., as.formula(formula_string), p.adjust.method = "BH",detailed = TRUE, conf.level = 0.95,paired = T)) %>%
+        dplyr::do(rstatix::wilcox_test(data =., as.formula(formula_string), p.adjust.method = "none",detailed = TRUE, conf.level = 0.95,paired = T)) %>%
         dplyr::ungroup() %>%
-        dplyr::mutate("variable" = variable) %>%
-        dplyr::mutate(Threshold = if_else(p.adj < 0.05,'Significant','Non-significant')) %>%
-        dplyr::rename(term = variable) %>%
-        dplyr::mutate(contrast = paste(group1, group2, sep = " - ")) %>%
-        dplyr::rename(Adjusted_pval = p.adj) %>%
-        dplyr::select(all_of(c("Assay", "OlinkID", "UniProt", "Panel", "term", "contrast", "estimate", "Adjusted_pval", "Threshold")))
+        dplyr::mutate(
+          term = .env[["variable"]],
+          contrast = paste(.data[["group1"]], .data[["group2"]], sep = " - "),
+          Adjusted_pval = p.adjust(p = .data[["p"]], method = "BH"),
+          Threshold = dplyr::if_else(.data[["Adjusted_pval"]] < 0.05,
+                                     "Significant",
+                                     "Non-significant")
+        ) %>%
+        dplyr::arrange(.data[["Adjusted_pval"]]) |>
+        dplyr::select(
+          dplyr::all_of(
+            c("Assay", "OlinkID", "UniProt", "Panel", "term", "contrast",
+              "estimate", "Adjusted_pval", "Threshold")
+          )
+        )
     } else {
       message("Pairwise comparisons for Kruskal-Wallis test using Dunn test were performed")
       p.hoc_val <- df %>%
@@ -405,15 +414,23 @@ olink_one_non_parametric_posthoc <- function(df,
         dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>% #Exclude assays where all samples have NPX=NA
         dplyr::mutate(OlinkID = factor(OlinkID, levels = olinkid_list)) %>%
         dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
-        dplyr::do(FSA::dunnTest(data =., as.formula(formula_string), method = "bh")$res) %>%
+        dplyr::do(FSA::dunnTest(data =., as.formula(formula_string), method = "none")$res) %>%
         dplyr::ungroup() %>%
-        dplyr::mutate("variable" = variable) %>%
-        dplyr::mutate(Threshold = if_else(P.adj < 0.05,'Significant','Non-significant')) %>%
-        dplyr::rename(term = variable) %>%
-        dplyr::rename(contrast = Comparison) %>%
-        dplyr::rename(Adjusted_pval = P.adj) %>%
-        dplyr::rename(estimate = Z) %>%
-        dplyr::select(all_of(c("Assay", "OlinkID", "UniProt", "Panel", "term", "contrast", "estimate", "Adjusted_pval", "Threshold")))
+        dplyr::mutate(
+          term = .env[["variable"]],
+          contrast = .data[["Comparison"]],
+          Adjusted_pval = p.adjust(p = .data[["P.unadj"]], method = "BH"),
+          Threshold = dplyr::if_else(.data[["Adjusted_pval"]] < 0.05,
+                                     "Significant",
+                                     "Non-significant")
+        ) %>%
+        dplyr::arrange(.data[["Adjusted_pval"]]) |>
+        dplyr::select(
+          dplyr::all_of(
+            c("Assay", "OlinkID", "UniProt", "Panel", "term", "contrast",
+              "estimate" = "Z", "Adjusted_pval", "Threshold")
+          )
+        )
     }
 
     return(p.hoc_val)
