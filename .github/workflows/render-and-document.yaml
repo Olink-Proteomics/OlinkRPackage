@@ -7,6 +7,8 @@ on:
 
 name: render-and-document
 
+permissions: write-all
+
 jobs:
   render-and-document:
     name: render-and-document
