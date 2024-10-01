@@ -1,5 +1,5 @@
 #' Bridge and/or subset normalization of all proteins among multiple NPX
-#' projects
+#' projects.
 #'
 #' This function normalizes pairs of NPX projects (data frames) using shared
 #' samples or subsets of samples.\cr\cr
