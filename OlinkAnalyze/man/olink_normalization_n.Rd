@@ -3,7 +3,7 @@
 \name{olink_normalization_n}
 \alias{olink_normalization_n}
 \title{Bridge and/or subset normalization of all proteins among multiple NPX
-projects}
+projects.}
 \usage{
 olink_normalization_n(norm_schema)
 }
