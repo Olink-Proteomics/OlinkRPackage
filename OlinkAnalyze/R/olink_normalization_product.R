@@ -420,7 +420,7 @@ olink_normalization_qs <- function(lst_df,
   ecdf_transform_npx <- function(data,
                                  quant_col,
                                  count_ref_col,
-                                 num_samples = 24L) {
+                                 num_samples = 40L) {
 
     # Briefly:
     # Take the ECDF of the reference quantification (e.g. NPX from Olink Explore
