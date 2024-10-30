@@ -211,10 +211,6 @@ npx_br_data <- olink_normalization(df1 = npx_ht,
 
 olinkids <- unique(paste0(npx_br_data$OlinkID,"_",npx_br_data$Assay))
 
-results <- list()
-for(i in 1:length(olinkids)){
-  results[[i]] <- bridgeable_plts(data = npx_br_data,
-                                  median_counts_threshold = 150)
-}
+results <- bridgeable_plts(data = npx_br_data, median_counts_threshold = 150)
 names(results) <- olinkids
-rm(i)
+
