@@ -940,15 +940,15 @@ olink_norm_input_cross_product <- function(lst_df,
 
   # check if each df comes from a different olink product
   lst_product <- sapply(names(lst_df), function(d_name) {
-    # get unique olink assay identifiers
-    u_oid <- lst_df[[d_name]] |>
+    # get unique panels
+    u_panel <- lst_df[[d_name]] |>
       dplyr::pull(
-        .data[[lst_cols[[d_name]]$olink_id]]
+        .data[[lst_cols[[d_name]]$panel]]
       ) |>
       unique()
-    if (all(u_oid %in% eHT_e3072_mapping$OlinkID_E3072)) {
+    if (all(u_panel %in% eHT_e3072_mapping$Panel_E3072)) {
       return("3k")
-    } else if (all(u_oid %in% eHT_e3072_mapping$OlinkID_HT)) {
+    } else if (all(u_panel %in% "Explore_HT")) {
       return("HT")
     } else {
       return("other")

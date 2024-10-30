@@ -2422,8 +2422,8 @@ test_that(
           "3K_2" = data_3k
         ),
         lst_cols = list(
-          "3K_1" = list(olink_id = "OlinkID"),
-          "3K_2" = list(olink_id = "OlinkID")
+          "3K_1" = list(panel = "Panel"),
+          "3K_2" = list(panel = "Panel")
         ),
         reference_project = "3K_1"
       )
@@ -2449,8 +2449,8 @@ test_that(
           "p2" = npx_data2
         ),
         lst_cols = list(
-          "p1" = list(olink_id = "OlinkID"),
-          "p2" = list(olink_id = "OlinkID")
+          "p1" = list(panel = "Panel"),
+          "p2" = list(panel = "Panel")
         ),
         reference_project = "p1"
       )
@@ -2484,8 +2484,10 @@ test_that(
           "p2" = data_ht
         ),
         lst_cols = list(
-          "p1" = list(olink_id = "OlinkID"),
-          "p2" = list(olink_id = "OlinkID")
+          "p1" = list(panel = "Panel",
+                      olink_id = "OlinkID"),
+          "p2" = list(panel = "Panel",
+                      olink_id = "OlinkID")
         ),
         reference_project = "p2"
       )
@@ -2548,8 +2550,8 @@ test_that(
           "T96" = npx_data1
         ),
         lst_cols = list(
-          "3K" = list(olink_id = "OlinkID"),
-          "T96" = list(olink_id = "OlinkID")
+          "3K" = list(panel = "Panel"),
+          "T96" = list(panel = "Panel")
         ),
         reference_project = "3K"
       ),
@@ -2565,8 +2567,8 @@ test_that(
           "T96" = npx_data1
         ),
         lst_cols = list(
-          "HT" = list(olink_id = "OlinkID"),
-          "T96" = list(olink_id = "OlinkID")
+          "HT" = list(panel = "Panel"),
+          "T96" = list(panel = "Panel")
         ),
         reference_project = "T96"
       ),
@@ -2590,8 +2592,8 @@ test_that(
           "HT" = data_ht
         ),
         lst_cols = list(
-          "3K" = list(olink_id = "OlinkID"),
-          "HT" = list(olink_id = "OlinkID")
+          "3K" = list(panel = "Panel"),
+          "HT" = list(panel = "Panel")
         ),
         reference_project = "3K"
       ),

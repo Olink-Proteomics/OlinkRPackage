@@ -51,7 +51,7 @@ df_assays <- dplyr::tibble(
   UniProt = eHT_e3072_mapping$UniProt[1L:100L],
   Assay = eHT_e3072_mapping$Assay[1L:100L],
   AssayType = rep(x = "assay", times = 100L),
-  Panel = "Explore HT",
+  Panel = "Explore_HT",
   Block = eHT_e3072_mapping$Block_HT[1L:100L]
 )
 sample_oid <- sample(x = df_assays$OlinkID, size = 5L, replace = FALSE)
