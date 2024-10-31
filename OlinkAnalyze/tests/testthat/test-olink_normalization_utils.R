@@ -182,8 +182,12 @@ test_that(
                 )
               ),
             by = "OlinkID_HT",
-            relationship = "many-to-one"
-          ),
+            relationship = "many-to-many"
+          ) |>
+          # If matched OlinkID is not found in mapping file, set OlinkID_HT to OlinkID
+          dplyr::mutate(OlinkID = ifelse(is.na(.data[["OlinkID"]]),
+                                         .data[["OlinkID_HT"]],
+                                         .data[["OlinkID"]])),
         ref_samples = bridge_samples,
         ref_name = "HT",
         ref_cols = list(sample_id = "SampleID",
@@ -211,7 +215,11 @@ test_that(
               ),
             by = "OlinkID_E3072",
             relationship = "many-to-one"
-          ),
+          ) |>
+          # If matched OlinkID is not found in mapping file, set OlinkID_HT to OlinkID
+          dplyr::mutate(OlinkID = ifelse(is.na(.data[["OlinkID"]]),
+                                         .data[["OlinkID_E3072"]],
+                                         .data[["OlinkID"]])),
         not_ref_samples = NULL,
         not_ref_name = "3K",
         not_ref_cols = list(sample_id = "SampleID",
@@ -2511,7 +2519,11 @@ test_that(
                 ),
               by = "OlinkID_E3072",
               relationship = "many-to-one"
-            ),
+            ) |>
+            # If matched OlinkID is not found in mapping file, set OlinkID_HT to OlinkID
+            dplyr::mutate(OlinkID = ifelse(is.na(.data[["OlinkID"]]),
+                                           .data[["OlinkID_E3072"]],
+                                           .data[["OlinkID"]])),
           "p2" = data_ht |>
             dplyr::rename(
               "OlinkID_HT" = "OlinkID"
@@ -2524,8 +2536,12 @@ test_that(
                   )
                 ),
               by = "OlinkID_HT",
-              relationship = "many-to-one"
-            )
+              relationship = "many-to-many"
+            ) |>
+            # If matched OlinkID is not found in mapping file, set OlinkID_HT to OlinkID
+            dplyr::mutate(OlinkID = ifelse(is.na(.data[["OlinkID"]]),
+                                           .data[["OlinkID_HT"]],
+                                           .data[["OlinkID"]]))
         )
       )
     )
@@ -3760,7 +3776,10 @@ test_that(
             ),
           by = "OlinkID_E3072",
           relationship = "many-to-one"
-        )
+        ) |>
+        dplyr::mutate(OlinkID = ifelse(is.na(.data[["OlinkID"]]),
+                                       .data[["OlinkID_E3072"]],
+                                       .data[["OlinkID"]]))
     )
 
     expect_no_error(
@@ -3799,6 +3818,10 @@ test_that(
           by = "OlinkID_E3072",
           relationship = "many-to-one"
         ) |>
+        # If matched OlinkID is not found in mapping file, set OlinkID_HT to OlinkID
+        dplyr::mutate(OlinkID = ifelse(is.na(.data[["OlinkID"]]),
+                                       .data[["OlinkID_E3072"]],
+                                       .data[["OlinkID"]])) |>
         dplyr::mutate(
           OlinkID = dplyr::if_else(.data[["OlinkID"]] == "OID40770_OID20117",
                                    "OID40770_OID2011",
@@ -5158,3 +5181,4 @@ test_that(
     )
   }
 )
+
