@@ -227,7 +227,8 @@ olink_norm_input_check <- function(df1,
   lst_df_overlap_assay <- olink_norm_input_assay_overlap(
     lst_df = lst_df_clean_assays$lst_df,
     reference_medians = lst_df_clean_assays$reference_medians,
-    lst_cols = lst_cols
+    lst_cols = lst_cols,
+    norm_mode = norm_mode
   )
   lst_df <- lst_df_overlap_assay$lst_df
   reference_medians <- lst_df_overlap_assay$reference_medians
@@ -1023,8 +1024,13 @@ olink_norm_input_cross_product <- function(lst_df,
             )
           ),
         by = stats::setNames(object = "OlinkID_HT", nm = l_ht_oid_rename),
-        relationship = "many-to-one"
-      )
+        relationship = "many-to-many"
+      ) |>
+      # If matched OlinkID is not found in mapping file, set OlinkID_HT to OlinkID
+        dplyr::mutate(OlinkID = ifelse(is.na(.data[["OlinkID"]]),
+                                       .data[["OlinkID_HT"]],
+                                       .data[["OlinkID"]]))
+
 
     # add combined OlinkID to 3k dataset
     l_3k_name <- names(lst_product)[lst_product == "3k"]
@@ -1046,7 +1052,11 @@ olink_norm_input_cross_product <- function(lst_df,
           ),
         by = stats::setNames(object = "OlinkID_E3072", nm = l_3k_oid_rename),
         relationship = "many-to-one"
-      )
+      ) |>
+      # If matched OlinkID is not found in mapping file, set OlinkID_HT to OlinkID
+      dplyr::mutate(OlinkID = ifelse(is.na(.data[["OlinkID"]]),
+                                     .data[[l_3k_oid_rename]],
+                                     .data[["OlinkID"]]))
 
   }
 
@@ -1430,7 +1440,7 @@ olink_norm_input_clean_assays <- function(lst_df,
       df |>
         dplyr::filter(
           grepl(
-            pattern = "^OID\\d{5}_OID\\d{5}$",
+            pattern = "^OID\\d{5}_OID\\d{5}$|^OID\\d{5}$",
             x = .data[[col_name]]
           )
         )
@@ -1657,13 +1667,17 @@ olink_norm_input_clean_assays <- function(lst_df,
 #' Used for reference median normalization.
 #' @param lst_cols Named list of vectors with the required column names for each
 #' dataset in \var{lst_df}.
+#' @param norm_mode Character string indicating the type of normalization to be
+#' performed. Expecting one of
+#' `r cli::ansi_collapse(x = OlinkAnalyze:::olink_norm_modes, sep2 = " or ", last = " or ")`. # nolint
 #'
 #' @return A named list containing \var{lst_df} and \var{reference_medians}
 #' will assays shared across all datasets.
 #'
 olink_norm_input_assay_overlap <- function(lst_df,
                                            reference_medians,
-                                           lst_cols) {
+                                           lst_cols,
+                                           norm_mode = norm_mode) {
   # help variables
   lst_out <- list()
 
@@ -1738,8 +1752,15 @@ olink_norm_input_assay_overlap <- function(lst_df,
           !(.data[["OlinkID"]] %in% oid_removed)
         )
     }
-
-    # warning message
+    if (norm_mode == olink_norm_modes$norm_ht_3k){
+      cli::cli_warn(
+        c(
+          "{cli::qty(oid_removed)} assay{?s} are not shared across products.",
+          "i" = "{cli::qty(oid_removed)} assay{?s} will be removed from
+        normalization."
+        ),
+        wrap = FALSE)
+    } else{    # warning message
     cli::cli_warn(
       c(
         "Assay{?s} {.val {oid_removed}} not shared across input dataset(s):",
@@ -1748,7 +1769,9 @@ olink_norm_input_assay_overlap <- function(lst_df,
         normalization."
       ),
       wrap = FALSE
-    )
+    )}
+
+
   } else {
 
     # if all assays shared, return original datasets
