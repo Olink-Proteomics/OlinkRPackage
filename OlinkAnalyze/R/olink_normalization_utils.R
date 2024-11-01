@@ -1755,11 +1755,12 @@ olink_norm_input_assay_overlap <- function(lst_df,
     if (norm_mode == olink_norm_modes$norm_ht_3k){
       cli::cli_warn(
         c(
-          "{cli::qty(oid_removed)} assay{?s} are not shared across products.",
-          "i" = "{cli::qty(oid_removed)} assay{?s} will be removed from
+          "{length(oid_removed)} assay{?s} are not shared across products.",
+          "i" = "{length(oid_removed)} assay{?s} will be removed from
         normalization."
         ),
         wrap = FALSE)
+
     } else{    # warning message
     cli::cli_warn(
       c(
