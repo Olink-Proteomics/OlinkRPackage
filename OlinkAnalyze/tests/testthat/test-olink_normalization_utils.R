@@ -152,8 +152,12 @@ test_that(
       (\(x) x[!grepl(pattern = "CONTROL", x = x)])() |>
       sort() |>
       head(20L)
+    filtered_oids <- c("OID12345",
+                       "OID54321",
+                       "OID43201",
+                       eHT_e3072_mapping$OlinkID_E3072[eHT_e3072_mapping$OlinkID_HT == "OID43201"]) # nolint
 
-    expect_message(
+    expect_message(expect_warning(
       object = lst_check_out <- olink_norm_input_check(
         df1 = data_3k,
         df2 = data_ht,
@@ -163,7 +167,7 @@ test_that(
         df2_project_nr = "HT",
         reference_project = "HT",
         reference_medians = NULL
-      ),
+      ), regexp = "2 assays are not shared across products."),
       regexp = "Cross-product normalization will be performed!"
     )
 
@@ -187,7 +191,8 @@ test_that(
           # If matched OlinkID is not found in mapping file, set OlinkID_HT to OlinkID
           dplyr::mutate(OlinkID = ifelse(is.na(.data[["OlinkID"]]),
                                          .data[["OlinkID_HT"]],
-                                         .data[["OlinkID"]])),
+                                         .data[["OlinkID"]])) |>
+          dplyr::filter(!(.data[["OlinkID_HT"]] %in% filtered_oids)),
         ref_samples = bridge_samples,
         ref_name = "HT",
         ref_cols = list(sample_id = "SampleID",
@@ -219,7 +224,8 @@ test_that(
           # If matched OlinkID is not found in mapping file, set OlinkID_HT to OlinkID
           dplyr::mutate(OlinkID = ifelse(is.na(.data[["OlinkID"]]),
                                          .data[["OlinkID_E3072"]],
-                                         .data[["OlinkID"]])),
+                                         .data[["OlinkID"]])) |>
+          dplyr::filter(!(.data[["OlinkID_E3072"]] %in% filtered_oids)),
         not_ref_samples = NULL,
         not_ref_name = "3K",
         not_ref_cols = list(sample_id = "SampleID",
@@ -4606,7 +4612,8 @@ test_that(
             reference_medians = reference_medians_v0,
             lst_cols = list(
               "p1" = list(olink_id = "OlinkID")
-            )
+            ),
+            norm_mode = olink_norm_modes$ref_median
           )
         )
       )
@@ -4637,7 +4644,8 @@ test_that(
             lst_cols = list(
               "p1" = list(olink_id = "OlinkID"),
               "p2" = list(olink_id = "OlinkID")
-            )
+            ),
+            norm_mode = olink_norm_modes$bridge
           )
         )
       )
@@ -4668,7 +4676,8 @@ test_that(
               "p2" = list(olink_id = "OlinkID"),
               "p3" = list(olink_id = "OlinkID"),
               "p4" = list(olink_id = "OlinkID")
-            )
+            ),
+            norm_mode = olink_norm_modes$bridge
           )
         )
       )
@@ -4710,7 +4719,8 @@ test_that(
         reference_medians = reference_medians_v0,
         lst_cols = list(
           "p1" = list(olink_id = "OlinkID")
-        )
+        ),
+        norm_mode = olink_norm_modes$ref_median
       ),
       regexp = "Assay \"OID00471\" not shared across input dataset"
     )
@@ -4750,7 +4760,8 @@ test_that(
         reference_medians = reference_medians_v1,
         lst_cols = list(
           "p1" = list(olink_id = "OlinkID")
-        )
+        ),
+        norm_mode = olink_norm_modes$ref_median
       ),
       regexp = "Assay \"OID00471\" not shared across input dataset"
     )
@@ -4796,7 +4807,8 @@ test_that(
         reference_medians = reference_medians_v2,
         lst_cols = list(
           "p1" = list(olink_id = "OlinkID")
-        )
+        ),
+        norm_mode = olink_norm_modes$ref_median
       ),
       regexp = paste("Assays \"OID00471\", \"OID00472\", \"OID00474\",",
                      "\"OID00475\", \"OID00479\", \"OID00480\", and",
@@ -4843,7 +4855,8 @@ test_that(
         lst_cols = list(
           "p1" = list(olink_id = "OlinkID"),
           "p2" = list(olink_id = "OlinkID")
-        )
+        ),
+        norm_mode = olink_norm_modes$bridge
       ),
       regexp = paste("Assay \"OID00471\" not shared across input dataset")
     )
@@ -4880,7 +4893,8 @@ test_that(
         lst_cols = list(
           "p1" = list(olink_id = "OlinkID"),
           "p2" = list(olink_id = "OlinkID")
-        )
+        ),
+        norm_mode = olink_norm_modes$bridge
       ),
       regexp = paste("Assays \"OID01300\", \"OID01301\", \"OID01302\",",
                      "\"OID01303\", \"OID01282\", \"OID01283\"")
@@ -4928,7 +4942,8 @@ test_that(
           "p2" = list(olink_id = "OlinkID"),
           "p3" = list(olink_id = "OlinkID"),
           "p4" = list(olink_id = "OlinkID")
-        )
+        ),
+        norm_mode = olink_norm_modes$bridge
       ),
       regexp = paste("Assays \"OID01300\", \"OID01301\", \"OID01302\",",
                      "\"OID01303\", \"OID01282\", \"OID01283\"")
