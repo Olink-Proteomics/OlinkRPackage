@@ -975,7 +975,7 @@ olink_norm_input_cross_product <- function(lst_df,
     cli::cli_abort(
       c(
         "x" = "Unexpected datasets to be bridge normalized!",
-        "i" = "Only nomalization within the same Olink product, and between
+        "i" = "Only normalization within the same Olink product, and between
         Olink Explore 3072 and Olink Explore HT is permitted!"
       ),
       call = rlang::caller_env(),
