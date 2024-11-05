@@ -39,8 +39,8 @@
 #'olinkids <- unique(paste0(npx_br_data$OlinkID,"_",npx_br_data$Assay))
 #'results <- bridgeable_plts(data = npx_br_data,
 #'median_counts_threshold = 150)
-#'names(results) <- olinkids}
-#'
+#'names(results) <- olinkids
+#'}
 
 bridgeable_plts <- function(data = npx_br_data , median_counts_threshold = 150){
 
