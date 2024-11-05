@@ -51,10 +51,36 @@ df_assays <- dplyr::tibble(
   UniProt = eHT_e3072_mapping$UniProt[1L:100L],
   Assay = eHT_e3072_mapping$Assay[1L:100L],
   AssayType = rep(x = "assay", times = 100L),
-  Panel = "Explore HT",
+  Panel = "Explore_HT",
   Block = eHT_e3072_mapping$Block_HT[1L:100L]
 )
 sample_oid <- sample(x = df_assays$OlinkID, size = 5L, replace = FALSE)
+
+# Correlation Assay
+oid <- "OID43204"
+
+cor_assays <- dplyr::tibble(
+  OlinkID = eHT_e3072_mapping$OlinkID_HT[eHT_e3072_mapping$OlinkID_HT == oid],
+  UniProt = eHT_e3072_mapping$UniProt[eHT_e3072_mapping$OlinkID_HT == oid],
+  Assay = eHT_e3072_mapping$Assay[eHT_e3072_mapping$OlinkID_HT == oid],
+  AssayType = "assay",
+  Panel = "Explore_HT",
+  Block = eHT_e3072_mapping$Block_HT[eHT_e3072_mapping$OlinkID_HT == oid]
+) |>
+  dplyr::distinct()
+
+# Non overlapping assay
+unique_assay <- dplyr::tibble(
+  OlinkID = "OID54321",
+  UniProt = "RANDHT",
+  Assay = "TEST_HT",
+  Panel = "Explore_HT",
+  AssayType = "assay",
+  Block =  eHT_e3072_mapping$Block_HT[1L],
+) |>
+  dplyr::distinct()
+
+df_assays <- rbind(df_assays, cor_assays, unique_assay)
 
 # Combine data and generate NPX dataset
 data_ht <- tidyr::expand_grid(
