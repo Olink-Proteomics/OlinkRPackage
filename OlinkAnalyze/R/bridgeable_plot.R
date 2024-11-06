@@ -16,34 +16,36 @@
 #' \donttest{
 #'
 #'npx_ht <- OlinkAnalyze:::data_ht_small |>
-#'dplyr::filter(SampleType == "SAMPLE") |>
-#'dplyr::mutate(Project = "data1")
+#'  dplyr::filter(SampleType == "SAMPLE") |>
+#'  dplyr::mutate(Project = "data1")
 #'
 #'npx_3072 <- OlinkAnalyze:::data_3k_small |>
-#'dplyr::filter(SampleType == "SAMPLE") |>
-#'dplyr::mutate(Project = "data2")
+#'  dplyr::filter(SampleType == "SAMPLE") |>
+#'  dplyr::mutate(Project = "data2")
 #'
 #'overlapping_samples <- unique(intersect(npx_ht |>
-#'dplyr::distinct(SampleID) |>
-#'dplyr::pull(),
-#'npx_3072 |>
-#'dplyr::distinct(SampleID) |>
-#'dplyr::pull()))
+#'                                          dplyr::distinct(SampleID) |>
+#'                                          dplyr::pull(),
+#'                                        npx_3072 |>
+#'                                          dplyr::distinct(SampleID) |>
+#'                                          dplyr::pull()))
 #'
-#'npx_br_data <- OlinkAnalyze::olink_normalization(df1 = npx_ht,
-#'df2 = npx_3072,
-#'overlapping_samples_df1 = overlapping_samples,
-#'df1_project_nr = "Explore HT",
-#'df2_project_nr = "Explore 3072",
-#'reference_project = "Explore HT")
+#'data <- OlinkAnalyze::olink_normalization(df1 = npx_ht,
+#'                                                 df2 = npx_3072,
+#'                                                 overlapping_samples_df1 = overlapping_samples,
+#'                                                 df1_project_nr = "Explore HT",
+#'                                                 df2_project_nr = "Explore 3072",
+#'                                                 reference_project = "Explore HT")
 #'
-#'olinkids <- unique(paste0(npx_br_data$OlinkID,"_",npx_br_data$Assay))
-#'results <- bridgeable_plts(data = npx_br_data,
-#'median_counts_threshold = 150, min_count = 10)
+#'olinkids <- unique(paste0(data$OlinkID,"_",data$Assay))
+#'
+#'results <- bridgeable_plts(data = data,
+#'                           median_counts_threshold = 150,
+#'                           min_count = 10)
 #'names(results) <- olinkids
 #'}
 
-bridgeable_plts <- function(data = npx_br_data ,
+bridgeable_plts <- function(data,
                             median_counts_threshold = 150,
                             min_count = 10){
 
@@ -56,28 +58,29 @@ bridgeable_plts <- function(data = npx_br_data ,
 
   out_plts <- list()
 
-  ids <- npx_br_data |>
+  ids <- data |>
     dplyr::select(OlinkID, .data[["BridgingRecommendation"]]) |> #HT OlinkID
     dplyr::distinct() |>
     dplyr::pull(OlinkID)
 
   # Adjusting the platform
-  npx_br_data <- npx_br_data |>
-    dplyr::filter(Count > min_count) |>
-    dplyr::mutate(Panel = dplyr::case_when(!Panel == "Explore HT" |
-                                             is.element("_II", Panel) ~
-                                             "Explore 3072",
-                                           !Panel == "Explore HT" ~
-                                             "Explore 1536",
-                                           TRUE ~ Panel))
-  platforms <- unique(npx_br_data$Panel)
+  data <- data |>
+    dplyr::filter(Count > min_count)
+
+  platforms <- unique(data$Project)
+
+  if(length(platforms) != 2){
+    cli::cli_abort(message = paste0(
+                     "Expect 2 platforms. ",
+                     length(platforms), "found."))
+  }
 
   # IQR/Range plot ----
-  iqr_range_plt <- function(data = npx_br_data, id = id){
-    iqr_range_plt <- npx_br_data |>
+  iqr_range_plt <- function(data = data, id = id){
+    iqr_range_plt <- data |>
       dplyr::filter(OlinkID %in% id) |>
       ggplot2::ggplot(ggplot2::aes(x = paste(Assay, OlinkID, sep = "\n") ,
-                                   y = NPX, fill = Panel)) +
+                                   y = NPX, fill = Project)) +
       ggplot2::geom_violin(alpha = 0.4,
                            position = ggplot2::position_nudge(x = 0),
                            width = 0.4) +
@@ -94,26 +97,26 @@ bridgeable_plts <- function(data = npx_br_data ,
   }
 
   # Correlation plot ----
-  r2_plt <- function(data = npx_br_data, id = id){
+  r2_plt <- function(data = data, id = id){
 
-    data1 <- npx_br_data |>
-      dplyr::filter(Panel %in% platforms[1],
+    data1 <- data |>
+      dplyr::filter(Project %in% platforms[1],
                     OlinkID %in% id)
 
-    data2 <- npx_br_data |>
-      dplyr::filter(Panel %in% platforms[2],
+    data2 <- data |>
+      dplyr::filter(Project %in% platforms[2],
                     OlinkID %in% id)
 
-    npx_br_data_wider <- data1 |>
+    data_wider <- data1 |>
       dplyr::select(SampleID, Assay, Count, OlinkID, UniProt, NPX) |>
       dplyr::inner_join(data2 |>
                           dplyr::select(SampleID, Assay, Count, OlinkID,
                                         UniProt, NPX),
                         by = c("SampleID","OlinkID", "Assay", "UniProt"),
                         suffix = c(platforms[1], platforms[2]))
-    axis_names <- grep("NPX", colnames(npx_br_data_wider), value = T)
+    axis_names <- grep("NPX", colnames(data_wider), value = T)
 
-    r2_plt <- npx_br_data_wider |>
+    r2_plt <- data_wider |>
       ggplot2::ggplot(ggplot2::aes(x = .data[[axis_names[1]]],
                           y = .data[[axis_names[2]]])) +
       ggplot2::geom_point(color = 'blue', alpha = 0.4) +
@@ -129,19 +132,19 @@ bridgeable_plts <- function(data = npx_br_data ,
   }
 
   # Median counts plot ----
-  counts_plt <- function(data = npx_br_data, median_counts_threshold,
+  counts_plt <- function(data = data, median_counts_threshold,
                          id = id) {
-    counts_plt <- npx_br_data |>
+    counts_plt <- data |>
       dplyr::filter(OlinkID %in% id) |>
-      dplyr::group_by(OlinkID, Panel) |>
+      dplyr::group_by(OlinkID, Project) |>
       dplyr::mutate(median_count = median(Count, na.rm = T)) |>
       dplyr::ungroup() |>
       dplyr::mutate(Assay = factor(paste(Assay, OlinkID, sep = "\n")),
-                    Panel = factor(Panel)) |>
-      dplyr::group_by(Assay, Panel) |>
+                    Project = factor(Project)) |>
+      dplyr::group_by(Assay, Project) |>
       dplyr::reframe(n = .data[["median_count"]]) |>
       dplyr::ungroup() |>
-      ggplot2::ggplot(ggplot2::aes(x = Assay, fill = Panel, y = n, label = n)) +
+      ggplot2::ggplot(ggplot2::aes(x = Assay, fill = Project, y = n, label = n)) +
       ggplot2::geom_col(width = 0.5, position = 'dodge') +
       ggplot2::geom_text(position = ggplot2::position_dodge(0.5),
                          vjust = -0.25) +
@@ -155,12 +158,12 @@ bridgeable_plts <- function(data = npx_br_data ,
   }
 
   # KS plot ----
-  ks_plt <- function(data = npx_br_data, id = id) {
-    data1 <- npx_br_data |>
-      dplyr::filter(Panel %in% platforms[1],
+  ks_plt <- function(data = data, id = id) {
+    data1 <- data |>
+      dplyr::filter(Project %in% platforms[1],
                     OlinkID %in% id)
-    data2 <- npx_br_data |>
-      dplyr::filter(Panel %in% platforms[2],
+    data2 <- data |>
+      dplyr::filter(Project %in% platforms[2],
                     OlinkID %in% id)
 
     # Calculate empirical cumulative distribution function (ECDF) per platform
@@ -179,9 +182,9 @@ bridgeable_plts <- function(data = npx_br_data ,
     ks_results = stats::ks.test(data1$NPX, data2$NPX)
 
     # Main KS plot construction
-    ks_plt <- npx_br_data |>
+    ks_plt <- data |>
       dplyr::filter(OlinkID %in% id) |>
-      ggplot2::ggplot(ggplot2::aes(x = NPX, group = Panel, color = Panel)) +
+      ggplot2::ggplot(ggplot2::aes(x = NPX, group = Project, color = Project)) +
       ggplot2::scale_color_manual(values = c("#FF1F05", "#00C7E1")) +
       ggplot2::stat_ecdf(linewidth = 1) +
       ggplot2::theme_bw(base_size = 10) +
@@ -212,14 +215,14 @@ bridgeable_plts <- function(data = npx_br_data ,
     final_plts <- list()
 
     message(paste0("Working on OlinkID : ", i ))
-    final_plts[["iqr"]] <- iqr_range_plt(data = npx_br_data, id = ids[i])
+    final_plts[["iqr"]] <- iqr_range_plt(data = data, id = ids[i])
     message("IQR plot done")
-    final_plts[["r2"]] <- r2_plt(data = npx_br_data, id = ids[i])
+    final_plts[["r2"]] <- r2_plt(data = data, id = ids[i])
     message("R2 plot done")
-    final_plts[["counts"]] <- counts_plt(data = npx_br_data,
+    final_plts[["counts"]] <- counts_plt(data = data,
                                   median_counts_threshold, id = ids[i])
     message("Counts plot done")
-    final_plts[["ks"]] <- ks_plt(data = npx_br_data, id = ids[i])
+    final_plts[["ks"]] <- ks_plt(data = data, id = ids[i])
     message("KS plot done")
 
     out <- ggpubr::ggarrange(plotlist = final_plts, widths = 1, heights = 1,
