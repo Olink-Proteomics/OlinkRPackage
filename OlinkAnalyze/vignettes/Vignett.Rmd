@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
   comment = "#>")
 options(tibble.print_min = 4L, tibble.print_max = 4L)
 ```
-
+test
 Olink® Analyze is an R package that provides a versatile toolbox to enable fast and easy handling of Olink® NPX data for your proteomics research. Olink® Analyze provides functions for using Olink data, including functions for importing Olink® NPX datasets, as well as quality control (QC) plot functions and functions for various statistical tests. This package is meant to provide a convenient pipeline for your Olink NPX data analysis.
 
 # Installation 
