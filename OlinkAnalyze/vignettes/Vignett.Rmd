@@ -115,7 +115,7 @@ The columns found in an Olink data set may vary based on the version and product
 
 ## Read NPX data (read_NPX)
 
-The read_NPX function imports an NPX file into a tidy format to work with in R. No prior alterations to the NPX output file should be made for this function to work as expected.
+The read_NPX function imports an NPX file into a tidy format to work with in R. This function supports NPX output files exported in CSV, Excel, and Parquet file formats. No prior alterations to the NPX output file should be made for this function to work as expected.
 
 ### Function arguments
 
