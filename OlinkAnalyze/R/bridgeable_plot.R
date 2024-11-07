@@ -67,9 +67,12 @@ bridgeable_plts <- function(data,
     dplyr::distinct() |>
     dplyr::pull(OlinkID)
 
-  # Adjusting the platform
+  # Adjusting the platform and add color green for bridgeable assays
   data <- data |>
-    dplyr::filter(Count > min_count)
+    dplyr::filter(Count > min_count) |>
+    dplyr::mutate(textcol =
+                    dplyr::if_else(.data[["BridgingRecommendation"]] == "No",
+                                   "red", "green"))
 
   platforms <- unique(data$Project)
 
@@ -81,6 +84,12 @@ bridgeable_plts <- function(data,
 
   # IQR/Range plot ----
   iqr_range_plt <- function(data = data, id = id) {
+
+    col <- data |>
+      dplyr::filter(OlinkID %in% id) |>
+      dplyr::pull(.data[["textcol"]]) |>
+      unique()
+
     iqr_range_plt <- data |>
       dplyr::filter(OlinkID %in% id) |>
       ggplot2::ggplot(ggplot2::aes(x = paste(Assay, OlinkID, sep = "\n"),
@@ -94,7 +103,8 @@ bridgeable_plts <- function(data,
       ggplot2::labs(x = "Assay", y = "NPX Distribution", fill = "Platform: ") +
       ggplot2::guides(fill = ggplot2::guide_legend(nrow = 1, byrow = TRUE)) +
       OlinkAnalyze::set_plot_theme(font = "") +
-      ggplot2::theme(axis.text.x = ggplot2::element_blank()) +
+      ggplot2::theme(axis.text.x = ggplot2::element_blank(),
+                     strip.text = element_text(colour = col)) +
       ggplot2::facet_wrap(. ~ paste(Assay, OlinkID, sep = "\n"),
                           scales = "free")
     return(iqr_range_plt)
@@ -112,13 +122,20 @@ bridgeable_plts <- function(data,
                     OlinkID %in% id)
 
     data_wider <- data1 |>
-      dplyr::select(SampleID, Assay, Count, OlinkID, UniProt, NPX) |>
+      dplyr::select(SampleID, Assay, Count, OlinkID, UniProt, NPX,
+                    .data[["textcol"]]) |>
       dplyr::inner_join(data2 |>
                           dplyr::select(SampleID, Assay, Count, OlinkID,
-                                        UniProt, NPX),
-                        by = c("SampleID", "OlinkID", "Assay", "UniProt"),
+                                        UniProt, NPX, .data[["textcol"]]),
+                        by = c("SampleID", "OlinkID", "Assay", "UniProt",
+                               "textcol"),
                         suffix = c(platforms[1], platforms[2]))
     axis_names <- grep("NPX", colnames(data_wider), value = TRUE)
+
+    col <- data_wider |>
+      dplyr::filter(OlinkID %in% id) |>
+      dplyr::pull(.data[["textcol"]]) |>
+      unique()
 
     r2_plt <- data_wider |>
       ggplot2::ggplot(ggplot2::aes(x = .data[[axis_names[1]]],
@@ -131,13 +148,20 @@ bridgeable_plts <- function(data,
       OlinkAnalyze::set_plot_theme(font = "") +
       OlinkAnalyze::olink_color_discrete() +
       ggplot2::facet_wrap(. ~ paste(Assay, OlinkID, sep = "\n"),
-                          scales = "free")
+                          scales = "free") +
+      ggplot2::theme(strip.text = element_text(colour = col))
     return(r2_plt)
   }
 
   # Median counts plot ----
   counts_plt <- function(data = data, median_counts_threshold,
                          id = id) {
+
+    col <- data |>
+      dplyr::filter(OlinkID %in% id) |>
+      dplyr::pull(.data[["textcol"]]) |>
+      unique()
+
     counts_plt <- data |>
       dplyr::filter(OlinkID %in% id) |>
       dplyr::group_by(OlinkID, Project) |>
@@ -152,10 +176,11 @@ bridgeable_plts <- function(data,
                                    label = n)) +
       ggplot2::geom_col(width = 0.5, position = "dodge") +
       ggplot2::geom_text(position = ggplot2::position_dodge(0.5),
-                         vjust = -0.25) +
+                         vjust = 0.5) +
       ggplot2::labs(y = "Median Count", fill = "Platform:") +
       OlinkAnalyze::set_plot_theme(font = "") +
-      ggplot2::theme(axis.text.x = ggplot2::element_blank()) +
+      ggplot2::theme(axis.text.x = ggplot2::element_blank(),
+                     strip.text = element_text(colour = col)) +
       ggplot2::facet_wrap(. ~ Assay, scales = "free") +
       ggplot2::geom_hline(yintercept = median_counts_threshold,
                           color = "#FF1F05", linewidth = 0.7)
@@ -164,6 +189,7 @@ bridgeable_plts <- function(data,
 
   # KS plot ----
   ks_plt <- function(data = data, id = id) {
+
     data1 <- data |>
       dplyr::filter(Project %in% platforms[1],
                     OlinkID %in% id)
@@ -205,11 +231,10 @@ bridgeable_plts <- function(data,
                           scales = "free", nrow = 4, ncol = 5) +
       ggplot2::annotate("text", x = Inf, y = 0.1, hjust = 1,
                         cex = 2.5,
-                        label = paste0("D = ", signif(ks_results$statistic, 2),
-                                       "\nP-value = ",
-                                       signif(ks_results$p.value, 2))) +
+                        label = paste0("D = ", signif(ks_results$statistic,
+                                                      2))) +
       ggplot2::theme(legend.title = ggplot2::element_blank()) +
-      OlinkAnalyze::set_plot_theme() +
+      OlinkAnalyze::set_plot_theme(font = "") +
       ggplot2::labs(color = "Platform:")
     return(ks_plt)
   }
@@ -229,8 +254,15 @@ bridgeable_plts <- function(data,
     final_plts[["ks"]] <- ks_plt(data = data, id = ids[i])
     message("KS plot done")
 
-    out <- ggpubr::ggarrange(plotlist = final_plts, widths = 1, heights = 1,
-                             legend = "top", common.legend = TRUE)
+    out1 <- ggpubr::ggarrange(final_plts$r2, final_plts$iqr, final_plts$counts,
+                              nrow = 1, ncol = 3, legend = "top",
+                              common.legend = TRUE)
+
+    out <- ggpubr::ggarrange(out1, final_plts$ks,
+                             nrow = 2, ncol = 1, legend = "top",
+                             common.legend = FALSE)
+
+    rm(out1)
 
     out_plts[[i]] <- out
     rm(out, final_plts)
