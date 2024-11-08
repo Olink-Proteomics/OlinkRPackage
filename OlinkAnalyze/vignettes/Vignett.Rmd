@@ -209,7 +209,7 @@ For more information on calculating LOD, consult the [Calculating LOD from Olink
 
 ## T-test analysis (olink_ttest)
 
-The olink_ttest function performs a Welch 2-sample t-test or paired t-test at confidence level 0.95 for every protein (by OlinkID) for a given grouping variable using the function *t.test* from the R library *stats* and corrects for multiple testing using the Benjamini-Hochberg method (“fdr”) using the function *p.adjust* from the R library *stats*. Adjusted p-values are logically evaluated towards adjusted p-value<0.05. The resulting t-test table is arranged by ascending p-values.
+The olink_ttest function performs a Welch 2-sample t-test or paired t-test at confidence level 0.95 for every protein (by OlinkID) for a given grouping variable. It corrects for multiple testing using the Benjamini-Hochberg method (“fdr”). Adjusted p-values are logically evaluated towards adjusted p-value<0.05. The resulting t-test table is arranged by ascending p-values.
 
 ### Function arguments
 
@@ -243,7 +243,7 @@ A tibble with the following columns:
 
 ## Mann-Whitney U Test analysis (olink_wilcox)
 
-The olink_wilcox function performs a 2-sample Mann-Whitney U test or paired Mann-Whitney U test at confidence level 0.95 for every protein (by OlinkID) for a given grouping variable using the function *wilcox.test* from the R library *stats* and corrects for multiple testing using the Benjamini-Hochberg method (“fdr”) based on the function *p.adjust* from the R library *stats*. Adjusted p-values are logically evaluated towards adjusted p-value<0.05. The resulting Mann-Whitney U table is arranged by ascending p-values.
+The olink_wilcox function performs a 2-sample Mann-Whitney U test or paired Mann-Whitney U test at confidence level 0.95 for every protein (by OlinkID) for a given grouping variable. It corrects for multiple testing using the Benjamini-Hochberg method (“fdr”). Adjusted p-values are logically evaluated towards adjusted p-value<0.05. The resulting Mann-Whitney U table is arranged by ascending p-values.
 
 ### Function arguments
 
@@ -273,11 +273,11 @@ A tibble with the following columns:
 
 ## Analysis for variance (ANOVA) (olink_anova)
 
-The olink_anova is a wrapper function that performs an ANOVA F-test for each assay using the function *Anova* from the R library *car* and Type III sum of squares. The function handles both factor and numerical variables, and/or confounding factors. 
+The olink_anova function performs an ANOVA F-test for each assay (by OlinkID) and Type III sum of squares. The function handles both factor and numerical variables, and/or confounding factors. 
 
-Samples with missing variable information or factor levels are excluded from the analysis. Character columns in the input data frame are converted to factors. The automatic handling of the data from above is announced by a message if the flag *verbose=TRUE*.
+Samples with missing variable information or factor levels are excluded from the analysis. Character columns in the input data frame are converted to factors.
 
-Control samples and control assays (AssayType is not "assay", or Assay contains "control" or "ctrl") should be removed before using this function.
+Control samples and control assays should be removed before using this function.
 
 Crossed/interaction analysis, i.e. A*B formula notation, is inferred from the variable argument in the following cases: 
 
@@ -285,11 +285,9 @@ Crossed/interaction analysis, i.e. A*B formula notation, is inferred from the va
 * c('A:B')
 * c('A:B', 'B') or c('A:B', 'A')
 
-Inference is specified in a message if *verbose=TRUE*.
+For covariates, crossed analyses need to be specified explicitly, i.e. two main effects will not be expanded with a c('A','B') notation. Main effects present in the variable take precedence. 
 
-For covariates, crossed analyses need to be specified explicitly, i.e. two main effects will not be expanded with a c('A','B') notation. Main effects present in the variable take precedence. The formula notation of the final model is specified in a message if *verbose=TRUE*. 
-
-Adjusted p-values are calculated using the function *p.adjust* from the R library *stats* with the Benjamini & Hochberg (1995) method (“fdr”). The threshold is determined by logic evaluation of Adjusted_pval < 0.05. Covariates are not included in the p-value adjustment.
+Adjusted p-values are calculated using the Benjamini & Hochberg (1995) method (“fdr”). The threshold is determined by logic evaluation of Adjusted_pval < 0.05. Covariates are not included in the p-value adjustment.
 
 ### Function arguments
 
@@ -341,7 +339,7 @@ A tibble with the following columns:
 
 ## Post-hoc ANOVA analysis (olink_anova_posthoc)
 
-olink_anova_posthoc performs a post-hoc ANOVA test using the function *emmeans* from the R library *emmeans* with Tukey p-value adjustment per assay (by OlinkID) at confidence level 0.95. 
+olink_anova_posthoc performs a post-hoc ANOVA test with Tukey p-value adjustment per assay (by OlinkID) at confidence level 0.95. 
 
 The function handles both factor and numerical variables and/or covariates. The post-hoc test for a numerical variable compares the difference in means of the outcome variable (default: NPX) for 1 standard deviation (SD) difference in the numerical variable, e.g. mean NPX at mean (numerical variable) versus mean NPX at mean (numerical variable) + 1*SD (numerical variable).
 
@@ -390,9 +388,9 @@ A tibble with the following columns:
 
 ## Linear mixed effects model analysis (olink_lmer)
 
-The olink_lmer fits a linear mixed effects model for every protein (by OlinkID) in every panel, using the function *lmer* from the R library *lmerTest* and the function *anova* from the R library *stats*. The function handles both factor and numerical variables and/or covariates.
+The olink_lmer fits a linear mixed effects model for every protein (by OlinkID) in every panel. The function handles both factor and numerical variables and/or covariates.
 
-Samples with missing variable information or factor levels are excluded from the analysis. Character columns in the input data frame are converted to factors. The automatic handling of the data from above is announced by a message if the flag *verbose=TRUE*. 
+Samples with missing variable information or factor levels are excluded from the analysis. Character columns in the input data frame are converted to factors.
 
 Crossed/interaction analysis, i.e. A*B formula notation, is inferred from the variable argument in the following cases: 
 
@@ -400,11 +398,9 @@ Crossed/interaction analysis, i.e. A*B formula notation, is inferred from the va
 * c('A:B')
 * c('A:B', 'B') or c('A:B', 'A')
 
-Inference is specified in a message if *verbose=TRUE*.
+For covariates, crossed analyses need to be specified explicitly, i.e. two main effects will not be expanded with a c('A','B') notation. Main effects present in the variable take precedence. 
 
-For covariates, crossed analyses need to be specified explicitly, i.e. two main effects will not be expanded with a c('A','B') notation. Main effects present in the variable take precedence. The formula notation of the final model is specified in a message if *verbose=TRUE*.  
-
-Adjusted p-values are calculated using the function *p.adjust* from the R library *stats* with the Benjamini & Hochberg (1995) method (“fdr”). The threshold is determined by logic evaluation of Adjusted_pval < 0.05. Covariates are not included in the p-value adjustment.
+Adjusted p-values are calculated using the Benjamini & Hochberg (1995) method (“fdr”). The threshold is determined by logic evaluation of Adjusted_pval < 0.05. Covariates are not included in the p-value adjustment.
 
 ### Function arguments
 
@@ -449,7 +445,7 @@ A tibble with the following columns:
 
 ## Post-hoc linear mixed effects model analysis (olink_lmer_posthoc)
 
-The olink_lmer_posthoc function is similar to olink_lmer but performs a post-hoc analysis based on a linear mixed model effects model using the function *lmer* from the R library *lmerTest* and the function *emmeans* from the R library *emmeans*. The function handles both factor and numerical variables and/or covariates. Differences in estimated marginal means are calculated for all pairwise levels of a given output variable. Degrees of freedom are estimated using Satterthwaite’s approximation. The post-hoc test for a numerical variable compares the difference in means of the outcome variable (default: NPX) for 1 standard deviation difference in the numerical variable, e.g. mean NPX at mean(numerical variable) versus mean NPX at mean(numerical variable) + 1*SD(numerical variable). The output tibble is arranged by ascending adjusted p-values.
+The olink_lmer_posthoc function is similar to olink_lmer but performs a post-hoc analysis based on a linear mixed model effects model. The function handles both factor and numerical variables and/or covariates. Differences in estimated marginal means are calculated for all pairwise levels of a given output variable. Degrees of freedom are estimated using Satterthwaite’s approximation. The post-hoc test for a numerical variable compares the difference in means of the outcome variable (default: NPX) for 1 standard deviation difference in the numerical variable, e.g. mean NPX at mean(numerical variable) versus mean NPX at mean(numerical variable) + 1*SD(numerical variable). The output tibble is arranged by ascending adjusted p-values.
 
 ### Function arguments
 
