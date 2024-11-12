@@ -444,3 +444,97 @@ test_that(
     )
   }
 )
+
+
+# Test olink_normalization_product_format ----
+
+test_that(
+  "olink_normalization_product_format - works",
+  {
+    data_3k <- get_example_data(filename = "example_3k_data.rds")
+    data_ht <- get_example_data(filename = "example_HT_data.rds")
+
+    expect_message(expect_warning(
+      object = norm_br_data <- olink_normalization(
+        df1 = data_3k,
+        df2 = data_ht,
+        overlapping_samples_df1 = intersect(
+          x = unique(data_3k$SampleID),
+          y = unique(data_ht$SampleID)
+        ) |>
+          (\(x) x[!grepl("CONTROL", x)])(),
+        overlapping_samples_df2 = NULL,
+        df1_project_nr = "P1",
+        df2_project_nr = "P2",
+        reference_project = "P2",
+        reference_medians = NULL
+      ),
+      regexp = "2 assays are not shared across products."),
+      regexp = "Cross-product normalization will be performed!"
+    )
+
+
+    # Format output
+    norm_br_data_format <- olink_normalization_product_format(norm_br_data)
+
+    ## check that correct columns are removed
+    expect_equal(
+      object = length(intersect(colnames(norm_br_data_format),
+                         c("BridgingRecommendation", "MedianCenteredNPX",
+                           "QSNormalizedNPX", "OlinkID_E3072"))),
+      expected = 0L
+    )
+
+    ## check that NotBridgeable assays are removed
+    not_bridgeable_assays <- norm_br_data |>
+      dplyr::filter(.data[["BridgingRecommendation"]] == "NotBridgeable") |>
+      dplyr::mutate(OlinkID = paste0(.data[["OlinkID"]],
+                                     "_",
+                                     .data[["OlinkID_E3072"]]))
+
+    expect_equal(
+      object = norm_br_data_format |>
+        dplyr::filter(.data[["OlinkID"]] %in% not_bridgeable_assays$OlinkID) |>
+        nrow(),
+      expected = 0L
+    )
+
+
+    ## check that NPX is being replaced correctly
+    npx_bridging_recs <- norm_br_data |>
+      dplyr::mutate(OlinkID =  paste0(
+        .data[["OlinkID"]],
+        "_",
+        .data[["OlinkID_E3072"]])) |>
+      dplyr::select(c("SampleID",
+                      "OlinkID",
+                      "Block",
+                      "BridgingRecommendation",
+                      "MedianCenteredNPX",
+                      "QSNormalizedNPX"))
+
+    npx_assignment_check <- norm_br_data_format |>
+      dplyr::filter(.data[["SampleType"]] == "SAMPLE") |> # Remove sample controls
+      dplyr::left_join(npx_bridging_recs,
+                by = c("SampleID",
+                       "OlinkID",
+                       "Block")) |>
+      dplyr::filter(.data[["Project"]] == "P1") |>
+      dplyr::mutate(replace_flag = case_when(
+        .data[["BridgingRecommendation"]] == "MedianCentering" &
+          .data[["NPX"]] == .data[["MedianCenteredNPX"]] ~ "Correct",
+        .data[["BridgingRecommendation"]] == "QuantileSmoothing" &
+          .data[["NPX"]] == .data[["QSNormalizedNPX"]] ~ "Correct",
+        TRUE ~ "Incorrect"
+      ))
+
+    expect_equal(
+      object = npx_assignment_check |>
+        dplyr::filter(.data[["replace_flag"]] == "Incorrect") |>
+        nrow(),
+      expected = 0L
+    )
+
+  }
+)
+

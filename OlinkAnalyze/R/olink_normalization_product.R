@@ -640,3 +640,72 @@ olink_normalization_qs <- function(lst_df,
 
   return(df_qq_norm)
 }
+
+
+
+#' Formatting the output of olink_normalization_product for seamless use with
+#' downstream OA functions.
+#'
+#' @author
+#' Danai G. Topouza
+#'
+#' @description
+#' Removes non-bridgeable assays. Replaces the NPX values of the non-reference
+#' project by the Median Centered or QS Normalized NPX, according to the
+#' Bridging Recommendation. Replaces OlinkID by the concatenation of the
+#' Explore HT and Explore 3072 OlinkIDs. Removes columns BridgingRecommendation,
+#' MedianCenteredNPX, QSNormalizedNPX, OlinkID_E3072.
+#'
+#' @param df A "tibble" of Olink data in long format resulting from the
+#' olink_normalization_product function.
+#'
+#' @return A "tibble" of Olink data in long format containing both input
+#' datasets with the quantile normalized quantifications, with the above
+#' modifications.
+#'
+#' @examples
+#' \donttest{
+#' # Bridge samples
+#' bridge_samples <- intersect(
+#'   x = unique(OlinkAnalyze:::data_ht_small$SampleID),
+#'   y = unique(OlinkAnalyze:::data_3k_small$SampleID)
+#' ) |>
+#'   (\(x) x[!grepl("CONTROL", x)])()
+#'
+#' # Run olink_normalization_product
+#' npx_br_data <- olink_normalization(
+#' df1 = OlinkAnalyze:::data_ht_small,
+#' df2 = OlinkAnalyze:::data_3k_small,
+#' overlapping_samples_df1 = bridge_samples,
+#' df1_project_nr = "Explore HT",
+#' df2_project_nr = "Explore 3072",
+#' reference_project = "Explore HT")
+#'
+#' # Format output
+#' npx_br_data_format <- OlinkAnalyze:::olink_normalization_product_format(npx_br_data)
+#'
+#' }
+
+olink_normalization_product_format <- function(df) {
+
+  ### Keep the data following BridgingRecommendation
+  df_format <- df |>
+    dplyr::filter(.data[["BridgingRecommendation"]] != "NotBridgeable") |>
+    dplyr::mutate(NPX = case_when(
+      .data[["BridgingRecommendation"]] == "MedianCentering" ~
+        .data[["MedianCenteredNPX"]],
+      .data[["BridgingRecommendation"]] == "QuantileSmoothing" ~
+        .data[["QSNormalizedNPX"]],
+      .default = .data[["NPX"]])) |>
+    dplyr::filter(.data[["AssayType"]] == "assay") |>
+    dplyr::mutate(OlinkID = paste0(.data[["OlinkID"]],
+                                   "_",
+                                   .data[["OlinkID_E3072"]])) |>
+    dplyr::select(!c(.data[["BridgingRecommendation"]],
+                     .data[["MedianCenteredNPX"]],
+                     .data[["QSNormalizedNPX"]],
+                     .data[["OlinkID_E3072"]]))# Remove extra columns
+
+  return(df_format)
+}
+
