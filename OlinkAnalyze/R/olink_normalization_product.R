@@ -655,8 +655,9 @@ olink_normalization_qs <- function(lst_df,
 #' Bridging Recommendation. Replaces OlinkID by the concatenation of the
 #' Explore HT and Explore 3072 OlinkIDs to record the OlinkIDs from both
 #' projects. Replaces SampleID with the concatenation of SampleID and Project
-#' to make unique sample IDs for downstream analysis. Removes columns:
-#' BridgingRecommendation, MedianCenteredNPX, QSNormalizedNPX, OlinkID_E3072.
+#' to make unique sample IDs for downstream analysis. Removes internal and
+#' external controls. Removes BridgingRecommendation, MedianCenteredNPX,
+#'QSNormalizedNPX, OlinkID_E3072 columns.
 #'
 #' @param df A "tibble" of Olink data in long format resulting from the
 #' olink_normalization_product function.
