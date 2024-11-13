@@ -502,6 +502,9 @@ test_that(
 
     ## check that NPX is being replaced correctly
     npx_bridging_recs <- norm_br_data |>
+      dplyr:::mutate(SampleID = paste0(.data[["SampleID"]],
+                                       "_",
+                                       .data[["Project"]])) |>
       dplyr::mutate(OlinkID =  paste0(
         .data[["OlinkID"]],
         "_",
@@ -514,7 +517,6 @@ test_that(
                       "QSNormalizedNPX"))
 
     npx_assignment_check <- norm_br_data_format |>
-      dplyr::filter(.data[["SampleType"]] == "SAMPLE") |> # Remove sample controls
       dplyr::left_join(npx_bridging_recs,
                 by = c("SampleID",
                        "OlinkID",

@@ -20,8 +20,10 @@ modifications.
 Removes non-bridgeable assays. Replaces the NPX values of the non-reference
 project by the Median Centered or QS Normalized NPX, according to the
 Bridging Recommendation. Replaces OlinkID by the concatenation of the
-Explore HT and Explore 3072 OlinkIDs. Removes columns BridgingRecommendation,
-MedianCenteredNPX, QSNormalizedNPX, OlinkID_E3072.
+Explore HT and Explore 3072 OlinkIDs to record the OlinkIDs from both
+projects. Replaces SampleID with the concatenation of SampleID and Project
+to make unique sample IDs for downstream analysis. Removes columns:
+BridgingRecommendation, MedianCenteredNPX, QSNormalizedNPX, OlinkID_E3072.
 }
 \examples{
 \donttest{
@@ -42,7 +44,8 @@ df2_project_nr = "Explore 3072",
 reference_project = "Explore HT")
 
 # Format output
-npx_br_data_format <- OlinkAnalyze:::olink_normalization_product_format(npx_br_data)
+npx_br_data_format <- OlinkAnalyze:::olink_normalization_product_format(
+npx_br_data)
 
 }
 }

@@ -653,8 +653,10 @@ olink_normalization_qs <- function(lst_df,
 #' Removes non-bridgeable assays. Replaces the NPX values of the non-reference
 #' project by the Median Centered or QS Normalized NPX, according to the
 #' Bridging Recommendation. Replaces OlinkID by the concatenation of the
-#' Explore HT and Explore 3072 OlinkIDs. Removes columns BridgingRecommendation,
-#' MedianCenteredNPX, QSNormalizedNPX, OlinkID_E3072.
+#' Explore HT and Explore 3072 OlinkIDs to record the OlinkIDs from both
+#' projects. Replaces SampleID with the concatenation of SampleID and Project
+#' to make unique sample IDs for downstream analysis. Removes columns:
+#' BridgingRecommendation, MedianCenteredNPX, QSNormalizedNPX, OlinkID_E3072.
 #'
 #' @param df A "tibble" of Olink data in long format resulting from the
 #' olink_normalization_product function.
@@ -682,7 +684,8 @@ olink_normalization_qs <- function(lst_df,
 #' reference_project = "Explore HT")
 #'
 #' # Format output
-#' npx_br_data_format <- OlinkAnalyze:::olink_normalization_product_format(npx_br_data)
+#' npx_br_data_format <- OlinkAnalyze:::olink_normalization_product_format(
+#' npx_br_data)
 #'
 #' }
 
@@ -690,6 +693,10 @@ olink_normalization_product_format <- function(df) {
 
   ### Keep the data following BridgingRecommendation
   df_format <- df |>
+    dplyr::filter(.data[["SampleType"]] == "SAMPLE") |> # Remove controls
+    dplyr::mutate(SampleID = paste0(.data[["SampleID"]],
+                                     "_",
+                                     .data[["Project"]])) |>
     dplyr::filter(.data[["BridgingRecommendation"]] != "NotBridgeable") |>
     dplyr::mutate(NPX = case_when(
       .data[["BridgingRecommendation"]] == "MedianCentering" ~
