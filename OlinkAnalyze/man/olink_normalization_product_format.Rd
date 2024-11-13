@@ -22,8 +22,9 @@ project by the Median Centered or QS Normalized NPX, according to the
 Bridging Recommendation. Replaces OlinkID by the concatenation of the
 Explore HT and Explore 3072 OlinkIDs to record the OlinkIDs from both
 projects. Replaces SampleID with the concatenation of SampleID and Project
-to make unique sample IDs for downstream analysis. Removes columns:
-BridgingRecommendation, MedianCenteredNPX, QSNormalizedNPX, OlinkID_E3072.
+to make unique sample IDs for downstream analysis. Removes internal and
+external controls. Removes BridgingRecommendation, MedianCenteredNPX,
+QSNormalizedNPX, OlinkID_E3072 columns.
 }
 \examples{
 \donttest{
