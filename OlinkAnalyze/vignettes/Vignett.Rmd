@@ -510,10 +510,6 @@ The olink_pathway_enrichment function can be used to perform Gene Set Enrichment
 
 Alternative statistical results can be used as input as long as they include the columns "OlinkID", "Assay", and "estimate". A column named "Adjusted_pal" is also needed for ORA. Any statistical results that contains one estimate per protein will work as long as the estimates are comparable to each other.
 
-clusterProfiler is originally developed by Guangchuang Yu at the School of Basic Medical Sciences at Southern Medical University.
-
-T Wu, E Hu, S Xu, M Chen, P Guo, Z Dai, T Feng, L Zhou, W Tang, L Zhan, X Fu, S Liu, X Bo, and G Yu. clusterProfiler 4.0: A universal enrichment tool for interpreting omics data. The Innovation. 2021, 2(3):100141. doi: 10.1016/j.xinn.2021.100141
-
 ### Function Arguments
 
 * data: NPX data frame in long format with columns Assay, OlinkID, UniProt, SampleID, QC_Warning, NPX, and LOD
@@ -569,19 +565,17 @@ Columns for GSEA:
 
 ## Principal components analysis (PCA) plot (olink_pca_plot)
 
-Generates PCA projection of all samples from NPX data along two principal components (Default PC2 vs PC1) colored by the variable QC_Warning and including the percentage of explained variance. The function used the functions *prcomp* and *ggplot* from the R libraries *stats* and *ggplot2*, respectively. By default, the values scaled and centered in the PCA and proteins with missing NPX values removed from the corresponding assay(s). Unique sample names are required. Imputation by median value is done for assays with missingness <10% and for multi-plate projects, and for missingness <5% for single plate projects.
-
-The values are by default scaled and centered in the PCA and proteins with missing NPX values are by default removed from the corresponding assay. Unique sample names are required. Imputation by the median is done for assays with missingness <10% for multi-plate projects and <5% for single plate projects. The plot is printed, and a list of ggplot objects is returned. 
+Generates PCA projection of all samples from NPX data along two principal components (Default PC2 vs PC1) colored by the variable QC_Warning and including the percentage of explained variance. By default, the values are scaled and centered in the PCA and proteins with missing NPX values removed from the corresponding assay(s). Unique sample names are required. Imputation by median value is done for assays with missingness <10% and for multi-plate projects, and for missingness <5% for single plate projects. 
 
 More information about `olink_pca()` can be found in the [Outlier Exclusion Vignette](OutlierExclusion.html).
 
 ## Uniform Manifold Approximation and Projection for Dimension Reduction (UMAP) (olink_umap_plot)
 
-Computes a manifold approximation and projection using umap::umap and plots the two specified components. Unique sample names are required and imputation by the median is done for assays with missingness <10% for multi-plate projects and <5% for single plate projects. 
+Computes a manifold approximation and projection and plots the two specified components. Unique sample names are required and imputation by the median is done for assays with missingness <10% for multi-plate projects and <5% for single plate projects. 
 
-If byPanel = TRUE, the data processing (imputation of missing values etc) and subsequent UMAP is performed separately per panel. A faceted plot is printed, while the individual ggplot objects are returned. 
+The arguments outlierDefX and outlierDefY can be used to identify outliers in the UMAP results. Sample outliers will be labelled. 
 
-The arguments outlierDefX and outlierDefY can be used to identify outliers in the UMAP results. Samples more than +/-outlierDef[X,Y] standard deviations from the mean of the plotted UMAP component will be labelled. Both arguments have to be specified. NOTE: UMAP is a non-linear data transformation that might not accurately preserve the properties of the data. Distances in the UMAP plane should therefore be interpreted with caution
+NOTE: UMAP is a non-linear data transformation that might not accurately preserve the properties of the data. Distances in the UMAP plane should therefore be interpreted with caution
 
 ### Function arguments (selection)
 
@@ -625,8 +619,7 @@ A list of objects of class *ggplot* (silently returned). Plots are also printed 
 
 ## Boxplots for outcomes (olink_boxplot)
 
-The olink_boxplot function is used to generate boxplots of NPX values stratified on a variable for a given list of proteins. olink_boxplot uses the functions *ggplot* and *geom_boxplot* of the R library *ggplot2*.
-
+The olink_boxplot function is used to generate boxplots of NPX values stratified on a variable for a given list of proteins.
 
 In order to annotate the plot with ANOVA posthoc analysis results, control samples and control assays (AssayType is not "assay", or Assay contains "control" or "ctrl") should be removed.
 
@@ -681,7 +674,7 @@ A list of objects of class *ggplot*.
 
 ## Boxplots for QC (olink_dist_plot)
 
-The olink_dist_plot function generates boxplots of NPX values for each sample, faceted by Olink panel. This is used as an initial QC step to identify potential outliers. olink_dist_plot uses the functions *ggplot* and *geom_boxplot* of the R library *ggplot2*.
+The olink_dist_plot function generates boxplots of NPX values for each sample, faceted by Olink panel. This is used as an initial QC step to identify potential outliers. 
 
 More information about `olink_dist_plot()` can be found in the [Outlier Exclusion Vignette](OutlierExclusion.html).
 
@@ -751,7 +744,7 @@ olink_pathway_heatmap(enrich_results = ora_results, test_results = ttest_results
 A heatmap as a ggplot object
 
 ## Bargraph for visualizing pathway enrichment (olink_pathway_visualization)
-The olink_pathway_visualization function generates a bar graph of the top terms or terms related to a certain keyword for results from the olink_pathway_enrichment function. The bar represents either the normalized enrichment score (NES) for GSEA results or counts (number of proteins) for ORA results colored by adjusted p-value. The ORA visualization also contains the number of proteins out of the total proteins in that pathway as a ratio after the bar.
+The olink_pathway_visualization function generates a bar graph of the top terms or terms related to a certain keyword for results from the olink_pathway_enrichment function. The bar represents either the normalized enrichment score (NES) for GSEA results or counts (number of proteins) for ORA results colored by adjusted p-value. Pathways are ordered by unadjusted p-value. The ORA visualization also contains the number of proteins out of the total proteins in that pathway as a ratio after the bar.
 
 ### Function arguments
 
@@ -765,15 +758,15 @@ A bar graph as a **ggplot** object.
 
 ## Scatterplot for QC (olink_qc_plot) 
 
-The olink_qc_plot function generates a facet plot per Panel using ggplot and ggplot2::geom_point and stats::IQR plotting IQR vs. median for all samples. This is a good first check to find out if any samples have a tendency to be classified as outliers. Horizontal dashed lines indicate +/-3 standard deviations from the mean IQR. Vertical dashed lines indicate +/-3 standard deviations from the mean sample median.
+The olink_qc_plot function generates a plot faceted by Panel, plotting IQR vs. median for all samples. This is a good first check to find out if any samples have a tendency to be classified as outliers. Horizontal dashed lines indicate +/-3 standard deviations from the mean IQR. Vertical dashed lines indicate +/-3 standard deviations from the mean sample median.
 
 More information about `olink_qc_plot()` can be found in the [Outlier Exclusion Vignette](OutlierExclusion.html).
 
 ## Heatmap (olink_heatmap_plot)
 
-The olink_heatmap_plot function generates a heatmap for all samples and proteins using pheatmap::pheatmap. By default the heatmap center and scaled NPX across all proteins and cluster samples and proteins using a dendrogram. Unique sample names are required.
+The olink_heatmap_plot function generates a heatmap for all samples and proteins. By default, the heatmap centers and scales NPX across all proteins and cluster samples and proteins using a dendrogram. Unique sample names are required.
 
-Group variable can be annotated and colored in the left side of the heatmap. 
+The grouping variable(s) are annotated and colored in the left side of the heatmap. 
 
 ### Function arguments
 
@@ -816,7 +809,7 @@ An object of class *ggplot*.
 
 ## Plot results of t-test (olink_volcano_plot)
 
-The olink_volcano_plot function generates a volcano plot using results from the olink_ttest function using the function *ggplot* and *geom_point* of the R library *ggplot2*. The estimated difference is shown in the x-axis and -log<sub>10</sub>(p-value) in the y-axis. A horizontal dotted line indicates p-value = 0.05. Dots are colored based on Benjamini-Hochberg adjusted p-value cutoff 0.05 and can optionally be annotated by OlinkID.
+The olink_volcano_plot function generates a volcano plot using results from the olink_ttest function. The estimated difference is shown in the x-axis and -log<sub>10</sub>(p-value) in the y-axis. The horizontal dotted line indicates p-value = 0.05. Dots are colored based on significance following Benjamini-Hochberg adjustment with a p-value cutoff of 0.05. Significant assays after adjustment can optionally be annotated by OlinkID.
 
 ### Function arguments
 
