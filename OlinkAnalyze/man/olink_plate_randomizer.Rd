@@ -13,7 +13,8 @@ olink_plate_randomizer(
   available.spots,
   num_ctrl = 8,
   rand_ctrl = FALSE,
-  seed
+  seed,
+  study = NULL
 )
 }
 \arguments{
@@ -34,6 +35,8 @@ olink_plate_randomizer(
 \item{rand_ctrl}{Logical. Whether controls are added to be randomized across the plate (default = FALSE)}
 
 \item{seed}{Seed to set. Highly recommend setting this for reproducibility.}
+
+\item{study}{String. Optional. Name of column that includes study information. For when multiple studies are being plated and randomizing within studies. If \code{study} column is present in manifest, within study randomization will be performed.}
 }
 \value{
 A "tibble" including SampleID, SubjectID etc. assigned to well positions.
@@ -46,7 +49,7 @@ Columns include same columns as Manifest with additional columns:
 }
 }
 \description{
-Generates a scheme for how to plate samples with an option to keep subjects on the same plate.
+Generates a scheme for how to plate samples with an option to keep subjects on the same plate and/or to keep studies together.
 }
 \details{
 Variables of interest should if possible be randomized across plates to avoid confounding with potential plate effects. In the case of multiple samples per subject (e.g. in longitudinal studies), Olink recommends keeping each subject on the same plate. This can be achieved using the SubjectColumn argument.

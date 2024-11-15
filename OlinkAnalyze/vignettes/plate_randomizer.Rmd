@@ -113,6 +113,10 @@ randomized_manifest %>%
 
 ```
 
+## Multi-study manifests
+
+In the case of a manifest that includes multiple studies, the optional `st`
+
 ## Visualization
 
 To illustrate the goodness of randomization, both `olink_displayPlateLayout()` and `olink_displayPlateDistributions` functions could be used.
