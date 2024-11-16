@@ -72,7 +72,7 @@ bridgeable_plts <- function(data,
     dplyr::filter(Count > min_count) |>
     dplyr::mutate(textcol =
                     dplyr::if_else(.data[["BridgingRecommendation"]] == "No",
-                                   "red", "green"))
+                                   "#A61F04", "#00559E"))
 
   platforms <- unique(data$Project)
 
@@ -104,7 +104,7 @@ bridgeable_plts <- function(data,
       ggplot2::guides(fill = ggplot2::guide_legend(nrow = 1, byrow = TRUE)) +
       OlinkAnalyze::set_plot_theme(font = "") +
       ggplot2::theme(axis.text.x = ggplot2::element_blank(),
-                     strip.text = element_text(colour = col)) +
+                     strip.text = ggplot2::element_text(colour = col)) +
       ggplot2::facet_wrap(. ~ paste(Assay, OlinkID, sep = "\n"),
                           scales = "free")
     return(iqr_range_plt)
@@ -113,34 +113,86 @@ bridgeable_plts <- function(data,
   # Correlation plot ----
   r2_plt <- function(data = data, id = id) {
 
+    set.seed(1234)
+
+    # Adding and finding median of negative controls for an approximate LOD
+
     data1 <- data |>
       dplyr::filter(Project %in% platforms[1],
-                    OlinkID %in% id)
+                    OlinkID %in% id) |>
+      dplyr::add_row(SampleType = "NEGATIVE_CONTROL", SampleID =
+                       paste0("Sample_NC", seq(1:10))) |>
+      dplyr::mutate(NPX = ifelse(.data[["SampleType"]] == "NEGATIVE_CONTROL",
+                                 stats::rnorm(10,  sd = 1, mean = -1), NPX)) |>
+      dplyr::mutate(med_NC = ifelse(.data[["SampleType"]] == "NEGATIVE_CONTROL",
+                                    median(NPX), NA)) |>
+      dplyr::mutate(med_NC = unique(na.omit(.data[["med_NC"]]))) |>
+      dplyr::mutate(lod_flag = ifelse(NPX > .data[["med_NC"]], "Yes",
+                                      "No")) |>
+      dplyr::filter(.data[["SampleType"]] == "SAMPLE")
 
     data2 <- data |>
       dplyr::filter(Project %in% platforms[2],
-                    OlinkID %in% id)
+                    OlinkID %in% id) |>
+      dplyr::add_row(SampleType = "NEGATIVE_CONTROL", SampleID =
+                       paste0("Sample_NC", seq(1:10))) |>
+      dplyr::mutate(NPX = ifelse(.data[["SampleType"]] == "NEGATIVE_CONTROL",
+                                 stats::rnorm(10, sd = 1, mean = -2), NPX)) |>
+      dplyr::mutate(med_NC = ifelse(.data[["SampleType"]] == "NEGATIVE_CONTROL",
+                                    median(NPX), NA)) |>
+      dplyr::mutate(med_NC = unique(na.omit(.data[["med_NC"]]))) |>
+      dplyr::mutate(lod_flag = ifelse(NPX > .data[["med_NC"]], "Yes",
+                                      "No")) |>
+      dplyr::filter(.data[["SampleType"]] == "SAMPLE")
 
     data_wider <- data1 |>
       dplyr::select(SampleID, Assay, Count, OlinkID, UniProt, NPX,
-                    .data[["textcol"]]) |>
+                    .data[["lod_flag"]], .data[["textcol"]]) |>
       dplyr::inner_join(data2 |>
                           dplyr::select(SampleID, Assay, Count, OlinkID,
-                                        UniProt, NPX, .data[["textcol"]]),
+                                        UniProt, NPX, .data[["lod_flag"]],
+                                        .data[["textcol"]]),
                         by = c("SampleID", "OlinkID", "Assay", "UniProt",
                                "textcol"),
                         suffix = c(platforms[1], platforms[2]))
+
+    col <- grep("lod_flag", colnames(data_wider), value = TRUE)
+
+    data_wider_lod_flags <- data_wider |>
+      dplyr::mutate(med_NC = dplyr::case_when(
+        .data[[col[1]]] == "Yes" & .data[[col[2]]] == "Yes" ~ "Above both",
+        .data[[col[1]]] == "No" & .data[[col[2]]] == "No" ~ "Below both",
+        .data[[col[1]]] == "No" & .data[[col[2]]] == "Yes" ~
+          paste0("Above in ", strsplit(col[2], "\ ")[[1]][2]),
+        .data[[col[1]]] == "Yes" & .data[[col[2]]] == "No" ~
+          paste0("Above in ", strsplit(col[1], "\ ")[[1]][2]),
+        .default = NA
+      ))
+
+    data_wider_lod_flags <- data_wider_lod_flags |>
+      dplyr::mutate(lod_cols = dplyr::case_when(
+        .data[["med_NC"]] == "Above both" ~ "#00559e",
+        .data[["med_NC"]] == "Below both" ~ "#111111",
+        .data[["med_NC"]] ==
+          paste0("Above in ", strsplit(col[2], "\ ")[[1]][2]) ~ "#00C7E1",
+        .data[["med_NC"]] ==
+          paste0("Above in ", strsplit(col[1], "\ ")[[1]][2]) ~ "#FF8C22",
+        .default = NA
+      ))
+
     axis_names <- grep("NPX", colnames(data_wider), value = TRUE)
 
-    col <- data_wider |>
+    col <- data_wider_lod_flags |>
       dplyr::filter(OlinkID %in% id) |>
       dplyr::pull(.data[["textcol"]]) |>
       unique()
 
-    r2_plt <- data_wider |>
+    r2_plt <- data_wider_lod_flags |>
       ggplot2::ggplot(ggplot2::aes(x = .data[[axis_names[1]]],
                                    y = .data[[axis_names[2]]])) +
-      ggplot2::geom_point(color = "blue", alpha = 0.4) +
+      ggplot2::geom_point(ggplot2::aes(colour = .data[["med_NC"]]),
+                          alpha = 0.7) +
+      ggplot2::scale_colour_manual(values = data_wider_lod_flags$lod_cols) +
       ggplot2::geom_smooth(method = "lm", color = "black") +
       ggpubr::stat_cor(ggplot2::aes(label =
                                       ggplot2::after_stat(.data[["rr.label"]])),
@@ -149,7 +201,7 @@ bridgeable_plts <- function(data,
       OlinkAnalyze::olink_color_discrete() +
       ggplot2::facet_wrap(. ~ paste(Assay, OlinkID, sep = "\n"),
                           scales = "free") +
-      ggplot2::theme(strip.text = element_text(colour = col))
+      ggplot2::theme(strip.text = ggplot2::element_text(colour = col))
     return(r2_plt)
   }
 
@@ -180,7 +232,7 @@ bridgeable_plts <- function(data,
       ggplot2::labs(y = "Median Count", fill = "Platform:") +
       OlinkAnalyze::set_plot_theme(font = "") +
       ggplot2::theme(axis.text.x = ggplot2::element_blank(),
-                     strip.text = element_text(colour = col)) +
+                     strip.text = ggplot2::element_text(colour = col)) +
       ggplot2::facet_wrap(. ~ Assay, scales = "free") +
       ggplot2::geom_hline(yintercept = median_counts_threshold,
                           color = "#FF1F05", linewidth = 0.7)
@@ -230,7 +282,7 @@ bridgeable_plts <- function(data,
       ggplot2::facet_wrap(. ~ paste(Assay, OlinkID, sep = "\n"),
                           scales = "free", nrow = 4, ncol = 5) +
       ggplot2::annotate("text", x = Inf, y = 0.1, hjust = 1,
-                        cex = 2.5,
+                        cex = 4,
                         label = paste0("D = ", signif(ks_results$statistic,
                                                       2))) +
       ggplot2::theme(legend.title = ggplot2::element_blank()) +
@@ -239,7 +291,7 @@ bridgeable_plts <- function(data,
     return(ks_plt)
   }
 
-  # Bridegeable plot ----
+  # Bridgeable plot ----
   for (i in seq_along(ids)){
     final_plts <- list()
 
@@ -254,15 +306,19 @@ bridgeable_plts <- function(data,
     final_plts[["ks"]] <- ks_plt(data = data, id = ids[i])
     message("KS plot done")
 
-    out1 <- ggpubr::ggarrange(final_plts$r2, final_plts$iqr, final_plts$counts,
-                              nrow = 1, ncol = 3, legend = "top",
+    out1 <- ggpubr::ggarrange(final_plts$iqr, final_plts$counts,
+                              nrow = 1, ncol = 2, legend = "top",
                               common.legend = TRUE)
 
-    out <- ggpubr::ggarrange(out1, final_plts$ks,
+    out2 <- ggpubr::ggarrange(final_plts$r2, out1,
+                              nrow = 1, ncol = 2, legend = "right",
+                              common.legend = FALSE)
+
+    out <- ggpubr::ggarrange(out2, final_plts$ks,
                              nrow = 2, ncol = 1, legend = "top",
                              common.legend = FALSE)
 
-    rm(out1)
+    rm(out1, out2)
 
     out_plts[[i]] <- out
     rm(out, final_plts)
