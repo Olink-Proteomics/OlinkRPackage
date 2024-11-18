@@ -209,7 +209,7 @@ For more information on calculating LOD, consult the [Calculating LOD from Olink
 
 ## T-test analysis (olink_ttest)
 
-The olink_ttest function performs a Welch 2-sample t-test or paired t-test at confidence level 0.95 for every protein (by OlinkID) for a given grouping variable. It corrects for multiple testing using the Benjamini-Hochberg method (“fdr”). Adjusted p-values are logically evaluated towards adjusted p-value<0.05. The resulting t-test table is arranged by ascending p-values.
+The olink_ttest function performs a Welch 2-sample t-test or paired t-test at confidence level 0.95 for every protein (by OlinkID) for a given grouping variable. It corrects for multiple testing using the Benjamini-Hochberg method (“fdr”). Adjusted p-values are logically evaluated towards adjusted p-value < 0.05. The resulting t-test table is arranged by ascending p-values.
 
 ### Function arguments
 
