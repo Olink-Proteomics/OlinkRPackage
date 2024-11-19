@@ -3,6 +3,7 @@
 * Product is now identified by column name for cross-product normalization, rather than OlinkIDs. This allows for non-overlapping assays to be present in input files. (#469, @kathy-nevola)
 * Added many-to-many mapping in joining Explore HT data to the mapping file to support correlation assays (#469, @kathy-nevola)
 * Corrected spelling in error message. (#469, @kathy-nevola)
+* Fixed typo in NotBridgeable category name in tutorial (#471, @dtopouza)
 
 
 # Olink Analyze 4.0.1
