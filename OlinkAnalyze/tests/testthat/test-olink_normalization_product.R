@@ -97,8 +97,10 @@ test_that(
     skip_if_not(file.exists("../data/example_3k_data.rds"))
     skip_if_not(file.exists("../data/example_HT_data.rds"))
 
-    data_3k <- get_example_data(filename = "example_3k_data.rds")
-    data_ht <- get_example_data(filename = "example_HT_data.rds")
+    data_3k <- get_example_data(filename = "example_3k_data.rds") |>
+      dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321")))
+    data_ht <- get_example_data(filename = "example_HT_data.rds") |>
+      dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321")))
 
     # load reference data ----
 
@@ -191,8 +193,11 @@ test_that(
     skip_if_not(file.exists("../data/example_3k_data.rds"))
     skip_if_not(file.exists("../data/example_HT_data.rds"))
 
-    data_3k <- get_example_data(filename = "example_3k_data.rds")
-    data_ht <- get_example_data(filename = "example_HT_data.rds")
+
+    data_3k <- get_example_data(filename = "example_3k_data.rds") |>
+      dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321")))
+    data_ht <- get_example_data(filename = "example_HT_data.rds") |>
+      dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321")))
 
     # bridge samples
     bridge_samples <- intersect(

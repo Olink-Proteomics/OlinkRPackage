@@ -478,7 +478,7 @@ test_that(
 
     # load example data
 
-    expect_message(
+    expect_message(expect_warning(
       object = ht_3k_norm <- olink_normalization(
         df1 = data_ht,
         df2 = data_3k,
