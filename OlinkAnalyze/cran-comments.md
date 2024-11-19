@@ -1,6 +1,6 @@
 ## Release Summary
 
-This release provides additional functionality and documentation to Olink Analyze 3.9. It also optimizes and improves reproducibility for olink_normalization() and educational materials for the new functionality.
+This release removes large files used for unit testing to meet CRAN size specifications.
 
 ## R CMD check results
 
