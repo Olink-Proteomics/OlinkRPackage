@@ -63,4 +63,6 @@ jobs:
       - name: Run devtools::test()
         run: |
           devtools::test()
+        with:
+          working-directory: OlinkAnalyze
         shell: Rscript {0}
