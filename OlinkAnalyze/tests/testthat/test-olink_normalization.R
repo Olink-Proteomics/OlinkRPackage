@@ -14,7 +14,7 @@
 test_that(
   "olink_normalization - works - bridge normalization",
   {
-    skip_if_not(file.exists(test_path("..", "data", "ref_results_norm.rds")))
+    # skip_if_not(file.exists(test_path("..", "data", "ref_results_norm.rds")))
 
     # load normalized datasets generated with the original olink_normalization
     # function from OlinkAnalyze 3.8.2
@@ -128,7 +128,7 @@ test_that(
 test_that(
   "olink_normalization - works - intensity normalization",
   {
-    skip_if_not(file.exists(test_path("..", "data", "ref_results_norm.rds")))
+    # skip_if_not(file.exists(test_path("..", "data", "ref_results_norm.rds")))
 
     # load normalized datasets generated with the original olink_normalization
     # function from OlinkAnalyze 3.8.2
@@ -246,7 +246,7 @@ test_that(
 test_that(
   "olink_normalization - works - subset normalization",
   {
-    skip_if_not(file.exists(test_path("..", "data", "ref_results_norm.rds")))
+    # skip_if_not(file.exists(test_path("..", "data", "ref_results_norm.rds")))
 
     # load normalized datasets generated with the original olink_normalization
     # function from OlinkAnalyze 3.8.2
@@ -364,7 +364,7 @@ test_that(
 test_that(
   "olink_normalization - works - reference median normalization",
   {
-    skip_if_not(file.exists(test_path("..", "data", "ref_results_norm.rds")))
+    # skip_if_not(file.exists(test_path("..", "data", "ref_results_norm.rds")))
 
     # load normalized datasets generated with the original olink_normalization
     # function from OlinkAnalyze 3.8.2
@@ -470,8 +470,8 @@ test_that(
 test_that(
   "olink_normalization - works - 3k-HT normalization",
   {
-    skip_if_not(file.exists(test_path("..", "data", "example_3k_data.rds")))
-    skip_if_not(file.exists(test_path("..", "data", "example_HT_data.rds")))
+    # skip_if_not(file.exists(test_path("..", "data", "example_3k_data.rds")))
+    # skip_if_not(file.exists(test_path("..", "data", "example_HT_data.rds")))
 
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")

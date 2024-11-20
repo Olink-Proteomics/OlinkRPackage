@@ -3,7 +3,7 @@
 test_that(
   "olink_normalization_is_bridgeable - works",
   {
-    skip_if_not(file.exists(normalizePath("../data/example_3k_data.rds")))
+    # skip_if_not(file.exists(normalizePath("../data/example_3k_data.rds")))
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
 
@@ -115,10 +115,10 @@ test_that(
 test_that(
   "olink_normalization_qs - works - compare to reference",
   {
-    skip_if_not(file.exists("../data/example_3k_data.rds"))
-    skip_if_not(file.exists("../data/example_HT_data.rds"))
+    # skip_if_not(file.exists(test_path("..","data","example_3k_data.rds")))
+    # skip_if_not(file.exists(test_path("..","data","example_HT_data.rds")))
 
-    data_3k <- get_example_data(filename = "example_3k_data.rds") |>
+    data_3k <- get_example_data(filename = test_path("..","data","example_3k_data.rds")) |>
       dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321")))
     data_ht <- get_example_data(filename = "example_HT_data.rds") |>
       dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321")))
@@ -211,8 +211,8 @@ test_that(
 test_that(
   "olink_normalization_qs - works - expected output, all bridge samples",
   {
-    skip_if_not(file.exists("../data/example_3k_data.rds"))
-    skip_if_not(file.exists("../data/example_HT_data.rds"))
+    # skip_if_not(file.exists("../data/example_3k_data.rds"))
+    # skip_if_not(file.exists("../data/example_HT_data.rds"))
 
     data_3k <- get_example_data(filename = "example_3k_data.rds") |>
       dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321")))
@@ -334,8 +334,8 @@ test_that(
 test_that(
   "olink_normalization_qs - works - expected output, 50 bridge samples",
   {
-    skip_if_not(file.exists("../data/example_3k_data.rds"))
-    skip_if_not(file.exists("../data/example_HT_data.rds"))
+    # skip_if_not(file.exists("../data/example_3k_data.rds"))
+    # skip_if_not(file.exists("../data/example_HT_data.rds"))
 
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
