@@ -13,6 +13,7 @@ volcano_plot2 <- olink_volcano_plot(ref_results$t.test_results,
 
 
 test_that("olink_volcano_plot works", {
+  skip_if_not_installed("vdiffr")
   vdiffr::expect_doppelganger('volcano plot', volcano_plot)
   vdiffr::expect_doppelganger('volcano plot with coloroption', volcano_plot2)
 })
