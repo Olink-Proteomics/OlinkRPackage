@@ -6,13 +6,13 @@ skip_if_not_installed("lmerTest")
 sink(file = file(tempfile(), open = "wt"), type = "message")
 
 #Load reference results
-refRes_file <- '../data/refResults.RData'
+refRes_file <- test_path('data','refResults.RData')
 load(refRes_file)
-load(file = '../data/npx_data_format221010.RData')
+load(file = test_path('data','npx_data_format221010.RData'))
 npx_Check <- suppressWarnings(npxCheck(npx_data_format221010))
 
 #Load data with hidden/excluded assays (all NPX=NA)
-load(file = '../data/npx_data_format221010.RData')
+load(file = test_path('data','npx_data_format221010.RData'))
 
 #Run olink_lmer
 lmer_results_1 <- olink_lmer(df = npx_data1,

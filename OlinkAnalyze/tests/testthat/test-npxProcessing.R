@@ -1,5 +1,5 @@
 #Load reference results
-refRes_file <- testthat::test_path("../data/refResults.RData")
+refRes_file <- testthat::test_path("data','refResults.RData")
 load(refRes_file)
 
 npx_data1.uniqIDs <- npx_data1 %>%
@@ -44,8 +44,8 @@ test_that("npxProcessing_forDimRed works", {
 })
 
 #Load data with hidden/excluded assays (all NPX=NA)
-load(file = '../data/npx_data_format221010.RData')
-load(file = '../data/npx_data_format221121.RData')
+load(file = test_path('data','npx_data_format221010.RData'))
+load(file = test_path('data','npx_data_format221121.RData'))
 
 npx_Check <- suppressWarnings(npxCheck(npx_data_format221010))
 
