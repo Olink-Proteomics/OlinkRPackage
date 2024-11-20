@@ -9,12 +9,12 @@ skip_if(
 
 set.seed(10)
 #Load reference results
-refRes_file <- testthat::test_path('../data/refResults.RData')
+refRes_file <- testthat::test_path('data','refResults.RData')
 load(refRes_file)
 
 #Load data with hidden/excluded assays (all NPX=NA)
-load(file = testthat::test_path('../data/npx_data_format221010.RData'))
-load(file = testthat::test_path('../data/npx_data_format221121.RData'))
+load(file = testthat::test_path('data','npx_data_format221010.RData'))
+load(file = testthat::test_path('data','npx_data_format221121.RData'))
 
 pca_plot <- npx_data1 %>%
   mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%

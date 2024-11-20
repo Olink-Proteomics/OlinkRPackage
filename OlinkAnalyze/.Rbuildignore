@@ -15,4 +15,4 @@
 ^CITATION\.cff$
 ^data-raw$
 ^.RData
-^tests/data/.*[.]rds
+^tests/testthat/data/.*[.]rds

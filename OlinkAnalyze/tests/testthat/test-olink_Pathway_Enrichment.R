@@ -1,7 +1,7 @@
 skip_on_cran()
 skip_if_not_installed("clusterProfiler")
 
-load(file = '../data/npx_data_format221010.RData')
+load(file = test_path('data','npx_data_format221010.RData'))
 
 npx_df <- npx_data1 %>%
   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL"))

@@ -92,7 +92,6 @@ Suggests:
     extrafont,
     FSA,
     ggplotify,
-    here,
     kableExtra,
     knitr,
     lme4,
