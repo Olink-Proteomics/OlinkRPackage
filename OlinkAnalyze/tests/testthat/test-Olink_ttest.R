@@ -3,7 +3,7 @@ refRes_file <- test_path('data','refResults.RData')
 load(refRes_file)
 
 #Load data with hidden/excluded assays (all NPX=NA)
-load(file = 'data','npx_data_format221010.RData')
+load(file = test_path('data','npx_data_format221010.RData'))
 
 #Run olink_ttest
 t.test_results <- olink_ttest(npx_data1, 'Treatment')
