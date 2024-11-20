@@ -1,5 +1,5 @@
 #Load reference results
-refRes_file <- testthat::test_path("data','refResults.RData")
+refRes_file <- testthat::test_path("data","refResults.RData")
 load(refRes_file)
 
 npx_data1.uniqIDs <- npx_data1 %>%
