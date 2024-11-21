@@ -113,95 +113,61 @@ bridgeable_plts <- function(data,
   # Correlation plot ----
   r2_plt <- function(data = data, id = id) {
 
-    set.seed(1234)
-
     # Adding and finding median of negative controls for an approximate LOD
 
     data1 <- data |>
       dplyr::filter(Project %in% platforms[1],
-                    OlinkID %in% id) |>
-      dplyr::add_row(SampleType = "NEGATIVE_CONTROL", SampleID =
-                       paste0("Sample_NC", seq(1:10))) |>
-      dplyr::mutate(NPX = ifelse(.data[["SampleType"]] == "NEGATIVE_CONTROL",
-                                 stats::rnorm(10,  sd = 1, mean = -1), NPX)) |>
-      dplyr::mutate(med_NC = ifelse(.data[["SampleType"]] == "NEGATIVE_CONTROL",
-                                    median(NPX), NA)) |>
-      dplyr::mutate(med_NC = unique(na.omit(.data[["med_NC"]]))) |>
-      dplyr::mutate(lod_flag = ifelse(NPX > .data[["med_NC"]], "Yes",
-                                      "No")) |>
-      dplyr::filter(.data[["SampleType"]] == "SAMPLE")
+                    OlinkID %in% id)
 
     data2 <- data |>
       dplyr::filter(Project %in% platforms[2],
-                    OlinkID %in% id) |>
-      dplyr::add_row(SampleType = "NEGATIVE_CONTROL", SampleID =
-                       paste0("Sample_NC", seq(1:10))) |>
-      dplyr::mutate(NPX = ifelse(.data[["SampleType"]] == "NEGATIVE_CONTROL",
-                                 stats::rnorm(10, sd = 1, mean = -2), NPX)) |>
-      dplyr::mutate(med_NC = ifelse(.data[["SampleType"]] == "NEGATIVE_CONTROL",
-                                    median(NPX), NA)) |>
-      dplyr::mutate(med_NC = unique(na.omit(.data[["med_NC"]]))) |>
-      dplyr::mutate(lod_flag = ifelse(NPX > .data[["med_NC"]], "Yes",
-                                      "No")) |>
-      dplyr::filter(.data[["SampleType"]] == "SAMPLE")
+                    OlinkID %in% id)
 
     data_wider <- data1 |>
       dplyr::select(SampleID, Assay, Count, OlinkID, UniProt, NPX,
-                    .data[["lod_flag"]], .data[["textcol"]]) |>
+                    .data[["textcol"]]) |>
       dplyr::inner_join(data2 |>
                           dplyr::select(SampleID, Assay, Count, OlinkID,
-                                        UniProt, NPX, .data[["lod_flag"]],
-                                        .data[["textcol"]]),
+                                        UniProt, NPX, .data[["textcol"]]),
                         by = c("SampleID", "OlinkID", "Assay", "UniProt",
                                "textcol"),
                         suffix = c(platforms[1], platforms[2]))
 
-    col <- grep("lod_flag", colnames(data_wider), value = TRUE)
-
-    data_wider_lod_flags <- data_wider |>
-      dplyr::mutate(med_NC = dplyr::case_when(
-        .data[[col[1]]] == "Yes" & .data[[col[2]]] == "Yes" ~ "Above both",
-        .data[[col[1]]] == "No" & .data[[col[2]]] == "No" ~ "Below both",
-        .data[[col[1]]] == "No" & .data[[col[2]]] == "Yes" ~
-          paste0("Above in ", strsplit(col[2], "\ ")[[1]][2]),
-        .data[[col[1]]] == "Yes" & .data[[col[2]]] == "No" ~
-          paste0("Above in ", strsplit(col[1], "\ ")[[1]][2]),
-        .default = NA
-      ))
-
-    data_wider_lod_flags <- data_wider_lod_flags |>
-      dplyr::mutate(lod_cols = dplyr::case_when(
-        .data[["med_NC"]] == "Above both" ~ "#00559e",
-        .data[["med_NC"]] == "Below both" ~ "#111111",
-        .data[["med_NC"]] ==
-          paste0("Above in ", strsplit(col[2], "\ ")[[1]][2]) ~ "#00C7E1",
-        .data[["med_NC"]] ==
-          paste0("Above in ", strsplit(col[1], "\ ")[[1]][2]) ~ "#FF8C22",
-        .default = NA
-      ))
-
     axis_names <- grep("NPX", colnames(data_wider), value = TRUE)
 
-    col <- data_wider_lod_flags |>
+    r2_lm <- data_wider |>
+      dplyr::mutate(r2_lm = stats::cor(x = .data[[axis_names[1]]],
+                                       y = .data[[axis_names[2]]],
+                                       use = "everything",
+                                       method = "pearson") ^ 2) |>
+      dplyr::pull(r2_lm) |>
+      unique()
+    r2_lm <- signif(r2_lm, 2)
+
+    if (r2_lm < 0.2)
+      caps <- paste0("Possibly bridging background to background")
+    else caps <- ""
+
+    col <- data_wider |>
       dplyr::filter(OlinkID %in% id) |>
       dplyr::pull(.data[["textcol"]]) |>
       unique()
 
-    r2_plt <- data_wider_lod_flags |>
+    r2_plt <- data_wider |>
       ggplot2::ggplot(ggplot2::aes(x = .data[[axis_names[1]]],
                                    y = .data[[axis_names[2]]])) +
-      ggplot2::geom_point(ggplot2::aes(colour = .data[["med_NC"]]),
-                          alpha = 0.7) +
-      ggplot2::scale_colour_manual(values = data_wider_lod_flags$lod_cols) +
+      ggplot2::geom_point(color = "blue", alpha = 0.4) +
       ggplot2::geom_smooth(method = "lm", color = "black") +
-      ggpubr::stat_cor(ggplot2::aes(label =
+      ggpubr::stat_cor(method = "pearson",
+                       ggplot2::aes(label =
                                       ggplot2::after_stat(.data[["rr.label"]])),
                        geom = "label") +
       OlinkAnalyze::set_plot_theme(font = "") +
       OlinkAnalyze::olink_color_discrete() +
       ggplot2::facet_wrap(. ~ paste(Assay, OlinkID, sep = "\n"),
                           scales = "free") +
-      ggplot2::theme(strip.text = ggplot2::element_text(colour = col))
+      ggplot2::theme(strip.text = ggplot2::element_text(colour = col)) +
+      ggplot2::labs(caption = caps)
     return(r2_plt)
   }
 
