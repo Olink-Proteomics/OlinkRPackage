@@ -9,6 +9,7 @@ olink_one_non_parametric_posthoc(
   olinkid_list = NULL,
   variable,
   test = "kruskal",
+  subject = "Subject",
   verbose = TRUE
 )
 }
