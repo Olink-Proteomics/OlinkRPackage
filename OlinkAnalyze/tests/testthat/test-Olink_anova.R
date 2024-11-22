@@ -1,9 +1,9 @@
 #Load reference results
-refRes_file <- '../data/refResults.RData'
+refRes_file <- test_path('data','refResults.RData')
 load(refRes_file)
 
 #Load data with hidden/excluded assays (all NPX=NA)
-load(file = '../data/npx_data_format221010.RData')
+load(file = test_path('data','npx_data_format221010.RData'))
 
 # Remove assays with NPX == NA from npx_data_format221010 for testing
 npx_data_format221010_no_NA <- npx_data_format221010 |>
