@@ -1,3 +1,15 @@
+# Olink Analyze 4.0.2
+## Bug Fixes
+* Product is now identified by column name for cross-product normalization, rather than OlinkIDs. This allows for non-overlapping assays to be present in input files. (#469, @kathy-nevola)
+* Added many-to-many mapping in joining Explore HT data to the mapping file to support correlation assays (#469, @kathy-nevola)
+* Corrected spelling in error message. (#469, @kathy-nevola)
+* Fixed typo in NotBridgeable category name in tutorial (#471, @dtopouza)
+
+
+# Olink Analyze 4.0.1
+## Minor Changes
+* larger rds files used for unit tests have been excluded from build to abide by CRAN size limitations (#462, @kathy-nevola)
+
 # Olink Analyze 4.0.0
 ## Major Changes
 * olink_normalization can now be used for bridging Explore 3072 data to Explore HT data (#453, #452, #439, #449, #447,#446, #441, #440, #434, #422, #436, #435 @klevdiamanti, @kathy-nevola, @kristynchin-olink, @dtopouza, @amrita-kar, @MasoumehSheikh)
