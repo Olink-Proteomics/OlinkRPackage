@@ -16,6 +16,12 @@ vignette: >
 library(OlinkAnalyze)
 ```
 
+```{r include=FALSE}
+library(OlinkAnalyze)
+data(manifest)
+```
+
+
 ```{r, echo=FALSE,message=FALSE}
 library(dplyr)
 library(ggplot2)
