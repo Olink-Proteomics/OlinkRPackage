@@ -1,6 +1,6 @@
 ## Release Summary
 
-This release removes large files used for unit testing to meet CRAN size specifications.
+This release adds minor bug fixes to recent feature addition in Olink Analyze 4.0.0.
 
 ## R CMD check results
 

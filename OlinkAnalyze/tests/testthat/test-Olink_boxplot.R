@@ -2,9 +2,9 @@ skip_on_cran()
 skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
 
 #Load reference results
-refRes_file <- '../data/refResults.RData'
+refRes_file <- test_path('data','refResults.RData')
 load(refRes_file)
-load(file = '../data/npx_data_format221010.RData')
+load(file = test_path('data','npx_data_format221010.RData'))
 npx_Check <- suppressWarnings(npxCheck(npx_data_format221010))
 
 boxplot_site_2prots <- npx_data1 %>%

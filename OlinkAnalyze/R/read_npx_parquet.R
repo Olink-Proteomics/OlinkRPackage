@@ -47,7 +47,7 @@ read_npx_parquet <- function (filename) {
   if (!all(olink_parquet_metadata %in% names(parquet_file$metadata))) {
 
     stop(
-      paste("Missing required fileds",
+      paste("Missing required fields",
             paste(
               paste0("\"", olink_parquet_metadata, "\""),
               collapse = " and "),
