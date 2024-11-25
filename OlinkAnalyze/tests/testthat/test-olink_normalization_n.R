@@ -1,7 +1,7 @@
 # Load data for tests ----
 
 # load reference results
-refRes_file <- testthat::test_path("../data/refResults.RData")
+refRes_file <- testthat::test_path("data","refResults.RData")
 load(refRes_file)
 
 # sample subset used to reduce file size of the ref results
@@ -9,7 +9,7 @@ sampleSubset <- c("A6", "A38", "B47", "B22", "A43", "D75", "D79", "C66", "B43",
                   "B70", "D52", "A58", "B71", "A50", "D1", "B8")
 
 # load data with hidden/excluded assays (all NPX = NA for specific assays)
-load(file = testthat::test_path("../data/npx_data_format221010.RData"))
+load(file = testthat::test_path("data","npx_data_format221010.RData"))
 # loads npx_data_format221010 and npx_data_format221010.project2
 
 complex_npx_file <- system.file("extdata", "complex_dataset.rds",

@@ -1,6 +1,5 @@
 # Test olink_normalization ----
 
-
 # this tests also all functions called norm_internal_* except from
 # "norm_internal_rename_cols". Namely:
 # - norm_internal_assay_median
@@ -12,17 +11,19 @@
 # - norm_internal_adjust_not_ref
 #
 
-# load normalized datasets generated with the original olink_normalization
-# function from OlinkAnalyze 3.8.2
-get_ref_norm_res <- function() {
-  ref_norm_res_file <- test_path("..", "data", "ref_results_norm.rds")
-  readRDS(file = ref_norm_res_file)
-}
-ref_norm_res <- get_ref_norm_res()
-
 test_that(
   "olink_normalization - works - bridge normalization",
   {
+    skip_if_not(file.exists(test_path("data", "ref_results_norm.rds")))
+
+    # load normalized datasets generated with the original olink_normalization
+    # function from OlinkAnalyze 3.8.2
+    get_ref_norm_res <- function() {
+      ref_norm_res_file <- test_path("data", "ref_results_norm.rds")
+      readRDS(file = ref_norm_res_file)
+    }
+    ref_norm_res <- get_ref_norm_res()
+
     ### bridge normalization - no norm column ----
 
     expect_warning(
@@ -127,6 +128,16 @@ test_that(
 test_that(
   "olink_normalization - works - intensity normalization",
   {
+    skip_if_not(file.exists(test_path("data", "ref_results_norm.rds")))
+
+    # load normalized datasets generated with the original olink_normalization
+    # function from OlinkAnalyze 3.8.2
+    get_ref_norm_res <- function() {
+      ref_norm_res_file <- test_path("data", "ref_results_norm.rds")
+      readRDS(file = ref_norm_res_file)
+    }
+    ref_norm_res <- get_ref_norm_res()
+
     ### intensity normalization - no norm column ----
 
     expect_warning(
@@ -235,6 +246,16 @@ test_that(
 test_that(
   "olink_normalization - works - subset normalization",
   {
+    skip_if_not(file.exists(test_path("data", "ref_results_norm.rds")))
+
+    # load normalized datasets generated with the original olink_normalization
+    # function from OlinkAnalyze 3.8.2
+    get_ref_norm_res <- function() {
+      ref_norm_res_file <- test_path("data", "ref_results_norm.rds")
+      readRDS(file = ref_norm_res_file)
+    }
+    ref_norm_res <- get_ref_norm_res()
+
     ### subset normalization - no norm column ----
 
     expect_warning(
@@ -343,6 +364,16 @@ test_that(
 test_that(
   "olink_normalization - works - reference median normalization",
   {
+    skip_if_not(file.exists(test_path("data", "ref_results_norm.rds")))
+
+    # load normalized datasets generated with the original olink_normalization
+    # function from OlinkAnalyze 3.8.2
+    get_ref_norm_res <- function() {
+      ref_norm_res_file <- test_path("data", "ref_results_norm.rds")
+      readRDS(file = ref_norm_res_file)
+    }
+    ref_norm_res <- get_ref_norm_res()
+
     ### reference median normalization - no norm column ----
 
     expect_warning(
@@ -439,11 +470,15 @@ test_that(
 test_that(
   "olink_normalization - works - 3k-HT normalization",
   {
-    # load example data
+    
+    skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
+
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
 
-    expect_message(
+
+    expect_message(expect_warning(
       object = ht_3k_norm <- olink_normalization(
         df1 = data_ht,
         df2 = data_3k,
@@ -456,12 +491,13 @@ test_that(
         df2_project_nr = "df_3k",
         reference_project = "df_ht"
       ),
+      regexp = "2 assays are not shared across products."),
       regexp = "Cross-product normalization will be performed!"
     )
 
     expect_identical(
       object = dim(ht_3k_norm),
-      expected = c(38400L, 22L)
+      expected = c(39936L, 22L)
     )
 
     expect_identical(
@@ -694,5 +730,64 @@ test_that(
                      "\"Panel_Version\", and \"DataAnalysisRefID\"")
     )
 
+  }
+)
+
+test_that(
+  "Cross product normalization works - correlation assays present",
+  {
+    skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
+
+    data_3k <- get_example_data(filename = "example_3k_data.rds")
+    data_ht <- get_example_data(filename = "example_HT_data.rds")
+
+    # bridge samples
+    bridge_samples <- intersect(
+      x = unique(data_ht$SampleID),
+      y = unique(data_3k$SampleID)
+    ) |>
+      (\(x) x[!grepl("CONTROL", x)])() |>
+      sort() |>
+      head(50L)
+
+    #correlation assay IDs
+    oid_ht <- "OID43204"
+    oid_3k <- eHT_e3072_mapping$OlinkID_E3072[
+      eHT_e3072_mapping$OlinkID_HT == oid_ht]
+
+    # HT correlation is present
+    expect_contains(
+      object = olink_normalization(
+        df1 = data_ht |>
+          dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321"))),
+        df2 = data_3k |>
+          dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321"))),
+        overlapping_samples_df1 = bridge_samples,
+        df1_project_nr = "proj_ht",
+        df2_project_nr = "proj_3k",
+        reference_project = "proj_ht"
+      ) |>
+        dplyr::distinct(OlinkID) |>
+        dplyr::pull(),
+      expected = oid_ht
+    )
+
+    # All 3k correlations are present
+    expect_contains(
+      object = olink_normalization(
+        df1 = data_ht |>
+          dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321"))),
+        df2 = data_3k |>
+          dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321"))),
+        overlapping_samples_df1 = bridge_samples,
+        df1_project_nr = "proj_ht",
+        df2_project_nr = "proj_3k",
+        reference_project = "proj_ht"
+      ) |>
+        dplyr::distinct(OlinkID_E3072) |>
+        dplyr::pull(),
+      expected = oid_3k
+    )
   }
 )
