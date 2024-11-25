@@ -63,11 +63,15 @@ randomized.manifest_a <- olink_plate_randomizer(manifest, seed=12345)
 randomized.manifest_b <- olink_plate_randomizer(manifest,SubjectColumn="SubjectID",
                                                         available.spots=c(88,88), seed=12345)
 
+# Generate randomization scheme that keeps samples from the same study together
+randomized.manifest_c <- olink_plate_randomizer(manifest, study = "Site")
+
 #Visualize the generated plate layouts
 olink_displayPlateLayout(randomized.manifest_a, fill.color = 'Site')
 olink_displayPlateLayout(randomized.manifest_a, fill.color = 'SubjectID')
 olink_displayPlateLayout(randomized.manifest_b, fill.color = 'Site')
 olink_displayPlateLayout(randomized.manifest_b, fill.color = 'SubjectID')
+olink_displayPlateLayout(randomized.manifest_c, fill.color = 'Site')
 
 #Validate that sites are properly randomized
 olink_displayPlateDistributions(randomized.manifest_a, fill.color = 'Site')

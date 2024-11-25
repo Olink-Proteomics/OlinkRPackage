@@ -247,11 +247,15 @@ generatePlateHolder <- function(n.plates,n.spots,n.samples, PlateSize, num_ctrl,
 #' randomized.manifest_b <- olink_plate_randomizer(manifest,SubjectColumn="SubjectID",
 #'                                                         available.spots=c(88,88), seed=12345)
 #'
+#' # Generate randomization scheme that keeps samples from the same study together
+#' randomized.manifest_c <- olink_plate_randomizer(manifest, study = "Site")
+#'
 #' #Visualize the generated plate layouts
 #' olink_displayPlateLayout(randomized.manifest_a, fill.color = 'Site')
 #' olink_displayPlateLayout(randomized.manifest_a, fill.color = 'SubjectID')
 #' olink_displayPlateLayout(randomized.manifest_b, fill.color = 'Site')
 #' olink_displayPlateLayout(randomized.manifest_b, fill.color = 'SubjectID')
+#' olink_displayPlateLayout(randomized.manifest_c, fill.color = 'Site')
 #'
 #' #Validate that sites are properly randomized
 #' olink_displayPlateDistributions(randomized.manifest_a, fill.color = 'Site')
@@ -280,7 +284,8 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, Product, SubjectCol
 
   if(is.null(study)&("study" %in% names(Manifest))){
     study <- "study"
-    cli::cli_inform("`study` column detected in manifest. Randomizing within study.")
+    cli::cli_inform("`study` column detected in manifest.
+                    Optional study argument is set to \"study\".")
   }
 
   # Check if there are any duplicated Sample IDs in manifest
@@ -505,14 +510,14 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, Product, SubjectCol
     j_tot <- 0
 
     #Keep every study together
-    for (studyNo in unique(Manifest$study)){
+    for (studyNo in unique(Manifest[[study]])){
       passed <- FALSE
       rand.subjects <- sample(Manifest %>%
-                                dplyr::filter(study == studyNo) %>%
+                                dplyr::filter(.data[[study]] == studyNo) %>%
                                 dplyr::select(SubjectID) %>%
                                 unique() %>%
                                 dplyr::pull())
-      studyInterval <- which(Manifest$study == studyNo)
+      studyInterval <- which(Manifest[[study]] == studyNo)
       sub.groups <- Manifest %>%
         dplyr::filter(study == studyNo) %>%
         dplyr::select(SubjectID) %>% table()
@@ -611,7 +616,8 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, Product, SubjectCol
 
   #### Complete randomization within studies when subjectID is not given ####
   if(missing(SubjectColumn) & !is.null(study)){
-    message("Assigning subjects to plates. 'study' column detected so keeping studies together during randomization. \n")
+    message("Assigning subjects to plates. Multi-study project detected.
+            Studies will be kept together during randomization. \n")
 
     out.manifest <- matrix(nrow = 0,ncol = ncol(Manifest))
 
@@ -623,7 +629,8 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, Product, SubjectCol
     if(rand_ctrl){
       ctrl_locations <- all.plates %>%
         dplyr::group_by(plate) %>%
-        dplyr::slice_sample(n = num_ctrl*rand_ctrl) %>%  # Select random locations from each plate when randomizing controls
+        dplyr::slice_sample(n = num_ctrl*rand_ctrl) %>%
+        # Select random locations from each plate when randomizing controls
         dplyr::mutate(ID = paste0(plate,column,row)) %>%
         dplyr::mutate(SampleID = "CONTROL_SAMPLE")
     }
@@ -635,8 +642,8 @@ olink_plate_randomizer <- function(Manifest, PlateSize = 96, Product, SubjectCol
       dplyr::filter(!(ID %in% ctrl_locations$ID))
 
     Manifest <- Manifest %>% dplyr::arrange(study)
-    for (studyNo in unique(Manifest$study)){
-      studyInterval <- which(Manifest$study == studyNo)
+    for (studyNo in unique(Manifest[[study]])){
+      studyInterval <- which(Manifest[[study]] == studyNo)
 
       ManifestStudy <- Manifest[studyInterval,]
       all.plates_study <- all.plates[studyInterval,]
