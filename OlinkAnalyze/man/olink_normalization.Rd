@@ -12,7 +12,8 @@ olink_normalization(
   df1_project_nr = "P1",
   df2_project_nr = "P2",
   reference_project = "P1",
-  reference_medians = NULL
+  reference_medians = NULL,
+  format = FALSE
 )
 }
 \arguments{
@@ -39,6 +40,10 @@ subset normalization.}
 
 \item{reference_medians}{Dataset with columns "OlinkID" and "Reference_NPX".
 Required for reference median normalization.}
+
+\item{format}{Boolean that controls whether the normalized dataset will be
+formatted for input to downstream analysis. Only applicable for cross-product
+bridge normalization.}
 }
 \value{
 Tibble or ArrowObject with the normalized dataset.
@@ -250,7 +255,8 @@ olink_normalization(
   overlapping_samples_df1 = overlap_samples_product,
   df1_project_nr = "proj_ht",
   df2_project_nr = "proj_3k",
-  reference_project = "proj_ht"
+  reference_project = "proj_ht",
+  format = FALSE
 )
 }
 
