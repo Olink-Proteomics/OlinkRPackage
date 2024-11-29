@@ -112,22 +112,24 @@ olink_anova <- function(df,
   if ("AssayType" %in% names(df)) {
     if (any(df$AssayType != "assay")) {
       ctrl_assays <- df |>
-        dplyr::filter(AssayType != "assay")
-      
+        dplyr::filter(.data[["AssayType"]] != "assay")
+
       stop(paste0('Control assays have not been removed from the dataset.\n  Assays with AssayType != "assay" should be excluded.\n  The following ', length(unique(ctrl_assays$Assay)) ,' control assays were found:\n  ',
                   paste(strwrap(toString(unique(ctrl_assays$Assay)), width = 80), collapse = "\n")))
     }
-  } else if (any(stringr::str_detect(df$Assay, stringr::regex("control|ctrl", ignore_case = TRUE)))) {
+  } else {
     ctrl_assays <- df |>
-      dplyr::filter(stringr::str_detect(df$Assay, stringr::regex("control|ctrl", ignore_case = TRUE)))
-    
-    stop(paste0('Control assays have not been removed from the dataset.\n  Assays with "control" in their Assay field should be excluded.\n  The following ', length(unique(ctrl_assays$Assay)) ,' control assays were found:\n  ',
+      dplyr::filter(stringr::str_detect(.data[["Assay"]], stringr::regex("(?i)(?=.*\\bcontrol|ctrl\\b)(?!.*\\bCTRL\\b)")))
+
+    if (nrow(ctrl_assays) > 0) {
+      stop(paste0('Control assays have not been removed from the dataset.\n  Assays with "control" in their Assay field should be excluded.\n  The following ', length(unique(ctrl_assays$Assay)) ,' control assays were found:\n  ',
                 paste(strwrap(toString(unique(ctrl_assays$Assay)), width = 80), collapse = "\n")))
+    }
   }
-  
-  
+
+
   withCallingHandlers({
-    
+
     #Filtering on valid OlinkID
     df <- df |>
       dplyr::filter(stringr::str_detect(OlinkID,
@@ -294,7 +296,7 @@ olink_anova <- function(df,
       dplyr::group_modify(~ internal_anova(x = .x,
           formula_string = formula_string,
           fact.vars = fact.vars))|>
-      dplyr::ungroup()|> 
+      dplyr::ungroup()|>
       dplyr::filter(!term %in% c('(Intercept)','Residuals')) |>
       dplyr::mutate(covariates = term %in% covariate_filter_string) |>
       dplyr::group_by(covariates) |>
@@ -467,26 +469,25 @@ olink_anova_posthoc <- function(df,
   if ("AssayType" %in% names(df)) {
     if (any(df$AssayType != "assay")) {
       ctrl_assays <- df |>
-        dplyr::filter(AssayType != "assay")
-      
-      stop(paste0(
-        'Control assays have not been removed from the dataset.\n  Assays with AssayType != "assay" should be excluded.\n  The following ', length(unique(ctrl_assays$Assay)), " control assays were found:\n  ",
-        paste(strwrap(toString(unique(ctrl_assays$Assay)), width = 80), collapse = "\n")
-      ))
+        dplyr::filter(.data[["AssayType"]] != "assay")
+
+      stop(paste0('Control assays have not been removed from the dataset.\n  Assays with AssayType != "assay" should be excluded.\n  The following ', length(unique(ctrl_assays$Assay)) ,' control assays were found:\n  ',
+                  paste(strwrap(toString(unique(ctrl_assays$Assay)), width = 80), collapse = "\n")))
     }
-  } else if (any(stringr::str_detect(df$Assay, stringr::regex("control|ctrl", ignore_case = TRUE)))) {
+  } else {
     ctrl_assays <- df |>
-      dplyr::filter(stringr::str_detect(df$Assay, stringr::regex("control|ctrl", ignore_case = TRUE)))
-    
-    stop(paste0(
-      'Control assays have not been removed from the dataset.\n  Assays with "control" in their Assay field should be excluded.\n  The following ', length(unique(ctrl_assays$Assay)), " control assays were found:\n  ",
-      paste(strwrap(toString(unique(ctrl_assays$Assay)), width = 80), collapse = "\n")
-    ))
+      dplyr::filter(stringr::str_detect(.data[["Assay"]], stringr::regex("(?i)(?=.*\\bcontrol|ctrl\\b)(?!.*\\bCTRL\\b)")))
+
+
+    if (nrow(ctrl_assays) > 0) {
+      stop(paste0('Control assays have not been removed from the dataset.\n  Assays with "control" in their Assay field should be excluded.\n  The following ', length(unique(ctrl_assays$Assay)) ,' control assays were found:\n  ',
+                  paste(strwrap(toString(unique(ctrl_assays$Assay)), width = 80), collapse = "\n")))
+    }
   }
 
-  
+
   withCallingHandlers({
-    
+
     #Filtering on valid OlinkID
     df <- df |>
       dplyr::filter(stringr::str_detect(OlinkID,
