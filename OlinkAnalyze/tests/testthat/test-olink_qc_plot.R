@@ -1,6 +1,6 @@
 #Load data with hidden/excluded assays (all NPX=NA)
-load(file = '../data/npx_data_format221010.RData')
-load(file = '../data/npx_data_format221121.RData')
+load(file = test_path('data','npx_data_format221010.RData'))
+load(file = test_path('data','npx_data_format221121.RData'))
 
 
 qc_plot <- npx_data1 %>%
