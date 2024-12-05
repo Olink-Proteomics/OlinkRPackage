@@ -60,6 +60,8 @@ bridgeable_plts <- function(data,
             install.packages(\"ggpubr\")")
   }
 
+  set.seed(seed = 1)
+
   out_plts <- list()
 
   ids <- data |>
@@ -68,11 +70,13 @@ bridgeable_plts <- function(data,
     dplyr::pull(OlinkID)
 
   # Adjusting the platform and add color green for bridgeable assays
+
   data <- data |>
     dplyr::filter(Count > min_count) |>
-    dplyr::mutate(textcol = dplyr::if_else(
-      stringr::str_detect(.data[["BridgingRecommendation"]],
-                          "No"), "#A61F04", "#00559E"))
+    dplyr::mutate(
+      textcol = dplyr::if_else(stringr::str_detect( # nolint
+        .data[["BridgingRecommendation"]], # nolint
+        "No"), "#A61F04", "#00559E"))
 
   platforms <- unique(data$Project)
 
@@ -226,7 +230,9 @@ bridgeable_plts <- function(data,
     y0 <- ecdf_data1(x0)
     y1 <- ecdf_data2(x0)
 
-    ks_results <- stats::ks.test(data1$NPX, data2$NPX)
+    ks_results <- stats::ks.test(data1$NPX, data2$NPX,
+                                 alternative = "two.sided", exact = NULL,
+                                 simulate.p.value = FALSE, B = 2000L)
 
     # Main KS plot construction
     ks_plt <- data |>
