@@ -27,6 +27,11 @@ npx_data_format221010_ext_ctrl <- rbind(
   assay_ctrl
 )
 
+# Dataset with no AssayType column, no internal controls but includes CTRL assay
+npx_data_format221010_ctrl_assay <- npx_data_format221010_ext_ctrl |>
+  dplyr::filter(!str_detect(
+    Assay, "Incubation control|Amplification control|Extension control"))
+
 # Add AssayType
 npx_data_format221010_AssayType <- npx_data_format221010_ext_ctrl |>
   dplyr::mutate(AssayType = dplyr::case_when(
@@ -35,6 +40,7 @@ npx_data_format221010_AssayType <- npx_data_format221010_ext_ctrl |>
     stringr::str_detect(Assay, "Extension control") ~ "ext_ctrl",
     TRUE ~ "assay"
   ))
+
 
 # Remove control assays from npx_data_format221010 for warning tests
 npx_data_format221010_no_ctrl <- npx_data_format221010 |>
@@ -97,16 +103,21 @@ test_that("olink_anova function works", {
 
   expect_warning(olink_anova(npx_data_format221010_no_ctrl, 'treatment2')) # data with all NPX=NA for some assays
 
-  expect_error(olink_anova(npx_data_format221010_AssayType, variable = "Site"),
+  expect_error(olink_anova(npx_data_format221010_AssayType, variable = "treatment2"),
                regexp = 'The following 4 control assays were found:
   Incubation control 1, Amplification control 2, Amplification control 4,
 Extension control 1$',
                fixed = FALSE) # Assay controls not removed, AssayType present
-  expect_error(olink_anova(npx_data_format221010_ext_ctrl, variable = "Site"),
+
+  expect_error(olink_anova(npx_data_format221010_ext_ctrl, variable = "treatment2"),
                regexp = "The following 4 control assays were found:
   Incubation control 1, Amplification control 2, Amplification control 4,
 Extension control 1$",
                fixed = FALSE) # Assay controls not removed, no AssayType
+
+  expect_no_error(olink_anova(npx_data_format221010_ctrl_assay,
+                              variable = "treatment1"))
+  # Assay controls removed, CTRL assay present
   })
 
 test_that("olink_anova_posthoc function works", {
@@ -125,18 +136,23 @@ test_that("olink_anova_posthoc function works", {
   expect_warning(olink_anova_posthoc(npx_data_format221010_no_ctrl, variable = 'treatment2', effect = 'treatment2')) # data with all NPX=NA for some assays
 
   expect_error(olink_anova_posthoc(npx_data_format221010_AssayType,
-                                   variable = 'Site',
-                                   effect = 'Site'),
+                                   variable = 'treatment2',
+                                   effect = 'treatment2'),
                regexp = "The following 4 control assays were found:
   Incubation control 1, Amplification control 2, Amplification control 4,
 Extension control 1$",
                fixed = FALSE) # Assay controls not removed, AssayType present
   expect_error(olink_anova_posthoc(npx_data_format221010_ext_ctrl,
-                                   variable = 'Site',
-                                   effect = 'Site'),
+                                   variable = 'treatment2',
+                                   effect = 'treatment2'),
                regexp = "The following 4 control assays were found:
   Incubation control 1, Amplification control 2, Amplification control 4,
 Extension control 1$",
                fixed = FALSE) # Assay controls not removed, no AssayType
+
+  expect_no_error(olink_anova_posthoc(npx_data_format221010_ctrl_assay,
+                                      variable = 'treatment2',
+                                      effect = 'treatment2'))
+  # Assay controls removed, CTRL assay present
 
 })
