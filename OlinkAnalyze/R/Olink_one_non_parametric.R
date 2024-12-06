@@ -176,6 +176,7 @@ olink_one_non_parametric <- function(df,
       if(verbose){message(paste("Friedman model fit to each assay: "),formula_string)}
 
       formula_string <- paste0(formula_string,"|",subject)
+
       # add repeat measurement groups
       df_nas_remove <- df %>%
         dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>%
@@ -259,6 +260,7 @@ olink_one_non_parametric <- function(df,
 #' @param olinkid_list Character vector of OlinkID's on which to perform post hoc analysis. If not specified, all assays in df are used.
 #' @param variable Single character value or character array.
 #' @param test Single character value indicates running the post hoc test for friedman or kruskal.
+#' @param subject Single character value indicates running the post hoc test for friedman or kruskal.
 #' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #' @return Tibble of posthoc tests for specified effect, arranged by ascending adjusted p-values.
 #'
@@ -311,6 +313,7 @@ olink_one_non_parametric_posthoc <- function(df,
                                              olinkid_list = NULL,
                                              variable,
                                              test = "kruskal",
+                                             subject = "Subject",
                                              verbose=TRUE
                                              ){
   if (test != "friedman"){
@@ -345,6 +348,7 @@ olink_one_non_parametric_posthoc <- function(df,
     npxCheck <- npxCheck(df)
     data_type <- npxCheck$data_type #Temporary fix to avoid issues with rlang::ensym downstream
 
+    #Variables to check
     variable_testers <- intersect(c(variable), names(df))
     ##Remove rows where variables or covariate is NA (cant include in analysis anyway)
     removed.sampleids <- NULL
@@ -385,17 +389,102 @@ olink_one_non_parametric_posthoc <- function(df,
 
     if(test == "friedman"){
       message("Pairwise comparisons for Friedman test using paired Wilcoxon signed-rank test were performed")
-      p.hoc_val <- df %>%
+
+      #Not testing assays that have all NA:s in one level
+      #Every sample needs to have a unique level of the factor
+
+      nas_in_var <- character(0)
+
+      single_fixed_effects <- variable
+
+      for(effect in single_fixed_effects){
+
+        current_nas <- df %>%
+          dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>%
+          dplyr::group_by(OlinkID, !!rlang::ensym(effect)) %>%
+          dplyr::summarise(n = dplyr::n(), n_na = sum(is.na(!!rlang::ensym(data_type))),.groups="drop") %>%
+          dplyr::filter(n == n_na) %>%
+          dplyr::distinct(OlinkID) %>%
+          dplyr::pull(OlinkID)
+
+        if(length(current_nas) > 0) {
+          nas_in_var <- c(nas_in_var, current_nas)
+          warning(paste0('The assay(s) ',
+                         current_nas,
+                         ' has only NA:s in atleast one level of ',
+                         effect,
+                         '. It will not be tested.'),
+                  call. = F)
+        }
+
+        number_of_samples_w_more_than_one_level <- df %>%
+          dplyr::group_by(SampleID) %>%
+          dplyr::summarise(n_levels = dplyr::n_distinct(!!rlang::ensym(effect), na.rm = T),.groups = "drop") %>%
+          dplyr::filter(n_levels > 1) %>%
+          nrow(.)
+
+        if (number_of_samples_w_more_than_one_level > 0) {
+          stop(paste0("There are ",
+                      number_of_samples_w_more_than_one_level,
+                      " samples that do not have a unique level for the effect ",
+                      effect,
+                      ". Only one level per sample is allowed."))
+        }
+      }
+
+      formula_string <- paste0(data_type, "~", paste(variable,collapse="*"))
+
+      #Get factors
+      fact.vars <- sapply(variable_testers, function(x) is.factor(df[[x]]))
+      fact.vars <- names(fact.vars)[fact.vars]
+
+      # add repeat measurement groups
+      df_nas_remove <- df %>%
+        dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>%
+        dplyr::filter(!(OlinkID %in% nas_in_var))
+      # remove subject without complete data
+      ## number of the items in the subject
+
+      n_subject <- df_nas_remove %>%
+        dplyr::select(!!!rlang::syms(variable)) %>%
+        stats::na.omit() %>%
+        unique() %>%
+        pull() %>%
+        length()
+
+      subject_remove <- df_nas_remove %>%
+        dplyr::filter(!is.na(NPX)) %>%
+        dplyr::group_by(Assay, !!!rlang::syms(subject)) %>%
+        dplyr::summarize(n = n(),.groups = "drop") %>%
+        dplyr::filter(n == n_subject) %>%
+        dplyr::mutate(Friedman_remove = "no") %>%
+        dplyr::select(-n)
+
+      if(length(subject_remove %>%
+                dplyr::select(!!!rlang::syms(subject)) %>%
+                dplyr::pull() %>%
+                unique()) < length(df_nas_remove %>%
+                                   dplyr::select(!!!rlang::syms(subject)) %>%
+                                   dplyr::pull() %>%
+                                   unique())){
+        message(paste("Subjects removed due to incomplete data"))
+      }
+
+      p.hoc_val <- df_nas_remove %>%
+        dplyr::left_join(subject_remove, by = c("Assay",subject)) %>%
+        dplyr::filter(Friedman_remove == "no") %>%
         dplyr::filter(OlinkID %in% olinkid_list) %>%
         dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>% #Exclude assays where all samples have NPX=NA
         dplyr::mutate(OlinkID = factor(OlinkID, levels = olinkid_list)) %>%
+        dplyr::arrange(Assay, OlinkID, UniProt, Panel,.data[[variable]],.data[[subject]]) %>%
         dplyr::group_by(Assay, OlinkID, UniProt, Panel) %>%
-        dplyr::do(rstatix::wilcox_test(data =., as.formula(formula_string), p.adjust.method = "BH",detailed = TRUE, conf.level = 0.95,paired = T)) %>%
+        dplyr::do(rstatix::wilcox_test(data =., as.formula(formula_string), p.adjust.method = "BH",detailed = TRUE, conf.level = 0.95, paired = T)) %>%
         dplyr::ungroup() %>%
         dplyr::mutate("variable" = variable) %>%
         dplyr::mutate(Threshold = if_else(p.adj < 0.05,'Significant','Non-significant')) %>%
         dplyr::rename(term = variable) %>%
         dplyr::mutate(contrast = paste(group1, group2, sep = " - ")) %>%
+        dplyr::arrange(p.adj) %>%
         dplyr::rename(Adjusted_pval = p.adj) %>%
         dplyr::select(all_of(c("Assay", "OlinkID", "UniProt", "Panel", "term", "contrast", "estimate", "Adjusted_pval", "Threshold")))
     } else {
@@ -411,6 +500,7 @@ olink_one_non_parametric_posthoc <- function(df,
         dplyr::mutate(Threshold = if_else(P.adj < 0.05,'Significant','Non-significant')) %>%
         dplyr::rename(term = variable) %>%
         dplyr::rename(contrast = Comparison) %>%
+        dplyr::arrange(P.adj) %>%
         dplyr::rename(Adjusted_pval = P.adj) %>%
         dplyr::rename(estimate = Z) %>%
         dplyr::select(all_of(c("Assay", "OlinkID", "UniProt", "Panel", "term", "contrast", "estimate", "Adjusted_pval", "Threshold")))
