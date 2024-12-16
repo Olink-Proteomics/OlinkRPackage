@@ -1,4 +1,4 @@
-load(file = '../data/npx_data_format221010.RData')
+load(file = test_path('data','npx_data_format221010.RData'))
 
 bridgeSamples <- olink_bridgeselector(df = npx_data1,
                                       sampleMissingFreq = .1,

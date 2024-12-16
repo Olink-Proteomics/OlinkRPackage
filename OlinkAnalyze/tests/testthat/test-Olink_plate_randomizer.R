@@ -1,5 +1,5 @@
 #Load reference results
-refRes_file <- '../data/refResults.RData'
+refRes_file <- test_path('data','refResults.RData')
 load(refRes_file)
 
 #Run olink_plate_randomizer
