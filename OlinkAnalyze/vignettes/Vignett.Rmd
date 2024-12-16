@@ -913,7 +913,7 @@ npx_data1 %>%
 ```{r message=FALSE, echo = FALSE}
 knitr::include_graphics(normalizePath("../man/figures/olink_fill_discrete_boxplot.png"), error = FALSE)
 ```
-<<<<<<< HEAD
+
 
 ## Visualizing bridgeability criteria for between-product normalization (bridgeable_plts)
 
@@ -962,5 +962,3 @@ knitr::include_graphics(normalizePath("../man/figures/bridgeable_plt_MedianCente
 ### Function output
 
 A list of objects of class *ggplot*.
-=======
->>>>>>> 0c5fcee6e3ae687d8213f3aea90dc6f22fa3ed85
