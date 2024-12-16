@@ -54,31 +54,6 @@ df_assays <- dplyr::tibble(
   Panel = eHT_e3072_mapping$Panel_E3072[1L:100L],
   Block = eHT_e3072_mapping$Block_E3072[1L:100L]
 )
-# Correlation Assay
-oid <- "OID43204"
-
-cor_assays <- dplyr::tibble(
-  OlinkID = eHT_e3072_mapping$OlinkID_E3072[eHT_e3072_mapping$OlinkID_HT == oid],
-  UniProt = eHT_e3072_mapping$UniProt[eHT_e3072_mapping$OlinkID_HT == oid],
-  Assay = eHT_e3072_mapping$Assay[eHT_e3072_mapping$OlinkID_HT == oid],
-  Panel = eHT_e3072_mapping$Panel_E3072[eHT_e3072_mapping$OlinkID_HT == oid],
-  AssayType = "assay",
-  Block = eHT_e3072_mapping$Block_E3072[eHT_e3072_mapping$OlinkID_HT == oid]
-) |>
-  dplyr::distinct()
-
-# Non overlapping assay
-unique_assay <- dplyr::tibble(
-  OlinkID = "OID12345",
-  UniProt = "RANDOM",
-  Assay = "TEST_3072",
-  Panel = eHT_e3072_mapping$Panel_E3072[1L],
-  AssayType = "assay",
-  Block =  eHT_e3072_mapping$Block_E3072[1L],
-) |>
-  dplyr::distinct()
-
-df_assays <- rbind(df_assays, cor_assays, unique_assay)
 
 # Combine data
 data_3k <- tidyr::expand_grid(

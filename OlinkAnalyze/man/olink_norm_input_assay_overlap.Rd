@@ -5,12 +5,7 @@
 \title{Check \var{datasets} and \var{reference_medians} for Olink identifiers not
 shared across datasets.}
 \usage{
-olink_norm_input_assay_overlap(
-  lst_df,
-  reference_medians,
-  lst_cols,
-  norm_mode = norm_mode
-)
+olink_norm_input_assay_overlap(lst_df, reference_medians, lst_cols)
 }
 \arguments{
 \item{lst_df}{Named list of datasets to be normalized.}
@@ -20,10 +15,6 @@ Used for reference median normalization.}
 
 \item{lst_cols}{Named list of vectors with the required column names for each
 dataset in \var{lst_df}.}
-
-\item{norm_mode}{Character string indicating the type of normalization to be
-performed. Expecting one of
-bridge, subset, ref_median or norm_ht_3k. # nolint}
 }
 \value{
 A named list containing \var{lst_df} and \var{reference_medians}
