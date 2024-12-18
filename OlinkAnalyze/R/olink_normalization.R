@@ -312,7 +312,11 @@ olink_normalization <- function(df1,
       )
 
       if (format == TRUE) {
-        df_norm <- olink_normalization_product_format(df_norm)
+        df_norm <- olink_normalization_product_format(bridged_df = df_norm,
+                                                      df1 = df1,
+                                                      df1_project_nr = df1_project_nr,
+                                                      df2 = df2,
+                                                      df2_project_nr = df2_project_nr)
       }
 
     } else if (lst_check$norm_mode == olink_norm_modes$subset) {

@@ -650,20 +650,31 @@ olink_normalization_qs <- function(lst_df,
 #' Danai G. Topouza
 #'
 #' @description
-#' Removes non-bridgeable assays. Replaces the NPX values of the non-reference
-#' project by the Median Centered or QS Normalized NPX, according to the
-#' Bridging Recommendation. Replaces OlinkID by the concatenation of the
-#' Explore HT and Explore 3072 OlinkIDs to record the OlinkIDs from both
-#' projects. Replaces SampleID with the concatenation of SampleID and Project
-#' to make unique sample IDs for downstream analysis. Removes internal and
-#' external controls. Removes BridgingRecommendation, MedianCenteredNPX,
-#'QSNormalizedNPX, OlinkID_E3072 columns.
+#' Replaces the NPX values of the non-reference project by the Median Centered
+#' or QS Normalized NPX, according to the Bridging Recommendation. Edits the
+#' BridgingRecommendation column to indicate whether an assay is NotBridgeable,
+#' NotOverlapping, MedianCentering, or QuantileSmoothing bridged. Replaces
+#' OlinkID by the concatenation of the Explore HT and Explore 3072 OlinkIDs to
+#' record the OlinkIDs from both projects for bridgeable assays. Assays that are
+#' NotBridgeable or NotOverlapping retain their original non-reference OlinkIDs
+#' and NPX values. Replaces SampleID with the concatenation of SampleID and
+#' Project to make unique sample IDs for downstream analysis. Removes internal
+#' and external controls. Removes  MedianCenteredNPX, QSNormalizedNPX,
+#' OlinkID_E3072 columns.
 #'
-#' @param df A "tibble" of Olink data in long format resulting from the
+#' @param bridged_df A "tibble" of Olink data in long format resulting from the
 #' olink_normalization_product function.
+#' @param df1 First dataset to be used for normalization, pre-normalization.
+#' Must match df1 used in olink_normalization product bridging.
+#' @param df2 Second dataset to be used for normalization, pre-normalization.
+#' Must match df2 used in olink_normalization product bridging.
+#' @param df1_project_nr Project name of first dataset. Must match name used in
+#' olink_normalization product bridging.
+#' @param df2_project_nr Project name of second dataset. Must match name used in
+#' olink_normalization product bridging.
 #'
 #' @return A "tibble" of Olink data in long format containing both input
-#' datasets with the quantile normalized quantifications, with the above
+#' datasets with the bridged NPX quantifications, with the above
 #' modifications.
 #'
 #' @examples
@@ -686,20 +697,66 @@ olink_normalization_qs <- function(lst_df,
 #'
 #' # Format output
 #' npx_br_data_format <- OlinkAnalyze:::olink_normalization_product_format(
-#' npx_br_data)
+#' bridged_df = npx_br_data,
+#' df1 = OlinkAnalyze:::data_ht_small,
+#' df2 = OlinkAnalyze:::data_3k_small,
+#' df1_project_nr = "Explore HT",
+#' df2_project_nr = "Explore 3072")
 #'
 #' }
 
-olink_normalization_product_format <- function(df) {
+olink_normalization_product_format <- function(bridged_df,
+                                               df1,
+                                               df1_project_nr,
+                                               df2,
+                                               df2_project_nr) {
+
+  # Extract data from NotBridgeable assays
+  df_not_bridgeable <- bridged_df |>
+    dplyr::mutate(SampleID = paste0(.data[["SampleID"]],
+                                    "_",
+                                    .data[["Project"]])) |>
+    dplyr::filter(.data[["SampleType"]] == "SAMPLE") |> # Remove controls
+    dplyr::filter(.data[["AssayType"]] == "assay") |>
+    dplyr::filter(.data[["BridgingRecommendation"]] == "NotBridgeable") |>
+    dplyr::mutate(OlinkID = case_when(
+      Panel == "Explore_HT" ~ OlinkID,
+      Panel != "Explore_HT" ~ OlinkID_E3072
+    )) |>
+    dplyr::select(!c(.data[["MedianCenteredNPX"]],
+                       .data[["QSNormalizedNPX"]],
+                       .data[["OlinkID_E3072"]]))# Remove extra columns
+
+
+  # Extract data from non-overlapping assays
+  df1_no_overlap <- df1 |>
+    dplyr::filter(.data[["SampleType"]] == "SAMPLE") |> # Remove controls
+    dplyr::filter(!(.data[["OlinkID"]] %in%
+               unlist(eHT_e3072_mapping |>
+                        dplyr::select(starts_with("OlinkID_"))))) |>
+    dplyr::mutate(Project = df1_project_nr) |>
+    dplyr::mutate(SampleID =
+             paste0(.data[["SampleID"]],"_",df1_project_nr)) |>
+    dplyr::mutate(BridgingRecommendation = "NotOverlapping")
+
+  df2_no_overlap <- df2 |>
+    dplyr::filter(.data[["SampleType"]] == "SAMPLE") |> # Remove controls
+    dplyr::filter(!(.data[["OlinkID"]] %in%
+               unlist(eHT_e3072_mapping |>
+                        dplyr::select(starts_with("OlinkID_"))))) |>
+    dplyr::mutate(Project = df2_project_nr) |>
+    dplyr::mutate(SampleID =
+             paste0(.data[["SampleID"]],"_",df2_project_nr)) |>
+    dplyr::mutate(BridgingRecommendation = "NotOverlapping")
 
   ### Keep the data following BridgingRecommendation
-  df_format <- df |>
+  df_format <- bridged_df |>
     dplyr::filter(.data[["SampleType"]] == "SAMPLE") |> # Remove controls
     dplyr::mutate(SampleID = paste0(.data[["SampleID"]],
                                      "_",
                                      .data[["Project"]])) |>
-    dplyr::filter(.data[["BridgingRecommendation"]] != "NotBridgeable") |>
-    dplyr::mutate(NPX = case_when(
+    dplyr::filter(!.data[["BridgingRecommendation"]] == "NotBridgeable") |>
+   dplyr::mutate(NPX = case_when(
       .data[["BridgingRecommendation"]] == "MedianCentering" ~
         .data[["MedianCenteredNPX"]],
       .data[["BridgingRecommendation"]] == "QuantileSmoothing" ~
@@ -709,11 +766,15 @@ olink_normalization_product_format <- function(df) {
     dplyr::mutate(OlinkID = paste0(.data[["OlinkID"]],
                                    "_",
                                    .data[["OlinkID_E3072"]])) |>
-    dplyr::select(!c(.data[["BridgingRecommendation"]],
-                     .data[["MedianCenteredNPX"]],
+    dplyr::select(!c(.data[["MedianCenteredNPX"]],
                      .data[["QSNormalizedNPX"]],
                      .data[["OlinkID_E3072"]]))# Remove extra columns
 
-  return(df_format)
+  df_full <- rbind(df_format,
+                   df_not_bridgeable,
+                   df1_no_overlap,
+                   df2_no_overlap)
+
+  return(df_full)
 }
 
