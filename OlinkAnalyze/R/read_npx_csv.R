@@ -66,5 +66,10 @@ read_npx_csv <- function(filename) {
     }
   }
 
+  if ("Block" %in% colnames(df_npx)) {
+    df_npx <- df_npx %>%
+      dplyr::mutate(Block = as.character(Block))
+  }
+
   return(df_npx)
 }

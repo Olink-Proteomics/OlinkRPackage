@@ -1,5 +1,5 @@
 #Load data with hidden/excluded assays (all NPX=NA)
-load(file = '../data/npx_data_format221010.RData')
+load(file = test_path('data','npx_data_format221010.RData'))
 
 #Create an outlier group that should be picked up by the UMAP
 outGroup <- c("A1_1", "A10_11", "A12_13", "A17_18", "A25_27", "A69_71", "B2_81", "B31_112", "B66_147", "B71_152")

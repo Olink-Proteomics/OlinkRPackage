@@ -1,9 +1,9 @@
 #Load reference results
-refRes_file <- testthat::test_path('../data/refResults.RData')
+refRes_file <- testthat::test_path('data','refResults.RData')
 load(refRes_file)
 
 #Load data with hidden/excluded assays (all NPX=NA)
-load(file = '../data/npx_data_format221010.RData')
+load(file = test_path('data','npx_data_format221010.RData'))
 
 #Run olink_wilcox
 wilcox.test_results <- olink_wilcox(npx_data1, 'Treatment')
