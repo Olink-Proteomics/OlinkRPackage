@@ -16,7 +16,7 @@
 #' @param bridge_sampleid Character vector containing overlapping SampleIDs
 #'  between the two bridging projects. If this argument is not provided,
 #'  the function will look for overlapping SampleID values between the two 
-#'  projects in the bridged dataframe.  
+#'  projects in the bridged dataframe  
 #'
 #' @return An object of class "ggplot", 4 combined plots for each protein.
 #' @export
