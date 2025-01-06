@@ -51,7 +51,8 @@
 
 bridgeable_plts <- function(data,
                             median_counts_threshold = 150,
-                            min_count = 10) {
+                            min_count = 10,
+                            bridge_sampleid = NULL) {
 
   if (!requireNamespace("ggpubr", quietly = TRUE)) {
 
@@ -62,21 +63,84 @@ bridgeable_plts <- function(data,
 
   set.seed(seed = 1)
 
+  # Identify datapoints with counts below the min_count threshold
+
+  low_count_data <- data |>
+    filter(.data[["Count"]] <= min_count) |>
+    select(all_of(c("SampleID", "OlinkID"))) |>
+    distinct() |>
+    mutate(datapointID = paste(.data[["SampleID"]], .data[["OlinkID"]]))
+
+  # Identify bridging samples for unique naming across projects
+
+  if (is.null(bridge_sampleid) & ! "Type" %in% colnames(data)){
+    cli::cli_abort("Bridge samples must be specified in bridge_sampleid.")
+  } else if (!is.null(bridge_sampleid)) {
+    data <- data |>
+      dplyr::filter(.data[["SampleID"]] %in% bridge_sampleid)
+  } else if ("Type_Project" %in% colnames(data)) {
+    bridge_sampleid <- data |>
+      dplyr::filter(stringr::str_detect(Type_Project, "Bridge")) |>
+      dplyr::distinct(SampleID) |>
+      dplyr::pull()
+
+    data <- data |>
+      dplyr::filter(.data[["SampleID"]] %in% bridge_sampleid)
+  }
+
+  if (nrow(data) == 0){
+    cli::cli_abort("Bridge samples not found. Please check bridge_sampleid.")
+  }
+
+  # Generates plots for each assay
+
   out_plts <- list()
 
+  # Adding OlinkID to 3K correlation assays to provide unique IDs for plots
+
+  corr_assays_3K <- c("CXCL8", "TNF", "IL6", "IDO1", "SCRIB", "LMOD1")
+
+  data <- data |>
+    dplyr::mutate(OlinkID = if_else(Assay %in% corr_assays_3K,
+                                    paste(OlinkID, OlinkID_E3072, sep = "_"),
+                                    OlinkID)) |>
+    group_by(OlinkID) |>
+    mutate(Assay = ifelse(length(unique(Assay)) > 1,
+                          max(unique(Assay)),
+                          Assay)) |>
+    ungroup()
+
   ids <- data |>
-    dplyr::select(OlinkID, .data[["BridgingRecommendation"]]) |> #HT OlinkID
+    dplyr::select(OlinkID,
+                  OlinkID_E3072,
+                  Assay,
+                  .data[["BridgingRecommendation"]]) |>
     dplyr::distinct() |>
     dplyr::pull(OlinkID)
+
+  ids_assay <- data |>
+    dplyr::select(OlinkID,
+                  OlinkID_E3072,
+                  Assay,
+                  .data[["BridgingRecommendation"]]) |>
+    dplyr::distinct() |>
+    dplyr::pull(Assay)
 
   # Adjusting the platform and add color green for bridgeable assays
 
   data <- data |>
-    dplyr::filter(Count > min_count) |>
+    dplyr::mutate(datapointID = paste(.data[["SampleID"]], .data[["OlinkID"]])) |>
+    dplyr::filter(!(datapointID %in% low_count_data$datapointID)) |>
+    dplyr::filter(
+      # apply only to customer samples
+      .data[["SampleType"]] == "SAMPLE"
+      # remove internal control assays
+      & .data[["AssayType"]] == "assay") |>
     dplyr::mutate(
       textcol = dplyr::if_else(stringr::str_detect( # nolint
         .data[["BridgingRecommendation"]], # nolint
-        "No"), "#A61F04", "#00559E"))
+        "No"), "#A61F04", "#00559E")) |>
+    select(-"datapointID")
 
   platforms <- unique(data$Project)
 
@@ -86,12 +150,47 @@ bridgeable_plts <- function(data,
     )
   }
 
+  rm(low_count_data)
+
   # IQR/Range plot ----
   iqr_range_plt <- function(data = data, id = id) {
 
     col <- data |>
       dplyr::filter(OlinkID %in% id) |>
       dplyr::pull(.data[["textcol"]]) |>
+      unique()
+
+    tmp1 <- data |>
+      dplyr::filter(OlinkID %in% id)
+
+    tmp2 <- tmp1 |>
+      dplyr::filter(Project == platforms[1]) |>
+      dplyr::select(OlinkID, SampleID, NPX) |>
+      dplyr::rename("NPX1" = "NPX") |>
+      dplyr::distinct()
+
+    tmp3 <- tmp1 |>
+      dplyr::filter(Project == platforms[2]) |>
+      dplyr::select(OlinkID, SampleID, NPX) |>
+      dplyr::rename("NPX2" = "NPX") |>
+      dplyr::distinct()
+
+    lab <- tmp2 |>
+      inner_join(tmp3, by = c("OlinkID", "SampleID")) |>
+      dplyr::mutate(range1 = stats::quantile(x = NPX1, probs = 0.9, names = FALSE,
+                                             na.rm = TRUE) - stats::quantile(x = NPX1,
+                                                                             probs = 0.1,
+                                                                             names = FALSE,
+                                                                             na.rm = TRUE)) |>
+      dplyr::mutate(range2 = stats::quantile(x = NPX2, probs = 0.9, names = FALSE,
+                                             na.rm = TRUE) - stats::quantile(x = NPX2,
+                                                                             probs = 0.1,
+                                                                             names = FALSE,
+                                                                             na.rm = TRUE)) |>
+      dplyr::mutate(range_diff = abs(range1 - range2)) |>
+      dplyr::mutate(range_flag = dplyr::if_else(range_diff > 1, "Range Diff > 1",
+                                                "Range Diff < 1")) |>
+      dplyr::pull(range_flag) |>
       unique()
 
     iqr_range_plt <- data |>
@@ -126,14 +225,16 @@ bridgeable_plts <- function(data,
                     OlinkID %in% id)
 
     data_wider <- data1 |>
-      dplyr::select(SampleID, Assay, Count, OlinkID, UniProt, NPX,
-                    .data[["textcol"]]) |>
+      dplyr::select(SampleID, Assay, Count, OlinkID, OlinkID_E3072, UniProt,
+                    NPX, .data[["textcol"]]) |>
       dplyr::inner_join(data2 |>
-                          dplyr::select(SampleID, Assay, Count, OlinkID,
-                                        UniProt, NPX, .data[["textcol"]]),
-                        by = c("SampleID", "OlinkID", "Assay", "UniProt",
+                          dplyr::select(SampleID, Count, OlinkID,
+                                        OlinkID_E3072, UniProt, NPX,
+                                        .data[["textcol"]]),
+                        by = c("SampleID", "OlinkID", "OlinkID_E3072",
                                "textcol"),
-                        suffix = c(platforms[1], platforms[2]))
+                        suffix = c(paste0("_",platforms[1]),
+                                   paste0("_",platforms[2])))
 
     axis_names <- grep("NPX", colnames(data_wider), value = TRUE)
 
@@ -144,6 +245,7 @@ bridgeable_plts <- function(data,
                                        method = "pearson") ^ 2) |>
       dplyr::pull(r2_lm) |>
       unique()
+
     r2_lm <- signif(r2_lm, 2)
 
     if (r2_lm < 0.2)
@@ -218,6 +320,35 @@ bridgeable_plts <- function(data,
       dplyr::filter(Project %in% platforms[2],
                     OlinkID %in% id)
 
+    data1_outliers <- data1$SampleID[
+      which(
+        OlinkAnalyze:::olink_median_iqr_outlier(
+          df = data1,
+          quant_col = "NPX",
+          group = "OlinkID",
+          iqr_sd = 3L
+        )
+
+      )]
+
+    data2_outliers <- data2$SampleID[
+      which(
+        OlinkAnalyze:::olink_median_iqr_outlier(
+          df = data2,
+          quant_col = "NPX",
+          group = "OlinkID",
+          iqr_sd = 3L
+        )
+
+      )]
+
+
+    data1 <- data1 |>
+      filter(!SampleID %in% c(data1_outliers, data2_outliers))
+
+    data2 <- data2 |>
+      filter(!SampleID %in% c(data1_outliers, data2_outliers))
+
     # Calculate empirical cumulative distribution function (ECDF) per platform
     ecdf_data1 <- stats::ecdf(data1$NPX)
     ecdf_data2 <- stats::ecdf(data2$NPX)
@@ -266,7 +397,7 @@ bridgeable_plts <- function(data,
   for (i in seq_along(ids)){
     final_plts <- list()
 
-    message(paste0("Working on OlinkID : ", i))
+    message(paste0("Working on OlinkID ", i, " : ", ids[i]))
     final_plts[["iqr"]] <- iqr_range_plt(data = data, id = ids[i])
     message("IQR plot done")
     final_plts[["r2"]] <- r2_plt(data = data, id = ids[i])
