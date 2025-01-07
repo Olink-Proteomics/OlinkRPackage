@@ -46,7 +46,7 @@ read_npx_parquet <- function (filename) {
                               "Product")
   if (!all(olink_parquet_metadata %in% names(parquet_file$metadata))) {
 
-    stop(
+    cli::cli_warn(
       paste("Missing required fields",
             paste(
               paste0("\"", olink_parquet_metadata, "\""),
@@ -60,10 +60,10 @@ read_npx_parquet <- function (filename) {
   # We allow only Olink Explore HT parquet files for now
   # If other platforms are to be reported as parquet too, we have to add
   # them to this array
-  olink_platforms <- c("ExploreHT", "Explore3072")
+  olink_platforms <- c("ExploreHT", "Explore3072", "Reveal")
   if (!(parquet_file$metadata$Product %in% olink_platforms)) {
 
-    stop("Only \"Olink Explore HT\" or \"Olink Explore 3072\" parquet files are currently supported.")
+    cli::cli_warn("Only \"Olink Explore HT\", \"Olink Explore 3072\", or \"Olink Reveal\" parquet files are currently supported.")
 
   }
 
@@ -75,7 +75,10 @@ read_npx_parquet <- function (filename) {
                    "Internal CLI Data Export File",
                    "R Package Export File",
                    "Olink Analyze Export File")
-  if (parquet_file$metadata$DataFileType %in% olink_files) {
+  if ("DataFileType" %in% names(parquet_file$metadata) &
+      !(parquet_file$metadata$DataFileType %in% olink_files)) {
+    cli::cli_warn("Only \"NPX\" parquet files are currently supported.")
+  }
 
     # Check that required columns are present
     required_cols <- c("SampleID",
@@ -97,11 +100,6 @@ read_npx_parquet <- function (filename) {
 
     }
 
-  } else {
-
-    stop("Only \"NPX\" parquet files are currently supported.")
-
-  }
 
   df_npx <- parquet_file %>%
     dplyr::collect() %>%
