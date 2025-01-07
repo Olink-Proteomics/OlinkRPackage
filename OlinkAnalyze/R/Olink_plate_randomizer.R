@@ -1,5 +1,5 @@
 product_to_platesize <- function(Product){
-  olink_products <-c("Target 96", "Target 48", "Explore 384","Explore 3072","Explore HT")
+  olink_products <-c("Target 96", "Target 48", "Explore 384","Explore 3072","Explore HT", "Reveal", "Flex")
   if(!(Product %in% olink_products)){
     stop(paste0("Product must be one of the following: ", paste(olink_products, sep = " ", collapse = ", ")))
   }
