@@ -37,11 +37,11 @@ library(dplyr)
 
 ## Introduction
 
-This tutorial describes how to use Olink® Analyze to integrate Limit of
-Detection (LOD) into Olink® Explore HT and Olink® Explore 384/3072
-datasets. Although it is recommended to use all Olink Explore data in
-downstream analyses, LOD information can be useful when performing
-technical evaluations of a dataset.
+This tutorial describes how to use Olink^®^ Analyze to integrate Limit of
+Detection (LOD) into Olink^®^ Explore HT, Olink^®^ Reveal, and Olink^®^ 
+Explore 384/3072 datasets. Although it is recommended to use all 
+Olink Explore data in downstream analyses, LOD information can be useful when 
+performing technical evaluations of a dataset.
 
 In this tutorial, you will learn how to use `olink_lod()` to add LOD
 information to your Olink Explore dataset. Note that Olink Analyze does
