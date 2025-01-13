@@ -59,6 +59,7 @@ jobs:
         with:
           working-directory: OlinkAnalyze
           extra-packages: any::rcmdcheck, pillar
+          upgrade: TRUE
 
       - uses: r-lib/actions/check-r-package@v2
         with:
