@@ -55,10 +55,16 @@ jobs:
           write(forenv, file = Sys.getenv("GITHUB_ENV"), append = TRUE) # Store current value to ENV          
         shell: Rscript {0}
         
+      - name: Install fgsea
+        run: |
+          install.packages("BiocManager")
+          BiocManager::install("fgsea")
+        shell: Rscript {0}
+        
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           working-directory: OlinkAnalyze
-          extra-packages: any::rcmdcheck, pillar, bioc::fgsea
+          extra-packages: any::rcmdcheck, pillar
 
       - uses: r-lib/actions/check-r-package@v2
         with:
