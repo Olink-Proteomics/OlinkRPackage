@@ -6,7 +6,8 @@ output:
   html_vignette:
     toc: true
     toc_depth: 3
-    
+    includes:
+      in_header: ../man/figures/logo.html
 vignette: >
   %\VignetteIndexEntry{Outlier Exclusion Vignette}
   %\VignetteEngine{knitr::rmarkdown}

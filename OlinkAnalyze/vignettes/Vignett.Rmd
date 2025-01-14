@@ -6,6 +6,8 @@ output:
   html_vignette:
     toc: true
     toc_depth: 2
+    includes:
+      in_header: ../man/figures/logo.html
 vignette: >
   %\VignetteIndexEntry{Olink® Analyze Vignette}
   %\VignetteEngine{knitr::rmarkdown}
