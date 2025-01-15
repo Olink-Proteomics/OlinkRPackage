@@ -2,7 +2,7 @@
    {
       "os": "macOS-latest",
       "r": "release",
-      "runOn": "always"
+      "runOn": "pull_request"
    },
    {
       "os": "windows-latest",
