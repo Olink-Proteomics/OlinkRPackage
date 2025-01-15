@@ -22,7 +22,7 @@
    {
       "os": "ubuntu-24.04",
       "r": "devel",
-      "runOn": "always"
+      "runOn": "pull_request"
    },
    {
       "os": "ubuntu-24.04",
