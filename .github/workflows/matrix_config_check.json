@@ -2,15 +2,35 @@
    {
       "os": "macOS-latest",
       "r": "release",
-      "runOn": "pull_request"
+      "runOn": "always"
    },
    {
       "os": "windows-latest",
       "r": "release",
-      "runOn": "pull_request"
+      "runOn": "always"
+   },
+   {
+      "os": "ubuntu-20.04",
+      "r": "release",
+      "runOn": "always"
    },
    {
       "os": "ubuntu-22.04",
+      "r": "release",
+      "runOn": "always"
+   },
+   {
+      "os": "ubuntu-22.04",
+      "r": "devel",
+      "runOn": "always"
+   },
+   {
+      "os": "ubuntu-24.04",
+      "r": "devel",
+      "runOn": "always"
+   },
+   {
+      "os": "ubuntu-24.04",
       "r": "release",
       "runOn": "always"
    }
