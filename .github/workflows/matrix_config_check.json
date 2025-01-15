@@ -12,7 +12,7 @@
    {
       "os": "ubuntu-20.04",
       "r": "release",
-      "runOn": "always"
+      "runOn": "pull_request"
    },
    {
       "os": "ubuntu-22.04",
