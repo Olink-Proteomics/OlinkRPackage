@@ -23,15 +23,5 @@
       "os": "ubuntu-22.04",
       "r": "devel",
       "runOn": "always"
-   },
-   {
-      "os": "ubuntu-24.04",
-      "r": "devel",
-      "runOn": "always"
-   },
-   {
-      "os": "ubuntu-24.04",
-      "r": "release",
-      "runOn": "always"
    }
 ]
