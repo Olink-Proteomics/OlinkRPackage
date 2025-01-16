@@ -57,7 +57,6 @@ read_npx_parquet <- function (filename) {
 
   }
 
-  # We allow only Olink Explore HT parquet files for now
   # If other platforms are to be reported as parquet too, we have to add
   # them to this array
   olink_platforms <- c("ExploreHT", "Explore3072", "Reveal")
@@ -67,6 +66,13 @@ read_npx_parquet <- function (filename) {
 
   }
 
+
+  # Print RUO message if present
+  if (("RUO" %in% names(parquet_file$metadata))) {
+
+    cli::cli_alert_info(parquet_file$metadata$RUO)
+
+  }
 
   # Check if it is an NPX file
   olink_files <- c("NPX File",
