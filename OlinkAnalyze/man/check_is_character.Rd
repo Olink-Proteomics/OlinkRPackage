@@ -2,21 +2,22 @@
 % Please edit documentation in R/check_character.R
 \name{check_is_character}
 \alias{check_is_character}
-\title{Help function checking if a variable is a character vector.}
+\title{Help function checking if a variable is a vector of character.}
 \usage{
 check_is_character(string, error = FALSE)
 }
 \arguments{
-\item{string}{String to check.}
+\item{string}{Variable to check.}
 
-\item{error}{Return error or a boolean (default = FALSE).}
+\item{error}{Scalar boolean to return an error instead of a \code{TRUE}/\code{FALSE}
+(\code{default = FALSE}).}
 }
 \value{
-Boolean if the variable is a character vector or not, and an error if
-"error = TRUE".
+\code{TRUE} if the variable is a character vector, and \code{FALSE} if not;
+error if variable is not a character vector and \code{error = TRUE}.
 }
 \description{
-Help function checking if a variable is a character vector.
+Help function checking if a variable is a vector of character.
 }
 \seealso{
 \code{\link{check_is_boolean}}

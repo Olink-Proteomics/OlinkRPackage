@@ -1,13 +1,14 @@
-#' Help function checking if a variable is a character vector.
+#' Help function checking if a variable is a vector of character.
 #'
 #' @author
 #'   Klev Diamanti
 #'
-#' @param string String to check.
-#' @param error Return error or a boolean (default = FALSE).
+#' @param string Variable to check.
+#' @param error Scalar boolean to return an error instead of a `TRUE`/`FALSE`
+#' (`default = FALSE`).
 #'
-#' @return Boolean if the variable is a character vector or not, and an error if
-#' "error = TRUE".
+#' @return `TRUE` if the variable is a character vector, and `FALSE` if not;
+#' error if variable is not a character vector and `error = TRUE`.
 #'
 #' @seealso
 #'   \code{\link{check_is_boolean}}
@@ -21,7 +22,7 @@ check_is_character <- function(string,
   check_is_scalar_boolean(bool = error,
                           error = TRUE)
 
-  # check that the input is a numeric vector
+  # check if the input is a character vector
   if (!rlang::is_character(string)
       || any(rlang::are_na(string))) {
 
@@ -49,16 +50,18 @@ check_is_character <- function(string,
 
 }
 
-#' Help function checking if a variable is a character vector of length 1.
+#' Help function checking if a variable is a scalar character.
 #'
 #' @author
 #'   Klev Diamanti
 #'
-#' @param string String vector to check.
-#' @param error Return error or a boolean (default = FALSE).
+#' @param string Variable to check.
+#' @param error Scalar boolean to return an error instead of a `TRUE`/`FALSE`
+#' (`default = FALSE`).
 #'
-#' @return Boolean if the variable is a character vector of length 1 or not, and
-#' an error if "error = TRUE".
+#' @return `TRUE` if the variable is a character vector of length 1, and `FALSE`
+#' if not; error if the variable is not a character vector of length 1, and
+#' `error = TRUE`.
 #'
 #' @seealso
 #'   \code{\link{check_is_scalar_boolean}}
@@ -72,7 +75,7 @@ check_is_scalar_character <- function(string,
   check_is_scalar_boolean(bool = error,
                           error = TRUE)
 
-  # check that the input is a character vector of length 1
+  # check if the input is a character vector of length 1
   if (!rlang::is_scalar_character(string)
       || rlang::is_na(string)) {
 
@@ -80,7 +83,7 @@ check_is_scalar_character <- function(string,
 
       cli::cli_abort(
         c(
-          "x" = "{.arg {rlang::caller_arg(string)}} must be a string!"
+          "x" = "{.arg {rlang::caller_arg(string)}} must be a scalar character!"
         ),
         call = rlang::caller_env(),
         wrap = FALSE
