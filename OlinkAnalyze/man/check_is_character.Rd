@@ -2,7 +2,7 @@
 % Please edit documentation in R/check_character.R
 \name{check_is_character}
 \alias{check_is_character}
-\title{Help function checking if a variable is a vector of character.}
+\title{Help function checking if a variable is a vector of characters.}
 \usage{
 check_is_character(string, error = FALSE)
 }
@@ -14,10 +14,10 @@ check_is_character(string, error = FALSE)
 }
 \value{
 \code{TRUE} if the variable is a character vector, and \code{FALSE} if not;
-error if variable is not a character vector and \code{error = TRUE}.
+error if the variable is not a character vector and \code{error = TRUE}.
 }
 \description{
-Help function checking if a variable is a vector of character.
+Help function checking if a variable is a vector of characters.
 }
 \seealso{
 \code{\link{check_is_boolean}}

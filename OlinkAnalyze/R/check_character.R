@@ -8,7 +8,7 @@
 #' (`default = FALSE`).
 #'
 #' @return `TRUE` if the variable is a character vector, and `FALSE` if not;
-#' error if variable is not a character vector and `error = TRUE`.
+#' error if the variable is not a character vector and `error = TRUE`.
 #'
 #' @seealso
 #'   \code{\link{check_is_boolean}}
