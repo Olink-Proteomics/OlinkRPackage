@@ -2,21 +2,23 @@
 % Please edit documentation in R/check_numeric.R
 \name{check_is_scalar_numeric}
 \alias{check_is_scalar_numeric}
-\title{Help function checking if a variable is a numeric vector of length 1.}
+\title{Help function checking if a variable is a scalar numeric}
 \usage{
 check_is_scalar_numeric(num, error = FALSE)
 }
 \arguments{
-\item{num}{Vector of numbers to check.}
+\item{num}{Variable to check.}
 
-\item{error}{Return error or a boolean (default = FALSE).}
+\item{error}{Scalar boolean to return an error instead of a \code{TRUE}/\code{FALSE}
+(\code{default = FALSE}).}
 }
 \value{
-Boolean if the variable is a numeric vector of length 1 or not, and
-an error if "error = TRUE".
+\code{TRUE} if the variable is a numeric vector of length 1, and \code{FALSE}
+if not; error if the variable is not a numeric vector of length 1, and
+\code{error = TRUE}.
 }
 \description{
-Help function checking if a variable is a numeric vector of length 1.
+Help function checking if a variable is a scalar numeric
 }
 \seealso{
 \code{\link{check_is_scalar_boolean}}
