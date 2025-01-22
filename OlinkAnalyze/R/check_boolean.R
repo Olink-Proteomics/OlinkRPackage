@@ -18,7 +18,7 @@
 check_is_boolean <- function(bool,
                              error = FALSE) {
 
-  # check if the input is a boolean vector
+  # check if input is a boolean vector
   if (!rlang::is_logical(bool)
       || any(rlang::are_na(bool))) {
 
@@ -67,7 +67,7 @@ check_is_boolean <- function(bool,
 check_is_scalar_boolean <- function(bool,
                                     error = FALSE) {
 
-  # check if the input is a boolean vector of length 1
+  # check if input is a boolean vector of length 1
   if (!rlang::is_scalar_logical(bool)
       || rlang::is_na(bool)) {
 

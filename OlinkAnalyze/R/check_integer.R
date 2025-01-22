@@ -22,7 +22,7 @@ check_is_integer <- function(int,
   check_is_scalar_boolean(bool = error,
                           error = TRUE)
 
-  # check if the input is an integer vector
+  # check if input is an integer vector
   if (!rlang::is_integer(int)
       || any(rlang::are_na(int))) {
 
@@ -75,7 +75,7 @@ check_is_scalar_integer <- function(int,
   check_is_scalar_boolean(bool = error,
                           error = TRUE)
 
-  # check if the input is an integer vector of length 1
+  # check if input is an integer vector of length 1
   if (!rlang::is_scalar_integer(int)
       || rlang::is_na(int)) {
 

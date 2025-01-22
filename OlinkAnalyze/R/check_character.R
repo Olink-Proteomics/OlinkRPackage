@@ -22,7 +22,7 @@ check_is_character <- function(string,
   check_is_scalar_boolean(bool = error,
                           error = TRUE)
 
-  # check if the input is a character vector
+  # check if input is a character vector
   if (!rlang::is_character(string)
       || any(rlang::are_na(string))) {
 
@@ -75,7 +75,7 @@ check_is_scalar_character <- function(string,
   check_is_scalar_boolean(bool = error,
                           error = TRUE)
 
-  # check if the input is a character vector of length 1
+  # check if input is a character vector of length 1
   if (!rlang::is_scalar_character(string)
       || rlang::is_na(string)) {
 
