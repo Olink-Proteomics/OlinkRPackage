@@ -208,7 +208,7 @@ olink_one_non_parametric <- function(df,
                                    dplyr::pull() %>%
                                    unique())){
         message(paste0("Subjects ",
-                       paste(dplyr::setdiff(df_nas_remove %>%
+                       paste(setdiff(df_nas_remove %>%
                                               dplyr::select(Subject) %>%
                                               dplyr::pull() %>%
                                               unique(),
@@ -485,7 +485,7 @@ olink_one_non_parametric_posthoc <- function(df,
                                    dplyr::pull() %>%
                                    unique())){
         message(paste0("Subjects ",
-                       paste(dplyr::setdiff(df_nas_remove %>%
+                       paste(setdiff(df_nas_remove %>%
                                  dplyr::select(Subject) %>%
                                  dplyr::pull() %>%
                                  unique(),
