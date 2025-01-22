@@ -37,24 +37,22 @@ read_npx_parquet <- function (filename) {
   }
 
   # pointer to parquet file
-  parquet_file <- arrow::open_dataset(
+  p_file <- arrow::open_dataset(
     sources = filename
   )
+  p_file_meta <- names(p_file$metadata)
 
   # Check that all required parquet metadata is in place
-  olink_parquet_metadata <- c("DataFileType",
-                              "Product")
-  if (!all(olink_parquet_metadata %in% names(parquet_file$metadata))) {
-
-    cli::cli_warn(
-      paste("Missing required fields",
-            paste(
-              paste0("\"", olink_parquet_metadata, "\""),
-              collapse = " and "),
-            "in parquet file's metadata."
-            )
-      )
-
+  exp_p_meta <- list(
+    dtftp = "DataFileType",
+    prod = "Product"
+  )
+  if (!all(unlist(exp_p_meta) %in% p_file_meta)) {
+    cli::cli_warn( # nolint
+      "Missing required field{?s}
+      {.val {unlist(exp_p_meta)[!(unlist(exp_p_meta) %in% p_file_meta)]}}
+      in parquet file's metadata."
+    )
   }
 
   # If other platforms are to be reported as parquet too, we have to add
