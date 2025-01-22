@@ -227,7 +227,7 @@ test_that(
                                        error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "must be an integer!",
+                    x = "must be a scalar integer!",
                     fixed = TRUE)
     )
 
@@ -237,7 +237,7 @@ test_that(
                                        error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "must be an integer!",
+                    x = "must be a scalar integer!",
                     fixed = TRUE)
     )
 
@@ -246,7 +246,7 @@ test_that(
                                        error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "must be an integer!",
+                    x = "must be a scalar integer!",
                     fixed = TRUE)
     )
 
@@ -255,7 +255,7 @@ test_that(
                                        error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "must be an integer!",
+                    x = "must be a scalar integer!",
                     fixed = TRUE)
     )
 
@@ -264,7 +264,7 @@ test_that(
                                        error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "must be an integer!",
+                    x = "must be a scalar integer!",
                     fixed = TRUE)
     )
 
@@ -273,7 +273,7 @@ test_that(
                                        error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "must be an integer!",
+                    x = "must be a scalar integer!",
                     fixed = TRUE)
     )
 
@@ -282,7 +282,7 @@ test_that(
                                        error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "must be an integer!",
+                    x = "must be a scalar integer!",
                     fixed = TRUE)
     )
 

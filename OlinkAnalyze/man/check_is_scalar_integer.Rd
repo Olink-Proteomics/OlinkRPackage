@@ -2,21 +2,23 @@
 % Please edit documentation in R/check_integer.R
 \name{check_is_scalar_integer}
 \alias{check_is_scalar_integer}
-\title{Help function checking if a variable is an integer vector of length 1.}
+\title{Help function checking if a variable is a scalar integer.}
 \usage{
 check_is_scalar_integer(int, error = FALSE)
 }
 \arguments{
-\item{int}{Integer vector to check.}
+\item{int}{Variable to check.}
 
-\item{error}{Return error or a boolean (default = FALSE).}
+\item{error}{Scalar boolean to return an error instead of a \code{TRUE}/\code{FALSE}
+(\code{default = FALSE}).}
 }
 \value{
-Boolean if the variable is an integer vector of length 1 or not, and
-an error if "error = TRUE".
+\code{TRUE} if the variable is an integer vector of length 1, and \code{FALSE}
+if not; error if the variable is not an integer vector of length 1, and
+\code{error = TRUE}.
 }
 \description{
-Help function checking if a variable is an integer vector of length 1.
+Help function checking if a variable is a scalar integer.
 }
 \seealso{
 \code{\link{check_is_scalar_boolean}}
