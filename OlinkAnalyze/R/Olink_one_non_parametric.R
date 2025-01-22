@@ -173,6 +173,7 @@ olink_one_non_parametric <- function(df,
       if (is.null(subject)){
         stop("Subject variable need to be specified!")
       }
+      
       if(verbose){message(paste("Friedman model fit to each assay: "),formula_string)}
 
       formula_string <- paste0(formula_string,"|",subject)
@@ -206,7 +207,17 @@ olink_one_non_parametric <- function(df,
                                    dplyr::select(!!!rlang::syms(subject)) %>%
                                    dplyr::pull() %>%
                                    unique())){
-        message(paste("Subjects removed due to incomplete data"))
+        message(paste0("Subjects ",
+                       paste(dplyr::setdiff(df_nas_remove %>%
+                                              dplyr::select(Subject) %>%
+                                              dplyr::pull() %>%
+                                              unique(),
+                                            subject_remove %>%
+                                              dplyr::select(Subject) %>%
+                                              dplyr::pull() %>%
+                                              unique()),
+                             collapse = ", "),
+                       " are removed due to incomplete data"))
       }
 
       p.val <- df_nas_remove %>%
@@ -260,7 +271,7 @@ olink_one_non_parametric <- function(df,
 #' @param olinkid_list Character vector of OlinkID's on which to perform post hoc analysis. If not specified, all assays in df are used.
 #' @param variable Single character value or character array.
 #' @param test Single character value indicates running the post hoc test for friedman or kruskal.
-#' @param subject Single character value indicates running the post hoc test for friedman or kruskal.
+#' @param subject Group information for the repeated measurement. If runing the post hoc test for friedman, this parameter need to be specified.
 #' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #' @return Tibble of posthoc tests for specified effect, arranged by ascending adjusted p-values.
 #'
@@ -297,6 +308,7 @@ olink_one_non_parametric <- function(df,
 #'friedman_posthoc_results <- olink_one_non_parametric_posthoc(npx_data1,
 #'                                                             variable = "Time",
 #'                                                             test = "friedman",
+#'                                                             subject = "Subject",
 #'                                                             olinkid_list = {friedman_results %>%
 #'                                                               filter(Threshold == 'Significant') %>%
 #'                                                               dplyr::select(OlinkID) %>%
@@ -313,7 +325,7 @@ olink_one_non_parametric_posthoc <- function(df,
                                              olinkid_list = NULL,
                                              variable,
                                              test = "kruskal",
-                                             subject = "Subject",
+                                             subject = NULL,
                                              verbose=TRUE
                                              ){
   if (test != "friedman"){
@@ -388,10 +400,15 @@ olink_one_non_parametric_posthoc <- function(df,
     }
 
     if(test == "friedman"){
+      
       message("Pairwise comparisons for Friedman test using paired Wilcoxon signed-rank test were performed")
 
       #Not testing assays that have all NA:s in one level
       #Every sample needs to have a unique level of the factor
+      
+      if (is.null(subject)){
+        stop("Subject variable need to be specified!")
+      }
 
       nas_in_var <- character(0)
 
@@ -414,7 +431,7 @@ olink_one_non_parametric_posthoc <- function(df,
                          ' has only NA:s in atleast one level of ',
                          effect,
                          '. It will not be tested.'),
-                  call. = F)
+                  call. = FALSE)
         }
 
         number_of_samples_w_more_than_one_level <- df %>%
@@ -467,7 +484,17 @@ olink_one_non_parametric_posthoc <- function(df,
                                    dplyr::select(!!!rlang::syms(subject)) %>%
                                    dplyr::pull() %>%
                                    unique())){
-        message(paste("Subjects removed due to incomplete data"))
+        message(paste0("Subjects ",
+                       paste(dplyr::setdiff(df_nas_remove %>%
+                                 dplyr::select(Subject) %>%
+                                 dplyr::pull() %>%
+                                 unique(),
+                               subject_remove %>%
+                                 dplyr::select(Subject) %>%
+                                 dplyr::pull() %>%
+                                 unique()),
+                             collapse = ", "),
+                       " are removed due to incomplete data"))
       }
 
       p.hoc_val <- df_nas_remove %>%

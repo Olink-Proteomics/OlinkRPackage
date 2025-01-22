@@ -9,7 +9,7 @@ olink_one_non_parametric_posthoc(
   olinkid_list = NULL,
   variable,
   test = "kruskal",
-  subject = "Subject",
+  subject = NULL,
   verbose = TRUE
 )
 }
@@ -22,7 +22,7 @@ olink_one_non_parametric_posthoc(
 
 \item{test}{Single character value indicates running the post hoc test for friedman or kruskal.}
 
-\item{subject}{Single character value indicates running the post hoc test for friedman or kruskal.}
+\item{subject}{Group information for the repeated measurement. If runing the post hoc test for friedman, this parameter need to be specified.}
 
 \item{verbose}{Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
 }
