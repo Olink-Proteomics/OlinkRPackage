@@ -8,7 +8,7 @@
 #' (`default = FALSE`).
 #'
 #' @return `TRUE` if the variable is a boolean vector, and `FALSE` if not; error
-#' if the variable is not boolean vector, and `error = TRUE`.
+#' if the variable is not a boolean vector, and `error = TRUE`.
 #'
 #' @seealso
 #'   \code{\link{check_is_character}}
@@ -56,7 +56,7 @@ check_is_boolean <- function(bool,
 #' (`default = FALSE`).
 #'
 #' @return `TRUE` if the variable is a boolean vector of length 1, and `FALSE`
-#' if not; error if the variable is not boolean vector of length 1, and
+#' if not; error if the variable is not a boolean vector of length 1, and
 #' `error = TRUE`.
 #'
 #' @seealso

@@ -14,7 +14,7 @@ check_is_scalar_boolean(bool, error = FALSE)
 }
 \value{
 \code{TRUE} if the variable is a boolean vector of length 1, and \code{FALSE}
-if not; error if the variable is not boolean vector of length 1, and
+if not; error if the variable is not a boolean vector of length 1, and
 \code{error = TRUE}.
 }
 \description{
