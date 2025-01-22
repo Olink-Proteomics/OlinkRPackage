@@ -186,7 +186,8 @@ test_that("extra column", {
 test_that(
   "read_npx_parquet - RUO file",
   {
-    skip_if_not_installed(c("withr", "arrow"))
+    skip_if_not_installed("withr")
+    skip_if_not_installed("arrow")
 
     withr::with_tempfile(
       new = "pfile_ruo",
