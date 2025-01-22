@@ -13,8 +13,9 @@ check_is_scalar_boolean(bool, error = FALSE)
 (\code{default = FALSE}).}
 }
 \value{
-Scalar boolean to return an error instead of a \code{TRUE}/\code{FALSE}
-(\code{default = FALSE}).
+\code{TRUE} if the variable is a boolean vector of length 1, and \code{FALSE}
+if not; error if the variable is not boolean vector of length 1, and
+\code{error = TRUE}.
 }
 \description{
 Help function checking if a variable is a scalar boolean.

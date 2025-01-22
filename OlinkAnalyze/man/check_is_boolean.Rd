@@ -13,7 +13,8 @@ check_is_boolean(bool, error = FALSE)
 (\code{default = FALSE}).}
 }
 \value{
-\code{TRUE} if the variable is a boolean vector, and \verb{FALSE if not; error is returned if variable is not boolean and }error = TRUE`.
+\code{TRUE} if the variable is a boolean vector, and \code{FALSE} if not; error
+if the variable is not boolean vector, and \code{error = TRUE}.
 }
 \description{
 Help function checking if a variable is a vector of booleans.

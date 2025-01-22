@@ -7,8 +7,8 @@
 #' @param error Scalar boolean to return an error instead of a `TRUE`/`FALSE`
 #' (`default = FALSE`).
 #'
-#' @return `TRUE` if the variable is a boolean vector, and `FALSE if not; error
-#' is returned if variable is not boolean and `error = TRUE`.
+#' @return `TRUE` if the variable is a boolean vector, and `FALSE` if not; error
+#' if the variable is not boolean vector, and `error = TRUE`.
 #'
 #' @seealso
 #'   \code{\link{check_is_character}}
@@ -55,8 +55,9 @@ check_is_boolean <- function(bool,
 #' @param error Scalar boolean to return an error instead of a `TRUE`/`FALSE`
 #' (`default = FALSE`).
 #'
-#' @return Scalar boolean to return an error instead of a `TRUE`/`FALSE`
-#' (`default = FALSE`).
+#' @return `TRUE` if the variable is a boolean vector of length 1, and `FALSE`
+#' if not; error if the variable is not boolean vector of length 1, and
+#' `error = TRUE`.
 #'
 #' @seealso
 #'   \code{\link{check_is_scalar_character}}
