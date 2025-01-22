@@ -75,7 +75,7 @@ check_is_scalar_boolean <- function(bool,
 
       cli::cli_abort(
         c(
-          "x" = "{.arg {rlang::caller_arg(bool)}} must be a boolean!"
+          "x" = "{.arg {rlang::caller_arg(bool)}} must be a scalar boolean!"
         ),
         call = rlang::caller_env(),
         wrap = FALSE
