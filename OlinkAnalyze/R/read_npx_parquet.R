@@ -102,9 +102,9 @@ read_npx_parquet <- function (filename) {
     )
   }
 
-
-  df_npx <- parquet_file %>%
-    dplyr::collect() %>%
+  # convert arrow object to tibble
+  df_npx <- p_file |>
+    dplyr::collect() |>
     dplyr::as_tibble()
 
   return(df_npx)
