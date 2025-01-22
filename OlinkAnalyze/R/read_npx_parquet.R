@@ -85,25 +85,22 @@ read_npx_parquet <- function (filename) {
                   supported.")
   }
 
-    # Check that required columns are present
-    required_cols <- c("SampleID",
-                       "OlinkID",
-                       "UniProt",
-                       "Assay",
-                       "Panel",
-                       "PlateID",
-                       "SampleQC",
-                       "NPX")
-
-    missing_cols <- setdiff(required_cols,
-                            names(parquet_file))
-
-    if(length(missing_cols) != 0) {
-
-      stop(paste("The following columns are missing:",
-                 paste(missing_cols, collapse = ", ")))
-
-    }
+  # Check that required columns are present
+  required_cols <- c("SampleID",
+                     "OlinkID",
+                     "UniProt",
+                     "Assay",
+                     "Panel",
+                     "PlateID",
+                     "SampleQC",
+                     "NPX")
+  missing_cols <- setdiff(x = required_cols,
+                          y = names(p_file))
+  if(length(missing_cols) != 0L) {
+    cli::cli_abort(
+      "The following columns are missing: {.val {missing_cols}}"
+    )
+  }
 
 
   df_npx <- parquet_file %>%
