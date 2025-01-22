@@ -79,9 +79,10 @@ read_npx_parquet <- function (filename) {
                    "Internal CLI Data Export File",
                    "R Package Export File",
                    "Olink Analyze Export File")
-  if ("DataFileType" %in% names(parquet_file$metadata) &
-      !(parquet_file$metadata$DataFileType %in% olink_files)) {
-    cli::cli_warn("Only \"NPX\" parquet files are currently supported.")
+  if (exp_p_meta$dtftp %in% p_file_meta
+      & !(p_file$metadata[[exp_p_meta$dtftp]] %in% olink_files)) {
+    cli::cli_warn("Only {.val {\"NPX\"}} parquet files are currently
+                  supported.")
   }
 
     # Check that required columns are present
