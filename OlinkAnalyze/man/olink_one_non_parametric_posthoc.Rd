@@ -67,6 +67,7 @@ friedman_results <- olink_one_non_parametric(df = npx_data1,
 friedman_posthoc_results <- olink_one_non_parametric_posthoc(npx_data1,
                                                             variable = "Time",
                                                             test = "friedman",
+                                                            subject = "Subject",
                                                             olinkid_list = {friedman_results \%>\%
                                                               filter(Threshold == 'Significant') \%>\%
                                                               dplyr::select(OlinkID) \%>\%
