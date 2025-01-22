@@ -85,23 +85,6 @@ read_npx_parquet <- function (filename) {
                   supported.")
   }
 
-  # Check that required columns are present
-  required_cols <- c("SampleID",
-                     "OlinkID",
-                     "UniProt",
-                     "Assay",
-                     "Panel",
-                     "PlateID",
-                     "SampleQC",
-                     "NPX")
-  missing_cols <- setdiff(x = required_cols,
-                          y = names(p_file))
-  if(length(missing_cols) != 0L) {
-    cli::cli_abort(
-      "The following columns are missing: {.val {missing_cols}}"
-    )
-  }
-
   # convert arrow object to tibble
   df_npx <- p_file |>
     dplyr::collect() |>
