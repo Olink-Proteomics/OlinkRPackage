@@ -65,12 +65,11 @@ read_npx_parquet <- function (filename) {
     )
   }
 
-
   # Print RUO message if present
-  if (("RUO" %in% names(parquet_file$metadata))) {
-
-    cli::cli_alert_info(parquet_file$metadata$RUO)
-
+  if (("RUO" %in% names(p_file$metadata))) {
+    cli::cli_alert_info(
+      "This parquet file is for research use only:
+      {.val {p_file$metadata$RUO}}!")
   }
 
   # Check if it is an NPX file
