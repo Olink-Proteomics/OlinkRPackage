@@ -917,7 +917,7 @@ knitr::include_graphics(normalizePath("../man/figures/olink_fill_discrete_boxplo
 
 ## Visualizing bridgeability criteria for between-product normalization (bridgeable_plts)
 
-The bridgeable_plts function generates a series of plots on a per-assay basis for a data frame generated from between-product bridging. The coloration of the figure headers indicate whether that assay has been defined as bridgeable or not bridgeble. The correlation plot, violin plot, and bar chart figures illustrate the three criteria for determining whether an assay is bridgeable. If an assay is determined to  be bridgeable, the ECDF curve and corresponding KS statistic are used to determine which normalization approach (median centering or quantile smoothing) is most suitable for between-product normalization.
+The bridgeable_plts function generates a series of plots on a per-assay basis for a data frame generated from between-product bridging. The coloration of the figure headers indicate whether that assay has been defined as bridgeable or not bridgeable. The correlation plot, violin plot, and bar chart figures illustrate the three criteria for determining whether an assay is bridgeable. If an assay is determined to  be bridgeable, the ECDF curve and corresponding KS statistic are used to determine which normalization approach (median centering or quantile smoothing) is most suitable for between-product normalization.
 
 ### Function arguments
 
