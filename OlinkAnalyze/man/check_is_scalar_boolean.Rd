@@ -2,21 +2,22 @@
 % Please edit documentation in R/check_boolean.R
 \name{check_is_scalar_boolean}
 \alias{check_is_scalar_boolean}
-\title{Help function checking if a variable is a boolean vector of length 1.}
+\title{Help function checking if a variable is a scalar boolean.}
 \usage{
 check_is_scalar_boolean(bool, error = FALSE)
 }
 \arguments{
-\item{bool}{Boolean vector to check.}
+\item{bool}{Variable to check.}
 
-\item{error}{Return error or a boolean (default = FALSE).}
+\item{error}{Scalar boolean to return an error instead of a \code{TRUE}/\code{FALSE}
+(\code{default = FALSE}).}
 }
 \value{
-Boolean if the variable is a boolean vector of length 1 or not, and
-an error if "error = TRUE".
+Scalar boolean to return an error instead of a \code{TRUE}/\code{FALSE}
+(\code{default = FALSE}).
 }
 \description{
-Help function checking if a variable is a boolean vector of length 1.
+Help function checking if a variable is a scalar boolean.
 }
 \seealso{
 \code{\link{check_is_scalar_character}}

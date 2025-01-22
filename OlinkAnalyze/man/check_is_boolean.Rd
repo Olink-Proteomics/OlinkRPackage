@@ -2,21 +2,21 @@
 % Please edit documentation in R/check_boolean.R
 \name{check_is_boolean}
 \alias{check_is_boolean}
-\title{Help function checking if a variable is a boolean vector.}
+\title{Help function checking if a variable is a vector of booleans.}
 \usage{
 check_is_boolean(bool, error = FALSE)
 }
 \arguments{
-\item{bool}{Boolean to check.}
+\item{bool}{Variable to check.}
 
-\item{error}{Return error or a boolean (default = FALSE).}
+\item{error}{Scalar boolean to return an error instead of a \code{TRUE}/\code{FALSE}
+(\code{default = FALSE}).}
 }
 \value{
-Boolean if the variable is a boolean vector or not, and an error if
-"error = TRUE".
+\code{TRUE} if the variable is a boolean vector, and \verb{FALSE if not; error is returned if variable is not boolean and }error = TRUE`.
 }
 \description{
-Help function checking if a variable is a boolean vector.
+Help function checking if a variable is a vector of booleans.
 }
 \seealso{
 \code{\link{check_is_character}}

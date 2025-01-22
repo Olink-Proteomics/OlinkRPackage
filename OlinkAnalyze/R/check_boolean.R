@@ -1,13 +1,14 @@
-#' Help function checking if a variable is a boolean vector.
+#' Help function checking if a variable is a vector of booleans.
 #'
 #' @author
 #'   Klev Diamanti
 #'
-#' @param bool Boolean to check.
-#' @param error Return error or a boolean (default = FALSE).
+#' @param bool Variable to check.
+#' @param error Scalar boolean to return an error instead of a `TRUE`/`FALSE`
+#' (`default = FALSE`).
 #'
-#' @return Boolean if the variable is a boolean vector or not, and an error if
-#' "error = TRUE".
+#' @return `TRUE` if the variable is a boolean vector, and `FALSE if not; error
+#' is returned if variable is not boolean and `error = TRUE`.
 #'
 #' @seealso
 #'   \code{\link{check_is_character}}
@@ -17,7 +18,7 @@
 check_is_boolean <- function(bool,
                              error = FALSE) {
 
-  # check that the input is a boolean vector
+  # check if the input is a boolean vector
   if (!rlang::is_logical(bool)
       || any(rlang::are_na(bool))) {
 
@@ -45,16 +46,17 @@ check_is_boolean <- function(bool,
 
 }
 
-#' Help function checking if a variable is a boolean vector of length 1.
+#' Help function checking if a variable is a scalar boolean.
 #'
 #' @author
 #'   Klev Diamanti
 #'
-#' @param bool Boolean vector to check.
-#' @param error Return error or a boolean (default = FALSE).
+#' @param bool Variable to check.
+#' @param error Scalar boolean to return an error instead of a `TRUE`/`FALSE`
+#' (`default = FALSE`).
 #'
-#' @return Boolean if the variable is a boolean vector of length 1 or not, and
-#' an error if "error = TRUE".
+#' @return Scalar boolean to return an error instead of a `TRUE`/`FALSE`
+#' (`default = FALSE`).
 #'
 #' @seealso
 #'   \code{\link{check_is_scalar_character}}
@@ -64,7 +66,7 @@ check_is_boolean <- function(bool,
 check_is_scalar_boolean <- function(bool,
                                     error = FALSE) {
 
-  # check that the input is a character vector of length 1
+  # check if the input is a boolean vector of length 1
   if (!rlang::is_scalar_logical(bool)
       || rlang::is_na(bool)) {
 
