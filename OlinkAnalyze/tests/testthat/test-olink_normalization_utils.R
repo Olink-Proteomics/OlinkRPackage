@@ -2411,7 +2411,7 @@ test_that(
   "olink_norm_input_cross_product - works - bridge normalization",
   {
     skip_if_not_installed("arrow")
-    
+
     skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
     skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
 
@@ -2441,6 +2441,33 @@ test_that(
         lst_df = list(
           "3K_1" = data_3k,
           "3K_2" = data_3k
+        )
+      )
+    )
+
+    # HT - HT ----
+
+    expect_no_condition(
+      object = lst_cross_prod_out_ht <- olink_norm_input_cross_product(
+        lst_df = list(
+          "HT_1" = data_ht,
+          "HT_2" = data_ht
+        ),
+        lst_cols = list(
+          "HT_1" = list(panel = "Panel"),
+          "HT_2" = list(panel = "Panel")
+        ),
+        reference_project = "HT_1"
+      )
+    )
+
+    expect_identical(
+      object = lst_cross_prod_out_ht,
+      expected = list(
+        norm_mode = olink_norm_modes$bridge,
+        lst_df = list(
+          "HT_1" = data_ht,
+          "HT_2" = data_ht
         )
       )
     )
@@ -2478,7 +2505,7 @@ test_that(
   "olink_norm_input_cross_product - works - cross-product normalization",
   {
     skip_if_not_installed("arrow")
-    
+
     skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
     skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
 
@@ -2543,7 +2570,7 @@ test_that(
   "olink_norm_input_cross_product - error - unexpected normalization",
   {
     skip_if_not_installed("arrow")
-    
+
     skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
     skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
 
@@ -2590,7 +2617,7 @@ test_that(
   "olink_norm_input_cross_product - error - incorrect reference project",
   {
     skip_if_not_installed("arrow")
-    
+
     skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
     skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
 
@@ -2709,7 +2736,7 @@ test_that(
     )
 
     # cross-platform norm - reference samples in datasets ----
-    
+
     skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
     skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
 
@@ -3755,7 +3782,7 @@ test_that(
   "olink_norm_input_clean_assays - works - invalid OID in df*",
   {
     skip_if_not_installed("arrow")
-    
+
     skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
     skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
 
