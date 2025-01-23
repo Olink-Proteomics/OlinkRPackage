@@ -2,22 +2,22 @@
 % Please edit documentation in R/read_npx_utils.R
 \name{check_olink_platform}
 \alias{check_olink_platform}
-\title{Help function checking that the olink_platform is acceptable.}
+\title{Help function checking that \var{olink_platform} is acceptable.}
 \usage{
 check_olink_platform(x, broader_platform = NULL)
 }
 \arguments{
-\item{x}{The name of the Olink platform. One of
-Target 48, Flex, Target 96, Explore 3072, Explore HT, or Focus. # nolint}
+\item{x}{Name of Olink platform. One of
+"Explore 3072", "Explore HT", "Flex", "Focus", "Target 48", and "Target 96".}
 
 \item{broader_platform}{Name of the broader Olink platform. One of
-qPCR or NGS. # nolint}
+"NGS" and "qPCR".}
 }
 \value{
 \code{NULL} if platform is ok, otherwise an error.
 }
 \description{
-Help function checking that the olink_platform is acceptable.
+Help function checking that \var{olink_platform} is acceptable.
 }
 \author{
 Klev Diamanti

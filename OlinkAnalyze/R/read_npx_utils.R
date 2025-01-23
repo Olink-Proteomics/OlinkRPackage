@@ -76,15 +76,15 @@ convert_read_npx_output <- function(df,
 
 }
 
-#' Help function checking that the olink_platform is acceptable.
+#' Help function checking that \var{olink_platform} is acceptable.
 #'
 #' @author
 #'   Klev Diamanti
 #'
-#' @param x The name of the Olink platform. One of
-#' `r cli::ansi_collapse(x = accepted_olink_platforms$name)`.
+#' @param x Name of Olink platform. One of
+#' `r ansi_collapse_quot(x = get_all_olink_platforms())`.
 #' @param broader_platform Name of the broader Olink platform. One of
-#' `r unique(accepted_olink_platforms$broader_platform) |> cli::ansi_collapse()`. # nolint
+#' `r ansi_collapse_quot(x = get_olink_broader_platforms())`.
 #'
 #' @return
 #' `NULL` if platform is ok, otherwise an error.
@@ -121,8 +121,9 @@ check_olink_platform <- function(x,
 
     cli::cli_abort(
       message = c(
-        "x" = "Unexpected Olink platform {.arg {rlang::caller_arg(x)}}!",
-        "i" = "Expected one of: {olink_platforms$name}"
+        "x" = "Unexpected Olink platform {.val {x}}!",
+        "i" = "Expected one of:
+        {ansi_collapse_quot(x = get_all_olink_platforms())}"
       ),
       call = rlang::caller_env(),
       wrap = FALSE
