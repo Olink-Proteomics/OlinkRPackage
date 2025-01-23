@@ -9,7 +9,7 @@ check_is_arrow_object(df, error = FALSE)
 \arguments{
 \item{df}{Variable to check.}
 
-\item{error}{Scalar boolean to return an error instead of a \code{TRUE}/\code{FALSE}
+\item{error}{Scalar boolean to return an error instead of a \code{FALSE}
 (\code{default = FALSE}).}
 }
 \value{

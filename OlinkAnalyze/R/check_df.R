@@ -4,7 +4,7 @@
 #'   Klev Diamanti
 #'
 #' @param df Variable to check.
-#' @param error Scalar boolean to return an error instead of a `TRUE`/`FALSE`
+#' @param error Scalar boolean to return an error instead of a `FALSE`
 #' (`default = FALSE`).
 #'
 #' @return `TRUE` if the variable is an ArrowObject, and `FALSE` if not; error
@@ -56,7 +56,7 @@ check_is_arrow_object <- function(df,
 #'   Klev Diamanti
 #'
 #' @param df Variable to check.
-#' @param error Scalar boolean to return an error instead of a `TRUE`/`FALSE`
+#' @param error Scalar boolean to return an error instead of a `FALSE`
 #' (`default = FALSE`).
 #'
 #' @return `TRUE` if the variable is a tibble, and `FALSE` if not; error if the
@@ -108,7 +108,7 @@ check_is_tibble <- function(df,
 #'   Klev Diamanti
 #'
 #' @param df Variable to check.
-#' @param error Scalar boolean to return an error instead of a `TRUE`/`FALSE`
+#' @param error Scalar boolean to return an error instead of a `FALSE`
 #' (`default = FALSE`).
 #'
 #' @return `TRUE` if the variable is a tibble or an ArrowObject, and `FALSE` if

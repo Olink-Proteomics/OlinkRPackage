@@ -4,7 +4,7 @@
 #'   Klev Diamanti
 #'
 #' @param string Variable to check.
-#' @param error Scalar boolean to return an error instead of a `TRUE`/`FALSE`
+#' @param error Scalar boolean to return an error instead of a `FALSE`
 #' (`default = FALSE`).
 #'
 #' @return `TRUE` if the variable is a character vector, and `FALSE` if not;
@@ -56,7 +56,7 @@ check_is_character <- function(string,
 #'   Klev Diamanti
 #'
 #' @param string Variable to check.
-#' @param error Scalar boolean to return an error instead of a `TRUE`/`FALSE`
+#' @param error Scalar boolean to return an error instead of a `FALSE`
 #' (`default = FALSE`).
 #'
 #' @return `TRUE` if the variable is a character vector of length 1, and `FALSE`

@@ -9,7 +9,7 @@ check_is_scalar_numeric(num, error = FALSE)
 \arguments{
 \item{num}{Variable to check.}
 
-\item{error}{Scalar boolean to return an error instead of a \code{TRUE}/\code{FALSE}
+\item{error}{Scalar boolean to return an error instead of a \code{FALSE}
 (\code{default = FALSE}).}
 }
 \value{

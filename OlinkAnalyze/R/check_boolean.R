@@ -4,7 +4,7 @@
 #'   Klev Diamanti
 #'
 #' @param bool Variable to check.
-#' @param error Scalar boolean to return an error instead of a `TRUE`/`FALSE`
+#' @param error Scalar boolean to return an error instead of a `FALSE`
 #' (`default = FALSE`).
 #'
 #' @return `TRUE` if the variable is a boolean vector, and `FALSE` if not; error
@@ -52,7 +52,7 @@ check_is_boolean <- function(bool,
 #'   Klev Diamanti
 #'
 #' @param bool Variable to check.
-#' @param error Scalar boolean to return an error instead of a `TRUE`/`FALSE`
+#' @param error Scalar boolean to return an error instead of a `FALSE`
 #' (`default = FALSE`).
 #'
 #' @return `TRUE` if the variable is a boolean vector of length 1, and `FALSE`
