@@ -2,21 +2,23 @@
 % Please edit documentation in R/check_df.R
 \name{check_is_dataset}
 \alias{check_is_dataset}
-\title{Help function checking if a data frame is a tibble or an arrow object.}
+\title{Help function checking if a variable is a tibble or an ArrowObject dataset.}
 \usage{
 check_is_dataset(df, error = FALSE)
 }
 \arguments{
-\item{df}{Data frame to check.}
+\item{df}{Variable to check.}
 
-\item{error}{Return error or a boolean (default = FALSE).}
+\item{error}{Scalar boolean to return an error instead of a \code{TRUE}/\code{FALSE}
+(\code{default = FALSE}).}
 }
 \value{
-A scalar boolean if the object is a tibble or an arrow object or not,
-and an error if "error = TRUE".
+\code{TRUE} if the variable is a tibble or an ArrowObject, and \code{FALSE} if
+not; error if the variable is not a tibble or an ArrowObject and
+\code{error = TRUE}.
 }
 \description{
-Help function checking if a data frame is a tibble or an arrow object.
+Help function checking if a variable is a tibble or an ArrowObject dataset.
 }
 \seealso{
 \code{\link{check_is_arrow_object}}

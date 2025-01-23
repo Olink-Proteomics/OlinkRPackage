@@ -102,16 +102,18 @@ check_is_tibble <- function(df,
 
 }
 
-#' Help function checking if a data frame is a tibble or an arrow object.
+#' Help function checking if a variable is a tibble or an ArrowObject dataset.
 #'
 #' @author
 #'   Klev Diamanti
 #'
-#' @param df Data frame to check.
-#' @param error Return error or a boolean (default = FALSE).
+#' @param df Variable to check.
+#' @param error Scalar boolean to return an error instead of a `TRUE`/`FALSE`
+#' (`default = FALSE`).
 #'
-#' @return A scalar boolean if the object is a tibble or an arrow object or not,
-#' and an error if "error = TRUE".
+#' @return `TRUE` if the variable is a tibble or an ArrowObject, and `FALSE` if
+#' not; error if the variable is not a tibble or an ArrowObject and
+#' `error = TRUE`.
 #'
 #' @seealso
 #'   \code{\link{check_is_arrow_object}}
