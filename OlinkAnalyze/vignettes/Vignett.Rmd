@@ -70,8 +70,9 @@ install.packages("OlinkAnalyze")
 + *olink_qc_plot* Function to plot an overview of a sample cohort per Panel
 + *olink_umap_plot* Function to plot a UMAP of the data
 + *olink_volcano_plot* Easy volcano plot with Olink theme
-+ *olink_heatmap_plot* Function which generate a heatmap over all proteins
++ *olink_heatmap_plot* Function which generates a heatmap over all proteins
 + *set_plot_theme* Function to set plot theme
++ *bridgeable_plts* Function which generates plots that illustrate the three criteria for determining whether an assay is bridgeable in cross-product bridge normalizations
 
 
 **Sample datasets**
@@ -278,7 +279,7 @@ A tibble with the following columns:
 
 ## Analysis for variance (ANOVA) (olink_anova)
 
-The olink_anova function performs an ANOVA F-test for each assay (by OlinkID) and Type III sum of squares. The function handles both factor and numerical variables, and/or confounding factors. 
+The olink_anova function performs an ANOVA F-test for each assay (by OlinkID) using Type III sum of squares. The function handles both factor and numerical variables, and/or confounding factors. 
 
 Samples with missing variable information or factor levels are excluded from the analysis. Character columns in the input data frame are converted to factors.
 
@@ -651,7 +652,7 @@ npx_data1_no_controls <- npx_data1 |>
                            ignore_case = TRUE)))
 
 plot <- npx_data1_no_controls %>%
-  na.omit() %>% # removing missing values which exists for Site
+  na.omit() %>% # removing missing values which exist for Site
   olink_boxplot(variable = "Site", 
                 olinkid_list = c("OID00488", "OID01276"),
                 number_of_proteins_per_plot  = 2)
@@ -800,7 +801,7 @@ More information about `olink_qc_plot()` can be found in the [Outlier Exclusion 
 
 ## Heatmap (olink_heatmap_plot)
 
-The olink_heatmap_plot function generates a heatmap for all samples and proteins. By default, the heatmap centers and scales NPX across all proteins and cluster samples and proteins using a dendrogram. Unique sample names are required.
+The olink_heatmap_plot function generates a heatmap for all samples and proteins. By default, the heatmap centers and scales NPX across all proteins and clusters samples and proteins using a dendrogram. Unique sample names are required.
 
 The grouping variable(s) are annotated and colored in the left side of the heatmap. 
 
