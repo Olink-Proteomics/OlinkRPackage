@@ -204,7 +204,7 @@ The function handles four different types of normalization:
 * **Reference median normalization**: Works only on one dataframe. This is effectively subset normalization, but using difference of medians to pre-recorded median values. df1, overlapping_samples_df1 and reference_medians need to be specified. 
 * **Cross-product bridging**: Similar to bridging normalization but bridging across products, for example bridging Explore 3072 data to Explore HT data. Overlapping samples are run on both products and used to determine which assays are bridgeable and what method should be used to bridge each assay. For more information on the between-product bridging methodology, consult the [Bridging Olink^®^ Explore 3072 to Olink^®^ Explore HT Tutorial](bridging_E3072toEHT.html).
 
-## Format between-product normalized NPX data for downstream analysis (olink_normalization_product_format)
+## Format cross-product normalized NPX data for downstream analysis (olink_normalization_product_format)
 
 The olink_normalization_product_format is a function used to format the bridge normalized dataframe from a cross-product bridging. The resulting dataframe from this function is compatible with other Olink Analyze functions for downstream analysis. External controls (Sample Controls, Plate Controls, and Negative Controls) will be removed from the formatted dataframe.
 
@@ -978,7 +978,7 @@ We are always happy to help. Email us with any questions:
 
 ## Legal Disclaimer
 
-© 2025 Olink Proteomics AB.
+© 2025 Olink Proteomics AB, part of Thermo Fisher Scientific.
 
 Olink products and services are For Research Use Only and not for Use in
 Diagnostic Procedures.
