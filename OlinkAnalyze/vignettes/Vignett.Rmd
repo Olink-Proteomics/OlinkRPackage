@@ -963,6 +963,7 @@ knitr::include_graphics(normalizePath("../man/figures/bridgeable_plt_MedianCente
 
 A list of objects of class *ggplot*.
 
+
 ## Contact Us
 
 We are always happy to help. Email us with any questions:
@@ -978,19 +979,12 @@ We are always happy to help. Email us with any questions:
 
 © 2025 Olink Proteomics AB, part of Thermo Fisher Scientific.
 
-Olink products and services are For Research Use Only and not for Use in
-Diagnostic Procedures.
+Olink products and services are For Research Use Only. Not for use in diagnostic procedures.
 
-All information in this document is subject to change without notice.
-This document is not intended to convey any warranties, representations
-and/or recommendations of any kind, unless such warranties,
-representations and/or recommendations are explicitly stated.
+All information in this document is subject to change without notice. This document is not intended to convey any warranties, representations and/or recommendations of any kind, unless such warranties, representations and/or recommendations are explicitly stated.
 
-Olink assumes no liability arising from a prospective reader’s actions
-based on this document.
+Olink assumes no liability arising from a prospective reader’s actions based on this document.
 
-OLINK, NPX, PEA, PROXIMITY EXTENSION, INSIGHT and the Olink logotype are
-trademarks registered, or pending registration, by Olink Proteomics AB.
-All third-party trademarks are the property of their respective owners.
+OLINK, NPX, PEA, PROXIMITY EXTENSION, INSIGHT and the Olink logotype are trademarks registered, or pending registration, by Olink Proteomics AB. All third-party trademarks are the property of their respective owners.
 
-Olink products and assay methods are covered by several patents and patent applications https://olink.com/legal/patents.
+Olink products and assay methods are covered by several patents and patent applications https://www.olink.com/patents/.
