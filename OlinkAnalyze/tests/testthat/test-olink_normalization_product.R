@@ -3,10 +3,10 @@
 test_that(
   "olink_normalization_is_bridgeable - works",
   {
-    
+
     skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
     skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
-    
+
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
 
@@ -118,7 +118,7 @@ test_that(
 test_that(
   "olink_normalization_qs - works - compare to reference",
   {
-    
+
     skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
     skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
 
@@ -214,7 +214,7 @@ test_that(
 test_that(
   "olink_normalization_qs - works - expected output, all bridge samples",
   {
-    
+
     skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
     skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
 
@@ -338,7 +338,7 @@ test_that(
 test_that(
   "olink_normalization_qs - works - expected output, 50 bridge samples",
   {
-    
+
     skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
     skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
 
@@ -466,8 +466,8 @@ test_that(
 test_that(
   "olink_normalization_product_format - works",
   {
-    data_3k <- get_example_data(filename = "../data/example_3k_data.rds")
-    data_ht <- get_example_data(filename = "../data/example_HT_data.rds")
+    data_3k <- get_example_data(filename = "example_3k_data.rds")
+    data_ht <- get_example_data(filename = "example_HT_data.rds")
 
     expect_message(expect_warning(
       object = norm_br_data_format <- olink_normalization(
