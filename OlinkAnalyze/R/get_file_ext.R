@@ -13,15 +13,10 @@ get_accepted_file_ext_summary <- function() {
                       split = "_",
                       fixed = TRUE) |>
         lapply(utils::head, 1L) |>
-        unlist(),
-      ext = paste0("\"", .data[["ext"]], "\"")
+        unlist()
     ) |>
     dplyr::summarise(
-      ext = cli::ansi_collapse(
-        x = .data[["ext"]],
-        sep2 = " or ",
-        last = ", or "
-      ),
+      ext = ansi_collapse_quot(x = .data[["ext"]], sep = "or"),
       .by = dplyr::all_of("name")
     ) |>
     dplyr::mutate(
