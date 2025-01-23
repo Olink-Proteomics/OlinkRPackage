@@ -733,7 +733,7 @@ olink_normalization_product_format <- function(bridged_df,
     dplyr::filter(.data[["SampleType"]] == "SAMPLE") |> # Remove controls
     dplyr::filter(!(.data[["OlinkID"]] %in%
                unlist(eHT_e3072_mapping |>
-                        dplyr::select(starts_with("OlinkID_"))))) |>
+                        dplyr::select(dplyr::starts_with("OlinkID_"))))) |>
     dplyr::mutate(Project = df1_project_nr) |>
     dplyr::mutate(SampleID =
              paste0(.data[["SampleID"]],"_",df1_project_nr)) |>
