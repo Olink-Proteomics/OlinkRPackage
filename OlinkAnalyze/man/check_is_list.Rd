@@ -2,21 +2,22 @@
 % Please edit documentation in R/check_list.R
 \name{check_is_list}
 \alias{check_is_list}
-\title{Help function to check if the variable is a list.}
+\title{Help function checking if a variable is a list.}
 \usage{
 check_is_list(lst, error = FALSE)
 }
 \arguments{
-\item{lst}{List to check.}
+\item{lst}{Variable to check.}
 
-\item{error}{Return error or a boolean (default = FALSE).}
+\item{error}{Scalar boolean to return an error instead of a \code{FALSE}
+(\code{default = FALSE}).}
 }
 \value{
-Boolean if the object is a list or not, and an error if
-"error = TRUE".
+\code{TRUE} if the variable is a list, and \code{FALSE} if not; error if the
+variable is not a list and \code{error = TRUE}.
 }
 \description{
-Help function to check if the variable is a list.
+Help function checking if a variable is a list.
 }
 \author{
 Klev Diamanti
