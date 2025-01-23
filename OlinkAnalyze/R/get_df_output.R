@@ -3,8 +3,7 @@
 #' @return A scalar character vector with the input options for \var{out_df}.
 #'
 get_df_output <- function() {
-  paste0("\"", read_npx_df_output, "\"") |>
-    cli::ansi_collapse()
+  ansi_collapse_quot(x = read_npx_df_output, sep = "and")
 }
 
 #' Prints class type output from read_npx* functions.
@@ -13,7 +12,10 @@ get_df_output <- function() {
 #' read_npx* functions.
 #'
 get_df_output_print <- function() {
-  paste0("\"", read_npx_df_output, "\"") |>
-    (\(.) stringr::str_replace_all(., "arrow", "ArrowObject"))() |>
-    cli::ansi_collapse(sep2 = " or ", last = " or ")
+  stringr::str_replace_all(
+    string = read_npx_df_output,
+    pattern = "arrow",
+    replacement = "ArrowObject"
+  ) |>
+    ansi_collapse_quot(sep = "or")
 }
