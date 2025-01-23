@@ -237,8 +237,8 @@ read_npx_legacy_check <- function(file,
                                   bottom_mat_v) {
   # check input ----
 
-  check_is_arrow_or_tibble(df = df_top,
-                           error = TRUE)
+  check_is_dataset(df = df_top,
+                   error = TRUE)
 
   check_olink_data_type(x = data_type,
                         broader_platform = "qPCR")

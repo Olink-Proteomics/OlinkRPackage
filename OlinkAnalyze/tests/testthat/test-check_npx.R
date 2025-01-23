@@ -15,7 +15,7 @@ test_that(
 
     expect_error(
       object = check_npx(df),
-      regexp = "`df` is not a tibble or an arrow data frame!"
+      regexp = "`df` is not a tibble or an ArrowObject dataset!"
     )
   }
 )

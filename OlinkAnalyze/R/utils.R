@@ -12,8 +12,8 @@ remove_all_na_cols <- function(df) {
 
   # input check ----
 
-  check_is_arrow_or_tibble(df = df,
-                           error = TRUE)
+  check_is_dataset(df = df,
+                   error = TRUE)
 
   # identify all NA cols ----
 

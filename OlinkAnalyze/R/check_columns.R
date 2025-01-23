@@ -71,8 +71,8 @@ check_columns <- function(df,
 
   # Check input ----
 
-  check_is_arrow_or_tibble(df = df,
-                           error = TRUE)
+  check_is_dataset(df = df,
+                   error = TRUE)
 
   check_is_list(lst = col_list,
                 error = TRUE)

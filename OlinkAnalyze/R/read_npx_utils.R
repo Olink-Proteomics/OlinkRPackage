@@ -49,7 +49,7 @@ convert_read_npx_output <- function(df,
   # check that out_df is ok
   check_out_df_arg(out_df = out_df)
 
-  if (check_is_arrow_or_tibble(df = df, error = FALSE)) {
+  if (check_is_dataset(df = df, error = FALSE)) {
 
     if (out_df == "tibble") {
 
@@ -253,8 +253,8 @@ read_npx_format_colnames <- function(df,
                                      file) {
 
   # check input ----
-  check_is_arrow_or_tibble(df = df,
-                           error = TRUE)
+  check_is_dataset(df = df,
+                   error = TRUE)
 
   # check columns names ----
 

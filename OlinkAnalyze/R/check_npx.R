@@ -100,8 +100,8 @@ check_npx <- function(df = df,
 
   # check input ----
 
-  check_is_arrow_or_tibble(df = df,
-                           error = TRUE)
+  check_is_dataset(df = df,
+                   error = TRUE)
 
   # check functions ----
 
@@ -221,8 +221,8 @@ check_npx_col_names <- function(df,
 
   # check input ----
 
-  check_is_arrow_or_tibble(df = df,
-                           error = TRUE)
+  check_is_dataset(df = df,
+                   error = TRUE)
 
   # if not NULL, preferred_names is checked in check_npx_update_col_names
   if (!is.null(preferred_names)) {
