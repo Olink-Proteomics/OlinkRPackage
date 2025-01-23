@@ -1,12 +1,11 @@
-#' Utility function removing columns with all values NA from a tibble or an
-#' arrow object.
+#' Utility function removing columns with all values NA from a dataset.
 #'
 #' @author
 #'   Klev Diamanti
 #'
-#' @param df A tibble or an arrow object.
+#' @param df An Olink dataset.
 #'
-#' @return The same data frame as input without all-NA columns.
+#' @return The input Olink dataset without all-NA columns.
 #'
 remove_all_na_cols <- function(df) {
 
