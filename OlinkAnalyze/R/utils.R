@@ -33,3 +33,22 @@ remove_all_na_cols <- function(df) {
 
   return(df)
 }
+
+#' Utility function that adds quotation marks on elements printed by
+#' ansi_collapse from cli.
+#'
+#' @param x Character vector.
+#' @param sep One of "or" and "and".
+#'
+#' @return Scalar character vector collapsed by "and" or "or".
+#'
+ansi_collapse_quot <- function(x,
+                               sep = "and") {
+  x_paste <- paste0("\"", x, "\"")
+
+  if (sep == "or") {
+    cli::ansi_collapse(x = x_paste, sep2 = " or ", last = ", or ")
+  } else {
+    cli::ansi_collapse(x = x_paste)
+  }
+}
