@@ -1,17 +1,14 @@
-#' Help function to check if suggested libraries are installed when required.
+#' Help function checking if one or more R libraries are installed.
 #'
 #' @author
 #'   Klev Diamanti
 #'
-#' @description
-#' Checks whether a collection of R libraries is available.
-#'
-#'
 #' @param libraries Character vector of R libraries.
-#' @param error Return error or a boolean (default = FALSE).
+#' @param error Scalar boolean to return an error instead of a `FALSE`
+#' (`default = FALSE`).
 #'
-#' @return Boolean if the library is installed or not, and an error if
-#' "error = TRUE".
+#' @return `TRUE` if the libraries are installed, and `FALSE` if not; error if
+#' the libraries are not installed and `error = TRUE`.
 #'
 check_library_installed <- function(libraries,
                                     error = FALSE) {

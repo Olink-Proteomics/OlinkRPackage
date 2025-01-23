@@ -2,21 +2,22 @@
 % Please edit documentation in R/check_r_library.R
 \name{check_library_installed}
 \alias{check_library_installed}
-\title{Help function to check if suggested libraries are installed when required.}
+\title{Help function checking if one or more R libraries are installed.}
 \usage{
 check_library_installed(libraries, error = FALSE)
 }
 \arguments{
 \item{libraries}{Character vector of R libraries.}
 
-\item{error}{Return error or a boolean (default = FALSE).}
+\item{error}{Scalar boolean to return an error instead of a \code{FALSE}
+(\code{default = FALSE}).}
 }
 \value{
-Boolean if the library is installed or not, and an error if
-"error = TRUE".
+\code{TRUE} if the libraries are installed, and \code{FALSE} if not; error if
+the libraries are not installed and \code{error = TRUE}.
 }
 \description{
-Checks whether a collection of R libraries is available.
+Help function checking if one or more R libraries are installed.
 }
 \author{
 Klev Diamanti
