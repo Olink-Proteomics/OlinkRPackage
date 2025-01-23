@@ -4,14 +4,13 @@
 #' @author
 #'   Klev Diamanti
 #'
-#' @param out_df The class of output data frame. One of "tibble" (default) or
-#' "arrow" for ArrowObject.
+#' @param out_df Class of output data frame. One of `r get_df_output()`.
 #'
-#' @return An error if the argument is not as expected.
+#' @return Error if \var{out_df} is not one of `r get_df_output()`.
 #'
 check_out_df_arg <- function(out_df) {
 
-  # check taht out_df is a string
+  # check that out_df is a string
   check_is_scalar_character(string = out_df,
                             error = TRUE)
 
@@ -19,9 +18,8 @@ check_out_df_arg <- function(out_df) {
 
     cli::cli_abort(
       message = c(
-        "x" = "Unknown output argument {.arg {rlang::caller_arg(out_df)}}!",
-        "i" = "Acceptable {.arg {rlang::caller_arg(out_df)}}:
-        {read_npx_df_output}"
+        "x" = "Unknown output argument {.val {out_df}}!",
+        "i" = "Expecting one of {.val {read_npx_df_output}}"
       ),
       call = rlang::caller_env(),
       wrap = FALSE
@@ -31,17 +29,16 @@ check_out_df_arg <- function(out_df) {
 
 }
 
-#' Help function converting the output data frame from a read_npx* function to a
-#' tibble or an ArrowObject.
+#' Help function converting the output data frame from a read_npx* function to
+#' `r get_df_output_print()`.
 #'
 #' @author
 #'   Klev Diamanti
 #'
-#' @param df The data frame to be converted.
-#' @param out_df The class of output data frame. One of "tibble" (default) or
-#' "arrow" for ArrowObject.
+#' @param df Dataset to be converted.
+#' @param out_df Class of output data frame. One of `r get_df_output()`.
 #'
-#' @return The data frame in the requested class.
+#' @return The dataset in the requested class.
 #'
 convert_read_npx_output <- function(df,
                                     out_df) {
@@ -66,7 +63,7 @@ convert_read_npx_output <- function(df,
     # if nont of the above throw an error
     cli::cli_abort(
       message = c(
-        "x" = "Unexpected input data frame {.arg {rlang::caller_arg(df)}}!",
+        "x" = "Unexpected input dataset {.arg df}!",
         "i" = "Expecting: { cli::ansi_collapse(x = read_npx_df_output,
                                                sep2 = \" or \",
                                                last = \", or \") }"
@@ -85,9 +82,9 @@ convert_read_npx_output <- function(df,
 #'   Klev Diamanti
 #'
 #' @param x The name of the Olink platform. One of
-#' `r cli::ansi_collapse(x = accepted_olink_platforms$name, sep2 = " or ", last = ", or ")`. # nolint
+#' `r cli::ansi_collapse(x = accepted_olink_platforms$name)`.
 #' @param broader_platform Name of the broader Olink platform. One of
-#' `r unique(accepted_olink_platforms$broader_platform) |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' `r unique(accepted_olink_platforms$broader_platform) |> cli::ansi_collapse()`. # nolint
 #'
 #' @return
 #' `NULL` if platform is ok, otherwise an error.

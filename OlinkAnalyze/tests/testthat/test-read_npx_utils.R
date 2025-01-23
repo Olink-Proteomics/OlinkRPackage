@@ -128,37 +128,37 @@ test_that(
       object = convert_read_npx_output(df = c("I_Shall_Not_Pass",
                                               NA_character_),
                                        out_df = "tibble"),
-      regexp = "Unexpected input data frame"
+      regexp = "Unexpected input dataset"
     )
 
     expect_error(
       object = convert_read_npx_output(df = NA_character_,
                                        out_df = "tibble"),
-      regexp = "Unexpected input data frame"
+      regexp = "Unexpected input dataset"
     )
 
     expect_error(
       object = convert_read_npx_output(df = NULL,
                                        out_df = "tibble"),
-      regexp = "Unexpected input data frame"
+      regexp = "Unexpected input dataset"
     )
 
     expect_error(
       object = convert_read_npx_output(df = 1,
                                        out_df = "tibble"),
-      regexp = "Unexpected input data frame"
+      regexp = "Unexpected input dataset"
     )
 
     expect_error(
       object = convert_read_npx_output(df = 1L,
                                        out_df = "tibble"),
-      regexp = "Unexpected input data frame"
+      regexp = "Unexpected input dataset"
     )
 
     expect_error(
       object = convert_read_npx_output(df = TRUE,
                                        out_df = "tibble"),
-      regexp = "Unexpected input data frame"
+      regexp = "Unexpected input dataset"
     )
 
     expect_error(
@@ -172,7 +172,7 @@ test_that(
         ),
         out_df = "tibble"
       ),
-      regexp = "Unexpected input data frame"
+      regexp = "Unexpected input dataset"
     )
 
   }
