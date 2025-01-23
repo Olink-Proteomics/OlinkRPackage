@@ -539,7 +539,7 @@ normalization_multibatch <-
     SampleID_tmp = {
       .data[["SampleID"]] |>
         stringr::str_split(pattern = "_") |>
-        lapply(head, 1L) |>
+        lapply(utils::head, 1L) |>
         unlist()
     }
   ) |>

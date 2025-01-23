@@ -1387,7 +1387,8 @@ test_that(
         )
 
         # modify df_top_wide - remove QC Warning
-        qc_warn_col <- colnames(df_rand$list_df_wide$df_top_wide) |> tail(1L)
+        qc_warn_col <- colnames(df_rand$list_df_wide$df_top_wide) |>
+          utils::tail(1L)
 
         df_rand$list_df_wide$df_top_wide <- df_rand$list_df_wide$df_top_wide |>
           dplyr::select(
@@ -1433,7 +1434,8 @@ test_that(
         )
 
         # modify df_top_wide - remove Plate ID
-        plate_id_col <- colnames(df_rand$list_df_wide$df_top_wide) |> tail(1L)
+        plate_id_col <- colnames(df_rand$list_df_wide$df_top_wide) |>
+          utils::tail(1L)
 
         df_rand$list_df_wide$df_top_wide <- df_rand$list_df_wide$df_top_wide |>
           dplyr::select(
@@ -1479,7 +1481,8 @@ test_that(
         )
 
         # modify df_top_wide - remove Plate ID and QC Warning
-        pid_qcw_col <- colnames(df_rand$list_df_wide$df_top_wide) |> tail(2L)
+        pid_qcw_col <- colnames(df_rand$list_df_wide$df_top_wide) |>
+          utils::tail(2L)
 
         df_rand$list_df_wide$df_top_wide <- df_rand$list_df_wide$df_top_wide |>
           dplyr::select(
@@ -7193,7 +7196,8 @@ test_that(
         )
 
         # remove one column from df_top to reproduce the error
-        remove_col <- colnames(df_rand$list_df_wide$df_top_wide) |> tail(1L)
+        remove_col <- colnames(df_rand$list_df_wide$df_top_wide) |>
+          utils::tail(1L)
 
         df_rand$list_df_wide$df_top_wide <- df_rand$list_df_wide$df_top_wide |>
           dplyr::select(
@@ -9048,9 +9052,9 @@ test_that(
         df_rand$list_df_wide$df_middle_wide <-
           df_rand$list_df_wide$df_middle_wide |>
           dplyr::select(
-            -dplyr::all_of(head(col_names$df_top_plate, 1L))
+            -dplyr::all_of(utils::head(col_names$df_top_plate, 1L))
           )
-        col_names$df_top_plate <- tail(col_names$df_top_plate, 1L)
+        col_names$df_top_plate <- utils::tail(col_names$df_top_plate, 1L)
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -9090,9 +9094,9 @@ test_that(
         df_rand$list_df_wide$df_middle_wide <-
           df_rand$list_df_wide$df_middle_wide |>
           dplyr::select(
-            -dplyr::all_of(head(col_names$df_top_qc_warn, 1L))
+            -dplyr::all_of(utils::head(col_names$df_top_qc_warn, 1L))
           )
-        col_names$df_top_qc_warn <- tail(col_names$df_top_qc_warn, 1L)
+        col_names$df_top_qc_warn <- utils::tail(col_names$df_top_qc_warn, 1L)
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -9204,7 +9208,8 @@ test_that(
         last_col_idx <- ncol(df_rand$list_df_wide$df_middle_wide) + 1L
         last_col_idx <- last_col_idx:(last_col_idx + 2L)
         last_col <- paste0("V", last_col_idx)
-        rep_col <- colnames(df_rand$list_df_wide$df_middle_wide) |> tail(1L)
+        rep_col <- colnames(df_rand$list_df_wide$df_middle_wide) |>
+          utils::tail(1L)
         df_rand$list_df_wide$df_middle_wide[last_col] <- NA
 
         # write empty-ish file
@@ -10738,7 +10743,7 @@ test_that(
         .x |>
           dplyr::mutate(
             Panel = strsplit(x = .data[["Panel"]], split = "(", fixed = TRUE) |>
-              lapply(head, 1L) |>
+              lapply(utils::head, 1L) |>
               unlist()
           )
       })

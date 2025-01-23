@@ -61,7 +61,7 @@ olink_wide_top <- function(olink_platform,
   ) |>
     dplyr::mutate(
       int_ctrl_group = strsplit(x = int_ctrl, split = " ", fixed = TRUE) |>
-        lapply(head, 2L) |>
+        lapply(utils::head, 2L) |>
         lapply(paste, collapse = " ") |>
         unlist()
     ) |>
@@ -161,7 +161,7 @@ olink_wide_top <- function(olink_platform,
   ) |>
     dplyr::mutate(
       V6 = strsplit(x = .data[["V1"]], split = " ", fixed = TRUE) |>
-        sapply(tail, 1L) |>
+        sapply(utils::tail, 1L) |>
         unlist(),
       V1 = dplyr::if_else(.data[["V1"]] == "Panel",
                           .data[["V1"]],
@@ -1494,7 +1494,7 @@ olink_wide_to_long <- function(df_top_wide,
       Panel_Version = strsplit(x = .data[["Panel"]],
                                split = "(",
                                fixed = TRUE) |>
-        lapply(tail, 1L) |>
+        lapply(utils::tail, 1L) |>
         unlist() |>
         (\(x) {
           sub(pattern = ")",
@@ -1507,7 +1507,7 @@ olink_wide_to_long <- function(df_top_wide,
       Panel = strsplit(x = .data[["Panel"]],
                        split = "(",
                        fixed = TRUE) |>
-        lapply(head, -1L) |>
+        lapply(utils::head, -1L) |>
         lapply(paste, collapse = "(") |>
         unlist()
     ) |>
