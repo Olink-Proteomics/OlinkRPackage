@@ -2,6 +2,8 @@
 ## Minor Changes
 * Functionality has been added to read_NPX, olink_lod, and olink_plate_randomizer to support additional data types (#487, @kathy-nevola)
 * A new function has been added to visualize the criteria used to establish the recommended bridging method for an assay in cross-product bridging (#468, @amrita-kar)
+* A new function has been added to simplify data wrangling on bridged data after cross-product bridging (#472, @dtopouza)
+* The tutorial on Olink Explore 3072 to Explore HT bridging has been updated to reflect the new functions (#473, @kristinchin-olink)
 * Documentation for plate randomization when keeping samples from the same studies together has been improved in function documentation and the Plate Randomization tutorial (#483, @kathy-nevola)
 * Contact us and legal disclaimer information has been updated and added to all tutorials (#490, @kathy-nevola)
 * A Research Use Only (RUO) message is now printed when reading parquet files (#487, @kathy-nevola)
