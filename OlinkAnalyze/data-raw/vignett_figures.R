@@ -177,8 +177,9 @@ rm(top_10_name)
 
 # set_plot_theme applied to boxplot ---------------------------------------
 
-npx_data1 %>% 
-  filter(OlinkID == 'OID01216') %>% 
+npx_data1 |>
+  filter(!is.na(Treatment)) |>
+  filter(OlinkID == 'OID01216') |> 
   ggplot(aes(x = Treatment, y = NPX, fill = Treatment)) +
   geom_boxplot() +
   set_plot_theme()
@@ -188,8 +189,9 @@ ggplot2::ggsave("OlinkAnalyze/man/figures/set_plot_theme_boxplot.png", dpi = "sc
 
 # olink_fill_discreted applied to boxplot ---------------------------------
 
-npx_data1 %>% 
-  filter(OlinkID == 'OID01216') %>% 
+npx_data1 |>
+  filter(!is.na(Treatment)) |>
+  filter(OlinkID == 'OID01216') |> 
   ggplot(aes(x = Treatment, y = NPX, fill = Treatment)) +
   geom_boxplot() +
   set_plot_theme() +

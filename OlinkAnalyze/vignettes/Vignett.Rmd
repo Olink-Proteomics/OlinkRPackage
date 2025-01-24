@@ -307,12 +307,12 @@ Adjusted p-values are calculated using the Benjamini & Hochberg (1995) method (�
 ```{r message=FALSE, eval=FALSE}
 # Remove control samples and assays
 npx_data1_no_controls <- npx_data1 |>
-  filter(!str_detect(SampleID,
-                     regex("control|ctrl", 
-                           ignore_case = TRUE))) |>
-  filter(!str_detect(Assay, 
-                     regex("control|ctrl", 
-                           ignore_case = TRUE)))
+  dplyr::filter(!stringr::str_detect(SampleID,
+                                     regex("control|ctrl", 
+                                           ignore_case = TRUE))) |>
+  dplyr::filter(!stringr::str_detect(Assay, 
+                                     regex("control|ctrl",
+                                           ignore_case = TRUE)))
   
 # One-way ANOVA, no covariates
 anova_results_oneway <- olink_anova(df = npx_data1_no_controls, 
@@ -366,10 +366,12 @@ Control samples and control assays (AssayType is not "assay", or Assay contains 
 # calculate the p-value for the ANOVA
 anova_results_oneway <- olink_anova(df = npx_data1_no_controls, 
                                     variable = 'Site')
+
 # extracting the significant proteins
 anova_results_oneway_significant <- anova_results_oneway %>%
-  filter(Threshold == 'Significant') %>%
-  pull(OlinkID)
+  dplyr::filter(Threshold == 'Significant') %>%
+  dplyr::pull(OlinkID)
+
 anova_posthoc_oneway_results <- olink_anova_posthoc(df = npx_data1_no_controls,
                                                     olinkid_list = anova_results_oneway_significant,
                                                     variable = 'Site',
@@ -473,8 +475,8 @@ if (requireNamespace("lme4", quietly = TRUE) & requireNamespace("lmerTest", quie
                                     random = 'Subject')
   # extracting the significant proteins
   lmer_results_twoway_significant <- lmer_results_twoway %>%
-    filter(Threshold == 'Significant', term == 'Treatment') %>%
-    pull(OlinkID)
+    dplyr::filter(Threshold == 'Significant', term == 'Treatment') %>%
+    dplyr::pull(OlinkID)
   # performing post-hoc analysis
   lmer_posthoc_twoway_results <- olink_lmer_posthoc(df = npx_data1,
                                                     olinkid_list = lmer_results_twoway_significant,
@@ -525,7 +527,9 @@ Alternative statistical results can be used as input as long as they include the
 * organism: String of name of organism. Must be either "human" or "mouse"
 
 ```{r message=FALSE}
-npx_df <- npx_data1 %>% filter(!grepl("control", SampleID, ignore.case = TRUE))
+npx_df <- npx_data1 |>
+  dplyr::filter(!grepl("control", SampleID, ignore.case = TRUE))
+
 ttest_results <- olink_ttest(
   df = npx_df,
   variable = "Treatment",
@@ -603,11 +607,12 @@ NOTE: UMAP is a non-linear data transformation that might not accurately preserv
 ```{r message=FALSE, eval = FALSE}
 if (requireNamespace("umap", quietly = TRUE) ){
 npx_data1 %>% 
-  filter(!str_detect(SampleID, 'CONTROL_SAMPLE')) %>% 
+  dplyr::filter(!stringr::str_detect(SampleID, 'CONTROL_SAMPLE')) %>% 
   olink_umap_plot(df = .,
                  color_g = "QC_Warning", byPanel = TRUE)  
   }
 ```
+
 ```{r message=FALSE, echo = FALSE}
 knitr::include_graphics(normalizePath("../man/figures/olink_umap_plot.png"),
                         error = FALSE)
@@ -615,7 +620,7 @@ knitr::include_graphics(normalizePath("../man/figures/olink_umap_plot.png"),
 
 ```{r message=FALSE, eval =FALSE}
 npx_data1 %>% 
-  filter(!str_detect(SampleID, 'CONTROL_SAMPLE')) %>% 
+  dplyr::filter(!stringr::str_detect(SampleID, 'CONTROL_SAMPLE')) %>% 
   olink_umap_plot(df = .,
                  color_g = "QC_Warning", byPanel = TRUE)  
 ```
@@ -644,18 +649,19 @@ The olink_boxplot function is used to generate boxplots of NPX values stratified
 ```{r message=FALSE, eval = FALSE}
 # Remove control samples and assays
 npx_data1_no_controls <- npx_data1 |>
-  filter(!str_detect(SampleID,
-                     regex("control|ctrl", 
-                           ignore_case = TRUE))) |>
-  filter(!str_detect(Assay, 
-                     regex("control|ctrl", 
-                           ignore_case = TRUE)))
+  dplyr::filter(!stringr::str_detect(SampleID,
+                                     regex("control|ctrl", 
+                                           ignore_case = TRUE))) |>
+  dplyr::filter(!stringr::str_detect(Assay,
+                                     regex("control|ctrl", 
+                                           ignore_case = TRUE)))
 
-plot <- npx_data1_no_controls %>%
-  na.omit() %>% # removing missing values which exist for Site
+plot <- npx_data1_no_controls |>
+  dplyr::filter(!is.na(Site)) |> # removing missing values which exist for Site
   olink_boxplot(variable = "Site", 
                 olinkid_list = c("OID00488", "OID01276"),
                 number_of_proteins_per_plot  = 2)
+
 plot[[1]]
 ```
 
@@ -822,7 +828,7 @@ The grouping variable(s) are annotated and colored in the left side of the heatm
 
 ```{r message=FALSE,  eval = FALSE}
 first10 <- npx_data1 %>%
-  pull(OlinkID) %>% 
+  dplyr::pull(OlinkID) %>% 
   unique() %>% 
   head(10)
 
@@ -831,9 +837,9 @@ first15samples <- npx_data1$SampleID %>%
   head(15)
 
 npx_data_small <- npx_data1 %>% 
-  filter(!str_detect(SampleID, 'CONT')) %>% 
-  filter(OlinkID %in% first10) %>% 
-  filter(SampleID %in% first15samples)
+  dplyr::filter(!str_detect(SampleID, 'CONT')) %>% 
+  dplyr::filter(OlinkID %in% first10) %>% 
+  dplyr::filter(SampleID %in% first15samples)
 
 try({ #This statement might fail if dependencies are not installed
   olink_heatmap_plot(npx_data_small, variable_row_list =  'Treatment')
@@ -864,8 +870,8 @@ ttest_results <- olink_ttest(df = npx_data1,
                              variable = 'Treatment')
 # select names of proteins to show
 top_10_name <- ttest_results %>%
-  slice_head(n = 10) %>%
-  pull(OlinkID)
+  dplyr::slice_head(n = 10) %>%
+  dplyr::pull(OlinkID)
 # volcano plot
 olink_volcano_plot(p.val_tbl = ttest_results,
                    x_lab = 'Treatment',
@@ -886,7 +892,8 @@ This function sets a coherent plot theme for plots by adding it to a ggplot obje
 
 ```{r message=FALSE, eval = FALSE}
 npx_data1 %>% 
-  filter(OlinkID == 'OID01216') %>% 
+  dplyr::filter(!is.na(Treatment)) |>
+  dplyr::filter(OlinkID == 'OID01216') %>% 
   ggplot(aes(x = Treatment, y = NPX, fill = Treatment)) +
   geom_boxplot() +
   set_plot_theme()
@@ -902,7 +909,8 @@ These functions sets a coherent coloring theme for the plots by adding it to a g
 
 ```{r message=FALSE, eval = FALSE}
 npx_data1 %>% 
-  filter(OlinkID == 'OID01216') %>% 
+  dplyr::filter(!is.na(Treatment)) |>
+  dplyr::filter(OlinkID == 'OID01216') %>% 
   ggplot(aes(x = Treatment, y = NPX, fill = Treatment)) +
   geom_boxplot() +
   set_plot_theme() +
@@ -916,7 +924,7 @@ knitr::include_graphics(normalizePath("../man/figures/olink_fill_discrete_boxplo
 
 ## Visualizing bridgeability criteria for between-product normalization (olink_bridgeability_plot)
 
-The olink_bridgeability_plot function generates a series of plots on a per-assay basis for a data frame generated from between-product bridging. The coloration of the figure headers indicate whether that assay has been defined as bridgeable or not bridgeable. The correlation plot, violin plot, and bar chart figures illustrate the three criteria for determining whether an assay is bridgeable. If an assay is determined to  be bridgeable, the ECDF curve and corresponding KS statistic are used to determine which normalization approach (median centering or quantile smoothing) is most suitable for between-product normalization. For more information on the between-product bridging methodology and bridgeability criteria, consult the [Bridging Olink^®^ Explore 3072 to Olink^®^ Explore HT Tutorial](bridging_E3072toEHT.html).
+The olink_bridgeability_plot function generates a series of plots on a per-assay basis for a data frame generated from between-product bridging. The coloration of the figure headers indicate whether that assay has been defined as bridgeable or not bridgeable. The correlation plot, violin plot, and bar chart figures illustrate the three criteria for determining whether an assay is bridgeable. For assays determined to be bridgeable, the ECDF curve and corresponding KS statistic are used to determine which normalization approach (median centering or quantile smoothing) is most suitable for between-product normalization. For more information on the between-product bridging methodology and bridgeability criteria, consult the [Bridging Olink^®^ Explore 3072 to Olink^®^ Explore HT Tutorial](bridging_E3072toEHT.html).
 
 ### Function arguments
 
