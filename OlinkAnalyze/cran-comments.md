@@ -1,6 +1,6 @@
 ## Release Summary
 
-This release adds minor bug fixes to recent feature addition in Olink Analyze 4.0.0.
+This release adds new visualization functions and expanded data input functionality to Olink Analyze 4.1.0.
 
 ## R CMD check results
 
