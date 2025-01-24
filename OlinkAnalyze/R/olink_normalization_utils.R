@@ -967,7 +967,7 @@ olink_norm_input_cross_product <- function(lst_df,
   # the other one probably T96, T48, which we do not normalize.
   lst_prod_uniq <- lst_product |> unique() |> sort()
   if (length(lst_prod_uniq) == 1L
-      && all(lst_prod_uniq %in% c("3k", "other"))) {
+      && all(lst_prod_uniq %in% c("3k", "HT", "other"))) {
     norm_mode <- olink_norm_modes$bridge
   } else if (identical(x = lst_prod_uniq, y = c("3k", "HT"))) {
     norm_mode <- olink_norm_modes$norm_ht_3k
