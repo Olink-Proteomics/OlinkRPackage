@@ -775,6 +775,10 @@ olink_normalization_product_format <- function(bridged_df,
                    df1_no_overlap,
                    df2_no_overlap)
 
+  # Sort by Project
+  df_full <- df_full |>
+    dplyr::arrange(.data[["Project"]], .data[["SampleID"]])
+
   return(df_full)
 }
 
