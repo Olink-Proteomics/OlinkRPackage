@@ -37,36 +37,40 @@ read_npx_parquet <- function (filename) {
   }
 
   # pointer to parquet file
-  parquet_file <- arrow::open_dataset(
+  p_file <- arrow::open_dataset(
     sources = filename
   )
+  p_file_meta <- names(p_file$metadata)
 
   # Check that all required parquet metadata is in place
-  olink_parquet_metadata <- c("DataFileType",
-                              "Product")
-  if (!all(olink_parquet_metadata %in% names(parquet_file$metadata))) {
-
-    stop(
-      paste("Missing required fields",
-            paste(
-              paste0("\"", olink_parquet_metadata, "\""),
-              collapse = " and "),
-            "in parquet file's metadata."
-            )
-      )
-
+  exp_p_meta <- list(
+    dtftp = "DataFileType",
+    prod = "Product"
+  )
+  if (!all(unlist(exp_p_meta) %in% p_file_meta)) {
+    cli::cli_warn( # nolint
+      "Missing required field{?s}
+      {.val {unlist(exp_p_meta)[!(unlist(exp_p_meta) %in% p_file_meta)]}}
+      in parquet file's metadata."
+    )
   }
 
-  # We allow only Olink Explore HT parquet files for now
   # If other platforms are to be reported as parquet too, we have to add
   # them to this array
-  olink_platforms <- c("ExploreHT", "Explore3072")
-  if (!(parquet_file$metadata$Product %in% olink_platforms)) {
-
-    stop("Only \"Olink Explore HT\" or \"Olink Explore 3072\" parquet files are currently supported.")
-
+  olink_platforms <- c("ExploreHT", "Explore3072", "Reveal")
+  if (exp_p_meta$prod %in% p_file_meta
+      & !(p_file$metadata[[exp_p_meta$prod]] %in% olink_platforms)) {
+    cli::cli_warn(
+      "Only parquet file from {.val {olink_platforms}} are currently supported."
+    )
   }
 
+  # Print RUO message if present
+  if (("RUO" %in% names(p_file$metadata))) {
+    cli::cli_alert_info(
+      "This parquet file is for research use only:
+      {.val {p_file$metadata$RUO}}!")
+  }
 
   # Check if it is an NPX file
   olink_files <- c("NPX File",
@@ -75,36 +79,15 @@ read_npx_parquet <- function (filename) {
                    "Internal CLI Data Export File",
                    "R Package Export File",
                    "Olink Analyze Export File")
-  if (parquet_file$metadata$DataFileType %in% olink_files) {
-
-    # Check that required columns are present
-    required_cols <- c("SampleID",
-                       "OlinkID",
-                       "UniProt",
-                       "Assay",
-                       "Panel",
-                       "PlateID",
-                       "SampleQC",
-                       "NPX")
-
-    missing_cols <- setdiff(required_cols,
-                            names(parquet_file))
-
-    if(length(missing_cols) != 0) {
-
-      stop(paste("The following columns are missing:",
-                 paste(missing_cols, collapse = ", ")))
-
-    }
-
-  } else {
-
-    stop("Only \"NPX\" parquet files are currently supported.")
-
+  if (exp_p_meta$dtftp %in% p_file_meta
+      & !(p_file$metadata[[exp_p_meta$dtftp]] %in% olink_files)) {
+    cli::cli_warn("Only {.val {\"NPX\"}} parquet files are currently
+                  supported.")
   }
 
-  df_npx <- parquet_file %>%
-    dplyr::collect() %>%
+  # convert arrow object to tibble
+  df_npx <- p_file |>
+    dplyr::collect() |>
     dplyr::as_tibble()
 
   return(df_npx)

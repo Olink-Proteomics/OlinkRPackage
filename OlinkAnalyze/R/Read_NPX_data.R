@@ -199,7 +199,7 @@ read_NPX_explore <- function(filename) {
                         "DataAnalysisRefID",
                         "AssayType",
                         "Block",
-                        "Counts",
+                        "Count",
                         "ExtNPX",
                         "Normalization",
                         "PCNormalizedNPX",
@@ -226,7 +226,25 @@ read_NPX_explore <- function(filename) {
                             "SampleBlockQCWarn",
                             "SampleBlockQCFail",
                             "BlockQCFail",
-                            "AssayQCWarn")
+                            "AssayQCWarn"),
+    "header_npx_reveal" = c(header_base,
+                            "SampleType",
+                            "WellID",
+                            "DataAnalysisRefID",
+                            "AssayType",
+                            "Block",
+                            "Count",
+                            "ExtNPX",
+                            "Normalization",
+                            "PCNormalizedNPX",
+                            "AssayQC",
+                            "SampleQC",
+                            "SoftwareVersion",
+                            "SoftwareName",
+                            "PanelDataArchiveVersion",
+                            "PreProcessingVersion",
+                            "PreProcessingSoftware",
+                            "InstrumentType")
 
   )
 

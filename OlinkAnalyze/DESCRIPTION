@@ -107,6 +107,7 @@ Suggests:
     testthat (>= 3.0.0),
     umap,
     vdiffr,
+    withr,
     zip
 VignetteBuilder: 
   kableExtra,

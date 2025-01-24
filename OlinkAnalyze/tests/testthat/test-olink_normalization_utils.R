@@ -154,12 +154,8 @@ test_that(
       (\(x) x[!grepl(pattern = "CONTROL", x = x)])() |>
       sort() |>
       head(20L)
-    filtered_oids <- c("OID12345",
-                       "OID54321",
-                       "OID43201",
-                       eHT_e3072_mapping$OlinkID_E3072[eHT_e3072_mapping$OlinkID_HT == "OID43201"]) # nolint
 
-    expect_message(expect_warning(
+    expect_message(
       object = lst_check_out <- olink_norm_input_check(
         df1 = data_3k,
         df2 = data_ht,
@@ -169,7 +165,7 @@ test_that(
         df2_project_nr = "HT",
         reference_project = "HT",
         reference_medians = NULL
-      ), regexp = "2 assays are not shared across products."),
+      ),
       regexp = "Cross-product normalization will be performed!"
     )
 
@@ -188,13 +184,8 @@ test_that(
                 )
               ),
             by = "OlinkID_HT",
-            relationship = "many-to-many"
-          ) |>
-          # If matched OlinkID is not found in mapping file, set OlinkID_HT to OlinkID
-          dplyr::mutate(OlinkID = ifelse(is.na(.data[["OlinkID"]]),
-                                         .data[["OlinkID_HT"]],
-                                         .data[["OlinkID"]])) |>
-          dplyr::filter(!(.data[["OlinkID_HT"]] %in% filtered_oids)),
+            relationship = "many-to-one"
+          ),
         ref_samples = bridge_samples,
         ref_name = "HT",
         ref_cols = list(sample_id = "SampleID",
@@ -222,12 +213,7 @@ test_that(
               ),
             by = "OlinkID_E3072",
             relationship = "many-to-one"
-          ) |>
-          # If matched OlinkID is not found in mapping file, set OlinkID_HT to OlinkID
-          dplyr::mutate(OlinkID = ifelse(is.na(.data[["OlinkID"]]),
-                                         .data[["OlinkID_E3072"]],
-                                         .data[["OlinkID"]])) |>
-          dplyr::filter(!(.data[["OlinkID_E3072"]] %in% filtered_oids)),
+          ),
         not_ref_samples = NULL,
         not_ref_name = "3K",
         not_ref_cols = list(sample_id = "SampleID",
@@ -2425,7 +2411,7 @@ test_that(
   "olink_norm_input_cross_product - works - bridge normalization",
   {
     skip_if_not_installed("arrow")
-    
+
     skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
     skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
 
@@ -2441,8 +2427,8 @@ test_that(
           "3K_2" = data_3k
         ),
         lst_cols = list(
-          "3K_1" = list(panel = "Panel"),
-          "3K_2" = list(panel = "Panel")
+          "3K_1" = list(olink_id = "OlinkID"),
+          "3K_2" = list(olink_id = "OlinkID")
         ),
         reference_project = "3K_1"
       )
@@ -2459,6 +2445,33 @@ test_that(
       )
     )
 
+    # HT - HT ----
+
+    expect_no_condition(
+      object = lst_cross_prod_out_ht <- olink_norm_input_cross_product(
+        lst_df = list(
+          "HT_1" = data_ht,
+          "HT_2" = data_ht
+        ),
+        lst_cols = list(
+          "HT_1" = list(panel = "Panel"),
+          "HT_2" = list(panel = "Panel")
+        ),
+        reference_project = "HT_1"
+      )
+    )
+
+    expect_identical(
+      object = lst_cross_prod_out_ht,
+      expected = list(
+        norm_mode = olink_norm_modes$bridge,
+        lst_df = list(
+          "HT_1" = data_ht,
+          "HT_2" = data_ht
+        )
+      )
+    )
+
     # T96 - T96 ----
 
     expect_no_condition(
@@ -2468,8 +2481,8 @@ test_that(
           "p2" = npx_data2
         ),
         lst_cols = list(
-          "p1" = list(panel = "Panel"),
-          "p2" = list(panel = "Panel")
+          "p1" = list(olink_id = "OlinkID"),
+          "p2" = list(olink_id = "OlinkID")
         ),
         reference_project = "p1"
       )
@@ -2492,7 +2505,7 @@ test_that(
   "olink_norm_input_cross_product - works - cross-product normalization",
   {
     skip_if_not_installed("arrow")
-    
+
     skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
     skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
 
@@ -2506,10 +2519,8 @@ test_that(
           "p2" = data_ht
         ),
         lst_cols = list(
-          "p1" = list(panel = "Panel",
-                      olink_id = "OlinkID"),
-          "p2" = list(panel = "Panel",
-                      olink_id = "OlinkID")
+          "p1" = list(olink_id = "OlinkID"),
+          "p2" = list(olink_id = "OlinkID")
         ),
         reference_project = "p2"
       )
@@ -2533,11 +2544,7 @@ test_that(
                 ),
               by = "OlinkID_E3072",
               relationship = "many-to-one"
-            ) |>
-            # If matched OlinkID is not found in mapping file, set OlinkID_HT to OlinkID
-            dplyr::mutate(OlinkID = ifelse(is.na(.data[["OlinkID"]]),
-                                           .data[["OlinkID_E3072"]],
-                                           .data[["OlinkID"]])),
+            ),
           "p2" = data_ht |>
             dplyr::rename(
               "OlinkID_HT" = "OlinkID"
@@ -2550,12 +2557,8 @@ test_that(
                   )
                 ),
               by = "OlinkID_HT",
-              relationship = "many-to-many"
-            ) |>
-            # If matched OlinkID is not found in mapping file, set OlinkID_HT to OlinkID
-            dplyr::mutate(OlinkID = ifelse(is.na(.data[["OlinkID"]]),
-                                           .data[["OlinkID_HT"]],
-                                           .data[["OlinkID"]]))
+              relationship = "many-to-one"
+            )
         )
       )
     )
@@ -2567,7 +2570,7 @@ test_that(
   "olink_norm_input_cross_product - error - unexpected normalization",
   {
     skip_if_not_installed("arrow")
-    
+
     skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
     skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
 
@@ -2583,8 +2586,8 @@ test_that(
           "T96" = npx_data1
         ),
         lst_cols = list(
-          "3K" = list(panel = "Panel"),
-          "T96" = list(panel = "Panel")
+          "3K" = list(olink_id = "OlinkID"),
+          "T96" = list(olink_id = "OlinkID")
         ),
         reference_project = "3K"
       ),
@@ -2600,8 +2603,8 @@ test_that(
           "T96" = npx_data1
         ),
         lst_cols = list(
-          "HT" = list(panel = "Panel"),
-          "T96" = list(panel = "Panel")
+          "HT" = list(olink_id = "OlinkID"),
+          "T96" = list(olink_id = "OlinkID")
         ),
         reference_project = "T96"
       ),
@@ -2614,7 +2617,7 @@ test_that(
   "olink_norm_input_cross_product - error - incorrect reference project",
   {
     skip_if_not_installed("arrow")
-    
+
     skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
     skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
 
@@ -2628,8 +2631,8 @@ test_that(
           "HT" = data_ht
         ),
         lst_cols = list(
-          "3K" = list(panel = "Panel"),
-          "HT" = list(panel = "Panel")
+          "3K" = list(olink_id = "OlinkID"),
+          "HT" = list(olink_id = "OlinkID")
         ),
         reference_project = "3K"
       ),
@@ -2733,7 +2736,7 @@ test_that(
     )
 
     # cross-platform norm - reference samples in datasets ----
-    
+
     skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
     skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
 
@@ -3779,7 +3782,7 @@ test_that(
   "olink_norm_input_clean_assays - works - invalid OID in df*",
   {
     skip_if_not_installed("arrow")
-    
+
     skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
     skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
 
@@ -3802,10 +3805,7 @@ test_that(
             ),
           by = "OlinkID_E3072",
           relationship = "many-to-one"
-        ) |>
-        dplyr::mutate(OlinkID = ifelse(is.na(.data[["OlinkID"]]),
-                                       .data[["OlinkID_E3072"]],
-                                       .data[["OlinkID"]]))
+        )
     )
 
     expect_no_error(
@@ -3844,10 +3844,6 @@ test_that(
           by = "OlinkID_E3072",
           relationship = "many-to-one"
         ) |>
-        # If matched OlinkID is not found in mapping file, set OlinkID_HT to OlinkID
-        dplyr::mutate(OlinkID = ifelse(is.na(.data[["OlinkID"]]),
-                                       .data[["OlinkID_E3072"]],
-                                       .data[["OlinkID"]])) |>
         dplyr::mutate(
           OlinkID = dplyr::if_else(.data[["OlinkID"]] == "OID40770_OID20117",
                                    "OID40770_OID2011",
@@ -4632,8 +4628,7 @@ test_that(
             reference_medians = reference_medians_v0,
             lst_cols = list(
               "p1" = list(olink_id = "OlinkID")
-            ),
-            norm_mode = olink_norm_modes$ref_median
+            )
           )
         )
       )
@@ -4664,8 +4659,7 @@ test_that(
             lst_cols = list(
               "p1" = list(olink_id = "OlinkID"),
               "p2" = list(olink_id = "OlinkID")
-            ),
-            norm_mode = olink_norm_modes$bridge
+            )
           )
         )
       )
@@ -4696,8 +4690,7 @@ test_that(
               "p2" = list(olink_id = "OlinkID"),
               "p3" = list(olink_id = "OlinkID"),
               "p4" = list(olink_id = "OlinkID")
-            ),
-            norm_mode = olink_norm_modes$bridge
+            )
           )
         )
       )
@@ -4739,8 +4732,7 @@ test_that(
         reference_medians = reference_medians_v0,
         lst_cols = list(
           "p1" = list(olink_id = "OlinkID")
-        ),
-        norm_mode = olink_norm_modes$ref_median
+        )
       ),
       regexp = "Assay \"OID00471\" not shared across input dataset"
     )
@@ -4780,8 +4772,7 @@ test_that(
         reference_medians = reference_medians_v1,
         lst_cols = list(
           "p1" = list(olink_id = "OlinkID")
-        ),
-        norm_mode = olink_norm_modes$ref_median
+        )
       ),
       regexp = "Assay \"OID00471\" not shared across input dataset"
     )
@@ -4827,8 +4818,7 @@ test_that(
         reference_medians = reference_medians_v2,
         lst_cols = list(
           "p1" = list(olink_id = "OlinkID")
-        ),
-        norm_mode = olink_norm_modes$ref_median
+        )
       ),
       regexp = paste("Assays \"OID00471\", \"OID00472\", \"OID00474\",",
                      "\"OID00475\", \"OID00479\", \"OID00480\", and",
@@ -4875,8 +4865,7 @@ test_that(
         lst_cols = list(
           "p1" = list(olink_id = "OlinkID"),
           "p2" = list(olink_id = "OlinkID")
-        ),
-        norm_mode = olink_norm_modes$bridge
+        )
       ),
       regexp = paste("Assay \"OID00471\" not shared across input dataset")
     )
@@ -4913,8 +4902,7 @@ test_that(
         lst_cols = list(
           "p1" = list(olink_id = "OlinkID"),
           "p2" = list(olink_id = "OlinkID")
-        ),
-        norm_mode = olink_norm_modes$bridge
+        )
       ),
       regexp = paste("Assays \"OID01300\", \"OID01301\", \"OID01302\",",
                      "\"OID01303\", \"OID01282\", \"OID01283\"")
@@ -4962,8 +4950,7 @@ test_that(
           "p2" = list(olink_id = "OlinkID"),
           "p3" = list(olink_id = "OlinkID"),
           "p4" = list(olink_id = "OlinkID")
-        ),
-        norm_mode = olink_norm_modes$bridge
+        )
       ),
       regexp = paste("Assays \"OID01300\", \"OID01301\", \"OID01302\",",
                      "\"OID01303\", \"OID01282\", \"OID01283\"")
@@ -5216,4 +5203,3 @@ test_that(
     )
   }
 )
-
