@@ -180,3 +180,60 @@ test_that("extra column", {
 
   expect_no_warning(read_NPX(testthat::test_path("refs/mock_sampleID_hashes.csv")))
 })
+
+# RUO parquet file ----
+
+test_that(
+  "read_npx_parquet - RUO file",
+  {
+    skip_if_not_installed("withr")
+    skip_if_not_installed("arrow")
+
+    withr::with_tempfile(
+      new = "pfile_ruo",
+      pattern = "parquet-file_ruo",
+      fileext = ".parquet",
+      code = {
+
+        # random data frame
+        df <- dplyr::tibble(
+          "SampleID" = c(1, 2.2, 3.14),
+          "OlinkID" = c("a", "b", "c"),
+          "UniProt" = c(TRUE, TRUE, FALSE),
+          "Assay" = c("NA", "B", NA_character_),
+          "Panel" = c(1L, 2L, 3L),
+          "PlateID" = c(1, 2.2, 3.14),
+          "SampleQC" = c("a", "b", "c"),
+          "NPX" = c(1L, 2L, 3L)
+        ) |>
+          arrow::as_arrow_table(df)
+
+        # modify metadata
+        df_metadata_list <- list(
+          "DataFileType" = "NPX File",
+          "Product" = "ExploreHT",
+          "RUO" = "I am for reasearch only!"
+        )
+        df$metadata <- df_metadata_list
+
+        # write parquet
+        arrow::write_parquet(
+          x = df,
+          sink = pfile_ruo,
+          compression = "gzip"
+        )
+
+        # check that the parquet file was created
+        expect_true(object = file.exists(pfile_ruo))
+
+        # check that relevant error is thrown
+        expect_message(
+          object = read_npx_parquet(filename = pfile_ruo),
+          regexp = "I am for reasearch only!"
+        )
+
+      }
+    )
+
+  }
+)
