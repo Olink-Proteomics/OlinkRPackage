@@ -72,7 +72,7 @@ install.packages("OlinkAnalyze")
 + *olink_volcano_plot* Easy volcano plot with Olink theme
 + *olink_heatmap_plot* Function which generates a heatmap over all proteins
 + *set_plot_theme* Function to set plot theme
-+ *bridgeable_plts* Function which generates plots that illustrate the three criteria for determining whether an assay is bridgeable in cross-product bridge normalizations
++ *olink_bridgeability_plot* Function which generates plots that illustrate the three criteria for determining whether an assay is bridgeable in cross-product bridge normalizations
 
 
 **Sample datasets**
@@ -914,9 +914,9 @@ knitr::include_graphics(normalizePath("../man/figures/olink_fill_discrete_boxplo
 ```
 
 
-## Visualizing bridgeability criteria for between-product normalization (bridgeable_plts)
+## Visualizing bridgeability criteria for between-product normalization (olink_bridgeability_plot)
 
-The bridgeable_plts function generates a series of plots on a per-assay basis for a data frame generated from between-product bridging. The coloration of the figure headers indicate whether that assay has been defined as bridgeable or not bridgeable. The correlation plot, violin plot, and bar chart figures illustrate the three criteria for determining whether an assay is bridgeable. If an assay is determined to  be bridgeable, the ECDF curve and corresponding KS statistic are used to determine which normalization approach (median centering or quantile smoothing) is most suitable for between-product normalization. For more information on the between-product bridging methodology and bridgeability criteria, consult the [Bridging Olink^®^ Explore 3072 to Olink^®^ Explore HT Tutorial](bridging_E3072toEHT.html).
+The olink_bridgeability_plot function generates a series of plots on a per-assay basis for a data frame generated from between-product bridging. The coloration of the figure headers indicate whether that assay has been defined as bridgeable or not bridgeable. The correlation plot, violin plot, and bar chart figures illustrate the three criteria for determining whether an assay is bridgeable. If an assay is determined to  be bridgeable, the ECDF curve and corresponding KS statistic are used to determine which normalization approach (median centering or quantile smoothing) is most suitable for between-product normalization. For more information on the between-product bridging methodology and bridgeability criteria, consult the [Bridging Olink^®^ Explore 3072 to Olink^®^ Explore HT Tutorial](bridging_E3072toEHT.html).
 
 ### Function arguments
 
@@ -942,20 +942,26 @@ overlapping_samples <- unique(intersect(npx_ht |>
                                           dplyr::distinct(SampleID) |>
                                           dplyr::pull()))
 
-data <- OlinkAnalyze::olink_normalization(df1 = npx_ht,
-                                          df2 = npx_3072,
-                                          overlapping_samples_df1 =
-                                            overlapping_samples,
-                                          df1_project_nr = "Explore HT",
-                                          df2_project_nr = "Explore 3072",
-                                          reference_project = "Explore HT")
+npx_br_data <- OlinkAnalyze::olink_normalization(
+  df1 = npx_ht,
+  df2 = npx_3072,
+  overlapping_samples_df1 = overlapping_samples,
+  df1_project_nr = "Explore HT",
+  df2_project_nr = "Explore 3072",
+  reference_project = "Explore HT"
+  )
 
 
-results <- bridgeable_plts(data = data,
-                           median_counts_threshold = 150,
-                           min_count = 10,
-                           bridge_sampleid = overlapping_samples)
+npx_br_data_bridgeable_plt <- olink_bridgeability_plot(
+  data = npx_br_data,
+  median_counts_threshold = 150,
+  min_count = 10,
+  bridge_sampleid = overlapping_samples
+  )
+
+npx_br_data_bridgeable_plt[[1]]
 ```
+
 ```{r message=FALSE, echo = FALSE, out.width = "600px"}
 knitr::include_graphics(normalizePath("../man/figures/bridgeable_plt_MedianCenter.png"), error = FALSE)
 ```
