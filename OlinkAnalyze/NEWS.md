@@ -1,3 +1,22 @@
+# Olink Analyze 4.1.0
+## Minor Changes
+* Functionality has been added to read_NPX, olink_lod, and olink_plate_randomizer to support additional data types (#487, @kathy-nevola)
+* A new function has been added to visualize the criteria used to establish the recommended bridging method for an assay in cross-product bridging (#468, @amrita-kar)
+* A new function has been added to simplify data wrangling on bridged data after cross-product bridging (#472, @dtopouza)
+* The tutorial on Olink Explore 3072 to Explore HT bridging has been updated to reflect the new functions (#473, @kristynchin-olink)
+* Documentation for plate randomization when keeping samples from the same studies together has been improved in function documentation and the Plate Randomization tutorial (#483, @kathy-nevola)
+* Contact us and legal disclaimer information has been updated and added to all tutorials (#490, @kathy-nevola)
+* A Research Use Only (RUO) message is now printed when reading parquet files (#487, @kathy-nevola)
+* References to NPX Explore have been generalized to Olink Software in tutorials (#490, @kathy-nevola)
+* The overview tutorial has been updated and streamlined (#473, @kristynchin-olink)
+
+## Bug Fixes
+* Assay CTRL is no longer characterized as a control assay (#484, @dtopouza)
+* An error that had previously limited Explore HT to Explore HT bridging has been resolved (#491, @klevdiamanti)
+* The minimum number of bridge samples for QS normalization has been corrected to 40 samples.
+* The Block column is now transformed into a character value to ensure consistency across products.
+
+
 # Olink Analyze 4.0.2
 ## Bug Fixes
 * Product is now identified by column name for cross-product normalization, rather than OlinkIDs. This allows for non-overlapping assays to be present in input files. (#469, @kathy-nevola)
