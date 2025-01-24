@@ -543,7 +543,7 @@ test_that(
         dplyr::select(all_of("OlinkID")) |>
         dplyr::distinct() |>
         dplyr::pull(),
-      expected = c("OID41012", "OID20054")
+      expected = c("OID20054", "OID41012")
     )
 
 
