@@ -15,7 +15,6 @@
 *	The Block column is now transformed into a character value to ensure consistency across products.
 
 
-
 # Olink Analyze 4.0.2
 ## Bug Fixes
 * Product is now identified by column name for cross-product normalization, rather than OlinkIDs. This allows for non-overlapping assays to be present in input files. (#469, @kathy-nevola)
