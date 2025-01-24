@@ -43,13 +43,13 @@
 #'                                          reference_project = "Explore HT")
 #'
 #'olinkids <- unique(paste0(data$OlinkID,"_",data$Assay))
-#'results <- bridgeable_plts(data = data,
+#'results <- olink_bridgeability_plot(data = data,
 #'                           median_counts_threshold = 150,
 #'                           min_count = 10)
 #'names(results) <- olinkids
 #'}
 
-bridgeable_plts <- function(data,
+olink_bridgeability_plot <- function(data,
                             median_counts_threshold = 150,
                             min_count = 10) {
 
