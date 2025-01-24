@@ -15,6 +15,7 @@
 * An error that had previously limited Explore HT to Explore HT bridging has been resolved (#491, @klevdiamanti)
 * The minimum number of bridge samples for QS normalization has been corrected to 40 samples.
 * The Block column is now transformed into a character value to ensure consistency across products.
+* An error that had previously impacted paired Wilcoxon tests has been resolved. (#485, @boxizhang)
 
 
 # Olink Analyze 4.0.2
