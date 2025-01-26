@@ -644,7 +644,7 @@ olink_normalization_qs <- function(lst_df,
 
 
 #' Formatting the output of olink_normalization_product for seamless use with
-#' downstream OA functions.
+#' downstream Olink Analyze functions.
 #'
 #' @author
 #' Danai G. Topouza
@@ -723,9 +723,9 @@ olink_normalization_product_format <- function(bridged_df,
       Panel == "Explore_HT" ~ OlinkID,
       Panel != "Explore_HT" ~ OlinkID_E3072
     )) |>
-    dplyr::select(!c(.data[["MedianCenteredNPX"]],
-                       .data[["QSNormalizedNPX"]],
-                       .data[["OlinkID_E3072"]]))# Remove extra columns
+    dplyr::select(-any_of(c("MedianCenteredNPX",
+                            "QSNormalizedNPX",
+                            "OlinkID_E3072")))# Remove extra columns
 
 
   # Extract data from non-overlapping assays
@@ -766,9 +766,9 @@ olink_normalization_product_format <- function(bridged_df,
     dplyr::mutate(OlinkID = paste0(.data[["OlinkID"]],
                                    "_",
                                    .data[["OlinkID_E3072"]])) |>
-    dplyr::select(!c(.data[["MedianCenteredNPX"]],
-                     .data[["QSNormalizedNPX"]],
-                     .data[["OlinkID_E3072"]]))# Remove extra columns
+    dplyr::select(-any_of(c("MedianCenteredNPX",
+                            "QSNormalizedNPX",
+                            "OlinkID_E3072")))# Remove extra columns
 
   df_full <- rbind(df_format,
                    df_not_bridgeable,

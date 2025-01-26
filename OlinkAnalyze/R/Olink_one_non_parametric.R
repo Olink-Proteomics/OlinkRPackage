@@ -260,6 +260,7 @@ olink_one_non_parametric <- function(df,
 #' @param olinkid_list Character vector of OlinkID's on which to perform post hoc analysis. If not specified, all assays in df are used.
 #' @param variable Single character value or character array.
 #' @param test Single character value indicates running the post hoc test for friedman or kruskal.
+#' @param subject Group information for the repeated measurement. If (dependence = TRUE), this parameter need to be specified.
 #' @param verbose Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 #' @return Tibble of posthoc tests for specified effect, arranged by ascending adjusted p-values.
 #'
