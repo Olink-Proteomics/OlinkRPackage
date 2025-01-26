@@ -723,9 +723,9 @@ olink_normalization_product_format <- function(bridged_df,
       Panel == "Explore_HT" ~ OlinkID,
       Panel != "Explore_HT" ~ OlinkID_E3072
     )) |>
-    dplyr::select(!c(.data[["MedianCenteredNPX"]],
-                       .data[["QSNormalizedNPX"]],
-                       .data[["OlinkID_E3072"]]))# Remove extra columns
+    dplyr::select(-any_of(c("MedianCenteredNPX",
+                            "QSNormalizedNPX",
+                            "OlinkID_E3072")))# Remove extra columns
 
 
   # Extract data from non-overlapping assays
