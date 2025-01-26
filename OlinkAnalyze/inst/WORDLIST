@@ -11,7 +11,9 @@ Bargraph
 BgRatio
 BioConductor
 Bo
+bridgeability
 bridgeselector
+bridgings
 BridgingRecommendation
 Bugfixes
 BugFixes
@@ -102,6 +104,7 @@ na
 NES
 nolint
 NotBridgeable
+NotOverlapping
 npx
 NPX
 nr
@@ -153,6 +156,8 @@ Readme
 reproducibility
 rstatix
 Rstudio
+RUO
+sampleid
 SampleID
 SampleID's
 SampleIDs
@@ -171,6 +176,7 @@ sumsq
 tbl
 theming
 Theming
+Thermo
 tibble
 Tibble
 tidyselect
@@ -219,3 +225,4 @@ Topouza's
 ctrl
 lapply
 rds
+xlsx

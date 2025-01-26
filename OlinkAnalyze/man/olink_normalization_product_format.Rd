@@ -3,7 +3,7 @@
 \name{olink_normalization_product_format}
 \alias{olink_normalization_product_format}
 \title{Formatting the output of olink_normalization_product for seamless use with
-downstream OA functions.}
+downstream Olink Analyze functions.}
 \usage{
 olink_normalization_product_format(
   bridged_df,

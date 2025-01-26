@@ -72,7 +72,7 @@ install.packages("OlinkAnalyze")
 + *olink_volcano_plot* Easy volcano plot with Olink theme
 + *olink_heatmap_plot* Function which generates a heatmap over all proteins
 + *set_plot_theme* Function to set plot theme
-+ *olink_bridgeability_plot* Function which generates plots that illustrate the three criteria for determining whether an assay is bridgeable in cross-product bridge normalizations
++ *olink_bridgeability_plot* Function which generates plots that illustrate the three criteria for determining whether an assay is bridgeable in cross-product bridge normalization.
 
 
 **Sample datasets**
@@ -930,7 +930,7 @@ The olink_bridgeability_plot function generates a series of plots on a per-assay
 
 * df: NPX data frame generated from between-product bridging in long format. Should minimally contain Assay, OlinkID, OlinkID_E3072, and all data points corresponding to bridging samples from the reference project and the new project.
 * median_counts_threshold: Integer indicating minimum median counts allowed for each platform. If either platform has median counts below 150 for an assay, the assay fails the counts criteria when evaluating bridgeability. Default: 150.
-* min_counts: Integer indicating minimum counts allowed for a datapoint. If any datapoint in the bridge normalized dataframe contains fewer than the defined minimum count cutoff, it is excluded from the bridgeability assessment and corresponding figures. Default: 10.
+* min_counts: Integer indicating minimum counts allowed for a data point. If any data point in the bridge normalized dataframe contains fewer than the defined minimum count cutoff, it is excluded from the bridgeability assessment and corresponding figures. Default: 10.
 * bridge_sampleid: Character vector containing overlapping SampleIDs between the two bridging projects. If this argument is not provided, the function will look for overlapping SampleID values between the two projects in the bridged dataframe. Default: NULL.  
 
 ```{r message=FALSE, eval = FALSE}

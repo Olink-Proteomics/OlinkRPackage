@@ -644,7 +644,7 @@ olink_normalization_qs <- function(lst_df,
 
 
 #' Formatting the output of olink_normalization_product for seamless use with
-#' downstream OA functions.
+#' downstream Olink Analyze functions.
 #'
 #' @author
 #' Danai G. Topouza
