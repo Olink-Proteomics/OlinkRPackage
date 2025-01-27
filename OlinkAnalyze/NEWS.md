@@ -1,3 +1,11 @@
+# Olink Analyze 4.1.1
+## Minor Changes
+* Images were decreased in dimension to meet CRAN Size requirements (#500, @kathy-nevola)
+
+## Bug Fixes
+* Dataframe name was corrected in Olink Explore 3072 to Olink Explore HT bridging tutorial Downstream Analysis section. (#500, @kathy-nevola)
+
+
 # Olink Analyze 4.1.0
 ## Minor Changes
 * Functionality has been added to read_NPX, olink_lod, and olink_plate_randomizer to support additional data types (#487, @kathy-nevola)

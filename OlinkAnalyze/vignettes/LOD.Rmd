@@ -280,8 +280,8 @@ df$metadata$ExploreVersion <- "NA"
 df$metadata$ProjectName <- "NA"
 df$metadata$SampleMatrix <- "NA"
 df$metadata$DataFileType <- "Olink Analyze Export File"
-df$metadata$ProductType <- "ExploreHT" # "ExploreHT" or "Explore3072"
-df$metadata$Product <- "ExploreHT" # "ExploreHT" or "Explore3072"
+df$metadata$ProductType <- "ExploreHT" # "ExploreHT", "Explore3072", or "Reveal"
+df$metadata$Product <- "ExploreHT" # "ExploreHT", "Explore3072", or "Reveal"
 
 arrow::write_parquet(x = df, sink = "path_to_output.parquet")
 ```
