@@ -220,7 +220,7 @@ test_that(
         arrow::write_parquet(
           x = df,
           sink = pfile_ruo,
-          compression = "gzip"
+          compression = "uncompressed"
         )
 
         # check that the parquet file was created
