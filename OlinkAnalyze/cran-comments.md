@@ -1,6 +1,6 @@
 ## Release Summary
 
-This release adds new visualization functions and expanded data input functionality to Olink Analyze 4.1.0.
+This release removes gzip compression in unit test to support Debian. 
 
 ## R CMD check results
 
