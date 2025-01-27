@@ -372,7 +372,7 @@ olink_normalization_bridgeable <- function(lst_df,
 #' @return A "tibble" of Olink data in long format containing both input
 #' datasets with the quantile normalized quantifications.
 #'
-#' @keywords Normalization; Quantile ; Smoothing
+#' @keywords Normalization Quantile Smoothing
 #'
 #'
 #' @examples
