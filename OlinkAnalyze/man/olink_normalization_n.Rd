@@ -287,6 +287,6 @@ olink_normalization_n(norm_schema = norm_schema_n)
 
 }
 \keyword{Bridge}
-\keyword{Normalization;}
+\keyword{Normalization}
 \keyword{Subset}
-\keyword{normalization;}
+\keyword{n}

@@ -82,6 +82,9 @@
 #' subset normalization.
 #' @param reference_medians Dataset with columns "OlinkID" and "Reference_NPX".
 #' Required for reference median normalization.
+#' @param format Boolean that controls whether the normalized dataset will be
+#' formatted for input to downstream analysis. Only applicable for cross-product
+#' bridge normalization.
 #'
 #' @return Tibble or ArrowObject with the normalized dataset.
 #'
@@ -222,7 +225,8 @@
 #'   overlapping_samples_df1 = overlap_samples_product,
 #'   df1_project_nr = "proj_ht",
 #'   df2_project_nr = "proj_3k",
-#'   reference_project = "proj_ht"
+#'   reference_project = "proj_ht",
+#'   format = FALSE
 #' )
 #' }
 #'
@@ -233,7 +237,8 @@ olink_normalization <- function(df1,
                                 df1_project_nr = "P1",
                                 df2_project_nr = "P2",
                                 reference_project = "P1",
-                                reference_medians = NULL) {
+                                reference_medians = NULL,
+                                format = FALSE) {
 
   # check input ----
   lst_check <- olink_norm_input_check(
@@ -305,6 +310,14 @@ olink_normalization <- function(df1,
         not_ref_name = lst_check$not_ref_name,
         not_ref_cols = lst_check$not_ref_cols
       )
+
+      if (format == TRUE) {
+        df_norm <- olink_normalization_product_format(bridged_df = df_norm,
+                                                      df1 = df1,
+                                                      df1_project_nr = df1_project_nr,
+                                                      df2 = df2,
+                                                      df2_project_nr = df2_project_nr)
+      }
 
     } else if (lst_check$norm_mode == olink_norm_modes$subset) {
       # subset normalization ----

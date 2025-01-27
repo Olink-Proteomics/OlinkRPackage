@@ -4,6 +4,8 @@ output:
   html_vignette:
     toc: true
     toc_depth: 3
+    includes:
+      in_header: ../man/figures/logo.html
 vignette: >
   %\VignetteIndexEntry{Introduction to bridging Olink® NPX datasets}
   %\VignetteEncoding{UTF-8}
@@ -502,15 +504,27 @@ new_normalized_data <- npx_br_data %>%
 
 ```
 
-## Contact us
+## Contact Us
 
 We are always happy to help. Email us with any questions:
 
 -   biostat\@olink.com for statistical services and general stats
     questions
 
--   biostattools\@olink.com for Olink Analyze and Shiny app support
-
 -   support\@olink.com for Olink lab product and technical support
 
 -   info\@olink.com for more information
+
+## Legal Disclaimer
+
+© 2025 Olink Proteomics AB, part of Thermo Fisher Scientific.
+
+Olink products and services are For Research Use Only. Not for use in diagnostic procedures.
+
+All information in this document is subject to change without notice. This document is not intended to convey any warranties, representations and/or recommendations of any kind, unless such warranties, representations and/or recommendations are explicitly stated.
+
+Olink assumes no liability arising from a prospective reader’s actions based on this document.
+
+OLINK, NPX, PEA, PROXIMITY EXTENSION, INSIGHT and the Olink logotype are trademarks registered, or pending registration, by Olink Proteomics AB. All third-party trademarks are the property of their respective owners.
+
+Olink products and assay methods are covered by several patents and patent applications [https://www.olink.com/patents/](https://olink.com/patents/).

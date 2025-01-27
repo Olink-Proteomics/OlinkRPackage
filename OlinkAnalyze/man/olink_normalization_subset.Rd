@@ -139,6 +139,5 @@ olink_normalization_subset(project_1_df = npx_df1,
 }
 
 }
-\keyword{Normalization;}
+\keyword{Normalization}
 \keyword{Subset}
-\keyword{normalization}

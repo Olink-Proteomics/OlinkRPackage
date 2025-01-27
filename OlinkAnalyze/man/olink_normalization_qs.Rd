@@ -101,7 +101,6 @@ Marianne Sandin
 Masoumeh Sheikhi
 Klev Diamanti
 }
-\keyword{;}
-\keyword{Normalization;}
+\keyword{Normalization}
 \keyword{Quantile}
 \keyword{Smoothing}

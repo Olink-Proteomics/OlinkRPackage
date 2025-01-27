@@ -6,6 +6,8 @@ output:
   html_vignette:
     toc: true
     toc_depth: 3
+    includes:
+      in_header: ../man/figures/logo.html
     
 vignette: >
   %\VignetteIndexEntry{Plate Randomization Vignette}
@@ -15,6 +17,12 @@ vignette: >
 ```{r, echo=FALSE,message=FALSE, eval=FALSE}
 library(OlinkAnalyze)
 ```
+
+```{r include=FALSE}
+library(OlinkAnalyze)
+data(manifest)
+```
+
 
 ```{r, echo=FALSE,message=FALSE}
 library(dplyr)
@@ -31,12 +39,6 @@ knitr::opts_chunk$set(warning = FALSE,
 ## Introduction
 
 This vignette describes how to use Olink® Analyze to randomize the samples with an option to keep subjects on the same plate. When a study is well randomized the experimental variables can be considered to be evenly distributed across each plate, even for a larger study. What variables to randomize for should be decided for each study as these vary with the study purpose. Correct sample randomization will empower your study and minimize the risk of introducing any bias that can confound downstream analyses. If at all possible, samples from the same subject that are taken at various times during a longitudinal research should all be placed on the same plate to further limit data fluctuation. In order to evenly disperse the remaining experimental variables between plates, the individuals should subsequently be distributed. If randomization is not performed true biological variation may be missed or misidentified as e.g. technical variations. However, it would be challenging for us to control every variable. Most of the time, a complete randomization will be carried out, and the outcomes can be assessed by visualizing the layout of the plates. In this vignette, you will learn how to achieve this using the `olink_plate_randomizer()` function. And on top of that, you will also learn how to use `olink_displayPlateLayout()` and `olink_displayPlateDistributions()` to evaluate the performed randomization based on a given grouping variable.
-
-
-```{r Outlier_data, include=FALSE}
-library(OlinkAnalyze)
-data(manifest)
-```
 
 
 ## Sample randomization
@@ -113,6 +115,16 @@ randomized_manifest %>%
 
 ```
 
+## Multi-study manifests
+
+In the case of a manifest that includes multiple studies, the optional `study` argument can be used to group samples by study and randomized the samples within the study. In the example below, "Site" is used as a surrogate for study. After randomization the sites are kept together across the plates.
+
+```{r}
+randomized.manifest_c <- olink_plate_randomizer(manifest, study = "Site")
+olink_displayPlateLayout(randomized.manifest_c, fill.color = "Site")
+```
+
+
 ## Visualization
 
 To illustrate the goodness of randomization, both `olink_displayPlateLayout()` and `olink_displayPlateDistributions` functions could be used.
@@ -176,17 +188,27 @@ write_xlsx(randomized.manifest,"randomized.manifest.xlsx")
 ```
 
 
-## Contact Us!
+## Contact Us
 
 We are always happy to help. Email us with any questions:
 
--   biostat\@olink.com for statistical services and general stats questions
-
--   biostattools\@olink.com for Olink Analyze and Shiny app support
+-   biostat\@olink.com for statistical services and general stats
+    questions
 
 -   support\@olink.com for Olink lab product and technical support
 
 -   info\@olink.com for more information
 
+## Legal Disclaimer
 
+© 2025 Olink Proteomics AB, part of Thermo Fisher Scientific.
 
+Olink products and services are For Research Use Only. Not for use in diagnostic procedures.
+
+All information in this document is subject to change without notice. This document is not intended to convey any warranties, representations and/or recommendations of any kind, unless such warranties, representations and/or recommendations are explicitly stated.
+
+Olink assumes no liability arising from a prospective reader’s actions based on this document.
+
+OLINK, NPX, PEA, PROXIMITY EXTENSION, INSIGHT and the Olink logotype are trademarks registered, or pending registration, by Olink Proteomics AB. All third-party trademarks are the property of their respective owners.
+
+Olink products and assay methods are covered by several patents and patent applications [https://www.olink.com/patents/](https://olink.com/patents/).
