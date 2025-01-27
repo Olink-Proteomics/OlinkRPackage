@@ -767,7 +767,7 @@ knitr::include_graphics(normalizePath("../man/figures/olink_pathway_heatmap_gsea
 try({ # This expression might fail if dependencies are not installed
 olink_pathway_heatmap(enrich_results = ora_results, 
                       test_results = ttest_results,
-                      method = "ORA", keyword = "cell")
+                      method = "ORA", keyword = "immune")
 })
 ```
 
