@@ -2,7 +2,7 @@
 % Please edit documentation in R/read_npx_utils.R
 \name{convert_read_npx_output}
 \alias{convert_read_npx_output}
-\title{Help function converting the output data frame from a read_npx* function to
+\title{Help function converting the output dataset from read_npx* functions to
 "tibble" or "ArrowObject".}
 \usage{
 convert_read_npx_output(df, out_df)
@@ -10,13 +10,14 @@ convert_read_npx_output(df, out_df)
 \arguments{
 \item{df}{Dataset to be converted.}
 
-\item{out_df}{Class of output data frame. One of "tibble" and "arrow".}
+\item{out_df}{Class of output data frame. One of
+"tibble" and "arrow".}
 }
 \value{
 The dataset in the requested class.
 }
 \description{
-Help function converting the output data frame from a read_npx* function to
+Help function converting the output dataset from read_npx* functions to
 "tibble" or "ArrowObject".
 }
 \author{
