@@ -71,7 +71,7 @@
 #'
 #' @export
 #'
-#' @keywords Normalization; Bridge normalization; Subset normalization;
+#' @keywords Normalization Bridge Subset n
 #'
 #' @examples
 #' \donttest{
@@ -445,7 +445,7 @@ olink_normalization_n <- function(norm_schema) {
 #'
 #' @export
 #'
-#' @keywords Normalization; Bridge normalization
+#' @keywords Normalization Bridge
 #'
 #' @examples
 #' \donttest{
@@ -580,7 +580,7 @@ olink_normalization_bridge <- function(project_1_df,
 #'
 #' @export
 #'
-#' @keywords Normalization; Subset normalization
+#' @keywords Normalization Subset
 #'
 #' @examples
 #' \donttest{

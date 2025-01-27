@@ -78,5 +78,4 @@ olink_normalization_bridge(project_1_df = npx_df1,
 
 }
 \keyword{Bridge}
-\keyword{Normalization;}
-\keyword{normalization}
+\keyword{Normalization}
