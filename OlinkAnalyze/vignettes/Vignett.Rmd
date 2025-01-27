@@ -956,8 +956,7 @@ npx_br_data <- OlinkAnalyze::olink_normalization(
 npx_br_data_bridgeable_plt <- olink_bridgeability_plot(
   data = npx_br_data,
   median_counts_threshold = 150,
-  min_count = 10,
-  bridge_sampleid = overlapping_samples
+  min_count = 10
   )
 
 npx_br_data_bridgeable_plt[[1]]
