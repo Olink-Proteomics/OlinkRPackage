@@ -14,14 +14,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60        
     env:
-      GITHUB_PAT: ${{ secrets.PAT }}
+      GITHUB_PAT: ${{ secrets.OA_PAT }}
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
         with: 
           fetch-depth: 0
-          token: ${{ secrets.PAT }}
+          token: ${{ secrets.OA_PAT }}
 
       - uses: r-lib/actions/setup-pandoc@v2
         with:
