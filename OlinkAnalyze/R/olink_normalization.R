@@ -336,6 +336,12 @@ olink_normalization <- function(df1,
     }
   }
 
+  # Recalculate MaxLOD
+  df_norm <- norm_internal_update_maxlod(
+    df = df_norm,
+    cols = lst_check$ref_cols
+  )
+
   return(df_norm)
 }
 
@@ -958,4 +964,36 @@ norm_internal_adjust_not_ref <- function(df,
         ~ .x + .data[["Adj_factor"]]
       )
     )
+}
+
+#' Update MaxLOD to the maximum MaxLOD across normalized datatsets.
+#'
+#' @param df Normalized Olink dataset (required).
+#' @param cols Named list of column names in the dataset (required).
+#'
+#' @returns The same dataset as the input \var{df} with the column reflecting
+#' MaxLOD updated.
+#'
+norm_internal_update_maxlod <- function(df,
+                                        cols) {
+
+  # check if MaxLOD is present in the column names
+  if (any(names(df) %in% olink_norm_recalc$max_lod)) {
+
+    # update MaxLOD to the maximum of the MaxLODs for each assay
+    df <- df |>
+      dplyr::group_by(
+        .data[[cols$olink_id]]
+      ) |>
+      dplyr::mutate(
+        dplyr::across(
+          dplyr::any_of(olink_norm_recalc$max_lod),
+          ~ max(.x, na.rm = TRUE)
+        )
+      ) |>
+      dplyr::ungroup()
+
+  }
+
+  return(df)
 }
