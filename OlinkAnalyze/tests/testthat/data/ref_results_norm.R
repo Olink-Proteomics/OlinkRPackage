@@ -231,6 +231,10 @@ lst_norm$bridge_norm$multiple_lod <- OlinkAnalyze::olink_normalization(
 ) |>
   dplyr::filter(
     .data[["SampleID"]] %in% lst_sample$sample_subset
+  ) |>
+  dplyr::mutate(
+    MaxLOD = max(.data[["MaxLOD"]], na.rm = TRUE),
+    .by = dplyr::all_of(c("OlinkID"))
   )
 
 ## subset normalization ----
@@ -295,6 +299,10 @@ lst_norm$subset_norm$multiple_lod <- OlinkAnalyze::olink_normalization(
 ) |>
   dplyr::filter(
     .data[["SampleID"]] %in% lst_sample$sample_subset
+  ) |>
+  dplyr::mutate(
+    MaxLOD = max(.data[["MaxLOD"]], na.rm = TRUE),
+    .by = dplyr::all_of(c("OlinkID"))
   )
 
 ## intensity normalization ----
@@ -359,6 +367,10 @@ lst_norm$intensity_norm$multiple_lod <- OlinkAnalyze::olink_normalization(
 ) |>
   dplyr::filter(
     .data[["SampleID"]] %in% lst_sample$sample_subset
+  ) |>
+  dplyr::mutate(
+    MaxLOD = max(.data[["MaxLOD"]], na.rm = TRUE),
+    .by = dplyr::all_of(c("OlinkID"))
   )
 
 ## reference median normalization ----
@@ -439,6 +451,10 @@ lst_norm$ref_med_norm$multiple_lod <- OlinkAnalyze::olink_normalization(
     dplyr::all_of(
       c(colnames(lst_df$df1_multiple_lod), "Adj_factor", "Project")
     )
+  ) |>
+  dplyr::mutate(
+    MaxLOD = max(.data[["MaxLOD"]], na.rm = TRUE),
+    .by = dplyr::all_of(c("OlinkID"))
   )
 
 # save data ----
