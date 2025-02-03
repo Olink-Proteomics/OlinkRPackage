@@ -1,4 +1,4 @@
-# This script generated reference data for olink_normalization using
+# This script generated reference data for OlinkAnalyze::olink_normalization using
 # OlinkAnalyze v3.8.2. To revert to OA version OA 3.8.2 please use the following
 # command:
 # remotes::install_version("OlinkAnalyze", version = "3.8.2")
@@ -179,7 +179,7 @@ lst_norm$bridge_norm <- list()
 
 ### df1_no_norm + df2_no_norm ----
 
-lst_norm$bridge_norm$no_norm <- olink_normalization(
+lst_norm$bridge_norm$no_norm <- OlinkAnalyze::olink_normalization(
   df1 = lst_df$df1_no_norm,
   df2 = lst_df$df2_no_norm,
   overlapping_samples_df1 = lst_sample$bridge_samples,
@@ -193,7 +193,7 @@ lst_norm$bridge_norm$no_norm <- olink_normalization(
 
 ### df1_norm + df2_norm ----
 
-lst_norm$bridge_norm$norm <- olink_normalization(
+lst_norm$bridge_norm$norm <- OlinkAnalyze::olink_normalization(
   df1 = lst_df$df1_norm,
   df2 = lst_df$df2_norm,
   overlapping_samples_df1 = lst_sample$bridge_samples,
@@ -207,7 +207,7 @@ lst_norm$bridge_norm$norm <- olink_normalization(
 
 ### df1_no_lod + df2_no_lod ----
 
-lst_norm$bridge_norm$no_lod <- olink_normalization(
+lst_norm$bridge_norm$no_lod <- OlinkAnalyze::olink_normalization(
   df1 = lst_df$df1_no_lod,
   df2 = lst_df$df2_no_lod,
   overlapping_samples_df1 = lst_sample$bridge_samples,
@@ -221,7 +221,7 @@ lst_norm$bridge_norm$no_lod <- olink_normalization(
 
 ### df1_multiple_lod + df2_multiple_lod ----
 
-lst_norm$bridge_norm$multiple_lod <- olink_normalization(
+lst_norm$bridge_norm$multiple_lod <- OlinkAnalyze::olink_normalization(
   df1 = lst_df$df1_multiple_lod,
   df2 = lst_df$df2_multiple_lod,
   overlapping_samples_df1 = lst_sample$bridge_samples,
@@ -239,7 +239,7 @@ lst_norm$subset_norm <- list()
 
 ### df1_no_norm + df2_no_norm ----
 
-lst_norm$subset_norm$no_norm <- olink_normalization(
+lst_norm$subset_norm$no_norm <- OlinkAnalyze::olink_normalization(
   df1 = lst_df$df1_no_norm,
   df2 = lst_df$df2_no_norm,
   overlapping_samples_df1 = lst_sample$df1_subset,
@@ -254,7 +254,7 @@ lst_norm$subset_norm$no_norm <- olink_normalization(
 
 ### df1_norm + df2_norm ----
 
-lst_norm$subset_norm$norm <- olink_normalization(
+lst_norm$subset_norm$norm <- OlinkAnalyze::olink_normalization(
   df1 = lst_df$df1_norm,
   df2 = lst_df$df2_norm,
   overlapping_samples_df1 = lst_sample$df1_subset,
@@ -269,7 +269,7 @@ lst_norm$subset_norm$norm <- olink_normalization(
 
 ### df1_no_lod + df2_no_lod ----
 
-lst_norm$subset_norm$no_lod <- olink_normalization(
+lst_norm$subset_norm$no_lod <- OlinkAnalyze::olink_normalization(
   df1 = lst_df$df1_no_lod,
   df2 = lst_df$df2_no_lod,
   overlapping_samples_df1 = lst_sample$df1_subset,
@@ -284,7 +284,7 @@ lst_norm$subset_norm$no_lod <- olink_normalization(
 
 ### df1_multiple_lod + df2_multiple_lod ----
 
-lst_norm$subset_norm$multiple_lod <- olink_normalization(
+lst_norm$subset_norm$multiple_lod <- OlinkAnalyze::olink_normalization(
   df1 = lst_df$df1_multiple_lod,
   df2 = lst_df$df2_multiple_lod,
   overlapping_samples_df1 = lst_sample$df1_subset,
@@ -303,7 +303,7 @@ lst_norm$intensity_norm <- list()
 
 ### df1_no_norm + df2_no_norm ----
 
-lst_norm$intensity_norm$no_norm <- olink_normalization(
+lst_norm$intensity_norm$no_norm <- OlinkAnalyze::olink_normalization(
   df1 = lst_df$df1_no_norm,
   df2 = lst_df$df2_no_norm,
   overlapping_samples_df1 = lst_sample$df1_all,
@@ -318,7 +318,7 @@ lst_norm$intensity_norm$no_norm <- olink_normalization(
 
 ### df1_norm + df2_norm ----
 
-lst_norm$intensity_norm$norm <- olink_normalization(
+lst_norm$intensity_norm$norm <- OlinkAnalyze::olink_normalization(
   df1 = lst_df$df1_norm,
   df2 = lst_df$df2_norm,
   overlapping_samples_df1 = lst_sample$df1_all,
@@ -333,7 +333,7 @@ lst_norm$intensity_norm$norm <- olink_normalization(
 
 ### df1_no_lod + df2_no_lod ----
 
-lst_norm$intensity_norm$no_lod <- olink_normalization(
+lst_norm$intensity_norm$no_lod <- OlinkAnalyze::olink_normalization(
   df1 = lst_df$df1_no_lod,
   df2 = lst_df$df2_no_lod,
   overlapping_samples_df1 = lst_sample$df1_all,
@@ -348,7 +348,7 @@ lst_norm$intensity_norm$no_lod <- olink_normalization(
 
 ### df1_multiple_lod + df2_multiple_lod ----
 
-lst_norm$intensity_norm$multiple_lod <- olink_normalization(
+lst_norm$intensity_norm$multiple_lod <- OlinkAnalyze::olink_normalization(
   df1 = lst_df$df1_multiple_lod,
   df2 = lst_df$df2_multiple_lod,
   overlapping_samples_df1 = lst_sample$df1_all,
@@ -367,7 +367,7 @@ lst_norm$ref_med_norm <- list()
 
 ### df1_no_norm ----
 
-lst_norm$ref_med_norm$no_norm <- olink_normalization(
+lst_norm$ref_med_norm$no_norm <- OlinkAnalyze::olink_normalization(
   df1 = lst_df$df1_no_norm,
   overlapping_samples_df1 = lst_sample$df1_subset,
   reference_medians = lst_df$ref_med
@@ -386,7 +386,7 @@ lst_norm$ref_med_norm$no_norm <- olink_normalization(
 
 ### df1_norm ----
 
-lst_norm$ref_med_norm$norm <- olink_normalization(
+lst_norm$ref_med_norm$norm <- OlinkAnalyze::olink_normalization(
   df1 = lst_df$df1_norm,
   overlapping_samples_df1 = lst_sample$df1_subset,
   reference_medians = lst_df$ref_med
@@ -405,7 +405,7 @@ lst_norm$ref_med_norm$norm <- olink_normalization(
 
 ### df1_no_lod ----
 
-lst_norm$ref_med_norm$no_lod <- olink_normalization(
+lst_norm$ref_med_norm$no_lod <- OlinkAnalyze::olink_normalization(
   df1 = lst_df$df1_no_lod,
   overlapping_samples_df1 = lst_sample$df1_subset,
   reference_medians = lst_df$ref_med
@@ -424,7 +424,7 @@ lst_norm$ref_med_norm$no_lod <- olink_normalization(
 
 ### df1_multiple_lod ----
 
-lst_norm$ref_med_norm$multiple_lod <- olink_normalization(
+lst_norm$ref_med_norm$multiple_lod <- OlinkAnalyze::olink_normalization(
   df1 = lst_df$df1_multiple_lod,
   overlapping_samples_df1 = lst_sample$df1_subset,
   reference_medians = lst_df$ref_med
