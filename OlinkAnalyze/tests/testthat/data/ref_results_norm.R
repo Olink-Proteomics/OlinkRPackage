@@ -1,4 +1,4 @@
-# This script generated reference data for OlinkAnalyze::olink_normalization using
+# This script generated reference data for olink_normalization using
 # OlinkAnalyze v3.8.2. To revert to OA version OA 3.8.2 please use the following
 # command:
 # remotes::install_version("OlinkAnalyze", version = "3.8.2")
