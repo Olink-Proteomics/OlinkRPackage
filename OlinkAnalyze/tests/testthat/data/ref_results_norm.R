@@ -465,7 +465,7 @@ saveRDS(
     lst_sample = lst_sample,
     lst_norm = lst_norm
   ),
-  file = "tests/data/ref_results_norm.rds",
+  file = "tests/testthat/data/ref_results_norm.rds",
   version = 2L,
   compress = "gzip"
 )
