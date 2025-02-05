@@ -37,6 +37,7 @@ rm(normalization_utilities_file)
 # save to R/sysdata.rda ----
 
 usethis::use_data(eHT_e3072_mapping,
+                  reveal_e3072_mapping,
                   data_ht_small,
                   data_3k_small,
                   olink_norm_mode_combos,
