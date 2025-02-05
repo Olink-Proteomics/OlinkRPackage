@@ -1,6 +1,7 @@
 # load example HT data ----
 
-data_ht_file <- system.file("tests", "data", "example_HT_data.rds",
+data_ht_file <- system.file("tests", "testthat", "data",
+                            "example_HT_data.rds",
                             package = "OlinkAnalyze",
                             mustWork = TRUE)
 data_ht <- readRDS(data_ht_file)
