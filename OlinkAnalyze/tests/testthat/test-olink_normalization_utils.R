@@ -243,7 +243,7 @@ test_that(
                             lod = character(0),
                             normalization = "Normalization"),
         reference_medians = NULL,
-        norm_mode = olink_norm_modes$norm_ht_3k
+        norm_mode = olink_norm_modes$norm_cross_product
       )
     )
   }
@@ -2545,7 +2545,7 @@ test_that(
     expect_identical(
       object = lst_cross_prod_out,
       expected = list(
-        norm_mode = olink_norm_modes$norm_ht_3k,
+        norm_mode = olink_norm_modes$norm_cross_product,
         lst_df = list(
           "p1" = data_3k |>
             dplyr::rename(
@@ -2788,7 +2788,7 @@ test_that(
               "p1" = ref_samples_bridge_3k_ht,
               "p2" = ref_samples_bridge_3k_ht
             ),
-            norm_mode = "norm_ht_3k"
+            norm_mode = "norm_cross_product"
           )
         )
       )
@@ -3845,7 +3845,7 @@ test_that(
               "p1" = list(olink_id = "OlinkID",
                           normalization = character(0L))
             ),
-            norm_mode = olink_norm_modes$norm_ht_3k
+            norm_mode = olink_norm_modes$norm_cross_product
           )
         )
       )
@@ -3890,7 +3890,7 @@ test_that(
           "p1" = list(olink_id = "OlinkID",
                       normalization = character(0L))
         ),
-        norm_mode = olink_norm_modes$norm_ht_3k
+        norm_mode = olink_norm_modes$norm_cross_product
       ),
       regexp = "* p1: OID40770_OID2011"
     )

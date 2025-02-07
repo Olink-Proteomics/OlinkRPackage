@@ -30,8 +30,9 @@ The function uses the internal dataset \var{eHT_e3072_mapping} to determine
 the product source of each dataset. If both datasets originate from the same
 Olink product, then it will return
 bridge. If the datasets to be normalized
-originate from Olink Explore HT and Olink Explore 3072, it will return
-norm_ht_3k. In any other case an error is
+originate from Olink Explore HT and Olink Explore 3072
+or Olink Reveal and Olink Explore 3072, it will return
+. In any other case an error is
 thrown.
 }
 \author{
