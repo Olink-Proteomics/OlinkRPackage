@@ -368,6 +368,8 @@ olink_normalization_bridgeable <- function(lst_df,
 #' olink_norm_input_check. (required)
 #' @param bridge_samples Character vector of samples to be used for the
 #' quantile mapping. (required)
+#' @param num_samples Minimum number of bridge samples required to perform QS
+#' normalization between products.
 #'
 #' @return A "tibble" of Olink data in long format containing both input
 #' datasets with the quantile normalized quantifications.
