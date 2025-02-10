@@ -460,6 +460,70 @@ test_that(
   }
 )
 
+test_that(
+  "olink_normalization_qs - works - fewer than 40 bridge samples",
+  {
+
+    skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
+
+    data_3k <- get_example_data(filename = "example_3k_data.rds")
+    data_ht <- get_example_data(filename = "example_HT_data.rds")
+
+    # 38 bridge samples for all assays ----
+
+    bridge_samples <- intersect(
+      x = unique(data_ht$SampleID),
+      y = unique(data_3k$SampleID)
+    ) |>
+      (\(x) x[!grepl("CONTROL", x)])() |>
+      sort()
+
+    # run the internal function that check input from olink_normalization
+    expect_message(
+      object = expect_warning(
+        object = norm_input_check <- olink_norm_input_check(
+          df1 = data_ht,
+          df2 = data_3k,
+          overlapping_samples_df1 = head(x = bridge_samples, 38L),
+          overlapping_samples_df2 = NULL,
+          df1_project_nr = "P1",
+          df2_project_nr = "P2",
+          reference_project = "P1",
+          reference_medians = NULL
+        ),
+        regexp = "2 assays are not shared across products."
+      ),
+      regexp = "Cross-product normalization will be performed!"
+    )
+
+    lst_df <- list(
+      norm_input_check$ref_df,
+      norm_input_check$not_ref_df
+    )
+    names(lst_df) <- c(norm_input_check$ref_name,
+                       norm_input_check$not_ref_name)
+
+    # run the function
+    expect_warning(
+      object = olink_normalization_qs(
+        lst_df = lst_df,
+        ref_cols = norm_input_check$ref_cols,
+        bridge_samples = head(x = bridge_samples, 38L)
+      ),
+      regexp = "There is 104 assays with fewer than 40 bridge samples for QS"
+    )
+
+    expect_warning(
+      object = olink_normalization_qs(
+        lst_df = lst_df,
+        ref_cols = norm_input_check$ref_cols,
+        bridge_samples = head(x = bridge_samples, 40L)
+      ),
+      regexp = "There is 31 assays with fewer than 40 bridge samples for QS"
+    )
+  }
+)
 
 # Test olink_normalization_product_format ----
 
