@@ -10,24 +10,28 @@ test_that(
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
 
+    # Warning that some assays are not overlapping and will be removed from
+    # normalization.
     expect_warning(
-      object = olink_norm_input_check(
-        df1 = data_3k,
-        df2 = data_ht,
-        overlapping_samples_df1 = intersect(
-          x = unique(data_3k$SampleID),
-          y = unique(data_ht$SampleID)
-        ) |>
-          (\(x) x[!grepl("CONTROL", x)])(),
-        overlapping_samples_df2 = NULL,
-        df1_project_nr = "P1",
-        df2_project_nr = "P2",
-        reference_project = "P2",
-        reference_medians = NULL
+      object = expect_message(
+        object = olink_norm_input_check(
+          df1 = data_3k,
+          df2 = data_ht,
+          overlapping_samples_df1 = intersect(
+            x = unique(data_3k$SampleID),
+            y = unique(data_ht$SampleID)
+          ) |>
+            (\(x) x[!grepl("CONTROL", x)])(),
+          overlapping_samples_df2 = NULL,
+          df1_project_nr = "P1",
+          df2_project_nr = "P2",
+          reference_project = "P2",
+          reference_medians = NULL
+        ),
+        regexp = "Cross-product normalization will be performed!"
       ),
-      regexp = "2 assays are not shared across products." # Warning that some assays are not overlapping and will be removed from normalization.
+      regexp = "2 assays are not shared across products."
     )
-
 
     expect_message(
       object = data_explore_check <- olink_norm_input_check(
@@ -355,19 +359,21 @@ test_that(
       head(50L)
 
     # run the internal function that check input from olink_normalization
-    expect_message(expect_warning(
-      object = norm_input_check <- olink_norm_input_check(
-        df1 = data_ht,
-        df2 = data_3k,
-        overlapping_samples_df1 = bridge_samples,
-        overlapping_samples_df2 = NULL,
-        df1_project_nr = "P1",
-        df2_project_nr = "P2",
-        reference_project = "P1",
-        reference_medians = NULL
+    expect_warning(
+      object = expect_message(
+        object = norm_input_check <- olink_norm_input_check(
+          df1 = data_ht,
+          df2 = data_3k,
+          overlapping_samples_df1 = bridge_samples,
+          overlapping_samples_df2 = NULL,
+          df1_project_nr = "P1",
+          df2_project_nr = "P2",
+          reference_project = "P1",
+          reference_medians = NULL
+        ),
+        regexp = "Cross-product normalization will be performed!"
       ),
-      regexp = "2 assays are not shared across products."),
-      regexp = "Cross-product normalization will be performed!"
+      regexp = "2 assays are not shared across products."
     )
 
     lst_df <- list(
@@ -480,8 +486,8 @@ test_that(
       sort()
 
     # run the internal function that check input from olink_normalization
-    expect_message(
-      object = expect_warning(
+    expect_warning(
+      object = expect_message(
         object = norm_input_check <- olink_norm_input_check(
           df1 = data_ht,
           df2 = data_3k,
@@ -492,9 +498,9 @@ test_that(
           reference_project = "P1",
           reference_medians = NULL
         ),
-        regexp = "2 assays are not shared across products."
+        regexp = "Cross-product normalization will be performed!"
       ),
-      regexp = "Cross-product normalization will be performed!"
+      regexp = "2 assays are not shared across products."
     )
 
     lst_df <- list(
