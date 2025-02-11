@@ -1875,6 +1875,18 @@ olink_norm_input_norm_method <- function(lst_df,
   }
 }
 
+#' Identify names of product for each project
+#'
+#' @author Kathy Nevola
+#' @param lst_df Named list of datasets to be normalized.
+#' @param reference_project Name of reference product
+#' @param lst_cols Named list of vectors with the required column names for each
+#' dataset in \var{lst_df}.
+#'
+#' @return list of lists containing named list of product (3k, Reveal, HT,
+#' or other) and reference (ref or not_ref)
+#'
+#'
 olink_product_identifier_norm<- function(
     lst_df,
     reference_project,
@@ -1908,6 +1920,15 @@ olink_product_identifier_norm<- function(
 
 }
 
+#' Identifying which mapping file to use
+#'
+#' @param ref_product one of "HT" or "Reveal" depending on reference product
+#'
+#' @return dataframe of mapping file to use for OlinkID mapping
+#' (eHT_e3072_mapping or reveal_e3072_mapping)
+#'
+#' @examples
+#' df <- mapping_file_id("HT")
 mapping_file_id <- function(ref_product){
   # Ref mapping file
   if(ref_product == "HT") {

@@ -29,6 +29,10 @@ Must match df2 used in olink_normalization product bridging.}
 
 \item{df2_project_nr}{Project name of second dataset. Must match name used in
 olink_normalization product bridging.}
+
+\item{reference_project}{Project name of reference project. Must match name
+used in olink_normalization product bridging and be one of df1_project_nr or
+df2_project_nr.}
 }
 \value{
 A "tibble" of Olink data in long format containing both input
@@ -72,7 +76,8 @@ bridged_df = npx_br_data,
 df1 = OlinkAnalyze:::data_ht_small,
 df2 = OlinkAnalyze:::data_3k_small,
 df1_project_nr = "Explore HT",
-df2_project_nr = "Explore 3072")
+df2_project_nr = "Explore 3072",
+reference_project = "Explore HT")
 
 }
 }
