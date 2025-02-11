@@ -126,7 +126,7 @@ olink_norm_input_check <- function(df1,
     norm_mode = norm_mode
   )
 
-  # Check column names ----
+# Check column names ----
 
   if (norm_mode == olink_norm_modes$ref_median) {
     # reference median normalization
@@ -135,6 +135,8 @@ olink_norm_input_check <- function(df1,
     lst_df <- list(df1)
     names(lst_df) <- df1_project_nr
     lst_cols <- olink_norm_input_check_df_cols(lst_df = lst_df)
+
+
 
     # list of samples
     lst_ref_samples <- list(overlapping_samples_df1)
@@ -152,6 +154,12 @@ olink_norm_input_check <- function(df1,
     lst_df <- list(df1, df2)
     names(lst_df) <- c(df1_project_nr, df2_project_nr)
     lst_cols <- olink_norm_input_check_df_cols(lst_df = lst_df)
+    product_ids <- olink_product_identifier_norm(
+      lst_df = lst_df,
+      reference_project = reference_project,
+      lst_cols = lst_cols
+    )
+
 
     if (norm_mode %in% c(olink_norm_modes$bridge,
                          olink_norm_modes$norm_cross_product)) {
@@ -159,7 +167,8 @@ olink_norm_input_check <- function(df1,
       norm_cross_product <- olink_norm_input_cross_product(
         lst_df = lst_df,
         lst_cols = lst_cols,
-        reference_project = reference_project
+        reference_project = reference_project,
+        lst_product = product_ids
       )
       norm_mode <- norm_cross_product$norm_mode
       lst_df <- norm_cross_product$lst_df
@@ -936,29 +945,13 @@ olink_norm_input_check_df_cols <- function(lst_df) {
 #'
 olink_norm_input_cross_product <- function(lst_df,
                                            lst_cols,
-                                           reference_project) {
+                                           reference_project,
+                                           lst_product) {
 
   # check and correct norm_mode if needed ----
 
   # check if each df comes from a different olink product
-  lst_product <- sapply(names(lst_df), function(d_name) {
-    # get unique panels
-    u_panel <- lst_df[[d_name]] |>
-      dplyr::pull(
-        .data[[lst_cols[[d_name]]$panel]]
-      ) |>
-      unique()
-    if (all(u_panel %in% eHT_e3072_mapping$Panel_E3072)) {
-      return("3k")
-    } else if (all(u_panel == "Explore_HT")) {
-      return("HT")
-    } else if (all(u_panel == "Reveal")) {
-      return("Reveal")
-    } else {
-      return("other")
-    }
-  })
-  names(lst_product) <- names(lst_df)
+
 
   # if all elements of the array contain the same product, it is simple
   # bridge normalization. In case of 3k-3k bridging lst_product should contain
@@ -968,7 +961,7 @@ olink_norm_input_cross_product <- function(lst_df,
   # 3k and HT or 3k and Reveal.
   # In any other case (e.g. 3k and NA_character) means that one df is 3k, but
   # the other one probably T96, T48, which we do not normalize.
-  lst_prod_uniq <- lst_product |> unique() |> sort()
+  lst_prod_uniq <- lst_product$product |> unique() |> sort()
   if (length(lst_prod_uniq) == 1L
       && all(lst_prod_uniq %in% c("3k", "HT", "Reveal","other"))) {
     norm_mode <- olink_norm_modes$bridge
@@ -991,18 +984,12 @@ olink_norm_input_cross_product <- function(lst_df,
     )
   }
 
-  # check if reference dataset is HT if cross-product normalization ----
-  ref_product <- case_when(
-    "HT" %in% lst_prod_uniq ~ "HT",
-    "Reveal" %in% lst_prod_uniq ~ "Reveal",
-    "3k" %in% lst_prod_uniq ~ "3k",
-    .default =  "other"
-  )
+  # check if reference dataset is HT or Reveal if cross-product normalization ----
 
 
 
   if (norm_mode == olink_norm_modes$norm_cross_product
-      && (!(reference_project %in% names(lst_product)[lst_product == ref_product])))  {
+      && (!(lst_product$product[lst_product$reference == "ref"] %in% c("Reveal", "HT"))))  {
 
     cli::cli_abort(
       c(
@@ -1022,7 +1009,8 @@ olink_norm_input_cross_product <- function(lst_df,
   if (norm_mode == olink_norm_modes$norm_cross_product) {
 
     # add combined OlinkID to HT dataset
-    l_ref_name <- names(lst_product)[lst_product == ref_product]
+    l_ref_name <- names(lst_product$product)[lst_product$reference == "ref"]
+    ref_product <- lst_product$product[lst_product$reference == "ref"]
     l_ref_oid_rename <- paste0(lst_cols[[l_ref_name]]$olink_id, "_",
                                ref_product)
     ref_3k_map_ref_rename <- stats::setNames(
@@ -1030,13 +1018,7 @@ olink_norm_input_cross_product <- function(lst_df,
       nm = c(paste0("OlinkID_", ref_product), lst_cols[[l_ref_name]]$olink_id)
     )
 
-    # Ref mapping file
-    if(ref_product == "HT") {
-      ref_map_3k <- eHT_e3072_mapping
-    }
-    if (ref_product == "Reveal"){
-      ref_map_3k <- reveal_e3072_mapping
-    }
+    ref_map_3k <- mapping_file_id(ref_product = ref_product)
 
     lst_df[[l_ref_name]] <- lst_df[[l_ref_name]] |>
       dplyr::rename(
@@ -1059,7 +1041,7 @@ olink_norm_input_cross_product <- function(lst_df,
 
 
     # add combined OlinkID to 3k dataset
-    l_3k_name <- names(lst_product)[lst_product == "3k"]
+    l_3k_name <- names(lst_product$product)[lst_product$product == "3k"]
     l_3k_oid_rename <- paste0(lst_cols[[l_3k_name]]$olink_id, "_E3072")
     ref_3k_map_3k_rename <- stats::setNames(
       object = c("OlinkID_E3072", "OlinkID"),
@@ -1891,4 +1873,48 @@ olink_norm_input_norm_method <- function(lst_df,
       )
     )
   }
+}
+
+olink_product_identifier_norm<- function(
+    lst_df,
+    reference_project,
+    lst_cols
+){
+  # product_list = c("3k", "HT", "Reveal", "other")
+  lst_product <- sapply(names(lst_df), function(d_name) {
+    # get unique panels
+    u_panel <- lst_df[[d_name]] |>
+      dplyr::pull(
+        .data[[lst_cols[[d_name]]$panel]]
+      ) |>
+      unique()
+    if (all(u_panel %in% eHT_e3072_mapping$Panel_E3072)) {
+      return("3k")
+    } else if (all(u_panel == "Explore_HT")) {
+      return("HT")
+    } else if (all(u_panel == "Reveal")) {
+      return("Reveal")
+    } else {
+      return("other")
+    }
+  })
+  names(lst_product) <- names(lst_df)
+  ref_names <- ifelse(names(lst_product) == reference_project,
+                              "ref", "not_ref")
+  names(ref_names) <- names(lst_product)
+  lst_product <- list(lst_product, ref_names)
+  names(lst_product) <- c('product', 'reference')
+  return(lst_product)
+
+}
+
+mapping_file_id <- function(ref_product){
+  # Ref mapping file
+  if(ref_product == "HT") {
+    ref_map_3k <- eHT_e3072_mapping
+  }
+  if (ref_product == "Reveal"){
+    ref_map_3k <- reveal_e3072_mapping
+  }
+  return(ref_map_3k)
 }

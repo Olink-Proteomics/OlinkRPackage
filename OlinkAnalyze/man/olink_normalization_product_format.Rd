@@ -10,7 +10,8 @@ olink_normalization_product_format(
   df1,
   df1_project_nr,
   df2,
-  df2_project_nr
+  df2_project_nr,
+  reference_project
 )
 }
 \arguments{

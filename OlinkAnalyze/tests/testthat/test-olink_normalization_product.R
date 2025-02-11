@@ -519,7 +519,8 @@ test_that(
                                            df1 = data_ht,
                                            df1_project_nr = "P2",
                                            df2 = data_3k,
-                                           df2_project_nr = "P1"),
+                                           df2_project_nr = "P1",
+                                           reference_project = "P2"),
       regexp = NA)
 
     ## check that function works both ways
@@ -630,3 +631,17 @@ test_that(
   }
 )
 
+# testthat("cross product bridging works with 3k to Reveal",
+#          {
+#            # bridging results are correct
+#
+#            # formatting is correct
+#
+#            # Correlation assays are correctly present
+#
+#            # Non overlapping assays in both direction are present
+#
+#
+#          }
+#
+# )

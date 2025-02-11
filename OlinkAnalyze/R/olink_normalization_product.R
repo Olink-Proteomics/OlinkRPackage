@@ -709,7 +709,8 @@ olink_normalization_product_format <- function(bridged_df,
                                                df1,
                                                df1_project_nr,
                                                df2,
-                                               df2_project_nr) {
+                                               df2_project_nr,
+                                               reference_project) {
 
   # Extract data from NotBridgeable assays
   df_not_bridgeable <- bridged_df |>
@@ -720,8 +721,8 @@ olink_normalization_product_format <- function(bridged_df,
     dplyr::filter(.data[["AssayType"]] == "assay") |>
     dplyr::filter(.data[["BridgingRecommendation"]] == "NotBridgeable") |>
     dplyr::mutate(OlinkID = case_when(
-      Panel == "Explore_HT" ~ OlinkID,
-      Panel != "Explore_HT" ~ OlinkID_E3072
+      Project == reference_project ~ OlinkID,
+      Project != reference_project ~ OlinkID_E3072
     )) |>
     dplyr::select(-any_of(c("MedianCenteredNPX",
                             "QSNormalizedNPX",

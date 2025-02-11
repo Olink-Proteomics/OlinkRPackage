@@ -2444,7 +2444,17 @@ test_that(
           "3K_1" = list(panel = "Panel"),
           "3K_2" = list(panel = "Panel")
         ),
-        reference_project = "3K_1"
+        lst_product = olink_product_identifier_norm(
+          lst_df = list(
+            "3K_1" = data_3k,
+            "3K_2" = data_3k
+          ),
+          lst_cols = list(
+            "3K_1" = list(panel = "Panel"),
+            "3K_2" = list(panel = "Panel")
+          ),
+          reference_project = "3K_1"
+        )
       )
     )
 
@@ -2471,7 +2481,18 @@ test_that(
           "HT_1" = list(panel = "Panel"),
           "HT_2" = list(panel = "Panel")
         ),
-        reference_project = "HT_1"
+        reference_project = "HT_1",
+        lst_product = olink_product_identifier_norm(
+          lst_df = list(
+            "HT_1" = data_ht,
+            "HT_2" = data_ht
+          ),
+          lst_cols = list(
+            "HT_1" = list(panel = "Panel"),
+            "HT_2" = list(panel = "Panel")
+          ),
+          reference_project = "HT_1"
+        )
       )
     )
 
@@ -2498,7 +2519,18 @@ test_that(
           "p1" = list(panel = "Panel"),
           "p2" = list(panel = "Panel")
         ),
-        reference_project = "p1"
+        reference_project = "p1",
+        lst_product = olink_product_identifier_norm(
+          lst_df = list(
+            "p1" = npx_data1,
+            "p2" = npx_data2
+          ),
+          lst_cols = list(
+            "p1" = list(panel = "Panel"),
+            "p2" = list(panel = "Panel")
+          ),
+          reference_project = "p1"
+        )
       )
     )
 
@@ -2538,7 +2570,20 @@ test_that(
           "p2" = list(panel = "Panel",
                       olink_id = "OlinkID")
         ),
-        reference_project = "p2"
+        reference_project = "p2",
+        lst_product = olink_product_identifier_norm(
+          lst_df = list(
+            "p1" = data_3k,
+            "p2" = data_ht
+          ),
+          lst_cols = list(
+            "p1" = list(panel = "Panel",
+                        olink_id = "OlinkID"),
+            "p2" = list(panel = "Panel",
+                        olink_id = "OlinkID")
+          ),
+          reference_project = "p2"
+        )
       )
     )
 
@@ -2613,7 +2658,18 @@ test_that(
           "3K" = list(panel = "Panel"),
           "T96" = list(panel = "Panel")
         ),
-        reference_project = "3K"
+        reference_project = "3K",
+        lst_product = olink_product_identifier_norm(
+          lst_df = list(
+            "3K" = data_3k,
+            "T96" = npx_data1
+          ),
+          lst_cols = list(
+            "3K" = list(panel = "Panel"),
+            "T96" = list(panel = "Panel")
+          ),
+          reference_project = "3K"
+        )
       ),
       regexp = "Unexpected datasets to be bridge normalized!"
     )
@@ -2630,7 +2686,18 @@ test_that(
           "HT" = list(panel = "Panel"),
           "T96" = list(panel = "Panel")
         ),
-        reference_project = "T96"
+        reference_project = "T96",
+        olink_product_identifier_norm(
+          lst_df = list(
+            "HT" = data_ht,
+            "T96" = npx_data1
+          ),
+          lst_cols = list(
+            "HT" = list(panel = "Panel"),
+            "T96" = list(panel = "Panel")
+          ),
+          reference_project = "T96"
+        )
       ),
       regexp = "Unexpected datasets to be bridge normalized!"
     )
@@ -2658,7 +2725,18 @@ test_that(
           "3K" = list(panel = "Panel"),
           "HT" = list(panel = "Panel")
         ),
-        reference_project = "3K"
+        reference_project = "3K",
+        lst_product = olink_product_identifier_norm(
+          lst_df = list(
+            "3K" = data_3k,
+            "HT" = data_ht
+          ),
+          lst_cols = list(
+            "3K" = list(panel = "Panel"),
+            "HT" = list(panel = "Panel")
+          ),
+          reference_project = "3K"
+        )
       ),
       regexp = "Incorrect reference project!"
     )
@@ -5244,3 +5322,37 @@ test_that(
   }
 )
 
+testthat(
+  "olink_product_identifier_norm - works",
+  {
+    # returns 3k
+
+    # returns HT
+
+    # returns Reveal
+  }
+)
+
+testthat(
+  "mapping_file_id - works",
+  {
+    # returns HT mapping file
+
+    # returns Reveal mapping file
+  }
+)
+
+testthat(
+  "cross product missing assays/OlinkIDs",
+  {
+    expect_warning(
+      object =
+      regexp = "are not shared across products."
+    )
+    # check_oid for cross product bridging
+
+    # update OlinkIDs with _ ref_product for cross product bridging
+
+    # Unexpected datasets to be bridge normalized! error from olink_norm_input
+  }
+)

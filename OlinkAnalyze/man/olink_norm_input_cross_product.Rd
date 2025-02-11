@@ -4,7 +4,12 @@
 \alias{olink_norm_input_cross_product}
 \title{Check if bridge or cross-platform normalization}
 \usage{
-olink_norm_input_cross_product(lst_df, lst_cols, reference_project)
+olink_norm_input_cross_product(
+  lst_df,
+  lst_cols,
+  reference_project,
+  lst_product
+)
 }
 \arguments{
 \item{lst_df}{Named list of datasets to be normalized.}

@@ -5,7 +5,7 @@
 #' reference set of medians values.
 #'
 #' @details
-#' The function handles three different types of normalization:
+#' The function handles four different types of normalization:
 #'  - \strong{Bridge normalization}: One of the datasets is adjusted to another
 #'  using overlapping samples (bridge samples). Overlapping samples need to have
 #'  the same identifiers in both datasets. Normalization is performed using the
@@ -298,7 +298,7 @@ olink_normalization <- function(df1,
         not_ref_cols = lst_check$not_ref_cols
       )
 
-    } else if (lst_check$norm_mode == olink_norm_modes$norm_ht_3k) {
+    } else if (lst_check$norm_mode == olink_norm_modes$norm_cross_product) {
       # HT-3K normalization ----
 
       df_norm <- norm_internal_cross_product(
@@ -316,7 +316,8 @@ olink_normalization <- function(df1,
                                                       df1 = df1,
                                                       df1_project_nr = df1_project_nr,
                                                       df2 = df2,
-                                                      df2_project_nr = df2_project_nr)
+                                                      df2_project_nr = df2_project_nr,
+                                                      reference_project = reference_project)
       }
 
     } else if (lst_check$norm_mode == olink_norm_modes$subset) {
