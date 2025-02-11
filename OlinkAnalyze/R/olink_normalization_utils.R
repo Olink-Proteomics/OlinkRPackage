@@ -937,6 +937,8 @@ olink_norm_input_check_df_cols <- function(lst_df) {
 #' @param reference_project Project name of reference_project. Should be one of
 #' \var{df1_project_nr} or \var{df2_project_nr}. Indicates the project to which
 #' the other project is adjusted to.
+#' @param lst_product list of lists containing named list of product
+#' (3k, Reveal, HT, or other) and reference (ref or not_ref) for each project
 #'
 #' @return Character string indicating the type of normalization to be
 #' performed. One of

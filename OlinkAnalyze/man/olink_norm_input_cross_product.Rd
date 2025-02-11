@@ -20,6 +20,9 @@ dataset in \var{lst_df}.}
 \item{reference_project}{Project name of reference_project. Should be one of
 \var{df1_project_nr} or \var{df2_project_nr}. Indicates the project to which
 the other project is adjusted to.}
+
+\item{lst_product}{list of lists containing named list of product
+(3k, Reveal, HT, or other) and reference (ref or not_ref) for each project}
 }
 \value{
 Character string indicating the type of normalization to be
