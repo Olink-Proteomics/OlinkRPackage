@@ -308,7 +308,8 @@ olink_normalization <- function(df1,
         ref_cols = lst_check$ref_cols,
         not_ref_df = lst_check$not_ref_df,
         not_ref_name = lst_check$not_ref_name,
-        not_ref_cols = lst_check$not_ref_cols
+        not_ref_cols = lst_check$not_ref_cols,
+        lst_product = lst_check$lst_product
       )
 
       if (format == TRUE) {
@@ -654,7 +655,8 @@ norm_internal_cross_product <- function(ref_df,
                                         ref_cols,
                                         not_ref_df,
                                         not_ref_name,
-                                        not_ref_cols) {
+                                        not_ref_cols,
+                                        lst_product) {
   # prepare inputs ----
 
   lst_df <- list(
@@ -701,7 +703,8 @@ norm_internal_cross_product <- function(ref_df,
   df_norm_qq <- olink_normalization_qs(
     lst_df = lst_df,
     ref_cols = ref_cols,
-    bridge_samples = ref_samples
+    bridge_samples = ref_samples,
+    ref_product = lst_product$product[lst_product$reference == "ref"]
   )
 
   # integrate normalization approaches ----
@@ -753,7 +756,8 @@ norm_internal_cross_product <- function(ref_df,
       )
     ) |>
     dplyr::rename(
-      !!ref_cols$olink_id := "OlinkID_HT"
+      !!ref_cols$olink_id := paste0("OlinkID_",
+                                    lst_product$product[lst_product$reference == "ref"])
     )
 
   # return ----

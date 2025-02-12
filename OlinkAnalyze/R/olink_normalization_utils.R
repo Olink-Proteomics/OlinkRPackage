@@ -309,6 +309,7 @@ olink_norm_input_check <- function(df1,
     } else if (norm_mode %in% c(olink_norm_modes$bridge,
                                 olink_norm_modes$norm_cross_product)) {
       lst_out$ref_samples <- overlapping_samples_df1
+      lst_out$lst_product <- product_ids
     }
   }
 

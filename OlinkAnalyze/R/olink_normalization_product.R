@@ -368,6 +368,8 @@ olink_normalization_bridgeable <- function(lst_df,
 #' olink_norm_input_check. (required)
 #' @param bridge_samples Character vector of samples to be used for the
 #' quantile mapping. (required)
+#' @param ref_product Name of reference product.
+#' Must be one of "HT" or "Reveal".
 #'
 #' @return A "tibble" of Olink data in long format containing both input
 #' datasets with the quantile normalized quantifications.
@@ -408,19 +410,30 @@ olink_normalization_bridgeable <- function(lst_df,
 #' qs_result <- OlinkAnalyze:::olink_normalization_qs(
 #'  lst_df = lst_df,
 #'  ref_cols = ref_cols,
-#'  bridge_samples = bridge_samples
+#'  bridge_samples = bridge_samples,
+#'  ref_product = "HT"
 #' )
 #' }
 #'
 olink_normalization_qs <- function(lst_df,
                                    ref_cols,
-                                   bridge_samples) {
+                                   bridge_samples,
+                                   ref_product) {
 
   # main QS normalization function
   ecdf_transform_npx <- function(data,
                                  quant_col,
                                  count_ref_col,
-                                 num_samples = 32L) {
+                                 ref_product) {
+    if(ref_product == "HT"){
+      num_samples <- 40L
+    } else if (ref_product == "Reveal"){
+      num_samples <- 32L
+    } else {
+      cli::cli_abort(
+        "Reference product must be HT or Reveal."
+      )
+    }
 
     # Briefly:
     # Take the ECDF of the reference quantification (e.g. NPX from Olink Explore
@@ -600,7 +613,8 @@ olink_normalization_qs <- function(lst_df,
           )
         ),
         quant_col = .env[["quant_col"]],
-        count_ref_col = .env[["cnt_ref_col"]]
+        count_ref_col = .env[["cnt_ref_col"]],
+        ref_product = ref_product
       )
     ) |>
     dplyr::ungroup() |>

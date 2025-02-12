@@ -170,6 +170,7 @@ test_that(
       })
     names(lst_df) <- c(norm_input_check$ref_name,
                        norm_input_check$not_ref_name)
+    lst_product <- norm_input_check$lst_product
 
     # run the function
     expect_no_message(
@@ -178,7 +179,8 @@ test_that(
           object = qs_norm <- olink_normalization_qs(
             lst_df = lst_df,
             ref_cols = norm_input_check$ref_cols,
-            bridge_samples = bridge_samples
+            bridge_samples = bridge_samples,
+            ref_product = lst_product$product[lst_product$reference == "ref"]
           )
         )
       )
@@ -249,6 +251,7 @@ test_that(
       norm_input_check$ref_df,
       norm_input_check$not_ref_df
     )
+    lst_product <- norm_input_check$lst_product
     names(lst_df) <- c(norm_input_check$ref_name,
                        norm_input_check$not_ref_name)
 
@@ -259,7 +262,8 @@ test_that(
           object = qs_norm <- olink_normalization_qs(
             lst_df = lst_df,
             ref_cols = norm_input_check$ref_cols,
-            bridge_samples = bridge_samples
+            bridge_samples = bridge_samples,
+            ref_product = lst_product$product[lst_product$reference == "ref"]
           )
         )
       )
@@ -384,7 +388,8 @@ test_that(
           object = qs_norm <- olink_normalization_qs(
             lst_df = lst_df,
             ref_cols = norm_input_check$ref_cols,
-            bridge_samples = bridge_samples
+            bridge_samples = bridge_samples,
+            ref_product = "HT"
           )
         )
       )
@@ -631,8 +636,9 @@ test_that(
   }
 )
 
-# testthat("cross product bridging works with 3k to Reveal",
+# test_that("cross product bridging works with 3k to Reveal",
 #          {
+#
 #            # bridging results are correct
 #
 #            # formatting is correct

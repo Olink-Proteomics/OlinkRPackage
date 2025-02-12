@@ -63,7 +63,11 @@ test_that(
                             lod = "LOD",
                             normalization = character(0L)),
         reference_medians = NULL,
-        norm_mode = olink_norm_modes$bridge
+        norm_mode = olink_norm_modes$bridge,
+        lst_product = list(product = c( "20200001" = "other",
+                                           "20200002" = "other"),
+                           reference = c("20200001" = "ref",
+                                            "20200002" = "not_ref"))
       )
     )
 
@@ -133,7 +137,11 @@ test_that(
                             lod = "LOD",
                             normalization = "Normalization"),
         reference_medians = NULL,
-        norm_mode = olink_norm_modes$bridge
+        norm_mode = olink_norm_modes$bridge,
+        lst_product = list(product = c("20200001" = "other",
+                                          "20200002" = "other"),
+                           reference = c("20200001" = "not_ref",
+                                            "20200002" = "ref"))
       )
     )
   }
@@ -243,7 +251,11 @@ test_that(
                             lod = character(0),
                             normalization = "Normalization"),
         reference_medians = NULL,
-        norm_mode = olink_norm_modes$norm_cross_product
+        norm_mode = olink_norm_modes$norm_cross_product,
+        lst_product = list(product = c("3K" = "3k",
+                                          "HT" = "HT"),
+                           reference = c("3K" = "not_ref",
+                                            "HT" = "ref"))
       )
     )
   }
@@ -5322,37 +5334,63 @@ test_that(
   }
 )
 
-testthat(
-  "olink_product_identifier_norm - works",
-  {
-    # returns 3k
-
-    # returns HT
-
-    # returns Reveal
-  }
-)
-
-testthat(
+test_that(
   "mapping_file_id - works",
   {
     # returns HT mapping file
+    expect_identical(mapping_file_id("HT"),
+                     eHT_e3072_mapping)
 
     # returns Reveal mapping file
+    expect_identical(mapping_file_id("Reveal"),
+                     reveal_e3072_mapping)
   }
 )
 
-testthat(
-  "cross product missing assays/OlinkIDs",
+# testthat(
+#   "cross product missing assays/OlinkIDs",
+#   {
+#     expect_warning(
+#       object =
+#       regexp = "are not shared across products."
+#     )
+#     # check_oid for cross product bridging
+#
+#     # update OlinkIDs with _ ref_product for cross product bridging
+#
+#     # Unexpected datasets to be bridge normalized! error from olink_norm_input
+#   }
+# )
+
+test_that(
+  "cross product input works with Reveal",
   {
-    expect_warning(
-      object =
-      regexp = "are not shared across products."
-    )
-    # check_oid for cross product bridging
+    skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data","example_Reveal_data.rds")))
 
-    # update OlinkIDs with _ ref_product for cross product bridging
+    data_3k <- get_example_data(filename = "example_3k_data.rds")
+    data_reveal <- get_example_data(filename = "example_Reveal_data.rds")
 
-    # Unexpected datasets to be bridge normalized! error from olink_norm_input
+    bridge_samples <- intersect(
+      x = unique(data_reveal$SampleID),
+      y = unique(data_3k$SampleID)
+    ) |>
+      (\(x) x[!grepl("CONTROL", x)])() |>
+      sort() |>
+      head(32L)
+    expect_warning(object = reveal_input <- olink_norm_input_check(df1 = data_reveal,
+                           df2 = data_3k,
+                           overlapping_samples_df1 = bridge_samples,
+                           overlapping_samples_df2 = NULL,
+                           df1_project_nr = "Reveal",
+                           df2_project_nr = "3K",
+                           reference_project = "Reveal",
+                           reference_medians = NULL
+                           ),
+                   regexp = "85 assays")
+    expect_identical(reveal_input$lst_product$product,
+                  c("Reveal" = "Reveal", "3K" = "3k"))
+    expect_identical(reveal_input$lst_product$reference,
+                  c("Reveal" = "ref", "3K" = "not_ref"))
   }
 )
