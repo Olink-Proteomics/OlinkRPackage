@@ -11,7 +11,8 @@ norm_internal_cross_product(
   ref_cols,
   not_ref_df,
   not_ref_name,
-  not_ref_cols
+  not_ref_cols,
+  lst_product
 )
 }
 \arguments{
