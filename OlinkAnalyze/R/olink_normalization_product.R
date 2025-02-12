@@ -368,6 +368,8 @@ olink_normalization_bridgeable <- function(lst_df,
 #' olink_norm_input_check. (required)
 #' @param bridge_samples Character vector of samples to be used for the
 #' quantile mapping. (required)
+#' @param ref_product Name of reference product.
+#' Must be one of "HT" or "Reveal".
 #'
 #' @return A "tibble" of Olink data in long format containing both input
 #' datasets with the quantile normalized quantifications.
@@ -408,19 +410,30 @@ olink_normalization_bridgeable <- function(lst_df,
 #' qs_result <- OlinkAnalyze:::olink_normalization_qs(
 #'  lst_df = lst_df,
 #'  ref_cols = ref_cols,
-#'  bridge_samples = bridge_samples
+#'  bridge_samples = bridge_samples,
+#'  ref_product = "HT"
 #' )
 #' }
 #'
 olink_normalization_qs <- function(lst_df,
                                    ref_cols,
-                                   bridge_samples) {
+                                   bridge_samples,
+                                   ref_product) {
 
   # main QS normalization function
   ecdf_transform_npx <- function(data,
                                  quant_col,
                                  count_ref_col,
-                                 num_samples = 40L) {
+                                 ref_product) {
+    if(ref_product == "HT"){
+      num_samples <- 40L
+    } else if (ref_product == "Reveal"){
+      num_samples <- 32L
+    } else {
+      cli::cli_abort(
+        "Reference product must be HT or Reveal."
+      )
+    }
 
     # Briefly:
     # Take the ECDF of the reference quantification (e.g. NPX from Olink Explore
@@ -600,7 +613,8 @@ olink_normalization_qs <- function(lst_df,
           )
         ),
         quant_col = .env[["quant_col"]],
-        count_ref_col = .env[["cnt_ref_col"]]
+        count_ref_col = .env[["cnt_ref_col"]],
+        ref_product = ref_product
       )
     ) |>
     dplyr::ungroup() |>
@@ -672,6 +686,9 @@ olink_normalization_qs <- function(lst_df,
 #' olink_normalization product bridging.
 #' @param df2_project_nr Project name of second dataset. Must match name used in
 #' olink_normalization product bridging.
+#' @param reference_project Project name of reference project. Must match name
+#' used in olink_normalization product bridging and be one of df1_project_nr or
+#' df2_project_nr.
 #'
 #' @return A "tibble" of Olink data in long format containing both input
 #' datasets with the bridged NPX quantifications, with the above
@@ -701,7 +718,8 @@ olink_normalization_qs <- function(lst_df,
 #' df1 = OlinkAnalyze:::data_ht_small,
 #' df2 = OlinkAnalyze:::data_3k_small,
 #' df1_project_nr = "Explore HT",
-#' df2_project_nr = "Explore 3072")
+#' df2_project_nr = "Explore 3072",
+#' reference_project = "Explore HT")
 #'
 #' }
 
@@ -709,7 +727,8 @@ olink_normalization_product_format <- function(bridged_df,
                                                df1,
                                                df1_project_nr,
                                                df2,
-                                               df2_project_nr) {
+                                               df2_project_nr,
+                                               reference_project) {
 
   # Extract data from NotBridgeable assays
   df_not_bridgeable <- bridged_df |>
@@ -720,8 +739,8 @@ olink_normalization_product_format <- function(bridged_df,
     dplyr::filter(.data[["AssayType"]] == "assay") |>
     dplyr::filter(.data[["BridgingRecommendation"]] == "NotBridgeable") |>
     dplyr::mutate(OlinkID = case_when(
-      Panel == "Explore_HT" ~ OlinkID,
-      Panel != "Explore_HT" ~ OlinkID_E3072
+      Project == reference_project ~ OlinkID,
+      Project != reference_project ~ OlinkID_E3072
     )) |>
     dplyr::select(-any_of(c("MedianCenteredNPX",
                             "QSNormalizedNPX",

@@ -53,7 +53,7 @@ Normalizes two Olink datasets to each other, or one Olink dataset to a
 reference set of medians values.
 }
 \details{
-The function handles three different types of normalization:
+The function handles four different types of normalization:
 \itemize{
 \item \strong{Bridge normalization}: One of the datasets is adjusted to another
 using overlapping samples (bridge samples). Overlapping samples need to have

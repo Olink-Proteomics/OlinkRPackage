@@ -1,6 +1,6 @@
 # load example 3k data ----
 
-data_3k_file <- system.file("tests", "data", "example_3k_data.rds",
+data_3k_file <- system.file("tests", "testthat", "data", "example_3k_data.rds",
                             package = "OlinkAnalyze",
                             mustWork = TRUE)
 data_3k <- readRDS(data_3k_file)

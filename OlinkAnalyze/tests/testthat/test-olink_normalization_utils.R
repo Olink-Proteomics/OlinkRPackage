@@ -63,7 +63,11 @@ test_that(
                             lod = "LOD",
                             normalization = character(0L)),
         reference_medians = NULL,
-        norm_mode = olink_norm_modes$bridge
+        norm_mode = olink_norm_modes$bridge,
+        lst_product = list(product = c( "20200001" = "other",
+                                           "20200002" = "other"),
+                           reference = c("20200001" = "ref",
+                                            "20200002" = "not_ref"))
       )
     )
 
@@ -133,7 +137,11 @@ test_that(
                             lod = "LOD",
                             normalization = "Normalization"),
         reference_medians = NULL,
-        norm_mode = olink_norm_modes$bridge
+        norm_mode = olink_norm_modes$bridge,
+        lst_product = list(product = c("20200001" = "other",
+                                          "20200002" = "other"),
+                           reference = c("20200001" = "not_ref",
+                                            "20200002" = "ref"))
       )
     )
   }
@@ -243,7 +251,11 @@ test_that(
                             lod = character(0),
                             normalization = "Normalization"),
         reference_medians = NULL,
-        norm_mode = olink_norm_modes$norm_ht_3k
+        norm_mode = olink_norm_modes$norm_cross_product,
+        lst_product = list(product = c("3K" = "3k",
+                                          "HT" = "HT"),
+                           reference = c("3K" = "not_ref",
+                                            "HT" = "ref"))
       )
     )
   }
@@ -2444,7 +2456,17 @@ test_that(
           "3K_1" = list(panel = "Panel"),
           "3K_2" = list(panel = "Panel")
         ),
-        reference_project = "3K_1"
+        lst_product = olink_product_identifier_norm(
+          lst_df = list(
+            "3K_1" = data_3k,
+            "3K_2" = data_3k
+          ),
+          lst_cols = list(
+            "3K_1" = list(panel = "Panel"),
+            "3K_2" = list(panel = "Panel")
+          ),
+          reference_project = "3K_1"
+        )
       )
     )
 
@@ -2471,7 +2493,18 @@ test_that(
           "HT_1" = list(panel = "Panel"),
           "HT_2" = list(panel = "Panel")
         ),
-        reference_project = "HT_1"
+        reference_project = "HT_1",
+        lst_product = olink_product_identifier_norm(
+          lst_df = list(
+            "HT_1" = data_ht,
+            "HT_2" = data_ht
+          ),
+          lst_cols = list(
+            "HT_1" = list(panel = "Panel"),
+            "HT_2" = list(panel = "Panel")
+          ),
+          reference_project = "HT_1"
+        )
       )
     )
 
@@ -2498,7 +2531,18 @@ test_that(
           "p1" = list(panel = "Panel"),
           "p2" = list(panel = "Panel")
         ),
-        reference_project = "p1"
+        reference_project = "p1",
+        lst_product = olink_product_identifier_norm(
+          lst_df = list(
+            "p1" = npx_data1,
+            "p2" = npx_data2
+          ),
+          lst_cols = list(
+            "p1" = list(panel = "Panel"),
+            "p2" = list(panel = "Panel")
+          ),
+          reference_project = "p1"
+        )
       )
     )
 
@@ -2538,14 +2582,27 @@ test_that(
           "p2" = list(panel = "Panel",
                       olink_id = "OlinkID")
         ),
-        reference_project = "p2"
+        reference_project = "p2",
+        lst_product = olink_product_identifier_norm(
+          lst_df = list(
+            "p1" = data_3k,
+            "p2" = data_ht
+          ),
+          lst_cols = list(
+            "p1" = list(panel = "Panel",
+                        olink_id = "OlinkID"),
+            "p2" = list(panel = "Panel",
+                        olink_id = "OlinkID")
+          ),
+          reference_project = "p2"
+        )
       )
     )
 
     expect_identical(
       object = lst_cross_prod_out,
       expected = list(
-        norm_mode = olink_norm_modes$norm_ht_3k,
+        norm_mode = olink_norm_modes$norm_cross_product,
         lst_df = list(
           "p1" = data_3k |>
             dplyr::rename(
@@ -2613,7 +2670,18 @@ test_that(
           "3K" = list(panel = "Panel"),
           "T96" = list(panel = "Panel")
         ),
-        reference_project = "3K"
+        reference_project = "3K",
+        lst_product = olink_product_identifier_norm(
+          lst_df = list(
+            "3K" = data_3k,
+            "T96" = npx_data1
+          ),
+          lst_cols = list(
+            "3K" = list(panel = "Panel"),
+            "T96" = list(panel = "Panel")
+          ),
+          reference_project = "3K"
+        )
       ),
       regexp = "Unexpected datasets to be bridge normalized!"
     )
@@ -2630,7 +2698,18 @@ test_that(
           "HT" = list(panel = "Panel"),
           "T96" = list(panel = "Panel")
         ),
-        reference_project = "T96"
+        reference_project = "T96",
+        olink_product_identifier_norm(
+          lst_df = list(
+            "HT" = data_ht,
+            "T96" = npx_data1
+          ),
+          lst_cols = list(
+            "HT" = list(panel = "Panel"),
+            "T96" = list(panel = "Panel")
+          ),
+          reference_project = "T96"
+        )
       ),
       regexp = "Unexpected datasets to be bridge normalized!"
     )
@@ -2658,7 +2737,18 @@ test_that(
           "3K" = list(panel = "Panel"),
           "HT" = list(panel = "Panel")
         ),
-        reference_project = "3K"
+        reference_project = "3K",
+        lst_product = olink_product_identifier_norm(
+          lst_df = list(
+            "3K" = data_3k,
+            "HT" = data_ht
+          ),
+          lst_cols = list(
+            "3K" = list(panel = "Panel"),
+            "HT" = list(panel = "Panel")
+          ),
+          reference_project = "3K"
+        )
       ),
       regexp = "Incorrect reference project!"
     )
@@ -2788,7 +2878,7 @@ test_that(
               "p1" = ref_samples_bridge_3k_ht,
               "p2" = ref_samples_bridge_3k_ht
             ),
-            norm_mode = "norm_ht_3k"
+            norm_mode = "norm_cross_product"
           )
         )
       )
@@ -3845,7 +3935,7 @@ test_that(
               "p1" = list(olink_id = "OlinkID",
                           normalization = character(0L))
             ),
-            norm_mode = olink_norm_modes$norm_ht_3k
+            norm_mode = olink_norm_modes$norm_cross_product
           )
         )
       )
@@ -3890,7 +3980,7 @@ test_that(
           "p1" = list(olink_id = "OlinkID",
                       normalization = character(0L))
         ),
-        norm_mode = olink_norm_modes$norm_ht_3k
+        norm_mode = olink_norm_modes$norm_cross_product
       ),
       regexp = "* p1: OID40770_OID2011"
     )
@@ -5244,3 +5334,63 @@ test_that(
   }
 )
 
+test_that(
+  "mapping_file_id - works",
+  {
+    # returns HT mapping file
+    expect_identical(mapping_file_id("HT"),
+                     eHT_e3072_mapping)
+
+    # returns Reveal mapping file
+    expect_identical(mapping_file_id("Reveal"),
+                     reveal_e3072_mapping)
+  }
+)
+
+# testthat(
+#   "cross product missing assays/OlinkIDs",
+#   {
+#     expect_warning(
+#       object =
+#       regexp = "are not shared across products."
+#     )
+#     # check_oid for cross product bridging
+#
+#     # update OlinkIDs with _ ref_product for cross product bridging
+#
+#     # Unexpected datasets to be bridge normalized! error from olink_norm_input
+#   }
+# )
+
+test_that(
+  "cross product input works with Reveal",
+  {
+    skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data","example_Reveal_data.rds")))
+
+    data_3k <- get_example_data(filename = "example_3k_data.rds")
+    data_reveal <- get_example_data(filename = "example_Reveal_data.rds")
+
+    bridge_samples <- intersect(
+      x = unique(data_reveal$SampleID),
+      y = unique(data_3k$SampleID)
+    ) |>
+      (\(x) x[!grepl("CONTROL", x)])() |>
+      sort() |>
+      head(32L)
+    expect_warning(object = reveal_input <- olink_norm_input_check(df1 = data_reveal,
+                           df2 = data_3k,
+                           overlapping_samples_df1 = bridge_samples,
+                           overlapping_samples_df2 = NULL,
+                           df1_project_nr = "Reveal",
+                           df2_project_nr = "3K",
+                           reference_project = "Reveal",
+                           reference_medians = NULL
+                           ),
+                   regexp = "85 assays")
+    expect_identical(reveal_input$lst_product$product,
+                  c("Reveal" = "Reveal", "3K" = "3k"))
+    expect_identical(reveal_input$lst_product$reference,
+                  c("Reveal" = "ref", "3K" = "not_ref"))
+  }
+)

@@ -470,7 +470,7 @@ test_that(
 test_that(
   "olink_normalization - works - 3k-HT normalization",
   {
-    
+
     skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
     skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
 
@@ -791,3 +791,29 @@ test_that(
     )
   }
 )
+
+test_that("bridging 3k to Reveal - works",
+         {
+           skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
+           skip_if_not(file.exists(test_path("data","example_Reveal_data.rds")))
+
+           data_3k <- get_example_data(filename = "example_3k_data.rds")
+           data_reveal <- get_example_data(filename = "example_Reveal_data.rds")
+
+           bridge_samples <- intersect(
+             x = unique(data_reveal$SampleID),
+             y = unique(data_3k$SampleID)
+           ) |>
+             (\(x) x[!grepl("CONTROL", x)])() |>
+             sort() |>
+             head(32L)
+
+           expect_no_error(expect_warning(olink_normalization(df1 = data_reveal,
+                               df2 = data_3k,
+                               overlapping_samples_df1 = bridge_samples,
+                               df1_project_nr = "Reveal",
+                               df2_project_nr = "3k",
+                               reference_project = "Reveal"),
+                               "85 assays"))
+
+         })

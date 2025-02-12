@@ -33,17 +33,18 @@ knitr::opts_chunk$set(
 
 Individual Olink® NPX datasets are normalized using either plate control
 normalization or intensity normalization methods. Plate control
-normalization is generally used for single plate projects or for Explore HT projects, while
-intensity normalization is generally used for multi-plate projects. Additionally,
-intensity normalization method assumes that all samples within a project
-are fully randomized.
+normalization is generally used for single plate projects or for Explore
+HT projects, while intensity normalization is generally used for
+multi-plate projects. Additionally, intensity normalization method
+assumes that all samples within a project are fully randomized.
 
 In the case where all samples within a project are not fully randomized,
 or when a study is separated into separate batches, an additional
 normalization step is needed to allow the data to be comparable, since
 NPX is a relative measurement. The joint analysis of two or more Olink®
 NPX datasets often requires an additional batch correction step to
-remove technical variations, which is referred to as overlapping sample reference normalization, bridge normalization, or just simply bridging.
+remove technical variations, which is referred to as overlapping sample
+reference normalization, bridge normalization, or just simply bridging.
 
 Bridging is also needed if Olink® NPX datasets are:
 
@@ -70,15 +71,21 @@ library(kableExtra)
 
 ```{r brnrtab, message=FALSE, echo=FALSE}
 data.frame(Platform = c("Target 96",
-                         "Explore 384 Cardiometabolic, Inflammation, Neurology, and Oncology",
-                        "Explore 384 Cardiometabolic II, Inflammation II, Neurology II, and Oncology II",
-                        "Explore HT", 
-                        "Explore 3072 to Explore HT"),
+                        paste0("Explore 384: \n",
+                               "Cardiometabolic, Inflammation, ",
+                               "Neurology, and Oncology"),
+                        paste0("Explore 384: \n",
+                               "Cardiometabolic II, Inflammation II,",
+                               "Neurology II, and Oncology II"),
+                        "Explore HT",
+                        "Explore 3072 to Explore HT",
+                        "Explore 3072 to Reveal"),
            BridgingSamples = c("8-16",
                                "8-16",
-                              "16-24",
-                              "16-32",
-                              "40-64")) %>%
+                               "16-24",
+                               "16-32",
+                               "40-64",
+                               "32-48")) %>%
   kbl(booktabs = TRUE,
       digits = 2,
       caption = "Table 1. Recommended number of bridging samples for Olink platforms") %>%
@@ -101,13 +108,27 @@ from the reference study and be added to the second study. These samples
 can be selected using the `olink_bridgeselector()` function in Olink
 Analyze. The bridge selection function will select a number of bridge
 samples based on the reference data. This function selects samples which
-passes QC and have high detectability. In the case of where detectability cannot be calculated from the test data set (ex: Explore HT data), the function will only select samples which pass QC. External controls are not selected as bridge samples as they are not necessarily representative of the study and therefore may not cover the dynamic range of assays that would be expressed within the samples. Note that due to naming convention differences, it is necessary to exclude the control samples using either `SampleType == "SAMPLE"` if available or `stringr::str_detect()` as shown below.
+passes QC and have high detectability. In the case of where
+detectability cannot be calculated from the test data set (ex: Explore
+HT data), the function will only select samples which pass QC. External
+controls are not selected as bridge samples as they are not necessarily
+representative of the study and therefore may not cover the dynamic
+range of assays that would be expressed within the samples. Note that
+due to naming convention differences, it is necessary to exclude the
+control samples using either `SampleType == "SAMPLE"` if available or
+`stringr::str_detect()` as shown below.
 
-To select samples across the range of the data, the samples are ordered by mean NPX value and selected across this range. When running the selector, Olink recommends starting at sampleMissingFreq = 0.10 which represents a maximum of 10% data below LOD per sample. If there are not enough samples output, increase to 20%. For alternative matrices and specific disease types, it may be needed to increase the sampleMissingFreq to higher levels.
-
+To select samples across the range of the data, the samples are ordered
+by mean NPX value and selected across this range. When running the
+selector, Olink recommends starting at sampleMissingFreq = 0.10 which
+represents a maximum of 10% data below LOD per sample. If there are not
+enough samples output, increase to 20%. For alternative matrices and
+specific disease types, it may be needed to increase the
+sampleMissingFreq to higher levels.
 
 In this example we will demonstrate how to select 16 bridging samples
-using `npx_data1` which will act as the reference data. The selected bridge samples are displayed in Table 2.
+using `npx_data1` which will act as the reference data. The selected
+bridge samples are displayed in Table 2.
 
 ```{r bridge_sample_selection_example, echo=T, eval=T}
 
@@ -131,7 +152,12 @@ npx_data1 %>%
   
 ```
 
-It's important to make sure that the select bridge samples are representative of the overall samples within the study. This can be done by generating a PCA plot with the following code and make sure that the bridge samples are evenly dispersed among the other samples, as shown in Figure 1.
+It's important to make sure that the select bridge samples are
+representative of the overall samples within the study. This can be done
+by generating a PCA plot with the following code and make sure that the
+bridge samples are evenly dispersed among the other samples, as shown in
+Figure 1.
+
 ```{r captions, echo=FALSE}
 f1<- "Figure 1. PCA plot of bridging samples and other samples in npx_data1. Control samples are excluded from the PCA plot."
 
@@ -149,7 +175,6 @@ f7 <- "Figure 7. Density plot of inter-project CV before and after bridging."
 
 f8 <- "Figure 8. PCA plot of both datasets after bridging."
 ```
-
 
 ```{r bridge_sample_selection_example_pca, echo=T, eval=T, fig.cap= f1}
 npx_data1 %>% 
@@ -178,13 +203,19 @@ packages.
 ## Check bridging datasets
 
 First, confirm that there are overlapping sample IDs within the study.
-It is important that the sample IDs are the same in both NPX files as shown in Table 3. Note that while external controls may share the same SampleID in both datasets, theses samples should not be treated as bridging samples. External control samples often share the same naming convention across datasets but may represent different samples due to reagent batch differences. Additionally, external control samples are unlikely to cover the dynamic range of assays expressed in the study samples.
+It is important that the sample IDs are the same in both NPX files as
+shown in Table 3. Note that while external controls may share the same
+SampleID in both datasets, theses samples should not be treated as
+bridging samples. External control samples often share the same naming
+convention across datasets but may represent different samples due to
+reagent batch differences. Additionally, external control samples are
+unlikely to cover the dynamic range of assays expressed in the study
+samples.
 
 ```{r, eval= FALSE}
 data.frame(SampleID = intersect(npx_data1$SampleID, npx_data2$SampleID)) %>%
   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_SAMPLE"))
 ```
-
 
 ```{r, echo=FALSE}
 
@@ -198,9 +229,12 @@ data.frame(SampleID = intersect(npx_data1$SampleID, npx_data2$SampleID)) %>%
 ```
 
 Then, gain an overview of the datasets that are going to be bridged. For
-example, plot and compare NPX distribution between datasets, as shown in Figure 2. By having a
-sense of how the studies compared to each other before bridging, we can
-then determine the success of the bridging process post bridging. Figure 2 shows a large overlap between data1 and data2, however there are still some differences as indicated by the blue and red areas on the edge of the distribution.
+example, plot and compare NPX distribution between datasets, as shown in
+Figure 2. By having a sense of how the studies compared to each other
+before bridging, we can then determine the success of the bridging
+process post bridging. Figure 2 shows a large overlap between data1 and
+data2, however there are still some differences as indicated by the blue
+and red areas on the edge of the distribution.
 
 ```{r check, message=FALSE, fig.cap= f2}
 # Load datasets
@@ -228,9 +262,17 @@ npx_df %>%
         legend.position = "top")
 ```
 
-Use a PCA plot as shown in Figure 3 to visualize sample-to-sample distance before bridging.
-Typically the project dataset accounts for most of the observed
-variation within the combined datasets at this point. Control samples are removed from the PCA plot because they are not expected to be representative of the rest of the dataset, and therefore the variation between sample and control samples could skew the PCA, making it more challenging to see differences between projects. Additional, the PCA function does not support multiple samples with the same SampleID, which is also why the bridging samples in the second project are appended with "_new". In Figure 3, data1 and data2 separate along PC1, indicating batch differences between the two datasets.
+Use a PCA plot as shown in Figure 3 to visualize sample-to-sample
+distance before bridging. Typically the project dataset accounts for
+most of the observed variation within the combined datasets at this
+point. Control samples are removed from the PCA plot because they are
+not expected to be representative of the rest of the dataset, and
+therefore the variation between sample and control samples could skew
+the PCA, making it more challenging to see differences between projects.
+Additional, the PCA function does not support multiple samples with the
+same SampleID, which is also why the bridging samples in the second
+project are appended with "\_new". In Figure 3, data1 and data2 separate
+along PC1, indicating batch differences between the two datasets.
 
 ```{r pca1, message=FALSE, fig.cap=f3}
 #### Extract bridging samples
@@ -282,7 +324,7 @@ distinguish between reference dataset from the other dataset. It is up
 to the user to define which dataset is the reference dataset and specify
 the names of the bridge samples. The resulting dataset will contain the
 reference dataset, which will be identical to the input reference data,
-with adjustment factors of 0, and the newly bridged dataset. 
+with adjustment factors of 0, and the newly bridged dataset.
 
 ```{r bridging, message=FALSE}
 # Find shared samples
@@ -320,7 +362,6 @@ npx_br_data %>%
   kableExtra::scroll_box(width = "100%")
 ```
 
-
 ## Perform bridging with non-matching sample names
 
 `olink_normalization_bridge()` also supports data where the shared
@@ -338,7 +379,10 @@ overlap_sample_list <-list("DF1" = c("A1", "A2", "A3", "Sample_1_Aliquot_1"),
 
 ## Perform evaluation of bridging normalization
 
-First, check NPX distribution in datasets after bridging normalization, as shown in Figure 4. Figure 4 shows a larger overlap in projects than seen in Figure 2, as indicated by fewer areas of red and blue along the outside of the distribution.
+First, check NPX distribution in datasets after bridging normalization,
+as shown in Figure 4. Figure 4 shows a larger overlap in projects than
+seen in Figure 2, as indicated by fewer areas of red and blue along the
+outside of the distribution.
 
 ```{r densitybr, message=FALSE, fig.cap= f4}
 # Plot NPX density after bridging normalization
@@ -363,17 +407,21 @@ Then, summarize number of assays that have adjustment factors in certain
 ranges. High adjustment factors can result from variations between
 projects, such as panel versions or technical modifications. The cutoff
 of a deviating adjustment factor is subjective and depends on a variety
-of factors including the distribution of adjustment factors, as shown in Figure 5. While there are a few assays with adjustment factors between 2 and 4 and -2 and -4, the majority of the adjustment factors shown in Figure 5 occur between -2 and 2.
+of factors including the distribution of adjustment factors, as shown in
+Figure 5. While there are a few assays with adjustment factors between 2
+and 4 and -2 and -4, the majority of the adjustment factors shown in
+Figure 5 occur between -2 and 2.
 
-Such assays can be visualized individually with violin plots, as shown in Figure 6, and may
-warrant further investigation to confirm they are still comparable
-between projects. For example, if a violin plot exhibits a different
-range or truncated distribution, this may suggest that the assay is
-below LOD or at hook in one of the data sets. However, as long as the
-bridge samples are not at hook or below LOD, this should not impact the
-bridging quality. For projects with differing clinical phenotypes, it is
-more informative to look at the similarities between the bridging
-samples than the similarity between the datasets, as indicated by the overlaid black dots in Figure 6.
+Such assays can be visualized individually with violin plots, as shown
+in Figure 6, and may warrant further investigation to confirm they are
+still comparable between projects. For example, if a violin plot
+exhibits a different range or truncated distribution, this may suggest
+that the assay is below LOD or at hook in one of the data sets. However,
+as long as the bridge samples are not at hook or below LOD, this should
+not impact the bridging quality. For projects with differing clinical
+phenotypes, it is more informative to look at the similarities between
+the bridging samples than the similarity between the datasets, as
+indicated by the overlaid black dots in Figure 6.
 
 ```{r dist_adj_fct, message=FALSE, echo = FALSE, fig.cap = f5}
 npx_br_data %>% 
@@ -416,10 +464,14 @@ npx_data1 %>%
 ```
 
 Another way to determine if bridging decreased variability between
-projects is to calculate the CV of the control samples across both projects before and after bridging, as shown in Figure 7. The CV after normalization is expected to be smaller than the CV prior to normalization, as shown in Figure 7. 
+projects is to calculate the CV of the control samples across both
+projects before and after bridging, as shown in Figure 7. The CV after
+normalization is expected to be smaller than the CV prior to
+normalization, as shown in Figure 7.
 
-Note that the CV calculation formula differs for Olink Target
-96 and Olink Explore products. More information of CV calculation can be found in the [Olink FAQ](https://olink.com/knowledge/faq)
+Note that the CV calculation formula differs for Olink Target 96 and
+Olink Explore products. More information of CV calculation can be found
+in the [Olink FAQ](https://olink.com/knowledge/faq)
 
 ```{r CV_calculation, fig.cap= f7}
 
@@ -465,11 +517,12 @@ cv_before %>%
 ```
 
 Finally, use PCA plot to check whether bridging normalization has effect
-in correcting batch effects (Figure 8). In the example below, it is clear that
-before bridging samples from data 1 and 2 are divided into separate
-clusters due to the batch effects (Figure 3), but after bridging they are shown as
-one cluster in the PCA plot (Figure 8). Bridging normalization has sufficiently
-removed the batch effects between two data sets.
+in correcting batch effects (Figure 8). In the example below, it is
+clear that before bridging samples from data 1 and 2 are divided into
+separate clusters due to the batch effects (Figure 3), but after
+bridging they are shown as one cluster in the PCA plot (Figure 8).
+Bridging normalization has sufficiently removed the batch effects
+between two data sets.
 
 ```{r pca2, message=FALSE, fig.cap= f8}
 ## After bridging
@@ -519,12 +572,21 @@ We are always happy to help. Email us with any questions:
 
 © 2025 Olink Proteomics AB, part of Thermo Fisher Scientific.
 
-Olink products and services are For Research Use Only. Not for use in diagnostic procedures.
+Olink products and services are For Research Use Only. Not for use in
+diagnostic procedures.
 
-All information in this document is subject to change without notice. This document is not intended to convey any warranties, representations and/or recommendations of any kind, unless such warranties, representations and/or recommendations are explicitly stated.
+All information in this document is subject to change without notice.
+This document is not intended to convey any warranties, representations
+and/or recommendations of any kind, unless such warranties,
+representations and/or recommendations are explicitly stated.
 
-Olink assumes no liability arising from a prospective reader’s actions based on this document.
+Olink assumes no liability arising from a prospective reader’s actions
+based on this document.
 
-OLINK, NPX, PEA, PROXIMITY EXTENSION, INSIGHT and the Olink logotype are trademarks registered, or pending registration, by Olink Proteomics AB. All third-party trademarks are the property of their respective owners.
+OLINK, NPX, PEA, PROXIMITY EXTENSION, INSIGHT and the Olink logotype are
+trademarks registered, or pending registration, by Olink Proteomics AB.
+All third-party trademarks are the property of their respective owners.
 
-Olink products and assay methods are covered by several patents and patent applications [https://www.olink.com/patents/](https://olink.com/patents/).
+Olink products and assay methods are covered by several patents and
+patent applications
+[https://www.olink.com/patents/](https://olink.com/patents/).
