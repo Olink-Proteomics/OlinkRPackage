@@ -470,7 +470,7 @@ test_that(
 test_that(
   "olink_normalization - works - 3k-HT normalization",
   {
-    
+
     skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
     skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
 
@@ -509,6 +509,7 @@ test_that(
                    "MedianCenteredNPX", "QSNormalizedNPX",
                    "BridgingRecommendation")
     )
+
   }
 )
 
@@ -789,5 +790,63 @@ test_that(
         dplyr::pull(),
       expected = oid_3k
     )
+  }
+)
+
+test_that(
+  "norm_internal_cross_product missing counts - error",
+  {
+    
+    skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
+    
+    data_3k <- get_example_data(filename = "example_3k_data.rds")
+    data_ht <- get_example_data(filename = "example_HT_data.rds")
+    
+    ## error v1: reference/HT and new/3K DF missing count column ----
+    
+    expect_error(
+      object = norm_internal_cross_product(
+        ref_df = data_ht |> select(-Count),
+        ref_samples = intersect(data_ht$SampleID, data_3k$SampleID),
+        ref_name= "proj_ht",
+        ref_cols = colnames(data_ht),
+        not_ref_df = data_3k |> select(-Count),
+        not_ref_name = "proj_3k",
+        not_ref_cols = colnames(data_3k)
+      ),
+      regexp = paste("No Count column detected in proj_ht and proj_3k!")
+    )
+
+    ## error v2: reference/HT DF missing count column ----
+    
+    expect_error(
+      object = norm_internal_cross_product(
+        ref_df = data_ht |> select(-Count),
+        ref_samples = intersect(data_ht$SampleID, data_3k$SampleID),
+        ref_name= "proj_ht",
+        ref_cols = colnames(data_ht),
+        not_ref_df = data_3k,
+        not_ref_name = "proj_3k",
+        not_ref_cols = colnames(data_3k)
+      ),
+      regexp = paste("No Count column detected in proj_ht!")
+    )
+      
+    ## error v3: new/3K DF missing count column ----
+
+    expect_error(
+      object = norm_internal_cross_product(
+        ref_df = data_ht,
+        ref_samples = intersect(data_ht$SampleID, data_3k$SampleID),
+        ref_name= "proj_ht",
+        ref_cols = colnames(data_ht),
+        not_ref_df = data_3k |> select(-Count),
+        not_ref_name = "proj_3k",
+        not_ref_cols = colnames(data_3k)
+      ),
+      regexp = paste("No Count column detected in proj_3k!")
+    )
+
   }
 )
