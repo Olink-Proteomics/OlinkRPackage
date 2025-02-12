@@ -663,7 +663,7 @@ norm_internal_cross_product <- function(ref_df,
   names(lst_df) <- c(ref_name, not_ref_name)
   
   # check if both dfs in cross-product normalization contain Count column ----
-  browser()
+  
   if (!"Count" %in% names(ref_df) && !"Count" %in% names(not_ref_df)) {
     cli::cli_abort(
       c(
