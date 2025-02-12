@@ -185,6 +185,12 @@ test_that(
         )
       )
     )
+    expect_error(olink_normalization_qs(
+      lst_df = lst_df,
+      ref_cols = norm_input_check$ref_cols,
+      bridge_samples = bridge_samples,
+      ref_product = "other"),
+      "Reference product must be HT or Reveal")
 
     # check if reference is reproduced ----
 
@@ -632,22 +638,7 @@ test_that(
         pull(),
       expected = 63L
     )
-
   }
 )
 
-# test_that("cross product bridging works with 3k to Reveal",
-#          {
-#
-#            # bridging results are correct
-#
-#            # formatting is correct
-#
-#            # Correlation assays are correctly present
-#
-#            # Non overlapping assays in both direction are present
-#
-#
-#          }
-#
-# )
+
