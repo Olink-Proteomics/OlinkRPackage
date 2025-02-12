@@ -1001,6 +1001,40 @@ olink_norm_input_cross_product <- function(lst_df,
 
   }
 
+  # check if both dfs in cross-product normalization contain Count column ----
+  
+  if (norm_mode == olink_norm_modes$norm_ht_3k
+      && !"Count" %in% lst_df[1]) {
+    cli::cli_abort(
+      c(
+        "x" = "No Count column detected in {names(lst_df[1])}!",
+        "i" = "When performing cross-product normalization, count values are 
+        required for QS normalization calculations. Please ensure that the 
+        'Count' column is present in {names(lst_df[1])}. Re-export of 
+        {names(lst_df[1])} may be required."
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+    
+  }
+  if (norm_mode == olink_norm_modes$norm_ht_3k
+      && !"Count" %in% lst_df[2]) {
+    browser()
+    cli::cli_abort(
+      c(
+        "x" = "No Count column detected in {names(lst_df[2])}!",
+        "i" = "When performing cross-product normalization, count values are 
+        required for QS normalization calculations. Please ensure that the 
+        'Count' column is present in {names(lst_df[2])}. Re-export of 
+        {names(lst_df[2])} may be required."
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+    
+  }
+  
   # update Olink assay identifiers if cross product normalization ----
 
   if (norm_mode == olink_norm_modes$norm_ht_3k) {
