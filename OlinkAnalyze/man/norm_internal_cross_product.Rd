@@ -33,6 +33,9 @@ adjustment factor calculation in the reference dataset (required).}
 
 \item{not_ref_cols}{Named list of column names in the non-reference dataset
 (required).}
+
+\item{lst_product}{a list of the products of each
+project and if they are the reference project.}
 }
 \value{
 Tibble or ArrowObject with a dataset with the following additional

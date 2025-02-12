@@ -16,6 +16,3 @@ dataframe of mapping file to use for OlinkID mapping
 \description{
 Identifying which mapping file to use
 }
-\examples{
-df <- mapping_file_id("HT")
-}

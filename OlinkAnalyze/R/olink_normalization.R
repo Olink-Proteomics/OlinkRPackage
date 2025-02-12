@@ -633,6 +633,8 @@ norm_internal_bridge <- function(ref_df,
 #' @param not_ref_name Project name of the non-reference dataset (required).
 #' @param not_ref_cols Named list of column names in the non-reference dataset
 #' (required).
+#' @param lst_product a list of the products of each
+#' project and if they are the reference project.
 #'
 #' @return Tibble or ArrowObject with a dataset with the following additional
 #' columns:

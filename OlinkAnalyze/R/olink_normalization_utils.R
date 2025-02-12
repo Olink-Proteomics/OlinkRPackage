@@ -1930,8 +1930,6 @@ olink_product_identifier_norm<- function(
 #' @return dataframe of mapping file to use for OlinkID mapping
 #' (eHT_e3072_mapping or reveal_e3072_mapping)
 #'
-#' @examples
-#' df <- mapping_file_id("HT")
 mapping_file_id <- function(ref_product){
   # Ref mapping file
   if(ref_product == "HT") {
