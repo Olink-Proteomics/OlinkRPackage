@@ -101,7 +101,7 @@ olink_norm_input_check <- function(df1,
                                    reference_project,
                                    reference_medians) {
   # Validate the normalization input ----
-
+  # browser()
   norm_valid <- olink_norm_input_validate(
     df1 = df1,
     df2 = df2,
@@ -1000,41 +1000,7 @@ olink_norm_input_cross_product <- function(lst_df,
     )
 
   }
-
-  # check if both dfs in cross-product normalization contain Count column ----
-  
-  if (norm_mode == olink_norm_modes$norm_ht_3k
-      && !"Count" %in% lst_df[1]) {
-    cli::cli_abort(
-      c(
-        "x" = "No Count column detected in {names(lst_df[1])}!",
-        "i" = "When performing cross-product normalization, count values are 
-        required for QS normalization calculations. Please ensure that the 
-        'Count' column is present in {names(lst_df[1])}. Re-export of 
-        {names(lst_df[1])} may be required."
-      ),
-      call = rlang::caller_env(),
-      wrap = FALSE
-    )
-    
-  }
-  if (norm_mode == olink_norm_modes$norm_ht_3k
-      && !"Count" %in% lst_df[2]) {
-    browser()
-    cli::cli_abort(
-      c(
-        "x" = "No Count column detected in {names(lst_df[2])}!",
-        "i" = "When performing cross-product normalization, count values are 
-        required for QS normalization calculations. Please ensure that the 
-        'Count' column is present in {names(lst_df[2])}. Re-export of 
-        {names(lst_df[2])} may be required."
-      ),
-      call = rlang::caller_env(),
-      wrap = FALSE
-    )
-    
-  }
-  
+ 
   # update Olink assay identifiers if cross product normalization ----
 
   if (norm_mode == olink_norm_modes$norm_ht_3k) {
@@ -1205,7 +1171,7 @@ olink_norm_input_cross_product <- function(lst_df,
 olink_norm_input_check_samples <- function(lst_df_samples,
                                            lst_ref_samples,
                                            norm_mode) {
-
+  
   if (!(length(lst_df_samples) %in% c(1L, 2L))) {
     # if 0 or more than 2 datasets are provided
     cli::cli_abort(
