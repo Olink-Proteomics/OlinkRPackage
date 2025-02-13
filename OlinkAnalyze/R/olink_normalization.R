@@ -669,11 +669,12 @@ norm_internal_cross_product <- function(ref_df,
       c(
         "x" = "No Count column detected in {names(lst_df[1])} and 
         {names(lst_df[2])}!",
-        "i" = "When performing cross-product normalization, count values are 
-        required in both the new and reference datasets for QS normalization 
+        "i" = "When performing cross-product normalization, count values from
+        both the new and reference datasets are required for QS normalization 
         calculations. Please ensure that the 'Count' column is present in both 
         {names(lst_df[1])} and {names(lst_df[2])}. Re-export of 
-        {names(lst_df[1])} and/or {names(lst_df[2])} may be required."
+        {names(lst_df[1])} and/or {names(lst_df[2])} NPX files from Olink data 
+        software  may be required."
       ),
       call = rlang::caller_env(),
       wrap = FALSE
@@ -683,10 +684,11 @@ norm_internal_cross_product <- function(ref_df,
     cli::cli_abort(
       c(
         "x" = "No Count column detected in {names(lst_df[1])}!",
-        "i" = "When performing cross-product normalization, count values are 
-        required in both the new and reference datasets for QS normalization 
-        calculations. Please ensure that the 'Count' column is present in 
-        {names(lst_df[1])}. Re-export of {names(lst_df[1])} may be required."
+        "i" = "When performing cross-product normalization, count values from
+        both the new and reference datasets are required for QS normalization
+        calculations. Please ensure that the 'Count' column is present in
+        {names(lst_df[1])}. Re-export of {names(lst_df[1])} NPX file from Olink 
+        data software  may be required."
       ),
       call = rlang::caller_env(),
       wrap = FALSE
@@ -696,10 +698,11 @@ norm_internal_cross_product <- function(ref_df,
     cli::cli_abort(
       c(
         "x" = "No Count column detected in {names(lst_df[2])}!",
-        "i" = "When performing cross-product normalization, count values are 
-        required in both the new and reference datasets for QS normalization 
-        calculations. Please ensure that the 'Count' column is present in 
-        {names(lst_df[2])}. Re-export of {names(lst_df[2])} may be required."
+        "i" = "When performing cross-product normalization, count values from
+        both the new and reference datasets are required in  for
+        QS normalization calculations. Please ensure that the 'Count' column is 
+        present in {names(lst_df[2])}. Re-export of {names(lst_df[2])} NPX file 
+        from Olink data software  may be required."
       ),
       call = rlang::caller_env(),
       wrap = FALSE
