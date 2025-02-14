@@ -101,7 +101,7 @@ olink_norm_input_check <- function(df1,
                                    reference_project,
                                    reference_medians) {
   # Validate the normalization input ----
-  
+
   norm_valid <- olink_norm_input_validate(
     df1 = df1,
     df2 = df2,
@@ -657,7 +657,8 @@ olink_norm_input_check_df_cols <- function(lst_df) {
     lod = c("LOD",
             "Plate LOD", "Plate_LOD", "PlateLOD",
             "Max LOD", "Max_LOD", "MaxLOD"),
-    normalization = "Normalization"
+    normalization = "Normalization",
+    count = "Count"
   )
 
   # intersect required column names with columns of df
@@ -728,7 +729,8 @@ olink_norm_input_check_df_cols <- function(lst_df) {
     # we allow assay_warn to be missing but we want to match it to reference
     # df in normalization
     lapply(function(sub_lst) {
-      sub_lst[!(names(sub_lst) %in% c("lod", "normalization", "assay_warn"))]
+      sub_lst[!(names(sub_lst) %in% c("lod", "normalization",
+                                      "assay_warn", "count"))]
     }) |>
     # remove all elements that have no missing value
     lapply(function(sub_lst) {
@@ -1000,10 +1002,12 @@ olink_norm_input_cross_product <- function(lst_df,
     )
 
   }
- 
-  # update Olink assay identifiers if cross product normalization ----
+
+  # cross-product specific checks ----
 
   if (norm_mode == olink_norm_modes$norm_ht_3k) {
+
+    # update Olink assay identifiers if cross product normalization ----
 
     # add combined OlinkID to HT dataset
     l_ht_name <- names(lst_product)[lst_product == "HT"]
@@ -1057,6 +1061,26 @@ olink_norm_input_cross_product <- function(lst_df,
       dplyr::mutate(OlinkID = ifelse(is.na(.data[["OlinkID"]]),
                                      .data[[l_3k_oid_rename]],
                                      .data[["OlinkID"]]))
+
+    # check if both datasets contain the count column ----
+
+    check_cnt <- lapply(lst_cols, function(x) x[["count"]]) |> unlist()
+
+    if (length(check_cnt) != 2L) {
+      cnt_miss <- names(lst_cols)[!(names(lst_cols) %in% names(check_cnt))]
+
+      cli::cli_abort(
+        c(
+          "x" = "Column {.val {\"Count\"}} not found in {cli::qty(cnt_miss)}
+        dataset{?s} {.val {cnt_miss}}!",
+          "i" = "When performing cross-product normalization, count values from
+        both datasets are required for QS normalization. Re-export of NPX files
+        from Olink software may be required."
+        ),
+        call = rlang::caller_env(),
+        wrap = FALSE
+      )
+    }
 
   }
 
@@ -1171,7 +1195,7 @@ olink_norm_input_cross_product <- function(lst_df,
 olink_norm_input_check_samples <- function(lst_df_samples,
                                            lst_ref_samples,
                                            norm_mode) {
-  
+
   if (!(length(lst_df_samples) %in% c(1L, 2L))) {
     # if 0 or more than 2 datasets are provided
     cli::cli_abort(
