@@ -632,7 +632,7 @@ olink_normalization_qs <- function(lst_df,
     cli::cli_warn(
       message = c(
         "Insufficient number of bridge samples to perform QS normalization.
-        There is {.val {nrow(num_not_qs_norm_assays)}} assays with fewer
+        There {?is/are} {.val {nrow(num_not_qs_norm_assays)}} assay{?s} with fewer
         than {.val {num_samples}} bridge samples for QS normalization!"
       ),
       wrap = FALSE
