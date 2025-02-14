@@ -354,9 +354,10 @@ read_NPX_explore <- function(filename) {
       mutate("{quant_value}" := as.numeric(.data[[quant_value]]))
   }
 
-  if(typeof(out$PanelVersion) != "character") {
-    out <- out %>%
-      mutate(PanelVersion = as.character(PanelVersion))
+  if (!("PanelVersion" %in% names(out))) {
+    return(out)
+  } else {
+    out <- out %>% mutate(PanelVersion = as.character(PanelVersion))
   }
   
   # If multiple quantification columns be detected, trigger the message and print 
