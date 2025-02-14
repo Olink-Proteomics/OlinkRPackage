@@ -517,7 +517,7 @@ test_that(
         ref_cols = norm_input_check$ref_cols,
         bridge_samples = head(x = bridge_samples, 38L)
       ),
-      regexp = "There is 104 assays with fewer than 40 bridge samples for QS"
+      regexp = "There are 104 assays with fewer than 40 bridge samples for QS"
     )
 
     expect_warning(
@@ -526,7 +526,7 @@ test_that(
         ref_cols = norm_input_check$ref_cols,
         bridge_samples = head(x = bridge_samples, 40L)
       ),
-      regexp = "There is 31 assays with fewer than 40 bridge samples for QS"
+      regexp = "There are 31 assays with fewer than 40 bridge samples for QS"
     )
   }
 )
