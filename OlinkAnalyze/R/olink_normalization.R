@@ -300,7 +300,7 @@ olink_normalization <- function(df1,
 
     } else if (lst_check$norm_mode == olink_norm_modes$norm_ht_3k) {
       # HT-3K normalization ----
-  
+
       df_norm <- norm_internal_cross_product(
         ref_df = lst_check$ref_df,
         ref_samples = lst_check$ref_samples,
@@ -661,54 +661,6 @@ norm_internal_cross_product <- function(ref_df,
     not_ref_df
   )
   names(lst_df) <- c(ref_name, not_ref_name)
-  
-  # check if both dfs in cross-product normalization contain Count column ----
-  
-  if (!"Count" %in% names(ref_df) && !"Count" %in% names(not_ref_df)) {
-    cli::cli_abort(
-      c(
-        "x" = "No Count column detected in {names(lst_df[1])} and 
-        {names(lst_df[2])}!",
-        "i" = "When performing cross-product normalization, count values from
-        both the new and reference datasets are required for QS normalization 
-        calculations. Please ensure that the 'Count' column is present in both 
-        {names(lst_df[1])} and {names(lst_df[2])}. Re-export of 
-        {names(lst_df[1])} and/or {names(lst_df[2])} NPX files from Olink data 
-        software  may be required."
-      ),
-      call = rlang::caller_env(),
-      wrap = FALSE
-    )
-    
-  } else if (!"Count" %in% names(ref_df)) {
-    cli::cli_abort(
-      c(
-        "x" = "No Count column detected in {names(lst_df[1])}!",
-        "i" = "When performing cross-product normalization, count values from
-        both the new and reference datasets are required for QS normalization
-        calculations. Please ensure that the 'Count' column is present in
-        {names(lst_df[1])}. Re-export of {names(lst_df[1])} NPX file from Olink 
-        data software  may be required."
-      ),
-      call = rlang::caller_env(),
-      wrap = FALSE
-    )
-    
-  } else if (!"Count" %in% names(not_ref_df)) {
-    cli::cli_abort(
-      c(
-        "x" = "No Count column detected in {names(lst_df[2])}!",
-        "i" = "When performing cross-product normalization, count values from
-        both the new and reference datasets are required in  for
-        QS normalization calculations. Please ensure that the 'Count' column is 
-        present in {names(lst_df[2])}. Re-export of {names(lst_df[2])} NPX file 
-        from Olink data software  may be required."
-      ),
-      call = rlang::caller_env(),
-      wrap = FALSE
-    )
-    
-  }
 
   # is bridgeable ----
 
