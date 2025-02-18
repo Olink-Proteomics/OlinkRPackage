@@ -193,6 +193,50 @@ read_NPX_explore <- function(filename) {
                              "QC.Deviation.Inc.Ctrl",
                              "QC.Deviation.Det.Ctrl",
                              "Olink.NPX.Signature.Version"),
+    "header_quant_npxs2.0" = c(header_base,
+                               "Product",
+                               "PanelVersion",
+                               "WellID",
+                               "SampleType",
+                               "Ct",
+                               "LODNPX",
+                               "BelowLOD",
+                               "QuantifiedValue",
+                               "Unit",
+                               "LODQuant",
+                               "LLOQ",
+                               "LQL",
+                               "BelowLQL",
+                               "ULOQ",
+                               "AboveULOQ",
+                               "SampleQC",
+                               "AssayQC",
+                               "MissingFreq",
+                               "Normalization",
+                               "SoftwareVersion",
+                               "SoftwareName",
+                               "AssayType",
+                               "QCDeviationDetCtrl",
+                               "QCDeviationIncCtrl"),
+    "header_T96_npxs2.0" = c(header_base,
+                             "Product",
+                             "PanelVersion",
+                             "WellID",
+                             "SampleType",
+                             "Ct",
+                             "LODNPX",
+                             "BelowLOD",
+                             "SampleQC",
+                             "AssayQC",
+                             "MissingFreq",
+                             "Normalization",
+                             "SoftwareVersion",
+                             "SoftwareName",
+                             "AssayType",
+                             "IPCNormalizedNPX",
+                             "LODIPCNormalizedNPX",
+                             "QCDeviationDetCtrl",
+                             "QCDeviationIncCtrl"),
     "header_csv_hp" = c(header_base,
                         "SampleType",
                         "WellID",
@@ -302,10 +346,26 @@ read_NPX_explore <- function(filename) {
       dplyr::mutate(Panel = trimws(Panel, which = "right")) %>%
       dplyr::select(-Panel_Start, -Panel_End)
   }
-  if ("Quantified_value" %in% names(out)){
+
+  quant_value <- intersect(c("Quantified_value", "QuantifiedValue"), names(out))
+  if (length(quant_value) == 1) {
     message("QUANT data detected. Some downstream functions may not be supported.")
     out <- out %>%
-      mutate(Quantified_value = as.numeric(Quantified_value))
+      mutate("{quant_value}" := as.numeric(.data[[quant_value]]))
+  }
+
+  if (!("PanelVersion" %in% names(out))) {
+    return(out)
+  } else {
+    out <- out %>% mutate(PanelVersion = as.character(PanelVersion))
+  }
+  
+  # If multiple quantification columns be detected, trigger the message and print 
+  # out NPX will be used for analysis
+  quant_cols <- intersect(c("NPX", "PCNormalizedNPX", "Count", "Quantified_value", "QuantifiedValue"),
+                          names(out))
+  if (length(quant_cols) > 1) {
+    message("Multiple quantification columns detected (", paste(quant_cols, collapse = ", "), "). NPX will be used for downstream analysis.")
   }
 
   return(out)
