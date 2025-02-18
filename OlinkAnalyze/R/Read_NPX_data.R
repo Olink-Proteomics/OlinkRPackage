@@ -339,6 +339,7 @@ read_NPX_explore <- function(filename) {
       dplyr::select(-Panel_Start, -Panel_End)
   }
 
+  # Reformat for npxs2.0
   quant_value <- intersect(c("Quantified_value", "QuantifiedValue"), names(out))
   if (length(quant_value) == 1) {
     message("QUANT data detected. Some downstream functions may not be supported.")
@@ -352,9 +353,15 @@ read_NPX_explore <- function(filename) {
     out <- out %>% mutate(PanelVersion = as.character(PanelVersion))
   }
 
+  if(!("BelowLOD" %in% names(out))) {
+    return(out)
+  } else {
+    out <- out %>% mutate(BelowLOD = as.logical(BelowLOD))
+  }
+
   # If multiple quantification columns be detected, trigger the message and print
   # out NPX will be used for analysis
-  quant_cols <- intersect(c("NPX", "PCNormalizedNPX", "Count", "Quantified_value", "QuantifiedValue"),
+  quant_cols <- intersect(c("NPX", "PCNormalizedNPX", "Count", "Quantified_value", "QuantifiedValue", "Ct", "IPCNormalizedNPX"),
                           names(out))
   if (length(quant_cols) > 1) {
     message("Multiple quantification columns detected (", paste(quant_cols, collapse = ", "), "). NPX will be used for downstream analysis.")
