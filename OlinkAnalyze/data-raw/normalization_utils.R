@@ -14,6 +14,11 @@ olink_norm_ref_median_cols <- dplyr::tibble(
   name = c("olink_id", "ref_med")
 )
 
+# columns tha should be re-calculated post-normalization
+olink_norm_recalc <- list(
+  max_lod = c("Max LOD", "Max_LOD", "MaxLOD")
+)
+
 # dataset with all possible combinations of inputs that olink_normalization may
 # take and the error, warning or messages that should be printed in each case.
 # The dataset also marks which olink_norm_mode is returned in each case.
