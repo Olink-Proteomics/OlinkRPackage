@@ -4,7 +4,7 @@
 \alias{olink_normalization_qs}
 \title{Quantile smoothing normalization of all proteins between two NPX projects.}
 \usage{
-olink_normalization_qs(lst_df, ref_cols, bridge_samples)
+olink_normalization_qs(lst_df, ref_cols, bridge_samples, num_samples = 40L)
 }
 \arguments{
 \item{lst_df}{A named list of the 2 input datasets. First element should be
@@ -16,6 +16,9 @@ olink_norm_input_check. (required)}
 
 \item{bridge_samples}{Character vector of samples to be used for the
 quantile mapping. (required)}
+
+\item{num_samples}{Minimum number of bridge samples required to perform QS
+normalization between products.}
 }
 \value{
 A "tibble" of Olink data in long format containing both input
