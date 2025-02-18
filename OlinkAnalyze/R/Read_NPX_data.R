@@ -214,10 +214,7 @@ read_NPX_explore <- function(filename) {
                                "MissingFreq",
                                "Normalization",
                                "SoftwareVersion",
-                               "SoftwareName",
-                               "AssayType",
-                               "QCDeviationDetCtrl",
-                               "QCDeviationIncCtrl"),
+                               "SoftwareName"),
     "header_T96_npxs2.0" = c(header_base,
                              "Product",
                              "PanelVersion",
@@ -231,12 +228,7 @@ read_NPX_explore <- function(filename) {
                              "MissingFreq",
                              "Normalization",
                              "SoftwareVersion",
-                             "SoftwareName",
-                             "AssayType",
-                             "IPCNormalizedNPX",
-                             "LODIPCNormalizedNPX",
-                             "QCDeviationDetCtrl",
-                             "QCDeviationIncCtrl"),
+                             "SoftwareName"),
     "header_csv_hp" = c(header_base,
                         "SampleType",
                         "WellID",
@@ -359,8 +351,8 @@ read_NPX_explore <- function(filename) {
   } else {
     out <- out %>% mutate(PanelVersion = as.character(PanelVersion))
   }
-  
-  # If multiple quantification columns be detected, trigger the message and print 
+
+  # If multiple quantification columns be detected, trigger the message and print
   # out NPX will be used for analysis
   quant_cols <- intersect(c("NPX", "PCNormalizedNPX", "Count", "Quantified_value", "QuantifiedValue"),
                           names(out))
