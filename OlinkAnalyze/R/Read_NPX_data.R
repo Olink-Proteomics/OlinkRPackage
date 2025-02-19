@@ -339,33 +339,33 @@ read_NPX_explore <- function(filename) {
       dplyr::select(-Panel_Start, -Panel_End)
   }
 
-  # Reformat for npxs2.0
-  quant_value <- intersect(c("Quantified_value", "QuantifiedValue"), names(out))
-  if (length(quant_value) == 1) {
-    message("QUANT data detected. Some downstream functions may not be supported.")
-    out <- out %>%
-      mutate("{quant_value}" := as.numeric(.data[[quant_value]]))
+
+  # Trigger message
+  if (intersect(c("Quantified_value", "QuantifiedValue"), names(out)) %>% length == 1) {
+    message("\nQUANT data detected. Some downstream functions may not be supported.\n")
   }
 
-  if (!("PanelVersion" %in% names(out))) {
-    return(out)
-  } else {
-    out <- out %>% mutate(PanelVersion = as.character(PanelVersion))
-  }
-
-  if(!("BelowLOD" %in% names(out))) {
-    return(out)
-  } else {
-    out <- out %>% mutate(BelowLOD = as.logical(BelowLOD))
-  }
-
-  # If multiple quantification columns be detected, trigger the message and print
-  # out NPX will be used for analysis
-  quant_cols <- intersect(c("NPX", "PCNormalizedNPX", "Count", "Quantified_value", "QuantifiedValue", "Ct", "IPCNormalizedNPX"),
-                          names(out))
+  quant_cols <- intersect(c("NPX", "PCNormalizedNPX", "Count", "Quantified_value", "QuantifiedValue", "Ct", "IPCNormalizedNPX"), names(out))
   if (length(quant_cols) > 1) {
-    message("Multiple quantification columns detected (", paste(quant_cols, collapse = ", "), "). NPX will be used for downstream analysis.")
+    message("\nMultiple quantification columns detected (", paste(quant_cols, collapse = ", "), "). NPX will be used for downstream analysis.\n")
   }
+
+
+  # Format data type
+  # Report string cols as string
+  str_cols <- c("PanelVersion")
+  matching_cols <- intersect(str_cols, names(out))
+  if (length(matching_cols) > 0) {
+    out <- out %>% mutate(across(all_of(matching_cols), as.character))
+  }
+
+  # Report logical cols as logical
+  logic_cols <- c("BelowLOD", "AboveULOQ", "BelowLQL")
+  matching_cols <- intersect(logic_cols, names(out))
+  if (length(matching_cols) > 0) {
+    out <- out %>% mutate(across(all_of(matching_cols), as.logical))
+  }
+
 
   return(out)
 
