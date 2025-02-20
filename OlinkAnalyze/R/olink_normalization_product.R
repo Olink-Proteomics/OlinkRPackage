@@ -617,8 +617,42 @@ olink_normalization_qs <- function(lst_df,
         ref_product = ref_product
       )
     ) |>
+    dplyr::ungroup()
+
+  # warning message for assays that were not QS normalized because of lack of
+  # bridge samples (bridge samples < 40)
+  num_notref_samples <- df_combo$SampleID |> unique() |> length()
+
+  num_not_qs_norm_assays <- ecdf_transform |>
+    dplyr::group_by(
+      .data[[ref_cols$olink_id]]
+    ) |>
+    dplyr::summarise(
+      na_npx = sum(is.na(.data[[quant_col$notref]]), na.rm = TRUE),
+      na_qs = sum(is.na(.data[["QSNormalizedNPX"]]), na.rm = TRUE)
+    ) |>
     dplyr::ungroup() |>
-    # keep only relevant columns
+    dplyr::filter(
+      .data[["na_npx"]] == 0L
+      & .data[["na_qs"]] == .env[["num_notref_samples"]]
+    )
+
+  # warning
+  if (nrow(num_not_qs_norm_assays) > 0L) {
+    cli::cli_warn(
+      message = c(
+        "Insufficient number of bridge samples to perform QS normalization.
+        {cli::qty(num_not_qs_norm_assays)} There {?is/are}
+        {.val {nrow(num_not_qs_norm_assays)}} assay{?s} with fewer than
+        {.val {num_samples}} bridge samples for QS normalization!"
+      ),
+      wrap = FALSE
+    )
+  }
+  rm(num_notref_samples, num_not_qs_norm_assays)
+
+  # keep only relevant columns
+  ecdf_transform <- ecdf_transform |>
     dplyr::select(
       dplyr::all_of(
         c(ref_cols$sample_id, ref_cols$olink_id, "QSNormalizedNPX")

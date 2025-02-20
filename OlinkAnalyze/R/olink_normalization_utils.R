@@ -989,8 +989,6 @@ olink_norm_input_cross_product <- function(lst_df,
 
   # check if reference dataset is HT or Reveal if cross-product normalization ----
 
-
-
   if (norm_mode == olink_norm_modes$norm_cross_product
       && (!(lst_product$product[lst_product$reference == "ref"] %in% c("Reveal", "HT"))))  {
 
