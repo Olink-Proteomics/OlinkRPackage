@@ -154,7 +154,7 @@ olink_norm_input_check <- function(df1,
     lst_cols <- olink_norm_input_check_df_cols(lst_df = lst_df)
 
     if (norm_mode %in% c(olink_norm_modes$bridge,
-                         olink_norm_modes$norm_ht_3k)) {
+                         olink_norm_modes$norm_cross_product)) {
       # check if it is 3k-HT normalization, or simple bridge normalization
       norm_cross_product <- olink_norm_input_cross_product(
         lst_df = lst_df,
@@ -176,7 +176,7 @@ olink_norm_input_check <- function(df1,
   # Update normalization message ----
 
   # Update the message to inform what type of normalization we will perform
-  if (norm_mode == olink_norm_modes$norm_ht_3k) {
+  if (norm_mode == olink_norm_modes$norm_cross_product) {
     norm_msg <- gsub(
       pattern = "Bridge",
       replacement = "Cross-product",
@@ -276,7 +276,7 @@ olink_norm_input_check <- function(df1,
     lst_out$reference_medians <- reference_medians
   } else if (norm_mode %in% c(olink_norm_modes$subset,
                               olink_norm_modes$bridge,
-                              olink_norm_modes$norm_ht_3k)) {
+                              olink_norm_modes$norm_cross_product)) {
     # bridge or subset normalization
     if (reference_project == df1_project_nr) {
       lst_out$ref_name <- df1_project_nr
@@ -298,7 +298,7 @@ olink_norm_input_check <- function(df1,
         lst_out$not_ref_samples <- overlapping_samples_df1
       }
     } else if (norm_mode %in% c(olink_norm_modes$bridge,
-                                olink_norm_modes$norm_ht_3k)) {
+                                olink_norm_modes$norm_cross_product)) {
       lst_out$ref_samples <- overlapping_samples_df1
     }
   }
@@ -918,8 +918,8 @@ olink_norm_input_check_df_cols <- function(lst_df) {
 #' Olink product, then it will return
 #' `r OlinkAnalyze:::olink_norm_modes$bridge`. If the datasets to be normalized
 #' originate from Olink Explore HT and Olink Explore 3072, it will return
-#' `r OlinkAnalyze:::olink_norm_modes$norm_ht_3k`. In any other case an error is
-#' thrown.
+#' `r OlinkAnalyze:::olink_norm_modes$norm_cross_product`. In any other case an
+#' error is thrown.
 #'
 #' @param lst_df Named list of datasets to be normalized.
 #' @param lst_cols Named list of vectors with the required column names for each
@@ -970,7 +970,7 @@ olink_norm_input_cross_product <- function(lst_df,
       && all(lst_prod_uniq %in% c("3k", "HT", "other"))) {
     norm_mode <- olink_norm_modes$bridge
   } else if (identical(x = lst_prod_uniq, y = c("3k", "HT"))) {
-    norm_mode <- olink_norm_modes$norm_ht_3k
+    norm_mode <- olink_norm_modes$norm_cross_product
   } else {
     cli::cli_abort(
       c(
@@ -985,7 +985,7 @@ olink_norm_input_cross_product <- function(lst_df,
 
   # check if reference dataset is HT if cross-product normalization ----
 
-  if (norm_mode == olink_norm_modes$norm_ht_3k
+  if (norm_mode == olink_norm_modes$norm_cross_product
       && names(lst_product)[lst_product == "HT"] != reference_project) {
 
     cli::cli_abort(
@@ -1003,7 +1003,7 @@ olink_norm_input_cross_product <- function(lst_df,
 
   # update Olink assay identifiers if cross product normalization ----
 
-  if (norm_mode == olink_norm_modes$norm_ht_3k) {
+  if (norm_mode == olink_norm_modes$norm_cross_product) {
 
     # add combined OlinkID to HT dataset
     l_ht_name <- names(lst_product)[lst_product == "HT"]
@@ -1266,7 +1266,7 @@ olink_norm_input_check_samples <- function(lst_df_samples,
 
     # check the number of samples is equal if bridge normalization
     if (tolower(norm_mode) %in% c(olink_norm_modes$bridge,
-                                  olink_norm_modes$norm_ht_3k)
+                                  olink_norm_modes$norm_cross_product)
         && sapply(lst_ref_samples, length) |> unique() |> length() != 1L) {
       # error message for uneven number of bridge samples
       cli::cli_abort(
@@ -1436,7 +1436,7 @@ olink_norm_input_clean_assays <- function(lst_df,
 
   # remove all assays that do not match the pattern and that have NA for OlinkID
   check_oid <- function(df, col_name, norm_mode) {
-    if (norm_mode == olink_norm_modes$norm_ht_3k) {
+    if (norm_mode == olink_norm_modes$norm_cross_product) {
       df |>
         dplyr::filter(
           grepl(
@@ -1752,7 +1752,7 @@ olink_norm_input_assay_overlap <- function(lst_df,
           !(.data[["OlinkID"]] %in% oid_removed)
         )
     }
-    if (norm_mode == olink_norm_modes$norm_ht_3k){
+    if (norm_mode == olink_norm_modes$norm_cross_product){
       cli::cli_warn(
         c(
           "{length(oid_removed)} assay{?s} are not shared across products.",
