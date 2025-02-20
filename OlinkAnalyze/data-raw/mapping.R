@@ -1,8 +1,7 @@
-# code to prepare `mapping` dataset goes here
-# Raw data is generated here:
+# Explore 3072 to Explore HT Mapping
 
 eHT_e3072_mapping_rds <- system.file("extdata",
-                                     "OlinkIDMapping.rds",
+                                     "OlinkID_HT_mapping.rds",
                                      package = "OlinkAnalyze",
                                      mustWork = TRUE)
 eHT_e3072_mapping <- readRDS(file = eHT_e3072_mapping_rds) |>
