@@ -39,6 +39,8 @@
 #' originate from Olink Explore 3072.
 #' @param ref_cols A named list with the column names to use. Exported from
 #' olink_norm_input_check.
+#' @param not_ref_cols A named list with the column names from the non-reference 
+#' dataset. Exported from olink_norm_input_check. 
 #' @param seed Integer random seed (Default: seek = 1).
 #'
 #' @return A "tibble" in long format with the following columns:
@@ -81,17 +83,20 @@
 #'
 #' # create ref_cols
 #' ref_cols <- data_explore_check$ref_cols
+#' not_ref_cols <- data_explore_check$not_ref_cols
 #'
 #' # run olink_normalization_bridgeable
 #' is_bridgeable_result <- OlinkAnalyze:::olink_normalization_bridgeable(
 #'   lst_df = lst_df,
 #'   ref_cols = ref_cols,
+#'   not_ref_cols = not_ref_cols,
 #'   seed = 1
 #' )
 #' }
 #'
 olink_normalization_bridgeable <- function(lst_df,
                                            ref_cols,
+                                           not_ref_cols,
                                            seed = 1) {
   # help vars ----
 
@@ -113,7 +118,8 @@ olink_normalization_bridgeable <- function(lst_df,
       l_df |>
         dplyr::filter(
           # only customer samples
-          .data[["SampleType"]] == "SAMPLE"
+          if_any(any_of(c(ref_cols$sample_type,not_ref_cols$sample_type)),
+                 ~ . =="SAMPLE")
           # remove interal control assays
           & .data[["AssayType"]] == "assay"
           # remove datapoints with very few counts
@@ -366,6 +372,8 @@ olink_normalization_bridgeable <- function(lst_df,
 #' originate from Olink Explore 3072. (required)
 #' @param ref_cols A named list with the column names to use. Exported from
 #' olink_norm_input_check. (required)
+#' @param not_ref_cols A named list with the column names from the non-reference
+#'  dataset. Exported from olink_norm_input_check. (required)
 #' @param bridge_samples Character vector of samples to be used for the
 #' quantile mapping. (required)
 #'
@@ -404,16 +412,19 @@ olink_normalization_bridgeable <- function(lst_df,
 #' names(lst_df) <- c(check_norm$ref_name, check_norm$not_ref_name)
 #'
 #' ref_cols <- check_norm$ref_cols
+#' not_ref_cols <- check_norm$not_ref_cols
 #'
 #' qs_result <- OlinkAnalyze:::olink_normalization_qs(
 #'  lst_df = lst_df,
 #'  ref_cols = ref_cols,
+#'  not_ref_cols = not_ref_cols,
 #'  bridge_samples = bridge_samples
 #' )
 #' }
 #'
 olink_normalization_qs <- function(lst_df,
                                    ref_cols,
+                                   not_ref_cols,
                                    bridge_samples) {
 
   # main QS normalization function
@@ -515,7 +526,8 @@ olink_normalization_qs <- function(lst_df,
       l_df |>
         dplyr::filter(
           # only customer samples
-          .data[["SampleType"]] == "SAMPLE"
+          if_any(any_of(c(ref_cols$sample_type,not_ref_cols$sample_type)),
+                 ~ . =="SAMPLE")
           # remove internal control assays
           & .data[["AssayType"]] == "assay"
         ) |>
