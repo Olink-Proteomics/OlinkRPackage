@@ -298,7 +298,7 @@ olink_normalization <- function(df1,
         not_ref_cols = lst_check$not_ref_cols
       )
 
-    } else if (lst_check$norm_mode == olink_norm_modes$norm_ht_3k) {
+    } else if (lst_check$norm_mode == olink_norm_modes$norm_cross_product) {
       # HT-3K normalization ----
 
       df_norm <- norm_internal_cross_product(

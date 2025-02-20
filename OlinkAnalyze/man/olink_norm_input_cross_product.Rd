@@ -19,7 +19,7 @@ the other project is adjusted to.}
 \value{
 Character string indicating the type of normalization to be
 performed. One of
-bridge, subset, ref_median or norm_ht_3k. # nolint
+bridge, subset, ref_median or norm_cross_product. # nolint
 And the updated list of datasets in case of cross-platform normalization.
 }
 \description{
@@ -31,8 +31,8 @@ the product source of each dataset. If both datasets originate from the same
 Olink product, then it will return
 bridge. If the datasets to be normalized
 originate from Olink Explore HT and Olink Explore 3072, it will return
-norm_ht_3k. In any other case an error is
-thrown.
+norm_cross_product. In any other case an
+error is thrown.
 }
 \author{
 Klev Diamanti
