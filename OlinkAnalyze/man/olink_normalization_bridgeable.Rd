@@ -5,7 +5,7 @@
 \title{Identify if assays shared between Olink Explore 3072 and Olink Explore HT can
 be bridged}
 \usage{
-olink_normalization_bridgeable(lst_df, ref_cols, seed = 1)
+olink_normalization_bridgeable(lst_df, ref_cols, not_ref_cols, seed = 1)
 }
 \arguments{
 \item{lst_df}{A named list of the 2 input datasets. First element should be
@@ -14,6 +14,9 @@ originate from Olink Explore 3072.}
 
 \item{ref_cols}{A named list with the column names to use. Exported from
 olink_norm_input_check.}
+
+\item{not_ref_cols}{A named list with the column names from the non-reference
+dataset. Exported from olink_norm_input_check.}
 
 \item{seed}{Integer random seed (Default: seek = 1).}
 }
@@ -83,11 +86,13 @@ names(lst_df) <- c(data_explore_check$ref_name,
 
 # create ref_cols
 ref_cols <- data_explore_check$ref_cols
+not_ref_cols <- data_explore_check$not_ref_cols
 
 # run olink_normalization_bridgeable
 is_bridgeable_result <- OlinkAnalyze:::olink_normalization_bridgeable(
   lst_df = lst_df,
   ref_cols = ref_cols,
+  not_ref_cols = not_ref_cols,
   seed = 1
 )
 }
