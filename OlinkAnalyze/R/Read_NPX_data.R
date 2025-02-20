@@ -193,6 +193,42 @@ read_NPX_explore <- function(filename) {
                              "QC.Deviation.Inc.Ctrl",
                              "QC.Deviation.Det.Ctrl",
                              "Olink.NPX.Signature.Version"),
+    "header_quant_npxs2.0" = c(header_base,
+                               "Product",
+                               "PanelVersion",
+                               "WellID",
+                               "SampleType",
+                               "Ct",
+                               "LODNPX",
+                               "BelowLOD",
+                               "QuantifiedValue",
+                               "Unit",
+                               "LODQuant",
+                               "LLOQ",
+                               "LQL",
+                               "BelowLQL",
+                               "ULOQ",
+                               "AboveULOQ",
+                               "SampleQC",
+                               "AssayQC",
+                               "MissingFreq",
+                               "Normalization",
+                               "SoftwareVersion",
+                               "SoftwareName"),
+    "header_T96_npxs2.0" = c(header_base,
+                             "Product",
+                             "PanelVersion",
+                             "WellID",
+                             "SampleType",
+                             "Ct",
+                             "LODNPX",
+                             "BelowLOD",
+                             "SampleQC",
+                             "AssayQC",
+                             "MissingFreq",
+                             "Normalization",
+                             "SoftwareVersion",
+                             "SoftwareName"),
     "header_csv_hp" = c(header_base,
                         "SampleType",
                         "WellID",
@@ -302,11 +338,34 @@ read_NPX_explore <- function(filename) {
       dplyr::mutate(Panel = trimws(Panel, which = "right")) %>%
       dplyr::select(-Panel_Start, -Panel_End)
   }
-  if ("Quantified_value" %in% names(out)){
-    message("QUANT data detected. Some downstream functions may not be supported.")
-    out <- out %>%
-      mutate(Quantified_value = as.numeric(Quantified_value))
+
+
+  # Trigger message
+  if (intersect(c("Quantified_value", "QuantifiedValue"), names(out)) %>% length == 1) {
+    message("\nQUANT data detected. Some downstream functions may not be supported.\n")
   }
+
+  quant_cols <- intersect(c("NPX", "PCNormalizedNPX", "Count", "Quantified_value", "QuantifiedValue", "Ct", "IPCNormalizedNPX"), names(out))
+  if (length(quant_cols) > 1) {
+    message("\nMultiple quantification columns detected (", paste(quant_cols, collapse = ", "), "). NPX will be used for downstream analysis.\n")
+  }
+
+
+  # Format data type
+  # Report string cols as string
+  str_cols <- c("PanelVersion")
+  matching_cols <- intersect(str_cols, names(out))
+  if (length(matching_cols) > 0) {
+    out <- out %>% mutate(across(all_of(matching_cols), as.character))
+  }
+
+  # Report logical cols as logical
+  logic_cols <- c("BelowLOD", "AboveULOQ", "BelowLQL")
+  matching_cols <- intersect(logic_cols, names(out))
+  if (length(matching_cols) > 0) {
+    out <- out %>% mutate(across(all_of(matching_cols), as.logical))
+  }
+
 
   return(out)
 

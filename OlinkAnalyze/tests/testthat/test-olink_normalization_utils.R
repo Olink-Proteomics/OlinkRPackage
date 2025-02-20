@@ -46,7 +46,8 @@ test_that(
                         assay_warn = character(0L),
                         quant = "NPX",
                         lod = "LOD",
-                        normalization = character(0L)),
+                        normalization = character(0L),
+                        count = character(0L)),
         not_ref_df = npx_data2,
         not_ref_samples = NULL,
         not_ref_name = "20200002",
@@ -61,7 +62,8 @@ test_that(
                             assay_warn = character(0L),
                             quant = "NPX",
                             lod = "LOD",
-                            normalization = character(0L)),
+                            normalization = character(0L),
+                            count = character(0L)),
         reference_medians = NULL,
         norm_mode = olink_norm_modes$bridge,
         lst_product = list(product = c( "20200001" = "other",
@@ -117,7 +119,8 @@ test_that(
                         assay_warn = character(0L),
                         quant = "NPX",
                         lod = "LOD",
-                        normalization = "Normalization"),
+                        normalization = "Normalization",
+                        count = character(0L)),
         not_ref_df = npx_data1 |>
           dplyr::mutate(
             Normalization = "Intensity"
@@ -135,7 +138,8 @@ test_that(
                             assay_warn = character(0L),
                             quant = "NPX",
                             lod = "LOD",
-                            normalization = "Normalization"),
+                            normalization = "Normalization",
+                            count = character(0L)),
         reference_medians = NULL,
         norm_mode = olink_norm_modes$bridge,
         lst_product = list(product = c("20200001" = "other",
@@ -216,7 +220,8 @@ test_that(
                         assay_warn = "AssayQC",
                         quant = "NPX",
                         lod = character(0),
-                        normalization = "Normalization"),
+                        normalization = "Normalization",
+                        count = "Count"),
         not_ref_df = data_3k |>
           dplyr::rename(
             "OlinkID_E3072" = "OlinkID"
@@ -249,7 +254,8 @@ test_that(
                             assay_warn = "AssayQC",
                             quant = "NPX",
                             lod = character(0),
-                            normalization = "Normalization"),
+                            normalization = "Normalization",
+                            count = "Count"),
         reference_medians = NULL,
         norm_mode = olink_norm_modes$norm_cross_product,
         lst_product = list(product = c("3K" = "3k",
@@ -303,7 +309,8 @@ test_that(
                         assay_warn = character(0L),
                         quant = "NPX",
                         lod = "LOD",
-                        normalization = character(0L)),
+                        normalization = character(0L),
+                        count = character(0L)),
         not_ref_df = npx_data2,
         not_ref_samples = unique(npx_data2$SampleID),
         not_ref_name = "20200002",
@@ -318,7 +325,8 @@ test_that(
                             assay_warn = character(0L),
                             quant = "NPX",
                             lod = "LOD",
-                            normalization = character(0L)),
+                            normalization = character(0L),
+                            count = character(0L)),
         reference_medians = NULL,
         norm_mode = olink_norm_modes$subset
       )
@@ -366,7 +374,8 @@ test_that(
                         assay_warn = character(0L),
                         quant = "NPX",
                         lod = "LOD",
-                        normalization = "Normalization"),
+                        normalization = "Normalization",
+                        count = character(0L)),
         not_ref_df = npx_data1 |>
           dplyr::mutate(
             Normalization = "Intensity"
@@ -384,7 +393,8 @@ test_that(
                             assay_warn = character(0L),
                             quant = "NPX",
                             lod = "LOD",
-                            normalization = "Normalization"),
+                            normalization = "Normalization",
+                            count = character(0L)),
         reference_medians = NULL,
         norm_mode = olink_norm_modes$subset
       )
@@ -439,7 +449,8 @@ test_that(
                         assay_warn = character(0L),
                         quant = "NPX",
                         lod = "LOD",
-                        normalization = character(0L)),
+                        normalization = character(0L),
+                        count = character(0L)),
         not_ref_df = npx_data2,
         not_ref_samples = npx_df2_samples,
         not_ref_name = "20200002",
@@ -454,7 +465,8 @@ test_that(
                             assay_warn = character(0L),
                             quant = "NPX",
                             lod = "LOD",
-                            normalization = character(0L)),
+                            normalization = character(0L),
+                            count = character(0L)),
         reference_medians = NULL,
         norm_mode = olink_norm_modes$subset
       )
@@ -502,7 +514,8 @@ test_that(
                         assay_warn = character(0L),
                         quant = "NPX",
                         lod = "LOD",
-                        normalization = "Normalization"),
+                        normalization = "Normalization",
+                        count = character(0L)),
         not_ref_df = npx_data1 |>
           dplyr::mutate(
             Normalization = "Intensity"
@@ -520,7 +533,8 @@ test_that(
                             assay_warn = character(0L),
                             quant = "NPX",
                             lod = "LOD",
-                            normalization = "Normalization"),
+                            normalization = "Normalization",
+                            count = character(0L)),
         reference_medians = NULL,
         norm_mode = olink_norm_modes$subset
       )
@@ -586,7 +600,8 @@ test_that(
                         assay_warn = character(0L),
                         quant = "NPX",
                         lod = "LOD",
-                        normalization = character(0L)),
+                        normalization = character(0L),
+                        count = character(0L)),
         not_ref_df = NULL,
         not_ref_samples = NULL,
         not_ref_name = NULL,
@@ -638,7 +653,8 @@ test_that(
                         assay_warn = character(0L),
                         quant = "NPX",
                         lod = "LOD",
-                        normalization = "Normalization"),
+                        normalization = "Normalization",
+                        count = character(0L)),
         not_ref_df = NULL,
         not_ref_samples = NULL,
         not_ref_name = NULL,
@@ -1558,7 +1574,8 @@ test_that(
           assay_warn = character(0L),
           quant = "NPX",
           lod = "LOD",
-          normalization = character(0L)
+          normalization = character(0L),
+          count = character(0L)
         )
       )
     )
@@ -1596,7 +1613,8 @@ test_that(
           assay_warn = character(0L),
           quant = "NPX",
           lod = "LOD",
-          normalization = character(0L)
+          normalization = character(0L),
+          count = character(0L)
         )
       )
     )
@@ -1636,7 +1654,8 @@ test_that(
           assay_warn = character(0L),
           quant = "NPX",
           lod = "LOD",
-          normalization = "Normalization"
+          normalization = "Normalization",
+          count = character(0L)
         )
       )
     )
@@ -1677,7 +1696,8 @@ test_that(
           assay_warn = character(0L),
           quant = "NPX",
           lod = "LOD",
-          normalization = "Normalization"
+          normalization = "Normalization",
+          count = character(0L)
         )
       )
     )
@@ -1722,7 +1742,8 @@ test_that(
           assay_warn = character(0L),
           quant = "NPX",
           lod = "LOD",
-          normalization = character(0L)
+          normalization = character(0L),
+          count = character(0L)
         ),
         "p2" = list(
           sample_id = "SampleID",
@@ -1736,7 +1757,8 @@ test_that(
           assay_warn = character(0L),
           quant = "NPX",
           lod = "LOD",
-          normalization = character(0L)
+          normalization = character(0L),
+          count = character(0L)
         )
       )
     )
@@ -1777,7 +1799,8 @@ test_that(
           assay_warn = character(0L),
           quant = "NPX",
           lod = "LOD",
-          normalization = "Normalization"
+          normalization = "Normalization",
+          count = character(0L)
         ),
         "p2" = list(
           sample_id = "SampleID",
@@ -1791,7 +1814,8 @@ test_that(
           assay_warn = character(0L),
           quant = "NPX",
           lod = "LOD",
-          normalization = "Normalization"
+          normalization = "Normalization",
+          count = character(0L)
         )
       )
     )
@@ -1828,7 +1852,8 @@ test_that(
           assay_warn = character(0L),
           quant = "NPX",
           lod = "LOD",
-          normalization = "Normalization"
+          normalization = "Normalization",
+          count = character(0L)
         ),
         "p2" = list(
           sample_id = "SampleID",
@@ -1842,7 +1867,8 @@ test_that(
           assay_warn = character(0L),
           quant = "NPX",
           lod = "LOD",
-          normalization = "Normalization"
+          normalization = "Normalization",
+          count = character(0L)
         )
       )
     )
@@ -1948,7 +1974,8 @@ test_that(
           assay_warn = character(0L),
           quant = "NPX",
           lod = "LOD",
-          normalization = "Normalization"
+          normalization = "Normalization",
+          count = character(0L)
         ),
         "p2" = list(
           sample_id = "SampleID",
@@ -1962,7 +1989,8 @@ test_that(
           assay_warn = character(0L),
           quant = "NPX",
           lod = "LOD",
-          normalization = "Normalization"
+          normalization = "Normalization",
+          count = character(0L)
         ),
         "p3" = list(
           sample_id = "SampleID",
@@ -1976,7 +2004,8 @@ test_that(
           assay_warn = character(0L),
           quant = "NPX",
           lod = "LOD",
-          normalization = "Normalization"
+          normalization = "Normalization",
+          count = character(0L)
         ),
         "p4" = list(
           sample_id = "SampleID",
@@ -1990,7 +2019,8 @@ test_that(
           assay_warn = character(0L),
           quant = "NPX",
           lod = "LOD",
-          normalization = "Normalization"
+          normalization = "Normalization",
+          count = character(0L)
         )
       )
     )
@@ -2023,7 +2053,8 @@ test_that(
           assay_warn = character(0L),
           quant = "NPX",
           lod = "LOD",
-          normalization = character(0L)
+          normalization = character(0L),
+          count = character(0L)
         ),
         "p2" = list(
           sample_id = "SampleID",
@@ -2037,7 +2068,8 @@ test_that(
           assay_warn = character(0L),
           quant = "NPX",
           lod = "LOD",
-          normalization = character(0L)
+          normalization = character(0L),
+          count = character(0L)
         ),
         "p3" = list(
           sample_id = "SampleID",
@@ -2051,7 +2083,8 @@ test_that(
           assay_warn = character(0L),
           quant = "NPX",
           lod = "LOD",
-          normalization = character(0L)
+          normalization = character(0L),
+          count = character(0L)
         ),
         "p4" = list(
           sample_id = "SampleID",
@@ -2065,7 +2098,8 @@ test_that(
           assay_warn = character(0L),
           quant = "NPX",
           lod = "LOD",
-          normalization = character(0L)
+          normalization = character(0L),
+          count = character(0L)
         )
       )
     )
@@ -2136,6 +2170,89 @@ test_that(
         regexp = "Datasets \"p1\" and \"p2\" contain multiple columns matching"
       ),
       regexp = "* p1: MaxLOD"
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_check_df_cols - message - non-required columns",
+  {
+    skip_if_not_installed("arrow")
+
+    # df has assay_warn ----
+
+    expect_warning(
+      object = lst_col <- olink_norm_input_check_df_cols(
+        lst_df = list(
+          "p1" = npx_data1
+        ) |>
+          lapply(function(l_df) {
+            l_df |>
+              dplyr::mutate(
+                Assay_Warning = NA_character_
+              )
+          })
+      ),
+      regexp = "Dataset \"p1\" does not contain a column named"
+    )
+
+    expect_identical(
+      object = lst_col,
+      expected = list(
+        "p1" = list(
+          sample_id = "SampleID",
+          olink_id = "OlinkID",
+          uniprot = "UniProt",
+          assay = "Assay",
+          panel = "Panel",
+          panel_version = "Panel_Version",
+          plate_id = "PlateID",
+          qc_warn = "QC_Warning",
+          assay_warn = "Assay_Warning",
+          quant = "NPX",
+          lod = "LOD",
+          normalization = character(0L),
+          count = character(0L)
+        )
+      )
+    )
+
+    # df has Count ----
+
+    expect_warning(
+      object = lst_col <- olink_norm_input_check_df_cols(
+        lst_df = list(
+          "p1" = npx_data1
+        ) |>
+          lapply(function(l_df) {
+            l_df |>
+              dplyr::mutate(
+                Count = NA_integer_
+              )
+          })
+      ),
+      regexp = "Dataset \"p1\" does not contain a column named"
+    )
+
+    expect_identical(
+      object = lst_col,
+      expected = list(
+        "p1" = list(
+          sample_id = "SampleID",
+          olink_id = "OlinkID",
+          uniprot = "UniProt",
+          assay = "Assay",
+          panel = "Panel",
+          panel_version = "Panel_Version",
+          plate_id = "PlateID",
+          qc_warn = "QC_Warning",
+          assay_warn = character(0L),
+          quant = "NPX",
+          lod = "LOD",
+          normalization = character(0L),
+          count = "Count"
+        )
+      )
     )
   }
 )
@@ -2578,9 +2695,11 @@ test_that(
         ),
         lst_cols = list(
           "p1" = list(panel = "Panel",
-                      olink_id = "OlinkID"),
+                      olink_id = "OlinkID",
+                      count = "Count"),
           "p2" = list(panel = "Panel",
-                      olink_id = "OlinkID")
+                      olink_id = "OlinkID",
+                      count = "Count")
         ),
         reference_project = "p2",
         lst_product = olink_product_identifier_norm(
@@ -2751,6 +2870,78 @@ test_that(
         )
       ),
       regexp = "Incorrect reference project!"
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_cross_product - error - missing count col",
+  {
+    skip_if_not_installed("arrow")
+
+    skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
+
+    data_3k <- get_example_data(filename = "example_3k_data.rds")
+    data_ht <- get_example_data(filename = "example_HT_data.rds")
+
+    # missing from p1
+
+    expect_error(
+      object = olink_norm_input_cross_product(
+        lst_df = list(
+          "p1" = data_3k,
+          "p2" = data_ht
+        ),
+        lst_cols = list(
+          "p1" = list(panel = "Panel",
+                      olink_id = "OlinkID"),
+          "p2" = list(panel = "Panel",
+                      olink_id = "OlinkID",
+                      count = "Count")
+        ),
+        reference_project = "p2"
+      ),
+      regexp = "Column \"Count\" not found in dataset \"p1\"!"
+    )
+
+    # missing from p2
+
+    expect_error(
+      object = olink_norm_input_cross_product(
+        lst_df = list(
+          "p1" = data_3k,
+          "p2" = data_ht
+        ),
+        lst_cols = list(
+          "p1" = list(panel = "Panel",
+                      olink_id = "OlinkID",
+                      count = "Count"),
+          "p2" = list(panel = "Panel",
+                      olink_id = "OlinkID")
+        ),
+        reference_project = "p2"
+      ),
+      regexp = "Column \"Count\" not found in dataset \"p2\"!"
+    )
+
+    # missing from p1 and p2
+
+    expect_error(
+      object = olink_norm_input_cross_product(
+        lst_df = list(
+          "p1" = data_3k,
+          "p2" = data_ht
+        ),
+        lst_cols = list(
+          "p1" = list(panel = "Panel",
+                      olink_id = "OlinkID"),
+          "p2" = list(panel = "Panel",
+                      olink_id = "OlinkID")
+        ),
+        reference_project = "p2"
+      ),
+      regexp = "Column \"Count\" not found in datasets \"p1\" and \"p2\"!"
     )
   }
 )

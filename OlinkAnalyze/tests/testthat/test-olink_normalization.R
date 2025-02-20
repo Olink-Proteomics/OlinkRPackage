@@ -509,6 +509,7 @@ test_that(
                    "MedianCenteredNPX", "QSNormalizedNPX",
                    "BridgingRecommendation")
     )
+
   }
 )
 
@@ -733,6 +734,8 @@ test_that(
   }
 )
 
+# Cross-product specific tests ----
+
 test_that(
   "Cross product normalization works - correlation assays present",
   {
@@ -757,38 +760,99 @@ test_that(
       eHT_e3072_mapping$OlinkID_HT == oid_ht]
 
     # HT correlation is present
-    expect_contains(
-      object = olink_normalization(
-        df1 = data_ht |>
-          dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321"))),
-        df2 = data_3k |>
-          dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321"))),
-        overlapping_samples_df1 = bridge_samples,
-        df1_project_nr = "proj_ht",
-        df2_project_nr = "proj_3k",
-        reference_project = "proj_ht"
-      ) |>
-        dplyr::distinct(OlinkID) |>
-        dplyr::pull(),
-      expected = oid_ht
+    expect_message(
+      object = expect_contains(
+        object = olink_normalization(
+          df1 = data_ht |>
+            dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321"))),
+          df2 = data_3k |>
+            dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321"))),
+          overlapping_samples_df1 = bridge_samples,
+          df1_project_nr = "proj_ht",
+          df2_project_nr = "proj_3k",
+          reference_project = "proj_ht"
+        ) |>
+          dplyr::distinct(OlinkID) |>
+          dplyr::pull(),
+        expected = oid_ht
+      ),
+      regexp = "Cross-product normalization will be performed!"
     )
 
     # All 3k correlations are present
-    expect_contains(
+    expect_message(
+      object = expect_contains(
+        object = olink_normalization(
+          df1 = data_ht |>
+            dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321"))),
+          df2 = data_3k |>
+            dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321"))),
+          overlapping_samples_df1 = bridge_samples,
+          df1_project_nr = "proj_ht",
+          df2_project_nr = "proj_3k",
+          reference_project = "proj_ht"
+        ) |>
+          dplyr::distinct(OlinkID_E3072) |>
+          dplyr::pull(),
+        expected = oid_3k
+      ),
+      regexp = "Cross-product normalization will be performed!"
+    )
+  }
+)
+
+test_that(
+  "norm_internal_cross_product missing counts - error",
+  {
+
+    skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
+
+    data_3k <- get_example_data(filename = "example_3k_data.rds")
+    data_ht <- get_example_data(filename = "example_HT_data.rds")
+
+    ## error v1: reference/HT and new/3K DF missing count column ----
+
+    expect_error(
       object = olink_normalization(
-        df1 = data_ht |>
-          dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321"))),
-        df2 = data_3k |>
-          dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321"))),
-        overlapping_samples_df1 = bridge_samples,
+        df1 = data_ht |> dplyr::select(-dplyr::all_of("Count")),
+        df2 = data_3k |> dplyr::select(-dplyr::all_of("Count")),
+        overlapping_samples_df1 = intersect(data_ht$SampleID, data_3k$SampleID),
         df1_project_nr = "proj_ht",
         df2_project_nr = "proj_3k",
         reference_project = "proj_ht"
-      ) |>
-        dplyr::distinct(OlinkID_E3072) |>
-        dplyr::pull(),
-      expected = oid_3k
+      ),
+      regexp = "Column \"Count\" not found in datasets \"proj_ht\" and"
     )
+
+    ## error v2: reference/HT DF missing count column ----
+
+    expect_error(
+      object = olink_normalization(
+        df1 = data_ht |> dplyr::select(-dplyr::all_of("Count")),
+        df2 = data_3k,
+        overlapping_samples_df1 = intersect(data_ht$SampleID, data_3k$SampleID),
+        df1_project_nr = "proj_ht",
+        df2_project_nr = "proj_3k",
+        reference_project = "proj_ht"
+      ),
+      regexp = "Column \"Count\" not found in dataset \"proj_ht\"!"
+    )
+
+    ## error v3: new/3K DF missing count column ----
+
+    expect_error(
+      object = olink_normalization(
+        df1 = data_ht,
+        df2 = data_3k |> dplyr::select(-dplyr::all_of("Count")),
+        overlapping_samples_df1 = intersect(data_ht$SampleID, data_3k$SampleID),
+        df1_project_nr = "proj_ht",
+        df2_project_nr = "proj_3k",
+        reference_project = "proj_ht"
+      ),
+      regexp = "Column \"Count\" not found in dataset \"proj_3k\"!"
+    )
+
   }
 )
 
