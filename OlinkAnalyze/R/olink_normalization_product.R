@@ -118,7 +118,9 @@ olink_normalization_bridgeable <- function(lst_df,
       l_df |>
         dplyr::filter(
           # only customer samples
-          dplyr::if_any(tidyselect::any_of(c(ref_cols$sample_type,not_ref_cols$sample_type)),
+          dplyr::if_any(tidyselect::any_of(c(ref_cols$sample_type,
+                                             not_ref_cols$sample_type)
+                                           ),
                  ~ . =="SAMPLE")
           # remove interal control assays
           & .data[["AssayType"]] == "assay"
@@ -526,7 +528,8 @@ olink_normalization_qs <- function(lst_df,
       l_df |>
         dplyr::filter(
           # only customer samples
-          dplyr::if_any(tidyselect::any_of(c(ref_cols$sample_type,not_ref_cols$sample_type)),
+          dplyr::if_any(tidyselect::any_of(c(ref_cols$sample_type,
+                                             not_ref_cols$sample_type)),
                  ~ . =="SAMPLE")
           # remove internal control assays
           & .data[["AssayType"]] == "assay"
