@@ -1,8 +1,7 @@
-# code to prepare `mapping` dataset goes here
-# Raw data is generated here:
+# Explore 3072 to Explore HT Mapping
 
 eHT_e3072_mapping_rds <- system.file("extdata",
-                                     "OlinkIDMapping.rds",
+                                     "OlinkID_HT_mapping.rds",
                                      package = "OlinkAnalyze",
                                      mustWork = TRUE)
 eHT_e3072_mapping <- readRDS(file = eHT_e3072_mapping_rds) |>
@@ -31,9 +30,9 @@ rm(eHT_e3072_mapping_rds)
 # Explore 3072 to Reveal Mapping
 
 reveal_e3072_mapping_rds <- system.file("extdata",
-                                     "OlinkID_Reveal_mapping.rds",
-                                     package = "OlinkAnalyze",
-                                     mustWork = TRUE)
+                                        "OlinkID_Reveal_mapping.rds",
+                                        package = "OlinkAnalyze",
+                                        mustWork = TRUE)
 reveal_e3072_mapping <- readRDS(file = reveal_e3072_mapping_rds) |>
   dplyr::rename(
     "Assay" = "gene_name",
