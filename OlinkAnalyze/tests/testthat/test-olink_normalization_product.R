@@ -57,10 +57,12 @@ test_that(
                        data_explore_check$not_ref_name)
 
     ref_cols <- data_explore_check$ref_cols
+    not_ref_cols <- data_explore_check$not_ref_cols
 
     is_bridgeable_result <- olink_normalization_bridgeable(
       lst_df = lst_df,
       ref_cols = ref_cols,
+      not_ref_cols = not_ref_cols,
       seed = 1
     )
 
@@ -178,6 +180,7 @@ test_that(
           object = qs_norm <- olink_normalization_qs(
             lst_df = lst_df,
             ref_cols = norm_input_check$ref_cols,
+            not_ref_cols = norm_input_check$not_ref_cols,
             bridge_samples = bridge_samples
           )
         )
@@ -259,6 +262,7 @@ test_that(
           object = qs_norm <- olink_normalization_qs(
             lst_df = lst_df,
             ref_cols = norm_input_check$ref_cols,
+            not_ref_cols = norm_input_check$not_ref_cols,
             bridge_samples = bridge_samples
           )
         )
@@ -384,6 +388,7 @@ test_that(
           object = qs_norm <- olink_normalization_qs(
             lst_df = lst_df,
             ref_cols = norm_input_check$ref_cols,
+            not_ref_cols = norm_input_check$not_ref_cols,
             bridge_samples = bridge_samples
           )
         )
