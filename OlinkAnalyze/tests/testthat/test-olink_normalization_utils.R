@@ -48,6 +48,7 @@ test_that(
                         lod = "LOD",
                         normalization = character(0L),
                         count = character(0L)),
+        ref_product = "other",
         not_ref_df = npx_data2,
         not_ref_samples = NULL,
         not_ref_name = "20200002",
@@ -64,6 +65,7 @@ test_that(
                             lod = "LOD",
                             normalization = character(0L),
                             count = character(0L)),
+        not_ref_product = "other",
         reference_medians = NULL,
         norm_mode = olink_norm_modes$bridge
       )
@@ -117,6 +119,7 @@ test_that(
                         lod = "LOD",
                         normalization = "Normalization",
                         count = character(0L)),
+        ref_product = "other",
         not_ref_df = npx_data1 |>
           dplyr::mutate(
             Normalization = "Intensity"
@@ -136,6 +139,7 @@ test_that(
                             lod = "LOD",
                             normalization = "Normalization",
                             count = character(0L)),
+        not_ref_product = "other",
         reference_medians = NULL,
         norm_mode = olink_norm_modes$bridge
       )
@@ -147,33 +151,36 @@ test_that(
   "olink_norm_input_check - works - cross-platform normalization",
   {
     skip_if_not_installed("arrow")
-    skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
-    skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_Reveal_data.rds")))
 
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
+    data_reveal <- get_example_data(filename = "example_Reveal_data.rds")
+
+    # 3k-HT normalization ----
 
     bridge_samples <- intersect(x = data_3k$SampleID,
                                 y = data_ht$SampleID) |>
       (\(x) x[!grepl(pattern = "CONTROL", x = x)])() |>
       sort() |>
       head(20L)
-    filtered_oids <- c("OID12345",
-                       "OID54321",
-                       "OID43201",
-                       eHT_e3072_mapping$OlinkID_E3072[eHT_e3072_mapping$OlinkID_HT == "OID43201"]) # nolint
 
-    expect_message(expect_warning(
-      object = lst_check_out <- olink_norm_input_check(
-        df1 = data_3k,
-        df2 = data_ht,
-        overlapping_samples_df1 = bridge_samples,
-        overlapping_samples_df2 = NULL,
-        df1_project_nr = "3K",
-        df2_project_nr = "HT",
-        reference_project = "HT",
-        reference_medians = NULL
-      ), regexp = "2 assays are not shared across products."),
+    expect_message(
+      expect_warning(
+        object = lst_check_out <- olink_norm_input_check(
+          df1 = data_3k,
+          df2 = data_ht,
+          overlapping_samples_df1 = bridge_samples,
+          overlapping_samples_df2 = NULL,
+          df1_project_nr = "3K",
+          df2_project_nr = "HT",
+          reference_project = "HT",
+          reference_medians = NULL
+        ),
+        regexp = "2 assays are not shared across products."
+      ),
       regexp = "Cross-product normalization will be performed!"
     )
 
@@ -194,11 +201,14 @@ test_that(
             by = "OlinkID_HT",
             relationship = "many-to-many"
           ) |>
-          # If matched OlinkID is not found in mapping file, set OlinkID_HT to OlinkID
-          dplyr::mutate(OlinkID = ifelse(is.na(.data[["OlinkID"]]),
-                                         .data[["OlinkID_HT"]],
-                                         .data[["OlinkID"]])) |>
-          dplyr::filter(!(.data[["OlinkID_HT"]] %in% filtered_oids)),
+          dplyr::mutate(
+            OlinkID = dplyr::if_else(is.na(.data[["OlinkID"]]),
+                                     .data[["OlinkID_HT"]],
+                                     .data[["OlinkID"]])
+          ) |>
+          dplyr::filter(
+            .data[["OlinkID_HT"]] != .data[["OlinkID"]]
+          ),
         ref_samples = bridge_samples,
         ref_name = "HT",
         ref_cols = list(sample_id = "SampleID",
@@ -214,6 +224,7 @@ test_that(
                         lod = character(0),
                         normalization = "Normalization",
                         count = "Count"),
+        ref_product = "HT",
         not_ref_df = data_3k |>
           dplyr::rename(
             "OlinkID_E3072" = "OlinkID"
@@ -228,11 +239,14 @@ test_that(
             by = "OlinkID_E3072",
             relationship = "many-to-one"
           ) |>
-          # If matched OlinkID is not found in mapping file, set OlinkID_HT to OlinkID
-          dplyr::mutate(OlinkID = ifelse(is.na(.data[["OlinkID"]]),
-                                         .data[["OlinkID_E3072"]],
-                                         .data[["OlinkID"]])) |>
-          dplyr::filter(!(.data[["OlinkID_E3072"]] %in% filtered_oids)),
+          dplyr::mutate(
+            OlinkID = dplyr::if_else(is.na(.data[["OlinkID"]]),
+                                     .data[["OlinkID_E3072"]],
+                                     .data[["OlinkID"]])
+          ) |>
+          dplyr::filter(
+            .data[["OlinkID_E3072"]] != .data[["OlinkID"]]
+          ),
         not_ref_samples = NULL,
         not_ref_name = "3K",
         not_ref_cols = list(sample_id = "SampleID",
@@ -248,6 +262,119 @@ test_that(
                             lod = character(0),
                             normalization = "Normalization",
                             count = "Count"),
+        not_ref_product = "3k",
+        reference_medians = NULL,
+        norm_mode = olink_norm_modes$norm_cross_product
+      )
+    )
+
+    # 3k-Reveal normalization ----
+
+    bridge_samples <- intersect(
+      x = unique(data_reveal$SampleID),
+      y = unique(data_3k$SampleID)
+    ) |>
+      (\(x) x[!grepl("CONTROL", x)])() |>
+      sort() |>
+      head(32L)
+
+    expect_message(
+      object = expect_warning(
+        reveal_input <- olink_norm_input_check(
+          df1 = data_reveal,
+          df2 = data_3k,
+          overlapping_samples_df1 = bridge_samples,
+          overlapping_samples_df2 = NULL,
+          df1_project_nr = "reveal",
+          df2_project_nr = "3K",
+          reference_project = "reveal",
+          reference_medians = NULL
+        ),
+        regexp = "85 assays are not shared across products"
+      ),
+      regexp = "Cross-product normalization will be performed!"
+    )
+
+    expect_identical(
+      object = reveal_input,
+      expected = list(
+        ref_df = data_reveal |>
+          dplyr::rename(
+            "OlinkID_Reveal" = "OlinkID"
+          ) |>
+          dplyr::left_join(
+            reveal_e3072_mapping |>
+              dplyr::select(
+                dplyr::all_of(
+                  c("OlinkID_Reveal", "OlinkID")
+                )
+              ),
+            by = "OlinkID_Reveal",
+            relationship = "many-to-many"
+          ) |>
+          dplyr::mutate(
+            OlinkID = dplyr::if_else(is.na(.data[["OlinkID"]]),
+                                     .data[["OlinkID_Reveal"]],
+                                     .data[["OlinkID"]])
+          ) |>
+          dplyr::filter(
+            .data[["OlinkID_Reveal"]] != .data[["OlinkID"]]
+          ),
+        ref_samples = bridge_samples,
+        ref_name = "reveal",
+        ref_cols = list(sample_id = "SampleID",
+                        olink_id = "OlinkID",
+                        uniprot = "UniProt",
+                        assay = "Assay",
+                        panel = "Panel",
+                        panel_version = "DataAnalysisRefID",
+                        plate_id = "PlateID",
+                        qc_warn = "SampleQC",
+                        assay_warn = "AssayQC",
+                        quant = "NPX",
+                        lod = character(0),
+                        normalization = "Normalization",
+                        count = "Count"),
+        ref_product = "Reveal",
+        not_ref_df = data_3k |>
+          dplyr::rename(
+            "OlinkID_E3072" = "OlinkID"
+          ) |>
+          dplyr::left_join(
+            reveal_e3072_mapping |>
+              dplyr::select(
+                dplyr::all_of(
+                  c("OlinkID_E3072", "OlinkID")
+                )
+              ),
+            by = "OlinkID_E3072",
+            relationship = "many-to-one"
+          ) |>
+          dplyr::mutate(
+            OlinkID = dplyr::if_else(is.na(.data[["OlinkID"]]),
+                                     .data[["OlinkID_E3072"]],
+                                     .data[["OlinkID"]])
+          ) |>
+          dplyr::filter(
+            .data[["OlinkID_E3072"]] != .data[["OlinkID"]]
+            & .data[["OlinkID_E3072"]] != "OID20473"
+          ),
+        not_ref_samples = NULL,
+        not_ref_name = "3K",
+        not_ref_cols = list(sample_id = "SampleID",
+                            olink_id = "OlinkID",
+                            uniprot = "UniProt",
+                            assay = "Assay",
+                            panel = "Panel",
+                            panel_version = "DataAnalysisRefID",
+                            plate_id = "PlateID",
+                            qc_warn = "SampleQC",
+                            assay_warn = "AssayQC",
+                            quant = "NPX",
+                            lod = character(0),
+                            normalization = "Normalization",
+                            count = "Count"),
+        not_ref_product = "3k",
         reference_medians = NULL,
         norm_mode = olink_norm_modes$norm_cross_product
       )
@@ -299,6 +426,7 @@ test_that(
                         lod = "LOD",
                         normalization = character(0L),
                         count = character(0L)),
+        ref_product = NULL,
         not_ref_df = npx_data2,
         not_ref_samples = unique(npx_data2$SampleID),
         not_ref_name = "20200002",
@@ -315,6 +443,7 @@ test_that(
                             lod = "LOD",
                             normalization = character(0L),
                             count = character(0L)),
+        not_ref_product = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$subset
       )
@@ -364,6 +493,7 @@ test_that(
                         lod = "LOD",
                         normalization = "Normalization",
                         count = character(0L)),
+        ref_product = NULL,
         not_ref_df = npx_data1 |>
           dplyr::mutate(
             Normalization = "Intensity"
@@ -383,6 +513,7 @@ test_that(
                             lod = "LOD",
                             normalization = "Normalization",
                             count = character(0L)),
+        not_ref_product = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$subset
       )
@@ -439,6 +570,7 @@ test_that(
                         lod = "LOD",
                         normalization = character(0L),
                         count = character(0L)),
+        ref_product = NULL,
         not_ref_df = npx_data2,
         not_ref_samples = npx_df2_samples,
         not_ref_name = "20200002",
@@ -455,6 +587,7 @@ test_that(
                             lod = "LOD",
                             normalization = character(0L),
                             count = character(0L)),
+        not_ref_product = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$subset
       )
@@ -504,6 +637,7 @@ test_that(
                         lod = "LOD",
                         normalization = "Normalization",
                         count = character(0L)),
+        ref_product = NULL,
         not_ref_df = npx_data1 |>
           dplyr::mutate(
             Normalization = "Intensity"
@@ -523,6 +657,7 @@ test_that(
                             lod = "LOD",
                             normalization = "Normalization",
                             count = character(0L)),
+        not_ref_product = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$subset
       )
@@ -590,10 +725,12 @@ test_that(
                         lod = "LOD",
                         normalization = character(0L),
                         count = character(0L)),
+        ref_product = NULL,
         not_ref_df = NULL,
         not_ref_samples = NULL,
         not_ref_name = NULL,
         not_ref_cols = NULL,
+        not_ref_product = NULL,
         reference_medians = ref_median_df,
         norm_mode = olink_norm_modes$ref_median
       )
@@ -643,10 +780,12 @@ test_that(
                         lod = "LOD",
                         normalization = "Normalization",
                         count = character(0L)),
+        ref_product = NULL,
         not_ref_df = NULL,
         not_ref_samples = NULL,
         not_ref_name = NULL,
         not_ref_cols = NULL,
+        not_ref_product = NULL,
         reference_medians = ref_median_df,
         norm_mode = olink_norm_modes$ref_median
       )
@@ -2543,11 +2682,13 @@ test_that(
   {
     skip_if_not_installed("arrow")
 
-    skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
-    skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_Reveal_data.rds")))
 
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
+    data_reveal <- get_example_data(filename = "example_Reveal_data.rds")
 
     # 3k - 3k ----
 
@@ -2561,7 +2702,9 @@ test_that(
           "3K_1" = list(panel = "Panel"),
           "3K_2" = list(panel = "Panel")
         ),
-        reference_project = "3K_1"
+        reference_project = "3K_1",
+        product_ids = c("3K_1" = "3k", "3K_2" = "3k"),
+        ref_ids = c("3K_1" = "ref", "3K_2" = "not_ref")
       )
     )
 
@@ -2588,7 +2731,9 @@ test_that(
           "HT_1" = list(panel = "Panel"),
           "HT_2" = list(panel = "Panel")
         ),
-        reference_project = "HT_1"
+        reference_project = "HT_1",
+        product_ids = c("HT_1" = "HT", "HT_2" = "HT"),
+        ref_ids = c("HT_1" = "ref", "HT_2" = "not_ref")
       )
     )
 
@@ -2615,7 +2760,9 @@ test_that(
           "p1" = list(panel = "Panel"),
           "p2" = list(panel = "Panel")
         ),
-        reference_project = "p1"
+        reference_project = "p1",
+        product_ids = c("p1" = "other", "p2" = "other"),
+        ref_ids = c("p1" = "ref", "p2" = "not_ref")
       )
     )
 
@@ -2629,6 +2776,35 @@ test_that(
         )
       )
     )
+
+    # Reveal - Reveal ----
+
+    expect_no_condition(
+      object = lst_cross_prod_out_ht <- olink_norm_input_cross_product(
+        lst_df = list(
+          "Reveal_1" = data_reveal,
+          "Reveal_2" = data_reveal
+        ),
+        lst_cols = list(
+          "Reveal_1" = list(panel = "Panel"),
+          "Reveal_2" = list(panel = "Panel")
+        ),
+        reference_project = "Reveal_2",
+        product_ids = c("Reveal_1" = "Reveal", "Reveal_2" = "Reveal"),
+        ref_ids = c("Reveal_1" = "not_ref", "Reveal_2" = "ref")
+      )
+    )
+
+    expect_identical(
+      object = lst_cross_prod_out_ht,
+      expected = list(
+        norm_mode = olink_norm_modes$bridge,
+        lst_df = list(
+          "Reveal_1" = data_reveal,
+          "Reveal_2" = data_reveal
+        )
+      )
+    )
   }
 )
 
@@ -2637,14 +2813,18 @@ test_that(
   {
     skip_if_not_installed("arrow")
 
-    skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
-    skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_Reveal_data.rds")))
 
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
+    data_reveal <- get_example_data(filename = "example_Reveal_data.rds")
+
+    # 3k-HT ----
 
     expect_no_condition(
-      object = lst_cross_prod_out <- olink_norm_input_cross_product(
+      object = lst_cross_prod_out_ht <- olink_norm_input_cross_product(
         lst_df = list(
           "p1" = data_3k,
           "p2" = data_ht
@@ -2657,12 +2837,14 @@ test_that(
                       olink_id = "OlinkID",
                       count = "Count")
         ),
-        reference_project = "p2"
+        reference_project = "p2",
+        product_ids = c("p1" = "3k", "p2" = "HT"),
+        ref_ids = c("p1" = "not_ref", "p2" = "ref")
       )
     )
 
     expect_identical(
-      object = lst_cross_prod_out,
+      object = lst_cross_prod_out_ht,
       expected = list(
         norm_mode = olink_norm_modes$norm_cross_product,
         lst_df = list(
@@ -2680,10 +2862,11 @@ test_that(
               by = "OlinkID_E3072",
               relationship = "many-to-one"
             ) |>
-            # If matched OlinkID is not found in mapping file, set OlinkID_HT to OlinkID
-            dplyr::mutate(OlinkID = ifelse(is.na(.data[["OlinkID"]]),
-                                           .data[["OlinkID_E3072"]],
-                                           .data[["OlinkID"]])),
+            dplyr::mutate(
+              OlinkID = dplyr::if_else(is.na(.data[["OlinkID"]]),
+                                       .data[["OlinkID_E3072"]],
+                                       .data[["OlinkID"]])
+            ),
           "p2" = data_ht |>
             dplyr::rename(
               "OlinkID_HT" = "OlinkID"
@@ -2698,10 +2881,80 @@ test_that(
               by = "OlinkID_HT",
               relationship = "many-to-many"
             ) |>
-            # If matched OlinkID is not found in mapping file, set OlinkID_HT to OlinkID
-            dplyr::mutate(OlinkID = ifelse(is.na(.data[["OlinkID"]]),
-                                           .data[["OlinkID_HT"]],
-                                           .data[["OlinkID"]]))
+            dplyr::mutate(
+              OlinkID = dplyr::if_else(is.na(.data[["OlinkID"]]),
+                                       .data[["OlinkID_HT"]],
+                                       .data[["OlinkID"]])
+            )
+        )
+      )
+    )
+
+    # 3k-Reveal ----
+
+    expect_no_condition(
+      object = lst_cross_prod_out_rev <- olink_norm_input_cross_product(
+        lst_df = list(
+          "p1" = data_3k,
+          "p2" = data_reveal
+        ),
+        lst_cols = list(
+          "p1" = list(panel = "Panel",
+                      olink_id = "OlinkID",
+                      count = "Count"),
+          "p2" = list(panel = "Panel",
+                      olink_id = "OlinkID",
+                      count = "Count")
+        ),
+        reference_project = "p2",
+        product_ids = c("p1" = "3k", "p2" = "Reveal"),
+        ref_ids = c("p1" = "not_ref", "p2" = "ref")
+      )
+    )
+
+    expect_identical(
+      object = lst_cross_prod_out_rev,
+      expected = list(
+        norm_mode = olink_norm_modes$norm_cross_product,
+        lst_df = list(
+          "p1" = data_3k |>
+            dplyr::rename(
+              "OlinkID_E3072" = "OlinkID"
+            ) |>
+            dplyr::left_join(
+              reveal_e3072_mapping |>
+                dplyr::select(
+                  dplyr::all_of(
+                    c("OlinkID_E3072", "OlinkID")
+                  )
+                ),
+              by = "OlinkID_E3072",
+              relationship = "many-to-one"
+            ) |>
+            dplyr::mutate(
+              OlinkID = dplyr::if_else(is.na(.data[["OlinkID"]]),
+                                       .data[["OlinkID_E3072"]],
+                                       .data[["OlinkID"]])
+            ),
+          "p2" = data_reveal |>
+            dplyr::rename(
+              "OlinkID_Reveal" = "OlinkID"
+            ) |>
+            dplyr::left_join(
+              reveal_e3072_mapping |>
+                dplyr::select(
+                  dplyr::all_of(
+                    c("OlinkID_Reveal", "OlinkID")
+                  )
+                ),
+              by = "OlinkID_Reveal",
+              relationship = "many-to-many"
+            ) |>
+            dplyr::mutate(
+              OlinkID = dplyr::if_else(is.na(.data[["OlinkID"]]),
+                                       .data[["OlinkID_Reveal"]],
+                                       .data[["OlinkID"]])
+            )
         )
       )
     )
@@ -2714,13 +2967,15 @@ test_that(
   {
     skip_if_not_installed("arrow")
 
-    skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
-    skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_Reveal_data.rds")))
 
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
+    data_reveal <- get_example_data(filename = "example_Reveal_data.rds")
 
-    # 3k - T96
+    # 3k - T96 ----
 
     expect_error(
       object = olink_norm_input_cross_product(
@@ -2732,12 +2987,14 @@ test_that(
           "3K" = list(panel = "Panel"),
           "T96" = list(panel = "Panel")
         ),
-        reference_project = "3K"
+        reference_project = "3K",
+        product_ids = c("3K" = "3k", "T96" = "other"),
+        ref_ids = c("3K" = "ref", "T96" = "not_ref")
       ),
       regexp = "Unexpected datasets to be bridge normalized!"
     )
 
-    # HT - T96
+    # HT - T96 ----
 
     expect_error(
       object = olink_norm_input_cross_product(
@@ -2749,7 +3006,47 @@ test_that(
           "HT" = list(panel = "Panel"),
           "T96" = list(panel = "Panel")
         ),
-        reference_project = "T96"
+        reference_project = "T96",
+        product_ids = c("HT" = "HT", "T96" = "other"),
+        ref_ids = c("HT" = "not_ref", "T96" = "ref")
+      ),
+      regexp = "Unexpected datasets to be bridge normalized!"
+    )
+
+    # Reveal - T96 ----
+
+    expect_error(
+      object = olink_norm_input_cross_product(
+        lst_df = list(
+          "Reveal" = data_reveal,
+          "T96" = npx_data1
+        ),
+        lst_cols = list(
+          "Reveal" = list(panel = "Panel"),
+          "T96" = list(panel = "Panel")
+        ),
+        reference_project = "Reveal",
+        product_ids = c("Reveal" = "Reveal", "T96" = "other"),
+        ref_ids = c("Reveal" = "ref", "T96" = "not_ref")
+      ),
+      regexp = "Unexpected datasets to be bridge normalized!"
+    )
+
+    # Reveal - HT ----
+
+    expect_error(
+      object = olink_norm_input_cross_product(
+        lst_df = list(
+          "Reveal" = data_reveal,
+          "HT" = data_ht
+        ),
+        lst_cols = list(
+          "Reveal" = list(panel = "Panel"),
+          "HT" = list(panel = "Panel")
+        ),
+        reference_project = "HT",
+        product_ids = c("Reveal" = "Reveal", "HT" = "HT"),
+        ref_ids = c("Reveal" = "not_ref", "HT" = "ref")
       ),
       regexp = "Unexpected datasets to be bridge normalized!"
     )
@@ -2761,11 +3058,13 @@ test_that(
   {
     skip_if_not_installed("arrow")
 
-    skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
-    skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_Reveal_data.rds")))
 
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
+    data_reveal <- get_example_data(filename = "example_Reveal_data.rds")
 
     expect_error(
       object = olink_norm_input_cross_product(
@@ -2777,7 +3076,26 @@ test_that(
           "3K" = list(panel = "Panel"),
           "HT" = list(panel = "Panel")
         ),
-        reference_project = "3K"
+        reference_project = "3K",
+        product_ids = c("3K" = "3k", "HT" = "HT"),
+        ref_ids = c("3K" = "ref", "HT" = "not_ref")
+      ),
+      regexp = "Incorrect reference project!"
+    )
+
+    expect_error(
+      object = olink_norm_input_cross_product(
+        lst_df = list(
+          "3K" = data_3k,
+          "reveal" = data_reveal
+        ),
+        lst_cols = list(
+          "3K" = list(panel = "Panel"),
+          "reveal" = list(panel = "Panel")
+        ),
+        reference_project = "3K",
+        product_ids = c("3K" = "3k", "reveal" = "Reveal"),
+        ref_ids = c("3K" = "ref", "reveal" = "not_ref")
       ),
       regexp = "Incorrect reference project!"
     )
@@ -2789,18 +3107,21 @@ test_that(
   {
     skip_if_not_installed("arrow")
 
-    skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
-    skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_Reveal_data.rds")))
 
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
+    data_reveal <- get_example_data(filename = "example_Reveal_data.rds")
 
     # missing from p1
 
     expect_error(
       object = olink_norm_input_cross_product(
         lst_df = list(
-          "p1" = data_3k,
+          "p1" = data_3k |>
+            dplyr::select(-dplyr::all_of("Count")),
           "p2" = data_ht
         ),
         lst_cols = list(
@@ -2810,7 +3131,9 @@ test_that(
                       olink_id = "OlinkID",
                       count = "Count")
         ),
-        reference_project = "p2"
+        reference_project = "p2",
+        product_ids = c("p1" = "3k", "p2" = "HT"),
+        ref_ids = c("p1" = "not_ref", "p2" = "ref")
       ),
       regexp = "Column \"Count\" not found in dataset \"p1\"!"
     )
@@ -2821,7 +3144,8 @@ test_that(
       object = olink_norm_input_cross_product(
         lst_df = list(
           "p1" = data_3k,
-          "p2" = data_ht
+          "p2" = data_ht |>
+            dplyr::select(-dplyr::all_of("Count"))
         ),
         lst_cols = list(
           "p1" = list(panel = "Panel",
@@ -2830,7 +3154,9 @@ test_that(
           "p2" = list(panel = "Panel",
                       olink_id = "OlinkID")
         ),
-        reference_project = "p2"
+        reference_project = "p2",
+        product_ids = c("p1" = "3k", "p2" = "HT"),
+        ref_ids = c("p1" = "not_ref", "p2" = "ref")
       ),
       regexp = "Column \"Count\" not found in dataset \"p2\"!"
     )
@@ -2840,8 +3166,10 @@ test_that(
     expect_error(
       object = olink_norm_input_cross_product(
         lst_df = list(
-          "p1" = data_3k,
-          "p2" = data_ht
+          "p1" = data_3k |>
+            dplyr::select(-dplyr::all_of("Count")),
+          "p2" = data_reveal |>
+            dplyr::select(-dplyr::all_of("Count"))
         ),
         lst_cols = list(
           "p1" = list(panel = "Panel",
@@ -2849,7 +3177,9 @@ test_that(
           "p2" = list(panel = "Panel",
                       olink_id = "OlinkID")
         ),
-        reference_project = "p2"
+        reference_project = "p2",
+        product_ids = c("p1" = "3k", "p2" = "Reveal"),
+        ref_ids = c("p1" = "not_ref", "p2" = "ref")
       ),
       regexp = "Column \"Count\" not found in datasets \"p1\" and \"p2\"!"
     )
@@ -2952,8 +3282,8 @@ test_that(
 
     # cross-platform norm - reference samples in datasets ----
 
-    skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
-    skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
 
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
@@ -2979,7 +3309,7 @@ test_that(
               "p1" = ref_samples_bridge_3k_ht,
               "p2" = ref_samples_bridge_3k_ht
             ),
-            norm_mode = "norm_ht_3k"
+            norm_mode = "norm_cross_product"
           )
         )
       )
@@ -3998,8 +4328,8 @@ test_that(
   {
     skip_if_not_installed("arrow")
 
-    skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
-    skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
 
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
@@ -4062,10 +4392,11 @@ test_that(
           by = "OlinkID_E3072",
           relationship = "many-to-one"
         ) |>
-        # If matched OlinkID is not found in mapping file, set OlinkID_HT to OlinkID
-        dplyr::mutate(OlinkID = ifelse(is.na(.data[["OlinkID"]]),
-                                       .data[["OlinkID_E3072"]],
-                                       .data[["OlinkID"]])) |>
+        dplyr::mutate(
+          OlinkID = ifelse(is.na(.data[["OlinkID"]]),
+                           .data[["OlinkID_E3072"]],
+                           .data[["OlinkID"]])
+        ) |>
         dplyr::mutate(
           OlinkID = dplyr::if_else(.data[["OlinkID"]] == "OID40770_OID20117",
                                    "OID40770_OID2011",
@@ -5431,6 +5762,270 @@ test_that(
         )
       ),
       regexp = "Column `Normalization` not present in all datasets."
+    )
+  }
+)
+
+# Test olink_norm_product_id ----
+
+test_that(
+  "olink_norm_product_id - works",
+  {
+    skip_if_not_installed("arrow")
+
+    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_Reveal_data.rds")))
+
+    data_3k <- get_example_data(filename = "example_3k_data.rds")
+    data_ht <- get_example_data(filename = "example_HT_data.rds")
+    data_reveal <- get_example_data(filename = "example_Reveal_data.rds")
+
+    # T96-T96 ----
+
+    expect_identical(
+      object = olink_norm_product_id(
+        lst_df = list(
+          "p1" = npx_data1,
+          "p2" = npx_data2
+        ),
+        lst_cols = list(
+          "p1" = list(panel = "Panel"),
+          "p2" = list(panel = "Panel")
+        )
+      ),
+      expected = c("p1" = "other", "p2" = "other")
+    )
+
+    # T96-3k ----
+
+    expect_identical(
+      object = olink_norm_product_id(
+        lst_df = list(
+          "p1" = npx_data1,
+          "p2" = data_3k
+        ),
+        lst_cols = list(
+          "p1" = list(panel = "Panel"),
+          "p2" = list(panel = "Panel")
+        )
+      ),
+      expected = c("p1" = "other", "p2" = "3k")
+    )
+
+    # T96-HT ----
+
+    expect_identical(
+      object = olink_norm_product_id(
+        lst_df = list(
+          "p1" = npx_data1,
+          "p2" = data_ht
+        ),
+        lst_cols = list(
+          "p1" = list(panel = "Panel"),
+          "p2" = list(panel = "Panel")
+        )
+      ),
+      expected = c("p1" = "other", "p2" = "HT")
+    )
+
+    # T96-Reveal ----
+
+    expect_identical(
+      object = olink_norm_product_id(
+        lst_df = list(
+          "p1" = npx_data1,
+          "p2" = data_reveal
+        ),
+        lst_cols = list(
+          "p1" = list(panel = "Panel"),
+          "p2" = list(panel = "Panel")
+        )
+      ),
+      expected = c("p1" = "other", "p2" = "Reveal")
+    )
+
+    # 3k-3k ----
+
+    expect_identical(
+      object = olink_norm_product_id(
+        lst_df = list(
+          "p1" = data_3k,
+          "p2" = data_3k
+        ),
+        lst_cols = list(
+          "p1" = list(panel = "Panel"),
+          "p2" = list(panel = "Panel")
+        )
+      ),
+      expected = c("p1" = "3k", "p2" = "3k")
+    )
+
+    # 3k-HT ----
+
+    expect_identical(
+      object = olink_norm_product_id(
+        lst_df = list(
+          "p1" = data_3k,
+          "p2" = data_ht
+        ),
+        lst_cols = list(
+          "p1" = list(panel = "Panel"),
+          "p2" = list(panel = "Panel")
+        )
+      ),
+      expected = c("p1" = "3k", "p2" = "HT")
+    )
+
+    # 3k-Reveal ----
+
+    expect_identical(
+      object = olink_norm_product_id(
+        lst_df = list(
+          "p1" = data_3k,
+          "p2" = data_reveal
+        ),
+        lst_cols = list(
+          "p1" = list(panel = "Panel"),
+          "p2" = list(panel = "Panel")
+        )
+      ),
+      expected = c("p1" = "3k", "p2" = "Reveal")
+    )
+
+    # Reveal-Reveal ----
+
+    expect_identical(
+      object = olink_norm_product_id(
+        lst_df = list(
+          "p1" = data_reveal,
+          "p2" = data_reveal
+        ),
+        lst_cols = list(
+          "p1" = list(panel = "Panel"),
+          "p2" = list(panel = "Panel")
+        )
+      ),
+      expected = c("p1" = "Reveal", "p2" = "Reveal")
+    )
+
+    # HT-Reveal ----
+
+    expect_identical(
+      object = olink_norm_product_id(
+        lst_df = list(
+          "p1" = data_ht,
+          "p2" = data_reveal
+        ),
+        lst_cols = list(
+          "p1" = list(panel = "Panel"),
+          "p2" = list(panel = "Panel")
+        )
+      ),
+      expected = c("p1" = "HT", "p2" = "Reveal")
+    )
+
+    # HT-HT ----
+
+    expect_identical(
+      object = olink_norm_product_id(
+        lst_df = list(
+          "p1" = data_ht,
+          "p2" = data_ht
+        ),
+        lst_cols = list(
+          "p1" = list(panel = "Panel"),
+          "p2" = list(panel = "Panel")
+        )
+      ),
+      expected = c("p1" = "HT", "p2" = "HT")
+    )
+  }
+)
+
+# Test olink_norm_reference_id ----
+
+test_that(
+  "olink_norm_reference_id - works",
+  {
+    # other-other ----
+
+    expect_identical(
+      object = olink_norm_reference_id(
+        lst_product = c("p1" = "other", "p2" = "other"),
+        reference_project = "p1"
+      ),
+      expected = c("p1" = "ref", "p2" = "not_ref")
+    )
+
+    # 3k-3k ----
+
+    expect_identical(
+      object = olink_norm_reference_id(
+        lst_product = c("p1" = "3k", "p2" = "3k"),
+        reference_project = "p2"
+      ),
+      expected = c("p1" = "not_ref", "p2" = "ref")
+    )
+
+    # ht-ht ----
+
+    expect_identical(
+      object = olink_norm_reference_id(
+        lst_product = c("p1" = "HT", "p2" = "HT"),
+        reference_project = "p2"
+      ),
+      expected = c("p1" = "not_ref", "p2" = "ref")
+    )
+
+    # reveal-reveal ----
+
+    expect_identical(
+      object = olink_norm_reference_id(
+        lst_product = c("p1" = "Reveal", "p2" = "Reveal"),
+        reference_project = "p1"
+      ),
+      expected = c("p1" = "ref", "p2" = "not_ref")
+    )
+
+    # 3k-reveal ----
+
+    expect_identical(
+      object = olink_norm_reference_id(
+        lst_product = c("p1" = "3k", "p2" = "Reveal"),
+        reference_project = "p1"
+      ),
+      expected = c("p1" = "ref", "p2" = "not_ref")
+    )
+
+    # 3k-ht ----
+
+    expect_identical(
+      object = olink_norm_reference_id(
+        lst_product = c("p1" = "3", "p2" = "HT"),
+        reference_project = "p2"
+      ),
+      expected = c("p1" = "not_ref", "p2" = "ref")
+    )
+
+  }
+)
+
+# Test olink_norm_mapping_file_id ----
+
+test_that(
+  "mapping_file_id - works",
+  {
+    # returns HT mapping file
+    expect_identical(
+      object = mapping_file_id("HT"),
+      expected = eHT_e3072_mapping
+    )
+
+    # returns Reveal mapping file
+    expect_identical(
+      object = mapping_file_id("Reveal"),
+      expected = reveal_e3072_mapping
     )
   }
 )

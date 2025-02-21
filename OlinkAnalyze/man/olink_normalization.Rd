@@ -53,7 +53,7 @@ Normalizes two Olink datasets to each other, or one Olink dataset to a
 reference set of medians values.
 }
 \details{
-The function handles three different types of normalization:
+The function handles four different types of normalization:
 \itemize{
 \item \strong{Bridge normalization}: One of the datasets is adjusted to another
 using overlapping samples (bridge samples). Overlapping samples need to have
@@ -115,9 +115,9 @@ that was applied to the non-reference dataset.
 "BridgingRecommendation" in case of cross-product normalization. The columns
 correspond to the project of origin based on \code{df1_project_nr} and
 \code{df2_project_nr}, the assay identifier in the non-reference project, the
-bridge-normalized quantification value, the quantile smoothing-normalized quantification
-value, and the recommendation about which of the two normalized values is
-more suitable for downstream analysis.
+bridge-normalized quantification value, the quantile smoothing-normalized
+quantification value, and the recommendation about which of the two
+normalized values is more suitable for downstream analysis.
 }
 }
 \examples{
