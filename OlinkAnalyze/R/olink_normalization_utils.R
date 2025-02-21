@@ -1902,7 +1902,9 @@ olink_norm_input_norm_method <- function(lst_df,
 
 #' Identify names of product for each project
 #'
-#' @author Kathy Nevola
+#' @author
+#'   Kathy Nevola
+#'   Klev Diamanti
 #'
 #' @param lst_df Named list of datasets to be normalized.
 #' @param lst_cols Named list of vectors with the required column names for each
