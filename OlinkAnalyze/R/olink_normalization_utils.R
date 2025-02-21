@@ -1910,8 +1910,8 @@ olink_norm_input_norm_method <- function(lst_df,
 #' @param lst_cols Named list of vectors with the required column names for each
 #' dataset in \var{lst_df}.
 #'
-#' @return Named character vector with the Olink product each input datatset
-#' matches to.
+#' @return Named character vector with the Olink product name that  each input
+#' datatset matches to.
 #'
 olink_norm_product_id <- function(lst_df,
                                   lst_cols) {
