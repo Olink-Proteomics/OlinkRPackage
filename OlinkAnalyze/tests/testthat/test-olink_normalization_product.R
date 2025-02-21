@@ -123,16 +123,16 @@ test_that(
   "olink_normalization_qs - works - compare to reference",
   {
 
-    skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
-    skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
-    skip_if_not(file.exists(test_path("data","example_Reveal_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_Reveal_data.rds")))
 
     data_3k <- get_example_data(filename = "example_3k_data.rds") |>
-      dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321")))
+      dplyr::filter(!(.data[["OlinkID"]] %in% c("OID12345", "OID54321")))
     data_ht <- get_example_data(filename = "example_HT_data.rds") |>
-      dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321")))
+      dplyr::filter(!(.data[["OlinkID"]] %in% c("OID12345", "OID54321")))
     data_reveal <- get_example_data(filename = "example_Reveal_data.rds") |>
-      dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321")))
+      dplyr::filter(!(.data[["OlinkID"]] %in% c("OID12345", "OID54321")))
 
     # load reference data ----
 
@@ -227,7 +227,7 @@ test_that(
             lst_df = lst_df,
             ref_cols = norm_input_check$ref_cols,
             bridge_samples = bridge_samples,
-            ref_product = lst_product$product[lst_product$reference == "ref"]
+            ref_product = norm_input_check$ref_product
           )
         )
       )
@@ -240,7 +240,7 @@ test_that(
             lst_df = lst_df_reveal,
             ref_cols = norm_input_check_reveal$ref_cols,
             bridge_samples = bridge_samples_reveal,
-            ref_product = lst_product_reveal$product[lst_product$reference == "ref"]
+            ref_product = norm_input_check$ref_product
           )
         )
       )
@@ -303,8 +303,6 @@ test_that(
   }
 )
 
-
-
 test_that(
   "olink_normalization_qs - works - expected output, all bridge samples",
   {
@@ -355,7 +353,7 @@ test_that(
             lst_df = lst_df,
             ref_cols = norm_input_check$ref_cols,
             bridge_samples = bridge_samples,
-            ref_product = lst_product$product[lst_product$reference == "ref"]
+            ref_product = norm_input_check$ref_product
           )
         )
       )
@@ -483,7 +481,7 @@ test_that(
             lst_df = lst_df,
             ref_cols = norm_input_check$ref_cols,
             bridge_samples = bridge_samples,
-            ref_product = "HT"
+            ref_product = norm_input_check$ref_product
           )
         )
       )
@@ -608,7 +606,8 @@ test_that(
       object = olink_normalization_qs(
         lst_df = lst_df,
         ref_cols = norm_input_check$ref_cols,
-        bridge_samples = head(x = bridge_samples, 38L)
+        bridge_samples = head(x = bridge_samples, 38L),
+        ref_product = norm_input_check$ref_product
       ),
       regexp = "There are 104 assays with fewer than 40 bridge samples for QS"
     )
@@ -617,7 +616,8 @@ test_that(
       object = olink_normalization_qs(
         lst_df = lst_df,
         ref_cols = norm_input_check$ref_cols,
-        bridge_samples = head(x = bridge_samples, 40L)
+        bridge_samples = head(x = bridge_samples, 40L),
+        ref_product = norm_input_check$ref_product
       ),
       regexp = "There are 31 assays with fewer than 40 bridge samples for QS"
     )
@@ -793,42 +793,59 @@ test_that(
   }
 )
 
-test_that("Non-overlapping assays 3k and Reveal",
-          {
-            skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
-            skip_if_not(file.exists(test_path("data","example_Reveal_data.rds")))
+test_that(
+  "Non-overlapping assays 3k and Reveal",
+  {
+    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_Reveal_data.rds")))
 
-            data_3k <- get_example_data(filename = "example_3k_data.rds")
-            data_reveal <- get_example_data(filename = "example_Reveal_data.rds")
+    data_3k <- get_example_data(filename = "example_3k_data.rds")
+    data_reveal <- get_example_data(filename = "example_Reveal_data.rds")
 
-            lst_df <- list("e3k" = data_3k,
-                           "Reveal" = data_reveal)
-            lst_cols <- olink_norm_input_check_df_cols(lst_df = lst_df)
-            lst_product <- olink_product_identifier_norm(lst_df = lst_df,
-                                                         reference_project = "Reveal",
-                                                          lst_cols = lst_cols)
-            lst_norm_cp <- olink_norm_input_cross_product(lst_df = lst_df,
-                                                          lst_cols = lst_cols,
-                                                          lst_product = lst_product,
-                                                          reference_project = "Reveal")
-            overlapping_assays<-suppressWarnings(olink_norm_input_assay_overlap(lst_df = lst_norm_cp$lst_df,
-                                           reference_medians = NULL,
-                                           lst_cols = lst_cols,
-                                           norm_mode = lst_norm_cp$norm_mode))
-            expect_equal(
-              object = length(
-              unique(
-                overlapping_assays$lst_df$e3k$OlinkID
-                )
-              ),
-              expected = 21L)
+    lst_df <- list("e3k" = data_3k,
+                   "Reveal" = data_reveal)
+    lst_cols <- olink_norm_input_check_df_cols(lst_df = lst_df)
+    lst_product <- olink_norm_product_id(
+      lst_df = lst_df,
+      lst_cols = lst_cols
+    )
+    ref_ids <- olink_norm_reference_id(
+      lst_product = lst_product,
+      reference_project = "Reveal"
+    )
+    lst_norm_cp <- olink_norm_input_cross_product(
+      lst_df = lst_df,
+      lst_cols = lst_cols,
+      reference_project = "Reveal",
+      product_ids = lst_product,
+      ref_ids = ref_ids
+    )
 
-            expect_equal(
-              object = length(
-                unique(
-                  overlapping_assays$lst_df$Reveal$OlinkID
-                )
-              ),
-              expected = 21L)
+    expect_warning(
+      object = overlapping_assays <- olink_norm_input_assay_overlap(
+        lst_df = lst_norm_cp$lst_df,
+        reference_medians = NULL,
+        lst_cols = lst_cols,
+        norm_mode = lst_norm_cp$norm_mode
+      ),
+      regexp = "85 assays are not shared across products"
+    )
 
-})
+    expect_equal(
+      object = length(
+        unique(
+          overlapping_assays$lst_df$e3k$OlinkID
+        )
+      ),
+      expected = 21L)
+
+    expect_equal(
+      object = length(
+        unique(
+          overlapping_assays$lst_df$Reveal$OlinkID
+        )
+      ),
+      expected = 21L)
+
+  }
+)

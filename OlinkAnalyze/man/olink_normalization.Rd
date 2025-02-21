@@ -115,9 +115,9 @@ that was applied to the non-reference dataset.
 "BridgingRecommendation" in case of cross-product normalization. The columns
 correspond to the project of origin based on \code{df1_project_nr} and
 \code{df2_project_nr}, the assay identifier in the non-reference project, the
-bridge-normalized quantification value, the quantile smoothing-normalized quantification
-value, and the recommendation about which of the two normalized values is
-more suitable for downstream analysis.
+bridge-normalized quantification value, the quantile smoothing-normalized
+quantification value, and the recommendation about which of the two
+normalized values is more suitable for downstream analysis.
 }
 }
 \examples{

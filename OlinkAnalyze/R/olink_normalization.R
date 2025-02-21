@@ -62,9 +62,9 @@
 #' "BridgingRecommendation" in case of cross-product normalization. The columns
 #' correspond to the project of origin based on `df1_project_nr` and
 #' `df2_project_nr`, the assay identifier in the non-reference project, the
-#' bridge-normalized quantification value, the quantile smoothing-normalized quantification
-#' value, and the recommendation about which of the two normalized values is
-#' more suitable for downstream analysis.
+#' bridge-normalized quantification value, the quantile smoothing-normalized
+#' quantification value, and the recommendation about which of the two
+#' normalized values is more suitable for downstream analysis.
 #'
 #' @param df1 First dataset to be used for normalization (required).
 #' @param df2 Second dataset to be used for normalization. Required for bridge
@@ -306,19 +306,21 @@ olink_normalization <- function(df1,
         ref_samples = lst_check$ref_samples,
         ref_name = lst_check$ref_name,
         ref_cols = lst_check$ref_cols,
+        ref_product = lst_check$ref_product,
         not_ref_df = lst_check$not_ref_df,
         not_ref_name = lst_check$not_ref_name,
-        not_ref_cols = lst_check$not_ref_cols,
-        lst_product = lst_check$lst_product
+        not_ref_cols = lst_check$not_ref_cols
       )
 
       if (format == TRUE) {
-        df_norm <- olink_normalization_product_format(bridged_df = df_norm,
-                                                      df1 = df1,
-                                                      df1_project_nr = df1_project_nr,
-                                                      df2 = df2,
-                                                      df2_project_nr = df2_project_nr,
-                                                      reference_project = reference_project)
+        df_norm <- olink_normalization_product_format(
+          bridged_df = df_norm,
+          df1 = df1,
+          df1_project_nr = df1_project_nr,
+          df2 = df2,
+          df2_project_nr = df2_project_nr,
+          reference_project = reference_project
+        )
       }
 
     } else if (lst_check$norm_mode == olink_norm_modes$subset) {
@@ -634,13 +636,12 @@ norm_internal_bridge <- function(ref_df,
 #' @param ref_name Project name of the reference dataset (required).
 #' @param ref_cols Named list of column names in the reference dataset
 #' (required).
+#' @param ref_product Name of reference product (required).
 #' @param not_ref_df The non-reference dataset to be used in normalization
 #' (required).
 #' @param not_ref_name Project name of the non-reference dataset (required).
 #' @param not_ref_cols Named list of column names in the non-reference dataset
 #' (required).
-#' @param lst_product a list of the products of each
-#' project and if they are the reference project.
 #'
 #' @return Tibble or ArrowObject with a dataset with the following additional
 #' columns:
@@ -653,18 +654,18 @@ norm_internal_bridge <- function(ref_df,
 #'    "QuantileSmoothing".
 #'    \item{MedianCenteredNPX:} NPX values adjusted based on the median of the
 #'    pair-wise differences of NPX values between bridge samples.
-#'    \item{QSNormalizedNPX:} NPX values adjusted based on the quantile smoothing
-#'    normalization among bridge samples.
+#'    \item{QSNormalizedNPX:} NPX values adjusted based on the quantile
+#'    smoothing normalization among bridge samples.
 #' }
 #'
 norm_internal_cross_product <- function(ref_df,
                                         ref_samples,
                                         ref_name,
                                         ref_cols,
+                                        ref_product,
                                         not_ref_df,
                                         not_ref_name,
-                                        not_ref_cols,
-                                        lst_product) {
+                                        not_ref_cols) {
   # prepare inputs ----
 
   lst_df <- list(
@@ -712,7 +713,7 @@ norm_internal_cross_product <- function(ref_df,
     lst_df = lst_df,
     ref_cols = ref_cols,
     bridge_samples = ref_samples,
-    ref_product = lst_product$product[lst_product$reference == "ref"]
+    ref_product = ref_product
   )
 
   # integrate normalization approaches ----
@@ -764,8 +765,7 @@ norm_internal_cross_product <- function(ref_df,
       )
     ) |>
     dplyr::rename(
-      !!ref_cols$olink_id := paste0("OlinkID_",
-                                    lst_product$product[lst_product$reference == "ref"])
+      !!ref_cols$olink_id := paste0("OlinkID_", ref_product)
     )
 
   # return ----

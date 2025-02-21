@@ -420,21 +420,21 @@ olink_normalization_qs <- function(lst_df,
                                    bridge_samples,
                                    ref_product) {
 
+  if (ref_product == "HT") {
+    num_samples <- 40L
+  } else if (ref_product == "Reveal") {
+    num_samples <- 32L
+  } else {
+    cli::cli_abort(
+      "Reference product must be HT or Reveal."
+    )
+  }
+
   # main QS normalization function
   ecdf_transform_npx <- function(data,
                                  quant_col,
                                  count_ref_col,
-                                 ref_product) {
-    if(ref_product == "HT"){
-      num_samples <- 40L
-    } else if (ref_product == "Reveal"){
-      num_samples <- 32L
-    } else {
-      cli::cli_abort(
-        "Reference product must be HT or Reveal."
-      )
-    }
-
+                                 num_samples) {
     # Briefly:
     # Take the ECDF of the reference quantification (e.g. NPX from Olink Explore
     # HT). The inverse of the ECDF will be in x ~ y OR
@@ -614,7 +614,7 @@ olink_normalization_qs <- function(lst_df,
         ),
         quant_col = .env[["quant_col"]],
         count_ref_col = .env[["cnt_ref_col"]],
-        ref_product = ref_product
+        num_samples = num_samples
       )
     ) |>
     dplyr::ungroup()
@@ -789,7 +789,7 @@ olink_normalization_product_format <- function(bridged_df,
                         dplyr::select(dplyr::starts_with("OlinkID_"))))) |>
     dplyr::mutate(Project = df1_project_nr) |>
     dplyr::mutate(SampleID =
-             paste0(.data[["SampleID"]],"_",df1_project_nr)) |>
+             paste0(.data[["SampleID"]], "_", df1_project_nr)) |>
     dplyr::mutate(BridgingRecommendation = "NotOverlapping")
 
   df2_no_overlap <- df2 |>
@@ -799,7 +799,7 @@ olink_normalization_product_format <- function(bridged_df,
                         dplyr::select(dplyr::starts_with("OlinkID_"))))) |>
     dplyr::mutate(Project = df2_project_nr) |>
     dplyr::mutate(SampleID =
-             paste0(.data[["SampleID"]],"_",df2_project_nr)) |>
+             paste0(.data[["SampleID"]], "_", df2_project_nr)) |>
     dplyr::mutate(BridgingRecommendation = "NotOverlapping")
 
   ### Keep the data following BridgingRecommendation
@@ -834,4 +834,3 @@ olink_normalization_product_format <- function(bridged_df,
 
   return(df_full)
 }
-
