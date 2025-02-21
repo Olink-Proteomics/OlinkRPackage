@@ -1954,7 +1954,7 @@ olink_norm_product_id <- function(lst_df,
 #' @returns  Named character vector with \var{df1_project_nr} and
 #' \var{df2_project_nr} marked as "ref" and "not_ref".
 #'
-olink_nrom_reference_id <- function(lst_product,
+olink_norm_reference_id <- function(lst_product,
                                     reference_project) {
 
   ref_names <- lst_product

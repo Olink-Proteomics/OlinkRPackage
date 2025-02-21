@@ -5730,15 +5730,15 @@ test_that(
   }
 )
 
-# Test olink_nrom_reference_id ----
+# Test olink_norm_reference_id ----
 
 test_that(
-  "olink_nrom_reference_id - works",
+  "olink_norm_reference_id - works",
   {
     # other-other ----
 
     expect_identical(
-      object = olink_nrom_reference_id(
+      object = olink_norm_reference_id(
         lst_product = c("p1" = "other", "p2" = "other"),
         reference_project = "p1"
       ),
@@ -5748,7 +5748,7 @@ test_that(
     # 3k-3k ----
 
     expect_identical(
-      object = olink_nrom_reference_id(
+      object = olink_norm_reference_id(
         lst_product = c("p1" = "3k", "p2" = "3k"),
         reference_project = "p2"
       ),
@@ -5758,7 +5758,7 @@ test_that(
     # ht-ht ----
 
     expect_identical(
-      object = olink_nrom_reference_id(
+      object = olink_norm_reference_id(
         lst_product = c("p1" = "HT", "p2" = "HT"),
         reference_project = "p2"
       ),
@@ -5768,7 +5768,7 @@ test_that(
     # reveal-reveal ----
 
     expect_identical(
-      object = olink_nrom_reference_id(
+      object = olink_norm_reference_id(
         lst_product = c("p1" = "Reveal", "p2" = "Reveal"),
         reference_project = "p1"
       ),
@@ -5778,7 +5778,7 @@ test_that(
     # 3k-reveal ----
 
     expect_identical(
-      object = olink_nrom_reference_id(
+      object = olink_norm_reference_id(
         lst_product = c("p1" = "3k", "p2" = "Reveal"),
         reference_project = "p1"
       ),
@@ -5788,7 +5788,7 @@ test_that(
     # 3k-ht ----
 
     expect_identical(
-      object = olink_nrom_reference_id(
+      object = olink_norm_reference_id(
         lst_product = c("p1" = "3", "p2" = "HT"),
         reference_project = "p2"
       ),
