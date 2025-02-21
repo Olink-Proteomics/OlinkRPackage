@@ -126,7 +126,7 @@ olink_norm_input_check <- function(df1,
     norm_mode = norm_mode
   )
 
-# Check column names ----
+  # Check column names ----
 
   if (norm_mode == olink_norm_modes$ref_median) {
     # reference median normalization
@@ -1040,9 +1040,9 @@ olink_norm_input_cross_product <- function(lst_df,
         relationship = "many-to-many"
       ) |>
       # If matched OlinkID is not found in mapping file, set OlinkID_ref to OlinkID
-        dplyr::mutate(OlinkID = ifelse(is.na(.data[["OlinkID"]]),
-                                       .data[[paste0("OlinkID_", ref_product)]],
-                                       .data[["OlinkID"]]))
+      dplyr::mutate(OlinkID = ifelse(is.na(.data[["OlinkID"]]),
+                                     .data[[paste0("OlinkID_", ref_product)]],
+                                     .data[["OlinkID"]]))
 
 
     # add combined OlinkID to 3k dataset
@@ -1795,15 +1795,15 @@ olink_norm_input_assay_overlap <- function(lst_df,
         wrap = FALSE)
 
     } else{    # warning message
-    cli::cli_warn(
-      c(
-        "Assay{?s} {.val {oid_removed}} not shared across input dataset(s):",
-        dplyr::pull(oid_combos_miss, .data[["M"]]),
-        "i" = "{cli::qty(oid_removed)} Assay{?s} will be removed from
+      cli::cli_warn(
+        c(
+          "Assay{?s} {.val {oid_removed}} not shared across input dataset(s):",
+          dplyr::pull(oid_combos_miss, .data[["M"]]),
+          "i" = "{cli::qty(oid_removed)} Assay{?s} will be removed from
         normalization."
-      ),
-      wrap = FALSE
-    )}
+        ),
+        wrap = FALSE
+      )}
 
 
   } else {
