@@ -157,9 +157,13 @@ test_that(
     skip_if_not_installed("arrow")
     skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
     skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
+    skip_if_not(file.exists(test_path("data","example_Reveal_data.rds")))
 
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
+    data_reveal <- get_example_data(filename = "example_Reveal_data.rds")
+
+    # 3k-HT normalization ----
 
     bridge_samples <- intersect(x = data_3k$SampleID,
                                 y = data_ht$SampleID) |>
@@ -264,6 +268,30 @@ test_that(
                                             "HT" = "ref"))
       )
     )
+
+    # 3k-Reveal normalization ----
+
+    bridge_samples <- intersect(
+      x = unique(data_reveal$SampleID),
+      y = unique(data_3k$SampleID)
+    ) |>
+      (\(x) x[!grepl("CONTROL", x)])() |>
+      sort() |>
+      head(32L)
+    expect_warning(object = reveal_input <- olink_norm_input_check(df1 = data_reveal,
+                                                                   df2 = data_3k,
+                                                                   overlapping_samples_df1 = bridge_samples,
+                                                                   overlapping_samples_df2 = NULL,
+                                                                   df1_project_nr = "Reveal",
+                                                                   df2_project_nr = "3K",
+                                                                   reference_project = "Reveal",
+                                                                   reference_medians = NULL
+    ),
+    regexp = "85 assays")
+    expect_identical(reveal_input$lst_product$product,
+                     c("Reveal" = "Reveal", "3K" = "3k"))
+    expect_identical(reveal_input$lst_product$reference,
+                     c("Reveal" = "ref", "3K" = "not_ref"))
   }
 )
 
@@ -5782,53 +5810,5 @@ test_that(
     # returns Reveal mapping file
     expect_identical(mapping_file_id("Reveal"),
                      reveal_e3072_mapping)
-  }
-)
-
-# testthat(
-#   "cross product missing assays/OlinkIDs",
-#   {
-#     expect_warning(
-#       object =
-#       regexp = "are not shared across products."
-#     )
-#     # check_oid for cross product bridging
-#
-#     # update OlinkIDs with _ ref_product for cross product bridging
-#
-#     # Unexpected datasets to be bridge normalized! error from olink_norm_input
-#   }
-# )
-
-test_that(
-  "cross product input works with Reveal",
-  {
-    skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
-    skip_if_not(file.exists(test_path("data","example_Reveal_data.rds")))
-
-    data_3k <- get_example_data(filename = "example_3k_data.rds")
-    data_reveal <- get_example_data(filename = "example_Reveal_data.rds")
-
-    bridge_samples <- intersect(
-      x = unique(data_reveal$SampleID),
-      y = unique(data_3k$SampleID)
-    ) |>
-      (\(x) x[!grepl("CONTROL", x)])() |>
-      sort() |>
-      head(32L)
-    expect_warning(object = reveal_input <- olink_norm_input_check(df1 = data_reveal,
-                           df2 = data_3k,
-                           overlapping_samples_df1 = bridge_samples,
-                           overlapping_samples_df2 = NULL,
-                           df1_project_nr = "Reveal",
-                           df2_project_nr = "3K",
-                           reference_project = "Reveal",
-                           reference_medians = NULL
-                           ),
-                   regexp = "85 assays")
-    expect_identical(reveal_input$lst_product$product,
-                  c("Reveal" = "Reveal", "3K" = "3k"))
-    expect_identical(reveal_input$lst_product$reference,
-                  c("Reveal" = "ref", "3K" = "not_ref"))
   }
 )
