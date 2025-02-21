@@ -4,7 +4,13 @@
 \alias{olink_normalization_qs}
 \title{Quantile smoothing normalization of all proteins between two NPX projects.}
 \usage{
-olink_normalization_qs(lst_df, ref_cols, not_ref_cols, bridge_samples, ref_product)
+olink_normalization_qs(
+  lst_df,
+  ref_cols,
+  not_ref_cols,
+  bridge_samples,
+  ref_product
+)
 }
 \arguments{
 \item{lst_df}{A named list of the 2 input datasets. First element should be
