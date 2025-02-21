@@ -356,14 +356,14 @@ read_NPX_explore <- function(filename) {
   str_cols <- c("PanelVersion")
   matching_cols <- intersect(str_cols, names(out))
   if (length(matching_cols) > 0) {
-    out <- out %>% mutate(across(all_of(matching_cols), as.character))
+    out <- out %>% dplyr::mutate(dplyr::across(dplyr::all_of(matching_cols), as.character))
   }
 
   # Report logical cols as logical
   logic_cols <- c("BelowLOD", "AboveULOQ", "BelowLQL")
   matching_cols <- intersect(logic_cols, names(out))
   if (length(matching_cols) > 0) {
-    out <- out %>% mutate(across(all_of(matching_cols), as.logical))
+    out <- out %>% dplyr::mutate(dplyr::across(dplyr::all_of(matching_cols), as.logical))
   }
 
 
