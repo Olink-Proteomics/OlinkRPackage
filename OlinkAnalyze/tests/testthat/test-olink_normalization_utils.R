@@ -5804,11 +5804,15 @@ test_that(
   "mapping_file_id - works",
   {
     # returns HT mapping file
-    expect_identical(mapping_file_id("HT"),
-                     eHT_e3072_mapping)
+    expect_identical(
+      object = mapping_file_id("HT"),
+      expected = eHT_e3072_mapping
+    )
 
     # returns Reveal mapping file
-    expect_identical(mapping_file_id("Reveal"),
-                     reveal_e3072_mapping)
+    expect_identical(
+      object = mapping_file_id("Reveal"),
+      expected = reveal_e3072_mapping
+    )
   }
 )
