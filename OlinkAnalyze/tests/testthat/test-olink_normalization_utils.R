@@ -5604,6 +5604,22 @@ test_that(
       expected = c("p1" = "other", "p2" = "Reveal")
     )
 
+    # 3k-3k ----
+
+    expect_identical(
+      object = olink_norm_product_id(
+        lst_df = list(
+          "p1" = data_3k,
+          "p2" = data_3k
+        ),
+        lst_cols = list(
+          "p1" = list(panel = "Panel"),
+          "p2" = list(panel = "Panel")
+        )
+      ),
+      expected = c("p1" = "3k", "p2" = "3k")
+    )
+
     # 3k-HT ----
 
     expect_identical(
@@ -5636,6 +5652,22 @@ test_that(
       expected = c("p1" = "3k", "p2" = "Reveal")
     )
 
+    # Reveal-Reveal ----
+
+    expect_identical(
+      object = olink_norm_product_id(
+        lst_df = list(
+          "p1" = data_reveal,
+          "p2" = data_reveal
+        ),
+        lst_cols = list(
+          "p1" = list(panel = "Panel"),
+          "p2" = list(panel = "Panel")
+        )
+      ),
+      expected = c("p1" = "Reveal", "p2" = "Reveal")
+    )
+
     # HT-Reveal ----
 
     expect_identical(
@@ -5650,6 +5682,22 @@ test_that(
         )
       ),
       expected = c("p1" = "HT", "p2" = "Reveal")
+    )
+
+    # HT-HT ----
+
+    expect_identical(
+      object = olink_norm_product_id(
+        lst_df = list(
+          "p1" = data_ht,
+          "p2" = data_ht
+        ),
+        lst_cols = list(
+          "p1" = list(panel = "Panel"),
+          "p2" = list(panel = "Panel")
+        )
+      ),
+      expected = c("p1" = "HT", "p2" = "HT")
     )
   }
 )
