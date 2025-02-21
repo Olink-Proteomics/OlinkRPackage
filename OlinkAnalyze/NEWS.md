@@ -8,7 +8,7 @@
 ## Bug Fixes
 * A warning message will be displayed when fewer than the recommended number of bridging samples are used in cross product bridging (#507, @klevdiamanti)
 * If count data is not provided in cross-product bridging, an error message will occur (#510, @kristynchin-olink)
-* For cross-product bridging, if the sample type and assay warning columns do not have the same column naming (ex: SampleType and Sample_Type), both columns will be included in the output. ()
+* For cross-product bridging, if the sample type and assay warning columns do not have the same column naming (ex: SampleType and Sample_Type), both columns will be included in the output. (#515, @spollo-olprot, @MasoumehSheikh)
 
 
 # Olink Analyze 4.1.1
