@@ -1903,8 +1903,8 @@ olink_norm_input_norm_method <- function(lst_df,
 #' Identify names of product for each project
 #'
 #' @author Kathy Nevola
+#'
 #' @param lst_df Named list of datasets to be normalized.
-#' @param reference_project Name of reference product
 #' @param lst_cols Named list of vectors with the required column names for each
 #' dataset in \var{lst_df}.
 #'
@@ -1912,12 +1912,9 @@ olink_norm_input_norm_method <- function(lst_df,
 #' or other) and reference (ref or not_ref)
 #'
 #'
-olink_product_identifier_norm<- function(
-    lst_df,
-    reference_project,
-    lst_cols
-){
-  # product_list = c("3k", "HT", "Reveal", "other")
+olink_product_identifier_norm <- function(lst_df,
+                                          lst_cols) {
+  # Identify product from panel names by going through the input datasets
   lst_product <- sapply(names(lst_df), function(d_name) {
     # get unique panels
     u_panel <- lst_df[[d_name]] |>
@@ -1936,11 +1933,7 @@ olink_product_identifier_norm<- function(
     }
   })
   names(lst_product) <- names(lst_df)
-  ref_names <- ifelse(names(lst_product) == reference_project,
-                              "ref", "not_ref")
-  names(ref_names) <- names(lst_product)
-  lst_product <- list(lst_product, ref_names)
-  names(lst_product) <- c('product', 'reference')
+
   return(lst_product)
 
 }
