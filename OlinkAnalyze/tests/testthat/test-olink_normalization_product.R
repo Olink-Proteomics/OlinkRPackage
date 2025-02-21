@@ -253,6 +253,7 @@ test_that(
     expect_error(olink_normalization_qs(
       lst_df = lst_df,
       ref_cols = norm_input_check$ref_cols,
+      not_ref_cols = norm_input_check$not_ref_cols,
       bridge_samples = bridge_samples,
       ref_product = "other"),
       "Reference product must be HT or Reveal")
@@ -612,6 +613,7 @@ test_that(
       object = olink_normalization_qs(
         lst_df = lst_df,
         ref_cols = norm_input_check$ref_cols,
+        not_ref_cols = norm_input_check$not_ref_cols,
         bridge_samples = head(x = bridge_samples, 38L),
         ref_product = norm_input_check$ref_product
       ),
@@ -622,6 +624,7 @@ test_that(
       object = olink_normalization_qs(
         lst_df = lst_df,
         ref_cols = norm_input_check$ref_cols,
+        not_ref_cols = norm_input_check$not_ref_cols,
         bridge_samples = head(x = bridge_samples, 40L),
         ref_product = norm_input_check$ref_product
       ),
