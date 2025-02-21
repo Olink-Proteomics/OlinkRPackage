@@ -906,3 +906,53 @@ test_that(
 
   }
 )
+
+test_that(
+  "olink_normalization - works - old3kformat-HT normalization",
+  {
+
+    skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
+
+    data_3k <- get_example_data(filename = "example_3k_data.rds")
+    data_ht <- get_example_data(filename = "example_HT_data.rds")
+
+    data_3k_old <- data_3k |>
+      dplyr::rename(Sample_Type = SampleType) |>
+      dplyr::rename(QC_Warning = SampleQC) |>
+      dplyr::rename(Assay_Warning = AssayQC)
+
+    expect_message(expect_warning(
+      object = ht_3k_norm <- olink_normalization(
+        df1 = data_ht,
+        df2 = data_3k_old,
+        overlapping_samples_df1 = intersect(
+          x = unique(data_ht$SampleID),
+          y = unique(data_3k_old$SampleID)
+        ) |>
+          (\(.) .[!grepl("CONTROL", .)])(),
+        df1_project_nr = "df_ht",
+        df2_project_nr = "df_3k",
+        reference_project = "df_ht"
+      ),
+      regexp = "2 assays are not shared across products."),
+      regexp = "Cross-product normalization will be performed!"
+    )
+
+    expect_identical(
+      object = dim(ht_3k_norm),
+      expected = c(39936L, 23L)
+    )
+
+    expect_identical(
+      object = names(ht_3k_norm),
+      expected = c("SampleID", "OlinkID", "SampleType", "WellID", "PlateID",
+                   "UniProt", "Assay", "AssayType", "Panel", "Block", "NPX",
+                   "PCNormalizedNPX", "Count", "Normalization", "AssayQC",
+                   "SampleQC", "DataAnalysisRefID", "Project", "OlinkID_E3072",
+                   "Sample_Type", "MedianCenteredNPX", "QSNormalizedNPX",
+                   "BridgingRecommendation")
+    )
+
+  }
+)

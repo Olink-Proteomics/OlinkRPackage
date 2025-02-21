@@ -684,7 +684,8 @@ norm_internal_cross_product <- function(ref_df,
             .data[[ref_cols$sample_id]] %in% .env[["ref_samples"]]
           )
       }),
-    ref_cols = ref_cols
+    ref_cols = ref_cols,
+    not_ref_cols = not_ref_cols
   )
 
   # bridge normalize HT-3k ----
@@ -712,6 +713,7 @@ norm_internal_cross_product <- function(ref_df,
   df_norm_qq <- olink_normalization_qs(
     lst_df = lst_df,
     ref_cols = ref_cols,
+    not_ref_cols = not_ref_cols,
     bridge_samples = ref_samples,
     ref_product = ref_product
   )

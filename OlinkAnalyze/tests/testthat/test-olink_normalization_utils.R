@@ -47,7 +47,8 @@ test_that(
                         quant = "NPX",
                         lod = "LOD",
                         normalization = character(0L),
-                        count = character(0L)),
+                        count = character(0L),
+                        sample_type = character(0L)),
         ref_product = "other",
         not_ref_df = npx_data2,
         not_ref_samples = NULL,
@@ -64,7 +65,8 @@ test_that(
                             quant = "NPX",
                             lod = "LOD",
                             normalization = character(0L),
-                            count = character(0L)),
+                            count = character(0L),
+                            sample_type = character(0L)),
         not_ref_product = "other",
         reference_medians = NULL,
         norm_mode = olink_norm_modes$bridge
@@ -118,7 +120,8 @@ test_that(
                         quant = "NPX",
                         lod = "LOD",
                         normalization = "Normalization",
-                        count = character(0L)),
+                        count = character(0L),
+                        sample_type = character(0L)),
         ref_product = "other",
         not_ref_df = npx_data1 |>
           dplyr::mutate(
@@ -138,7 +141,8 @@ test_that(
                             quant = "NPX",
                             lod = "LOD",
                             normalization = "Normalization",
-                            count = character(0L)),
+                            count = character(0L),
+                            sample_type = character(0L)),
         not_ref_product = "other",
         reference_medians = NULL,
         norm_mode = olink_norm_modes$bridge
@@ -223,7 +227,8 @@ test_that(
                         quant = "NPX",
                         lod = character(0),
                         normalization = "Normalization",
-                        count = "Count"),
+                        count = "Count",
+                        sample_type = "SampleType"),
         ref_product = "HT",
         not_ref_df = data_3k |>
           dplyr::rename(
@@ -261,7 +266,8 @@ test_that(
                             quant = "NPX",
                             lod = character(0),
                             normalization = "Normalization",
-                            count = "Count"),
+                            count = "Count",
+                            sample_type = "SampleType"),
         not_ref_product = "3k",
         reference_medians = NULL,
         norm_mode = olink_norm_modes$norm_cross_product
@@ -334,7 +340,8 @@ test_that(
                         quant = "NPX",
                         lod = character(0),
                         normalization = "Normalization",
-                        count = "Count"),
+                        count = "Count",
+                        sample_type = "SampleType"),
         ref_product = "Reveal",
         not_ref_df = data_3k |>
           dplyr::rename(
@@ -373,7 +380,8 @@ test_that(
                             quant = "NPX",
                             lod = character(0),
                             normalization = "Normalization",
-                            count = "Count"),
+                            count = "Count",
+                            sample_type = "SampleType"),
         not_ref_product = "3k",
         reference_medians = NULL,
         norm_mode = olink_norm_modes$norm_cross_product
@@ -425,7 +433,8 @@ test_that(
                         quant = "NPX",
                         lod = "LOD",
                         normalization = character(0L),
-                        count = character(0L)),
+                        count = character(0L),
+                        sample_type = character(0L)),
         ref_product = NULL,
         not_ref_df = npx_data2,
         not_ref_samples = unique(npx_data2$SampleID),
@@ -442,7 +451,8 @@ test_that(
                             quant = "NPX",
                             lod = "LOD",
                             normalization = character(0L),
-                            count = character(0L)),
+                            count = character(0L),
+                            sample_type = character(0L)),
         not_ref_product = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$subset
@@ -492,7 +502,8 @@ test_that(
                         quant = "NPX",
                         lod = "LOD",
                         normalization = "Normalization",
-                        count = character(0L)),
+                        count = character(0L),
+                        sample_type = character(0L)),
         ref_product = NULL,
         not_ref_df = npx_data1 |>
           dplyr::mutate(
@@ -512,7 +523,8 @@ test_that(
                             quant = "NPX",
                             lod = "LOD",
                             normalization = "Normalization",
-                            count = character(0L)),
+                            count = character(0L),
+                            sample_type = character(0L)),
         not_ref_product = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$subset
@@ -569,7 +581,8 @@ test_that(
                         quant = "NPX",
                         lod = "LOD",
                         normalization = character(0L),
-                        count = character(0L)),
+                        count = character(0L),
+                        sample_type = character(0L)),
         ref_product = NULL,
         not_ref_df = npx_data2,
         not_ref_samples = npx_df2_samples,
@@ -586,7 +599,8 @@ test_that(
                             quant = "NPX",
                             lod = "LOD",
                             normalization = character(0L),
-                            count = character(0L)),
+                            count = character(0L),
+                            sample_type = character(0L)),
         not_ref_product = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$subset
@@ -636,7 +650,8 @@ test_that(
                         quant = "NPX",
                         lod = "LOD",
                         normalization = "Normalization",
-                        count = character(0L)),
+                        count = character(0L),
+                        sample_type = character(0L)),
         ref_product = NULL,
         not_ref_df = npx_data1 |>
           dplyr::mutate(
@@ -656,7 +671,8 @@ test_that(
                             quant = "NPX",
                             lod = "LOD",
                             normalization = "Normalization",
-                            count = character(0L)),
+                            count = character(0L),
+                            sample_type = character(0L)),
         not_ref_product = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$subset
@@ -724,7 +740,8 @@ test_that(
                         quant = "NPX",
                         lod = "LOD",
                         normalization = character(0L),
-                        count = character(0L)),
+                        count = character(0L),
+                        sample_type = character(0L)),
         ref_product = NULL,
         not_ref_df = NULL,
         not_ref_samples = NULL,
@@ -779,7 +796,8 @@ test_that(
                         quant = "NPX",
                         lod = "LOD",
                         normalization = "Normalization",
-                        count = character(0L)),
+                        count = character(0L),
+                        sample_type = character(0L)),
         ref_product = NULL,
         not_ref_df = NULL,
         not_ref_samples = NULL,
@@ -1702,7 +1720,8 @@ test_that(
           quant = "NPX",
           lod = "LOD",
           normalization = character(0L),
-          count = character(0L)
+          count = character(0L),
+          sample_type = character(0L)
         )
       )
     )
@@ -1741,7 +1760,8 @@ test_that(
           quant = "NPX",
           lod = "LOD",
           normalization = character(0L),
-          count = character(0L)
+          count = character(0L),
+          sample_type = character(0L)
         )
       )
     )
@@ -1782,7 +1802,8 @@ test_that(
           quant = "NPX",
           lod = "LOD",
           normalization = "Normalization",
-          count = character(0L)
+          count = character(0L),
+          sample_type = character(0L)
         )
       )
     )
@@ -1824,7 +1845,8 @@ test_that(
           quant = "NPX",
           lod = "LOD",
           normalization = "Normalization",
-          count = character(0L)
+          count = character(0L),
+          sample_type = character(0L)
         )
       )
     )
@@ -1870,7 +1892,8 @@ test_that(
           quant = "NPX",
           lod = "LOD",
           normalization = character(0L),
-          count = character(0L)
+          count = character(0L),
+          sample_type = character(0L)
         ),
         "p2" = list(
           sample_id = "SampleID",
@@ -1885,7 +1908,8 @@ test_that(
           quant = "NPX",
           lod = "LOD",
           normalization = character(0L),
-          count = character(0L)
+          count = character(0L),
+          sample_type = character(0L)
         )
       )
     )
@@ -1927,7 +1951,8 @@ test_that(
           quant = "NPX",
           lod = "LOD",
           normalization = "Normalization",
-          count = character(0L)
+          count = character(0L),
+          sample_type = character(0L)
         ),
         "p2" = list(
           sample_id = "SampleID",
@@ -1942,7 +1967,8 @@ test_that(
           quant = "NPX",
           lod = "LOD",
           normalization = "Normalization",
-          count = character(0L)
+          count = character(0L),
+          sample_type = character(0L)
         )
       )
     )
@@ -1980,7 +2006,8 @@ test_that(
           quant = "NPX",
           lod = "LOD",
           normalization = "Normalization",
-          count = character(0L)
+          count = character(0L),
+          sample_type = character(0L)
         ),
         "p2" = list(
           sample_id = "SampleID",
@@ -1995,7 +2022,8 @@ test_that(
           quant = "NPX",
           lod = "LOD",
           normalization = "Normalization",
-          count = character(0L)
+          count = character(0L),
+          sample_type = character(0L)
         )
       )
     )
@@ -2102,7 +2130,8 @@ test_that(
           quant = "NPX",
           lod = "LOD",
           normalization = "Normalization",
-          count = character(0L)
+          count = character(0L),
+          sample_type = character(0L)
         ),
         "p2" = list(
           sample_id = "SampleID",
@@ -2117,7 +2146,8 @@ test_that(
           quant = "NPX",
           lod = "LOD",
           normalization = "Normalization",
-          count = character(0L)
+          count = character(0L),
+          sample_type = character(0L)
         ),
         "p3" = list(
           sample_id = "SampleID",
@@ -2132,7 +2162,8 @@ test_that(
           quant = "NPX",
           lod = "LOD",
           normalization = "Normalization",
-          count = character(0L)
+          count = character(0L),
+          sample_type = character(0L)
         ),
         "p4" = list(
           sample_id = "SampleID",
@@ -2147,7 +2178,8 @@ test_that(
           quant = "NPX",
           lod = "LOD",
           normalization = "Normalization",
-          count = character(0L)
+          count = character(0L),
+          sample_type = character(0L)
         )
       )
     )
@@ -2181,7 +2213,8 @@ test_that(
           quant = "NPX",
           lod = "LOD",
           normalization = character(0L),
-          count = character(0L)
+          count = character(0L),
+          sample_type = character(0L)
         ),
         "p2" = list(
           sample_id = "SampleID",
@@ -2196,7 +2229,8 @@ test_that(
           quant = "NPX",
           lod = "LOD",
           normalization = character(0L),
-          count = character(0L)
+          count = character(0L),
+          sample_type = character(0L)
         ),
         "p3" = list(
           sample_id = "SampleID",
@@ -2211,7 +2245,8 @@ test_that(
           quant = "NPX",
           lod = "LOD",
           normalization = character(0L),
-          count = character(0L)
+          count = character(0L),
+          sample_type = character(0L)
         ),
         "p4" = list(
           sample_id = "SampleID",
@@ -2226,7 +2261,8 @@ test_that(
           quant = "NPX",
           lod = "LOD",
           normalization = character(0L),
-          count = character(0L)
+          count = character(0L),
+          sample_type = character(0L)
         )
       )
     )
@@ -2339,7 +2375,8 @@ test_that(
           quant = "NPX",
           lod = "LOD",
           normalization = character(0L),
-          count = character(0L)
+          count = character(0L),
+          sample_type = character(0L)
         )
       )
     )
@@ -2377,7 +2414,8 @@ test_that(
           quant = "NPX",
           lod = "LOD",
           normalization = character(0L),
-          count = "Count"
+          count = "Count",
+          sample_type = character(0L)
         )
       )
     )
