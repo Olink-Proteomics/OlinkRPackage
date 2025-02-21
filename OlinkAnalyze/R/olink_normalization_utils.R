@@ -1912,8 +1912,8 @@ olink_norm_input_norm_method <- function(lst_df,
 #' or other) and reference (ref or not_ref)
 #'
 #'
-olink_norm_product_identifier <- function(lst_df,
-                                          lst_cols) {
+olink_norm_product_id <- function(lst_df,
+                                  lst_cols) {
   # Identify product from panel names by going through the input datasets
   lst_product <- sapply(names(lst_df), function(d_name) {
     # get unique panels
