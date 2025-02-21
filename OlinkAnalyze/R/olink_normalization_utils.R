@@ -1939,6 +1939,31 @@ olink_norm_product_id <- function(lst_df,
 
 }
 
+#' Identify reference project.
+#'
+#' @author
+#'   Kathy Nevola
+#'   Klev Diamanti
+#'
+#' @param lst_product Named character vector with the Olink product name that
+#' each input datatset matches to.
+#' @param reference_project Project name of reference_project. Should be one of
+#' \var{df1_project_nr} or \var{df2_project_nr}. Indicates the project to which
+#' the other project is adjusted to.
+#'
+#' @returns  Named character vector with \var{df1_project_nr} and
+#' \var{df2_project_nr} marked as "ref" and "not_ref".
+#'
+olink_nrom_reference_id <- function(lst_product,
+                                    reference_project) {
+
+  ref_names <- lst_product
+  ref_names[names(ref_names) %in% reference_project] <- "ref"
+  ref_names[!(names(ref_names) %in% reference_project)] <- "not_ref"
+
+  return(ref_names)
+}
+
 #' Identifying which mapping file to use
 #'
 #' @param ref_product one of "HT" or "Reveal" depending on reference product
