@@ -471,27 +471,28 @@ test_that(
   "olink_normalization - works - 3k-HT normalization",
   {
 
-    skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
-    skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
 
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
 
-
-    expect_message(expect_warning(
-      object = ht_3k_norm <- olink_normalization(
-        df1 = data_ht,
-        df2 = data_3k,
-        overlapping_samples_df1 = intersect(
-          x = unique(data_ht$SampleID),
-          y = unique(data_3k$SampleID)
-        ) |>
-          (\(.) .[!grepl("CONTROL", .)])(),
-        df1_project_nr = "df_ht",
-        df2_project_nr = "df_3k",
-        reference_project = "df_ht"
+    expect_message(
+      expect_warning(
+        object = ht_3k_norm <- olink_normalization(
+          df1 = data_ht,
+          df2 = data_3k,
+          overlapping_samples_df1 = intersect(
+            x = unique(data_ht$SampleID),
+            y = unique(data_3k$SampleID)
+          ) |>
+            (\(.) .[!grepl("CONTROL", .)])(),
+          df1_project_nr = "df_ht",
+          df2_project_nr = "df_3k",
+          reference_project = "df_ht"
+        ),
+        regexp = "2 assays are not shared across products."
       ),
-      regexp = "2 assays are not shared across products."),
       regexp = "Cross-product normalization will be performed!"
     )
 
@@ -502,6 +503,57 @@ test_that(
 
     expect_identical(
       object = names(ht_3k_norm),
+      expected = c("SampleID", "OlinkID", "SampleType", "WellID", "PlateID",
+                   "UniProt", "Assay", "AssayType", "Panel", "Block", "NPX",
+                   "PCNormalizedNPX", "Count", "Normalization", "AssayQC",
+                   "SampleQC", "DataAnalysisRefID", "Project", "OlinkID_E3072",
+                   "MedianCenteredNPX", "QSNormalizedNPX",
+                   "BridgingRecommendation")
+    )
+
+  }
+)
+
+test_that(
+  "olink_normalization - works - 3k-Reveal",
+  {
+    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_Reveal_data.rds")))
+
+    data_3k <- get_example_data(filename = "example_3k_data.rds")
+    data_reveal <- get_example_data(filename = "example_Reveal_data.rds")
+
+    expect_warning(
+      object = expect_warning(
+        object = expect_message(
+          object = rev_3k_norm <- olink_normalization(
+            df1 = data_reveal,
+            df2 = data_3k,
+            overlapping_samples_df1 = intersect(
+              x = unique(data_reveal$SampleID),
+              y = unique(data_3k$SampleID)
+            ) |>
+              (\(x) x[!grepl("CONTROL", x)])() |>
+              sort() |>
+              head(32L),
+            df1_project_nr = "Reveal",
+            df2_project_nr = "3k",
+            reference_project = "Reveal"
+          ),
+          regexp = "Cross-product normalization will be performed!"
+        ),
+        regexp = "85 assays are not shared across products"
+      ),
+      regexp = "There are 20 assays with fewer than 32 bridge samples for QS"
+    )
+
+    expect_identical(
+      object = dim(rev_3k_norm),
+      expected = c(8064L, 22L)
+    )
+
+    expect_identical(
+      object = names(rev_3k_norm),
       expected = c("SampleID", "OlinkID", "SampleType", "WellID", "PlateID",
                    "UniProt", "Assay", "AssayType", "Panel", "Block", "NPX",
                    "PCNormalizedNPX", "Count", "Normalization", "AssayQC",
@@ -739,8 +791,8 @@ test_that(
 test_that(
   "Cross product normalization works - correlation assays present",
   {
-    skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
-    skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
 
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
@@ -756,8 +808,7 @@ test_that(
 
     #correlation assay IDs
     oid_ht <- "OID43204"
-    oid_3k <- eHT_e3072_mapping$OlinkID_E3072[
-      eHT_e3072_mapping$OlinkID_HT == oid_ht]
+    oid_3k <- eHT_e3072_mapping$OlinkID_E3072[eHT_e3072_mapping$OlinkID_HT == oid_ht] # nolint
 
     # HT correlation is present
     expect_message(
@@ -805,8 +856,8 @@ test_that(
   "norm_internal_cross_product missing counts - error",
   {
 
-    skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
-    skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
 
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")

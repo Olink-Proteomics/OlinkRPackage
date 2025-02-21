@@ -5,7 +5,7 @@
 #' reference set of medians values.
 #'
 #' @details
-#' The function handles three different types of normalization:
+#' The function handles four different types of normalization:
 #'  - \strong{Bridge normalization}: One of the datasets is adjusted to another
 #'  using overlapping samples (bridge samples). Overlapping samples need to have
 #'  the same identifiers in both datasets. Normalization is performed using the
@@ -62,9 +62,9 @@
 #' "BridgingRecommendation" in case of cross-product normalization. The columns
 #' correspond to the project of origin based on `df1_project_nr` and
 #' `df2_project_nr`, the assay identifier in the non-reference project, the
-#' bridge-normalized quantification value, the quantile smoothing-normalized quantification
-#' value, and the recommendation about which of the two normalized values is
-#' more suitable for downstream analysis.
+#' bridge-normalized quantification value, the quantile smoothing-normalized
+#' quantification value, and the recommendation about which of the two
+#' normalized values is more suitable for downstream analysis.
 #'
 #' @param df1 First dataset to be used for normalization (required).
 #' @param df2 Second dataset to be used for normalization. Required for bridge
@@ -298,7 +298,7 @@ olink_normalization <- function(df1,
         not_ref_cols = lst_check$not_ref_cols
       )
 
-    } else if (lst_check$norm_mode == olink_norm_modes$norm_ht_3k) {
+    } else if (lst_check$norm_mode == olink_norm_modes$norm_cross_product) {
       # HT-3K normalization ----
 
       df_norm <- norm_internal_cross_product(
@@ -306,17 +306,21 @@ olink_normalization <- function(df1,
         ref_samples = lst_check$ref_samples,
         ref_name = lst_check$ref_name,
         ref_cols = lst_check$ref_cols,
+        ref_product = lst_check$ref_product,
         not_ref_df = lst_check$not_ref_df,
         not_ref_name = lst_check$not_ref_name,
         not_ref_cols = lst_check$not_ref_cols
       )
 
       if (format == TRUE) {
-        df_norm <- olink_normalization_product_format(bridged_df = df_norm,
-                                                      df1 = df1,
-                                                      df1_project_nr = df1_project_nr,
-                                                      df2 = df2,
-                                                      df2_project_nr = df2_project_nr)
+        df_norm <- olink_normalization_product_format(
+          bridged_df = df_norm,
+          df1 = df1,
+          df1_project_nr = df1_project_nr,
+          df2 = df2,
+          df2_project_nr = df2_project_nr,
+          reference_project = reference_project
+        )
       }
 
     } else if (lst_check$norm_mode == olink_norm_modes$subset) {
@@ -335,6 +339,12 @@ olink_normalization <- function(df1,
 
     }
   }
+
+  # Recalculate MaxLOD
+  df_norm <- norm_internal_update_maxlod(
+    df = df_norm,
+    cols = lst_check$ref_cols
+  )
 
   return(df_norm)
 }
@@ -626,6 +636,7 @@ norm_internal_bridge <- function(ref_df,
 #' @param ref_name Project name of the reference dataset (required).
 #' @param ref_cols Named list of column names in the reference dataset
 #' (required).
+#' @param ref_product Name of reference product (required).
 #' @param not_ref_df The non-reference dataset to be used in normalization
 #' (required).
 #' @param not_ref_name Project name of the non-reference dataset (required).
@@ -643,14 +654,15 @@ norm_internal_bridge <- function(ref_df,
 #'    "QuantileSmoothing".
 #'    \item{MedianCenteredNPX:} NPX values adjusted based on the median of the
 #'    pair-wise differences of NPX values between bridge samples.
-#'    \item{QSNormalizedNPX:} NPX values adjusted based on the quantile smoothing
-#'    normalization among bridge samples.
+#'    \item{QSNormalizedNPX:} NPX values adjusted based on the quantile
+#'    smoothing normalization among bridge samples.
 #' }
 #'
 norm_internal_cross_product <- function(ref_df,
                                         ref_samples,
                                         ref_name,
                                         ref_cols,
+                                        ref_product,
                                         not_ref_df,
                                         not_ref_name,
                                         not_ref_cols) {
@@ -702,7 +714,8 @@ norm_internal_cross_product <- function(ref_df,
     lst_df = lst_df,
     ref_cols = ref_cols,
     not_ref_cols = not_ref_cols,
-    bridge_samples = ref_samples
+    bridge_samples = ref_samples,
+    ref_product = ref_product
   )
 
   # integrate normalization approaches ----
@@ -754,7 +767,7 @@ norm_internal_cross_product <- function(ref_df,
       )
     ) |>
     dplyr::rename(
-      !!ref_cols$olink_id := "OlinkID_HT"
+      !!ref_cols$olink_id := paste0("OlinkID_", ref_product)
     )
 
   # return ----
@@ -960,4 +973,36 @@ norm_internal_adjust_not_ref <- function(df,
         ~ .x + .data[["Adj_factor"]]
       )
     )
+}
+
+#' Update MaxLOD to the maximum MaxLOD across normalized datatsets.
+#'
+#' @param df Normalized Olink dataset (required).
+#' @param cols Named list of column names in the dataset (required).
+#'
+#' @returns The same dataset as the input \var{df} with the column reflecting
+#' MaxLOD updated.
+#'
+norm_internal_update_maxlod <- function(df,
+                                        cols) {
+
+  # check if MaxLOD is present in the column names
+  if (any(names(df) %in% olink_norm_recalc$max_lod)) {
+
+    # update MaxLOD to the maximum of the MaxLODs for each assay
+    df <- df |>
+      dplyr::group_by(
+        .data[[cols$olink_id]]
+      ) |>
+      dplyr::mutate(
+        dplyr::across(
+          dplyr::any_of(olink_norm_recalc$max_lod),
+          ~ max(.x, na.rm = TRUE)
+        )
+      ) |>
+      dplyr::ungroup()
+
+  }
+
+  return(df)
 }

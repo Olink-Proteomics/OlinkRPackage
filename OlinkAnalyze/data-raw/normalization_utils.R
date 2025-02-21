@@ -3,7 +3,7 @@ olink_norm_modes <- list(
   "bridge" = "bridge",
   "subset" = "subset",
   "ref_median" = "ref_median",
-  "norm_ht_3k" = "norm_ht_3k"
+  "norm_cross_product" = "norm_cross_product"
 )
 
 # pre-populated dataset with column names and classes that the reference medians
@@ -12,6 +12,11 @@ olink_norm_ref_median_cols <- dplyr::tibble(
   cols = c("OlinkID", "Reference_NPX"),
   class = c("character", "numeric"),
   name = c("olink_id", "ref_med")
+)
+
+# columns tha should be re-calculated post-normalization
+olink_norm_recalc <- list(
+  max_lod = c("Max LOD", "Max_LOD", "MaxLOD")
 )
 
 # dataset with all possible combinations of inputs that olink_normalization may

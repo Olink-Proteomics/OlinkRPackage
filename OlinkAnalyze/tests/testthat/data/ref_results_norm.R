@@ -1,5 +1,9 @@
 # This script generated reference data for olink_normalization using
-# OlinkAnalyze v3.8.2
+# OlinkAnalyze v3.8.2. To revert to OA version OA 3.8.2 please use the following
+# command:
+# remotes::install_version("OlinkAnalyze", version = "3.8.2")
+# and check the packageVersion using:
+# packageVersion("OlinkAnalyze")
 
 # datasets ----
 
@@ -8,7 +12,7 @@ lst_df <- list()
 ## npx_data1 ----
 
 # npx_data1 does not contain column Normalization
-lst_df$df1_no_norm <- npx_data1 |>
+lst_df$df1_no_norm <- OlinkAnalyze::npx_data1 |>
   dplyr::select(
     -dplyr::all_of(
       c("Subject", "Treatment", "Site", "Time", "Project")
@@ -16,7 +20,7 @@ lst_df$df1_no_norm <- npx_data1 |>
   )
 
 # npx_data1 with Normalization column
-lst_df$df1_norm <- npx_data1 |>
+lst_df$df1_norm <- OlinkAnalyze::npx_data1 |>
   dplyr::select(
     -dplyr::all_of(
       c("Subject", "Treatment", "Site", "Time", "Project")
@@ -27,7 +31,7 @@ lst_df$df1_norm <- npx_data1 |>
   )
 
 # npx_data1 with Normalization column, but no LOD column
-lst_df$df1_no_lod <- npx_data1 |>
+lst_df$df1_no_lod <- OlinkAnalyze::npx_data1 |>
   dplyr::select(
     -dplyr::all_of(
       c("Subject", "Treatment", "Site", "Time", "Project", "LOD")
@@ -38,7 +42,7 @@ lst_df$df1_no_lod <- npx_data1 |>
   )
 
 # npx_data1 with Normalization column, and PlateLOD+MaxLOD instead of LOD
-lst_df$df1_multiple_lod <- npx_data1 |>
+lst_df$df1_multiple_lod <- OlinkAnalyze::npx_data1 |>
   dplyr::select(
     -dplyr::all_of(
       c("Subject", "Treatment", "Site", "Time", "Project")
@@ -55,7 +59,7 @@ lst_df$df1_multiple_lod <- npx_data1 |>
 ## npx_data2 ----
 
 # npx_data2 does not contain column Normalization
-lst_df$df2_no_norm <- npx_data2 |>
+lst_df$df2_no_norm <- OlinkAnalyze::npx_data2 |>
   dplyr::select(
     -dplyr::all_of(
       c("Subject", "Treatment", "Site", "Time", "Project")
@@ -63,7 +67,7 @@ lst_df$df2_no_norm <- npx_data2 |>
   )
 
 # npx_data2 with Normalization column
-lst_df$df2_norm <- npx_data2 |>
+lst_df$df2_norm <- OlinkAnalyze::npx_data2 |>
   dplyr::select(
     -dplyr::all_of(
       c("Subject", "Treatment", "Site", "Time", "Project")
@@ -74,7 +78,7 @@ lst_df$df2_norm <- npx_data2 |>
   )
 
 # npx_data2 with Normalization column, but no LOD column
-lst_df$df2_no_lod <- npx_data2 |>
+lst_df$df2_no_lod <- OlinkAnalyze::npx_data2 |>
   dplyr::select(
     -dplyr::all_of(
       c("Subject", "Treatment", "Site", "Time", "Project", "LOD")
@@ -85,7 +89,7 @@ lst_df$df2_no_lod <- npx_data2 |>
   )
 
 # npx_data2 with Normalization column, and PlateLOD+MaxLOD instead of LOD
-lst_df$df2_multiple_lod <- npx_data2 |>
+lst_df$df2_multiple_lod <- OlinkAnalyze::npx_data2 |>
   dplyr::select(
     -dplyr::all_of(
       c("Subject", "Treatment", "Site", "Time", "Project")
@@ -101,7 +105,7 @@ lst_df$df2_multiple_lod <- npx_data2 |>
 
 ## reference_medians ----
 
-lst_df$ref_med <- npx_data1 |>
+lst_df$ref_med <- OlinkAnalyze::npx_data1 |>
   dplyr::group_by(
     dplyr::pick(
       c("OlinkID")
@@ -136,18 +140,18 @@ lst_sample$sample_subset <- c("A6", "A38", "B47", "B22", "A43", "D75", "D79",
 ## bridge samples ----
 
 lst_sample$bridge_samples <- intersect(
-  x = npx_data1$SampleID,
-  y = npx_data2$SampleID
+  x = OlinkAnalyze::npx_data1$SampleID,
+  y = OlinkAnalyze::npx_data2$SampleID
 ) |>
   (\(x) x[!grepl(pattern = "CONTROL_SAMPLE", x = x)])()
 
 ## npx_data1 samples ----
 
-lst_sample$df1_all <- npx_data1$SampleID |>
+lst_sample$df1_all <- OlinkAnalyze::npx_data1$SampleID |>
   unique() |>
   (\(x) x[!grepl(pattern = "CONTROL_SAMPLE", x = x)])()
 
-lst_sample$df1_subset <- npx_data1$SampleID |>
+lst_sample$df1_subset <- OlinkAnalyze::npx_data1$SampleID |>
   unique() |>
   sort() |>
   (\(x) x[!grepl(pattern = "CONTROL_SAMPLE", x = x)])() |>
@@ -155,11 +159,11 @@ lst_sample$df1_subset <- npx_data1$SampleID |>
 
 ## npx_data2 samples ----
 
-lst_sample$df2_all <- npx_data2$SampleID |>
+lst_sample$df2_all <- OlinkAnalyze::npx_data2$SampleID |>
   unique() |>
   (\(x) x[!grepl(pattern = "CONTROL_SAMPLE", x = x)])()
 
-lst_sample$df2_subset <- npx_data2$SampleID |>
+lst_sample$df2_subset <- OlinkAnalyze::npx_data2$SampleID |>
   unique() |>
   sort() |>
   (\(x) x[!grepl(pattern = "CONTROL_SAMPLE", x = x)])() |>
@@ -175,7 +179,7 @@ lst_norm$bridge_norm <- list()
 
 ### df1_no_norm + df2_no_norm ----
 
-lst_norm$bridge_norm$no_norm <- olink_normalization(
+lst_norm$bridge_norm$no_norm <- OlinkAnalyze::olink_normalization(
   df1 = lst_df$df1_no_norm,
   df2 = lst_df$df2_no_norm,
   overlapping_samples_df1 = lst_sample$bridge_samples,
@@ -189,7 +193,7 @@ lst_norm$bridge_norm$no_norm <- olink_normalization(
 
 ### df1_norm + df2_norm ----
 
-lst_norm$bridge_norm$norm <- olink_normalization(
+lst_norm$bridge_norm$norm <- OlinkAnalyze::olink_normalization(
   df1 = lst_df$df1_norm,
   df2 = lst_df$df2_norm,
   overlapping_samples_df1 = lst_sample$bridge_samples,
@@ -203,7 +207,7 @@ lst_norm$bridge_norm$norm <- olink_normalization(
 
 ### df1_no_lod + df2_no_lod ----
 
-lst_norm$bridge_norm$no_lod <- olink_normalization(
+lst_norm$bridge_norm$no_lod <- OlinkAnalyze::olink_normalization(
   df1 = lst_df$df1_no_lod,
   df2 = lst_df$df2_no_lod,
   overlapping_samples_df1 = lst_sample$bridge_samples,
@@ -217,7 +221,7 @@ lst_norm$bridge_norm$no_lod <- olink_normalization(
 
 ### df1_multiple_lod + df2_multiple_lod ----
 
-lst_norm$bridge_norm$multiple_lod <- olink_normalization(
+lst_norm$bridge_norm$multiple_lod <- OlinkAnalyze::olink_normalization(
   df1 = lst_df$df1_multiple_lod,
   df2 = lst_df$df2_multiple_lod,
   overlapping_samples_df1 = lst_sample$bridge_samples,
@@ -227,6 +231,10 @@ lst_norm$bridge_norm$multiple_lod <- olink_normalization(
 ) |>
   dplyr::filter(
     .data[["SampleID"]] %in% lst_sample$sample_subset
+  ) |>
+  dplyr::mutate(
+    MaxLOD = max(.data[["MaxLOD"]], na.rm = TRUE),
+    .by = dplyr::all_of(c("OlinkID"))
   )
 
 ## subset normalization ----
@@ -235,7 +243,7 @@ lst_norm$subset_norm <- list()
 
 ### df1_no_norm + df2_no_norm ----
 
-lst_norm$subset_norm$no_norm <- olink_normalization(
+lst_norm$subset_norm$no_norm <- OlinkAnalyze::olink_normalization(
   df1 = lst_df$df1_no_norm,
   df2 = lst_df$df2_no_norm,
   overlapping_samples_df1 = lst_sample$df1_subset,
@@ -250,7 +258,7 @@ lst_norm$subset_norm$no_norm <- olink_normalization(
 
 ### df1_norm + df2_norm ----
 
-lst_norm$subset_norm$norm <- olink_normalization(
+lst_norm$subset_norm$norm <- OlinkAnalyze::olink_normalization(
   df1 = lst_df$df1_norm,
   df2 = lst_df$df2_norm,
   overlapping_samples_df1 = lst_sample$df1_subset,
@@ -265,7 +273,7 @@ lst_norm$subset_norm$norm <- olink_normalization(
 
 ### df1_no_lod + df2_no_lod ----
 
-lst_norm$subset_norm$no_lod <- olink_normalization(
+lst_norm$subset_norm$no_lod <- OlinkAnalyze::olink_normalization(
   df1 = lst_df$df1_no_lod,
   df2 = lst_df$df2_no_lod,
   overlapping_samples_df1 = lst_sample$df1_subset,
@@ -280,7 +288,7 @@ lst_norm$subset_norm$no_lod <- olink_normalization(
 
 ### df1_multiple_lod + df2_multiple_lod ----
 
-lst_norm$subset_norm$multiple_lod <- olink_normalization(
+lst_norm$subset_norm$multiple_lod <- OlinkAnalyze::olink_normalization(
   df1 = lst_df$df1_multiple_lod,
   df2 = lst_df$df2_multiple_lod,
   overlapping_samples_df1 = lst_sample$df1_subset,
@@ -291,6 +299,10 @@ lst_norm$subset_norm$multiple_lod <- olink_normalization(
 ) |>
   dplyr::filter(
     .data[["SampleID"]] %in% lst_sample$sample_subset
+  ) |>
+  dplyr::mutate(
+    MaxLOD = max(.data[["MaxLOD"]], na.rm = TRUE),
+    .by = dplyr::all_of(c("OlinkID"))
   )
 
 ## intensity normalization ----
@@ -299,7 +311,7 @@ lst_norm$intensity_norm <- list()
 
 ### df1_no_norm + df2_no_norm ----
 
-lst_norm$intensity_norm$no_norm <- olink_normalization(
+lst_norm$intensity_norm$no_norm <- OlinkAnalyze::olink_normalization(
   df1 = lst_df$df1_no_norm,
   df2 = lst_df$df2_no_norm,
   overlapping_samples_df1 = lst_sample$df1_all,
@@ -314,7 +326,7 @@ lst_norm$intensity_norm$no_norm <- olink_normalization(
 
 ### df1_norm + df2_norm ----
 
-lst_norm$intensity_norm$norm <- olink_normalization(
+lst_norm$intensity_norm$norm <- OlinkAnalyze::olink_normalization(
   df1 = lst_df$df1_norm,
   df2 = lst_df$df2_norm,
   overlapping_samples_df1 = lst_sample$df1_all,
@@ -329,7 +341,7 @@ lst_norm$intensity_norm$norm <- olink_normalization(
 
 ### df1_no_lod + df2_no_lod ----
 
-lst_norm$intensity_norm$no_lod <- olink_normalization(
+lst_norm$intensity_norm$no_lod <- OlinkAnalyze::olink_normalization(
   df1 = lst_df$df1_no_lod,
   df2 = lst_df$df2_no_lod,
   overlapping_samples_df1 = lst_sample$df1_all,
@@ -344,7 +356,7 @@ lst_norm$intensity_norm$no_lod <- olink_normalization(
 
 ### df1_multiple_lod + df2_multiple_lod ----
 
-lst_norm$intensity_norm$multiple_lod <- olink_normalization(
+lst_norm$intensity_norm$multiple_lod <- OlinkAnalyze::olink_normalization(
   df1 = lst_df$df1_multiple_lod,
   df2 = lst_df$df2_multiple_lod,
   overlapping_samples_df1 = lst_sample$df1_all,
@@ -355,6 +367,10 @@ lst_norm$intensity_norm$multiple_lod <- olink_normalization(
 ) |>
   dplyr::filter(
     .data[["SampleID"]] %in% lst_sample$sample_subset
+  ) |>
+  dplyr::mutate(
+    MaxLOD = max(.data[["MaxLOD"]], na.rm = TRUE),
+    .by = dplyr::all_of(c("OlinkID"))
   )
 
 ## reference median normalization ----
@@ -363,7 +379,7 @@ lst_norm$ref_med_norm <- list()
 
 ### df1_no_norm ----
 
-lst_norm$ref_med_norm$no_norm <- olink_normalization(
+lst_norm$ref_med_norm$no_norm <- OlinkAnalyze::olink_normalization(
   df1 = lst_df$df1_no_norm,
   overlapping_samples_df1 = lst_sample$df1_subset,
   reference_medians = lst_df$ref_med
@@ -382,7 +398,7 @@ lst_norm$ref_med_norm$no_norm <- olink_normalization(
 
 ### df1_norm ----
 
-lst_norm$ref_med_norm$norm <- olink_normalization(
+lst_norm$ref_med_norm$norm <- OlinkAnalyze::olink_normalization(
   df1 = lst_df$df1_norm,
   overlapping_samples_df1 = lst_sample$df1_subset,
   reference_medians = lst_df$ref_med
@@ -401,7 +417,7 @@ lst_norm$ref_med_norm$norm <- olink_normalization(
 
 ### df1_no_lod ----
 
-lst_norm$ref_med_norm$no_lod <- olink_normalization(
+lst_norm$ref_med_norm$no_lod <- OlinkAnalyze::olink_normalization(
   df1 = lst_df$df1_no_lod,
   overlapping_samples_df1 = lst_sample$df1_subset,
   reference_medians = lst_df$ref_med
@@ -420,7 +436,7 @@ lst_norm$ref_med_norm$no_lod <- olink_normalization(
 
 ### df1_multiple_lod ----
 
-lst_norm$ref_med_norm$multiple_lod <- olink_normalization(
+lst_norm$ref_med_norm$multiple_lod <- OlinkAnalyze::olink_normalization(
   df1 = lst_df$df1_multiple_lod,
   overlapping_samples_df1 = lst_sample$df1_subset,
   reference_medians = lst_df$ref_med
@@ -435,6 +451,10 @@ lst_norm$ref_med_norm$multiple_lod <- olink_normalization(
     dplyr::all_of(
       c(colnames(lst_df$df1_multiple_lod), "Adj_factor", "Project")
     )
+  ) |>
+  dplyr::mutate(
+    MaxLOD = max(.data[["MaxLOD"]], na.rm = TRUE),
+    .by = dplyr::all_of(c("OlinkID"))
   )
 
 # save data ----
@@ -445,7 +465,7 @@ saveRDS(
     lst_sample = lst_sample,
     lst_norm = lst_norm
   ),
-  file = "tests/data/ref_results_norm.rds",
+  file = "tests/testthat/data/ref_results_norm.rds",
   version = 2L,
   compress = "gzip"
 )

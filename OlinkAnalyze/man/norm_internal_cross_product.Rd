@@ -9,6 +9,7 @@ norm_internal_cross_product(
   ref_samples,
   ref_name,
   ref_cols,
+  ref_product,
   not_ref_df,
   not_ref_name,
   not_ref_cols
@@ -24,6 +25,8 @@ adjustment factor calculation in the reference dataset (required).}
 
 \item{ref_cols}{Named list of column names in the reference dataset
 (required).}
+
+\item{ref_product}{Name of reference product (required).}
 
 \item{not_ref_df}{The non-reference dataset to be used in normalization
 (required).}
@@ -45,8 +48,8 @@ bridgeable or not. One of "NotBridgeable", "MedianCentering", or
 "QuantileSmoothing".
 \item{MedianCenteredNPX:} NPX values adjusted based on the median of the
 pair-wise differences of NPX values between bridge samples.
-\item{QSNormalizedNPX:} NPX values adjusted based on the quantile smoothing
-normalization among bridge samples.
+\item{QSNormalizedNPX:} NPX values adjusted based on the quantile
+smoothing normalization among bridge samples.
 }
 }
 \description{
