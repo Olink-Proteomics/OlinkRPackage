@@ -5702,6 +5702,74 @@ test_that(
   }
 )
 
+# Test olink_nrom_reference_id ----
+
+test_that(
+  "olink_nrom_reference_id - works",
+  {
+    # other-other ----
+
+    expect_identical(
+      object = olink_nrom_reference_id(
+        lst_product = c("p1" = "other", "p2" = "other"),
+        reference_project = "p1"
+      ),
+      expected = c("p1" = "ref", "p2" = "not_ref")
+    )
+
+    # 3k-3k ----
+
+    expect_identical(
+      object = olink_nrom_reference_id(
+        lst_product = c("p1" = "3k", "p2" = "3k"),
+        reference_project = "p2"
+      ),
+      expected = c("p1" = "not_ref", "p2" = "ref")
+    )
+
+    # ht-ht ----
+
+    expect_identical(
+      object = olink_nrom_reference_id(
+        lst_product = c("p1" = "HT", "p2" = "HT"),
+        reference_project = "p2"
+      ),
+      expected = c("p1" = "not_ref", "p2" = "ref")
+    )
+
+    # reveal-reveal ----
+
+    expect_identical(
+      object = olink_nrom_reference_id(
+        lst_product = c("p1" = "Reveal", "p2" = "Reveal"),
+        reference_project = "p1"
+      ),
+      expected = c("p1" = "ref", "p2" = "not_ref")
+    )
+
+    # 3k-reveal ----
+
+    expect_identical(
+      object = olink_nrom_reference_id(
+        lst_product = c("p1" = "3k", "p2" = "Reveal"),
+        reference_project = "p1"
+      ),
+      expected = c("p1" = "ref", "p2" = "not_ref")
+    )
+
+    # 3k-ht ----
+
+    expect_identical(
+      object = olink_nrom_reference_id(
+        lst_product = c("p1" = "3", "p2" = "HT"),
+        reference_project = "p2"
+      ),
+      expected = c("p1" = "not_ref", "p2" = "ref")
+    )
+
+  }
+)
+
 # Test olink_norm_mapping_file_id ----
 
 test_that(
