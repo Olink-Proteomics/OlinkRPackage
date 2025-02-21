@@ -145,21 +145,31 @@ olink_norm_input_check <- function(df1,
 
   } else {
 
-    # bridge, subset, or 3K-HT normalization
+    # bridge, subset, or cross_product normalization
 
     reference_medians <- NULL
 
     lst_df <- list(df1, df2)
     names(lst_df) <- c(df1_project_nr, df2_project_nr)
     lst_cols <- olink_norm_input_check_df_cols(lst_df = lst_df)
+    product_ids <- olink_norm_product_id(
+      lst_df = lst_df,
+      lst_cols = lst_cols
+    )
+    ref_ids <- olink_norm_reference_id(
+      lst_product = product_ids,
+      reference_project = reference_project
+    )
 
     if (norm_mode %in% c(olink_norm_modes$bridge,
                          olink_norm_modes$norm_cross_product)) {
-      # check if it is 3k-HT normalization, or simple bridge normalization
+      # check if it is cross_product normalization, or bridge normalization
       norm_cross_product <- olink_norm_input_cross_product(
         lst_df = lst_df,
         lst_cols = lst_cols,
-        reference_project = reference_project
+        reference_project = reference_project,
+        product_ids = product_ids,
+        ref_ids = ref_ids
       )
       norm_mode <- norm_cross_product$norm_mode
       lst_df <- norm_cross_product$lst_df
@@ -256,10 +266,12 @@ olink_norm_input_check <- function(df1,
     ref_samples = NULL,
     ref_name = NULL,
     ref_cols = NULL,
+    ref_product = NULL,
     not_ref_df = NULL,
     not_ref_samples = NULL,
     not_ref_name = NULL,
     not_ref_cols = NULL,
+    not_ref_product = NULL,
     reference_medians = NULL,
     norm_mode = NULL
   )
@@ -300,6 +312,10 @@ olink_norm_input_check <- function(df1,
     } else if (norm_mode %in% c(olink_norm_modes$bridge,
                                 olink_norm_modes$norm_cross_product)) {
       lst_out$ref_samples <- overlapping_samples_df1
+      lst_out$ref_product <- product_ids[names(product_ids) == lst_out$ref_name] |> # nolint
+        unname()
+      lst_out$not_ref_product <- product_ids[names(product_ids) == lst_out$not_ref_name] |>  # nolint
+        unname()
     }
   }
 
@@ -517,7 +533,7 @@ olink_norm_input_class <- function(df1,
 
   # check inputs ----
 
-  # check those taht should always be there
+  # check those that should always be there
   check_is_tibble_arrow(df = df1)
   check_is_character(string = overlapping_samples_df1,
                      scalar = FALSE)
@@ -657,7 +673,8 @@ olink_norm_input_check_df_cols <- function(lst_df) {
     lod = c("LOD",
             "Plate LOD", "Plate_LOD", "PlateLOD",
             "Max LOD", "Max_LOD", "MaxLOD"),
-    normalization = "Normalization"
+    normalization = "Normalization",
+    count = "Count"
   )
 
   # intersect required column names with columns of df
@@ -728,7 +745,8 @@ olink_norm_input_check_df_cols <- function(lst_df) {
     # we allow assay_warn to be missing but we want to match it to reference
     # df in normalization
     lapply(function(sub_lst) {
-      sub_lst[!(names(sub_lst) %in% c("lod", "normalization", "assay_warn"))]
+      sub_lst[!(names(sub_lst) %in% c("lod", "normalization",
+                                      "assay_warn", "count"))]
     }) |>
     # remove all elements that have no missing value
     lapply(function(sub_lst) {
@@ -911,13 +929,15 @@ olink_norm_input_check_df_cols <- function(lst_df) {
 #'
 #' @description
 #' A function to check whether we are to perform simple bridge normalization, or
-#' cross-platform (Olink Explore 3072 - Olink Explore HT) normalization.
+#' cross-platform (Olink Explore 3072 - Olink Explore HT/Olink Reveal)
+#' normalization.
 #'
 #' The function uses the internal dataset \var{eHT_e3072_mapping} to determine
 #' the product source of each dataset. If both datasets originate from the same
 #' Olink product, then it will return
 #' `r OlinkAnalyze:::olink_norm_modes$bridge`. If the datasets to be normalized
-#' originate from Olink Explore HT and Olink Explore 3072, it will return
+#' originate from Olink Explore HT and Olink Explore 3072
+#' or Olink Reveal and Olink Explore 3072, it will return
 #' `r OlinkAnalyze:::olink_norm_modes$norm_cross_product`. In any other case an
 #' error is thrown.
 #'
@@ -927,6 +947,10 @@ olink_norm_input_check_df_cols <- function(lst_df) {
 #' @param reference_project Project name of reference_project. Should be one of
 #' \var{df1_project_nr} or \var{df2_project_nr}. Indicates the project to which
 #' the other project is adjusted to.
+#' @param product_ids Named character vector with the Olink product name that
+#' each input datatset matches to.
+#' @param ref_ids Named character vector with \var{df1_project_nr} and
+#' \var{df2_project_nr} marked as "ref" and "not_ref".
 #'
 #' @return Character string indicating the type of normalization to be
 #' performed. One of
@@ -935,65 +959,52 @@ olink_norm_input_check_df_cols <- function(lst_df) {
 #'
 olink_norm_input_cross_product <- function(lst_df,
                                            lst_cols,
-                                           reference_project) {
+                                           reference_project,
+                                           product_ids,
+                                           ref_ids) {
 
   # check and correct norm_mode if needed ----
 
-  # check if each df comes from a different olink product
-  lst_product <- sapply(names(lst_df), function(d_name) {
-    # get unique panels
-    u_panel <- lst_df[[d_name]] |>
-      dplyr::pull(
-        .data[[lst_cols[[d_name]]$panel]]
-      ) |>
-      unique()
-    if (all(u_panel %in% eHT_e3072_mapping$Panel_E3072)) {
-      return("3k")
-    } else if (all(u_panel %in% "Explore_HT")) {
-      return("HT")
-    } else {
-      return("other")
-    }
-  })
-  names(lst_product) <- names(lst_df)
-
+  # check if each df comes from a different olink product:
   # if all elements of the array contain the same product, it is simple
   # bridge normalization. In case of 3k-3k bridging lst_product should contain
   # only "3k" as element. For other olink products, all elements should be
   # NA_character.
   # If more than one products are in the vector, then it should be exclusively
-  # 3k and HT.
+  # 3k and HT or 3k and Reveal.
   # In any other case (e.g. 3k and NA_character) means that one df is 3k, but
   # the other one probably T96, T48, which we do not normalize.
-  lst_prod_uniq <- lst_product |> unique() |> sort()
-  if (length(lst_prod_uniq) == 1L
-      && all(lst_prod_uniq %in% c("3k", "HT", "other"))) {
+  prod_uniq <- product_ids |> unique() |> sort()
+  if (length(prod_uniq) == 1L
+      && all(prod_uniq %in% c("3k", "HT", "Reveal", "other"))) {
     norm_mode <- olink_norm_modes$bridge
-  } else if (identical(x = lst_prod_uniq, y = c("3k", "HT"))) {
+  } else if (identical(x = prod_uniq, y = c("3k", "HT"))
+             || identical(x = prod_uniq, y = c("3k", "Reveal"))) {
     norm_mode <- olink_norm_modes$norm_cross_product
   } else {
     cli::cli_abort(
-      c(
-        "x" = "Unexpected datasets to be bridge normalized!",
-        "i" = "Only normalization within the same Olink product, and between
-        Olink Explore 3072 and Olink Explore HT is permitted!"
-      ),
+      c("x" = "Unexpected datasets to be bridge normalized!",
+        "i" = "Normalization is supported within the same Olink product or
+        between the following sets of products where the first product must be
+        the reference product:",
+        "* {.val {\"Explore HT\"}} and {.val {\"Explore 3072\"}}",
+        "* {.val {\"Reveal\"}} and {.val {\"Explore 3072\"}}"),
       call = rlang::caller_env(),
-      wrap = FALSE
+      wrap = TRUE
     )
   }
 
-  # check if reference dataset is HT if cross-product normalization ----
+  # check if reference dataset is HT/Reveal if cross-product normalization ----
 
   if (norm_mode == olink_norm_modes$norm_cross_product
-      && names(lst_product)[lst_product == "HT"] != reference_project) {
+      && (!(product_ids[ref_ids == "ref"] %in% c("Reveal", "HT"))))  {
 
     cli::cli_abort(
       c(
         "x" = "Incorrect reference project!",
-        "i" = "When normalizing between Olink Explore 3072 and Olink Explore
-        HT, the latter should be set as reference project in
-        {.arg reference_project}!"
+        "i" = "When normalizing between {.val {\"Olink Explore 3072\"}} and
+        {.val {\"Olink Explore HT\"}} or {.val {\"Olink Reveal\"}}, the latter
+        should be set as reference project in {.arg reference_project}!"
       ),
       call = rlang::caller_env(),
       wrap = FALSE
@@ -1001,62 +1012,93 @@ olink_norm_input_cross_product <- function(lst_df,
 
   }
 
-  # update Olink assay identifiers if cross product normalization ----
+  # cross-product specific checks ----
 
   if (norm_mode == olink_norm_modes$norm_cross_product) {
 
+    # update Olink assay identifiers if cross product normalization ----
+
     # add combined OlinkID to HT dataset
-    l_ht_name <- names(lst_product)[lst_product == "HT"]
-    l_ht_oid_rename <- paste0(lst_cols[[l_ht_name]]$olink_id, "_HT")
-    ht_3k_map_ht_rename <- stats::setNames(
-      object = c("OlinkID_HT", "OlinkID"),
-      nm = c("OlinkID_HT", lst_cols[[l_ht_name]]$olink_id)
-    )
-    lst_df[[l_ht_name]] <- lst_df[[l_ht_name]] |>
+    l_ref_name <- names(product_ids)[ref_ids == "ref"]
+    ref_product <- product_ids[ref_ids == "ref"] |> unname()
+    l_ref_oid_rename <- paste0(lst_cols[[l_ref_name]]$olink_id, "_",
+                               ref_product)
+
+    map_3k_ref_oid_col <- paste0("OlinkID_", ref_product)
+    ref_map_3k <- mapping_file_id(ref_product = ref_product)
+    ref_df_to_map_3k_keys <- stats::setNames(object = map_3k_ref_oid_col,
+                                             nm = l_ref_oid_rename)
+
+    lst_df[[l_ref_name]] <- lst_df[[l_ref_name]] |>
       dplyr::rename(
-        !!l_ht_oid_rename := lst_cols[[l_ht_name]]$olink_id
+        !!l_ref_oid_rename := lst_cols[[l_ref_name]]$olink_id
       ) |>
       dplyr::left_join(
-        eHT_e3072_mapping |>
+        ref_map_3k |>
           dplyr::select(
             dplyr::all_of(
-              ht_3k_map_ht_rename
+              c(map_3k_ref_oid_col, "OlinkID")
             )
           ),
-        by = stats::setNames(object = "OlinkID_HT", nm = l_ht_oid_rename),
+        by = ref_df_to_map_3k_keys,
         relationship = "many-to-many"
       ) |>
-      # If matched OlinkID is not found in mapping file, set OlinkID_HT to OlinkID
-        dplyr::mutate(OlinkID = ifelse(is.na(.data[["OlinkID"]]),
-                                       .data[["OlinkID_HT"]],
-                                       .data[["OlinkID"]]))
-
+      # If matched OlinkID not found in mapping file, set OlinkID_ref to OlinkID
+      dplyr::mutate(
+        OlinkID = dplyr::if_else(is.na(.data[["OlinkID"]]),
+                                 .data[[map_3k_ref_oid_col]],
+                                 .data[["OlinkID"]])
+      )
 
     # add combined OlinkID to 3k dataset
-    l_3k_name <- names(lst_product)[lst_product == "3k"]
+    l_3k_name <- names(product_ids)[product_ids == "3k"]
     l_3k_oid_rename <- paste0(lst_cols[[l_3k_name]]$olink_id, "_E3072")
-    ht_3k_map_3k_rename <- stats::setNames(
-      object = c("OlinkID_E3072", "OlinkID"),
-      nm = c("OlinkID_E3072", lst_cols[[l_3k_name]]$olink_id)
-    )
+
+    map_3k_nonref_oid_col <- "OlinkID_E3072"
+    nonref_df_to_map_3k_keys <- stats::setNames(object = map_3k_nonref_oid_col,
+                                                nm = l_3k_oid_rename)
+
     lst_df[[l_3k_name]] <- lst_df[[l_3k_name]] |>
       dplyr::rename(
         !!l_3k_oid_rename := lst_cols[[l_3k_name]]$olink_id
       ) |>
       dplyr::left_join(
-        eHT_e3072_mapping |>
+        ref_map_3k |>
           dplyr::select(
             dplyr::all_of(
-              ht_3k_map_3k_rename
+              c(map_3k_nonref_oid_col, "OlinkID")
             )
           ),
-        by = stats::setNames(object = "OlinkID_E3072", nm = l_3k_oid_rename),
+        by = nonref_df_to_map_3k_keys,
         relationship = "many-to-one"
       ) |>
-      # If matched OlinkID is not found in mapping file, set OlinkID_HT to OlinkID
-      dplyr::mutate(OlinkID = ifelse(is.na(.data[["OlinkID"]]),
-                                     .data[[l_3k_oid_rename]],
-                                     .data[["OlinkID"]]))
+      # If matched OlinkID is not found in mapping file
+      # set OlinkID_HT to OlinkID
+      dplyr::mutate(
+        OlinkID = dplyr::if_else(is.na(.data[["OlinkID"]]),
+                                 .data[[l_3k_oid_rename]],
+                                 .data[["OlinkID"]])
+      )
+
+    # check if both datasets contain the count column ----
+
+    check_cnt <- lapply(lst_cols, function(x) x[["count"]]) |> unlist()
+
+    if (length(check_cnt) != 2L) {
+      cnt_miss <- names(lst_cols)[!(names(lst_cols) %in% names(check_cnt))] # nolint
+
+      cli::cli_abort(
+        c(
+          "x" = "Column {.val {\"Count\"}} not found in {cli::qty(cnt_miss)}
+        dataset{?s} {.val {cnt_miss}}!",
+          "i" = "When performing cross-product normalization, count values from
+        both datasets are required for QS normalization. Re-export of NPX files
+        from Olink software may be required."
+        ),
+        call = rlang::caller_env(),
+        wrap = FALSE
+      )
+    }
 
   }
 
@@ -1752,25 +1794,27 @@ olink_norm_input_assay_overlap <- function(lst_df,
           !(.data[["OlinkID"]] %in% oid_removed)
         )
     }
-    if (norm_mode == olink_norm_modes$norm_cross_product){
+    if (norm_mode == olink_norm_modes$norm_cross_product) {
       cli::cli_warn(
         c(
           "{length(oid_removed)} assay{?s} are not shared across products.",
           "i" = "{length(oid_removed)} assay{?s} will be removed from
         normalization."
         ),
-        wrap = FALSE)
+        wrap = FALSE
+      )
 
-    } else{    # warning message
-    cli::cli_warn(
-      c(
-        "Assay{?s} {.val {oid_removed}} not shared across input dataset(s):",
-        dplyr::pull(oid_combos_miss, .data[["M"]]),
-        "i" = "{cli::qty(oid_removed)} Assay{?s} will be removed from
+    } else {    # warning message
+      cli::cli_warn(
+        c(
+          "Assay{?s} {.val {oid_removed}} not shared across input dataset(s):",
+          dplyr::pull(oid_combos_miss, .data[["M"]]),
+          "i" = "{cli::qty(oid_removed)} Assay{?s} will be removed from
         normalization."
-      ),
-      wrap = FALSE
-    )}
+        ),
+        wrap = FALSE
+      )
+    }
 
 
   } else {
@@ -1865,4 +1909,85 @@ olink_norm_input_norm_method <- function(lst_df,
       )
     )
   }
+}
+
+#' Identify names of product for each project
+#'
+#' @author
+#'   Kathy Nevola
+#'   Klev Diamanti
+#'
+#' @param lst_df Named list of datasets to be normalized.
+#' @param lst_cols Named list of vectors with the required column names for each
+#' dataset in \var{lst_df}.
+#'
+#' @return Named character vector with the Olink product name that each input
+#' datatset matches to.
+#'
+olink_norm_product_id <- function(lst_df,
+                                  lst_cols) {
+  # Identify product from panel names by going through the input datasets
+  lst_product <- sapply(names(lst_df), function(d_name) {
+    # get unique panels
+    u_panel <- lst_df[[d_name]] |>
+      dplyr::pull(
+        .data[[lst_cols[[d_name]]$panel]]
+      ) |>
+      unique()
+    if (all(u_panel %in% eHT_e3072_mapping$Panel_E3072)) {
+      return("3k")
+    } else if (all(u_panel == "Explore_HT")) {
+      return("HT")
+    } else if (all(u_panel == "Reveal")) {
+      return("Reveal")
+    } else {
+      return("other")
+    }
+  })
+  names(lst_product) <- names(lst_df)
+
+  return(lst_product)
+
+}
+
+#' Identify reference project.
+#'
+#' @author
+#'   Kathy Nevola
+#'   Klev Diamanti
+#'
+#' @param lst_product Named character vector with the Olink product name that
+#' each input datatset matches to.
+#' @param reference_project Project name of reference_project. Should be one of
+#' \var{df1_project_nr} or \var{df2_project_nr}. Indicates the project to which
+#' the other project is adjusted to.
+#'
+#' @returns Named character vector with \var{df1_project_nr} and
+#' \var{df2_project_nr} marked as "ref" and "not_ref".
+#'
+olink_norm_reference_id <- function(lst_product,
+                                    reference_project) {
+
+  ref_names <- lst_product
+  ref_names[names(ref_names) %in% reference_project] <- "ref"
+  ref_names[!(names(ref_names) %in% reference_project)] <- "not_ref"
+
+  return(ref_names)
+}
+
+#' Identifying which mapping file to use
+#'
+#' @param ref_product one of "HT" or "Reveal" depending on reference product
+#'
+#' @return dataframe of mapping file to use for OlinkID mapping
+#' (eHT_e3072_mapping or reveal_e3072_mapping)
+#'
+mapping_file_id <- function(ref_product) {
+  # Ref mapping file
+  if (ref_product == "HT") {
+    ref_map_3k <- eHT_e3072_mapping
+  } else if (ref_product == "Reveal") {
+    ref_map_3k <- reveal_e3072_mapping
+  }
+  ref_map_3k
 }
