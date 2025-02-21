@@ -13,8 +13,8 @@ olink_norm_product_id(lst_df, lst_cols)
 dataset in \var{lst_df}.}
 }
 \value{
-list of lists containing named list of product (3k, Reveal, HT,
-or other) and reference (ref or not_ref)
+Named character vector with the Olink product each input datatset
+matches to.
 }
 \description{
 Identify names of product for each project
