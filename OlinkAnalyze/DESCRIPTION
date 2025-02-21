@@ -29,7 +29,7 @@ Authors@R: c(
             comment = c("kristynchin-olink")),
     person("Danai", "Topouza", role = "aut",
             comment = c("dtopouza", ORCID = "0000-0002-6897-9281")),
-    person("Stephen", "Pollo", role = "aut"),
+    person("Stephen", "Pollo", role = "aut",
             comment = c("spollo-olprot", ORCID = "0000-0001-9252-4976")),
     person("Kang", "Dong", role = "aut",
             comment = c("KangD-dev", ORCID = "0000-0002-4567-5007")),
