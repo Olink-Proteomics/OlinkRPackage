@@ -1,3 +1,16 @@
+# Olink Analyze 4.2.0
+## Minor Changes
+* Cross-product bridging is now supported for bridging Olink Explore 3072 to Olink Reveal (#509, @kathy-nevola)
+* Standard data exports from NPX Signature 2.0 are now supported (#511, @KangD-dev)
+* Kang Dong and Stephen Pollo have been added as authors (#514, @kathy-nevola)
+* MaxLOD will be recalculated after bridging to reflect the MaxLOD across all projects (#505, @klevdiamanti)
+
+## Bug Fixes
+* A warning message will be displayed when fewer than the recommended number of bridging samples are used in cross product bridging (#507, @klevdiamanti)
+* If count data is not provided in cross-product bridging, an error message will occur (#510, @kristynchin-olink)
+* For cross-product bridging, if the sample type and assay warning columns do not have the same column naming (ex: SampleType and Sample_Type), both columns will be included in the output. (#515, @spollo-olprot, @MasoumehSheikh)
+
+
 # Olink Analyze 4.1.1
 ## Minor Changes
 * Images were decreased in dimension to meet CRAN Size requirements (#500, @kathy-nevola)
