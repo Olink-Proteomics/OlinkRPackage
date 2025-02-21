@@ -5525,6 +5525,137 @@ test_that(
   }
 )
 
+# Test olink_norm_product_id ----
+
+test_that(
+  "olink_norm_product_id - works",
+  {
+    skip_if_not_installed("arrow")
+
+    skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
+    skip_if_not(file.exists(test_path("data","example_Reveal_data.rds")))
+
+    data_3k <- get_example_data(filename = "example_3k_data.rds")
+    data_ht <- get_example_data(filename = "example_HT_data.rds")
+    data_reveal <- get_example_data(filename = "example_Reveal_data.rds")
+
+    # T96-T96 ----
+
+    expect_identical(
+      object = olink_norm_product_id(
+        lst_df = list(
+          "p1" = npx_data1,
+          "p2" = npx_data2
+        ),
+        lst_cols = list(
+          "p1" = list(panel = "Panel"),
+          "p2" = list(panel = "Panel")
+        )
+      ),
+      expected = c("p1" = "other", "p2" = "other")
+    )
+
+    # T96-3k ----
+
+    expect_identical(
+      object = olink_norm_product_id(
+        lst_df = list(
+          "p1" = npx_data1,
+          "p2" = data_3k
+        ),
+        lst_cols = list(
+          "p1" = list(panel = "Panel"),
+          "p2" = list(panel = "Panel")
+        )
+      ),
+      expected = c("p1" = "other", "p2" = "3k")
+    )
+
+    # T96-HT ----
+
+    expect_identical(
+      object = olink_norm_product_id(
+        lst_df = list(
+          "p1" = npx_data1,
+          "p2" = data_ht
+        ),
+        lst_cols = list(
+          "p1" = list(panel = "Panel"),
+          "p2" = list(panel = "Panel")
+        )
+      ),
+      expected = c("p1" = "other", "p2" = "HT")
+    )
+
+    # T96-Reveal ----
+
+    expect_identical(
+      object = olink_norm_product_id(
+        lst_df = list(
+          "p1" = npx_data1,
+          "p2" = data_reveal
+        ),
+        lst_cols = list(
+          "p1" = list(panel = "Panel"),
+          "p2" = list(panel = "Panel")
+        )
+      ),
+      expected = c("p1" = "other", "p2" = "Reveal")
+    )
+
+    # 3k-HT ----
+
+    expect_identical(
+      object = olink_norm_product_id(
+        lst_df = list(
+          "p1" = data_3k,
+          "p2" = data_ht
+        ),
+        lst_cols = list(
+          "p1" = list(panel = "Panel"),
+          "p2" = list(panel = "Panel")
+        )
+      ),
+      expected = c("p1" = "3k", "p2" = "HT")
+    )
+
+    # 3k-Reveal ----
+
+    expect_identical(
+      object = olink_norm_product_id(
+        lst_df = list(
+          "p1" = data_3k,
+          "p2" = data_reveal
+        ),
+        lst_cols = list(
+          "p1" = list(panel = "Panel"),
+          "p2" = list(panel = "Panel")
+        )
+      ),
+      expected = c("p1" = "3k", "p2" = "Reveal")
+    )
+
+    # HT-Reveal ----
+
+    expect_identical(
+      object = olink_norm_product_id(
+        lst_df = list(
+          "p1" = data_ht,
+          "p2" = data_reveal
+        ),
+        lst_cols = list(
+          "p1" = list(panel = "Panel"),
+          "p2" = list(panel = "Panel")
+        )
+      ),
+      expected = c("p1" = "HT", "p2" = "Reveal")
+    )
+  }
+)
+
+# Test olink_norm_mapping_file_id ----
+
 test_that(
   "mapping_file_id - works",
   {
