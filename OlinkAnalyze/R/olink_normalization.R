@@ -975,7 +975,7 @@ norm_internal_adjust_not_ref <- function(df,
     )
 }
 
-#' Update MaxLOD to the maximum MaxLOD across normalized datatsets.
+#' Update MaxLOD to the maximum MaxLOD across normalized datasets.
 #'
 #' @param df Normalized Olink dataset (required).
 #' @param cols Named list of column names in the dataset (required).

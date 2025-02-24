@@ -23,7 +23,7 @@ dataset in \var{lst_df}.}
 the other project is adjusted to.}
 
 \item{product_ids}{Named character vector with the Olink product name that
-each input datatset matches to.}
+each input dataset matches to.}
 
 \item{ref_ids}{Named character vector with \var{df1_project_nr} and
 \var{df2_project_nr} marked as "ref" and "not_ref".}

@@ -949,7 +949,7 @@ olink_norm_input_check_df_cols <- function(lst_df) {
 #' \var{df1_project_nr} or \var{df2_project_nr}. Indicates the project to which
 #' the other project is adjusted to.
 #' @param product_ids Named character vector with the Olink product name that
-#' each input datatset matches to.
+#' each input dataset matches to.
 #' @param ref_ids Named character vector with \var{df1_project_nr} and
 #' \var{df2_project_nr} marked as "ref" and "not_ref".
 #'
@@ -1923,7 +1923,7 @@ olink_norm_input_norm_method <- function(lst_df,
 #' dataset in \var{lst_df}.
 #'
 #' @return Named character vector with the Olink product name that each input
-#' datatset matches to.
+#' dataset matches to.
 #'
 olink_norm_product_id <- function(lst_df,
                                   lst_cols) {
@@ -1958,7 +1958,7 @@ olink_norm_product_id <- function(lst_df,
 #'   Klev Diamanti
 #'
 #' @param lst_product Named character vector with the Olink product name that
-#' each input datatset matches to.
+#' each input dataset matches to.
 #' @param reference_project Project name of reference_project. Should be one of
 #' \var{df1_project_nr} or \var{df2_project_nr}. Indicates the project to which
 #' the other project is adjusted to.

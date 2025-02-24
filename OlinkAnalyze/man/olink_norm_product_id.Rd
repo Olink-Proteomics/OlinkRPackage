@@ -14,7 +14,7 @@ dataset in \var{lst_df}.}
 }
 \value{
 Named character vector with the Olink product name that each input
-datatset matches to.
+dataset matches to.
 }
 \description{
 Identify names of product for each project
