@@ -41,6 +41,7 @@ doi
 dplyr
 dunnTest
 ECDF
+eHT
 emmeans
 enrichmentScore
 ExploreVersion
@@ -206,8 +207,10 @@ AssayType
 CVs
 DataAnalysisRefID
 FixedLOD
+MaxLOD
 NCLOD
 NCs
+NGS
 PCNormalizedLOD
 PCNormalizedNPX
 SampleType

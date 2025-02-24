@@ -4,7 +4,13 @@
 \alias{olink_normalization_qs}
 \title{Quantile smoothing normalization of all proteins between two NPX projects.}
 \usage{
-olink_normalization_qs(lst_df, ref_cols, bridge_samples)
+olink_normalization_qs(
+  lst_df,
+  ref_cols,
+  not_ref_cols,
+  bridge_samples,
+  ref_product
+)
 }
 \arguments{
 \item{lst_df}{A named list of the 2 input datasets. First element should be
@@ -14,8 +20,14 @@ originate from Olink Explore 3072. (required)}
 \item{ref_cols}{A named list with the column names to use. Exported from
 olink_norm_input_check. (required)}
 
+\item{not_ref_cols}{A named list with the column names from the non-reference
+dataset. Exported from olink_norm_input_check. (required)}
+
 \item{bridge_samples}{Character vector of samples to be used for the
 quantile mapping. (required)}
+
+\item{ref_product}{Name of reference product.
+Must be one of "HT" or "Reveal".}
 }
 \value{
 A "tibble" of Olink data in long format containing both input
@@ -86,11 +98,14 @@ lst_df <- list(
 names(lst_df) <- c(check_norm$ref_name, check_norm$not_ref_name)
 
 ref_cols <- check_norm$ref_cols
+not_ref_cols <- check_norm$not_ref_cols
 
 qs_result <- OlinkAnalyze:::olink_normalization_qs(
  lst_df = lst_df,
  ref_cols = ref_cols,
- bridge_samples = bridge_samples
+ not_ref_cols = not_ref_cols,
+ bridge_samples = bridge_samples,
+ ref_product = "HT"
 )
 }
 

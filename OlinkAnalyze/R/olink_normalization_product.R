@@ -39,6 +39,8 @@
 #' originate from Olink Explore 3072.
 #' @param ref_cols A named list with the column names to use. Exported from
 #' olink_norm_input_check.
+#' @param not_ref_cols A named list with the column names from the non-reference 
+#' dataset. Exported from olink_norm_input_check. 
 #' @param seed Integer random seed (Default: seek = 1).
 #'
 #' @return A "tibble" in long format with the following columns:
@@ -81,17 +83,20 @@
 #'
 #' # create ref_cols
 #' ref_cols <- data_explore_check$ref_cols
+#' not_ref_cols <- data_explore_check$not_ref_cols
 #'
 #' # run olink_normalization_bridgeable
 #' is_bridgeable_result <- OlinkAnalyze:::olink_normalization_bridgeable(
 #'   lst_df = lst_df,
 #'   ref_cols = ref_cols,
+#'   not_ref_cols = not_ref_cols,
 #'   seed = 1
 #' )
 #' }
 #'
 olink_normalization_bridgeable <- function(lst_df,
                                            ref_cols,
+                                           not_ref_cols,
                                            seed = 1) {
   # help vars ----
 
@@ -113,7 +118,10 @@ olink_normalization_bridgeable <- function(lst_df,
       l_df |>
         dplyr::filter(
           # only customer samples
-          .data[["SampleType"]] == "SAMPLE"
+          dplyr::if_any(tidyselect::any_of(c(ref_cols$sample_type,
+                                             not_ref_cols$sample_type)
+                                           ),
+                 ~ . =="SAMPLE")
           # remove interal control assays
           & .data[["AssayType"]] == "assay"
           # remove datapoints with very few counts
@@ -366,8 +374,12 @@ olink_normalization_bridgeable <- function(lst_df,
 #' originate from Olink Explore 3072. (required)
 #' @param ref_cols A named list with the column names to use. Exported from
 #' olink_norm_input_check. (required)
+#' @param not_ref_cols A named list with the column names from the non-reference
+#'  dataset. Exported from olink_norm_input_check. (required)
 #' @param bridge_samples Character vector of samples to be used for the
 #' quantile mapping. (required)
+#' @param ref_product Name of reference product.
+#' Must be one of "HT" or "Reveal".
 #'
 #' @return A "tibble" of Olink data in long format containing both input
 #' datasets with the quantile normalized quantifications.
@@ -404,24 +416,38 @@ olink_normalization_bridgeable <- function(lst_df,
 #' names(lst_df) <- c(check_norm$ref_name, check_norm$not_ref_name)
 #'
 #' ref_cols <- check_norm$ref_cols
+#' not_ref_cols <- check_norm$not_ref_cols
 #'
 #' qs_result <- OlinkAnalyze:::olink_normalization_qs(
 #'  lst_df = lst_df,
 #'  ref_cols = ref_cols,
-#'  bridge_samples = bridge_samples
+#'  not_ref_cols = not_ref_cols,
+#'  bridge_samples = bridge_samples,
+#'  ref_product = "HT"
 #' )
 #' }
 #'
 olink_normalization_qs <- function(lst_df,
                                    ref_cols,
-                                   bridge_samples) {
+                                   not_ref_cols,
+                                   bridge_samples,
+                                   ref_product) {
+
+  if (ref_product == "HT") {
+    num_samples <- 40L
+  } else if (ref_product == "Reveal") {
+    num_samples <- 32L
+  } else {
+    cli::cli_abort(
+      "Reference product must be HT or Reveal."
+    )
+  }
 
   # main QS normalization function
   ecdf_transform_npx <- function(data,
                                  quant_col,
                                  count_ref_col,
-                                 num_samples = 40L) {
-
+                                 num_samples) {
     # Briefly:
     # Take the ECDF of the reference quantification (e.g. NPX from Olink Explore
     # HT). The inverse of the ECDF will be in x ~ y OR
@@ -515,7 +541,9 @@ olink_normalization_qs <- function(lst_df,
       l_df |>
         dplyr::filter(
           # only customer samples
-          .data[["SampleType"]] == "SAMPLE"
+          dplyr::if_any(tidyselect::any_of(c(ref_cols$sample_type,
+                                             not_ref_cols$sample_type)),
+                 ~ . =="SAMPLE")
           # remove internal control assays
           & .data[["AssayType"]] == "assay"
         ) |>
@@ -600,11 +628,46 @@ olink_normalization_qs <- function(lst_df,
           )
         ),
         quant_col = .env[["quant_col"]],
-        count_ref_col = .env[["cnt_ref_col"]]
+        count_ref_col = .env[["cnt_ref_col"]],
+        num_samples = num_samples
       )
     ) |>
+    dplyr::ungroup()
+
+  # warning message for assays that were not QS normalized because of lack of
+  # bridge samples (bridge samples < 40)
+  num_notref_samples <- df_combo$SampleID |> unique() |> length()
+
+  num_not_qs_norm_assays <- ecdf_transform |>
+    dplyr::group_by(
+      .data[[ref_cols$olink_id]]
+    ) |>
+    dplyr::summarise(
+      na_npx = sum(is.na(.data[[quant_col$notref]]), na.rm = TRUE),
+      na_qs = sum(is.na(.data[["QSNormalizedNPX"]]), na.rm = TRUE)
+    ) |>
     dplyr::ungroup() |>
-    # keep only relevant columns
+    dplyr::filter(
+      .data[["na_npx"]] == 0L
+      & .data[["na_qs"]] == .env[["num_notref_samples"]]
+    )
+
+  # warning
+  if (nrow(num_not_qs_norm_assays) > 0L) {
+    cli::cli_warn(
+      message = c(
+        "Insufficient number of bridge samples to perform QS normalization.
+        {cli::qty(num_not_qs_norm_assays)} There {?is/are}
+        {.val {nrow(num_not_qs_norm_assays)}} assay{?s} with fewer than
+        {.val {num_samples}} bridge samples for QS normalization!"
+      ),
+      wrap = FALSE
+    )
+  }
+  rm(num_notref_samples, num_not_qs_norm_assays)
+
+  # keep only relevant columns
+  ecdf_transform <- ecdf_transform |>
     dplyr::select(
       dplyr::all_of(
         c(ref_cols$sample_id, ref_cols$olink_id, "QSNormalizedNPX")
@@ -672,6 +735,9 @@ olink_normalization_qs <- function(lst_df,
 #' olink_normalization product bridging.
 #' @param df2_project_nr Project name of second dataset. Must match name used in
 #' olink_normalization product bridging.
+#' @param reference_project Project name of reference project. Must match name
+#' used in olink_normalization product bridging and be one of df1_project_nr or
+#' df2_project_nr.
 #'
 #' @return A "tibble" of Olink data in long format containing both input
 #' datasets with the bridged NPX quantifications, with the above
@@ -701,7 +767,8 @@ olink_normalization_qs <- function(lst_df,
 #' df1 = OlinkAnalyze:::data_ht_small,
 #' df2 = OlinkAnalyze:::data_3k_small,
 #' df1_project_nr = "Explore HT",
-#' df2_project_nr = "Explore 3072")
+#' df2_project_nr = "Explore 3072",
+#' reference_project = "Explore HT")
 #'
 #' }
 
@@ -709,7 +776,8 @@ olink_normalization_product_format <- function(bridged_df,
                                                df1,
                                                df1_project_nr,
                                                df2,
-                                               df2_project_nr) {
+                                               df2_project_nr,
+                                               reference_project) {
 
   # Extract data from NotBridgeable assays
   df_not_bridgeable <- bridged_df |>
@@ -720,8 +788,8 @@ olink_normalization_product_format <- function(bridged_df,
     dplyr::filter(.data[["AssayType"]] == "assay") |>
     dplyr::filter(.data[["BridgingRecommendation"]] == "NotBridgeable") |>
     dplyr::mutate(OlinkID = case_when(
-      Panel == "Explore_HT" ~ OlinkID,
-      Panel != "Explore_HT" ~ OlinkID_E3072
+      Project == reference_project ~ OlinkID,
+      Project != reference_project ~ OlinkID_E3072
     )) |>
     dplyr::select(-any_of(c("MedianCenteredNPX",
                             "QSNormalizedNPX",
@@ -736,7 +804,7 @@ olink_normalization_product_format <- function(bridged_df,
                         dplyr::select(dplyr::starts_with("OlinkID_"))))) |>
     dplyr::mutate(Project = df1_project_nr) |>
     dplyr::mutate(SampleID =
-             paste0(.data[["SampleID"]],"_",df1_project_nr)) |>
+             paste0(.data[["SampleID"]], "_", df1_project_nr)) |>
     dplyr::mutate(BridgingRecommendation = "NotOverlapping")
 
   df2_no_overlap <- df2 |>
@@ -746,7 +814,7 @@ olink_normalization_product_format <- function(bridged_df,
                         dplyr::select(dplyr::starts_with("OlinkID_"))))) |>
     dplyr::mutate(Project = df2_project_nr) |>
     dplyr::mutate(SampleID =
-             paste0(.data[["SampleID"]],"_",df2_project_nr)) |>
+             paste0(.data[["SampleID"]], "_", df2_project_nr)) |>
     dplyr::mutate(BridgingRecommendation = "NotOverlapping")
 
   ### Keep the data following BridgingRecommendation
@@ -781,4 +849,3 @@ olink_normalization_product_format <- function(bridged_df,
 
   return(df_full)
 }
-

@@ -1,7 +1,7 @@
 Type: Package
 Package: OlinkAnalyze
 Title: Facilitate Analysis of Proteomic Data from Olink
-Version: 4.1.2
+Version: 4.2.0
 Authors@R: c(
     person("Kathleen", "Nevola", , "biostattools@olink.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-5183-6444", "kathy-nevola")),
@@ -29,6 +29,10 @@ Authors@R: c(
             comment = c("kristynchin-olink")),
     person("Danai", "Topouza", role = "aut",
             comment = c("dtopouza", ORCID = "0000-0002-6897-9281")),
+    person("Stephen", "Pollo", role = "aut",
+            comment = c("spollo-olprot", ORCID = "0000-0001-9252-4976")),
+    person("Kang", "Dong", role = "aut",
+            comment = c("KangD-dev", ORCID = "0000-0002-4567-5007")),
     person("Kristian", "Hodén", role = "ctb",
            comment = c(ORCID = "0000-0003-0354-0662", "kristianHoden")),
     person("Per", "Eriksson", role = "ctb",

@@ -1,6 +1,6 @@
 ## Release Summary
 
-This release removes gzip compression in unit test to support Debian. 
+This release adds minor functionality to Olink Analyze 4.1.2
 
 ## R CMD check results
 
