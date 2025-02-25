@@ -788,7 +788,6 @@ olink_normalization_product_format <- function(df_norm,
       & .data[["BridgingRecommendation"]] == "NotBridgeable"
     ) |>
     dplyr::mutate(
-      SampleID = paste0(.data[["SampleID"]], "_", .data[["Project"]]),
       OlinkID = dplyr::if_else(
         .data[["Project"]] == .env[["reference_project"]],
         .data[["OlinkID"]],
@@ -811,7 +810,6 @@ olink_normalization_product_format <- function(df_norm,
     ) |>
     dplyr::mutate(
       Project = .env[["df1_project_nr"]],
-      SampleID = paste0(.data[["SampleID"]], "_", .env[["df1_project_nr"]]),
       BridgingRecommendation = "NotOverlapping"
     )
 
@@ -822,7 +820,6 @@ olink_normalization_product_format <- function(df_norm,
     ) |>
     dplyr::mutate(
       Project = .env[["df2_project_nr"]],
-      SampleID = paste0(.data[["SampleID"]], "_", .env[["df2_project_nr"]]),
       BridgingRecommendation = "NotOverlapping"
     )
 
@@ -835,7 +832,6 @@ olink_normalization_product_format <- function(df_norm,
       & .data[["AssayType"]] == "assay"
     ) |> # Remove controls
     dplyr::mutate(
-      SampleID = paste0(.data[["SampleID"]], "_", .data[["Project"]]),
       OlinkID = paste0(.data[["OlinkID"]], "_", .data[["OlinkID_E3072"]]),
       NPX = dplyr::case_when(
         .data[["BridgingRecommendation"]] == "MedianCentering" ~
@@ -857,6 +853,9 @@ olink_normalization_product_format <- function(df_norm,
     ) |>
     dplyr::bind_rows(
       df2_no_overlap
+    ) |>
+    dplyr::mutate(
+      SampleID = paste0(.data[["SampleID"]], "_", .data[["Project"]])
     ) |>
     dplyr::select( # Remove extra columns
       -dplyr::any_of(
