@@ -795,7 +795,7 @@ olink_normalization_product_format <- function(df_norm,
       )
     ) |>
     dplyr::select( # Remove extra columns
-      -dplyr::any_of(
+      -dplyr::all_of(
         c("MedianCenteredNPX", "QSNormalizedNPX", "OlinkID_E3072")
       )
     )
