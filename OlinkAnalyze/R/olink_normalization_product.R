@@ -794,20 +794,20 @@ olink_normalization_product_format <- function(df_norm,
         .data[["OlinkID"]],
         .data[["OlinkID_E3072"]]
       )
-    ) |>
-    dplyr::select( # Remove extra columns
-      -dplyr::all_of(
-        c("MedianCenteredNPX", "QSNormalizedNPX", "OlinkID_E3072")
-      )
     )
 
   # Extract data from non-overlapping assays ----
 
+  oid_ref_notref <- eHT_e3072_mapping |>
+    dplyr::select(
+      dplyr::starts_with("OlinkID_")
+    ) |>
+    unlist(use.names = FALSE)
+
   df1_no_overlap <- df1 |>
     dplyr::filter(
       .data[["SampleType"]] == "SAMPLE" # Remove controls
-      & !(.data[["OlinkID"]] %in%
-            unlist(dplyr::select(eHT_e3072_mapping, dplyr::starts_with("OlinkID_"))))
+      & !(.data[["OlinkID"]] %in% .env[["oid_ref_notref"]])
     ) |>
     dplyr::mutate(
       Project = .env[["df1_project_nr"]],
@@ -818,8 +818,7 @@ olink_normalization_product_format <- function(df_norm,
   df2_no_overlap <- df2 |>
     dplyr::filter(
       .data[["SampleType"]] == "SAMPLE" # Remove controls
-      & !(.data[["OlinkID"]] %in%
-            unlist(dplyr::select(eHT_e3072_mapping, dplyr::starts_with("OlinkID_"))))
+      & !(.data[["OlinkID"]] %in% .env[["oid_ref_notref"]])
     ) |>
     dplyr::mutate(
       Project = .env[["df2_project_nr"]],
@@ -827,7 +826,7 @@ olink_normalization_product_format <- function(df_norm,
       BridgingRecommendation = "NotOverlapping"
     )
 
-  # Keep the data following BridgingRecommendation for bridgeable assays
+  # Keep the data following BridgingRecommendation for bridgeable assays ----
 
   df_format <- df_norm |>
     dplyr::filter(
@@ -845,11 +844,6 @@ olink_normalization_product_format <- function(df_norm,
           .data[["QSNormalizedNPX"]],
         .default = .data[["NPX"]]
       )
-    ) |>
-    dplyr::select( # Remove extra columns
-      -dplyr::any_of(
-        c("MedianCenteredNPX", "QSNormalizedNPX", "OlinkID_E3072")
-      )
     )
 
   # combine data and sort ----
@@ -863,6 +857,11 @@ olink_normalization_product_format <- function(df_norm,
     ) |>
     dplyr::bind_rows(
       df2_no_overlap
+    ) |>
+    dplyr::select( # Remove extra columns
+      -dplyr::any_of(
+        c("MedianCenteredNPX", "QSNormalizedNPX", "OlinkID_E3072")
+      )
     ) |>
     dplyr::arrange(
       .data[["Project"]], .data[["SampleID"]]
