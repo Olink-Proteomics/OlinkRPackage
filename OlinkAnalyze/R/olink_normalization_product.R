@@ -118,10 +118,12 @@ olink_normalization_bridgeable <- function(lst_df,
       l_df |>
         dplyr::filter(
           # only customer samples
-          dplyr::if_any(tidyselect::any_of(c(ref_cols$sample_type,
-                                             not_ref_cols$sample_type)
-                                           ),
-                 ~ . =="SAMPLE")
+          dplyr::if_any(
+            dplyr::any_of(
+              c(ref_cols$sample_type, not_ref_cols$sample_type)
+            ),
+            ~ . == "SAMPLE"
+          )
           # remove interal control assays
           & .data[["AssayType"]] == "assay"
           # remove datapoints with very few counts
@@ -541,9 +543,12 @@ olink_normalization_qs <- function(lst_df,
       l_df |>
         dplyr::filter(
           # only customer samples
-          dplyr::if_any(tidyselect::any_of(c(ref_cols$sample_type,
-                                             not_ref_cols$sample_type)),
-                 ~ . =="SAMPLE")
+          dplyr::if_any(
+            dplyr::any_of(
+              c(ref_cols$sample_type, not_ref_cols$sample_type)
+            ),
+            ~ . == "SAMPLE"
+          )
           # remove internal control assays
           & .data[["AssayType"]] == "assay"
         ) |>
@@ -809,7 +814,7 @@ olink_normalization_product_format <- function(df_norm,
   # We also keep OlinkIDs of assays from both products that are being normalized
   # as one vector, to identify assays that were excluded from the cross-product
   # normalization.
-  oid_ref_notref <- mapping_file_id(ref_product = ref_product) |>
+  oid_ref_notref <- mapping_file_id(ref_product = ref_product) |> # nolint
     dplyr::select(
       dplyr::starts_with("OlinkID_")
     ) |>
