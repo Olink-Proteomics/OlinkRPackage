@@ -788,8 +788,8 @@ olink_normalization_product_format <- function(df_norm,
 
   df_not_bridgeable <- df_norm |>
     dplyr::filter(
-      .data[["SampleType"]] == "SAMPLE" # Remove controls
-      & .data[["AssayType"]] == "assay"
+      .data[["SampleType"]] == "SAMPLE" # remove control samples
+      & .data[["AssayType"]] == "assay" # remove control assays
       & .data[["BridgingRecommendation"]] == "NotBridgeable"
     ) |>
     dplyr::mutate(
@@ -810,7 +810,8 @@ olink_normalization_product_format <- function(df_norm,
 
   df1_no_overlap <- df1 |>
     dplyr::filter(
-      .data[["SampleType"]] == "SAMPLE" # Remove controls
+      .data[["SampleType"]] == "SAMPLE" # remove control samples
+      & .data[["AssayType"]] == "assay" # remove control assays
       & !(.data[["OlinkID"]] %in% .env[["oid_ref_notref"]])
     ) |>
     dplyr::mutate(
@@ -820,7 +821,8 @@ olink_normalization_product_format <- function(df_norm,
 
   df2_no_overlap <- df2 |>
     dplyr::filter(
-      .data[["SampleType"]] == "SAMPLE" # Remove controls
+      .data[["SampleType"]] == "SAMPLE" # remove control samples
+      & .data[["AssayType"]] == "assay" # remove control assays
       & !(.data[["OlinkID"]] %in% .env[["oid_ref_notref"]])
     ) |>
     dplyr::mutate(
@@ -832,9 +834,9 @@ olink_normalization_product_format <- function(df_norm,
 
   df_bridgeable <- df_norm |>
     dplyr::filter(
-      .data[["SampleType"]] == "SAMPLE"
+      .data[["SampleType"]] == "SAMPLE" # remove control samples
+      & .data[["AssayType"]] == "assay" # remove control assays
       & .data[["BridgingRecommendation"]] != "NotBridgeable"
-      & .data[["AssayType"]] == "assay"
     ) |> # Remove controls
     dplyr::mutate(
       OlinkID = paste0(.data[["OlinkID"]], "_", .data[["OlinkID_E3072"]]),
