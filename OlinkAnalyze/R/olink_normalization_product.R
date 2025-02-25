@@ -830,7 +830,7 @@ olink_normalization_product_format <- function(df_norm,
 
   # Keep the data following BridgingRecommendation for bridgeable assays ----
 
-  df_format <- df_norm |>
+  df_bridgeable <- df_norm |>
     dplyr::filter(
       .data[["SampleType"]] == "SAMPLE"
       & .data[["BridgingRecommendation"]] != "NotBridgeable"
@@ -849,7 +849,7 @@ olink_normalization_product_format <- function(df_norm,
 
   # combine data and sort ----
 
-  df_full <- df_format |>
+  df_full <- df_bridgeable |>
     dplyr::bind_rows(
       df_not_bridgeable
     ) |>
