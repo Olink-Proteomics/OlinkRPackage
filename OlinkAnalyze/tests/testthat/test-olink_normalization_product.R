@@ -692,7 +692,8 @@ test_that(
                                            df1_project_nr = "P2",
                                            df2 = data_3k,
                                            df2_project_nr = "P1",
-                                           reference_project = "P2"),
+                                           reference_project = "P2",
+                                           ref_product = "HT"),
       regexp = NA)
 
     ## check that function works both ways

@@ -378,8 +378,8 @@ olink_normalization_bridgeable <- function(lst_df,
 #'  dataset. Exported from olink_norm_input_check. (required)
 #' @param bridge_samples Character vector of samples to be used for the
 #' quantile mapping. (required)
-#' @param ref_product Name of reference product.
-#' Must be one of "HT" or "Reveal".
+#' @param ref_product Name of reference product. Must be one of "HT" or
+#' "Reveal".
 #'
 #' @return A "tibble" of Olink data in long format containing both input
 #' datasets with the quantile normalized quantifications.
@@ -738,6 +738,8 @@ olink_normalization_qs <- function(lst_df,
 #' @param reference_project Project name of reference project. Must match name
 #' used in olink_normalization product bridging and be one of df1_project_nr or
 #' df2_project_nr.
+#' @param ref_product Name of reference product. Must be one of "HT" or
+#' "Reveal".
 #'
 #' @return A "tibble" of Olink data in long format containing both input
 #' datasets with the bridged NPX quantifications, with the above
@@ -745,31 +747,33 @@ olink_normalization_qs <- function(lst_df,
 #'
 #' @examples
 #' \donttest{
-#' # Bridge samples
+#' # bridge samples
 #' bridge_samples <- intersect(
 #'   x = unique(OlinkAnalyze:::data_ht_small$SampleID),
 #'   y = unique(OlinkAnalyze:::data_3k_small$SampleID)
 #' ) |>
 #'   (\(x) x[!grepl("CONTROL", x)])()
 #'
-#' # Run olink_normalization_product
-#' npx_br_data <- olink_normalization(
-#' df1 = OlinkAnalyze:::data_ht_small,
-#' df2 = OlinkAnalyze:::data_3k_small,
-#' overlapping_samples_df1 = bridge_samples,
-#' df1_project_nr = "Explore HT",
-#' df2_project_nr = "Explore 3072",
-#' reference_project = "Explore HT")
+#' # run olink_normalization
+#' df_norm <- olink_normalization(
+#'   df1 = OlinkAnalyze:::data_ht_small,
+#'   df2 = OlinkAnalyze:::data_3k_small,
+#'   overlapping_samples_df1 = bridge_samples,
+#'   df1_project_nr = "Explore HT",
+#'   df2_project_nr = "Explore 3072",
+#'   reference_project = "Explore HT"
+#' )
 #'
-#' # Format output
-#' npx_br_data_format <- OlinkAnalyze:::olink_normalization_product_format(
-#' df_norm = npx_br_data,
-#' df1 = OlinkAnalyze:::data_ht_small,
-#' df2 = OlinkAnalyze:::data_3k_small,
-#' df1_project_nr = "Explore HT",
-#' df2_project_nr = "Explore 3072",
-#' reference_project = "Explore HT")
-#'
+#' # format output
+#' OlinkAnalyze:::olink_normalization_product_format(
+#'   df_norm = df_norm,
+#'   df1 = OlinkAnalyze:::data_ht_small,
+#'   df2 = OlinkAnalyze:::data_3k_small,
+#'   df1_project_nr = "Explore HT",
+#'   df2_project_nr = "Explore 3072",
+#'   reference_project = "Explore HT",
+#'   ref_product = "HT"
+#' )
 #' }
 #'
 olink_normalization_product_format <- function(df_norm,
@@ -777,7 +781,8 @@ olink_normalization_product_format <- function(df_norm,
                                                df1_project_nr,
                                                df2,
                                                df2_project_nr,
-                                               reference_project) {
+                                               reference_project,
+                                               ref_product) {
 
   # Extract data for assays = "NotBridgeable" ----
 
@@ -797,7 +802,7 @@ olink_normalization_product_format <- function(df_norm,
 
   # Extract data from non-overlapping assays ----
 
-  oid_ref_notref <- eHT_e3072_mapping |>
+  oid_ref_notref <- mapping_file_id(ref_product = ref_product) |>
     dplyr::select(
       dplyr::starts_with("OlinkID_")
     ) |>
