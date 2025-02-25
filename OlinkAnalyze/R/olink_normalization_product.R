@@ -781,15 +781,13 @@ olink_normalization_product_format <- function(df_norm,
 
   # Extract data for assays = "NotBridgeable"
   df_not_bridgeable <- df_norm |>
-    dplyr::mutate(
-      SampleID = paste0(.data[["SampleID"]], "_", .data[["Project"]])
-    ) |>
     dplyr::filter(
       .data[["SampleType"]] == "SAMPLE" # Remove controls
       & .data[["AssayType"]] == "assay"
       & .data[["BridgingRecommendation"]] == "NotBridgeable"
     ) |>
     dplyr::mutate(
+      SampleID = paste0(.data[["SampleID"]], "_", .data[["Project"]]),
       OlinkID = dplyr::if_else(
         .data[["Project"]] == .data[["reference_project"]],
         .data[["OlinkID"]],
