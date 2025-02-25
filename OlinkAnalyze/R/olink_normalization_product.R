@@ -790,6 +790,7 @@ olink_normalization_product_format <- function(df_norm,
     dplyr::filter(
       .data[["SampleType"]] == "SAMPLE" # remove control samples
       & .data[["AssayType"]] == "assay" # remove control assays
+      # keep only assays that are not bridgeable
       & .data[["BridgingRecommendation"]] == "NotBridgeable"
     ) |>
     dplyr::mutate(
@@ -802,6 +803,11 @@ olink_normalization_product_format <- function(df_norm,
 
   # Extract data from non-overlapping assays ----
 
+  # There are different mapping datsets for 3k-HT and 3k-Reveal. Using this
+  # function we always select the relevant mapping dataset.
+  # We also keep OlinkIDs of assays from both products that are being normalized
+  # as one vector, to identify assays that were excluded from the cross-product
+  # normalization.
   oid_ref_notref <- mapping_file_id(ref_product = ref_product) |>
     dplyr::select(
       dplyr::starts_with("OlinkID_")
@@ -812,8 +818,10 @@ olink_normalization_product_format <- function(df_norm,
     dplyr::filter(
       .data[["SampleType"]] == "SAMPLE" # remove control samples
       & .data[["AssayType"]] == "assay" # remove control assays
+      # keep non-overlapping assays
       & !(.data[["OlinkID"]] %in% .env[["oid_ref_notref"]])
     ) |>
+    # add missing variables
     dplyr::mutate(
       Project = .env[["df1_project_nr"]],
       BridgingRecommendation = "NotOverlapping"
@@ -823,8 +831,10 @@ olink_normalization_product_format <- function(df_norm,
     dplyr::filter(
       .data[["SampleType"]] == "SAMPLE" # remove control samples
       & .data[["AssayType"]] == "assay" # remove control assays
+      # keep non-overlapping assays
       & !(.data[["OlinkID"]] %in% .env[["oid_ref_notref"]])
     ) |>
+    # add missing variables
     dplyr::mutate(
       Project = .env[["df2_project_nr"]],
       BridgingRecommendation = "NotOverlapping"
@@ -836,6 +846,7 @@ olink_normalization_product_format <- function(df_norm,
     dplyr::filter(
       .data[["SampleType"]] == "SAMPLE" # remove control samples
       & .data[["AssayType"]] == "assay" # remove control assays
+      # keep only assays that are bridgeable
       & .data[["BridgingRecommendation"]] != "NotBridgeable"
     ) |> # Remove controls
     dplyr::mutate(
