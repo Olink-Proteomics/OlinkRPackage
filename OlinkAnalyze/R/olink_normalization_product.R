@@ -790,9 +790,10 @@ olink_normalization_product_format <- function(df_norm,
       & .data[["BridgingRecommendation"]] == "NotBridgeable"
     ) |>
     dplyr::mutate(
-      OlinkID = dplyr::case_when(
-        .data[["Project"]] == .data[["reference_project"]] ~ .data[["OlinkID"]],
-        .data[["Project"]] != .data[["reference_project"]] ~ .data[["OlinkID_E3072"]]
+      OlinkID = dplyr::if_else(
+        .data[["Project"]] == .data[["reference_project"]],
+        .data[["OlinkID"]],
+        .data[["OlinkID_E3072"]]
       )
     ) |>
     dplyr::select( # Remove extra columns
