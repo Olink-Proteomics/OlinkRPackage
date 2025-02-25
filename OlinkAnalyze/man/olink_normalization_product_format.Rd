@@ -3,7 +3,7 @@
 \name{olink_normalization_product_format}
 \alias{olink_normalization_product_format}
 \title{Formatting the output of olink_normalization_product for seamless use with
-downstream Olink Analyze functions.}
+downstream analysis functions.}
 \usage{
 olink_normalization_product_format(
   df_norm,
@@ -90,4 +90,5 @@ OlinkAnalyze:::olink_normalization_product_format(
 }
 \author{
 Danai G. Topouza
+Klev Diamanti
 }

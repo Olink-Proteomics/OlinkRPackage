@@ -707,10 +707,11 @@ olink_normalization_qs <- function(lst_df,
 
 
 #' Formatting the output of olink_normalization_product for seamless use with
-#' downstream Olink Analyze functions.
+#' downstream analysis functions.
 #'
 #' @author
-#' Danai G. Topouza
+#'   Danai G. Topouza
+#'   Klev Diamanti
 #'
 #' @description
 #' Replaces the NPX values of the non-reference project by the Median Centered
