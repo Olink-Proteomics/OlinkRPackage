@@ -779,21 +779,27 @@ olink_normalization_product_format <- function(df_norm,
                                                df2_project_nr,
                                                reference_project) {
 
-  # Extract data from NotBridgeable assays
+  # Extract data for assays = "NotBridgeable"
   df_not_bridgeable <- df_norm |>
-    dplyr::mutate(SampleID = paste0(.data[["SampleID"]],
-                                    "_",
-                                    .data[["Project"]])) |>
-    dplyr::filter(.data[["SampleType"]] == "SAMPLE") |> # Remove controls
-    dplyr::filter(.data[["AssayType"]] == "assay") |>
-    dplyr::filter(.data[["BridgingRecommendation"]] == "NotBridgeable") |>
-    dplyr::mutate(OlinkID = case_when(
-      Project == reference_project ~ OlinkID,
-      Project != reference_project ~ OlinkID_E3072
-    )) |>
-    dplyr::select(-any_of(c("MedianCenteredNPX",
-                            "QSNormalizedNPX",
-                            "OlinkID_E3072")))# Remove extra columns
+    dplyr::mutate(
+      SampleID = paste0(.data[["SampleID"]], "_", .data[["Project"]])
+    ) |>
+    dplyr::filter(
+      .data[["SampleType"]] == "SAMPLE" # Remove controls
+      & .data[["AssayType"]] == "assay"
+      & .data[["BridgingRecommendation"]] == "NotBridgeable"
+    ) |>
+    dplyr::mutate(
+      OlinkID = dplyr::case_when(
+        .data[["Project"]] == .data[["reference_project"]] ~ .data[["OlinkID"]],
+        .data[["Project"]] != .data[["reference_project"]] ~ .data[["OlinkID_E3072"]]
+      )
+    ) |>
+    dplyr::select( # Remove extra columns
+      -dplyr::any_of(
+        c("MedianCenteredNPX", "QSNormalizedNPX", "OlinkID_E3072")
+      )
+    )
 
 
   # Extract data from non-overlapping assays
