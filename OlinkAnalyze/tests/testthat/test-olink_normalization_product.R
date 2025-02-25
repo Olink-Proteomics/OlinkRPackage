@@ -687,7 +687,7 @@ test_that(
 
     expect_warning(
       object = norm_br_data_format_function <-
-        olink_normalization_product_format(bridged_df = norm_br_data,
+        olink_normalization_product_format(df_norm = norm_br_data,
                                            df1 = data_ht,
                                            df1_project_nr = "P2",
                                            df2 = data_3k,

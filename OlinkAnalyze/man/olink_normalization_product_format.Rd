@@ -6,7 +6,7 @@
 downstream Olink Analyze functions.}
 \usage{
 olink_normalization_product_format(
-  bridged_df,
+  df_norm,
   df1,
   df1_project_nr,
   df2,
@@ -15,7 +15,7 @@ olink_normalization_product_format(
 )
 }
 \arguments{
-\item{bridged_df}{A "tibble" of Olink data in long format resulting from the
+\item{df_norm}{A "tibble" of Olink data in long format resulting from the
 olink_normalization_product function.}
 
 \item{df1}{First dataset to be used for normalization, pre-normalization.
@@ -72,7 +72,7 @@ reference_project = "Explore HT")
 
 # Format output
 npx_br_data_format <- OlinkAnalyze:::olink_normalization_product_format(
-bridged_df = npx_br_data,
+df_norm = npx_br_data,
 df1 = OlinkAnalyze:::data_ht_small,
 df2 = OlinkAnalyze:::data_3k_small,
 df1_project_nr = "Explore HT",

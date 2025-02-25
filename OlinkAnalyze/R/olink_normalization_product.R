@@ -39,8 +39,8 @@
 #' originate from Olink Explore 3072.
 #' @param ref_cols A named list with the column names to use. Exported from
 #' olink_norm_input_check.
-#' @param not_ref_cols A named list with the column names from the non-reference 
-#' dataset. Exported from olink_norm_input_check. 
+#' @param not_ref_cols A named list with the column names from the non-reference
+#' dataset. Exported from olink_norm_input_check.
 #' @param seed Integer random seed (Default: seek = 1).
 #'
 #' @return A "tibble" in long format with the following columns:
@@ -725,7 +725,7 @@ olink_normalization_qs <- function(lst_df,
 #' and external controls. Removes  MedianCenteredNPX, QSNormalizedNPX,
 #' OlinkID_E3072 columns.
 #'
-#' @param bridged_df A "tibble" of Olink data in long format resulting from the
+#' @param df_norm A "tibble" of Olink data in long format resulting from the
 #' olink_normalization_product function.
 #' @param df1 First dataset to be used for normalization, pre-normalization.
 #' Must match df1 used in olink_normalization product bridging.
@@ -763,7 +763,7 @@ olink_normalization_qs <- function(lst_df,
 #'
 #' # Format output
 #' npx_br_data_format <- OlinkAnalyze:::olink_normalization_product_format(
-#' bridged_df = npx_br_data,
+#' df_norm = npx_br_data,
 #' df1 = OlinkAnalyze:::data_ht_small,
 #' df2 = OlinkAnalyze:::data_3k_small,
 #' df1_project_nr = "Explore HT",
@@ -772,7 +772,7 @@ olink_normalization_qs <- function(lst_df,
 #'
 #' }
 
-olink_normalization_product_format <- function(bridged_df,
+olink_normalization_product_format <- function(df_norm,
                                                df1,
                                                df1_project_nr,
                                                df2,
@@ -780,7 +780,7 @@ olink_normalization_product_format <- function(bridged_df,
                                                reference_project) {
 
   # Extract data from NotBridgeable assays
-  df_not_bridgeable <- bridged_df |>
+  df_not_bridgeable <- df_norm |>
     dplyr::mutate(SampleID = paste0(.data[["SampleID"]],
                                     "_",
                                     .data[["Project"]])) |>
@@ -818,7 +818,7 @@ olink_normalization_product_format <- function(bridged_df,
     dplyr::mutate(BridgingRecommendation = "NotOverlapping")
 
   ### Keep the data following BridgingRecommendation
-  df_format <- bridged_df |>
+  df_format <- df_norm |>
     dplyr::filter(.data[["SampleType"]] == "SAMPLE") |> # Remove controls
     dplyr::mutate(SampleID = paste0(.data[["SampleID"]],
                                      "_",
