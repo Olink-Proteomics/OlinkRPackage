@@ -2,7 +2,7 @@
 % Please edit documentation in R/olink_normalization.R
 \name{norm_internal_update_maxlod}
 \alias{norm_internal_update_maxlod}
-\title{Update MaxLOD to the maximum MaxLOD across normalized datatsets.}
+\title{Update MaxLOD to the maximum MaxLOD across normalized datasets.}
 \usage{
 norm_internal_update_maxlod(df, cols)
 }
@@ -16,5 +16,5 @@ The same dataset as the input \var{df} with the column reflecting
 MaxLOD updated.
 }
 \description{
-Update MaxLOD to the maximum MaxLOD across normalized datatsets.
+Update MaxLOD to the maximum MaxLOD across normalized datasets.
 }

@@ -8,7 +8,7 @@ olink_norm_reference_id(lst_product, reference_project)
 }
 \arguments{
 \item{lst_product}{Named character vector with the Olink product name that
-each input datatset matches to.}
+each input dataset matches to.}
 
 \item{reference_project}{Project name of reference_project. Should be one of
 \var{df1_project_nr} or \var{df2_project_nr}. Indicates the project to which
