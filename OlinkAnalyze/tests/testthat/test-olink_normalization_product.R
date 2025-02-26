@@ -1019,62 +1019,21 @@ test_that(
         nrow(),
       expected = 6L
     )
-  }
-)
 
-test_that(
-  "Non-overlapping assays 3k and Reveal",
-  {
-    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
-    skip_if_not(file.exists(test_path("data", "example_Reveal_data.rds")))
-
-    data_3k <- get_example_data(filename = "example_3k_data.rds")
-    data_reveal <- get_example_data(filename = "example_Reveal_data.rds")
-
-    lst_df <- list("e3k" = data_3k,
-                   "Reveal" = data_reveal)
-    lst_cols <- olink_norm_input_check_df_cols(lst_df = lst_df)
-    lst_product <- olink_norm_product_id(
-      lst_df = lst_df,
-      lst_cols = lst_cols
+    expect_true(
+      object = df_3k_reveal_noformat |>
+        dplyr::distinct(
+          .data[["Project"]], .data[["OlinkID"]]
+        ) |>
+        dplyr::group_by(
+          .data[["Project"]]
+        ) |>
+        dplyr::tally(
+          name = "n"
+        ) |>
+        dplyr::ungroup() |>
+        dplyr::pull(.data[["n"]]) |>
+        unique() == 21L
     )
-    ref_ids <- olink_norm_reference_id(
-      lst_product = lst_product,
-      reference_project = "Reveal"
-    )
-    lst_norm_cp <- olink_norm_input_cross_product(
-      lst_df = lst_df,
-      lst_cols = lst_cols,
-      reference_project = "Reveal",
-      product_ids = lst_product,
-      ref_ids = ref_ids
-    )
-
-    expect_warning(
-      object = overlapping_assays <- olink_norm_input_assay_overlap(
-        lst_df = lst_norm_cp$lst_df,
-        reference_medians = NULL,
-        lst_cols = lst_cols,
-        norm_mode = lst_norm_cp$norm_mode
-      ),
-      regexp = "85 assays are not shared across products"
-    )
-
-    expect_equal(
-      object = length(
-        unique(
-          overlapping_assays$lst_df$e3k$OlinkID
-        )
-      ),
-      expected = 21L)
-
-    expect_equal(
-      object = length(
-        unique(
-          overlapping_assays$lst_df$Reveal$OlinkID
-        )
-      ),
-      expected = 21L)
-
   }
 )
