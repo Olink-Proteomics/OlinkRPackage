@@ -4,11 +4,17 @@ test_that(
   "olink_normalization_is_bridgeable - works",
   {
 
-    skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
-    skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
 
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
+
+    bridge_samples_3k_ht <- intersect(
+      x = unique(data_3k$SampleID),
+      y = unique(data_ht$SampleID)
+    ) |>
+      (\(x) x[!grepl("CONTROL", x)])()
 
     # Warning that some assays are not overlapping and will be removed from
     # normalization.
@@ -17,11 +23,7 @@ test_that(
         object = olink_norm_input_check(
           df1 = data_3k,
           df2 = data_ht,
-          overlapping_samples_df1 = intersect(
-            x = unique(data_3k$SampleID),
-            y = unique(data_ht$SampleID)
-          ) |>
-            (\(x) x[!grepl("CONTROL", x)])(),
+          overlapping_samples_df1 = bridge_samples_3k_ht,
           overlapping_samples_df2 = NULL,
           df1_project_nr = "P1",
           df2_project_nr = "P2",
@@ -36,14 +38,14 @@ test_that(
     expect_message(
       object = data_explore_check <- olink_norm_input_check(
         df1 = data_3k |>
-          dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321"))),
-        df2 = data_ht|>
-          dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321"))),
-        overlapping_samples_df1 = intersect(
-          x = unique(data_3k$SampleID),
-          y = unique(data_ht$SampleID)
-        ) |>
-          (\(x) x[!grepl("CONTROL", x)])(),
+          dplyr::filter(
+            !(.data[["OlinkID"]] %in% c("OID12345", "OID54321"))
+          ),
+        df2 = data_ht |>
+          dplyr::filter(
+            !(.data[["OlinkID"]] %in% c("OID12345", "OID54321"))
+          ),
+        overlapping_samples_df1 = bridge_samples_3k_ht,
         overlapping_samples_df2 = NULL,
         df1_project_nr = "P1",
         df2_project_nr = "P2",
@@ -124,27 +126,40 @@ test_that(
 test_that(
   "olink_normalization_qs - works - compare to reference",
   {
-
     skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
     skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
     skip_if_not(file.exists(test_path("data", "example_Reveal_data.rds")))
 
+    exclude_assays <- c("OID12345", "OID54321")
     data_3k <- get_example_data(filename = "example_3k_data.rds") |>
-      dplyr::filter(!(.data[["OlinkID"]] %in% c("OID12345", "OID54321")))
+      dplyr::filter(
+        !(.data[["OlinkID"]] %in% .env[["exclude_assays"]])
+      )
     data_ht <- get_example_data(filename = "example_HT_data.rds") |>
-      dplyr::filter(!(.data[["OlinkID"]] %in% c("OID12345", "OID54321")))
+      dplyr::filter(
+        !(.data[["OlinkID"]] %in% .env[["exclude_assays"]])
+      )
     data_reveal <- get_example_data(filename = "example_Reveal_data.rds") |>
-      dplyr::filter(!(.data[["OlinkID"]] %in% c("OID12345", "OID54321")))
+      dplyr::filter(
+        !(.data[["OlinkID"]] %in% .env[["exclude_assays"]])
+      )
 
     # load reference data ----
 
-    ref_qs_norm_file <- test_path("data",
-                                  "qq_normalization_reference_result.rds")
-    ref_qs_reveal_file <- test_path("data",
-                                       "qq_normalization_reference_result_reveal.rds")
+    skip_if_not(file.exists(
+      testthat::test_path("data", "qq_normalization_reference_result.rds")
+    ))
+    skip_if_not(file.exists(
+      testthat::test_path("data",
+                          "qq_normalization_reference_result_reveal.rds")
+    ))
 
-    ref_qs_norm <- readRDS(file = ref_qs_norm_file)
-    ref_qs_norm_reveal <- readRDS(file = ref_qs_reveal_file)
+    ref_qs_norm <- get_example_data(
+      filename = "qq_normalization_reference_result.rds"
+    )
+    ref_qs_norm_reveal <- get_example_data(
+      filename = "qq_normalization_reference_result_reveal.rds"
+    )
 
     # run example data in the function ----
 
@@ -176,19 +191,21 @@ test_that(
       regexp = "Cross-product normalization will be performed!"
     )
 
-    expect_message(
-      object = expect_warning(norm_input_check_reveal <- olink_norm_input_check(
-        df1 = data_reveal,
-        df2 = data_3k,
-        overlapping_samples_df1 = bridge_samples_reveal,
-        overlapping_samples_df2 = NULL,
-        df1_project_nr = "P1",
-        df2_project_nr = "P2",
-        reference_project = "P1",
-        reference_medians = NULL
+    expect_warning(
+      object = expect_message(
+        object = norm_input_check_reveal <- olink_norm_input_check(
+          df1 = data_reveal,
+          df2 = data_3k,
+          overlapping_samples_df1 = bridge_samples_reveal,
+          overlapping_samples_df2 = NULL,
+          df1_project_nr = "P1",
+          df2_project_nr = "P2",
+          reference_project = "P1",
+          reference_medians = NULL
+        ),
+        regexp = "Cross-product normalization will be performed!"
       ),
-      "83 assays are not shared"),
-      regexp = "Cross-product normalization will be performed!"
+      regexp = "83 assays are not shared"
     )
 
     lst_df <- list(
@@ -196,11 +213,12 @@ test_that(
       norm_input_check$not_ref_df
     ) |>
       lapply(function(l_df) {
-        l_df |>
+        l_df_res <- l_df |>
           dplyr::filter(
             .data[[norm_input_check$ref_cols$sample_id]] %in%
               .env[["bridge_samples"]]
           )
+        return(l_df_res)
       })
     names(lst_df) <- c(norm_input_check$ref_name,
                        norm_input_check$not_ref_name)
@@ -211,14 +229,15 @@ test_that(
       norm_input_check_reveal$not_ref_df
     ) |>
       lapply(function(l_df) {
-        l_df |>
+        l_df_res <- l_df |>
           dplyr::filter(
             .data[[norm_input_check$ref_cols$sample_id]] %in%
               .env[["bridge_samples"]]
           )
+        return(l_df_res)
       })
     names(lst_df_reveal) <- c(norm_input_check$ref_name,
-                       norm_input_check$not_ref_name)
+                              norm_input_check$not_ref_name)
     lst_product_reveal <- norm_input_check_reveal$lst_product
 
     # run the function
@@ -250,13 +269,16 @@ test_that(
       )
     )
 
-    expect_error(olink_normalization_qs(
-      lst_df = lst_df,
-      ref_cols = norm_input_check$ref_cols,
-      not_ref_cols = norm_input_check$not_ref_cols,
-      bridge_samples = bridge_samples,
-      ref_product = "other"),
-      "Reference product must be HT or Reveal")
+    expect_error(
+      object = olink_normalization_qs(
+        lst_df = lst_df,
+        ref_cols = norm_input_check$ref_cols,
+        not_ref_cols = norm_input_check$not_ref_cols,
+        bridge_samples = bridge_samples,
+        ref_product = "other"
+      ),
+      regexp = "Reference product must be HT or Reveal"
+    )
 
     # check if reference is reproduced ----
 
@@ -304,21 +326,24 @@ test_that(
       tolerance = 1e-4
     )
 
-
   }
 )
 
 test_that(
   "olink_normalization_qs - works - expected output, all bridge samples",
   {
+    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
 
-    skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
-    skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
-
+    excluded_assays <- c("OID12345", "OID54321")
     data_3k <- get_example_data(filename = "example_3k_data.rds") |>
-      dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321")))
+      dplyr::filter(
+        !(.data[["OlinkID"]] %in% .env[["excluded_assays"]])
+      )
     data_ht <- get_example_data(filename = "example_HT_data.rds") |>
-      dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321")))
+      dplyr::filter(
+        !(.data[["OlinkID"]] %in% .env[["excluded_assays"]])
+      )
 
     # bridge samples
     bridge_samples <- intersect(
@@ -438,9 +463,8 @@ test_that(
 test_that(
   "olink_normalization_qs - works - expected output, 50 bridge samples",
   {
-
-    skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
-    skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
 
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
@@ -568,8 +592,8 @@ test_that(
   "olink_normalization_qs - works - fewer than 40 bridge samples",
   {
 
-    skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
-    skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
 
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
@@ -810,7 +834,7 @@ test_that(
 )
 
 test_that(
-  "olink_normalization_product_format - works - 3k-HT",
+  "olink_normalization_product_format - works - 3k-Reveal",
   {
     skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
     skip_if_not(file.exists(test_path("data", "example_Reveal_data.rds")))
