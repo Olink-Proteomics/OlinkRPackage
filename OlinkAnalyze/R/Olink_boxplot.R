@@ -202,7 +202,19 @@ olink_boxplot <- function(df,
         dplyr::mutate(Star = dplyr::case_when(Adjusted_pval <0.05 & Adjusted_pval > 0.01 ~ "*",
                                               Adjusted_pval <= 0.01 & Adjusted_pval > 0.005 ~ "**",
                                               Adjusted_pval <= 0.005  ~ "***",
-                                              Adjusted_pval >= 0.05 ~ NA_character_)) |>
+                                              Adjusted_pval >= 0.05 ~ NA_character_))
+        
+        # emmeans parenthesizes the contrast names if they contain spaces or operators
+        ## so we need to check if this happened
+        if (
+          length(intersect(star.info$x.vals, line.data$x.vals)) == 0 &&
+          any(grepl("\\(.*\\)", line.data$x.vals))
+        ) {
+          # remove the outer parentheses from the x.vals
+          line.data$x.vals <- gsub("^\\(|\\)$", "", line.data$x.vals)
+        }
+        
+        line.data <- line.data |>
         dplyr::left_join(star.info, by = "x.vals") |>
         dplyr::group_by(contrast,Name_OID) |>
         dplyr::mutate(x.m = sum(id)/2) |>
