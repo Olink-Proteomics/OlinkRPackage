@@ -1,0 +1,8 @@
+linters: linters_with_defaults(
+  # require that every function has a return()
+  return_linter = return_linter(
+    return_style = "explicit"),
+  # allow objects to have names up to 40 characters
+  object_length_linter = object_length_linter(
+    length = 40))
+encoding: "UTF-8"
