@@ -115,7 +115,7 @@ olink_normalization_bridgeable <- function(lst_df,
   lst_df_clean <- lapply(
     lst_df,
     function(l_df) {
-      l_df |>
+      l_df_res <- l_df |>
         dplyr::filter(
           # only customer samples
           dplyr::if_any(
@@ -140,6 +140,7 @@ olink_normalization_bridgeable <- function(lst_df,
             )
           )
         )
+      return(l_df_res)
     }
   )
 
@@ -540,7 +541,7 @@ olink_normalization_qs <- function(lst_df,
   lst_df_clean <- lapply(
     lst_df,
     function(l_df) {
-      l_df |>
+      l_df_res <- l_df |>
         dplyr::filter(
           # only customer samples
           dplyr::if_any(
@@ -563,6 +564,7 @@ olink_normalization_qs <- function(lst_df,
             )
           )
         )
+      return(l_df_res)
     }
   )
 
