@@ -394,13 +394,14 @@ norm_internal_rename_cols <- function(ref_cols,
           )
         )
       } else {
-        dplyr::tibble(ref = ref_cols[[c_to_u]],
-                      non_ref = not_ref_cols[[c_to_u]])
+        df_nonref_cols <- dplyr::tibble(ref = ref_cols[[c_to_u]],
+                                        non_ref = not_ref_cols[[c_to_u]])
       }
     } else {
-      dplyr::tibble(ref = not_ref_cols[[c_to_u]],
-                    non_ref = not_ref_cols[[c_to_u]])
+      df_nonref_cols <- dplyr::tibble(ref = not_ref_cols[[c_to_u]],
+                                      non_ref = not_ref_cols[[c_to_u]])
     }
+    return(df_nonref_cols)
   }) |>
     dplyr::bind_rows()
 
@@ -446,7 +447,7 @@ norm_internal_assay_median <- function(df,
                                        samples,
                                        name,
                                        cols) {
-  df |>
+  df_median <- df |>
     # filter out df samples not in samples
     dplyr::filter(
       .data[[cols$sample_id]] %in% .env[["samples"]]
@@ -466,6 +467,8 @@ norm_internal_assay_median <- function(df,
       assay_med = median(x = .data[[cols$quant]], na.rm = TRUE),
       .groups = "drop"
     )
+
+  return(df_median)
 }
 
 #' Internal reference median normalization function
@@ -679,12 +682,15 @@ norm_internal_cross_product <- function(ref_df,
 
   df_is_bridgeable <- olink_normalization_bridgeable(
     lst_df = lst_df |> # keep only bridge samples
-      lapply(function(l_df) {
-        l_df |>
-          dplyr::filter(
-            .data[[ref_cols$sample_id]] %in% .env[["ref_samples"]]
-          )
-      }),
+      lapply(
+        function(l_df) {
+          l_df_res <- l_df |>
+            dplyr::filter(
+              .data[[ref_cols$sample_id]] %in% .env[["ref_samples"]]
+            )
+          return(l_df_res)
+        }
+      ),
     ref_cols = ref_cols,
     not_ref_cols = not_ref_cols
   )
@@ -896,7 +902,7 @@ norm_internal_adjust <- function(ref_df,
                                  not_ref_name,
                                  not_ref_cols,
                                  adj_fct_df) {
-  dplyr::bind_rows(
+  df_adjust <- dplyr::bind_rows(
     # reference dataset
     norm_internal_adjust_ref(
       ref_df = ref_df,
@@ -911,6 +917,8 @@ norm_internal_adjust <- function(ref_df,
       adj_fct_cols = ref_cols
     )
   )
+
+  return(df_adjust)
 }
 
 #' Modify the reference dataset to be combined with the non-reference normalized
@@ -927,12 +935,13 @@ norm_internal_adjust <- function(ref_df,
 #'
 norm_internal_adjust_ref <- function(ref_df,
                                      ref_name) {
-  ref_df |>
+  df_adjust_ref <- ref_df |>
     # add project name and Adj_factor = 0 to ref_df
     dplyr::mutate(
       Project = .env[["ref_name"]],
       Adj_factor = 0
     )
+  return(df_adjust_ref)
 }
 
 #' Add adjustment factors to a dataset
@@ -961,7 +970,7 @@ norm_internal_adjust_not_ref <- function(df,
   names(join_by) <- cols$olink_id
 
   # adjust non reference df
-  df |>
+  df_adjust_notref <- df |>
     dplyr::left_join(
       adj_fct_df,
       by = join_by,
@@ -974,6 +983,8 @@ norm_internal_adjust_not_ref <- function(df,
         ~ .x + .data[["Adj_factor"]]
       )
     )
+
+  return(df_adjust_notref)
 }
 
 #' Update MaxLOD to the maximum MaxLOD across normalized datasets.
