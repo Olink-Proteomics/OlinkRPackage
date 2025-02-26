@@ -16,13 +16,7 @@ test_that(
   {
     skip_if_not(file.exists(test_path("data", "ref_results_norm.rds")))
 
-    # load normalized datasets generated with the original olink_normalization
-    # function from OlinkAnalyze 3.8.2
-    get_ref_norm_res <- function() {
-      ref_norm_res_file <- test_path("data", "ref_results_norm.rds")
-      readRDS(file = ref_norm_res_file)
-    }
-    ref_norm_res <- get_ref_norm_res()
+    ref_norm_res <- get_example_data("ref_results_norm.rds")
 
     ### bridge normalization - no norm column ----
 
@@ -130,13 +124,7 @@ test_that(
   {
     skip_if_not(file.exists(test_path("data", "ref_results_norm.rds")))
 
-    # load normalized datasets generated with the original olink_normalization
-    # function from OlinkAnalyze 3.8.2
-    get_ref_norm_res <- function() {
-      ref_norm_res_file <- test_path("data", "ref_results_norm.rds")
-      readRDS(file = ref_norm_res_file)
-    }
-    ref_norm_res <- get_ref_norm_res()
+    ref_norm_res <- get_example_data("ref_results_norm.rds")
 
     ### intensity normalization - no norm column ----
 
@@ -248,13 +236,7 @@ test_that(
   {
     skip_if_not(file.exists(test_path("data", "ref_results_norm.rds")))
 
-    # load normalized datasets generated with the original olink_normalization
-    # function from OlinkAnalyze 3.8.2
-    get_ref_norm_res <- function() {
-      ref_norm_res_file <- test_path("data", "ref_results_norm.rds")
-      readRDS(file = ref_norm_res_file)
-    }
-    ref_norm_res <- get_ref_norm_res()
+    ref_norm_res <- get_example_data("ref_results_norm.rds")
 
     ### subset normalization - no norm column ----
 
@@ -366,13 +348,7 @@ test_that(
   {
     skip_if_not(file.exists(test_path("data", "ref_results_norm.rds")))
 
-    # load normalized datasets generated with the original olink_normalization
-    # function from OlinkAnalyze 3.8.2
-    get_ref_norm_res <- function() {
-      ref_norm_res_file <- test_path("data", "ref_results_norm.rds")
-      readRDS(file = ref_norm_res_file)
-    }
-    ref_norm_res <- get_ref_norm_res()
+    ref_norm_res <- get_example_data("ref_results_norm.rds")
 
     ### reference median normalization - no norm column ----
 
@@ -911,8 +887,8 @@ test_that(
   "olink_normalization - works - old3kformat-HT normalization",
   {
 
-    skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
-    skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
 
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
@@ -922,21 +898,23 @@ test_that(
       dplyr::rename(QC_Warning = SampleQC) |>
       dplyr::rename(Assay_Warning = AssayQC)
 
-    expect_message(expect_warning(
-      object = ht_3k_norm <- olink_normalization(
-        df1 = data_ht,
-        df2 = data_3k_old,
-        overlapping_samples_df1 = intersect(
-          x = unique(data_ht$SampleID),
-          y = unique(data_3k_old$SampleID)
-        ) |>
-          (\(.) .[!grepl("CONTROL", .)])(),
-        df1_project_nr = "df_ht",
-        df2_project_nr = "df_3k",
-        reference_project = "df_ht"
+    expect_warning(
+      object = expect_message(
+        object = ht_3k_norm <- olink_normalization(
+          df1 = data_ht,
+          df2 = data_3k_old,
+          overlapping_samples_df1 = intersect(
+            x = unique(data_ht$SampleID),
+            y = unique(data_3k_old$SampleID)
+          ) |>
+            (\(.) .[!grepl("CONTROL", .)])(),
+          df1_project_nr = "df_ht",
+          df2_project_nr = "df_3k",
+          reference_project = "df_ht"
+        ),
+        regexp = "Cross-product normalization will be performed!"
       ),
-      regexp = "2 assays are not shared across products."),
-      regexp = "Cross-product normalization will be performed!"
+      regexp = "2 assays are not shared across products."
     )
 
     expect_identical(
