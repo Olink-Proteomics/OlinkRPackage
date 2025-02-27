@@ -23,7 +23,7 @@ dataset in \var{lst_df}.}
 
 \item{norm_mode}{Character string indicating the type of normalization to be
 performed. Expecting one of
-bridge, subset, ref_median or norm_cross_product. # nolint}
+bridge, subset, ref_median or norm_cross_product. # nolint line_length_linter}
 }
 \value{
 A named list containing \var{lst_df} and \var{reference_medians}
