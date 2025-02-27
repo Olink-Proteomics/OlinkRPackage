@@ -1,10 +1,7 @@
 linters: linters_with_defaults(
   # require that every function has a return()
   return_linter = return_linter(
-    return_style = "explicit"),
-  # allow objects to have names up to 40 characters
-  object_length_linter = object_length_linter(
-    length = 40))
+    return_style = "explicit"))
 encoding: "UTF-8"
 exclusions: list(
   # files under R
@@ -24,7 +21,7 @@ exclusions: list(
   # "OlinkAnalyze/R/olink_normalization.R",
   "OlinkAnalyze/R/olink_normalization_n.R",
   # "OlinkAnalyze/R/olink_normalization_product.R",
-  "OlinkAnalyze/R/olink_normalization_utils.R",
+  # "OlinkAnalyze/R/olink_normalization_utils.R",
   "OlinkAnalyze/R/Olink_one_non_parametric.R",
   "OlinkAnalyze/R/Olink_ordinalRegression.R",
   "OlinkAnalyze/R/olink_outlier_detection_utils.R",
@@ -48,14 +45,14 @@ exclusions: list(
   "OlinkAnalyze/R/utils-pipe.R",
   "OlinkAnalyze/R/Volcano_plot.R",
   # files under tests
-  "OlinkAnalyze/tests/testthat.R",
-  "OlinkAnalyze/tests/testthat/data/example_3k_data.R",
-  "OlinkAnalyze/tests/testthat/data/example_HT_data.R",
-  "OlinkAnalyze/tests/testthat/data/example_reveal_data.R",
+  # "OlinkAnalyze/tests/testthat.R",
+  # "OlinkAnalyze/tests/testthat/data/example_3k_data.R",
+  # "OlinkAnalyze/tests/testthat/data/example_HT_data.R",
+  # "OlinkAnalyze/tests/testthat/data/example_reveal_data.R",
   "OlinkAnalyze/tests/testthat/data/refResults.R",
-  "OlinkAnalyze/tests/testthat/data/ref_results_norm.R",
-  "OlinkAnalyze/tests/testthat/helper-get_example_olink_data.R",
-  "OlinkAnalyze/tests/testthat/setup.R",
+  # "OlinkAnalyze/tests/testthat/data/ref_results_norm.R",
+  # "OlinkAnalyze/tests/testthat/helper-get_example_olink_data.R",
+  # "OlinkAnalyze/tests/testthat/setup.R",
   "OlinkAnalyze/tests/testthat/test-dist_plot.R",
   "OlinkAnalyze/tests/testthat/test-linear_mixed_model.R",
   "OlinkAnalyze/tests/testthat/test-npxProcessing.R",
@@ -67,7 +64,7 @@ exclusions: list(
   # "OlinkAnalyze/tests/testthat/test-olink_normalization.R",
   "OlinkAnalyze/tests/testthat/test-olink_normalization_n.R",
   # "OlinkAnalyze/tests/testthat/test-olink_normalization_product.R",
-  "OlinkAnalyze/tests/testthat/test-olink_normalization_utils.R",
+  # "OlinkAnalyze/tests/testthat/test-olink_normalization_utils.R",
   "OlinkAnalyze/tests/testthat/test-Olink_one_non_parametric.R",
   "OlinkAnalyze/tests/testthat/test-Olink_ordinalRegression.R",
   "OlinkAnalyze/tests/testthat/test-olink_Pathway_Enrichment.R",
@@ -83,12 +80,12 @@ exclusions: list(
   "OlinkAnalyze/tests/testthat/test-Volcano_plot.R",
   "OlinkAnalyze/tests/testthat/test_Olink_wilcox.R",
   # files under data-raw
-  "OlinkAnalyze/data-raw/example_3k_data_small.R",
-  "OlinkAnalyze/data-raw/example_HT_data_small.R",
-  "OlinkAnalyze/data-raw/mapping.R",
-  "OlinkAnalyze/data-raw/normalization_utils.R",
-  "OlinkAnalyze/data-raw/sysdata.R",
-  "OlinkAnalyze/data-raw/tutorial_figures.R",
+  # "OlinkAnalyze/data-raw/example_3k_data_small.R",
+  # "OlinkAnalyze/data-raw/example_HT_data_small.R",
+  # "OlinkAnalyze/data-raw/mapping.R",
+  # "OlinkAnalyze/data-raw/normalization_utils.R",
+  # "OlinkAnalyze/data-raw/sysdata.R",
+  # "OlinkAnalyze/data-raw/tutorial_figures.R",
   # files under vignettes
   "OlinkAnalyze/vignettes/bridging_crossproduct.Rmd",
   "OlinkAnalyze/vignettes/bridging_introduction.Rmd",
