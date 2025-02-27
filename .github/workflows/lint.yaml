@@ -1,0 +1,38 @@
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+on: pull_request
+
+name: lint
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: any::pak
+          
+      - name: install OA
+        run: |
+          pak::pkg_install(c("local::OlinkAnalyze", "lintr", "devtools"))
+        shell: Rscript {0}
+
+      - name: Lint
+        run: |
+          options(lintr.github_annotation_project_dir = "OlinkAnalyze")
+          devtools::load_all(path = "OlinkAnalyze")
+          lintr::lint_package(path = "OlinkAnalyze")
+        shell: Rscript {0}
+        env:
+          LINTR_ERROR_ON_LINT: true
