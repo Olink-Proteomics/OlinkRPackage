@@ -13,7 +13,7 @@ exclusions: list(
   "OlinkAnalyze/R/npxProcessing.R",
   "OlinkAnalyze/R/Olink_anova.R",
   "OlinkAnalyze/R/Olink_boxplot.R",
-  "OlinkAnalyze/R/olink_bridgeability_plot.R",
+  # "OlinkAnalyze/R/olink_bridgeability_plot.R",
   "OlinkAnalyze/R/Olink_bridgeselector.R",
   "OlinkAnalyze/R/Olink_color.R",
   "OlinkAnalyze/R/Olink_heatmap.R",
