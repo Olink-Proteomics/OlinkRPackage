@@ -213,12 +213,11 @@ test_that(
       norm_input_check$not_ref_df
     ) |>
       lapply(function(l_df) {
-        l_df_res <- l_df |>
+        l_df |> # nolint return_linter
           dplyr::filter(
             .data[[norm_input_check$ref_cols$sample_id]] %in%
               .env[["bridge_samples"]]
           )
-        return(l_df_res)
       })
     names(lst_df) <- c(norm_input_check$ref_name,
                        norm_input_check$not_ref_name)
@@ -229,12 +228,11 @@ test_that(
       norm_input_check_reveal$not_ref_df
     ) |>
       lapply(function(l_df) {
-        l_df_res <- l_df |>
+        l_df |> # nolint return_linter
           dplyr::filter(
             .data[[norm_input_check$ref_cols$sample_id]] %in%
               .env[["bridge_samples"]]
           )
-        return(l_df_res)
       })
     names(lst_df_reveal) <- c(norm_input_check$ref_name,
                               norm_input_check$not_ref_name)

@@ -384,7 +384,7 @@ norm_internal_rename_cols <- function(ref_cols,
   df_nonref_cols_rename <- lapply(names(ref_cols), function(c_to_u) {
     if (c_to_u %in% cols_to_update) {
       if (length(ref_cols[[c_to_u]]) != length(not_ref_cols[[c_to_u]])) {
-        cli::cli_abort(
+        cli::cli_abort(  # nolint return_linter
           c(
             "x" = "Cannot rename {cli::qty(not_ref_cols[[c_to_u]])}
             column{?s} {.val {not_ref_cols[[c_to_u]]}}, with
@@ -394,14 +394,13 @@ norm_internal_rename_cols <- function(ref_cols,
           )
         )
       } else {
-        df_nonref_cols <- dplyr::tibble(ref = ref_cols[[c_to_u]],
-                                        non_ref = not_ref_cols[[c_to_u]])
+        dplyr::tibble(ref = ref_cols[[c_to_u]], # nolint return_linter
+                      non_ref = not_ref_cols[[c_to_u]])
       }
     } else {
-      df_nonref_cols <- dplyr::tibble(ref = not_ref_cols[[c_to_u]],
-                                      non_ref = not_ref_cols[[c_to_u]])
+      dplyr::tibble(ref = not_ref_cols[[c_to_u]], # nolint return_linter
+                    non_ref = not_ref_cols[[c_to_u]])
     }
-    return(df_nonref_cols)
   }) |>
     dplyr::bind_rows()
 
@@ -684,11 +683,10 @@ norm_internal_cross_product <- function(ref_df,
     lst_df = lst_df |> # keep only bridge samples
       lapply(
         function(l_df) {
-          l_df_res <- l_df |>
+          l_df |> # nolint return_linter
             dplyr::filter(
               .data[[ref_cols$sample_id]] %in% .env[["ref_samples"]]
             )
-          return(l_df_res)
         }
       ),
     ref_cols = ref_cols,
@@ -1002,7 +1000,7 @@ norm_internal_update_maxlod <- function(df,
   if (any(names(df) %in% olink_norm_recalc$max_lod)) {
 
     # update MaxLOD to the maximum of the MaxLODs for each assay
-    df <- df |>
+    df_update_maxlod <- df |>
       dplyr::group_by(
         .data[[cols$olink_id]]
       ) |>
@@ -1016,5 +1014,5 @@ norm_internal_update_maxlod <- function(df,
 
   }
 
-  return(df)
+  return(df_update_maxlod)
 }
