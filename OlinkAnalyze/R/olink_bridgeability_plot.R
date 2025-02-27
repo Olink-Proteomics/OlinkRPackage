@@ -74,8 +74,8 @@ olink_bridgeability_plot <- function(data,
   data <- data |>
     dplyr::filter(Count > min_count) |>
     dplyr::mutate(
-      textcol = dplyr::if_else(stringr::str_detect( # nolint
-        .data[["BridgingRecommendation"]], # nolint
+      textcol = dplyr::if_else(stringr::str_detect(
+        .data[["BridgingRecommendation"]],
         "No"), "#A61F04", "#00559E"))
 
   platforms <- unique(data$Project)
