@@ -1012,6 +1012,8 @@ norm_internal_update_maxlod <- function(df,
       ) |>
       dplyr::ungroup()
 
+  } else {
+    df_update_maxlod <- df
   }
 
   return(df_update_maxlod)

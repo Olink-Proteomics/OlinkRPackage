@@ -782,7 +782,7 @@ olink_normalization_qs <- function(lst_df,
 #' )
 #' }
 #'
-olink_normalization_product_format <- function(df_norm,
+olink_normalization_product_format <- function(df_norm, # nolint object_length_linter
                                                df1,
                                                df1_project_nr,
                                                df2,

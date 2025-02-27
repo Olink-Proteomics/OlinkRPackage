@@ -1695,7 +1695,7 @@ test_that(
           "p1" = npx_data1
         ) |>
           lapply(function(l_df) {
-            l_df |>
+            l_df |> # nolint return_linter
               dplyr::select(
                 -dplyr::any_of(c("Normalization"))
               )
@@ -1734,7 +1734,7 @@ test_that(
           "p1" = npx_data1
         ) |>
           lapply(function(l_df) {
-            l_df |>
+            l_df |> # nolint return_linter
               dplyr::select(
                 -dplyr::any_of(c("Normalization"))
               ) |>
@@ -1776,7 +1776,7 @@ test_that(
               "p1" = npx_data1
             ) |>
               lapply(function(l_df) {
-                l_df |>
+                l_df |> # nolint return_linter
                   dplyr::mutate(
                     Normalization = "Intensity"
                   )
@@ -1818,7 +1818,7 @@ test_that(
               "p1" = npx_data1
             ) |>
               lapply(function(l_df) {
-                l_df |>
+                l_df |> # nolint return_linter
                   dplyr::mutate(
                     Normalization = "Intensity"
                   ) |>
@@ -1867,7 +1867,7 @@ test_that(
           "p2" = npx_data2
         ) |>
           lapply(function(l_df) {
-            l_df |>
+            l_df |> # nolint return_linter
               dplyr::select(
                 -dplyr::any_of(c("Normalization"))
               )
@@ -1925,7 +1925,7 @@ test_that(
               "p2" = npx_data2
             ) |>
               lapply(function(l_df) {
-                l_df |>
+                l_df |> # nolint return_linter
                   dplyr::mutate(
                     Normalization = "Intensity"
                   )
@@ -2350,7 +2350,7 @@ test_that(
           "p1" = npx_data1
         ) |>
           lapply(function(l_df) {
-            l_df |>
+            l_df |> # nolint return_linter
               dplyr::mutate(
                 Assay_Warning = NA_character_
               )
@@ -2389,7 +2389,7 @@ test_that(
           "p1" = npx_data1
         ) |>
           lapply(function(l_df) {
-            l_df |>
+            l_df |> # nolint return_linter
               dplyr::mutate(
                 Count = NA_integer_
               )
@@ -5376,7 +5376,7 @@ test_that(
     expect_identical(
       object = lst_out$lst_df,
       expected = lapply(lst_df_v1, function(x) {
-        x |>
+        x |> # nolint return_linter
           dplyr::filter(
             .data[["OlinkID"]] != "OID00471"
           )
@@ -5425,7 +5425,7 @@ test_that(
     expect_identical(
       object = lst_out$lst_df,
       expected = lapply(lst_df_v2, function(x) {
-        x |>
+        x |> # nolint return_linter
           dplyr::filter(
             !(.data[["OlinkID"]] %in% c("OID00471", "OID00472",
                                         "OID00474", "OID00475",
@@ -5471,7 +5471,7 @@ test_that(
     expect_identical(
       object = lst_out$lst_df,
       expected = lapply(lst_df_v3, function(x) {
-        x |>
+        x |> # nolint return_linter
           dplyr::filter(
             .data[["OlinkID"]] != "OID00471"
           )
@@ -5510,7 +5510,7 @@ test_that(
     expect_identical(
       object = lst_out$lst_df,
       expected = lapply(lst_df_v4, function(x) {
-        x |>
+        x |> # nolint return_linter
           dplyr::filter(
             !(.data[["OlinkID"]] %in% c("OID01300", "OID01301",
                                         "OID01302", "OID01303",
@@ -5559,7 +5559,7 @@ test_that(
     expect_identical(
       object = lst_out$lst_df,
       expected = lapply(lst_df_v5, function(x) {
-        x |>
+        x |> # nolint return_linter
           dplyr::filter(
             !(.data[["OlinkID"]] %in% c("OID01300", "OID01301",
                                         "OID01302", "OID01303",
