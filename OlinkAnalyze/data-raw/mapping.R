@@ -1,10 +1,10 @@
 # Explore 3072 to Explore HT Mapping
 
-eHT_e3072_mapping_rds <- system.file("extdata",
+eHT_e3072_mapping_rds <- system.file("extdata", # nolint object_name_linter
                                      "OlinkID_HT_mapping.rds",
                                      package = "OlinkAnalyze",
                                      mustWork = TRUE)
-eHT_e3072_mapping <- readRDS(file = eHT_e3072_mapping_rds) |>
+eHT_e3072_mapping <- readRDS(file = eHT_e3072_mapping_rds) |> # nolint object_name_linter
   dplyr::rename(
     "Assay" = "Gene",
     "OlinkID_HT" = "OlinkID",
@@ -50,7 +50,9 @@ reveal_e3072_mapping <- readRDS(file = reveal_e3072_mapping_rds) |>
     dplyr::ends_with("_E3072")
   ) |>
   dplyr::mutate(
-    OlinkID = paste(.data[["OlinkID_Reveal"]], .data[["OlinkID_E3072"]], sep = "_"),
+    OlinkID = paste(.data[["OlinkID_Reveal"]],
+                    .data[["OlinkID_E3072"]],
+                    sep = "_"),
     Block_Reveal = "Reveal"
   ) |>
   dplyr::as_tibble()

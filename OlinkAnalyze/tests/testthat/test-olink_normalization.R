@@ -784,7 +784,7 @@ test_that(
 
     #correlation assay IDs
     oid_ht <- "OID43204"
-    oid_3k <- eHT_e3072_mapping$OlinkID_E3072[eHT_e3072_mapping$OlinkID_HT == oid_ht] # nolint
+    oid_3k <- eHT_e3072_mapping$OlinkID_E3072[eHT_e3072_mapping$OlinkID_HT == oid_ht] # nolint line_length_linter
 
     # HT correlation is present
     expect_message(

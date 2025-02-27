@@ -312,9 +312,9 @@ olink_norm_input_check <- function(df1,
     } else if (norm_mode %in% c(olink_norm_modes$bridge,
                                 olink_norm_modes$norm_cross_product)) {
       lst_out$ref_samples <- overlapping_samples_df1
-      lst_out$ref_product <- product_ids[names(product_ids) == lst_out$ref_name] |> # nolint
+      lst_out$ref_product <- product_ids[names(product_ids) == lst_out$ref_name] |> # nolint line_length_linter
         unname()
-      lst_out$not_ref_product <- product_ids[names(product_ids) == lst_out$not_ref_name] |>  # nolint
+      lst_out$not_ref_product <- product_ids[names(product_ids) == lst_out$not_ref_name] |> # nolint line_length_linter
         unname()
     }
   }
@@ -369,31 +369,31 @@ olink_norm_input_validate <- function(df1,
   ## check df1 ----
 
   # in any case df1 should be a tibble, data.frame or ArrowObject
-  v_df1 <- ifelse(!missing(df1), # nolint
+  v_df1 <- ifelse(!missing(df1), # nolint object_usage_linter
                   TRUE,
                   FALSE)
 
   ## check df2 ----
 
-  v_df2 <- ifelse(!is.null(df2), # nolint
+  v_df2 <- ifelse(!is.null(df2), # nolint object_usage_linter
                   TRUE,
                   FALSE)
 
   ## check overlapping_samples_df1 ----
 
-  v_overlap_samples_df1 <- ifelse(!missing(overlapping_samples_df1), # nolint
+  v_overlap_samples_df1 <- ifelse(!missing(overlapping_samples_df1), # nolint object_usage_linter
                                   TRUE,
                                   FALSE)
 
   ## check overlapping_samples_df2 ----
 
-  v_overlap_samples_df2 <- ifelse(!is.null(overlapping_samples_df2), # nolint
+  v_overlap_samples_df2 <- ifelse(!is.null(overlapping_samples_df2), # nolint object_usage_linter
                                   TRUE,
                                   FALSE)
 
   ## check reference_medians ----
 
-  v_reference_medians <- ifelse(!is.null(reference_medians), # nolint
+  v_reference_medians <- ifelse(!is.null(reference_medians), # nolint object_usage_linter
                                 TRUE,
                                 FALSE)
 
@@ -961,7 +961,7 @@ olink_norm_input_check_df_cols <- function(lst_df) {
 #'
 #' @return Character string indicating the type of normalization to be
 #' performed. One of
-#' `r cli::ansi_collapse(x = OlinkAnalyze:::olink_norm_modes, sep2 = " or ", last = " or ")`. # nolint
+#' `r cli::ansi_collapse(x = OlinkAnalyze:::olink_norm_modes, sep2 = " or ", last = " or ")`. # nolint line_length_linter
 #' And the updated list of datasets in case of cross-platform normalization.
 #'
 olink_norm_input_cross_product <- function(lst_df,
@@ -1092,7 +1092,7 @@ olink_norm_input_cross_product <- function(lst_df,
     check_cnt <- lapply(lst_cols, function(x) x[["count"]]) |> unlist()
 
     if (length(check_cnt) != 2L) {
-      cnt_miss <- names(lst_cols)[!(names(lst_cols) %in% names(check_cnt))] # nolint
+      cnt_miss <- names(lst_cols)[!(names(lst_cols) %in% names(check_cnt))] # nolint object_usage_linter
 
       cli::cli_abort(
         c(
@@ -1137,7 +1137,7 @@ olink_norm_input_cross_product <- function(lst_df,
 #' for normalization.
 #' @param norm_mode Character string indicating the type of normalization to be
 #' performed. Expecting one of
-#' `r cli::ansi_collapse(x = OlinkAnalyze:::olink_norm_modes, sep2 = " or ", last = " or ")`. # nolint
+#' `r cli::ansi_collapse(x = OlinkAnalyze:::olink_norm_modes, sep2 = " or ", last = " or ")`. # nolint line_length_linter
 #'
 #' @return `NULL` if no warning or error.
 #'
@@ -1401,7 +1401,7 @@ olink_norm_input_ref_medians <- function(reference_medians) {
 
   if (any(ref_med_class == FALSE)) {
 
-    wrong_class <- names(ref_med_class)[ref_med_class == FALSE] # nolint
+    wrong_class <- names(ref_med_class)[ref_med_class == FALSE] # nolint object_usage_linter
 
     cli::cli_abort(
       c(
@@ -1475,7 +1475,7 @@ olink_norm_input_ref_medians <- function(reference_medians) {
 #' dataset in \var{lst_df}.
 #' @param norm_mode Character string indicating the type of normalization to be
 #' performed. Expecting one of
-#' `r cli::ansi_collapse(x = OlinkAnalyze:::olink_norm_modes, sep2 = " or ", last = " or ")`. # nolint
+#' `r cli::ansi_collapse(x = OlinkAnalyze:::olink_norm_modes, sep2 = " or ", last = " or ")`. # nolint line_length_linter
 #'
 #' @return A named list containing \var{lst_df} and \var{reference_medians}
 #' stripped from unexpected Olink identifiers or excluded assays
@@ -1647,7 +1647,7 @@ olink_norm_input_clean_assays <- function(lst_df,
 
   # check that df's have still rows
   if (any(sapply(lst_out$lst_df, nrow) == 0L)) {
-    no_row_df <- names(lst_out$lst_df)[sapply(lst_out$lst_df, nrow) == 0L] # nolint
+    no_row_df <- names(lst_out$lst_df)[sapply(lst_out$lst_df, nrow) == 0L] # nolint object_usage_linter
 
     cli::cli_abort(
       c(
@@ -1722,7 +1722,7 @@ olink_norm_input_clean_assays <- function(lst_df,
 #' dataset in \var{lst_df}.
 #' @param norm_mode Character string indicating the type of normalization to be
 #' performed. Expecting one of
-#' `r cli::ansi_collapse(x = OlinkAnalyze:::olink_norm_modes, sep2 = " or ", last = " or ")`. # nolint
+#' `r cli::ansi_collapse(x = OlinkAnalyze:::olink_norm_modes, sep2 = " or ", last = " or ")`. # nolint line_length_linter
 #'
 #' @return A named list containing \var{lst_df} and \var{reference_medians}
 #' will assays shared across all datasets.
