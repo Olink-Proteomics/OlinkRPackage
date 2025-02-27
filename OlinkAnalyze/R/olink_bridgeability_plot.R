@@ -59,33 +59,45 @@
 #'}
 #'
 olink_bridgeability_plot <- function(data,
-                            median_counts_threshold = 150,
-                            min_count = 10) {
+                                     median_counts_threshold = 150,
+                                     min_count = 10) {
 
+  # check if package ggpubr is installed
   if (!requireNamespace("ggpubr", quietly = TRUE)) {
-
     stop("These plots require the ggpubr package.
          Please install ggpubr before continuing.
             install.packages(\"ggpubr\")")
   }
 
+  # set seed
   set.seed(seed = 1)
+
+  # clean up data to bridgeable assays only
+
+  data <- data |>
+    dplyr::filter(
+      .data[["Count"]] > .env[["min_count"]]
+    ) |>
+    dplyr::mutate(
+      textcol = dplyr::if_else(stringr::str_detect(
+        .data[["BridgingRecommendation"]],
+        "No"), "#A61F04", "#00559E")
+    )
 
   out_plts <- list()
 
+
+
   ids <- data |>
-    dplyr::select(OlinkID, .data[["BridgingRecommendation"]]) |> #HT OlinkID
-    dplyr::distinct() |>
+    dplyr::select() |> #HT OlinkID
+    dplyr::distinct(
+      .data[["OlinkID"]], .data[["BridgingRecommendation"]]
+    ) |>
     dplyr::pull(OlinkID)
 
   # Adjusting the platform and add color green for bridgeable assays
 
-  data <- data |>
-    dplyr::filter(Count > min_count) |>
-    dplyr::mutate(
-      textcol = dplyr::if_else(stringr::str_detect(
-        .data[["BridgingRecommendation"]],
-        "No"), "#A61F04", "#00559E"))
+
 
   platforms <- unique(data$Project)
 
