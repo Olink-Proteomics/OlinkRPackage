@@ -49,13 +49,11 @@
 #'   reference_project = "Explore HT"
 #' )
 #'
-#' olinkids <- unique(paste0(data_norm$OlinkID, "_", data_norm$Assay))
-#' data_norm_bridge_p <- OlinkAnalyze:::olink_bridgeability_plot(
+#' data_norm_bridge_p <- OlinkAnalyze::olink_bridgeability_plot(
 #'   data = data_norm,
 #'   median_counts_threshold = 150L,
 #'   min_count = 10L
 #' )
-#' names(data_norm_bridge_p) <- olinkids
 #'}
 #'
 olink_bridgeability_plot <- function(data,
@@ -361,8 +359,10 @@ olink_bridgeability_plot <- function(data,
 
   # Bridgeable plot ----
 
+  olink_ids <- unique(data$OlinkID)
+
   out_plts <- lapply(
-    unique(data$OlinkID),
+    olink_ids,
     function(oid) {
       data_tmp <- data |>
         dplyr::filter(
@@ -402,6 +402,7 @@ olink_bridgeability_plot <- function(data,
       return(out_plot)
     }
   )
+  names(out_plts) <- olink_ids
 
   return(out_plts)
 }

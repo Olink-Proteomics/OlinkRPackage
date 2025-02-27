@@ -4,7 +4,7 @@
 \alias{olink_bridgeability_plot}
 \title{Plots for each bridgeable assays between two products.}
 \usage{
-olink_bridgeability_plot(data, median_counts_threshold = 150, min_count = 10)
+olink_bridgeability_plot(data, median_counts_threshold = 150L, min_count = 10L)
 }
 \arguments{
 \item{data}{A tibble containing the cross-product bridge normalized dataset
@@ -54,13 +54,11 @@ data_norm <- OlinkAnalyze::olink_normalization(
   reference_project = "Explore HT"
 )
 
-olinkids <- unique(paste0(data_norm$OlinkID, "_", data_norm$Assay))
-data_norm_bridge_p <- OlinkAnalyze:::olink_bridgeability_plot(
+data_norm_bridge_p <- OlinkAnalyze::olink_bridgeability_plot(
   data = data_norm,
   median_counts_threshold = 150L,
   min_count = 10L
 )
-names(data_norm_bridge_p) <- olinkids
 }
 
 }
