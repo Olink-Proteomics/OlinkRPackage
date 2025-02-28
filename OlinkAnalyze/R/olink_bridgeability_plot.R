@@ -81,7 +81,7 @@ olink_bridgeability_plot <- function(data,
   } else if (!all(olink_id %in% unique(data$OlinkID))) {
 
     # check that all OlinkID are present in the data
-    non_overlap_oid <- olink_id[!(olink_id %in% unique(data$OlinkID))]
+    non_overlap_oid <- olink_id[!(olink_id %in% unique(data$OlinkID))] # nolint object_usage_linter
     cli::cli_abort(
       c(
         "x" = "{length(non_overlap_oid)} Olink assay identifiers {?is/are} not
