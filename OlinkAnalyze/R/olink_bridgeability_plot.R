@@ -107,10 +107,6 @@ olink_bridgeability_plot <- function(data,
         outlier.shape = NA,
         alpha = 0.4
       ) +
-      ggplot2::facet_wrap(
-        facets = . ~ .data[["oid_assay"]],
-        scales = "free"
-      ) +
       ggplot2::labs(
         x = "Assay",
         y = "NPX Distribution",
@@ -184,10 +180,6 @@ olink_bridgeability_plot <- function(data,
         ),
         geom = "label"
       ) +
-      ggplot2::facet_wrap(
-        facets = . ~ .data[["oid_assay"]],
-        scales = "free"
-      ) +
       OlinkAnalyze::set_plot_theme() +
       OlinkAnalyze::olink_color_discrete() +
       ggplot2::labs(
@@ -231,10 +223,6 @@ olink_bridgeability_plot <- function(data,
         yintercept = median_counts_threshold,
         color = "#FF1F05",
         linewidth = 0.7
-      ) +
-      ggplot2::facet_wrap(
-        facets = . ~ .data[["oid_assay"]],
-        scales = "free"
       ) +
       ggplot2::labs(
         x = "Assay",
@@ -330,10 +318,6 @@ olink_bridgeability_plot <- function(data,
         color = "black",
         size = 2L
       ) +
-      ggplot2::facet_wrap(
-        facets = . ~ .data[["oid_assay"]],
-        scales = "free"
-      ) +
       ggplot2::annotate(
         geom = "text",
         x = Inf,
@@ -369,8 +353,21 @@ olink_bridgeability_plot <- function(data,
           .data[["OlinkID"]] %in% .env[["oid"]]
         ) |>
         dplyr::mutate(
-          oid_assay = paste(.data[["Assay"]], .data[["OlinkID"]], sep = "\n")
+          oid_assay = paste(.data[["Assay"]], .data[["OlinkID"]], sep = " - ")
         )
+
+      # check that bridging recommendation is unique
+      bridge_suggest <- unique(data_tmp$BridgingRecommendation)
+      if (length(bridge_suggest) != 1L) {
+        cli::cli_abort(
+          c(
+            "x" = "Identified {length(bridge_suggest)} bridging
+            recommendation{?s} in column {.arg {\"BridgingRecommendation\"}} for
+            assay {.val {oid}}.",
+            "i" = "Expected 1!"
+          )
+        )
+      }
 
       # iqr plot
       iqr <- iqr_range_plt(data = data_tmp)
@@ -397,6 +394,22 @@ olink_bridgeability_plot <- function(data,
         ks,
         nrow = 2L,
         heights = c(1L, 1L)
+      )
+
+      out_plot_title <- ifelse(
+        bridge_suggest %in% c("MedianCentering", "QuantileSmoothing"),
+        paste0(unique(data_tmp$oid_assay), " (bridgeable)"),
+        paste0(unique(data_tmp$oid_assay), " (non bridgeable)")
+      )
+
+      out_plot <- ggpubr::annotate_figure(
+        p = out_plot,
+        top = ggpubr::text_grob(
+          label = out_plot_title,
+          size = 14L,
+          just = "centre",
+          face = "plain"
+        )
       )
 
       return(out_plot)
