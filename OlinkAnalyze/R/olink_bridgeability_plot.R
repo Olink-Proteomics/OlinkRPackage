@@ -245,7 +245,8 @@ olink_bridgeability_plot <- function(data,
       ) +
       ggplot2::geom_hline(
         yintercept = median_counts_threshold,
-        color = "#FF1F05",
+        color = "black",
+        linetype = "dashed",
         linewidth = 0.7
       ) +
       ggplot2::labs(
