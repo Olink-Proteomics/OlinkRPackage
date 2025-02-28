@@ -311,7 +311,7 @@ olink_normalization <- function(df1,
         not_ref_name = lst_check$not_ref_name,
         not_ref_cols = lst_check$not_ref_cols
       )
-
+## this is a way for me to test the lintr ci to determine if it is correctly working and giving the correct error message
       if (format == TRUE) {
         df_norm <- olink_normalization_product_format(
           df_norm = df_norm,
