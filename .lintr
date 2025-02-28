@@ -61,6 +61,7 @@ exclusions: list(
   "OlinkAnalyze/tests/testthat/test-Olink_bridgeselector.R",
   "OlinkAnalyze/tests/testthat/test-Olink_color.R",
   "OlinkAnalyze/tests/testthat/test-Olink_heatmap.R",
+  # "OlinkAnalyze/tests/testthat/test-olink_bridgeability_plot.R",
   # "OlinkAnalyze/tests/testthat/test-olink_normalization.R",
   "OlinkAnalyze/tests/testthat/test-olink_normalization_n.R",
   # "OlinkAnalyze/tests/testthat/test-olink_normalization_product.R",
