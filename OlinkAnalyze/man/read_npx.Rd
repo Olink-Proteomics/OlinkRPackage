@@ -34,13 +34,11 @@ read_NPX(
 Expecting extensions "xls" or "xlsx" for excel files, "csv" or "txt" for delim files, "parquet" for parquet files, and "zip" for compressed files.}
 
 \item{out_df}{The class of the output dataset. One of
-"tibble" and "arrow". (default =
-"tibble")}
+"tibble" and "arrow". (default = "tibble")}
 
 \item{sep}{Character separator of delimited input file. One of \code{NULL}
-(default) for auto-detection, or
-";" and ",". Used only
-for delimited output files from Olink software.}
+(default) for auto-detection, or ";" and ",".
+Used only for delimited output files from Olink software.}
 
 \item{long_format}{Boolean marking format of input file. One of \code{NULL}
 (default) for auto-detection, or \code{TRUE} for long format and \code{FALSE} for
@@ -51,8 +49,7 @@ One of \code{NULL} (default) for auto-detection,
 or Target 48, Flex, Target 96, Explore 3072, Explore HT, and Focus.}
 
 \item{data_type}{Quantification method of the input data. One of \code{NULL}
-(default) for auto-detection,
-Ct, NPX, and Quantified. # nolint}
+(default) for auto-detection, "Ct", "NPX", and "Quantified".}
 
 \item{.ignore_files}{Character vector of files included in the zip-compressed
 Olink software output files that should be ignored. Used only for
@@ -67,11 +64,11 @@ and \code{FALSE} to print.}
 Target 48 with NPX Software version earlier than 1.8!} (default \code{FALSE}).}
 }
 \value{
-Tibble or ArrowObject with Olink data in long format.
+Dataset, tibble, ArrowObject, with Olink data in long format.
 }
 \description{
-Imports a file exported from Olink software that quantifies proteins in NPX,
-Ct or absolute quantification.
+Imports a file exported from Olink software that quantifies protein levels in
+NPX, Ct or absolute quantification.
 
 \strong{Note:} Do not modify the Olink software output file prior to
 importing it with \code{\link{read_npx}} as it might fail.

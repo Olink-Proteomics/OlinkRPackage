@@ -1,8 +1,8 @@
 #' Read Olink data in R.
 #'
 #' @description
-#' Imports a file exported from Olink software that quantifies proteins in NPX,
-#' Ct or absolute quantification.
+#' Imports a file exported from Olink software that quantifies protein levels in
+#' NPX, Ct or absolute quantification.
 #'
 #' \strong{Note:} Do not modify the Olink software output file prior to
 #' importing it with \code{\link{read_npx}} as it might fail.
@@ -19,12 +19,10 @@
 #' @param filename Path to Olink software output file in wide or long format.
 #' Expecting extensions `r get_accepted_file_ext_summary()`.
 #' @param out_df The class of the output dataset. One of
-#' `r cli::ansi_collapse(paste0("\"", read_npx_df_output, "\""))`. (default =
-#' "tibble")
+#' `r ansi_collapse_quot(read_npx_df_output)`. (default = "tibble")
 #' @param sep Character separator of delimited input file. One of `NULL`
-#' (default) for auto-detection, or
-#' `r paste0("\"", accepted_field_sep, "\"") |> cli::ansi_collapse()`. Used only
-#' for delimited output files from Olink software.
+#' (default) for auto-detection, or `r ansi_collapse_quot(accepted_field_sep)`.
+#' Used only for delimited output files from Olink software.
 #' @param long_format Boolean marking format of input file. One of `NULL`
 #' (default) for auto-detection, or `TRUE` for long format and `FALSE` for
 #' wide format files.
@@ -32,8 +30,7 @@
 #' One of `NULL` (default) for auto-detection,
 #' or `r cli::ansi_collapse(x = accepted_olink_platforms$name)`.
 #' @param data_type Quantification method of the input data. One of `NULL`
-#' (default) for auto-detection,
-#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse()`. # nolint
+#' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
 #' @param .ignore_files Character vector of files included in the zip-compressed
 #' Olink software output files that should be ignored. Used only for
 #' zip-compressed input files (default = \emph{c("README.txt")}).
@@ -44,7 +41,7 @@
 #' \strong{Important: should be used only to wide format files from Target 96 or
 #' Target 48 with NPX Software version earlier than 1.8!} (default `FALSE`).
 #'
-#' @return Tibble or ArrowObject with Olink data in long format.
+#' @return Dataset, `r get_df_output_print()`, with Olink data in long format.
 #'
 #' @keywords
 #'   NPX;
