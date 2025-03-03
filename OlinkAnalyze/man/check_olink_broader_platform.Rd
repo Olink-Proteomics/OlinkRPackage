@@ -2,19 +2,37 @@
 % Please edit documentation in R/get_olink_platforms.R
 \name{check_olink_broader_platform}
 \alias{check_olink_broader_platform}
-\title{Help function checking that the broader Olink platform is expected.}
+\title{Help function checking that \var{broad_platform} is expected.}
 \usage{
-check_olink_broader_platform(x)
+check_olink_broader_platform(
+  x,
+  platform_name = NULL,
+  data_type = NULL,
+  quant_type = NULL
+)
 }
 \arguments{
 \item{x}{Name of the broader Olink platform. One of
 "NGS" and "qPCR".}
+
+\item{platform_name}{Name of the \var{platform_name} to filter the Olink
+broader platforms for. If \code{NULL} all relevant Olink broader platforms are
+returned, otherwise one of "Explore 3072", "Explore HT", "Flex", "Focus", "Target 48", and "Target 96" is
+expected.}
+
+\item{data_type}{Name of the \var{data_type} to filter the Olink broader
+platforms for. If \code{NULL} all relevant Olink broader platforms are returned,
+otherwise one of "Ct", "NPX", and "Quantified" is expected.}
+
+\item{quant_type}{Name of the \var{quant_type} to filter the Olink broader
+platforms for. If \code{NULL} all relevant Olink broader platforms are returned,
+otherwise one of "absolute" and "relative" is expected.}
 }
 \value{
 \code{NULL} if broader Olink platform is expected, otherwise an error.
 }
 \description{
-Help function checking that the broader Olink platform is expected.
+Help function checking that \var{broad_platform} is expected.
 }
 \author{
 Klev Diamanti

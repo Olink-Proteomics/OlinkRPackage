@@ -4,17 +4,33 @@
 \alias{check_olink_data_type}
 \title{Help function checking that \var{data_type} is expected.}
 \usage{
-check_olink_data_type(x, broader_platform = NULL)
+check_olink_data_type(
+  x,
+  broad_platform = NULL,
+  platform_name = NULL,
+  quant_type = NULL
+)
 }
 \arguments{
 \item{x}{The name of the Olink data type. One of
 "Ct", "NPX", and "Quantified".}
 
-\item{broader_platform}{Name of the broader Olink platform. One of
-"NGS" and "qPCR".}
+\item{broad_platform}{Name of the \var{broad_platform} to filter the Olink
+data types for. If \code{NULL} all relevant Olink data types are returned,
+otherwise one of "NGS" and "qPCR" is
+expected.}
+
+\item{platform_name}{Name of the \var{platform_name} to filter the Olink
+data types for. If \code{NULL} all relevant Olink data types are returned,
+otherwise one of "Explore 3072", "Explore HT", "Flex", "Focus", "Target 48", and "Target 96" is
+expected.}
+
+\item{quant_type}{Name of the \var{quant_type} to filter the Olink data types
+for. If \code{NULL} all relevant Olink data types are returned, otherwise one of
+"absolute" and "relative" is expected.}
 }
 \value{
-\code{NULL} if data_type is expected, otherwise an error.
+\code{NULL} if quantification method (data type) is expected, otherwise an error.
 }
 \description{
 Help function checking that \var{data_type} is expected.

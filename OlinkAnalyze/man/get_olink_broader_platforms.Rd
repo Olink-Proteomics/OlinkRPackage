@@ -2,13 +2,35 @@
 % Please edit documentation in R/get_olink_platforms.R
 \name{get_olink_broader_platforms}
 \alias{get_olink_broader_platforms}
-\title{Get names of current broader Olink platforms.}
+\title{Get names of selected broader Olink platforms.}
 \usage{
-get_olink_broader_platforms()
+get_olink_broader_platforms(
+  platform_name = NULL,
+  data_type = NULL,
+  quant_type = NULL
+)
+}
+\arguments{
+\item{platform_name}{Name of the \var{platform_name} to filter the Olink
+broader platforms for. If \code{NULL} all relevant Olink broader platforms are
+returned, otherwise one of "Explore 3072", "Explore HT", "Flex", "Focus", "Target 48", and "Target 96" is
+expected.}
+
+\item{data_type}{Name of the \var{data_type} to filter the Olink broader
+platforms for. If \code{NULL} all relevant Olink broader platforms are returned,
+otherwise one of "Ct", "NPX", and "Quantified" is expected.}
+
+\item{quant_type}{Name of the \var{quant_type} to filter the Olink broader
+platforms for. If \code{NULL} all relevant Olink broader platforms are returned,
+otherwise one of "absolute" and "relative" is expected.}
 }
 \value{
-A character vector with names of the broader Olink platforms.
+A character vector with names of Olink broader platforms filtered by
+\var{platform_name}, \var{data_type}, and \var{quant_type}.
 }
 \description{
-Get names of current broader Olink platforms.
+Get names of selected broader Olink platforms.
+}
+\author{
+Klev Diamanti
 }

@@ -4,14 +4,29 @@
 \alias{check_olink_platform}
 \title{Help function checking that \var{olink_platform} is expected.}
 \usage{
-check_olink_platform(x, broader_platform = NULL)
+check_olink_platform(
+  x,
+  broad_platform = NULL,
+  data_type = NULL,
+  quant_type = NULL
+)
 }
 \arguments{
 \item{x}{Name of Olink platform. One of
 "Explore 3072", "Explore HT", "Flex", "Focus", "Target 48", and "Target 96".}
 
-\item{broader_platform}{Name of the broader Olink platform. One of
-"NGS" and "qPCR".}
+\item{broad_platform}{Name of the \var{broad_platform} to filter the
+Olink platforms for. If \code{NULL} all relevant Olink platforms are returned,
+otherwise one of "NGS" and "qPCR" is
+expected.}
+
+\item{data_type}{Name of the \var{data_type} to filter the Olink platforms
+for. If \code{NULL} all relevant Olink platforms are returned, otherwise one of
+"Ct", "NPX", and "Quantified" is expected.}
+
+\item{quant_type}{Name of the \var{quant_type} to filter the Olink platforms
+for. If \code{NULL} all relevant Olink platforms are returned, otherwise one of
+"absolute" and "relative" is expected.}
 }
 \value{
 \code{NULL} if platform is expected, otherwise an error.

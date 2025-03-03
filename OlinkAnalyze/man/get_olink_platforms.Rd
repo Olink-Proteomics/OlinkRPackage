@@ -2,17 +2,31 @@
 % Please edit documentation in R/get_olink_platforms.R
 \name{get_olink_platforms}
 \alias{get_olink_platforms}
-\title{Get names of current Olink platforms.}
+\title{Get names of selected Olink platforms.}
 \usage{
-get_olink_platforms(broader_platform = NULL)
+get_olink_platforms(broad_platform = NULL, data_type = NULL, quant_type = NULL)
 }
 \arguments{
-\item{broader_platform}{Name of the \var{broader_platform} to filter the
-Olink platforms for. If set to \code{NULL}, all Olink platforms are returned.}
+\item{broad_platform}{Name of the \var{broad_platform} to filter the
+Olink platforms for. If \code{NULL} all relevant Olink platforms are returned,
+otherwise one of "NGS" and "qPCR" is
+expected.}
+
+\item{data_type}{Name of the \var{data_type} to filter the Olink platforms
+for. If \code{NULL} all relevant Olink platforms are returned, otherwise one of
+"Ct", "NPX", and "Quantified" is expected.}
+
+\item{quant_type}{Name of the \var{quant_type} to filter the Olink platforms
+for. If \code{NULL} all relevant Olink platforms are returned, otherwise one of
+"absolute" and "relative" is expected.}
 }
 \value{
-A character vector with names of Olink platforms.
+A character vector with names of Olink platforms filtered by
+\var{broad_platform}, \var{data_type}, and \var{quant_type}.
 }
 \description{
-Get names of current Olink platforms.
+Get names of selected Olink platforms.
+}
+\author{
+Klev Diamanti
 }
