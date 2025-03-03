@@ -21,7 +21,9 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          packages: any::pak
+         extra-packages: any::pak, any::lintr, local::.
+         working-directory: OlinkAnalyze
+          
           
       - name: install OA
         run: |
