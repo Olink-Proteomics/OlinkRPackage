@@ -198,7 +198,7 @@ olink_norm_input_check <- function(df1,
 
   # extract all unique sample identifiers
   lst_df_samples <- lapply(names(lst_cols), function(l_col) {
-    lst_df[[l_col]] |>
+    lst_df[[l_col]] |> # nolint return_linter
       dplyr::select(
         dplyr::all_of(
           lst_cols[[l_col]]$sample_id
@@ -312,9 +312,9 @@ olink_norm_input_check <- function(df1,
     } else if (norm_mode %in% c(olink_norm_modes$bridge,
                                 olink_norm_modes$norm_cross_product)) {
       lst_out$ref_samples <- overlapping_samples_df1
-      lst_out$ref_product <- product_ids[names(product_ids) == lst_out$ref_name] |> # nolint
+      lst_out$ref_product <- product_ids[names(product_ids) == lst_out$ref_name] |> # nolint line_length_linter
         unname()
-      lst_out$not_ref_product <- product_ids[names(product_ids) == lst_out$not_ref_name] |>  # nolint
+      lst_out$not_ref_product <- product_ids[names(product_ids) == lst_out$not_ref_name] |> # nolint line_length_linter
         unname()
     }
   }
@@ -369,31 +369,31 @@ olink_norm_input_validate <- function(df1,
   ## check df1 ----
 
   # in any case df1 should be a tibble, data.frame or ArrowObject
-  v_df1 <- ifelse(!missing(df1), # nolint
+  v_df1 <- ifelse(!missing(df1), # nolint object_usage_linter
                   TRUE,
                   FALSE)
 
   ## check df2 ----
 
-  v_df2 <- ifelse(!is.null(df2), # nolint
+  v_df2 <- ifelse(!is.null(df2), # nolint object_usage_linter
                   TRUE,
                   FALSE)
 
   ## check overlapping_samples_df1 ----
 
-  v_overlap_samples_df1 <- ifelse(!missing(overlapping_samples_df1), # nolint
+  v_overlap_samples_df1 <- ifelse(!missing(overlapping_samples_df1), # nolint object_usage_linter
                                   TRUE,
                                   FALSE)
 
   ## check overlapping_samples_df2 ----
 
-  v_overlap_samples_df2 <- ifelse(!is.null(overlapping_samples_df2), # nolint
+  v_overlap_samples_df2 <- ifelse(!is.null(overlapping_samples_df2), # nolint object_usage_linter
                                   TRUE,
                                   FALSE)
 
   ## check reference_medians ----
 
-  v_reference_medians <- ifelse(!is.null(reference_medians), # nolint
+  v_reference_medians <- ifelse(!is.null(reference_medians), # nolint object_usage_linter
                                 TRUE,
                                 FALSE)
 
@@ -446,6 +446,8 @@ olink_norm_input_validate <- function(df1,
     )
 
   }
+
+  return(NULL)
 
 }
 
@@ -502,6 +504,7 @@ olink_norm_input_class <- function(df1,
         wrap = FALSE
       )
     }
+    return(NULL)
   }
 
   check_is_character <- function(string,
@@ -529,6 +532,7 @@ olink_norm_input_class <- function(df1,
         )
       }
     }
+    return(NULL)
   }
 
   # check inputs ----
@@ -587,6 +591,8 @@ olink_norm_input_class <- function(df1,
       )
     }
   }
+
+  return(NULL)
 }
 
 #' Check columns of a list of datasets to be normalized.
@@ -679,8 +685,8 @@ olink_norm_input_check_df_cols <- function(lst_df) {
   )
 
   # intersect required column names with columns of df
-  lst_req_col <- lapply(lst_df, function(l_df) {
-    lapply(required_cols, function(r_col) r_col[r_col %in% names(l_df)])
+  lst_req_col <- lapply(lst_df, function(l_df) { # nolint return_linter
+    lapply(required_cols, function(r_col) r_col[r_col %in% names(l_df)]) # nolint return_linter
   })
 
   ## normalization can be missing from both datasets ----
@@ -716,7 +722,7 @@ olink_norm_input_check_df_cols <- function(lst_df) {
 
   col_lod <- lapply(lst_req_col, function(x) x$lod) |>
     lapply(function(x) {
-      x[length(x) > 1L] |>
+      x[length(x) > 1L] |> # nolint return_linter
         cli::ansi_collapse()
     }) |>
     unlist()
@@ -738,24 +744,24 @@ olink_norm_input_check_df_cols <- function(lst_df) {
   # identify missing column names from the set of required_cols and prepare the
   # error to be thrown
   lst_col_miss <- lapply(lst_req_col, function(l_col) {
-    lapply(l_col, function(r_col) {
-      length(r_col) == 1L
+    lapply(l_col, function(r_col) { # nolint return_linter
+      length(r_col) == 1L # nolint return_linter
     })
   }) |>
     # remove lod and normalization as it was checked above
     # we allow assay_warn to be missing but we want to match it to reference
     # df in normalization
     lapply(function(sub_lst) {
-      sub_lst[!(names(sub_lst) %in% c("lod", "normalization",
+      sub_lst[!(names(sub_lst) %in% c("lod", "normalization", # nolint return_linter
                                       "assay_warn", "count", "sample_type"))]
     }) |>
     # remove all elements that have no missing value
     lapply(function(sub_lst) {
-      sub_lst[sub_lst == FALSE]
+      sub_lst[sub_lst == FALSE] # nolint return_linter
     }) |>
     # keep only elements with no or more than 1 matches to required_cols
     lapply(function(sub_lst) {
-      required_cols[names(required_cols) %in% names(sub_lst)] |>
+      required_cols[names(required_cols) %in% names(sub_lst)] |> # nolint return_linter
         # collapse columns whose names can differ in different datasets
         lapply(cli::ansi_collapse, sep = ", ", sep2 = " or ", last = " or ") |>
         # unlist for better error printing
@@ -809,7 +815,7 @@ olink_norm_input_check_df_cols <- function(lst_df) {
       n_df = names(lst_df),
       n_col = lapply(names(lst_df), function(n_df) {
         df_cnames <- names(lst_df[[n_df]])
-        df_cnames[!(df_cnames %in% lst_req_col[[n_df]])]
+        df_cnames[!(df_cnames %in% lst_req_col[[n_df]])] # nolint return_linter
       }) |>
         unlist() |>
         unique()
@@ -858,7 +864,7 @@ olink_norm_input_check_df_cols <- function(lst_df) {
   # error.
 
   lst_class <- lapply(names(lst_df), function(l_name) {
-    lst_df[[l_name]] |>
+    lst_df[[l_name]] |> # nolint return_linter
       dplyr::select(
         dplyr::all_of(
           unlist(lst_req_col[[l_name]])
@@ -955,7 +961,7 @@ olink_norm_input_check_df_cols <- function(lst_df) {
 #'
 #' @return Character string indicating the type of normalization to be
 #' performed. One of
-#' `r cli::ansi_collapse(x = OlinkAnalyze:::olink_norm_modes, sep2 = " or ", last = " or ")`. # nolint
+#' `r cli::ansi_collapse(x = OlinkAnalyze:::olink_norm_modes, sep2 = " or ", last = " or ")`. # nolint line_length_linter
 #' And the updated list of datasets in case of cross-platform normalization.
 #'
 olink_norm_input_cross_product <- function(lst_df,
@@ -1086,7 +1092,7 @@ olink_norm_input_cross_product <- function(lst_df,
     check_cnt <- lapply(lst_cols, function(x) x[["count"]]) |> unlist()
 
     if (length(check_cnt) != 2L) {
-      cnt_miss <- names(lst_cols)[!(names(lst_cols) %in% names(check_cnt))] # nolint
+      cnt_miss <- names(lst_cols)[!(names(lst_cols) %in% names(check_cnt))] # nolint object_usage_linter
 
       cli::cli_abort(
         c(
@@ -1131,7 +1137,7 @@ olink_norm_input_cross_product <- function(lst_df,
 #' for normalization.
 #' @param norm_mode Character string indicating the type of normalization to be
 #' performed. Expecting one of
-#' `r cli::ansi_collapse(x = OlinkAnalyze:::olink_norm_modes, sep2 = " or ", last = " or ")`. # nolint
+#' `r cli::ansi_collapse(x = OlinkAnalyze:::olink_norm_modes, sep2 = " or ", last = " or ")`. # nolint line_length_linter
 #'
 #' @return `NULL` if no warning or error.
 #'
@@ -1249,7 +1255,7 @@ olink_norm_input_check_samples <- function(lst_df_samples,
 
     # find samples in lst_ref_samples that are not present in the dataset
     miss_samples <- lapply(names(lst_df_samples), function(n_df) {
-      setdiff(
+      setdiff( # nolint return_linter
         x = lst_ref_samples[[n_df]],
         y = lst_df_samples[[n_df]]
       ) |>
@@ -1284,9 +1290,9 @@ olink_norm_input_check_samples <- function(lst_df_samples,
         lapply(duplicated) |>
         sapply(any) |>
         (\(x) {
-          lst_ref_samples[x] |>
+          lst_ref_samples[x] |> # nolint return_linter
             lapply(function(y) {
-              y[duplicated(y)] |>
+              y[duplicated(y)] |> # nolint return_linter
                 unique() |>
                 cli::ansi_collapse()
             })
@@ -1340,6 +1346,8 @@ olink_norm_input_check_samples <- function(lst_df_samples,
     )
 
   }
+
+  return(NULL)
 }
 
 #' Check datasets of \var{reference_medians}
@@ -1376,7 +1384,7 @@ olink_norm_input_ref_medians <- function(reference_medians) {
   ref_med_class <- sapply(
     seq_len(nrow(olink_norm_ref_median_cols)),
     function(i) {
-      reference_medians |>
+      reference_medians |> # nolint return_linter
         dplyr::select(
           dplyr::all_of(
             olink_norm_ref_median_cols$cols[i]
@@ -1393,7 +1401,7 @@ olink_norm_input_ref_medians <- function(reference_medians) {
 
   if (any(ref_med_class == FALSE)) {
 
-    wrong_class <- names(ref_med_class)[ref_med_class == FALSE] # nolint
+    wrong_class <- names(ref_med_class)[ref_med_class == FALSE] # nolint object_usage_linter
 
     cli::cli_abort(
       c(
@@ -1451,6 +1459,7 @@ olink_norm_input_ref_medians <- function(reference_medians) {
 
   }
 
+  return(NULL)
 }
 
 #' Check \var{datasets} and \var{reference_medians} for unexpected Olink
@@ -1466,7 +1475,7 @@ olink_norm_input_ref_medians <- function(reference_medians) {
 #' dataset in \var{lst_df}.
 #' @param norm_mode Character string indicating the type of normalization to be
 #' performed. Expecting one of
-#' `r cli::ansi_collapse(x = OlinkAnalyze:::olink_norm_modes, sep2 = " or ", last = " or ")`. # nolint
+#' `r cli::ansi_collapse(x = OlinkAnalyze:::olink_norm_modes, sep2 = " or ", last = " or ")`. # nolint line_length_linter
 #'
 #' @return A named list containing \var{lst_df} and \var{reference_medians}
 #' stripped from unexpected Olink identifiers or excluded assays
@@ -1480,7 +1489,7 @@ olink_norm_input_clean_assays <- function(lst_df,
   # remove all assays that do not match the pattern and that have NA for OlinkID
   check_oid <- function(df, col_name, norm_mode) {
     if (norm_mode == olink_norm_modes$norm_cross_product) {
-      df |>
+      df_oid <- df |>
         dplyr::filter(
           grepl(
             pattern = "^OID\\d{5}_OID\\d{5}$|^OID\\d{5}$",
@@ -1488,7 +1497,7 @@ olink_norm_input_clean_assays <- function(lst_df,
           )
         )
     } else {
-      df |>
+      df_oid <- df |>
         dplyr::filter(
           grepl(
             pattern = "^OID\\d{5}$",
@@ -1496,6 +1505,7 @@ olink_norm_input_clean_assays <- function(lst_df,
           )
         )
     }
+    return(df_oid)
   }
 
   # help variables ----
@@ -1509,7 +1519,7 @@ olink_norm_input_clean_assays <- function(lst_df,
   ### remove from input df ----
 
   lst_df_oid <- lapply(names(lst_df), function(l_name) {
-    check_oid(df = lst_df[[l_name]],
+    check_oid(df = lst_df[[l_name]], # nolint return_linter
               col_name = lst_cols[[l_name]]$olink_id,
               norm_mode = norm_mode)
   })
@@ -1540,7 +1550,7 @@ olink_norm_input_clean_assays <- function(lst_df,
       dplyr::pull(
         .data[[lst_cols[[l_name]]$olink_id]]
       )
-    setdiff(x = oid_orig,
+    setdiff(x = oid_orig, # nolint return_linter
             y = oid_out) |>
       cli::ansi_collapse()
   })
@@ -1624,12 +1634,12 @@ olink_norm_input_clean_assays <- function(lst_df,
 
   lst_df_excluded <- lapply(names(lst_df_oid), function(l_name) {
     if (length(lst_cols[[l_name]]$normalization) > 0L) {
-      lst_df_oid[[l_name]] |>
+      lst_df_oid[[l_name]] |> # nolint return_linter
         dplyr::filter(
           .data[[lst_cols[[l_name]]$normalization]] != excluded_assay_flag
         )
     } else {
-      lst_df_oid[[l_name]]
+      lst_df_oid[[l_name]] # nolint return_linter
     }
   })
   names(lst_df_excluded) <- names(lst_df_oid)
@@ -1637,7 +1647,7 @@ olink_norm_input_clean_assays <- function(lst_df,
 
   # check that df's have still rows
   if (any(sapply(lst_out$lst_df, nrow) == 0L)) {
-    no_row_df <- names(lst_out$lst_df)[sapply(lst_out$lst_df, nrow) == 0L] # nolint
+    no_row_df <- names(lst_out$lst_df)[sapply(lst_out$lst_df, nrow) == 0L] # nolint object_usage_linter
 
     cli::cli_abort(
       c(
@@ -1675,7 +1685,7 @@ olink_norm_input_clean_assays <- function(lst_df,
       dplyr::pull(
         .data[[lst_cols[[l_name]]$olink_id]]
       )
-    setdiff(x = oid_orig,
+    setdiff(x = oid_orig, # nolint return_linter
             y = oid_out) |>
       cli::ansi_collapse()
   })
@@ -1712,7 +1722,7 @@ olink_norm_input_clean_assays <- function(lst_df,
 #' dataset in \var{lst_df}.
 #' @param norm_mode Character string indicating the type of normalization to be
 #' performed. Expecting one of
-#' `r cli::ansi_collapse(x = OlinkAnalyze:::olink_norm_modes, sep2 = " or ", last = " or ")`. # nolint
+#' `r cli::ansi_collapse(x = OlinkAnalyze:::olink_norm_modes, sep2 = " or ", last = " or ")`. # nolint line_length_linter
 #'
 #' @return A named list containing \var{lst_df} and \var{reference_medians}
 #' will assays shared across all datasets.
@@ -1726,7 +1736,7 @@ olink_norm_input_assay_overlap <- function(lst_df,
 
   # get unique OID for each dataset
   lst_df_oid <- lapply(names(lst_df), function(l_name) {
-    lst_df[[l_name]] |>
+    lst_df[[l_name]] |> # nolint return_linter
       dplyr::select(
         dplyr::all_of(lst_cols[[l_name]]$olink_id)
       ) |>
@@ -1781,7 +1791,7 @@ olink_norm_input_assay_overlap <- function(lst_df,
 
     # remove non-shared assays
     lst_out$lst_df <- lapply(names(lst_df), function(l_name) {
-      lst_df[[l_name]] |>
+      lst_df[[l_name]] |> # nolint return_linter
         dplyr::filter(
           !(.data[[lst_cols[[l_name]]$olink_id]] %in% oid_removed)
         )
@@ -1857,7 +1867,7 @@ olink_norm_input_norm_method <- function(lst_df,
       select_cols <- c(lst_cols[[l_name]]$olink_id,
                        lst_cols[[l_name]]$normalization)
       names(select_cols) <- c("olink_id", l_name)
-      lst_df[[l_name]] |>
+      lst_df[[l_name]] |> # nolint return_linter
         # EXCLUDED assays have been removed already in
         # olink_norm_input_clean_assays
         dplyr::select(
@@ -1910,6 +1920,8 @@ olink_norm_input_norm_method <- function(lst_df,
       )
     )
   }
+
+  return(NULL)
 }
 
 #' Identify names of product for each project
@@ -1990,5 +2002,5 @@ mapping_file_id <- function(ref_product) {
   } else if (ref_product == "Reveal") {
     ref_map_3k <- reveal_e3072_mapping
   }
-  ref_map_3k
+  return(ref_map_3k)
 }

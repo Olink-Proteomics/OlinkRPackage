@@ -58,7 +58,7 @@ df_assays <- dplyr::tibble(
 oid <- "OID43204"
 
 cor_assays <- dplyr::tibble(
-  OlinkID = eHT_e3072_mapping$OlinkID_E3072[eHT_e3072_mapping$OlinkID_HT == oid],
+  OlinkID = eHT_e3072_mapping$OlinkID_E3072[eHT_e3072_mapping$OlinkID_HT == oid], # nolint line_length_linter
   UniProt = eHT_e3072_mapping$UniProt[eHT_e3072_mapping$OlinkID_HT == oid],
   Assay = eHT_e3072_mapping$Assay[eHT_e3072_mapping$OlinkID_HT == oid],
   Panel = eHT_e3072_mapping$Panel_E3072[eHT_e3072_mapping$OlinkID_HT == oid],

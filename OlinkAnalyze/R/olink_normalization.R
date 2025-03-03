@@ -314,12 +314,13 @@ olink_normalization <- function(df1,
 
       if (format == TRUE) {
         df_norm <- olink_normalization_product_format(
-          bridged_df = df_norm,
+          df_norm = df_norm,
           df1 = df1,
           df1_project_nr = df1_project_nr,
           df2 = df2,
           df2_project_nr = df2_project_nr,
-          reference_project = reference_project
+          reference_project = reference_project,
+          ref_product = lst_check$ref_product
         )
       }
 
@@ -383,7 +384,7 @@ norm_internal_rename_cols <- function(ref_cols,
   df_nonref_cols_rename <- lapply(names(ref_cols), function(c_to_u) {
     if (c_to_u %in% cols_to_update) {
       if (length(ref_cols[[c_to_u]]) != length(not_ref_cols[[c_to_u]])) {
-        cli::cli_abort(
+        cli::cli_abort(  # nolint return_linter
           c(
             "x" = "Cannot rename {cli::qty(not_ref_cols[[c_to_u]])}
             column{?s} {.val {not_ref_cols[[c_to_u]]}}, with
@@ -393,11 +394,11 @@ norm_internal_rename_cols <- function(ref_cols,
           )
         )
       } else {
-        dplyr::tibble(ref = ref_cols[[c_to_u]],
+        dplyr::tibble(ref = ref_cols[[c_to_u]], # nolint return_linter
                       non_ref = not_ref_cols[[c_to_u]])
       }
     } else {
-      dplyr::tibble(ref = not_ref_cols[[c_to_u]],
+      dplyr::tibble(ref = not_ref_cols[[c_to_u]], # nolint return_linter
                     non_ref = not_ref_cols[[c_to_u]])
     }
   }) |>
@@ -445,7 +446,7 @@ norm_internal_assay_median <- function(df,
                                        samples,
                                        name,
                                        cols) {
-  df |>
+  df_median <- df |>
     # filter out df samples not in samples
     dplyr::filter(
       .data[[cols$sample_id]] %in% .env[["samples"]]
@@ -465,6 +466,8 @@ norm_internal_assay_median <- function(df,
       assay_med = median(x = .data[[cols$quant]], na.rm = TRUE),
       .groups = "drop"
     )
+
+  return(df_median)
 }
 
 #' Internal reference median normalization function
@@ -678,12 +681,14 @@ norm_internal_cross_product <- function(ref_df,
 
   df_is_bridgeable <- olink_normalization_bridgeable(
     lst_df = lst_df |> # keep only bridge samples
-      lapply(function(l_df) {
-        l_df |>
-          dplyr::filter(
-            .data[[ref_cols$sample_id]] %in% .env[["ref_samples"]]
-          )
-      }),
+      lapply(
+        function(l_df) {
+          l_df |> # nolint return_linter
+            dplyr::filter(
+              .data[[ref_cols$sample_id]] %in% .env[["ref_samples"]]
+            )
+        }
+      ),
     ref_cols = ref_cols,
     not_ref_cols = not_ref_cols
   )
@@ -895,7 +900,7 @@ norm_internal_adjust <- function(ref_df,
                                  not_ref_name,
                                  not_ref_cols,
                                  adj_fct_df) {
-  dplyr::bind_rows(
+  df_adjust <- dplyr::bind_rows(
     # reference dataset
     norm_internal_adjust_ref(
       ref_df = ref_df,
@@ -910,6 +915,8 @@ norm_internal_adjust <- function(ref_df,
       adj_fct_cols = ref_cols
     )
   )
+
+  return(df_adjust)
 }
 
 #' Modify the reference dataset to be combined with the non-reference normalized
@@ -926,12 +933,13 @@ norm_internal_adjust <- function(ref_df,
 #'
 norm_internal_adjust_ref <- function(ref_df,
                                      ref_name) {
-  ref_df |>
+  df_adjust_ref <- ref_df |>
     # add project name and Adj_factor = 0 to ref_df
     dplyr::mutate(
       Project = .env[["ref_name"]],
       Adj_factor = 0
     )
+  return(df_adjust_ref)
 }
 
 #' Add adjustment factors to a dataset
@@ -960,7 +968,7 @@ norm_internal_adjust_not_ref <- function(df,
   names(join_by) <- cols$olink_id
 
   # adjust non reference df
-  df |>
+  df_adjust_notref <- df |>
     dplyr::left_join(
       adj_fct_df,
       by = join_by,
@@ -973,6 +981,8 @@ norm_internal_adjust_not_ref <- function(df,
         ~ .x + .data[["Adj_factor"]]
       )
     )
+
+  return(df_adjust_notref)
 }
 
 #' Update MaxLOD to the maximum MaxLOD across normalized datasets.
@@ -990,7 +1000,7 @@ norm_internal_update_maxlod <- function(df,
   if (any(names(df) %in% olink_norm_recalc$max_lod)) {
 
     # update MaxLOD to the maximum of the MaxLODs for each assay
-    df <- df |>
+    df_update_maxlod <- df |>
       dplyr::group_by(
         .data[[cols$olink_id]]
       ) |>
@@ -1002,7 +1012,9 @@ norm_internal_update_maxlod <- function(df,
       ) |>
       dplyr::ungroup()
 
+  } else {
+    df_update_maxlod <- df
   }
 
-  return(df)
+  return(df_update_maxlod)
 }

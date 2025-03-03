@@ -26,8 +26,8 @@ dataset. Exported from olink_norm_input_check. (required)}
 \item{bridge_samples}{Character vector of samples to be used for the
 quantile mapping. (required)}
 
-\item{ref_product}{Name of reference product.
-Must be one of "HT" or "Reveal".}
+\item{ref_product}{Name of reference product. Must be one of "HT" or
+"Reveal".}
 }
 \value{
 A "tibble" of Olink data in long format containing both input
