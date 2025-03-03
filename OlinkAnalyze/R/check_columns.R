@@ -135,7 +135,7 @@ check_columns <- function(df,
 
   if (length(option_cols) > 0L) {
 
-    missing_one <- option_cols[sapply(option_cols, \(x) !any(x %in% df_column_names))] # nolint
+    missing_one <- option_cols[sapply(option_cols, \(x) !any(x %in% df_column_names))] # nolint line_length_linter
 
     if (length(missing_one) > 0L) {
 
