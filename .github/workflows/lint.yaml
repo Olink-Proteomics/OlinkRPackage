@@ -24,12 +24,6 @@ jobs:
          extra-packages: any::pak, any::lintr, local::.
          working-directory: OlinkAnalyze
           
-          
-      - name: install OA
-        run: |
-          pak::pkg_install(c("local::OlinkAnalyze", "lintr", "devtools"))
-        shell: Rscript {0}
-
       - name: Lint
         run: |
           options(lintr.github_annotation_project_dir = "OlinkAnalyze")
