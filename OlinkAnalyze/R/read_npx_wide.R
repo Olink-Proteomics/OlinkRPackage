@@ -38,10 +38,10 @@ read_npx_wide <- function(df,
                     error = TRUE)
 
   check_olink_data_type(x = data_type,
-                        broader_platform = "qPCR")
+                        broad_platform = "qPCR")
 
   check_olink_platform(x = olink_platform,
-                       broader_platform = "qPCR")
+                       broad_platform = "qPCR")
 
   # get expected format specifications ----
 
@@ -233,7 +233,7 @@ read_npx_wide_split_row <- function(df,
                     error = TRUE)
 
   check_olink_data_type(x = data_type,
-                        broader_platform = "qPCR")
+                        broad_platform = "qPCR")
 
   check_is_tibble(df = format_spec,
                   error = TRUE)
@@ -769,7 +769,7 @@ read_npx_wide_top <- function(df,
   # check input and top matrix ----
 
   check_olink_platform(x = olink_platform,
-                       broader_platform = "qPCR")
+                       broad_platform = "qPCR")
 
   check_is_tibble(df = format_spec,
                   error = TRUE)
@@ -1022,7 +1022,7 @@ read_npx_wide_middle <- function(df,
                     error = TRUE)
 
   check_olink_data_type(x = data_type,
-                        broader_platform = "qPCR")
+                        broad_platform = "qPCR")
 
   check_is_list(lst = col_names,
                 error = TRUE)
@@ -1660,10 +1660,10 @@ read_npx_wide_bottom <- function(df,
                     error = TRUE)
 
   check_olink_platform(x = olink_platform,
-                       broader_platform = "qPCR")
+                       broad_platform = "qPCR")
 
   check_olink_data_type(x = data_type,
-                        broader_platform = "qPCR")
+                        broad_platform = "qPCR")
 
   check_is_list(lst = col_names,
                 error = TRUE)
