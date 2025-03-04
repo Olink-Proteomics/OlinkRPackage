@@ -54,18 +54,24 @@ get_file_ext <- function(name_sub = NULL) {
 
   if (!is.null(name_sub)) {
 
-    check_is_scalar_character(string = name_sub,
-                              error = TRUE)
+    check_is_character(string = name_sub,
+                       error = TRUE)
 
-    if (!(name_sub %in% get_file_formats())) {
+    if (!all(name_sub %in% get_file_formats())) {
+      no_overlap <- name_sub[!(name_sub %in% get_file_formats())]
       cli::cli_abort(
         c(
-          "x" = "{.val {name_sub}} does not reflect an acceptable file format!",
+          "x" = "{.val {no_overlap}} {?does/do} not reflect an acceptable file
+          format!",
           "i" = "Expected one of: {.val {get_file_formats()}}"
         ),
         call = rlang::caller_env(),
         wrap = FALSE
       )
+    }
+
+    if (length(name_sub) > 1L) {
+      name_sub <- paste(name_sub, collapse = "|")
     }
 
   } else {

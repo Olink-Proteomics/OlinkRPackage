@@ -79,6 +79,16 @@ test_that(
       object = get_file_ext(name_sub = "delim") |> unname(),
       expected = c("csv", "txt")
     )
+
+    expect_identical(
+      object = get_file_ext(name_sub = c("excel", "parquet")) |> unname(),
+      expected = c("xls", "xlsx", "parquet")
+    )
+
+    expect_identical(
+      object = get_file_ext(name_sub = c("excel", "delim")) |> unname(),
+      expected = c("xls", "xlsx", "csv", "txt")
+    )
   }
 )
 
@@ -87,7 +97,7 @@ test_that(
   {
     expect_error(
       object = get_file_ext(name_sub = NA_character_),
-      regexp = "must be a scalar character"
+      regexp = "must be a character vector"
     )
 
     expect_error(
@@ -98,6 +108,11 @@ test_that(
     expect_error(
       object = get_file_ext(name_sub = "text"),
       regexp = "\"text\" does not reflect an acceptable file format"
+    )
+
+    expect_error(
+      object = get_file_ext(name_sub = c("text", "zip")),
+      regexp = "\"text\" and \"zip\" do not reflect an acceptable file format"
     )
 
     expect_error(
