@@ -141,7 +141,7 @@ check_columns <- function(df,
 
       cli::cli_abort(
         c(
-          "i" = "The data frame {.arg {rlang::caller_arg(df)}} is missing
+          "x" = "The data frame {.arg {rlang::caller_arg(df)}} is missing
           columns that should be present in at least one of the vectors:
           {.val {missing_one}}!",
           "i" = "Please make sure they are part of the input dataset."

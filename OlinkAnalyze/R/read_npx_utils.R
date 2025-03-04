@@ -84,10 +84,10 @@ convert_read_npx_output <- function(df,
 #'   Klev Diamanti
 #'
 #' @param df Olink dataset
-#' (`r ansi_collapse_quot(x =get_df_output_print(), sep = "or")`)
+#' (`r ansi_collapse_quot(x = get_df_output_print(), sep = "or")`)
 #' in wide or long format.
 #' @param file Path to Olink software output file in wide or long format.
-#' Expected file types: `r get_accepted_file_ext_summary()`.
+#' Expected file types: `r get_file_ext_summary()`.
 #'
 #' @return Error is file contains problematic column names. `NULL` otherwise.
 #'

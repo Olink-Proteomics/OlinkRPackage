@@ -59,7 +59,8 @@ check_file_exists <- function(file,
 #'
 #' @description
 #' Use variable \var{accepted_npx_file_ext} to check if extension of the input
-#' file is acceptable. Expecting `r get_accepted_file_ext_summary()`.
+#' file is acceptable. Expecting one of
+#' `r ansi_collapse_quot(get_file_ext_summary())`.
 #'
 #' @param file Path to file.
 #'
