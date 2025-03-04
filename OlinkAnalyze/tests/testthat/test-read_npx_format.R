@@ -1964,7 +1964,7 @@ test_that(
         # check that read_npx_format_get_format works with long_format = NULL
         expect_no_condition(
           object = df_npx_null <- read_npx_format_get_format(
-            df = df,
+            df_top_n = df,
             file = excel_wide,
             long_format = NULL
           )
@@ -1994,7 +1994,7 @@ test_that(
         # check that read_npx_format_get_format works with long_format = FALSE
         expect_no_condition(
           object = df_npx_false <- read_npx_format_get_format(
-            df = df,
+            df_top_n = df,
             file = excel_wide,
             long_format = FALSE
           )
@@ -2063,7 +2063,7 @@ test_that(
         # check that read_npx_format_get_format works with long_format = NULL
         expect_no_condition(
           object = df_npx_null <- read_npx_format_get_format(
-            df = df,
+            df_top_n = df,
             file = excel_long,
             long_format = NULL
           )
@@ -2098,7 +2098,7 @@ test_that(
         # check that read_npx_format_get_format works with long_format = TRUE
         expect_no_condition(
           object = df_npx_true <- read_npx_format_get_format(
-            df = df,
+            df_top_n = df,
             file = excel_long,
             long_format = TRUE
           )
@@ -2169,7 +2169,7 @@ test_that(
         # read_npx_format_get_format throws warn with long_format = FALSE
         expect_warning(
           object = df_npx_false <- read_npx_format_get_format(
-            df = df,
+            df_top_n = df,
             file = excel_long,
             long_format = FALSE
           ),
@@ -2227,7 +2227,7 @@ test_that(
         expect_error(
           object = expect_warning(
             object = read_npx_format_get_format(
-              df = df,
+              df_top_n = df,
               file = excel_wide,
               long_format = TRUE
             ),
@@ -2293,7 +2293,7 @@ test_that(
         # read_npx_format_get_format throws warn with long_format = FALSE
         expect_warning(
           object = df_npx_false <- read_npx_format_get_format(
-            df = df,
+            df_top_n = df,
             file = excel_long,
             long_format = TRUE
           ),
@@ -2359,7 +2359,7 @@ test_that(
         # read_npx_format_get_format throws warn with long_format = TRUE
         expect_warning(
           object = df_npx_true <- read_npx_format_get_format(
-            df = df,
+            df_top_n = df,
             file = excel_wide,
             long_format = FALSE
           ),
@@ -2447,7 +2447,7 @@ test_that(
         # read_npx_format_get_format throws warn with long_format = FALSE
         expect_error(
           object = df_npx_false <- read_npx_format_get_format(
-            df = df,
+            df_top_n = df,
             file = excel_long,
             long_format = NULL
           ),
@@ -2485,7 +2485,7 @@ test_that(
         # read_npx_format_get_format throws warn with long_format = TRUE
         expect_error(
           object = df_npx_true <- read_npx_format_get_format(
-            df = df,
+            df_top_n = df,
             file = excel_wide,
             long_format = NULL
           ),
@@ -2554,7 +2554,7 @@ test_that(
         # read_npx_format_get_format throws warn with long_format = FALSE
         expect_error(
           object = df_npx_false <- read_npx_format_get_format(
-            df = df,
+            df_top_n = df,
             file = excel_long,
             long_format = NULL
           ),
@@ -2592,7 +2592,7 @@ test_that(
         # read_npx_format_get_format throws warn with long_format = TRUE
         expect_error(
           object = df_npx_true <- read_npx_format_get_format(
-            df = df,
+            df_top_n = df,
             file = excel_wide,
             long_format = NULL
           ),

@@ -114,7 +114,7 @@ read_npx_format <- function(file,
   ## Determine long or wide format ----
 
   file_format_check <- read_npx_format_get_format(
-    df = list_df_read$df_top_n,
+    df_top_n = list_df_read$df_top_n,
     file = file,
     long_format = long_format
   )
@@ -405,8 +405,8 @@ read_npx_format_read <- function(file,
 #' @author
 #'   Klev Diamanti
 #'
-#' @param df A tibble containing the first \var{read_n} rows of the input Olink
-#' file.
+#' @param df_top_n A tibble containing the first \var{read_n} rows of the input
+#' Olink file.
 #' @param file Path to Olink software output file in wide or long format.
 #' Expecting file extensions
 #' `r get_file_ext(name_sub = c("excel", "delim")) |> ansi_collapse_quot()`.
@@ -429,13 +429,13 @@ read_npx_format_read <- function(file,
 #'   \code{\link{read_npx_format_get_platform}}
 #'   \code{\link{read_npx_format_get_quant}}
 #'
-read_npx_format_get_format <- function(df,
+read_npx_format_get_format <- function(df_top_n,
                                        file,
                                        long_format = NULL) {
 
   # Check inputs ----
 
-  check_is_tibble(df = df,
+  check_is_tibble(df = df_top_n,
                   error = TRUE)
 
   check_file_exists(file = file,
@@ -451,7 +451,7 @@ read_npx_format_get_format <- function(df,
 
   # Read specific cells of the excel files to determine wide or long format,
   # and protein level metric (NPX, Quant or Ct)
-  data_cells_wide <- df |>
+  data_cells_wide <- df_top_n |>
     dplyr::select(
       dplyr::all_of("V1")
     ) |>
@@ -461,7 +461,7 @@ read_npx_format_get_format <- function(df,
     # convert to character to simplify operations below
     as.character()
 
-  data_cells_long <- df |>
+  data_cells_long <- df_top_n |>
     dplyr::slice_head(
       n = 1L
     ) |>
@@ -577,7 +577,7 @@ read_npx_format_get_format <- function(df,
 
   ## Check that long format data do not have NA colnames ----
 
-  check_na_colname <- df[1L, ] |>
+  check_na_colname <- df_top_n[1L, ] |>
     as.character() |>
     is.na() |>
     any() && (is_long_format == TRUE)

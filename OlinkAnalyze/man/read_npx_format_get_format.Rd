@@ -4,11 +4,11 @@
 \alias{read_npx_format_get_format}
 \title{Help function to determine wide or long file format.}
 \usage{
-read_npx_format_get_format(df, file, long_format = NULL)
+read_npx_format_get_format(df_top_n, file, long_format = NULL)
 }
 \arguments{
-\item{df}{A tibble containing the first \var{read_n} rows of the input Olink
-file.}
+\item{df_top_n}{A tibble containing the first \var{read_n} rows of the input
+Olink file.}
 
 \item{file}{Path to Olink software output file in wide or long format.
 Expecting file extensions
