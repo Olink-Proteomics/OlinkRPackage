@@ -139,10 +139,9 @@ read_npx_format <- function(file,
 
     # get platform
     file_olink_platform <- read_npx_format_get_platform(
-      df = list_df_read$df_top_n,
+      df_top_n = list_df_read$df_top_n,
       file = file,
-      olink_platform = olink_platform,
-      olink_platforms_wide = olink_platforms_wide
+      olink_platform = olink_platform
     )
 
     # get quantification method
@@ -618,19 +617,17 @@ read_npx_format_get_format <- function(df_top_n,
 #' @author
 #'   Klev Diamanti
 #'
-#' @param df A tibble containing the first \var{read_n} rows of the input Olink
-#' file.
-#' @param file Path to Olink software output file in wide format. Expecting file
-#' extensions
-#' `r accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' @param df_top_n A tibble containing the first \var{read_n} rows of the input
+#' Olink file.
+#' @param file Path to Olink software output file in wide format. #' Expecting
+#' file extensions
+#' `r get_file_ext(name_sub = c("excel", "delim")) |> ansi_collapse_quot()`.
 #' @param olink_platform Olink platform used to generate the input file.
-#' One of `NULL` (default),
-#' `r accepted_olink_platforms |> dplyr::filter(.data[["broader_platform"]] == "qPCR") |> dplyr::pull(.data[["name"]]) |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
-#' @param olink_platforms_wide Tibble with rows corresponding to qPCR platforms
-#' extracted from \var{accepted_olink_platforms} from the local environment.
+#' One of `NULL` (default) for auto-detection,
+#' `r get_olink_platforms(broad_platform = "qPCR") |> ansi_collapse_quot()`.
 #'
 #' @return The name of the Olink platform. One of
-#' `r accepted_olink_platforms |> dplyr::filter(.data[["broader_platform"]] == "qPCR") |> dplyr::pull(.data[["name"]]) |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' `r ansi_collapse_quot(get_olink_platforms(broad_platform = "qPCR"))`.
 #'
 #' @seealso
 #'   \code{\link{read_npx_format}}
@@ -638,35 +635,37 @@ read_npx_format_get_format <- function(df_top_n,
 #'   \code{\link{read_npx_format_get_format}}
 #'   \code{\link{read_npx_format_get_quant}}
 #'
-read_npx_format_get_platform <- function(df,
+read_npx_format_get_platform <- function(df_top_n,
                                          file,
-                                         olink_platform = NULL,
-                                         olink_platforms_wide) {
+                                         olink_platform = NULL) {
 
   # Checks inputs ----
 
-  check_is_tibble(df = df,
+  check_is_tibble(df = df_top_n,
                   error = TRUE)
 
   check_file_exists(file = file,
                     error = TRUE)
 
-  check_is_tibble(df = olink_platforms_wide,
-                  error = TRUE)
+  # help vars
+  broad_platform <- "qPCR"
+
+  check_is_scalar_character(string = broad_platform,
+                            error = TRUE)
 
   # check olink platform
   if (!is.null(olink_platform)) {
     check_olink_platform(x = olink_platform,
-                         broad_platform = "qPCR")
+                         broad_platform = broad_platform)
   }
 
   # Determine olink platform from input file ----
 
   # From cell B3 in the wide file read panel name
 
-  check_columns(df = df, col_list = list("V2"))
+  check_columns(df = df_top_n, col_list = list("V2"))
 
-  panel_name <- df |>
+  panel_name <- df_top_n |>
     dplyr::select(
       dplyr::all_of("V2")
     ) |>
@@ -677,15 +676,21 @@ read_npx_format_get_platform <- function(df,
 
   # run the platform-specific regular expression from the global variable to
   # determine that platform.
-  olink_platform_df <- olink_platforms_wide |>
+  olink_platform_auto <- accepted_olink_platforms |>
+    dplyr::filter(
+      .data[["broader_platform"]] == .env[["broad_platform"]]
+    ) |>
     dplyr::mutate(
       detected_platform = stringr::str_detect(
-        string = panel_name,
+        string = .env[["panel_name"]],
         pattern = .data[["regexp"]]
       )
     ) |>
     dplyr::filter(
       .data[["detected_platform"]] == TRUE
+    ) |>
+    dplyr::pull(
+      .data[["name"]]
     )
 
   # Confirm that detected platform matches user input ----
@@ -694,29 +699,31 @@ read_npx_format_get_platform <- function(df,
     # if olink_platform is NULL
 
     # check how many platforms match regular expression
-    if (nrow(olink_platform_df) == 0L) {
+    if (length(olink_platform_auto) == 0L) {
       # if platform cannot be determined from input file throw an error
 
       cli::cli_abort(
         message = c(
           "x" = "Unable to recognize the Olink platform from the input file:
         {.file {file}}!",
-          "i" = "Expected one of: {olink_platforms_wide$name}. Consider setting
-        {.arg olink_platform}."
+          "i" = "Expected one of:
+          {.val {get_olink_platforms(broad_platform = broad_platform)}}.
+          Consider setting {.arg olink_platform}."
         ),
         call = rlang::caller_env(),
         wrap = FALSE
       )
 
-    } else if (nrow(olink_platform_df) > 1L) {
+    } else if (length(olink_platform_auto) > 1L) {
       # if too many platform matches cannot from input file throw an error
 
       cli::cli_abort(
         message = c(
           "x" = "Unable to recognize the Olink platform from the input file:
         {.file {file}}!",
-          "i" = "Too many matches from: {olink_platforms_wide$name}. Consider
-        setting {.arg olink_platform}."
+          "i" = "Too many matches from:
+          {.val {get_olink_platforms(broad_platform = broad_platform)}}.
+          Consider setting {.arg olink_platform}."
         ),
         call = rlang::caller_env(),
         wrap = FALSE
@@ -725,7 +732,7 @@ read_npx_format_get_platform <- function(df,
     } else {
 
       # if data format input is NULL then set it from autodetect
-      out_olink_platform <- olink_platform_df$name
+      out_olink_platform <- olink_platform_auto
 
     }
 
@@ -733,7 +740,7 @@ read_npx_format_get_platform <- function(df,
     # if olink_platform is not NULL
 
     # check how many platforms match regular expression
-    if (nrow(olink_platform_df) == 0L) {
+    if (length(olink_platform_auto) == 0L) {
       # if platform cannot be determined from input file throw a warning
 
       cli::cli_warn(
@@ -745,7 +752,7 @@ read_npx_format_get_platform <- function(df,
         wrap = FALSE
       )
 
-    } else if (nrow(olink_platform_df) > 1L) {
+    } else if (length(olink_platform_auto) > 1L) {
       # if too many platform matches from input file throw a warning
 
       cli::cli_warn(
@@ -757,13 +764,13 @@ read_npx_format_get_platform <- function(df,
         wrap = FALSE
       )
 
-    } else if (olink_platform != olink_platform_df$name) {
+    } else if (olink_platform != olink_platform_auto) {
 
       cli::cli_warn(
         message = c(
           "i" = "Based on {.arg olink_platform} we were expecting Olink
-          {olink_platform} data, but instead we detected
-          {olink_platform_df$name} data. We trust your input!"
+          {.val {olink_platform}} data, but instead we detected
+          {.val {olink_platform_auto}} data. We trust your input!"
         ),
         call = rlang::caller_env(),
         wrap = FALSE

@@ -4,31 +4,23 @@
 \alias{read_npx_format_get_platform}
 \title{Help function to determine Olink platform from the input file in wide format.}
 \usage{
-read_npx_format_get_platform(
-  df,
-  file,
-  olink_platform = NULL,
-  olink_platforms_wide
-)
+read_npx_format_get_platform(df_top_n, file, olink_platform = NULL)
 }
 \arguments{
-\item{df}{A tibble containing the first \var{read_n} rows of the input Olink
-file.}
+\item{df_top_n}{A tibble containing the first \var{read_n} rows of the input
+Olink file.}
 
-\item{file}{Path to Olink software output file in wide format. Expecting file
-extensions
-xls, xlsx, csv, or txt. # nolint}
+\item{file}{Path to Olink software output file in wide format. #' Expecting
+file extensions
+"xls", "xlsx", "csv", and "txt".}
 
 \item{olink_platform}{Olink platform used to generate the input file.
-One of \code{NULL} (default),
-Target 48, Flex, Target 96, or Focus. # nolint}
-
-\item{olink_platforms_wide}{Tibble with rows corresponding to qPCR platforms
-extracted from \var{accepted_olink_platforms} from the local environment.}
+One of \code{NULL} (default) for auto-detection,
+"Flex", "Focus", "Target 48", and "Target 96".}
 }
 \value{
 The name of the Olink platform. One of
-Target 48, Flex, Target 96, or Focus. # nolint
+"Flex", "Focus", "Target 48", and "Target 96".
 }
 \description{
 This function uses the panel name from Olink software files in wide format to

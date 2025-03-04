@@ -2612,9 +2612,6 @@ test_that(
   {
     skip_on_cran()
 
-    olink_platforms_wide <- accepted_olink_platforms |>
-      dplyr::filter(.data[["broader_platform"]] == "qPCR")
-
     ## Target 96 ----
 
     withr::with_tempfile(
@@ -2648,10 +2645,9 @@ test_that(
         # read_npx_format_get_platform works for olink_platform = NULL
         expect_no_condition(
           object = df_npx_null <- read_npx_format_get_platform(
-            df = df,
+            df_top_n = df,
             file = excel_t96,
-            olink_platform = NULL,
-            olink_platforms_wide = olink_platforms_wide
+            olink_platform = NULL
           )
         )
 
@@ -2667,10 +2663,9 @@ test_that(
         # read_npx_format_get_platform works for olink_platform = "T96"
         expect_no_condition(
           object = df_npx_t96 <- read_npx_format_get_platform(
-            df = df,
+            df_top_n = df,
             file = excel_t96,
-            olink_platform = "Target 96",
-            olink_platforms_wide = olink_platforms_wide
+            olink_platform = "Target 96"
           )
         )
 
@@ -2716,10 +2711,9 @@ test_that(
         # read_npx_format_get_platform works for olink_platform = NULL
         expect_no_condition(
           object = df_npx_null <- read_npx_format_get_platform(
-            df = df,
+            df_top_n = df,
             file = excel_t48,
-            olink_platform = NULL,
-            olink_platforms_wide = olink_platforms_wide
+            olink_platform = NULL
           )
         )
 
@@ -2735,10 +2729,9 @@ test_that(
         # read_npx_format_get_platform works for olink_platform = "T48"
         expect_no_condition(
           object = df_npx_t48 <- read_npx_format_get_platform(
-            df = df,
+            df_top_n = df,
             file = excel_t48,
-            olink_platform = "Target 48",
-            olink_platforms_wide = olink_platforms_wide
+            olink_platform = "Target 48"
           )
         )
 
@@ -2787,10 +2780,9 @@ test_that(
         # read_npx_format_get_platform works for olink_platform = NULL
         expect_no_condition(
           object = df_npx_null <- read_npx_format_get_platform(
-            df = df,
+            df_top_n = df,
             file = excel_flex,
-            olink_platform = NULL,
-            olink_platforms_wide = olink_platforms_wide
+            olink_platform = NULL
           )
         )
 
@@ -2806,10 +2798,9 @@ test_that(
         # read_npx_format_get_platform works for olink_platform = "Flex"
         expect_no_condition(
           object = df_npx_flex <- read_npx_format_get_platform(
-            df = df,
+            df_top_n = df,
             file = excel_flex,
-            olink_platform = "Flex",
-            olink_platforms_wide = olink_platforms_wide
+            olink_platform = "Flex"
           )
         )
 
@@ -2867,10 +2858,9 @@ test_that(
         # read_npx_format_get_platform works for olink_platform = NULL
         expect_no_condition(
           object = df_npx_null <- read_npx_format_get_platform(
-            df = df,
+            df_top_n = df,
             file = excel_flex,
-            olink_platform = NULL,
-            olink_platforms_wide = olink_platforms_wide
+            olink_platform = NULL
           )
         )
 
@@ -2886,10 +2876,9 @@ test_that(
         # read_npx_format_get_platform works for olink_platform = "Flex"
         expect_no_condition(
           object = df_npx_flex <- read_npx_format_get_platform(
-            df = df,
+            df_top_n = df,
             file = excel_flex,
-            olink_platform = "Flex",
-            olink_platforms_wide = olink_platforms_wide
+            olink_platform = "Flex"
           )
         )
 
@@ -2953,11 +2942,9 @@ test_that(
         # check that read_npx_format_get_platform throws error
         expect_error(
           object = read_npx_format_get_platform(
-            df = df,
+            df_top_n = df,
             file = excel_wide,
-            olink_platform = NULL,
-            olink_platforms_wide = accepted_olink_platforms |>
-              dplyr::filter(.data[["broader_platform"]] == "qPCR")
+            olink_platform = NULL
           ),
           regexp = "Expected one of"
         )
@@ -3013,11 +3000,9 @@ test_that(
         # check that read_npx_format_get_platform throws error
         expect_error(
           object = read_npx_format_get_platform(
-            df = df,
+            df_top_n = df,
             file = excel_wide,
-            olink_platform = NULL,
-            olink_platforms_wide = accepted_olink_platforms |>
-              dplyr::filter(.data[["broader_platform"]] == "qPCR")
+            olink_platform = NULL
           ),
           regexp = "Too many matches from"
         )
@@ -3049,9 +3034,6 @@ test_that(
         n = 3L
       )
 
-    olink_platforms_wide <- accepted_olink_platforms |>
-      dplyr::filter(.data[["broader_platform"]] == "qPCR")
-
     ## no match ----
 
     withr::with_tempfile(
@@ -3081,10 +3063,9 @@ test_that(
         # check that read_npx_format_get_platform throws error
         expect_warning(
           object = df_npx <- read_npx_format_get_platform(
-            df = df,
+            df_top_n = df,
             file = excel_wide,
-            olink_platform = "Target 96",
-            olink_platforms_wide = olink_platforms_wide
+            olink_platform = "Target 96"
           ),
           regexp = "Unable to recognize the Olink platform from the input file:"
         )
@@ -3130,10 +3111,9 @@ test_that(
         # check that read_npx_format_get_platform throws error
         expect_warning(
           object = df_npx <- read_npx_format_get_platform(
-            df = df,
+            df_top_n = df,
             file = excel_wide,
-            olink_platform = "Target 96",
-            olink_platforms_wide = olink_platforms_wide
+            olink_platform = "Target 96"
           ),
           regexp = "Unable to recognize the Olink platform from the input file:"
         )
@@ -3167,10 +3147,9 @@ test_that(
         # check that read_npx_format_get_platform throws error
         expect_warning(
           object = df_npx <- read_npx_format_get_platform(
-            df = df,
+            df_top_n = df,
             file = excel_wide,
-            olink_platform = "Target 48",
-            olink_platforms_wide = olink_platforms_wide
+            olink_platform = "Target 48"
           ),
           regexp = "Based on `olink_platform` we were expecting Olink"
         )
