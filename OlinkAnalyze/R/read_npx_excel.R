@@ -8,11 +8,12 @@
 #'
 #' @param file Path to Olink software output excel file in wide or long format.
 #' Expected file extensions
-#' `r ansi_collapse_quot(accepted_npx_file_ext[grepl("excel", names(accepted_npx_file_ext))])`. # nolint line_length_linter
+#' `r ansi_collapse_quot(get_file_ext(name_sub = "excel"))`.
 #' @param out_df The class of output data frame. One of
 #' `r ansi_collapse_quot(get_df_output_print())`.
 #'
-#' @return Tibble or ArrowObject with Olink data in wide or long format.
+#' @return `r ansi_collapse_quot(x = get_df_output_print(), sep = "or")` with
+#' Olink data in long or wide format.
 #'
 #' @seealso
 #'   \code{\link{read_npx}}

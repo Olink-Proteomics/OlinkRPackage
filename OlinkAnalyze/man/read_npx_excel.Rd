@@ -10,13 +10,14 @@ read_npx_excel(file, out_df = "arrow")
 \arguments{
 \item{file}{Path to Olink software output excel file in wide or long format.
 Expected file extensions
-"xls" and "xlsx". # nolint line_length_linter}
+"xls" and "xlsx".}
 
 \item{out_df}{The class of output data frame. One of
 "tibble" and "ArrowObject".}
 }
 \value{
-Tibble or ArrowObject with Olink data in wide or long format.
+"tibble" or "ArrowObject" with
+Olink data in long or wide format.
 }
 \description{
 Help function to read "Ct", "NPX", and "Quantified" data
