@@ -10,8 +10,8 @@ read_npx_format_get_platform(df_top_n, file, olink_platform = NULL)
 \item{df_top_n}{A tibble containing the first \var{read_n} rows of the input
 Olink file.}
 
-\item{file}{Path to Olink software output file in wide format. #' Expecting
-file extensions
+\item{file}{Path to Olink software output file in wide format. Expecting file
+extensions
 "xls", "xlsx", "csv", and "txt".}
 
 \item{olink_platform}{Olink platform used to generate the input file.

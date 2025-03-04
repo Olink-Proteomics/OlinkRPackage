@@ -619,8 +619,8 @@ read_npx_format_get_format <- function(df_top_n,
 #'
 #' @param df_top_n A tibble containing the first \var{read_n} rows of the input
 #' Olink file.
-#' @param file Path to Olink software output file in wide format. #' Expecting
-#' file extensions
+#' @param file Path to Olink software output file in wide format. Expecting file
+#' extensions
 #' `r get_file_ext(name_sub = c("excel", "delim")) |> ansi_collapse_quot()`.
 #' @param olink_platform Olink platform used to generate the input file.
 #' One of `NULL` (default) for auto-detection,
