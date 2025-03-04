@@ -18,7 +18,8 @@ Expecting file extensions
 Used only for delimited output files from Olink software.}
 }
 \value{
-Tibble or ArrowObject with Olink data in wide format.
+"tibble" or "ArrowObject" with
+Olink data in wide format.
 }
 \description{
 The function can handle delimited files in wide format.

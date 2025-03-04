@@ -18,7 +18,8 @@
 #' (default) for auto-detection, or `r ansi_collapse_quot(accepted_field_sep)`.
 #' Used only for delimited output files from Olink software.
 #'
-#' @return Tibble or ArrowObject with Olink data in long format.
+#' @return `r ansi_collapse_quot(x = get_df_output_print(), sep = "or")` with
+#' Olink data in long or wide format.
 #'
 #' @seealso
 #'   \code{\link{read_npx}}
@@ -142,7 +143,8 @@ read_npx_csv <- read_npx_delim
 #' (default) for auto-detection, or `r ansi_collapse_quot(accepted_field_sep)`.
 #' Used only for delimited output files from Olink software.
 #'
-#' @return Tibble or ArrowObject with Olink data in long format.
+#' @return `r ansi_collapse_quot(x = get_df_output_print(), sep = "or")` with
+#' Olink data in long format.
 #'
 #' @seealso
 #'   \code{\link{read_npx_delim_wide}}
@@ -193,7 +195,8 @@ read_npx_delim_long <- function(file,
 #' (default) for auto-detection, or `r ansi_collapse_quot(accepted_field_sep)`.
 #' Used only for delimited output files from Olink software.
 #'
-#' @return Tibble or ArrowObject with Olink data in wide format.
+#' @return `r ansi_collapse_quot(x = get_df_output_print(), sep = "or")` with
+#' Olink data in wide format.
 #'
 #' @seealso
 #'   \code{\link{read_npx_delim_long}}
@@ -244,7 +247,7 @@ read_npx_delim_wide <- function(file,
 #' (default) for auto-detection, or `r ansi_collapse_quot(accepted_field_sep)`.
 #' Used only for delimited output files from Olink software.
 #'
-#' @return The file separator comma "," or semicolon ";".
+#' @return The file separator `r ansi_collapse_quot(accepted_field_sep)`.
 #'
 #' @seealso
 #'   \code{\link{read_npx_delim_long}}
@@ -301,7 +304,7 @@ check_field_separator <- function(file,
 #' Expecting file extensions
 #' `r get_file_ext(name_sub = "delim") |> ansi_collapse_quot()`.
 #'
-#' @return The file separator comma "," or semicolon ";".
+#' @return The file separator `r ansi_collapse_quot(accepted_field_sep)`.
 #'
 #' @seealso
 #'   \code{\link{read_npx_delim_long}}

@@ -17,7 +17,7 @@ Expecting file extensions
 Used only for delimited output files from Olink software.}
 }
 \value{
-The file separator comma "," or semicolon ";".
+The file separator ";" and ",".
 }
 \description{
 Help function to check and get the separator of a delimited file from Olink

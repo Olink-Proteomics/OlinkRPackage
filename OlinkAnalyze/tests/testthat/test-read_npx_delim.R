@@ -303,6 +303,64 @@ test_that(
 )
 
 test_that(
+  "read_npx_delim - works - long format - file contains quotations",
+  {
+
+    withr::with_tempfile(
+      new = "cdfile_test",
+      pattern = "delim-file-test",
+      fileext = ".csv",
+      code = {
+
+        # random data frame
+        df <- dplyr::tibble(
+          "B" = c("a#1", "b", "c"),
+          "A" = c(1, 2.2, 3.14),
+          "C" = c(TRUE, TRUE, FALSE),
+          "D" = c("A", "B", NA_character_),
+          "E" = c(1L, 2L, 3L)
+        )
+
+        # write the coma-delimited file
+        utils::write.table(
+          x = df,
+          file = cdfile_test,
+          append = FALSE,
+          quote = TRUE,
+          sep = ";",
+          eol = "\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = TRUE
+        )
+
+        # check that the comma delimited file exists
+        expect_true(object = file.exists(cdfile_test))
+
+        # chech that reading the file works
+        expect_no_condition(
+          object = df_out <- read_npx_delim(file = cdfile_test,
+                                            out_df = "tibble",
+                                            sep = NULL)
+        )
+
+        # check that variable exists
+        expect_true(object = exists("df_out"))
+
+        # check that the two dataframes are identical
+        expect_equal(
+          object = df_out,
+          expected = df
+        )
+
+      }
+    )
+
+  }
+)
+
+test_that(
   "read_npx_delim - error - long format - file not delimited",
   {
     withr::with_tempfile(
@@ -973,7 +1031,7 @@ test_that(
         # check that relevant error is thrown
         expect_error(
           object = get_field_separator(file = tfile_hashtag),
-          regexp = "Expecting semicolon.*.or comma.*.!"
+          regexp = "Expected one of \";\" and \",\"!"
         )
 
       }
@@ -1002,7 +1060,7 @@ test_that(
         # check that relevant error is thrown
         expect_error(
           object = get_field_separator(file = tfile_mixed),
-          regexp = "Both semicolon.*.and comma.*.are present in header line."
+          regexp = "Both \";\" and \",\" are present in header line."
         )
 
       }

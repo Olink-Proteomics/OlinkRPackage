@@ -12,7 +12,7 @@ Expecting file extensions
 "csv" and "txt".}
 }
 \value{
-The file separator comma "," or semicolon ";".
+The file separator ";" and ",".
 }
 \description{
 This function uses the first line of the provided file to determine the

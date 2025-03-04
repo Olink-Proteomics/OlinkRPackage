@@ -18,7 +18,8 @@ Expecting file extensions
 Used only for delimited output files from Olink software.}
 }
 \value{
-Tibble or ArrowObject with Olink data in long format.
+"tibble" or "ArrowObject" with
+Olink data in long format.
 }
 \description{
 The function can handle delimited files in long format.
