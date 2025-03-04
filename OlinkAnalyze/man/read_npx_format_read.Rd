@@ -9,11 +9,11 @@ read_npx_format_read(file, sep = NULL, read_n = 3L)
 \arguments{
 \item{file}{Path to Olink software output file in wide or long format.
 Expecting file extensions
-xls, xlsx, csv, or txt. # nolint}
+"xls", "xlsx", "csv", and "txt".}
 
-\item{sep}{Character separator of delimited input file. One of \code{NULL} for
-auto-detection (default), "," for comma or ";" for semicolon. Used only for
-delimited output files from Olink software.}
+\item{sep}{Character separator of delimited input file. One of \code{NULL}
+(default) for auto-detection, or ";" and ",".
+Used only for delimited output files from Olink software.}
 
 \item{read_n}{Number of top rows to read.}
 }
@@ -31,11 +31,11 @@ This function reads Olink software excel or delimited files regardless of
 data type, platform or format.
 
 \strong{Olink software excel files} with the extension
-xls or xlsx. # nolint
+"xls" or "xlsx"
 are imported in R by the function \code{\link{read_npx_excel}}.
 
 \strong{Olink software delimited files} with suffix
-csv or txt. # nolint
+"csv" or "txt"
 are imported in R by the functions \code{\link{read_npx_delim}} or
 \code{\link{read_npx_csv}}.
 
