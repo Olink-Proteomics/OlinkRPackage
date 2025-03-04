@@ -3195,8 +3195,7 @@ test_that(
           object = df_npx_null <- read_npx_format_get_quant(
             file = excel_wide,
             data_type = NULL,
-            data_cells = "NPX",
-            quant_methods_expected = c("NPX", "Ct", "Quantified")
+            data_cells = "NPX"
           )
         )
 
@@ -3214,8 +3213,7 @@ test_that(
           object = df_npx_npx <- read_npx_format_get_quant(
             file = excel_wide,
             data_type = "NPX",
-            data_cells = "NPX",
-            quant_methods_expected = c("NPX", "Ct", "Quantified")
+            data_cells = "NPX"
           )
         )
 
@@ -3250,8 +3248,7 @@ test_that(
           object = df_npx_null <- read_npx_format_get_quant(
             file = excel_wide,
             data_type = NULL,
-            data_cells = "Ct",
-            quant_methods_expected = c("NPX", "Ct", "Quantified")
+            data_cells = "Ct"
           )
         )
 
@@ -3269,8 +3266,7 @@ test_that(
           object = df_npx_ct <- read_npx_format_get_quant(
             file = excel_wide,
             data_type = "Ct",
-            data_cells = "Ct",
-            quant_methods_expected = c("NPX", "Ct", "Quantified")
+            data_cells = "Ct"
           )
         )
 
@@ -3305,8 +3301,7 @@ test_that(
           object = df_npx_null <- read_npx_format_get_quant(
             file = excel_wide,
             data_type = NULL,
-            data_cells = "Quantified",
-            quant_methods_expected = c("NPX", "Ct", "Quantified")
+            data_cells = "Quantified"
           )
         )
 
@@ -3324,8 +3319,7 @@ test_that(
           object = df_npx_quant <- read_npx_format_get_quant(
             file = excel_wide,
             data_type = "Quantified",
-            data_cells = "Quantified",
-            quant_methods_expected = c("NPX", "Ct", "Quantified")
+            data_cells = "Quantified"
           )
         )
 
@@ -3366,8 +3360,7 @@ test_that(
           object = df_npx <- read_npx_format_get_quant(
             file = excel_wide,
             data_type = "Ct",
-            data_cells = "NPX",
-            quant_methods_expected = c("NPX", "Ct", "Quantified")
+            data_cells = "NPX"
           ),
           regexp = "Based on `data_type` we were expecting \"Ct\" format data"
         )
@@ -3409,8 +3402,7 @@ test_that(
           object = read_npx_format_get_quant(
             file = excel_wide,
             data_type = NULL,
-            data_cells = "Wrong_Name",
-            quant_methods_expected = c("NPX", "Ct", "Quantified")
+            data_cells = "Wrong_Name"
           ),
           regexp = "Expected one of:"
         )
@@ -3420,8 +3412,7 @@ test_that(
           object = df_npx <- read_npx_format_get_quant(
             file = excel_wide,
             data_type = "NPX",
-            data_cells = "Wrong_Name",
-            quant_methods_expected = c("NPX", "Ct", "Quantified")
+            data_cells = "Wrong_Name"
           ),
           regexp = "Unable to recognize the quantification method from the inpu"
         )
@@ -3463,8 +3454,7 @@ test_that(
           object = df_npx <- read_npx_format_get_quant(
             file = excel_wide,
             data_type = "NPX",
-            data_cells = "NPX_Ct",
-            quant_methods_expected = c("NPX", "Ct", "Quantified")
+            data_cells = "NPX_Ct"
           ),
           regexp = "Unable to recognize the quantification method from the inpu"
         )
@@ -3506,8 +3496,7 @@ test_that(
           object = read_npx_format_get_quant(
             file = excel_wide,
             data_type = NULL,
-            data_cells = "NPX_Ct",
-            quant_methods_expected = c("NPX", "Ct", "Quantified")
+            data_cells = "NPX_Ct"
           ),
           regexp = "Too many occurrences of:"
         )

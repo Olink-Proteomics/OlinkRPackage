@@ -125,18 +125,6 @@ read_npx_format <- function(file,
 
   if (file_format_check$is_long_format == FALSE) {
 
-    # default variables ----
-
-    broad_platform <- "qPCR"
-
-    # filter the global variable accepted_olink_platforms to have a collection
-    # of platforms and quant methods available.
-    # Note that only Target platforms can report data in excel.
-    olink_platforms_wide <- accepted_olink_platforms |>
-      dplyr::filter(
-        .data[["broader_platform"]] == .env[["broad_platform"]]
-      )
-
     # get platform
     file_olink_platform <- read_npx_format_get_platform(
       df_top_n = list_df_read$df_top_n,
@@ -148,15 +136,7 @@ read_npx_format <- function(file,
     file_quant_method <- read_npx_format_get_quant(
       file = file,
       data_type = data_type,
-      data_cells = file_format_check$data_cells,
-      quant_methods_expected = olink_platforms_wide |>
-        dplyr::filter(
-          .data[["name"]] == .env[["file_olink_platform"]]
-        ) |>
-        dplyr::pull(
-          .data[["quant_method"]]
-        ) |>
-        unlist()
+      data_cells = file_format_check$data_cells
     )
 
     out_msg <- "Detected \"{file_quant_method}\" data from
@@ -802,20 +782,15 @@ read_npx_format_get_platform <- function(df_top_n,
 #'
 #' @param file Path to Olink software output file in wide format. Expecting file
 #' extensions
-#' `r accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' `r get_file_ext(name_sub = c("excel", "delim")) |> ansi_collapse_quot()`.
 #' @param data_type Quantification method of the input data. One of `NULL`
-#' (default),
-#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
 #' @param data_cells A character vector with the contents of the cell \emph{A2}
 #' from the Olink software file in wide format indicating the quantification
 #' method.
-#' @param quant_methods_expected Character vector with the Olink protein
-#' quantification methods extracted from \var{accepted_olink_platforms} from the
-#' local environment filtered for the Olink platform detected in function
-#' \code{\link{read_npx_format_get_platform}}.
 #'
-#' @return The name of the quantification method. One of
-#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' @return The name of the data type. One of
+#' `r ansi_collapse_quot(get_olink_data_types(broad_platform = "qPCR"))`.
 #'
 #' @seealso
 #'   \code{\link{read_npx_format}}
@@ -825,8 +800,7 @@ read_npx_format_get_platform <- function(df_top_n,
 #'
 read_npx_format_get_quant <- function(file,
                                       data_type = NULL,
-                                      data_cells,
-                                      quant_methods_expected) {
+                                      data_cells) {
 
   # Checks inputs ----
 
@@ -836,13 +810,13 @@ read_npx_format_get_quant <- function(file,
   check_is_character(string = data_cells,
                      error = TRUE)
 
-  check_is_character(string = quant_methods_expected,
-                     error = TRUE)
+  # help vars
+  broad_platform <- "qPCR"
 
   # check data type
   if (!is.null(data_type)) {
     check_olink_data_type(x = data_type,
-                          broad_platform = "qPCR")
+                          broad_platform = broad_platform)
   }
 
   # Determine quantification method from excel file ----
@@ -850,7 +824,7 @@ read_npx_format_get_quant <- function(file,
   # In wide format data_cells is of length 1 as we read only cell A2
   # the solution below is expected to catch all cases
   quant_matches <- sapply(
-    X = quant_methods_expected,
+    X = get_olink_data_types(broad_platform = broad_platform),
     FUN = grepl,
     x = data_cells,
     ignore.case = FALSE,
@@ -863,12 +837,17 @@ read_npx_format_get_quant <- function(file,
       input_string = .env[["data_cells"]]
     ) |>
     tidyr::pivot_longer(
-      cols = dplyr::all_of(quant_methods_expected),
+      cols = dplyr::all_of(get_olink_data_types(
+        broad_platform = broad_platform
+      )),
       names_to = "q_method",
       values_to = "is_in"
     ) |>
     dplyr::filter(
       .data[["is_in"]] == TRUE
+    ) |>
+    dplyr::pull(
+      .data[["q_method"]]
     )
 
   # Confirm that detected quant method matches user input ----
@@ -876,29 +855,31 @@ read_npx_format_get_quant <- function(file,
   if (is.null(data_type)) {
     # if data_type is null
 
-    if (nrow(quant_matches) == 0L) {
+    if (length(quant_matches) == 0L) {
       # check if there are no matches
 
       cli::cli_abort(
         message = c(
           "x" = "Unable to recognize the quantification method from the input
         file: {.file {file}}!",
-          "i" = "Expected one of: {quant_methods_expected} Consider setting
-          {.arg data_type}."
+          "i" = "Expected one of:
+          {.val {get_olink_data_types(broad_platform = broad_platform)}}.
+          Consider setting {.arg data_type}."
         ),
         call = rlang::caller_env(),
         wrap = FALSE
       )
 
-    } else if (nrow(quant_matches) > 1L) {
+    } else if (length(quant_matches) > 1L) {
       # check if there are multiple matches
 
       cli::cli_abort(
         message = c(
           "x" = "Unable to recognize the quantification method from the input
         file: {.file {file}}!",
-          "i" = "Too many occurrences of: {quant_methods_expected}. Consider
-          setting {.arg data_type}."
+          "i" = "Too many occurrences of:
+          {.val {get_olink_data_types(broad_platform = broad_platform)}}.
+          Consider setting {.arg data_type}."
         ),
         call = rlang::caller_env(),
         wrap = FALSE
@@ -907,7 +888,7 @@ read_npx_format_get_quant <- function(file,
     } else {
 
       # if data_type input is NULL then set it from autodetect
-      out_data_type <- quant_matches$q_method
+      out_data_type <- quant_matches
 
     }
 
@@ -915,7 +896,7 @@ read_npx_format_get_quant <- function(file,
     # if data_type is null
 
     # check how many platforms match regular expression
-    if (nrow(quant_matches) == 0L) {
+    if (length(quant_matches) == 0L) {
       # if quant method cannot be determined from input file throw a warning
 
       cli::cli_warn(
@@ -927,7 +908,7 @@ read_npx_format_get_quant <- function(file,
         wrap = FALSE
       )
 
-    } else if (nrow(quant_matches) > 1L) {
+    } else if (length(quant_matches) > 1L) {
       # if too many quant method matches from input file throw a warning
 
       cli::cli_warn(
@@ -939,13 +920,13 @@ read_npx_format_get_quant <- function(file,
         wrap = FALSE
       )
 
-    } else if (data_type != quant_matches$q_method) {
+    } else if (data_type != quant_matches) {
 
       cli::cli_warn(
         message = c(
-          "i" = "Based on {.arg data_type} we were expecting \"{data_type}\"
-          format data, but instead detected \"{quant_matches$q_method}\". We
-          trust your input!"
+          "i" = "Based on {.arg data_type} we were expecting {.val {data_type}}
+          format data, but instead detected {.val {quant_matches}}. We trust
+          your input!"
         ),
         call = rlang::caller_env(),
         wrap = FALSE
