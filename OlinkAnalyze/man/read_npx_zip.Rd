@@ -2,8 +2,8 @@
 % Please edit documentation in R/read_npx_zip.R
 \name{read_npx_zip}
 \alias{read_npx_zip}
-\title{Help function to read NPX, Ct or absolute quantification data from
-zip-compressed Olink software output files in R.}
+\title{Help function to read "Ct", "NPX", and "Quantified" data
+from zip-compressed Olink software output files in R.}
 \usage{
 read_npx_zip(
   file,
@@ -18,43 +18,43 @@ read_npx_zip(
 }
 \arguments{
 \item{file}{Path to Olink software output zip-compressed file in wide or long
-format. Expecting file extension
-zip. # nolint}
+format. Expected file extensions
+"zip".}
 
-\item{out_df}{The class of output data frame. One of "tibble" (default) or
-"arrow" for ArrowObject.}
+\item{out_df}{The class of the output dataset. One of
+"tibble" and "arrow". (default = "tibble")}
 
-\item{sep}{Character separator of delimited input file. One of \code{NULL} for
-auto-detection (default), "," for comma or ";" for semicolon. Used only for
-delimited output files from Olink software.}
+\item{sep}{Character separator of delimited input file. One of \code{NULL}
+(default) for auto-detection, or ";" and ",".
+Used only for delimited output files from Olink software.}
 
 \item{long_format}{Boolean marking format of input file. One of \code{NULL}
-(default) for auto-detection, "TRUE" for long format files or "FALSE" for
+(default) for auto-detection, \code{TRUE} for long format files or \code{FALSE} for
 wide format files.}
 
 \item{olink_platform}{Olink platform used to generate the input file.
-One of \code{NULL} (default),
-Target 48, Flex, Target 96, Explore 3072, Explore HT, or Focus. # nolint}
+One of \code{NULL} (default) for auto-detection,
+"Flex", "Focus", "Target 48", and "Target 96".}
 
 \item{data_type}{Quantification method of the input data. One of \code{NULL}
-(default),
-Ct, NPX, or Quantified. # nolint}
+(default) for auto-detection, "Ct", "NPX", and "Quantified".}
 
 \item{.ignore_files}{Character vector of files included in the zip-compressed
-Olink software output files that should be ignored. Applies only to
-zip-compressed input files. (default = c("README.txt")).}
+Olink software output files that should be ignored. Used only for
+zip-compressed input files (default = \emph{c("README.txt")}).}
 
 \item{quiet}{Boolean to print a confirmation message when reading the input
-file. Applies to excel or delimited input only. "TRUE" (default) to not print
-and "FALSE" to print.}
+file. Applies to excel or delimited input only. \code{TRUE} (default) to not print
+and \code{FALSE} to print.}
 }
 \value{
-Tibble or ArrowObject with Olink data in long format.
+"tibble" or "ArrowObject" with
+Olink data in long or wide format.
 }
 \description{
 A zip-compressed input file might contain a file from the Olink software
-containing NPX, Ct or absolute quantification data, a checksum file and one
-or more files to be ignored.
+containing "Ct", "NPX", and "Quantified" data, a checksum
+file and one or more files to be ignored.
 
 \strong{Note:} The zip-compressed file should strictly contain \strong{one}
 Olink data file, \strong{none or one} checksum file and
@@ -63,10 +63,10 @@ Olink data file, \strong{none or one} checksum file and
 \itemize{
 \item \strong{Olink file} exported by Olink software in wide or long format.
 Expecting file extensions
-xls, xlsx, csv, txt, parquet, or zip. # nolint
+"xls", "xlsx", "csv", "txt", and "parquet".
 This file is subsequently provided as input to \code{\link{read_npx}}.
 \item \strong{checksum file} One of
-MD5_checksum.txt or checksum_sha256.txt # nolint
+"MD5_checksum.txt" or "checksum_sha256.txt".
 depending on the checksum algorithm. The file contains only one line with the
 checksum string of characters.
 \item \strong{File(s) to be ignored} from the zip file. These files can be

@@ -93,7 +93,7 @@ test_that(
 
         expect_error(
           object = read_npx_zip(file = zip_test),
-          regexp = "No NPX and checksum file in the compressed file"
+          regexp = "No files other than 'README.txt' detected in the compressed"
         )
 
         file.remove(readme_file)
