@@ -16,27 +16,63 @@ get_df_output_print <- function() {
 #' @return A scalar character vector with one sentence describing the acceptable
 #' extensions of each file type.
 #'
-get_accepted_file_ext_summary <- function() {
-  dplyr::tibble(
-    ext = accepted_npx_file_ext,
-    name = names(accepted_npx_file_ext)
+get_file_ext_summary <- function() {
+  sapply(
+    get_file_formats(),
+    function(ff) {
+      paste0(
+        get_file_ext(name_sub = ff) |> ansi_collapse_quot(sep = "or"),
+        " for ", ff, " files"
+      )
+
+    }
   ) |>
-    dplyr::mutate(
-      name = strsplit(x = .data[["name"]],
-                      split = "_",
-                      fixed = TRUE) |>
-        lapply(utils::head, 1L) |>
-        unlist()
-    ) |>
-    dplyr::summarise(
-      ext = ansi_collapse_quot(x = .data[["ext"]], sep = "or"),
-      .by = dplyr::all_of("name")
-    ) |>
-    dplyr::mutate(
-      outname = paste0(.data[["ext"]], " for ", .data[["name"]], " files")
-    ) |>
-    dplyr::pull(
-      .data[["outname"]]
-    ) |>
     cli::ansi_collapse()
+}
+
+#' Get all acceptable file formats.
+#'
+#' @return A character vector with the acceptable file formats.
+#'
+get_file_formats <- function() {
+  file_ext_nm <- names(accepted_npx_file_ext) |>
+    strsplit(split = "_", fixed = TRUE) |>
+    sapply(utils::head, 1L) |>
+    unique()
+  return(file_ext_nm)
+}
+
+#' Gets all file extensions based on the file format.
+#'
+#' @param name_sub Substring of file format. One of
+#' `r ansi_collapse_quot(c(get_file_formats(), "NULL"))`. If `NULL` all
+#' file extensions are returned.
+#'
+#' @return Character vector with accepted file extensions.
+#'
+get_file_ext <- function(name_sub = NULL) {
+
+  if (!is.null(name_sub)) {
+
+    check_is_scalar_character(string = name_sub,
+                              error = TRUE)
+
+    if (!(name_sub %in% get_file_formats())) {
+      cli::cli_abort(
+        c(
+          "x" = "{.val {name_sub}} does not reflect an acceptable file format!",
+          "i" = "Expected one of: {.val {get_file_formats()}}"
+        ),
+        call = rlang::caller_env(),
+        wrap = FALSE
+      )
+    }
+
+  } else {
+    name_sub <- get_file_formats() |>
+      paste(collapse = "|")
+  }
+
+  f_ext <- accepted_npx_file_ext[grepl(name_sub, names(accepted_npx_file_ext))]
+  return(f_ext)
 }

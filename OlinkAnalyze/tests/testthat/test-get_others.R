@@ -12,12 +12,12 @@ test_that(
   }
 )
 
-# Test get_accepted_file_ext_summary ----
+# Test get_file_ext_summary ----
 
 test_that(
-  "get_accepted_file_ext_summary - works",
+  "get_file_ext_summary - works",
   {
-    acc_f_ext_sum <- get_accepted_file_ext_summary()
+    acc_f_ext_sum <- get_file_ext_summary()
 
     # file extensions present ----
 
@@ -35,5 +35,74 @@ test_that(
       sapply(grepl, acc_f_ext_sum)
 
     expect_true(object = all(all_type_present))
+  }
+)
+
+# Test get_file_formats ----
+
+test_that(
+  "get_file_formats - works",
+  {
+    expect_identical(
+      object = get_file_formats(),
+      expected = c("excel", "delim", "parquet", "compressed")
+    )
+  }
+)
+
+# Test get_file_ext ----
+
+test_that(
+  "get_file_ext - works",
+  {
+    expect_identical(
+      object = get_file_ext(name_sub = NULL) |> unname(),
+      expected = c("xls", "xlsx", "csv", "txt", "parquet", "zip")
+    )
+
+    expect_identical(
+      object = get_file_ext(name_sub = "excel") |> unname(),
+      expected = c("xls", "xlsx")
+    )
+
+    expect_identical(
+      object = get_file_ext(name_sub = "parquet") |> unname(),
+      expected = c("parquet")
+    )
+
+    expect_identical(
+      object = get_file_ext(name_sub = "compressed") |> unname(),
+      expected = c("zip")
+    )
+
+    expect_identical(
+      object = get_file_ext(name_sub = "delim") |> unname(),
+      expected = c("csv", "txt")
+    )
+  }
+)
+
+test_that(
+  "get_file_ext - error",
+  {
+    expect_error(
+      object = get_file_ext(name_sub = NA_character_),
+      regexp = "must be a scalar character"
+    )
+
+    expect_error(
+      object = get_file_ext(name_sub = "zip"),
+      regexp = "\"zip\" does not reflect an acceptable file format"
+    )
+
+    expect_error(
+      object = get_file_ext(name_sub = "text"),
+      regexp = "\"text\" does not reflect an acceptable file format"
+    )
+
+    expect_error(
+      object = get_file_ext(name_sub = "An_Unacceptable_File_Format"),
+      regexp = "\"An_Unacceptable_File_Format\" does not reflect an acceptable"
+    )
   }
 )
