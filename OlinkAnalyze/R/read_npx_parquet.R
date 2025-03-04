@@ -1,5 +1,5 @@
 #' Help function to read NPX data from long format parquet Olink software output
-#' files in R.
+#' file in R.
 #'
 #' @author
 #'   Klev Diamanti;
@@ -8,11 +8,12 @@
 #'
 #' @param file Path to Olink software output parquet file in long format.
 #' Expecting file extension
-#' `r accepted_npx_file_ext[grepl("parquet", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
-#' @param out_df The class of output data frame. One of "tibble" (default) or
-#' "arrow" for ArrowObject.
+#' `r get_file_ext(name_sub = "parquet") |> ansi_collapse_quot()`. # nolint
+#' @param out_df The class of the output dataset. One of
+#' `r ansi_collapse_quot(read_npx_df_output)`. (default = "tibble")
 #'
-#' @return Tibble or ArrowObject with Olink data in long format.
+#' @return `r ansi_collapse_quot(x = get_df_output_print(), sep = "or")` with
+#' Olink data in long or wide format.
 #'
 #' @seealso
 #'   \code{\link{read_npx}}
@@ -46,7 +47,7 @@ read_npx_parquet <- function(file,
       cli::cli_abort(
         c(
           "x" = "Unable to read parquet file: {.file {file}}",
-          "i" = "Check the file is in parquet format and potential file
+          "i" = "Check if the file is in parquet format and/or potential file
           corruption."
         ),
         call = rlang::caller_env(),
@@ -67,7 +68,7 @@ read_npx_parquet <- function(file,
     cli::cli_abort(
       c(
         "x" = "Missing required field{?s} in metadata:
-        {missing_fields}"
+        {.val {missing_fields}}"
       ),
       call = rlang::caller_env(),
       wrap = FALSE
@@ -89,7 +90,7 @@ read_npx_parquet <- function(file,
         "x" = "Unsupported product:
         {.val {df_olink$metadata[[olink_parquet_product]]}}",
         "i" = "Metadata field {.val {olink_parquet_product}} expects:
-        {olink_parquet_spec$parquet_platforms}"
+        {.val {olink_parquet_spec$parquet_platforms}}."
       ),
       call = rlang::caller_env(),
       wrap = FALSE
@@ -113,6 +114,21 @@ read_npx_parquet <- function(file,
       ),
       call = rlang::caller_env(),
       wrap = FALSE
+    )
+
+  }
+
+  # Research use only
+  olink_ruo <- olink_parquet_spec$optional_metadata[
+    names(olink_parquet_spec$optional_metadata) == "ruo"
+  ] |>
+    unname()
+
+  if (olink_ruo %in% names(df_olink$metadata)) {
+
+    cli::cli_alert_info(
+      "This parquet file is for research use only:
+      {.val {df_olink$metadata[[olink_ruo]]}}!"
     )
 
   }
