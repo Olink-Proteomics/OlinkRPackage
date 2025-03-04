@@ -4,7 +4,7 @@
 \alias{read_npx_format_get_format}
 \title{Help function to determine wide or long file format.}
 \usage{
-read_npx_format_get_format(df, file, long_format = NULL, quant_methods)
+read_npx_format_get_format(df, file, long_format = NULL)
 }
 \arguments{
 \item{df}{A tibble containing the first \var{read_n} rows of the input Olink
@@ -12,15 +12,11 @@ file.}
 
 \item{file}{Path to Olink software output file in wide or long format.
 Expecting file extensions
-xls, xlsx, csv, or txt. # nolint}
+"xls", "xlsx", "csv", and "txt".}
 
 \item{long_format}{Boolean marking format of input file. One of \code{NULL}
-(default) for auto-detection, "TRUE" for long format files or "FALSE" for
+(default) for auto-detection, \code{TRUE} for long format files or \code{FALSE} for
 wide format files.}
-
-\item{quant_methods}{Character vector with the Olink protein quantification
-methods extracted from \var{accepted_olink_platforms$quant_method} in the
-local environment.}
 }
 \value{
 A list with two elements:

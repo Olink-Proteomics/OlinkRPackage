@@ -1966,8 +1966,7 @@ test_that(
           object = df_npx_null <- read_npx_format_get_format(
             df = df,
             file = excel_wide,
-            long_format = NULL,
-            quant_methods = c("NPX", "Ct", "Quantified")
+            long_format = NULL
           )
         )
 
@@ -1997,8 +1996,7 @@ test_that(
           object = df_npx_false <- read_npx_format_get_format(
             df = df,
             file = excel_wide,
-            long_format = FALSE,
-            quant_methods = c("NPX", "Ct", "Quantified")
+            long_format = FALSE
           )
         )
 
@@ -2067,8 +2065,7 @@ test_that(
           object = df_npx_null <- read_npx_format_get_format(
             df = df,
             file = excel_long,
-            long_format = NULL,
-            quant_methods = c("NPX", "Ct", "Quantified")
+            long_format = NULL
           )
         )
 
@@ -2103,8 +2100,7 @@ test_that(
           object = df_npx_true <- read_npx_format_get_format(
             df = df,
             file = excel_long,
-            long_format = TRUE,
-            quant_methods = c("NPX", "Ct", "Quantified")
+            long_format = TRUE
           )
         )
 
@@ -2124,7 +2120,7 @@ test_that(
 )
 
 test_that(
-  "read_npx_excel_format - warning - diff autodetection vs user input",
+  "read_npx_format_get_format - warning - diff autodetection vs user input",
   {
     skip_on_cran()
 
@@ -2175,8 +2171,7 @@ test_that(
           object = df_npx_false <- read_npx_format_get_format(
             df = df,
             file = excel_long,
-            long_format = FALSE,
-            quant_methods = c("NPX", "Ct", "Quantified")
+            long_format = FALSE
           ),
           regexp = "Based on `long_format` we were expecting \"wide\" format"
         )
@@ -2234,8 +2229,7 @@ test_that(
             object = read_npx_format_get_format(
               df = df,
               file = excel_wide,
-              long_format = TRUE,
-              quant_methods = c("NPX", "Ct", "Quantified")
+              long_format = TRUE
             ),
             regexp = "Based on `long_format` we were expecting \"long\" format"
           ),
@@ -2249,7 +2243,7 @@ test_that(
 )
 
 test_that(
-  "read_npx_excel_format - warning - diff autodetection vs user input V2",
+  "read_npx_format_get_format - warning - diff autodetection vs user input V2",
   {
     skip_on_cran()
 
@@ -2301,8 +2295,7 @@ test_that(
           object = df_npx_false <- read_npx_format_get_format(
             df = df,
             file = excel_long,
-            long_format = TRUE,
-            quant_methods = c("NPX", "Ct", "Quantified")
+            long_format = TRUE
           ),
           regexp = "Unable to confirm the \"long\" format from the input file:"
         )
@@ -2368,8 +2361,7 @@ test_that(
           object = df_npx_true <- read_npx_format_get_format(
             df = df,
             file = excel_wide,
-            long_format = FALSE,
-            quant_methods = c("NPX", "Ct", "Quantified")
+            long_format = FALSE
           ),
           regexp = "Unable to confirm the \"wide\" format from the input file:"
         )
@@ -2405,7 +2397,7 @@ test_that(
 )
 
 test_that(
-  "read_npx_excel_format - error - unable to detect format",
+  "read_npx_format_get_format - error - unable to detect format",
   {
     skip_on_cran()
 
@@ -2457,8 +2449,7 @@ test_that(
           object = df_npx_false <- read_npx_format_get_format(
             df = df,
             file = excel_long,
-            long_format = NULL,
-            quant_methods = c("NPX", "Ct", "Quantified")
+            long_format = NULL
           ),
           regexp = "Unable to recognize the format of the input file"
         )
@@ -2496,8 +2487,7 @@ test_that(
           object = df_npx_true <- read_npx_format_get_format(
             df = df,
             file = excel_wide,
-            long_format = NULL,
-            quant_methods = c("NPX", "Ct", "Quantified")
+            long_format = NULL
           ),
           regexp = "Unable to recognize the format of the input file"
         )
@@ -2509,7 +2499,7 @@ test_that(
 )
 
 test_that(
-  "read_npx_excel_format - error - long format with NA colnames",
+  "read_npx_format_get_format - error - long format with NA colnames",
   {
     skip_on_cran()
 
@@ -2566,8 +2556,7 @@ test_that(
           object = df_npx_false <- read_npx_format_get_format(
             df = df,
             file = excel_long,
-            long_format = NULL,
-            quant_methods = c("NPX", "Ct", "Quantified")
+            long_format = NULL
           ),
           regexp = "`NA` column names in long format file"
         )
@@ -2605,8 +2594,7 @@ test_that(
           object = df_npx_true <- read_npx_format_get_format(
             df = df,
             file = excel_wide,
-            long_format = NULL,
-            quant_methods = c("NPX", "Ct", "Quantified")
+            long_format = NULL
           ),
           regexp = "Unable to recognize the format of the input file"
         )

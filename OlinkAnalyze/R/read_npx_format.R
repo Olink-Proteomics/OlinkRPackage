@@ -113,15 +113,10 @@ read_npx_format <- function(file,
 
   ## Determine long or wide format ----
 
-  broad_platform <- "qPCR"
-
   file_format_check <- read_npx_format_get_format(
     df = list_df_read$df_top_n,
     file = file,
-    long_format = long_format,
-    quant_methods = get_olink_data_types(
-      broad_platform = broad_platform
-    )
+    long_format = long_format
   )
 
   ## Determine Olink platform & quantification method ----
@@ -131,6 +126,8 @@ read_npx_format <- function(file,
   if (file_format_check$is_long_format == FALSE) {
 
     # default variables ----
+
+    broad_platform <- "qPCR"
 
     # filter the global variable accepted_olink_platforms to have a collection
     # of platforms and quant methods available.
@@ -412,13 +409,10 @@ read_npx_format_read <- function(file,
 #' file.
 #' @param file Path to Olink software output file in wide or long format.
 #' Expecting file extensions
-#' `r accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' `r get_file_ext(name_sub = c("excel", "delim")) |> ansi_collapse_quot()`.
 #' @param long_format Boolean marking format of input file. One of `NULL`
-#' (default) for auto-detection, "TRUE" for long format files or "FALSE" for
+#' (default) for auto-detection, `TRUE` for long format files or `FALSE` for
 #' wide format files.
-#' @param quant_methods Character vector with the Olink protein quantification
-#' methods extracted from \var{accepted_olink_platforms$quant_method} in the
-#' local environment.
 #'
 #' @return A list with two elements:
 #' \itemize{
@@ -437,8 +431,7 @@ read_npx_format_read <- function(file,
 #'
 read_npx_format_get_format <- function(df,
                                        file,
-                                       long_format = NULL,
-                                       quant_methods) {
+                                       long_format = NULL) {
 
   # Check inputs ----
 
@@ -447,9 +440,6 @@ read_npx_format_get_format <- function(df,
 
   check_file_exists(file = file,
                     error = TRUE)
-
-  check_is_character(string = quant_methods,
-                     error = TRUE)
 
   # check long format input
   if (!is.null(long_format)) {
@@ -483,10 +473,10 @@ read_npx_format_get_format <- function(df,
 
   # Determine long or wide format from file ----
 
-  is_data_wide <- grepl(pattern = paste(quant_methods, collapse = "|"),
+  is_data_wide <- grepl(pattern = paste(get_olink_data_types(), collapse = "|"),
                         x = data_cells_wide,
                         ignore.case = FALSE)
-  is_data_long <- grepl(pattern = paste(quant_methods, collapse = "|"),
+  is_data_long <- grepl(pattern = paste(get_olink_data_types(), collapse = "|"),
                         x = data_cells_long,
                         ignore.case = FALSE)
 
