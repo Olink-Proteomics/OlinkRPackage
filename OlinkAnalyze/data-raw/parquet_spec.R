@@ -9,11 +9,13 @@ olink_parquet_spec <- list(
     project_name = "ProjectName",
     sample_matrix = "SampleMatrix",
     product = "Product",
-    data_file_type = "DataFileType"
+    data_file_type = "DataFileType",
+    rnd_only = "RUO"
   ),
   parquet_platforms = c(
     "ExploreHT",
-    "Explore3072"
+    "Explore3072",
+    "Reveal"
   ),
   parquet_files = c(
     "NPX File",
