@@ -8,7 +8,7 @@
 #'
 #' @param file Path to Olink software output parquet file in long format.
 #' Expecting file extension
-#' `r get_file_ext(name_sub = "parquet") |> ansi_collapse_quot()`. # nolint
+#' `r get_file_ext(name_sub = "parquet") |> ansi_collapse_quot()`.
 #' @param out_df The class of the output dataset. One of
 #' `r ansi_collapse_quot(read_npx_df_output)`. (default = "tibble")
 #'
@@ -61,7 +61,7 @@ read_npx_parquet <- function(file,
 
   # Check that all required parquet metadata is in place
   if (!all(olink_parquet_spec$parquet_metadata %in% names(df_olink$metadata))) {
-    missing_fields <- olink_parquet_spec$parquet_metadata[ # nolint
+    missing_fields <- olink_parquet_spec$parquet_metadata[
       !(olink_parquet_spec$parquet_metadata %in% names(df_olink$metadata))
     ]
 
@@ -83,7 +83,7 @@ read_npx_parquet <- function(file,
     names(olink_parquet_spec$parquet_metadata) == "product"
   ]
 
-  if (!(df_olink$metadata[[olink_parquet_product]] %in% olink_parquet_spec$parquet_platforms)) { # nolint
+  if (!(df_olink$metadata[[olink_parquet_product]] %in% olink_parquet_spec$parquet_platforms)) {
 
     cli::cli_abort(
       c(
@@ -103,7 +103,7 @@ read_npx_parquet <- function(file,
     names(olink_parquet_spec$parquet_metadata) == "data_file_type"
   ]
 
-  if (!(df_olink$metadata[[olink_parquet_files]] %in% olink_parquet_spec$parquet_files)) { # nolint
+  if (!(df_olink$metadata[[olink_parquet_files]] %in% olink_parquet_spec$parquet_files)) {
 
     cli::cli_abort(
       c(

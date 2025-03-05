@@ -10,7 +10,7 @@ read_npx_parquet(file, out_df = "arrow")
 \arguments{
 \item{file}{Path to Olink software output parquet file in long format.
 Expecting file extension
-"parquet". # nolint}
+"parquet".}
 
 \item{out_df}{The class of the output dataset. One of
 "tibble" and "arrow". (default = "tibble")}

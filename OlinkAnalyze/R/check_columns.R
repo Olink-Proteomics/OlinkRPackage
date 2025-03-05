@@ -81,7 +81,7 @@ check_columns <- function(df,
   col_list_char <- sapply(col_list, check_is_character, error = FALSE)
   if (any(col_list_char == FALSE)) {
 
-    col_list_not_char <- col_list[!col_list_char] # nolint
+    col_list_not_char <- col_list[!col_list_char]
 
     # error if lst is not a list
     cli::cli_abort(
@@ -135,7 +135,9 @@ check_columns <- function(df,
 
   if (length(option_cols) > 0L) {
 
-    missing_one <- option_cols[sapply(option_cols, \(x) !any(x %in% df_column_names))] # nolint line_length_linter
+    missing_one <- option_cols[
+      sapply(option_cols, \(x) !any(x %in% df_column_names))
+    ]
 
     if (length(missing_one) > 0L) {
 

@@ -162,4 +162,4 @@ read_npx <- function(filename,
 
 #' @rdname read_npx
 #' @export
-read_NPX <- read_npx # nolint
+read_NPX <- read_npx

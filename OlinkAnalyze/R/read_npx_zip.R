@@ -354,7 +354,7 @@ get_npx_file <- function(files,
 #'
 #' @description
 #' Runs only if one of
-#' `r cli::ansi_collapse(x = accepted_checksum_files, sep2 = " or ", last = ", or ")` # nolint
+#' `r ansi_collapse_quot(x = accepted_checksum_files, sep = "or")`.
 #' are present in the input zip-compressed file. This function does not check if
 #' the \var{checksum_file} is in acceptable format.
 #'
