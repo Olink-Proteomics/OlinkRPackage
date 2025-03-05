@@ -93,7 +93,7 @@ test_that(
 
         expect_error(
           object = read_npx_zip(file = zip_test),
-          regexp = "No NPX and checksum file in the compressed file"
+          regexp = "No files other than 'README.txt' detected in the compressed"
         )
 
         file.remove(readme_file)
@@ -1437,16 +1437,17 @@ test_checksum_npx_combo <- function(c_file, n_file) {
       )
     }
   )
+  return(NULL)
 }
 
 invisible(
   sapply(
     accepted_checksum_files,
     function(checksum_file) {
-      sapply(
+      sapply( # nolint return_linter
         paste0("test.", accepted_npx_file_ext[accepted_npx_file_ext != "zip"]),
         function(npx_file) {
-          test_checksum_npx_combo(c_file = checksum_file, n_file = npx_file)
+          test_checksum_npx_combo(c_file = checksum_file, n_file = npx_file) # nolint return_linter
         }
       )
     }
@@ -1468,13 +1469,14 @@ test_npx_input <- function(n_file) {
       )
     }
   )
+  return(NULL)
 }
 
 invisible(
   sapply(
-    paste0("test.", accepted_npx_file_ext[accepted_npx_file_ext != "zip"]),
+    paste0("test.", accepted_npx_file_ext[accepted_npx_file_ext != "zip"]), # nolint return_linter
     function(npx_file) {
-      test_npx_input(n_file = npx_file)
+      test_npx_input(n_file = npx_file) # nolint return_linter
     }
   )
 )

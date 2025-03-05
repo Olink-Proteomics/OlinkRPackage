@@ -1,13 +1,14 @@
-#' Help function checking if a variable is a numeric vector.
+#' Help function checking if a variable is a vector of numerics.
 #'
 #' @author
 #'   Klev Diamanti
 #'
-#' @param num Number to check.
-#' @param error Return error or a boolean (default = FALSE).
+#' @param num Variable to check.
+#' @param error Scalar boolean to return an error instead of a `FALSE`
+#' (`default = FALSE`).
 #'
-#' @return Boolean if the variable is a numeric vector or not, and an error if
-#' "error = TRUE".
+#' @return `TRUE` if the variable is a numeric vector, and `FALSE` if not;
+#' error if the variable is not a numeric vector and `error = TRUE`.
 #'
 #' @seealso
 #'   \code{\link{check_is_boolean}}
@@ -21,15 +22,15 @@ check_is_numeric <- function(num,
   check_is_scalar_boolean(bool = error,
                           error = TRUE)
 
-  # check that the input is a character vector
+  # check if input is a numeric vector
   if ((!rlang::is_character(num) && !rlang::is_integer(num) && !is.numeric(num))
       || any(rlang::are_na(num))) {
 
     if (error == TRUE) {
 
-      cli::cli_abort(
+      cli::cli_abort( # nolint return_linter
         c(
-          "x" = "{.arg {rlang::caller_arg(num)}} must be a number vector!"
+          "x" = "{.arg {rlang::caller_arg(num)}} must be a numeric vector!"
         ),
         call = rlang::caller_env(),
         wrap = FALSE
@@ -49,16 +50,18 @@ check_is_numeric <- function(num,
 
 }
 
-#' Help function checking if a variable is a numeric vector of length 1.
+#' Help function checking if a variable is a scalar numeric
 #'
 #' @author
 #'   Klev Diamanti
 #'
-#' @param num Vector of numbers to check.
-#' @param error Return error or a boolean (default = FALSE).
+#' @param num Variable to check.
+#' @param error Scalar boolean to return an error instead of a `FALSE`
+#' (`default = FALSE`).
 #'
-#' @return Boolean if the variable is a numeric vector of length 1 or not, and
-#' an error if "error = TRUE".
+#' @return `TRUE` if the variable is a numeric vector of length 1, and `FALSE`
+#' if not; error if the variable is not a numeric vector of length 1, and
+#' `error = TRUE`.
 #'
 #' @seealso
 #'   \code{\link{check_is_scalar_boolean}}
@@ -72,15 +75,15 @@ check_is_scalar_numeric <- function(num,
   check_is_scalar_boolean(bool = error,
                           error = TRUE)
 
-  # check that the input is a character vector of length 1
+  # check if input is a numeric vector of length 1
   if ((!rlang::is_scalar_double(num) && !rlang::is_scalar_integer(num))
       || rlang::is_na(num)) {
 
     if (error == TRUE) {
 
-      cli::cli_abort(
+      cli::cli_abort( # nolint return_linter
         c(
-          "x" = "{.arg {rlang::caller_arg(num)}} must be a number!"
+          "x" = "{.arg {rlang::caller_arg(num)}} must be a scalar numeric!"
         ),
         call = rlang::caller_env(),
         wrap = FALSE

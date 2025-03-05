@@ -62,6 +62,44 @@ test_that(
 test_that(
   "read_npx_parquet - error - required metadata fields are missing",
   {
+    # Both missing ----
+
+    withr::with_tempfile(
+      new = "pfile_metadata",
+      pattern = "parquet-file_alt-product-type",
+      fileext = ".parquet",
+      code = {
+
+        # random data frame
+        df <- dplyr::tibble(
+          "A" = c(1, 2.2, 3.14),
+          "B" = c("a", "b", "c"),
+          "C" = c(TRUE, TRUE, FALSE),
+          "D" = c("NA", "B", NA_character_),
+          "E" = c(1L, 2L, 3L)
+        ) |>
+          arrow::as_arrow_table(df)
+
+        # write parquet
+        arrow::write_parquet(
+          x = df,
+          sink = pfile_metadata,
+          compression = "gzip"
+        )
+
+        # check that the parquet file was created
+        expect_true(object = file.exists(pfile_metadata))
+
+        # check that relevant error is thrown
+        expect_error(
+          object = read_npx_parquet(file = pfile_metadata),
+          regexp = "Missing required fields in metadata: "
+        )
+
+      }
+    )
+
+    # One missing ----
 
     withr::with_tempfile(
       new = "pfile_metadata",
@@ -80,9 +118,9 @@ test_that(
           arrow::as_arrow_table(df)
 
         # modify metadata
-        df_metadata_list <- rep(x = "NA", times = 3L) |>
+        df_metadata_list <- "NA" |>
           as.list()
-        names(df_metadata_list) <- olink_parquet_spec$parquet_metadata[1L:3L] |>
+        names(df_metadata_list) <- olink_parquet_spec$parquet_metadata[1L] |>
           unname()
         df$metadata <- df_metadata_list
 
@@ -99,7 +137,7 @@ test_that(
         # check that relevant error is thrown
         expect_error(
           object = read_npx_parquet(file = pfile_metadata),
-          regexp = "Missing required fields in metadata: "
+          regexp = "Missing required field in metadata: "
         )
 
       }
@@ -183,12 +221,10 @@ test_that(
           arrow::as_arrow_table()
 
         # modify metadata
-        df_metadata_list <- c(rep(x = "NA", times = 3L),
-                              "ExploreHT",
+        df_metadata_list <- c("ExploreHT",
                               "Unknown File") |>
           as.list()
-        names(df_metadata_list) <- olink_parquet_spec$parquet_metadata[1L:5L] |>
-          unname()
+        names(df_metadata_list) <- unname(olink_parquet_spec$parquet_metadata)
         df$metadata <- df_metadata_list
 
         # write parquet
@@ -228,12 +264,10 @@ test_that(
       arrow::as_arrow_table()
 
     # modify metadata
-    df_metadata_list <- c(rep(x = "NA", times = 3L),
-                          "ExploreHT",
+    df_metadata_list <- c("ExploreHT",
                           "NA") |>
       as.list()
-    names(df_metadata_list) <- olink_parquet_spec$parquet_metadata[1L:5L] |>
-      unname()
+    names(df_metadata_list) <- unname(olink_parquet_spec$parquet_metadata)
     df$metadata <- df_metadata_list
 
     # DataFileType = "NPX File" ----
@@ -245,7 +279,7 @@ test_that(
       code = {
 
         # modify metadata
-        df$metadata[olink_parquet_spec$parquet_metadata[5L]] <- "NPX File"
+        df$metadata[olink_parquet_spec$parquet_metadata[2L]] <- "NPX File"
 
         # write the parquet file
         arrow::write_parquet(
@@ -282,7 +316,7 @@ test_that(
       code = {
 
         # modify metadata ----
-        df$metadata[olink_parquet_spec$parquet_metadata[5L]] <-
+        df$metadata[olink_parquet_spec$parquet_metadata[2L]] <-
           "Extended NPX File"
 
         # write the parquet file
@@ -320,7 +354,7 @@ test_that(
       code = {
 
         # modify metadata ----
-        df$metadata[olink_parquet_spec$parquet_metadata[5L]] <-
+        df$metadata[olink_parquet_spec$parquet_metadata[2L]] <-
           "CLI Data Export File"
 
         # write the parquet file
@@ -358,7 +392,7 @@ test_that(
       code = {
 
         # modify metadata ----
-        df$metadata[olink_parquet_spec$parquet_metadata[5L]] <-
+        df$metadata[olink_parquet_spec$parquet_metadata[2L]] <-
           "Internal CLI Data Export File"
 
         # write the parquet file
@@ -396,7 +430,7 @@ test_that(
       code = {
 
         # modify metadata ----
-        df$metadata[olink_parquet_spec$parquet_metadata[5L]] <-
+        df$metadata[olink_parquet_spec$parquet_metadata[2L]] <-
           "R Package Export File"
 
         # write the parquet file
@@ -443,15 +477,13 @@ test_that(
       arrow::as_arrow_table()
 
     # modify metadata
-    df_metadata_list <- c(rep(x = "NA", times = 3L),
-                          "NA",
+    df_metadata_list <- c("NA",
                           "NPX File") |>
       as.list()
-    names(df_metadata_list) <- olink_parquet_spec$parquet_metadata[1L:5L] |>
-      unname()
+    names(df_metadata_list) <- unname(olink_parquet_spec$parquet_metadata)
     df$metadata <- df_metadata_list
 
-    ## Product is "ExploreHT"
+    ## Product is "ExploreHT" ----
 
     withr::with_tempfile(
       new = "pfile_test",
@@ -460,7 +492,7 @@ test_that(
       code = {
 
         # modify metadata
-        df$metadata[olink_parquet_spec$parquet_metadata[4L]] <- "ExploreHT"
+        df$metadata[olink_parquet_spec$parquet_metadata[1L]] <- "ExploreHT"
 
         # write the parquet file
         arrow::write_parquet(
@@ -488,7 +520,7 @@ test_that(
       }
     )
 
-    ## Product is "Explore3072"
+    ## Product is "Explore3072" ----
 
     withr::with_tempfile(
       new = "pfile_test",
@@ -497,7 +529,44 @@ test_that(
       code = {
 
         # modify metadata
-        df$metadata[olink_parquet_spec$parquet_metadata[4L]] <- "Explore3072"
+        df$metadata[olink_parquet_spec$parquet_metadata[1L]] <- "Explore3072"
+
+        # write the parquet file
+        arrow::write_parquet(
+          x = df,
+          sink = pfile_test,
+          compression = "gzip"
+        )
+
+        # check that the file exists
+        expect_true(object = file.exists(pfile_test))
+
+        # check that function works
+        expect_true(
+          object = read_npx_parquet(file = pfile_test,
+                                    out_df = "arrow") |>
+            inherits(what = "ArrowObject")
+        )
+
+        expect_true(
+          object = read_npx_parquet(file = pfile_test,
+                                    out_df = "tibble") |>
+            inherits(what = "tbl_df")
+        )
+
+      }
+    )
+
+    ## Product is "Reveal" ----
+
+    withr::with_tempfile(
+      new = "pfile_test",
+      pattern = "parquet-file_test",
+      fileext = ".parquet",
+      code = {
+
+        # modify metadata
+        df$metadata[olink_parquet_spec$parquet_metadata[1L]] <- "Reveal"
 
         # write the parquet file
         arrow::write_parquet(
@@ -549,12 +618,10 @@ test_that(
           arrow::as_arrow_table()
 
         # modify metadata
-        df_metadata_list <- c(rep(x = "NA", times = 3L),
-                              "Explore3072",
+        df_metadata_list <- c("Explore3072",
                               "NPX File") |>
           as.list()
-        names(df_metadata_list) <- olink_parquet_spec$parquet_metadata[1L:5L] |>
-          unname()
+        names(df_metadata_list) <- unname(olink_parquet_spec$parquet_metadata)
         df$metadata <- df_metadata_list
 
         # write the parquet file
@@ -584,6 +651,59 @@ test_that(
 
         expect_identical(object = dplyr::as_tibble(df_arrow),
                          expected = dplyr::as_tibble(df))
+
+      }
+    )
+
+  }
+)
+
+# Test RUO parquet file
+test_that(
+  "read_npx_parquet - works - RUO file",
+  {
+    withr::with_tempfile(
+      new = "pfile_ruo",
+      pattern = "parquet-file_ruo",
+      fileext = ".parquet",
+      code = {
+
+        # random data frame
+        df <- dplyr::tibble(
+          "SampleID" = c(1, 2.2, 3.14),
+          "OlinkID" = c("a", "b", "c"),
+          "UniProt" = c(TRUE, TRUE, FALSE),
+          "Assay" = c("NA", "B", NA_character_),
+          "Panel" = c(1L, 2L, 3L),
+          "PlateID" = c(1, 2.2, 3.14),
+          "SampleQC" = c("a", "b", "c"),
+          "NPX" = c(1L, 2L, 3L)
+        ) |>
+          arrow::as_arrow_table(df)
+
+        # modify metadata
+        df_metadata_list <- list(
+          "DataFileType" = "NPX File",
+          "Product" = "ExploreHT",
+          "RUO" = "I am for reasearch only!"
+        )
+        df$metadata <- df_metadata_list
+
+        # write parquet
+        arrow::write_parquet(
+          x = df,
+          sink = pfile_ruo,
+          compression = "uncompressed"
+        )
+
+        # check that the parquet file was created
+        expect_true(object = file.exists(pfile_ruo))
+
+        # check that relevant error is thrown
+        expect_message(
+          object = read_npx_parquet(file = pfile_ruo),
+          regexp = "I am for reasearch only!"
+        )
 
       }
     )

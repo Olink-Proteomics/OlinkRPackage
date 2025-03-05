@@ -1,10 +1,10 @@
-#' Help function to read NPX, Ct or absolute quantification data from
-#' zip-compressed Olink software output files in R.
+#' Help function to read `r ansi_collapse_quot(get_olink_data_types())` data
+#' from zip-compressed Olink software output files in R.
 #'
 #' @description
 #' A zip-compressed input file might contain a file from the Olink software
-#' containing NPX, Ct or absolute quantification data, a checksum file and one
-#' or more files to be ignored.
+#' containing `r ansi_collapse_quot(get_olink_data_types())` data, a checksum
+#' file and one or more files to be ignored.
 #'
 #' \strong{Note:} The zip-compressed file should strictly contain \strong{one}
 #' Olink data file, \strong{none or one} checksum file and
@@ -13,10 +13,10 @@
 #' \itemize{
 #' \item \strong{Olink file} exported by Olink software in wide or long format.
 #' Expecting file extensions
-#' `r cli::ansi_collapse(x = accepted_npx_file_ext, sep2 = " or ", last = ", or ")`. # nolint
+#' `r ansi_collapse_quot(get_file_ext(c("excel", "delim", "parquet")))`.
 #' This file is subsequently provided as input to \code{\link{read_npx}}.
 #' \item \strong{checksum file} One of
-#' `r cli::ansi_collapse(x = accepted_checksum_files, sep2 = " or ", last = ", or ")` # nolint
+#' `r ansi_collapse_quot(x = accepted_checksum_files, sep = "or")`.
 #' depending on the checksum algorithm. The file contains only one line with the
 #' checksum string of characters.
 #' \item \strong{File(s) to be ignored} from the zip file. These files can be
@@ -29,30 +29,30 @@
 #'   Pascal Pucholt
 #'
 #' @param file Path to Olink software output zip-compressed file in wide or long
-#' format. Expecting file extension
-#' `r accepted_npx_file_ext[grepl("compress", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
-#' @param out_df The class of output data frame. One of "tibble" (default) or
-#' "arrow" for ArrowObject.
-#' @param sep Character separator of delimited input file. One of `NULL` for
-#' auto-detection (default), "," for comma or ";" for semicolon. Used only for
-#' delimited output files from Olink software.
+#' format. Expected file extensions
+#' `r ansi_collapse_quot(get_file_ext(name_sub = "compressed"))`.
+#' @param out_df The class of the output dataset. One of
+#' `r ansi_collapse_quot(read_npx_df_output)`. (default = "tibble")
+#' @param sep Character separator of delimited input file. One of `NULL`
+#' (default) for auto-detection, or `r ansi_collapse_quot(accepted_field_sep)`.
+#' Used only for delimited output files from Olink software.
 #' @param long_format Boolean marking format of input file. One of `NULL`
-#' (default) for auto-detection, "TRUE" for long format files or "FALSE" for
+#' (default) for auto-detection, `TRUE` for long format files or `FALSE` for
 #' wide format files.
 #' @param olink_platform Olink platform used to generate the input file.
-#' One of `NULL` (default),
-#' `r cli::ansi_collapse(x = accepted_olink_platforms$name, sep2 = " or ", last = ", or ")`. # nolint
+#' One of `NULL` (default) for auto-detection,
+#' `r get_olink_platforms(broad_platform = "qPCR") |> ansi_collapse_quot()`.
 #' @param data_type Quantification method of the input data. One of `NULL`
-#' (default),
-#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
 #' @param .ignore_files Character vector of files included in the zip-compressed
-#' Olink software output files that should be ignored. Applies only to
-#' zip-compressed input files. (default = c("README.txt")).
+#' Olink software output files that should be ignored. Used only for
+#' zip-compressed input files (default = \emph{c("README.txt")}).
 #' @param quiet Boolean to print a confirmation message when reading the input
-#' file. Applies to excel or delimited input only. "TRUE" (default) to not print
-#' and "FALSE" to print.
+#' file. Applies to excel or delimited input only. `TRUE` (default) to not print
+#' and `FALSE` to print.
 #'
-#' @return Tibble or ArrowObject with Olink data in long format.
+#' @return `r ansi_collapse_quot(x = get_df_output_print(), sep = "or")` with
+#' Olink data in long or wide format.
 #'
 #' @seealso
 #'   \code{\link{read_npx}}
@@ -87,10 +87,6 @@ read_npx_zip <- function(file,
   check_is_character(string = .ignore_files,
                      error = TRUE)
 
-  # **** Help vars ----
-
-  excl_file_ext <- c("zip")
-
   # **** Prep ****
 
   # tryCatch in case reading the zip file fails
@@ -104,11 +100,11 @@ read_npx_zip <- function(file,
 
     }, error = function(msg) {
 
-      cli::cli_abort(
+      cli::cli_abort( # nolint return_linter
         c(
           "x" = "Unable to open compressed file: {.file {file}}",
-          "i" = "Check if the file is a zip and/or potential file
-          corruption."
+          "i" = "Check if the file is {get_file_ext(name_sub = \"compressed\")}
+          and if the file is corrupt."
         ),
         call = rlang::caller_env(),
         wrap = FALSE
@@ -120,15 +116,20 @@ read_npx_zip <- function(file,
   # check contents of the compressed file
   # keep all files but the README.txt
   compressed_file_contents <- compressed_file_contents |>
-    dplyr::filter(!(.data[["Name"]] %in% .env[[".ignore_files"]])) |>
-    dplyr::pull(.data[["Name"]])
+    dplyr::filter(
+      !(.data[["Name"]] %in% .env[[".ignore_files"]])
+    ) |>
+    dplyr::pull(
+      .data[["Name"]]
+    )
 
   # check: files vector contains no entries
   if (length(compressed_file_contents) == 0L) {
 
     cli::cli_abort(
       c(
-        "x" = "No NPX and checksum file in the compressed file: {.file {file}}"
+        "x" = "No files other than {.file { .ignore_files }} detected in the
+        compressed file: {.file {file}}"
       ),
       call = rlang::caller_env(),
       wrap = FALSE
@@ -144,7 +145,7 @@ read_npx_zip <- function(file,
   # Get the name of the NPX files
   compressed_file_npx <- get_npx_file(
     files = compressed_file_contents,
-    excl_file_ext = excl_file_ext
+    excl_file_ext = get_file_ext(name_sub = "compressed") |> unname()
   )
 
   # Array of files to extract
@@ -306,14 +307,13 @@ get_npx_file <- function(files,
     cli::cli_abort(
       c(
         "x" = "The compressed file contains
-        {ifelse(nrow(df_files) == 0L, \"no\", \"multiple\")}
-        acceptable  files!",
+        {ifelse(nrow(df_files) == 0L, \"no\", \"multiple\")} acceptable files!",
         "i" = "The compressed input file should contain {.strong only} one
         file with extension:
-        {cli::ansi_collapse(x =
-      accepted_npx_file_ext[!(accepted_npx_file_ext %in% excl_file_ext)],
+        { cli::ansi_collapse(
+            x = get_file_ext(name_sub = c(\"excel\", \"delim\", \"parquet\")),
         sep2 = \" or \",
-        last = \", or \")}."
+        last = \", or \") }."
       ),
       call = rlang::caller_env(),
       wrap = FALSE
@@ -325,8 +325,8 @@ get_npx_file <- function(files,
     cli::cli_abort(
       c(
         "x" = "The compressed file contains another compressed file:
-        {df_files$files}!",
-        "i" = "Nested compressed files are not allowed to avoid infinite loops"
+        {.file {df_files$files}}!",
+        "i" = "Nested compressed files are not allowed to avoid infinite loops!"
       ),
       call = rlang::caller_env(),
       wrap = FALSE
@@ -337,8 +337,12 @@ get_npx_file <- function(files,
   # get the NPX file
   npx_file <- df_files |>
     # we can safely assume that there is only one file here
-    dplyr::slice_head(n = 1L) |>
-    dplyr::pull(.data[["files"]])
+    dplyr::slice_head(
+      n = 1L
+    ) |>
+    dplyr::pull(
+      .data[["files"]]
+    )
 
   # return
   return(npx_file)
@@ -350,7 +354,7 @@ get_npx_file <- function(files,
 #'
 #' @description
 #' Runs only if one of
-#' `r cli::ansi_collapse(x = accepted_checksum_files, sep2 = " or ", last = ", or ")` # nolint
+#' `r ansi_collapse_quot(x = accepted_checksum_files, sep = "or")`.
 #' are present in the input zip-compressed file. This function does not check if
 #' the \var{checksum_file} is in acceptable format.
 #'
@@ -441,7 +445,7 @@ check_checksum <- function(checksum_file,
   if (checksum_file_content != npx_file_checksum) {
 
     # error message
-    cli::cli_abort(
+    cli::cli_abort( # nolint return_linter
       c(
         "x" = "The checksum of the NPX file does not match the one included in
         the compressed file",

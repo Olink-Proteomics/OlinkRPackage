@@ -1,19 +1,18 @@
-#' Utility function removing columns with all values NA from a tibble or an
-#' arrow object.
+#' Utility function removing columns with all values NA from a dataset.
 #'
 #' @author
 #'   Klev Diamanti
 #'
-#' @param df A tibble or an arrow object.
+#' @param df An Olink dataset.
 #'
-#' @return The same data frame as input without all-NA columns.
+#' @return The input Olink dataset without all-NA columns.
 #'
 remove_all_na_cols <- function(df) {
 
   # input check ----
 
-  check_is_arrow_or_tibble(df = df,
-                           error = TRUE)
+  check_is_dataset(df = df,
+                   error = TRUE)
 
   # identify all NA cols ----
 
@@ -33,4 +32,24 @@ remove_all_na_cols <- function(df) {
   # return ----
 
   return(df)
+}
+
+#' Utility function that adds quotation marks on elements printed by
+#' ansi_collapse from cli.
+#'
+#' @param x Character vector.
+#' @param sep One of "or" and "and".
+#'
+#' @return Scalar character vector collapsed by "and" or "or".
+#'
+ansi_collapse_quot <- function(x,
+                               sep = "and") {
+  x_paste <- paste0("\"", x, "\"")
+
+  if (sep == "or") {
+    x <- cli::ansi_collapse(x = x_paste, sep2 = " or ", last = ", or ")
+  } else {
+    x <- cli::ansi_collapse(x = x_paste)
+  }
+  return(x)
 }

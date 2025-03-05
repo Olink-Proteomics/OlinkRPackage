@@ -1,3 +1,87 @@
+# Olink Analyze 4.2.0
+## Minor Changes
+* Cross-product bridging is now supported for bridging Olink Explore 3072 to Olink Reveal (#509, @kathy-nevola)
+* Standard data exports from NPX Signature 2.0 are now supported (#511, @KangD-dev)
+* Kang Dong and Stephen Pollo have been added as authors (#514, @kathy-nevola)
+* MaxLOD will be recalculated after bridging to reflect the MaxLOD across all projects (#505, @klevdiamanti)
+
+## Bug Fixes
+* A warning message will be displayed when fewer than the recommended number of bridging samples are used in cross product bridging (#507, @klevdiamanti)
+* If count data is not provided in cross-product bridging, an error message will occur (#510, @kristynchin-olink)
+* For cross-product bridging, if the sample type and assay warning columns do not have the same column naming (ex: SampleType and Sample_Type), both columns will be included in the output. (#515, @spollo-olprot, @MasoumehSheikh)
+
+# Olink Analyze 4.1.1
+## Minor Changes
+* Images were decreased in dimension to meet CRAN Size requirements (#500, @kathy-nevola)
+
+## Bug Fixes
+* Dataframe name was corrected in Olink Explore 3072 to Olink Explore HT bridging tutorial Downstream Analysis section. (#500, @kathy-nevola)
+
+# Olink Analyze 4.1.0
+## Minor Changes
+* Functionality has been added to read_NPX, olink_lod, and olink_plate_randomizer to support additional data types (#487, @kathy-nevola)
+* A new function has been added to visualize the criteria used to establish the recommended bridging method for an assay in cross-product bridging (#468, @amrita-kar)
+* A new function has been added to simplify data wrangling on bridged data after cross-product bridging (#472, @dtopouza)
+* The tutorial on Olink Explore 3072 to Explore HT bridging has been updated to reflect the new functions (#473, @kristynchin-olink)
+* Documentation for plate randomization when keeping samples from the same studies together has been improved in function documentation and the Plate Randomization tutorial (#483, @kathy-nevola)
+* Contact us and legal disclaimer information has been updated and added to all tutorials (#490, @kathy-nevola)
+* A Research Use Only (RUO) message is now printed when reading parquet files (#487, @kathy-nevola)
+* References to NPX Explore have been generalized to Olink Software in tutorials (#490, @kathy-nevola)
+* The overview tutorial has been updated and streamlined (#473, @kristynchin-olink)
+
+## Bug Fixes
+* Assay CTRL is no longer characterized as a control assay (#484, @dtopouza)
+* An error that had previously limited Explore HT to Explore HT bridging has been resolved (#491, @klevdiamanti)
+* The minimum number of bridge samples for QS normalization has been corrected to 40 samples.
+* The Block column is now transformed into a character value to ensure consistency across products.
+* An error that had previously impacted paired Wilcoxon tests has been resolved. (#485, @boxizhang)
+
+# Olink Analyze 4.0.2
+## Bug Fixes
+* Product is now identified by column name for cross-product normalization, rather than OlinkIDs. This allows for non-overlapping assays to be present in input files. (#469, @kathy-nevola)
+* Added many-to-many mapping in joining Explore HT data to the mapping file to support correlation assays (#469, @kathy-nevola)
+* Corrected spelling in error message. (#469, @kathy-nevola)
+* Fixed typo in NotBridgeable category name in tutorial (#471, @dtopouza)
+
+# Olink Analyze 4.0.1
+## Minor Changes
+* larger rds files used for unit tests have been excluded from build to abide by CRAN size limitations (#462, @kathy-nevola)
+
+# Olink Analyze 4.0.0
+## Major Changes
+* olink_normalization can now be used for bridging Explore 3072 data to Explore HT data (#453, #452, #439, #449, #447,#446, #441, #440, #434, #422, #436, #435 @klevdiamanti, @kathy-nevola, @kristynchin-olink, @dtopouza, @amrita-kar, @MasoumehSheikh)
+* olink_normalization has undergone major changes to improve speed, reproducibility, and extending functionality (#418, @klevdiamanti, @kristynchin-olink, @MasoumehSheikh)
+
+## Minor Changes
+* New tutorial has been added to explain and support Explore 3072 to Explore HT bridging (#448, #428, #427, #426, #425, #424, #423, @kristynchin-olink, @boxizhang, @dtopouza, @kathy-nevola, @MasoumehSheikh)
+* Update FAQ links in tutorials with queries links (#451, @kathy-nevola)
+* Decrease package size on Mac and Linux (#445, @kathy-nevola)
+* Removed redundant information from overview vignette (#458, @kathy-nevola)
+
+## Bug Fixes
+* Add support back for files with quotes to read_NPX (#431 @kathy-nevola)
+
+# Olink Analyze 3.9.1
+## Bug Fix
+* Extra set of parentheses removed from vignette (#430, @kathy-nevola)
+
+# Olink Analyze 3.9.0
+## Minor Changes
+* Explore HT recommended bridging samples have been added to Introduction to Bridging tutorial (#409, @kathy-nevola)
+* Support for CSVs with SampleQC column was added to read_NPX (#406, @kathy-nevola)
+* Support for Olink Analyze Export parquets was added to read_NPX (#408, @kathy-nevola)
+* Quantitative value csvs will now give a warning about limited support for Quant data (#406, @kathy-nevola)
+* Instructions for importing multiple NPX files has been added to the overview tutorial (#403, @dtopouza)
+* Additional background information was added to the LOD tutorial to clarify how LOD is calculated from counts (#404, @kathy-nevola)
+* LOD can now be calculated using fixed LOD, negative controls, or both methods (#390, @kathy-nevola)
+* An error message will now appear when running anova and control assays are present (#416, @dtopouza)
+* Danai Topouza's role has been changed from contributor to author (#415, @kathy-nevola)
+
+## Bug Fixes
+* URLs in tutorials will now direct to updated olink.com locations (#402,  @kathy-nevola)
+* Instructions to export parquet files with LOD have been updated (#408, @kathy-nevola)
+* removed scale_name argument when ggplot2 3.5+ is installed (#421, @kathy-nevola)
+
 # Olink Analyze 3.8.2
 ## Bug Fixes 
 * update to URL hyperlink in LOD tutorial to include https

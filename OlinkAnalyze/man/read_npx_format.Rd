@@ -19,47 +19,48 @@ read_npx_format(
 \arguments{
 \item{file}{Path to Olink software output file in wide or long format.
 Expecting file extensions
-xls, xlsx, csv, or txt. # nolint}
+"xls", "xlsx", "csv", and "txt".}
 
-\item{out_df}{The class of output data frame. One of "tibble" (default) or
-"arrow" for ArrowObject.}
+\item{out_df}{The class of output data frame. One of
+"tibble" and "arrow".}
 
-\item{sep}{Character separator of delimited input file. One of \code{NULL} for
-auto-detection (default), "," for comma or ";" for semicolon. Used only for
-delimited output files from Olink software.}
+\item{sep}{Character separator of delimited input file. One of \code{NULL}
+(default) for auto-detection, or ";" and ",".
+Used only for delimited output files from Olink software.}
 
 \item{long_format}{Boolean marking format of input file. One of \code{NULL}
-(default) for auto-detection, "TRUE" for long format files or "FALSE" for
+(default) for auto-detection, \code{TRUE} for long format files or \code{FALSE} for
 wide format files.}
 
 \item{olink_platform}{Olink platform used to generate the input file.
-One of \code{NULL} (default),
-Target 48, Flex, Target 96, Explore 3072, Explore HT, or Focus. # nolint}
+One of \code{NULL} (default) for auto-detection,
+"Flex", "Focus", "Target 48", and "Target 96".}
 
 \item{data_type}{Quantification method of the input data. One of \code{NULL}
-(default),
-Ct, NPX, or Quantified. # nolint}
+(default) for auto-detection, "Ct", "NPX", and "Quantified".}
 
 \item{quiet}{Boolean to print a confirmation message when reading the input
-file. Applies to excel or delimited input only. "TRUE" (default) to not print
-and "FALSE" to print.}
+file. \code{TRUE} (default) to skip printing, and \code{FALSE} to print.}
 
 \item{legacy}{Boolean to enforce returning a list containing olink_platform,
-data_type and long_format information together with the dataset.}
+data_type and long_format information together with the dataset. Used only
+when \code{\link{read_npx_format}} is called from
+\code{\link{read_npx_legacy}}.}
 }
 \value{
-Tibble or ArrowObject with Olink data in long format.
+"tibble" or "ArrowObject" with
+Olink data in long or wide format.
 }
 \description{
 This function processes Olink software excel or delimited files regardless of
 data type, platform or format.
 
 \strong{Olink software excel files} with the extension
-xls or xlsx. # nolint
+"xls" or "xlsx"
 are imported in R by the function \code{\link{read_npx_excel}}.
 
 \strong{Olink software delimited files} with suffix
-csv or txt. # nolint
+"csv" or "txt"
 are imported in R by the functions \code{\link{read_npx_delim}} or
 \code{\link{read_npx_csv}}.
 

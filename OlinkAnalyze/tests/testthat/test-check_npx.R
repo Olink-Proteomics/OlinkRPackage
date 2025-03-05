@@ -15,7 +15,7 @@ test_that(
 
     expect_error(
       object = check_npx(df),
-      regexp = "`df` is not a tibble or an arrow data frame!"
+      regexp = "`df` is not a tibble or an ArrowObject dataset!"
     )
   }
 )
@@ -313,7 +313,7 @@ test_that(
         check_npx_col_names(
           preferred_names = c("sample_id" = "IamSampleName")
         ),
-      regexp = "Some of the values of \"preferred_names\" are not detected in"
+      regexp = "Some of the values of `preferred_names` are not detected in"
     )
 
     # multiple non existing column column names ----
@@ -325,7 +325,7 @@ test_that(
                               "lod" = "PlateLOD",
                               "sample_type" = "IamSampleType")
         ),
-      regexp = "Some of the values of \"preferred_names\" are not detected in"
+      regexp = "Some of the values of `preferred_names` are not detected in"
     )
   }
 )
@@ -473,7 +473,7 @@ test_that(
                      "12345",
                      "NA")
       ),
-      regexp = "Unrecognized OlinkIDs detected: OID123456, OID1234, 12345, and"
+      regexp = "Unrecognized OlinkIDs detected: \"OID123456\", \"OID1234\","
     )
 
   }
@@ -533,7 +533,7 @@ test_that(
         ),
         expected = "OID12345"
       ),
-      regexp = "OID12345 has NPX = NA for all samples."
+      regexp = "\"OID12345\" has \"NPX\" = NA for all samples."
     )
 
   }
@@ -591,7 +591,7 @@ test_that(
         ),
         expected = "OID12345"
       ),
-      regexp = "OID12345 has NPX = NA for all samples."
+      regexp = "\"OID12345\" has \"NPX\" = NA for all samples."
     )
 
   }
@@ -639,7 +639,7 @@ test_that(
                                                 col_names = col_names),
         expected = "A"
       ),
-      regexp = "Duplicate SampleID detected: A"
+      regexp = "Duplicate SampleID detected: \"A\""
     )
 
   }
@@ -663,7 +663,7 @@ test_that(
                                                 col_names = col_names),
         expected = c("A", "B")
       ),
-      regexp = "Duplicate SampleIDs detected: A and B"
+      regexp = "Duplicate SampleIDs detected: \"A\" and \"B\""
     )
 
   }

@@ -1,20 +1,22 @@
-#' Convert Olink data in wide format with NPX, Ct or Quantified data to long
-#' format.
+#' Convert Olink data in wide format with
+#' `r ansi_collapse_quot(get_olink_data_types(broad_platform = "qPCR"))` data to
+#' long format.
 #'
 #' @author
 #'   Klev Diamanti
 #'
 #' @param df A tibble containing the full Olink dataset in wide format.
-#' @param file Path to Olink software output file in wide or long format.
-#' Expecting file extensions
-#' `r accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' @param file Path to Olink software output file in wide format. Expected one
+#' of file extensions
+#' `r ansi_collapse_quot(x = get_file_ext(name_sub = c("excel", "delim")))`.
 #' @param olink_platform Olink platform used to generate the input file.
-#' One of
-#' `r accepted_olink_platforms |> dplyr::filter(.data[["broader_platform"]] == "qPCR") |> dplyr::pull(.data[["name"]]) |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
-#' @param data_type Quantification method of the input data. One of
-#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' One of `NULL` (default) for auto-detection,
+#' `r get_olink_platforms(broad_platform = "qPCR") |> ansi_collapse_quot()`.
+#' @param data_type Quantification method of the input data. One of `NULL`
+#' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
 #'
-#' @return Tibble with Olink data in long format.
+#' @return `r ansi_collapse_quot(x = get_df_output_print(), sep = "or")` with
+#' Olink data in long or wide format.
 #'
 #' @seealso
 #'   \code{\link{read_npx_format}}
@@ -37,11 +39,13 @@ read_npx_wide <- function(df,
   check_file_exists(file = file,
                     error = TRUE)
 
+  broad_platform <- "qPCR"
+
   check_olink_data_type(x = data_type,
-                        broader_platform = "qPCR")
+                        broad_platform = broad_platform)
 
   check_olink_platform(x = olink_platform,
-                       broader_platform = "qPCR")
+                       broad_platform = broad_platform)
 
   # get expected format specifications ----
 
@@ -61,7 +65,9 @@ read_npx_wide <- function(df,
 
   # header matrix NPXS version ----
 
-  npxs_v <- read_npx_wide_npxs_version(df = df_split_row$df_head)
+  npxs_v <- read_npx_wide_npxs_version(
+    df = df_split_row$df_head
+  )
 
   # top list of df to long ----
 
@@ -85,10 +91,12 @@ read_npx_wide <- function(df,
 
   # combine top and middle matrices ----
 
-  df_long <- red_npx_wide_top_mid_long(df_top_list = df_top_list,
-                                       df_middle_list = df_middle_list,
-                                       data_type = data_type,
-                                       format_spec = format_spec)
+  df_long <- red_npx_wide_top_mid_long(
+    df_top_list = df_top_list,
+    df_middle_list = df_middle_list,
+    data_type = data_type,
+    format_spec = format_spec
+  )
 
   # add bottom df to long ----
 
@@ -163,10 +171,10 @@ read_npx_wide <- function(df,
 #' Split Olink wide files to sub-matrices.
 #'
 #' @description
-#' Olink datasets in wide format contain 1 or 2 rows with all columns NA marking
-#' sub-matrices of the data. This function takes advantage of that feature and
-#' splits the dataset into 3 or 4 sub-matrices. Each sub-matrix is used
-#' downstream to assemble a long data frame.
+#' Olink datasets in wide format contain 2 or 3 rows with all columns `NA`
+#' marking sub-matrices of the data. This function takes advantage of that
+#' feature and splits the dataset into 3 or 4 sub-matrices. Each sub-matrix is
+#' used downstream to assemble a long data frame.
 #'
 #' Specifically:
 #' \itemize{
@@ -178,9 +186,9 @@ read_npx_wide <- function(df,
 #'   on assays, panels, columns with plate identifiers, columns with sample QC
 #'   warnings and column with deviations from the internal controls. Note that
 #'   not all the columns are present in all datasets and for all quantification
-#'   methods. The local environment variable \var{olink_wide_spec} marks all
-#'   the expected configurations.
-#'   \item \strong{Middle matrix} is marked by rows with all columns "NA: above
+#'   methods. The local environment variable \var{olink_wide_spec} marks all the
+#'   expected configurations.
+#'   \item \strong{Middle matrix} is marked by rows with all columns `NA` above
 #'   and below. This matrix contains sample identifiers, quantification
 #'   measurements for all assays, plate identifiers, sample QC warnings and
 #'   deviations from the internal controls.
@@ -194,11 +202,11 @@ read_npx_wide <- function(df,
 #'   Klev Diamanti
 #'
 #' @param df A tibble containing the full Olink dataset in wide format.
-#' @param file Path to Olink software output file in wide or long format.
-#' Expecting file extensions
-#' `r accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
-#' @param data_type Quantification method of the input data. One of
-#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' @param file Path to Olink software output file in wide format. Expected one
+#' of file extensions
+#' `r ansi_collapse_quot(x = get_file_ext(name_sub = c("excel", "delim")))`.
+#' @param data_type Quantification method of the input data. One of `NULL`
+#' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
 #' @param format_spec A tibble derived from \var{olink_wide_spec} in the local
 #' environment containing the expected format of the Olink wide file based on
 #' the \var{olink_platform} and \var{data_type}.
@@ -233,12 +241,12 @@ read_npx_wide_split_row <- function(df,
                     error = TRUE)
 
   check_olink_data_type(x = data_type,
-                        broader_platform = "qPCR")
+                        broad_platform = "qPCR")
 
   check_is_tibble(df = format_spec,
                   error = TRUE)
 
-  # help gunction to fill NA ----
+  # help function to fill NA ----
 
   # we are not using tidyr::fill because it still depends on dplyr::mutate_at
   # which is superseded, and throws error in test
@@ -317,9 +325,10 @@ read_npx_wide_split_row <- function(df,
     cli::cli_abort(
       message = c(
         "x" = "We identified
-        {ifelse(identical(na_row_index, integer(0L)), 0L, nrow(na_row_index))}
+        {.val { ifelse(identical(na_row_index, integer(0L)),
+                       0L, nrow(na_row_index))}}
         rows with all columns `NA` in file {.file {file}}, while we expected
-        {format_spec$n_na_rows}!",
+        {.val {format_spec$n_na_rows}}!",
         "i" = "Has the file been modified manually?"
       ),
       call = rlang::caller_env(),
@@ -415,13 +424,9 @@ read_npx_wide_npxs_version <- function(df) {
       .data[["V2"]]
     ) |>
     as.character() |>
-    (\(x) {
-      strsplit(x = x,
-               split = " ",
-               fixed = TRUE) |>
-        lapply(utils::tail, 1L) |>
-        unlist()
-    })()
+    strsplit(split = " ", fixed = TRUE) |>
+    lapply(utils::tail, 1L) |>
+    unlist()
 
   # return ----
 
@@ -435,9 +440,9 @@ read_npx_wide_npxs_version <- function(df) {
 #'   Klev Diamanti
 #'
 #' @param df Top matrix of Olink datasets in wide format \var{df_top}.
-#' @param file Path to Olink software output file in wide or long format.
-#' Expecting file extensions
-#' `r accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' @param file Path to Olink software output file in wide format. Expected one
+#' of file extensions
+#' `r ansi_collapse_quot(x = get_file_ext(name_sub = c("excel", "delim")))`.
 #' @param format_spec A tibble derived from \var{olink_wide_spec} in the local
 #' environment containing the expected format of the Olink wide file based on
 #' the \var{olink_platform} and \var{data_type}.
@@ -479,12 +484,12 @@ read_npx_wide_check_top <- function(df,
 
   if (!identical(dplyr::pull(df, .data[["V1"]]), top_mat_v1)) {
 
-    top_v1_miss <- top_mat_v1[!(top_mat_v1 %in% df$V1)] # nolint
+    top_v1_miss <- top_mat_v1[!(top_mat_v1 %in% df$V1)] # nolint object_usage_linter
 
     cli::cli_abort(
       message = c(
         "x" = "Column 1 of the top matrix with assay data in file
-        {.file {file}} does not contain: {top_v1_miss}",
+        {.file {file}} does not contain: {.val {top_v1_miss}}",
         "i" = "Has the file been modified manually?"
       ),
       call = rlang::caller_env(),
@@ -504,12 +509,14 @@ read_npx_wide_check_top <- function(df,
 
   if (!all(top_mat_assay_labels %in% df[2L, ])) {
 
-    top_mat_assay_miss <- top_mat_assay_labels[!(top_mat_assay_labels %in% df[2L, ])] # nolint
+    top_mat_assay_miss <- top_mat_assay_labels[ # nolint object_usage_linter
+      !(top_mat_assay_labels %in% df[2L, ])
+    ]
 
     cli::cli_abort(
       message = c(
         "x" = "Row 2 of the top matrix with assay data in file {.file {file}}
-        does not contain: {top_mat_assay_miss}",
+        does not contain: {.val {top_mat_assay_miss}}",
         "i" = "Has the file been modified manually?"
       ),
       call = rlang::caller_env(),
@@ -600,10 +607,11 @@ read_npx_wide_check_top <- function(df,
 
       cli::cli_abort(
         message = c(
-          "x" = "Panel(s) {unique(int_ctrl_df_missing$panel)} {?is/are} missing
-          one or more of the internal control assays
-          {unique(int_ctrl_df_missing$int_ctrl)} from row 2 of the top matrix
-          with assay data in file {.file {file}}!",
+          "x" = "{cli::qty(unique(int_ctrl_df_missing$panel))} Panel{?s}
+          {.val {unique(int_ctrl_df_missing$panel)}} {?is/are} missing one or
+          more of the internal control assays
+          {.val {unique(int_ctrl_df_missing$int_ctrl)}} from row 2 of the top
+          matrix with assay data in file {.file {file}}!",
           "i" = "Has the file been modified manually?"
         ),
         call = rlang::caller_env(),
@@ -703,11 +711,12 @@ read_npx_wide_check_top <- function(df,
 
       if (nrow(dev_int_ctrl_df_missing) > 0L) {
 
-        cli::cli_abort(
+        cli::cli_abort( # nolint return_linter
           message = c(
-            "x" = "Panel(s) {unique(dev_int_ctrl_df_missing$panel)} {?is/are}
-            missing one or more of the deviations from the internal control
-            assays {unique(dev_int_ctrl_df_missing$dev_int_ctrl)} from row 3 of
+            "x" = "{cli::qty(unique(int_ctrl_df_missing$panel))} Panel{?s}
+            {.val {unique(dev_int_ctrl_df_missing$panel)}} {?is/are} missing one
+            or more of the deviations from the internal control assays
+            {.val {unique(dev_int_ctrl_df_missing$dev_int_ctrl)}} from row 3 of
             the top matrix with assay data in file {.file {file}}!",
             "i" = "Has the file been modified manually?"
           ),
@@ -734,12 +743,12 @@ read_npx_wide_check_top <- function(df,
 #'   Klev Diamanti
 #'
 #' @param df Top matrix of Olink dataset in wide format \var{df_top}.
-#' @param file Path to Olink software output file in wide or long format.
-#' Expecting file extensions
-#' `r accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' @param file Path to Olink software output file in wide format. Expected one
+#' of file extensions
+#' `r ansi_collapse_quot(x = get_file_ext(name_sub = c("excel", "delim")))`.
 #' @param olink_platform Olink platform used to generate the input file.
-#' One of
-#' `r accepted_olink_platforms |> dplyr::filter(.data[["broader_platform"]] == "qPCR") |> dplyr::pull(.data[["name"]]) |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' One of `NULL` (default) for auto-detection,
+#' `r get_olink_platforms(broad_platform = "qPCR") |> ansi_collapse_quot()`.
 #' @param format_spec A tibble derived from \var{olink_wide_spec} in the local
 #' environment containing the expected format of the Olink wide file based on
 #' the \var{olink_platform} and \var{data_type}.
@@ -769,7 +778,7 @@ read_npx_wide_top <- function(df,
   # check input and top matrix ----
 
   check_olink_platform(x = olink_platform,
-                       broader_platform = "qPCR")
+                       broad_platform = "qPCR")
 
   check_is_tibble(df = format_spec,
                   error = TRUE)
@@ -804,20 +813,22 @@ read_npx_wide_top <- function(df,
     )
 
   # extract plate_id and qc_warning from Assay column
-  df_pid_qcw <- lapply(unlist(format_spec$top_matrix_assay_labels),
-                       function(x) {
-                         df_t |>
-                           dplyr::filter(
-                             is.na(.data[["OlinkID"]])
-                             & .data[["Assay"]] %in% .env[["x"]]
-                           ) |>
-                           dplyr::select(
-                             -dplyr::any_of(c("Uniprot ID", "OlinkID", "Unit"))
-                           ) |>
-                           dplyr::rename(
-                             "Var" = "Assay"
-                           )
-                       })
+  df_pid_qcw <- lapply(
+    unlist(format_spec$top_matrix_assay_labels),
+    function(x) {
+      df_t |> # nolint return_linter
+        dplyr::filter(
+          is.na(.data[["OlinkID"]])
+          & .data[["Assay"]] %in% .env[["x"]]
+        ) |>
+        dplyr::select(
+          -dplyr::any_of(c("Uniprot ID", "OlinkID", "Unit"))
+        ) |>
+        dplyr::rename(
+          "Var" = "Assay"
+        )
+    }
+  )
   names(df_pid_qcw) <- paste("df_top", names(df_pid_qcw), sep = "_")
 
   # extract internal control from Assay column
@@ -846,7 +857,7 @@ read_npx_wide_top <- function(df,
                      + nrow(df_top_int_ctrl)
                      + nrow(df_top_dev_int_ctrl))) {
 
-    top_mat_unknown_cols <- setdiff(df_t$col_index, # nolint
+    top_mat_unknown_cols <- setdiff(df_t$col_index, # nolint object_usage_linter
                                     c(df_top_oid$col_index,
                                       sapply(df_pid_qcw, \(x) x$col_index) |>
                                         unname() |>
@@ -858,7 +869,7 @@ read_npx_wide_top <- function(df,
       message = c(
         "x" = "The top matrix with the assay data in file {.file {file}} in row
         `Assay` contains unrecognized values in columns:
-        {top_mat_unknown_cols}!",
+        {.val {top_mat_unknown_cols}}!",
         "i" = "Has the file been modified manually?"
       ),
       call = rlang::caller_env(),
@@ -877,7 +888,7 @@ read_npx_wide_top <- function(df,
       message = c(
         "x" = "The top matrix with the assay data in file {.file {file}} expects
         no empty cells for assays other than internal controls. Identified
-        { sum(is.na(df_top_oid)) } empty cells!",
+        {.val {sum(is.na(df_top_oid))}} empty cells!",
         "i" = "Has the file been modified manually?"
       ),
       call = rlang::caller_env(),
@@ -905,9 +916,9 @@ read_npx_wide_top <- function(df,
 
     cli::cli_abort(
       message = c(
-        "x" = "Detected {nrow(df_top_oid)} assays in
-        {length(unique(df_top_oid$Panel))} panels in file {.file {file}}, but
-        expected {expected_num_assays}!",
+        "x" = "Detected {.val {nrow(df_top_oid)}} assays in
+        {.val {length(unique(df_top_oid$Panel))}} panels in file {.file {file}},
+        but expected {.val {expected_num_assays}}!",
         "i" = "Has the file been modified manually?"
       ),
       call = rlang::caller_env(),
@@ -928,10 +939,8 @@ read_npx_wide_top <- function(df,
       cli::cli_abort(
         message = c(
           "x" = "Expected equal number of
-          {unlist(format_spec$top_matrix_assay_labels) |>
-          sapply(\\(x) paste0(\"`\", x, \"`\")) |>
-          cli::ansi_collapse()} columns in the top matrix with the assay data in
-          file {.file {file}}!",
+          {.val {unlist(format_spec$top_matrix_assay_labels)}} columns in the
+          top matrix with the assay data in file {.file {file}}!",
           "i" = "Has the file been modified manually?"
         ),
         call = rlang::caller_env(),
@@ -978,11 +987,11 @@ read_npx_wide_top <- function(df,
 #'   Klev Diamanti
 #'
 #' @param df Middle matrix of Olink dataset in wide format \var{df_mid}.
-#' @param file Path to Olink software output file in wide or long format.
-#' Expecting file extensions
-#' `r accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
-#' @param data_type Quantification method of the input data. One of
-#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' @param file Path to Olink software output file in wide format. Expected one
+#' of file extensions
+#' `r ansi_collapse_quot(x = get_file_ext(name_sub = c("excel", "delim")))`.
+#' @param data_type Quantification method of the input data. One of `NULL`
+#' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
 #' @param col_names Names list of character vectors containing column names from
 #' each chunk of columns \var{df_top} was split on in function.
 #' \code{\link{read_npx_wide_top}}.
@@ -1022,7 +1031,7 @@ read_npx_wide_middle <- function(df,
                     error = TRUE)
 
   check_olink_data_type(x = data_type,
-                        broader_platform = "qPCR")
+                        broad_platform = "qPCR")
 
   check_is_list(lst = col_names,
                 error = TRUE)
@@ -1041,7 +1050,8 @@ read_npx_wide_middle <- function(df,
     cli::cli_inform(
       message = c(
         "i" = "The middle matrix in file {.file {file}} does not contain unique
-        sample identifiers. Identified {nrow(df) - n_uniq_sample} duplicates!"
+        sample identifiers. Identified {.val {nrow(df) - n_uniq_sample}}
+        duplicates!"
       ),
       call = rlang::caller_env(),
       wrap = FALSE
@@ -1198,8 +1208,9 @@ read_npx_wide_middle <- function(df,
 
     cli::cli_abort(
       message = c(
-        "x" = "Unable to assign column(s) {col_mid_missing} from the Olink wide
-        format file {.file {file}}!",
+        "x" = "Unable to assign {cli::qty(col_mid_missing)} column{?s}
+        {.val {col_mid_missing}} from the Olink wide format file
+        {.file {file}}!",
         "i" = "Has the file been modified manually?"
       ),
       call = rlang::caller_env(),
@@ -1234,7 +1245,7 @@ read_npx_wide_panel_version <- function(df) {
 
   # extarct Panel_Version and modify Panel ----
 
-  df |>
+  panel_v <- df |>
     # add Panel_Version
     dplyr::mutate(
       # if else allows us to have Panel_Version NA when the pattern (v.X) is not
@@ -1247,7 +1258,7 @@ read_npx_wide_panel_version <- function(df) {
           lapply(utils::tail, 1L) |>
           unlist() |>
           (\(x) {
-            sub(pattern = ")",
+            sub(pattern = ")", # nolint return_linter
                 replacement = "",
                 x = x,
                 fixed = TRUE)
@@ -1270,6 +1281,8 @@ read_npx_wide_panel_version <- function(df) {
         .data[["Panel"]]
       )
     )
+
+  return(panel_v)
 }
 
 #' Combine top and middle matrices in long format.
@@ -1286,8 +1299,8 @@ read_npx_wide_panel_version <- function(df) {
 #' function \code{\link{read_npx_wide_top}}.
 #' @param df_middle_list List of data frames from the middle matrix. Output of
 #' function \code{\link{read_npx_wide_middle}}.
-#' @param data_type Quantification method of the input data. One of
-#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' @param data_type Quantification method of the input data. One of `NULL`
+#' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
 #' @param format_spec A tibble derived from \var{olink_wide_spec} in the local
 #' environment containing the expected format of the Olink wide file based on
 #' the \var{olink_platform} and \var{data_type}.
@@ -1456,14 +1469,14 @@ red_npx_wide_top_mid_long <- function(df_top_list,
 #'   Klev Diamanti
 #'
 #' @param df Bottom matrix of Olink dataset in wide format \var{df_bottom}.
-#' @param file Path to Olink software output file in wide or long format.
-#' Expecting file extensions
-#' `r accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
-#' @param data_type Quantification method of the input data. One of
-#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' @param file Path to Olink software output file in wide format. Expected one
+#' of file extensions
+#' `r ansi_collapse_quot(x = get_file_ext(name_sub = c("excel", "delim")))`.
+#' @param data_type Quantification method of the input data. One of `NULL`
+#' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
 #' @param olink_platform Olink platform used to generate the input file.
-#' One of
-#' `r accepted_olink_platforms |> dplyr::filter(.data[["broader_platform"]] == "qPCR") |> dplyr::pull(.data[["name"]]) |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' One of `NULL` (default) for auto-detection,
+#' `r get_olink_platforms(broad_platform = "qPCR") |> ansi_collapse_quot()`.
 #'
 #' @return Tibble with the bottom matrix specifications for the Olink wide file.
 #'
@@ -1506,7 +1519,7 @@ read_npx_wide_bottom_version <- function(df,
 
     list_bottom_v <- lapply(format_spec_bottom_v,
                             function(x) {
-                              format_spec_bottom |>
+                              format_spec_bottom |> # nolint return_linter
                                 dplyr::filter(
                                   .data[["version"]] %in% c(0L, x)
                                 ) |>
@@ -1531,11 +1544,11 @@ read_npx_wide_bottom_version <- function(df,
   # contains all names in V1
   format_spec_bottom <- lapply(format_spec_bottom, function(x) {
     name_in_df <- lapply(x$variable_alt_names,
-                         \(y) (y[y %in% df$V1])) |>
+                         \(y) (y[y %in% df$V1])) |> # nolint return_linter
       lapply(\(y) (ifelse(length(y) == 0L, NA_character_, y))) |>
       unlist()
 
-    x |>
+    x |> # nolint return_linter
       dplyr::mutate(
         variable_name_in_df = name_in_df,
         in_df = dplyr::if_else(
@@ -1547,7 +1560,7 @@ read_npx_wide_bottom_version <- function(df,
   })
 
   names_in_v1 <- lapply(format_spec_bottom, function(.x) {
-    .x |>
+    .x |> # nolint return_linter
       dplyr::mutate(
         total_n = dplyr::n(),
         true_n = sum(.data[["in_df"]])
@@ -1578,10 +1591,10 @@ read_npx_wide_bottom_version <- function(df,
   if (length(names_in_v1) != 1L
       || nrow(format_spec_bottom[[names_in_v1]]) != length(unique(df$V1))) {
 
-    bottom_mat_v1_expected <- sapply( # nolint
+    bottom_mat_v1_expected <- sapply(
       format_spec_bottom,
       function(x) {
-        sapply(x$variable_alt_names, utils::head, 1L) |>
+        sapply(x$variable_alt_names, utils::head, 1L) |> # nolint return_linter
           cli::ansi_collapse() |>
           (\(.x) paste("*", .x))()
       }
@@ -1619,14 +1632,14 @@ read_npx_wide_bottom_version <- function(df,
 #'   Klev Diamanti
 #'
 #' @param df Bottom matrix of Olink dataset in wide format \var{df_bottom}.
-#' @param file Path to Olink software output file in wide or long format.
-#' Expecting file extensions
-#' `r accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' @param file Path to Olink software output file in wide format. Expected one
+#' of file extensions
+#' `r ansi_collapse_quot(x = get_file_ext(name_sub = c("excel", "delim")))`.
 #' @param olink_platform Olink platform used to generate the input file.
-#' One of
-#' `r accepted_olink_platforms |> dplyr::filter(.data[["broader_platform"]] == "qPCR") |> dplyr::pull(.data[["name"]]) |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
-#' @param data_type Quantification method of the input data. One of
-#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' One of `NULL` (default) for auto-detection,
+#' `r get_olink_platforms(broad_platform = "qPCR") |> ansi_collapse_quot()`.
+#' @param data_type Quantification method of the input data. One of `NULL`
+#' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
 #' @param col_names Names list of character vectors containing column names from
 #' each chunk of columns \var{df_top} was split on in function.
 #' @param format_spec A tibble derived from \var{olink_wide_spec} in the local
@@ -1660,10 +1673,10 @@ read_npx_wide_bottom <- function(df,
                     error = TRUE)
 
   check_olink_platform(x = olink_platform,
-                       broader_platform = "qPCR")
+                       broad_platform = "qPCR")
 
   check_olink_data_type(x = data_type,
-                        broader_platform = "qPCR")
+                        broad_platform = "qPCR")
 
   check_is_list(lst = col_names,
                 error = TRUE)
@@ -1748,8 +1761,9 @@ read_npx_wide_bottom <- function(df,
       cli::cli_abort(
         message = c(
           "x" = "Column 1 of the bottom matrix does not contain the same number
-          of  rows for plate-specific QC measurement(s)
-          {format_spec_bottom_plate_spec} in file {.file {file}}!",
+          of rows for plate-specific QC
+          {cli::qty(format_spec_bottom_plate_spec)} measurement{?s}
+          {.val {format_spec_bottom_plate_spec}} in file {.file {file}}!",
           "i" = "Has the file been modified manually?"
         ),
         call = rlang::caller_env(),
@@ -1762,7 +1776,7 @@ read_npx_wide_bottom <- function(df,
     df_plate_spec <- lapply(
       format_spec_bottom_plate_spec,
       function(x) {
-        df_plate_spec |>
+        df_plate_spec |> # nolint return_linter
           # keep only one Vq variable at a time
           dplyr::filter(
             .data[["V1"]] == .env[["x"]]
@@ -1793,7 +1807,7 @@ read_npx_wide_bottom <- function(df,
 
     # left join all data frames from the list
     df_plate_spec <- Reduce(f = function(df_1, df_2) {
-      dplyr::left_join(x = df_1,
+      dplyr::left_join(x = df_1, # nolint return_linter
                        y = df_2,
                        by = c("PlateID", "col_index"),
                        relationship = "one-to-one")

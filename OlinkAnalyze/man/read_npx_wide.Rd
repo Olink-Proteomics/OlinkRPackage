@@ -2,31 +2,34 @@
 % Please edit documentation in R/read_npx_wide.R
 \name{read_npx_wide}
 \alias{read_npx_wide}
-\title{Convert Olink data in wide format with NPX, Ct or Quantified data to long
-format.}
+\title{Convert Olink data in wide format with
+"Ct", "NPX", and "Quantified" data to
+long format.}
 \usage{
 read_npx_wide(df, file, data_type, olink_platform)
 }
 \arguments{
 \item{df}{A tibble containing the full Olink dataset in wide format.}
 
-\item{file}{Path to Olink software output file in wide or long format.
-Expecting file extensions
-xls, xlsx, csv, or txt. # nolint}
+\item{file}{Path to Olink software output file in wide format. Expected one
+of file extensions
+"xls", "xlsx", "csv", and "txt".}
 
-\item{data_type}{Quantification method of the input data. One of
-Ct, NPX, or Quantified. # nolint}
+\item{data_type}{Quantification method of the input data. One of \code{NULL}
+(default) for auto-detection, "Ct", "NPX", and "Quantified".}
 
 \item{olink_platform}{Olink platform used to generate the input file.
-One of
-Target 48, Flex, Target 96, or Focus. # nolint}
+One of \code{NULL} (default) for auto-detection,
+"Flex", "Focus", "Target 48", and "Target 96".}
 }
 \value{
-Tibble with Olink data in long format.
+"tibble" or "ArrowObject" with
+Olink data in long or wide format.
 }
 \description{
-Convert Olink data in wide format with NPX, Ct or Quantified data to long
-format.
+Convert Olink data in wide format with
+"Ct", "NPX", and "Quantified" data to
+long format.
 }
 \seealso{
 \code{\link{read_npx_format}}

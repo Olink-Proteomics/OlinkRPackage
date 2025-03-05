@@ -2,21 +2,23 @@
 % Please edit documentation in R/check_character.R
 \name{check_is_scalar_character}
 \alias{check_is_scalar_character}
-\title{Help function checking if a variable is a character vector of length 1.}
+\title{Help function checking if a variable is a scalar character.}
 \usage{
 check_is_scalar_character(string, error = FALSE)
 }
 \arguments{
-\item{string}{String vector to check.}
+\item{string}{Variable to check.}
 
-\item{error}{Return error or a boolean (default = FALSE).}
+\item{error}{Scalar boolean to return an error instead of a \code{FALSE}
+(\code{default = FALSE}).}
 }
 \value{
-Boolean if the variable is a character vector of length 1 or not, and
-an error if "error = TRUE".
+\code{TRUE} if the variable is a character vector of length 1, and \code{FALSE}
+if not; error if the variable is not a character vector of length 1, and
+\code{error = TRUE}.
 }
 \description{
-Help function checking if a variable is a character vector of length 1.
+Help function checking if a variable is a scalar character.
 }
 \seealso{
 \code{\link{check_is_scalar_boolean}}

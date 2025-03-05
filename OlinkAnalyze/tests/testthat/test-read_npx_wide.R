@@ -1387,7 +1387,8 @@ test_that(
         )
 
         # modify df_top_wide - remove QC Warning
-        qc_warn_col <- colnames(df_rand$list_df_wide$df_top_wide) |> tail(1L)
+        qc_warn_col <- colnames(df_rand$list_df_wide$df_top_wide) |>
+          utils::tail(1L)
 
         df_rand$list_df_wide$df_top_wide <- df_rand$list_df_wide$df_top_wide |>
           dplyr::select(
@@ -1404,7 +1405,7 @@ test_that(
             file = olink_wide_format,
             format_spec = get_format_spec(data_type = data_type)
           ),
-          regexp = "does not contain: QC Warning"
+          regexp = "does not contain: \"QC Warning\""
         )
 
       }
@@ -1433,7 +1434,8 @@ test_that(
         )
 
         # modify df_top_wide - remove Plate ID
-        plate_id_col <- colnames(df_rand$list_df_wide$df_top_wide) |> tail(1L)
+        plate_id_col <- colnames(df_rand$list_df_wide$df_top_wide) |>
+          utils::tail(1L)
 
         df_rand$list_df_wide$df_top_wide <- df_rand$list_df_wide$df_top_wide |>
           dplyr::select(
@@ -1450,7 +1452,7 @@ test_that(
             file = olink_wide_format,
             format_spec = get_format_spec(data_type = data_type)
           ),
-          regexp = "does not contain: Plate ID"
+          regexp = "does not contain: \"Plate ID\""
         )
 
       }
@@ -1479,7 +1481,8 @@ test_that(
         )
 
         # modify df_top_wide - remove Plate ID and QC Warning
-        pid_qcw_col <- colnames(df_rand$list_df_wide$df_top_wide) |> tail(2L)
+        pid_qcw_col <- colnames(df_rand$list_df_wide$df_top_wide) |>
+          utils::tail(2L)
 
         df_rand$list_df_wide$df_top_wide <- df_rand$list_df_wide$df_top_wide |>
           dplyr::select(
@@ -1496,7 +1499,7 @@ test_that(
             file = olink_wide_format,
             format_spec = get_format_spec(data_type = data_type)
           ),
-          regexp = "does not contain: Plate ID and QC Warning"
+          regexp = "does not contain: \"Plate ID\" and \"QC Warning\""
         )
 
       }
@@ -6933,7 +6936,7 @@ test_that(
                                      format_spec = get_format_spec(
                                        data_type = data_type
                                      )),
-          regexp = "in row `Assay` contains unrecognized values in columns: V49"
+          regexp = "`Assay` contains unrecognized values in columns: \"V49\""
         )
 
       }
@@ -6961,7 +6964,7 @@ test_that(
                                      format_spec = get_format_spec(
                                        data_type = data_type
                                      )),
-          regexp = "in row `Assay` contains unrecognized values in columns: V48"
+          regexp = "`Assay` contains unrecognized values in columns: \"V48\""
         )
 
       }
@@ -7193,7 +7196,8 @@ test_that(
         )
 
         # remove one column from df_top to reproduce the error
-        remove_col <- colnames(df_rand$list_df_wide$df_top_wide) |> tail(1L)
+        remove_col <- colnames(df_rand$list_df_wide$df_top_wide) |>
+          utils::tail(1L)
 
         df_rand$list_df_wide$df_top_wide <- df_rand$list_df_wide$df_top_wide |>
           dplyr::select(
@@ -7211,7 +7215,7 @@ test_that(
                                      format_spec = get_format_spec(
                                        data_type = data_type
                                      )),
-          regexp = "Expected equal number of `Plate ID` and `QC\ Warning`"
+          regexp = "Expected equal number of \"Plate ID\" and \"QC Warning\""
         )
 
       }
@@ -8877,7 +8881,7 @@ test_that(
         # rename samples from the separate dfs of the reference input
         df_rand$list_df_long$df_middle_long <-
           lapply(df_rand$list_df_long$df_middle_long, function(.x) {
-            .x |>
+            .x |> # nolint return_linter
               dplyr::mutate(
                 SampleID = dplyr::if_else(.data[["SampleID"]] == "S2",
                                           "S1",
@@ -8959,7 +8963,7 @@ test_that(
         # rename samples from the separate dfs of the reference input
         df_rand$list_df_long$df_middle_long <-
           lapply(df_rand$list_df_long$df_middle_long, function(.x) {
-            .x |>
+            .x |> # nolint return_linter
               dplyr::mutate(
                 SampleID = dplyr::case_when(
                   .data[["SampleID"]] %in% c("S2", "S3") ~ "S1",
@@ -9048,9 +9052,9 @@ test_that(
         df_rand$list_df_wide$df_middle_wide <-
           df_rand$list_df_wide$df_middle_wide |>
           dplyr::select(
-            -dplyr::all_of(head(col_names$df_top_plate, 1L))
+            -dplyr::all_of(utils::head(col_names$df_top_plate, 1L))
           )
-        col_names$df_top_plate <- tail(col_names$df_top_plate, 1L)
+        col_names$df_top_plate <- utils::tail(col_names$df_top_plate, 1L)
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -9090,9 +9094,9 @@ test_that(
         df_rand$list_df_wide$df_middle_wide <-
           df_rand$list_df_wide$df_middle_wide |>
           dplyr::select(
-            -dplyr::all_of(head(col_names$df_top_qc_warn, 1L))
+            -dplyr::all_of(utils::head(col_names$df_top_qc_warn, 1L))
           )
-        col_names$df_top_qc_warn <- tail(col_names$df_top_qc_warn, 1L)
+        col_names$df_top_qc_warn <- utils::tail(col_names$df_top_qc_warn, 1L)
 
         # write empty-ish file
         writeLines("foo", olink_wide_format)
@@ -9177,7 +9181,7 @@ test_that(
             data_type = data_type,
             col_names = col_names
           ),
-          regexp = "143 from the Olink wide format file"
+          regexp = "\"143\" from the Olink wide format file"
         )
 
       }
@@ -9204,7 +9208,8 @@ test_that(
         last_col_idx <- ncol(df_rand$list_df_wide$df_middle_wide) + 1L
         last_col_idx <- last_col_idx:(last_col_idx + 2L)
         last_col <- paste0("V", last_col_idx)
-        rep_col <- colnames(df_rand$list_df_wide$df_middle_wide) |> tail(1L)
+        rep_col <- colnames(df_rand$list_df_wide$df_middle_wide) |>
+          utils::tail(1L)
         df_rand$list_df_wide$df_middle_wide[last_col] <- NA
 
         # write empty-ish file
@@ -9218,7 +9223,7 @@ test_that(
             data_type = data_type,
             col_names = col_names
           ),
-          regexp = "143, 144, and 145 from the Olink wide format file"
+          regexp = "\"143\", \"144\", and \"145\" from the Olink wide format"
         )
 
       }
@@ -10735,10 +10740,10 @@ test_that(
         "df_dev_int_ctrl")
     ] |>
       lapply(function(.x) {
-        .x |>
+        .x |> # nolint return_linter
           dplyr::mutate(
             Panel = strsplit(x = .data[["Panel"]], split = "(", fixed = TRUE) |>
-              lapply(head, 1L) |>
+              lapply(utils::head, 1L) |>
               unlist()
           )
       })

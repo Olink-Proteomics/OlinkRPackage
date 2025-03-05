@@ -2,31 +2,32 @@
 % Please edit documentation in R/check_columns.R
 \name{check_columns}
 \alias{check_columns}
-\title{Check that an input tibble or arrow object contains the required columns.}
+\title{Check presence of columns in dataset.}
 \usage{
 check_columns(df, col_list)
 }
 \arguments{
-\item{df}{A tibble or arrow object.}
+\item{df}{An Olink dataset (tibble or ArrowObject).}
 
-\item{col_list}{A list, where each element is a character vector (usually of
-length one). The function will check whether the column names of \var{df}
-contain elements from \var{col_list}. When an element of \var{col_list}
-contains more than one elements, the function will check whether the column
-names of \var{df} include \strong{at least one} of the elements of that
-vector.}
+\item{col_list}{A list of character vectors.}
 }
 \value{
 Nothing or an error message if any column is missing.
 }
 \description{
-Checks if the input tibble or arrow object \var{df} contains all of the
-columns in \var{col_list}.
+Check if the input dataset (tibble or ArrowObject) \var{df} contains columns
+specified in \var{col_list}. \var{col_list} supports both exact matches of
+column names and alternative column names. In the latter case, alternative
+column names are elements of a character vector, and exactly one of the
+elements is required to be present.
 }
 \details{
-\var{col_list} might contain also vectors of characters as elements. In this
-case one of the characters in the vector is expected to be present. See
-examples.
+\var{col_list} contains a collection of character vectors. If a character
+vector is scalar (length = 1), the element of the vector is expected to be
+present among the column names of \var{df}. When an element of \var{col_list}
+contains more than one elements, the function will check whether the column
+names of \var{df} include \strong{at least one} of the elements of that
+vector.
 }
 \examples{
 \dontrun{

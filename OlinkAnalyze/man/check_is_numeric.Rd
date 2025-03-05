@@ -2,21 +2,22 @@
 % Please edit documentation in R/check_numeric.R
 \name{check_is_numeric}
 \alias{check_is_numeric}
-\title{Help function checking if a variable is a numeric vector.}
+\title{Help function checking if a variable is a vector of numerics.}
 \usage{
 check_is_numeric(num, error = FALSE)
 }
 \arguments{
-\item{num}{Number to check.}
+\item{num}{Variable to check.}
 
-\item{error}{Return error or a boolean (default = FALSE).}
+\item{error}{Scalar boolean to return an error instead of a \code{FALSE}
+(\code{default = FALSE}).}
 }
 \value{
-Boolean if the variable is a numeric vector or not, and an error if
-"error = TRUE".
+\code{TRUE} if the variable is a numeric vector, and \code{FALSE} if not;
+error if the variable is not a numeric vector and \code{error = TRUE}.
 }
 \description{
-Help function checking if a variable is a numeric vector.
+Help function checking if a variable is a vector of numerics.
 }
 \seealso{
 \code{\link{check_is_boolean}}

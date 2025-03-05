@@ -1,5 +1,5 @@
-#' Help function to read NPX, Ct or absolute quantification data from excel
-#' Olink software output files in R.
+#' Help function to read `r ansi_collapse_quot(x = get_olink_data_types())` data
+#' from excel Olink software output files in R.
 #'
 #' @author
 #'   Klev Diamanti;
@@ -7,12 +7,13 @@
 #'   Kathleen Nevola
 #'
 #' @param file Path to Olink software output excel file in wide or long format.
-#' Expecting file extensions
-#' `r accepted_npx_file_ext[grepl("excel", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
-#' @param out_df The class of output data frame. One of "tibble" (default) or
-#' "arrow" for ArrowObject.
+#' Expected file extensions
+#' `r ansi_collapse_quot(get_file_ext(name_sub = "excel"))`.
+#' @param out_df The class of output data frame. One of
+#' `r ansi_collapse_quot(get_df_output_print())`.
 #'
-#' @return Tibble or ArrowObject with Olink data in wide or long format.
+#' @return `r ansi_collapse_quot(x = get_df_output_print(), sep = "or")` with
+#' Olink data in long or wide format.
 #'
 #' @seealso
 #'   \code{\link{read_npx}}
@@ -69,7 +70,7 @@ read_npx_excel <- function(file,
 
     }, error = function(msg) {
 
-      cli::cli_abort(
+      cli::cli_abort( # nolint return_linter
         c(
           "x" = "Unable to open excel file: {.file {file}}",
           "i" = "Check if the input {.arg file} is an excel file."

@@ -1,13 +1,14 @@
-#' Help function checking if a variable is a boolean vector.
+#' Help function checking if a variable is a vector of booleans.
 #'
 #' @author
 #'   Klev Diamanti
 #'
-#' @param bool Boolean to check.
-#' @param error Return error or a boolean (default = FALSE).
+#' @param bool Variable to check.
+#' @param error Scalar boolean to return an error instead of a `FALSE`
+#' (`default = FALSE`).
 #'
-#' @return Boolean if the variable is a boolean vector or not, and an error if
-#' "error = TRUE".
+#' @return `TRUE` if the variable is a boolean vector, and `FALSE` if not; error
+#' if the variable is not a boolean vector, and `error = TRUE`.
 #'
 #' @seealso
 #'   \code{\link{check_is_character}}
@@ -17,13 +18,13 @@
 check_is_boolean <- function(bool,
                              error = FALSE) {
 
-  # check that the input is a boolean vector
+  # check if input is a boolean vector
   if (!rlang::is_logical(bool)
       || any(rlang::are_na(bool))) {
 
     if (error == TRUE) {
 
-      cli::cli_abort(
+      cli::cli_abort( # nolint return_linter
         c(
           "x" = "{.arg {rlang::caller_arg(bool)}} must be a boolean vector!"
         ),
@@ -45,16 +46,18 @@ check_is_boolean <- function(bool,
 
 }
 
-#' Help function checking if a variable is a boolean vector of length 1.
+#' Help function checking if a variable is a scalar boolean.
 #'
 #' @author
 #'   Klev Diamanti
 #'
-#' @param bool Boolean vector to check.
-#' @param error Return error or a boolean (default = FALSE).
+#' @param bool Variable to check.
+#' @param error Scalar boolean to return an error instead of a `FALSE`
+#' (`default = FALSE`).
 #'
-#' @return Boolean if the variable is a boolean vector of length 1 or not, and
-#' an error if "error = TRUE".
+#' @return `TRUE` if the variable is a boolean vector of length 1, and `FALSE`
+#' if not; error if the variable is not a boolean vector of length 1, and
+#' `error = TRUE`.
 #'
 #' @seealso
 #'   \code{\link{check_is_scalar_character}}
@@ -64,15 +67,15 @@ check_is_boolean <- function(bool,
 check_is_scalar_boolean <- function(bool,
                                     error = FALSE) {
 
-  # check that the input is a character vector of length 1
+  # check if input is a boolean vector of length 1
   if (!rlang::is_scalar_logical(bool)
       || rlang::is_na(bool)) {
 
     if (error == TRUE) {
 
-      cli::cli_abort(
+      cli::cli_abort( # nolint return_linter
         c(
-          "x" = "{.arg {rlang::caller_arg(bool)}} must be a boolean!"
+          "x" = "{.arg {rlang::caller_arg(bool)}} must be a scalar boolean!"
         ),
         call = rlang::caller_env(),
         wrap = FALSE

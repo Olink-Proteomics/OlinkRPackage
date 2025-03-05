@@ -2,25 +2,26 @@
 % Please edit documentation in R/check_df.R
 \name{check_is_tibble}
 \alias{check_is_tibble}
-\title{Help function checking if a data frame is a tibble data frame.}
+\title{Help function checking if a variable is a tibble dataset.}
 \usage{
 check_is_tibble(df, error = FALSE)
 }
 \arguments{
-\item{df}{Data frame to check.}
+\item{df}{Variable to check.}
 
-\item{error}{Return error or a boolean (default = FALSE).}
+\item{error}{Scalar boolean to return an error instead of a \code{FALSE}
+(\code{default = FALSE}).}
 }
 \value{
-A scalar boolean if the object is a tibble or not, and an error if
-"error = TRUE".
+\code{TRUE} if the variable is a tibble, and \code{FALSE} if not; error if the
+variable is not a tibble and \code{error = TRUE}.
 }
 \description{
-Help function checking if a data frame is a tibble data frame.
+Help function checking if a variable is a tibble dataset.
 }
 \seealso{
 \code{\link{check_is_arrow_object}}
-\code{\link{check_is_arrow_or_tibble}}
+\code{\link{check_is_dataset}}
 }
 \author{
 Klev Diamanti

@@ -3,24 +3,25 @@
 \name{read_npx_parquet}
 \alias{read_npx_parquet}
 \title{Help function to read NPX data from long format parquet Olink software output
-files in R.}
+file in R.}
 \usage{
 read_npx_parquet(file, out_df = "arrow")
 }
 \arguments{
 \item{file}{Path to Olink software output parquet file in long format.
 Expecting file extension
-parquet. # nolint}
+"parquet".}
 
-\item{out_df}{The class of output data frame. One of "tibble" (default) or
-"arrow" for ArrowObject.}
+\item{out_df}{The class of the output dataset. One of
+"tibble" and "arrow". (default = "tibble")}
 }
 \value{
-Tibble or ArrowObject with Olink data in long format.
+"tibble" or "ArrowObject" with
+Olink data in long or wide format.
 }
 \description{
 Help function to read NPX data from long format parquet Olink software output
-files in R.
+file in R.
 }
 \seealso{
 \code{\link{read_npx}}

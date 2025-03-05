@@ -4,12 +4,14 @@
 #'   Klev Diamanti
 #'
 #' @description
-#' Check \strong{only one file at a time} if it exists.
+#' Check \strong{one file at a time} if it exists.
 #'
 #' @param file Path to file.
-#' @param error Return error or a boolean (default = FALSE).
+#' @param error Scalar boolean to return an error instead of a `FALSE`
+#' (`default = FALSE`).
 #'
-#' @return Boolean if the file exists or not, and an error if "error = TRUE".
+#' @return `TRUE` if the file exists, and `FALSE` if not; error if the file does
+#' not exist and `error = TRUE`.
 #'
 check_file_exists <- function(file,
                               error = FALSE) {
@@ -27,7 +29,7 @@ check_file_exists <- function(file,
     if (error == TRUE) {
 
       # error if the file does not exist
-      cli::cli_abort(
+      cli::cli_abort( # nolint return_linter
         c(
           "x" = "Unable to locate file: {.file {file}}",
           "i" = "Missing {.arg file}?"
@@ -57,7 +59,8 @@ check_file_exists <- function(file,
 #'
 #' @description
 #' Use variable \var{accepted_npx_file_ext} to check if extension of the input
-#' file is acceptable.
+#' file is acceptable. Expecting one of
+#' `r ansi_collapse_quot(get_file_ext_summary())`.
 #'
 #' @param file Path to file.
 #'
@@ -89,7 +92,7 @@ check_file_extension <- function(file) {
     cli::cli_abort(
       message = c(
         "x" = "Unable to recognize the extension of the file {.file {file}}!",
-        "i" = "Expected on of {.val {accepted_npx_file_ext}}!"
+        "i" = "Expected one of {.val {get_file_ext_summary()}}!"
       ),
       call = rlang::caller_env(),
       wrap = FALSE

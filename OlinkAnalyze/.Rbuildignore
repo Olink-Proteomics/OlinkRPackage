@@ -11,3 +11,5 @@
 ^inst/WORDLIST
 ^CITATION\.cff$
 ^data-raw$
+^.RData
+^.Rhistory
