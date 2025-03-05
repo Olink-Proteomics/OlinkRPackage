@@ -39,11 +39,13 @@ read_npx_wide <- function(df,
   check_file_exists(file = file,
                     error = TRUE)
 
+  broad_platform <- "qPCR"
+
   check_olink_data_type(x = data_type,
-                        broad_platform = "qPCR")
+                        broad_platform = broad_platform)
 
   check_olink_platform(x = olink_platform,
-                       broad_platform = "qPCR")
+                       broad_platform = broad_platform)
 
   # get expected format specifications ----
 
@@ -63,7 +65,9 @@ read_npx_wide <- function(df,
 
   # header matrix NPXS version ----
 
-  npxs_v <- read_npx_wide_npxs_version(df = df_split_row$df_head)
+  npxs_v <- read_npx_wide_npxs_version(
+    df = df_split_row$df_head
+  )
 
   # top list of df to long ----
 
@@ -87,10 +91,12 @@ read_npx_wide <- function(df,
 
   # combine top and middle matrices ----
 
-  df_long <- red_npx_wide_top_mid_long(df_top_list = df_top_list,
-                                       df_middle_list = df_middle_list,
-                                       data_type = data_type,
-                                       format_spec = format_spec)
+  df_long <- red_npx_wide_top_mid_long(
+    df_top_list = df_top_list,
+    df_middle_list = df_middle_list,
+    data_type = data_type,
+    format_spec = format_spec
+  )
 
   # add bottom df to long ----
 
