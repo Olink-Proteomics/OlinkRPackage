@@ -7,19 +7,18 @@
 read_npx_legacy_check(file, df_top, data_type, olink_platform, bottom_mat_v)
 }
 \arguments{
-\item{file}{Path to Olink software output file in wide format. Expecting file
-extensions
-xls, xlsx, csv, or txt. # nolint}
+\item{file}{Path to Olink software output file in wide format. Expected one
+of file extensions
+"xls", "xlsx", "csv", and "txt".}
 
 \item{df_top}{Top matrix of Olink dataset in wide format.}
 
 \item{data_type}{Quantification method of the input data. One of \code{NULL}
-(default),
-Ct, NPX, or Quantified. # nolint}
+(default) for auto-detection, "Ct", "NPX", and "Quantified".}
 
 \item{olink_platform}{Olink platform used to generate the input file.
-One of \code{NULL} (default),
-Target 48 or Target 96. # nolint}
+One of \code{NULL} (default) for auto-detection,
+"Flex", "Focus", "Target 48", and "Target 96".}
 
 \item{bottom_mat_v}{Version of the rows in the bottom matrix of the Olink
 file in wide format based on the local environment variable

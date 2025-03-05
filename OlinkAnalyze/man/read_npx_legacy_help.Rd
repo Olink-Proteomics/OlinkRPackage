@@ -14,20 +14,19 @@ read_npx_legacy_help(
 )
 }
 \arguments{
-\item{file}{Path to Olink software output file in wide format. Expecting file
-extensions
-xls, xlsx, csv, or txt. # nolint}
+\item{file}{Path to Olink software output file in wide format. Expected one
+of file extensions
+"xls", "xlsx", "csv", and "txt".}
 
-\item{out_df}{The class of output data frame. One of "tibble" (default) or
-"arrow" for ArrowObject.}
+\item{out_df}{The class of the output dataset. One of
+"tibble" and "arrow". (default = "tibble")}
 
 \item{olink_platform}{Olink platform used to generate the input file.
-One of \code{NULL} (default),
-Target 48 or Target 96. # nolint}
+One of \code{NULL} (default) for auto-detection,
+"Flex", "Focus", "Target 48", and "Target 96".}
 
 \item{data_type}{Quantification method of the input data. One of \code{NULL}
-(default),
-Ct, NPX, or Quantified. # nolint}
+(default) for auto-detection, "Ct", "NPX", and "Quantified".}
 
 \item{data_type_no_accept}{Character vector of data types that should be
 rejected (default = "Ct").}
@@ -36,11 +35,11 @@ rejected (default = "Ct").}
 A list of objects containing the following:
 \itemize{
 \item \strong{olink_platform}: auto-detected Olink platform. One of
-Target 48 or Target 96. # nolint
+"Flex", "Focus", "Target 48", and "Target 96".
 \item \strong{long_format}: auto-detected Olink format. Should always be
 "FALSE".
 \item \strong{data_type}: auto-detected Olink data type. One of
-Ct, NPX, or Quantified. # nolint
+"".
 \item \strong{df_split}: list of 2 tibbles. Top matrix from the Olink wide
 file, and middle combined with bottom matrix.
 \item \strong{npxs_v}: Olink NPX software version.

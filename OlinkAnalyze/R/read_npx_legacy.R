@@ -4,28 +4,27 @@
 #' @author
 #'   Klev Diamanti
 #'
-#' @param file Path to Olink software output file in wide format. Expecting file
-#' extensions
-#' `r accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
-#' @param out_df The class of output data frame. One of "tibble" (default) or
-#' "arrow" for ArrowObject.
+#' @param file Path to Olink software output file in wide format. Expected one
+#' of file extensions
+#' `r ansi_collapse_quot(x = get_file_ext(name_sub = c("excel", "delim")))`.
+#' @param out_df The class of the output dataset. One of
+#' `r ansi_collapse_quot(read_npx_df_output)`. (default = "tibble")
 #' @param olink_platform Olink platform used to generate the input file.
-#' One of `NULL` (default),
-#' `r accepted_olink_platforms |> dplyr::filter(.data[["broader_platform"]] == "qPCR" & grepl("Target", .data[["name"]])) |> dplyr::pull(.data[["name"]]) |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' One of `NULL` (default) for auto-detection,
+#' `r get_olink_platforms(broad_platform = "qPCR") |> ansi_collapse_quot()`.
 #' @param data_type Quantification method of the input data. One of `NULL`
-#' (default),
-#' `r accepted_olink_platforms |> dplyr::filter(.data[["quant_method"]] != "Ct") |> dplyr::pull(.data[["quant_method"]]) |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
 #' @param data_type_no_accept Character vector of data types that should be
 #' rejected (default = "Ct").
 #'
 #' @return A list of objects containing the following:
 #' \itemize{
 #' \item \strong{olink_platform}: auto-detected Olink platform. One of
-#' `r accepted_olink_platforms |> dplyr::filter(.data[["broader_platform"]] == "qPCR" & grepl("Target", .data[["name"]])) |> dplyr::pull(.data[["name"]]) |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' `r get_olink_platforms(broad_platform = "qPCR") |> ansi_collapse_quot()`.
 #' \item \strong{long_format}: auto-detected Olink format. Should always be
 #' "FALSE".
 #' \item \strong{data_type}: auto-detected Olink data type. One of
-#' `r accepted_olink_platforms |> dplyr::filter(.data[["quant_method"]] != "Ct") |> dplyr::pull(.data[["quant_method"]]) |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' `r ansi_collapse_quot(get_olink_data_types()[!("Ct" %in% get_olink_data_types())])`.
 #' \item \strong{df_split}: list of 2 tibbles. Top matrix from the Olink wide
 #' file, and middle combined with bottom matrix.
 #' \item \strong{npxs_v}: Olink NPX software version.
@@ -214,16 +213,15 @@ read_npx_legacy_help <- function(file,
 #' @author
 #'   Klev Diamanti
 #'
-#' @param file Path to Olink software output file in wide format. Expecting file
-#' extensions
-#' `r accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' @param file Path to Olink software output file in wide format. Expected one
+#' of file extensions
+#' `r ansi_collapse_quot(x = get_file_ext(name_sub = c("excel", "delim")))`.
 #' @param df_top Top matrix of Olink dataset in wide format.
 #' @param olink_platform Olink platform used to generate the input file.
-#' One of `NULL` (default),
-#' `r accepted_olink_platforms |> dplyr::filter(.data[["broader_platform"]] == "qPCR" & grepl("Target", .data[["name"]])) |> dplyr::pull(.data[["name"]]) |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' One of `NULL` (default) for auto-detection,
+#' `r get_olink_platforms(broad_platform = "qPCR") |> ansi_collapse_quot()`.
 #' @param data_type Quantification method of the input data. One of `NULL`
-#' (default),
-#' `r accepted_olink_platforms |> dplyr::filter(.data[["quant_method"]] != "Ct") |> dplyr::pull(.data[["quant_method"]]) |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
 #' @param bottom_mat_v Version of the rows in the bottom matrix of the Olink
 #' file in wide format based on the local environment variable
 #' \var{olink_wide_bottom_matrix}.
@@ -400,15 +398,15 @@ read_npx_legacy_check <- function(file,
 #' only NPX)} with the bottom matrix containing one of the following
 #' combinations of rows:
 #' \itemize{
-#' \item `r olink_wide_bottom_matrix |> dplyr::filter(.data[["olink_platform"]] == "Target 96" & .data[["version"]] <= 1L) |> dplyr::pull(.data[["variable_name"]]) |> cli::ansi_collapse()`. # nolint
-#' \item `r olink_wide_bottom_matrix |> dplyr::filter(.data[["olink_platform"]] == "Target 96" & .data[["version"]] %in% c(0L, 2L)) |> dplyr::pull(.data[["variable_name"]]) |> cli::ansi_collapse()`. # nolint
+#' \item `r olink_wide_bottom_matrix |> dplyr::filter(.data[["olink_platform"]] == "Target 96" & .data[["version"]] <= 1L) |> dplyr::pull(.data[["variable_name"]]) |> cli::ansi_collapse()`.
+#' \item `r olink_wide_bottom_matrix |> dplyr::filter(.data[["olink_platform"]] == "Target 96" & .data[["version"]] %in% c(0L, 2L)) |> dplyr::pull(.data[["variable_name"]]) |> cli::ansi_collapse()`.
 #' }
 #' \item \strong{Target 48} output files in wide format \strong{NPX} with the
 #' bottom matrix containing the following rows:
-#' `r olink_wide_bottom_matrix |> dplyr::filter(.data[["olink_platform"]] == "Target 48" & .data[["data_type"]] == "NPX" & .data[["version"]] <= 1L) |> dplyr::pull(.data[["variable_name"]]) |> cli::ansi_collapse()`. # nolint
+#' `r olink_wide_bottom_matrix |> dplyr::filter(.data[["olink_platform"]] == "Target 48" & .data[["data_type"]] == "NPX" & .data[["version"]] <= 1L) |> dplyr::pull(.data[["variable_name"]]) |> cli::ansi_collapse()`.
 #' \item \strong{Target 48} output files in wide format \strong{absolute
 #' Quantification} with the bottom matrix containing the following rows:
-#' `r olink_wide_bottom_matrix |> dplyr::filter(.data[["olink_platform"]] == "Target 48" & .data[["data_type"]] == "Quantified") |> dplyr::pull(.data[["variable_name"]]) |> cli::ansi_collapse()`. # nolint
+#' `r olink_wide_bottom_matrix |> dplyr::filter(.data[["olink_platform"]] == "Target 48" & .data[["data_type"]] == "Quantified") |> dplyr::pull(.data[["variable_name"]]) |> cli::ansi_collapse()`.
 #' }
 #'
 #' This function would accept data exported in wide format from Olink NPX
@@ -423,20 +421,19 @@ read_npx_legacy_check <- function(file,
 #'   Olof Mansson;
 #'   Marianne Sandin
 #'
-#' @param file Path to Olink software output file in wide format. Expecting file
-#' extensions
-#' `r accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
-#' @param out_df The class of output data frame. One of "tibble" (default) or
-#' "arrow" for ArrowObject.
+#' @param file Path to Olink software output file in wide format. Expected one
+#' of file extensions
+#' `r ansi_collapse_quot(x = get_file_ext(name_sub = c("excel", "delim")))`.
+#' @param out_df The class of the output dataset. One of
+#' `r ansi_collapse_quot(read_npx_df_output)`. (default = "tibble")
 #' @param olink_platform Olink platform used to generate the input file.
-#' One of `NULL` (default),
-#' `r accepted_olink_platforms |> dplyr::filter(.data[["broader_platform"]] == "qPCR" & grepl("Target", .data[["name"]])) |> dplyr::pull(.data[["name"]]) |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' One of `NULL` (default) for auto-detection,
+#' `r get_olink_platforms(broad_platform = "qPCR") |> ansi_collapse_quot()`.
 #' @param data_type Quantification method of the input data. One of `NULL`
-#' (default),
-#' `r accepted_olink_platforms |> dplyr::filter(.data[["quant_method"]] != "Ct") |> dplyr::pull(.data[["quant_method"]]) |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
 #' @param quiet Boolean to print a confirmation message when reading the input
-#' file. Applies to excel or delimited input only. "TRUE" (default) to not print
-#' and "FALSE" to print.
+#' file. Applies to excel or delimited input only. `TRUE` (default) to not print
+#' and `FALSE` to print.
 #'
 #' @return Tibble or ArrowObject with Olink data in long format.
 #'
