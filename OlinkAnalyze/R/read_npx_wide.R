@@ -171,10 +171,10 @@ read_npx_wide <- function(df,
 #' Split Olink wide files to sub-matrices.
 #'
 #' @description
-#' Olink datasets in wide format contain 1 or 2 rows with all columns NA marking
-#' sub-matrices of the data. This function takes advantage of that feature and
-#' splits the dataset into 3 or 4 sub-matrices. Each sub-matrix is used
-#' downstream to assemble a long data frame.
+#' Olink datasets in wide format contain 2 or 3 rows with all columns `NA`
+#' marking sub-matrices of the data. This function takes advantage of that
+#' feature and splits the dataset into 3 or 4 sub-matrices. Each sub-matrix is
+#' used downstream to assemble a long data frame.
 #'
 #' Specifically:
 #' \itemize{
@@ -186,9 +186,9 @@ read_npx_wide <- function(df,
 #'   on assays, panels, columns with plate identifiers, columns with sample QC
 #'   warnings and column with deviations from the internal controls. Note that
 #'   not all the columns are present in all datasets and for all quantification
-#'   methods. The local environment variable \var{olink_wide_spec} marks all
-#'   the expected configurations.
-#'   \item \strong{Middle matrix} is marked by rows with all columns "NA: above
+#'   methods. The local environment variable \var{olink_wide_spec} marks all the
+#'   expected configurations.
+#'   \item \strong{Middle matrix} is marked by rows with all columns `NA` above
 #'   and below. This matrix contains sample identifiers, quantification
 #'   measurements for all assays, plate identifiers, sample QC warnings and
 #'   deviations from the internal controls.
@@ -202,11 +202,11 @@ read_npx_wide <- function(df,
 #'   Klev Diamanti
 #'
 #' @param df A tibble containing the full Olink dataset in wide format.
-#' @param file Path to Olink software output file in wide or long format.
-#' Expecting file extensions
-#' `r accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
-#' @param data_type Quantification method of the input data. One of
-#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' @param file Path to Olink software output file in wide format. Expected one
+#' of file extensions
+#' `r ansi_collapse_quot(x = get_file_ext(name_sub = c("excel", "delim")))`.
+#' @param data_type Quantification method of the input data. One of `NULL`
+#' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
 #' @param format_spec A tibble derived from \var{olink_wide_spec} in the local
 #' environment containing the expected format of the Olink wide file based on
 #' the \var{olink_platform} and \var{data_type}.
@@ -246,7 +246,7 @@ read_npx_wide_split_row <- function(df,
   check_is_tibble(df = format_spec,
                   error = TRUE)
 
-  # help gunction to fill NA ----
+  # help function to fill NA ----
 
   # we are not using tidyr::fill because it still depends on dplyr::mutate_at
   # which is superseded, and throws error in test
