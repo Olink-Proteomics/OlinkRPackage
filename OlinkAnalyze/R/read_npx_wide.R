@@ -325,7 +325,8 @@ read_npx_wide_split_row <- function(df,
     cli::cli_abort(
       message = c(
         "x" = "We identified
-        {.val {ifelse(identical(na_row_index, integer(0L)), 0L, nrow(na_row_index))}}
+        {.val { ifelse(identical(na_row_index, integer(0L)),
+                       0L, nrow(na_row_index))}}
         rows with all columns `NA` in file {.file {file}}, while we expected
         {.val {format_spec$n_na_rows}}!",
         "i" = "Has the file been modified manually?"
@@ -742,12 +743,12 @@ read_npx_wide_check_top <- function(df,
 #'   Klev Diamanti
 #'
 #' @param df Top matrix of Olink dataset in wide format \var{df_top}.
-#' @param file Path to Olink software output file in wide or long format.
-#' Expecting file extensions
-#' `r accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' @param file Path to Olink software output file in wide format. Expected one
+#' of file extensions
+#' `r ansi_collapse_quot(x = get_file_ext(name_sub = c("excel", "delim")))`.
 #' @param olink_platform Olink platform used to generate the input file.
-#' One of
-#' `r accepted_olink_platforms |> dplyr::filter(.data[["broader_platform"]] == "qPCR") |> dplyr::pull(.data[["name"]]) |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' One of `NULL` (default) for auto-detection,
+#' `r get_olink_platforms(broad_platform = "qPCR") |> ansi_collapse_quot()`.
 #' @param format_spec A tibble derived from \var{olink_wide_spec} in the local
 #' environment containing the expected format of the Olink wide file based on
 #' the \var{olink_platform} and \var{data_type}.
@@ -812,20 +813,22 @@ read_npx_wide_top <- function(df,
     )
 
   # extract plate_id and qc_warning from Assay column
-  df_pid_qcw <- lapply(unlist(format_spec$top_matrix_assay_labels),
-                       function(x) {
-                         df_t |>
-                           dplyr::filter(
-                             is.na(.data[["OlinkID"]])
-                             & .data[["Assay"]] %in% .env[["x"]]
-                           ) |>
-                           dplyr::select(
-                             -dplyr::any_of(c("Uniprot ID", "OlinkID", "Unit"))
-                           ) |>
-                           dplyr::rename(
-                             "Var" = "Assay"
-                           )
-                       })
+  df_pid_qcw <- lapply(
+    unlist(format_spec$top_matrix_assay_labels),
+    function(x) {
+      df_t |>
+        dplyr::filter(
+          is.na(.data[["OlinkID"]])
+          & .data[["Assay"]] %in% .env[["x"]]
+        ) |>
+        dplyr::select(
+          -dplyr::any_of(c("Uniprot ID", "OlinkID", "Unit"))
+        ) |>
+        dplyr::rename(
+          "Var" = "Assay"
+        )
+    }
+  )
   names(df_pid_qcw) <- paste("df_top", names(df_pid_qcw), sep = "_")
 
   # extract internal control from Assay column
@@ -866,7 +869,7 @@ read_npx_wide_top <- function(df,
       message = c(
         "x" = "The top matrix with the assay data in file {.file {file}} in row
         `Assay` contains unrecognized values in columns:
-        {top_mat_unknown_cols}!",
+        {.val {top_mat_unknown_cols}}!",
         "i" = "Has the file been modified manually?"
       ),
       call = rlang::caller_env(),
@@ -885,7 +888,7 @@ read_npx_wide_top <- function(df,
       message = c(
         "x" = "The top matrix with the assay data in file {.file {file}} expects
         no empty cells for assays other than internal controls. Identified
-        { sum(is.na(df_top_oid)) } empty cells!",
+        {.val {sum(is.na(df_top_oid))}} empty cells!",
         "i" = "Has the file been modified manually?"
       ),
       call = rlang::caller_env(),
@@ -913,9 +916,9 @@ read_npx_wide_top <- function(df,
 
     cli::cli_abort(
       message = c(
-        "x" = "Detected {nrow(df_top_oid)} assays in
-        {length(unique(df_top_oid$Panel))} panels in file {.file {file}}, but
-        expected {expected_num_assays}!",
+        "x" = "Detected {.val {nrow(df_top_oid)}} assays in
+        {.val {length(unique(df_top_oid$Panel))}} panels in file {.file {file}},
+        but expected {.val {expected_num_assays}}!",
         "i" = "Has the file been modified manually?"
       ),
       call = rlang::caller_env(),
@@ -936,10 +939,8 @@ read_npx_wide_top <- function(df,
       cli::cli_abort(
         message = c(
           "x" = "Expected equal number of
-          {unlist(format_spec$top_matrix_assay_labels) |>
-          sapply(\\(x) paste0(\"`\", x, \"`\")) |>
-          cli::ansi_collapse()} columns in the top matrix with the assay data in
-          file {.file {file}}!",
+          {.val {unlist(format_spec$top_matrix_assay_labels)}} columns in the
+          top matrix with the assay data in file {.file {file}}!",
           "i" = "Has the file been modified manually?"
         ),
         call = rlang::caller_env(),
@@ -986,11 +987,11 @@ read_npx_wide_top <- function(df,
 #'   Klev Diamanti
 #'
 #' @param df Middle matrix of Olink dataset in wide format \var{df_mid}.
-#' @param file Path to Olink software output file in wide or long format.
-#' Expecting file extensions
-#' `r accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
-#' @param data_type Quantification method of the input data. One of
-#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' @param file Path to Olink software output file in wide format. Expected one
+#' of file extensions
+#' `r ansi_collapse_quot(x = get_file_ext(name_sub = c("excel", "delim")))`.
+#' @param data_type Quantification method of the input data. One of `NULL`
+#' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
 #' @param col_names Names list of character vectors containing column names from
 #' each chunk of columns \var{df_top} was split on in function.
 #' \code{\link{read_npx_wide_top}}.
@@ -1049,7 +1050,8 @@ read_npx_wide_middle <- function(df,
     cli::cli_inform(
       message = c(
         "i" = "The middle matrix in file {.file {file}} does not contain unique
-        sample identifiers. Identified {nrow(df) - n_uniq_sample} duplicates!"
+        sample identifiers. Identified {.val {nrow(df) - n_uniq_sample}}
+        duplicates!"
       ),
       call = rlang::caller_env(),
       wrap = FALSE
@@ -1206,8 +1208,9 @@ read_npx_wide_middle <- function(df,
 
     cli::cli_abort(
       message = c(
-        "x" = "Unable to assign column(s) {col_mid_missing} from the Olink wide
-        format file {.file {file}}!",
+        "x" = "Unable to assign {cli::qty(col_mid_missing)} column{?s}
+        {.val {col_mid_missing}} from the Olink wide format file
+        {.file {file}}!",
         "i" = "Has the file been modified manually?"
       ),
       call = rlang::caller_env(),
@@ -1294,8 +1297,8 @@ read_npx_wide_panel_version <- function(df) {
 #' function \code{\link{read_npx_wide_top}}.
 #' @param df_middle_list List of data frames from the middle matrix. Output of
 #' function \code{\link{read_npx_wide_middle}}.
-#' @param data_type Quantification method of the input data. One of
-#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' @param data_type Quantification method of the input data. One of `NULL`
+#' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
 #' @param format_spec A tibble derived from \var{olink_wide_spec} in the local
 #' environment containing the expected format of the Olink wide file based on
 #' the \var{olink_platform} and \var{data_type}.

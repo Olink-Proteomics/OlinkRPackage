@@ -9,12 +9,12 @@ read_npx_wide_middle(df, file, data_type, col_names)
 \arguments{
 \item{df}{Middle matrix of Olink dataset in wide format \var{df_mid}.}
 
-\item{file}{Path to Olink software output file in wide or long format.
-Expecting file extensions
-xls, xlsx, csv, or txt. # nolint}
+\item{file}{Path to Olink software output file in wide format. Expected one
+of file extensions
+"xls", "xlsx", "csv", and "txt".}
 
-\item{data_type}{Quantification method of the input data. One of
-Ct, NPX, or Quantified. # nolint}
+\item{data_type}{Quantification method of the input data. One of \code{NULL}
+(default) for auto-detection, "Ct", "NPX", and "Quantified".}
 
 \item{col_names}{Names list of character vectors containing column names from
 each chunk of columns \var{df_top} was split on in function.

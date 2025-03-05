@@ -6936,7 +6936,7 @@ test_that(
                                      format_spec = get_format_spec(
                                        data_type = data_type
                                      )),
-          regexp = "in row `Assay` contains unrecognized values in columns: V49"
+          regexp = "`Assay` contains unrecognized values in columns: \"V49\""
         )
 
       }
@@ -6964,7 +6964,7 @@ test_that(
                                      format_spec = get_format_spec(
                                        data_type = data_type
                                      )),
-          regexp = "in row `Assay` contains unrecognized values in columns: V48"
+          regexp = "`Assay` contains unrecognized values in columns: \"V48\""
         )
 
       }
@@ -7215,7 +7215,7 @@ test_that(
                                      format_spec = get_format_spec(
                                        data_type = data_type
                                      )),
-          regexp = "Expected equal number of `Plate ID` and `QC\ Warning`"
+          regexp = "Expected equal number of \"Plate ID\" and \"QC Warning\""
         )
 
       }
@@ -9181,7 +9181,7 @@ test_that(
             data_type = data_type,
             col_names = col_names
           ),
-          regexp = "143 from the Olink wide format file"
+          regexp = "\"143\" from the Olink wide format file"
         )
 
       }
@@ -9223,7 +9223,7 @@ test_that(
             data_type = data_type,
             col_names = col_names
           ),
-          regexp = "143, 144, and 145 from the Olink wide format file"
+          regexp = "\"143\", \"144\", and \"145\" from the Olink wide format"
         )
 
       }
