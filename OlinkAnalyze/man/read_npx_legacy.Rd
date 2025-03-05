@@ -43,15 +43,15 @@ files in wide format. Specifically, it supports:
 only NPX)} with the bottom matrix containing one of the following
 combinations of rows:
 \itemize{
-\item Missing Data freq. and LOD.
-\item Missing Data freq., LOD, and Normalization.
+\item Missing Data freq. and LOD. # nolint line_length_linter
+\item Missing Data freq., LOD, and Normalization. # nolint line_length_linter
 }
 \item \strong{Target 48} output files in wide format \strong{NPX} with the
 bottom matrix containing the following rows:
-Missing Data freq., Normalization, and LOD.
+Missing Data freq., Normalization, and LOD. # nolint line_length_linter
 \item \strong{Target 48} output files in wide format \strong{absolute
 Quantification} with the bottom matrix containing the following rows:
-Assay warning, LLOQ, Lowest quantifiable level, Missing Data freq., Normalization, Plate_LOD, and ULOQ.
+Assay warning, LLOQ, Lowest quantifiable level, Missing Data freq., Normalization, Plate_LOD, and ULOQ. # nolint line_length_linter
 }
 
 This function would accept data exported in wide format from Olink NPX
