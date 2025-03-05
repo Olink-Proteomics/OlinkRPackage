@@ -1467,14 +1467,14 @@ red_npx_wide_top_mid_long <- function(df_top_list,
 #'   Klev Diamanti
 #'
 #' @param df Bottom matrix of Olink dataset in wide format \var{df_bottom}.
-#' @param file Path to Olink software output file in wide or long format.
-#' Expecting file extensions
-#' `r accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
-#' @param data_type Quantification method of the input data. One of
-#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' @param file Path to Olink software output file in wide format. Expected one
+#' of file extensions
+#' `r ansi_collapse_quot(x = get_file_ext(name_sub = c("excel", "delim")))`.
+#' @param data_type Quantification method of the input data. One of `NULL`
+#' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
 #' @param olink_platform Olink platform used to generate the input file.
-#' One of
-#' `r accepted_olink_platforms |> dplyr::filter(.data[["broader_platform"]] == "qPCR") |> dplyr::pull(.data[["name"]]) |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' One of `NULL` (default) for auto-detection,
+#' `r get_olink_platforms(broad_platform = "qPCR") |> ansi_collapse_quot()`.
 #'
 #' @return Tibble with the bottom matrix specifications for the Olink wide file.
 #'
@@ -1630,14 +1630,14 @@ read_npx_wide_bottom_version <- function(df,
 #'   Klev Diamanti
 #'
 #' @param df Bottom matrix of Olink dataset in wide format \var{df_bottom}.
-#' @param file Path to Olink software output file in wide or long format.
-#' Expecting file extensions
-#' `r accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' @param file Path to Olink software output file in wide format. Expected one
+#' of file extensions
+#' `r ansi_collapse_quot(x = get_file_ext(name_sub = c("excel", "delim")))`.
 #' @param olink_platform Olink platform used to generate the input file.
-#' One of
-#' `r accepted_olink_platforms |> dplyr::filter(.data[["broader_platform"]] == "qPCR") |> dplyr::pull(.data[["name"]]) |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
-#' @param data_type Quantification method of the input data. One of
-#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' One of `NULL` (default) for auto-detection,
+#' `r get_olink_platforms(broad_platform = "qPCR") |> ansi_collapse_quot()`.
+#' @param data_type Quantification method of the input data. One of `NULL`
+#' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
 #' @param col_names Names list of character vectors containing column names from
 #' each chunk of columns \var{df_top} was split on in function.
 #' @param format_spec A tibble derived from \var{olink_wide_spec} in the local
