@@ -857,7 +857,7 @@ read_npx_wide_top <- function(df,
                      + nrow(df_top_int_ctrl)
                      + nrow(df_top_dev_int_ctrl))) {
 
-    top_mat_unknown_cols <- setdiff(df_t$col_index, # nolint
+    top_mat_unknown_cols <- setdiff(df_t$col_index,
                                     c(df_top_oid$col_index,
                                       sapply(df_pid_qcw, \(x) x$col_index) |>
                                         unname() |>
@@ -1589,7 +1589,7 @@ read_npx_wide_bottom_version <- function(df,
   if (length(names_in_v1) != 1L
       || nrow(format_spec_bottom[[names_in_v1]]) != length(unique(df$V1))) {
 
-    bottom_mat_v1_expected <- sapply( # nolint
+    bottom_mat_v1_expected <- sapply(
       format_spec_bottom,
       function(x) {
         sapply(x$variable_alt_names, utils::head, 1L) |>
@@ -1759,8 +1759,9 @@ read_npx_wide_bottom <- function(df,
       cli::cli_abort(
         message = c(
           "x" = "Column 1 of the bottom matrix does not contain the same number
-          of  rows for plate-specific QC measurement(s)
-          {format_spec_bottom_plate_spec} in file {.file {file}}!",
+          of rows for plate-specific QC
+          {cli::qty(format_spec_bottom_plate_spec)} measurement{?s}
+          {.val {format_spec_bottom_plate_spec}} in file {.file {file}}!",
           "i" = "Has the file been modified manually?"
         ),
         call = rlang::caller_env(),
