@@ -4,11 +4,12 @@
 #' read_npx* functions.
 #'
 get_df_output_print <- function() {
-  stringr::str_replace_all(
+  x <- stringr::str_replace_all(
     string = read_npx_df_output,
     pattern = "arrow",
     replacement = "ArrowObject"
   )
+  return(x)
 }
 
 #' Describes acceptable file extension for each file type.
@@ -17,10 +18,10 @@ get_df_output_print <- function() {
 #' extensions of each file type.
 #'
 get_file_ext_summary <- function() {
-  sapply(
+  x <- sapply(
     get_file_formats(),
     function(ff) {
-      paste0(
+      paste0( # nolint return_linter
         get_file_ext(name_sub = ff) |> ansi_collapse_quot(sep = "or"),
         " for ", ff, " files"
       )
@@ -28,6 +29,7 @@ get_file_ext_summary <- function() {
     }
   ) |>
     cli::ansi_collapse()
+  return(x)
 }
 
 #' Get all acceptable file formats.

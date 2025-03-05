@@ -17,7 +17,7 @@ olink_wide_head <- function(data_type) {
 
 # extract NPXS version
 olink_wide_npxs_v <- function(df) {
-  df |>
+  panel_v <- df |>
     dplyr::slice_head(
       n = 1L
     ) |>
@@ -26,10 +26,11 @@ olink_wide_npxs_v <- function(df) {
     ) |>
     as.character() |>
     (\(x) {
-      strsplit(x = x, split = " ", fixed = TRUE) |>
+      strsplit(x = x, split = " ", fixed = TRUE) |> # nolint return_linter
         lapply(utils::tail, 1L) |>
         unlist()
     })()
+  return(panel_v)
 }
 
 ## Top matrix ----
@@ -327,11 +328,11 @@ olink_wide_middle <- function(data_type,
     ) |>
     unlist() |>
     (\(x) {
-      strsplit(x = x,
+      strsplit(x = x, # nolint return_linter
                split = " ",
                fixed = TRUE) |>
         sapply(function(y) {
-          paste(y[1L:2L], collapse = " ")
+          paste(y[1L:2L], collapse = " ") # nolint return_linter
         }) |>
         unlist()
     })() |>
@@ -345,11 +346,11 @@ olink_wide_middle <- function(data_type,
     ) |>
     unlist() |>
     (\(x) {
-      strsplit(x = x,
+      strsplit(x = x, # nolint return_linter
                split = " ",
                fixed = TRUE) |>
         sapply(function(y) {
-          paste(y[1L:2L], collapse = " ")
+          paste(y[1L:2L], collapse = " ") # nolint return_linter
         }) |>
         unlist()
     })() |>
@@ -681,7 +682,7 @@ olink_wide_bottom <- function(olink_platform,
     ) |>
     unlist() |>
     (\(x) {
-      strsplit(x = x, split = " ", fixed = TRUE) |>
+      strsplit(x = x, split = " ", fixed = TRUE) |> # nolint return_linter
         lapply(function(y) paste(y[1:2], collapse = " ")) |>
         unlist()
     })() |>
@@ -1040,7 +1041,7 @@ olink_wide_bottom_long <- function(df,
 
     # left join all data frames from the list
     df_plate_specific <- Reduce(f = function(df_1, df_2) {
-      dplyr::left_join(x = df_1,
+      dplyr::left_join(x = df_1, # nolint return_linter
                        y = df_2,
                        by = c("col_index", "PlateID"),
                        relationship = "one-to-one")
@@ -1497,7 +1498,7 @@ olink_wide_to_long <- function(df_top_wide,
         lapply(utils::tail, 1L) |>
         unlist() |>
         (\(x) {
-          sub(pattern = ")",
+          sub(pattern = ")", # nolint return_linter
               replacement = "",
               x = x,
               fixed = TRUE)

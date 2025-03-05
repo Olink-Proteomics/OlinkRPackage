@@ -286,7 +286,7 @@ check_npx_col_names <- function(df,
     column_name_multi_prnt <- lapply(
       seq_along(column_name_multi_lst),
       function(i) {
-        paste0("* \"", names(column_name_multi_lst[i]), "\": ",
+        paste0("* \"", names(column_name_multi_lst[i]), "\": ", # nolint return_linter
                cli::ansi_collapse(x = unlist(column_name_multi_lst[i])))
       }
     ) |>

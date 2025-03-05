@@ -47,8 +47,9 @@ ansi_collapse_quot <- function(x,
   x_paste <- paste0("\"", x, "\"")
 
   if (sep == "or") {
-    cli::ansi_collapse(x = x_paste, sep2 = " or ", last = ", or ")
+    x <- cli::ansi_collapse(x = x_paste, sep2 = " or ", last = ", or ")
   } else {
-    cli::ansi_collapse(x = x_paste)
+    x <- cli::ansi_collapse(x = x_paste)
   }
+  return(x)
 }

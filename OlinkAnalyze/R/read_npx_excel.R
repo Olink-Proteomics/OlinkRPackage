@@ -79,6 +79,8 @@ read_npx_excel <- function(file,
         wrap = FALSE
       )
 
+      return(NULL)
+
     }
   )
 

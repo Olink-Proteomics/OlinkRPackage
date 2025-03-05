@@ -36,6 +36,8 @@ check_is_character <- function(string,
         wrap = FALSE
       )
 
+      return(NULL)
+
     } else {
 
       return(FALSE)
@@ -88,6 +90,8 @@ check_is_scalar_character <- function(string,
         call = rlang::caller_env(),
         wrap = FALSE
       )
+
+      return(NULL)
 
     } else {
 

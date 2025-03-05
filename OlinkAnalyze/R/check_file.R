@@ -38,6 +38,8 @@ check_file_exists <- function(file,
         wrap = FALSE
       )
 
+      return(NULL)
+
     } else {
 
       return(FALSE)

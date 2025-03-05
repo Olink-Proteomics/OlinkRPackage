@@ -8881,7 +8881,7 @@ test_that(
         # rename samples from the separate dfs of the reference input
         df_rand$list_df_long$df_middle_long <-
           lapply(df_rand$list_df_long$df_middle_long, function(.x) {
-            .x |>
+            .x |> # nolint return_linter
               dplyr::mutate(
                 SampleID = dplyr::if_else(.data[["SampleID"]] == "S2",
                                           "S1",
@@ -8963,7 +8963,7 @@ test_that(
         # rename samples from the separate dfs of the reference input
         df_rand$list_df_long$df_middle_long <-
           lapply(df_rand$list_df_long$df_middle_long, function(.x) {
-            .x |>
+            .x |> # nolint return_linter
               dplyr::mutate(
                 SampleID = dplyr::case_when(
                   .data[["SampleID"]] %in% c("S2", "S3") ~ "S1",
@@ -10740,7 +10740,7 @@ test_that(
         "df_dev_int_ctrl")
     ] |>
       lapply(function(.x) {
-        .x |>
+        .x |> # nolint return_linter
           dplyr::mutate(
             Panel = strsplit(x = .data[["Panel"]], split = "(", fixed = TRUE) |>
               lapply(utils::head, 1L) |>

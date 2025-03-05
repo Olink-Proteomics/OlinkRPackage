@@ -45,7 +45,7 @@ df_wide_summary <- dplyr::tibble(
 
 # all combination of parameters for synthetic wide data
 df_wide_combos <- lapply(seq_len(nrow(df_wide_summary)), function(i) {
-  expand.grid(
+  expand.grid( # nolint return_linter
     olink_platform = unlist(df_wide_summary$olink_platform[i]),
     data_type = unlist(df_wide_summary$data_type[i]),
     n_panels = unlist(df_wide_summary$n_panels[i]),
@@ -85,7 +85,7 @@ df_wide_combos <- lapply(seq_len(nrow(df_wide_summary)), function(i) {
 
 # generate a dataset for each combination
 df_wide_combos$df <- lapply(seq_len(nrow(df_wide_combos)), function(i) {
-  olink_wide_synthetic(
+  olink_wide_synthetic( # nolint return_linter
     olink_platform = df_wide_combos$olink_platform[i],
     data_type = df_wide_combos$data_type[i],
     n_panels = df_wide_combos$n_panels[i],
@@ -101,7 +101,7 @@ df_wide_combos$df <- lapply(seq_len(nrow(df_wide_combos)), function(i) {
 df_wide_combos <- df_wide_combos |>
   dplyr::mutate(
     olink_platform = lapply(.data[["olink_platform"]], function(.x) {
-      accepted_olink_platforms |>
+      accepted_olink_platforms |> # nolint return_linter
         dplyr::filter(
           .data[["name"]] == .env[[".x"]]
         ) |>
@@ -151,7 +151,7 @@ lapply(seq_len(nrow(df_wide_combos)), function(i) {
       ".rds"
     )
   )
-  saveRDS(object = df_wide_combos_tmp$df[1L][[1L]],
+  saveRDS(object = df_wide_combos_tmp$df[1L][[1L]], # nolint return_linter
           file = file_name,
           version = 2L,
           compress = "gzip")

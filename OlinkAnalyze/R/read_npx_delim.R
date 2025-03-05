@@ -369,6 +369,8 @@ get_field_separator <- function(file) {
       wrap = FALSE
     )
 
+    return(NULL)
+
   } else {
 
     cli::cli_abort(
@@ -379,6 +381,8 @@ get_field_separator <- function(file) {
       call = rlang::caller_env(),
       wrap = FALSE
     )
+
+    return(NULL)
 
   }
 }

@@ -367,6 +367,8 @@ read_npx_legacy_check <- function(file,
       wrap = TRUE
     )
 
+    return(NULL)
+
   }
 
 }
@@ -729,7 +731,7 @@ read_npx_legacy <- function(file,
     panel_list[[i]][, c(-(base_index + 1L), -(base_index + 2L))] <-
       lapply(panel_list[[i]][, c(-(base_index + 1L), -(base_index + 2L))],
              function(.x) {
-               stringr::str_replace_all(
+               stringr::str_replace_all( # nolint return_linter
                  string = .x,
                  pattern = c("#" = "",
                              "," = ".",
@@ -882,7 +884,7 @@ read_npx_legacy <- function(file,
       function(.x) {
         lookup_rename <- c("Plate_LOD" = "LOD",
                            "Quantified_value" = "NPX")
-        .x |>
+        .x |> # nolint return_linter
           dplyr::rename(
             dplyr::all_of(lookup_rename)
           )

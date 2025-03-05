@@ -36,6 +36,8 @@ check_is_arrow_object <- function(df,
         wrap = FALSE
       )
 
+      return(NULL)
+
     } else {
 
       return(FALSE)
@@ -87,6 +89,8 @@ check_is_tibble <- function(df,
         call = rlang::caller_env(),
         wrap = TRUE
       )
+
+      return(NULL)
 
     } else {
 
@@ -149,6 +153,8 @@ check_is_dataset <- function(df,
         call = rlang::caller_env(),
         wrap = TRUE
       )
+
+      return(NULL)
 
     } else {
 

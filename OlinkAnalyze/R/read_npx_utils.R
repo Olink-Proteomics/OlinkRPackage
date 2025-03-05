@@ -27,6 +27,8 @@ check_out_df_arg <- function(out_df) {
       wrap = FALSE
     )
 
+    return(NULL)
+
   }
 
 }
@@ -72,6 +74,8 @@ convert_read_npx_output <- function(df,
       call = rlang::caller_env(),
       wrap = FALSE
     )
+
+    return(NULL)
 
   }
 
@@ -125,6 +129,8 @@ read_npx_format_colnames <- function(df,
         wrap = FALSE
       )
 
+      return(NULL)
+
     }
 
   } else { # long format
@@ -142,6 +148,8 @@ read_npx_format_colnames <- function(df,
         call = rlang::caller_env(),
         wrap = FALSE
       )
+
+      return(NULL)
 
     }
 

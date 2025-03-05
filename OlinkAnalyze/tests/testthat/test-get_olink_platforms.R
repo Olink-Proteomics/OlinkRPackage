@@ -20,7 +20,7 @@ test_that(
       accepted_olink_platforms$broader_platform |>
         unique(),
       function(x) {
-        identical(
+        identical( # nolint return_linter
           x = accepted_olink_platforms |>
             dplyr::filter(
               .data[["broader_platform"]] == .env[["x"]]
@@ -45,7 +45,7 @@ test_that(
         unlist() |>
         unique(),
       function(x) {
-        identical(
+        identical( # nolint return_linter
           x = accepted_olink_platforms |>
             tidyr::unnest(
               cols = dplyr::all_of(c("quant_method"))
@@ -73,7 +73,7 @@ test_that(
         unlist() |>
         unique(),
       function(x) {
-        identical(
+        identical( # nolint return_linter
           x = accepted_olink_platforms |>
             tidyr::unnest(
               cols = dplyr::all_of(c("quant_type"))
@@ -111,7 +111,7 @@ test_that(
         bplat_dt_i <- bplat_dt |>
           dplyr::slice(i)
 
-        identical(
+        identical( # nolint return_linter
           x = accepted_olink_platforms |>
             tidyr::unnest(
               cols = dplyr::all_of(c("quant_method"))
@@ -152,7 +152,7 @@ test_that(
         bplat_qm_i <- bplat_qm |>
           dplyr::slice(i)
 
-        identical(
+        identical( # nolint return_linter
           x = accepted_olink_platforms |>
             tidyr::unnest(
               cols = dplyr::all_of(c("quant_type"))
@@ -193,7 +193,7 @@ test_that(
         dt_qm_i <- dt_qm |>
           dplyr::slice(i)
 
-        identical(
+        identical( # nolint return_linter
           x = accepted_olink_platforms |>
             tidyr::unnest(
               cols = dplyr::all_of(c("quant_method", "quant_type"))
@@ -234,7 +234,7 @@ test_that(
         bplat_dt_qm_i <- bplat_dt_qm |>
           dplyr::slice(i)
 
-        identical(
+        identical( # nolint return_linter
           x = accepted_olink_platforms |>
             tidyr::unnest(
               cols = dplyr::all_of(c("quant_method", "quant_type"))
@@ -391,7 +391,7 @@ test_that(
     lapply(
       accepted_olink_platforms$name,
       function(x) {
-        identical(
+        identical( # nolint return_linter
           x = accepted_olink_platforms |>
             dplyr::filter(
               .data[["name"]] == .env[["x"]]
@@ -416,7 +416,7 @@ test_that(
         unlist() |>
         unique(),
       function(x) {
-        identical(
+        identical( # nolint return_linter
           x = accepted_olink_platforms |>
             tidyr::unnest(
               cols = dplyr::all_of(c("quant_method"))
@@ -444,7 +444,7 @@ test_that(
         unlist() |>
         unique(),
       function(x) {
-        identical(
+        identical( # nolint return_linter
           x = accepted_olink_platforms |>
             tidyr::unnest(
               cols = dplyr::all_of(c("quant_type"))
@@ -482,7 +482,7 @@ test_that(
         plat_dt_i <- plat_dt |>
           dplyr::slice(i)
 
-        identical(
+        identical( # nolint return_linter
           x = accepted_olink_platforms |>
             tidyr::unnest(
               cols = dplyr::all_of(c("quant_method"))
@@ -523,7 +523,7 @@ test_that(
         plat_qm_i <- plat_qm |>
           dplyr::slice(i)
 
-        identical(
+        identical( # nolint return_linter
           x = accepted_olink_platforms |>
             tidyr::unnest(
               cols = dplyr::all_of(c("quant_type"))
@@ -564,7 +564,7 @@ test_that(
         dt_qm_i <- dt_qm |>
           dplyr::slice(i)
 
-        identical(
+        identical( # nolint return_linter
           x = accepted_olink_platforms |>
             tidyr::unnest(
               cols = dplyr::all_of(c("quant_method", "quant_type"))
@@ -605,7 +605,7 @@ test_that(
         plat_dt_qm_i <- plat_dt_qm |>
           dplyr::slice(i)
 
-        identical(
+        identical( # nolint return_linter
           x = accepted_olink_platforms |>
             tidyr::unnest(
               cols = dplyr::all_of(c("quant_method", "quant_type"))
@@ -799,7 +799,7 @@ test_that(
       accepted_olink_platforms$broader_platform |>
         unique(),
       function(x) {
-        identical(
+        identical( # nolint return_linter
           x = accepted_olink_platforms |>
             dplyr::filter(
               .data[["broader_platform"]] == .env[["x"]]
@@ -823,7 +823,7 @@ test_that(
     lapply(
       accepted_olink_platforms$name,
       function(x) {
-        identical(
+        identical( # nolint return_linter
           x = accepted_olink_platforms |>
             dplyr::filter(
               .data[["name"]] == .env[["x"]]
@@ -849,7 +849,7 @@ test_that(
         unlist() |>
         unique(),
       function(x) {
-        identical(
+        identical( # nolint return_linter
           x = accepted_olink_platforms |>
             tidyr::unnest(
               cols = dplyr::all_of(c("quant_type", "quant_method"))
@@ -884,7 +884,7 @@ test_that(
         bplat_plat_i <- bplat_plat |>
           dplyr::slice(.env[["i"]])
 
-        identical(
+        identical( # nolint return_linter
           x = accepted_olink_platforms |>
             dplyr::filter(
               .data[["broader_platform"]] == bplat_plat_i$broader_platform
@@ -925,7 +925,7 @@ test_that(
         bplat_qm_i <- bplat_qm |>
           dplyr::slice(.env[["i"]])
 
-        identical(
+        identical( # nolint return_linter
           x = accepted_olink_platforms |>
             tidyr::unnest(
               dplyr::all_of(c("quant_type", "quant_method"))
@@ -968,7 +968,7 @@ test_that(
         plat_qm_i <- plat_qm |>
           dplyr::slice(i)
 
-        identical(
+        identical( # nolint return_linter
           x = accepted_olink_platforms |>
             tidyr::unnest(
               cols = dplyr::all_of(c("quant_type", "quant_method"))
@@ -1009,7 +1009,7 @@ test_that(
         bplat_plat_qm_i <- bplat_plat_qm |>
           dplyr::slice(i)
 
-        identical(
+        identical( # nolint return_linter
           x = accepted_olink_platforms |>
             tidyr::unnest(
               cols = dplyr::all_of(c("quant_method", "quant_type"))
@@ -1288,7 +1288,7 @@ test_that(
       accepted_olink_platforms$broader_platform |>
         unique(),
       function(x) {
-        identical(
+        identical( # nolint return_linter
           x = accepted_olink_platforms |>
             dplyr::filter(
               .data[["broader_platform"]] == .env[["x"]]
@@ -1312,7 +1312,7 @@ test_that(
     lapply(
       accepted_olink_platforms$name,
       function(x) {
-        identical(
+        identical( # nolint return_linter
           x = accepted_olink_platforms |>
             dplyr::filter(
               .data[["name"]] == .env[["x"]]
@@ -1338,7 +1338,7 @@ test_that(
         unlist() |>
         unique(),
       function(x) {
-        identical(
+        identical( # nolint return_linter
           x = accepted_olink_platforms |>
             tidyr::unnest(
               cols = dplyr::all_of(c("quant_type", "quant_method"))
@@ -1373,7 +1373,7 @@ test_that(
         bplat_plat_i <- bplat_plat |>
           dplyr::slice(.env[["i"]])
 
-        identical(
+        identical( # nolint return_linter
           x = accepted_olink_platforms |>
             dplyr::filter(
               .data[["broader_platform"]] == bplat_plat_i$broader_platform
@@ -1414,7 +1414,7 @@ test_that(
         bplat_dt_i <- bplat_dt |>
           dplyr::slice(.env[["i"]])
 
-        identical(
+        identical( # nolint return_linter
           x = accepted_olink_platforms |>
             tidyr::unnest(
               dplyr::all_of(c("quant_type", "quant_method"))
@@ -1457,7 +1457,7 @@ test_that(
         plat_dt_i <- plat_dt |>
           dplyr::slice(i)
 
-        identical(
+        identical( # nolint return_linter
           x = accepted_olink_platforms |>
             tidyr::unnest(
               cols = dplyr::all_of(c("quant_type", "quant_method"))
@@ -1498,7 +1498,7 @@ test_that(
         bplat_plat_dt_i <- bplat_plat_dt |>
           dplyr::slice(i)
 
-        identical(
+        identical( # nolint return_linter
           x = accepted_olink_platforms |>
             tidyr::unnest(
               cols = dplyr::all_of(c("quant_method", "quant_type"))

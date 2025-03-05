@@ -138,6 +138,8 @@ check_olink_platform <- function(x,
       wrap = FALSE
     )
 
+    return(NULL)
+
   } else if (!(x %in% olink_platforms)) {
 
     cli::cli_abort(
@@ -150,6 +152,8 @@ check_olink_platform <- function(x,
       call = rlang::caller_env(),
       wrap = FALSE
     )
+
+    return(NULL)
 
   }
 
@@ -295,6 +299,8 @@ check_olink_broader_platform <- function(x,
       wrap = FALSE
     )
 
+    return(NULL)
+
   } else if (!(x %in% olink_broad_platforms)) {
 
     cli::cli_abort(
@@ -307,6 +313,8 @@ check_olink_broader_platform <- function(x,
       call = rlang::caller_env(),
       wrap = FALSE
     )
+
+    return(NULL)
 
   }
 
@@ -459,6 +467,8 @@ check_olink_data_type <- function(x,
       wrap = FALSE
     )
 
+    return(NULL)
+
   } else if (!(x %in% olink_quant_methods)) {
 
     cli::cli_abort(
@@ -471,6 +481,8 @@ check_olink_data_type <- function(x,
       call = rlang::caller_env(),
       wrap = FALSE
     )
+
+    return(NULL)
 
   }
 
@@ -622,6 +634,8 @@ check_olink_quant_type <- function(x,
       wrap = FALSE
     )
 
+    return(NULL)
+
   } else if (!(x %in% olink_quant_types)) {
 
     cli::cli_abort(
@@ -634,6 +648,8 @@ check_olink_quant_type <- function(x,
       call = rlang::caller_env(),
       wrap = FALSE
     )
+
+    return(NULL)
 
   }
 }

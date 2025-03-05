@@ -32,6 +32,8 @@ check_is_boolean <- function(bool,
         wrap = FALSE
       )
 
+      return(NULL)
+
     } else {
 
       return(FALSE)
@@ -80,6 +82,8 @@ check_is_scalar_boolean <- function(bool,
         call = rlang::caller_env(),
         wrap = FALSE
       )
+
+      return(NULL)
 
     } else {
 

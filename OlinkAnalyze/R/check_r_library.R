@@ -40,6 +40,8 @@ check_library_installed <- function(libraries,
         wrap = FALSE
       )
 
+      return(NULL)
+
     } else {
 
       return(FALSE)

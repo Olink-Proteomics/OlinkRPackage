@@ -110,6 +110,8 @@ read_npx_zip <- function(file,
         wrap = FALSE
       )
 
+      return(NULL)
+
     }
   )
 
@@ -454,6 +456,8 @@ check_checksum <- function(checksum_file,
       call = rlang::caller_env(),
       wrap = FALSE
     )
+
+    return(NULL)
 
   }
 

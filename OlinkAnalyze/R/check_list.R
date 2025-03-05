@@ -30,6 +30,8 @@ check_is_list <- function(lst,
         wrap = TRUE
       )
 
+      return(NULL)
+
     } else {
 
       return(FALSE)

@@ -36,6 +36,8 @@ check_is_numeric <- function(num,
         wrap = FALSE
       )
 
+      return(NULL)
+
     } else {
 
       return(FALSE)
@@ -88,6 +90,8 @@ check_is_scalar_numeric <- function(num,
         call = rlang::caller_env(),
         wrap = FALSE
       )
+
+      return(NULL)
 
     } else {
 

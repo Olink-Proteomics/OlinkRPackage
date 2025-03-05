@@ -36,6 +36,8 @@ check_is_integer <- function(int,
         wrap = FALSE
       )
 
+      return(NULL)
+
     } else {
 
       return(FALSE)
@@ -88,6 +90,8 @@ check_is_scalar_integer <- function(int,
         call = rlang::caller_env(),
         wrap = FALSE
       )
+
+      return(NULL)
 
     } else {
 

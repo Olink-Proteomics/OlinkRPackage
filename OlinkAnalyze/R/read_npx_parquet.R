@@ -54,6 +54,8 @@ read_npx_parquet <- function(file,
         wrap = FALSE
       )
 
+      return(NULL)
+
     }
   )
 
