@@ -162,7 +162,7 @@ check_olink_platform <- function(x,
 #'
 #' @return A character vector with names of all Olink broader platforms.
 #'
-get_all_olink_broader_platforms <- function() {
+get_all_olink_broader_platforms <- function() { # nolint object_length_linter
   # return all Olink broader platforms
   olk_all_broad_platforms <- accepted_olink_platforms |>
     dplyr::pull(
