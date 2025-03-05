@@ -1,12 +1,10 @@
-ref_res_file <- test_path("..",
-                          "data",
-                          "reference_results",
-                          "reference_results.rds")
-ref_res <- readRDS(file = ref_res_file)
-
 test_that(
   "data loads correctly - long - parquet",
   {
+    skip_if_not(file.exists(test_path("data", "reference_results.rds")))
+
+    ref_res <- get_example_data("reference_results.rds")
+
     withr::with_tempfile(
       new = "tmp_long_parquet",
       pattern = "parquet-long-",
@@ -84,6 +82,10 @@ test_that(
 test_that(
   "data loads correctly - long - csv",
   {
+    skip_if_not(file.exists(test_path("data", "reference_results.rds")))
+
+    ref_res <- get_example_data("reference_results.rds")
+
     withr::with_tempfile(
       new = "tmp_long_csv",
       pattern = "csv-long-",
@@ -161,6 +163,9 @@ test_that(
   "data loads correctly - long - zip",
   {
     skip_if_not_installed("zip")
+    skip_if_not(file.exists(test_path("data", "reference_results.rds")))
+
+    ref_res <- get_example_data("reference_results.rds")
 
     withr::with_tempfile(
       new = "tmp_long_csv_zip",
@@ -239,6 +244,9 @@ test_that(
   "data loads correctly - wide - npx_data2 - xlsx",
   {
     skip_if_not_installed(pkg = "readxl")
+    skip_if_not(file.exists(test_path("data", "reference_results.rds")))
+
+    ref_res <- get_example_data("reference_results.rds")
 
     withr::with_tempfile(
       new = "tmp_wide_xlsx",
@@ -334,6 +342,9 @@ test_that(
   "data loads correctly - wide - npx_data1 - xlsx",
   {
     skip_if_not_installed(pkg = "readxl")
+    skip_if_not(file.exists(test_path("data", "reference_results.rds")))
+
+    ref_res <- get_example_data("reference_results.rds")
 
     withr::with_tempfile(
       new = "tmp_wide_xlsx",
@@ -443,6 +454,10 @@ test_that(
 test_that(
   "data loads correctly - wide - csv",
   {
+    skip_if_not(file.exists(test_path("data", "reference_results.rds")))
+
+    ref_res <- get_example_data("reference_results.rds")
+
     withr::with_tempfile(
       new = "tmp_wide_csv",
       pattern = "csv-wide-",
@@ -558,6 +573,9 @@ test_that(
   "data loads correctly - legacy - wide - npx_data1 - xlsx",
   {
     skip_if_not_installed(pkg = "readxl")
+    skip_if_not(file.exists(test_path("data", "reference_results.rds")))
+
+    ref_res <- get_example_data("reference_results.rds")
 
     withr::with_tempfile(
       new = "tmp_wide_xlsx",
