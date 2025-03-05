@@ -24,7 +24,7 @@
 #' \item \strong{long_format}: auto-detected Olink format. Should always be
 #' "FALSE".
 #' \item \strong{data_type}: auto-detected Olink data type. One of
-#' `r ansi_collapse_quot(get_olink_data_types()[!("Ct" %in% get_olink_data_types())])`.
+#' `r ansi_collapse_quot(get_olink_data_types()[!("Ct" %in% get_olink_data_types())])`. # nolint line_length_linter
 #' \item \strong{df_split}: list of 2 tibbles. Top matrix from the Olink wide
 #' file, and middle combined with bottom matrix.
 #' \item \strong{npxs_v}: Olink NPX software version.
@@ -382,15 +382,15 @@ read_npx_legacy_check <- function(file,
 #' only NPX)} with the bottom matrix containing one of the following
 #' combinations of rows:
 #' \itemize{
-#' \item `r olink_wide_bottom_matrix |> dplyr::filter(.data[["olink_platform"]] == "Target 96" & .data[["version"]] <= 1L) |> dplyr::pull(.data[["variable_name"]]) |> cli::ansi_collapse()`.
-#' \item `r olink_wide_bottom_matrix |> dplyr::filter(.data[["olink_platform"]] == "Target 96" & .data[["version"]] %in% c(0L, 2L)) |> dplyr::pull(.data[["variable_name"]]) |> cli::ansi_collapse()`.
+#' \item `r olink_wide_bottom_matrix |> dplyr::filter(.data[["olink_platform"]] == "Target 96" & .data[["version"]] <= 1L) |> dplyr::pull(.data[["variable_name"]]) |> cli::ansi_collapse()`. # nolint line_length_linter
+#' \item `r olink_wide_bottom_matrix |> dplyr::filter(.data[["olink_platform"]] == "Target 96" & .data[["version"]] %in% c(0L, 2L)) |> dplyr::pull(.data[["variable_name"]]) |> cli::ansi_collapse()`. # nolint line_length_linter
 #' }
 #' \item \strong{Target 48} output files in wide format \strong{NPX} with the
 #' bottom matrix containing the following rows:
-#' `r olink_wide_bottom_matrix |> dplyr::filter(.data[["olink_platform"]] == "Target 48" & .data[["data_type"]] == "NPX" & .data[["version"]] <= 1L) |> dplyr::pull(.data[["variable_name"]]) |> cli::ansi_collapse()`.
+#' `r olink_wide_bottom_matrix |> dplyr::filter(.data[["olink_platform"]] == "Target 48" & .data[["data_type"]] == "NPX" & .data[["version"]] <= 1L) |> dplyr::pull(.data[["variable_name"]]) |> cli::ansi_collapse()`. # nolint line_length_linter
 #' \item \strong{Target 48} output files in wide format \strong{absolute
 #' Quantification} with the bottom matrix containing the following rows:
-#' `r olink_wide_bottom_matrix |> dplyr::filter(.data[["olink_platform"]] == "Target 48" & .data[["data_type"]] == "Quantified") |> dplyr::pull(.data[["variable_name"]]) |> cli::ansi_collapse()`.
+#' `r olink_wide_bottom_matrix |> dplyr::filter(.data[["olink_platform"]] == "Target 48" & .data[["data_type"]] == "Quantified") |> dplyr::pull(.data[["variable_name"]]) |> cli::ansi_collapse()`. # nolint line_length_linter
 #' }
 #'
 #' This function would accept data exported in wide format from Olink NPX

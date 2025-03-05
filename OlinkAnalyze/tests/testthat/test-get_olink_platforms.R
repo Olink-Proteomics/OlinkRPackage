@@ -249,9 +249,11 @@ test_that(
             ) |>
             unique() |>
             sort(),
-          y = get_olink_platforms(broad_platform = bplat_dt_qm_i$broader_platform,
-                                  data_type = bplat_dt_qm_i$quant_method,
-                                  quant_type = bplat_dt_qm_i$quant_type)
+          y = get_olink_platforms(
+            broad_platform = bplat_dt_qm_i$broader_platform,
+            data_type = bplat_dt_qm_i$quant_method,
+            quant_type = bplat_dt_qm_i$quant_type
+          )
         )
       }
     ) |>
