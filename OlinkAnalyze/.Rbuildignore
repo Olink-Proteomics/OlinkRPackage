@@ -11,3 +11,6 @@
 ^inst/WORDLIST
 ^CITATION\.cff$
 ^data-raw$
+^.RData
+^tests/testthat/data/.*[.]rds
+^tests/testthat/data/.*[.]R
