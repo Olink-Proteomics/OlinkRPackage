@@ -106,7 +106,7 @@ test_that(
       dplyr::distinct()
 
     lapply(
-      1L:nrow(bplat_dt),
+      seq_len(nrow(bplat_dt)),
       function(i) {
         bplat_dt_i <- bplat_dt |>
           dplyr::slice(i)
@@ -147,7 +147,7 @@ test_that(
       dplyr::distinct()
 
     lapply(
-      1L:nrow(bplat_qm),
+      seq_len(nrow(bplat_qm)),
       function(i) {
         bplat_qm_i <- bplat_qm |>
           dplyr::slice(i)
@@ -188,7 +188,7 @@ test_that(
       dplyr::distinct()
 
     lapply(
-      1L:nrow(dt_qm),
+      seq_len(nrow(dt_qm)),
       function(i) {
         dt_qm_i <- dt_qm |>
           dplyr::slice(i)
@@ -229,7 +229,7 @@ test_that(
       dplyr::distinct()
 
     lapply(
-      1L:nrow(bplat_dt_qm),
+      seq_len(nrow(bplat_dt_qm)),
       function(i) {
         bplat_dt_qm_i <- bplat_dt_qm |>
           dplyr::slice(i)
@@ -477,7 +477,7 @@ test_that(
       dplyr::distinct()
 
     lapply(
-      1L:nrow(plat_dt),
+      seq_len(nrow(plat_dt)),
       function(i) {
         plat_dt_i <- plat_dt |>
           dplyr::slice(i)
@@ -518,7 +518,7 @@ test_that(
       dplyr::distinct()
 
     lapply(
-      1L:nrow(plat_qm),
+      seq_len(nrow(plat_qm)),
       function(i) {
         plat_qm_i <- plat_qm |>
           dplyr::slice(i)
@@ -559,7 +559,7 @@ test_that(
       dplyr::distinct()
 
     lapply(
-      1L:nrow(dt_qm),
+      seq_len(nrow(dt_qm)),
       function(i) {
         dt_qm_i <- dt_qm |>
           dplyr::slice(i)
@@ -600,7 +600,7 @@ test_that(
       dplyr::distinct()
 
     lapply(
-      1L:nrow(plat_dt_qm),
+      seq_len(nrow(plat_dt_qm)),
       function(i) {
         plat_dt_qm_i <- plat_dt_qm |>
           dplyr::slice(i)
@@ -879,7 +879,7 @@ test_that(
       dplyr::distinct()
 
     lapply(
-      1L:nrow(bplat_plat),
+      seq_len(nrow(bplat_plat)),
       function(i) {
         bplat_plat_i <- bplat_plat |>
           dplyr::slice(.env[["i"]])
@@ -920,7 +920,7 @@ test_that(
       dplyr::distinct()
 
     lapply(
-      1L:nrow(bplat_qm),
+      seq_len(nrow(bplat_qm)),
       function(i) {
         bplat_qm_i <- bplat_qm |>
           dplyr::slice(.env[["i"]])
@@ -963,7 +963,7 @@ test_that(
       dplyr::distinct()
 
     lapply(
-      1L:nrow(plat_qm),
+      seq_len(nrow(plat_qm)),
       function(i) {
         plat_qm_i <- plat_qm |>
           dplyr::slice(i)
@@ -1004,7 +1004,7 @@ test_that(
       dplyr::distinct()
 
     lapply(
-      1L:nrow(bplat_plat_qm),
+      seq_len(nrow(bplat_plat_qm)),
       function(i) {
         bplat_plat_qm_i <- bplat_plat_qm |>
           dplyr::slice(i)
@@ -1368,7 +1368,7 @@ test_that(
       dplyr::distinct()
 
     lapply(
-      1L:nrow(bplat_plat),
+      seq_len(nrow(bplat_plat)),
       function(i) {
         bplat_plat_i <- bplat_plat |>
           dplyr::slice(.env[["i"]])
@@ -1409,7 +1409,7 @@ test_that(
       dplyr::distinct()
 
     lapply(
-      1L:nrow(bplat_dt),
+      seq_len(nrow(bplat_dt)),
       function(i) {
         bplat_dt_i <- bplat_dt |>
           dplyr::slice(.env[["i"]])
@@ -1452,7 +1452,7 @@ test_that(
       dplyr::distinct()
 
     lapply(
-      1L:nrow(plat_dt),
+      seq_len(nrow(plat_dt)),
       function(i) {
         plat_dt_i <- plat_dt |>
           dplyr::slice(i)
@@ -1493,7 +1493,7 @@ test_that(
       dplyr::distinct()
 
     lapply(
-      1L:nrow(bplat_plat_dt),
+      seq_len(nrow(bplat_plat_dt)),
       function(i) {
         bplat_plat_dt_i <- bplat_plat_dt |>
           dplyr::slice(i)
