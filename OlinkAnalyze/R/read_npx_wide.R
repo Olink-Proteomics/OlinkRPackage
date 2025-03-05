@@ -325,9 +325,9 @@ read_npx_wide_split_row <- function(df,
     cli::cli_abort(
       message = c(
         "x" = "We identified
-        {ifelse(identical(na_row_index, integer(0L)), 0L, nrow(na_row_index))}
+        {.val {ifelse(identical(na_row_index, integer(0L)), 0L, nrow(na_row_index))}}
         rows with all columns `NA` in file {.file {file}}, while we expected
-        {format_spec$n_na_rows}!",
+        {.val {format_spec$n_na_rows}}!",
         "i" = "Has the file been modified manually?"
       ),
       call = rlang::caller_env(),
@@ -423,13 +423,9 @@ read_npx_wide_npxs_version <- function(df) {
       .data[["V2"]]
     ) |>
     as.character() |>
-    (\(x) {
-      strsplit(x = x,
-               split = " ",
-               fixed = TRUE) |>
-        lapply(utils::tail, 1L) |>
-        unlist()
-    })()
+    strsplit(split = " ", fixed = TRUE) |>
+    lapply(utils::tail, 1L) |>
+    unlist()
 
   # return ----
 
@@ -443,9 +439,9 @@ read_npx_wide_npxs_version <- function(df) {
 #'   Klev Diamanti
 #'
 #' @param df Top matrix of Olink datasets in wide format \var{df_top}.
-#' @param file Path to Olink software output file in wide or long format.
-#' Expecting file extensions
-#' `r accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' @param file Path to Olink software output file in wide format. Expected one
+#' of file extensions
+#' `r ansi_collapse_quot(x = get_file_ext(name_sub = c("excel", "delim")))`.
 #' @param format_spec A tibble derived from \var{olink_wide_spec} in the local
 #' environment containing the expected format of the Olink wide file based on
 #' the \var{olink_platform} and \var{data_type}.
@@ -487,12 +483,12 @@ read_npx_wide_check_top <- function(df,
 
   if (!identical(dplyr::pull(df, .data[["V1"]]), top_mat_v1)) {
 
-    top_v1_miss <- top_mat_v1[!(top_mat_v1 %in% df$V1)] # nolint
+    top_v1_miss <- top_mat_v1[!(top_mat_v1 %in% df$V1)]
 
     cli::cli_abort(
       message = c(
         "x" = "Column 1 of the top matrix with assay data in file
-        {.file {file}} does not contain: {top_v1_miss}",
+        {.file {file}} does not contain: {.val {top_v1_miss}}",
         "i" = "Has the file been modified manually?"
       ),
       call = rlang::caller_env(),
@@ -512,12 +508,14 @@ read_npx_wide_check_top <- function(df,
 
   if (!all(top_mat_assay_labels %in% df[2L, ])) {
 
-    top_mat_assay_miss <- top_mat_assay_labels[!(top_mat_assay_labels %in% df[2L, ])] # nolint
+    top_mat_assay_miss <- top_mat_assay_labels[
+      !(top_mat_assay_labels %in% df[2L, ])
+    ]
 
     cli::cli_abort(
       message = c(
         "x" = "Row 2 of the top matrix with assay data in file {.file {file}}
-        does not contain: {top_mat_assay_miss}",
+        does not contain: {.val {top_mat_assay_miss}}",
         "i" = "Has the file been modified manually?"
       ),
       call = rlang::caller_env(),
@@ -608,10 +606,11 @@ read_npx_wide_check_top <- function(df,
 
       cli::cli_abort(
         message = c(
-          "x" = "Panel(s) {unique(int_ctrl_df_missing$panel)} {?is/are} missing
-          one or more of the internal control assays
-          {unique(int_ctrl_df_missing$int_ctrl)} from row 2 of the top matrix
-          with assay data in file {.file {file}}!",
+          "x" = "{cli::qty(unique(int_ctrl_df_missing$panel))} Panel{?s}
+          {.val {unique(int_ctrl_df_missing$panel)}} {?is/are} missing one or
+          more of the internal control assays
+          {.val {unique(int_ctrl_df_missing$int_ctrl)}} from row 2 of the top
+          matrix with assay data in file {.file {file}}!",
           "i" = "Has the file been modified manually?"
         ),
         call = rlang::caller_env(),
@@ -713,9 +712,10 @@ read_npx_wide_check_top <- function(df,
 
         cli::cli_abort(
           message = c(
-            "x" = "Panel(s) {unique(dev_int_ctrl_df_missing$panel)} {?is/are}
-            missing one or more of the deviations from the internal control
-            assays {unique(dev_int_ctrl_df_missing$dev_int_ctrl)} from row 3 of
+            "x" = "{cli::qty(unique(int_ctrl_df_missing$panel))} Panel{?s}
+            {.val {unique(dev_int_ctrl_df_missing$panel)}} {?is/are} missing one
+            or more of the deviations from the internal control assays
+            {.val {unique(dev_int_ctrl_df_missing$dev_int_ctrl)}} from row 3 of
             the top matrix with assay data in file {.file {file}}!",
             "i" = "Has the file been modified manually?"
           ),

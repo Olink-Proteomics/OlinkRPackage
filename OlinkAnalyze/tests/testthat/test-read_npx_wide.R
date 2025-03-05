@@ -1405,7 +1405,7 @@ test_that(
             file = olink_wide_format,
             format_spec = get_format_spec(data_type = data_type)
           ),
-          regexp = "does not contain: QC Warning"
+          regexp = "does not contain: \"QC Warning\""
         )
 
       }
@@ -1452,7 +1452,7 @@ test_that(
             file = olink_wide_format,
             format_spec = get_format_spec(data_type = data_type)
           ),
-          regexp = "does not contain: Plate ID"
+          regexp = "does not contain: \"Plate ID\""
         )
 
       }
@@ -1499,7 +1499,7 @@ test_that(
             file = olink_wide_format,
             format_spec = get_format_spec(data_type = data_type)
           ),
-          regexp = "does not contain: Plate ID and QC Warning"
+          regexp = "does not contain: \"Plate ID\" and \"QC Warning\""
         )
 
       }
