@@ -58,7 +58,7 @@ get_file_ext <- function(name_sub = NULL) {
                        error = TRUE)
 
     if (!all(name_sub %in% get_file_formats())) {
-      no_overlap <- name_sub[!(name_sub %in% get_file_formats())]
+      no_overlap <- name_sub[!(name_sub %in% get_file_formats())] # nolint object_usage_linter
       cli::cli_abort(
         c(
           "x" = "{.val {no_overlap}} {?does/do} not reflect an acceptable file

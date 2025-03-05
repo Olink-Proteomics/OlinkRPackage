@@ -484,7 +484,7 @@ read_npx_wide_check_top <- function(df,
 
   if (!identical(dplyr::pull(df, .data[["V1"]]), top_mat_v1)) {
 
-    top_v1_miss <- top_mat_v1[!(top_mat_v1 %in% df$V1)]
+    top_v1_miss <- top_mat_v1[!(top_mat_v1 %in% df$V1)] # nolint object_usage_linter
 
     cli::cli_abort(
       message = c(
@@ -509,7 +509,7 @@ read_npx_wide_check_top <- function(df,
 
   if (!all(top_mat_assay_labels %in% df[2L, ])) {
 
-    top_mat_assay_miss <- top_mat_assay_labels[
+    top_mat_assay_miss <- top_mat_assay_labels[ # nolint object_usage_linter
       !(top_mat_assay_labels %in% df[2L, ])
     ]
 
@@ -857,7 +857,7 @@ read_npx_wide_top <- function(df,
                      + nrow(df_top_int_ctrl)
                      + nrow(df_top_dev_int_ctrl))) {
 
-    top_mat_unknown_cols <- setdiff(df_t$col_index,
+    top_mat_unknown_cols <- setdiff(df_t$col_index, # nolint object_usage_linter
                                     c(df_top_oid$col_index,
                                       sapply(df_pid_qcw, \(x) x$col_index) |>
                                         unname() |>

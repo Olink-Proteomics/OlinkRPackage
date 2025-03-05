@@ -81,7 +81,7 @@ check_columns <- function(df,
   col_list_char <- sapply(col_list, check_is_character, error = FALSE)
   if (any(col_list_char == FALSE)) {
 
-    col_list_not_char <- col_list[!col_list_char]
+    col_list_not_char <- col_list[!col_list_char] # nolint object_usage_linter
 
     # error if lst is not a list
     cli::cli_abort(

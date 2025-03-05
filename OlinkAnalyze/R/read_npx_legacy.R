@@ -227,7 +227,7 @@ read_npx_legacy_check <- function(file,
 
   # help vars ----
 
-  format_spec <- olink_wide_spec |>
+  format_spec <- olink_wide_spec |> # nolint object_usage_linter
     dplyr::filter(
       .data[["data_type"]] == .env[["data_type"]]
     )

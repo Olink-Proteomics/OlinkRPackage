@@ -61,7 +61,7 @@ read_npx_parquet <- function(file,
 
   # Check that all required parquet metadata is in place
   if (!all(olink_parquet_spec$parquet_metadata %in% names(df_olink$metadata))) {
-    missing_fields <- olink_parquet_spec$parquet_metadata[
+    missing_fields <- olink_parquet_spec$parquet_metadata[ # nolint object_usage_linter
       !(olink_parquet_spec$parquet_metadata %in% names(df_olink$metadata))
     ]
 

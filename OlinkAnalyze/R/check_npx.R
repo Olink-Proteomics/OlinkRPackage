@@ -368,7 +368,7 @@ check_npx_update_col_names <- function(preferred_names) {
 
     # identify names of the vector preferred_names that do not match names from
     # column_name_dict. Names should match to be able to update the field.
-    missing_names <- names(preferred_names)[!(names(preferred_names) %in%
+    missing_names <- names(preferred_names)[!(names(preferred_names) %in% # nolint object_usage_linter
                                                 names(column_name_dict))]
 
     cli::cli_abort(

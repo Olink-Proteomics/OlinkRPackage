@@ -645,7 +645,7 @@ read_npx_format_get_platform <- function(df_top_n,
 
   check_columns(df = df_top_n, col_list = list("V2"))
 
-  panel_name <- df_top_n |>
+  panel_name <- df_top_n |> # nolint object_usage_linter
     dplyr::select(
       dplyr::all_of("V2")
     ) |>
