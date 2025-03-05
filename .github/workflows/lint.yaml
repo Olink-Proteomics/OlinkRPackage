@@ -21,7 +21,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          packages: any::pak, any::lintr, local::.
+          packages: any::pak, any::lintr, any::devtools, local::.
           working-directory: OlinkAnalyze
           
       - name: Lint
