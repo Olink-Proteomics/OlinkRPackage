@@ -28,15 +28,13 @@ check_is_integer <- function(int,
 
     if (error == TRUE) {
 
-      cli::cli_abort(
+      cli::cli_abort( # nolint return_linter
         c(
           "x" = "{.arg {rlang::caller_arg(int)}} must be an integer vector!"
         ),
         call = rlang::caller_env(),
         wrap = FALSE
       )
-
-      return(NULL)
 
     } else {
 
@@ -83,15 +81,13 @@ check_is_scalar_integer <- function(int,
 
     if (error == TRUE) {
 
-      cli::cli_abort(
+      cli::cli_abort( # nolint return_linter
         c(
           "x" = "{.arg {rlang::caller_arg(int)}} must be a scalar integer!"
         ),
         call = rlang::caller_env(),
         wrap = FALSE
       )
-
-      return(NULL)
 
     } else {
 

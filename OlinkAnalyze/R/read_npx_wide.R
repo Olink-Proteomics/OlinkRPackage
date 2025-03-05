@@ -711,7 +711,7 @@ read_npx_wide_check_top <- function(df,
 
       if (nrow(dev_int_ctrl_df_missing) > 0L) {
 
-        cli::cli_abort(
+        cli::cli_abort( # nolint return_linter
           message = c(
             "x" = "{cli::qty(unique(int_ctrl_df_missing$panel))} Panel{?s}
             {.val {unique(dev_int_ctrl_df_missing$panel)}} {?is/are} missing one
@@ -723,8 +723,6 @@ read_npx_wide_check_top <- function(df,
           call = rlang::caller_env(),
           wrap = FALSE
         )
-
-        return(NULL)
 
       }
 

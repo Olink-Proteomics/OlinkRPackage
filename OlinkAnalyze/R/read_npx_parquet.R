@@ -44,7 +44,7 @@ read_npx_parquet <- function(file,
 
     }, error = function(msg) {
 
-      cli::cli_abort(
+      cli::cli_abort( # nolint return_linter
         c(
           "x" = "Unable to read parquet file: {.file {file}}",
           "i" = "Check if the file is in parquet format and/or potential file
@@ -53,8 +53,6 @@ read_npx_parquet <- function(file,
         call = rlang::caller_env(),
         wrap = FALSE
       )
-
-      return(NULL)
 
     }
   )

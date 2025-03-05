@@ -18,7 +18,7 @@ check_out_df_arg <- function(out_df) {
 
   if (!(out_df %in% read_npx_df_output)) {
 
-    cli::cli_abort(
+    cli::cli_abort( # nolint return_linter
       message = c(
         "x" = "Unknown output argument {.arg out_df}!",
         "i" = "Expected one of {.val {read_npx_df_output}}"
@@ -26,8 +26,6 @@ check_out_df_arg <- function(out_df) {
       call = rlang::caller_env(),
       wrap = FALSE
     )
-
-    return(NULL)
 
   }
 
@@ -66,7 +64,7 @@ convert_read_npx_output <- function(df,
   } else {
 
     # if nont of the above throw an error
-    cli::cli_abort(
+    cli::cli_abort( # nolint return_linter
       message = c(
         "x" = "Unexpected input dataset {.arg df}!",
         "i" = "Expected one of: {.val {read_npx_df_output}}."
@@ -74,8 +72,6 @@ convert_read_npx_output <- function(df,
       call = rlang::caller_env(),
       wrap = FALSE
     )
-
-    return(NULL)
 
   }
 
@@ -119,7 +115,7 @@ read_npx_format_colnames <- function(df,
 
     if (ncol(df_row_1) < 3L || num_of_cells_with_vals != 2L) {
 
-      cli::cli_abort(
+      cli::cli_abort( # nolint return_linter
         message = c(
           "x" = "Unexpected first row in file {.file {file}}!",
           "i" = "Detected file in wide format. Expected only cells in A1 and B1
@@ -129,8 +125,6 @@ read_npx_format_colnames <- function(df,
         wrap = FALSE
       )
 
-      return(NULL)
-
     }
 
   } else { # long format
@@ -139,7 +133,7 @@ read_npx_format_colnames <- function(df,
         || check_is_character(string = names(df),
                               error = FALSE) == FALSE) {
 
-      cli::cli_abort(
+      cli::cli_abort( # nolint return_linter
         message = c(
           "x" = "Unexpected columns in file {.file {file}}!",
           "i" = "The dataset contains column names that are `NA` or `empty
@@ -148,8 +142,6 @@ read_npx_format_colnames <- function(df,
         call = rlang::caller_env(),
         wrap = FALSE
       )
-
-      return(NULL)
 
     }
 

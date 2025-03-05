@@ -70,7 +70,7 @@ read_npx_excel <- function(file,
 
     }, error = function(msg) {
 
-      cli::cli_abort(
+      cli::cli_abort( # nolint return_linter
         c(
           "x" = "Unable to open excel file: {.file {file}}",
           "i" = "Check if the input {.arg file} is an excel file."
@@ -78,8 +78,6 @@ read_npx_excel <- function(file,
         call = rlang::caller_env(),
         wrap = FALSE
       )
-
-      return(NULL)
 
     }
   )

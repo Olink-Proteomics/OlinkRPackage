@@ -360,7 +360,7 @@ get_field_separator <- function(file) {
 
   } else if (num_fields_semicolon > 1L && num_fields_comma > 1L) {
 
-    cli::cli_abort(
+    cli::cli_abort( # nolint return_linter
       c(
         "x" = "Unable to identify the separator of the file: {.file {file}}",
         "i" = "Both {.val {accepted_field_sep}} are present in header line."
@@ -369,11 +369,9 @@ get_field_separator <- function(file) {
       wrap = FALSE
     )
 
-    return(NULL)
-
   } else {
 
-    cli::cli_abort(
+    cli::cli_abort( # nolint return_linter
       c(
         "x" = "Unable to identify the separator of the file: {.file {file}}",
         "i" = "Expected one of {.val {accepted_field_sep}}!"
@@ -381,8 +379,6 @@ get_field_separator <- function(file) {
       call = rlang::caller_env(),
       wrap = FALSE
     )
-
-    return(NULL)
 
   }
 }

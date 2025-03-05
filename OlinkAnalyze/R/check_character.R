@@ -28,15 +28,13 @@ check_is_character <- function(string,
 
     if (error == TRUE) {
 
-      cli::cli_abort(
+      cli::cli_abort( # nolint return_linter
         c(
           "x" = "{.arg {rlang::caller_arg(string)}} must be a character vector!"
         ),
         call = rlang::caller_env(),
         wrap = FALSE
       )
-
-      return(NULL)
 
     } else {
 
@@ -83,15 +81,13 @@ check_is_scalar_character <- function(string,
 
     if (error == TRUE) {
 
-      cli::cli_abort(
+      cli::cli_abort( # nolint return_linter
         c(
           "x" = "{.arg {rlang::caller_arg(string)}} must be a scalar character!"
         ),
         call = rlang::caller_env(),
         wrap = FALSE
       )
-
-      return(NULL)
 
     } else {
 

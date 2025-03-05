@@ -24,15 +24,13 @@ check_is_boolean <- function(bool,
 
     if (error == TRUE) {
 
-      cli::cli_abort(
+      cli::cli_abort( # nolint return_linter
         c(
           "x" = "{.arg {rlang::caller_arg(bool)}} must be a boolean vector!"
         ),
         call = rlang::caller_env(),
         wrap = FALSE
       )
-
-      return(NULL)
 
     } else {
 
@@ -75,15 +73,13 @@ check_is_scalar_boolean <- function(bool,
 
     if (error == TRUE) {
 
-      cli::cli_abort(
+      cli::cli_abort( # nolint return_linter
         c(
           "x" = "{.arg {rlang::caller_arg(bool)}} must be a scalar boolean!"
         ),
         call = rlang::caller_env(),
         wrap = FALSE
       )
-
-      return(NULL)
 
     } else {
 

@@ -128,7 +128,7 @@ check_olink_platform <- function(x,
 
   if (length(olink_platforms) == 0L) {
 
-    cli::cli_abort(
+    cli::cli_abort( # nolint return_linter
       message = c(
         "x" = "No Olink platform detected!",
         "i" = "Please check input criteria {.arg broad_platform},
@@ -138,11 +138,9 @@ check_olink_platform <- function(x,
       wrap = FALSE
     )
 
-    return(NULL)
-
   } else if (!(x %in% olink_platforms)) {
 
-    cli::cli_abort(
+    cli::cli_abort( # nolint return_linter
       message = c(
         "x" = "Unexpected Olink platform {.val {x}}!",
         "i" = "Expected one of:
@@ -152,8 +150,6 @@ check_olink_platform <- function(x,
       call = rlang::caller_env(),
       wrap = FALSE
     )
-
-    return(NULL)
 
   }
 
@@ -289,7 +285,7 @@ check_olink_broader_platform <- function(x,
 
   if (length(olink_broad_platforms) == 0L) {
 
-    cli::cli_abort(
+    cli::cli_abort( # nolint return_linter
       message = c(
         "x" = "No Olink broad platform detected!",
         "i" = "Please check input criteria {.arg platform_name},
@@ -299,11 +295,9 @@ check_olink_broader_platform <- function(x,
       wrap = FALSE
     )
 
-    return(NULL)
-
   } else if (!(x %in% olink_broad_platforms)) {
 
-    cli::cli_abort(
+    cli::cli_abort( # nolint return_linter
       message = c(
         "x" = "Unexpected Olink broader platform: {.val {x}}!",
         "i" = "Expected one of:
@@ -313,8 +307,6 @@ check_olink_broader_platform <- function(x,
       call = rlang::caller_env(),
       wrap = FALSE
     )
-
-    return(NULL)
 
   }
 
@@ -457,7 +449,7 @@ check_olink_data_type <- function(x,
 
   if (length(olink_quant_methods) == 0L) {
 
-    cli::cli_abort(
+    cli::cli_abort( # nolint return_linter
       message = c(
         "x" = "No Olink data type detected!",
         "i" = "Please check input criteria {.arg broad_platform},
@@ -467,11 +459,9 @@ check_olink_data_type <- function(x,
       wrap = FALSE
     )
 
-    return(NULL)
-
   } else if (!(x %in% olink_quant_methods)) {
 
-    cli::cli_abort(
+    cli::cli_abort( # nolint return_linter
       message = c(
         "x" = "Unexpected Olink data type {.val {x}}!",
         "i" = "Expected one of:
@@ -481,8 +471,6 @@ check_olink_data_type <- function(x,
       call = rlang::caller_env(),
       wrap = FALSE
     )
-
-    return(NULL)
 
   }
 
@@ -624,7 +612,7 @@ check_olink_quant_type <- function(x,
 
   if (length(olink_quant_types) == 0L) {
 
-    cli::cli_abort(
+    cli::cli_abort( # nolint return_linter
       message = c(
         "x" = "No Olink quantification type detected!",
         "i" = "Please check input criteria {.arg broad_platform},
@@ -634,11 +622,9 @@ check_olink_quant_type <- function(x,
       wrap = FALSE
     )
 
-    return(NULL)
-
   } else if (!(x %in% olink_quant_types)) {
 
-    cli::cli_abort(
+    cli::cli_abort( # nolint return_linter
       message = c(
         "x" = "Unexpected Olink quantification type {.val {x}}!",
         "i" = "Expected one of:
@@ -648,8 +634,6 @@ check_olink_quant_type <- function(x,
       call = rlang::caller_env(),
       wrap = FALSE
     )
-
-    return(NULL)
 
   }
 }

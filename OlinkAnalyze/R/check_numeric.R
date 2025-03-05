@@ -28,15 +28,13 @@ check_is_numeric <- function(num,
 
     if (error == TRUE) {
 
-      cli::cli_abort(
+      cli::cli_abort( # nolint return_linter
         c(
           "x" = "{.arg {rlang::caller_arg(num)}} must be a numeric vector!"
         ),
         call = rlang::caller_env(),
         wrap = FALSE
       )
-
-      return(NULL)
 
     } else {
 
@@ -83,15 +81,13 @@ check_is_scalar_numeric <- function(num,
 
     if (error == TRUE) {
 
-      cli::cli_abort(
+      cli::cli_abort( # nolint return_linter
         c(
           "x" = "{.arg {rlang::caller_arg(num)}} must be a scalar numeric!"
         ),
         call = rlang::caller_env(),
         wrap = FALSE
       )
-
-      return(NULL)
 
     } else {
 

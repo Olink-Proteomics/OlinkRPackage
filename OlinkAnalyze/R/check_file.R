@@ -29,7 +29,7 @@ check_file_exists <- function(file,
     if (error == TRUE) {
 
       # error if the file does not exist
-      cli::cli_abort(
+      cli::cli_abort( # nolint return_linter
         c(
           "x" = "Unable to locate file: {.file {file}}",
           "i" = "Missing {.arg file}?"
@@ -37,8 +37,6 @@ check_file_exists <- function(file,
         call = rlang::caller_env(),
         wrap = FALSE
       )
-
-      return(NULL)
 
     } else {
 

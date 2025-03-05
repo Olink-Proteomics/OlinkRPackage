@@ -22,15 +22,13 @@ check_is_list <- function(lst,
     if (error == TRUE) {
 
       # error if lst is not a list
-      cli::cli_abort(
+      cli::cli_abort( # nolint return_linter
         c(
           "x" = "{.arg {rlang::caller_arg(lst)}} is not a list!"
         ),
         call = rlang::caller_env(),
         wrap = TRUE
       )
-
-      return(NULL)
 
     } else {
 

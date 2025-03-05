@@ -357,7 +357,7 @@ read_npx_legacy_check <- function(file,
 
   if (is_npx_t48_v2 || is_npx_t96_v3) {
 
-    cli::cli_abort(
+    cli::cli_abort( # nolint return_linter
       message = c(
         "x" = "File {.file {file}} contains bottom matrix with unsupported
         labels!",
@@ -366,8 +366,6 @@ read_npx_legacy_check <- function(file,
       call = rlang::caller_env(),
       wrap = TRUE
     )
-
-    return(NULL)
 
   }
 

@@ -28,15 +28,13 @@ check_is_arrow_object <- function(df,
     if (error == TRUE) {
 
       # error if the variable is not a tibble
-      cli::cli_abort(
+      cli::cli_abort( # nolint return_linter
         c(
           "x" = "{.arg {rlang::caller_arg(df)}} is not an R6 ArrowObject!"
         ),
         call = rlang::caller_env(),
         wrap = FALSE
       )
-
-      return(NULL)
 
     } else {
 
@@ -82,15 +80,13 @@ check_is_tibble <- function(df,
     if (error == TRUE) {
 
       # error if df is not a tibble
-      cli::cli_abort(
+      cli::cli_abort( # nolint return_linter
         c(
           "x" = "{.arg {rlang::caller_arg(df)}} is not a tibble dataset!"
         ),
         call = rlang::caller_env(),
         wrap = TRUE
       )
-
-      return(NULL)
 
     } else {
 
@@ -145,7 +141,7 @@ check_is_dataset <- function(df,
     if (error == TRUE) {
 
       # error if df is not a tibble
-      cli::cli_abort(
+      cli::cli_abort( # nolint return_linter
         c(
           "x" = "{.arg {rlang::caller_arg(df)}} is not a tibble or an
           ArrowObject dataset!"
@@ -153,8 +149,6 @@ check_is_dataset <- function(df,
         call = rlang::caller_env(),
         wrap = TRUE
       )
-
-      return(NULL)
 
     } else {
 
