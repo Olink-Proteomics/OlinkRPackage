@@ -47,8 +47,6 @@ file, and middle combined with bottom matrix.
 \var{olink_wide_bottom_matrix}.
 \item \strong{format_spec}: specifications of the wide format based on
 \var{olink_wide_spec}.
-\item \strong{accept_platforms}: accepted Olink platforms and some
-specifications, derived from \var{accepted_olink_platforms}.
 }
 }
 \description{

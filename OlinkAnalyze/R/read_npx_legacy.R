@@ -32,8 +32,6 @@
 #' \var{olink_wide_bottom_matrix}.
 #' \item \strong{format_spec}: specifications of the wide format based on
 #' \var{olink_wide_spec}.
-#' \item \strong{accept_platforms}: accepted Olink platforms and some
-#' specifications, derived from \var{accepted_olink_platforms}.
 #' }
 #'
 read_npx_legacy_help <- function(file,
@@ -81,18 +79,15 @@ read_npx_legacy_help <- function(file,
   }
 
   # only Target 48 and Target 96 platforms are accepted
-  accept_platforms <- accepted_olink_platforms |>
-    dplyr::filter(
-      .data[["broader_platform"]] == "qPCR"
-      & grepl("Target", .data[["name"]])
-    )
+  accept_platforms <- get_olink_platforms(broad_platform = "qPCR") |>
+    (\(.) .[grepl("Target", .)])()
 
-  if (!(list_format$olink_platform %in% accept_platforms$name)) {
+  if (!(list_format$olink_platform %in% accept_platforms)) {
 
     cli::cli_abort(
       message = c(
         "x" = "{.fn read_npx_legacy} accepts only data from
-        {.val {accept_platforms$name}}!",
+        {.val {accept_platforms}}!",
         "i" = "Detected {.val {list_format$olink_platform}}!"
       ),
       call = rlang::caller_env(),
@@ -102,18 +97,11 @@ read_npx_legacy_help <- function(file,
   }
 
   # only NPX and Quantified values
-  accept_quant <- accepted_olink_platforms |>
-    # keep only relevant quantification methods
-    dplyr::filter(
-      .data[["broader_platform"]] == "qPCR"
-      & .data[["name"]] == list_format$olink_platform
-    ) |>
-    dplyr::pull(
-      .data[["quant_method"]]
-    ) |>
-    unlist() |>
-    # remove Ct as is in not supported
-    (\(.x) .x[!(.x %in% data_type_no_accept)])()
+  accept_quant <- get_olink_data_types(
+    broad_platform = "qPCR",
+    platform_name = list_format$olink_platform
+  ) |>
+    (\(.) .[!(. %in% data_type_no_accept)])()
   if (!(list_format$data_type %in% accept_quant)) {
 
     cli::cli_abort(
@@ -199,11 +187,7 @@ read_npx_legacy_help <- function(file,
       df_split = df_split,
       npxs_v = npxs_v,
       bottom_mat_v = bottm_mat_v,
-      format_spec = format_spec,
-      accept_platforms = accept_platforms |>
-        dplyr::filter(
-          .data[["name"]] == list_format$olink_platform
-        )
+      format_spec = format_spec
     )
   )
 }
@@ -239,7 +223,7 @@ read_npx_legacy_check <- function(file,
                    error = TRUE)
 
   check_olink_data_type(x = data_type,
-                        broader_platform = "qPCR")
+                        broad_platform = "qPCR")
 
   # help vars ----
 
