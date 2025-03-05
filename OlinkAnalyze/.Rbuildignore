@@ -12,5 +12,6 @@
 ^CITATION\.cff$
 ^data-raw$
 ^.RData
+^.Rhistory
 ^tests/testthat/data/.*[.]rds
 ^tests/testthat/data/.*[.]R
