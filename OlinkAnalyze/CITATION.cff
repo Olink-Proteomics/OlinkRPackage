@@ -2,7 +2,7 @@
 # CITATION file created with {cffr} R package, v0.4.1
 # See also: https://docs.ropensci.org/cffr/
 # -----------------------------------------------------------
- 
+
 cff-version: 1.2.0
 message: 'To cite package "Olink Analyze" in publications use:'
 type: software
