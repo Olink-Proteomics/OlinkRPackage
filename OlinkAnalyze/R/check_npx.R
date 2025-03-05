@@ -267,8 +267,8 @@ check_npx_col_names <- function(df,
 
     if (any(sapply(col_name_user, length) == 0L) || any(is.na(col_name_user))) {
       cli::cli_abort(
-        c("x" = "Some of the values of {.val preferred_names} are not detected
-          in the column names of the input data set {.val df}."),
+        c("x" = "Some of the values of {.arg preferred_names} are not detected
+          in the column names of the input data set {.arg df}."),
         call = rlang::caller_env(),
         wrap = FALSE
       )
@@ -283,7 +283,7 @@ check_npx_col_names <- function(df,
   if (any(column_name_multi > 1L)) {
 
     column_name_multi_lst <- column_name_df[column_name_multi > 1L]
-    column_name_multi_prnt <- lapply( #nolint
+    column_name_multi_prnt <- lapply(
       seq_along(column_name_multi_lst),
       function(i) {
         paste0("* \"", names(column_name_multi_lst[i]), "\": ",
@@ -296,7 +296,7 @@ check_npx_col_names <- function(df,
       c("x" = "There are multiple column names associated with the following
         key(s):",
         column_name_multi_prnt,
-        "i" = "Please use {.val preferred_names} to break ties of column
+        "i" = "Please use {.arg preferred_names} to break ties of column
         names."),
       call = rlang::caller_env(),
       wrap = FALSE
@@ -310,7 +310,7 @@ check_npx_col_names <- function(df,
     cli::cli_abort(
       c("x" = "There are no column names associated with the following key(s):",
         paste0("* \"", names(column_name_df[column_name_multi == 0L]), "\""),
-        "i" = "Please use {.val preferred_names} to select the correct column
+        "i" = "Please use {.arg preferred_names} to select the correct column
       names."),
       call = rlang::caller_env(),
       wrap = FALSE
@@ -368,11 +368,11 @@ check_npx_update_col_names <- function(preferred_names) {
 
     # identify names of the vector preferred_names that do not match names from
     # column_name_dict. Names should match to be able to update the field.
-    missing_names <- names(preferred_names)[!(names(preferred_names) %in% # nolint
+    missing_names <- names(preferred_names)[!(names(preferred_names) %in%
                                                 names(column_name_dict))]
 
     cli::cli_abort(
-      c("x" = "Unexpected name{?s} in {.val preferred_names}:
+      c("x" = "Unexpected name{?s} in {.arg preferred_names}:
         {.val {missing_names}}!",
         "i" = "Expected one or more of the following names:
         {names(column_name_dict)}"),
@@ -441,7 +441,7 @@ check_npx_olinkid <- function(df,
   # warning if there is any invalid Olink ID
   if (length(invalid_oid) > 0L) {
     cli::cli_warn(c(
-      "Unrecognized OlinkID{?s} detected: {invalid_oid}"
+      "Unrecognized OlinkID{?s} detected: {.val {invalid_oid}}"
     ))
   }
 
@@ -468,7 +468,8 @@ check_npx_olinkid <- function(df,
 #'  Masoumeh Sheikhi
 #'
 #' @param df A tibble or an arrow object containing columns \var{OlinkID} and
-#' the quantification column `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep2 = " or ", last = ", or ")` # nolint
+#' the quantification column
+#' `r ansi_collapse_quot(x = get_olink_data_types(), sep = "or")`.
 #' @param col_names A list of matched column names. This is the output of the
 #' \var{check_npx_col_names} function.
 #'
@@ -511,7 +512,8 @@ check_npx_all_na_assays <- function(df, col_names) {
   # Issue warning if any assays with only NAs are found
   if (length(all_nas) > 0L) {
     cli::cli_warn(c(
-      "{all_nas} ha{?s/ve} {col_names$quant} = NA for all samples."
+      "{.val {all_nas}} ha{?s/ve} {.val {col_names$quant}} = NA for all
+      samples."
     ))
   }
 
@@ -560,7 +562,7 @@ check_npx_duplicate_sample_ids <- function(df, col_names) {
   # Warn if duplicates are found
   if (length(duplicates) > 0L) {
     cli::cli_warn(c(
-      "Duplicate SampleID{?s} detected: {duplicates}"
+      "Duplicate SampleID{?s} detected: {.val {duplicates}}"
     ))
   }
 
