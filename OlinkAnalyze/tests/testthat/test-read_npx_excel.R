@@ -14,7 +14,8 @@ test_that(
     )
 
     skip_if_not(file.exists(file_synthetic))
-    skip_if_not_installed(pkg = c("writexl", "readxl"))
+    skip_if_not_installed(pkg = "readxl")
+    skip_if_not_installed(pkg = "writexl")
 
     # get wide synthetic data
     df_synthetic <- readRDS(file = file_synthetic)
@@ -107,7 +108,8 @@ test_that(
     )
 
     skip_if_not(file.exists(file_synthetic))
-    skip_if_not_installed(pkg = c("writexl", "readxl"))
+    skip_if_not_installed(pkg = "readxl")
+    skip_if_not_installed(pkg = "writexl")
 
     # get wide synthetic data
     df_synthetic <- readRDS(file = file_synthetic)
@@ -224,7 +226,8 @@ test_that(
 test_that(
   "read_npx_excel - error - df has one column only",
   {
-    skip_if_not_installed(pkg = c("writexl", "readxl"))
+    skip_if_not_installed(pkg = "readxl")
+    skip_if_not_installed(pkg = "writexl")
 
     withr::with_tempfile(
       new = "excel_file",
