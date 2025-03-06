@@ -10,7 +10,6 @@ test_that(
       pattern = "delim-file-test",
       fileext = ".csv",
       code = {
-
         # random data frame
         df <- dplyr::tibble(
           "A" = c(1, 2.2, NA_real_),
@@ -64,7 +63,6 @@ test_that(
           object = df_out,
           expected = df
         )
-
       }
     )
 
@@ -75,7 +73,6 @@ test_that(
       pattern = "delim-file-test",
       fileext = ".csv",
       code = {
-
         # random data frame
         df <- dplyr::tibble(
           "A" = c(1, 2.2, NA_real_),
@@ -129,25 +126,30 @@ test_that(
           object = dplyr::as_tibble(df_out),
           expected = df
         )
-
       }
     )
-
   }
 )
 
 test_that(
   "read_npx_delim - works - wide format - output df matches input df",
   {
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = "Target 96",
+      data_type = "NPX",
+      n_panels = 3L,
+      n_assays = 92L,
+      n_samples = 99L,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = 1L
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
     # get wide synthetic data
-    df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 96",
-                                            data_type = "NPX",
-                                            n_panels = 3L,
-                                            n_assays = 92L,
-                                            n_samples = 99L,
-                                            show_dev_int_ctrl = TRUE,
-                                            show_int_ctrl = TRUE,
-                                            version = 1L)
+    df_synthetic <- readRDS(file = file_synthetic)
 
     ## tibble ----
 
@@ -156,7 +158,6 @@ test_that(
       pattern = "delim-file-test",
       fileext = ".csv",
       code = {
-
         # write the coma-delimited file
         utils::write.table(
           x = df_synthetic$list_df_wide$df_wide,
@@ -191,7 +192,6 @@ test_that(
           object = df_out,
           expected = df_synthetic$list_df_wide$df_wide
         )
-
       }
     )
 
@@ -202,7 +202,6 @@ test_that(
       pattern = "delim-file-test",
       fileext = ".csv",
       code = {
-
         # write the coma-delimited file
         utils::write.table(
           x = df_synthetic$list_df_wide$df_wide,
@@ -237,23 +236,19 @@ test_that(
           object = dplyr::as_tibble(df_out),
           expected = df_synthetic$list_df_wide$df_wide
         )
-
       }
     )
-
   }
 )
 
 test_that(
   "read_npx_delim - works - long format - file contains hashtags \"#\"",
   {
-
     withr::with_tempfile(
       new = "cdfile_test",
       pattern = "delim-file-test",
       fileext = ".csv",
       code = {
-
         # random data frame
         df <- dplyr::tibble(
           "B" = c("a#1", "b", "c"),
@@ -295,23 +290,19 @@ test_that(
           object = df_out,
           expected = df
         )
-
       }
     )
-
   }
 )
 
 test_that(
   "read_npx_delim - works - long format - file contains quotations",
   {
-
     withr::with_tempfile(
       new = "cdfile_test",
       pattern = "delim-file-test",
       fileext = ".csv",
       code = {
-
         # random data frame
         df <- dplyr::tibble(
           "B" = c("a#1", "b", "c"),
@@ -353,10 +344,8 @@ test_that(
           object = df_out,
           expected = df
         )
-
       }
     )
-
   }
 )
 
@@ -368,7 +357,6 @@ test_that(
       pattern = "parquet-file_test",
       fileext = ".parquet",
       code = {
-
         # write the parquet file from a random data frame
         dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -391,7 +379,6 @@ test_that(
                                   sep = ","),
           regexp = "Unable to open delimited file:"
         )
-
       }
     )
   }
@@ -400,21 +387,27 @@ test_that(
 test_that(
   "read_npx_delim - error - wide format - file not delimited",
   {
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = "Target 96",
+      data_type = "NPX",
+      n_panels = 3L,
+      n_assays = 92L,
+      n_samples = 99L,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = 1L
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
     withr::with_tempfile(
       new = "pfile_test",
       pattern = "parquet-file_test",
       fileext = ".parquet",
       code = {
-
         # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 96",
-                                                data_type = "NPX",
-                                                n_panels = 3L,
-                                                n_assays = 92L,
-                                                n_samples = 99L,
-                                                show_dev_int_ctrl = TRUE,
-                                                show_int_ctrl = TRUE,
-                                                version = 1L)
+        df_synthetic <- readRDS(file = file_synthetic)
 
         arrow::write_parquet(
           x = df_synthetic$list_df_wide$df_wide,
@@ -432,7 +425,6 @@ test_that(
             suppressWarnings(),
           regexp = "Unable to open delimited file:"
         )
-
       }
     )
   }
@@ -446,7 +438,6 @@ test_that(
       pattern = "delim-file-test",
       fileext = ".txt",
       code = {
-
         # write the coma-delimited file from a random data frame
         dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -476,7 +467,6 @@ test_that(
                                   sep = ";"),
           regexp = "Wrong input `sep` = \";\"?"
         )
-
       }
     )
   }
@@ -487,14 +477,11 @@ test_that(
 test_that(
   "check_field_separator - error - sep not a scalar string",
   {
-    skip_on_cran()
-
     withr::with_tempfile(
       new = "cfile_test",
       pattern = "csv_temp_file",
       fileext = ".csv",
       code = {
-
         writeLines("foo", cfile_test)
         expect_true(object = file.exists(cfile_test))
 
@@ -522,24 +509,19 @@ test_that(
                                          sep = TRUE),
           regexp = "`sep` should be a string!"
         )
-
       }
     )
-
   }
 )
 
 test_that(
   "check_field_separator - error - sep is scalar string but not accepted",
   {
-    skip_on_cran()
-
     withr::with_tempfile(
       new = "cfile_test",
       pattern = "csv_temp_file",
       fileext = ".csv",
       code = {
-
         writeLines("foo", cfile_test)
         expect_true(object = file.exists(cfile_test))
 
@@ -561,30 +543,24 @@ test_that(
           regexp = "Unexpected separator:"
         )
 
-
         expect_error(
           object = check_field_separator(file = cfile_test,
                                          sep = "|"),
           regexp = "Unexpected separator:"
         )
-
       }
     )
-
   }
 )
 
 test_that(
   "check_field_separator - works - long format - sep is NULL",
   {
-    skip_on_cran()
-
     withr::with_tempfile(
       new = c("cdfile_test", "scdfile_test"),
       pattern = "delim-file-test",
       fileext = ".txt",
       code = {
-
         ## comma delimited ----
 
         # random data frame
@@ -655,24 +631,19 @@ test_that(
 
         expect_identical(object = semicolon_sep,
                          expected = ";")
-
       }
     )
-
   }
 )
 
 test_that(
   "check_field_separator - works - wide format - sep is NULL",
   {
-    skip_on_cran()
-
     withr::with_tempfile(
       new = c("cdfile_test", "scdfile_test"),
       pattern = "delim-file-test",
       fileext = ".txt",
       code = {
-
         ## comma delimited ----
 
         # random data frame
@@ -741,24 +712,19 @@ test_that(
 
         expect_identical(object = semicolon_sep,
                          expected = ";")
-
       }
     )
-
   }
 )
 
 test_that(
   "check_field_separator - works - long format - sep is correct",
   {
-    skip_on_cran()
-
     withr::with_tempfile(
       new = c("cdfile_test", "scdfile_test"),
       pattern = "delim-file-test",
       fileext = ".txt",
       code = {
-
         ## comma delimited ----
 
         # random data frame
@@ -829,24 +795,19 @@ test_that(
 
         expect_identical(object = semicolon_sep,
                          expected = ";")
-
       }
     )
-
   }
 )
 
 test_that(
   "check_field_separator - works - wide format - sep is correct",
   {
-    skip_on_cran()
-
     withr::with_tempfile(
       new = c("cdfile_test", "scdfile_test"),
       pattern = "delim-file-test",
       fileext = ".txt",
       code = {
-
         ## comma delimited ----
 
         # random data frame
@@ -915,10 +876,8 @@ test_that(
 
         expect_identical(object = semicolon_sep,
                          expected = ";")
-
       }
     )
-
   }
 )
 
@@ -927,8 +886,6 @@ test_that(
 test_that(
   "get_field_separator - error - empty header or file",
   {
-    skip_on_cran()
-
     withr::with_tempfile(
       new = "tfile_empty",
       pattern = "txt-file_semicolon",
@@ -946,24 +903,19 @@ test_that(
           object = get_field_separator(file = tfile_empty),
           regexp = "Unable to read header line from"
         )
-
       }
     )
-
   }
 )
 
 test_that(
   "get_field_separator - works - semicolon",
   {
-    skip_on_cran()
-
     withr::with_tempfile(
       new = "tfile_semicolon",
       pattern = "txt-file_semicolon",
       fileext = ".txt",
       code = {
-
         # write some text in a txt file
         writeLines("1;2;3;4;5", tfile_semicolon)
 
@@ -975,24 +927,19 @@ test_that(
           object = get_field_separator(file = tfile_semicolon),
           expected = ";"
         )
-
       }
     )
-
   }
 )
 
 test_that(
   "get_field_separator - works - comma",
   {
-    skip_on_cran()
-
     withr::with_tempfile(
       new = "tfile_comma",
       pattern = "txt-file_comma",
       fileext = ".txt",
       code = {
-
         # write some text in a txt file
         writeLines("1,2,3,4,5", tfile_comma)
 
@@ -1004,24 +951,19 @@ test_that(
           object = get_field_separator(file = tfile_comma),
           expected = ","
         )
-
       }
     )
-
   }
 )
 
 test_that(
   "get_field_separator - error - wrong sep",
   {
-    skip_on_cran()
-
     withr::with_tempfile(
       new = "tfile_hashtag",
       pattern = "txt-file_hashtag",
       fileext = ".txt",
       code = {
-
         # write some text in a txt file
         writeLines("1#2#3#4#5", tfile_hashtag)
 
@@ -1033,24 +975,19 @@ test_that(
           object = get_field_separator(file = tfile_hashtag),
           regexp = "Expected one of \";\" and \",\"!"
         )
-
       }
     )
-
   }
 )
 
 test_that(
   "get_field_separator - error - both comma and semicolon",
   {
-    skip_on_cran()
-
     withr::with_tempfile(
       new = "tfile_mixed",
       pattern = "txt-file_mixed",
       fileext = ".txt",
       code = {
-
         # write some text in a txt file
         writeLines("1,2;3,4;5", tfile_mixed)
 
@@ -1062,9 +999,7 @@ test_that(
           object = get_field_separator(file = tfile_mixed),
           regexp = "Both \";\" and \",\" are present in header line."
         )
-
       }
     )
-
   }
 )
