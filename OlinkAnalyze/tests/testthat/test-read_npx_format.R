@@ -5,24 +5,32 @@ test_that(
   {
     skip_if_not_installed("writexl")
 
-    # get wide synthetic data
-    df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
-                                            data_type = "NPX",
-                                            n_panels = 3L,
-                                            n_assays = 45L,
-                                            n_samples = 99L,
-                                            show_dev_int_ctrl = TRUE,
-                                            show_int_ctrl = TRUE,
-                                            version = 2L)
+    ## current version ----
 
-    ## csv semicolon ----
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = "Target 48",
+      data_type = "NPX",
+      n_panels = 3L,
+      n_assays = 45L,
+      n_samples = 99L,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = 2L
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
+    ### csv semicolon ----
 
     withr::with_tempfile(
       new = "csv_long",
       pattern = "test_long",
       fileext = ".csv",
       code = {
-
         # write in csv
         write.table(x = df_synthetic$list_df_long$df_long,
                     file = csv_long,
@@ -138,18 +146,16 @@ test_that(
             ),
           expected = df_synthetic$list_df_long$df_long
         )
-
       }
     )
 
-    ## csv comma ----
+    ### csv comma ----
 
     withr::with_tempfile(
       new = "csv_long",
       pattern = "test_long",
       fileext = ".csv",
       code = {
-
         # write in csv
         write.table(x = df_synthetic$list_df_long$df_long,
                     file = csv_long,
@@ -265,18 +271,16 @@ test_that(
             ),
           expected = df_synthetic$list_df_long$df_long
         )
-
       }
     )
 
-    ## excel ----
+    ### excel ----
 
     withr::with_tempfile(
       new = "excel_long",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
         # write in csv
         writexl::write_xlsx(x = df_synthetic$list_df_long$df_long,
                             path = excel_long,
@@ -386,7 +390,6 @@ test_that(
             ),
           expected = df_synthetic$list_df_long$df_long
         )
-
       }
     )
 
@@ -394,27 +397,28 @@ test_that(
 
     ### T48 NPX ----
 
+    # file path
+    file_synthetic_legacy <- file_wide_synthetic_data(
+      olink_platform = "Target 48",
+      data_type = "NPX",
+      n_panels = 3L,
+      n_assays = 45L,
+      n_samples = 99L,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = 2L
+    )
+
+    skip_if_not(file.exists(file_synthetic_legacy))
+
+    # get wide synthetic data
+    df_synthetic_legacy <- readRDS(file = file_synthetic_legacy)
+
     withr::with_tempfile(
       new = "excel_long",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        data_type <- "NPX"
-        olink_platform <- "Target 48"
-
-        # df_synthetic_legacy
-        df_synthetic_legacy <- get_wide_synthetic_data(
-          olink_platform = olink_platform,
-          data_type = data_type,
-          n_panels = 3L,
-          n_assays = 45L,
-          n_samples = 99L,
-          show_dev_int_ctrl = FALSE,
-          show_int_ctrl = FALSE,
-          version = 2L
-        )
-
         # write in csv
         writexl::write_xlsx(x = df_synthetic_legacy$list_df_long$df_long,
                             path = excel_long,
@@ -458,33 +462,33 @@ test_that(
             df = df_synthetic_legacy$list_df_long$df_long
           )
         )
-
       }
     )
 
     ### T48 Quantified ----
 
+    # file path
+    file_synthetic_legacy <- file_wide_synthetic_data(
+      olink_platform = "Target 48",
+      data_type = "Quantified",
+      n_panels = 3L,
+      n_assays = 45L,
+      n_samples = 99L,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = 0L
+    )
+
+    skip_if_not(file.exists(file_synthetic_legacy))
+
+    # get wide synthetic data
+    df_synthetic_legacy <- readRDS(file = file_synthetic_legacy)
+
     withr::with_tempfile(
       new = "excel_long",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        data_type <- "Quantified"
-        olink_platform <- "Target 48"
-
-        # df_synthetic_legacy
-        df_synthetic_legacy <- get_wide_synthetic_data(
-          olink_platform = olink_platform,
-          data_type = data_type,
-          n_panels = 3L,
-          n_assays = 45L,
-          n_samples = 99L,
-          show_dev_int_ctrl = FALSE,
-          show_int_ctrl = FALSE,
-          version = 0L
-        )
-
         # write in csv
         writexl::write_xlsx(x = df_synthetic_legacy$list_df_long$df_long,
                             path = excel_long,
@@ -528,33 +532,33 @@ test_that(
             df = df_synthetic_legacy$list_df_long$df_long
           )
         )
-
       }
     )
 
     ### T48 Ct ----
 
+    # file path
+    file_synthetic_legacy <- file_wide_synthetic_data(
+      olink_platform = "Target 48",
+      data_type = "Ct",
+      n_panels = 3L,
+      n_assays = 45L,
+      n_samples = 99L,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = 0L
+    )
+
+    skip_if_not(file.exists(file_synthetic_legacy))
+
+    # get wide synthetic data
+    df_synthetic_legacy <- readRDS(file = file_synthetic_legacy)
+
     withr::with_tempfile(
       new = "excel_long",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        data_type <- "Ct"
-        olink_platform <- "Target 48"
-
-        # df_synthetic_legacy
-        df_synthetic_legacy <- get_wide_synthetic_data(
-          olink_platform = olink_platform,
-          data_type = data_type,
-          n_panels = 3L,
-          n_assays = 45L,
-          n_samples = 99L,
-          show_dev_int_ctrl = FALSE,
-          show_int_ctrl = FALSE,
-          version = 0L
-        )
-
         # write in csv
         writexl::write_xlsx(x = df_synthetic_legacy$list_df_long$df_long,
                             path = excel_long,
@@ -598,33 +602,33 @@ test_that(
             df = df_synthetic_legacy$list_df_long$df_long
           )
         )
-
       }
     )
 
     ### T96 NPX ----
+
+    # file path
+    file_synthetic_legacy <- file_wide_synthetic_data(
+      olink_platform = "Target 96",
+      data_type = "NPX",
+      n_panels = 3L,
+      n_assays = 92L,
+      n_samples = 99L,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = 2L
+    )
+
+    skip_if_not(file.exists(file_synthetic_legacy))
+
+    # get wide synthetic data
+    df_synthetic_legacy <- readRDS(file = file_synthetic_legacy)
 
     withr::with_tempfile(
       new = "excel_long",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        data_type <- "NPX"
-        olink_platform <- "Target 96"
-
-        # df_synthetic_legacy
-        df_synthetic_legacy <- get_wide_synthetic_data(
-          olink_platform = olink_platform,
-          data_type = data_type,
-          n_panels = 3L,
-          n_assays = 92L,
-          n_samples = 99L,
-          show_dev_int_ctrl = FALSE,
-          show_int_ctrl = FALSE,
-          version = 2L
-        )
-
         # write in csv
         writexl::write_xlsx(x = df_synthetic_legacy$list_df_long$df_long,
                             path = excel_long,
@@ -674,27 +678,28 @@ test_that(
 
     ### T96 Ct ----
 
+    # file path
+    file_synthetic_legacy <- file_wide_synthetic_data(
+      olink_platform = "Target 96",
+      data_type = "Ct",
+      n_panels = 3L,
+      n_assays = 92L,
+      n_samples = 99L,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = 0L
+    )
+
+    skip_if_not(file.exists(file_synthetic_legacy))
+
+    # get wide synthetic data
+    df_synthetic_legacy <- readRDS(file = file_synthetic_legacy)
+
     withr::with_tempfile(
       new = "excel_long",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        data_type <- "Ct"
-        olink_platform <- "Target 96"
-
-        # df_synthetic_legacy
-        df_synthetic_legacy <- get_wide_synthetic_data(
-          olink_platform = olink_platform,
-          data_type = data_type,
-          n_panels = 3L,
-          n_assays = 92L,
-          n_samples = 99L,
-          show_dev_int_ctrl = FALSE,
-          show_int_ctrl = FALSE,
-          version = 0L
-        )
-
         # write in csv
         writexl::write_xlsx(x = df_synthetic_legacy$list_df_long$df_long,
                             path = excel_long,
@@ -738,10 +743,8 @@ test_that(
             df = df_synthetic_legacy$list_df_long$df_long
           )
         )
-
       }
     )
-
   }
 )
 
@@ -750,15 +753,24 @@ test_that(
   {
     skip_if_not_installed("writexl")
 
+    ## current version ----
+
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = "Target 48",
+      data_type = "NPX",
+      n_panels = 3L,
+      n_assays = 45L,
+      n_samples = 99L,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = 2L
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
     # get wide synthetic data
-    df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
-                                            data_type = "NPX",
-                                            n_panels = 3L,
-                                            n_assays = 45L,
-                                            n_samples = 99L,
-                                            show_dev_int_ctrl = TRUE,
-                                            show_int_ctrl = TRUE,
-                                            version = 2L)
+    df_synthetic <- readRDS(file = file_synthetic)
 
     ## csv semicolon ----
 
@@ -767,7 +779,6 @@ test_that(
       pattern = "test_wide",
       fileext = ".csv",
       code = {
-
         # write in csv
         write.table(x = df_synthetic$list_df_wide$df_wide,
                     file = csv_wide,
@@ -895,7 +906,6 @@ test_that(
             ),
           expected = df_synthetic$list_df_long$df_long
         )
-
       }
     )
 
@@ -906,7 +916,6 @@ test_that(
       pattern = "test_wide",
       fileext = ".csv",
       code = {
-
         # write in csv
         write.table(x = df_synthetic$list_df_wide$df_wide,
                     file = csv_wide,
@@ -1034,7 +1043,6 @@ test_that(
             ),
           expected = df_synthetic$list_df_long$df_long
         )
-
       }
     )
 
@@ -1045,7 +1053,6 @@ test_that(
       pattern = "test_wide",
       fileext = ".xlsx",
       code = {
-
         # write in csv
         writexl::write_xlsx(x = df_synthetic$list_df_wide$df_wide,
                             path = excel_wide,
@@ -1167,7 +1174,6 @@ test_that(
             ),
           expected = df_synthetic$list_df_long$df_long
         )
-
       }
     )
 
@@ -1175,27 +1181,28 @@ test_that(
 
     ### T48 NPX ----
 
+    # file path
+    file_synthetic_legacy <- file_wide_synthetic_data(
+      olink_platform = "Target 48",
+      data_type = "NPX",
+      n_panels = 3L,
+      n_assays = 45L,
+      n_samples = 99L,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = 2L
+    )
+
+    skip_if_not(file.exists(file_synthetic_legacy))
+
+    # get wide synthetic data
+    df_synthetic_legacy <- readRDS(file = file_synthetic_legacy)
+
     withr::with_tempfile(
       new = "excel_wide",
       pattern = "test_wide",
       fileext = ".xlsx",
       code = {
-
-        data_type <- "NPX"
-        olink_platform <- "Target 48"
-
-        # df_synthetic_legacy
-        df_synthetic_legacy <- get_wide_synthetic_data(
-          olink_platform = olink_platform,
-          data_type = data_type,
-          n_panels = 3L,
-          n_assays = 45L,
-          n_samples = 99L,
-          show_dev_int_ctrl = FALSE,
-          show_int_ctrl = FALSE,
-          version = 2L
-        )
-
         # write in csv
         writexl::write_xlsx(x = df_synthetic_legacy$list_df_wide$df_wide,
                             path = excel_wide,
@@ -1217,8 +1224,8 @@ test_that(
             quiet = FALSE,
             legacy = TRUE
           ),
-          regexp = paste0("Detected \"", data_type, "\" data from \"Olink ",
-                          olink_platform, "\" in wide format")
+          regexp = paste0("Detected \"NPX\" data from \"Olink Target 48\"",
+                          " in wide format")
         )
 
         # modify list_out_v1
@@ -1234,39 +1241,39 @@ test_that(
         expect_identical(
           object = list_out_v1,
           expected = list(
-            olink_platform = olink_platform,
+            olink_platform = "Target 48",
             long_format = FALSE,
-            data_type = data_type,
+            data_type = "NPX",
             df = df_synthetic_legacy$list_df_wide$df_wide
           )
         )
-
       }
     )
 
     ### T48 Quantified ----
 
+    # file path
+    file_synthetic_legacy <- file_wide_synthetic_data(
+      olink_platform = "Target 48",
+      data_type = "Quantified",
+      n_panels = 3L,
+      n_assays = 45L,
+      n_samples = 99L,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = 0L
+    )
+
+    skip_if_not(file.exists(file_synthetic_legacy))
+
+    # get wide synthetic data
+    df_synthetic_legacy <- readRDS(file = file_synthetic_legacy)
+
     withr::with_tempfile(
       new = "excel_wide",
       pattern = "test_wide",
       fileext = ".xlsx",
       code = {
-
-        data_type <- "Quantified"
-        olink_platform <- "Target 48"
-
-        # df_synthetic_legacy
-        df_synthetic_legacy <- get_wide_synthetic_data(
-          olink_platform = olink_platform,
-          data_type = data_type,
-          n_panels = 3L,
-          n_assays = 45L,
-          n_samples = 99L,
-          show_dev_int_ctrl = FALSE,
-          show_int_ctrl = FALSE,
-          version = 0L
-        )
-
         # write in csv
         writexl::write_xlsx(x = df_synthetic_legacy$list_df_wide$df_wide,
                             path = excel_wide,
@@ -1288,8 +1295,8 @@ test_that(
             quiet = FALSE,
             legacy = TRUE
           ),
-          regexp = paste0("Detected \"", data_type, "\" data from \"Olink ",
-                          olink_platform, "\" in wide format")
+          regexp = paste0("Detected \"Quantified\" data from \"Olink Target 48",
+                          "\" in wide format")
         )
 
         # modify list_out_v1
@@ -1305,39 +1312,39 @@ test_that(
         expect_identical(
           object = list_out_v1,
           expected = list(
-            olink_platform = olink_platform,
+            olink_platform = "Target 48",
             long_format = FALSE,
-            data_type = data_type,
+            data_type = "Quantified",
             df = df_synthetic_legacy$list_df_wide$df_wide
           )
         )
-
       }
     )
 
     ### T48 Ct ----
 
+    # file path
+    file_synthetic_legacy <- file_wide_synthetic_data(
+      olink_platform = "Target 48",
+      data_type = "Ct",
+      n_panels = 3L,
+      n_assays = 45L,
+      n_samples = 99L,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = 0L
+    )
+
+    skip_if_not(file.exists(file_synthetic_legacy))
+
+    # get wide synthetic data
+    df_synthetic_legacy <- readRDS(file = file_synthetic_legacy)
+
     withr::with_tempfile(
       new = "excel_wide",
       pattern = "test_wide",
       fileext = ".xlsx",
       code = {
-
-        data_type <- "Ct"
-        olink_platform <- "Target 48"
-
-        # df_synthetic_legacy
-        df_synthetic_legacy <- get_wide_synthetic_data(
-          olink_platform = olink_platform,
-          data_type = data_type,
-          n_panels = 3L,
-          n_assays = 45L,
-          n_samples = 99L,
-          show_dev_int_ctrl = FALSE,
-          show_int_ctrl = FALSE,
-          version = 0L
-        )
-
         # write in csv
         writexl::write_xlsx(x = df_synthetic_legacy$list_df_wide$df_wide,
                             path = excel_wide,
@@ -1359,8 +1366,8 @@ test_that(
             quiet = FALSE,
             legacy = TRUE
           ),
-          regexp = paste0("Detected \"", data_type, "\" data from \"Olink ",
-                          olink_platform, "\" in wide format")
+          regexp = paste0("Detected \"Ct\" data from \"Olink Target 48\" in",
+                          " wide format")
         )
 
         # modify list_out_v1
@@ -1376,39 +1383,39 @@ test_that(
         expect_identical(
           object = list_out_v1,
           expected = list(
-            olink_platform = olink_platform,
+            olink_platform = "Target 48",
             long_format = FALSE,
-            data_type = data_type,
+            data_type = "Ct",
             df = df_synthetic_legacy$list_df_wide$df_wide
           )
         )
-
       }
     )
 
     ### T96 NPX ----
 
+    # file path
+    file_synthetic_legacy <- file_wide_synthetic_data(
+      olink_platform = "Target 96",
+      data_type = "NPX",
+      n_panels = 3L,
+      n_assays = 92L,
+      n_samples = 99L,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = 2L
+    )
+
+    skip_if_not(file.exists(file_synthetic_legacy))
+
+    # get wide synthetic data
+    df_synthetic_legacy <- readRDS(file = file_synthetic_legacy)
+
     withr::with_tempfile(
       new = "excel_wide",
       pattern = "test_wide",
       fileext = ".xlsx",
       code = {
-
-        data_type <- "NPX"
-        olink_platform <- "Target 96"
-
-        # df_synthetic_legacy
-        df_synthetic_legacy <- get_wide_synthetic_data(
-          olink_platform = olink_platform,
-          data_type = data_type,
-          n_panels = 3L,
-          n_assays = 92L,
-          n_samples = 99L,
-          show_dev_int_ctrl = FALSE,
-          show_int_ctrl = FALSE,
-          version = 2L
-        )
-
         # write in csv
         writexl::write_xlsx(x = df_synthetic_legacy$list_df_wide$df_wide,
                             path = excel_wide,
@@ -1430,8 +1437,8 @@ test_that(
             quiet = FALSE,
             legacy = TRUE
           ),
-          regexp = paste0("Detected \"", data_type, "\" data from \"Olink ",
-                          olink_platform, "\" in wide format")
+          regexp = paste0("Detected \"NPX\" data from \"Olink Target 96\" in",
+                          " wide format")
         )
 
         # modify list_out_v1
@@ -1447,39 +1454,39 @@ test_that(
         expect_identical(
           object = list_out_v1,
           expected = list(
-            olink_platform = olink_platform,
+            olink_platform = "Target 96",
             long_format = FALSE,
-            data_type = data_type,
+            data_type = "NPX",
             df = df_synthetic_legacy$list_df_wide$df_wide
           )
         )
-
       }
     )
 
     ### T96 Ct ----
 
+    # file path
+    file_synthetic_legacy <- file_wide_synthetic_data(
+      olink_platform = "Target 96",
+      data_type = "Ct",
+      n_panels = 3L,
+      n_assays = 92L,
+      n_samples = 99L,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = 0L
+    )
+
+    skip_if_not(file.exists(file_synthetic_legacy))
+
+    # get wide synthetic data
+    df_synthetic_legacy <- readRDS(file = file_synthetic_legacy)
+
     withr::with_tempfile(
       new = "excel_wide",
       pattern = "test_wide",
       fileext = ".xlsx",
       code = {
-
-        data_type <- "Ct"
-        olink_platform <- "Target 96"
-
-        # df_synthetic_legacy
-        df_synthetic_legacy <- get_wide_synthetic_data(
-          olink_platform = olink_platform,
-          data_type = data_type,
-          n_panels = 3L,
-          n_assays = 92L,
-          n_samples = 99L,
-          show_dev_int_ctrl = FALSE,
-          show_int_ctrl = FALSE,
-          version = 0L
-        )
-
         # write in csv
         writexl::write_xlsx(x = df_synthetic_legacy$list_df_wide$df_wide,
                             path = excel_wide,
@@ -1501,8 +1508,8 @@ test_that(
             quiet = FALSE,
             legacy = TRUE
           ),
-          regexp = paste0("Detected \"", data_type, "\" data from \"Olink ",
-                          olink_platform, "\" in wide format")
+          regexp = paste0("Detected \"Ct\" data from \"Olink Target 96\" in",
+                          " wide format")
         )
 
         # modify list_out_v1
@@ -1518,16 +1525,14 @@ test_that(
         expect_identical(
           object = list_out_v1,
           expected = list(
-            olink_platform = olink_platform,
+            olink_platform = "Target 96",
             long_format = FALSE,
-            data_type = data_type,
+            data_type = "Ct",
             df = df_synthetic_legacy$list_df_wide$df_wide
           )
         )
-
       }
     )
-
   }
 )
 
@@ -1537,17 +1542,23 @@ test_that(
   "read_npx_format_read - works",
   {
     skip_if_not_installed("writexl")
-    skip_on_cran()
+
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = "Target 48",
+      data_type = "Quantified",
+      n_panels = 3L,
+      n_assays = 45L,
+      n_samples = 88L,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = 0L
+    )
+
+    skip_if_not(file.exists(file_synthetic))
 
     # get wide synthetic data
-    df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
-                                            data_type = "Quantified",
-                                            n_panels = 3L,
-                                            n_assays = 45L,
-                                            n_samples = 88L,
-                                            show_dev_int_ctrl = TRUE,
-                                            show_int_ctrl = TRUE,
-                                            version = 0L)
+    df_synthetic <- readRDS(file = file_synthetic)
 
     # top n rows
     top_n_row <- 3L
@@ -1559,7 +1570,6 @@ test_that(
       pattern = "test-olink-wide",
       fileext = ".xlsx",
       code = {
-
         # write wide df
         writexl::write_xlsx(
           x = df_synthetic$list_df_wide$df_wide,
@@ -1589,7 +1599,6 @@ test_that(
           object = dplyr::as_tibble(df_read_out$df),
           expected = df_synthetic$list_df_wide$df_wide
         )
-
       }
     )
 
@@ -1600,9 +1609,7 @@ test_that(
       pattern = "test-olink-wide",
       fileext = ".csv",
       code = {
-
         sep <- ";"
-
         # write wide df
         utils::write.table(x = df_synthetic$list_df_wide$df_wide,
                            file = olink_wide_format,
@@ -1636,7 +1643,6 @@ test_that(
           object = dplyr::as_tibble(df_read_out$df),
           expected = df_synthetic$list_df_wide$df_wide
         )
-
       }
     )
 
@@ -1647,9 +1653,7 @@ test_that(
       pattern = "test-olink-wide",
       fileext = ".txt",
       code = {
-
         sep <- ";"
-
         # write wide df
         utils::write.table(x = df_synthetic$list_df_wide$df_wide,
                            file = olink_wide_format,
@@ -1683,7 +1687,6 @@ test_that(
           object = dplyr::as_tibble(df_read_out$df),
           expected = df_synthetic$list_df_wide$df_wide
         )
-
       }
     )
 
@@ -1694,7 +1697,6 @@ test_that(
       pattern = "test-olink-long",
       fileext = ".xlsx",
       code = {
-
         # write wide df
         writexl::write_xlsx(
           x = df_synthetic$list_df_long$df_long,
@@ -1742,7 +1744,6 @@ test_that(
             ),
           expected = df_synthetic$list_df_long$df_long
         )
-
       }
     )
 
@@ -1753,9 +1754,7 @@ test_that(
       pattern = "test-olink-long",
       fileext = ".csv",
       code = {
-
         sep <- ";"
-
         # write wide df
         write.table(x = df_synthetic$list_df_long$df_long,
                     file = olink_long_format,
@@ -1808,7 +1807,6 @@ test_that(
             ),
           expected = df_synthetic$list_df_long$df_long
         )
-
       }
     )
 
@@ -1819,9 +1817,7 @@ test_that(
       pattern = "test-olink-long",
       fileext = ".txt",
       code = {
-
         sep <- ","
-
         # write wide df
         write.table(x = df_synthetic$list_df_long$df_long,
                     file = olink_long_format,
@@ -1874,36 +1870,37 @@ test_that(
             ),
           expected = df_synthetic$list_df_long$df_long
         )
-
       }
     )
-
   }
 )
 
 test_that(
   "read_npx_format_read - error - unknown file type",
   {
-    skip_on_cran()
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = "Target 48",
+      data_type = "Quantified",
+      n_panels = 3L,
+      n_assays = 45L,
+      n_samples = 88L,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = 0L
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
 
     withr::with_tempfile(
       new = "olink_wide_format",
       pattern = "test-olink-wide",
       fileext = ".parquet",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
-                                                data_type = "Quantified",
-                                                n_panels = 3L,
-                                                n_assays = 45L,
-                                                n_samples = 88L,
-                                                show_dev_int_ctrl = TRUE,
-                                                show_int_ctrl = TRUE,
-                                                version = 0L)
-
         sep <- NULL
-
         # write wide df
         arrow::write_parquet(
           x = df_synthetic$list_df_long$df_oid_long,
@@ -1920,7 +1917,6 @@ test_that(
           ),
           regexp = "Unable to recognize format from file extension of"
         )
-
       }
     )
   }
@@ -1931,24 +1927,28 @@ test_that(
 test_that(
   "read_npx_format_get_format - works - wide",
   {
-    skip_on_cran()
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = "Target 48",
+      data_type = "NPX",
+      n_panels = 3L,
+      n_assays = 45L,
+      n_samples = 88L,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = TRUE,
+      version = 1L
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
 
     withr::with_tempfile(
       new = "excel_wide",
       pattern = "test_excel_npx_wide",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
-                                                data_type = "NPX",
-                                                n_panels = 3L,
-                                                n_assays = 45L,
-                                                n_samples = 88L,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = TRUE,
-                                                version = 1L)
-
         # modify df wide
         df <- df_synthetic$list_df_wide$df_wide |>
           dplyr::slice_head(
@@ -2008,34 +2008,36 @@ test_that(
           object = df_npx_false,
           expected = df_npx_null
         )
-
       }
     )
-
   }
 )
 
 test_that(
   "read_npx_format_get_format - works - long",
   {
-    skip_on_cran()
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = "Target 48",
+      data_type = "NPX",
+      n_panels = 3L,
+      n_assays = 45L,
+      n_samples = 88L,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = TRUE,
+      version = 1L
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
 
     withr::with_tempfile(
       new = "excel_long",
       pattern = "test_excel_npx_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
-                                                data_type = "NPX",
-                                                n_panels = 3L,
-                                                n_assays = 45L,
-                                                n_samples = 88L,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = TRUE,
-                                                version = 1L)
-
         # modify df long
         df_exp_r1 <- df_synthetic$list_df_long$df_long |>
           dplyr::slice_head(
@@ -2112,27 +2114,30 @@ test_that(
           object = df_npx_true,
           expected = df_npx_null
         )
-
       }
     )
-
   }
 )
 
 test_that(
   "read_npx_format_get_format - warning - diff autodetection vs user input",
   {
-    skip_on_cran()
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = "Target 48",
+      data_type = "NPX",
+      n_panels = 3L,
+      n_assays = 45L,
+      n_samples = 88L,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = TRUE,
+      version = 1L
+    )
+
+    skip_if_not(file.exists(file_synthetic))
 
     # get wide synthetic data
-    df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
-                                            data_type = "NPX",
-                                            n_panels = 3L,
-                                            n_assays = 45L,
-                                            n_samples = 88L,
-                                            show_dev_int_ctrl = FALSE,
-                                            show_int_ctrl = TRUE,
-                                            version = 1L)
+    df_synthetic <- readRDS(file = file_synthetic)
 
     ## long input ----
 
@@ -2141,7 +2146,6 @@ test_that(
       pattern = "test_excel_long",
       fileext = ".xlsx",
       code = {
-
         # modify df long
         df_exp_r1 <- df_synthetic$list_df_long$df_long |>
           dplyr::slice_head(
@@ -2199,7 +2203,6 @@ test_that(
             dplyr::slice(2L) |>
             as.character()
         )
-
       }
     )
 
@@ -2210,7 +2213,6 @@ test_that(
       pattern = "test_excel_wide",
       fileext = ".xlsx",
       code = {
-
         # modify df wide
         df <- df_synthetic$list_df_wide$df_wide |>
           dplyr::slice_head(
@@ -2235,27 +2237,30 @@ test_that(
           ),
           regexp = "`NA` column names in long format file"
         )
-
       }
     )
-
   }
 )
 
 test_that(
   "read_npx_format_get_format - warning - diff autodetection vs user input V2",
   {
-    skip_on_cran()
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = "Target 48",
+      data_type = "NPX",
+      n_panels = 3L,
+      n_assays = 45L,
+      n_samples = 88L,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = TRUE,
+      version = 1L
+    )
+
+    skip_if_not(file.exists(file_synthetic))
 
     # get wide synthetic data
-    df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
-                                            data_type = "NPX",
-                                            n_panels = 3L,
-                                            n_assays = 45L,
-                                            n_samples = 88L,
-                                            show_dev_int_ctrl = FALSE,
-                                            show_int_ctrl = TRUE,
-                                            version = 1L)
+    df_synthetic <- readRDS(file = file_synthetic)
 
     ## long input ----
 
@@ -2264,7 +2269,6 @@ test_that(
       pattern = "test_excel_long",
       fileext = ".xlsx",
       code = {
-
         # modify df long
         df_exp_r1 <- df_synthetic$list_df_long$df_long |>
           dplyr::slice_head(
@@ -2327,7 +2331,6 @@ test_that(
                         ignore.case = TRUE)]
             })()
         )
-
       }
     )
 
@@ -2338,7 +2341,6 @@ test_that(
       pattern = "test_excel_wide",
       fileext = ".xlsx",
       code = {
-
         # modify df wide
         df <- df_synthetic$list_df_wide$df_wide |>
           dplyr::slice_head(
@@ -2389,27 +2391,30 @@ test_that(
             dplyr::slice(2L) |>
             as.character()
         )
-
       }
     )
-
   }
 )
 
 test_that(
   "read_npx_format_get_format - error - unable to detect format",
   {
-    skip_on_cran()
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = "Target 48",
+      data_type = "NPX",
+      n_panels = 3L,
+      n_assays = 45L,
+      n_samples = 88L,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = TRUE,
+      version = 1L
+    )
+
+    skip_if_not(file.exists(file_synthetic))
 
     # get wide synthetic data
-    df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
-                                            data_type = "NPX",
-                                            n_panels = 3L,
-                                            n_assays = 45L,
-                                            n_samples = 88L,
-                                            show_dev_int_ctrl = FALSE,
-                                            show_int_ctrl = TRUE,
-                                            version = 1L)
+    df_synthetic <- readRDS(file = file_synthetic)
 
     ## long input ----
 
@@ -2418,7 +2423,6 @@ test_that(
       pattern = "test_excel_long",
       fileext = ".xlsx",
       code = {
-
         # modify df long
         df_exp_r1 <- df_synthetic$list_df_long$df_long |>
           dplyr::slice_head(
@@ -2453,7 +2457,6 @@ test_that(
           ),
           regexp = "Unable to recognize the format of the input file"
         )
-
       }
     )
 
@@ -2464,7 +2467,6 @@ test_that(
       pattern = "test_excel_wide",
       fileext = ".xlsx",
       code = {
-
         # modify df wide
         df <- df_synthetic$list_df_wide$df_wide |>
           dplyr::slice_head(
@@ -2491,27 +2493,30 @@ test_that(
           ),
           regexp = "Unable to recognize the format of the input file"
         )
-
       }
     )
-
   }
 )
 
 test_that(
   "read_npx_format_get_format - error - long format with NA colnames",
   {
-    skip_on_cran()
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = "Target 48",
+      data_type = "NPX",
+      n_panels = 1L,
+      n_assays = 45L,
+      n_samples = 88L,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = 1L
+    )
+
+    skip_if_not(file.exists(file_synthetic))
 
     # get wide synthetic data
-    df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
-                                            data_type = "NPX",
-                                            n_panels = 1L,
-                                            n_assays = 45L,
-                                            n_samples = 88L,
-                                            show_dev_int_ctrl = FALSE,
-                                            show_int_ctrl = FALSE,
-                                            version = 1L)
+    df_synthetic <- readRDS(file = file_synthetic)
 
     ## long input ----
 
@@ -2520,7 +2525,6 @@ test_that(
       pattern = "test_excel_long",
       fileext = ".xlsx",
       code = {
-
         # modify df long
         df_exp_r2 <- df_synthetic$list_df_long$df_long |>
           dplyr::slice_head(
@@ -2560,7 +2564,6 @@ test_that(
           ),
           regexp = "`NA` column names in long format file"
         )
-
       }
     )
 
@@ -2571,7 +2574,6 @@ test_that(
       pattern = "test_excel_wide",
       fileext = ".xlsx",
       code = {
-
         # modify df wide
         df <- df_synthetic$list_df_wide$df_wide |>
           dplyr::slice_head(
@@ -2598,10 +2600,8 @@ test_that(
           ),
           regexp = "Unable to recognize the format of the input file"
         )
-
       }
     )
-
   }
 )
 
@@ -2610,26 +2610,30 @@ test_that(
 test_that(
   "read_npx_format_get_platform - works",
   {
-    skip_on_cran()
-
     ## Target 96 ----
+
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = "Target 96",
+      data_type = "NPX",
+      n_panels = 1L,
+      n_assays = 92L,
+      n_samples = 88L,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = 2L
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
 
     withr::with_tempfile(
       new = "excel_t96",
       pattern = "test_excel_t96",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 96",
-                                                data_type = "NPX",
-                                                n_panels = 1L,
-                                                n_assays = 92L,
-                                                n_samples = 88L,
-                                                show_dev_int_ctrl = TRUE,
-                                                show_int_ctrl = TRUE,
-                                                version = 2L)
-
         # modify df wide
         df <- df_synthetic$list_df_wide$df_wide |>
           dplyr::slice_head(
@@ -2677,28 +2681,33 @@ test_that(
           object = df_npx_t96,
           expected = df_npx_null
         )
-
       }
     )
 
     ## Target 48 ----
+
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = "Target 48",
+      data_type = "NPX",
+      n_panels = 1L,
+      n_assays = 45L,
+      n_samples = 88L,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = 1L
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
 
     withr::with_tempfile(
       new = "excel_t48",
       pattern = "test_excel_t48",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
-                                                data_type = "NPX",
-                                                n_panels = 1L,
-                                                n_assays = 45L,
-                                                n_samples = 88L,
-                                                show_dev_int_ctrl = TRUE,
-                                                show_int_ctrl = TRUE,
-                                                version = 1L)
-
         # modify df wide
         df <- df_synthetic$list_df_wide$df_wide |>
           dplyr::slice_head(
@@ -2743,28 +2752,33 @@ test_that(
           object = df_npx_t48,
           expected = df_npx_null
         )
-
       }
     )
 
     ## Flex v1 ----
+
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = "Flex",
+      data_type = "NPX",
+      n_panels = 1L,
+      n_assays = 20L,
+      n_samples = 88L,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = 1L
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
 
     withr::with_tempfile(
       new = "excel_flex",
       pattern = "test_excel_flex",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = "Flex",
-                                                data_type = "NPX",
-                                                n_panels = 1L,
-                                                n_assays = 20L,
-                                                n_samples = 88L,
-                                                show_dev_int_ctrl = TRUE,
-                                                show_int_ctrl = TRUE,
-                                                version = 1L)
-
         # modify df wide
         df <- df_synthetic$list_df_wide$df_wide |>
           dplyr::slice_head(
@@ -2812,28 +2826,33 @@ test_that(
           object = df_npx_flex,
           expected = df_npx_null
         )
-
       }
     )
 
     ## Flex v2 ----
+
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = "Flex",
+      data_type = "NPX",
+      n_panels = 1L,
+      n_assays = 20L,
+      n_samples = 88L,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = 1L
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
 
     withr::with_tempfile(
       new = "excel_flex",
       pattern = "test_excel_flex",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = "Flex",
-                                                data_type = "NPX",
-                                                n_panels = 1L,
-                                                n_assays = 20L,
-                                                n_samples = 88L,
-                                                show_dev_int_ctrl = TRUE,
-                                                show_int_ctrl = TRUE,
-                                                version = 1L)
-
         # modify df wide
         df <- df_synthetic$list_df_wide$df_wide |>
           dplyr::slice_head(
@@ -2890,34 +2909,36 @@ test_that(
           object = df_npx_flex,
           expected = df_npx_null
         )
-
       }
     )
-
   }
 )
 
 test_that(
   "read_npx_format_get_platform - error - no match",
   {
-    skip_on_cran()
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = "Target 96",
+      data_type = "NPX",
+      n_panels = 1L,
+      n_assays = 92L,
+      n_samples = 88L,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = 2L
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
 
     withr::with_tempfile(
       new = "excel_wide",
       pattern = "test_excel_wide",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 96",
-                                                data_type = "NPX",
-                                                n_panels = 1L,
-                                                n_assays = 92L,
-                                                n_samples = 88L,
-                                                show_dev_int_ctrl = TRUE,
-                                                show_int_ctrl = TRUE,
-                                                version = 2L)
-
         # modify df wide
         df <- df_synthetic$list_df_wide$df_wide |>
           dplyr::slice_head(
@@ -2948,34 +2969,36 @@ test_that(
           ),
           regexp = "Expected one of"
         )
-
       }
     )
-
   }
 )
 
 test_that(
   "read_npx_format_get_platform - error - multiple matches",
   {
-    skip_on_cran()
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = "Target 96",
+      data_type = "NPX",
+      n_panels = 1L,
+      n_assays = 92L,
+      n_samples = 88L,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = 2L
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
 
     withr::with_tempfile(
       new = "excel_wide",
       pattern = "test_excel_wide",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 96",
-                                                data_type = "NPX",
-                                                n_panels = 1L,
-                                                n_assays = 92L,
-                                                n_samples = 88L,
-                                                show_dev_int_ctrl = TRUE,
-                                                show_int_ctrl = TRUE,
-                                                version = 2L)
-
         # modify df wide
         df <- df_synthetic$list_df_wide$df_wide |>
           dplyr::slice_head(
@@ -3006,27 +3029,30 @@ test_that(
           ),
           regexp = "Too many matches from"
         )
-
       }
     )
-
   }
 )
 
 test_that(
   "read_npx_format_get_platform - warning",
   {
-    skip_on_cran()
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = "Target 96",
+      data_type = "NPX",
+      n_panels = 1L,
+      n_assays = 92L,
+      n_samples = 88L,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = 2L
+    )
+
+    skip_if_not(file.exists(file_synthetic))
 
     # get wide synthetic data
-    df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 96",
-                                            data_type = "NPX",
-                                            n_panels = 1L,
-                                            n_assays = 92L,
-                                            n_samples = 88L,
-                                            show_dev_int_ctrl = TRUE,
-                                            show_int_ctrl = TRUE,
-                                            version = 2L)
+    df_synthetic <- readRDS(file = file_synthetic)
 
     # modify df wide
     df <- df_synthetic$list_df_wide$df_wide |>
@@ -3041,7 +3067,6 @@ test_that(
       pattern = "test_excel_wide",
       fileext = ".xlsx",
       code = {
-
         # modify df
         df <- df |>
           dplyr::mutate(
@@ -3078,7 +3103,6 @@ test_that(
           object = df_npx,
           expected = "Target 96"
         )
-
       }
     )
 
@@ -3089,7 +3113,6 @@ test_that(
       pattern = "test_excel_wide",
       fileext = ".xlsx",
       code = {
-
         # modify df
         df <- df |>
           dplyr::mutate(
@@ -3126,7 +3149,6 @@ test_that(
           object = df_npx,
           expected = "Target 96"
         )
-
       }
     )
 
@@ -3137,7 +3159,6 @@ test_that(
       pattern = "test_excel_wide",
       fileext = ".xlsx",
       code = {
-
         # write a dummy file
         writeLines("foo", excel_wide)
 
@@ -3162,10 +3183,8 @@ test_that(
           object = df_npx,
           expected = "Target 48"
         )
-
       }
     )
-
   }
 )
 
@@ -3174,8 +3193,6 @@ test_that(
 test_that(
   "read_npx_format_get_quant - works",
   {
-    skip_on_cran()
-
     ## NPX ----
 
     withr::with_tempfile(
@@ -3183,7 +3200,6 @@ test_that(
       pattern = "test_excel_npx_wide",
       fileext = ".xslx",
       code = {
-
         # writing something to the file
         writeLines("foo", excel_wide)
 
@@ -3225,7 +3241,6 @@ test_that(
           object = df_npx_npx,
           expected = df_npx_null
         )
-
       }
     )
 
@@ -3236,7 +3251,6 @@ test_that(
       pattern = "test_excel_ct_wide",
       fileext = ".xslx",
       code = {
-
         # writing something to the file
         writeLines("foo", excel_wide)
 
@@ -3278,7 +3292,6 @@ test_that(
           object = df_npx_ct,
           expected = df_npx_null
         )
-
       }
     )
 
@@ -3289,7 +3302,6 @@ test_that(
       pattern = "test_excel_quantified_wide",
       fileext = ".xslx",
       code = {
-
         # writing something to the file
         writeLines("foo", excel_wide)
 
@@ -3331,24 +3343,19 @@ test_that(
           object = df_npx_quant,
           expected = df_npx_null
         )
-
       }
     )
-
   }
 )
 
 test_that(
   "read_npx_format_get_quant - warning - difference in detection",
   {
-    skip_on_cran()
-
     withr::with_tempfile(
       new = "excel_wide",
       pattern = "test_excel_wide",
       fileext = ".xlsx",
       code = {
-
         # writing something to the file
         writeLines("foo", excel_wide)
 
@@ -3373,24 +3380,19 @@ test_that(
           object = df_npx,
           expected = "Ct"
         )
-
       }
     )
-
   }
 )
 
 test_that(
   "read_npx_format_get_quant - warning - no quant method match",
   {
-    skip_on_cran()
-
     withr::with_tempfile(
       new = "excel_wide",
       pattern = "test_excel_wide",
       fileext = ".xlsx",
       code = {
-
         # writing something to the file
         writeLines("foo", excel_wide)
 
@@ -3425,24 +3427,19 @@ test_that(
           object = df_npx,
           expected = "NPX"
         )
-
       }
     )
-
   }
 )
 
 test_that(
   "read_npx_format_get_quant - warning - multiple quant method matches",
   {
-    skip_on_cran()
-
     withr::with_tempfile(
       new = "excel_wide",
       pattern = "test_excel_wide",
       fileext = ".xlsx",
       code = {
-
         # writing something to the file
         writeLines("foo", excel_wide)
 
@@ -3467,24 +3464,19 @@ test_that(
           object = df_npx,
           expected = "NPX"
         )
-
       }
     )
-
   }
 )
 
 test_that(
   "read_npx_format_get_quant - error - no quant method identified",
   {
-    skip_on_cran()
-
     withr::with_tempfile(
       new = "excel_wide",
       pattern = "test_excel_wide",
       fileext = ".xlsx",
       code = {
-
         # writing something to the file
         writeLines("foo", excel_wide)
 
@@ -3500,9 +3492,7 @@ test_that(
           ),
           regexp = "Too many occurrences of:"
         )
-
       }
     )
-
   }
 )

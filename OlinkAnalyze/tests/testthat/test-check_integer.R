@@ -3,7 +3,6 @@
 test_that(
   "check is integer works - TRUE",
   {
-
     expect_true(
       object = check_is_integer(int = 1L,
                                 error = FALSE)
@@ -47,14 +46,12 @@ test_that(
                                         2L),
                                 error = TRUE)
     )
-
   }
 )
 
 test_that(
   "check is integer works - FALSE",
   {
-
     expect_false(
       object = check_is_integer(int = "I_Shall_Pass",
                                 error = FALSE)
@@ -79,14 +76,12 @@ test_that(
       object = check_is_integer(int = 1,
                                 error = FALSE)
     )
-
   }
 )
 
 test_that(
   "check is integer works - ERROR",
   {
-
     expect_error(
       object = check_is_integer(int = "I_Shall_Pass",
                                 error = TRUE),
@@ -131,7 +126,6 @@ test_that(
                     x = "must be an integer vector!",
                     fixed = TRUE)
     )
-
   }
 )
 
@@ -171,7 +165,6 @@ test_that(
                                                NULL),
                                        error = FALSE)
     )
-
   }
 )
 
@@ -214,7 +207,6 @@ test_that(
       object = check_is_scalar_integer(int = TRUE,
                                        error = FALSE)
     )
-
   }
 )
 
@@ -285,6 +277,5 @@ test_that(
                     x = "must be a scalar integer!",
                     fixed = TRUE)
     )
-
   }
 )

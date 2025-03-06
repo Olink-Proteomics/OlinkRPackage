@@ -3,10 +3,27 @@
 test_that(
   "read_npx_legacy_help - works",
   {
-    skip_on_cran()
-    skip_if_not_installed(pkg = c("writexl", "readxl"))
+    skip_if_not_installed(pkg = "readxl")
+    skip_if_not_installed(pkg = "writexl")
 
     # Target 48 NPX ----
+
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = "Target 48",
+      data_type = "NPX",
+      n_panels = 1L,
+      n_assays = 45L,
+      n_samples = 88L,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = 1L
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
 
     withr::with_tempfile(
       new = "file_wide",
@@ -17,16 +34,6 @@ test_that(
         # files
         file_wide_csv <- file_wide[1L]
         file_wide_xlsx <- file_wide[2L]
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
-                                                data_type = "NPX",
-                                                n_panels = 1L,
-                                                n_assays = 45L,
-                                                n_samples = 88L,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = FALSE,
-                                                version = 1L)
 
         # write in csv
         write.table(x = df_synthetic$list_df_wide$df_wide,
@@ -144,6 +151,23 @@ test_that(
 
     # Target 48 Quantified ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = "Target 48",
+      data_type = "Quantified",
+      n_panels = 1L,
+      n_assays = 45L,
+      n_samples = 88L,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = 0L
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide",
       pattern = "test_long",
@@ -153,16 +177,6 @@ test_that(
         # files
         file_wide_csv <- file_wide[1L]
         file_wide_xlsx <- file_wide[2L]
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
-                                                data_type = "Quantified",
-                                                n_panels = 1L,
-                                                n_assays = 45L,
-                                                n_samples = 88L,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = FALSE,
-                                                version = 0L)
 
         # write in csv
         write.table(x = df_synthetic$list_df_wide$df_wide,
@@ -280,6 +294,23 @@ test_that(
 
     # Target 96 NPX v1 ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = "Target 96",
+      data_type = "NPX",
+      n_panels = 1L,
+      n_assays = 92L,
+      n_samples = 88L,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = 1L
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide",
       pattern = "test_long",
@@ -289,16 +320,6 @@ test_that(
         # files
         file_wide_csv <- file_wide[1L]
         file_wide_xlsx <- file_wide[2L]
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 96",
-                                                data_type = "NPX",
-                                                n_panels = 1L,
-                                                n_assays = 92L,
-                                                n_samples = 88L,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = FALSE,
-                                                version = 1L)
 
         # write in csv
         write.table(x = df_synthetic$list_df_wide$df_wide,
@@ -416,6 +437,23 @@ test_that(
 
     # Target 96 NPX v2 ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = "Target 96",
+      data_type = "NPX",
+      n_panels = 1L,
+      n_assays = 92L,
+      n_samples = 88L,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = 2L
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide",
       pattern = "test_long",
@@ -425,16 +463,6 @@ test_that(
         # files
         file_wide_csv <- file_wide[1L]
         file_wide_xlsx <- file_wide[2L]
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 96",
-                                                data_type = "NPX",
-                                                n_panels = 1L,
-                                                n_assays = 92L,
-                                                n_samples = 88L,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = FALSE,
-                                                version = 2L)
 
         # write in csv
         write.table(x = df_synthetic$list_df_wide$df_wide,
@@ -555,24 +583,28 @@ test_that(
 test_that(
   "read_npx_legacy_help - error - long df",
   {
-    skip_on_cran()
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = "Target 48",
+      data_type = "NPX",
+      n_panels = 1L,
+      n_assays = 45L,
+      n_samples = 88L,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = 2L
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
 
     withr::with_tempfile(
       new = "csv_long",
       pattern = "test_long",
       fileext = ".csv",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
-                                                data_type = "NPX",
-                                                n_panels = 1L,
-                                                n_assays = 45L,
-                                                n_samples = 88L,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = FALSE,
-                                                version = 2L)
-
         # write in csv
         write.table(x = df_synthetic$list_df_long$df_long,
                     file = csv_long,
@@ -598,7 +630,6 @@ test_that(
           ),
           regexp = "accepts only wide format files!"
         )
-
       }
     )
   }
@@ -607,24 +638,28 @@ test_that(
 test_that(
   "read_npx_legacy_help - error - not T48, T96, Flex",
   {
-    skip_on_cran()
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = "Focus",
+      data_type = "NPX",
+      n_panels = 1L,
+      n_assays = 33L,
+      n_samples = 88L,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = 0L
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
 
     withr::with_tempfile(
       new = "csv_long",
       pattern = "test_long",
       fileext = ".csv",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = "Focus",
-                                                data_type = "NPX",
-                                                n_panels = 1L,
-                                                n_assays = 33L,
-                                                n_samples = 88L,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = FALSE,
-                                                version = 0L)
-
         # write in csv
         write.table(x = df_synthetic$list_df_wide$df_wide,
                     file = csv_long,
@@ -653,7 +688,6 @@ test_that(
           ),
           regexp = "Unable to recognize the Olink platform from the input file"
         )
-
       }
     )
   }
@@ -662,24 +696,28 @@ test_that(
 test_that(
   "read_npx_legacy_help - error - not NPX or Quantified",
   {
-    skip_on_cran()
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = "Target 48",
+      data_type = "Ct",
+      n_panels = 1L,
+      n_assays = 45L,
+      n_samples = 88L,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = 0L
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
 
     withr::with_tempfile(
       new = "csv_long",
       pattern = "test_long",
       fileext = ".csv",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
-                                                data_type = "Ct",
-                                                n_panels = 1L,
-                                                n_assays = 45L,
-                                                n_samples = 88L,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = FALSE,
-                                                version = 0L)
-
         # write in csv
         write.table(x = df_synthetic$list_df_wide$df_wide,
                     file = csv_long,
@@ -705,7 +743,6 @@ test_that(
           ),
           regexp = "accepts only \"NPX\" and \"Quantified\" data ran on"
         )
-
       }
     )
   }
@@ -716,7 +753,8 @@ test_that(
 test_that(
   "read_npx_legacy - works - T48 - single panel",
   {
-    skip_if_not_installed(pkg = c("writexl", "readxl"))
+    skip_if_not_installed(pkg = "readxl")
+    skip_if_not_installed(pkg = "writexl")
 
     olink_platform <- "Target 48"
     n_panels <- 1L
@@ -729,22 +767,28 @@ test_that(
 
     ## Target 48 NPX, no dev int ctrl, no int ctrl, 1 plate, v1 ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = FALSE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -790,22 +834,28 @@ test_that(
 
     ## Target 48 NPX, no dev int ctrl, w int ctrl, 1 plate, v1 ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = TRUE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = TRUE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -851,22 +901,28 @@ test_that(
 
     ## Target 48 NPX, w dev int ctrl, w int ctrl, 1 plate, v1 ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = TRUE,
-                                                show_int_ctrl = TRUE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -914,22 +970,28 @@ test_that(
 
     ## Target 48 NPX, no dev int ctrl, no int ctrl, 2 plates, v1 ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext =  ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = FALSE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -974,22 +1036,28 @@ test_that(
 
     ## Target 48 NPX, no dev int ctrl, w int ctrl, 2 plates, v1 ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = TRUE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = TRUE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -1034,22 +1102,28 @@ test_that(
 
     ## Target 48 NPX, w dev int ctrl, w int ctrl, 2 plates, v1 ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = TRUE,
-                                                show_int_ctrl = TRUE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -1099,22 +1173,28 @@ test_that(
 
     ## Target 48 Quantified, no dev int ctrl, no int ctrl, 1 plate ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = FALSE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -1159,22 +1239,28 @@ test_that(
 
     ## Target 48 Quantified, no dev int ctrl, w int ctrl, 1 plate ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = TRUE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = TRUE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -1219,22 +1305,28 @@ test_that(
 
     ## Target 48 Quantified, w dev int ctrl, w int ctrl, 1 plate ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = TRUE,
-                                                show_int_ctrl = TRUE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -1282,22 +1374,28 @@ test_that(
 
     ## Target 48 Quantified, no dev int ctrl, no int ctrl, 2 plates ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = FALSE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -1342,22 +1440,28 @@ test_that(
 
     ## Target 48 Quantified, no dev int ctrl, w int ctrl, 2 plates ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = TRUE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = TRUE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -1402,22 +1506,28 @@ test_that(
 
     ## Target 48 Quantified, w dev int ctrl, w int ctrl, 2 plates ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = TRUE,
-                                                show_int_ctrl = TRUE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -1465,7 +1575,8 @@ test_that(
 test_that(
   "read_npx_legacy - works - T48 - multiple panels",
   {
-    skip_if_not_installed(pkg = c("writexl", "readxl"))
+    skip_if_not_installed(pkg = "readxl")
+    skip_if_not_installed(pkg = "writexl")
 
     olink_platform <- "Target 48"
     n_panels <- 3L
@@ -1478,22 +1589,28 @@ test_that(
 
     ## Target 48 NPX, no dev int ctrl, no int ctrl, 1 plate, v1 ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = FALSE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -1539,22 +1656,28 @@ test_that(
 
     ## Target 48 NPX, no dev int ctrl, w int ctrl, 1 plate, v1 ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = TRUE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = TRUE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -1600,22 +1723,28 @@ test_that(
 
     ## Target 48 NPX, w dev int ctrl, w int ctrl, 1 plate, v1 ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = TRUE,
-                                                show_int_ctrl = TRUE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -1663,22 +1792,28 @@ test_that(
 
     ## Target 48 NPX, no dev int ctrl, no int ctrl, 2 plates, v1 ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext =  ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = FALSE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -1723,22 +1858,28 @@ test_that(
 
     ## Target 48 NPX, no dev int ctrl, w int ctrl, 2 plates, v1 ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = TRUE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = TRUE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -1783,22 +1924,28 @@ test_that(
 
     ## Target 48 NPX, w dev int ctrl, w int ctrl, 2 plates, v1 ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = TRUE,
-                                                show_int_ctrl = TRUE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -1848,22 +1995,28 @@ test_that(
 
     ## Target 48 Quantified, no dev int ctrl, no int ctrl, 1 plate ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = FALSE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -1908,23 +2061,28 @@ test_that(
 
     ## Target 48 Quantified, no dev int ctrl, w int ctrl, 1 plate ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = TRUE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
-      code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = TRUE,
-                                                version = version)
-
-        # write in excel
+      code = {# write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
         ) |>
@@ -1968,22 +2126,28 @@ test_that(
 
     ## Target 48 Quantified, w dev int ctrl, w int ctrl, 1 plate ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = TRUE,
-                                                show_int_ctrl = TRUE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -2031,22 +2195,28 @@ test_that(
 
     ## Target 48 Quantified, no dev int ctrl, no int ctrl, 2 plates ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = FALSE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -2091,22 +2261,28 @@ test_that(
 
     ## Target 48 Quantified, no dev int ctrl, w int ctrl, 2 plates ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = TRUE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = TRUE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -2151,22 +2327,28 @@ test_that(
 
     ## Target 48 Quantified, w dev int ctrl, w int ctrl, 2 plates ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = TRUE,
-                                                show_int_ctrl = TRUE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -2214,7 +2396,8 @@ test_that(
 test_that(
   "read_npx_legacy - works - T96 - single panel",
   {
-    skip_if_not_installed(pkg = c("writexl", "readxl"))
+    skip_if_not_installed(pkg = "readxl")
+    skip_if_not_installed(pkg = "writexl")
 
     olink_platform <- "Target 96"
     data_type <- "NPX"
@@ -2227,22 +2410,28 @@ test_that(
 
     ## Target 96 NPX, no dev int ctrl, no int ctrl, 1 plate, v1 ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = FALSE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -2288,22 +2477,28 @@ test_that(
 
     ## Target 96 NPX, no dev int ctrl, w int ctrl, 1 plate, v1 ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = TRUE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = TRUE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -2349,22 +2544,28 @@ test_that(
 
     ## Target 96 NPX, w dev int ctrl, w int ctrl, 1 plate, v1 ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = TRUE,
-                                                show_int_ctrl = TRUE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -2412,22 +2613,28 @@ test_that(
 
     ## Target 96 NPX, no dev int ctrl, no int ctrl, 2 plates, v1 ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext =  ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = FALSE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -2472,22 +2679,28 @@ test_that(
 
     ## Target 96 NPX, no dev int ctrl, w int ctrl, 2 plates, v1 ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = TRUE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = TRUE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -2532,22 +2745,28 @@ test_that(
 
     ## Target 96 NPX, w dev int ctrl, w int ctrl, 2 plates, v1 ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = TRUE,
-                                                show_int_ctrl = TRUE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -2596,22 +2815,28 @@ test_that(
 
     ## Target 96 NPX, no dev int ctrl, no int ctrl, 1 plate ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = FALSE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -2656,22 +2881,28 @@ test_that(
 
     ## Target 96 NPX, no dev int ctrl, w int ctrl, 1 plate ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = TRUE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = TRUE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -2716,23 +2947,28 @@ test_that(
 
     ## Target 96 NPX, w dev int ctrl, w int ctrl, 1 plate ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
-      code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = TRUE,
-                                                show_int_ctrl = TRUE,
-                                                version = version)
-
-        # write in excel
+      code = {# write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
         ) |>
@@ -2779,22 +3015,28 @@ test_that(
 
     ## Target 96 NPX, no dev int ctrl, no int ctrl, 2 plates ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = FALSE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -2839,22 +3081,28 @@ test_that(
 
     ## Target 96 NPX, no dev int ctrl, w int ctrl, 2 plates ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = TRUE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = TRUE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -2899,22 +3147,28 @@ test_that(
 
     ## Target 96 NPX, w dev int ctrl, w int ctrl, 2 plates ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = TRUE,
-                                                show_int_ctrl = TRUE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -2956,14 +3210,14 @@ test_that(
         )
       }
     )
-
   }
 )
 
 test_that(
   "read_npx_legacy - works - T96 - multiple panels",
   {
-    skip_if_not_installed(pkg = c("writexl", "readxl"))
+    skip_if_not_installed(pkg = "readxl")
+    skip_if_not_installed(pkg = "writexl")
 
     olink_platform <- "Target 96"
     data_type <- "NPX"
@@ -2976,22 +3230,28 @@ test_that(
 
     ## Target 96 NPX, no dev int ctrl, no int ctrl, 1 plate, v1 ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = FALSE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -3037,22 +3297,28 @@ test_that(
 
     ## Target 96 NPX, no dev int ctrl, w int ctrl, 1 plate, v1 ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = TRUE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = TRUE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -3098,22 +3364,28 @@ test_that(
 
     ## Target 96 NPX, w dev int ctrl, w int ctrl, 1 plate, v1 ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = TRUE,
-                                                show_int_ctrl = TRUE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -3161,22 +3433,28 @@ test_that(
 
     ## Target 96 NPX, no dev int ctrl, no int ctrl, 2 plates, v1 ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext =  ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = FALSE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -3221,22 +3499,28 @@ test_that(
 
     ## Target 96 NPX, no dev int ctrl, w int ctrl, 2 plates, v1 ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = TRUE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = TRUE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -3281,22 +3565,28 @@ test_that(
 
     ## Target 96 NPX, w dev int ctrl, w int ctrl, 2 plates, v1 ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = TRUE,
-                                                show_int_ctrl = TRUE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -3345,22 +3635,28 @@ test_that(
 
     ## Target 96 NPX, no dev int ctrl, no int ctrl, 1 plate ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = FALSE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -3405,22 +3701,28 @@ test_that(
 
     ## Target 96 NPX, no dev int ctrl, w int ctrl, 1 plate ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = TRUE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = TRUE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -3465,22 +3767,28 @@ test_that(
 
     ## Target 96 NPX, w dev int ctrl, w int ctrl, 1 plate ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = TRUE,
-                                                show_int_ctrl = TRUE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -3528,22 +3836,28 @@ test_that(
 
     ## Target 96 NPX, no dev int ctrl, no int ctrl, 2 plates ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = FALSE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -3588,22 +3902,28 @@ test_that(
 
     ## Target 96 NPX, no dev int ctrl, w int ctrl, 2 plates ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = TRUE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = TRUE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -3648,22 +3968,28 @@ test_that(
 
     ## Target 96 NPX, w dev int ctrl, w int ctrl, 2 plates ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = version
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = olink_platform,
-                                                data_type = data_type,
-                                                n_panels = n_panels,
-                                                n_assays = n_assays,
-                                                n_samples = n_samples,
-                                                show_dev_int_ctrl = TRUE,
-                                                show_int_ctrl = TRUE,
-                                                version = version)
-
         # write in excel
         olink_wide_order_cols(
           list_df_wide = df_synthetic$list_df_wide
@@ -3712,26 +4038,33 @@ test_that(
 test_that(
   "read_npx_legacy - error - wrong order of cols",
   {
-    skip_if_not_installed(pkg = c("writexl", "readxl"))
+    skip_if_not_installed(pkg = "readxl")
+    skip_if_not_installed(pkg = "writexl")
 
     ## Target 48 NPX, w dev int ctrl, w int ctrl, 1 plate, v1 ----
+
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = "Target 48",
+      data_type = "NPX",
+      n_panels = 3L,
+      n_assays = 45L,
+      n_samples = 88L,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = 1L
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
 
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
-                                                data_type = "NPX",
-                                                n_panels = 3L,
-                                                n_assays = 45L,
-                                                n_samples = 88L,
-                                                show_dev_int_ctrl = TRUE,
-                                                show_int_ctrl = TRUE,
-                                                version = 1L)
-
         # write in excel
         writexl::write_xlsx(
           x = df_synthetic$list_df_wide$df_wide,
@@ -3759,22 +4092,28 @@ test_that(
 
     ## Target 48 NPX, no dev int ctrl, w int ctrl, 1 plate, v1 ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = "Target 48",
+      data_type = "NPX",
+      n_panels = 3L,
+      n_assays = 45L,
+      n_samples = 88L,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = TRUE,
+      version = 1L
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
-                                                data_type = "NPX",
-                                                n_panels = 3L,
-                                                n_assays = 45L,
-                                                n_samples = 88L,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = TRUE,
-                                                version = 1L)
-
         # write in excel
         writexl::write_xlsx(
           x = df_synthetic$list_df_wide$df_wide,
@@ -3805,24 +4144,31 @@ test_that(
 test_that(
   "read_npx_legacy - error - dev int ctrl but no int ctrl",
   {
-    skip_if_not_installed(pkg = c("writexl", "readxl"))
+    skip_if_not_installed(pkg = "readxl")
+    skip_if_not_installed(pkg = "writexl")
+
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = "Target 48",
+      data_type = "NPX",
+      n_panels = 1L,
+      n_assays = 45L,
+      n_samples = 88L,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = FALSE,
+      version = 1L
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
 
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
-                                                data_type = "NPX",
-                                                n_panels = 1L,
-                                                n_assays = 45L,
-                                                n_samples = 88L,
-                                                show_dev_int_ctrl = TRUE,
-                                                show_int_ctrl = FALSE,
-                                                version = 1L)
-
         # write in excel
         writexl::write_xlsx(
           x = df_synthetic$list_df_wide$df_wide,
@@ -3853,26 +4199,33 @@ test_that(
 test_that(
   "read_npx_legacy - error - bottom matrix unsupported version",
   {
-    skip_if_not_installed(pkg = c("writexl", "readxl"))
+    skip_if_not_installed(pkg = "readxl")
+    skip_if_not_installed(pkg = "writexl")
 
     # T48 NPX v2 ----
+
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = "Target 48",
+      data_type = "NPX",
+      n_panels = 1L,
+      n_assays = 45L,
+      n_samples = 88L,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = 2L
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
 
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 48",
-                                                data_type = "NPX",
-                                                n_panels = 1L,
-                                                n_assays = 45L,
-                                                n_samples = 88L,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = FALSE,
-                                                version = 2L)
-
         # write in excel
         writexl::write_xlsx(
           x = df_synthetic$list_df_wide$df_wide,
@@ -3900,22 +4253,28 @@ test_that(
 
     # T96 NPX v3 ----
 
+    # file path
+    file_synthetic <- file_wide_synthetic_data(
+      olink_platform = "Target 96",
+      data_type = "NPX",
+      n_panels = 1L,
+      n_assays = 92L,
+      n_samples = 88L,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = FALSE,
+      version = 3L
+    )
+
+    skip_if_not(file.exists(file_synthetic))
+
+    # get wide synthetic data
+    df_synthetic <- readRDS(file = file_synthetic)
+
     withr::with_tempfile(
       new = "file_wide_xlsx",
       pattern = "test_long",
       fileext = ".xlsx",
       code = {
-
-        # get wide synthetic data
-        df_synthetic <- get_wide_synthetic_data(olink_platform = "Target 96",
-                                                data_type = "NPX",
-                                                n_panels = 1L,
-                                                n_assays = 92L,
-                                                n_samples = 88L,
-                                                show_dev_int_ctrl = FALSE,
-                                                show_int_ctrl = FALSE,
-                                                version = 3L)
-
         # write in excel
         writexl::write_xlsx(
           x = df_synthetic$list_df_wide$df_wide,

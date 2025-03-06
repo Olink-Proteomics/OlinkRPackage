@@ -2,7 +2,6 @@
 test_that(
   "read_npx_parquet - error - random non-parquet file",
   {
-
     withr::with_tempfile(
       new = "txtfile_p",
       pattern = "txt-file_as_parquet-file",
@@ -20,10 +19,8 @@ test_that(
           object = read_npx_parquet(file = txtfile_p),
           regexp = "Unable to read parquet file: "
         )
-
       }
     )
-
   }
 )
 
@@ -32,13 +29,11 @@ test_that(
 test_that(
   "read_npx_parquet - error - corrupt parquet file",
   {
-
     withr::with_tempfile(
       new = "txtfile_pcorrupt",
       pattern = "txt-file_as_corrupt-parquet-file",
       fileext = ".parquet",
       code = {
-
         # write some text in a txt file
         writeLines("foo", txtfile_pcorrupt)
 
@@ -50,10 +45,8 @@ test_that(
           object = read_npx_parquet(file = txtfile_pcorrupt),
           regexp = "Unable to read parquet file: "
         )
-
       }
     )
-
   }
 )
 
@@ -69,7 +62,6 @@ test_that(
       pattern = "parquet-file_alt-product-type",
       fileext = ".parquet",
       code = {
-
         # random data frame
         df <- dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -95,7 +87,6 @@ test_that(
           object = read_npx_parquet(file = pfile_metadata),
           regexp = "Missing required fields in metadata: "
         )
-
       }
     )
 
@@ -106,7 +97,6 @@ test_that(
       pattern = "parquet-file_alt-product-type",
       fileext = ".parquet",
       code = {
-
         # random data frame
         df <- dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -139,10 +129,8 @@ test_that(
           object = read_npx_parquet(file = pfile_metadata),
           regexp = "Missing required field in metadata: "
         )
-
       }
     )
-
   }
 )
 
@@ -151,13 +139,11 @@ test_that(
 test_that(
   "read_npx_parquet - error - Product field is incorrect",
   {
-
     withr::with_tempfile(
       new = "pfile_product",
       pattern = "parquet-file_alt-product-type",
       fileext = ".parquet",
       code = {
-
         # random data frame
         df <- dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -192,10 +178,8 @@ test_that(
           object = read_npx_parquet(file = pfile_product),
           regexp = "Unsupported product"
         )
-
       }
     )
-
   }
 )
 
@@ -209,7 +193,6 @@ test_that(
       pattern = "parquet-file_alt-product-type",
       fileext = ".parquet",
       code = {
-
         # random data frame
         df <- dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -242,10 +225,8 @@ test_that(
           object = read_npx_parquet(file = pfile_datafiletype),
           regexp = "Unsupported file"
         )
-
       }
     )
-
   }
 )
 
@@ -277,7 +258,6 @@ test_that(
       pattern = "parquet-file_test",
       fileext = ".parquet",
       code = {
-
         # modify metadata
         df$metadata[olink_parquet_spec$parquet_metadata[2L]] <- "NPX File"
 
@@ -303,7 +283,6 @@ test_that(
                                     out_df = "tibble") |>
             inherits(what = "tbl_df")
         )
-
       }
     )
 
@@ -314,7 +293,6 @@ test_that(
       pattern = "parquet-file_test",
       fileext = ".parquet",
       code = {
-
         # modify metadata ----
         df$metadata[olink_parquet_spec$parquet_metadata[2L]] <-
           "Extended NPX File"
@@ -341,7 +319,6 @@ test_that(
                                     out_df = "tibble") |>
             inherits(what = "tbl_df")
         )
-
       }
     )
 
@@ -352,7 +329,6 @@ test_that(
       pattern = "parquet-file_test",
       fileext = ".parquet",
       code = {
-
         # modify metadata ----
         df$metadata[olink_parquet_spec$parquet_metadata[2L]] <-
           "CLI Data Export File"
@@ -379,7 +355,6 @@ test_that(
                                     out_df = "tibble") |>
             inherits(what = "tbl_df")
         )
-
       }
     )
 
@@ -390,7 +365,6 @@ test_that(
       pattern = "parquet-file_test",
       fileext = ".parquet",
       code = {
-
         # modify metadata ----
         df$metadata[olink_parquet_spec$parquet_metadata[2L]] <-
           "Internal CLI Data Export File"
@@ -417,7 +391,6 @@ test_that(
                                     out_df = "tibble") |>
             inherits(what = "tbl_df")
         )
-
       }
     )
 
@@ -428,7 +401,6 @@ test_that(
       pattern = "parquet-file_test",
       fileext = ".parquet",
       code = {
-
         # modify metadata ----
         df$metadata[olink_parquet_spec$parquet_metadata[2L]] <-
           "R Package Export File"
@@ -455,10 +427,8 @@ test_that(
                                     out_df = "tibble") |>
             inherits(what = "tbl_df")
         )
-
       }
     )
-
   }
 )
 
@@ -490,7 +460,6 @@ test_that(
       pattern = "parquet-file_test",
       fileext = ".parquet",
       code = {
-
         # modify metadata
         df$metadata[olink_parquet_spec$parquet_metadata[1L]] <- "ExploreHT"
 
@@ -516,7 +485,6 @@ test_that(
                                     out_df = "tibble") |>
             inherits(what = "tbl_df")
         )
-
       }
     )
 
@@ -527,7 +495,6 @@ test_that(
       pattern = "parquet-file_test",
       fileext = ".parquet",
       code = {
-
         # modify metadata
         df$metadata[olink_parquet_spec$parquet_metadata[1L]] <- "Explore3072"
 
@@ -553,7 +520,6 @@ test_that(
                                     out_df = "tibble") |>
             inherits(what = "tbl_df")
         )
-
       }
     )
 
@@ -564,7 +530,6 @@ test_that(
       pattern = "parquet-file_test",
       fileext = ".parquet",
       code = {
-
         # modify metadata
         df$metadata[olink_parquet_spec$parquet_metadata[1L]] <- "Reveal"
 
@@ -590,10 +555,8 @@ test_that(
                                     out_df = "tibble") |>
             inherits(what = "tbl_df")
         )
-
       }
     )
-
   }
 )
 
@@ -606,7 +569,6 @@ test_that(
       pattern = "parquet-file_test",
       fileext = ".parquet",
       code = {
-
         # random data frame
         df <- dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -651,10 +613,8 @@ test_that(
 
         expect_identical(object = dplyr::as_tibble(df_arrow),
                          expected = dplyr::as_tibble(df))
-
       }
     )
-
   }
 )
 
@@ -667,7 +627,6 @@ test_that(
       pattern = "parquet-file_ruo",
       fileext = ".parquet",
       code = {
-
         # random data frame
         df <- dplyr::tibble(
           "SampleID" = c(1, 2.2, 3.14),
@@ -704,9 +663,7 @@ test_that(
           object = read_npx_parquet(file = pfile_ruo),
           regexp = "I am for reasearch only!"
         )
-
       }
     )
-
   }
 )

@@ -261,7 +261,6 @@ test_that(
       all() |>
       expect_true()
     rm(bplat_dt_qm)
-
   }
 )
 
@@ -630,7 +629,6 @@ test_that(
       all() |>
       expect_true()
     rm(plat_dt_qm)
-
   }
 )
 
@@ -1036,7 +1034,6 @@ test_that(
       all() |>
       expect_true()
     rm(bplat_plat_qm)
-
   }
 )
 
@@ -1525,7 +1522,6 @@ test_that(
       all() |>
       expect_true()
     rm(bplat_plat_dt)
-
   }
 )
 
