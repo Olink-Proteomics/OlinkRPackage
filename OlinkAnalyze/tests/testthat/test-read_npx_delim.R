@@ -134,8 +134,8 @@ test_that(
 test_that(
   "read_npx_delim - works - wide format - output df matches input df",
   {
-    # file path
-    file_synthetic <- file_wide_synthetic_data(
+    # get synthetic data, or skip if not available
+    df_rand <- get_wide_synthetic_data(
       olink_platform = "Target 96",
       data_type = "NPX",
       n_panels = 3L,
@@ -146,11 +146,6 @@ test_that(
       version = 1L
     )
 
-    skip_if_not(file.exists(file_synthetic))
-
-    # get wide synthetic data
-    df_synthetic <- readRDS(file = file_synthetic)
-
     ## tibble ----
 
     withr::with_tempfile(
@@ -160,7 +155,7 @@ test_that(
       code = {
         # write the coma-delimited file
         utils::write.table(
-          x = df_synthetic$list_df_wide$df_wide,
+          x = df_rand$list_df_wide$df_wide,
           file = scdfile_test,
           append = FALSE,
           quote = FALSE,
@@ -190,7 +185,7 @@ test_that(
         # check that the two dataframes are identical
         expect_equal(
           object = df_out,
-          expected = df_synthetic$list_df_wide$df_wide
+          expected = df_rand$list_df_wide$df_wide
         )
       }
     )
@@ -204,7 +199,7 @@ test_that(
       code = {
         # write the coma-delimited file
         utils::write.table(
-          x = df_synthetic$list_df_wide$df_wide,
+          x = df_rand$list_df_wide$df_wide,
           file = scdfile_test,
           append = FALSE,
           quote = FALSE,
@@ -234,7 +229,7 @@ test_that(
         # check that the two dataframes are identical
         expect_equal(
           object = dplyr::as_tibble(df_out),
-          expected = df_synthetic$list_df_wide$df_wide
+          expected = df_rand$list_df_wide$df_wide
         )
       }
     )
@@ -387,8 +382,8 @@ test_that(
 test_that(
   "read_npx_delim - error - wide format - file not delimited",
   {
-    # file path
-    file_synthetic <- file_wide_synthetic_data(
+    # get synthetic data, or skip if not available
+    df_rand <- get_wide_synthetic_data(
       olink_platform = "Target 96",
       data_type = "NPX",
       n_panels = 3L,
@@ -399,18 +394,13 @@ test_that(
       version = 1L
     )
 
-    skip_if_not(file.exists(file_synthetic))
-
     withr::with_tempfile(
       new = "pfile_test",
       pattern = "parquet-file_test",
       fileext = ".parquet",
       code = {
-        # get wide synthetic data
-        df_synthetic <- readRDS(file = file_synthetic)
-
         arrow::write_parquet(
-          x = df_synthetic$list_df_wide$df_wide,
+          x = df_rand$list_df_wide$df_wide,
           sink = pfile_test,
           compression = "gzip"
         )

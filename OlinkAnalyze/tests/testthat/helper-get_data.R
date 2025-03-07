@@ -1,14 +1,24 @@
-# function that retrieves the relevant pre-computed synthetic dataset of
-# wide Olink data
+# function that retrieves the data of the relevant pre-computed synthetic
+# dataset of wide Olink data
 get_wide_synthetic_data <- function(olink_platform,
-                                    data_type,
-                                    n_panels,
-                                    n_assays,
-                                    n_samples,
-                                    show_dev_int_ctrl,
-                                    show_int_ctrl,
-                                    version) {
-  # modify variables
+                                     data_type,
+                                     n_panels,
+                                     n_assays,
+                                     n_samples,
+                                     show_dev_int_ctrl,
+                                     show_int_ctrl,
+                                     version) {
+  # check inputs
+  check_olink_platform(x = olink_platform)
+  check_olink_data_type(x = data_type)
+  check_is_scalar_integer(int = n_panels, error = TRUE)
+  check_is_scalar_integer(int = n_assays, error = TRUE)
+  check_is_scalar_integer(int = n_samples, error = TRUE)
+  check_is_scalar_boolean(bool = show_dev_int_ctrl, error = TRUE)
+  check_is_scalar_boolean(bool = show_int_ctrl, error = TRUE)
+  check_is_scalar_integer(int = version, error = TRUE)
+
+  # get internal variables
   olink_p <- accepted_olink_platforms |>
     dplyr::filter(
       .data[["name"]] == .env[["olink_platform"]]
@@ -36,18 +46,20 @@ get_wide_synthetic_data <- function(olink_platform,
                          "ic=", int_ctrl, "_",
                          "dic=", dev_int_ctrl, "_",
                          "v=", version, ".rds")
-  # file path
+
+  # get full path
   df_rand_path <- test_path("data",
                             "synthetic_dt_wide",
                             olink_p,
                             data_t,
                             df_rand_file)
-  #check that file exists
-  expect_true(file.exists(df_rand_path))
-  # read rds data
-  df_synthetic <- readRDS(df_rand_path)
-  # return
-  return(df_synthetic)
+
+  if (file.exists(df_rand_path)) {
+    # return full file path
+    return(readRDS(file = df_rand_path))
+  } else {
+    testthat::skip()
+  }
 }
 
 # load example datasets for Olink Explore products
