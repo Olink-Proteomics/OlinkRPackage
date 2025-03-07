@@ -3,7 +3,6 @@
 test_that(
   "check is character works - TRUE",
   {
-
     expect_true(
       object = check_is_character(string = "I_Shall_Pass",
                                   error = FALSE)
@@ -47,14 +46,12 @@ test_that(
                                              "I_Shall_Not_Pass"),
                                   error = FALSE)
     )
-
   }
 )
 
 test_that(
   "check is character works - FALSE",
   {
-
     expect_false(
       object = check_is_character(string = c("I_Shall_Pass",
                                              NA_character_),
@@ -85,14 +82,12 @@ test_that(
       object = check_is_character(string = TRUE,
                                   error = FALSE)
     )
-
   }
 )
 
 test_that(
   "check is character works - ERROR",
   {
-
     expect_error(
       object = check_is_character(string = c("I_Shall_Pass",
                                              NA_character_),
@@ -147,7 +142,6 @@ test_that(
                     x = "must be a character vector!",
                     fixed = TRUE)
     )
-
   }
 )
 
@@ -187,7 +181,6 @@ test_that(
                                                     NULL),
                                          error = FALSE)
     )
-
   }
 )
 
@@ -230,7 +223,6 @@ test_that(
       object = check_is_scalar_character(string = TRUE,
                                          error = FALSE)
     )
-
   }
 )
 
@@ -301,6 +293,5 @@ test_that(
                     x = "must be a scalar character!",
                     fixed = TRUE)
     )
-
   }
 )

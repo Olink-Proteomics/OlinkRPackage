@@ -24,10 +24,8 @@ test_that(
           object = read_npx_zip(file = txtfile_z),
           regexp = "Unable to open compressed file: "
         )
-
       }
     )
-
   }
 )
 
@@ -56,10 +54,8 @@ test_that(
           object = read_npx_zip(file = txtfile_zcorrupt),
           regexp = "Unable to open compressed file: "
         )
-
       }
     )
-
   }
 )
 
@@ -82,7 +78,6 @@ test_that(
       pattern = "zip_test",
       fileext = ".zip",
       code = {
-
         utils::zip(
           zipfile = zip_test,
           files = c(readme_file),
@@ -99,7 +94,6 @@ test_that(
         file.remove(readme_file)
       }
     )
-
     expect_false(object = file.exists(readme_file))
   }
 )
@@ -116,7 +110,6 @@ test_that(
       pattern = "npx",
       fileext = ".csv",
       code = {
-
         # write the coma-delimited file
         dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -169,10 +162,8 @@ test_that(
 
           }
         )
-
       }
     )
-
   }
 )
 
@@ -193,7 +184,6 @@ test_that(
       pattern = "npx",
       fileext = ".csv",
       code = {
-
         # write the coma-delimited file
         dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -245,11 +235,9 @@ test_that(
             )
           }
         )
-
         file.remove(readmefile_test)
       }
     )
-
     expect_false(object = file.exists(readmefile_test))
   }
 )
@@ -274,7 +262,6 @@ test_that(
       pattern = "npx",
       fileext = ".csv",
       code = {
-
         # write the coma-delimited file
         dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -341,14 +328,11 @@ test_that(
 
           }
         )
-
         file.remove(readmefile_test)
 
       }
     )
-
     expect_false(object = file.exists(readmefile_test))
-
   }
 )
 
@@ -371,7 +355,6 @@ test_that(
       pattern = "npx",
       fileext = ".csv",
       code = {
-
         # write the coma-delimited file
         dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -400,13 +383,11 @@ test_that(
           pattern = "npx",
           fileext = ".zip",
           code = {
-
             withr::with_tempfile(
               new = "rfile_test",
               pattern = "random",
               fileext = ".yaml",
               code = {
-
                 # create random file
                 writeLines("foo", rfile_test)
                 expect_true(object = file.exists(rfile_test))
@@ -434,20 +415,15 @@ test_that(
                                         quiet = TRUE),
                   regexp = "Unable to confirm the \"long\" format from the inpu"
                 )
-
               }
             )
-
           }
         )
-
         file.remove(readmefile_test)
 
       }
     )
-
     expect_false(object = file.exists(readmefile_test))
-
   }
 )
 
@@ -470,7 +446,6 @@ test_that(
       pattern = "npx",
       fileext = ".csv",
       code = {
-
         # write the coma-delimited file
         dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -499,13 +474,11 @@ test_that(
           pattern = "npx",
           fileext = ".zip",
           code = {
-
             withr::with_tempfile(
               new = "rfile_test",
               pattern = "npx",
               fileext = ".csv",
               code = {
-
                 # create random file
                 writeLines("foo", rfile_test)
                 expect_true(object = file.exists(rfile_test))
@@ -533,20 +506,14 @@ test_that(
                                         quiet = TRUE),
                   regexp = "Unable to confirm the \"long\" format from the inpu"
                 )
-
               }
             )
-
           }
         )
-
         file.remove(readmefile_test)
-
       }
     )
-
     expect_false(object = file.exists(readmefile_test))
-
   }
 )
 
@@ -570,7 +537,6 @@ test_that(
       pattern = "npx",
       fileext = ".csv",
       code = {
-
         # write the coma-delimited file
         dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -606,7 +572,6 @@ test_that(
           pattern = "npx",
           fileext = ".zip",
           code = {
-
             # write zip file
             utils::zip(
               zipfile = zfile_test,
@@ -647,16 +612,12 @@ test_that(
             expect_true(exists("df_out_tibble"))
 
             expect_true(inherits(x = df_out_tibble, what = "tbl_df"))
-
           }
         )
-
         file.remove(readmefile_test)
         file.remove(checksumfile_test)
-
       }
     )
-
     expect_false(object = file.exists(readmefile_test))
     expect_false(object = file.exists(checksumfile_test))
   }
@@ -677,7 +638,6 @@ test_that(
       pattern = "npx",
       fileext = ".csv",
       code = {
-
         # write the coma-delimited file
         dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -713,7 +673,6 @@ test_that(
           pattern = "npx",
           fileext = ".zip",
           code = {
-
             # write zip file
             utils::zip(
               zipfile = zfile_test,
@@ -737,14 +696,10 @@ test_that(
             )
           }
         )
-
         file.remove(checksumfile_test)
-
       }
     )
-
     expect_false(object = file.exists(checksumfile_test))
-
   }
 )
 
@@ -768,7 +723,6 @@ test_that(
       pattern = "npx",
       fileext = ".csv",
       code = {
-
         # write the coma-delimited file
         dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -804,7 +758,6 @@ test_that(
           pattern = "npx",
           fileext = ".zip",
           code = {
-
             # write zip file
             utils::zip(
               zipfile = zfile_test,
@@ -845,19 +798,14 @@ test_that(
             expect_true(exists("df_out_tibble"))
 
             expect_true(inherits(x = df_out_tibble, what = "tbl_df"))
-
           }
         )
-
         file.remove(readmefile_test)
         file.remove(checksumfile_test)
-
       }
     )
-
     expect_false(object = file.exists(readmefile_test))
     expect_false(object = file.exists(checksumfile_test))
-
   }
 )
 
@@ -912,7 +860,6 @@ test_that(
           pattern = "npx",
           fileext = ".zip",
           code = {
-
             # write zip file
             utils::zip(
               zipfile = zfile_test,
@@ -934,17 +881,12 @@ test_that(
                                     quiet = TRUE),
               regexp = "Unable to confirm the \"long\" format from the inpu"
             )
-
           }
         )
-
         file.remove(checksumfile_test)
-
       }
     )
-
     expect_false(object = file.exists(checksumfile_test))
-
   }
 )
 
@@ -1000,7 +942,6 @@ test_that(
           pattern = "npx",
           fileext = ".zip",
           code = {
-
             # write zip file
             utils::zip(
               zipfile = zfile_test,
@@ -1019,19 +960,14 @@ test_that(
               object = read_npx_zip(file = zfile_test),
               regexp = "The checksum of the NPX file does not match the one"
             )
-
           }
         )
-
         file.remove(readmefile_test)
         file.remove(checksumfile_test)
-
       }
     )
-
     expect_false(object = file.exists(readmefile_test))
     expect_false(object = file.exists(checksumfile_test))
-
   }
 )
 
@@ -1051,7 +987,6 @@ test_that(
       pattern = "npx",
       fileext = ".csv",
       code = {
-
         # write the coma-delimited file
         dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -1086,7 +1021,6 @@ test_that(
           pattern = "npx",
           fileext = ".zip",
           code = {
-
             # write zip file
             utils::zip(
               zipfile = zfile_test,
@@ -1104,17 +1038,12 @@ test_that(
               object = read_npx_zip(file = zfile_test),
               regexp = "The checksum of the NPX file does not match the one"
             )
-
           }
         )
-
         file.remove(checksumfile_test)
-
       }
     )
-
     expect_false(object = file.exists(checksumfile_test))
-
   }
 )
 
@@ -1130,7 +1059,6 @@ test_that(
       pattern = "MD5",
       fileext = ".txt",
       code = {
-
         # write a random data frame to file
         dplyr::tibble("A" = c(1, 2.2, 3.14),
                       "B" = c("a", "b", "c"),
@@ -1164,10 +1092,8 @@ test_that(
           object = check_checksum(checksum_file = MD5_check,
                                   npx_file = text_file_test)
         )
-
       }
     )
-
   }
 )
 
@@ -1181,7 +1107,6 @@ test_that(
       pattern = "SHA256",
       fileext = ".txt",
       code = {
-
         # write a random data frame to file
         dplyr::tibble("A" = c(1, 2.2, 3.14),
                       "B" = c("a", "b", "c"),
@@ -1213,10 +1138,8 @@ test_that(
           object = check_checksum(checksum_file = SHA256_check,
                                   npx_file = text_file_test)
         )
-
       }
     )
-
   }
 )
 
@@ -1229,7 +1152,6 @@ test_that(
       pattern = "npx",
       fileext = ".parquet",
       code = {
-
         # check that the parquet file was created
         expect_false(object = file.exists(nfile_test))
 
@@ -1238,7 +1160,6 @@ test_that(
           pattern = "SHA256",
           fileext = ".txt",
           code = {
-
             # write in the checksum file
             writeLines("I_AM_A_R4ND0M_ChEcKuP", SHA256_check)
 
@@ -1251,13 +1172,10 @@ test_that(
                                       npx_file = nfile_test),
               regexp = "Unable to open NPX file"
             )
-
           }
         )
-
       }
     )
-
   }
 )
 
@@ -1270,7 +1188,6 @@ test_that(
       pattern = "SHA256",
       fileext = ".txt",
       code = {
-
         # write a random data frame to file
         dplyr::tibble("A" = c(1, 2.2, 3.14),
                       "B" = c("a", "b", "c"),
@@ -1299,10 +1216,8 @@ test_that(
                                   npx_file = text_file_test),
           regexp = "Unable to open checksum file"
         )
-
       }
     )
-
   }
 )
 
@@ -1316,7 +1231,6 @@ test_that(
       pattern = "SHA256",
       fileext = ".txt",
       code = {
-
         # write a random data frame to file
         dplyr::tibble("A" = c(1, 2.2, 3.14),
                       "B" = c("a", "b", "c"),
@@ -1348,10 +1262,8 @@ test_that(
                                   npx_file = text_file_test),
           regexp = "The checksum of the NPX file does not match the one"
         )
-
       }
     )
-
   }
 )
 
@@ -1594,7 +1506,6 @@ test_that(
 test_that(
   "get NPX file from zip - nested compressed file",
   {
-
     # A zip file only
     expect_error(
       object = get_npx_file(
@@ -1602,6 +1513,5 @@ test_that(
       ),
       regexp = "The compressed file contains another compressed file:"
     )
-
   }
 )

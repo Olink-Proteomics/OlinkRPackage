@@ -1,7 +1,7 @@
 # Test that the function returns TRUE when the packages are present
 test_that(
-  "check library installed works - TRUE", {
-
+  "check library installed works - TRUE",
+  {
     expect_no_condition(
       object = check_library_installed(
         libraries = c("tools", "base"),
@@ -15,7 +15,6 @@ test_that(
         error = TRUE
       )
     )
-
   }
 )
 
@@ -23,7 +22,6 @@ test_that(
 test_that(
   "check library installed works - FALSE",
   {
-
     expect_false(
       object = check_library_installed(
         libraries = c("MissingLibraryOne"),
@@ -47,7 +45,6 @@ test_that(
         error = FALSE
       )
     )
-
   }
 )
 
@@ -55,7 +52,6 @@ test_that(
 test_that(
   "check library installed works - library missing",
   {
-
     expect_error(
       object = check_library_installed(
         libraries = c("MissingLibraryOne"),
@@ -82,6 +78,5 @@ test_that(
       ),
       regexp = "Missing library:"
     )
-
   }
 )

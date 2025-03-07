@@ -3,7 +3,6 @@
 test_that(
   "check is list works - TRUE",
   {
-
     expect_true(
       object = check_is_list(lst = list("I_Shall_Pass"),
                              error = FALSE)
@@ -81,14 +80,12 @@ test_that(
                                         "B" = "Im_good"),
                              error = FALSE)
     )
-
   }
 )
 
 test_that(
   "check is list works - FALSE",
   {
-
     expect_false(
       object = check_is_list(lst = c("I_Shall_Pass",
                                      NA_character_),
@@ -119,14 +116,12 @@ test_that(
       object = check_is_list(lst = TRUE,
                              error = FALSE)
     )
-
   }
 )
 
 test_that(
   "check is list works - ERROR",
   {
-
     expect_error(
       object = check_is_list(lst = c("I_Shall_Pass",
                                      NA_character_),
@@ -181,6 +176,5 @@ test_that(
                     x = "is not a list!",
                     fixed = TRUE)
     )
-
   }
 )
