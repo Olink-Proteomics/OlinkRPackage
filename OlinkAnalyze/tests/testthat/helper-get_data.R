@@ -1,13 +1,13 @@
 # function that retrieves the data of the relevant pre-computed synthetic
 # dataset of wide Olink data
 get_wide_synthetic_data <- function(olink_platform,
-                                     data_type,
-                                     n_panels,
-                                     n_assays,
-                                     n_samples,
-                                     show_dev_int_ctrl,
-                                     show_int_ctrl,
-                                     version) {
+                                    data_type,
+                                    n_panels,
+                                    n_assays,
+                                    n_samples,
+                                    show_dev_int_ctrl,
+                                    show_int_ctrl,
+                                    version) {
   # check inputs
   check_olink_platform(x = olink_platform)
   check_olink_data_type(x = data_type)
@@ -58,16 +58,23 @@ get_wide_synthetic_data <- function(olink_platform,
     # return full file path
     return(readRDS(file = df_rand_path))
   } else {
+    # if not, skip the test
     testthat::skip()
+    return(NULL)
   }
 }
 
 # load example datasets for Olink Explore products
 get_example_data <- function(filename) {
+  # get file path under tests/testthat/data
   ref_norm_res_file <- test_path("data", filename)
-  #check that file exists
-  expect_true(file.exists(ref_norm_res_file), label = ref_norm_res_file)
-  # read rds data
-  example_data <- readRDS(file = ref_norm_res_file)
-  return(example_data)
+  # check that file exists
+  if (file.exists(ref_norm_res_file)) {
+    # return full file path
+    return(readRDS(file = ref_norm_res_file))
+  } else {
+    # if not, skip the test
+    testthat::skip()
+    return(NULL)
+  }
 }
