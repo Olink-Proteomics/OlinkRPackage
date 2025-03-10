@@ -64,7 +64,7 @@
 #' @examples
 #' \donttest{
 #' file <- system.file("extdata",
-#'                     "npx_data1.xlsx",
+#'                     "npx_data_ext.parquet",
 #'                     package = "OlinkAnalyze")
 #' read_npx(filename = file,
 #'          olink_platform = "Target 96")
