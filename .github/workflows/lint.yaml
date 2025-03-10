@@ -1,12 +1,6 @@
 # Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
-on: 
-  pull_request:
-    branches:
-      - 'main'
-      - 'develop'
-      - 'optimization_develop'
-      - 'optimization_main'
+on: pull_request
 
 name: lint
 
@@ -27,13 +21,9 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          packages: any::pak
+          packages: any::pak, any::lintr, any::devtools, local::.
+          working-directory: OlinkAnalyze
           
-      - name: install OA
-        run: |
-          pak::pkg_install(c("local::OlinkAnalyze", "lintr", "devtools"))
-        shell: Rscript {0}
-
       - name: Lint
         run: |
           options(lintr.github_annotation_project_dir = "OlinkAnalyze")

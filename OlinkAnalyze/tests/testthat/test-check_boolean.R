@@ -53,7 +53,6 @@ test_that(
 test_that(
   "check is boolean works - FALSE",
   {
-
     expect_false(
       object = check_is_boolean(bool = "I_Shall_Pass",
                                 error = FALSE)
@@ -78,14 +77,12 @@ test_that(
       object = check_is_boolean(bool = 1,
                                 error = FALSE)
     )
-
   }
 )
 
 test_that(
   "check is boolean works - ERROR",
   {
-
     expect_error(
       object = check_is_boolean(bool = "I_Shall_Pass",
                                 error = TRUE),
@@ -130,7 +127,6 @@ test_that(
                     x = "must be a boolean vector!",
                     fixed = TRUE)
     )
-
   }
 )
 
@@ -170,7 +166,6 @@ test_that(
                                                 NULL),
                                        error = FALSE)
     )
-
   }
 )
 
@@ -213,7 +208,6 @@ test_that(
       object = check_is_scalar_boolean(bool = 1L,
                                        error = FALSE)
     )
-
   }
 )
 
@@ -226,7 +220,7 @@ test_that(
                                        error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "must be a boolean!",
+                    x = "must be a scalar boolean!",
                     fixed = TRUE)
     )
 
@@ -236,7 +230,7 @@ test_that(
                                        error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "must be a boolean!",
+                    x = "must be a scalar boolean!",
                     fixed = TRUE)
     )
 
@@ -245,7 +239,7 @@ test_that(
                                        error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "must be a boolean!",
+                    x = "must be a scalar boolean!",
                     fixed = TRUE)
     )
 
@@ -254,7 +248,7 @@ test_that(
                                        error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "must be a boolean!",
+                    x = "must be a scalar boolean!",
                     fixed = TRUE)
     )
 
@@ -263,7 +257,7 @@ test_that(
                                        error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "must be a boolean!",
+                    x = "must be a scalar boolean!",
                     fixed = TRUE)
     )
 
@@ -272,7 +266,7 @@ test_that(
                                        error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "must be a boolean!",
+                    x = "must be a scalar boolean!",
                     fixed = TRUE)
     )
 
@@ -281,9 +275,8 @@ test_that(
                                        error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "must be a boolean!",
+                    x = "must be a scalar boolean!",
                     fixed = TRUE)
     )
-
   }
 )

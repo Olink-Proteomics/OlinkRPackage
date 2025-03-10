@@ -2,25 +2,26 @@
 % Please edit documentation in R/read_npx_excel.R
 \name{read_npx_excel}
 \alias{read_npx_excel}
-\title{Help function to read NPX, Ct or absolute quantification data from excel
-Olink software output files in R.}
+\title{Help function to read "Ct", "NPX", and "Quantified" data
+from excel Olink software output files in R.}
 \usage{
 read_npx_excel(file, out_df = "arrow")
 }
 \arguments{
 \item{file}{Path to Olink software output excel file in wide or long format.
-Expecting file extensions
-xls or xlsx. # nolint}
+Expected file extensions
+"xls" and "xlsx".}
 
-\item{out_df}{The class of output data frame. One of "tibble" (default) or
-"arrow" for ArrowObject.}
+\item{out_df}{The class of output data frame. One of
+"tibble" and "ArrowObject".}
 }
 \value{
-Tibble or ArrowObject with Olink data in wide or long format.
+"tibble" or "ArrowObject" with
+Olink data in long or wide format.
 }
 \description{
-Help function to read NPX, Ct or absolute quantification data from excel
-Olink software output files in R.
+Help function to read "Ct", "NPX", and "Quantified" data
+from excel Olink software output files in R.
 }
 \seealso{
 \code{\link{read_npx}}

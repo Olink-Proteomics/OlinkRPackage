@@ -10,14 +10,14 @@ check_field_separator(file, sep = NULL)
 \arguments{
 \item{file}{Path to Olink software output delimited file in wide format.
 Expecting file extensions
-csv or txt. # nolint}
+"csv" and "txt".}
 
-\item{sep}{Character separator of delimited input file. One of \code{NULL} for
-auto-detection (default), "," for comma or ";" for semicolon. Used only for
-delimited output files from Olink software.}
+\item{sep}{Character separator of delimited input file. One of \code{NULL}
+(default) for auto-detection, or ";" and ",".
+Used only for delimited output files from Olink software.}
 }
 \value{
-The file separator comma "," or semicolon ";".
+The file separator ";" and ",".
 }
 \description{
 Help function to check and get the separator of a delimited file from Olink

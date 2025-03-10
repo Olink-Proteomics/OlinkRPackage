@@ -3,7 +3,7 @@
 \name{read_npx}
 \alias{read_npx}
 \alias{read_NPX}
-\title{Read NPX, Ct or absolute quantification data in R.}
+\title{Read Olink data in R.}
 \usage{
 read_npx(
   filename,
@@ -31,46 +31,44 @@ read_NPX(
 }
 \arguments{
 \item{filename}{Path to Olink software output file in wide or long format.
-Expecting file extensions
-xls, xlsx, csv, txt, parquet, or zip. # nolint}
+Expecting extensions "xls" or "xlsx" for excel files, "csv" or "txt" for delim files, "parquet" for parquet files, and "zip" for compressed files.}
 
-\item{out_df}{The class of output data frame. One of "tibble" (default) or
-"arrow" for ArrowObject.}
+\item{out_df}{The class of the output dataset. One of
+"tibble" and "arrow". (default = "tibble")}
 
-\item{sep}{Character separator of delimited input file. One of \code{NULL} for
-auto-detection (default), "," for comma or ";" for semicolon. Used only for
-delimited output files from Olink software.}
+\item{sep}{Character separator of delimited input file. One of \code{NULL}
+(default) for auto-detection, or ";" and ",".
+Used only for delimited output files from Olink software.}
 
 \item{long_format}{Boolean marking format of input file. One of \code{NULL}
-(default) for auto-detection, "TRUE" for long format files or "FALSE" for
+(default) for auto-detection, or \code{TRUE} for long format and \code{FALSE} for
 wide format files.}
 
 \item{olink_platform}{Olink platform used to generate the input file.
-One of \code{NULL} (default),
-Target 48, Flex, Target 96, Explore 3072, Explore HT, or Focus. # nolint}
+One of \code{NULL} (default) for auto-detection,
+or "Target 48", "Flex", "Target 96", "Explore 3072", "Explore HT", and "Focus".}
 
 \item{data_type}{Quantification method of the input data. One of \code{NULL}
-(default),
-Ct, NPX, or Quantified. # nolint}
+(default) for auto-detection, "Ct", "NPX", and "Quantified".}
 
 \item{.ignore_files}{Character vector of files included in the zip-compressed
-Olink software output files that should be ignored. Applies only to
+Olink software output files that should be ignored. Used only for
 zip-compressed input files (default = \emph{c("README.txt")}).}
 
 \item{quiet}{Boolean to print a confirmation message when reading the input
-file. Applies to excel or delimited input only. "TRUE" (default) to not print
-and "FALSE" to print.}
+file. Applies to excel or delimited input only. \code{TRUE} (default) to not print
+and \code{FALSE} to print.}
 
 \item{legacy}{Boolean to run the legacy version of the read_npx function.
 \strong{Important: should be used only to wide format files from Target 96 or
-Target 48 with NPX Software version earlier than 1.8!} (default "FALSE").}
+Target 48 with NPX Software version earlier than 1.8!} (default \code{FALSE}).}
 }
 \value{
-Tibble or ArrowObject with Olink data in long format.
+Dataset, tibble, ArrowObject, with Olink data in long format.
 }
 \description{
-Imports a file exported from Olink software that quantifies proteins in NPX,
-Ct or absolute Quantification.
+Imports a file exported from Olink software that quantifies protein levels in
+NPX, Ct or absolute quantification.
 
 \strong{Note:} Do not modify the Olink software output file prior to
 importing it with \code{\link{read_npx}} as it might fail.

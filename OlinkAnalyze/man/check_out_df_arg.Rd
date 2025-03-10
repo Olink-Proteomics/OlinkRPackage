@@ -8,11 +8,12 @@ functions is acceptable.}
 check_out_df_arg(out_df)
 }
 \arguments{
-\item{out_df}{The class of output data frame. One of "tibble" (default) or
-"arrow" for ArrowObject.}
+\item{out_df}{Class of output data frame. One of
+"tibble" and "arrow".}
 }
 \value{
-An error if the argument is not as expected.
+Error if \var{out_df} is not one of
+"tibble" and "arrow".
 }
 \description{
 Help function checking that the requested output class of the read_npx*

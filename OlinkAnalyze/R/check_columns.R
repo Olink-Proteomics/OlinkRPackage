@@ -1,13 +1,11 @@
-#' Check that an input tibble or arrow object contains the required columns.
+#' Check presence of columns in dataset.
 #'
 #' @description
-#' Checks if the input tibble or arrow object \var{df} contains all of the
-#' columns in \var{col_list}.
-#'
-#' @details
-#' \var{col_list} might contain also vectors of characters as elements. In this
-#' case one of the characters in the vector is expected to be present. See
-#' examples.
+#' Check if the input dataset (tibble or ArrowObject) \var{df} contains columns
+#' specified in \var{col_list}. \var{col_list} supports both exact matches of
+#' column names and alternative column names. In the latter case, alternative
+#' column names are elements of a character vector, and exactly one of the
+#' elements is required to be present.
 #'
 #' @author
 #'   Klev Diamanti
@@ -16,10 +14,13 @@
 #'   Pascal Pucholt
 #'   Gil Henriques
 #'
-#' @param df A tibble or arrow object.
-#' @param col_list A list, where each element is a character vector (usually of
-#' length one). The function will check whether the column names of \var{df}
-#' contain elements from \var{col_list}. When an element of \var{col_list}
+#' @param df An Olink dataset (tibble or ArrowObject).
+#' @param col_list A list of character vectors.
+#'
+#' @details
+#' \var{col_list} contains a collection of character vectors. If a character
+#' vector is scalar (length = 1), the element of the vector is expected to be
+#' present among the column names of \var{df}. When an element of \var{col_list}
 #' contains more than one elements, the function will check whether the column
 #' names of \var{df} include \strong{at least one} of the elements of that
 #' vector.
@@ -69,8 +70,9 @@ check_columns <- function(df,
                           col_list) {
 
   # Check input ----
-  check_is_arrow_or_tibble(df = df,
-                           error = TRUE)
+
+  check_is_dataset(df = df,
+                   error = TRUE)
 
   check_is_list(lst = col_list,
                 error = TRUE)
@@ -79,15 +81,17 @@ check_columns <- function(df,
   col_list_char <- sapply(col_list, check_is_character, error = FALSE)
   if (any(col_list_char == FALSE)) {
 
-    col_list_not_char <- col_list[!col_list_char] # nolint
+    col_list_not_char <- col_list[!col_list_char] # nolint object_usage_linter
 
     # error if lst is not a list
     cli::cli_abort(
       c(
-        "x" = "{.arg col_list} contains { length(col_list_not_char) }
-        element{?s} that {?is/are} not character vector{?s}!",
-        "i" = "Incorrect elements are located in index poisiton
-        { seq_along(1L:length(col_list))[!col_list_char] } of {.arg col_list}."
+        "x" = "{.arg col_list} contains {length(col_list_not_char)}
+        {cli::qty(col_list_not_char)} element{?s} that {?is/are} not character
+        vector{?s}!",
+        "i" = "Non-character vector elements are located in index
+        {cli::qty(col_list_not_char)} poisiton{?s}
+        {seq_along(1L:length(col_list))[!col_list_char]} of {.arg col_list}."
       ),
       call = rlang::caller_env(),
       wrap = TRUE
@@ -114,7 +118,7 @@ check_columns <- function(df,
       cli::cli_abort(
         c(
           "x" = "The data frame {.arg {rlang::caller_arg(df)}} is missing the
-        required columns: {missing_cols}!",
+        required columns: {.val {missing_cols}}!",
           "i" = "Please make sure they are part of the input dataset."
         ),
         call = rlang::caller_env(),
@@ -131,17 +135,21 @@ check_columns <- function(df,
 
   if (length(option_cols) > 0L) {
 
-    missing_one <- option_cols[sapply(option_cols, \(x) !any(x %in% df_column_names))] # nolint
+    missing_one <- option_cols[
+      sapply(option_cols, \(x) !any(x %in% df_column_names))
+    ]
 
     if (length(missing_one) > 0L) {
 
-      cli::cli_abort(c(
-        "i" = "The data frame {.arg {rlang::caller_arg(df)}} is missing at least
-        one of the vectors of required columns: { missing_one }!",
-        "i" = "Please make sure they are part of the input dataset."
-      ),
-      call = rlang::caller_env(),
-      wrap = FALSE
+      cli::cli_abort(
+        c(
+          "x" = "The data frame {.arg {rlang::caller_arg(df)}} is missing
+          columns that should be present in at least one of the vectors:
+          {.val {missing_one}}!",
+          "i" = "Please make sure they are part of the input dataset."
+        ),
+        call = rlang::caller_env(),
+        wrap = FALSE
       )
 
     }

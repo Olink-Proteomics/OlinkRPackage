@@ -2,23 +2,24 @@
 % Please edit documentation in R/read_npx_utils.R
 \name{read_npx_format_colnames}
 \alias{read_npx_format_colnames}
-\title{Help function checking whether a data set contains NA or empty strings on
+\title{Help function checking whether a dataset contains NA or empty strings on
 its column names}
 \usage{
 read_npx_format_colnames(df, file)
 }
 \arguments{
-\item{df}{Tibble or ArrowObject with Olink data in wide or long format.}
+\item{df}{Olink dataset
+("tibble" or "ArrowObject")
+in wide or long format.}
 
 \item{file}{Path to Olink software output file in wide or long format.
-Expecting file extensions
-xls, xlsx, csv, txt, parquet, or zip. # nolint}
+Expected file types: "xls" or "xlsx" for excel files, "csv" or "txt" for delim files, "parquet" for parquet files, and "zip" for compressed files.}
 }
 \value{
 Error is file contains problematic column names. \code{NULL} otherwise.
 }
 \description{
-Help function checking whether a data set contains NA or empty strings on
+Help function checking whether a dataset contains NA or empty strings on
 its column names
 }
 \author{

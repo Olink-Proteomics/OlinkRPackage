@@ -4,7 +4,6 @@
 test_that(
   "check is arrow object - ERROR",
   {
-
     expect_error(
       object = check_is_arrow_object(df = c("I_Shall_Pass",
                                             NA_character_),
@@ -82,7 +81,6 @@ test_that(
                     x = "is not an R6 ArrowObject!",
                     fixed = TRUE)
     )
-
   }
 )
 
@@ -90,7 +88,6 @@ test_that(
 test_that(
   "check is arrow object - FALSE",
   {
-
     expect_false(
       object = check_is_arrow_object(df = c("I_Shall_Pass",
                                             NA_character_),
@@ -136,7 +133,6 @@ test_that(
                                        dplyr::as_tibble(),
                                      error = FALSE)
     )
-
   }
 )
 
@@ -144,13 +140,11 @@ test_that(
 test_that(
   "check is arrow object - csv - TRUE",
   {
-
     withr::with_tempfile(
       new = "dfile_test",
       pattern = "delim-file-test",
       fileext = ".csv",
       code = {
-
         # write the coma-delimited file from random data frame
         dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -197,10 +191,8 @@ test_that(
           object = check_is_arrow_object(df = df_arrow,
                                          error = TRUE)
         )
-
       }
     )
-
   }
 )
 
@@ -208,13 +200,11 @@ test_that(
 test_that(
   "check is arrow object - parquet - TRUE",
   {
-
     withr::with_tempfile(
       new = "pfile_test",
       pattern = "delim-file-test",
       fileext = ".parquet",
       code = {
-
         # write the parquet file from random data frame
         dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -252,10 +242,8 @@ test_that(
           object = check_is_arrow_object(df = df_arrow,
                                          error = TRUE)
         )
-
       }
     )
-
   }
 )
 
@@ -264,7 +252,6 @@ test_that(
 test_that(
   "check is arrow object - data.frame - TRUE",
   {
-
     # random data frame
     df <- dplyr::tibble(
       "A" = c(1, 2.2, 3.14),
@@ -289,7 +276,6 @@ test_that(
       object = check_is_arrow_object(df = df,
                                      error = TRUE)
     )
-
   }
 )
 
@@ -305,7 +291,7 @@ test_that(
                                error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "is not a tibble data frame!",
+                    x = "is not a tibble dataset!",
                     fixed = TRUE)
     )
 
@@ -314,7 +300,7 @@ test_that(
                                error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "is not a tibble data frame!",
+                    x = "is not a tibble dataset!",
                     fixed = TRUE)
     )
 
@@ -323,7 +309,7 @@ test_that(
                                error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "is not a tibble data frame!",
+                    x = "is not a tibble dataset!",
                     fixed = TRUE)
     )
 
@@ -332,7 +318,7 @@ test_that(
                                error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "is not a tibble data frame!",
+                    x = "is not a tibble dataset!",
                     fixed = TRUE)
     )
 
@@ -341,7 +327,7 @@ test_that(
                                error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "is not a tibble data frame!",
+                    x = "is not a tibble dataset!",
                     fixed = TRUE)
     )
 
@@ -350,7 +336,7 @@ test_that(
                                error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "is not a tibble data frame!",
+                    x = "is not a tibble dataset!",
                     fixed = TRUE)
     )
 
@@ -361,7 +347,7 @@ test_that(
                                error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "is not a tibble data frame!",
+                    x = "is not a tibble dataset!",
                     fixed = TRUE)
     )
 
@@ -373,10 +359,9 @@ test_that(
                                error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "is not a tibble data frame!",
+                    x = "is not a tibble dataset!",
                     fixed = TRUE)
     )
-
   }
 )
 
@@ -384,7 +369,6 @@ test_that(
 test_that(
   "check is tibble - FALSE",
   {
-
     expect_false(
       object = check_is_tibble(df = c("I_Shall_Not_Pass",
                                       NA_character_),
@@ -430,7 +414,6 @@ test_that(
                                  arrow::as_arrow_table(),
                                error = FALSE)
     )
-
   }
 )
 
@@ -438,13 +421,11 @@ test_that(
 test_that(
   "check is tibble - csv - TRUE",
   {
-
     withr::with_tempfile(
       new = "dfile_test",
       pattern = "delim-file-test",
       fileext = ".csv",
       code = {
-
         sep_arrow <- ","
 
         # write the coma-delimited file from a random data frame
@@ -496,10 +477,8 @@ test_that(
           object = check_is_tibble(df = df_read,
                                    error = TRUE)
         )
-
       }
     )
-
   }
 )
 
@@ -508,13 +487,11 @@ test_that(
 test_that(
   "check is tibble - parquet - TRUE",
   {
-
     withr::with_tempfile(
       new = "pfile_test",
       pattern = "delim-file-test",
       fileext = ".parquet",
       code = {
-
         # write the parquet file from a random data frame
         df <- dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -553,10 +530,8 @@ test_that(
           object = check_is_tibble(df = df_read,
                                    error = TRUE)
         )
-
       }
     )
-
   }
 )
 
@@ -564,7 +539,6 @@ test_that(
 test_that(
   "check is tibble - data.frame - TRUE",
   {
-
     # random data frame
     df <- dplyr::tibble(
       "A" = c(1, 2.2, 3.14),
@@ -588,110 +562,109 @@ test_that(
       object = check_is_tibble(df = df,
                                error = TRUE)
     )
-
   }
 )
 
-# Test check_is_arrow_or_data_frame ----
+# Test check_is_dataset ----
 
 test_that(
-  "check_is_arrow_or_tibble - error",
+  "check_is_dataset - error",
   {
     expect_error(
-      object = check_is_arrow_or_tibble(df = c("I_Shall_Not_Pass",
-                                               NA_character_),
-                                        error = TRUE),
+      object = check_is_dataset(df = c("I_Shall_Not_Pass",
+                                       NA_character_),
+                                error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "is not a tibble or an arrow data frame!",
+                    x = "is not a tibble or an ArrowObject dataset!",
                     fixed = TRUE)
     )
 
     expect_error(
-      object = check_is_arrow_or_tibble(df = NA_character_,
-                                        error = TRUE),
+      object = check_is_dataset(df = NA_character_,
+                                error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "is not a tibble or an arrow data frame!",
+                    x = "is not a tibble or an ArrowObject dataset!",
                     fixed = TRUE)
     )
 
     expect_error(
-      object = check_is_arrow_or_tibble(df = NULL,
-                                        error = TRUE),
+      object = check_is_dataset(df = NULL,
+                                error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "is not a tibble or an arrow data frame!",
+                    x = "is not a tibble or an ArrowObject dataset!",
                     fixed = TRUE)
     )
 
     expect_error(
-      object = check_is_arrow_or_tibble(df = 1,
-                                        error = TRUE),
+      object = check_is_dataset(df = 1,
+                                error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "is not a tibble or an arrow data frame!",
+                    x = "is not a tibble or an ArrowObject dataset!",
                     fixed = TRUE)
     )
 
     expect_error(
-      object = check_is_arrow_or_tibble(df = 1L,
-                                        error = TRUE),
+      object = check_is_dataset(df = 1L,
+                                error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "is not a tibble or an arrow data frame!",
+                    x = "is not a tibble or an ArrowObject dataset!",
                     fixed = TRUE)
     )
 
     expect_error(
-      object = check_is_arrow_or_tibble(df = TRUE,
-                                        error = TRUE),
+      object = check_is_dataset(df = TRUE,
+                                error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "is not a tibble or an arrow data frame!",
+                    x = "is not a tibble or an ArrowObject dataset!",
                     fixed = TRUE)
     )
   }
 )
 
 test_that(
-  "check_is_arrow_or_tibble - FALSE",
+  "check_is_dataset - FALSE",
   {
     expect_false(
-      object = check_is_arrow_or_tibble(df = c("I_Shall_Not_Pass",
-                                               NA_character_),
-                                        error = FALSE)
+      object = check_is_dataset(df = c("I_Shall_Not_Pass",
+                                       NA_character_),
+                                error = FALSE)
     )
 
     expect_false(
-      object = check_is_arrow_or_tibble(df = NA_character_,
-                                        error = FALSE)
+      object = check_is_dataset(df = NA_character_,
+                                error = FALSE)
     )
 
     expect_false(
-      object = check_is_arrow_or_tibble(df = NULL,
-                                        error = FALSE)
+      object = check_is_dataset(df = NULL,
+                                error = FALSE)
     )
 
     expect_false(
-      object = check_is_arrow_or_tibble(df = 1,
-                                        error = FALSE)
+      object = check_is_dataset(df = 1,
+                                error = FALSE)
     )
 
     expect_false(
-      object = check_is_arrow_or_tibble(df = 1L,
-                                        error = FALSE)
+      object = check_is_dataset(df = 1L,
+                                error = FALSE)
     )
 
     expect_false(
-      object = check_is_arrow_or_tibble(df = TRUE,
-                                        error = FALSE)
+      object = check_is_dataset(df = TRUE,
+                                error = FALSE)
     )
   }
 )
 
 test_that(
-  "check_is_arrow_or_tibble - works - csv to tibble or arrow",
+  "check_is_dataset - works - csv to tibble or arrow",
   {
     ## tibble ----
 
@@ -700,7 +673,6 @@ test_that(
       pattern = "delim-file-test",
       fileext = ".csv",
       code = {
-
         # random data frame
         df <- dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -745,18 +717,17 @@ test_that(
 
         # read.delim return a data.frame
         expect_false(
-          object = check_is_arrow_or_tibble(df = df_read,
-                                            error = FALSE)
+          object = check_is_dataset(df = df_read,
+                                    error = FALSE)
         )
 
         # check if return from check_is_data_frame is TRUE
         expect_true(
-          object = check_is_arrow_or_tibble(df = dplyr::as_tibble(df_read),
-                                            error = TRUE)
+          object = check_is_dataset(df = dplyr::as_tibble(df_read),
+                                    error = TRUE)
         )
       }
     )
-
 
     ## arrow ----
 
@@ -765,7 +736,6 @@ test_that(
       pattern = "delim-file-test",
       fileext = ".csv",
       code = {
-
         # random data frame
         df <- dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -810,8 +780,8 @@ test_that(
 
         # arrow::open_delim_dataset returns an arrow object
         expect_true(
-          object = check_is_arrow_or_tibble(df = df_read,
-                                            error = TRUE)
+          object = check_is_dataset(df = df_read,
+                                    error = TRUE)
         )
       }
     )
@@ -819,7 +789,7 @@ test_that(
 )
 
 test_that(
-  "check_is_arrow_or_tibble - works - parquet to arrow or tibble",
+  "check_is_dataset - works - parquet to arrow or tibble",
   {
     ## arrow ----
 
@@ -828,7 +798,6 @@ test_that(
       pattern = "delim-file-test",
       fileext = ".parquet",
       code = {
-
         # write the parquet file from random data frame
         dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -855,10 +824,10 @@ test_that(
         # check that variable exists
         expect_true(object = exists("df_read"))
 
-        # check if check_is_arrow_or_tibble returns TRUE
+        # check if check_is_dataset returns TRUE
         expect_true(
-          object = check_is_arrow_or_tibble(df = df_read,
-                                            error = TRUE)
+          object = check_is_dataset(df = df_read,
+                                    error = TRUE)
         )
 
         # check that reading the file as data_frame works
@@ -871,12 +840,11 @@ test_that(
         # check that variable exists
         expect_true(object = exists("df_parquet"))
 
-        # check if check_is_arrow_or_tibble returns TRUE
+        # check if check_is_dataset returns TRUE
         expect_true(
-          object = check_is_arrow_or_tibble(df = df_parquet,
-                                            error = TRUE)
+          object = check_is_dataset(df = df_parquet,
+                                    error = TRUE)
         )
-
       }
     )
 
@@ -887,7 +855,6 @@ test_that(
       pattern = "delim-file-test",
       fileext = ".parquet",
       code = {
-
         # write the parquet file from random data frame
         dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -915,10 +882,10 @@ test_that(
         # check that variable exists
         expect_true(object = exists("df_read"))
 
-        # check if check_is_arrow_or_tibble returns TRUE
+        # check if check_is_dataset returns TRUE
         expect_true(
-          object = check_is_arrow_or_tibble(df = df_read,
-                                            error = TRUE)
+          object = check_is_dataset(df = df_read,
+                                    error = TRUE)
         )
 
         # check that reading the file as data_frame works
@@ -932,19 +899,18 @@ test_that(
         # check that variable exists
         expect_true(object = exists("df_parquet"))
 
-        # check if check_is_arrow_or_tibble returns TRUE
+        # check if check_is_dataset returns TRUE
         expect_true(
-          object = check_is_arrow_or_tibble(df = df_parquet,
-                                            error = TRUE)
+          object = check_is_dataset(df = df_parquet,
+                                    error = TRUE)
         )
-
       }
     )
   }
 )
 
 test_that(
-  "check_is_arrow_or_tibble - works - data.frame to arrow or tibble",
+  "check_is_dataset - works - data.frame to arrow or tibble",
   {
     # random data frame
     df <- data.frame(
@@ -958,22 +924,22 @@ test_that(
     # check that variable exists
     expect_true(object = exists("df"))
 
-    # check if check_is_arrow_or_tibble returns FALSE
+    # check if check_is_dataset returns FALSE
     expect_false(
-      object = check_is_arrow_or_tibble(df = df,
-                                        error = FALSE)
+      object = check_is_dataset(df = df,
+                                error = FALSE)
     )
 
-    # check if check_is_arrow_or_tibble returns TRUE
+    # check if check_is_dataset returns TRUE
     expect_true(
-      object = check_is_arrow_or_tibble(df = dplyr::as_tibble(df),
-                                        error = TRUE)
+      object = check_is_dataset(df = dplyr::as_tibble(df),
+                                error = TRUE)
     )
 
-    # check if check_is_arrow_or_tibble returns TRUE
+    # check if check_is_dataset returns TRUE
     expect_true(
-      object = check_is_arrow_or_tibble(df = arrow::as_arrow_table(df),
-                                        error = FALSE)
+      object = check_is_dataset(df = arrow::as_arrow_table(df),
+                                error = FALSE)
     )
   }
 )

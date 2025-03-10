@@ -14,24 +14,23 @@ read_npx_legacy(
 )
 }
 \arguments{
-\item{file}{Path to Olink software output file in wide format. Expecting file
-extensions
-xls, xlsx, csv, or txt. # nolint}
+\item{file}{Path to Olink software output file in wide format. Expected one
+of file extensions
+"xls", "xlsx", "csv", and "txt".}
 
-\item{out_df}{The class of output data frame. One of "tibble" (default) or
-"arrow" for ArrowObject.}
+\item{out_df}{The class of the output dataset. One of
+"tibble" and "arrow". (default = "tibble")}
 
 \item{olink_platform}{Olink platform used to generate the input file.
-One of \code{NULL} (default),
-Target 48 or Target 96. # nolint}
+One of \code{NULL} (default) for auto-detection,
+"Flex", "Focus", "Target 48", and "Target 96".}
 
 \item{data_type}{Quantification method of the input data. One of \code{NULL}
-(default),
-Ct, NPX, or Quantified. # nolint}
+(default) for auto-detection, "Ct", "NPX", and "Quantified".}
 
 \item{quiet}{Boolean to print a confirmation message when reading the input
-file. Applies to excel or delimited input only. "TRUE" (default) to not print
-and "FALSE" to print.}
+file. Applies to excel or delimited input only. \code{TRUE} (default) to not print
+and \code{FALSE} to print.}
 }
 \value{
 Tibble or ArrowObject with Olink data in long format.
@@ -44,15 +43,15 @@ files in wide format. Specifically, it supports:
 only NPX)} with the bottom matrix containing one of the following
 combinations of rows:
 \itemize{
-\item Missing Data freq. and LOD. # nolint
-\item Missing Data freq., LOD, and Normalization. # nolint
+\item Missing Data freq. and LOD. # nolint line_length_linter
+\item Missing Data freq., LOD, and Normalization. # nolint line_length_linter
 }
 \item \strong{Target 48} output files in wide format \strong{NPX} with the
 bottom matrix containing the following rows:
-Missing Data freq., Normalization, and LOD. # nolint
+Missing Data freq., Normalization, and LOD. # nolint line_length_linter
 \item \strong{Target 48} output files in wide format \strong{absolute
 Quantification} with the bottom matrix containing the following rows:
-Assay warning, LLOQ, Lowest quantifiable level, Missing Data freq., Normalization, Plate_LOD, and ULOQ. # nolint
+Assay warning, LLOQ, Lowest quantifiable level, Missing Data freq., Normalization, Plate_LOD, and ULOQ. # nolint line_length_linter
 }
 
 This function would accept data exported in wide format from Olink NPX

@@ -1,17 +1,18 @@
-#' Help function checking if a data frame is an R6 ArrowObject.
+#' Help function checking if a variable is an R6 ArrowObject.
 #'
 #' @author
 #'   Klev Diamanti
 #'
-#' @param df Data frame to check.
-#' @param error Return error or a boolean (default = FALSE).
+#' @param df Variable to check.
+#' @param error Scalar boolean to return an error instead of a `FALSE`
+#' (`default = FALSE`).
 #'
-#' @return A scalar boolean if the object is an arrow object or not, and an
-#' error if "error = TRUE".
+#' @return `TRUE` if the variable is an ArrowObject, and `FALSE` if not; error
+#' if the variable is not an ArrowObject and `error = TRUE`.
 #'
 #' @seealso
 #'   \code{\link{check_is_tibble}}
-#'   \code{\link{check_is_arrow_or_tibble}}
+#'   \code{\link{check_is_dataset}}
 #'
 check_is_arrow_object <- function(df,
                                   error = FALSE) {
@@ -20,13 +21,14 @@ check_is_arrow_object <- function(df,
   check_is_scalar_boolean(bool = error,
                           error = TRUE)
 
+  # check if input is an ArrowObject
   if (!inherits(x = df,
                 what = "ArrowObject")) {
 
     if (error == TRUE) {
 
       # error if the variable is not a tibble
-      cli::cli_abort(
+      cli::cli_abort( # nolint return_linter
         c(
           "x" = "{.arg {rlang::caller_arg(df)}} is not an R6 ArrowObject!"
         ),
@@ -48,20 +50,21 @@ check_is_arrow_object <- function(df,
 
 }
 
-#' Help function checking if a data frame is a tibble data frame.
+#' Help function checking if a variable is a tibble dataset.
 #'
 #' @author
 #'   Klev Diamanti
 #'
-#' @param df Data frame to check.
-#' @param error Return error or a boolean (default = FALSE).
+#' @param df Variable to check.
+#' @param error Scalar boolean to return an error instead of a `FALSE`
+#' (`default = FALSE`).
 #'
-#' @return A scalar boolean if the object is a tibble or not, and an error if
-#' "error = TRUE".
+#' @return `TRUE` if the variable is a tibble, and `FALSE` if not; error if the
+#' variable is not a tibble and `error = TRUE`.
 #'
 #' @seealso
 #'   \code{\link{check_is_arrow_object}}
-#'   \code{\link{check_is_arrow_or_tibble}}
+#'   \code{\link{check_is_dataset}}
 #'
 check_is_tibble <- function(df,
                             error = FALSE) {
@@ -70,15 +73,16 @@ check_is_tibble <- function(df,
   check_is_scalar_boolean(bool = error,
                           error = TRUE)
 
+  # check if input is a tibble
   if (!inherits(x = df,
                 what = "tbl_df")) {
 
     if (error == TRUE) {
 
       # error if df is not a tibble
-      cli::cli_abort(
+      cli::cli_abort( # nolint return_linter
         c(
-          "x" = "{.arg {rlang::caller_arg(df)}} is not a tibble data frame!"
+          "x" = "{.arg {rlang::caller_arg(df)}} is not a tibble dataset!"
         ),
         call = rlang::caller_env(),
         wrap = TRUE
@@ -98,23 +102,25 @@ check_is_tibble <- function(df,
 
 }
 
-#' Help function checking if a data frame is a tibble or an arrow object.
+#' Help function checking if a variable is a tibble or an ArrowObject dataset.
 #'
 #' @author
 #'   Klev Diamanti
 #'
-#' @param df Data frame to check.
-#' @param error Return error or a boolean (default = FALSE).
+#' @param df Variable to check.
+#' @param error Scalar boolean to return an error instead of a `FALSE`
+#' (`default = FALSE`).
 #'
-#' @return A scalar boolean if the object is a tibble or an arrow object or not,
-#' and an error if "error = TRUE".
+#' @return `TRUE` if the variable is a tibble or an ArrowObject, and `FALSE` if
+#' not; error if the variable is not a tibble or an ArrowObject and
+#' `error = TRUE`.
 #'
 #' @seealso
 #'   \code{\link{check_is_arrow_object}}
 #'   \code{\link{check_is_tibble}}
 #'
-check_is_arrow_or_tibble <- function(df,
-                                     error = FALSE) {
+check_is_dataset <- function(df,
+                             error = FALSE) {
 
   # check input ----
 
@@ -135,10 +141,10 @@ check_is_arrow_or_tibble <- function(df,
     if (error == TRUE) {
 
       # error if df is not a tibble
-      cli::cli_abort(
+      cli::cli_abort( # nolint return_linter
         c(
-          "x" = "{.arg {rlang::caller_arg(df)}} is not a tibble or an arrow data
-          frame!"
+          "x" = "{.arg {rlang::caller_arg(df)}} is not a tibble or an
+          ArrowObject dataset!"
         ),
         call = rlang::caller_env(),
         wrap = TRUE

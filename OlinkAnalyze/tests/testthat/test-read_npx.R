@@ -1,18 +1,14 @@
-ref_res_file <- test_path("..",
-                          "data",
-                          "reference_results",
-                          "reference_results.rds")
-ref_res <- readRDS(file = ref_res_file)
-
 test_that(
   "data loads correctly - long - parquet",
   {
+    # get data if available, otherwise skip the test
+    ref_res <- get_example_data("reference_results.rds")
+
     withr::with_tempfile(
       new = "tmp_long_parquet",
       pattern = "parquet-long-",
       fileext = ".parquet",
       code = {
-
         # get the npx data file
         expect_no_error(
           object = npx_file <- system.file("extdata", "npx_data_ext.parquet",
@@ -75,7 +71,6 @@ test_that(
           expected = ref_res$npx_data_parquet,
           tolerance = 1e-4
         )
-
       }
     )
   }
@@ -84,12 +79,14 @@ test_that(
 test_that(
   "data loads correctly - long - csv",
   {
+    # get data if available, otherwise skip the test
+    ref_res <- get_example_data("reference_results.rds")
+
     withr::with_tempfile(
       new = "tmp_long_csv",
       pattern = "csv-long-",
       fileext = ".csv",
       code = {
-
         # get the npx data file
         expect_no_error(
           object = npx_file <- system.file("extdata",
@@ -151,7 +148,6 @@ test_that(
           expected = ref_res$npx_data_long_csv,
           tolerance = 1e-4
         )
-
       }
     )
   }
@@ -162,12 +158,14 @@ test_that(
   {
     skip_if_not_installed("zip")
 
+    # get data if available, otherwise skip the test
+    ref_res <- get_example_data("reference_results.rds")
+
     withr::with_tempfile(
       new = "tmp_long_csv_zip",
       pattern = "csv-zip-long-",
       fileext = ".zip",
       code = {
-
         # get the npx data file
         expect_no_error(
           object = npx_file <- system.file("extdata",
@@ -229,7 +227,6 @@ test_that(
           expected = ref_res$npx_data_long_zip,
           tolerance = 1e-4
         )
-
       }
     )
   }
@@ -240,12 +237,14 @@ test_that(
   {
     skip_if_not_installed(pkg = "readxl")
 
+    # get data if available, otherwise skip the test
+    ref_res <- get_example_data("reference_results.rds")
+
     withr::with_tempfile(
       new = "tmp_wide_xlsx",
       pattern = "xlsx-wide-",
       fileext = ".xlsx",
       code = {
-
         # get the npx data file
         expect_no_error(
           object = npx_file <- system.file("extdata",
@@ -324,7 +323,6 @@ test_that(
             ),
           tolerance = 1e-4
         )
-
       }
     )
   }
@@ -335,12 +333,14 @@ test_that(
   {
     skip_if_not_installed(pkg = "readxl")
 
+    # get data if available, otherwise skip the test
+    ref_res <- get_example_data("reference_results.rds")
+
     withr::with_tempfile(
       new = "tmp_wide_xlsx",
       pattern = "xlsx-wide-",
       fileext = ".xlsx",
       code = {
-
         # get the npx data file
         expect_no_error(
           object = npx_file <- system.file("extdata",
@@ -434,7 +434,6 @@ test_that(
             ),
           tolerance = 1e-4
         )
-
       }
     )
   }
@@ -443,12 +442,14 @@ test_that(
 test_that(
   "data loads correctly - wide - csv",
   {
+    # get data if available, otherwise skip the test
+    ref_res <- get_example_data("reference_results.rds")
+
     withr::with_tempfile(
       new = "tmp_wide_csv",
       pattern = "csv-wide-",
       fileext = ".csv",
       code = {
-
         # get the npx data file
         expect_no_error(
           object = npx_file <- system.file("extdata",
@@ -548,7 +549,6 @@ test_that(
             ),
           tolerance = 1e-4
         )
-
       }
     )
   }
@@ -559,12 +559,14 @@ test_that(
   {
     skip_if_not_installed(pkg = "readxl")
 
+    # get data if available, otherwise skip the test
+    ref_res <- get_example_data("reference_results.rds")
+
     withr::with_tempfile(
       new = "tmp_wide_xlsx",
       pattern = "xlsx-wide-",
       fileext = ".xlsx",
       code = {
-
         # get the npx data file
         expect_no_error(
           object = npx_file <- system.file("extdata",
@@ -635,7 +637,6 @@ test_that(
             ),
           tolerance = 1e-4
         )
-
       }
     )
   }

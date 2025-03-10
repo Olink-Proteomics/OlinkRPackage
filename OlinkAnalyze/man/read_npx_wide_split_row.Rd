@@ -9,12 +9,12 @@ read_npx_wide_split_row(df, file, data_type, format_spec)
 \arguments{
 \item{df}{A tibble containing the full Olink dataset in wide format.}
 
-\item{file}{Path to Olink software output file in wide or long format.
-Expecting file extensions
-xls, xlsx, csv, or txt. # nolint}
+\item{file}{Path to Olink software output file in wide format. Expected one
+of file extensions
+"xls", "xlsx", "csv", and "txt".}
 
-\item{data_type}{Quantification method of the input data. One of
-Ct, NPX, or Quantified. # nolint}
+\item{data_type}{Quantification method of the input data. One of \code{NULL}
+(default) for auto-detection, "Ct", "NPX", and "Quantified".}
 
 \item{format_spec}{A tibble derived from \var{olink_wide_spec} in the local
 environment containing the expected format of the Olink wide file based on
@@ -31,10 +31,10 @@ format file split on:
 }
 }
 \description{
-Olink datasets in wide format contain 1 or 2 rows with all columns NA marking
-sub-matrices of the data. This function takes advantage of that feature and
-splits the dataset into 3 or 4 sub-matrices. Each sub-matrix is used
-downstream to assemble a long data frame.
+Olink datasets in wide format contain 2 or 3 rows with all columns \code{NA}
+marking sub-matrices of the data. This function takes advantage of that
+feature and splits the dataset into 3 or 4 sub-matrices. Each sub-matrix is
+used downstream to assemble a long data frame.
 
 Specifically:
 \itemize{
@@ -46,9 +46,9 @@ dataset, depending on the quantification method. This matrix contains data
 on assays, panels, columns with plate identifiers, columns with sample QC
 warnings and column with deviations from the internal controls. Note that
 not all the columns are present in all datasets and for all quantification
-methods. The local environment variable \var{olink_wide_spec} marks all
-the expected configurations.
-\item \strong{Middle matrix} is marked by rows with all columns "NA: above
+methods. The local environment variable \var{olink_wide_spec} marks all the
+expected configurations.
+\item \strong{Middle matrix} is marked by rows with all columns \code{NA} above
 and below. This matrix contains sample identifiers, quantification
 measurements for all assays, plate identifiers, sample QC warnings and
 deviations from the internal controls.

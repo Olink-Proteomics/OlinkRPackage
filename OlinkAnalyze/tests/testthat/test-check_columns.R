@@ -3,7 +3,6 @@
 test_that(
   "check_columns - works - tibble",
   {
-
     tmp_data <- dplyr::tibble(
       "A" = c(1L, 2L, 3L),
       "B" = c(TRUE, TRUE, FALSE),
@@ -37,7 +36,7 @@ test_that(
       object = check_columns(df = tmp_data,
                              col_list = list("A",
                                              "E")),
-      regexp = "is missing the required columns: E!"
+      regexp = "is missing the required columns: \"E\"!"
     )
 
     # A exists but E and F do not
@@ -46,7 +45,7 @@ test_that(
                              col_list = list("A",
                                              "E",
                                              "F")),
-      regexp = "is missing the required columns: E and F!"
+      regexp = "is missing the required columns: \"E\" and \"F\"!"
     )
 
     # A and (B or E) exist -> no error as B exists
@@ -61,7 +60,7 @@ test_that(
       object = check_columns(df = tmp_data,
                              col_list = list("A",
                                              c("F", "E"))),
-      regexp = "at least one of the vectors of required columns"
+      regexp = "is missing columns that should be present in at least one"
     )
 
     # A and (F or E) exist -> error as neither E nor F exist
@@ -70,16 +69,14 @@ test_that(
                              col_list = list("A",
                                              c("F", "E"),
                                              c("M", "N"))),
-      regexp = "at least one of the vectors of required columns"
+      regexp = "is missing columns that should be present in at least one"
     )
-
   }
 )
 
 test_that(
   "check_columns - works - arrow",
   {
-
     tmp_data <- dplyr::tibble(
       "A" = c(1L, 2L, 3L),
       "B" = c(TRUE, TRUE, FALSE),
@@ -114,7 +111,7 @@ test_that(
       object = check_columns(df = tmp_data,
                              col_list = list("A",
                                              "E")),
-      regexp = "is missing the required columns: E!"
+      regexp = "is missing the required columns: \"E\"!"
     )
 
     # A exists but E and F do not
@@ -123,7 +120,7 @@ test_that(
                              col_list = list("A",
                                              "E",
                                              "F")),
-      regexp = "is missing the required columns: E and F!"
+      regexp = "is missing the required columns: \"E\" and \"F\"!"
     )
 
     # A and (B or E) exist -> no error as B exists
@@ -138,7 +135,7 @@ test_that(
       object = check_columns(df = tmp_data,
                              col_list = list("A",
                                              c("F", "E"))),
-      regexp = "at least one of the vectors of required columns"
+      regexp = "is missing columns that should be present in at least one"
     )
 
     # A and (F or E) exist -> error as neither E nor F exist
@@ -147,16 +144,14 @@ test_that(
                              col_list = list("A",
                                              c("F", "E"),
                                              c("M", "N"))),
-      regexp = "at least one of the vectors of required columns"
+      regexp = "is missing columns that should be present in at least one"
     )
-
   }
 )
 
 test_that(
   "check_columns - error - incorrect input",
   {
-
     tmp_data <- dplyr::tibble(
       "A" = c(1L, 2L, 3L),
       "B" = c(TRUE, TRUE, FALSE),
@@ -169,7 +164,7 @@ test_that(
       object = check_columns(df = tmp_data,
                              col_list = list("A",
                                              1L)),
-      regexp = "contains 1 element that is not character vector!"
+      regexp = "contains 1 element that is not character vector"
     )
 
     # error non-character vector
@@ -177,7 +172,7 @@ test_that(
       object = check_columns(df = tmp_data,
                              col_list = list("A",
                                              TRUE)),
-      regexp = "contains 1 element that is not character vector!"
+      regexp = "contains 1 element that is not character vector"
     )
 
     # error non-character vector
@@ -185,7 +180,7 @@ test_that(
       object = check_columns(df = tmp_data,
                              col_list = list("A",
                                              1.1)),
-      regexp = "contains 1 element that is not character vector!"
+      regexp = "contains 1 element that is not character vector"
     )
 
     # error non-character vector
@@ -195,7 +190,7 @@ test_that(
                                              TRUE,
                                              1L,
                                              1.1)),
-      regexp = "contains 3 elements that are not character vectors!"
+      regexp = "contains 3 elements that are not character vectors"
     )
 
     # error non-character vector
@@ -217,6 +212,5 @@ test_that(
                                              1.1)),
       regexp = "contains 2 elements that are not character vectors!"
     )
-
   }
 )

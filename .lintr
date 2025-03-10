@@ -1,0 +1,5 @@
+linters: linters_with_defaults(
+  # require that every function has a return()
+  return_linter = return_linter(
+    return_style = "explicit"))
+encoding: "UTF-8"

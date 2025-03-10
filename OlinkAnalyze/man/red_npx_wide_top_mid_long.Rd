@@ -13,8 +13,8 @@ function \code{\link{read_npx_wide_top}}.}
 \item{df_middle_list}{List of data frames from the middle matrix. Output of
 function \code{\link{read_npx_wide_middle}}.}
 
-\item{data_type}{Quantification method of the input data. One of
-Ct, NPX, or Quantified. # nolint}
+\item{data_type}{Quantification method of the input data. One of \code{NULL}
+(default) for auto-detection, "Ct", "NPX", and "Quantified".}
 
 \item{format_spec}{A tibble derived from \var{olink_wide_spec} in the local
 environment containing the expected format of the Olink wide file based on

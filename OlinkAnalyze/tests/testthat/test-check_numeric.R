@@ -70,14 +70,12 @@ test_that(
                                         1L),
                                 error = FALSE)
     )
-
   }
 )
 
 test_that(
   "check is numeric works - FALSE",
   {
-
     expect_false(
       object = check_is_numeric(num = c("I_Shall_Pass",
                                         NA_character_),
@@ -98,21 +96,19 @@ test_that(
       object = check_is_numeric(num = TRUE,
                                 error = FALSE)
     )
-
   }
 )
 
 test_that(
   "check is numeric works - ERROR",
   {
-
     expect_error(
       object = check_is_numeric(num = c("I_Shall_Pass",
                                         NA_character_),
                                 error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "must be a number vector!",
+                    x = "must be a numeric vector!",
                     fixed = TRUE)
     )
 
@@ -121,7 +117,7 @@ test_that(
                                 error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "must be a number vector!",
+                    x = "must be a numeric vector!",
                     fixed = TRUE)
     )
 
@@ -130,7 +126,7 @@ test_that(
                                 error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "must be a number vector!",
+                    x = "must be a numeric vector!",
                     fixed = TRUE)
     )
 
@@ -139,10 +135,9 @@ test_that(
                                 error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "must be a number vector!",
+                    x = "must be a numeric vector!",
                     fixed = TRUE)
     )
-
   }
 )
 
@@ -214,14 +209,12 @@ test_that(
                                                NULL),
                                        error = FALSE)
     )
-
   }
 )
 
 test_that(
   "check is scalar numeric works - FALSE",
   {
-
     expect_false(
       object = check_is_scalar_numeric(num = c(1,
                                                3.14),
@@ -253,21 +246,19 @@ test_that(
       object = check_is_scalar_numeric(num = TRUE,
                                        error = FALSE)
     )
-
   }
 )
 
 test_that(
   "check is scalar numeric works - ERROR",
   {
-
     expect_error(
       object = check_is_scalar_numeric(num = c(1,
                                                3.14),
                                        error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "must be a number!",
+                    x = "must be a scalar numeric!",
                     fixed = TRUE)
     )
 
@@ -277,7 +268,7 @@ test_that(
                                        error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "must be a number!",
+                    x = "must be a scalar numeric!",
                     fixed = TRUE)
     )
 
@@ -286,7 +277,7 @@ test_that(
                                        error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "must be a number!",
+                    x = "must be a scalar numeric!",
                     fixed = TRUE)
     )
 
@@ -295,7 +286,7 @@ test_that(
                                        error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "must be a number!",
+                    x = "must be a scalar numeric!",
                     fixed = TRUE)
     )
 
@@ -304,7 +295,7 @@ test_that(
                                        error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "must be a number!",
+                    x = "must be a scalar numeric!",
                     fixed = TRUE)
     )
 
@@ -313,9 +304,8 @@ test_that(
                                        error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "must be a number!",
+                    x = "must be a scalar numeric!",
                     fixed = TRUE)
     )
-
   }
 )

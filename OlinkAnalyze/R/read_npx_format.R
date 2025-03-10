@@ -6,11 +6,11 @@
 #' data type, platform or format.
 #'
 #' \strong{Olink software excel files} with the extension
-#' `r accepted_npx_file_ext[grepl("excel", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' `r ansi_collapse_quot(get_file_ext(name_sub = "excel"), sep = "or")`
 #' are imported in R by the function \code{\link{read_npx_excel}}.
 #'
 #' \strong{Olink software delimited files} with suffix
-#' `r accepted_npx_file_ext[grepl("delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' `r ansi_collapse_quot(get_file_ext(name_sub = "delim"), sep = "or")`
 #' are imported in R by the functions \code{\link{read_npx_delim}} or
 #' \code{\link{read_npx_csv}}.
 #'
@@ -34,29 +34,29 @@
 #'
 #' @param file Path to Olink software output file in wide or long format.
 #' Expecting file extensions
-#' `r accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
-#' @param out_df The class of output data frame. One of "tibble" (default) or
-#' "arrow" for ArrowObject.
-#' @param sep Character separator of delimited input file. One of `NULL` for
-#' auto-detection (default), "," for comma or ";" for semicolon. Used only for
-#' delimited output files from Olink software.
+#' `r get_file_ext(name_sub = c("excel", "delim")) |> ansi_collapse_quot()`.
+#' @param out_df The class of output data frame. One of
+#' `r ansi_collapse_quot(read_npx_df_output)`.
+#' @param sep Character separator of delimited input file. One of `NULL`
+#' (default) for auto-detection, or `r ansi_collapse_quot(accepted_field_sep)`.
+#' Used only for delimited output files from Olink software.
 #' @param long_format Boolean marking format of input file. One of `NULL`
-#' (default) for auto-detection, "TRUE" for long format files or "FALSE" for
+#' (default) for auto-detection, `TRUE` for long format files or `FALSE` for
 #' wide format files.
 #' @param olink_platform Olink platform used to generate the input file.
-#' One of `NULL` (default),
-#' `r cli::ansi_collapse(x = accepted_olink_platforms$name, sep2 = " or ", last = ", or ")`. # nolint
+#' One of `NULL` (default) for auto-detection,
+#' `r get_olink_platforms(broad_platform = "qPCR") |> ansi_collapse_quot()`.
 #' @param data_type Quantification method of the input data. One of `NULL`
-#' (default),
-#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
 #' @param quiet Boolean to print a confirmation message when reading the input
-#' file. Applies to excel or delimited input only. "TRUE" (default) to not print
-#' and "FALSE" to print.
+#' file. `TRUE` (default) to skip printing, and `FALSE` to print.
 #' @param legacy Boolean to enforce returning a list containing olink_platform,
-#' data_type and long_format information together with the dataset.
+#' data_type and long_format information together with the dataset. Used only
+#' when \code{\link{read_npx_format}} is called from
+#' \code{\link{read_npx_legacy}}.
 #'
-#'
-#' @return Tibble or ArrowObject with Olink data in long format.
+#' @return `r ansi_collapse_quot(x = get_df_output_print(), sep = "or")` with
+#' Olink data in long or wide format.
 #'
 #' @seealso
 #'   \code{\link{read_npx}}
@@ -114,12 +114,9 @@ read_npx_format <- function(file,
   ## Determine long or wide format ----
 
   file_format_check <- read_npx_format_get_format(
-    df = list_df_read$df_top_n,
+    df_top_n = list_df_read$df_top_n,
     file = file,
-    long_format = long_format,
-    quant_methods = accepted_olink_platforms$quant_method |>
-      unlist() |>
-      unique()
+    long_format = long_format
   )
 
   ## Determine Olink platform & quantification method ----
@@ -128,39 +125,18 @@ read_npx_format <- function(file,
 
   if (file_format_check$is_long_format == FALSE) {
 
-    # default variables ----
-
-    olink_broader_platform <- "qPCR" # nolint
-
-    # filter the global variable accepted_olink_platforms to have a collection
-    # of platforms and quant methods available.
-    # Note that only Target platforms can report data in excel.
-    olink_platforms_wide <- accepted_olink_platforms |>
-      dplyr::filter(
-        .data[["broader_platform"]] == .env[["olink_broader_platform"]]
-      )
-
     # get platform
     file_olink_platform <- read_npx_format_get_platform(
-      df = list_df_read$df_top_n,
+      df_top_n = list_df_read$df_top_n,
       file = file,
-      olink_platform = olink_platform,
-      olink_platforms_wide = olink_platforms_wide
+      olink_platform = olink_platform
     )
 
     # get quantification method
     file_quant_method <- read_npx_format_get_quant(
       file = file,
       data_type = data_type,
-      data_cells = file_format_check$data_cells,
-      quant_methods_expected = olink_platforms_wide |>
-        dplyr::filter(
-          .data[["name"]] == .env[["file_olink_platform"]]
-        ) |>
-        dplyr::pull(
-          .data[["quant_method"]]
-        ) |>
-        unlist()
+      data_cells = file_format_check$data_cells
     )
 
     out_msg <- "Detected \"{file_quant_method}\" data from
@@ -242,11 +218,11 @@ read_npx_format <- function(file,
 #' data type, platform or format.
 #'
 #' \strong{Olink software excel files} with the extension
-#' `r accepted_npx_file_ext[grepl("excel", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' `r ansi_collapse_quot(get_file_ext(name_sub = "excel"), sep = "or")`
 #' are imported in R by the function \code{\link{read_npx_excel}}.
 #'
 #' \strong{Olink software delimited files} with suffix
-#' `r accepted_npx_file_ext[grepl("delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' `r ansi_collapse_quot(get_file_ext(name_sub = "delim"), sep = "or")`
 #' are imported in R by the functions \code{\link{read_npx_delim}} or
 #' \code{\link{read_npx_csv}}.
 #'
@@ -264,10 +240,10 @@ read_npx_format <- function(file,
 #'
 #' @param file Path to Olink software output file in wide or long format.
 #' Expecting file extensions
-#' `r accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
-#' @param sep Character separator of delimited input file. One of `NULL` for
-#' auto-detection (default), "," for comma or ";" for semicolon. Used only for
-#' delimited output files from Olink software.
+#' `r get_file_ext(name_sub = c("excel", "delim")) |> ansi_collapse_quot()`.
+#' @param sep Character separator of delimited input file. One of `NULL`
+#' (default) for auto-detection, or `r ansi_collapse_quot(accepted_field_sep)`.
+#' Used only for delimited output files from Olink software.
 #' @param read_n Number of top rows to read.
 #'
 #' @return A list with two elements:
@@ -408,17 +384,14 @@ read_npx_format_read <- function(file,
 #' @author
 #'   Klev Diamanti
 #'
-#' @param df A tibble containing the first \var{read_n} rows of the input Olink
-#' file.
+#' @param df_top_n A tibble containing the first \var{read_n} rows of the input
+#' Olink file.
 #' @param file Path to Olink software output file in wide or long format.
 #' Expecting file extensions
-#' `r accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' `r get_file_ext(name_sub = c("excel", "delim")) |> ansi_collapse_quot()`.
 #' @param long_format Boolean marking format of input file. One of `NULL`
-#' (default) for auto-detection, "TRUE" for long format files or "FALSE" for
+#' (default) for auto-detection, `TRUE` for long format files or `FALSE` for
 #' wide format files.
-#' @param quant_methods Character vector with the Olink protein quantification
-#' methods extracted from \var{accepted_olink_platforms$quant_method} in the
-#' local environment.
 #'
 #' @return A list with two elements:
 #' \itemize{
@@ -435,21 +408,17 @@ read_npx_format_read <- function(file,
 #'   \code{\link{read_npx_format_get_platform}}
 #'   \code{\link{read_npx_format_get_quant}}
 #'
-read_npx_format_get_format <- function(df,
+read_npx_format_get_format <- function(df_top_n,
                                        file,
-                                       long_format = NULL,
-                                       quant_methods) {
+                                       long_format = NULL) {
 
   # Check inputs ----
 
-  check_is_tibble(df = df,
+  check_is_tibble(df = df_top_n,
                   error = TRUE)
 
   check_file_exists(file = file,
                     error = TRUE)
-
-  check_is_character(string = quant_methods,
-                     error = TRUE)
 
   # check long format input
   if (!is.null(long_format)) {
@@ -461,7 +430,7 @@ read_npx_format_get_format <- function(df,
 
   # Read specific cells of the excel files to determine wide or long format,
   # and protein level metric (NPX, Quant or Ct)
-  data_cells_wide <- df |>
+  data_cells_wide <- df_top_n |>
     dplyr::select(
       dplyr::all_of("V1")
     ) |>
@@ -471,7 +440,7 @@ read_npx_format_get_format <- function(df,
     # convert to character to simplify operations below
     as.character()
 
-  data_cells_long <- df |>
+  data_cells_long <- df_top_n |>
     dplyr::slice_head(
       n = 1L
     ) |>
@@ -483,10 +452,10 @@ read_npx_format_get_format <- function(df,
 
   # Determine long or wide format from file ----
 
-  is_data_wide <- grepl(pattern = paste(quant_methods, collapse = "|"),
+  is_data_wide <- grepl(pattern = paste(get_olink_data_types(), collapse = "|"),
                         x = data_cells_wide,
                         ignore.case = FALSE)
-  is_data_long <- grepl(pattern = paste(quant_methods, collapse = "|"),
+  is_data_long <- grepl(pattern = paste(get_olink_data_types(), collapse = "|"),
                         x = data_cells_long,
                         ignore.case = FALSE)
 
@@ -587,7 +556,7 @@ read_npx_format_get_format <- function(df,
 
   ## Check that long format data do not have NA colnames ----
 
-  check_na_colname <- df[1L, ] |>
+  check_na_colname <- df_top_n[1L, ] |>
     as.character() |>
     is.na() |>
     any() && (is_long_format == TRUE)
@@ -628,19 +597,17 @@ read_npx_format_get_format <- function(df,
 #' @author
 #'   Klev Diamanti
 #'
-#' @param df A tibble containing the first \var{read_n} rows of the input Olink
-#' file.
+#' @param df_top_n A tibble containing the first \var{read_n} rows of the input
+#' Olink file.
 #' @param file Path to Olink software output file in wide format. Expecting file
 #' extensions
-#' `r accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' `r get_file_ext(name_sub = c("excel", "delim")) |> ansi_collapse_quot()`.
 #' @param olink_platform Olink platform used to generate the input file.
-#' One of `NULL` (default),
-#' `r accepted_olink_platforms |> dplyr::filter(.data[["broader_platform"]] == "qPCR") |> dplyr::pull(.data[["name"]]) |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
-#' @param olink_platforms_wide Tibble with rows corresponding to qPCR platforms
-#' extracted from \var{accepted_olink_platforms} from the local environment.
+#' One of `NULL` (default) for auto-detection,
+#' `r get_olink_platforms(broad_platform = "qPCR") |> ansi_collapse_quot()`.
 #'
 #' @return The name of the Olink platform. One of
-#' `r accepted_olink_platforms |> dplyr::filter(.data[["broader_platform"]] == "qPCR") |> dplyr::pull(.data[["name"]]) |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' `r ansi_collapse_quot(get_olink_platforms(broad_platform = "qPCR"))`.
 #'
 #' @seealso
 #'   \code{\link{read_npx_format}}
@@ -648,35 +615,37 @@ read_npx_format_get_format <- function(df,
 #'   \code{\link{read_npx_format_get_format}}
 #'   \code{\link{read_npx_format_get_quant}}
 #'
-read_npx_format_get_platform <- function(df,
+read_npx_format_get_platform <- function(df_top_n,
                                          file,
-                                         olink_platform = NULL,
-                                         olink_platforms_wide) {
+                                         olink_platform = NULL) {
 
   # Checks inputs ----
 
-  check_is_tibble(df = df,
+  check_is_tibble(df = df_top_n,
                   error = TRUE)
 
   check_file_exists(file = file,
                     error = TRUE)
 
-  check_is_tibble(df = olink_platforms_wide,
-                  error = TRUE)
+  # help vars
+  broad_platform <- "qPCR"
+
+  check_is_scalar_character(string = broad_platform,
+                            error = TRUE)
 
   # check olink platform
   if (!is.null(olink_platform)) {
     check_olink_platform(x = olink_platform,
-                         broader_platform = "qPCR")
+                         broad_platform = broad_platform)
   }
 
   # Determine olink platform from input file ----
 
   # From cell B3 in the wide file read panel name
 
-  check_columns(df = df, col_list = list("V2"))
+  check_columns(df = df_top_n, col_list = list("V2"))
 
-  panel_name <- df |>
+  panel_name <- df_top_n |> # nolint object_usage_linter
     dplyr::select(
       dplyr::all_of("V2")
     ) |>
@@ -687,15 +656,21 @@ read_npx_format_get_platform <- function(df,
 
   # run the platform-specific regular expression from the global variable to
   # determine that platform.
-  olink_platform_df <- olink_platforms_wide |>
+  olink_platform_auto <- accepted_olink_platforms |>
+    dplyr::filter(
+      .data[["broader_platform"]] == .env[["broad_platform"]]
+    ) |>
     dplyr::mutate(
       detected_platform = stringr::str_detect(
-        string = panel_name,
+        string = .env[["panel_name"]],
         pattern = .data[["regexp"]]
       )
     ) |>
     dplyr::filter(
       .data[["detected_platform"]] == TRUE
+    ) |>
+    dplyr::pull(
+      .data[["name"]]
     )
 
   # Confirm that detected platform matches user input ----
@@ -704,29 +679,31 @@ read_npx_format_get_platform <- function(df,
     # if olink_platform is NULL
 
     # check how many platforms match regular expression
-    if (nrow(olink_platform_df) == 0L) {
+    if (length(olink_platform_auto) == 0L) {
       # if platform cannot be determined from input file throw an error
 
       cli::cli_abort(
         message = c(
           "x" = "Unable to recognize the Olink platform from the input file:
         {.file {file}}!",
-          "i" = "Expected one of: {olink_platforms_wide$name}. Consider setting
-        {.arg olink_platform}."
+          "i" = "Expected one of:
+          {.val {get_olink_platforms(broad_platform = broad_platform)}}.
+          Consider setting {.arg olink_platform}."
         ),
         call = rlang::caller_env(),
         wrap = FALSE
       )
 
-    } else if (nrow(olink_platform_df) > 1L) {
+    } else if (length(olink_platform_auto) > 1L) {
       # if too many platform matches cannot from input file throw an error
 
       cli::cli_abort(
         message = c(
           "x" = "Unable to recognize the Olink platform from the input file:
         {.file {file}}!",
-          "i" = "Too many matches from: {olink_platforms_wide$name}. Consider
-        setting {.arg olink_platform}."
+          "i" = "Too many matches from:
+          {.val {get_olink_platforms(broad_platform = broad_platform)}}.
+          Consider setting {.arg olink_platform}."
         ),
         call = rlang::caller_env(),
         wrap = FALSE
@@ -735,7 +712,7 @@ read_npx_format_get_platform <- function(df,
     } else {
 
       # if data format input is NULL then set it from autodetect
-      out_olink_platform <- olink_platform_df$name
+      out_olink_platform <- olink_platform_auto
 
     }
 
@@ -743,7 +720,7 @@ read_npx_format_get_platform <- function(df,
     # if olink_platform is not NULL
 
     # check how many platforms match regular expression
-    if (nrow(olink_platform_df) == 0L) {
+    if (length(olink_platform_auto) == 0L) {
       # if platform cannot be determined from input file throw a warning
 
       cli::cli_warn(
@@ -755,7 +732,7 @@ read_npx_format_get_platform <- function(df,
         wrap = FALSE
       )
 
-    } else if (nrow(olink_platform_df) > 1L) {
+    } else if (length(olink_platform_auto) > 1L) {
       # if too many platform matches from input file throw a warning
 
       cli::cli_warn(
@@ -767,13 +744,13 @@ read_npx_format_get_platform <- function(df,
         wrap = FALSE
       )
 
-    } else if (olink_platform != olink_platform_df$name) {
+    } else if (olink_platform != olink_platform_auto) {
 
       cli::cli_warn(
         message = c(
           "i" = "Based on {.arg olink_platform} we were expecting Olink
-          {olink_platform} data, but instead we detected
-          {olink_platform_df$name} data. We trust your input!"
+          {.val {olink_platform}} data, but instead we detected
+          {.val {olink_platform_auto}} data. We trust your input!"
         ),
         call = rlang::caller_env(),
         wrap = FALSE
@@ -805,20 +782,15 @@ read_npx_format_get_platform <- function(df,
 #'
 #' @param file Path to Olink software output file in wide format. Expecting file
 #' extensions
-#' `r accepted_npx_file_ext[grepl("excel|delim", names(accepted_npx_file_ext))] |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' `r get_file_ext(name_sub = c("excel", "delim")) |> ansi_collapse_quot()`.
 #' @param data_type Quantification method of the input data. One of `NULL`
-#' (default),
-#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
 #' @param data_cells A character vector with the contents of the cell \emph{A2}
 #' from the Olink software file in wide format indicating the quantification
 #' method.
-#' @param quant_methods_expected Character vector with the Olink protein
-#' quantification methods extracted from \var{accepted_olink_platforms} from the
-#' local environment filtered for the Olink platform detected in function
-#' \code{\link{read_npx_format_get_platform}}.
 #'
-#' @return The name of the quantification method. One of
-#' `r accepted_olink_platforms$quant_method |> unlist() |> unique() |> sort() |> cli::ansi_collapse(sep2 = " or ", last = ", or ")`. # nolint
+#' @return The name of the data type. One of
+#' `r ansi_collapse_quot(get_olink_data_types(broad_platform = "qPCR"))`.
 #'
 #' @seealso
 #'   \code{\link{read_npx_format}}
@@ -828,8 +800,7 @@ read_npx_format_get_platform <- function(df,
 #'
 read_npx_format_get_quant <- function(file,
                                       data_type = NULL,
-                                      data_cells,
-                                      quant_methods_expected) {
+                                      data_cells) {
 
   # Checks inputs ----
 
@@ -839,13 +810,13 @@ read_npx_format_get_quant <- function(file,
   check_is_character(string = data_cells,
                      error = TRUE)
 
-  check_is_character(string = quant_methods_expected,
-                     error = TRUE)
+  # help vars
+  broad_platform <- "qPCR"
 
   # check data type
   if (!is.null(data_type)) {
     check_olink_data_type(x = data_type,
-                          broader_platform = "qPCR")
+                          broad_platform = broad_platform)
   }
 
   # Determine quantification method from excel file ----
@@ -853,7 +824,7 @@ read_npx_format_get_quant <- function(file,
   # In wide format data_cells is of length 1 as we read only cell A2
   # the solution below is expected to catch all cases
   quant_matches <- sapply(
-    X = quant_methods_expected,
+    X = get_olink_data_types(broad_platform = broad_platform),
     FUN = grepl,
     x = data_cells,
     ignore.case = FALSE,
@@ -866,12 +837,17 @@ read_npx_format_get_quant <- function(file,
       input_string = .env[["data_cells"]]
     ) |>
     tidyr::pivot_longer(
-      cols = dplyr::all_of(quant_methods_expected),
+      cols = dplyr::all_of(get_olink_data_types(
+        broad_platform = broad_platform
+      )),
       names_to = "q_method",
       values_to = "is_in"
     ) |>
     dplyr::filter(
       .data[["is_in"]] == TRUE
+    ) |>
+    dplyr::pull(
+      .data[["q_method"]]
     )
 
   # Confirm that detected quant method matches user input ----
@@ -879,29 +855,31 @@ read_npx_format_get_quant <- function(file,
   if (is.null(data_type)) {
     # if data_type is null
 
-    if (nrow(quant_matches) == 0L) {
+    if (length(quant_matches) == 0L) {
       # check if there are no matches
 
       cli::cli_abort(
         message = c(
           "x" = "Unable to recognize the quantification method from the input
         file: {.file {file}}!",
-          "i" = "Expected one of: {quant_methods_expected} Consider setting
-          {.arg data_type}."
+          "i" = "Expected one of:
+          {.val {get_olink_data_types(broad_platform = broad_platform)}}.
+          Consider setting {.arg data_type}."
         ),
         call = rlang::caller_env(),
         wrap = FALSE
       )
 
-    } else if (nrow(quant_matches) > 1L) {
+    } else if (length(quant_matches) > 1L) {
       # check if there are multiple matches
 
       cli::cli_abort(
         message = c(
           "x" = "Unable to recognize the quantification method from the input
         file: {.file {file}}!",
-          "i" = "Too many occurrences of: {quant_methods_expected}. Consider
-          setting {.arg data_type}."
+          "i" = "Too many occurrences of:
+          {.val {get_olink_data_types(broad_platform = broad_platform)}}.
+          Consider setting {.arg data_type}."
         ),
         call = rlang::caller_env(),
         wrap = FALSE
@@ -910,7 +888,7 @@ read_npx_format_get_quant <- function(file,
     } else {
 
       # if data_type input is NULL then set it from autodetect
-      out_data_type <- quant_matches$q_method
+      out_data_type <- quant_matches
 
     }
 
@@ -918,7 +896,7 @@ read_npx_format_get_quant <- function(file,
     # if data_type is null
 
     # check how many platforms match regular expression
-    if (nrow(quant_matches) == 0L) {
+    if (length(quant_matches) == 0L) {
       # if quant method cannot be determined from input file throw a warning
 
       cli::cli_warn(
@@ -930,7 +908,7 @@ read_npx_format_get_quant <- function(file,
         wrap = FALSE
       )
 
-    } else if (nrow(quant_matches) > 1L) {
+    } else if (length(quant_matches) > 1L) {
       # if too many quant method matches from input file throw a warning
 
       cli::cli_warn(
@@ -942,13 +920,13 @@ read_npx_format_get_quant <- function(file,
         wrap = FALSE
       )
 
-    } else if (data_type != quant_matches$q_method) {
+    } else if (data_type != quant_matches) {
 
       cli::cli_warn(
         message = c(
-          "i" = "Based on {.arg data_type} we were expecting \"{data_type}\"
-          format data, but instead detected \"{quant_matches$q_method}\". We
-          trust your input!"
+          "i" = "Based on {.arg data_type} we were expecting {.val {data_type}}
+          format data, but instead detected {.val {quant_matches}}. We trust
+          your input!"
         ),
         call = rlang::caller_env(),
         wrap = FALSE

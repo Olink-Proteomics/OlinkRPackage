@@ -10,14 +10,12 @@ test_that(
     expect_no_condition(
       object = check_out_df_arg(out_df = "arrow")
     )
-
   }
 )
 
 test_that(
   "check out df arg works - ERROR",
   {
-
     expect_error(
       object = check_out_df_arg(out_df = "Tibble"),
       regexp = "Unknown output argument"
@@ -32,7 +30,6 @@ test_that(
       object = check_out_df_arg(out_df = "I_Shall_Not_Pass"),
       regexp = "Unknown output argument"
     )
-
   }
 )
 
@@ -55,7 +52,6 @@ test_that(
       ) |>
         inherits(what = "tbl_df")
     )
-
   }
 )
 
@@ -76,7 +72,6 @@ test_that(
       ) |>
         inherits(what = "ArrowObject")
     )
-
   }
 )
 
@@ -96,7 +91,6 @@ test_that(
       ) |>
         inherits(what = "ArrowObject")
     )
-
   }
 )
 
@@ -116,49 +110,47 @@ test_that(
       ) |>
         inherits(what = "tbl_df")
     )
-
   }
 )
 
 test_that(
   "check convert read npx output - ERROR",
   {
-
     expect_error(
       object = convert_read_npx_output(df = c("I_Shall_Not_Pass",
                                               NA_character_),
                                        out_df = "tibble"),
-      regexp = "Unexpected input data frame"
+      regexp = "Unexpected input dataset"
     )
 
     expect_error(
       object = convert_read_npx_output(df = NA_character_,
                                        out_df = "tibble"),
-      regexp = "Unexpected input data frame"
+      regexp = "Unexpected input dataset"
     )
 
     expect_error(
       object = convert_read_npx_output(df = NULL,
                                        out_df = "tibble"),
-      regexp = "Unexpected input data frame"
+      regexp = "Unexpected input dataset"
     )
 
     expect_error(
       object = convert_read_npx_output(df = 1,
                                        out_df = "tibble"),
-      regexp = "Unexpected input data frame"
+      regexp = "Unexpected input dataset"
     )
 
     expect_error(
       object = convert_read_npx_output(df = 1L,
                                        out_df = "tibble"),
-      regexp = "Unexpected input data frame"
+      regexp = "Unexpected input dataset"
     )
 
     expect_error(
       object = convert_read_npx_output(df = TRUE,
                                        out_df = "tibble"),
-      regexp = "Unexpected input data frame"
+      regexp = "Unexpected input dataset"
     )
 
     expect_error(
@@ -172,169 +164,7 @@ test_that(
         ),
         out_df = "tibble"
       ),
-      regexp = "Unexpected input data frame"
-    )
-
-  }
-)
-
-# Test check_olink_platform ----
-
-test_that(
-  "check_olink_platform - works",
-  {
-    expect_no_condition(
-      object = check_olink_platform(
-        x = "Target 48",
-        broader_platform = NULL
-      )
-    )
-
-    expect_no_condition(
-      object = check_olink_platform(
-        x = "Explore HT",
-        broader_platform = NULL
-      )
-    )
-
-    expect_no_condition(
-      object = check_olink_platform(
-        x = "Target 48",
-        broader_platform = "qPCR"
-      )
-    )
-
-    expect_no_condition(
-      object = check_olink_platform(
-        x = "Explore HT",
-        broader_platform = "NGS"
-      )
-    )
-  }
-)
-
-test_that(
-  "check_olink_platform - unexpected platform",
-  {
-    # random platform name
-    expect_error(
-      object = check_olink_platform(
-        x = "Not_An_Olink_Platform",
-        broader_platform = NULL
-      ),
-      regexp = "Unexpected Olink platform"
-    )
-
-    # qPCR platform in NGS broader platform
-    expect_error(
-      object = check_olink_platform(
-        x = "Target 48",
-        broader_platform = "NGS"
-      ),
-      regexp = "Unexpected Olink platform"
-    )
-
-    # qPCR platform in NGS broader platform
-    expect_error(
-      object = check_olink_platform(
-        x = "Explore HT",
-        broader_platform = "qPCR"
-      ),
-      regexp = "Unexpected Olink platform"
-    )
-  }
-)
-
-# Test check_olink_data_type ----
-
-test_that(
-  "check_olink_data_type - works",
-  {
-    expect_no_condition(
-      object = check_olink_data_type(x = "Ct",
-                                     broader_platform = "qPCR")
-    )
-
-    expect_no_condition(
-      object = check_olink_data_type(x = "NPX",
-                                     broader_platform = "qPCR")
-    )
-
-    expect_no_condition(
-      object = check_olink_data_type(x = "Quantified",
-                                     broader_platform = "qPCR")
-    )
-
-    expect_no_condition(
-      object = check_olink_data_type(x = "NPX",
-                                     broader_platform = "NGS")
-    )
-  }
-)
-
-test_that(
-  "check_olink_data_type - unexpected data_type",
-  {
-    expect_error(
-      object = check_olink_data_type(x = "Wrong_Data_Type",
-                                     broader_platform = NULL),
-      regexp = "Unexpected Olink data type"
-    )
-
-    expect_error(
-      object = check_olink_data_type(x = "Wrong_Data_Type",
-                                     broader_platform = "qPCR"),
-      regexp = "Unexpected Olink data type"
-    )
-
-    expect_error(
-      object = check_olink_data_type(x = "Wrong_Data_Type",
-                                     broader_platform = "NGS"),
-      regexp = "Unexpected Olink data type"
-    )
-
-    expect_error(
-      object = check_olink_data_type(x = "Ct",
-                                     broader_platform = "NGS"),
-      regexp = "Unexpected Olink data type"
-    )
-
-    expect_error(
-      object = check_olink_data_type(x = "Quantified",
-                                     broader_platform = "NGS"),
-      regexp = "Unexpected Olink data type"
-    )
-  }
-)
-
-# Test check_olink_broader_platform ----
-
-test_that(
-  "check_olink_broader_platform - works",
-  {
-    expect_no_condition(
-      object = check_olink_broader_platform(
-        x = "qPCR"
-      )
-    )
-
-    expect_no_condition(
-      object = check_olink_broader_platform(
-        x = "NGS"
-      )
-    )
-  }
-)
-
-test_that(
-  "check_olink_broader_platform - unexpected broader platform",
-  {
-    # random platform name
-    expect_error(
-      object = check_olink_broader_platform(
-        x = "Not_An_Olink_Platform"
-      ),
-      regexp = "Unexpected Olink broader platform"
+      regexp = "Unexpected input dataset"
     )
   }
 )
@@ -394,7 +224,6 @@ test_that(
                                             file = cdfile_test),
           regexp = "Detected file in wide format"
         )
-
       }
     )
   }
@@ -408,7 +237,6 @@ test_that(
       pattern = "delim-file-test",
       fileext = ".txt",
       code = {
-
         # write the coma-delimited file from a random data frame
         dplyr::tibble(
           "A" = c("", 1, 2.2, 3.14),
@@ -448,9 +276,7 @@ test_that(
         )
 
         # crashes when converting ArrowTable to tibble
-
       }
     )
-
   }
 )

@@ -1,13 +1,14 @@
-#' Help function checking if a variable is an integer vector.
+#' Help function checking if a variable is a vector of integers.
 #'
 #' @author
 #'   Klev Diamanti
 #'
-#' @param int Integer to check.
-#' @param error Return error or a boolean (default = FALSE).
+#' @param int Variable to check.
+#' @param error Scalar boolean to return an error instead of a `FALSE`
+#' (`default = FALSE`).
 #'
-#' @return Boolean if the variable is an integer vector or not, and an error if
-#' "error = TRUE".
+#' @return `TRUE` if the variable is an integer vector, and `FALSE` if not;
+#' error if the variable is not an integer vector and `error = TRUE`.
 #'
 #' @seealso
 #'   \code{\link{check_is_boolean}}
@@ -21,13 +22,13 @@ check_is_integer <- function(int,
   check_is_scalar_boolean(bool = error,
                           error = TRUE)
 
-  # check that the input is an integer vector
+  # check if input is an integer vector
   if (!rlang::is_integer(int)
       || any(rlang::are_na(int))) {
 
     if (error == TRUE) {
 
-      cli::cli_abort(
+      cli::cli_abort( # nolint return_linter
         c(
           "x" = "{.arg {rlang::caller_arg(int)}} must be an integer vector!"
         ),
@@ -49,16 +50,18 @@ check_is_integer <- function(int,
 
 }
 
-#' Help function checking if a variable is an integer vector of length 1.
+#' Help function checking if a variable is a scalar integer.
 #'
 #' @author
 #'   Klev Diamanti
 #'
-#' @param int Integer vector to check.
-#' @param error Return error or a boolean (default = FALSE).
+#' @param int Variable to check.
+#' @param error Scalar boolean to return an error instead of a `FALSE`
+#' (`default = FALSE`).
 #'
-#' @return Boolean if the variable is an integer vector of length 1 or not, and
-#' an error if "error = TRUE".
+#' @return `TRUE` if the variable is an integer vector of length 1, and `FALSE`
+#' if not; error if the variable is not an integer vector of length 1, and
+#' `error = TRUE`.
 #'
 #' @seealso
 #'   \code{\link{check_is_scalar_boolean}}
@@ -72,15 +75,15 @@ check_is_scalar_integer <- function(int,
   check_is_scalar_boolean(bool = error,
                           error = TRUE)
 
-  # check that the input is a character vector of length 1
+  # check if input is an integer vector of length 1
   if (!rlang::is_scalar_integer(int)
       || rlang::is_na(int)) {
 
     if (error == TRUE) {
 
-      cli::cli_abort(
+      cli::cli_abort( # nolint return_linter
         c(
-          "x" = "{.arg {rlang::caller_arg(int)}} must be an integer!"
+          "x" = "{.arg {rlang::caller_arg(int)}} must be a scalar integer!"
         ),
         call = rlang::caller_env(),
         wrap = FALSE

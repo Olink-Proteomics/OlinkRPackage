@@ -129,6 +129,59 @@ test_that(
         dplyr::collect(),
       expected = df_no_na
     )
+  }
+)
 
+# Test ansi_collapse_quot ----
+
+test_that(
+  "ansi_collapse_quot - works",
+  {
+    expect_equal(
+      object = ansi_collapse_quot(
+        x = c("A", "B"),
+        sep = "and"
+      ),
+      expected = "\"A\" and \"B\""
+    )
+
+    expect_equal(
+      object = ansi_collapse_quot(
+        x = c("A", "B"),
+        sep = "or"
+      ),
+      expected = "\"A\" or \"B\""
+    )
+
+    expect_equal(
+      object = ansi_collapse_quot(
+        x = c("A", "B", "C")
+      ),
+      expected = "\"A\", \"B\", and \"C\""
+    )
+
+    expect_equal(
+      object = ansi_collapse_quot(
+        x = c("A", "B", "C"),
+        sep = "and"
+      ),
+      expected = "\"A\", \"B\", and \"C\""
+    )
+
+    expect_equal(
+      object = ansi_collapse_quot(
+        x = c("A", "B", "C"),
+        sep = "something"
+      ),
+      expected = "\"A\", \"B\", and \"C\""
+    )
+
+    expect_equal(
+      object = ansi_collapse_quot(
+        x = c("A", "B", "C"),
+        sep = "or"
+      ),
+      expected = "\"A\", \"B\", or \"C\""
+    )
   }
 )

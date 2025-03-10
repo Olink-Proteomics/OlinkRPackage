@@ -9,16 +9,16 @@ read_npx_wide_bottom_version(df, file, data_type, olink_platform)
 \arguments{
 \item{df}{Bottom matrix of Olink dataset in wide format \var{df_bottom}.}
 
-\item{file}{Path to Olink software output file in wide or long format.
-Expecting file extensions
-xls, xlsx, csv, or txt. # nolint}
+\item{file}{Path to Olink software output file in wide format. Expected one
+of file extensions
+"xls", "xlsx", "csv", and "txt".}
 
-\item{data_type}{Quantification method of the input data. One of
-Ct, NPX, or Quantified. # nolint}
+\item{data_type}{Quantification method of the input data. One of \code{NULL}
+(default) for auto-detection, "Ct", "NPX", and "Quantified".}
 
 \item{olink_platform}{Olink platform used to generate the input file.
-One of
-Target 48, Flex, Target 96, or Focus. # nolint}
+One of \code{NULL} (default) for auto-detection,
+"Flex", "Focus", "Target 48", and "Target 96".}
 }
 \value{
 Tibble with the bottom matrix specifications for the Olink wide file.

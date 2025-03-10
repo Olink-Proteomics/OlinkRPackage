@@ -2,21 +2,22 @@
 % Please edit documentation in R/check_integer.R
 \name{check_is_integer}
 \alias{check_is_integer}
-\title{Help function checking if a variable is an integer vector.}
+\title{Help function checking if a variable is a vector of integers.}
 \usage{
 check_is_integer(int, error = FALSE)
 }
 \arguments{
-\item{int}{Integer to check.}
+\item{int}{Variable to check.}
 
-\item{error}{Return error or a boolean (default = FALSE).}
+\item{error}{Scalar boolean to return an error instead of a \code{FALSE}
+(\code{default = FALSE}).}
 }
 \value{
-Boolean if the variable is an integer vector or not, and an error if
-"error = TRUE".
+\code{TRUE} if the variable is an integer vector, and \code{FALSE} if not;
+error if the variable is not an integer vector and \code{error = TRUE}.
 }
 \description{
-Help function checking if a variable is an integer vector.
+Help function checking if a variable is a vector of integers.
 }
 \seealso{
 \code{\link{check_is_boolean}}

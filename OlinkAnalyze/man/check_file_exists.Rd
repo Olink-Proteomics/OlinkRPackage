@@ -9,13 +9,15 @@ check_file_exists(file, error = FALSE)
 \arguments{
 \item{file}{Path to file.}
 
-\item{error}{Return error or a boolean (default = FALSE).}
+\item{error}{Scalar boolean to return an error instead of a \code{FALSE}
+(\code{default = FALSE}).}
 }
 \value{
-Boolean if the file exists or not, and an error if "error = TRUE".
+\code{TRUE} if the file exists, and \code{FALSE} if not; error if the file does
+not exist and \code{error = TRUE}.
 }
 \description{
-Check \strong{only one file at a time} if it exists.
+Check \strong{one file at a time} if it exists.
 }
 \author{
 Klev Diamanti
