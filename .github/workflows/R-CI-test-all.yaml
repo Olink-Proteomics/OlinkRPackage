@@ -22,7 +22,7 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
          extra-packages: any::pak, any::cli, any::testthat
-          working-directory: OlinkAnalyze
+         working-directory: OlinkAnalyze
 
       - name: Tests pass
         run: |
