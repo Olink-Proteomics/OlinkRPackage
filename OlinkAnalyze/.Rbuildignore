@@ -14,7 +14,6 @@
 ^tests/testthat/data/.*[.]rds
 ^tests/testthat/data/.*[.]R
 ^inst/WORDLIST
-^inst/extdata/.*[.]parquet
 ^inst/extdata/.*[.]zip
 ^inst/extdata/.*_csv[.]csv
 ^inst/extdata/.*original[.]xlsx
