@@ -62,6 +62,41 @@ sample_id, sample_type, assay_type, olink_id, plate_id, qc_warning, lod, and qua
 check_npx_result <- OlinkAnalyze::npx_data1 |>
   OlinkAnalyze::check_npx() |>
   suppressWarnings()
+
+# read NPX data
+npx_file <- system.file("extdata",
+                        "npx_data_ext.parquet",
+                        package = "OlinkAnalyze")
+npx_df <- OlinkAnalyze::read_npx(filename = npx_file)
+
+# Example 1: run df as is
+OlinkAnalyze::check_npx(df = npx_df)
+
+# Example 2: SampleType missing from data frame
+npx_df |>
+  dplyr::select(
+    -dplyr::all_of(
+      c("SampleType")
+    )
+  ) |>
+  OlinkAnalyze::check_npx()
+
+# Example 3: Use PCNormalizedNPX instead on NPX
+OlinkAnalyze::check_npx(
+  df = npx_df,
+  preferred_names = c("quant" = "PCNormalizedNPX")
+)
+
+# Example 4: Use PCNormalizedNPX instead on NPX, and PlateLOD instead of LOD
+npx_df |>
+  dplyr::mutate(
+    LOD = 1L,
+    PlateLOD = 2L
+  ) |>
+  OlinkAnalyze::check_npx(
+    preferred_names = c("quant" = "PCNormalizedNPX",
+                        "lod" = "PlateLOD")
+  )
 }
 
 }
