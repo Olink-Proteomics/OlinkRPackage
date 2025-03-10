@@ -91,7 +91,6 @@ test_that(
       ),
       regexp = "Duplicate SampleID detected"
     )
-
   }
 )
 
@@ -475,7 +474,6 @@ test_that(
       ),
       regexp = "Unrecognized OlinkIDs detected: \"OID123456\", \"OID1234\","
     )
-
   }
 )
 
@@ -535,7 +533,6 @@ test_that(
       ),
       regexp = "\"OID12345\" has \"NPX\" = NA for all samples."
     )
-
   }
 )
 
@@ -593,7 +590,6 @@ test_that(
       ),
       regexp = "\"OID12345\" has \"NPX\" = NA for all samples."
     )
-
   }
 )
 
@@ -641,7 +637,6 @@ test_that(
       ),
       regexp = "Duplicate SampleID detected: \"A\""
     )
-
   }
 )
 
@@ -665,7 +660,6 @@ test_that(
       ),
       regexp = "Duplicate SampleIDs detected: \"A\" and \"B\""
     )
-
   }
 )
 

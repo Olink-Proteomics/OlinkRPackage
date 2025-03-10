@@ -1,8 +1,7 @@
 test_that(
   "data loads correctly - long - parquet",
   {
-    skip_if_not(file.exists(test_path("data", "reference_results.rds")))
-
+    # get data if available, otherwise skip the test
     ref_res <- get_example_data("reference_results.rds")
 
     withr::with_tempfile(
@@ -10,7 +9,6 @@ test_that(
       pattern = "parquet-long-",
       fileext = ".parquet",
       code = {
-
         # get the npx data file
         expect_no_error(
           object = npx_file <- system.file("extdata", "npx_data_ext.parquet",
@@ -73,7 +71,6 @@ test_that(
           expected = ref_res$npx_data_parquet,
           tolerance = 1e-4
         )
-
       }
     )
   }
@@ -82,8 +79,7 @@ test_that(
 test_that(
   "data loads correctly - long - csv",
   {
-    skip_if_not(file.exists(test_path("data", "reference_results.rds")))
-
+    # get data if available, otherwise skip the test
     ref_res <- get_example_data("reference_results.rds")
 
     withr::with_tempfile(
@@ -91,7 +87,6 @@ test_that(
       pattern = "csv-long-",
       fileext = ".csv",
       code = {
-
         # get the npx data file
         expect_no_error(
           object = npx_file <- system.file("extdata",
@@ -153,7 +148,6 @@ test_that(
           expected = ref_res$npx_data_long_csv,
           tolerance = 1e-4
         )
-
       }
     )
   }
@@ -163,8 +157,8 @@ test_that(
   "data loads correctly - long - zip",
   {
     skip_if_not_installed("zip")
-    skip_if_not(file.exists(test_path("data", "reference_results.rds")))
 
+    # get data if available, otherwise skip the test
     ref_res <- get_example_data("reference_results.rds")
 
     withr::with_tempfile(
@@ -172,7 +166,6 @@ test_that(
       pattern = "csv-zip-long-",
       fileext = ".zip",
       code = {
-
         # get the npx data file
         expect_no_error(
           object = npx_file <- system.file("extdata",
@@ -234,7 +227,6 @@ test_that(
           expected = ref_res$npx_data_long_zip,
           tolerance = 1e-4
         )
-
       }
     )
   }
@@ -244,8 +236,8 @@ test_that(
   "data loads correctly - wide - npx_data2 - xlsx",
   {
     skip_if_not_installed(pkg = "readxl")
-    skip_if_not(file.exists(test_path("data", "reference_results.rds")))
 
+    # get data if available, otherwise skip the test
     ref_res <- get_example_data("reference_results.rds")
 
     withr::with_tempfile(
@@ -253,7 +245,6 @@ test_that(
       pattern = "xlsx-wide-",
       fileext = ".xlsx",
       code = {
-
         # get the npx data file
         expect_no_error(
           object = npx_file <- system.file("extdata",
@@ -332,7 +323,6 @@ test_that(
             ),
           tolerance = 1e-4
         )
-
       }
     )
   }
@@ -342,8 +332,8 @@ test_that(
   "data loads correctly - wide - npx_data1 - xlsx",
   {
     skip_if_not_installed(pkg = "readxl")
-    skip_if_not(file.exists(test_path("data", "reference_results.rds")))
 
+    # get data if available, otherwise skip the test
     ref_res <- get_example_data("reference_results.rds")
 
     withr::with_tempfile(
@@ -351,7 +341,6 @@ test_that(
       pattern = "xlsx-wide-",
       fileext = ".xlsx",
       code = {
-
         # get the npx data file
         expect_no_error(
           object = npx_file <- system.file("extdata",
@@ -445,7 +434,6 @@ test_that(
             ),
           tolerance = 1e-4
         )
-
       }
     )
   }
@@ -454,8 +442,7 @@ test_that(
 test_that(
   "data loads correctly - wide - csv",
   {
-    skip_if_not(file.exists(test_path("data", "reference_results.rds")))
-
+    # get data if available, otherwise skip the test
     ref_res <- get_example_data("reference_results.rds")
 
     withr::with_tempfile(
@@ -463,7 +450,6 @@ test_that(
       pattern = "csv-wide-",
       fileext = ".csv",
       code = {
-
         # get the npx data file
         expect_no_error(
           object = npx_file <- system.file("extdata",
@@ -563,7 +549,6 @@ test_that(
             ),
           tolerance = 1e-4
         )
-
       }
     )
   }
@@ -573,8 +558,8 @@ test_that(
   "data loads correctly - legacy - wide - npx_data1 - xlsx",
   {
     skip_if_not_installed(pkg = "readxl")
-    skip_if_not(file.exists(test_path("data", "reference_results.rds")))
 
+    # get data if available, otherwise skip the test
     ref_res <- get_example_data("reference_results.rds")
 
     withr::with_tempfile(
@@ -582,7 +567,6 @@ test_that(
       pattern = "xlsx-wide-",
       fileext = ".xlsx",
       code = {
-
         # get the npx data file
         expect_no_error(
           object = npx_file <- system.file("extdata",
@@ -653,7 +637,6 @@ test_that(
             ),
           tolerance = 1e-4
         )
-
       }
     )
   }

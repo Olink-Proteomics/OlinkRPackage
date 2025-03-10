@@ -1,14 +1,13 @@
 # Test check_file_exists ----
 
 test_that(
-  "check_file_exists - works - file present", {
-
+  "check_file_exists - works - file present",
+  {
     withr::with_tempfile(
       new = "tfile_test",
       pattern = "text-file-test",
       fileext = ".csv",
       code = {
-
         # write soemthing to file
         writeLines("foo", tfile_test)
 
@@ -30,22 +29,19 @@ test_that(
             error = TRUE
           )
         )
-
       }
     )
-
   }
 )
 
 test_that(
-  "check_file_exists - error - file missing", {
-
+  "check_file_exists - error - file missing",
+  {
     withr::with_tempfile(
       new = "tfile_test",
       pattern = "text-file-test",
       fileext = ".csv",
       code = {
-
         # check if file exists
         expect_false(object = file.exists(tfile_test))
 
@@ -65,10 +61,8 @@ test_that(
           ),
           regexp = "Unable to locate file"
         )
-
       }
     )
-
   }
 )
 

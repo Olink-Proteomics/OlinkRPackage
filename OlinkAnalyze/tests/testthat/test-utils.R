@@ -129,7 +129,6 @@ test_that(
         dplyr::collect(),
       expected = df_no_na
     )
-
   }
 )
 

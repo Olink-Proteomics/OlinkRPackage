@@ -10,14 +10,12 @@ test_that(
     expect_no_condition(
       object = check_out_df_arg(out_df = "arrow")
     )
-
   }
 )
 
 test_that(
   "check out df arg works - ERROR",
   {
-
     expect_error(
       object = check_out_df_arg(out_df = "Tibble"),
       regexp = "Unknown output argument"
@@ -32,7 +30,6 @@ test_that(
       object = check_out_df_arg(out_df = "I_Shall_Not_Pass"),
       regexp = "Unknown output argument"
     )
-
   }
 )
 
@@ -55,7 +52,6 @@ test_that(
       ) |>
         inherits(what = "tbl_df")
     )
-
   }
 )
 
@@ -76,7 +72,6 @@ test_that(
       ) |>
         inherits(what = "ArrowObject")
     )
-
   }
 )
 
@@ -96,7 +91,6 @@ test_that(
       ) |>
         inherits(what = "ArrowObject")
     )
-
   }
 )
 
@@ -116,14 +110,12 @@ test_that(
       ) |>
         inherits(what = "tbl_df")
     )
-
   }
 )
 
 test_that(
   "check convert read npx output - ERROR",
   {
-
     expect_error(
       object = convert_read_npx_output(df = c("I_Shall_Not_Pass",
                                               NA_character_),
@@ -174,7 +166,6 @@ test_that(
       ),
       regexp = "Unexpected input dataset"
     )
-
   }
 )
 
@@ -233,7 +224,6 @@ test_that(
                                             file = cdfile_test),
           regexp = "Detected file in wide format"
         )
-
       }
     )
   }
@@ -247,7 +237,6 @@ test_that(
       pattern = "delim-file-test",
       fileext = ".txt",
       code = {
-
         # write the coma-delimited file from a random data frame
         dplyr::tibble(
           "A" = c("", 1, 2.2, 3.14),
@@ -287,9 +276,7 @@ test_that(
         )
 
         # crashes when converting ArrowTable to tibble
-
       }
     )
-
   }
 )

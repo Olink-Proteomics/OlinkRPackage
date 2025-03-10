@@ -3,7 +3,6 @@
 test_that(
   "check_columns - works - tibble",
   {
-
     tmp_data <- dplyr::tibble(
       "A" = c(1L, 2L, 3L),
       "B" = c(TRUE, TRUE, FALSE),
@@ -72,14 +71,12 @@ test_that(
                                              c("M", "N"))),
       regexp = "is missing columns that should be present in at least one"
     )
-
   }
 )
 
 test_that(
   "check_columns - works - arrow",
   {
-
     tmp_data <- dplyr::tibble(
       "A" = c(1L, 2L, 3L),
       "B" = c(TRUE, TRUE, FALSE),
@@ -149,14 +146,12 @@ test_that(
                                              c("M", "N"))),
       regexp = "is missing columns that should be present in at least one"
     )
-
   }
 )
 
 test_that(
   "check_columns - error - incorrect input",
   {
-
     tmp_data <- dplyr::tibble(
       "A" = c(1L, 2L, 3L),
       "B" = c(TRUE, TRUE, FALSE),
@@ -217,6 +212,5 @@ test_that(
                                              1.1)),
       regexp = "contains 2 elements that are not character vectors!"
     )
-
   }
 )

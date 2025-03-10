@@ -4,7 +4,6 @@
 test_that(
   "check is arrow object - ERROR",
   {
-
     expect_error(
       object = check_is_arrow_object(df = c("I_Shall_Pass",
                                             NA_character_),
@@ -82,7 +81,6 @@ test_that(
                     x = "is not an R6 ArrowObject!",
                     fixed = TRUE)
     )
-
   }
 )
 
@@ -90,7 +88,6 @@ test_that(
 test_that(
   "check is arrow object - FALSE",
   {
-
     expect_false(
       object = check_is_arrow_object(df = c("I_Shall_Pass",
                                             NA_character_),
@@ -136,7 +133,6 @@ test_that(
                                        dplyr::as_tibble(),
                                      error = FALSE)
     )
-
   }
 )
 
@@ -144,13 +140,11 @@ test_that(
 test_that(
   "check is arrow object - csv - TRUE",
   {
-
     withr::with_tempfile(
       new = "dfile_test",
       pattern = "delim-file-test",
       fileext = ".csv",
       code = {
-
         # write the coma-delimited file from random data frame
         dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -197,10 +191,8 @@ test_that(
           object = check_is_arrow_object(df = df_arrow,
                                          error = TRUE)
         )
-
       }
     )
-
   }
 )
 
@@ -208,13 +200,11 @@ test_that(
 test_that(
   "check is arrow object - parquet - TRUE",
   {
-
     withr::with_tempfile(
       new = "pfile_test",
       pattern = "delim-file-test",
       fileext = ".parquet",
       code = {
-
         # write the parquet file from random data frame
         dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -252,10 +242,8 @@ test_that(
           object = check_is_arrow_object(df = df_arrow,
                                          error = TRUE)
         )
-
       }
     )
-
   }
 )
 
@@ -264,7 +252,6 @@ test_that(
 test_that(
   "check is arrow object - data.frame - TRUE",
   {
-
     # random data frame
     df <- dplyr::tibble(
       "A" = c(1, 2.2, 3.14),
@@ -289,7 +276,6 @@ test_that(
       object = check_is_arrow_object(df = df,
                                      error = TRUE)
     )
-
   }
 )
 
@@ -376,7 +362,6 @@ test_that(
                     x = "is not a tibble dataset!",
                     fixed = TRUE)
     )
-
   }
 )
 
@@ -384,7 +369,6 @@ test_that(
 test_that(
   "check is tibble - FALSE",
   {
-
     expect_false(
       object = check_is_tibble(df = c("I_Shall_Not_Pass",
                                       NA_character_),
@@ -430,7 +414,6 @@ test_that(
                                  arrow::as_arrow_table(),
                                error = FALSE)
     )
-
   }
 )
 
@@ -438,13 +421,11 @@ test_that(
 test_that(
   "check is tibble - csv - TRUE",
   {
-
     withr::with_tempfile(
       new = "dfile_test",
       pattern = "delim-file-test",
       fileext = ".csv",
       code = {
-
         sep_arrow <- ","
 
         # write the coma-delimited file from a random data frame
@@ -496,10 +477,8 @@ test_that(
           object = check_is_tibble(df = df_read,
                                    error = TRUE)
         )
-
       }
     )
-
   }
 )
 
@@ -508,13 +487,11 @@ test_that(
 test_that(
   "check is tibble - parquet - TRUE",
   {
-
     withr::with_tempfile(
       new = "pfile_test",
       pattern = "delim-file-test",
       fileext = ".parquet",
       code = {
-
         # write the parquet file from a random data frame
         df <- dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -553,10 +530,8 @@ test_that(
           object = check_is_tibble(df = df_read,
                                    error = TRUE)
         )
-
       }
     )
-
   }
 )
 
@@ -564,7 +539,6 @@ test_that(
 test_that(
   "check is tibble - data.frame - TRUE",
   {
-
     # random data frame
     df <- dplyr::tibble(
       "A" = c(1, 2.2, 3.14),
@@ -588,7 +562,6 @@ test_that(
       object = check_is_tibble(df = df,
                                error = TRUE)
     )
-
   }
 )
 
@@ -700,7 +673,6 @@ test_that(
       pattern = "delim-file-test",
       fileext = ".csv",
       code = {
-
         # random data frame
         df <- dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -757,7 +729,6 @@ test_that(
       }
     )
 
-
     ## arrow ----
 
     withr::with_tempfile(
@@ -765,7 +736,6 @@ test_that(
       pattern = "delim-file-test",
       fileext = ".csv",
       code = {
-
         # random data frame
         df <- dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -828,7 +798,6 @@ test_that(
       pattern = "delim-file-test",
       fileext = ".parquet",
       code = {
-
         # write the parquet file from random data frame
         dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -876,7 +845,6 @@ test_that(
           object = check_is_dataset(df = df_parquet,
                                     error = TRUE)
         )
-
       }
     )
 
@@ -887,7 +855,6 @@ test_that(
       pattern = "delim-file-test",
       fileext = ".parquet",
       code = {
-
         # write the parquet file from random data frame
         dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -937,7 +904,6 @@ test_that(
           object = check_is_dataset(df = df_parquet,
                                     error = TRUE)
         )
-
       }
     )
   }
