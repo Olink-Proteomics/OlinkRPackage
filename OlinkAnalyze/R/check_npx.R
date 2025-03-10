@@ -58,41 +58,6 @@
 #' check_npx_result <- OlinkAnalyze::npx_data1 |>
 #'   OlinkAnalyze::check_npx() |>
 #'   suppressWarnings()
-#'
-#' # read NPX data
-#' npx_file <- system.file("extdata",
-#'                         "npx_data_ext.parquet",
-#'                         package = "OlinkAnalyze")
-#' npx_df <- OlinkAnalyze::read_npx(filename = npx_file)
-#'
-#' # Example 1: run df as is
-#' OlinkAnalyze::check_npx(df = npx_df)
-#'
-#' # Example 2: SampleType missing from data frame
-#' npx_df |>
-#'   dplyr::select(
-#'     -dplyr::all_of(
-#'       c("SampleType")
-#'     )
-#'   ) |>
-#'   OlinkAnalyze::check_npx()
-#'
-#' # Example 3: Use PCNormalizedNPX instead on NPX
-#' OlinkAnalyze::check_npx(
-#'   df = npx_df,
-#'   preferred_names = c("quant" = "PCNormalizedNPX")
-#' )
-#'
-#' # Example 4: Use PCNormalizedNPX instead on NPX, and PlateLOD instead of LOD
-#' npx_df |>
-#'   dplyr::mutate(
-#'     LOD = 1L,
-#'     PlateLOD = 2L
-#'   ) |>
-#'   OlinkAnalyze::check_npx(
-#'     preferred_names = c("quant" = "PCNormalizedNPX",
-#'                         "lod" = "PlateLOD")
-#'   )
 #' }
 #'
 check_npx <- function(df = df,
@@ -177,44 +142,6 @@ check_npx <- function(df = df,
 #'
 #' @return List of column names from the input data frame marking the columns to
 #' be used in downstream analyses.
-#'
-#' @examples
-#' \donttest{
-#' # read NPX data
-#' npx_file <- system.file("extdata",
-#'                         "npx_data_ext.parquet",
-#'                         package = "OlinkAnalyze")
-#' npx_df <- OlinkAnalyze::read_npx(filename = npx_file)
-#'
-#' # Example 1: run df as is
-#' OlinkAnalyze:::check_npx_col_names(df = npx_df)
-#'
-#' # Example 2: SampleType missing from data frame
-#' npx_df |>
-#'   dplyr::select(
-#'     -dplyr::all_of(
-#'       c("SampleType")
-#'     )
-#'   ) |>
-#'   OlinkAnalyze:::check_npx_col_names()
-#'
-#' # Example 3: Use PCNormalizedNPX instead on NPX
-#' OlinkAnalyze:::check_npx_col_names(
-#'   df = npx_df,
-#'   preferred_names = c("quant" = "PCNormalizedNPX")
-#' )
-#'
-#' # Example 4: Use PCNormalizedNPX instead on NPX, and PlateLOD instead of LOD
-#' npx_df |>
-#'   dplyr::mutate(
-#'     LOD = 1L,
-#'     PlateLOD = 2L
-#'   ) |>
-#'   OlinkAnalyze:::check_npx_col_names(
-#'     preferred_names = c("quant" = "PCNormalizedNPX",
-#'                         "lod" = "PlateLOD")
-#'   )
-#' }
 #'
 check_npx_col_names <- function(df,
                                 preferred_names = NULL) {
@@ -459,7 +386,7 @@ check_npx_olinkid <- function(df,
 #' @details
 #' We have added the tags importFrom for "dbplyr" and "duckdb" because
 #' "devtools::check()" would complain with a note that the two libraries are
-#' imported bu never used. To avoid that we used solutions taken from here:
+#' imported but never used. To avoid that we used solutions taken from here:
 #' 1. https://github.com/hadley/r-pkgs/issues/203
 #' 2. https://github.com/pbs-software/pbs-modelling/issues/95
 #'
