@@ -64,14 +64,10 @@
 #' @examples
 #' \donttest{
 #' file <- system.file("extdata",
-#'                     "npx_data_long_csv.csv",
+#'                     "npx_data1.xlsx",
 #'                     package = "OlinkAnalyze")
-#'
-#' read_NPX(filename = file,
-#'          sep = NULL)
-#'
-#' read_NPX(filename = file,
-#'          sep = ";")
+#' read_npx(filename = file,
+#'          olink_platform = "Target 96")
 #' }
 #'
 read_npx <- function(filename,
