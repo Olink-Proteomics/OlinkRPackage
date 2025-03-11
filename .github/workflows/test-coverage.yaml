@@ -46,6 +46,7 @@ jobs:
 
       - name: Pull first
         run: |
+          git config pull.rebase false
           git pull
 
       - name: Push

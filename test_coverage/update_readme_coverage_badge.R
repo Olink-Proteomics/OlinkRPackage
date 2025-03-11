@@ -25,27 +25,27 @@ coverage_badge_url <- paste0(
 readme <- readLines("README.Rmd")
 
 # Extract the current badge value
-badge_line <- which(grepl(pattern = "^\\!\\[Coverage\\]", x = readme))
+badge_line <- which(grepl(pattern = "^\\[\\!\\[Coverage\\]", x = readme))
 current_badge_url <- stringr::str_extract(string = readme[badge_line],
                                           pattern = "(?<=\\().+?(?=\\))")
 
 # Update the badge if the coverage value has changed
 if (current_badge_url != coverage_badge_url) {
   print("Changing test coverage badge!")
-  new_badge <- paste0("![Coverage](", coverage_badge_url, ")")
-  readme <- c(
+  new_badge <- paste0("[![Coverage](", coverage_badge_url, ")](", coverage_badge_url, ")")
+  new_readme <- c(
     head(x = readme, n = badge_line - 1L),
     new_badge,
     tail(x = readme, n = length(readme) - badge_line)
   )
-  writeLines(readme, "README.Rmd")
-  # rmarkdown::render(input = "README.Rmd",
-  #                   output_file = "README.md",
-  #                   output_format = rmarkdown::github_document(),
-  #                   clean = TRUE, quiet = TRUE)
-  # if (file.exists("README.html")) {
-  #   file.remove("README.html")
-  # }
+  writeLines(new_readme, "README.Rmd")
+  rmarkdown::render(input = "README.Rmd",
+                    output_file = "README.md",
+                    output_format = rmarkdown::github_document(),
+                    clean = TRUE, quiet = TRUE)
+  if (file.exists("README.html")) {
+    file.remove("README.html")
+  }
 } else {
   print("Test coverage is identical!")
 }
