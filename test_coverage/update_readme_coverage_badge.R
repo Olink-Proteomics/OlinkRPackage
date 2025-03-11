@@ -22,7 +22,7 @@ coverage_badge_url <- paste0(
 )
 
 # Read the README file
-readme <- readLines("README.md")
+readme <- readLines("README.Rmd")
 
 # Extract the current badge value
 badge_line <- which(grepl(pattern = "^\\!\\[Coverage\\]", x = readme))
@@ -38,7 +38,14 @@ if (current_badge_url != coverage_badge_url) {
     new_badge,
     tail(x = readme, n = length(readme) - badge_line)
   )
-  writeLines(readme, "README.md")
+  writeLines(readme, "README.Rmd")
+  # rmarkdown::render(input = "README.Rmd",
+  #                   output_file = "README.md",
+  #                   output_format = rmarkdown::github_document(),
+  #                   clean = TRUE, quiet = TRUE)
+  # if (file.exists("README.html")) {
+  #   file.remove("README.html")
+  # }
 } else {
   print("Test coverage is identical!")
 }
