@@ -32,7 +32,13 @@ current_badge_url <- stringr::str_extract(string = readme[badge_line],
 # Update the badge if the coverage value has changed
 if (current_badge_url != coverage_badge_url) {
   print("Changing test coverage badge!")
-  new_badge <- paste0("[![Coverage](", coverage_badge_url, ")](", coverage_badge_url, ")")
+  new_badge <- paste0(
+    "[![Coverage](",
+    coverage_badge_url,
+    ")](",
+    coverage_badge_url,
+    ")"
+  )
   new_readme <- c(
     head(x = readme, n = badge_line - 1L),
     new_badge,
