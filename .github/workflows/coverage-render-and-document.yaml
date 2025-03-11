@@ -32,6 +32,28 @@ jobs:
         with:
           extra-packages: any::pak, any::remotes, any::stringr, any::covr, any::devtools, any::rmarkdown, any::roxygen2, local::.
           working-directory: OlinkAnalyze
+          
+      - name: Test coverage badge
+        run: |
+          source("test_coverage/update_readme_coverage_badge.R")
+        shell: Rscript {0}
+
+      - name: Commit changes if README is updated
+        run: |
+          git config --local user.name "$GITHUB_ACTOR"
+          git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
+          git commit -am 'Update coverage badge in README' || echo "No changes to commit"
+          
+      - name: Render Rmarkdown files
+        run: |
+          RMD_PATH=($(find . -iname "*.rmd" | grep -v vignette || echo "No Rmd found"))
+          Rscript -e 'for (f in commandArgs(TRUE)) if (file.exists(f)) rmarkdown::render(f)' ${RMD_PATH[*]}
+
+      - name: Commit results
+        run: |
+          git config --local user.name "$GITHUB_ACTOR"
+          git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
+          git commit -am 'Re-build Rmarkdown files' || echo "No changes to commit"
 
       - name: Document
         run: Rscript -e 'roxygen2::roxygenise(package.dir = "OlinkAnalyze")'
