@@ -5,11 +5,11 @@ on:
     branches-ignore:    
       - 'main'
 
-name: rebuild-documentation
+name: coverage-render-and-document
 
 jobs:
-  rebuild-documentation:
-    name: rebuild-documentation
+  coverage-render-and-document:
+    name: coverage-render-and-document
     runs-on: ubuntu-latest
     timeout-minutes: 60        
     env:
@@ -30,7 +30,7 @@ jobs:
           
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::pak, any::roxygen2
+          extra-packages: any::pak, any::remotes, any::stringr, any::covr, any::devtools, any::rmarkdown, any::roxygen2, local::.
           working-directory: OlinkAnalyze
 
       - name: Document
