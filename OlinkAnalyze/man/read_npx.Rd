@@ -78,8 +78,7 @@ importing it with \code{\link{read_npx}} as it might fail.
 file <- system.file("extdata",
                     "npx_data_ext.parquet",
                     package = "OlinkAnalyze")
-read_npx(filename = file,
-         olink_platform = "Target 96")
+read_npx(filename = file)
 }
 
 }
