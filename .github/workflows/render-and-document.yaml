@@ -23,8 +23,6 @@ jobs:
           token: ${{ secrets.OA_PAT }}
 
       - uses: r-lib/actions/setup-pandoc@v2
-        with:
-          pandoc-version: '2.18'
 
       - uses: r-lib/actions/setup-r@v2
         with:
@@ -32,19 +30,8 @@ jobs:
           
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
+          extra-packages: any::pak, any::roxygen2
           working-directory: OlinkAnalyze
-          extra-packages: rmarkdown, roxygen2, devtools
-
-      - name: Render Rmarkdown files
-        run: |
-          RMD_PATH=($(find . -iname "*.rmd" | grep -v vignette || echo "No Rmd found"))
-          Rscript -e 'for (f in commandArgs(TRUE)) if (file.exists(f)) rmarkdown::render(f)' ${RMD_PATH[*]}
-
-      - name: Commit results
-        run: |
-          git config --local user.name "$GITHUB_ACTOR"
-          git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
-          git commit -am 'Re-build Rmarkdown files' || echo "No changes to commit"
 
       - name: Document
         run: Rscript -e 'roxygen2::roxygenise(package.dir = "OlinkAnalyze")'
@@ -54,7 +41,7 @@ jobs:
           git config --local user.name "$GITHUB_ACTOR"
           git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
           git add OlinkAnalyze/man/\* OlinkAnalyze/NAMESPACE
-          git commit -m 'Document' || echo "No changes to commit"
+          git commit -am 'Document' || echo "No changes to commit"
 
       - name: Pull first
         run: |
