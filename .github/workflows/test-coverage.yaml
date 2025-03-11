@@ -7,11 +7,11 @@ on:
       - 'optimization_main'
       - 'optimization_develop_ci_coverage'
 
-name: Update coverage badge
+name: update-test-coverage-badge
 
 jobs:
-  update-coverage-badge:
-    name: update-coverage-badge
+  update-test-coverage-badge:
+    name: update-test-coverage-badge
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
