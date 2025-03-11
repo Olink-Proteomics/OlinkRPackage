@@ -5,11 +5,11 @@ on:
     branches-ignore:    
       - 'main'
 
-name: render-and-document
+name: rebuild-documentation
 
 jobs:
-  render-and-document:
-    name: render-and-document
+  rebuild-documentation:
+    name: rebuild-documentation
     runs-on: ubuntu-latest
     timeout-minutes: 60        
     env:
