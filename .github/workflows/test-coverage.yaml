@@ -1,23 +1,28 @@
-# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
-# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
-on: 
-  pull_request:
+on:
+  push:
     branches:
       - 'main'
       - 'develop'
       - 'optimization_develop'
       - 'optimization_main'
+      - 'optimization_develop_ci_coverage'
 
-name: test-coverage
+name: Update coverage badge
 
 jobs:
-  test-coverage:
+  update-coverage-badge:
+    name: update-coverage-badge
     runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      GITHUB_PAT: ${{ secrets.OA_PAT }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
         with:
           fetch-depth: 2
+          token: ${{ secrets.OA_PAT }}
 
       - uses: r-lib/actions/setup-r@v2
         with:
@@ -25,30 +30,24 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
+          extra-packages: any::pak, any::remotes, any::stringr, any::covr, local::.
           working-directory: OlinkAnalyze
-          extra-packages: any::covr
-          needs: coverage
 
-      - name: Test coverage
+      - name: Test coverage badge
         run: |
-          covr::codecov(
-            path = "OlinkAnalyze",
-            quiet = FALSE,
-            clean = FALSE,
-            install_path = file.path(Sys.getenv("RUNNER_TEMP"), "package")
-          )
+          source("test_coverage/update_readme_coverage_badge.R")
         shell: Rscript {0}
-        
-      - name: Show testthat output
-        if: always()
+
+      - name: Commit changes if README is updated
         run: |
-          ## --------------------------------------------------------------------
-          find ${{ runner.temp }}/package -name 'testthat.Rout*' -exec cat '{}' \; || true
-        shell: bash
-        
-      - name: Upload test results
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-test-failures
-          path: ${{ runner.temp }}/package
+          git config --local user.name "$GITHUB_ACTOR"
+          git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
+          git commit -am 'Update coverage badge in README' || echo "No changes to commit"
+
+      - name: Pull first
+        run: |
+          git pull
+
+      - name: Push
+        run: |
+          git push origin
