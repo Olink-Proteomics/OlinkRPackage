@@ -43,22 +43,6 @@
 #'
 #' @return Dataset, `r get_df_output_print()`, with Olink data in long format.
 #'
-#' @keywords
-#'   NPX;
-#'   parquet;
-#'   csv;
-#'   zip;
-#'   xlsx;
-#'   Olink;
-#'   Olink Explore;
-#'   Olink Explore 1536;
-#'   Olink Explore 3072;
-#'   Olink Explore HT;
-#'   Olink Target 96;
-#'   Olink Target 48;
-#'   Olink Flex;
-#'   Olink Focus
-#'
 #' @export
 #'
 #' @examples
