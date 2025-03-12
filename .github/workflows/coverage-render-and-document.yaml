@@ -4,13 +4,12 @@ on:
   push:
     branches-ignore:
       - 'main'
-      - 'optimization_main'
 
-name: render-and-document
+name: coverage-render-and-document
 
 jobs:
-  render-and-document:
-    name: render-and-document
+  coverage-render-and-document:
+    name: coverage-render-and-document
     runs-on: ubuntu-latest
     timeout-minutes: 60        
     env:
@@ -24,8 +23,6 @@ jobs:
           token: ${{ secrets.OA_PAT }}
 
       - uses: r-lib/actions/setup-pandoc@v2
-        with:
-          pandoc-version: '2.18'
 
       - uses: r-lib/actions/setup-r@v2
         with:
@@ -33,9 +30,20 @@ jobs:
           
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
+          extra-packages: any::pak, any::remotes, any::stringr, any::covr, any::devtools, any::rmarkdown, any::roxygen2, local::.
           working-directory: OlinkAnalyze
-          extra-packages: rmarkdown, roxygen2, devtools
 
+      - name: Test coverage badge
+        run: |
+          source("test_coverage/update_readme_coverage_badge.R")
+        shell: Rscript {0}
+
+      - name: Commit changes if README is updated
+        run: |
+          git config --local user.name "$GITHUB_ACTOR"
+          git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
+          git commit -am 'Update coverage badge in README' || echo "No changes to commit"
+          
       - name: Render Rmarkdown files
         run: |
           RMD_PATH=($(find . -iname "*.rmd" | grep -v vignette || echo "No Rmd found"))
