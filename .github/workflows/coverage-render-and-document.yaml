@@ -2,7 +2,7 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches-ignore:    
+    branches-ignore:
       - 'main'
 
 name: coverage-render-and-document
@@ -32,7 +32,7 @@ jobs:
         with:
           extra-packages: any::pak, any::remotes, any::stringr, any::covr, any::devtools, any::rmarkdown, any::roxygen2, local::.
           working-directory: OlinkAnalyze
-          
+
       - name: Test coverage badge
         run: |
           source("test_coverage/update_readme_coverage_badge.R")
