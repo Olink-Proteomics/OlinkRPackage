@@ -278,7 +278,11 @@ gsea_pathwayenrichment <- function(geneList, msig_df) {
 
   GSEA <- clusterProfiler::GSEA(geneList = geneList, TERM2GENE = msig_df, pvalueCutoff = 1)
 
-  return(GSEA@result)
+  if (is.null(GSEA)) {
+    return(NULL)
+  } else {
+    return(GSEA@result)
+  }
 }
 
 ora_pathwayenrichment <- function(test_results, msig_df, pvalue_cutoff = pvalue_cutoff, estimate_cutoff = estimate_cutoff) {
@@ -300,5 +304,9 @@ ora_pathwayenrichment <- function(test_results, msig_df, pvalue_cutoff = pvalue_
 
   ORA <- clusterProfiler::enricher(gene = sig_genes, universe = universe, TERM2GENE = msig_df, pvalueCutoff = 1)
 
-  return(ORA@result)
+  if (is.null(ORA)) {
+    return(NULL)
+  } else {
+    return(ORA@result)
+  }
 }
