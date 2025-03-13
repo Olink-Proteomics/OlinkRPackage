@@ -102,7 +102,7 @@ Suggests:
     lmerTest,
     markdown,
     msigdbdf,
-    msigdbr,
+    msigdbr (>= 9.0.0),
     openssl,
     ordinal,
     pheatmap,
