@@ -254,7 +254,7 @@ select_db <- function(ontology = ontology, organism = organism){
   } else if (ontology == "KEGG") {
     message("Extracting KEGG Database from MSigDB...")
     msig_df <- msig_df %>%
-      dplyr::filter(gs_subcat == "CP:KEGG")
+      dplyr::filter(gs_subcat == "CP:KEGG_MEDICUS")
   } else if (ontology == "GO") {
     message("Extracting GO Database from MSigDB...")
     msig_df <- msig_df %>%
