@@ -238,16 +238,28 @@ test_that("Error if more than 1 contrast", {
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr")
   skip_if_not_installed("msigdbdf")
-  set.seed(123)
-  expect_error(olink_pathway_enrichment(npx_df, anova_posthoc_results))
+
+  expect_error(
+    object = olink_pathway_enrichment(
+      data = npx_df,
+      test_results = anova_posthoc_results
+    ),
+    regexp = "More than one contrast is specified in test results"
+  )
 })
 
 test_that("Nonsense method errors",{
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr")
   skip_if_not_installed("msigdbdf")
-  set.seed(123)
-  expect_error(olink_pathway_enrichment(npx_df, anova_posthoc_results, method = "IRA"))
+
+  expect_error(
+    object = olink_pathway_enrichment(
+      data = npx_df,
+      test_results = anova_posthoc_results,
+      method = "IRA"
+    )
+  )
 })
 
 test_that("Unsupported databases flag",{
