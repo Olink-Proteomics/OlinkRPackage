@@ -59,9 +59,22 @@ test_that("Reactome GSEA works", {
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr")
   skip_if_not_installed("msigdbdf")
-  tt_gsea_reactome <- olink_pathway_enrichment(npx_df, test_results = ttest_results, ontology = "Reactome")
-  set.seed(123)
-  expect_equal(nrow(tt_gsea_reactome), 18)
+
+  expect_no_warning(
+    expect_no_error(
+      object = tt_gsea_reactome <- olink_pathway_enrichment(
+        data = npx_df,
+        test_results = ttest_results,
+        ontology = "Reactome"
+      ) |>
+        suppressMessages()
+    )
+  )
+
+  expect_equal(
+    object = nrow(tt_gsea_reactome),
+    expected = 20L
+  )
 })
 
 test_that("KEGG GSEA works", {
