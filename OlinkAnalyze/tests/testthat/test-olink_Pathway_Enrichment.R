@@ -49,10 +49,33 @@ test_that("T-test GSEA works", {
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr")
   skip_if_not_installed("msigdbdf")
-  tt_gsea <- olink_pathway_enrichment(npx_df, test_results = ttest_results)
-  set.seed(123)
-  expect_equal(nrow(tt_gsea), 591L)
-  expect_warning(expect_warning(olink_pathway_enrichment(npx_data_format221010, test_results = ttest_na)))
+
+  expect_no_warning(
+    object = expect_no_error(
+      object = tt_gsea <- olink_pathway_enrichment(
+        data = npx_df,
+        test_results = ttest_results
+      ) |>
+        suppressMessages()
+    )
+  )
+
+  expect_equal(
+    object = nrow(tt_gsea),
+    expected = 591L
+  )
+
+  expect_warning(
+    object = expect_warning(
+      object = olink_pathway_enrichment(
+        data = npx_data_format221010,
+        test_results = ttest_na
+      ) |>
+        suppressMessages(),
+      regexp = "The number of Olink IDs in the data does not equal the number"
+    ),
+    regexp = "They will be excluded from the analysis"
+  )
 })
 
 test_that("Reactome GSEA works", {
