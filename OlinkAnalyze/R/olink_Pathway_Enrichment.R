@@ -250,15 +250,15 @@ select_db <- function(ontology = ontology, organism = organism){
   if (ontology == "Reactome") {
     message("Extracting Reactome Database from MSigDB...")
     msig_df <- msig_df %>%
-      dplyr::filter(gs_subcat == "CP:REACTOME")
+      dplyr::filter(gs_subcollection == "CP:REACTOME")
   } else if (ontology == "KEGG") {
     message("Extracting KEGG Database from MSigDB...")
     msig_df <- msig_df %>%
-      dplyr::filter(gs_subcat == "CP:KEGG_MEDICUS")
+      dplyr::filter(gs_subcollection == "CP:KEGG_MEDICUS")
   } else if (ontology == "GO") {
     message("Extracting GO Database from MSigDB...")
     msig_df <- msig_df %>%
-      dplyr::filter(gs_subcat %in% c("GO:BP", "GO:CC", "GO:MF"))
+      dplyr::filter(gs_subcollection %in% c("GO:BP", "GO:CC", "GO:MF"))
   } else {
     message("Using MSigDB...")
   }
