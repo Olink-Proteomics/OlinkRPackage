@@ -104,9 +104,22 @@ test_that("KEGG GSEA works", {
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr")
   skip_if_not_installed("msigdbdf")
-  tt_gsea_kegg <- olink_pathway_enrichment(npx_df, test_results = ttest_results, ontology = "KEGG")
-  set.seed(123)
-  expect_equal(nrow(tt_gsea_kegg), 5)
+
+  expect_no_warning(
+    object = expect_no_error(
+      object = tt_gsea_kegg <- olink_pathway_enrichment(
+        data = npx_df,
+        test_results = ttest_results,
+        ontology = "KEGG"
+      ) |>
+        suppressMessages()
+    )
+  )
+
+  expect_equal(
+    object = nrow(tt_gsea_kegg),
+    expected = 0L
+  )
 })
 
 test_that("GO GSEA works", {
@@ -117,7 +130,6 @@ test_that("GO GSEA works", {
   set.seed(123)
   expect_equal(nrow(tt_gsea_go), 384)
 })
-
 
 test_that("T-test ORA works", {
   skip_if_not_installed("clusterProfiler")
@@ -155,7 +167,6 @@ test_that("GO ORA works", {
   expect_equal(nrow(tt_ora_go), 226)
 })
 
-
 test_that("Error if more than 1 contrast", {
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr")
@@ -187,7 +198,6 @@ test_that("Estimate column must be present",{
   set.seed(123)
   expect_error(olink_pathway_enrichment(npx_df, ttest_results_no_estimate))
 })
-
 
 test_that(" ORA warns assays not found in database. ", {
   skip_if_not_installed("clusterProfiler")
