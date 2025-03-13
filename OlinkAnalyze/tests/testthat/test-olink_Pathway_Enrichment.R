@@ -170,9 +170,23 @@ test_that("Reactome ORA works", {
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr")
   skip_if_not_installed("msigdbdf")
-  tt_ora_reactome <- olink_pathway_enrichment(npx_df, test_results = ttest_results, method = "ORA", ontology = "Reactome")
-  set.seed(123)
-  expect_equal(nrow(tt_ora_reactome), 15)
+
+  expect_no_warning(
+    object = expect_no_error(
+      object = tt_ora_reactome <- olink_pathway_enrichment(
+        data = npx_df,
+        test_results = ttest_results,
+        method = "ORA",
+        ontology = "Reactome"
+      ) |>
+        suppressMessages()
+    )
+  )
+
+  expect_equal(
+    object = nrow(tt_ora_reactome),
+    expected = 15L
+  )
 })
 
 test_that("KEGG ORA works", {
