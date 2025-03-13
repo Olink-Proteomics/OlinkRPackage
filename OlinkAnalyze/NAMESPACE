@@ -3,5 +3,6 @@
 export(check_npx)
 export(read_NPX)
 export(read_npx)
+export(test)
 importFrom(dbplyr,memdb_frame)
 importFrom(duckdb,duckdb)
