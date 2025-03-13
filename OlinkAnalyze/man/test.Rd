@@ -7,7 +7,10 @@
 test(x)
 }
 \arguments{
-\item{x}{}
+\item{x}{a number}
+}
+\value{
+a number
 }
 \description{
 Title
