@@ -215,9 +215,23 @@ test_that("GO ORA works", {
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr")
   skip_if_not_installed("msigdbdf")
-  tt_ora_go <- olink_pathway_enrichment(npx_df, test_results = ttest_results, method = "ORA", ontology = "GO")
-  set.seed(123)
-  expect_equal(nrow(tt_ora_go), 226)
+
+  expect_no_warning(
+    object = expect_no_error(
+      object = tt_ora_go <- olink_pathway_enrichment(
+        data = npx_df,
+        test_results = ttest_results,
+        method = "ORA",
+        ontology = "GO"
+      ) |>
+        suppressMessages()
+    )
+  )
+
+  expect_equal(
+    object = nrow(tt_ora_go),
+    expected = 227L
+  )
 })
 
 test_that("Error if more than 1 contrast", {
