@@ -44,7 +44,6 @@ test_that("Input data equal for different LOD names", {
   expect_equal(unique(data_prep(npx_data1)$OlinkID), unique(data_prep(npx_nolod)$OlinkID))
 })
 
-
 test_that("T-test GSEA works", {
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr")
@@ -126,18 +125,45 @@ test_that("GO GSEA works", {
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr")
   skip_if_not_installed("msigdbdf")
-  tt_gsea_go <- olink_pathway_enrichment(npx_df, test_results = ttest_results, ontology = "GO")
-  set.seed(123)
-  expect_equal(nrow(tt_gsea_go), 384)
+
+  expect_no_warning(
+    object = expect_no_error(
+      object = tt_gsea_go <- olink_pathway_enrichment(
+        data = npx_df,
+        test_results = ttest_results,
+        ontology = "GO"
+      ) |>
+        suppressMessages()
+    )
+  )
+
+  expect_equal(
+    object = nrow(tt_gsea_go),
+    expected = 379L
+  )
 })
 
 test_that("T-test ORA works", {
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr")
   skip_if_not_installed("msigdbdf")
-  tt_ora <- olink_pathway_enrichment(npx_df, test_results = ttest_results, method = "ORA", ontology = "MSigDb")
-  set.seed(123)
-  expect_equal(nrow(tt_ora), 329)
+
+  expect_no_warning(
+    object = expect_no_error(
+      object = tt_ora <- olink_pathway_enrichment(
+        data = npx_df,
+        test_results = ttest_results,
+        method = "ORA",
+        ontology = "MSigDb"
+      ) |>
+        suppressMessages()
+    )
+  )
+
+  expect_equal(
+    object = nrow(tt_ora),
+    expected = 349L
+  )
 })
 
 test_that("Reactome ORA works", {
