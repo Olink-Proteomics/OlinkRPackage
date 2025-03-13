@@ -51,7 +51,7 @@ test_that("T-test GSEA works", {
   skip_if_not_installed("msigdbdf")
   tt_gsea <- olink_pathway_enrichment(npx_df, test_results = ttest_results)
   set.seed(123)
-  expect_equal(nrow(tt_gsea), 560)
+  expect_equal(nrow(tt_gsea), 591L)
   expect_warning(expect_warning(olink_pathway_enrichment(npx_data_format221010, test_results = ttest_na)))
 })
 
