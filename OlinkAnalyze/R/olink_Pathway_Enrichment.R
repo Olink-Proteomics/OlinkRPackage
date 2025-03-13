@@ -117,6 +117,13 @@ olink_pathway_enrichment <- function(data, test_results, method = "GSEA", ontolo
          install.packages(\"msigdbr\")")
   }
 
+  if(!requireNamespace("msigdbdf", quietly = TRUE)) {
+    stop(" Pathway enrichment requires msigdbdf package.
+         Please install msigdbdf before continuing.
+
+         install.packages(\"msigdbdf\", repos = c(\"https://igordot.r-universe.dev\", \"https://cloud.r-project.org\")")
+  }
+
   # Data Checks
   if(length(unique(data$OlinkID)) != length(unique(test_results$OlinkID))) {
     warning("The number of Olink IDs in the data does not equal the number of Olink IDs in the test results.")
@@ -185,12 +192,12 @@ data_prep <- function(data) {
       data$LOD <- -Inf
     }
   }
-  
+
   # For data with SampleQC instead of QC_Warning
   if("SampleQC" %in% names(data)){
     data$QC_Warning <- data$SampleQC
   }
-  
+
   # Filter highest detectibility for repeated IDs
   olink_ids <- data %>%
     dplyr::filter(!stringr::str_detect(string = SampleID, pattern = "CONTROL*.")) %>%
