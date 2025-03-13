@@ -240,11 +240,11 @@ results_to_genelist <- function(test_results) {
 
 select_db <- function(ontology = ontology, organism = organism){
   if (organism == "human") {
-    msig_df <- msigdbr::msigdbr(species = "Homo sapiens", category = "C2") %>%
-      rbind(msigdbr::msigdbr(species = "Homo sapiens", category = "C5"))
+    msig_df <- msigdbr::msigdbr(species = "Homo sapiens", collection = "C2") %>%
+      rbind(msigdbr::msigdbr(species = "Homo sapiens", collection = "C5"))
   } else if (organism == "mouse") {
-    msig_df <- msigdbr::msigdbr(species = "Mus musculus", category = "C2") %>%
-      rbind(msigdbr::msigdbr(species = "Mus musculus", category = "C5"))
+    msig_df <- msigdbr::msigdbr(species = "Mus musculus", collection = "C2") %>%
+      rbind(msigdbr::msigdbr(species = "Mus musculus", collection = "C5"))
   }
 
   if (ontology == "Reactome") {
