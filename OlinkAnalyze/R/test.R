@@ -1,9 +1,9 @@
 
 #' Title
 #'
-#' @param x
+#' @param x a number
 #'
-#' @return
+#' @return a number
 #' @export
 #'
 #' @examples
