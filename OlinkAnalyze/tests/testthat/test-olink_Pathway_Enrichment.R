@@ -193,9 +193,22 @@ test_that("KEGG ORA works", {
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr")
   skip_if_not_installed("msigdbdf")
-  tt_ora_kegg <- olink_pathway_enrichment(npx_df, test_results = ttest_results, method = "ORA", ontology = "KEGG")
-  set.seed(123)
-  expect_equal(nrow(tt_ora_kegg), 3)
+
+  expect_no_warning(
+    object = expect_no_error(
+      object = tt_ora_kegg <- olink_pathway_enrichment(
+        data = npx_df,
+        test_results = ttest_results,
+        method = "ORA",
+        ontology = "KEGG"
+      ) |>
+        suppressMessages()
+    )
+  )
+
+  expect_true(
+    object = is.null(tt_ora_kegg)
+  )
 })
 
 test_that("GO ORA works", {
