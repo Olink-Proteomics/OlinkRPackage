@@ -21,12 +21,6 @@ ttest_results <- olink_ttest(
   variable = "Treatment"
 ) |>
   suppressMessages()
-ttest_na <- olink_ttest(
-  df = npx_data_format221010,
-  variable = "treatment1"
-) |>
-  suppressMessages() |>
-  suppressWarnings()
 anova_results <- olink_anova(
   df = npx_df,
   variable = "Site"
@@ -157,6 +151,13 @@ test_that("T-test GSEA works", {
     object = nrow(tt_gsea),
     expected = 591L
   )
+
+  ttest_na <- olink_ttest(
+    df = npx_data_format221010,
+    variable = "treatment1"
+  ) |>
+    suppressMessages() |>
+    suppressWarnings()
 
   expect_warning(
     object = expect_warning(
