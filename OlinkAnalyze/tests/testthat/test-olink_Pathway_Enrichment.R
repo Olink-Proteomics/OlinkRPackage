@@ -3,12 +3,6 @@ skip_if_not_installed("clusterProfiler")
 skip_if_not_installed("msigdbr")
 skip_if_not_installed("msigdbdf")
 
-# example data
-npx_sample_data <- test_path("data", "npx_data_format221010.RData")
-skip_if_not(file.exists(npx_sample_data))
-load(file = npx_sample_data)
-rm(npx_data_format221010.project2)
-
 # clean up npa_data1
 npx_df <- npx_data1 |>
   dplyr::filter(
@@ -140,6 +134,12 @@ test_that("T-test GSEA works", {
     object = nrow(tt_gsea),
     expected = 591L
   )
+
+  # example data
+  npx_sample_data <- test_path("data", "npx_data_format221010.RData")
+  skip_if_not(file.exists(npx_sample_data))
+  load(file = npx_sample_data)
+  rm(npx_data_format221010.project2, npx_sample_data)
 
   ttest_na <- olink_ttest(
     df = npx_data_format221010,
