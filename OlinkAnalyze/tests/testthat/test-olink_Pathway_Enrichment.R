@@ -29,13 +29,6 @@ anova_posthoc_results <- olink_anova_posthoc(
 ) |>
   suppressMessages()
 sink()
-lme_results <- olink_lmer_posthoc(
-  df = npx_df,
-  variable = "Time",
-  random = "Site",
-  effect = "Time"
-) |>
-  suppressMessages()
 
 # set seed
 set.seed(123)
