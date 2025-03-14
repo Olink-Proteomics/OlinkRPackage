@@ -33,48 +33,19 @@ sink()
 # set seed
 set.seed(123)
 
-# additional data
-duplicate_assay_data <- npx_data1 |>
-  dplyr::filter(
-    .data[["Assay"]] == "MET"
-  ) |>
-  dplyr::mutate(
-    OlinkID = "OID01254"
-  ) |>
-  dplyr::mutate(
-    LOD = .data[["LOD"]] + 1L
-  )
-
-npx_platelod <- npx_data1 |>
-  dplyr::bind_rows(
-    duplicate_assay_data
-  ) |>
-  dplyr::rename(
-    "SampleQC" = "QC_Warning",
-    "PlateLOD" = "LOD"
-  )
-
-npx_maxlod <- npx_data1 |>
-  dplyr::bind_rows(
-    duplicate_assay_data
-  ) |>
-  dplyr::rename(
-    "SampleQC" = "QC_Warning",
-    "MaxLOD" = "LOD"
-  )
-
-npx_nolod <- npx_data1 |>
-  dplyr::bind_rows(
-    duplicate_assay_data
-  ) |>
-  dplyr::rename(
-    "SampleQC" = "QC_Warning"
-  ) |>
-  dplyr::select(
-    -dplyr::all_of("LOD")
-  )
-
 test_that("Input data equal for different LOD names", {
+  duplicate_assay_data <- npx_data1 |>
+    dplyr::filter(
+      .data[["Assay"]] == "MET"
+    ) |>
+    dplyr::mutate(
+      OlinkID = "OID01254"
+    ) |>
+    dplyr::mutate(
+      LOD = .data[["LOD"]] + 1L
+    )
+
+  # PlateLOD
   expect_equal(
     object = data_prep(data = npx_data1) |>
       suppressMessages() |>
@@ -82,13 +53,23 @@ test_that("Input data equal for different LOD names", {
         .data[["OlinkID"]]
       ) |>
       unique(),
-    expected = data_prep(data = npx_platelod) |>
+    expected = npx_data1 |>
+      dplyr::bind_rows(
+        duplicate_assay_data
+      ) |>
+      dplyr::rename(
+        "SampleQC" = "QC_Warning",
+        "PlateLOD" = "LOD"
+      ) |>
+      data_prep() |>
       suppressMessages() |>
       dplyr::pull(
         .data[["OlinkID"]]
       ) |>
       unique()
   )
+
+  # MaxLOD
   expect_equal(
     object = data_prep(data = npx_data1) |>
       suppressMessages() |>
@@ -96,13 +77,23 @@ test_that("Input data equal for different LOD names", {
         .data[["OlinkID"]]
       ) |>
       unique(),
-    expected = data_prep(data = npx_maxlod) |>
+    expected = npx_data1 |>
+      dplyr::bind_rows(
+        duplicate_assay_data
+      ) |>
+      dplyr::rename(
+        "SampleQC" = "QC_Warning",
+        "MaxLOD" = "LOD"
+      ) |>
+      data_prep() |>
       suppressMessages() |>
       dplyr::pull(
         .data[["OlinkID"]]
       ) |>
       unique()
   )
+
+  # no LOD
   expect_equal(
     object = data_prep(data = npx_data1) |>
       suppressMessages() |>
@@ -110,7 +101,17 @@ test_that("Input data equal for different LOD names", {
         .data[["OlinkID"]]
       ) |>
       unique(),
-    expected = data_prep(data = npx_nolod) |>
+    expected = npx_data1 |>
+      dplyr::bind_rows(
+        duplicate_assay_data
+      ) |>
+      dplyr::rename(
+        "SampleQC" = "QC_Warning"
+      ) |>
+      dplyr::select(
+        -dplyr::all_of("LOD")
+      ) |>
+      data_prep() |>
       suppressMessages() |>
       dplyr::pull(
         .data[["OlinkID"]]
