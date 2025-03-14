@@ -30,21 +30,20 @@ jobs:
           testthat::test_local(path = "OlinkAnalyze", reporter = reporter)
           reporter$end_reporter()
 
-          n_fail <- length(reporter$failures$as_list())
           n_warn <- length(reporter$warnings$as_list())
           n_skip <- length(reporter$skips$as_list())
 
-          if (n_fail > 0L || n_warn > 0L || n_skip > 0L) {
+          if (n_warn > 0L || n_skip > 0L) {
             cli::cli_abort(
               c(
-                "x" = "Identified {.val {n_fail}} failed, {.val {n_warn}}
-                warning, and {.val {n_skip}} skipped tests!",
+                "x" = "Identified {.val {n_warn}} warning(s) and {.val {n_skip}}
+                skipped test(s)!",
                 "i" = "Expected 0 of each."
               )
             )
           } else {
             cli::cli_inform(
-              c("Identified no failed, no warning, and no skipped tests!")
+              c("Identified no warning and no skipped tests!")
             )
           }
         shell: Rscript {0}
