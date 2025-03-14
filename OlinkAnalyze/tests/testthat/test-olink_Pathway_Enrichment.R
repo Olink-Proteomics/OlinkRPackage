@@ -15,14 +15,13 @@ ttest_results <- olink_ttest(
   variable = "Treatment"
 ) |>
   suppressMessages()
-sink("/dev/null")
+
 anova_posthoc_results <- olink_anova_posthoc(
   df = npx_df,
   variable = "Site",
   effect = "Site"
 ) |>
   suppressMessages()
-sink()
 
 # set seed
 set.seed(123)
