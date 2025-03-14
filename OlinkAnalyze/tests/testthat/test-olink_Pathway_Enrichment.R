@@ -3,7 +3,9 @@ skip_if_not_installed("clusterProfiler")
 skip_if_not_installed("msigdbr")
 skip_if_not_installed("msigdbdf")
 
-load(file = test_path('data','npx_data_format221010.RData'))
+npx_sample_data <- test_path("data", "npx_data_format221010.RData")
+skip_if_not(file.exists(npx_sample_data))
+load(file = npx_sample_data)
 
 npx_df <- npx_data1 %>%
   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL"))
@@ -45,6 +47,7 @@ test_that("Input data equal for different LOD names", {
 })
 
 test_that("T-test GSEA works", {
+  skip_on_cran()
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr")
   skip_if_not_installed("msigdbdf")
@@ -78,6 +81,7 @@ test_that("T-test GSEA works", {
 })
 
 test_that("Reactome GSEA works", {
+  skip_on_cran()
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr")
   skip_if_not_installed("msigdbdf")
@@ -100,6 +104,7 @@ test_that("Reactome GSEA works", {
 })
 
 test_that("KEGG GSEA works", {
+  skip_on_cran()
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr")
   skip_if_not_installed("msigdbdf")
@@ -122,6 +127,7 @@ test_that("KEGG GSEA works", {
 })
 
 test_that("GO GSEA works", {
+  skip_on_cran()
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr")
   skip_if_not_installed("msigdbdf")
@@ -144,6 +150,7 @@ test_that("GO GSEA works", {
 })
 
 test_that("T-test ORA works", {
+  skip_on_cran()
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr")
   skip_if_not_installed("msigdbdf")
@@ -167,6 +174,7 @@ test_that("T-test ORA works", {
 })
 
 test_that("Reactome ORA works", {
+  skip_on_cran()
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr")
   skip_if_not_installed("msigdbdf")
@@ -190,6 +198,7 @@ test_that("Reactome ORA works", {
 })
 
 test_that("KEGG ORA works", {
+  skip_on_cran()
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr")
   skip_if_not_installed("msigdbdf")
@@ -212,6 +221,7 @@ test_that("KEGG ORA works", {
 })
 
 test_that("GO ORA works", {
+  skip_on_cran()
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr")
   skip_if_not_installed("msigdbdf")
@@ -235,6 +245,7 @@ test_that("GO ORA works", {
 })
 
 test_that("Error if more than 1 contrast", {
+  skip_on_cran()
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr")
   skip_if_not_installed("msigdbdf")
@@ -249,6 +260,7 @@ test_that("Error if more than 1 contrast", {
 })
 
 test_that("Nonsense method errors",{
+  skip_on_cran()
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr")
   skip_if_not_installed("msigdbdf")
@@ -263,6 +275,7 @@ test_that("Nonsense method errors",{
 })
 
 test_that("Unsupported databases flag",{
+  skip_on_cran()
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr")
   skip_if_not_installed("msigdbdf")
@@ -271,6 +284,7 @@ test_that("Unsupported databases flag",{
 })
 
 test_that("Estimate column must be present",{
+  skip_on_cran()
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr")
   skip_if_not_installed("msigdbdf")
@@ -279,6 +293,7 @@ test_that("Estimate column must be present",{
 })
 
 test_that(" ORA warns assays not found in database. ", {
+  skip_on_cran()
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr")
   skip_if_not_installed("msigdbdf")
@@ -290,6 +305,7 @@ test_that(" ORA warns assays not found in database. ", {
 })
 
 test_that(" gsea warns assays not found in database. ", {
+  skip_on_cran()
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr")
   skip_if_not_installed("msigdbdf")
