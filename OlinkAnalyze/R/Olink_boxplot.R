@@ -182,8 +182,8 @@ olink_boxplot <- function(df,
         dplyr::left_join(scale_inf, by = "Name_OID") |>
         dplyr::mutate(C1=sapply(strsplit(as.character(contrast)," - "),function(x) x[1]),
                       C2=sapply(strsplit(as.character(contrast)," - "),function(x) x[2])) |>
-        dplyr::mutate(C1=str_replace_all(C1,"\\(|\\)", ""),
-                      C2=str_replace_all(C2,"\\(|\\)", "")) |> 
+        dplyr::mutate(C1=stringr::str_replace_all(C1,"\\(|\\)", ""),
+                      C2=stringr::str_replace_all(C2,"\\(|\\)", "")) |> 
         dplyr::group_by(Name_OID, contrast) |>
         dplyr::mutate(c.sort=min(C1,C2)) |>
         dplyr::mutate(p.value=paste0(myRound(Adjusted_pval)," Contrast: ", contrast)) |>
