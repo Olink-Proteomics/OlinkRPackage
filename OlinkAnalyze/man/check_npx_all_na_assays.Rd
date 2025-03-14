@@ -25,7 +25,7 @@ samples \emph{NA}.
 \details{
 We have added the tags importFrom for "dbplyr" and "duckdb" because
 "devtools::check()" would complain with a note that the two libraries are
-imported bu never used. To avoid that we used solutions taken from here:
+imported but never used. To avoid that we used solutions taken from here:
 \enumerate{
 \item https://github.com/hadley/r-pkgs/issues/203
 \item https://github.com/pbs-software/pbs-modelling/issues/95

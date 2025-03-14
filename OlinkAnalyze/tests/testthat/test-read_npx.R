@@ -3,22 +3,13 @@ test_that(
   {
     # get data if available, otherwise skip the test
     ref_res <- get_example_data("reference_results.rds")
+    npx_file <- get_inst_extdata_file(filename = "npx_data_ext.parquet")
 
     withr::with_tempfile(
       new = "tmp_long_parquet",
       pattern = "parquet-long-",
       fileext = ".parquet",
       code = {
-        # get the npx data file
-        expect_no_error(
-          object = npx_file <- system.file("extdata", "npx_data_ext.parquet",
-                                           package = "OlinkAnalyze",
-                                           mustWork = TRUE)
-        )
-
-        # check that the variable was created
-        expect_true(object = exists("npx_file"))
-
         # check that xlsx file can by copied without issues
         expect_no_condition(
           object = file.copy(npx_file, tmp_long_parquet)
@@ -81,23 +72,13 @@ test_that(
   {
     # get data if available, otherwise skip the test
     ref_res <- get_example_data("reference_results.rds")
+    npx_file <- get_inst_extdata_file(filename = "npx_data_long_csv.csv")
 
     withr::with_tempfile(
       new = "tmp_long_csv",
       pattern = "csv-long-",
       fileext = ".csv",
       code = {
-        # get the npx data file
-        expect_no_error(
-          object = npx_file <- system.file("extdata",
-                                           "npx_data_long_csv.csv",
-                                           package = "OlinkAnalyze",
-                                           mustWork = TRUE)
-        )
-
-        # check that the variable was created
-        expect_true(object = exists("npx_file"))
-
         # check that xlsx file can by copied without issues
         expect_no_condition(
           object = file.copy(npx_file, tmp_long_csv)
@@ -160,23 +141,13 @@ test_that(
 
     # get data if available, otherwise skip the test
     ref_res <- get_example_data("reference_results.rds")
+    npx_file <- get_inst_extdata_file(filename = "npx_data_long_zip.zip")
 
     withr::with_tempfile(
       new = "tmp_long_csv_zip",
       pattern = "csv-zip-long-",
       fileext = ".zip",
       code = {
-        # get the npx data file
-        expect_no_error(
-          object = npx_file <- system.file("extdata",
-                                           "npx_data_long_zip.zip",
-                                           package = "OlinkAnalyze",
-                                           mustWork = TRUE)
-        )
-
-        # check that the variable was created
-        expect_true(object = exists("npx_file"))
-
         # check that xlsx file can by copied without issues
         expect_no_condition(
           object = file.copy(npx_file, tmp_long_csv_zip)
@@ -239,23 +210,13 @@ test_that(
 
     # get data if available, otherwise skip the test
     ref_res <- get_example_data("reference_results.rds")
+    npx_file <- get_inst_extdata_file(filename = "npx_data2.xlsx")
 
     withr::with_tempfile(
       new = "tmp_wide_xlsx",
       pattern = "xlsx-wide-",
       fileext = ".xlsx",
       code = {
-        # get the npx data file
-        expect_no_error(
-          object = npx_file <- system.file("extdata",
-                                           "npx_data2.xlsx",
-                                           package = "OlinkAnalyze",
-                                           mustWork = TRUE)
-        )
-
-        # check that the variable was created
-        expect_true(object = exists("npx_file"))
-
         # check that xlsx file can by copied without issues
         expect_no_condition(
           object = file.copy(npx_file, tmp_wide_xlsx)
@@ -335,23 +296,13 @@ test_that(
 
     # get data if available, otherwise skip the test
     ref_res <- get_example_data("reference_results.rds")
+    npx_file <- get_inst_extdata_file(filename = "npx_data1.xlsx")
 
     withr::with_tempfile(
       new = "tmp_wide_xlsx",
       pattern = "xlsx-wide-",
       fileext = ".xlsx",
       code = {
-        # get the npx data file
-        expect_no_error(
-          object = npx_file <- system.file("extdata",
-                                           "npx_data1.xlsx",
-                                           package = "OlinkAnalyze",
-                                           mustWork = TRUE)
-        )
-
-        # check that the variable was created
-        expect_true(object = exists("npx_file"))
-
         # check that xlsx file can by copied without issues
         expect_no_condition(
           object = file.copy(npx_file, tmp_wide_xlsx)
@@ -444,23 +395,13 @@ test_that(
   {
     # get data if available, otherwise skip the test
     ref_res <- get_example_data("reference_results.rds")
+    npx_file <- get_inst_extdata_file(filename = "npx_data_wide_csv.csv")
 
     withr::with_tempfile(
       new = "tmp_wide_csv",
       pattern = "csv-wide-",
       fileext = ".csv",
       code = {
-        # get the npx data file
-        expect_no_error(
-          object = npx_file <- system.file("extdata",
-                                           "npx_data_wide_csv.csv",
-                                           package = "OlinkAnalyze",
-                                           mustWork = TRUE)
-        )
-
-        # check that the variable was created
-        expect_true(object = exists("npx_file"))
-
         # check that xlsx file can by copied without issues
         expect_no_condition(
           object = file.copy(npx_file, tmp_wide_csv)
@@ -561,23 +502,13 @@ test_that(
 
     # get data if available, otherwise skip the test
     ref_res <- get_example_data("reference_results.rds")
+    npx_file <- get_inst_extdata_file(filename = "npx_data1.xlsx")
 
     withr::with_tempfile(
       new = "tmp_wide_xlsx",
       pattern = "xlsx-wide-",
       fileext = ".xlsx",
       code = {
-        # get the npx data file
-        expect_no_error(
-          object = npx_file <- system.file("extdata",
-                                           "npx_data1.xlsx",
-                                           package = "OlinkAnalyze",
-                                           mustWork = TRUE)
-        )
-
-        # check that the variable was created
-        expect_true(object = exists("npx_file"))
-
         # check that xlsx file can by copied without issues
         expect_no_condition(
           object = file.copy(npx_file, tmp_wide_xlsx)

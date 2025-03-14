@@ -1,0 +1,49 @@
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+on: pull_request
+
+name: R-CI-tests-pass
+
+jobs:
+  R-CI-tests-pass:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+         extra-packages: any::pak, any::cli, any::testthat
+         working-directory: OlinkAnalyze
+
+      - name: Tests pass
+        run: |
+          reporter <- testthat::SummaryReporter$new()
+          testthat::test_local(path = "OlinkAnalyze", reporter = reporter)
+          reporter$end_reporter()
+
+          n_warn <- length(reporter$warnings$as_list())
+          n_skip <- length(reporter$skips$as_list())
+
+          if (n_warn > 0L || n_skip > 0L) {
+            cli::cli_abort(
+              c(
+                "x" = "Identified {.val {n_warn}} warning(s) and {.val {n_skip}}
+                skipped test(s)!",
+                "i" = "Expected 0 of each."
+              )
+            )
+          } else {
+            cli::cli_inform(
+              c("Identified no warning and no skipped tests!")
+            )
+          }
+        shell: Rscript {0}
