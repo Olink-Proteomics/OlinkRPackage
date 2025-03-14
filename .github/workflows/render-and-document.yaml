@@ -2,8 +2,8 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches-ignore:    
-      - 'main'  
+    branches-ignore:
+      - 'main'
 
 name: render-and-document
 
@@ -11,14 +11,14 @@ jobs:
   render-and-document:
     name: render-and-document
     runs-on: ubuntu-latest
-    timeout-minutes: 60        
+    timeout-minutes: 60
     env:
       GITHUB_PAT: ${{ secrets.OA_PAT }}
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
-        with: 
+        with:
           fetch-depth: 0
           token: ${{ secrets.OA_PAT }}
 
@@ -28,8 +28,9 @@ jobs:
 
       - uses: r-lib/actions/setup-r@v2
         with:
-          use-public-rspm: true        
-          
+          use-public-rspm: true
+          extra-repositories: https://igordot.r-universe.dev, https://cloud.r-project.org
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           working-directory: OlinkAnalyze
