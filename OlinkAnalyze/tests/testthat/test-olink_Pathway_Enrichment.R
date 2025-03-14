@@ -3,47 +3,142 @@ skip_if_not_installed("clusterProfiler")
 skip_if_not_installed("msigdbr")
 skip_if_not_installed("msigdbdf")
 
+# example data
 npx_sample_data <- test_path("data", "npx_data_format221010.RData")
 skip_if_not(file.exists(npx_sample_data))
 load(file = npx_sample_data)
+rm(npx_data_format221010.project2)
 
-npx_df <- npx_data1 %>%
-  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL"))
-ttest_results <- olink_ttest(df = npx_df, variable = "Treatment")
-anova_results <- olink_anova(df = npx_df, variable = "Site")
-anova_posthoc_results <- olink_anova_posthoc(npx_df, variable = "Site", effect = "Site")
-lme_results <- olink_lmer_posthoc(npx_df, variable = "Time", random = "Site", effect = "Time")
+# clean up npa_data1
+npx_df <- npx_data1 |>
+  dplyr::filter(
+    !stringr::str_detect(.data[["SampleID"]], "CONTROL")
+  )
+
+# statistical tests
+ttest_results <- olink_ttest(
+  df = npx_df,
+  variable = "Treatment"
+) |>
+  suppressMessages()
+ttest_results_no_estimate <- ttest_results |>
+  dplyr::select(
+    -dplyr::all_of("estimate")
+  )
+ttest_na <- olink_ttest(
+  df = npx_data_format221010,
+  variable = "treatment1"
+) |>
+  suppressMessages() |>
+  suppressWarnings()
+anova_results <- olink_anova(
+  df = npx_df,
+  variable = "Site"
+) |>
+  suppressMessages()
+sink("/dev/null")
+anova_posthoc_results <- olink_anova_posthoc(
+  df = npx_df,
+  variable = "Site",
+  effect = "Site"
+) |>
+  suppressMessages()
+sink()
+lme_results <- olink_lmer_posthoc(
+  df = npx_df,
+  variable = "Time",
+  random = "Site",
+  effect = "Time"
+) |>
+  suppressMessages()
+
+# set seed
 set.seed(123)
 
+# additional data
 duplicate_assay_data <- npx_data1 |>
-  dplyr::filter(Assay == "MET") |>
-  dplyr::mutate(OlinkID = "OID01254") |>
-  dplyr::mutate(LOD = LOD + 1)
+  dplyr::filter(
+    .data[["Assay"]] == "MET"
+  ) |>
+  dplyr::mutate(
+    OlinkID = "OID01254"
+  ) |>
+  dplyr::mutate(
+    LOD = .data[["LOD"]] + 1L
+  )
 
 npx_platelod <- npx_data1 |>
-  rbind(duplicate_assay_data) |>
-  dplyr::mutate(SampleQC = QC_Warning) |>
-  dplyr::mutate(PlateLOD = LOD) |>
-  dplyr::select(-QC_Warning, -LOD)
+  dplyr::bind_rows(
+    duplicate_assay_data
+  ) |>
+  dplyr::rename(
+    "SampleQC" = "QC_Warning",
+    "PlateLOD" = "LOD"
+  )
 
 npx_maxlod <- npx_data1 |>
-  rbind(duplicate_assay_data) |>
-  dplyr::mutate(SampleQC = QC_Warning) |>
-  dplyr::mutate(MaxLOD = LOD) |>
-  dplyr::select(-QC_Warning, -LOD)
+  dplyr::bind_rows(
+    duplicate_assay_data
+  ) |>
+  dplyr::rename(
+    "SampleQC" = "QC_Warning",
+    "MaxLOD" = "LOD"
+  )
 
 npx_nolod <- npx_data1 |>
-  rbind(duplicate_assay_data) |>
-  dplyr::mutate(SampleQC = QC_Warning) |>
-  dplyr::select(-QC_Warning, -LOD)
-
-ttest_results_no_estimate <- ttest_results %>% dplyr::select(-estimate)
-ttest_na <- suppressWarnings(olink_ttest(df = npx_data_format221010, variable = "treatment1"))
+  dplyr::bind_rows(
+    duplicate_assay_data
+  ) |>
+  dplyr::rename(
+    "SampleQC" = "QC_Warning"
+  ) |>
+  dplyr::select(
+    -dplyr::all_of("LOD")
+  )
 
 test_that("Input data equal for different LOD names", {
-  expect_equal(unique(data_prep(npx_data1)$OlinkID), unique(data_prep(npx_platelod)$OlinkID))
-  expect_equal(unique(data_prep(npx_data1)$OlinkID), unique(data_prep(npx_maxlod)$OlinkID))
-  expect_equal(unique(data_prep(npx_data1)$OlinkID), unique(data_prep(npx_nolod)$OlinkID))
+  expect_equal(
+    object = data_prep(data = npx_data1) |>
+      suppressMessages() |>
+      dplyr::pull(
+        .data[["OlinkID"]]
+      ) |>
+      unique(),
+    expected = data_prep(data = npx_platelod) |>
+      suppressMessages() |>
+      dplyr::pull(
+        .data[["OlinkID"]]
+      ) |>
+      unique()
+  )
+  expect_equal(
+    object = data_prep(data = npx_data1) |>
+      suppressMessages() |>
+      dplyr::pull(
+        .data[["OlinkID"]]
+      ) |>
+      unique(),
+    expected = data_prep(data = npx_maxlod) |>
+      suppressMessages() |>
+      dplyr::pull(
+        .data[["OlinkID"]]
+      ) |>
+      unique()
+  )
+  expect_equal(
+    object = data_prep(data = npx_data1) |>
+      suppressMessages() |>
+      dplyr::pull(
+        .data[["OlinkID"]]
+      ) |>
+      unique(),
+    expected = data_prep(data = npx_nolod) |>
+      suppressMessages() |>
+      dplyr::pull(
+        .data[["OlinkID"]]
+      ) |>
+      unique()
+  )
 })
 
 test_that("T-test GSEA works", {
@@ -279,8 +374,14 @@ test_that("Unsupported databases flag",{
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr")
   skip_if_not_installed("msigdbdf")
-  set.seed(123)
-  expect_error(olink_pathway_enrichment(npx_df, anova_posthoc_results, ontology = "WikiPathways"))
+
+  expect_error(
+    object = olink_pathway_enrichment(
+      data = npx_df,
+      test_results = anova_posthoc_results,
+      ontology = "WikiPathways"
+    )
+  )
 })
 
 test_that("Estimate column must be present",{
@@ -288,29 +389,52 @@ test_that("Estimate column must be present",{
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr")
   skip_if_not_installed("msigdbdf")
-  set.seed(123)
-  expect_error(olink_pathway_enrichment(npx_df, ttest_results_no_estimate))
+
+  expect_error(
+    object = olink_pathway_enrichment(
+      data = npx_df,
+      test_results = ttest_results_no_estimate
+    )
+  )
 })
 
-test_that(" ORA warns assays not found in database. ", {
+test_that("ORA warns assays not found in database", {
   skip_on_cran()
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr")
   skip_if_not_installed("msigdbdf")
-  messages <- capture_messages(olink_pathway_enrichment(npx_data1, test_results = ttest_results,
-                                                        method = "ORA", ontology = "MSigDb"))
-  messages <- paste(messages, collapse = "")
-  expect_true(grepl(pattern = "assays are not found in the database.", x = messages))
-
+  messages <- capture_messages(
+    code = olink_pathway_enrichment(
+      data = npx_data1,
+      test_results = ttest_results,
+      method = "ORA",
+      ontology = "MSigDb"
+    )
+  )
+  expect_true(
+    object = grepl(
+      pattern = "assays are not found in the database.",
+      x = paste(messages, collapse = "")
+    )
+  )
 })
 
-test_that(" gsea warns assays not found in database. ", {
+test_that("gsea warns assays not found in database", {
   skip_on_cran()
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr")
   skip_if_not_installed("msigdbdf")
 
-  messages <- capture_messages(olink_pathway_enrichment(npx_df, test_results = ttest_results))
-  messages <- paste(messages, collapse = "")
-  expect_true(grepl(pattern = "assays are not found in the database.", x = messages))
+  messages <- capture_messages(
+    code = olink_pathway_enrichment(
+      data = npx_df,
+      test_results = ttest_results
+    )
+  )
+  expect_true(
+    object = grepl(
+      pattern = "assays are not found in the database.",
+      x = paste(messages, collapse = "")
+    )
+  )
 })
