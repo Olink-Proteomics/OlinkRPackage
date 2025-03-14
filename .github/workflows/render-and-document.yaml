@@ -29,7 +29,7 @@ jobs:
       - uses: r-lib/actions/setup-r@v2
         with:
           use-public-rspm: true
-          extra-repositories: 'https://r-universe.dev'
+          extra-repositories: 'https://igordot.r-universe.dev'
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
