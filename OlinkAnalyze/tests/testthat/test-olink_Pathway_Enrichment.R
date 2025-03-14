@@ -21,11 +21,6 @@ ttest_results <- olink_ttest(
   variable = "Treatment"
 ) |>
   suppressMessages()
-anova_results <- olink_anova(
-  df = npx_df,
-  variable = "Site"
-) |>
-  suppressMessages()
 sink("/dev/null")
 anova_posthoc_results <- olink_anova_posthoc(
   df = npx_df,
