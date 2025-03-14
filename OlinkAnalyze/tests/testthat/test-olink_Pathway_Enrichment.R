@@ -21,10 +21,6 @@ ttest_results <- olink_ttest(
   variable = "Treatment"
 ) |>
   suppressMessages()
-ttest_results_no_estimate <- ttest_results |>
-  dplyr::select(
-    -dplyr::all_of("estimate")
-  )
 ttest_na <- olink_ttest(
   df = npx_data_format221010,
   variable = "treatment1"
@@ -393,7 +389,10 @@ test_that("Estimate column must be present",{
   expect_error(
     object = olink_pathway_enrichment(
       data = npx_df,
-      test_results = ttest_results_no_estimate
+      test_results = ttest_results |>
+        dplyr::select(
+          -dplyr::all_of("estimate")
+        )
     )
   )
 })
