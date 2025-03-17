@@ -35,7 +35,6 @@ jobs:
 
       - name: Test coverage badge
         run: |
-          set -e
           Rscript -e 'source("test_coverage/update_readme_coverage_badge.R")'
 
       - name: Commit changes if README is updated
@@ -46,7 +45,6 @@ jobs:
 
       - name: Render Rmarkdown files
         run: |
-          set -e
           RMD_PATH=($(find . -iname "*.rmd" | grep -v vignette || echo "No Rmd found"))
           Rscript -e 'for (f in commandArgs(TRUE)) if (file.exists(f)) rmarkdown::render(f)' ${RMD_PATH[*]}
 
@@ -58,7 +56,6 @@ jobs:
 
       - name: Document
         run: |
-          set -e
           Rscript -e 'roxygen2::roxygenise(package.dir = "OlinkAnalyze")'
 
       - name: Commit results
