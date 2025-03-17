@@ -6,9 +6,9 @@
 \title{Help function to read "Ct", "NPX", and "Quantified" data
 from delimited Olink software output files in R.}
 \usage{
-read_npx_delim(file, out_df = "arrow", sep = NULL)
+read_npx_delim(file, out_df = "arrow")
 
-read_npx_csv(file, out_df = "arrow", sep = NULL)
+read_npx_csv(file, out_df = "arrow")
 }
 \arguments{
 \item{file}{Path to Olink software output delimited file in wide or long
