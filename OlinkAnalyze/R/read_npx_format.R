@@ -37,9 +37,6 @@
 #' `r get_file_ext(name_sub = c("excel", "delim")) |> ansi_collapse_quot()`.
 #' @param out_df The class of output data frame. One of
 #' `r ansi_collapse_quot(read_npx_df_output)`.
-#' @param sep Character separator of delimited input file. One of `NULL`
-#' (default) for auto-detection, or `r ansi_collapse_quot(accepted_field_sep)`.
-#' Used only for delimited output files from Olink software.
 #' @param long_format Boolean marking format of input file. One of `NULL`
 #' (default) for auto-detection, `TRUE` for long format files or `FALSE` for
 #' wide format files.
@@ -68,7 +65,6 @@
 #'
 read_npx_format <- function(file,
                             out_df = "arrow",
-                            sep = NULL,
                             long_format = NULL,
                             olink_platform = NULL,
                             data_type = NULL,
@@ -108,7 +104,6 @@ read_npx_format <- function(file,
   ## read the file and its top n rows ----
 
   list_df_read <- read_npx_format_read(file = file,
-                                       sep = sep,
                                        read_n = 3L)
 
   ## Determine long or wide format ----
@@ -241,9 +236,6 @@ read_npx_format <- function(file,
 #' @param file Path to Olink software output file in wide or long format.
 #' Expecting file extensions
 #' `r get_file_ext(name_sub = c("excel", "delim")) |> ansi_collapse_quot()`.
-#' @param sep Character separator of delimited input file. One of `NULL`
-#' (default) for auto-detection, or `r ansi_collapse_quot(accepted_field_sep)`.
-#' Used only for delimited output files from Olink software.
 #' @param read_n Number of top rows to read.
 #'
 #' @return A list with two elements:
@@ -261,7 +253,6 @@ read_npx_format <- function(file,
 #'   \code{\link{read_npx_format_get_quant}}
 #'
 read_npx_format_read <- function(file,
-                                 sep = NULL,
                                  read_n = 3L) {
 
   # check input ----
@@ -291,8 +282,7 @@ read_npx_format_read <- function(file,
   } else if (grepl(pattern = "delim", x = f_label)) {
 
     df <- read_npx_delim(file = file,
-                         out_df = "arrow",
-                         sep = sep)
+                         out_df = "arrow")
 
   } else {
 

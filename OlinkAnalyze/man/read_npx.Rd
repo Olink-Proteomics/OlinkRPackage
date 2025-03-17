@@ -8,7 +8,6 @@
 read_npx(
   filename,
   out_df = "tibble",
-  sep = NULL,
   long_format = NULL,
   olink_platform = NULL,
   data_type = NULL,
@@ -20,7 +19,6 @@ read_npx(
 read_NPX(
   filename,
   out_df = "tibble",
-  sep = NULL,
   long_format = NULL,
   olink_platform = NULL,
   data_type = NULL,
@@ -35,10 +33,6 @@ Expecting extensions "xls" or "xlsx" for excel files, "csv" or "txt" for delim f
 
 \item{out_df}{The class of the output dataset. One of
 "tibble" and "arrow". (default = "tibble")}
-
-\item{sep}{Character separator of delimited input file. One of \code{NULL}
-(default) for auto-detection, or ";" and ",".
-Used only for delimited output files from Olink software.}
 
 \item{long_format}{Boolean marking format of input file. One of \code{NULL}
 (default) for auto-detection, or \code{TRUE} for long format and \code{FALSE} for

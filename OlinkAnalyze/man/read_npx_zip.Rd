@@ -8,7 +8,6 @@ from zip-compressed Olink software output files in R.}
 read_npx_zip(
   file,
   out_df = "arrow",
-  sep = NULL,
   long_format = NULL,
   olink_platform = NULL,
   data_type = NULL,
@@ -23,10 +22,6 @@ format. Expected file extensions
 
 \item{out_df}{The class of the output dataset. One of
 "tibble" and "arrow". (default = "tibble")}
-
-\item{sep}{Character separator of delimited input file. One of \code{NULL}
-(default) for auto-detection, or ";" and ",".
-Used only for delimited output files from Olink software.}
 
 \item{long_format}{Boolean marking format of input file. One of \code{NULL}
 (default) for auto-detection, \code{TRUE} for long format files or \code{FALSE} for

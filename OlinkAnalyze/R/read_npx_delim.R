@@ -52,7 +52,7 @@ read_npx_delim <- function(file,
         header = TRUE,
         stringsAsFactors = FALSE,
         na.strings = c("NA", ""),
-        check.names = TRUE,
+        check.names = FALSE,
         data.table = FALSE
       ) |>
         dplyr::as_tibble()
@@ -78,7 +78,7 @@ read_npx_delim <- function(file,
       header = FALSE,
       stringsAsFactors = FALSE,
       na.strings = c("NA", ""),
-      check.names = TRUE,
+      check.names = FALSE,
       data.table = FALSE
     ) |>
       dplyr::as_tibble()
