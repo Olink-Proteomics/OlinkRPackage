@@ -72,6 +72,7 @@ Depends: R (>= 4.1.0)
 Imports: 
     arrow (>= 14.0.0),
     cli (>= 3.6.2),
+    data.table,
     dbplyr,
     dplyr,
     duckdb,

@@ -33,9 +33,6 @@
 #' `r ansi_collapse_quot(get_file_ext(name_sub = "compressed"))`.
 #' @param out_df The class of the output dataset. One of
 #' `r ansi_collapse_quot(read_npx_df_output)`. (default = "tibble")
-#' @param sep Character separator of delimited input file. One of `NULL`
-#' (default) for auto-detection, or `r ansi_collapse_quot(accepted_field_sep)`.
-#' Used only for delimited output files from Olink software.
 #' @param long_format Boolean marking format of input file. One of `NULL`
 #' (default) for auto-detection, `TRUE` for long format files or `FALSE` for
 #' wide format files.
@@ -63,7 +60,6 @@
 #'
 read_npx_zip <- function(file,
                          out_df = "arrow",
-                         sep = NULL,
                          long_format = NULL,
                          olink_platform = NULL,
                          data_type = NULL,
@@ -193,7 +189,6 @@ read_npx_zip <- function(file,
   df_olink <- read_npx(
     filename = extracted_file_npx,
     out_df = out_df,
-    sep = sep,
     long_format = long_format,
     olink_platform = olink_platform,
     data_type = data_type,

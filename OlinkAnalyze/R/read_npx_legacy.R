@@ -53,7 +53,6 @@ read_npx_legacy_help <- function(file,
 
   list_format <- read_npx_format(file = file,
                                  out_df = out_df,
-                                 sep = NULL,
                                  long_format = NULL,
                                  olink_platform = olink_platform,
                                  data_type = data_type,

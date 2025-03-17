@@ -590,7 +590,6 @@ test_that(
             expect_warning(
               object = df_out_arrow <- read_npx_zip(file = zfile_test,
                                                     out_df = "arrow",
-                                                    sep = NULL,
                                                     long_format = TRUE,
                                                     quiet = TRUE),
               regexp = "Unable to confirm the \"long\" format from the inpu"
@@ -603,7 +602,6 @@ test_that(
             expect_warning(
               object = df_out_tibble <- read_npx_zip(file = zfile_test,
                                                      out_df = "tibble",
-                                                     sep = NULL,
                                                      long_format = TRUE,
                                                      quiet = TRUE),
               regexp = "Unable to confirm the \"long\" format from the inpu"
@@ -776,7 +774,6 @@ test_that(
             expect_warning(
               object = df_out_arrow <- read_npx_zip(file = zfile_test,
                                                     out_df = "arrow",
-                                                    sep = NULL,
                                                     long_format = TRUE,
                                                     quiet = TRUE),
               regexp = "Unable to confirm the \"long\" format from the inpu"
@@ -789,7 +786,6 @@ test_that(
             expect_warning(
               object = df_out_tibble <- read_npx_zip(file = zfile_test,
                                                      out_df = "tibble",
-                                                     sep = NULL,
                                                      long_format = TRUE,
                                                      quiet = TRUE),
               regexp = "Unable to confirm the \"long\" format from the inpu"
