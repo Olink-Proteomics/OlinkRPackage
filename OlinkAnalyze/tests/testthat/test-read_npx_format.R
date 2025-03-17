@@ -46,7 +46,6 @@ test_that(
           object = df_out_v1 <- read_npx_format(
             file = csv_long,
             out_df = "tibble",
-            sep = NULL,
             long_format = NULL,
             olink_platform = NULL,
             data_type = NULL,
@@ -60,7 +59,6 @@ test_that(
           object = df_out_v2 <- read_npx_format(
             file = csv_long,
             out_df = "tibble",
-            sep = NULL,
             long_format = NULL,
             olink_platform = "Target 48",
             data_type = NULL,
@@ -74,7 +72,6 @@ test_that(
           object = df_out_v3 <- read_npx_format(
             file = csv_long,
             out_df = "tibble",
-            sep = NULL,
             long_format = TRUE,
             olink_platform = "Target 48",
             data_type = NULL,
@@ -88,7 +85,6 @@ test_that(
           object = df_out_v4 <- read_npx_format(
             file = csv_long,
             out_df = "tibble",
-            sep = NULL,
             long_format = TRUE,
             olink_platform = "Target 48",
             data_type = "NPX",
@@ -171,7 +167,6 @@ test_that(
           object = df_out_v1 <- read_npx_format(
             file = csv_long,
             out_df = "tibble",
-            sep = NULL,
             long_format = NULL,
             olink_platform = NULL,
             data_type = NULL,
@@ -185,7 +180,6 @@ test_that(
           object = df_out_v2 <- read_npx_format(
             file = csv_long,
             out_df = "tibble",
-            sep = NULL,
             long_format = NULL,
             olink_platform = "Target 48",
             data_type = NULL,
@@ -199,7 +193,6 @@ test_that(
           object = df_out_v3 <- read_npx_format(
             file = csv_long,
             out_df = "tibble",
-            sep = NULL,
             long_format = TRUE,
             olink_platform = "Target 48",
             data_type = NULL,
@@ -213,7 +206,6 @@ test_that(
           object = df_out_v4 <- read_npx_format(
             file = csv_long,
             out_df = "tibble",
-            sep = NULL,
             long_format = TRUE,
             olink_platform = "Target 48",
             data_type = "NPX",
@@ -290,7 +282,6 @@ test_that(
           object = df_out_v1 <- read_npx_format(
             file = excel_long,
             out_df = "tibble",
-            sep = NULL,
             long_format = NULL,
             olink_platform = NULL,
             data_type = NULL,
@@ -304,7 +295,6 @@ test_that(
           object = df_out_v2 <- read_npx_format(
             file = excel_long,
             out_df = "tibble",
-            sep = NULL,
             long_format = NULL,
             olink_platform = "Target 48",
             data_type = NULL,
@@ -318,7 +308,6 @@ test_that(
           object = df_out_v3 <- read_npx_format(
             file = excel_long,
             out_df = "tibble",
-            sep = NULL,
             long_format = TRUE,
             olink_platform = "Target 48",
             data_type = NULL,
@@ -332,7 +321,6 @@ test_that(
           object = df_out_v4 <- read_npx_format(
             file = excel_long,
             out_df = "tibble",
-            sep = NULL,
             long_format = TRUE,
             olink_platform = "Target 48",
             data_type = "NPX",
@@ -423,7 +411,6 @@ test_that(
           object = list_out_v1 <- read_npx_format(
             file = excel_long,
             out_df = "tibble",
-            sep = NULL,
             long_format = NULL,
             olink_platform = NULL,
             data_type = NULL,
@@ -488,7 +475,6 @@ test_that(
           object = list_out_v1 <- read_npx_format(
             file = excel_long,
             out_df = "tibble",
-            sep = NULL,
             long_format = NULL,
             olink_platform = NULL,
             data_type = NULL,
@@ -553,7 +539,6 @@ test_that(
           object = list_out_v1 <- read_npx_format(
             file = excel_long,
             out_df = "tibble",
-            sep = NULL,
             long_format = NULL,
             olink_platform = NULL,
             data_type = NULL,
@@ -618,7 +603,6 @@ test_that(
           object = list_out_v1 <- read_npx_format(
             file = excel_long,
             out_df = "tibble",
-            sep = NULL,
             long_format = NULL,
             olink_platform = NULL,
             data_type = NULL,
@@ -684,7 +668,6 @@ test_that(
           object = list_out_v1 <- read_npx_format(
             file = excel_long,
             out_df = "tibble",
-            sep = NULL,
             long_format = NULL,
             olink_platform = NULL,
             data_type = NULL,
@@ -764,7 +747,6 @@ test_that(
           object = df_out_v1 <- read_npx_format(
             file = csv_wide,
             out_df = "tibble",
-            sep = NULL,
             long_format = NULL,
             olink_platform = NULL,
             data_type = NULL,
@@ -778,7 +760,6 @@ test_that(
           object = df_out_v2 <- read_npx_format(
             file = csv_wide,
             out_df = "tibble",
-            sep = NULL,
             long_format = NULL,
             olink_platform = "Target 48",
             data_type = NULL,
@@ -792,7 +773,6 @@ test_that(
           object = df_out_v3 <- read_npx_format(
             file = csv_wide,
             out_df = "tibble",
-            sep = NULL,
             long_format = FALSE,
             olink_platform = "Target 48",
             data_type = NULL,
@@ -806,7 +786,6 @@ test_that(
           object = df_out_v4 <- read_npx_format(
             file = csv_wide,
             out_df = "tibble",
-            sep = NULL,
             long_format = FALSE,
             olink_platform = "Target 48",
             data_type = "NPX",
@@ -901,7 +880,6 @@ test_that(
           object = df_out_v1 <- read_npx_format(
             file = csv_wide,
             out_df = "tibble",
-            sep = NULL,
             long_format = NULL,
             olink_platform = NULL,
             data_type = NULL,
@@ -915,7 +893,6 @@ test_that(
           object = df_out_v2 <- read_npx_format(
             file = csv_wide,
             out_df = "tibble",
-            sep = NULL,
             long_format = NULL,
             olink_platform = "Target 48",
             data_type = NULL,
@@ -929,7 +906,6 @@ test_that(
           object = df_out_v3 <- read_npx_format(
             file = csv_wide,
             out_df = "tibble",
-            sep = NULL,
             long_format = FALSE,
             olink_platform = "Target 48",
             data_type = NULL,
@@ -943,7 +919,6 @@ test_that(
           object = df_out_v4 <- read_npx_format(
             file = csv_wide,
             out_df = "tibble",
-            sep = NULL,
             long_format = FALSE,
             olink_platform = "Target 48",
             data_type = "NPX",
@@ -1032,7 +1007,6 @@ test_that(
           object = df_out_v1 <- read_npx_format(
             file = excel_wide,
             out_df = "tibble",
-            sep = NULL,
             long_format = NULL,
             olink_platform = NULL,
             data_type = NULL,
@@ -1046,7 +1020,6 @@ test_that(
           object = df_out_v2 <- read_npx_format(
             file = excel_wide,
             out_df = "tibble",
-            sep = NULL,
             long_format = NULL,
             olink_platform = "Target 48",
             data_type = NULL,
@@ -1060,7 +1033,6 @@ test_that(
           object = df_out_v3 <- read_npx_format(
             file = excel_wide,
             out_df = "tibble",
-            sep = NULL,
             long_format = FALSE,
             olink_platform = "Target 48",
             data_type = NULL,
@@ -1074,7 +1046,6 @@ test_that(
           object = df_out_v4 <- read_npx_format(
             file = excel_wide,
             out_df = "tibble",
-            sep = NULL,
             long_format = FALSE,
             olink_platform = "Target 48",
             data_type = "NPX",
@@ -1177,7 +1148,6 @@ test_that(
           object = list_out_v1 <- read_npx_format(
             file = excel_wide,
             out_df = "tibble",
-            sep = NULL,
             long_format = NULL,
             olink_platform = NULL,
             data_type = NULL,
@@ -1243,7 +1213,6 @@ test_that(
           object = list_out_v1 <- read_npx_format(
             file = excel_wide,
             out_df = "tibble",
-            sep = NULL,
             long_format = NULL,
             olink_platform = NULL,
             data_type = NULL,
@@ -1309,7 +1278,6 @@ test_that(
           object = list_out_v1 <- read_npx_format(
             file = excel_wide,
             out_df = "tibble",
-            sep = NULL,
             long_format = NULL,
             olink_platform = NULL,
             data_type = NULL,
@@ -1375,7 +1343,6 @@ test_that(
           object = list_out_v1 <- read_npx_format(
             file = excel_wide,
             out_df = "tibble",
-            sep = NULL,
             long_format = NULL,
             olink_platform = NULL,
             data_type = NULL,
@@ -1441,7 +1408,6 @@ test_that(
           object = list_out_v1 <- read_npx_format(
             file = excel_wide,
             out_df = "tibble",
-            sep = NULL,
             long_format = NULL,
             olink_platform = NULL,
             data_type = NULL,
@@ -1517,7 +1483,6 @@ test_that(
         expect_no_condition(
           object = df_read_out <- read_npx_format_read(
             file = olink_wide_format,
-            sep = NULL,
             read_n = top_n_row
           )
         )
@@ -1544,13 +1509,12 @@ test_that(
       pattern = "test-olink-wide",
       fileext = ".csv",
       code = {
-        sep <- ";"
         # write wide df
         utils::write.table(x = df_rand$list_df_wide$df_wide,
                            file = olink_wide_format,
                            append = FALSE,
                            quote = FALSE,
-                           sep = sep,
+                           sep = ";",
                            eol = "\n",
                            na = "",
                            dec = ".",
@@ -1561,7 +1525,6 @@ test_that(
         expect_no_condition(
           object = df_read_out <- read_npx_format_read(
             file = olink_wide_format,
-            sep = sep,
             read_n = top_n_row
           )
         )
@@ -1588,13 +1551,12 @@ test_that(
       pattern = "test-olink-wide",
       fileext = ".txt",
       code = {
-        sep <- ";"
         # write wide df
         utils::write.table(x = df_rand$list_df_wide$df_wide,
                            file = olink_wide_format,
                            append = FALSE,
                            quote = FALSE,
-                           sep = sep,
+                           sep = ";",
                            eol = "\n",
                            na = "",
                            dec = ".",
@@ -1605,7 +1567,6 @@ test_that(
         expect_no_condition(
           object = df_read_out <- read_npx_format_read(
             file = olink_wide_format,
-            sep = sep,
             read_n = top_n_row
           )
         )
@@ -1643,7 +1604,6 @@ test_that(
         expect_no_condition(
           object = df_read_out <- read_npx_format_read(
             file = olink_long_format,
-            sep = NULL,
             read_n = top_n_row
           )
         )
@@ -1689,13 +1649,12 @@ test_that(
       pattern = "test-olink-long",
       fileext = ".csv",
       code = {
-        sep <- ";"
         # write wide df
         write.table(x = df_rand$list_df_long$df_long,
                     file = olink_long_format,
                     append = FALSE,
                     quote = FALSE,
-                    sep = sep,
+                    sep = ";",
                     eol = "\n",
                     na = "",
                     dec = ".",
@@ -1706,7 +1665,6 @@ test_that(
         expect_no_condition(
           object = df_read_out <- read_npx_format_read(
             file = olink_long_format,
-            sep = sep,
             read_n = top_n_row
           )
         )
@@ -1752,13 +1710,12 @@ test_that(
       pattern = "test-olink-long",
       fileext = ".txt",
       code = {
-        sep <- ","
         # write wide df
         write.table(x = df_rand$list_df_long$df_long,
                     file = olink_long_format,
                     append = FALSE,
                     quote = FALSE,
-                    sep = sep,
+                    sep = ",",
                     eol = "\n",
                     na = "",
                     dec = ".",
@@ -1769,7 +1726,6 @@ test_that(
         expect_no_condition(
           object = df_read_out <- read_npx_format_read(
             file = olink_long_format,
-            sep = sep,
             read_n = top_n_row
           )
         )
@@ -1830,7 +1786,6 @@ test_that(
       pattern = "test-olink-wide",
       fileext = ".parquet",
       code = {
-        sep <- NULL
         # write wide df
         arrow::write_parquet(
           x = df_rand$list_df_long$df_oid_long,
@@ -1842,7 +1797,6 @@ test_that(
         expect_error(
           object = read_npx_format_read(
             file = olink_wide_format,
-            sep = sep,
             read_n = 3L
           ),
           regexp = "Unable to recognize format from file extension of"
