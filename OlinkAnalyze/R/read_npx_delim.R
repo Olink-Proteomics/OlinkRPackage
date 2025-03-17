@@ -14,9 +14,6 @@
 #' `r get_file_ext(name_sub = "delim") |> ansi_collapse_quot()`.
 #' @param out_df The class of output data frame. One of
 #' `r ansi_collapse_quot(read_npx_df_output)`.
-#' @param sep Character separator of delimited input file. One of `NULL`
-#' (default) for auto-detection, or `r ansi_collapse_quot(accepted_field_sep)`.
-#' Used only for delimited output files from Olink software.
 #'
 #' @return `r ansi_collapse_quot(x = get_df_output_print(), sep = "or")` with
 #' Olink data in long or wide format.
@@ -27,8 +24,6 @@
 #'   \code{\link{read_npx_zip}}
 #'   \code{\link{read_npx_excel}}
 #'   \code{\link{read_npx_format}}
-#'   \code{\link{read_npx_delim_wide}}
-#'   \code{\link{read_npx_delim_long}}
 #'
 read_npx_delim <- function(file,
                            out_df = "arrow") {
@@ -70,8 +65,9 @@ read_npx_delim <- function(file,
 
   # if long has only the first two columns not matching VX, where X is
   # the column name, then then file is in wide format
-  if (identical(x = tail(x = names(df_olink), n = -2L),
-                y = tail(x = paste0("V", seq_len(ncol(df_olink))), n = -2L))
+  if (identical(x = utils::tail(x = names(df_olink), n = -2L),
+                y = utils::tail(x = paste0("V", seq_len(ncol(df_olink))),
+                                n = -2L))
       && nrow(df_olink) > 2L) {
     df_olink <- data.table::fread(
       file = file,
