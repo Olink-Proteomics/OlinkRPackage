@@ -283,16 +283,15 @@ test_that("KEGG ORA works", {
   skip_if_not_installed("msigdbr")
   skip_if_not_installed("msigdbdf")
 
-  expect_no_warning(
-    object = expect_no_error(
-      object = tt_ora_kegg <- olink_pathway_enrichment(
-        data = npx_df,
-        test_results = ttest_results,
-        method = "ORA",
-        ontology = "KEGG"
-      ) |>
-        suppressMessages()
-    )
+  expect_warning(
+    object = tt_ora_kegg <- olink_pathway_enrichment(
+      data = npx_df,
+      test_results = ttest_results,
+      method = "ORA",
+      ontology = "KEGG"
+    ) |>
+      suppressMessages(),
+    regexp = "No remaining pathways within the range 10-500 proteins!"
   )
 
   expect_true(
@@ -339,7 +338,7 @@ test_that("Error if more than 1 contrast", {
   )
 })
 
-test_that("Nonsense method errors",{
+test_that("Nonsense method errors", {
   skip_on_cran()
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr")
@@ -354,7 +353,7 @@ test_that("Nonsense method errors",{
   )
 })
 
-test_that("Unsupported databases flag",{
+test_that("Unsupported databases flag", {
   skip_on_cran()
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr")
@@ -369,7 +368,7 @@ test_that("Unsupported databases flag",{
   )
 })
 
-test_that("Estimate column must be present",{
+test_that("Estimate column must be present", {
   skip_on_cran()
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr")

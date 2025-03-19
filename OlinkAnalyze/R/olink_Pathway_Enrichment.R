@@ -279,6 +279,9 @@ gsea_pathwayenrichment <- function(geneList, msig_df) {
   GSEA <- clusterProfiler::GSEA(geneList = geneList, TERM2GENE = msig_df, pvalueCutoff = 1)
 
   if (is.null(GSEA)) {
+    cli::cli_warn(
+      "No remaining pathways within the range 10-500 proteins!"
+    )
     return(NULL)
   } else {
     return(GSEA@result)
@@ -305,6 +308,9 @@ ora_pathwayenrichment <- function(test_results, msig_df, pvalue_cutoff = pvalue_
   ORA <- clusterProfiler::enricher(gene = sig_genes, universe = universe, TERM2GENE = msig_df, pvalueCutoff = 1)
 
   if (is.null(ORA)) {
+    cli::cli_warn(
+      "No remaining pathways within the range 10-500 proteins!"
+    )
     return(NULL)
   } else {
     return(ORA@result)
