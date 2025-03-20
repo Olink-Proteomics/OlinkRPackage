@@ -109,9 +109,11 @@ read_npx_delim <- function(file,
       # Try executing wide
       if (df_olink_warn_check == TRUE) {
         read_npx_delim_wide(file = file, sep = sep) |>
+          remove_all_na_cols() |>
           suppressWarnings()
       } else {
-        read_npx_delim_wide(file = file, sep = sep)
+        read_npx_delim_wide(file = file, sep = sep) |>
+          remove_all_na_cols()
       }
     }, warning = function(w) {
       # Handle warnings
@@ -298,7 +300,7 @@ get_field_separator <- function(file) {
 
   # get the first 5 lines of the file
   file_lines <- tryCatch({
-    readLines(con = file, n = 5L)
+    readLines(con = file, n = 5L, skipNul = FALSE)
   }, warning = function(w) {
     # convert warning to error
     stop()
