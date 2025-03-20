@@ -34,8 +34,7 @@ accepted_field_sep <- c(
   ",",
   "\t",
   "|",
-  ":",
-  " "
+  ":"
 )
 
 ## Acceptable classes of data frames that read_npx* functions may output ----

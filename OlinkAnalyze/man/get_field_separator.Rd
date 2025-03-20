@@ -13,7 +13,7 @@ Expecting file extensions
 }
 \value{
 The file delimiter
-";", ",", "	", "|", ":", or " ".
+";", ",", "	", "|", or ":".
 }
 \description{
 This function uses the first line of the provided file to determine the

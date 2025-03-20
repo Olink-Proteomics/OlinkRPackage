@@ -13,7 +13,7 @@ read_npx_delim_long(file, sep)
 Expecting file extensions}
 
 \item{sep}{Character separator of delimited input file. One of \code{NULL}
-(default) for auto-detection, or ";", ",", "    ", "|", ":", and " ".
+(default) for auto-detection, or ";", ",", "    ", "|", and ":".
 Used only for delimited output files from Olink software.}
 }
 \value{
