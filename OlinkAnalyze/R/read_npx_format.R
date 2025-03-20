@@ -449,20 +449,20 @@ read_npx_format_get_format <- function(df_top_n,
                         x = data_cells_long,
                         ignore.case = FALSE)
 
-  if (is_data_wide == FALSE && any(is_data_long == TRUE)) {
+  if (is_data_wide == TRUE) {
+    # in wide format files we expect the quantification method to appear in
+    # cell A2 and we also expect cells L1:O1 to be empty.
+
+    detected_long_format <- FALSE
+    data_cells <- data_cells_wide
+
+  } else if (is_data_wide == FALSE && any(is_data_long == TRUE)) {
     # in long format files we expect the quantification method to appear in
     # cells L1:O1 and we also expect no matches to cell A2. This is what marks
     # wide format files.
 
     detected_long_format <- TRUE
     data_cells <- data_cells_long
-
-  } else if (is_data_wide == TRUE && all(is_data_long == FALSE)) {
-    # in wide format files we expect the quantification method to appear in
-    # cell A2 and we also expect cells L1:O1 to be empty.
-
-    detected_long_format <- FALSE
-    data_cells <- data_cells_wide
 
   } else {
     # Throw an error only if the user has not provided any info if the file is
