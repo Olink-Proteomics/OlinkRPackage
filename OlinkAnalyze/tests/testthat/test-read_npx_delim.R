@@ -16,7 +16,8 @@ test_that(
           "B" = c("a", NA_character_, "c"),
           "C" = c(NA, TRUE, FALSE),
           "D" = c("NA", "B", NA_character_),
-          "E" = c(1L, 2L, NA_integer_)
+          "E" = c(1L, 2L, NA_integer_),
+
         )
 
         # write the coma-delimited file
@@ -411,6 +412,201 @@ test_that(
 )
 
 test_that(
+  "read_npx_delim - works - wide format - uneven number of columns",
+  {
+    # get synthetic data, or skip if not available
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = "Target 96",
+      data_type = "NPX",
+      n_panels = 1L,
+      n_assays = 92L,
+      n_samples = 99L,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = FALSE,
+      version = 1L
+    )
+
+    withr::with_tempfile(
+      new = "csvfile_test",
+      pattern = "csv-file_test",
+      fileext = ".csv",
+      code = {
+        # write the file with uneven number of columns in rows
+        write.table(
+          x = df_rand$list_df_wide$df_head_wide,
+          file = csvfile_test,
+          append = FALSE,
+          quote = FALSE,
+          sep = ";",
+          eol = "\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = FALSE
+        )
+        write.table(
+          x = df_rand$list_df_wide$df_top_wide,
+          file = csvfile_test,
+          append = TRUE,
+          quote = FALSE,
+          sep = ";",
+          eol = "\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = FALSE
+        )
+        write(x = "", file = csvfile_test, append = TRUE)
+        write.table(
+          x = df_rand$list_df_wide$df_middle_wide,
+          file = csvfile_test,
+          append = TRUE,
+          quote = FALSE,
+          sep = ";",
+          eol = "\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = FALSE
+        )
+        write(x = "", file = csvfile_test, append = TRUE)
+        write.table(
+          x = df_rand$list_df_wide$df_bottom_wide,
+          file = csvfile_test,
+          append = TRUE,
+          quote = FALSE,
+          sep = ";",
+          eol = "\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = FALSE
+        )
+
+        # chech that reading the file works
+        expect_no_condition(
+          object = df_out <- read_npx_delim(file = csvfile_test,
+                                            out_df = "tibble")
+        )
+
+        # check that variable exists
+        expect_true(object = exists("df_out"))
+
+        expect_true(inherits(x = df_out, what = "tbl_df"))
+
+        # check that the two dataframes are identical
+        expect_equal(
+          object = df_out,
+          expected = df_rand$list_df_wide$df_wide
+        )
+      }
+    )
+  }
+)
+
+test_that(
+  "read_npx_delim - works - wide format - windows new line \r\n",
+  {
+    # get synthetic data, or skip if not available
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = "Target 96",
+      data_type = "NPX",
+      n_panels = 1L,
+      n_assays = 92L,
+      n_samples = 99L,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = FALSE,
+      version = 1L
+    )
+
+    withr::with_tempfile(
+      new = "csvfile_test",
+      pattern = "csv-file_test",
+      fileext = ".csv",
+      code = {
+        # write the file with uneven number of columns in rows
+        write.table(
+          x = df_rand$list_df_wide$df_head_wide,
+          file = csvfile_test,
+          append = FALSE,
+          quote = FALSE,
+          sep = ";",
+          eol = "\r\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = FALSE
+        )
+        write.table(
+          x = df_rand$list_df_wide$df_top_wide |>
+            dplyr::mutate(
+              Vlast = NA_character_
+            ),
+          file = csvfile_test,
+          append = TRUE,
+          quote = FALSE,
+          sep = ";",
+          eol = "\r\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = FALSE
+        )
+        write(x = "\r", file = csvfile_test, append = TRUE)
+        write.table(
+          x = df_rand$list_df_wide$df_middle_wide |>
+            dplyr::mutate(
+              Vlast = NA_character_
+            ),
+          file = csvfile_test,
+          append = TRUE,
+          quote = FALSE,
+          sep = ";",
+          eol = "\r\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = FALSE
+        )
+        write(x = "\r", file = csvfile_test, append = TRUE)
+        write.table(
+          x = df_rand$list_df_wide$df_bottom_wide |>
+            dplyr::mutate(
+              Vlast = NA_character_
+            ),
+          file = csvfile_test,
+          append = TRUE,
+          quote = FALSE,
+          sep = ";",
+          eol = "\r\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = FALSE
+        )
+
+        # chech that reading the file works
+        expect_no_condition(
+          object = df_out <- read_npx_delim(file = csvfile_test,
+                                            out_df = "tibble")
+        )
+
+        # check that variable exists
+        expect_true(object = exists("df_out"))
+
+        expect_true(inherits(x = df_out, what = "tbl_df"))
+
+        # check that the two dataframes are identical
+        expect_equal(
+          object = df_out,
+          expected = df_rand$list_df_wide$df_wide
+        )
+      }
+    )
+  }
+)
+
+test_that(
   "read_npx_delim - error - long format - file not delimited",
   {
     withr::with_tempfile(
@@ -475,8 +671,7 @@ test_that(
 
         # check that relevant error is thrown
         expect_error(
-          object = read_npx_delim(file = pfile_test) |>
-            suppressWarnings(),
+          object = read_npx_delim(file = pfile_test),
           regexp = "Unable to open delimited file:"
         )
       }
@@ -497,14 +692,13 @@ test_that(
           "A" = c(1, 2.2, 3.14),
           "B" = c("a", "b", "c"),
           "C" = c(TRUE, TRUE, FALSE),
-          "D" = c("NA", "B", NA_character_),
-          "E" = c(1L, 2L, 3L)
+          "D" = c("NA", "B", NA_character_)
         ) |>
           utils::write.table(
             file = cdfile_test,
             append = FALSE,
             quote = FALSE,
-            sep = "ABC",
+            sep = ";",
             eol = "\n",
             na = "",
             dec = ".",
@@ -517,10 +711,383 @@ test_that(
 
         # check that reading the file works
         expect_warning(
-          object = expect_warning(
-            object = read_npx_delim(file = cdfile_test),
-            regexp = "has only one column"
+          object = read_npx_delim(file = cdfile_test),
+          regexp = "has too few"
+        )
+      }
+    )
+  }
+)
+
+# Test get_field_separator ----
+
+test_that(
+  "get_field_separator - works - semicolon",
+  {
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = "Target 96",
+      data_type = "NPX",
+      n_panels = 3L,
+      n_assays = 92L,
+      n_samples = 99L,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = 1L
+    )
+
+    # wide even columns
+    withr::with_tempfile(
+      new = "tfile_semicolon",
+      pattern = "txt-file_semicolon",
+      fileext = ".csv",
+      code = {
+        utils::write.table(
+          x = df_rand$list_df_wide$df_wide,
+          file = tfile_semicolon,
+          append = FALSE,
+          quote = FALSE,
+          sep = ";",
+          eol = "\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = FALSE
+        )
+
+        # check that the file was created
+        expect_true(object = file.exists(tfile_semicolon))
+
+        # check that relevant error is thrown
+        expect_identical(
+          object = get_field_separator(file = tfile_semicolon),
+          expected = ";"
+        )
+      }
+    )
+
+    # wide uneven columns
+    withr::with_tempfile(
+      new = "tfile_semicolon",
+      pattern = "txt-file_semicolon",
+      fileext = ".csv",
+      code = {
+        # write the file with uneven number of columns in rows
+        write.table(
+          x = df_rand$list_df_wide$df_head_wide,
+          file = tfile_semicolon,
+          append = FALSE,
+          quote = FALSE,
+          sep = ";",
+          eol = "\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = FALSE
+        )
+        write.table(
+          x = df_rand$list_df_wide$df_top_wide,
+          file = tfile_semicolon,
+          append = TRUE,
+          quote = FALSE,
+          sep = ";",
+          eol = "\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = FALSE
+        )
+        write(x = "", file = tfile_semicolon, append = TRUE)
+        write.table(
+          x = df_rand$list_df_wide$df_middle_wide,
+          file = tfile_semicolon,
+          append = TRUE,
+          quote = FALSE,
+          sep = ";",
+          eol = "\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = FALSE
+        )
+        write(x = "", file = tfile_semicolon, append = TRUE)
+        write.table(
+          x = df_rand$list_df_wide$df_bottom_wide,
+          file = tfile_semicolon,
+          append = TRUE,
+          quote = FALSE,
+          sep = ";",
+          eol = "\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = FALSE
+        )
+
+        # check that the file was created
+        expect_true(object = file.exists(tfile_semicolon))
+
+        # check that relevant error is thrown
+        expect_identical(
+          object = get_field_separator(file = tfile_semicolon),
+          expected = ";"
+        )
+      }
+    )
+
+    # long
+    withr::with_tempfile(
+      new = "tfile_semicolon",
+      pattern = "txt-file_semicolon",
+      fileext = ".csv",
+      code = {
+        utils::write.table(
+          x = df_rand$list_df_long$df_long,
+          file = tfile_semicolon,
+          append = FALSE,
+          quote = FALSE,
+          sep = ";",
+          eol = "\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = FALSE
+        )
+
+        # check that the file was created
+        expect_true(object = file.exists(tfile_semicolon))
+
+        # check that relevant error is thrown
+        expect_identical(
+          object = get_field_separator(file = tfile_semicolon),
+          expected = ";"
+        )
+      }
+    )
+  }
+)
+
+test_that(
+  "get_field_separator - works - comma",
+  {
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = "Target 96",
+      data_type = "NPX",
+      n_panels = 3L,
+      n_assays = 92L,
+      n_samples = 99L,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = 1L
+    )
+
+    # wide even columns
+    withr::with_tempfile(
+      new = "tfile_semicolon",
+      pattern = "txt-file_semicolon",
+      fileext = ".csv",
+      code = {
+        utils::write.table(
+          x = df_rand$list_df_wide$df_wide,
+          file = tfile_semicolon,
+          append = FALSE,
+          quote = FALSE,
+          sep = ",",
+          eol = "\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = FALSE
+        )
+
+        # check that the file was created
+        expect_true(object = file.exists(tfile_semicolon))
+
+        # check that relevant error is thrown
+        expect_identical(
+          object = get_field_separator(file = tfile_semicolon),
+          expected = ","
+        )
+      }
+    )
+
+    # wide uneven columns
+    withr::with_tempfile(
+      new = "tfile_semicolon",
+      pattern = "txt-file_semicolon",
+      fileext = ".csv",
+      code = {
+        # write the file with uneven number of columns in rows
+        write.table(
+          x = df_rand$list_df_wide$df_head_wide,
+          file = tfile_semicolon,
+          append = FALSE,
+          quote = FALSE,
+          sep = ",",
+          eol = "\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = FALSE
+        )
+        write.table(
+          x = df_rand$list_df_wide$df_top_wide,
+          file = tfile_semicolon,
+          append = TRUE,
+          quote = FALSE,
+          sep = ",",
+          eol = "\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = FALSE
+        )
+        write(x = "", file = tfile_semicolon, append = TRUE)
+        write.table(
+          x = df_rand$list_df_wide$df_middle_wide,
+          file = tfile_semicolon,
+          append = TRUE,
+          quote = FALSE,
+          sep = ",",
+          eol = "\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = FALSE
+        )
+        write(x = "", file = tfile_semicolon, append = TRUE)
+        write.table(
+          x = df_rand$list_df_wide$df_bottom_wide,
+          file = tfile_semicolon,
+          append = TRUE,
+          quote = FALSE,
+          sep = ",",
+          eol = "\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = FALSE
+        )
+
+        # check that the file was created
+        expect_true(object = file.exists(tfile_semicolon))
+
+        # check that relevant error is thrown
+        expect_identical(
+          object = get_field_separator(file = tfile_semicolon),
+          expected = ","
+        )
+      }
+    )
+
+    # long
+    withr::with_tempfile(
+      new = "tfile_semicolon",
+      pattern = "txt-file_semicolon",
+      fileext = ".csv",
+      code = {
+        utils::write.table(
+          x = df_rand$list_df_long$df_long,
+          file = tfile_semicolon,
+          append = FALSE,
+          quote = FALSE,
+          sep = ",",
+          eol = "\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = FALSE
+        )
+
+        # check that the file was created
+        expect_true(object = file.exists(tfile_semicolon))
+
+        # check that relevant error is thrown
+        expect_identical(
+          object = get_field_separator(file = tfile_semicolon),
+          expected = ","
+        )
+      }
+    )
+  }
+)
+
+test_that(
+  "get_field_separator - error - unable to read the file",
+  {
+    withr::with_tempfile(
+      new = "pfile_test",
+      pattern = "parquet-file_test",
+      fileext = ".parquet",
+      code = {
+        # write the parquet file from a random data frame
+        dplyr::tibble(
+          "A" = c(1, 2.2, 3.14),
+          "B" = c("a", "b", "c"),
+          "C" = c(TRUE, TRUE, FALSE),
+          "D" = c("NA", "B", NA_character_),
+          "E" = c(1L, 2L, 3L)
+        ) |>
+          arrow::write_parquet(
+            sink = pfile_test,
+            compression = "gzip"
           )
+
+        # check that the semicolon delimited file exists
+        expect_true(object = file.exists(pfile_test))
+
+        # check that relevant error is thrown
+        expect_error(
+          object = get_field_separator(file = pfile_test),
+          regexp = "Unable to open delimited file:"
+        )
+      }
+    )
+  }
+)
+
+test_that(
+  "get_field_separator - error - empty header or file",
+  {
+    withr::with_tempfile(
+      new = "tfile_empty",
+      pattern = "txt-file_semicolon",
+      fileext = ".txt",
+      code = {
+
+        # write some text in a txt file
+        writeLines(character(), tfile_empty)
+
+        # check that the file was created
+        expect_true(object = file.exists(tfile_empty))
+
+        # check that relevant error is thrown
+        expect_error(
+          object = get_field_separator(file = tfile_empty),
+          regexp = "Unable to identify the separator of the file"
+        )
+      }
+    )
+  }
+)
+
+test_that(
+  "get_field_separator - error - wrong sep",
+  {
+    withr::with_tempfile(
+      new = "tfile_hashtag",
+      pattern = "txt-file_hashtag",
+      fileext = ".txt",
+      code = {
+        # write some text in a txt file
+        writeLines("1#2#3#4#5", tfile_hashtag)
+
+        # check that the file was created
+        expect_true(object = file.exists(tfile_hashtag))
+
+        # check that relevant error is thrown
+        expect_error(
+          object = get_field_separator(file = tfile_hashtag),
+          regexp = "Unable to identify the separator of the file"
         )
       }
     )
