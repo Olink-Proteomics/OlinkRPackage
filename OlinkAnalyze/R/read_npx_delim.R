@@ -249,10 +249,38 @@ read_npx_delim_long <- function(file,
 read_npx_delim_wide <- function(file,
                                 sep) {
 
+  # Check if new lines are linux-like "\n" or Windows-like "\r\n" ----
+
+  # if there is windows-line new line separator, we need to replace \r\n with
+  # \n so that data.table::fread can read the empty lines. The updated file with
+  # is written to a temp file, which is removed when exiting the function!.
+
+  # read first line of the file
+  file_line_1 <- readLines(file, n = 1L)
+  # read first line plus 10 characters to extend a bit on the second line
+  file_line_1_extended <- readChar(con = file,
+                                   nchars = nchar(file_line_1) + 10L)
+  if (grepl("\r\n", file_line_1_extended)) {
+    # temporary directory to extract
+    tmp_file <- tempfile()
+    # read lines of file
+    file_content <- readLines(con = file)
+    file_content <- gsub("\r\n", "\n", file_content)
+    writeLines(file_content, tmp_file)
+
+    # cleanup temporary file after exiting the function
+    on.exit(
+      expr = invisible(file.remove(tmp_file)),
+      add = TRUE
+    )
+  } else {
+    tmp_file <- file
+  }
+
   # read wide file ----
 
   df_olink <- data.table::fread(
-    file = file,
+    file = tmp_file,
     header = FALSE,
     sep = sep,
     stringsAsFactors = FALSE,

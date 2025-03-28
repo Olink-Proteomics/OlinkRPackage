@@ -505,6 +505,108 @@ test_that(
 )
 
 test_that(
+  "read_npx_delim - works - wide format - windows new line \r\n",
+  {
+    # get synthetic data, or skip if not available
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = "Target 96",
+      data_type = "NPX",
+      n_panels = 1L,
+      n_assays = 92L,
+      n_samples = 99L,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = FALSE,
+      version = 1L
+    )
+
+    withr::with_tempfile(
+      new = "csvfile_test",
+      pattern = "csv-file_test",
+      fileext = ".csv",
+      code = {
+        # write the file with uneven number of columns in rows
+        write.table(
+          x = df_rand$list_df_wide$df_head_wide,
+          file = csvfile_test,
+          append = FALSE,
+          quote = FALSE,
+          sep = ";",
+          eol = "\r\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = FALSE
+        )
+        write.table(
+          x = df_rand$list_df_wide$df_top_wide |>
+            dplyr::mutate(
+              Vlast = NA_character_
+            ),
+          file = csvfile_test,
+          append = TRUE,
+          quote = FALSE,
+          sep = ";",
+          eol = "\r\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = FALSE
+        )
+        write(x = "\r", file = csvfile_test, append = TRUE)
+        write.table(
+          x = df_rand$list_df_wide$df_middle_wide |>
+            dplyr::mutate(
+              Vlast = NA_character_
+            ),
+          file = csvfile_test,
+          append = TRUE,
+          quote = FALSE,
+          sep = ";",
+          eol = "\r\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = FALSE
+        )
+        write(x = "\r", file = csvfile_test, append = TRUE)
+        write.table(
+          x = df_rand$list_df_wide$df_bottom_wide |>
+            dplyr::mutate(
+              Vlast = NA_character_
+            ),
+          file = csvfile_test,
+          append = TRUE,
+          quote = FALSE,
+          sep = ";",
+          eol = "\r\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = FALSE
+        )
+
+        # chech that reading the file works
+        expect_no_condition(
+          object = df_out <- read_npx_delim(file = csvfile_test,
+                                            out_df = "tibble")
+        )
+
+        # check that variable exists
+        expect_true(object = exists("df_out"))
+
+        expect_true(inherits(x = df_out, what = "tbl_df"))
+
+        # check that the two dataframes are identical
+        expect_equal(
+          object = df_out,
+          expected = df_rand$list_df_wide$df_wide
+        )
+      }
+    )
+  }
+)
+
+test_that(
   "read_npx_delim - error - long format - file not delimited",
   {
     withr::with_tempfile(
