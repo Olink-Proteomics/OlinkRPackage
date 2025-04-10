@@ -121,7 +121,7 @@ olink_pathway_enrichment <- function(data, test_results, method = "GSEA", ontolo
     stop(" Pathway enrichment requires msigdbdf package.
          Please install msigdbdf before continuing.
 
-         install.packages(\"msigdbdf\", repos = c(\"https://igordot.r-universe.dev\", \"https://cloud.r-project.org\")")
+         install.packages(\"msigdbdf\", repos = c(\"https://igordot.r-universe.dev\", \"https://cloud.r-project.org\"))")
   }
 
   # Data Checks
