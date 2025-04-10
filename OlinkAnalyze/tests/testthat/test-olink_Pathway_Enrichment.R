@@ -1,6 +1,6 @@
 skip_on_cran()
 skip_if_not_installed("clusterProfiler")
-skip_if_not_installed("msigdbr")
+skip_if_not_installed("msigdbr", minimum_version = "9.0.0")
 skip_if_not_installed("msigdbdf")
 
 # clean up npa_data1
@@ -116,7 +116,7 @@ test_that("Input data equal for different LOD names", {
 test_that("T-test GSEA works", {
   skip_on_cran()
   skip_if_not_installed("clusterProfiler")
-  skip_if_not_installed("msigdbr")
+  skip_if_not_installed("msigdbr", minimum_version = "9.0.0")
   skip_if_not_installed("msigdbdf")
 
   expect_no_warning(
@@ -163,7 +163,7 @@ test_that("T-test GSEA works", {
 test_that("Reactome GSEA works", {
   skip_on_cran()
   skip_if_not_installed("clusterProfiler")
-  skip_if_not_installed("msigdbr")
+  skip_if_not_installed("msigdbr", minimum_version = "9.0.0")
   skip_if_not_installed("msigdbdf")
 
   expect_no_warning(
@@ -186,7 +186,7 @@ test_that("Reactome GSEA works", {
 test_that("KEGG GSEA works", {
   skip_on_cran()
   skip_if_not_installed("clusterProfiler")
-  skip_if_not_installed("msigdbr")
+  skip_if_not_installed("msigdbr", minimum_version = "9.0.0")
   skip_if_not_installed("msigdbdf")
 
   expect_no_warning(
@@ -209,7 +209,7 @@ test_that("KEGG GSEA works", {
 test_that("GO GSEA works", {
   skip_on_cran()
   skip_if_not_installed("clusterProfiler")
-  skip_if_not_installed("msigdbr")
+  skip_if_not_installed("msigdbr", minimum_version = "9.0.0")
   skip_if_not_installed("msigdbdf")
 
   expect_no_warning(
@@ -232,7 +232,7 @@ test_that("GO GSEA works", {
 test_that("T-test ORA works", {
   skip_on_cran()
   skip_if_not_installed("clusterProfiler")
-  skip_if_not_installed("msigdbr")
+  skip_if_not_installed("msigdbr", minimum_version = "9.0.0")
   skip_if_not_installed("msigdbdf")
 
   expect_no_warning(
@@ -256,7 +256,7 @@ test_that("T-test ORA works", {
 test_that("Reactome ORA works", {
   skip_on_cran()
   skip_if_not_installed("clusterProfiler")
-  skip_if_not_installed("msigdbr")
+  skip_if_not_installed("msigdbr", minimum_version = "9.0.0")
   skip_if_not_installed("msigdbdf")
 
   expect_no_warning(
@@ -280,7 +280,7 @@ test_that("Reactome ORA works", {
 test_that("KEGG ORA works", {
   skip_on_cran()
   skip_if_not_installed("clusterProfiler")
-  skip_if_not_installed("msigdbr")
+  skip_if_not_installed("msigdbr", minimum_version = "9.0.0")
   skip_if_not_installed("msigdbdf")
 
   expect_warning(
@@ -302,7 +302,7 @@ test_that("KEGG ORA works", {
 test_that("GO ORA works", {
   skip_on_cran()
   skip_if_not_installed("clusterProfiler")
-  skip_if_not_installed("msigdbr")
+  skip_if_not_installed("msigdbr", minimum_version = "9.0.0")
   skip_if_not_installed("msigdbdf")
 
   expect_no_warning(
@@ -326,7 +326,7 @@ test_that("GO ORA works", {
 test_that("Error if more than 1 contrast", {
   skip_on_cran()
   skip_if_not_installed("clusterProfiler")
-  skip_if_not_installed("msigdbr")
+  skip_if_not_installed("msigdbr", minimum_version = "9.0.0")
   skip_if_not_installed("msigdbdf")
 
   expect_error(
@@ -341,7 +341,7 @@ test_that("Error if more than 1 contrast", {
 test_that("Nonsense method errors", {
   skip_on_cran()
   skip_if_not_installed("clusterProfiler")
-  skip_if_not_installed("msigdbr")
+  skip_if_not_installed("msigdbr", minimum_version = "9.0.0")
   skip_if_not_installed("msigdbdf")
 
   expect_error(
@@ -356,7 +356,7 @@ test_that("Nonsense method errors", {
 test_that("Unsupported databases flag", {
   skip_on_cran()
   skip_if_not_installed("clusterProfiler")
-  skip_if_not_installed("msigdbr")
+  skip_if_not_installed("msigdbr", minimum_version = "9.0.0")
   skip_if_not_installed("msigdbdf")
 
   expect_error(
@@ -371,7 +371,7 @@ test_that("Unsupported databases flag", {
 test_that("Estimate column must be present", {
   skip_on_cran()
   skip_if_not_installed("clusterProfiler")
-  skip_if_not_installed("msigdbr")
+  skip_if_not_installed("msigdbr", minimum_version = "9.0.0")
   skip_if_not_installed("msigdbdf")
 
   expect_error(
@@ -388,7 +388,7 @@ test_that("Estimate column must be present", {
 test_that("ORA warns assays not found in database", {
   skip_on_cran()
   skip_if_not_installed("clusterProfiler")
-  skip_if_not_installed("msigdbr")
+  skip_if_not_installed("msigdbr", minimum_version = "9.0.0")
   skip_if_not_installed("msigdbdf")
   messages <- capture_messages(
     code = olink_pathway_enrichment(
@@ -409,7 +409,7 @@ test_that("ORA warns assays not found in database", {
 test_that("gsea warns assays not found in database", {
   skip_on_cran()
   skip_if_not_installed("clusterProfiler")
-  skip_if_not_installed("msigdbr")
+  skip_if_not_installed("msigdbr", minimum_version = "9.0.0")
   skip_if_not_installed("msigdbdf")
 
   messages <- capture_messages(
