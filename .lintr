@@ -68,7 +68,7 @@ exclusions: list(
   # "OlinkAnalyze/tests/testthat/test-olink_normalization_utils.R",
   "OlinkAnalyze/tests/testthat/test-Olink_one_non_parametric.R",
   "OlinkAnalyze/tests/testthat/test-Olink_ordinalRegression.R",
-  "OlinkAnalyze/tests/testthat/test-olink_Pathway_Enrichment.R",
+  # "OlinkAnalyze/tests/testthat/test-olink_Pathway_Enrichment.R",
   "OlinkAnalyze/tests/testthat/test-olink_Pathway_Heatmap.R",
   "OlinkAnalyze/tests/testthat/test-olink_Pathway_Visualization.R",
   "OlinkAnalyze/tests/testthat/test-Olink_plate_randomizer.R",
