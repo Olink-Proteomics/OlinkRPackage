@@ -59,14 +59,14 @@ read_npx_parquet <- function (filename) {
   # them to this array
   olink_platforms <- c("ExploreHT", "Explore3072", "Reveal")
   if (exp_p_meta$prod %in% p_file_meta
-      & !(p_file$metadata[[exp_p_meta$prod]] %in% olink_platforms)) {
+      && !(p_file$metadata[[exp_p_meta$prod]] %in% olink_platforms)) {
     cli::cli_warn(
       "Only parquet file from {.val {olink_platforms}} are currently supported."
     )
   }
 
   # Print RUO message if present
-  if (("RUO" %in% names(p_file$metadata))) {
+  if ("RUO" %in% p_file_meta) {
     cli::cli_alert_info(
       "This parquet file is for research use only:
       {.val {p_file$metadata$RUO}}!")
@@ -80,7 +80,7 @@ read_npx_parquet <- function (filename) {
                    "R Package Export File",
                    "Olink Analyze Export File")
   if (exp_p_meta$dtftp %in% p_file_meta
-      & !(p_file$metadata[[exp_p_meta$dtftp]] %in% olink_files)) {
+      && !(p_file$metadata[[exp_p_meta$dtftp]] %in% olink_files)) {
     cli::cli_warn("Only {.val {\"NPX\"}} parquet files are currently
                   supported.")
   }
