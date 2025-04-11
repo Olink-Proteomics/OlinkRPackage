@@ -110,11 +110,18 @@ olink_pathway_enrichment <- function(data, test_results, method = "GSEA", ontolo
          BiocManager::install(\"clusterProfiler\")")
   }
 
-  if(!requireNamespace("msigdbr", quietly = TRUE)) {
-    stop(" Pathway enrichment requires msigdbr package.
-         Please install msigdbr before continuing.
+  if(!requireNamespace("msigdbr", minVersion = "9.0.0", quietly = TRUE)) {
+    stop(" Pathway enrichment requires version >=9.0.0 of the msigdbr package.
+         Please install a supported version of msigdbr before continuing.
 
          install.packages(\"msigdbr\")")
+  }
+
+  if(!requireNamespace("msigdbdf", quietly = TRUE)) {
+    stop(" Pathway enrichment requires msigdbdf package.
+         Please install msigdbdf before continuing.
+
+         install.packages(\"msigdbdf\", repos = c(\"https://igordot.r-universe.dev\", \"https://cloud.r-project.org\"))")
   }
 
   # Data Checks
@@ -185,12 +192,12 @@ data_prep <- function(data) {
       data$LOD <- -Inf
     }
   }
-  
+
   # For data with SampleQC instead of QC_Warning
   if("SampleQC" %in% names(data)){
     data$QC_Warning <- data$SampleQC
   }
-  
+
   # Filter highest detectibility for repeated IDs
   olink_ids <- data %>%
     dplyr::filter(!stringr::str_detect(string = SampleID, pattern = "CONTROL*.")) %>%
@@ -233,25 +240,25 @@ results_to_genelist <- function(test_results) {
 
 select_db <- function(ontology = ontology, organism = organism){
   if (organism == "human") {
-    msig_df <- msigdbr::msigdbr(species = "Homo sapiens", category = "C2") %>%
-      rbind(msigdbr::msigdbr(species = "Homo sapiens", category = "C5"))
+    msig_df <- msigdbr::msigdbr(species = "Homo sapiens", collection = "C2") %>%
+      rbind(msigdbr::msigdbr(species = "Homo sapiens", collection = "C5"))
   } else if (organism == "mouse") {
-    msig_df <- msigdbr::msigdbr(species = "Mus musculus", category = "C2") %>%
-      rbind(msigdbr::msigdbr(species = "Mus musculus", category = "C5"))
+    msig_df <- msigdbr::msigdbr(species = "Mus musculus", collection = "C2") %>%
+      rbind(msigdbr::msigdbr(species = "Mus musculus", collection = "C5"))
   }
 
   if (ontology == "Reactome") {
     message("Extracting Reactome Database from MSigDB...")
     msig_df <- msig_df %>%
-      dplyr::filter(gs_subcat == "CP:REACTOME")
+      dplyr::filter(gs_subcollection == "CP:REACTOME")
   } else if (ontology == "KEGG") {
     message("Extracting KEGG Database from MSigDB...")
     msig_df <- msig_df %>%
-      dplyr::filter(gs_subcat == "CP:KEGG")
+      dplyr::filter(gs_subcollection == "CP:KEGG_MEDICUS")
   } else if (ontology == "GO") {
     message("Extracting GO Database from MSigDB...")
     msig_df <- msig_df %>%
-      dplyr::filter(gs_subcat %in% c("GO:BP", "GO:CC", "GO:MF"))
+      dplyr::filter(gs_subcollection %in% c("GO:BP", "GO:CC", "GO:MF"))
   } else {
     message("Using MSigDB...")
   }
@@ -271,7 +278,14 @@ gsea_pathwayenrichment <- function(geneList, msig_df) {
 
   GSEA <- clusterProfiler::GSEA(geneList = geneList, TERM2GENE = msig_df, pvalueCutoff = 1)
 
-  return(GSEA@result)
+  if (is.null(GSEA)) {
+    cli::cli_warn(
+      "No remaining pathways within the range 10-500 proteins!"
+    )
+    return(NULL)
+  } else {
+    return(GSEA@result)
+  }
 }
 
 ora_pathwayenrichment <- function(test_results, msig_df, pvalue_cutoff = pvalue_cutoff, estimate_cutoff = estimate_cutoff) {
@@ -293,5 +307,12 @@ ora_pathwayenrichment <- function(test_results, msig_df, pvalue_cutoff = pvalue_
 
   ORA <- clusterProfiler::enricher(gene = sig_genes, universe = universe, TERM2GENE = msig_df, pvalueCutoff = 1)
 
-  return(ORA@result)
+  if (is.null(ORA)) {
+    cli::cli_warn(
+      "No remaining pathways within the range 10-500 proteins!"
+    )
+    return(NULL)
+  } else {
+    return(ORA@result)
+  }
 }
