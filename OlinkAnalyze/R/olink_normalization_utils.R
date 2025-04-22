@@ -677,7 +677,7 @@ olink_norm_input_check_df_cols <- function(lst_df) {
     qc_warn = c("QC_Warning", "SampleQC"),
     assay_warn = c("Assay_Warning", "AssayQC"),
     quant = c("Ct", "NPX", "Quantified_value"),
-    lod = c("LOD",
+    lod = c("LOD", "LODNPX",
             "Plate LOD", "Plate_LOD", "PlateLOD",
             "Max LOD", "Max_LOD", "MaxLOD"),
     normalization = "Normalization",
