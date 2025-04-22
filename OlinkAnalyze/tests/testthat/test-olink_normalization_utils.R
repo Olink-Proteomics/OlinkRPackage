@@ -2110,7 +2110,7 @@ test_that(
         )
       )
     )
-    
+
     # one datasets has PanelVersion ----
 
     expect_no_error(
@@ -2128,7 +2128,7 @@ test_that(
         )
       )
     )
-    
+
     expect_identical(
       object = lst_col,
       expected = list(
