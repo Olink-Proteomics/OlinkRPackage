@@ -955,8 +955,8 @@ olink_norm_input_check_quant <- function(dfs_lst_req_col) {
     cli::cli_abort(
       c(
         "x" = "No quantification column identified in at least one of the datasets.",
-        "i" = "Ensure that at least one quantification column is present in each
-        dataset. Re-export of datasets may be required."
+        "i" = "Ensure that at least one quantification column (NPX, Quantified_value, 
+        or Ct) is present in each dataset. Re-export of datasets may be required."
       )
     )
   }
@@ -1004,6 +1004,8 @@ olink_norm_input_check_quant <- function(dfs_lst_req_col) {
           "x" = paste0(names(dfs_lst_req_col)[[1L]], ": ", toString(lst_req_col_quant[[1L]])),
           "x" = paste0(names(dfs_lst_req_col)[[2L]], ": ", toString(lst_req_col_quant[[2L]])),
           "i" = "Re-export data with at least one shared quantification method."
+          ### Do we want to suggest that customers re-export in accordance with the 
+          ### quant priority list?
         ),
         call = rlang::caller_env(),
         wrap = FALSE
@@ -1025,6 +1027,11 @@ olink_norm_input_check_quant <- function(dfs_lst_req_col) {
       
       lst_req_col_quant[[1L]] <- quant_col_shared
       lst_req_col_quant[[2L]] <- quant_col_shared
+      
+      cli::cli_inform(
+        paste0(quant_col_shared, " column present in both datasets,
+               will be used for normalization."),
+      )
     } else {
       # both datasets have more than one quantification methods. We should use
       # choose quantification method by order in function
