@@ -675,7 +675,7 @@ olink_norm_input_check_df_cols <- function(lst_df) {
     plate_id = "PlateID",
     qc_warn = c("QC_Warning", "SampleQC"),
     assay_warn = c("Assay_Warning", "AssayQC"),
-    quant = c("Ct", "NPX", "Quantified_value"),
+    quant = c("NPX", "Quantified_value", "Ct"),
     lod = c("LOD",
             "Plate LOD", "Plate_LOD", "PlateLOD",
             "Max LOD", "Max_LOD", "MaxLOD"),
@@ -738,7 +738,16 @@ olink_norm_input_check_df_cols <- function(lst_df) {
       )
     )
   }
-
+  
+  ## if multiple quant columns, select a single quant unit as a req col
+  
+  all_quant_col <- lapply(lst_req_col, function(r_col) r_col$quant) |>
+    unlist()
+  
+  if (any(c("Ct", "Quantified_value") %in% all_quant_col)) {
+    lst_req_col <- olink_norm_input_check_quant(lst_req_col)
+  }
+  
   ## check for missing columns ----
 
   # identify missing column names from the set of required_cols and prepare the
@@ -770,7 +779,7 @@ olink_norm_input_check_df_cols <- function(lst_df) {
         cli::ansi_collapse(sep = "; ", sep2 = "; ", last = "; ")
     })
   lst_col_miss <- lst_col_miss[nchar(lst_col_miss) > 0L]
-
+  
   # error message if there are missing columns
   if (!all(sapply(lst_col_miss, nchar) == 0L)) {
     cli::cli_abort(
@@ -804,7 +813,6 @@ olink_norm_input_check_df_cols <- function(lst_df) {
   }
 
   # non-required column mismatches ----
-
   # this should work only if there are 2 or more datasets
   if (length(lst_df) > 1L) {
 
@@ -931,18 +939,32 @@ olink_norm_input_check_df_cols <- function(lst_df) {
 
 # lst_req_col_quant is lst_req_col$quant from olink_norm_input_check_df_cols
 #
-# this functuion will be called by olink_norm_input_check_df_cols to resolve the
+# this function will be called by olink_norm_input_check_df_cols to resolve the
 # the quantification columns.
-olink_norm_input_check_quant <- function(lst_req_col_quant) {
+olink_norm_input_check_quant <- function(dfs_lst_req_col) {
 
+  lst_req_col_quant <- list(dfs_lst_req_col[[1L]]$quant)
+  
+  if (length(dfs_lst_req_col) == 2L) {
+    lst_req_col_quant[[2L]] <- dfs_lst_req_col[[2L]]$quant
+  }
+    
+  # This seems to be handled by olink_norm_input_check() already - keep in?
   if (any(sapply(lst_req_col_quant, length) == 0L)) {
     # no quantification identified in at least one datasets -> ERROR
+    cli::cli_abort(
+      c(
+        "x" = "No quantification column identified in at least one of the datasets.",
+        "i" = "Ensure that at least one quantification column is present in each
+        dataset. Re-export of datasets may be required."
+      )
+    )
   }
-
+  
   if (length(lst_req_col_quant) == 1L) {
     # this holds if we are doing reference normalization, where one dataset is
     # required.
-
+    
     if (length(lst_req_col_quant[[1L]]) > 1L) {
       # choose quantification method by order from required_cols$quant in
       # function "olink_norm_input_check_df_cols".
@@ -950,6 +972,17 @@ olink_norm_input_check_quant <- function(lst_req_col_quant) {
       # Print an informative message.
       #
       # Here "lst_req_col_quant" has to be updated!
+      
+      lst_req_col_quant[[1L]] <- lst_req_col_quant[[1L]][[1L]]
+      
+      cli::cli_inform(
+        paste0(
+          lst_req_col_quant[[1L]], " column will be used for normalization."
+          )
+      )
+      
+      dfs_lst_req_col[[1L]]$quant <- lst_req_col_quant[[1L]]
+      
     }
     # if length(lst_req_col_quant[[1L]]) == 0L has been checked in the very
     # beginning of the function.
@@ -959,19 +992,18 @@ olink_norm_input_check_quant <- function(lst_req_col_quant) {
   } else {
     # this holds if we are doing bridge normalization, subset normalization, and
     # cross-product normalization.
-
+    
     # get the quantification columns present in all datasets
     quant_col_shared <- Reduce(intersect, lst_req_col_quant)
-
+    
     if (length(quant_col_shared) == 0L) {
       # the datasets have one or more quantifications each, but none of them
       # is common between/among them. -> ERROR
       cli::cli_abort(
-        c(
-          "x" = "{cli::qty(quant_col)} Dataset{?s} are not quantified with the
-        same method:",
-          paste0("* ", names(quant_col), ": ", quant_col),
-          "i" = "Re-export data with shared quantifications."
+        c("Datasets are not quantified with the same method.",
+          "x" = paste0(names(dfs_lst_req_col)[[1L]], ": ", toString(lst_req_col_quant[[1L]])),
+          "x" = paste0(names(dfs_lst_req_col)[[2L]], ": ", toString(lst_req_col_quant[[2L]])),
+          "i" = "Re-export data with at least one shared quantification method."
         ),
         call = rlang::caller_env(),
         wrap = FALSE
@@ -990,6 +1022,9 @@ olink_norm_input_check_quant <- function(lst_req_col_quant) {
       # sapply(lst_req_col_quant, length) |> unique() |> length() != 1L
       #
       # Here "lst_req_col_quant" has to be updated!
+      
+      lst_req_col_quant[[1L]] <- quant_col_shared
+      lst_req_col_quant[[2L]] <- quant_col_shared
     } else {
       # both datasets have more than one quantification methods. We should use
       # choose quantification method by order in function
@@ -998,10 +1033,21 @@ olink_norm_input_check_quant <- function(lst_req_col_quant) {
       # Print an informative message.
       #
       # Here "lst_req_col_quant" has to be updated!
+      
+      lst_req_col_quant[[1L]] <- quant_col_shared[1L]
+      lst_req_col_quant[[2L]] <- quant_col_shared[1L]
+      
+      cli::cli_inform(
+        paste0(quant_col_shared[1L], " column will be used for normalization."),
+        "i" = "Multiple matching quantification methods detected. Priority list
+               used to determine quantification used in the normalization process."
+      )
     }
+    
+    dfs_lst_req_col[[1L]]$quant <- lst_req_col_quant[[1L]]
+    dfs_lst_req_col[[2L]]$quant <- lst_req_col_quant[[2L]]
   }
-
-  return(lst_req_col_quant) # the updated version of it
+  return(dfs_lst_req_col) # the updated version of dfs_lst_req_col
 }
 
 #' Check if bridge or cross-platform normalization
