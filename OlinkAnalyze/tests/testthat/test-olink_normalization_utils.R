@@ -2713,6 +2713,57 @@ test_that(
   }
 )
 
+# Test olink_norm_input_check_quant
+# Test olink_norm_input_check_quant ----
+
+test_that(
+  "olink_norm_input_check_quant - Quant col - 1 dataset",
+  {
+    skip_if_not_installed("arrow")
+
+    # df does not have quant col ----
+
+    expect_warning(
+      object = lst_col <- olink_norm_input_check_quant(
+        lst_df = list(
+          "p1" = npx_data1 |>
+            dplyr::mutate(Ct = NPX,
+                          Quantified_value = NPX)
+        ) |>
+          lapply(function(l_df) {
+            l_df |> # nolint return_linter
+              dplyr::select(
+                -dplyr::any_of(c("NPX", "Ct", "Quantified_value"))
+              )
+          })
+      ),
+      regexp = NULL
+    )
+
+    # expect_identical(
+    #   object = lst_col,
+    #   expected = list(
+    #     "p1" = list(
+    #       sample_id = "SampleID",
+    #       olink_id = "OlinkID",
+    #       uniprot = "UniProt",
+    #       assay = "Assay",
+    #       panel = "Panel",
+    #       panel_version = "Panel_Version",
+    #       plate_id = "PlateID",
+    #       qc_warn = "QC_Warning",
+    #       assay_warn = character(0L),
+    #       quant =  c("NPX", "Quantified_value", "Ct"),
+    #       lod = "LOD",
+    #       normalization = character(0L),
+    #       count = character(0L),
+    #       sample_type = character(0L)
+    #     )
+    #   )
+    # )
+  }
+)
+
 # Test olink_norm_input_cross_product ----
 
 test_that(
