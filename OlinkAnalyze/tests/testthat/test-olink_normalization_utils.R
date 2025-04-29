@@ -2737,7 +2737,7 @@ test_that(
               )
           })
       ),
-      regexp = NULL
+      regexp = NA
     )
 
     # expect_identical(
