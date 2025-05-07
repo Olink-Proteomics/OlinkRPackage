@@ -63,7 +63,7 @@ olink_bridgeselector<-function(df, sampleMissingFreq, n){
 
 
   # Alternative LODs for when LOD is not present
-  alt_plate_lods <- c("Plate LOD", "PlateLOD", "plateLOD", "Plate_LOD")
+  alt_plate_lods <- c("Plate LOD", "PlateLOD", "plateLOD", "Plate_LOD", "NPXLOD")
   alt_max_lods <- c("Max LOD", "MaxLOD", "maxLOD", "Max_LOD")
   if(!("LOD" %in% names(df))){
     if(any(alt_plate_lods %in% names(df))){
