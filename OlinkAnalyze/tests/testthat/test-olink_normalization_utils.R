@@ -2534,7 +2534,7 @@ test_that(
 )
 
 test_that(
-  "olink_norm_input_check_df_cols - error - different quant methdos",
+  "olink_norm_input_check_df_cols - error - different quant methods",
   {
     skip_if_not_installed("arrow")
 
@@ -2719,17 +2719,17 @@ test_that(
 test_that(
   "olink_norm_input_check_quant - quant col present",
   {
-
+  skip_if_not_installed("arrow")
+    
     # df does not have quant col ----
 
-    lst_col <- list(
-      "p1" = list(
-        quant =  character(0L) ### empty quant list
+    quant_cols <- list(
+      "DF1" = character(0L) ### empty quant list
       )
-    )
+
 
     expect_error(
-      object = olink_norm_input_check_quant(lst_col),
+      object = olink_norm_input_check_quant(quant_cols),
       regexp = "No quantification column identified in at least one of the"
     )
   }
@@ -2738,20 +2738,17 @@ test_that(
 test_that(
   "olink_norm_input_check_quant - different quant cols in datasets",
   {
-
+  skip_if_not_installed("arrow")
+    
     # dfs does not have matching quant col ----
 
-    lst_col <- list(
-      "p1" = list(
-        quant =  "NPX"
-      ),
-      "p2" = list(
-        quant =  "Ct"
+    quant_cols <- list(
+      "DF1" =  "NPX",
+      "DF2" =  "Ct"
       )
-    )
 
     expect_error(
-      object = olink_norm_input_check_quant(lst_col),
+      object = olink_norm_input_check_quant(quant_cols),
       regexp = "Re-export data with at least one shared quantification method"
     )
   }
@@ -2760,34 +2757,27 @@ test_that(
 test_that(
   "olink_norm_input_check_quant - same and different quant cols in datasets",
   {
-
+  skip_if_not_installed("arrow")
+    
     # dfs have one or more matching quant col ----
 
-    lst_col <- list(
-      "p1" = list(
-        quant =  c("Ct", "NPX")
-      ),
-      "p2" = list(
-        quant =  c("Quantified_value", "NPX")
+    quant_cols <- list(
+      "DF1" = c("Ct", "NPX"),
+      "DF2" = c("Quantified_value", "NPX")
       )
-    )
-
-    lst_df <- list(
-      "p1" = list(
-        quant =  c("Ct", "NPX", "Quantified_value")
-      ),
-      "p2" = list(
-        quant =  c("Quantified_value", "Ct", "NPX")
-      )
-    )
 
     expect_message(
-      object = olink_norm_input_check_quant(lst_col),
+      object = olink_norm_input_check_quant(quant_cols),
       regexp = "NPX column present in both datasets, will be used"
     )
+    
+    quant_cols <- list(
+      "DF1" =  c("Ct", "NPX", "Quantified_value"),
+      "DF2" =  c("Quantified_value", "Ct", "NPX")
+    )
 
     expect_message(
-      object = olink_norm_input_check_quant(lst_df),
+      object = olink_norm_input_check_quant(quant_cols),
       regexp = "Multiple matching quantification methods detected. Priority"
     )
   }
@@ -5636,3 +5626,4 @@ test_that(
     )
   }
 )
+
