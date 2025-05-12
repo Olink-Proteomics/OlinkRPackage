@@ -50,11 +50,6 @@ jobs:
         run: |
           install.packages("Matrix", type="source", repos='http://cran.us.r-project.org')
         shell: Rscript {0}
-        
-      - name: Install msigdbdf from source
-        run: |
-          install.packages("msigdbdf", repos = "https://igordot.r-universe.dev")
-        shell: Rscript {0}
 
       - uses: r-lib/actions/check-r-package@v2
         with:
