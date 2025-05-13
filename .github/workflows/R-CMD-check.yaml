@@ -53,7 +53,12 @@ jobs:
         with:
           working-directory: OlinkAnalyze
           dependencies: '"hard"'  # instead of installing Suggests
-          extra-packages: any::rcmdcheck, pillar
+          extra-packages: |
+            any::rcmdcheck
+            any::testthat
+            any::knitr
+            any::rmarkdown
+            any::kableExtra
 
       - uses: r-lib/actions/check-r-package@v2
         with:
