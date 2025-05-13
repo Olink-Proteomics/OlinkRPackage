@@ -2768,7 +2768,7 @@ test_that(
 
     expect_message(
       object = olink_norm_input_check_quant(quant_cols),
-      regexp = "NPX column present in both datasets, will be used"
+      regexp = "NPX column present in all datasets, will be used"
     )
     
     quant_cols <- list(

@@ -743,23 +743,21 @@ olink_norm_input_check_df_cols <- function(lst_df) {
   
   all_quant_col <- lapply(lst_req_col, function(r_col) r_col$quant) |>
     unlist()
-
-  if (any(c("Ct", "Quantified_value") %in% all_quant_col) & 
-      length(lst_req_col) <= 2L) {
-
-    if (length(lst_req_col) == 1L) {
-      quant_cols <- list("DF1" = lst_req_col[[1L]][["quant"]])
-    } else if (length(lst_req_col) == 2L) {
-      quant_cols <- list("DF1" = lst_req_col[[1L]][["quant"]],
-                         "DF2" = lst_req_col[[2L]][["quant"]])
+  
+  
+  if (any(c("Ct", "Quantified_value") %in% all_quant_col)) {
+    
+    quant_cols <- list()
+    
+    for (i in 1:length(lst_req_col)) {
+      quant_cols_lst_tmp <- list(lst_req_col[[i]][["quant"]])
+      quant_cols <- append(quant_cols, quant_cols_lst_tmp)
     }
     
     lst_req_col_quant <- olink_norm_input_check_quant(quant_cols)
     
-    lst_req_col[[1L]]$quant <- lst_req_col_quant[[1L]]
-    
-    if (length(lst_req_col) == 2L) {
-      lst_req_col[[2L]]$quant <- lst_req_col_quant[[2L]]
+    for (i in 1:length(lst_req_col_quant)) {
+      lst_req_col[[i]]$quant <- lst_req_col_quant[[i]]
     }
     
   }
@@ -1013,12 +1011,17 @@ olink_norm_input_check_quant <- function(lst_req_col_quant) {
       # is common between/among them. -> ERROR
       cli::cli_abort(
         c("Datasets are not quantified with the same method.",
-          "x" = paste0(names(lst_req_col_quant)[[1L]], 
-                       ": ", 
-                       toString(lst_req_col_quant[[1L]])),
-          "x" = paste0(names(lst_req_col_quant)[[2L]], 
-                       ": ", 
-                       toString(lst_req_col_quant[[2L]])),
+          for (i in 1:length(lst_req_col_quant)) {
+            "x" = paste0(names(lst_req_col_quant)[[i]], 
+                         ": ", 
+                         toString(lst_req_col_quant[[i]]))
+          },
+          # "x" = paste0(names(lst_req_col_quant)[[1L]], 
+          #              ": ", 
+          #              toString(lst_req_col_quant[[1L]])),
+          # "x" = paste0(names(lst_req_col_quant)[[2L]], 
+          #              ": ", 
+          #              toString(lst_req_col_quant[[2L]])),
           "i" = "Re-export data with at least one shared quantification method."
         ),
         call = rlang::caller_env(),
@@ -1039,11 +1042,12 @@ olink_norm_input_check_quant <- function(lst_req_col_quant) {
       #
       # Here "lst_req_col_quant" has to be updated!
       
-      lst_req_col_quant[[1L]] <- quant_col_shared |> as.character()
-      lst_req_col_quant[[2L]] <- quant_col_shared |> as.character()
+      for (i in 1:length(lst_req_col_quant)) {
+        lst_req_col_quant[[i]] <- quant_col_shared |> as.character()
+      }
 
       cli::cli_inform(
-        paste0(quant_col_shared, " column present in both datasets,
+        paste0(quant_col_shared, " column present in all datasets,
                will be used for normalization."),
       )
     } else {
@@ -1054,9 +1058,10 @@ olink_norm_input_check_quant <- function(lst_req_col_quant) {
       # Print an informative message.
       #
       # Here "lst_req_col_quant" has to be updated!
-
-      lst_req_col_quant[[1L]] <- quant_col_shared[1L] |> as.character()
-      lst_req_col_quant[[2L]] <- quant_col_shared[1L] |> as.character()
+      
+      for (i in 1:length(lst_req_col_quant)) {
+        lst_req_col_quant[[i]] <- quant_col_shared[1L] |> as.character()
+      }
 
       cli::cli_inform(
         paste0(quant_col_shared[1L], " column will be used for normalization. ",
