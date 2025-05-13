@@ -1047,7 +1047,7 @@ olink_norm_input_check_quant <- function(lst_req_col_quant) {
       }
 
       cli::cli_inform(
-        paste0(quant_col_shared, " column present in all datasets,
+        paste0(quant_col_shared, " column present in both datasets,
                will be used for normalization."),
       )
     } else {
