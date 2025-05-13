@@ -1,0 +1,60 @@
+# For help debugging build failures open an issue on the RStudio community with the 'github-actions' tag.
+# https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions
+on: [push, pull_request]
+
+name: R-CMD-check
+
+jobs:
+
+  matrix_prep:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      # Required as the JSON input file needs to be read
+      - uses: actions/checkout@v2
+      - id: set-matrix
+        uses: JoshuaTheMiller/conditional-build-matrix@main
+        with:
+          inputFile: '.github/workflows/matrix_config_check.json'
+          filter: '[?runOn==`${{ github.event_name }}` || runOn==`always`]'
+          # addInclude: true
+
+  R-CMD-check:
+    needs: matrix_prep
+    strategy:
+      fail-fast: false
+      matrix: ${{fromJson(needs.matrix_prep.outputs.matrix)}}
+
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
+
+    name: ${{ matrix.os }} (${{ matrix.r }})
+
+    env:
+      R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
+      _R_CHECK_FORCE_SUGGESTS_: false
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: ${{ matrix.r }}
+          use-public-rspm: true
+          extra-repositories: 'https://igordot.r-universe.dev'
+
+      - uses: r-lib/actions/setup-pandoc@v2
+        with:
+          pandoc-version: '2.18'
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          working-directory: OlinkAnalyze
+          dependencies: '"direct"'  # instead of installing Suggests
+          extra-packages: any::rcmdcheck, pillar
+
+      - uses: r-lib/actions/check-r-package@v2
+        with:
+          working-directory: OlinkAnalyze
