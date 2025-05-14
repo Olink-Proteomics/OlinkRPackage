@@ -53,16 +53,9 @@ jobs:
         run: |
           echo 'options(repos = c(igordot = "https://igordot.r-universe.dev", CRAN = "https://cloud.r-project.org"))' >> ~/.Rprofile
 
-      - name: Manually install R-universe packages
-        run: |
-          install.packages(c("msigdbdf", "babelgene"), repos = c(
-            "https://igordot.r-universe.dev",
-            "https://cloud.r-project.org"
-          ))
-        shell: Rscript {0}
-
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
+          use-pak: false
           working-directory: OlinkAnalyze
           extra-packages: any::rcmdcheck, pillar
 
