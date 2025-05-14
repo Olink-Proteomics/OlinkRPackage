@@ -49,6 +49,10 @@ jobs:
         with:
           pandoc-version: '2.18'
 
+      - name: Set R-universe repo
+        run: |
+          echo 'options(repos = c(igordot = "https://igordot.r-universe.dev", CRAN = "https://cloud.r-project.org"))' >> ~/.Rprofile
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           working-directory: OlinkAnalyze
