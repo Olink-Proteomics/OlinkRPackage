@@ -101,6 +101,7 @@ Suggests:
     lme4,
     lmerTest,
     markdown,
+    msigdbdf,
     msigdbr (>= 9.0.0),
     openssl,
     ordinal,
