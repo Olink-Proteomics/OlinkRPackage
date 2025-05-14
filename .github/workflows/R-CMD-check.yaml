@@ -59,6 +59,7 @@ jobs:
             any::knitr
             any::rmarkdown
             any::kableExtra
+            any::msigdbdf
 
       - uses: r-lib/actions/check-r-package@v2
         with:
