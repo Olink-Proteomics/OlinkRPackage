@@ -49,17 +49,18 @@ jobs:
         with:
           pandoc-version: '2.18'
 
+      - name: Preinstall msigdbdf manually
+        run: |
+          install.packages(
+            "msigdbdf",
+            repos = c("https://igordot.r-universe.dev", "https://cloud.r-project.org")
+          )
+        shell: Rscript {0}
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           working-directory: OlinkAnalyze
-          dependencies: '"soft"'  # instead of installing Suggests
-          extra-packages: |
-            any::rcmdcheck
-            any::testthat
-            any::knitr
-            any::rmarkdown
-            any::kableExtra
-            any::msigdbdf
+          extra-packages: any::rcmdcheck, pillar
 
       - uses: r-lib/actions/check-r-package@v2
         with:
