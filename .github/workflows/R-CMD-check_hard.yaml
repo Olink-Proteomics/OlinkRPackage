@@ -44,12 +44,7 @@ jobs:
             any::rmarkdown
             any::kableExtra
           needs: check
-          working-directory: OlinkAnalyze  
-      
-      - name: Install Matrix from source
-        run: |
-          install.packages("Matrix", type="source", repos='http://cran.us.r-project.org')
-        shell: Rscript {0}
+          working-directory: OlinkAnalyze
 
       - uses: r-lib/actions/check-r-package@v2
         with:
