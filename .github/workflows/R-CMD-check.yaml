@@ -43,7 +43,6 @@ jobs:
         with:
           r-version: ${{ matrix.r }}
           use-public-rspm: true
-          extra-repositories: 'https://igordot.r-universe.dev'
 
       - uses: r-lib/actions/setup-pandoc@v2
         with:
@@ -53,6 +52,11 @@ jobs:
         with:
           working-directory: OlinkAnalyze
           extra-packages: any::rcmdcheck, pillar
+         
+      - name: Manually install msigdbdf from r-universe
+        run: |
+          install.packages("msigdbdf", repos = c("https://igordot.r-universe.dev"))
+        shell: Rscript {0}
 
       - uses: r-lib/actions/check-r-package@v2
         with:
