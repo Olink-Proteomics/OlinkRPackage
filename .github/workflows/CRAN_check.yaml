@@ -1,0 +1,110 @@
+# For help debugging build failures open an issue on the RStudio community with the 'github-actions' tag.
+# https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions
+on: 
+  pull_request:
+    branches:
+      - 'main'
+  push:
+    branches:
+      - 'CRAN*'
+
+name: CRAN checks
+
+jobs:
+
+  CRAN-check:
+    runs-on: ${{ matrix.config.os }}
+    timeout-minutes: 120       
+  
+    strategy:      
+      fail-fast: false    
+      matrix: 
+        config:
+          - {os: ubuntu-latest, r: 'release'}
+
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+
+    env:
+      R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
+      _R_CHECK_FORCE_SUGGESTS_: false
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: ${{ matrix.config.r }}
+          use-public-rspm: true            
+
+      - name: Set BioC version
+        run: |
+          install.packages("remotes")
+          forenv <- paste("R_BIOC_VERSION=", as.character(remotes::bioc_version()), sep = "")
+          write(forenv, file = Sys.getenv("GITHUB_ENV"), append = TRUE) # Store current value to ENV          
+        shell: Rscript {0}
+      
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          working-directory: OlinkAnalyze
+          extra-packages: any::rcmdcheck, pillar, any::devtools, any::cli, any::rhub, any::revdepcheck, github::r-lib/revdepcheck, any::spelling
+
+      - name: Install Matrix from source
+        run: |
+          install.packages("Matrix", type="source", repos='http://cran.us.r-project.org')
+        shell: Rscript {0}
+
+      - name: Record check messages
+        if: success() || failure()
+        run: |
+          setwd("OlinkAnalyze")
+          
+          # Pretend we are CRAN
+          results <- devtools::check(error_on = "never", 
+                                     env_vars = c(NOT_CRAN = "false"))
+
+          cat("::group::Errors")
+          cli::cli_alert_danger(results$errors)
+          
+          cat("::group::Warnings")
+          cli::cli_alert_warning(results$warnings)
+          
+          cat("::group::Notes")
+          cli::cli_alert_info(results$notes)
+        shell: Rscript {0}
+
+      - name: Spellcheck
+        if: success() || failure()      
+        run: |
+          setwd("OlinkAnalyze")
+        
+          devtools::spell_check()
+        shell: Rscript {0}
+          
+      - name: R_CHECK_CRAN_INCOMING_REMOTE
+        if: success() || failure()      
+        run: |
+          setwd("OlinkAnalyze")
+        
+          devtools::check(remote = T, incoming = T, env_vars = c(NOT_CRAN = "false"))
+        shell: Rscript {0}
+        
+      - name: revdep_check
+        if: success() || failure()      
+        run: |
+          setwd("OlinkAnalyze")
+        
+          revdepcheck::revdep_check()
+        shell: Rscript {0}          
+
+      - name: rhub & win-builder checks
+        if: success() # Only use external resources if all other checks passed
+        run: |
+          setwd("OlinkAnalyze")
+        
+          devtools::check_win_devel()
+          
+          rhub::validate_email(email = "biostattools@olink.com", token = "${{ secrets.RHUB_TOKEN }}")
+          stash <- devtools::check_rhub(env_vars = c(`_R_CHECK_FORCE_SUGGESTS_` = "false"), interactive = FALSE)
+        shell: Rscript {0}
+
