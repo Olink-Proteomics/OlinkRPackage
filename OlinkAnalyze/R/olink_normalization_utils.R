@@ -738,27 +738,26 @@ olink_norm_input_check_df_cols <- function(lst_df) {
       )
     )
   }
-
-  ## if multiple quant columns, select a single quant unit as a req col
+  
+  # check that quant methods are the same ----
+  # if multiple quant columns, select a single quant unit as a req col
   
   all_quant_col <- lapply(lst_req_col, function(r_col) r_col$quant) |>
     unlist()
   
   
-  if (any(c("Ct", "Quantified_value") %in% all_quant_col)) {
-    quant_cols <- list()
-    
-    quant_cols <-
-      lapply(seq_along(lst_req_col), function(i) {
-        quant_cols[[i]] <- lst_req_col[[i]][["quant"]]
-      })
-    
-    lst_req_col_quant <- olink_norm_input_check_quant(quant_cols)
-    
-    for (i in 1:length(lst_req_col_quant)) {
-      lst_req_col[[i]][["quant"]] <- lst_req_col_quant[[i]]
-    }
-    
+  # if (any(c("Ct", "Quantified_value") %in% all_quant_col)) {
+  quant_cols <- list()
+  
+  quant_cols <-
+    lapply(seq_along(lst_req_col), function(i) {
+      quant_cols[[i]] <- lst_req_col[[i]][["quant"]]
+    })
+  
+  lst_req_col_quant <- olink_norm_input_check_quant(quant_cols)
+  
+  for (i in 1:length(lst_req_col_quant)) {
+    lst_req_col[[i]][["quant"]] <- lst_req_col_quant[[i]]
   }
   
   ## check for missing columns ----
@@ -801,25 +800,6 @@ olink_norm_input_check_df_cols <- function(lst_df) {
         "x" = "{cli::qty(lst_col_miss)} Dataset{?s} with missing column(s):",
         paste0("* ", names(lst_col_miss), ": ", unlist(lst_col_miss)),
         "i" = "The missing columns are separated by semicolon (;)."
-      ),
-      call = rlang::caller_env(),
-      wrap = FALSE
-    )
-  }
-
-  ## check that quant methods are the same ----
-
-  quant_col <- lapply(lst_req_col, function(r_col) r_col$quant) |>
-    unlist()
-
-  # error message if not identical
-  if (length(unique(quant_col)) != 1L) {
-    cli::cli_abort(
-      c(
-        "x" = "{cli::qty(quant_col)} Dataset{?s} are not quantified with the
-        same method:",
-        paste0("* ", names(quant_col), ": ", quant_col),
-        "i" = "Re-export data with identical quantifications."
       ),
       call = rlang::caller_env(),
       wrap = FALSE
@@ -953,7 +933,6 @@ olink_norm_input_check_df_cols <- function(lst_df) {
 # this function will be called by olink_norm_input_check_df_cols to resolve the
 # the quantification columns.
 olink_norm_input_check_quant <- function(lst_req_col_quant) {
-  
   # This seems to be handled by olink_norm_input_check() already - keep in?
   if (any(sapply(lst_req_col_quant, length) == 0L)) {
     # no quantification identified in at least one datasets
@@ -976,7 +955,7 @@ olink_norm_input_check_quant <- function(lst_req_col_quant) {
 
       cli::cli_inform(
         paste0(
-          lst_req_col_quant[[1L]], " column will be used for normalization."
+          lst_req_col_quant[[1L]], " will be used for normalization."
           )
       )
       
@@ -1007,16 +986,21 @@ olink_norm_input_check_quant <- function(lst_req_col_quant) {
       # remove section "check that quant methods are the same" from
       # "olink_norm_input_check_df_cols" as they are overlapping.
     } else if (length(quant_col_shared) == 1L) {
+        
+        # if either dataset has 2 or more quant columns, print an
+        # informative message
+        if (any(sapply(lst_req_col_quant, length) > 1L))
+          cli::cli_inform(
+            paste0(quant_col_shared, " will be used for normalization."),
+          ) 
       
         lst_req_col_quant <- 
           lapply(seq_along(lst_req_col_quant), function(i) {
             lst_req_col_quant[[i]] <- quant_col_shared |> as.character()
             })
-    
-      cli::cli_inform(
-        paste0(quant_col_shared, " column present in both datasets,
-               will be used for normalization."),
-      )
+        
+
+
     } else {
       # both datasets have more than one quantification methods. We will 
       # choose quantification method by priority order
@@ -1027,7 +1011,7 @@ olink_norm_input_check_quant <- function(lst_req_col_quant) {
 
       cli::cli_inform(
         paste0(
-          quant_col_shared[1L], " column will be used for normalization. 
+          quant_col_shared[1L], " will be used for normalization.
           Multiple matching quantification methods detected. Priority list used 
           to determine quantification used in the normalization process.")
       )
