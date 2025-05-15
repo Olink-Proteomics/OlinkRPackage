@@ -37,6 +37,7 @@ jobs:
          
       - name: Manually install msigdbdf from r-universe
         run: |
+          install.packages("readr")
           install.packages("msigdbdf", repos = c("https://igordot.r-universe.dev"))
         shell: Rscript {0}
 
