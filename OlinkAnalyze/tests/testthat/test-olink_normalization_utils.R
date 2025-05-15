@@ -2454,7 +2454,7 @@ test_that(
         lst_df = list(
           "p1" = npx_data1 |>
             dplyr::select(
-              -dplyr::all_of(c("Panel_Version", "NPX"))
+              -dplyr::all_of(c("Panel_Version"))
             ),
           "p2" = npx_data2 |>
             dplyr::select(
@@ -2474,7 +2474,7 @@ test_that(
         lst_df = list(
           "p1" = npx_data1 |>
             dplyr::select(
-              -dplyr::all_of(c("NPX"))
+              -dplyr::all_of(c("Panel"))
             ),
           "p2" = npx_data2 |>
             arrow::as_arrow_table()
@@ -2492,7 +2492,7 @@ test_that(
           "p1" = npx_data1,
           "p2" = npx_data2 |>
             dplyr::select(
-              -dplyr::all_of(c("NPX"))
+              -dplyr::all_of(c("Panel"))
             ) |>
             arrow::as_arrow_table()
         ) |>
@@ -2508,7 +2508,7 @@ test_that(
         lst_df = list(
           "p1" = OlinkAnalyze::npx_data1 |>
             dplyr::select(
-              -dplyr::all_of(c("Panel_Version", "NPX"))
+              -dplyr::all_of(c("Panel_Version", "OlinkID"))
             ),
           "p2" = OlinkAnalyze::npx_data2 |>
             dplyr::select(
@@ -2768,7 +2768,7 @@ test_that(
 
     expect_message(
       object = olink_norm_input_check_quant(quant_cols),
-      regexp = "NPX column present in both datasets, will be used"
+      regexp = "NPX column will be used for normalization."
     )
     
     quant_cols <- list(
