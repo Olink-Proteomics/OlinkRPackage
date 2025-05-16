@@ -64,5 +64,5 @@ jobs:
           
       - name: Test that test
         run: |
-          devtools::test()
+          devtools::test(pkg = "OlinkAnalyze")
         shell: Rscript {0}
