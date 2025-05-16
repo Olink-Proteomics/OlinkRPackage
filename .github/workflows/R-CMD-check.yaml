@@ -61,3 +61,8 @@ jobs:
       - uses: r-lib/actions/check-r-package@v2
         with:
           working-directory: OlinkAnalyze
+          
+      - name: Test that test
+        run: |
+          devtools::test()
+        shell: Rscript {0}
