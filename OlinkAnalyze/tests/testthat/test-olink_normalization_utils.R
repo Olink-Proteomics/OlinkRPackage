@@ -2768,7 +2768,7 @@ test_that(
 
     expect_message(
       object = olink_norm_input_check_quant(quant_cols),
-      regexp = "NPX column will be used for normalization."
+      regexp = "NPX will be used for normalization."
     )
     
     quant_cols <- list(
