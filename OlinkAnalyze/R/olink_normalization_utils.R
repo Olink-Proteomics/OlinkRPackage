@@ -983,8 +983,7 @@ olink_norm_input_check_quant <- function(lst_req_col_quant) {
         call = rlang::caller_env(),
         wrap = FALSE
       )
-      # remove section "check that quant methods are the same" from
-      # "olink_norm_input_check_df_cols" as they are overlapping.
+
     } else if (length(quant_col_shared) == 1L) {
         
         # if either dataset has 2 or more quant columns, print an
