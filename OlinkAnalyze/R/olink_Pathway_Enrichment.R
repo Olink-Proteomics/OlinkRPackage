@@ -117,7 +117,7 @@ olink_pathway_enrichment <- function(data, test_results, method = "GSEA", ontolo
          install.packages(\"msigdbr\")")
   }
 
-  if(!requireNamespace("msigdbdf", quietly = TRUE)) {
+  if(!rlang::is_installed(pkg = "msigdbdf")) {
     stop(" Pathway enrichment requires msigdbdf package.
          Please install msigdbdf before continuing.
 
