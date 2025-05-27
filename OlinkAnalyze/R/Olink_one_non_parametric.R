@@ -92,7 +92,13 @@ olink_one_non_parametric <- function(df,
     #Check data format
     npxCheck <- npxCheck(df)
     data_type <- npxCheck$data_type #Temporary fix to avoid issues with rlang::ensym downstream
+    # Rename duplicate UniProts
 
+    df <- df |>
+      dplyr::mutate(UniProt = ifelse(OlinkID %in%
+                                       npxCheck$uniprot_replace$OlinkID,
+                                     npxCheck$uniprot_replace$new_UniProt,
+                                     UniProt))
     ##Convert character vars to factor
     converted.vars <- NULL
     num.vars <- NULL
@@ -347,6 +353,14 @@ olink_one_non_parametric_posthoc <- function(df,
     #Check data format
     npxCheck <- npxCheck(df)
     data_type <- npxCheck$data_type #Temporary fix to avoid issues with rlang::ensym downstream
+
+    # Rename duplicate UniProts
+
+    df <- df |>
+      dplyr::mutate(UniProt = ifelse(OlinkID %in%
+                                       npxCheck$uniprot_replace$OlinkID,
+                                     npxCheck$uniprot_replace$new_UniProt,
+                                     UniProt))
 
     #Variables to check
     variable_testers <- intersect(c(variable), names(df))

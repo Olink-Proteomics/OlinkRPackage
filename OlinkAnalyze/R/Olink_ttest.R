@@ -133,6 +133,14 @@ olink_ttest <- function(df, variable, pair_id, ...){
   #Check data format
   npxCheck <- npxCheck(df)
 
+  # Rename duplicate UniProts
+
+  df <- df |>
+    dplyr::mutate(UniProt = ifelse(OlinkID %in%
+                                     npxCheck$uniprot_replace$OlinkID,
+                                   npxCheck$uniprot_replace$new_UniProt,
+                                   UniProt))
+
   nas_in_level <- df  %>%
     dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>%
     dplyr::group_by(OlinkID, !!rlang::ensym(variable)) %>%

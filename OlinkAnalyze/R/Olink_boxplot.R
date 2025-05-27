@@ -60,40 +60,46 @@ olink_boxplot <- function(df,
 
   #checking ellipsis
   if(length(list(...)) > 0){
-    
+
     ellipsis_variables <- names(list(...))
-    
+
     if(length(ellipsis_variables) == 1){
-      
+
       if(!(ellipsis_variables == 'coloroption')){
-        
+
         stop(paste0('The ... option only takes the coloroption argument. ... currently contains the variable ',
                     ellipsis_variables,
                     '.'))
       }
     }else{
-      
+
       stop(paste0('The ... option only takes one argument. ... currently contains the variables ',
                   paste(ellipsis_variables, collapse = ', '),
                   '.'))
     }
   }
-  
+
   # Exclude OlinkIDs with missing NPX
   npx_check <- npxCheck(df)
-  
+  # Rename duplicate UniProts
+
+  df <- df |>
+    dplyr::mutate(UniProt = ifelse(OlinkID %in%
+                                     npxCheck$uniprot_replace$OlinkID,
+                                   npxCheck$uniprot_replace$new_UniProt,
+                                   UniProt))
   #Filtering on valid OlinkID
   df <- df |>
     dplyr::filter(stringr::str_detect(OlinkID,
-                                      "OID[0-9]{5}")) |> 
-    dplyr::filter(!(OlinkID %in% npx_check$all_nas)) 
-  
+                                      "OID[0-9]{5}")) |>
+    dplyr::filter(!(OlinkID %in% npx_check$all_nas))
+
   #Column setup
   columns_for_npx_data <- c("OlinkID","UniProt","Assay", "NPX", eval(variable))
 
   #Testing that needed columns are correct
   if(!(all(columns_for_npx_data %in% colnames(df)))){
-    
+
     stop(paste0("Column(s) ",
                 paste(setdiff(columns_for_npx_data,
                               colnames(df)),
@@ -183,7 +189,7 @@ olink_boxplot <- function(df,
         dplyr::mutate(C1=sapply(strsplit(as.character(contrast)," - "),function(x) x[1]),
                       C2=sapply(strsplit(as.character(contrast)," - "),function(x) x[2])) |>
         dplyr::mutate(C1=stringr::str_replace_all(C1,"\\(|\\)", ""),
-                      C2=stringr::str_replace_all(C2,"\\(|\\)", "")) |> 
+                      C2=stringr::str_replace_all(C2,"\\(|\\)", "")) |>
         dplyr::group_by(Name_OID, contrast) |>
         dplyr::mutate(c.sort=min(C1,C2)) |>
         dplyr::mutate(p.value=paste0(myRound(Adjusted_pval)," Contrast: ", contrast)) |>

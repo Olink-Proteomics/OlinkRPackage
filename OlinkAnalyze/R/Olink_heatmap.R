@@ -87,7 +87,13 @@ olink_heatmap_plot <- function(df,
 
   # Exclude OlinkIDs with missing NPX
   npx_check <- npxCheck(df)
+  # Rename duplicate UniProts
 
+  df <- df |>
+    dplyr::mutate(UniProt = ifelse(OlinkID %in%
+                                     npxCheck$uniprot_replace$OlinkID,
+                                   npxCheck$uniprot_replace$new_UniProt,
+                                   UniProt))
 
   #Filtering on valid OlinkID
   df_temp <- df %>%
