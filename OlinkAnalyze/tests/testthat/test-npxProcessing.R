@@ -106,6 +106,25 @@ npx_Check <- suppressMessages(npxCheck(npx_data1))
 test_that("npxCheck detects duplicate sample IDs.",
          {expect_equal(npx_Check$duplicate_samples, c("CONTROL_SAMPLE_AS 1", "CONTROL_SAMPLE_AS 2"))})
 
+# test for duplicate UniProts for 1 OlinkID
+npx_data_dup <- npx_data1
+npx_data_dup$UniProt[5] <- "new_uniprot"
+npx_data_dup$UniProt[10] <- "another_new_uniprot"
+npx_data_dup <- npx_data_dup |>
+  dplyr::filter(!stringr::str_detect(SampleID,"CONTROL"))
+
+test_that("npxCheck detects duplicated UniProt IDs.", {
+  expect_warning(assay_identifiers(npx_data_dup),
+                 regexp = "OlinkID has multiple unique UniProt IDs.")
+  expect_equal(unique(suppressWarnings(assay_identifiers(npx_data_dup)$OlinkID)),
+               "OID01216")
+  expect_equal(unique(suppressWarnings(
+    assay_identifiers(npx_data_dup)$new_UniProt)),
+               "O00533")
+  expect_equal(unique(suppressWarnings(assay_identifiers(npx_data_dup)$UniProt)),
+                      c("new_uniprot",
+                      "another_new_uniprot"))
+})
 
 # npxProcessing_forDimRed snapshot ----------------------------------------
 
