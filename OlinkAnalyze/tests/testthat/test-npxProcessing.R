@@ -131,7 +131,7 @@ test_that("npxCheck detects duplicated UniProt IDs.", {
 test_that("UniProts replaced correctly",
           {
             npx_check <- suppressWarnings(npxCheck(df = npx_data_dup))
-            df <- uniprot_replace(df = npx_data_dup, npxCheck = npx_check)
+            df <- uniprot_replace(df = npx_data_dup, npx_check = npx_check)
             expect_equal(df, npx_data1 |>
                            dplyr::filter(!stringr::str_detect(SampleID,"CONTROL")))
           })
