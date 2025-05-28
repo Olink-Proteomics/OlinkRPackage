@@ -21,7 +21,7 @@ assay_identifiers <- function(df){
     uniprot_replace <- dplyr::left_join(uniprot_dups,
                                         uniprot_original,
                                         by = "OlinkID") |>
-      dplyr::filter(UniProt != new_UniProt)
+      dplyr::filter(.data[["UniProt"]] != .data[["new_UniProt"]])
     uniprot_message <- paste0("OlinkID `", uniprot_replace$OlinkID,
                               "` with UniProt ID `", uniprot_replace$UniProt,
                               "` will be replaced with UniProt ID `",
@@ -43,12 +43,12 @@ uniprot_replace <- function(df, npxCheck){
     df <- df |>
       dplyr::left_join(npxCheck$uniprot_replace,
                        by = c("UniProt", "OlinkID")) |>
-      dplyr::mutate(new_UniProt = ifelse(is.na(new_UniProt),
-                                         UniProt,
-                                         new_UniProt)) |>
-      dplyr::mutate(UniProt = ifelse(UniProt != new_UniProt,
-                                     new_UniProt,
-                                     UniProt)) |>
+      dplyr::mutate(new_UniProt = ifelse(is.na( .data[["new_UniProt"]]),
+                                         .data[["UniProt"]],
+                                         .data[["new_UniProt"]])) |>
+      dplyr::mutate(UniProt = ifelse(.data[["UniProt"]] !=  .data[["new_UniProt"]],
+                                     .data[["new_UniProt"]],
+                                     .data[["UniProt"]])) |>
       dplyr::select(-dplyr::any_of("new_UniProt"))
   }
   return(df)
