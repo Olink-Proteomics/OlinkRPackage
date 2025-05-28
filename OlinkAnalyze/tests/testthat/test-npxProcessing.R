@@ -121,10 +121,20 @@ test_that("npxCheck detects duplicated UniProt IDs.", {
   expect_equal(unique(suppressWarnings(
     assay_identifiers(npx_data_dup)$new_UniProt)),
                "O00533")
-  expect_equal(unique(suppressWarnings(assay_identifiers(npx_data_dup)$UniProt)),
+  expect_equal(unique(suppressWarnings(
+    assay_identifiers(npx_data_dup)$UniProt)),
                       c("new_uniprot",
                       "another_new_uniprot"))
 })
+
+# Test that UniProts are replaced correctly
+test_that("UniProts replaced correctly",
+          {
+            npx_check <- suppressWarnings(npxCheck(df = npx_data_dup))
+            df <- uniprot_replace(df = npx_data_dup, npxCheck = npx_check)
+            expect_equal(df, npx_data1 |>
+                           dplyr::filter(!stringr::str_detect(SampleID,"CONTROL")))
+          })
 
 # npxProcessing_forDimRed snapshot ----------------------------------------
 
