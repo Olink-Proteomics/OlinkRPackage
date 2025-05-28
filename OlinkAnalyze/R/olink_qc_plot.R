@@ -80,12 +80,8 @@ olink_qc_plot <- function(df,
   #Check data format
   npxCheck <- npxCheck(df)
   # Rename duplicate UniProts
+  df <- uniprot_replace(df, npxCheck)
 
-  df <- df |>
-    dplyr::mutate(UniProt = ifelse(OlinkID %in%
-                                     npxCheck$uniprot_replace$OlinkID,
-                                   npxCheck$uniprot_replace$new_UniProt,
-                                   UniProt))
   #Check that IQR_outlierDef and median_outlierDef are both numeric
   if(!all(is.numeric(IQR_outlierDef), is.numeric(median_outlierDef))){
     stop('IQR_outlierDef and median_outlierDef have to be numerical values')

@@ -53,12 +53,7 @@ olink_dist_plot <- function(df, color_g = 'QC_Warning', ...) {
   npxCheck <- npxCheck(df)
 
   # Rename duplicate UniProts
-
-  df <- df |>
-    dplyr::mutate(UniProt = ifelse(OlinkID %in%
-                                     npxCheck$uniprot_replace$OlinkID,
-                                   npxCheck$uniprot_replace$new_UniProt,
-                                   UniProt))
+  df <- uniprot_replace(df, npxCheck)
 
   reorder_within <- function(x, by, within, fun = mean, sep = "___", ...) {
     new_x <- paste(x, within, sep = sep)

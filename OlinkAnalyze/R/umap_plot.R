@@ -125,12 +125,7 @@ olink_umap_plot <- function (df,
   df <- df %>% dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) #Exclude assays that have all NA:s
 
   # Rename duplicate UniProts
-
-  df <- df |>
-    dplyr::mutate(UniProt = ifelse(OlinkID %in%
-                                     npxCheck$uniprot_replace$OlinkID,
-                                   npxCheck$uniprot_replace$new_UniProt,
-                                   UniProt))
+  df <- uniprot_replace(df, npxCheck)
 
   #Check that the user didn't specify just one of outlierDefX and outlierDefY
   if(sum(c(is.numeric(outlierDefX), is.numeric(outlierDefY))) == 1){

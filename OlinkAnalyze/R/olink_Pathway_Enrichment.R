@@ -174,12 +174,8 @@ data_prep <- function(data) {
   npx_check <- npxCheck(data)
 
   # Rename duplicate UniProts
+  df <- uniprot_replace(df, npx_check)
 
-  df <- df |>
-    dplyr::mutate(UniProt = ifelse(OlinkID %in%
-                                     npxCheck$uniprot_replace$OlinkID,
-                                   npxCheck$uniprot_replace$new_UniProt,
-                                   UniProt))
   data <- data %>%
     dplyr::filter(!(OlinkID %in% npx_check$all_nas)) %>%
     dplyr::filter(stringr::str_detect(OlinkID,

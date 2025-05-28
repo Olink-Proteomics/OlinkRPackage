@@ -37,3 +37,19 @@ assay_identifiers <- function(df){
 
   return(uniprot_replace)
 }
+
+uniprot_replace <- function(df, npxCheck){
+  if (nrow(npxCheck$uniprot_replace) != 0){
+    df <- df |>
+      dplyr::left_join(npxCheck$uniprot_replace,
+                       by = c("UniProt", "OlinkID")) |>
+      dplyr::mutate(new_UniProt = ifelse(is.na(new_UniProt),
+                                         UniProt,
+                                         new_UniProt)) |>
+      dplyr::mutate(UniProt = ifelse(UniProt != new_UniProt,
+                                     new_UniProt,
+                                     UniProt)) |>
+      dplyr::select(-dplyr::any_of("new_UniProt"))
+  }
+  return(df)
+}

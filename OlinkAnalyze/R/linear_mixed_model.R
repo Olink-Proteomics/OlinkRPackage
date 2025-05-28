@@ -162,12 +162,7 @@ olink_lmer <- function(df,
     npxCheck <- npxCheck(df)
 
     # Rename duplicate UniProts
-
-    df <- df |>
-      dplyr::mutate(UniProt = ifelse(OlinkID %in%
-                                       npxCheck$uniprot_replace$OlinkID,
-                                     npxCheck$uniprot_replace$new_UniProt,
-                                     UniProt))
+    df <- uniprot_replace(df, npxCheck)
 
     ##Convert character vars to factor
     converted.vars <- NULL
@@ -509,12 +504,7 @@ olink_lmer_posthoc <- function(df,
     npxCheck <- npxCheck(df)
 
     # Rename duplicate UniProts
-
-    df <- df |>
-      dplyr::mutate(UniProt = ifelse(OlinkID %in%
-                                       npxCheck$uniprot_replace$OlinkID,
-                                     npxCheck$uniprot_replace$new_UniProt,
-                                     UniProt))
+    df <- uniprot_replace(df, npxCheck)
 
     #Allow for :/* notation in covariates
     variable <- gsub("\\*",":",variable)
