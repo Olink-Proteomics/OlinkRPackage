@@ -11,26 +11,64 @@ test_df <- npx_data1 |>
   mutate(Normalization = if_else(Assay == "IL8", "PC", "EXCLUDED"))
 test <- clean_failed_assay(test_df)
 
+# npx_file <- system.file("extdata",
+#                         "npx_data_ext.parquet",
+#                         package = "OlinkAnalyze")
+# npx_df <- OlinkAnalyze::read_npx(filename = npx_file)
 
-dir <- "~/shared/olink/Data_Science/Support Projects/PC ratio check/Regeneron/NPX data"
-list.files(dir)
-npx <- read_npx(file.path(dir, "RGC_Ultima_Dat_Extended_NPX_2025-04-02.parquet"))
-npx <- filter(npx, Block %in% c("1", "3", "7", "8"))
 
+test <- npx |> dplyr::rename(olink_id_test = OlinkID)
+check_npx(test)
+
+
+
+# test data
+# dir <- "~/shared/olink/Data_Science/Support Projects/PC ratio check/Regeneron/NPX data"
+# file_name <- "RGC_Ultima_Dat_Extended_NPX_2025-04-02.parquet"
+
+dir <- "C:/Users/kang.dong/OneDrive - Olink Proteomics AB/Desktop/BIDMC"
+file_name <- "BIDMC-JHS-plates31-40_Extended_NPX_2025-04-16_intensity norm.parquet"
+
+
+# load data
+npx <- read_npx(file.path(dir, file_name),
+                out_df = "arrow")
+
+
+# create invalid olink_id
+npx <- npx |>
+  dplyr::collect() |>
+  dplyr::mutate(OlinkID = dplyr::recode(OlinkID,
+                                        "OID40783" = "ABC123",
+                                        "OID40784" = "ABC1234",
+                                        "OID40785" = "ABC12345",
+                                        "OID40786" = "ABC123456"))
+
+# check NPX
 checked_npx <- check_npx(npx)
-cleaned_npx <- clean_excluded_assay(npx)
+
+# df <- npx
+# check_npx_log <- checked_npx
+#
 
 
-cleaned_npx <- clean_sample_type_controls(npx, checked_npx)
-cleaned_npx <- clean_sample_id_controls(npx, checked_npx)
-cleaned_npx <- clean_qc_warning(npx, checked_npx)
+# clean NPX
+cleaned_npx <- clean_assay_na(npx, checked_npx)
+cleaned_npx <- clean_invalid_oid(npx, checked_npx)
 
 
-checked_npx <- check_npx(npx_data1)
-cleaned_npx <- clean_excluded_assay(npx_data1)
 
-
-cleaned_npx <- clean_sample_type_controls(npx_data1, checked_npx)
-cleaned_npx <- clean_sample_id_controls(npx_data1, checked_npx)
-
-cleaned_npx <- clean_npx(npx, checked_npx)
+# cleaned_npx <- clean_excluded_assay(npx)
+# cleaned_npx <- clean_sample_type_controls(npx, checked_npx)
+# cleaned_npx <- clean_sample_id_controls(npx, checked_npx)
+# cleaned_npx <- clean_qc_warning(npx, checked_npx)
+#
+#
+# checked_npx <- check_npx(npx_data1)
+# cleaned_npx <- clean_excluded_assay(npx_data1)
+#
+#
+# cleaned_npx <- clean_sample_type_controls(npx_data1, checked_npx)
+# cleaned_npx <- clean_sample_id_controls(npx_data1, checked_npx)
+#
+# cleaned_npx <- clean_npx(npx, checked_npx)
