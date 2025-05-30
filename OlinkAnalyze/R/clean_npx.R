@@ -291,6 +291,7 @@
 
 #' Remove assays with only NA values
 #'
+#' @description
 #' This function filters out rows from a data frame where the assay
 #' identifier (e.g.,`OlinkID`) matches those listed in `check_npx_log$assay_na`,
 #'  which contains assays composed entirely of NA values. It uses CLI messaging
@@ -327,12 +328,8 @@ clean_assay_na <- function(df,
     )
   }
 
-
-  # Convert the olink_id column to a symbol for tidy evaluation
+  # Prepare column and values to filter
   col_olink_id <- rlang::sym(check_npx_log$col_names$olink_id)
-
-
-  # Extract the list of olink IDs to be removed (entirely NA)
   olink_ids_to_remove <- check_npx_log$assay_na
 
 
@@ -360,3 +357,72 @@ clean_assay_na <- function(df,
 }
 
 
+#' Remove assays with invalid OlinkID
+#'
+#' @description
+#' This function filters out rows from a data frame where the assay identifier
+#' column (e.g.,`OlinkID`) matches values listed in `check_npx_log$oid_invalid`,
+#' which identifies invalid or malformed assay identifiers. Uses CLI messages to
+#' inform users of what was excluded.
+#'
+#' @param df A data frame loaded from `read_npx()`, containing a column
+#' specified by `check_npx_log$col_names$olink_id`.
+#' @param check_npx_log A list returned by `check_npx()`, containing:
+#'   - `oid_invalid`: a character vector of invalid assay identifiers to be removed.
+#'   - `col_names$olink_id`: the name of the column in `df` that holds the assay IDs.
+#' @param out_df Output format of the cleaned data.
+#' Options: `"tibble"` (default) or `"arrow"`.
+#'
+#' @return A filtered data frame with invalid OlinkIDs removed.
+#' @export
+#'
+#' @examples
+#' # df <- read_npx("your_data.parquet")
+#' # log <- check_npx(df)
+#' # clean_df <- clean_invalid_oid(df, log)
+clean_invalid_oid <- function(df,
+                              check_npx_log,
+                              out_df = "tibble") {
+
+  # Check if there are any invalid OlinkIDs to remove
+  if (length(check_npx_log$oid_invalid) == 0) {
+    cli::cli_alert_info(
+      "No invalid OlinkIDs found. Returning original data frame."
+    )
+    return(
+      df |>
+        convert_read_npx_output(out_df = out_df)
+    )
+  }
+
+
+  # Prepare column and values to filter
+  col_olink_id <- rlang::sym(check_npx_log$col_names$olink_id)
+  olink_ids_to_remove <- check_npx_log$oid_invalid
+
+
+  # Inform user of which assays will be excluded
+  cli::cli_alert_warning(
+    "Excluding {length(olink_ids_to_remove)} assays with invalid OlinkIDs:
+    {paste(olink_ids_to_remove, collapse = ', ')}"
+  )
+
+
+  # Remove rows where the OlinkID is invalid
+  df_cleaned <- df |>
+    dplyr::filter(!(!!col_olink_id %in% olink_ids_to_remove)) |>
+    dplyr::collect()
+
+
+  # Confirmation message
+  cli::cli_alert_success(
+    "Removed rows for assays with invalid OlinkIDs. Returning cleaned data frame."
+  )
+
+
+  # Return cleaned data frame in desired format
+  return(
+    df_cleaned |>
+      convert_read_npx_output(out_df = out_df)
+  )
+}
