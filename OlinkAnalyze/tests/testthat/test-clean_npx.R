@@ -44,8 +44,12 @@ npx <- npx |>
                                         "OID40785" = "ABC12345",
                                         "OID40786" = "ABC123456"))
 
+npx <- npx |>
+  dplyr::collect() |>
+  dplyr::mutate(SampleID = dplyr::if_else(stringr::str_detect(SampleID, "NC"), "NC", SampleID))
+
 # check NPX
-checked_npx <- check_npx(npx)
+checked_npx_log <- check_npx(npx)
 
 # df <- npx
 # check_npx_log <- checked_npx
@@ -53,10 +57,18 @@ checked_npx <- check_npx(npx)
 
 
 # clean NPX
-cleaned_npx <- clean_assay_na(npx, checked_npx)
-cleaned_npx <- clean_invalid_oid(npx, checked_npx)
+cleaned_npx <- clean_assay_na(npx, checked_npx_log)
+cleaned_npx <- clean_invalid_oid(npx, checked_npx_log)
+cleaned_npx <- clean_duplicate_sample_id(npx, checked_npx_log)
+cleaned_npx <- clean_sample_type(npx, checked_npx_log)
+cleaned_npx <- clean_assay_type(npx, checked_npx_log)
+cleaned_npx <- clean_sample_qc(npx, checked_npx_log)
 
+qc <- clean_npx(df = npx, check_npx_log = checked_npx_log)
 
+qc
+
+# qc <- clean_control_sample_id(npx_data1, check_npx(npx_data1))
 
 # cleaned_npx <- clean_excluded_assay(npx)
 # cleaned_npx <- clean_sample_type_controls(npx, checked_npx)
