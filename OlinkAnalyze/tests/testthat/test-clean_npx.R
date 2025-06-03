@@ -66,7 +66,9 @@ cleaned_npx <- clean_sample_qc(npx, checked_npx_log)
 
 qc <- clean_npx(df = npx, check_npx_log = checked_npx_log)
 
-qc
+qc <- clean_npx(df = npx_data1, check_npx_log = check_npx(npx_data1))
+log <- check_npx(npx_data2)
+qc <- clean_npx(df = npx_data2, check_npx_log = log)
 
 # qc <- clean_control_sample_id(npx_data1, check_npx(npx_data1))
 
