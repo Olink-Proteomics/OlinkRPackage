@@ -32,4 +32,8 @@ inform users of what was excluded.
 # df <- read_npx("your_data.parquet")
 # log <- check_npx(df)
 # clean_df <- clean_invalid_oid(df, log)
+
+}
+\author{
+Kang Dong
 }
