@@ -1,288 +1,132 @@
 
-#' # Main function -----------------------------------------------------------
-#'
-#' #' @title Clean NPX Data Using Common Exclusion Criteria
-#' #'
-#' #' @description
-#' #' Cleans NPX data by removing:
-#' #' - Assays with failed normalization (Normalization = "excluded", case-insensitive)
-#' #' - Controls based on `SampleType` (e.g., "SAMPLE_CONTROL", "PLATE_CONTROL", "NEGATIVE_CONTROL")
-#' #' - Controls based on `SampleID` containing "control"
-#' #' - Samples that failed quality control (SampleQC = "FAIL")
-#' #'
-#' #' @param df A data.frame or tibble containing NPX data.
-#' #' @param check_npx_out_list A list from \code{check_npx()} containing unified column names.
-#' #'
-#' #' @return A cleaned data.frame or tibble with failed or control samples removed.
-#' #'
-#' #' @examples
-#' #' clean_data <- clean_npx(npx_data, check_npx_out_list)
-#' #'
-#' #' @export
-#' clean_npx <- function(df, check_npx_out_list) {
-#'   # Step 1: Remove excluded normalization assays ----
-#'   df <- clean_failed_assay(df)
-#'
-#'   # Step 2: Remove sample type controls (if SampleType present) ----
-#'   df <- clean_sample_type_controls(df, check_npx_out_list)
-#'
-#'   # Step 3: Remove sample ID controls ----
-#'   df <- clean_sample_id_controls(df, check_npx_out_list)
-#'
-#'   # Step 4: Remove failed QC ----
-#'   df <- clean_qc_warning(df, check_npx_out_list)
-#'
-#'   return(df)
-#' }
-#'
-#'
-#'
-#'
-#'
-#'
-#'
-#'
-#'
-#'
-#' # Support function --------------------------------------------------------
-#'
-#' #' #' @title Clean Excluded Assays from NPX Data Based on Normalization Column
-#' #' #'
-#' #' #' @description
-#' #' #' Removes rows in an NPX dataset where the Normalization status indicates
-#' #' #' exclusion. This includes any case variation of the word "excluded".
-#' #' #'
-#' #' #' @author
-#' #' #'  Kang Dong
-#' #' #'
-#' #' #' @param df A data.frame or tibble containing NPX data.
-#' #' #'
-#' #' #' @return A filtered data.frame or tibble where failed assays
-#' #' #' (Normalization matches "excluded") are removed.
-#' #' #'
-#' #' #' @examples
-#' #' #' clean_data <- clean_excluded_assay(npx_data)
-#' #' #'
-#' #' #' @export
-#' #' clean_excluded_assay <- function(df) {
-#' #'
-#' #'   # Check input ----
-#' #'   check_is_dataset(df = df,
-#' #'                    error = TRUE)
-#' #'
-#' #'   # Check for 'Normalization' column ----
-#' #'   if (!"Normalization" %in% colnames(df)) {
-#' #'     cli::cli_warn(c(
-#' #'       "Column {.var Normalization} not found.",
-#' #'       "i" = "Returning data unchanged."
-#' #'     ))
-#' #'     return(df)
-#' #'   }
-#' #'
-#' #'   # Use stringr to detect 'excluded' (case-insensitive) ----
-#' #'   excluded_idx <- stringr::str_detect(df$Normalization,
-#' #'                                       regex("excluded", ignore_case = TRUE))
-#' #'   n_excluded <- sum(excluded_idx, na.rm = TRUE)
-#' #'
-#' #'   # Inform user
-#' #'   cli::cli_inform(
-#' #'     "Removing {n_excluded} row{?s} with {.val Normalization = 'excluded'}
-#' #'     (case-insensitive match)."
-#' #'     )
-#' #'
-#' #'   # Filter and return ----
-#' #'   cleaned_df <- df[!excluded_idx, ]
-#' #'   return(cleaned_df)
-#' #' }
-#'
-#'
-#'
-#' #' @title Clean Control Samples Based on SampleID
-#' #'
-#' #' @description
-#' #' Removes rows from an NPX dataset where SampleID contains the term "control"
-#' #' (case-insensitive).
-#' #'
-#' #' @author
-#' #'  Kang Dong
-#' #'
-#' #' @param df A data.frame or tibble.
-#' #' @param check_npx_out_list A list returned from `check_npx()` with column
-#' #' name mapping.
-#' #'
-#' #' @return A filtered data.frame or tibble.
-#' #'
-#' #' @export
-#' clean_sample_id_controls <- function(df, check_npx_out_list) {
-#'
-#'   # Check input ----
-#'   check_is_dataset(df = df,
-#'                    error = TRUE)
-#'
-#'   # Safely access sample_id from col_names ----
-#'   if (!"sample_id" %in% names(check_npx_out_list$col_names)) {
-#'     cli::cli_warn(c(
-#'       "No column name found for {.var sample_id} in {.code check_npx_out_list}.",
-#'       "i" = "Returning data unchanged."
-#'     ))
-#'     return(df)
-#'   }
-#'
-#'   col_sample_id <- check_npx_out_list$col_names$sample_id
-#'
-#'   # Check if column exists in data ----
-#'   if (!col_sample_id %in% colnames(df)) {
-#'     cli::cli_warn(c(
-#'       "Column {.var {col_sample_id}} not found in data.",
-#'       "i" = "Returning data unchanged."
-#'     ))
-#'     return(df)
-#'   }
-#'
-#'   # Identify rows containing 'control' ----
-#'   control_idx <- stringr::str_detect(df[[col_sample_id]],
-#'                                      regex("control", ignore_case = TRUE))
-#'   n_controls <- sum(control_idx, na.rm = TRUE)
-#'
-#'   # Inform user ----
-#'   cli::cli_inform("Removing {n_controls} row{?s} with {.var {col_sample_id}}
-#'                   containing 'control' (case-insensitive).")
-#'
-#'   # Filter and return ----
-#'   cleaned_df <- df[!control_idx, ]
-#'   return(cleaned_df)
-#' }
-#'
-#'
-#'
-#' #' @title Clean Control Samples Based on SampleType
-#' #'
-#' #' @description
-#' #' Removes rows from an NPX dataset where SampleType indicates control samples.
-#' #' These include: "SAMPLE_CONTROL", "PLATE_CONTROL", and "NEGATIVE_CONTROL".
-#' #'
-#' #' @author
-#' #'  Kang Dong
-#' #'
-#' #' @param df A data.frame or tibble.
-#' #' @param check_npx_out_list A list returned from `check_npx()`
-#' #' with column name mapping.
-#' #'
-#' #' @return A filtered data.frame or tibble.
-#' #'
-#' #' @export
-#' clean_sample_type_controls <- function(df, check_npx_out_list) {
-#'
-#'   # Check input ----
-#'   check_is_dataset(df = df,
-#'                    error = TRUE)
-#'
-#'   # Safely access sample_type from col_names ----
-#'   if (!"sample_type" %in% names(check_npx_out_list$col_names)) {
-#'     cli::cli_warn(c(
-#'       "No column name found for {.var sample_type} in
-#'       {.code check_npx_out_list}.",
-#'       "i" = "Returning data unchanged."
-#'     ))
-#'     return(df)
-#'   }
-#'
-#'   col_sample_type <- check_npx_out_list$col_names$sample_type
-#'
-#'   # Check if column is in the actual data ----
-#'   if (!col_sample_type %in% colnames(df)) {
-#'     cli::cli_warn(c(
-#'       "Column {.var {col_sample_type}} not found in data.",
-#'       "i" = "Returning data unchanged."
-#'     ))
-#'     return(df)
-#'   }
-#'
-#'   # Filter out rows ----
-#'   control_types <- c("SAMPLE_CONTROL", "PLATE_CONTROL", "NEGATIVE_CONTROL")
-#'   control_idx <- df[[col_sample_type]] %in% control_types
-#'   n_controls <- sum(control_idx, na.rm = TRUE)
-#'
-#'   # Inform user ----
-#'   cli::cli_inform("Removing {n_controls} row{?s} with {.var {col_sample_type}}
-#'                   in {toString(control_types)}.")
-#'
-#'   # Filter and return ----
-#'   cleaned_df <- df[!control_idx, ]
-#'   return(cleaned_df)
-#' }
-#'
-#'
-#'
-#' #' @title Clean Samples That Failed QC
-#' #'
-#' #' @description
-#' #' Removes samples from NPX data where the SampleQC column equals "FAIL"
-#' #' (case-insensitive). Also logs a summary of all SampleQC statuses present
-#' #' in the dataset.
-#' #'
-#' #' @author
-#' #'  Kang Dong
-#' #'
-#' #' @param df A data.frame or tibble containing NPX data.
-#' #' @param check_npx_out_list A list returned from \code{check_npx()}
-#' #' containing standardized column names.
-#' #'
-#' #' @return A filtered data.frame or tibble with samples failing QC removed.
-#' #'
-#' #' @examples
-#' #' clean_data <- clean_qc_warning(npx_data, check_npx_out_list)
-#' #'
-#' #' @export
-#' clean_qc_warning <- function(df, check_npx_out_list) {
-#'
-#'   # Check input ----
-#'   check_is_dataset(df = df, error = TRUE)
-#'
-#'   # Get column name for qc_warning ----
-#'   if (!"qc_warning" %in% names(check_npx_out_list$col_names)) {
-#'     cli::cli_warn(c(
-#'       "No column name found for {.var qc_warning} in
-#'       {.code check_npx_out_list}.",
-#'       "i" = "Returning data unchanged."
-#'     ))
-#'     return(df)
-#'   }
-#'
-#'   col_qc_warning <- check_npx_out_list$col_names$qc_warning
-#'
-#'   # Check if the qc_warning column exists ----
-#'   if (!col_qc_warning %in% colnames(df)) {
-#'     cli::cli_warn(c(
-#'       "Column {.var {col_qc_warning}} not found in data.",
-#'       "i" = "Returning data unchanged."
-#'     ))
-#'     return(df)
-#'   }
-#'
-#'   # Summarize SampleQC statuses ----
-#'   qc_summary <- table(
-#'     toupper(trimws(df[[col_qc_warning]])),
-#'     useNA = "ifany")
-#'   qc_summary_msg <- paste(names(qc_summary),
-#'                           qc_summary,
-#'                           sep = ": ", collapse = "; ")
-#'   cli::cli_inform("SampleQC status summary — {qc_summary_msg}")
-#'
-#'   # Identify failed samples ----
-#'   fail_idx <- stringr::str_detect(df[[col_qc_warning]],
-#'                                   regex("^FAIL$", ignore_case = TRUE))
-#'   n_fail <- sum(fail_idx, na.rm = TRUE)
-#'
-#'   # Inform user and remove ----
-#'   cli::cli_inform("Removing {n_fail} row{?s} with {.val SampleQC = 'FAIL'}")
-#'
-#'   cleaned_df <- df[!fail_idx, ]
-#'   return(cleaned_df)
-#' }
+# Main Function -----------------------------------------------------------
 
 
-# -------------------------------------------------------------------------
+#' Clean Olink NPX Data Frame
+#'
+#' @description
+#' This function applies a series of cleaning steps to an NPX dataset based on
+#' the results from [`check_npx()`]. It removes samples/assays with errors,
+#' control samples, internal control assays to prepare the dataset for
+#' downstream analysis.
+#'
+#' The cleaning pipeline performs the following steps:
+#'
+#' 1. **Remove invalid OlinkIDs**: Any assays flagged as having invalid OlinkIDs
+#' are excluded.
+#' 2. **Remove assays with all NA values**: Assays that have no quantifiable data
+#' across all samples are removed.
+#' 3. **Remove duplicate SampleIDs**: Samples with duplicate identifiers are
+#' excluded to ensure unique observations.
+#' 4. **Remove control sample types**: Samples identified as controls (e.g.,
+#' `"SAMPLE_CONTROL"`, `"PLATE_CONTROL"`) are removed based on the `SampleType` column.
+#' 5. **Remove samples failing QC**: Samples that failed Olink internal quality
+#' control are excluded.
+#' 6. **Remove control-like SampleIDs**: Samples whose `SampleID` matches a
+#' user-defined regular expression (e.g., containing "control") are excluded.
+#' 7. **Remove internal control assays**: Assays used for internal controls
+#' (e.g., `"ext_ctrl"`, `"inc_ctrl"`) are removed based on `AssayType`.
+#'
+#' @param df A data frame or Arrow Table containing NPX data to be cleaned.
+#' @param check_npx_log A list object generated by [`check_npx()`], containing
+#' metadata used in cleaning decisions.
+#' @param out_df Output format. `"tibble"` (default) returns a tibble; `"arrow"`
+#' returns an Arrow Table.
+#' @param control_sample_types_regx A character vector of regex patterns for
+#' identifying control sample types in the `SampleType` column.
+#' @param control_assay_types_regx A character vector of regex patterns for
+#' identifying internal control assay types in the `AssayType` column.
+#' @param control_sample_id_regex A character vector of regex patterns for
+#' identifying control-like SampleIDs in the `SampleID` column.
+#'
+#' @returns A cleaned NPX dataset in either tibble or Arrow Table format,
+#' depending on `out_df`.
+#'
+#' @examples
+#'
+#' @export
+
+clean_npx <- function(df,
+                      check_npx_log,
+                      out_df = "tibble",
+                      control_sample_types_regx = c("SAMPLE_CONTROL",
+                                                    "PLATE_CONTROL",
+                                                    "NEGATIVE_CONTROL"),
+                      control_assay_types_regx = c("ext_ctrl",
+                                                   "inc_ctrl",
+                                                   "amp_ctrl"),
+                      control_sample_id_regex = c("control")) {
+
+  # Step 0: Validate inputs
+  check_is_dataset(df = df, error = TRUE)
+
+  if (!inherits(check_npx_log, "list")) {
+    cli::cli_abort(
+      "{.arg check_npx_log} must be the result of the {.fn check_npx} function."
+      )
+  }
+
+  cli::cli_h2("Starting {.fn clean_npx} pipeline")
+
+  # Step 1: Remove invalid Olink IDs
+  cli::cli_h3("Step 1: Removing assays with invalid OlinkIDs")
+  df <- clean_invalid_oid(df,
+                          check_npx_log = check_npx_log,
+                          out_df = out_df)
+
+  # Step 2: Remove assays with all NA values
+  cli::cli_h3("Step 2: Removing assays with all NA values")
+  df <- clean_assay_na(df,
+                       check_npx_log = check_npx_log,
+                       out_df = out_df)
+
+  # Step 3: Remove duplicate sample IDs
+  cli::cli_h3("Step 3: Removing duplicate SampleIDs")
+  df <- clean_duplicate_sample_id(df,
+                                  check_npx_log = check_npx_log,
+                                  out_df = out_df)
+
+  # Step 4: Remove unwanted sample types
+  cli::cli_h3("Step 4: Removing unwanted sample types")
+  df <- clean_sample_type(df,
+                          check_npx_log = check_npx_log,
+                          control_sample_types = control_sample_types_regx,
+                          out_df = out_df)
+
+  # Step 5: Remove samples that failed QC
+  cli::cli_h3("Step 5: Removing samples that failed QC")
+  df <- clean_sample_qc(df,
+                        check_npx_log = check_npx_log,
+                        out_df = out_df)
+
+  # Step 6: Remove control-like SampleIDs
+  cli::cli_h3("Step 6: Removing control-like SampleIDs")
+  df <- clean_control_sample_id(df,
+                                check_npx_log = check_npx_log,
+                                control_sample_id = control_sample_id_regex,
+                                out_df = out_df)
+
+  # Step 7: Remove internal control assays
+  cli::cli_h3("Step 7: Removing internal control assays")
+  df <- clean_assay_type(df,
+                         check_npx_log = check_npx_log,
+                         control_assay_types = control_assay_types_regx,
+                         out_df = out_df)
+
+  # Final output
+  cli::cli_h2("Completed {.fn clean_npx} pipeline")
+
+  if (out_df == "arrow") {
+    cli::cli_alert_success("Cleaning complete. Returning Arrow Table.")
+  } else {
+    cli::cli_alert_success("Cleaning complete. Returning tibble.")
+  }
+
+  return(df |>
+           convert_read_npx_output(out_df = out_df))
+}
+
+
 
 
 
@@ -294,8 +138,11 @@
 #' @description
 #' This function filters out rows from a data frame where the assay
 #' identifier (e.g.,`OlinkID`) matches those listed in `check_npx_log$assay_na`,
-#'  which contains assays composed entirely of NA values. It uses CLI messaging
-#'  to report which assays were removed.
+#' which contains assays composed entirely of NA values. It uses CLI messaging
+#' to report which assays were removed.
+#'
+#' @author
+#' Kang Dong
 #'
 #' @param df A data frame loads from `read_npx()`, including a column identified
 #' by `check_npx_log$col_names$olink_id`.
@@ -332,22 +179,20 @@ clean_assay_na <- function(df,
   col_olink_id <- rlang::sym(check_npx_log$col_names$olink_id)
   olink_ids_to_remove <- check_npx_log$assay_na
 
-
   # CLI message listing excluded assays
   cli::cli_alert_warning(
     "Excluding {length(olink_ids_to_remove)} assays with only NA values:
     {paste(olink_ids_to_remove, collapse = ', ')}"
   )
 
-
   # Exclude assays with only NA values
   df_cleaned <- df |>
-    dplyr::filter(!(!!col_olink_id %in% olink_ids_to_remove)) |>
-    dplyr::collect()
+    dplyr::collect() |>
+    dplyr::filter(!(!!col_olink_id %in% olink_ids_to_remove))
+
   cli::cli_alert_success(
   "Removed rows for assays with only NA values.Returning cleaned data frame."
   )
-
 
   # Convert output to desired format (tibble or arrow)
   return(
@@ -365,6 +210,9 @@ clean_assay_na <- function(df,
 #' which identifies invalid or malformed assay identifiers. Uses CLI messages to
 #' inform users of what was excluded.
 #'
+#' @author
+#' Kang Dong
+#'
 #' @param df A data frame loaded from `read_npx()`, containing a column
 #' specified by `check_npx_log$col_names$olink_id`.
 #' @param check_npx_log A list returned by `check_npx()`, containing:
@@ -380,6 +228,7 @@ clean_assay_na <- function(df,
 #' # df <- read_npx("your_data.parquet")
 #' # log <- check_npx(df)
 #' # clean_df <- clean_invalid_oid(df, log)
+#'
 clean_invalid_oid <- function(df,
                               check_npx_log,
                               out_df = "tibble") {
@@ -395,11 +244,9 @@ clean_invalid_oid <- function(df,
     )
   }
 
-
   # Prepare column and values to filter
   col_olink_id <- rlang::sym(check_npx_log$col_names$olink_id)
   olink_ids_to_remove <- check_npx_log$oid_invalid
-
 
   # Inform user of which assays will be excluded
   cli::cli_alert_warning(
@@ -407,20 +254,368 @@ clean_invalid_oid <- function(df,
     {paste(olink_ids_to_remove, collapse = ', ')}"
   )
 
-
   # Remove rows where the OlinkID is invalid
   df_cleaned <- df |>
-    dplyr::filter(!(!!col_olink_id %in% olink_ids_to_remove)) |>
-    dplyr::collect()
-
+    dplyr::collect() |>
+    dplyr::filter(!(!!col_olink_id %in% olink_ids_to_remove))
 
   # Confirmation message
   cli::cli_alert_success(
     "Removed rows for assays with invalid OlinkIDs. Returning cleaned data frame."
   )
 
-
   # Return cleaned data frame in desired format
+  return(
+    df_cleaned |>
+      convert_read_npx_output(out_df = out_df)
+  )
+}
+
+
+#' Remove samples with duplicate SampleIDs
+#'
+#' @description
+#' This function filters out rows from a data frame where the sample identifier
+#' (e.g., `SampleID`) appears more than once. The duplicate SampleIDs are
+#' identified in `check_npx_log$sample_id_dups`, which is generated by the
+#' `check_npx()` function. Uses CLI messages to inform users of exclusions.
+#'
+#' @author
+#' Kang Dong
+#'
+#' @param df A data frame loaded from `read_npx()`, containing a column
+#' specified by `check_npx_log$col_names$sample_id`.
+#' @param check_npx_log A list returned by `check_npx()`, containing:
+#'   - `sample_id_dups`: a character vector of duplicate SampleIDs to be removed.
+#'   - `col_names$sample_id`: the name of the column in `df` that holds
+#'   the SampleIDs.
+#' @param out_df Output format of the cleaned data.
+#' Options: `"tibble"` (default) or `"arrow"`.
+#'
+#' @return A filtered data frame with duplicated SampleIDs removed.
+#' @export
+#'
+#' @examples
+#' # df <- read_npx("example.parquet")
+#' # log <- check_npx(df)
+#' # clean_df <- clean_duplicate_sample_id(df, log)
+clean_duplicate_sample_id <- function(df,
+                                      check_npx_log,
+                                      out_df = "tibble") {
+
+  # Check if there are any duplicate SampleIDs to remove
+  if (length(check_npx_log$sample_id_dups) == 0) {
+    cli::cli_alert_info(
+      "No duplicate SampleIDs found. Returning original data frame."
+    )
+    return(
+      df |>
+        convert_read_npx_output(out_df = out_df)
+    )
+  }
+
+  # Prepare column and values to filter
+  col_sample_id <- rlang::sym(check_npx_log$col_names$sample_id)
+  sample_ids_to_remove <- check_npx_log$sample_id_dups
+
+  # Inform user about excluded SampleIDs
+  cli::cli_alert_warning(
+    "Excluding samples with duplicate SampleIDs:
+    {paste(sample_ids_to_remove, collapse = ', ')}"
+  )
+
+  # Filter out rows with duplicate SampleIDs
+  df_cleaned <- df |>
+    dplyr::collect() |>
+    dplyr::filter(!(!!col_sample_id %in% sample_ids_to_remove))
+
+  # Success message
+  cli::cli_alert_success(
+    "Removed rows with duplicate SampleIDs. Returning cleaned data frame."
+  )
+
+  # Convert and return the output in the desired format
+  return(
+    df_cleaned |>
+      convert_read_npx_output(out_df = out_df)
+  )
+}
+
+
+#' Remove control samples based on sample type
+#'
+#' @description
+#' This function filters out rows from an NPX data frame where the sample type
+#' column matches one of the defined control types using regular expressions
+#' (case-insensitive).
+#'
+#' @author
+#' Kang Dong
+#'
+#' @param df A data frame loaded from `read_npx()`.
+#' @param check_npx_log A list returned from `check_npx()`, containing:
+#'   - `col_names$sample_type`: name of the column in `df` that identifies
+#'   sample type.
+#' @param control_sample_types A character vector of control sample types to
+#' exclude. Regular expression matching is used.Default is c("SAMPLE_CONTROL",
+#' "PLATE_CONTROL", "NEGATIVE_CONTROL").
+#' @param out_df Output format: either "tibble" (default) or "arrow".
+#'
+#' @return A cleaned data frame with control sample removed.
+#' @export
+#'
+#' @examples
+#' clean_df <- clean_sample_type(df, check_npx_log)
+clean_sample_type <- function(df,
+                              check_npx_log,
+                              control_sample_types = c("SAMPLE_CONTROL",
+                                                       "PLATE_CONTROL",
+                                                       "NEGATIVE_CONTROL"),
+                              out_df = "tibble") {
+
+  # Check for required column name
+  if (!"sample_type" %in% names(check_npx_log$col_names)) {
+    cli::cli_alert_warning(c(
+      "No column name found for {.var sample_type} in
+      {.code check_npx_log$col_names}.",
+      "i" = "Returning data unchanged."
+    ))
+    return(
+      df |>
+        convert_read_npx_output(out_df = out_df)
+    )
+  }
+
+  # Get the sample type column name
+  col_sample_type <- check_npx_log$col_names$sample_type
+
+  # Combine control types into a single case-insensitive regex pattern
+  ctrl_pattern <- paste0("(?i)^(",
+                         paste(control_sample_types, collapse = "|"),
+                         ")$")
+
+  # Identify rows to remove using regex
+  rows_to_remove <- stringr::str_detect(df[[col_sample_type]], ctrl_pattern)
+  n_controls <- sum(rows_to_remove, na.rm = TRUE)
+
+  # Inform removed rows
+  cli::cli_inform(c(
+    "Removing {n_controls} row{?s} of control sample{?s}.",
+    "i" = "Matching sample type: {paste(control_sample_types, collapse = ', ')}"
+  ))
+
+  # Remove matched rows and return
+  df_cleaned <- df[!rows_to_remove, ] |> dplyr::collect()
+
+  return(
+    df_cleaned |>
+      convert_read_npx_output(out_df = out_df)
+  )
+}
+
+
+#' Remove Internal Control Assays by Assay Type
+#'
+#' @description
+#' This function filters out rows from an NPX data frame where the assay type
+#' matches any of the specified control assay types (e.g., `ext_ctrl`,
+#' `inc_ctrl`, `amp_ctrl`). Matching is case-insensitive and uses regular
+#' expressions via `stringr::str_detect()`. Informative CLI messages report the
+#' number and type of rows removed.
+#'
+#' @author
+#' Kang Dong
+#'
+#' @param df A data frame loaded from `read_npx()`, containing an assay type column.
+#' @param check_npx_log A list generated by `check_npx()` that includes:
+#'   - `col_names$assay_type`: the name of the column holding assay type information.
+#' @param control_assay_types A character vector of internal control assay types to remove.
+#'   Default is `c("ext_ctrl", "inc_ctrl", "amp_ctrl")`.
+#' @param out_df The class of output data frame. Options are `"tibble"` or
+#' `"arrow"`. Default: `"tibble"`.
+#'
+#' @return A filtered data frame with internal control assay rows removed.
+#' @export
+#'
+#' @examples
+#' # Assuming `df` is a data frame with an "AssayType" column
+#' # and `check_npx_log` contains `col_names$assay_type = "AssayType"`:
+#' clean_df <- clean_assay_type(df, check_npx_log)
+clean_assay_type <- function(df,
+                             check_npx_log,
+                             control_assay_types = c("ext_ctrl",
+                                                     "inc_ctrl",
+                                                     "amp_ctrl"),
+                             out_df = "tibble") {
+
+  # Check if assay_type column name is defined in log
+  if (!"assay_type" %in% names(check_npx_log$col_names)) {
+    cli::cli_alert_warning(c(
+      "No column name found for {.var assay_type} in
+      {.code check_npx_log$col_names}.",
+      "i" = "Returning data unchanged."
+    ))
+    return(
+      df |>
+        convert_read_npx_output(out_df = out_df)
+    )
+  }
+
+  # Extract column name for assay type
+  col_assay_type <- check_npx_log$col_names$assay_type
+
+  # Construct case-insensitive regex pattern for control assay types
+  ctrl_pattern <- paste0("(?i)^(",
+                         paste(control_assay_types, collapse = "|"),
+                         ")$")
+
+  # Identify rows matching control assay types
+  rows_to_remove <- stringr::str_detect(df[[col_assay_type]], ctrl_pattern)
+  n_controls <- sum(rows_to_remove, na.rm = TRUE)
+
+  # Inform user
+  cli::cli_inform(c(
+    "Removing {n_controls} row{?s} of internal control assay{?s}.",
+    "i" = "Matching assay type{?s}: {paste(control_assay_types, collapse = ', ')}"
+  ))
+
+  # Filter out control assay rows
+  df_cleaned <- df[!rows_to_remove, ] |>
+    dplyr::collect()
+
+  # Return result in desired output format
+  return(
+    df_cleaned |>
+      convert_read_npx_output(out_df = out_df)
+  )
+}
+
+
+#' Remove Samples That Failed QC
+#'
+#' @description
+#' This function removes rows from an NPX data frame where the QC warning column
+#' contains the term `"fail"` (case-insensitive). These rows typically represent
+#' samples that failed quality control checks. The function uses
+#' `stringr::str_detect()` for pattern matching and returns the cleaned data in
+#' the desired output format (`"tibble"` or `"arrow"`).
+#'
+#' @author
+#' Kang Dong
+#'
+#' @param df A data frame loaded using `read_npx()`, containing a QC status column.
+#' @param check_npx_log A list generated by `check_npx()` that includes:
+#'   - `col_names$qc_warning`: the name of the column indicating QC status.
+#' @param out_df A string specifying the output format of the data frame.
+#'   Options are `"tibble"` or `"arrow"`. Default is `"tibble"`.
+#'
+#' @returns A filtered data frame with samples that failed QC removed.
+#' @export
+#'
+#' @examples
+#' # Assuming df is a data frame with a QC warning column
+#' # and check_npx_log contains col_names$qc_warning = "QCWarning"
+#' clean_df <- clean_sample_qc(df, check_npx_log)
+clean_sample_qc <- function(df,
+                            check_npx_log,
+                            out_df = "tibble") {
+
+  # Check if qc_warning column name is defined in check_npx_log
+  if (!"qc_warning" %in% names(check_npx_log$col_names)) {
+    cli::cli_alert_warning(c(
+      "No column name found for {.var qc_warning} in
+      {.code check_npx_log$col_names}.",
+      "i" = "Returning data unchanged."
+    ))
+    return(
+      df |>
+        convert_read_npx_output(out_df = out_df)
+    )
+  }
+
+  # Extract column name for QC warning
+  col_sample_qc <- check_npx_log$col_names$qc_warning
+
+  # Identify rows where QC warning contains "fail" (case-insensitive)
+  rows_to_remove <- stringr::str_detect(df[[col_sample_qc]], "(?i)fail")
+  n_controls <- sum(rows_to_remove, na.rm = TRUE)
+
+  # Inform user about rows being removed
+  cli::cli_inform(c(
+    "Removing {n_controls} row{?s} of sample{?s} failed QC."
+  ))
+
+  # Filter out failed samples and return cleaned data
+  df_cleaned <- df[!rows_to_remove, ] |> dplyr::collect()
+
+  return(
+    df_cleaned |>
+      convert_read_npx_output(out_df = out_df)
+  )
+}
+
+
+#' Remove Control Samples Based on Sample ID Pattern
+#'
+#' @description
+#' This function removes rows from a data frame where the `sample_id` matches a
+#' regular expression pattern indicating control samples. This is useful for filtering
+#' out technical controls or reference samples based on their identifiers.
+#'
+#' @author
+#' Kang Dong
+#'
+#' @param df A data frame loaded using `read_npx()`, including a sample ID column.
+#' @param check_npx_log A list generated by `check_npx()` that includes:
+#'   - `col_names$sample_id`: the column name in `df` identifying sample IDs.
+#' @param control_sample_id_regex A character vector of regex strings
+#' (case-insensitive) used to match control sample IDs. Default: `"control"`.
+#' @param out_df Output format of the returned data frame.
+#'   Options: `"tibble"` or `"arrow"`. Default is `"tibble"`.
+#'
+#' @returns A filtered data frame with control sample IDs removed.
+#' @export
+#'
+#' @examples
+#' # Assuming df has a "SampleID" column, and control samples contain "Control"
+#' clean_df <- clean_control_sample_id(df, check_npx_log, control_sample_id_regex = c("control"))
+clean_control_sample_id <- function(df,
+                                    check_npx_log,
+                                    control_sample_id = c("control"),
+                                    out_df = "tibble") {
+
+  # Check if sample_id column is defined
+  if (!"sample_id" %in% names(check_npx_log$col_names)) {
+    cli::cli_alert_warning(c(
+      "No column name found for {.var sample_id} in
+      {.code check_npx_log$col_names}.",
+      "i" = "Returning data unchanged."
+    ))
+    return(
+      df |>
+        convert_read_npx_output(out_df = out_df)
+    )
+  }
+
+  # Extract sample_id column name
+  col_sample_id <- check_npx_log$col_names$sample_id
+
+  # Combine all regex patterns into one case-insensitive expression
+  ctrl_pattern <- paste0("(?i)", paste(control_sample_id, collapse = "|"))
+
+  # Identify rows to remove
+  rows_to_remove <- stringr::str_detect(df[[col_sample_id]], ctrl_pattern)
+  n_controls <- sum(rows_to_remove, na.rm = TRUE)
+
+  # Inform user of removed rows
+  cli::cli_inform(c(
+    "Removing {n_controls} row{?s} of control sample{?s} based on sample ID pattern.",
+    "i" = "Matching pattern: {paste(control_sample_id, collapse = ', ')}"
+  ))
+
+  # Filter and return the cleaned data
+  df_cleaned <- df[!rows_to_remove, ] |> dplyr::collect()
+
   return(
     df_cleaned |>
       convert_read_npx_output(out_df = out_df)
