@@ -29,12 +29,6 @@ identifier (e.g.,\code{OlinkID}) matches those listed in \code{check_npx_log$ass
 which contains assays composed entirely of NA values. It uses CLI messaging
 to report which assays were removed.
 }
-\examples{
-# Assuming df is a valid NPX-like data frame with an "OlinkID" column,
-# and check_npx_log is a list with assay_na and col_names$olink_id
-clean_df <- clean_assay_na(df, check_npx_log)
-
-}
 \author{
 Kang Dong
 }

@@ -34,9 +34,6 @@ This function filters out rows from an NPX data frame where the sample type
 column matches one of the defined control types using regular expressions
 (case-insensitive).
 }
-\examples{
-clean_df <- clean_sample_type(df, check_npx_log)
-}
 \author{
 Kang Dong
 }

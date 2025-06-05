@@ -35,11 +35,6 @@ matches any of the specified control assay types (e.g., \code{ext_ctrl},
 expressions via \code{stringr::str_detect()}. Informative CLI messages report the
 number and type of rows removed.
 }
-\examples{
-# Assuming `df` is a data frame with an "AssayType" column
-# and `check_npx_log` contains `col_names$assay_type = "AssayType"`:
-clean_df <- clean_assay_type(df, check_npx_log)
-}
 \author{
 Kang Dong
 }
