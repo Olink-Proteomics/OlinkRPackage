@@ -43,8 +43,32 @@
 #' depending on `out_df`.
 #'
 #' @examples
+#' df <- dplyr::tibble(
+#'   SampleID = c("A", "B", "C", "D", "E", "F", "F", "control_F"),
+#'   OlinkID = c("OID123456",
+#'               rep("OID12345", 3L),
+#'               rep("OID11111", 4L)),
+#'   NPX = c(1, NA, NA, NA, 5, 6, 7, 8),
+#'   PlateID = rep("plate1", 8L),
+#'   SampleType = c(
+#'     rep("SAMPLE", 5L),
+#'     "SAMPLE_CONTROL",
+#'     "PLATE_CONTROL",
+#'     "NEGATIVE_CONTROL"
+#'   ),
+#'   AssayType = c(
+#'     rep("assay", 3L),
+#'     rep("ext_ctrl", 5L)
+#'   ),
+#'   QC_Warning = c(
+#'     rep("FAIL", 3L),
+#'     rep("PASS", 5L)
+#'   )
+#' )
 #'
-#' @export
+#' log <- check_npx(df)
+#' outcome <- clean_npx(df, check_npx_log = log)
+#'
 
 clean_npx <- function(df,
                       check_npx_log,
@@ -154,12 +178,21 @@ clean_npx <- function(df,
 #'
 #' @return A filtered data frame with rows corresponding to NA-only
 #' assays removed.
-#' @export
 #'
 #' @examples
-#' # Assuming df is a valid NPX-like data frame with an "OlinkID" column,
-#' # and check_npx_log is a list with assay_na and col_names$olink_id
-#' clean_df <- clean_assay_na(df, check_npx_log)
+# df <- dplyr::tibble(
+#   SampleID = c("A", "B", "C", "D"),
+#   OlinkID = rep("OID12345", 4L),
+#   SampleType = rep("SAMPLE", 4L),
+#   NPX = NA,
+#   PlateID = rep("plate1", 4L),
+#   QC_Warning = rep("Pass", 4L),
+#   LOD = rnorm(4L)
+# )
+#
+# log <- suppressWarnings(check_npx(df))
+# out <- clean_assay_na(df, check_npx_log = log)
+#'
 #'
 clean_assay_na <- function(df,
                            check_npx_log,
@@ -167,8 +200,9 @@ clean_assay_na <- function(df,
 
   # If there are no assays with all NA values, skip filtering
   if (length(check_npx_log$assay_na) == 0) {
-    cli::cli_alert_info("No assays with only NA values found.
-                        Returning original data frame.")
+    cli::cli_alert_info(
+    "No assays with only NA values found. Returning original data frame."
+    )
     return(
       df |>
         convert_read_npx_output(out_df = out_df)
@@ -222,12 +256,21 @@ clean_assay_na <- function(df,
 #' Options: `"tibble"` (default) or `"arrow"`.
 #'
 #' @return A filtered data frame with invalid OlinkIDs removed.
-#' @export
 #'
 #' @examples
-#' # df <- read_npx("your_data.parquet")
-#' # log <- check_npx(df)
-#' # clean_df <- clean_invalid_oid(df, log)
+# df <- dplyr::tibble(
+#   SampleID = c("A", "B", "C", "D"),
+#   OlinkID = c(rep("OID12345", 2L), rep("OID123456", 2L)),
+#   SampleType = rep("SAMPLE", 4L),
+#   NPX = c(rep(1.0, 2L), rep(2.0, 2L)),
+#   PlateID = rep("plate1", 4L),
+#   QC_Warning = rep("Pass", 4L),
+#   LOD = rep(1.0, 4L)
+# )
+#
+# log <- suppressWarnings(check_npx(df))
+# out <- clean_assay_na(df, check_npx_log = log)
+#'
 #'
 clean_invalid_oid <- function(df,
                               check_npx_log,
@@ -293,12 +336,20 @@ clean_invalid_oid <- function(df,
 #' Options: `"tibble"` (default) or `"arrow"`.
 #'
 #' @return A filtered data frame with duplicated SampleIDs removed.
-#' @export
 #'
 #' @examples
-#' # df <- read_npx("example.parquet")
-#' # log <- check_npx(df)
-#' # clean_df <- clean_duplicate_sample_id(df, log)
+#' df <- dplyr::tibble(
+#' SampleID = c("A", "B", "C", "C"),
+#' OlinkID = c(rep("OID12345", 2L), rep("OID12345", 2L)),
+#' SampleType = rep("SAMPLE", 4L),
+#' NPX = c(rep(1.0, 2L), rep(2.0, 2L)),
+#' PlateID = rep("plate1", 4L),
+#' QC_Warning = rep("Pass", 4L),
+#'  LOD = rep(1.0, 4L)
+#'  )
+#'  log <- check_npx(df)
+#'  clean_df <- clean_duplicate_sample_id(df, log)
+
 clean_duplicate_sample_id <- function(df,
                                       check_npx_log,
                                       out_df = "tibble") {
@@ -362,10 +413,7 @@ clean_duplicate_sample_id <- function(df,
 #' @param out_df Output format: either "tibble" (default) or "arrow".
 #'
 #' @return A cleaned data frame with control sample removed.
-#' @export
-#'
-#' @examples
-#' clean_df <- clean_sample_type(df, check_npx_log)
+
 clean_sample_type <- function(df,
                               check_npx_log,
                               control_sample_types = c("SAMPLE_CONTROL",
@@ -435,12 +483,7 @@ clean_sample_type <- function(df,
 #' `"arrow"`. Default: `"tibble"`.
 #'
 #' @return A filtered data frame with internal control assay rows removed.
-#' @export
-#'
-#' @examples
-#' # Assuming `df` is a data frame with an "AssayType" column
-#' # and `check_npx_log` contains `col_names$assay_type = "AssayType"`:
-#' clean_df <- clean_assay_type(df, check_npx_log)
+
 clean_assay_type <- function(df,
                              check_npx_log,
                              control_assay_types = c("ext_ctrl",
@@ -510,12 +553,8 @@ clean_assay_type <- function(df,
 #'   Options are `"tibble"` or `"arrow"`. Default is `"tibble"`.
 #'
 #' @returns A filtered data frame with samples that failed QC removed.
-#' @export
 #'
-#' @examples
-#' # Assuming df is a data frame with a QC warning column
-#' # and check_npx_log contains col_names$qc_warning = "QCWarning"
-#' clean_df <- clean_sample_qc(df, check_npx_log)
+
 clean_sample_qc <- function(df,
                             check_npx_log,
                             out_df = "tibble") {
@@ -574,11 +613,8 @@ clean_sample_qc <- function(df,
 #'   Options: `"tibble"` or `"arrow"`. Default is `"tibble"`.
 #'
 #' @returns A filtered data frame with control sample IDs removed.
-#' @export
 #'
-#' @examples
-#' # Assuming df has a "SampleID" column, and control samples contain "Control"
-#' clean_df <- clean_control_sample_id(df, check_npx_log, control_sample_id = c("control"))
+
 clean_control_sample_id <- function(df,
                                     check_npx_log,
                                     control_sample_id = c("control"),

@@ -1,88 +1,429 @@
-test_that("multiplication works", {
-  expect_equal(2 * 2, 4)
-})
+library(testthat)
+
+# Test clean_assay_na -----------------------------------------------------
+
+test_that(
+  "clean_assay_na - message - no assays with only NA values",
+  {
+    df <- dplyr::tibble(
+      SampleID = c("A", "B", "C", "D"),
+      OlinkID = rep("OID12345", 4L),
+      SampleType = rep("SAMPLE", 4L),
+      NPX = rnorm(4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L),
+      LOD = rnorm(4L)
+    )
+
+    log <- suppressWarnings(check_npx(df))
+
+    expect_message(
+      object = clean_assay_na(df,
+                              check_npx_log = log),
+      regexp = "No assays with only NA values found. Returning original data frame."
+    )
+  }
+)
 
 
-#`clean_failed_assay
-test <- clean_failed_assay(npx_data1)
-setdiff(test, npx_data1)
+test_that(
+  "clean_assay_na - works - assays with only NA values",
+  {
+    df <- dplyr::tibble(
+      SampleID = c("A", "B", "C", "D"),
+      OlinkID = c(rep("OID11111", 2L), rep("OID22222", 2L)),
+      SampleType = rep("SAMPLE", 4L),
+      NPX = c(rep(1.0, 2L), rep(NA, 2L)),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L),
+      LOD = rep(1.0, 4L)
+    )
 
-test_df <- npx_data1 |>
-  mutate(Normalization = if_else(Assay == "IL8", "PC", "EXCLUDED"))
-test <- clean_failed_assay(test_df)
+    expected_result <- dplyr::tibble(
+      SampleID = c("A", "B"),
+      OlinkID = rep("OID11111", 2L),
+      SampleType = rep("SAMPLE", 2L),
+      NPX = rep(1.0, 2L),
+      PlateID = rep("plate1", 2L),
+      QC_Warning = rep("Pass", 2L),
+      LOD = rep(1.0, 2L)
+    )
 
-# npx_file <- system.file("extdata",
-#                         "npx_data_ext.parquet",
-#                         package = "OlinkAnalyze")
-# npx_df <- OlinkAnalyze::read_npx(filename = npx_file)
+    log <- suppressWarnings(check_npx(df))
 
+    expect_equal(
+      object = clean_assay_na(df,
+                              check_npx_log = log),
+      expected = expected_result
+    )
 
-test <- npx |> dplyr::rename(olink_id_test = OlinkID)
-check_npx(test)
-
-
-
-# test data
-# dir <- "~/shared/olink/Data_Science/Support Projects/PC ratio check/Regeneron/NPX data"
-# file_name <- "RGC_Ultima_Dat_Extended_NPX_2025-04-02.parquet"
-
-dir <- "C:/Users/kang.dong/OneDrive - Olink Proteomics AB/Desktop/BIDMC"
-file_name <- "BIDMC-JHS-plates31-40_Extended_NPX_2025-04-16_intensity norm.parquet"
-
-
-# load data
-npx <- read_npx(file.path(dir, file_name),
-                out_df = "arrow")
-
-
-# create invalid olink_id
-npx <- npx |>
-  dplyr::collect() |>
-  dplyr::mutate(OlinkID = dplyr::recode(OlinkID,
-                                        "OID40783" = "ABC123",
-                                        "OID40784" = "ABC1234",
-                                        "OID40785" = "ABC12345",
-                                        "OID40786" = "ABC123456"))
-
-npx <- npx |>
-  dplyr::collect() |>
-  dplyr::mutate(SampleID = dplyr::if_else(stringr::str_detect(SampleID, "NC"), "NC", SampleID))
-
-# check NPX
-checked_npx_log <- check_npx(npx)
-
-# df <- npx
-# check_npx_log <- checked_npx
-#
+  }
+)
 
 
-# clean NPX
-cleaned_npx <- clean_assay_na(npx, checked_npx_log)
-cleaned_npx <- clean_invalid_oid(npx, checked_npx_log)
-cleaned_npx <- clean_duplicate_sample_id(npx, checked_npx_log)
-cleaned_npx <- clean_sample_type(npx, checked_npx_log)
-cleaned_npx <- clean_assay_type(npx, checked_npx_log)
-cleaned_npx <- clean_sample_qc(npx, checked_npx_log)
 
-qc <- clean_npx(df = npx, check_npx_log = checked_npx_log)
+# clean_invalid_olid ------------------------------------------------------
 
-qc <- clean_npx(df = npx_data1, check_npx_log = check_npx(npx_data1))
-log <- check_npx(npx_data2)
-qc <- clean_npx(df = npx_data2, check_npx_log = log)
+test_that(
+  "clean_invalid_oid - message - no invalid OlinkId",
+  {
+    df <- dplyr::tibble(
+      SampleID = c("A", "B", "C", "D"),
+      OlinkID = rep("OID12345", 4L),
+      SampleType = rep("SAMPLE", 4L),
+      NPX = rnorm(4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L),
+      LOD = rnorm(4L)
+    )
 
-# qc <- clean_control_sample_id(npx_data1, check_npx(npx_data1))
+    log <- suppressWarnings(check_npx(df))
 
-# cleaned_npx <- clean_excluded_assay(npx)
-# cleaned_npx <- clean_sample_type_controls(npx, checked_npx)
-# cleaned_npx <- clean_sample_id_controls(npx, checked_npx)
-# cleaned_npx <- clean_qc_warning(npx, checked_npx)
-#
-#
-# checked_npx <- check_npx(npx_data1)
-# cleaned_npx <- clean_excluded_assay(npx_data1)
-#
-#
-# cleaned_npx <- clean_sample_type_controls(npx_data1, checked_npx)
-# cleaned_npx <- clean_sample_id_controls(npx_data1, checked_npx)
-#
-# cleaned_npx <- clean_npx(npx, checked_npx)
+    expect_message(
+      object = clean_invalid_oid(df,
+                                 check_npx_log = log),
+      regexp = "No invalid OlinkIDs found. Returning original data frame."
+    )
+  }
+)
+
+
+test_that(
+  "clean_invalid_oid - works - remove invalid OlinkId",
+  {
+    df <- dplyr::tibble(
+      SampleID = c("A", "B", "C", "D"),
+      OlinkID = c(rep("OID12345", 2L), rep("OID123456", 2L)),
+      SampleType = rep("SAMPLE", 4L),
+      NPX = c(rep(1.0, 2L), rep(2.0, 2L)),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L),
+      LOD = rep(1.0, 4L)
+    )
+
+    expected_result <- dplyr::tibble(
+      SampleID = c("A", "B"),
+      OlinkID = rep("OID12345", 2L),
+      SampleType = rep("SAMPLE", 2L),
+      NPX = rep(1.0, 2L),
+      PlateID = rep("plate1", 2L),
+      QC_Warning = rep("Pass", 2L),
+      LOD = rep(1.0, 2L)
+    )
+
+    log <- suppressWarnings(check_npx(df))
+
+    expect_equal(
+      object = clean_invalid_oid(df,
+                                 check_npx_log = log),
+      expected = expected_result
+    )
+
+  }
+)
+
+
+# clean_duplicate_sample_id -----------------------------------------------
+
+test_that(
+  "clean_duplicate_sample_id - message - no duplicate sample id",
+  {
+    df <- dplyr::tibble(
+      SampleID = c("A", "B", "C", "D"),
+      OlinkID = rep("OID12345", 4L),
+      SampleType = rep("SAMPLE", 4L),
+      NPX = rnorm(4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L),
+      LOD = rnorm(4L)
+    )
+
+    log <- suppressWarnings(check_npx(df))
+
+    expect_message(
+      object = clean_duplicate_sample_id(df,
+                                         check_npx_log = log),
+      regexp = "No duplicate SampleIDs found. Returning original data frame."
+    )
+  }
+)
+
+
+test_that(
+  "clean_duplicate_sample_id - works - remove duplicate sample id",
+  {
+    df <- dplyr::tibble(
+      SampleID = c("A", "B", "C", "C"),
+      OlinkID = c(rep("OID12345", 2L), rep("OID12345", 2L)),
+      SampleType = rep("SAMPLE", 4L),
+      NPX = c(rep(1.0, 2L), rep(2.0, 2L)),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L),
+      LOD = rep(1.0, 4L)
+    )
+
+    expected_result <- dplyr::tibble(
+      SampleID = c("A", "B"),
+      OlinkID = c(rep("OID12345", 2L)),
+      SampleType = rep("SAMPLE", 2L),
+      NPX = c(rep(1.0, 2L)),
+      PlateID = rep("plate1", 2L),
+      QC_Warning = rep("Pass", 2L),
+      LOD = rep(1.0, 2L)
+    )
+
+    log <- suppressWarnings(check_npx(df))
+
+    expect_equal(
+      object = clean_duplicate_sample_id(df,
+                                         check_npx_log = log),
+      expected = expected_result
+    )
+
+  }
+)
+
+
+# clean_sample_type -------------------------------------------------------
+
+test_that(
+  "clean_sample_type - message - sample type is not available",
+  {
+    df <- dplyr::tibble(
+      SampleID = c("A", "B", "C", "D"),
+      OlinkID = rep("OID12345", 4L),
+      NPX = rep(1, 4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L),
+      LOD = rep(1, 4L)
+    )
+
+    log <- suppressWarnings(check_npx(df))
+
+    expect_equal(
+      object = clean_sample_type(df,
+                                 check_npx_log = log),
+      expected = df
+    )
+  }
+)
+
+test_that(
+  "clean_sample_type - works - remove control sample based on sample type",
+  {
+    df <- dplyr::tibble(
+      SampleID = c("A", "B", "C", "D"),
+      OlinkID = rep("OID12345", 4L),
+      SampleType = c("SAMPLE",
+                     "SAMPLE_CONTROL",
+                     "PLATE_CONTROL",
+                     "NEGATIVE_CONTROL"),
+      NPX = rep(1, 4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L),
+      LOD = rep(1, 4L)
+    )
+
+    expected_result <- dplyr::tibble(
+      SampleID = c("A"),
+      OlinkID = rep("OID12345", 1L),
+      SampleType = c("SAMPLE"),
+      NPX = rep(1, 1L),
+      PlateID = rep("plate1", 1L),
+      QC_Warning = rep("Pass", 1L),
+      LOD = rep(1, 1L)
+
+    )
+
+    log <- suppressWarnings(check_npx(df))
+
+    expect_equal(
+      object = clean_sample_type(df,
+                                 check_npx_log = log),
+      expected = expected_result
+    )
+  }
+)
+
+
+# clean_assay_type --------------------------------------------------------
+
+test_that(
+  "clean_assay_type - message - assay type is not available",
+  {
+    df <- dplyr::tibble(
+      SampleID = c("A", "B", "C", "D"),
+      OlinkID = rep("OID12345", 4L),
+      NPX = rep(1, 4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L),
+      LOD = rep(1, 4L)
+    )
+
+    log <- suppressWarnings(check_npx(df))
+
+    expect_equal(
+      object = clean_assay_type(df,
+                                check_npx_log = log),
+      expected = df
+    )
+  }
+)
+
+
+test_that(
+  "clean_assay_type - works - remove control assays",
+  {
+    df <- dplyr::tibble(
+      SampleID = c("A", "B", "C", "D"),
+      OlinkID = rep("OID12345", 4L),
+      NPX = rep(1, 4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L),
+      LOD = rep(1, 4L),
+      AssayType = c("assay",
+                    "ext_ctrl",
+                    "inc_ctrl",
+                    "amp_ctrl")
+    )
+
+    expected_result <- dplyr::tibble(
+      SampleID = c("A"),
+      OlinkID = rep("OID12345", 1L),
+      NPX = rep(1, 1L),
+      PlateID = rep("plate1", 1L),
+      QC_Warning = rep("Pass", 1L),
+      LOD = rep(1, 1L),
+      AssayType = c("assay")
+    )
+
+    log <- suppressWarnings(check_npx(df))
+
+    expect_equal(
+      object = clean_assay_type(df,
+                                check_npx_log = log),
+      expected = expected_result
+    )
+  }
+)
+
+
+# clean_sample_qc ---------------------------------------------------------
+
+test_that(
+  "clean_sample_qc - works - sample QC failed",
+  {
+    df <- dplyr::tibble(
+      SampleID = c("A", "B", "C", "D"),
+      OlinkID = rep("OID12345", 4L),
+      NPX = rep(1, 4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = c(rep("Pass", 3L), "FAIL"),
+      LOD = rep(1, 4L)
+    )
+
+    expected_result <- dplyr::tibble(
+      SampleID = c("A", "B", "C"),
+      OlinkID = rep("OID12345", 3L),
+      NPX = rep(1, 3L),
+      PlateID = rep("plate1", 3L),
+      QC_Warning = c(rep("Pass", 3L)),
+      LOD = rep(1, 3L)
+    )
+
+    log <- suppressWarnings(check_npx(df))
+
+    expect_equal(
+      object = clean_sample_qc(df,
+                               check_npx_log = log),
+      expected = expected_result
+    )
+  }
+)
+
+
+# clean_control_sample_id -------------------------------------------------
+
+test_that(
+  "clean_control_sample_id - works - remove control sample",
+  {
+    df <- dplyr::tibble(
+      SampleID = c("A", "B", "C", "control_D"),
+      OlinkID = rep("OID12345", 4L),
+      NPX = rep(1, 4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L),
+      LOD = rep(1, 4L)
+    )
+
+    expected_result <- dplyr::tibble(
+      SampleID = c("A", "B", "C"),
+      OlinkID = rep("OID12345", 3L),
+      NPX = rep(1, 3L),
+      PlateID = rep("plate1", 3L),
+      QC_Warning = c(rep("Pass", 3L)),
+      LOD = rep(1, 3L)
+    )
+
+    log <- suppressWarnings(check_npx(df))
+
+    expect_equal(
+      object = clean_control_sample_id(df,
+                                       check_npx_log = log),
+      expected = expected_result
+    )
+  }
+)
+
+
+# clean_npx ---------------------------------------------------------------
+
+test_that(
+  "clean_npx - works - remove samples/assays identified by check_npx",
+  {
+
+    df <- dplyr::tibble(
+      SampleID = c("A", "B", "C", "D", "E", "F", "F", "control_F"),
+      OlinkID = c("OID123456",
+                  rep("OID12345", 3L),
+                  rep("OID11111", 4L)),
+      NPX = c(1, NA, NA, NA, 5, 6, 7, 8),
+      PlateID = rep("plate1", 8L),
+      SampleType = c(
+        rep("SAMPLE", 5L),
+        "SAMPLE_CONTROL",
+        "PLATE_CONTROL",
+        "NEGATIVE_CONTROL"
+      ),
+      AssayType = c(
+        rep("assay", 3L),
+        rep("ext_ctrl", 5L)
+      ),
+      QC_Warning = c(
+        rep("FAIL", 3L),
+        rep("PASS", 5L)
+      )
+    )
+
+    expected_result <- dplyr::tibble(
+      SampleID = character(),
+      OlinkID = character(),
+      NPX = numeric(),
+      PlateID = character(),
+      SampleType = character(),
+      AssayType = character(),
+      QC_Warning = character()
+    )
+
+    log <- suppressWarnings(check_npx(df))
+
+    expect_equal(
+      object = clean_npx(df, check_npx_log = log),
+      expected = expected_result
+    )
+
+
+  }
+)
+
+
