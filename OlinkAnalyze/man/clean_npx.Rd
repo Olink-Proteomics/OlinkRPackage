@@ -95,12 +95,7 @@ outcome <- OlinkAnalyze:clean_npx(df,
 # Example 2. Test default setting of clean_npx()
 npx_df <- OlinkAnalyze::npx_data1
 log <- OlinkAnalyze::check_npx(npx_df)
-<<<<<<< HEAD
 clean_df <- OlinkAnalyze::clean_npx(npx_df, log)}
-=======
-clean_df <- OlinkAnalyze::clean_npx(npx_df, log)
-}
->>>>>>> fcf503f04fb1bcfe2193213282633dcc54bdd129
 }
 \author{
 Kang Dong
