@@ -439,7 +439,7 @@ clean_duplicate_sample_id <- function(df,
 #' @examples
 #' \dontrun {
 #' # Example 1: Run clean_sample_type() with default setting to remove
-#' control samples
+#' # control samples
 #' df <- dplyr::tibble(
 #'   SampleID = c("A", "B", "C", "D"),
 #'   OlinkID = rep("OID12345", 4L),
@@ -456,7 +456,7 @@ clean_duplicate_sample_id <- function(df,
 #' clean_df <- OlinkAnalyze::clean_sample_type(df, log)
 #'
 #' # Example 2: Run control_sample_types = NULL to keep control samples, and
-#' return the unchanged data
+#' # return the unchanged data
 #' clean_df <- OlinkAnalyze::clean_sample_type(df, log, control_sample_types = NULL)
 #' }
 
@@ -731,7 +731,7 @@ clean_sample_qc <- function(df,
 #'                                              control_sample_id = "control")
 #'
 #' # Example 2: check default setting of clean_control_sample_id(). Return data
-#' unchanged.
+#' # unchanged.
 #' out <- OlinkAnalyze::clean_control_sample_id(npx_data1,
 #'                                              check_npx_log = log,
 #'                                              control_sample_id = NULL)
