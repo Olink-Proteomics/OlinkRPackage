@@ -29,6 +29,14 @@ Options: \code{"tibble"} or \code{"arrow"}. Default is \code{"tibble"}.}
 }
 \value{
 A filtered data frame with control sample IDs removed.
+}
+\description{
+This function removes rows from a NPX data where the \code{sample_id} matches a
+regular expression pattern indicating customer control samples. This is useful
+for filtering out technical controls or customer control samples based on their
+SampleID.
+}
+\examples{
 \dontrun{
 # Example 1: use npx_data1 to check that clean_control_sample_id() works
 log <- OlinkAnalyze::npx_data1 |>
@@ -43,14 +51,7 @@ out <- OlinkAnalyze::clean_control_sample_id(npx_data1,
 # unchanged.
 out <- OlinkAnalyze::clean_control_sample_id(npx_data1,
                                              check_npx_log = log,
-                                             control_sample_id = NULL)
-}
-}
-\description{
-This function removes rows from a NPX data where the \code{sample_id} matches a
-regular expression pattern indicating customer control samples. This is useful
-for filtering out technical controls or customer control samples based on their
-SampleID.
+                                             control_sample_id = NULL)}
 }
 \author{
 Kang Dong

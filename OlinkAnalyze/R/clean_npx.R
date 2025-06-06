@@ -47,7 +47,7 @@
 #' depending on `out_df`.
 #'
 #' @examples
-#' \dontrun {
+#' \dontrun{
 #' # Example 1. Run clean_npx() to check multiple errors
 #' df <- dplyr::tibble(
 #'   SampleID = c("A", "B", "C", "D", "E", "F", "F", "control_F"),
@@ -80,8 +80,7 @@
 #' # Example 2. Test default setting of clean_npx()
 #' npx_df <- OlinkAnalyze::npx_data1
 #' log <- OlinkAnalyze::check_npx(npx_df)
-#' clean_df <- OlinkAnalyze::clean_npx(npx_df, log)
-#' }
+#' clean_df <- OlinkAnalyze::clean_npx(npx_df, log)}
 
 clean_npx <- function(df,
                       check_npx_log,
@@ -206,8 +205,7 @@ clean_npx <- function(df,
 #' )
 #'
 #' log <- OlinkAnalyze::check_npx(df)
-#' out <- OlinkAnalyze::clean_assay_na(df, check_npx_log = log)
-#' }
+#' out <- OlinkAnalyze::clean_assay_na(df, check_npx_log = log)}
 
 clean_assay_na <- function(df,
                            check_npx_log,
@@ -286,8 +284,7 @@ clean_assay_na <- function(df,
 #' )
 #'
 #' log <- suppressWarnings(OlinkAnalyze::check_npx(df))
-#' out <- OlinkAnalyze::clean_invalid_oid(df, check_npx_log = log)
-#' }
+#' out <- OlinkAnalyze::clean_invalid_oid(df, check_npx_log = log)}
 
 clean_invalid_oid <- function(df,
                               check_npx_log,
@@ -355,7 +352,7 @@ clean_invalid_oid <- function(df,
 #' @return A filtered tibble or arrow object with duplicated SampleIDs removed.
 #'
 #' @examples
-#' \dontrun {
+#' \dontrun{
 #' # Example 1: Exclude 1 sample with duplicate SampleID
 #' df <- dplyr::tibble(
 #'   SampleID = c("A", "B", "C", "C"),
@@ -367,8 +364,7 @@ clean_invalid_oid <- function(df,
 #'   LOD = rep(1.0, 4L)
 #' )
 #' log <- OlinkAnalyze::check_npx(df)
-#' clean_df <- OlinkAnalyze::clean_duplicate_sample_id(df, log)
-#' }
+#' clean_df <- OlinkAnalyze::clean_duplicate_sample_id(df, log)}
 
 clean_duplicate_sample_id <- function(df,
                                       check_npx_log,
@@ -434,9 +430,8 @@ clean_duplicate_sample_id <- function(df,
 #'
 #' @return A cleaned tibble or arrow object with control sample removed.
 #' @examples
-#' \dontrun {
-#' # Example 1: Run clean_sample_type() with default setting to remove
-#' # control samples
+#' \dontrun{
+#' # Example 1: Run clean_sample_type() with default setting to remove control samples
 #' df <- dplyr::tibble(
 #'   SampleID = c("A", "B", "C", "D"),
 #'   OlinkID = rep("OID12345", 4L),
@@ -452,10 +447,8 @@ clean_duplicate_sample_id <- function(df,
 #' log <- OlinkAnalyze::check_npx(df)
 #' clean_df <- OlinkAnalyze::clean_sample_type(df, log)
 #'
-#' # Example 2: Run control_sample_types = NULL to keep control samples, and
-#' # return the unchanged data
-#' clean_df <- OlinkAnalyze::clean_sample_type(df, log, control_sample_types = NULL)
-#' }
+#' # Example 2: Run control_sample_types = NULL to keep control samples, and return the unchanged data
+#' clean_df <- OlinkAnalyze::clean_sample_type(df, log, control_sample_types = NULL)}
 
 clean_sample_type <- function(df,
                               check_npx_log,
@@ -533,11 +526,10 @@ clean_sample_type <- function(df,
 #' @param out_df The class of output data frame. Options are `"tibble"` or
 #' `"arrow"`. Default: `"tibble"`.
 #'
-#' @return A filtered tibble or arrow object with internal control assay
-#' rows removed.
+#' @return A filtered tibble or arrow object with internal control assay rows removed.
 #'
-#' #' @examples
-#' \dontrun {
+#' @examples
+#' \dontrun{
 #'
 #' df <- dplyr::tibble(
 #'   SampleID = c("A", "B", "C", "D"),
@@ -554,8 +546,7 @@ clean_sample_type <- function(df,
 #'
 #' log <- OlinkAnalyze::check_npx(df)
 #'
-#' # Example 1: Run clean_assay_type() as default. Internal control assay
-#' are removed
+#' # Example 1: Run clean_assay_type() as default. Internal control assay are removed
 #' clean_df <- OlinkAnalyze::clean_assay_type(df, log)
 #'
 #' # Example 2: Set control_assay_types = NULL. Return unchanged data
@@ -639,8 +630,8 @@ clean_assay_type <- function(df,
 #'
 #' @returns A filtered tibble or arrow object with samples that failed QC removed.
 #'
-#' @example
-#' \dontrun {
+#' @examples
+#' \dontrun{
 #' # Example 1: Remove 1 sample that failed sample QC
 #'
 #' df <- dplyr::tibble(
@@ -653,8 +644,7 @@ clean_assay_type <- function(df,
 #' )
 #'
 #' log <- OlinkAnalyze::check_npx(df)
-#' clean_df <- OlinkAnalyze::clean_sample_qc(df, log)
-#' }
+#' clean_df <- OlinkAnalyze::clean_sample_qc(df, log)}
 
 clean_sample_qc <- function(df,
                             check_npx_log,
@@ -717,6 +707,8 @@ clean_sample_qc <- function(df,
 #'   Options: `"tibble"` or `"arrow"`. Default is `"tibble"`.
 #'
 #' @returns A filtered data frame with control sample IDs removed.
+#'
+#' @examples
 #' \dontrun{
 #' # Example 1: use npx_data1 to check that clean_control_sample_id() works
 #' log <- OlinkAnalyze::npx_data1 |>
@@ -731,8 +723,7 @@ clean_sample_qc <- function(df,
 #' # unchanged.
 #' out <- OlinkAnalyze::clean_control_sample_id(npx_data1,
 #'                                              check_npx_log = log,
-#'                                              control_sample_id = NULL)
-#' }
+#'                                              control_sample_id = NULL)}
 
 clean_control_sample_id <- function(df,
                                     check_npx_log,

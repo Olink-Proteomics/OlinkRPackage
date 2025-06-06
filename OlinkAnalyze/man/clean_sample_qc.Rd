@@ -28,6 +28,22 @@ samples that failed quality control checks. The function uses
 \code{stringr::str_detect()} for pattern matching and returns the cleaned data in
 the desired output format (\code{"tibble"} or \code{"arrow"}).
 }
+\examples{
+\dontrun{
+# Example 1: Remove 1 sample that failed sample QC
+
+df <- dplyr::tibble(
+  SampleID = c("A", "B", "C", "D"),
+  OlinkID = rep("OID12345", 4L),
+  NPX = rep(1, 4L),
+  PlateID = rep("plate1", 4L),
+  QC_Warning = c(rep("Pass", 3L), "FAIL"),
+  LOD = rep(1, 4L)
+)
+
+log <- OlinkAnalyze::check_npx(df)
+clean_df <- OlinkAnalyze::clean_sample_qc(df, log)}
+}
 \author{
 Kang Dong
 }

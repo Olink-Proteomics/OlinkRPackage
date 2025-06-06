@@ -35,9 +35,8 @@ column matches one of the defined control types using regular expressions
 (case-insensitive).
 }
 \examples{
-\dontrun {
-# Example 1: Run clean_sample_type() with default setting to remove
-# control samples
+\dontrun{
+# Example 1: Run clean_sample_type() with default setting to remove control samples
 df <- dplyr::tibble(
   SampleID = c("A", "B", "C", "D"),
   OlinkID = rep("OID12345", 4L),
@@ -53,10 +52,8 @@ df <- dplyr::tibble(
 log <- OlinkAnalyze::check_npx(df)
 clean_df <- OlinkAnalyze::clean_sample_type(df, log)
 
-# Example 2: Run control_sample_types = NULL to keep control samples, and
-# return the unchanged data
-clean_df <- OlinkAnalyze::clean_sample_type(df, log, control_sample_types = NULL)
-}
+# Example 2: Run control_sample_types = NULL to keep control samples, and return the unchanged data
+clean_df <- OlinkAnalyze::clean_sample_type(df, log, control_sample_types = NULL)}
 }
 \author{
 Kang Dong

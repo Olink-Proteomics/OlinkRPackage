@@ -43,8 +43,7 @@ df <- dplyr::tibble(
 )
 
 log <- OlinkAnalyze::check_npx(df)
-out <- OlinkAnalyze::clean_assay_na(df, check_npx_log = log)
-}
+out <- OlinkAnalyze::clean_assay_na(df, check_npx_log = log)}
 }
 \author{
 Kang Dong

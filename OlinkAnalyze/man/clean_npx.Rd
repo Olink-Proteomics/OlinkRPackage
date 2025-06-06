@@ -62,7 +62,7 @@ user-defined regular expression (e.g., containing "control") are excluded.
 }
 }
 \examples{
-\dontrun {
+\dontrun{
 # Example 1. Run clean_npx() to check multiple errors
 df <- dplyr::tibble(
   SampleID = c("A", "B", "C", "D", "E", "F", "F", "control_F"),
@@ -95,11 +95,7 @@ outcome <- OlinkAnalyze:clean_npx(df,
 # Example 2. Test default setting of clean_npx()
 npx_df <- OlinkAnalyze::npx_data1
 log <- OlinkAnalyze::check_npx(npx_df)
-clean_df <- OlinkAnalyze::clean_npx(npx_df, log)
-
-# re-check the clean_df
-recheck_log <- OlinkAnalyze::check_npx(clean_df)
-}
+clean_df <- OlinkAnalyze::clean_npx(npx_df, log)}
 }
 \author{
 Kang Dong

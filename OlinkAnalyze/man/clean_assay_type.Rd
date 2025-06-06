@@ -28,32 +28,7 @@ types to remove. Default is \code{c("ext_ctrl", "inc_ctrl", "amp_ctrl")}.}
 \code{"arrow"}. Default: \code{"tibble"}.}
 }
 \value{
-A filtered tibble or arrow object with internal control assay
-rows removed.
-
-#' @examples
-\dontrun {
-
-df <- dplyr::tibble(
-SampleID = c("A", "B", "C", "D"),
-OlinkID = rep("OID12345", 4L),
-NPX = rep(1, 4L),
-PlateID = rep("plate1", 4L),
-QC_Warning = rep("Pass", 4L),
-LOD = rep(1, 4L),
-AssayType = c("assay",
-"ext_ctrl",
-"inc_ctrl",
-"amp_ctrl")
-)
-
-log <- OlinkAnalyze::check_npx(df)Example 1: Run clean_assay_type() as default. Internal control assay
-
-are removed
-clean_df <- OlinkAnalyze::clean_assay_type(df, log)Example 2: Set control_assay_types = NULL. Return unchanged data
-
-clean_df <- OlinkAnalyze::clean_assay_type(df, log, control_assay_types = NULL)
-}
+A filtered tibble or arrow object with internal control assay rows removed.
 }
 \description{
 This function filters out rows from an NPX data where the assay type
@@ -61,6 +36,31 @@ matches any of the specified control assay types (e.g., \code{ext_ctrl},
 \code{inc_ctrl}, \code{amp_ctrl}). Matching is case-insensitive and uses regular
 expressions via \code{stringr::str_detect()}. Informative CLI messages report the
 number and type of rows removed.
+}
+\examples{
+\dontrun{
+
+df <- dplyr::tibble(
+  SampleID = c("A", "B", "C", "D"),
+  OlinkID = rep("OID12345", 4L),
+  NPX = rep(1, 4L),
+  PlateID = rep("plate1", 4L),
+  QC_Warning = rep("Pass", 4L),
+  LOD = rep(1, 4L),
+  AssayType = c("assay",
+                "ext_ctrl",
+                "inc_ctrl",
+                "amp_ctrl")
+)
+
+log <- OlinkAnalyze::check_npx(df)
+
+# Example 1: Run clean_assay_type() as default. Internal control assay are removed
+clean_df <- OlinkAnalyze::clean_assay_type(df, log)
+
+# Example 2: Set control_assay_types = NULL. Return unchanged data
+clean_df <- OlinkAnalyze::clean_assay_type(df, log, control_assay_types = NULL)
+}
 }
 \author{
 Kang Dong
