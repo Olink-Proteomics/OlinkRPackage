@@ -81,9 +81,6 @@
 #' npx_df <- OlinkAnalyze::npx_data1
 #' log <- OlinkAnalyze::check_npx(npx_df)
 #' clean_df <- OlinkAnalyze::clean_npx(npx_df, log)
-#'
-#' # re-check the clean_df
-#' recheck_log <- OlinkAnalyze::check_npx(clean_df)
 #' }
 
 clean_npx <- function(df,
