@@ -27,11 +27,6 @@ samples that failed quality control checks. The function uses
 \code{stringr::str_detect()} for pattern matching and returns the cleaned data in
 the desired output format (\code{"tibble"} or \code{"arrow"}).
 }
-\examples{
-# Assuming df is a data frame with a QC warning column
-# and check_npx_log contains col_names$qc_warning = "QCWarning"
-clean_df <- clean_sample_qc(df, check_npx_log)
-}
 \author{
 Kang Dong
 }

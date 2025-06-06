@@ -33,10 +33,6 @@ This function removes rows from a data frame where the \code{sample_id} matches 
 regular expression pattern indicating control samples. This is useful for filtering
 out technical controls or reference samples based on their identifiers.
 }
-\examples{
-# Assuming df has a "SampleID" column, and control samples contain "Control"
-clean_df <- clean_control_sample_id(df, check_npx_log, control_sample_id = c("control"))
-}
 \author{
 Kang Dong
 }

@@ -59,3 +59,31 @@ user-defined regular expression (e.g., containing "control") are excluded.
 (e.g., \code{"ext_ctrl"}, \code{"inc_ctrl"}) are removed based on \code{AssayType}.
 }
 }
+\examples{
+df <- dplyr::tibble(
+  SampleID = c("A", "B", "C", "D", "E", "F", "F", "control_F"),
+  OlinkID = c("OID123456",
+              rep("OID12345", 3L),
+              rep("OID11111", 4L)),
+  NPX = c(1, NA, NA, NA, 5, 6, 7, 8),
+  PlateID = rep("plate1", 8L),
+  SampleType = c(
+    rep("SAMPLE", 5L),
+    "SAMPLE_CONTROL",
+    "PLATE_CONTROL",
+    "NEGATIVE_CONTROL"
+  ),
+  AssayType = c(
+    rep("assay", 3L),
+    rep("ext_ctrl", 5L)
+  ),
+  QC_Warning = c(
+    rep("FAIL", 3L),
+    rep("PASS", 5L)
+  )
+)
+
+log <- check_npx(df)
+outcome <- clean_npx(df, check_npx_log = log)
+
+}

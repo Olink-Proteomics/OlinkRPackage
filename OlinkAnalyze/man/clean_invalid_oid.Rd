@@ -28,12 +28,6 @@ column (e.g.,\code{OlinkID}) matches values listed in \code{check_npx_log$oid_in
 which identifies invalid or malformed assay identifiers. Uses CLI messages to
 inform users of what was excluded.
 }
-\examples{
-# df <- read_npx("your_data.parquet")
-# log <- check_npx(df)
-# clean_df <- clean_invalid_oid(df, log)
-
-}
 \author{
 Kang Dong
 }
