@@ -62,7 +62,7 @@ test_that(
 
 
 
-# clean_invalid_olid ------------------------------------------------------
+# clean_invalid_oid ------------------------------------------------------
 
 test_that(
   "clean_invalid_oid - message - no invalid OlinkId",
@@ -369,7 +369,8 @@ test_that(
 
     expect_equal(
       object = clean_control_sample_id(df,
-                                       check_npx_log = log),
+                                       check_npx_log = log,
+                                       control_sample_id = c("control")),
       expected = expected_result
     )
   }
@@ -418,7 +419,9 @@ test_that(
     log <- suppressWarnings(check_npx(df))
 
     expect_equal(
-      object = clean_npx(df, check_npx_log = log),
+      object = clean_npx(df,
+                         check_npx_log = log,
+                         control_sample_id_regex = c("control")),
       expected = expected_result
     )
 
