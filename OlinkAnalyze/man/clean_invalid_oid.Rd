@@ -7,7 +7,7 @@
 clean_invalid_oid(df, check_npx_log, out_df = "tibble")
 }
 \arguments{
-\item{df}{A data frame loaded from \code{read_npx()}, containing a column
+\item{df}{A \code{tibble} or \code{arrow} object loaded from \code{read_npx()}, containing a column
 specified by \code{check_npx_log$col_names$olink_id}.}
 
 \item{check_npx_log}{A list returned by \code{check_npx()}, containing:
@@ -20,13 +20,30 @@ specified by \code{check_npx_log$col_names$olink_id}.}
 Options: \code{"tibble"} (default) or \code{"arrow"}.}
 }
 \value{
-A filtered data frame with invalid OlinkIDs removed.
+A filtered \code{tibble} or \code{arrow} object with invalid OlinkIDs removed.
 }
 \description{
-This function filters out rows from a data frame where the assay identifier
+This function filters out rows from a NPX data where the assay identifier
 column (e.g.,\code{OlinkID}) matches values listed in \code{check_npx_log$oid_invalid},
 which identifies invalid or malformed assay identifiers. Uses CLI messages to
 inform users of what was excluded.
+}
+\examples{
+\dontrun{
+# Example 1: Exclude invalid OlinkID using clean_invalid_oid()
+df <- dplyr::tibble(
+  SampleID = c("A", "B", "C", "D"),
+  OlinkID = c(rep("OID12345", 2L), rep("OID123456", 2L)),
+  SampleType = rep("SAMPLE", 4L),
+  NPX = c(rep(1.0, 2L), rep(2.0, 2L)),
+  PlateID = rep("plate1", 4L),
+  QC_Warning = rep("Pass", 4L),
+  LOD = rep(1.0, 4L)
+)
+
+log <- suppressWarnings(OlinkAnalyze::check_npx(df))
+out <- OlinkAnalyze::clean_invalid_oid(df, check_npx_log = log)
+}
 }
 \author{
 Kang Dong

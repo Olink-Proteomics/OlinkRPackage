@@ -12,7 +12,7 @@ clean_sample_type(
 )
 }
 \arguments{
-\item{df}{A data frame loaded from \code{read_npx()}.}
+\item{df}{A \code{tibble} or \code{arrow} object loaded from \code{read_npx()}.}
 
 \item{check_npx_log}{A list returned from \code{check_npx()}, containing:
 \itemize{
@@ -21,18 +21,42 @@ sample type.
 }}
 
 \item{control_sample_types}{A character vector of control sample types to
-exclude. Regular expression matching is used.Default is c("SAMPLE_CONTROL",
+exclude. Regular expression matching is used. Default is c("SAMPLE_CONTROL",
 "PLATE_CONTROL", "NEGATIVE_CONTROL").}
 
 \item{out_df}{Output format: either "tibble" (default) or "arrow".}
 }
 \value{
-A cleaned data frame with control sample removed.
+A cleaned tibble or arrow object with control sample removed.
 }
 \description{
-This function filters out rows from an NPX data frame where the sample type
+This function filters out rows from an NPX data where the sample type
 column matches one of the defined control types using regular expressions
 (case-insensitive).
+}
+\examples{
+\dontrun {
+# Example 1: Run clean_sample_type() with default setting to remove
+control samples
+df <- dplyr::tibble(
+  SampleID = c("A", "B", "C", "D"),
+  OlinkID = rep("OID12345", 4L),
+  SampleType = c("SAMPLE",
+                 "SAMPLE_CONTROL",
+                 "PLATE_CONTROL",
+                 "NEGATIVE_CONTROL"),
+  NPX = rep(1, 4L),
+  PlateID = rep("plate1", 4L),
+  QC_Warning = rep("Pass", 4L),
+  LOD = rep(1, 4L)
+)
+log <- OlinkAnalyze::check_npx(df)
+clean_df <- OlinkAnalyze::clean_sample_type(df, log)
+
+# Example 2: Run control_sample_types = NULL to keep control samples, and
+return the unchanged data
+clean_df <- OlinkAnalyze::clean_sample_type(df, log, control_sample_types = NULL)
+}
 }
 \author{
 Kang Dong
