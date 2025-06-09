@@ -44,14 +44,17 @@ log <- OlinkAnalyze::npx_data1 |>
   suppressWarnings()
 
 out <- OlinkAnalyze::clean_control_sample_id(npx_data1,
-                                             check_npx_log = log,
-                                             control_sample_id = "control")
+  check_npx_log = log,
+  control_sample_id = "control"
+)
 
 # Example 2: check default setting of clean_control_sample_id(). Return data
 # unchanged.
 out <- OlinkAnalyze::clean_control_sample_id(npx_data1,
-                                             check_npx_log = log,
-                                             control_sample_id = NULL)}
+  check_npx_log = log,
+  control_sample_id = NULL
+)
+}
 }
 \author{
 Kang Dong

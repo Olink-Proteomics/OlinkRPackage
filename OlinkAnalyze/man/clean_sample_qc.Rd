@@ -43,7 +43,8 @@ df <- dplyr::tibble(
 )
 
 log <- OlinkAnalyze::check_npx(df)
-clean_df <- OlinkAnalyze::clean_sample_qc(df, log)}
+clean_df <- OlinkAnalyze::clean_sample_qc(df, log)
+}
 }
 \author{
 Kang Dong

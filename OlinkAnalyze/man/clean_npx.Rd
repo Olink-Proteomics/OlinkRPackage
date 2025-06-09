@@ -66,9 +66,11 @@ user-defined regular expression (e.g., containing "control") are excluded.
 # Example 1. Run clean_npx() to check multiple errors
 df <- dplyr::tibble(
   SampleID = c("A", "B", "C", "D", "E", "F", "F", "control_F"),
-  OlinkID = c("OID123456",
-              rep("OID12345", 3L),
-              rep("OID11111", 4L)),
+  OlinkID = c(
+    "OID123456",
+    rep("OID12345", 3L),
+    rep("OID11111", 4L)
+  ),
   NPX = c(1, NA, NA, NA, 5, 6, 7, 8),
   PlateID = rep("plate1", 8L),
   SampleType = c(
@@ -88,14 +90,17 @@ df <- dplyr::tibble(
 )
 
 log <- OlinkAnalyze::check_npx(df)
-outcome <- OlinkAnalyze:clean_npx(df,
-                                  check_npx_log = log,
-                                  control_sample_id_regex = c("control"))
+outcome <- OlinkAnalyze:clean_npx(
+  df,
+  check_npx_log = log,
+  control_sample_id_regex = c("control")
+)
 
 # Example 2. Test default setting of clean_npx()
 npx_df <- OlinkAnalyze::npx_data1
 log <- OlinkAnalyze::check_npx(npx_df)
-clean_df <- OlinkAnalyze::clean_npx(npx_df, log)}
+clean_df <- OlinkAnalyze::clean_npx(npx_df, log)
+}
 }
 \author{
 Kang Dong

@@ -40,10 +40,12 @@ column matches one of the defined control types using regular expressions
 df <- dplyr::tibble(
   SampleID = c("A", "B", "C", "D"),
   OlinkID = rep("OID12345", 4L),
-  SampleType = c("SAMPLE",
-                 "SAMPLE_CONTROL",
-                 "PLATE_CONTROL",
-                 "NEGATIVE_CONTROL"),
+  SampleType = c(
+    "SAMPLE",
+    "SAMPLE_CONTROL",
+    "PLATE_CONTROL",
+    "NEGATIVE_CONTROL"
+  ),
   NPX = rep(1, 4L),
   PlateID = rep("plate1", 4L),
   QC_Warning = rep("Pass", 4L),
@@ -54,8 +56,10 @@ clean_df <- OlinkAnalyze::clean_sample_type(df, log)
 
 # Example 2: Run control_sample_types = NULL to  return the unchanged data
 clean_df <- OlinkAnalyze::clean_sample_type(df,
-                                            log,
-                                           control_sample_types = NULL)}
+  log,
+  control_sample_types = NULL
+)
+}
 }
 \author{
 Kang Dong

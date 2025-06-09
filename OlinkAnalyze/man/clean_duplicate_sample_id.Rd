@@ -43,7 +43,8 @@ df <- dplyr::tibble(
   LOD = rep(1.0, 4L)
 )
 log <- OlinkAnalyze::check_npx(df)
-clean_df <- OlinkAnalyze::clean_duplicate_sample_id(df, log)}
+clean_df <- OlinkAnalyze::clean_duplicate_sample_id(df, log)
+}
 }
 \author{
 Kang Dong

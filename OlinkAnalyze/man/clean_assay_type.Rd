@@ -48,10 +48,12 @@ df <- dplyr::tibble(
   PlateID = rep("plate1", 4L),
   QC_Warning = rep("Pass", 4L),
   LOD = rep(1, 4L),
-  AssayType = c("assay",
-                "ext_ctrl",
-                "inc_ctrl",
-                "amp_ctrl")
+  AssayType = c(
+    "assay",
+    "ext_ctrl",
+    "inc_ctrl",
+    "amp_ctrl"
+  )
 )
 
 log <- OlinkAnalyze::check_npx(df)
@@ -62,8 +64,9 @@ clean_df <- OlinkAnalyze::clean_assay_type(df, log)
 
 # Example 2: Set control_assay_types = NULL. Return unchanged data
 clean_df <- OlinkAnalyze::clean_assay_type(df,
-                                           log,
-                                           control_assay_types = NULL)
+  log,
+  control_assay_types = NULL
+)
 }
 }
 \author{

@@ -44,7 +44,8 @@ df <- dplyr::tibble(
 )
 
 log <- suppressWarnings(OlinkAnalyze::check_npx(df))
-out <- OlinkAnalyze::clean_invalid_oid(df, check_npx_log = log)}
+out <- OlinkAnalyze::clean_invalid_oid(df, check_npx_log = log)
+}
 }
 \author{
 Kang Dong
