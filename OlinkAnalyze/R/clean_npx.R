@@ -1,4 +1,3 @@
-
 # Main Function -----------------------------------------------------------
 
 #' Clean Olink NPX Data Frame
@@ -51,9 +50,11 @@
 #' # Example 1. Run clean_npx() to check multiple errors
 #' df <- dplyr::tibble(
 #'   SampleID = c("A", "B", "C", "D", "E", "F", "F", "control_F"),
-#'   OlinkID = c("OID123456",
-#'               rep("OID12345", 3L),
-#'               rep("OID11111", 4L)),
+#'   OlinkID = c(
+#'     "OID123456",
+#'     rep("OID12345", 3L),
+#'     rep("OID11111", 4L)
+#'   ),
 #'   NPX = c(1, NA, NA, NA, 5, 6, 7, 8),
 #'   PlateID = rep("plate1", 8L),
 #'   SampleType = c(
@@ -73,28 +74,32 @@
 #' )
 #'
 #' log <- OlinkAnalyze::check_npx(df)
-#' outcome <- OlinkAnalyze:clean_npx(df,
-#'                                   check_npx_log = log,
-#'                                   control_sample_id_regex = c("control"))
+#' outcome <- OlinkAnalyze:clean_npx(
+#'   df,
+#'   check_npx_log = log,
+#'   control_sample_id_regex = c("control")
+#' )
 #'
 #' # Example 2. Test default setting of clean_npx()
 #' npx_df <- OlinkAnalyze::npx_data1
 #' log <- OlinkAnalyze::check_npx(npx_df)
-#' clean_df <- OlinkAnalyze::clean_npx(npx_df, log)}
-
+#' clean_df <- OlinkAnalyze::clean_npx(npx_df, log)
+#' }
 clean_npx <- function(
     df,
     check_npx_log,
     out_df = "tibble",
-    control_sample_types_regx = c("SAMPLE_CONTROL",
-                                  "PLATE_CONTROL",
-                                  "NEGATIVE_CONTROL"),
-    control_assay_types_regx = c("ext_ctrl",
-                                 "inc_ctrl",
-                                 "amp_ctrl"),
-    control_sample_id_regex = NULL
-) {
-
+    control_sample_types_regx = c(
+      "SAMPLE_CONTROL",
+      "PLATE_CONTROL",
+      "NEGATIVE_CONTROL"
+    ),
+    control_assay_types_regx = c(
+      "ext_ctrl",
+      "inc_ctrl",
+      "amp_ctrl"
+    ),
+    control_sample_id_regex = NULL) {
   # Step 0: Validate inputs
   check_is_dataset(df = df, error = TRUE)
 
@@ -108,48 +113,62 @@ clean_npx <- function(
 
   # Step 1: Remove invalid Olink IDs
   cli::cli_h3("Step 1: Removing assays with invalid OlinkIDs")
-  df <- clean_invalid_oid(df,
-                          check_npx_log = check_npx_log,
-                          out_df = out_df)
+  df <- clean_invalid_oid(
+    df,
+    check_npx_log = check_npx_log,
+    out_df = out_df
+  )
 
   # Step 2: Remove assays with all NA values
   cli::cli_h3("Step 2: Removing assays with all NA values")
-  df <- clean_assay_na(df,
-                       check_npx_log = check_npx_log,
-                       out_df = out_df)
+  df <- clean_assay_na(
+    df,
+    check_npx_log = check_npx_log,
+    out_df = out_df
+  )
 
   # Step 3: Remove duplicate sample IDs
   cli::cli_h3("Step 3: Removing duplicate SampleIDs")
-  df <- clean_duplicate_sample_id(df,
-                                  check_npx_log = check_npx_log,
-                                  out_df = out_df)
+  df <- clean_duplicate_sample_id(
+    df,
+    check_npx_log = check_npx_log,
+    out_df = out_df
+  )
 
   # Step 4: Remove control samples based on sample type
   cli::cli_h3("Step 4: Removing control samples based on sample type")
-  df <- clean_sample_type(df,
-                          check_npx_log = check_npx_log,
-                          control_sample_types = control_sample_types_regx,
-                          out_df = out_df)
+  df <- clean_sample_type(
+    df,
+    check_npx_log = check_npx_log,
+    control_sample_types = control_sample_types_regx,
+    out_df = out_df
+  )
 
   # Step 5: Remove samples that failed QC
   cli::cli_h3("Step 5: Removing samples that failed QC")
-  df <- clean_sample_qc(df,
-                        check_npx_log = check_npx_log,
-                        out_df = out_df)
+  df <- clean_sample_qc(
+    df,
+    check_npx_log = check_npx_log,
+    out_df = out_df
+  )
 
   # Step 6: Remove control-like SampleIDs
   cli::cli_h3("Step 6: Removing control-like SampleIDs")
-  df <- clean_control_sample_id(df,
-                                check_npx_log = check_npx_log,
-                                control_sample_id = control_sample_id_regex,
-                                out_df = out_df)
+  df <- clean_control_sample_id(
+    df,
+    check_npx_log = check_npx_log,
+    control_sample_id = control_sample_id_regex,
+    out_df = out_df
+  )
 
   # Step 7: Remove internal control assays
   cli::cli_h3("Step 7: Removing internal control assays")
-  df <- clean_assay_type(df,
-                         check_npx_log = check_npx_log,
-                         control_assay_types = control_assay_types_regx,
-                         out_df = out_df)
+  df <- clean_assay_type(
+    df,
+    check_npx_log = check_npx_log,
+    control_assay_types = control_assay_types_regx,
+    out_df = out_df
+  )
 
   # Final output
   cli::cli_h2("Completed {.fn clean_npx} pipeline")
@@ -160,9 +179,10 @@ clean_npx <- function(
     cli::cli_alert_success("Cleaning complete. Returning tibble.")
   }
 
-  return(df |>
-           convert_read_npx_output(out_df = out_df))
-
+  return(
+    df |>
+      convert_read_npx_output(out_df = out_df)
+  )
 }
 
 
@@ -206,14 +226,12 @@ clean_npx <- function(
 #' )
 #'
 #' log <- OlinkAnalyze::check_npx(df)
-#' out <- OlinkAnalyze::clean_assay_na(df, check_npx_log = log)}
-
+#' out <- OlinkAnalyze::clean_assay_na(df, check_npx_log = log)
+#' }
 clean_assay_na <- function(
     df,
     check_npx_log,
-    out_df = "tibble"
-) {
-
+    out_df = "tibble") {
   # If there are no assays with all NA values, skip filtering
   if (length(check_npx_log$assay_na) == 0) {
     cli::cli_alert_info(
@@ -289,14 +307,12 @@ clean_assay_na <- function(
 #' )
 #'
 #' log <- suppressWarnings(OlinkAnalyze::check_npx(df))
-#' out <- OlinkAnalyze::clean_invalid_oid(df, check_npx_log = log)}
-
+#' out <- OlinkAnalyze::clean_invalid_oid(df, check_npx_log = log)
+#' }
 clean_invalid_oid <- function(
     df,
     check_npx_log,
-    out_df = "tibble"
-) {
-
+    out_df = "tibble") {
   # Check if there are any invalid OlinkIDs to remove
   if (length(check_npx_log$oid_invalid) == 0) {
     cli::cli_alert_info(
@@ -373,14 +389,12 @@ clean_invalid_oid <- function(
 #'   LOD = rep(1.0, 4L)
 #' )
 #' log <- OlinkAnalyze::check_npx(df)
-#' clean_df <- OlinkAnalyze::clean_duplicate_sample_id(df, log)}
-
+#' clean_df <- OlinkAnalyze::clean_duplicate_sample_id(df, log)
+#' }
 clean_duplicate_sample_id <- function(
     df,
     check_npx_log,
-    out_df = "tibble"
-) {
-
+    out_df = "tibble") {
   # Check if there are any duplicate SampleIDs to remove
   if (length(check_npx_log$sample_id_dups) == 0) {
     cli::cli_alert_info(
@@ -446,10 +460,12 @@ clean_duplicate_sample_id <- function(
 #' df <- dplyr::tibble(
 #'   SampleID = c("A", "B", "C", "D"),
 #'   OlinkID = rep("OID12345", 4L),
-#'   SampleType = c("SAMPLE",
-#'                  "SAMPLE_CONTROL",
-#'                  "PLATE_CONTROL",
-#'                  "NEGATIVE_CONTROL"),
+#'   SampleType = c(
+#'     "SAMPLE",
+#'     "SAMPLE_CONTROL",
+#'     "PLATE_CONTROL",
+#'     "NEGATIVE_CONTROL"
+#'   ),
 #'   NPX = rep(1, 4L),
 #'   PlateID = rep("plate1", 4L),
 #'   QC_Warning = rep("Pass", 4L),
@@ -460,21 +476,22 @@ clean_duplicate_sample_id <- function(
 #'
 #' # Example 2: Run control_sample_types = NULL to  return the unchanged data
 #' clean_df <- OlinkAnalyze::clean_sample_type(df,
-#'                                             log,
-#'                                            control_sample_types = NULL)}
-
+#'   log,
+#'   control_sample_types = NULL
+#' )
+#' }
 clean_sample_type <- function(
     df,
     check_npx_log,
-    control_sample_types = c("SAMPLE_CONTROL",
-                             "PLATE_CONTROL",
-                             "NEGATIVE_CONTROL"),
-    out_df = "tibble"
-) {
-
+    control_sample_types = c(
+      "SAMPLE_CONTROL",
+      "PLATE_CONTROL",
+      "NEGATIVE_CONTROL"
+    ),
+    out_df = "tibble") {
   # Early exit if control_sample_types is NULL or sample_type column is missing
   if (is.null(control_sample_types) ||
-      !"sample_type" %in% names(check_npx_log$col_names)) {
+    !"sample_type" %in% names(check_npx_log$col_names)) {
     if (is.null(control_sample_types)) {
       cli::cli_alert_info(
         "No control sample types provided. Returning data unchanged."
@@ -496,9 +513,11 @@ clean_sample_type <- function(
   col_sample_type <- check_npx_log$col_names$sample_type
 
   # Combine control types into a single case-insensitive regex pattern
-  ctrl_pattern <- paste0("(?i)^(",
-                         paste(control_sample_types, collapse = "|"),
-                         ")$")
+  ctrl_pattern <- paste0(
+    "(?i)^(",
+    paste(control_sample_types, collapse = "|"),
+    ")$"
+  )
 
   # Identify rows to remove using regex
   rows_to_remove <- stringr::str_detect(df[[col_sample_type]], ctrl_pattern)
@@ -555,10 +574,12 @@ clean_sample_type <- function(
 #'   PlateID = rep("plate1", 4L),
 #'   QC_Warning = rep("Pass", 4L),
 #'   LOD = rep(1, 4L),
-#'   AssayType = c("assay",
-#'                 "ext_ctrl",
-#'                 "inc_ctrl",
-#'                 "amp_ctrl")
+#'   AssayType = c(
+#'     "assay",
+#'     "ext_ctrl",
+#'     "inc_ctrl",
+#'     "amp_ctrl"
+#'   )
 #' )
 #'
 #' log <- OlinkAnalyze::check_npx(df)
@@ -569,22 +590,22 @@ clean_sample_type <- function(
 #'
 #' # Example 2: Set control_assay_types = NULL. Return unchanged data
 #' clean_df <- OlinkAnalyze::clean_assay_type(df,
-#'                                            log,
-#'                                            control_assay_types = NULL)
+#'   log,
+#'   control_assay_types = NULL
+#' )
 #' }
-
 clean_assay_type <- function(
     df,
     check_npx_log,
-    control_assay_types = c("ext_ctrl",
-                            "inc_ctrl",
-                            "amp_ctrl"),
-    out_df = "tibble"
-) {
-
+    control_assay_types = c(
+      "ext_ctrl",
+      "inc_ctrl",
+      "amp_ctrl"
+    ),
+    out_df = "tibble") {
   # Early exit if control_assay_types is NULL or assay_type column is missing
   if (is.null(control_assay_types) ||
-      !"assay_type" %in% names(check_npx_log$col_names)) {
+    !"assay_type" %in% names(check_npx_log$col_names)) {
     if (is.null(control_assay_types)) {
       cli::cli_alert_info(
         "No control assay types provided. Returning data unchanged."
@@ -605,9 +626,11 @@ clean_assay_type <- function(
   col_assay_type <- check_npx_log$col_names$assay_type
 
   # Construct case-insensitive regex pattern for control assay types
-  ctrl_pattern <- paste0("(?i)^(",
-                         paste(control_assay_types, collapse = "|"),
-                         ")$")
+  ctrl_pattern <- paste0(
+    "(?i)^(",
+    paste(control_assay_types, collapse = "|"),
+    ")$"
+  )
 
   # Identify rows matching control assay types
   rows_to_remove <- stringr::str_detect(df[[col_assay_type]], ctrl_pattern)
@@ -668,14 +691,12 @@ clean_assay_type <- function(
 #' )
 #'
 #' log <- OlinkAnalyze::check_npx(df)
-#' clean_df <- OlinkAnalyze::clean_sample_qc(df, log)}
-
+#' clean_df <- OlinkAnalyze::clean_sample_qc(df, log)
+#' }
 clean_sample_qc <- function(
     df,
     check_npx_log,
-    out_df = "tibble"
-) {
-
+    out_df = "tibble") {
   # Check if qc_warning column name is defined in check_npx_log
   if (!"qc_warning" %in% names(check_npx_log$col_names)) {
     cli::cli_alert_warning(c(
@@ -742,25 +763,25 @@ clean_sample_qc <- function(
 #'   suppressWarnings()
 #'
 #' out <- OlinkAnalyze::clean_control_sample_id(npx_data1,
-#'                                              check_npx_log = log,
-#'                                              control_sample_id = "control")
+#'   check_npx_log = log,
+#'   control_sample_id = "control"
+#' )
 #'
 #' # Example 2: check default setting of clean_control_sample_id(). Return data
 #' # unchanged.
 #' out <- OlinkAnalyze::clean_control_sample_id(npx_data1,
-#'                                              check_npx_log = log,
-#'                                              control_sample_id = NULL)}
-
+#'   check_npx_log = log,
+#'   control_sample_id = NULL
+#' )
+#' }
 clean_control_sample_id <- function(
     df,
     check_npx_log,
     control_sample_id = NULL,
-    out_df = "tibble"
-) {
-
+    out_df = "tibble") {
   # Early exit check
   if (is.null(control_sample_id) ||
-      !"sample_id" %in% names(check_npx_log$col_names)) {
+    !"sample_id" %in% names(check_npx_log$col_names)) {
     if (is.null(control_sample_id)) {
       cli::cli_alert_info(
         "No control sample ID pattern provided. Returning data unchanged."
