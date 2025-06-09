@@ -7,12 +7,13 @@
 clean_duplicate_sample_id(df, check_npx_log, out_df = "tibble")
 }
 \arguments{
-\item{df}{A \code{tibble} or \code{arrow} object loaded from \code{read_npx()}, containing a column
-specified by \code{check_npx_log$col_names$sample_id}.}
+\item{df}{A \code{tibble} or \code{arrow} object loaded from \code{read_npx()},
+containing a columnmspecified by \code{check_npx_log$col_names$sample_id}.}
 
 \item{check_npx_log}{A list returned by \code{check_npx()}, containing:
 \itemize{
-\item \code{sample_id_dups}: a character vector of duplicate SampleIDs to be removed.
+\item \code{sample_id_dups}: a character vector of duplicate SampleIDs to
+be removed.
 \item \code{col_names$sample_id}: the name of the column in \code{df} that holds
 the SampleIDs.
 }}

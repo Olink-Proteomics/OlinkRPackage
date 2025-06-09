@@ -16,18 +16,18 @@ column identified by \code{check_npx_log$col_names$olink_id}.}
 \item \code{col_names$olink_id}: the column name in \code{df} that holds the \code{OlinkID}.
 }}
 
-\item{out_df}{Output format of the cleaned data. Options: \code{"tibble"} (default)
-or \code{"arrow"}.}
+\item{out_df}{Output format of the cleaned data. Options:
+\code{"tibble"} (default) or \code{"arrow"}.}
 }
 \value{
-A filtered \code{tibble} or \code{arrow} object with rows corresponding to NA-only
-assays removed.
+A filtered \code{tibble} or \code{arrow} object with rows corresponding to
+NA-only assays removed.
 }
 \description{
-This function filters out rows from a \code{tibble} or \code{arrow} object where the assay
-identifier (e.g.,\code{OlinkID}) matches those listed in \code{check_npx_log$assay_na},
-which contains assays composed entirely of NA values. It uses CLI messaging
-to report which assays were removed.
+This function filters out rows from a \code{tibble} or \code{arrow} object where the
+assay identifier (e.g.,\code{OlinkID}) matches those listed in
+\code{check_npx_log$assay_na}, which contains assays composed entirely of NA
+values. It uses CLI messaging to report which assays were removed.
 }
 \examples{
 \dontrun{

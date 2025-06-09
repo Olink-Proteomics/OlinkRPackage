@@ -28,7 +28,8 @@ types to remove. Default is \code{c("ext_ctrl", "inc_ctrl", "amp_ctrl")}.}
 \code{"arrow"}. Default: \code{"tibble"}.}
 }
 \value{
-A filtered tibble or arrow object with internal control assay rows removed.
+A filtered tibble or arrow object with internal control assay
+rows removed.
 }
 \description{
 This function filters out rows from an NPX data where the assay type
@@ -55,11 +56,14 @@ df <- dplyr::tibble(
 
 log <- OlinkAnalyze::check_npx(df)
 
-# Example 1: Run clean_assay_type() as default. Internal control assay are removed
+# Example 1: Run clean_assay_type() as default.
+# Internal control assay are removed
 clean_df <- OlinkAnalyze::clean_assay_type(df, log)
 
 # Example 2: Set control_assay_types = NULL. Return unchanged data
-clean_df <- OlinkAnalyze::clean_assay_type(df, log, control_assay_types = NULL)
+clean_df <- OlinkAnalyze::clean_assay_type(df,
+                                           log,
+                                           control_assay_types = NULL)
 }
 }
 \author{

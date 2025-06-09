@@ -19,7 +19,8 @@ a QC status column.}
 Options are \code{"tibble"} or \code{"arrow"}. Default is \code{"tibble"}.}
 }
 \value{
-A filtered tibble or arrow object with samples that failed QC removed.
+A filtered tibble or arrow object with samples that
+failed QC removed.
 }
 \description{
 This function removes rows from an NPX data where the QC warning column

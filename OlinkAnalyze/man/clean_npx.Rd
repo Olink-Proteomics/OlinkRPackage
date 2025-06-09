@@ -46,8 +46,8 @@ The cleaning pipeline performs the following steps:
 \enumerate{
 \item \strong{Remove invalid OlinkIDs}: Any assays flagged as having invalid OlinkIDs
 are excluded.
-\item \strong{Remove assays with all NA values}: Assays that have no quantifiable data
-across all samples are removed.
+\item \strong{Remove assays with all NA values}: Assays that have no quantifiable
+data across all samples are removed.
 \item \strong{Remove duplicate SampleIDs}: Samples with duplicate identifiers are
 excluded to ensure unique observations.
 \item \strong{Remove control sample types}: Samples identified as controls (e.g.,

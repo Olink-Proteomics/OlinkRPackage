@@ -32,9 +32,9 @@ A filtered data frame with control sample IDs removed.
 }
 \description{
 This function removes rows from a NPX data where the \code{sample_id} matches a
-regular expression pattern indicating customer control samples. This is useful
-for filtering out technical controls or customer control samples based on their
-SampleID.
+regular expression pattern indicating customer control samples. This is
+useful for filtering out technical controls or customer control samples based
+on their SampleID.
 }
 \examples{
 \dontrun{

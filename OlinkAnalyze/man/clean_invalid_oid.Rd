@@ -7,13 +7,15 @@
 clean_invalid_oid(df, check_npx_log, out_df = "tibble")
 }
 \arguments{
-\item{df}{A \code{tibble} or \code{arrow} object loaded from \code{read_npx()}, containing a column
-specified by \code{check_npx_log$col_names$olink_id}.}
+\item{df}{A \code{tibble} or \code{arrow} object loaded from \code{read_npx()}, containing
+a column specified by \code{check_npx_log$col_names$olink_id}.}
 
 \item{check_npx_log}{A list returned by \code{check_npx()}, containing:
 \itemize{
-\item \code{oid_invalid}: a character vector of invalid assay identifiers to be removed.
-\item \code{col_names$olink_id}: the name of the column in \code{df} that holds the assay IDs.
+\item \code{oid_invalid}: a character vector of invalid assay identifiers to be
+removed.
+\item \code{col_names$olink_id}: the name of the column in \code{df} that holds the
+assay IDs.
 }}
 
 \item{out_df}{Output format of the cleaned data.
