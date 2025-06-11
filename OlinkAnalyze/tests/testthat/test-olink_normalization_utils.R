@@ -2055,6 +2055,118 @@ test_that(
       regexp = "Dataset \"p2\" does not contain a column named \"Normalization"
     )
 
+    # one df had LODNPX ----
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = lst_col <- olink_norm_input_check_df_cols(
+            lst_df = list(
+              "p1" = npx_data1 |>
+                dplyr::mutate(Normalization = "Intensity"),
+              "p2" = npx_data2 |>
+                dplyr::mutate(Normalization = "Plate control") |>
+                dplyr::rename("LODNPX" = "LOD")
+            )
+          )
+        )
+      )
+    )
+
+    expect_identical(
+      object = lst_col,
+      expected = list(
+        "p1" = list(
+          sample_id = "SampleID",
+          olink_id = "OlinkID",
+          uniprot = "UniProt",
+          assay = "Assay",
+          panel = "Panel",
+          panel_version = "Panel_Version",
+          plate_id = "PlateID",
+          qc_warn = "QC_Warning",
+          assay_warn = character(0L),
+          quant = "NPX",
+          lod = "LOD",
+          normalization = "Normalization",
+          count = character(0L),
+          sample_type = character(0L)
+        ),
+        "p2" = list(
+          sample_id = "SampleID",
+          olink_id = "OlinkID",
+          uniprot = "UniProt",
+          assay = "Assay",
+          panel = "Panel",
+          panel_version = "Panel_Version",
+          plate_id = "PlateID",
+          qc_warn = "QC_Warning",
+          assay_warn = character(0L),
+          quant = "NPX",
+          lod = "LODNPX",
+          normalization = "Normalization",
+          count = character(0L),
+          sample_type = character(0L)
+        )
+      )
+    )
+
+    # one datasets has PanelVersion ----
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = lst_col <- olink_norm_input_check_df_cols(
+            lst_df = list(
+              "p1" = npx_data1 |>
+                dplyr::mutate(Normalization = "Intensity") |>
+                dplyr::rename("PanelVersion" = "Panel_Version"),
+              "p2" = npx_data2 |>
+                dplyr::mutate(Normalization = "Intensity")
+            )
+          )
+        )
+      )
+    )
+
+    expect_identical(
+      object = lst_col,
+      expected = list(
+        "p1" = list(
+          sample_id = "SampleID",
+          olink_id = "OlinkID",
+          uniprot = "UniProt",
+          assay = "Assay",
+          panel = "Panel",
+          panel_version = "PanelVersion",
+          plate_id = "PlateID",
+          qc_warn = "QC_Warning",
+          assay_warn = character(0L),
+          quant = "NPX",
+          lod = "LOD",
+          normalization = "Normalization",
+          count = character(0L),
+          sample_type = character(0L)
+        ),
+        "p2" = list(
+          sample_id = "SampleID",
+          olink_id = "OlinkID",
+          uniprot = "UniProt",
+          assay = "Assay",
+          panel = "Panel",
+          panel_version = "Panel_Version",
+          plate_id = "PlateID",
+          qc_warn = "QC_Warning",
+          assay_warn = character(0L),
+          quant = "NPX",
+          lod = "LOD",
+          normalization = "Normalization",
+          count = character(0L),
+          sample_type = character(0L)
+        )
+      )
+    )
+
   }
 )
 

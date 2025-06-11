@@ -117,7 +117,7 @@ olink_pathway_enrichment <- function(data, test_results, method = "GSEA", ontolo
          install.packages(\"msigdbr\")")
   }
 
-  if(!requireNamespace("msigdbdf", quietly = TRUE)) {
+  if(!rlang::is_installed(pkg = "msigdbdf")) {
     stop(" Pathway enrichment requires msigdbdf package.
          Please install msigdbdf before continuing.
 
@@ -177,7 +177,7 @@ data_prep <- function(data) {
     dplyr::filter(stringr::str_detect(OlinkID,
                                       "OID[0-9]{5}"))
   # For data missing LOD column
-  alt_plate_lods <- c("Plate LOD", "PlateLOD", "plateLOD", "Plate_LOD")
+  alt_plate_lods <- c("Plate LOD", "PlateLOD", "plateLOD", "Plate_LOD", "LODNPX")
   alt_max_lods <- c("Max LOD", "MaxLOD", "maxLOD", "Max_LOD")
   if(!("LOD" %in% names(data))){
     if(any(alt_plate_lods %in% names(df))){
