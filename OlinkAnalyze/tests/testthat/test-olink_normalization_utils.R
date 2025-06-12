@@ -2871,7 +2871,7 @@ test_that(
   {
     skip_if_not_installed("arrow")
 
-    # dfs have one or more matching quant col ----
+    # dfs have one or more matching quant col, 2 dfs ----
 
     quant_cols <- list(
       "DF1" = c("Ct", "NPX"),
@@ -2890,7 +2890,28 @@ test_that(
 
     expect_message(
       object = olink_norm_input_check_quant(quant_cols),
-      regexp = "Multiple matching quantification methods detected. Priority"
+      regexp = "Multiple matching quantification methods detected."
+    )
+
+    expect_message(
+      object = olink_norm_input_check_quant(quant_cols),
+      regexp = "NPX"
+    )
+
+    # dfs have two or more matching quant col, ref normalization ----
+
+    quant_cols <- list(
+      "DF1" =  c("Ct", "NPX", "Quantified_value")
+    )
+
+    expect_message(
+      object = olink_norm_input_check_quant(quant_cols),
+      regexp = "Multiple quantification methods detected."
+    )
+
+    expect_message(
+      object = olink_norm_input_check_quant(quant_cols),
+      regexp = "NPX"
     )
   }
 )
