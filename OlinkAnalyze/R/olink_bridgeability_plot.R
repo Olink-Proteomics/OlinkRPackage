@@ -71,6 +71,12 @@ olink_bridgeability_plot <- function(data,
   # set seed
   set.seed(seed = 1)
 
+  #Check data format
+  npxCheck <- npxCheck(df)
+
+  # Rename duplicate UniProts
+  data <- uniprot_replace(data, npxCheck)
+
   # check OlinkID ----
 
   if (is.null(olink_id)) {

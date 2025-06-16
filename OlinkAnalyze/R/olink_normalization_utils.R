@@ -101,6 +101,15 @@ olink_norm_input_check <- function(df1,
                                    reference_project,
                                    reference_medians) {
   # Validate the normalization input ----
+  #Check data format
+  npxCheck <- npxCheck(df1)
+  # Rename duplicate UniProts
+  df1 <- uniprot_replace(df1, npxCheck)
+
+  #Check data format
+  npxCheck <- npxCheck(df2)
+  # Rename duplicate UniProts
+  df2 <- uniprot_replace(df2, npxCheck)
 
   norm_valid <- olink_norm_input_validate(
     df1 = df1,
