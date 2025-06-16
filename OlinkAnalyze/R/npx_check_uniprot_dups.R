@@ -18,15 +18,16 @@ assay_identifiers <- function(df) {
     uniprot_original <- uniprot_dups[!duplicated(uniprot_dups$OlinkID), ]
     uniprot_original <- uniprot_original |>
       dplyr::rename("new_UniProt" = "UniProt")
-    uniprot_replace <- dplyr::left_join(uniprot_dups,
+    uniprot_replace_df <- dplyr::left_join(uniprot_dups,
                                         uniprot_original,
                                         by = "OlinkID") |>
       dplyr::filter(.data[["UniProt"]] != .data[["new_UniProt"]])
-    uniprot_message <- paste0("OlinkID `", uniprot_replace$OlinkID,
-                              "` with UniProt ID `", uniprot_replace$UniProt,
-                              "` will be replaced with UniProt ID `",
-                              uniprot_replace$new_UniProt, "`.\n")
 
+    uniprot_message <- paste0("UniProt ID `", uniprot_replace_df$UniProt,
+                              "` will be replaced with UniProt ID `",
+                              uniprot_replace_df$new_UniProt,
+                              "` for OlinkID", uniprot_replace_df$OlinkID,
+                              "`.\n")
     cli::cli_warn(c("!" = paste0(
                                  "{length(duplicated_oids)} OlinkID{?s}",
                                  " ha{?s/ve} multiple unique UniProt IDs. ",
@@ -35,11 +36,11 @@ assay_identifiers <- function(df) {
     "*" = uniprot_message))
   }
 
-  return(uniprot_replace)
+  return(uniprot_replace_df)
 }
 
 uniprot_replace <- function(df, npx_check) {
-  if (nrow(npx_check$uniprot_replace) != 0) {
+  if (!all(npx_check$uniprot_replace == "")) {
     df <- df |>
       dplyr::left_join(npx_check$uniprot_replace,
                        by = c("UniProt", "OlinkID")) |>
