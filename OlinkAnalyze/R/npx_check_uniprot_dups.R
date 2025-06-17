@@ -7,8 +7,8 @@ assay_identifiers <- function(df) {
   # warning if duplicate set of identifiers for 1 assay
   duplicated_oids <- unique(assay_ids$OlinkID[duplicated(assay_ids$OlinkID)])
   uniprot_replace_df <- data.frame(OlinkID = "",
-                                UniProt = "",
-                                new_UniProt = "")
+                                   UniProt = "",
+                                   new_UniProt = "")
 
 
   if (length(duplicated_oids) != 0L) {
@@ -19,8 +19,8 @@ assay_identifiers <- function(df) {
     uniprot_original <- uniprot_original |>
       dplyr::rename("new_UniProt" = "UniProt")
     uniprot_replace_df <- dplyr::left_join(uniprot_dups,
-                                        uniprot_original,
-                                        by = "OlinkID") |>
+                                           uniprot_original,
+                                           by = "OlinkID") |>
       dplyr::filter(.data[["UniProt"]] != .data[["new_UniProt"]])
 
     uniprot_message <- paste0("UniProt ID `", uniprot_replace_df$UniProt,

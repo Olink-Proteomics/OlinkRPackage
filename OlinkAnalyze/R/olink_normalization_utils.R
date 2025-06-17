@@ -102,15 +102,15 @@ olink_norm_input_check <- function(df1,
                                    reference_medians) {
   # Validate the normalization input ----
   #Check data format
-  npxCheck <- npxCheck(df1)
+  npx_check <- npxCheck(df1)
   # Rename duplicate UniProts
-  df1 <- uniprot_replace(df1, npxCheck)
+  df1 <- uniprot_replace(df1, npx_check)
 
-  if (!is.null(df2)){
+  if (!is.null(df2)) {
     #Check data format
-    npxCheck <- npxCheck(df2)
+    npx_check <- npxCheck(df2)
     # Rename duplicate UniProts
-    df2 <- uniprot_replace(df2, npxCheck)
+    df2 <- uniprot_replace(df2, npx_check)
   }
 
   norm_valid <- olink_norm_input_validate(
@@ -943,10 +943,10 @@ olink_norm_input_check_quant <- function(lst_req_col_quant) {
     # no quantification identified in at least one datasets
     cli::cli_abort(
       c(
-        "x" = "No quantification column identified in at least one of the 
+        "x" = "No quantification column identified in at least one of the
         datasets.",
-        "i" = "Ensure that at least one quantification column (NPX, 
-        Quantified_value, or Ct) is present in each dataset. Re-export of 
+        "i" = "Ensure that at least one quantification column (NPX,
+        Quantified_value, or Ct) is present in each dataset. Re-export of
         datasets may be required."
       )
     )
