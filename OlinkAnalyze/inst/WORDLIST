@@ -82,6 +82,7 @@ kruskal
 labelled
 lightblue
 linewidth
+linter
 Liu
 LME
 lmer
@@ -90,6 +91,7 @@ lmerTest
 LMOD
 loadings
 LOD
+LODNPX
 magrittr
 MAPK
 md
@@ -100,6 +102,7 @@ MedianCentering
 MissingFreq
 MSigDb
 MSigDB
+msigdbr
 MyData
 na
 NES
@@ -126,6 +129,7 @@ outlierDefX
 outlierDefY
 outlierLines
 OutlierLines
+PanelVersion
 pca
 PercAssaysBelowLOD
 pheatmap
