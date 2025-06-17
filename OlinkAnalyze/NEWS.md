@@ -1,3 +1,16 @@
+# Olink Analyze 4.3.0
+## Minor Changes
+* Recommended Olink Reveal bridge sample numbers have been added to the bridging tutorial (#523, @kathy-nevola)
+* Missing meta-data in parquet files now result in a warning instead of an error (#540, @OlaCaster)
+* Pathway enrichment updated to support msigdbr v10.0 (#542, @klevdiamanti)
+* Support for PanelVersion and LODNPX was added (#551, #552, #559, @klevdiamanti, @MasoumehSheikhi)
+* Support for new version of warning message when converting LME results to tidy format has been added (#565, @kathy-nevola)
+
+## Bug Fixes
+* Fixed bug causing missing significance stars in olink_boxplot (#536, @boxizhang)
+* Files with multiple quanitification files will now select the quantification method to use (#563, @kristynchin-olink, @amrita-kar)
+* OlinkIDs with multiple UniProt IDs across different PanelVersions will now be harmonized to one UniProt ID to allow for assays to be analyzed together (#564, @kathy-nevola)
+
 # Olink Analyze 4.2.0
 ## Minor Changes
 * Cross-product bridging is now supported for bridging Olink Explore 3072 to Olink Reveal (#509, @kathy-nevola)
