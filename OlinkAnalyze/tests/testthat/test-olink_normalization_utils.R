@@ -761,7 +761,8 @@ test_that(
           dplyr::mutate(
             Normalization = "Plate control"
           ) |>
-          arrow::as_arrow_table(),
+          arrow::as_arrow_table() |>
+          dplyr::collect(),
         df2 = NULL,
         overlapping_samples_df1 = npx_df1_samples,
         overlapping_samples_df2 = NULL,

@@ -111,6 +111,8 @@ olink_pca_plot <- function (df,
 
   #Check data format
   npxCheck <- npxCheck(df)
+  # Rename duplicate UniProts
+  df <- uniprot_replace(df, npxCheck)
 
   # Stop if duplicate sample ID's detected
   if (length(npxCheck$duplicate_samples) > 0) {

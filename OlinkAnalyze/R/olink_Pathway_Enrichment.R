@@ -172,6 +172,10 @@ olink_pathway_enrichment <- function(data, test_results, method = "GSEA", ontolo
 data_prep <- function(data) {
   # Remove NA data and filter for valid Olink IDs
   npx_check <- npxCheck(data)
+
+  # Rename duplicate UniProts
+  df <- uniprot_replace(df, npx_check)
+
   data <- data %>%
     dplyr::filter(!(OlinkID %in% npx_check$all_nas)) %>%
     dplyr::filter(stringr::str_detect(OlinkID,

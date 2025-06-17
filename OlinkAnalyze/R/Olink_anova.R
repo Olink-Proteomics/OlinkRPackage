@@ -167,6 +167,8 @@ olink_anova <- function(df,
 
     #Check data format
     npxCheck <- npxCheck(df)
+    # Rename duplicate UniProts
+    df <- uniprot_replace(df, npxCheck)
 
     ##Convert character vars to factor
     converted.vars <- NULL

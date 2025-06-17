@@ -113,6 +113,9 @@ olink_ordinalRegression <- function(df,
     npxCheck <- npxCheck(df)
     data_type <- npxCheck$data_type #Temporary fix to avoid issues with rlang::ensym downstream
 
+    # Rename duplicate UniProts
+    df <- uniprot_replace(df, npxCheck)
+
     ## Convert outcome to factor
     if (data_type == 'NPX') {
       df$NPX <- factor(df$NPX, ordered = TRUE)
@@ -375,7 +378,8 @@ olink_ordinalRegression_posthoc <- function(df,
     #Check data format
     npxCheck <- npxCheck(df)
     data_type <- npxCheck$data_type #Temporary fix to avoid issues with rlang::ensym downstream
-
+    # Rename duplicate UniProts
+    df <- uniprot_replace(df, npxCheck)
 
     #Allow for :/* notation in covariates
     variable <- gsub("\\*",":",variable)

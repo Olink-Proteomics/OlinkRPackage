@@ -79,17 +79,19 @@ olink_qc_plot <- function(df,
 
   #Check data format
   npxCheck <- npxCheck(df)
+  # Rename duplicate UniProts
+  df <- uniprot_replace(df, npxCheck)
 
   #Check that IQR_outlierDef and median_outlierDef are both numeric
   if(!all(is.numeric(IQR_outlierDef), is.numeric(median_outlierDef))){
     stop('IQR_outlierDef and median_outlierDef have to be numerical values')
   }
-  
+
   if(plot_index == TRUE & !("Index" %in% names(npx_df))){
     warning("Index not available. Setting plot_index to FALSE.")
     plot_index <- FALSE
   }
-  
+
   if("QC_Warning" %in% names(npx_df)){
     npx_df_qr <- npx_df %>%
       dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>% #Exclude assays that have all NA:s
@@ -100,7 +102,7 @@ olink_qc_plot <- function(df,
   }else{
     npx_df_qr <- npx_df %>%
       dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>% #Exclude assays that have all NA:s
-      dplyr::group_by(Panel, SampleID) 
+      dplyr::group_by(Panel, SampleID)
     }
   npx_df_qr <- npx_df_qr %>%
     dplyr::mutate(IQR = IQR(NPX, na.rm = TRUE),

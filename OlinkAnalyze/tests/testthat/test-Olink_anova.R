@@ -19,7 +19,8 @@ extension_control <- npx_data_format221010_no_NA |>
 assay_ctrl <- npx_data_format221010_no_NA |>
   dplyr::filter(stringr::str_detect(Assay, "ACY3")) |>
   dplyr::mutate(Assay = gsub("ACY3", "CTRL", Assay)) |>
-  dplyr::mutate(UniProt = gsub("Q96HD9", "P40313", UniProt))
+  dplyr::mutate(UniProt = gsub("Q96HD9", "P40313", UniProt)) |>
+  dplyr::mutate(OlinkID = gsub("OID30086", "OID12345", OlinkID))
 
 npx_data_format221010_ext_ctrl <- rbind(
   npx_data_format221010_no_NA,

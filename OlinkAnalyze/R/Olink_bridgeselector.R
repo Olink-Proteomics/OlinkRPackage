@@ -28,6 +28,8 @@
 olink_bridgeselector<-function(df, sampleMissingFreq, n){
   # Exclude OlinkIDs with missing NPX
   npx_check <- npxCheck(df)
+  # Rename duplicate UniProts
+  df <- uniprot_replace(df, npx_check)
 
   #Filtering on valid OlinkID
   df <- df %>%
