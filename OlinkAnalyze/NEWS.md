@@ -4,7 +4,7 @@
 * Missing meta-data in parquet files now result in a warning instead of an error (#540, @OlaCaster)
 * Pathway enrichment updated to support msigdbr v10.0 (#542, @klevdiamanti)
 * Support for PanelVersion and LODNPX was added (#551, #552, #559, @klevdiamanti, @MasoumehSheikhi)
-* Support for new version of warning message when converting LME results to tidy format has been added (#535, @kathy-nevola)
+* Support for new version of warning message when converting LME results to tidy format has been added (#565, @kathy-nevola)
 
 ## Bug Fixes
 * Fixed bug causing missing significance stars in olink_boxplot (#536, @boxizhang)
