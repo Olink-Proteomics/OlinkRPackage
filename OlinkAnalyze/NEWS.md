@@ -8,8 +8,8 @@
 
 ## Bug Fixes
 * Fixed bug causing missing significance stars in olink_boxplot (#536, @boxizhang)
-* Files with multiple quanitification files will now select the quantification method to use (#563, @kristynchin-olink, @amrita-kar)
-* OlinkIDs with multiple UniProt IDs across different PanelVersions will now be harmonized to one UniProt ID to allow for assays to be analyzed together (#564, @kathy-nevola)
+* Files with multiple quantification files will now select the quantification method to use (#563, @kristynchin-olink, @amrita-kar)
+* OlinkIDs with multiple UniProt IDs across different panel versions will now be harmonized to one UniProt ID to allow for assays to be analyzed together (#564, @kathy-nevola)
 
 # Olink Analyze 4.2.0
 ## Minor Changes

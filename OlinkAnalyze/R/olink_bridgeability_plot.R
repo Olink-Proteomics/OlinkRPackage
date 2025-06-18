@@ -16,7 +16,7 @@
 #' @param median_counts_threshold Threshold indicating the minimum median counts
 #' for each product (default = 150).
 #' @param min_count Threshold indicating the minimum number of counts per
-#' datapoint (default = 10). Data below \var{min_count} are excluded.
+#' data point (default = 10). Data below \var{min_count} are excluded.
 #'
 #' @return An object of class "ggplot" containing 4 plots for each assay.
 #'
