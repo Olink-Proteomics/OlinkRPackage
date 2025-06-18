@@ -184,11 +184,11 @@ data_prep <- function(data) {
   alt_plate_lods <- c("Plate LOD", "PlateLOD", "plateLOD", "Plate_LOD", "LODNPX")
   alt_max_lods <- c("Max LOD", "MaxLOD", "maxLOD", "Max_LOD")
   if(!("LOD" %in% names(data))){
-    if(any(alt_plate_lods %in% names(df))){
+    if(any(alt_plate_lods %in% names(data))){
       data <- data |>
         dplyr::rename(LOD = any_of(alt_plate_lods))
     }
-    else if(any(alt_max_lods %in% names(df))){
+    else if(any(alt_max_lods %in% names(data))){
       data <- data |>
         dplyr::rename(LOD = any_of(alt_max_lods))
     }
