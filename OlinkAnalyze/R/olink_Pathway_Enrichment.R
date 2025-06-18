@@ -174,7 +174,7 @@ data_prep <- function(data) {
   npx_check <- npxCheck(data)
 
   # Rename duplicate UniProts
-  df <- uniprot_replace(df, npx_check)
+  data <- uniprot_replace(data, npx_check)
 
   data <- data %>%
     dplyr::filter(!(OlinkID %in% npx_check$all_nas)) %>%
