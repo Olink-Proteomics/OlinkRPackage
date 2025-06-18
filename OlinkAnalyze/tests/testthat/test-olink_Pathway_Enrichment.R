@@ -14,14 +14,16 @@ ttest_results <- olink_ttest(
   df = npx_df,
   variable = "Treatment"
 ) |>
-  suppressMessages()
+  suppressMessages() |>
+  suppressWarnings()
 
 anova_posthoc_results <- olink_anova_posthoc(
   df = npx_df,
   variable = "Site",
   effect = "Site"
 ) |>
-  suppressMessages()
+  suppressMessages() |>
+  suppressWarnings()
 
 # set seed
 set.seed(123)
@@ -42,6 +44,7 @@ test_that("Input data equal for different LOD names", {
   expect_equal(
     object = data_prep(data = npx_data1) |>
       suppressMessages() |>
+      suppressWarnings() |>
       dplyr::pull(
         .data[["OlinkID"]]
       ) |>
@@ -56,6 +59,7 @@ test_that("Input data equal for different LOD names", {
       ) |>
       data_prep() |>
       suppressMessages() |>
+      suppressWarnings() |>
       dplyr::pull(
         .data[["OlinkID"]]
       ) |>
@@ -66,6 +70,7 @@ test_that("Input data equal for different LOD names", {
   expect_equal(
     object = data_prep(data = npx_data1) |>
       suppressMessages() |>
+      suppressWarnings() |>
       dplyr::pull(
         .data[["OlinkID"]]
       ) |>
@@ -80,6 +85,7 @@ test_that("Input data equal for different LOD names", {
       ) |>
       data_prep() |>
       suppressMessages() |>
+      suppressWarnings() |>
       dplyr::pull(
         .data[["OlinkID"]]
       ) |>
@@ -90,6 +96,7 @@ test_that("Input data equal for different LOD names", {
   expect_equal(
     object = data_prep(data = npx_data1) |>
       suppressMessages() |>
+      suppressWarnings() |>
       dplyr::pull(
         .data[["OlinkID"]]
       ) |>
@@ -106,6 +113,7 @@ test_that("Input data equal for different LOD names", {
       ) |>
       data_prep() |>
       suppressMessages() |>
+      suppressWarnings() |>
       dplyr::pull(
         .data[["OlinkID"]]
       ) |>
@@ -125,7 +133,8 @@ test_that("T-test GSEA works", {
         data = npx_df,
         test_results = ttest_results
       ) |>
-        suppressMessages()
+        suppressMessages() |>
+        suppressWarnings()
     )
   )
 
