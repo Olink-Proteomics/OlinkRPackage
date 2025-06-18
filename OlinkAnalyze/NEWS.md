@@ -5,6 +5,7 @@
 * Pathway enrichment updated to support msigdbr v10.0 (#542, @klevdiamanti)
 * Support for PanelVersion and LODNPX was added (#551, #552, #559, @klevdiamanti, @MasoumehSheikhi)
 * Support for new version of warning message when converting LME results to tidy format has been added (#565, @kathy-nevola)
+* Improvements made to user interface for olink_bridgeability_plot() (#525, #522, @klevdiamanti)
 
 ## Bug Fixes
 * Fixed bug causing missing significance stars in olink_boxplot (#536, @boxizhang)
