@@ -42,6 +42,8 @@ npxCheck <- function(df) {
                                         negate = TRUE)) |>
       dplyr::pull(OlinkID)
   }
+  # Check for OlinkIDs that map to multiple UniProtIDs
+  uniprot_replace <- assay_identifiers(df)
 
   # Check for duplicates in SampleID ----
   duplicate_ids <- df |>
@@ -129,7 +131,8 @@ npxCheck <- function(df) {
       non_conforming_OID = non_conforming_OID,
       all_nas = all_nas,
       sample_all_nas = sample_all_nas,
-      duplicate_samples = duplicate_samples
+      duplicate_samples = duplicate_samples,
+      uniprot_replace = uniprot_replace
     )
   )
 }

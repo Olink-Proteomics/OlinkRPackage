@@ -15,7 +15,7 @@ for normalization.}
 
 \item{norm_mode}{Character string indicating the type of normalization to be
 performed. Expecting one of
-bridge, subset, ref_median or norm_cross_product. # nolint}
+bridge, subset, ref_median or norm_cross_product. # nolint line_length_linter}
 }
 \value{
 \code{NULL} if no warning or error.

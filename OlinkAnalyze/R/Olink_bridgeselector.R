@@ -28,6 +28,8 @@
 olink_bridgeselector<-function(df, sampleMissingFreq, n){
   # Exclude OlinkIDs with missing NPX
   npx_check <- npxCheck(df)
+  # Rename duplicate UniProts
+  df <- uniprot_replace(df, npx_check)
 
   #Filtering on valid OlinkID
   df <- df %>%
@@ -63,7 +65,7 @@ olink_bridgeselector<-function(df, sampleMissingFreq, n){
 
 
   # Alternative LODs for when LOD is not present
-  alt_plate_lods <- c("Plate LOD", "PlateLOD", "plateLOD", "Plate_LOD")
+  alt_plate_lods <- c("Plate LOD", "PlateLOD", "plateLOD", "Plate_LOD", "LODNPX")
   alt_max_lods <- c("Max LOD", "MaxLOD", "maxLOD", "Max_LOD")
   if(!("LOD" %in% names(df))){
     if(any(alt_plate_lods %in% names(df))){

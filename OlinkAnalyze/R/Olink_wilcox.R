@@ -126,6 +126,9 @@ olink_wilcox <- function(df, variable, pair_id, ...){
   npxCheck <- npxCheck(df)
   data_type <- npxCheck$data_type #Temporary fix to avoid issues with rlang::ensym downstream
 
+  # Rename duplicate UniProts
+  df <- uniprot_replace(df, npxCheck)
+
   nas_in_level <- df  %>%
     dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>%
     dplyr::group_by(OlinkID, !!rlang::ensym(variable)) %>%

@@ -4,11 +4,17 @@ test_that(
   "olink_normalization_is_bridgeable - works",
   {
 
-    skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
-    skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
 
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
+
+    bridge_samples_3k_ht <- intersect(
+      x = unique(data_3k$SampleID),
+      y = unique(data_ht$SampleID)
+    ) |>
+      (\(x) x[!grepl("CONTROL", x)])()
 
     # Warning that some assays are not overlapping and will be removed from
     # normalization.
@@ -17,11 +23,7 @@ test_that(
         object = olink_norm_input_check(
           df1 = data_3k,
           df2 = data_ht,
-          overlapping_samples_df1 = intersect(
-            x = unique(data_3k$SampleID),
-            y = unique(data_ht$SampleID)
-          ) |>
-            (\(x) x[!grepl("CONTROL", x)])(),
+          overlapping_samples_df1 = bridge_samples_3k_ht,
           overlapping_samples_df2 = NULL,
           df1_project_nr = "P1",
           df2_project_nr = "P2",
@@ -36,14 +38,14 @@ test_that(
     expect_message(
       object = data_explore_check <- olink_norm_input_check(
         df1 = data_3k |>
-          dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321"))),
-        df2 = data_ht|>
-          dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321"))),
-        overlapping_samples_df1 = intersect(
-          x = unique(data_3k$SampleID),
-          y = unique(data_ht$SampleID)
-        ) |>
-          (\(x) x[!grepl("CONTROL", x)])(),
+          dplyr::filter(
+            !(.data[["OlinkID"]] %in% c("OID12345", "OID54321"))
+          ),
+        df2 = data_ht |>
+          dplyr::filter(
+            !(.data[["OlinkID"]] %in% c("OID12345", "OID54321"))
+          ),
+        overlapping_samples_df1 = bridge_samples_3k_ht,
         overlapping_samples_df2 = NULL,
         df1_project_nr = "P1",
         df2_project_nr = "P2",
@@ -124,27 +126,40 @@ test_that(
 test_that(
   "olink_normalization_qs - works - compare to reference",
   {
-
     skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
     skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
     skip_if_not(file.exists(test_path("data", "example_Reveal_data.rds")))
 
+    exclude_assays <- c("OID12345", "OID54321")
     data_3k <- get_example_data(filename = "example_3k_data.rds") |>
-      dplyr::filter(!(.data[["OlinkID"]] %in% c("OID12345", "OID54321")))
+      dplyr::filter(
+        !(.data[["OlinkID"]] %in% .env[["exclude_assays"]])
+      )
     data_ht <- get_example_data(filename = "example_HT_data.rds") |>
-      dplyr::filter(!(.data[["OlinkID"]] %in% c("OID12345", "OID54321")))
+      dplyr::filter(
+        !(.data[["OlinkID"]] %in% .env[["exclude_assays"]])
+      )
     data_reveal <- get_example_data(filename = "example_Reveal_data.rds") |>
-      dplyr::filter(!(.data[["OlinkID"]] %in% c("OID12345", "OID54321")))
+      dplyr::filter(
+        !(.data[["OlinkID"]] %in% .env[["exclude_assays"]])
+      )
 
     # load reference data ----
 
-    ref_qs_norm_file <- test_path("data",
-                                  "qq_normalization_reference_result.rds")
-    ref_qs_reveal_file <- test_path("data",
-                                       "qq_normalization_reference_result_reveal.rds")
+    skip_if_not(file.exists(
+      testthat::test_path("data", "qq_normalization_reference_result.rds")
+    ))
+    skip_if_not(file.exists(
+      testthat::test_path("data",
+                          "qq_normalization_reference_result_reveal.rds")
+    ))
 
-    ref_qs_norm <- readRDS(file = ref_qs_norm_file)
-    ref_qs_norm_reveal <- readRDS(file = ref_qs_reveal_file)
+    ref_qs_norm <- get_example_data(
+      filename = "qq_normalization_reference_result.rds"
+    )
+    ref_qs_norm_reveal <- get_example_data(
+      filename = "qq_normalization_reference_result_reveal.rds"
+    )
 
     # run example data in the function ----
 
@@ -176,19 +191,21 @@ test_that(
       regexp = "Cross-product normalization will be performed!"
     )
 
-    expect_message(
-      object = expect_warning(norm_input_check_reveal <- olink_norm_input_check(
-        df1 = data_reveal,
-        df2 = data_3k,
-        overlapping_samples_df1 = bridge_samples_reveal,
-        overlapping_samples_df2 = NULL,
-        df1_project_nr = "P1",
-        df2_project_nr = "P2",
-        reference_project = "P1",
-        reference_medians = NULL
+    expect_warning(
+      object = expect_message(
+        object = norm_input_check_reveal <- olink_norm_input_check(
+          df1 = data_reveal,
+          df2 = data_3k,
+          overlapping_samples_df1 = bridge_samples_reveal,
+          overlapping_samples_df2 = NULL,
+          df1_project_nr = "P1",
+          df2_project_nr = "P2",
+          reference_project = "P1",
+          reference_medians = NULL
+        ),
+        regexp = "Cross-product normalization will be performed!"
       ),
-      "83 assays are not shared"),
-      regexp = "Cross-product normalization will be performed!"
+      regexp = "83 assays are not shared"
     )
 
     lst_df <- list(
@@ -196,7 +213,7 @@ test_that(
       norm_input_check$not_ref_df
     ) |>
       lapply(function(l_df) {
-        l_df |>
+        l_df |> # nolint return_linter
           dplyr::filter(
             .data[[norm_input_check$ref_cols$sample_id]] %in%
               .env[["bridge_samples"]]
@@ -211,14 +228,14 @@ test_that(
       norm_input_check_reveal$not_ref_df
     ) |>
       lapply(function(l_df) {
-        l_df |>
+        l_df |> # nolint return_linter
           dplyr::filter(
             .data[[norm_input_check$ref_cols$sample_id]] %in%
               .env[["bridge_samples"]]
           )
       })
     names(lst_df_reveal) <- c(norm_input_check$ref_name,
-                       norm_input_check$not_ref_name)
+                              norm_input_check$not_ref_name)
     lst_product_reveal <- norm_input_check_reveal$lst_product
 
     # run the function
@@ -250,13 +267,16 @@ test_that(
       )
     )
 
-    expect_error(olink_normalization_qs(
-      lst_df = lst_df,
-      ref_cols = norm_input_check$ref_cols,
-      not_ref_cols = norm_input_check$not_ref_cols,
-      bridge_samples = bridge_samples,
-      ref_product = "other"),
-      "Reference product must be HT or Reveal")
+    expect_error(
+      object = olink_normalization_qs(
+        lst_df = lst_df,
+        ref_cols = norm_input_check$ref_cols,
+        not_ref_cols = norm_input_check$not_ref_cols,
+        bridge_samples = bridge_samples,
+        ref_product = "other"
+      ),
+      regexp = "Reference product must be HT or Reveal"
+    )
 
     # check if reference is reproduced ----
 
@@ -304,21 +324,24 @@ test_that(
       tolerance = 1e-4
     )
 
-
   }
 )
 
 test_that(
   "olink_normalization_qs - works - expected output, all bridge samples",
   {
+    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
 
-    skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
-    skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
-
+    excluded_assays <- c("OID12345", "OID54321")
     data_3k <- get_example_data(filename = "example_3k_data.rds") |>
-      dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321")))
+      dplyr::filter(
+        !(.data[["OlinkID"]] %in% .env[["excluded_assays"]])
+      )
     data_ht <- get_example_data(filename = "example_HT_data.rds") |>
-      dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321")))
+      dplyr::filter(
+        !(.data[["OlinkID"]] %in% .env[["excluded_assays"]])
+      )
 
     # bridge samples
     bridge_samples <- intersect(
@@ -438,9 +461,8 @@ test_that(
 test_that(
   "olink_normalization_qs - works - expected output, 50 bridge samples",
   {
-
-    skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
-    skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
 
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
@@ -568,8 +590,8 @@ test_that(
   "olink_normalization_qs - works - fewer than 40 bridge samples",
   {
 
-    skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
-    skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
 
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
@@ -636,174 +658,181 @@ test_that(
 # Test olink_normalization_product_format ----
 
 test_that(
-  "olink_normalization_product_format - works",
+  "olink_normalization_product_format - works - 3k-HT",
   {
-    skip_if_not(file.exists(test_path("data","example_3k_data.rds")))
-    skip_if_not(file.exists(test_path("data","example_HT_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
 
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
 
-    expect_message(expect_warning(
-      object = norm_br_data_format <- olink_normalization(
+    bridge_samples_3k_ht <- intersect(
+      x = unique(data_3k$SampleID),
+      y = unique(data_ht$SampleID)
+    ) |>
+      (\(x) x[!grepl("CONTROL", x)])()
+
+    # formatted data
+    expect_message(
+      object = expect_warning(
+        object = df_3k_ht_format <- olink_normalization(
           df1 = data_3k,
           df2 = data_ht,
-          overlapping_samples_df1 = intersect(
-            x = unique(data_3k$SampleID),
-            y = unique(data_ht$SampleID)
-          ) |>
-            (\(x) x[!grepl("CONTROL", x)])(),
-          overlapping_samples_df2 = NULL,
+          overlapping_samples_df1 = bridge_samples_3k_ht,
           df1_project_nr = "P1",
           df2_project_nr = "P2",
           reference_project = "P2",
-          reference_medians = NULL,
           format = TRUE # format data
         ),
-      regexp = "2 assays are not shared across products."),
+        regexp = "2 assays are not shared across products."
+      ),
       regexp = "Cross-product normalization will be performed!"
     )
 
-
     # unformatted data
-    expect_message(expect_warning(
-      object = norm_br_data <- olink_normalization(
-      df1 = data_3k,
-      df2 = data_ht,
-      overlapping_samples_df1 = intersect(
-        x = unique(data_3k$SampleID),
-        y = unique(data_ht$SampleID)
-      ) |>
-        (\(x) x[!grepl("CONTROL", x)])(),
-      overlapping_samples_df2 = NULL,
-      df1_project_nr = "P1",
-      df2_project_nr = "P2",
-      reference_project = "P2",
-      reference_medians = NULL # format data
-    ),
-    regexp = "2 assays are not shared across products."),
-    regexp = "Cross-product normalization will be performed!"
-  )
+    expect_message(
+      object = expect_warning(
+        object = df_3k_ht_noformat <- olink_normalization(
+          df1 = data_3k,
+          df2 = data_ht,
+          overlapping_samples_df1 = bridge_samples_3k_ht,
+          df1_project_nr = "P1",
+          df2_project_nr = "P2",
+          reference_project = "P2"
+        ),
+        regexp = "2 assays are not shared across products."
+      ),
+      regexp = "Cross-product normalization will be performed!"
+    )
 
-    expect_warning(
-      object = norm_br_data_format_function <-
-        olink_normalization_product_format(bridged_df = norm_br_data,
-                                           df1 = data_ht,
-                                           df1_project_nr = "P2",
-                                           df2 = data_3k,
-                                           df2_project_nr = "P1",
-                                           reference_project = "P2"),
-      regexp = NA)
+    expect_no_condition(
+      object = df_3k_ht_format_fun <- olink_normalization_product_format(
+        df_norm = df_3k_ht_noformat,
+        df1 = data_ht,
+        df1_project_nr = "P2",
+        df2 = data_3k,
+        df2_project_nr = "P1",
+        reference_project = "P2",
+        ref_product = "HT"
+      )
+    )
 
     ## check that function works both ways
     expect_equal(
-      object = dim(norm_br_data_format),
-      expected = dim(norm_br_data_format_function)
+      object = dim(df_3k_ht_format),
+      expected = dim(df_3k_ht_format_fun)
     )
 
     ## check that correct columns are removed
-    expect_equal(
-      object = length(intersect(colnames(norm_br_data_format),
-                         c("MedianCenteredNPX",
-                           "QSNormalizedNPX", "OlinkID_E3072"))),
-      expected = 0L
+    expect_false(
+      object = any(c("MedianCenteredNPX", "QSNormalizedNPX", "OlinkID_E3072")
+                   %in% colnames(df_3k_ht_format))
     )
 
     ## check that NotBridgeable assays get their own OlinkIDs
     expect_equal(
-      object = norm_br_data_format |>
-        dplyr::filter(.data[["BridgingRecommendation"]] == "NotBridgeable") |>
-        dplyr::select(all_of("OlinkID")) |>
-        dplyr::distinct() |>
-        dplyr::pull(),
+      object = df_3k_ht_format |>
+        dplyr::filter(
+          .data[["BridgingRecommendation"]] == "NotBridgeable"
+        ) |>
+        dplyr::pull(
+          .data[["OlinkID"]]
+        ) |>
+        unique() |>
+        sort(),
       expected = c("OID20054", "OID41012")
     )
 
-
     ## check that NPX is being replaced correctly
-    npx_bridging_recs <- norm_br_data |>
-      dplyr:::mutate(SampleID = paste0(.data[["SampleID"]],
-                                       "_",
-                                       .data[["Project"]])) |>
-      dplyr::mutate(OlinkID =  paste0(
-        .data[["OlinkID"]],
-        "_",
-        .data[["OlinkID_E3072"]])) |>
-      dplyr::select(c("SampleID",
-                      "OlinkID",
-                      "Block",
-                      "BridgingRecommendation",
-                      "MedianCenteredNPX",
-                      "QSNormalizedNPX"))
+    npx_bridging_recs <- df_3k_ht_noformat |>
+      dplyr:::mutate(
+        SampleID = paste0(.data[["SampleID"]], "_", .data[["Project"]]),
+        OlinkID =  paste0(.data[["OlinkID"]], "_", .data[["OlinkID_E3072"]])
+      ) |>
+      dplyr::select(
+        dplyr::all_of(
+          c("SampleID", "OlinkID", "Block",
+            "BridgingRecommendationOriginal" = "BridgingRecommendation",
+            "MedianCenteredNPX", "QSNormalizedNPX")
+        )
+      )
 
-    npx_assignment_check <- norm_br_data_format |>
-      dplyr::filter(!.data[["BridgingRecommendation"]] %in% c("NotBridgeable","NotOverlapping")) |>
-      dplyr::left_join(npx_bridging_recs |>
-                         rename(BridgingRecommendationOriginal = all_of("BridgingRecommendation")),
-                by = c("SampleID",
-                       "OlinkID",
-                       "Block")) |>
-      dplyr::filter(.data[["Project"]] == "P1") |>
-      dplyr::mutate(replace_flag = case_when(
-        .data[["BridgingRecommendationOriginal"]] == "MedianCentering" &
-          .data[["NPX"]] == .data[["MedianCenteredNPX"]] ~ "Correct",
-        .data[["BridgingRecommendationOriginal"]] == "QuantileSmoothing" &
-          .data[["NPX"]] == .data[["QSNormalizedNPX"]] ~ "Correct",
-        TRUE ~ "Incorrect"
-      ))
+    npx_assignment_check <- df_3k_ht_format |>
+      dplyr::filter(
+        !(.data[["BridgingRecommendation"]] %in% c("NotBridgeable",
+                                                   "NotOverlapping"))
+      ) |>
+      dplyr::left_join(
+        npx_bridging_recs,
+        by = c("SampleID", "OlinkID", "Block"),
+        relationship = "one-to-one"
+      ) |>
+      dplyr::filter(
+        .data[["Project"]] == "P1"
+        & !((.data[["BridgingRecommendationOriginal"]] == "MedianCentering"
+             & .data[["NPX"]] == .data[["MedianCenteredNPX"]])
+            | (.data[["BridgingRecommendationOriginal"]] == "QuantileSmoothing"
+               & .data[["NPX"]] == .data[["QSNormalizedNPX"]]))
+      )
 
     expect_equal(
-      object = npx_assignment_check |>
-        dplyr::filter(.data[["replace_flag"]] == "Incorrect") |>
-        nrow(),
+      object = nrow(npx_assignment_check),
       expected = 0L
     )
 
     ## check that the numbers of assay assignments are correct
     expect_equal(
-      object = norm_br_data_format |>
-        select(OlinkID, BridgingRecommendation) |>
-        distinct() |>
-        filter(BridgingRecommendation == "NotOverlapping") |>
-        tally() |>
-        pull(),
+      object = df_3k_ht_format |>
+        dplyr::distinct(
+          .data[["OlinkID"]], .data[["BridgingRecommendation"]]
+        ) |>
+        dplyr::filter(
+          .data[["BridgingRecommendation"]] == "NotOverlapping"
+        ) |>
+        nrow(),
       expected = 2L
     )
 
     expect_equal(
-      object = norm_br_data_format |>
-        select(OlinkID, BridgingRecommendation) |>
-        distinct() |>
-        filter(BridgingRecommendation == "NotBridgeable") |>
-        tally() |>
-        pull(),
+      object = df_3k_ht_format |>
+        dplyr::distinct(
+          .data[["OlinkID"]], .data[["BridgingRecommendation"]]
+        ) |>
+        dplyr::filter(
+          .data[["BridgingRecommendation"]] == "NotBridgeable"
+        ) |>
+        nrow(),
       expected = 2L
     )
 
     expect_equal(
-      object = norm_br_data_format |>
-        select(OlinkID, BridgingRecommendation) |>
-        distinct() |>
-        filter(BridgingRecommendation == "MedianCentering") |>
-        tally() |>
-        pull(),
+      object = df_3k_ht_format |>
+        dplyr::distinct(
+          .data[["OlinkID"]], .data[["BridgingRecommendation"]]
+        ) |>
+        dplyr::filter(
+          .data[["BridgingRecommendation"]] == "MedianCentering"
+        ) |>
+        nrow(),
       expected = 40L
     )
 
     expect_equal(
-      object = norm_br_data_format |>
-        select(OlinkID, BridgingRecommendation) |>
-        distinct() |>
-        filter(BridgingRecommendation == "QuantileSmoothing") |>
-        tally() |>
-        pull(),
+      object = df_3k_ht_format |>
+        dplyr::distinct(
+          .data[["OlinkID"]], .data[["BridgingRecommendation"]]
+        ) |>
+        dplyr::filter(
+          .data[["BridgingRecommendation"]] == "QuantileSmoothing"
+        ) |>
+        nrow(),
       expected = 63L
     )
   }
 )
 
 test_that(
-  "Non-overlapping assays 3k and Reveal",
+  "olink_normalization_product_format - works - 3k-Reveal",
   {
     skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
     skip_if_not(file.exists(test_path("data", "example_Reveal_data.rds")))
@@ -811,50 +840,198 @@ test_that(
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_reveal <- get_example_data(filename = "example_Reveal_data.rds")
 
-    lst_df <- list("e3k" = data_3k,
-                   "Reveal" = data_reveal)
-    lst_cols <- olink_norm_input_check_df_cols(lst_df = lst_df)
-    lst_product <- olink_norm_product_id(
-      lst_df = lst_df,
-      lst_cols = lst_cols
-    )
-    ref_ids <- olink_norm_reference_id(
-      lst_product = lst_product,
-      reference_project = "Reveal"
-    )
-    lst_norm_cp <- olink_norm_input_cross_product(
-      lst_df = lst_df,
-      lst_cols = lst_cols,
-      reference_project = "Reveal",
-      product_ids = lst_product,
-      ref_ids = ref_ids
-    )
+    # 3k-HT ----
 
+    bridge_samples_3k_reveal <- intersect(
+      x = unique(data_3k$SampleID),
+      y = unique(data_reveal$SampleID)
+    ) |>
+      (\(x) x[!grepl("CONTROL", x)])() |>
+      sort() |>
+      head(35L)
+
+    # formatted data
     expect_warning(
-      object = overlapping_assays <- olink_norm_input_assay_overlap(
-        lst_df = lst_norm_cp$lst_df,
-        reference_medians = NULL,
-        lst_cols = lst_cols,
-        norm_mode = lst_norm_cp$norm_mode
+      object = expect_warning(
+        object = expect_message(
+          object = df_3k_reveal_format <- olink_normalization(
+            df1 = data_3k,
+            df2 = data_reveal,
+            overlapping_samples_df1 = bridge_samples_3k_reveal,
+            df1_project_nr = "P1",
+            df2_project_nr = "P2",
+            reference_project = "P2",
+            format = TRUE # format data
+          ),
+          regexp = "Cross-product normalization will be performed!"
+        ),
+        regexp = "85 assays are not shared across products."
       ),
-      regexp = "85 assays are not shared across products"
+      regexp = "There are 6 assays with fewer than 32 bridge samples for QS"
+    )
+
+    # unformatted data
+    expect_warning(
+      object = expect_warning(
+        object = expect_message(
+          object = df_3k_reveal_noformat <- olink_normalization(
+            df1 = data_3k,
+            df2 = data_reveal,
+            overlapping_samples_df1 = bridge_samples_3k_reveal,
+            df1_project_nr = "P1",
+            df2_project_nr = "P2",
+            reference_project = "P2"
+          ),
+          regexp = "Cross-product normalization will be performed!"
+        ),
+        regexp = "85 assays are not shared across products."
+      ),
+      regexp = "There are 6 assays with fewer than 32 bridge samples for QS"
+    )
+
+    expect_no_condition(
+      object = df_3k_reveal_format_fun <- olink_normalization_product_format(
+        df_norm = df_3k_reveal_noformat,
+        df1 = data_reveal,
+        df1_project_nr = "P2",
+        df2 = data_3k,
+        df2_project_nr = "P1",
+        reference_project = "P2",
+        ref_product = "Reveal"
+      )
+    )
+
+    ## check that function works both ways
+    expect_equal(
+      object = dim(df_3k_reveal_format),
+      expected = dim(df_3k_reveal_format_fun)
+    )
+
+    ## check that correct columns are removed
+    expect_false(
+      object = any(c("MedianCenteredNPX", "QSNormalizedNPX", "OlinkID_E3072")
+                   %in% colnames(df_3k_reveal_format))
+    )
+
+    ## check that NotBridgeable assays get their own OlinkIDs
+    expect_equal(
+      object = df_3k_reveal_format |>
+        dplyr::filter(
+          .data[["BridgingRecommendation"]] == "NotBridgeable"
+        ) |>
+        dplyr::pull(
+          .data[["OlinkID"]]
+        ) |>
+        unique() |>
+        sort(),
+      expected = c("OID20052", "OID20117", "OID20798", "OID20843", "OID20856",
+                   "OID21178", "OID21197", "OID21198", "OID21234", "OID30086",
+                   "OID30421", "OID30498", "OID31161", "OID50023", "OID50033",
+                   "OID50044", "OID50059", "OID50088", "OID50092", "OID50093",
+                   "OID50100", "OID50101", "OID50102", "OID50105", "OID50106",
+                   "OID50107")
+    )
+
+    ## check that NPX is being replaced correctly
+    npx_bridging_recs <- df_3k_reveal_noformat |>
+      dplyr:::mutate(
+        SampleID = paste0(.data[["SampleID"]], "_", .data[["Project"]]),
+        OlinkID =  paste0(.data[["OlinkID"]], "_", .data[["OlinkID_E3072"]])
+      ) |>
+      dplyr::select(
+        dplyr::all_of(
+          c("SampleID", "OlinkID", "Block",
+            "BridgingRecommendationOriginal" = "BridgingRecommendation",
+            "MedianCenteredNPX", "QSNormalizedNPX")
+        )
+      )
+
+    npx_assignment_check <- df_3k_reveal_format |>
+      dplyr::filter(
+        !(.data[["BridgingRecommendation"]] %in% c("NotBridgeable",
+                                                   "NotOverlapping"))
+      ) |>
+      dplyr::left_join(
+        npx_bridging_recs,
+        by = c("SampleID", "OlinkID", "Block"),
+        relationship = "one-to-one"
+      ) |>
+      dplyr::filter(
+        .data[["Project"]] == "P1"
+        & !((.data[["BridgingRecommendationOriginal"]] == "MedianCentering"
+             & .data[["NPX"]] == .data[["MedianCenteredNPX"]])
+            | (.data[["BridgingRecommendationOriginal"]] == "QuantileSmoothing"
+               & .data[["NPX"]] == .data[["QSNormalizedNPX"]]))
+      )
+
+    expect_equal(
+      object = nrow(npx_assignment_check),
+      expected = 0L
+    )
+
+    ## check that the numbers of assay assignments are correct
+    expect_equal(
+      object = df_3k_reveal_format |>
+        dplyr::distinct(
+          .data[["OlinkID"]], .data[["BridgingRecommendation"]]
+        ) |>
+        dplyr::filter(
+          .data[["BridgingRecommendation"]] == "NotOverlapping"
+        ) |>
+        nrow(),
+      expected = 84L
     )
 
     expect_equal(
-      object = length(
-        unique(
-          overlapping_assays$lst_df$e3k$OlinkID
-        )
-      ),
-      expected = 21L)
+      object = df_3k_reveal_format |>
+        dplyr::distinct(
+          .data[["OlinkID"]], .data[["BridgingRecommendation"]]
+        ) |>
+        dplyr::filter(
+          .data[["BridgingRecommendation"]] == "NotBridgeable"
+        ) |>
+        nrow(),
+      expected = 26L
+    )
 
     expect_equal(
-      object = length(
-        unique(
-          overlapping_assays$lst_df$Reveal$OlinkID
-        )
-      ),
-      expected = 21L)
+      object = df_3k_reveal_format |>
+        dplyr::distinct(
+          .data[["OlinkID"]], .data[["BridgingRecommendation"]]
+        ) |>
+        dplyr::filter(
+          .data[["BridgingRecommendation"]] == "MedianCentering"
+        ) |>
+        nrow(),
+      expected = 2L
+    )
 
+    expect_equal(
+      object = df_3k_reveal_format |>
+        dplyr::distinct(
+          .data[["OlinkID"]], .data[["BridgingRecommendation"]]
+        ) |>
+        dplyr::filter(
+          .data[["BridgingRecommendation"]] == "QuantileSmoothing"
+        ) |>
+        nrow(),
+      expected = 6L
+    )
+
+    expect_true(
+      object = df_3k_reveal_noformat |>
+        dplyr::distinct(
+          .data[["Project"]], .data[["OlinkID"]]
+        ) |>
+        dplyr::group_by(
+          .data[["Project"]]
+        ) |>
+        dplyr::tally(
+          name = "n"
+        ) |>
+        dplyr::ungroup() |>
+        dplyr::pull(.data[["n"]]) |>
+        unique() == 21L
+    )
   }
 )

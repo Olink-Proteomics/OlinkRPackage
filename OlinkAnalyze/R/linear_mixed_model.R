@@ -161,6 +161,9 @@ olink_lmer <- function(df,
     #Check data format
     npxCheck <- npxCheck(df)
 
+    # Rename duplicate UniProts
+    df <- uniprot_replace(df, npxCheck)
+
     ##Convert character vars to factor
     converted.vars <- NULL
     num.vars <- NULL
@@ -307,7 +310,7 @@ olink_lmer <- function(df,
     }
 
   }, warning = function(w) {
-    if (grepl(x = w, pattern = glob2rx("*not recognized or transformed: NumDF, DenDF*")) |
+    if (grepl(x = w, pattern = glob2rx("*not recognized or transformed*")) |
         grepl(x = w, pattern = glob2rx("*contains implicit NA, consider using*"))){
       invokeRestart("muffleWarning")
     }
@@ -499,6 +502,9 @@ olink_lmer_posthoc <- function(df,
 
     #Check data format
     npxCheck <- npxCheck(df)
+
+    # Rename duplicate UniProts
+    df <- uniprot_replace(df, npxCheck)
 
     #Allow for :/* notation in covariates
     variable <- gsub("\\*",":",variable)

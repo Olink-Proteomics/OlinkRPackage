@@ -1,7 +1,7 @@
 Type: Package
 Package: OlinkAnalyze
 Title: Facilitate Analysis of Proteomic Data from Olink
-Version: 4.2.0
+Version: 4.3.0
 Authors@R: c(
     person("Kathleen", "Nevola", , "biostattools@olink.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-5183-6444", "kathy-nevola")),
@@ -101,7 +101,7 @@ Suggests:
     lme4,
     lmerTest,
     markdown,
-    msigdbr,
+    msigdbr (>= 9.0.0),
     openssl,
     ordinal,
     pheatmap,

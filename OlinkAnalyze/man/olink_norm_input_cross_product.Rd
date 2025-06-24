@@ -31,7 +31,7 @@ each input dataset matches to.}
 \value{
 Character string indicating the type of normalization to be
 performed. One of
-bridge, subset, ref_median or norm_cross_product. # nolint
+bridge, subset, ref_median or norm_cross_product. # nolint line_length_linter
 And the updated list of datasets in case of cross-platform normalization.
 }
 \description{

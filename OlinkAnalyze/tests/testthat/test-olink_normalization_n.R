@@ -95,7 +95,8 @@ npxBridged <-
     project_1_name = 'P1',
     project_2_name = 'P2',
     project_ref_name = 'P1') |>
-  suppressMessages()
+  suppressMessages() |>
+  suppressWarnings()
 
 npxBridged_proj2ref <-
   olink_normalization_bridge(
@@ -106,7 +107,8 @@ npxBridged_proj2ref <-
     project_1_name = 'P1',
     project_2_name = 'P2',
     project_ref_name = 'P2') |>
-  suppressMessages()
+  suppressMessages() |>
+  suppressWarnings()
 
 # Subset and Intensity normalization ----
 
@@ -213,7 +215,8 @@ norm_schema_npxBridged.n <- dplyr::tibble(
 )
 npxBridged.n <-
   olink_normalization_n(norm_schema = norm_schema_npxBridged.n) |>
-  suppressMessages()
+  suppressMessages() |>
+  suppressWarnings()
 
 norm_schema_npxBridged_proj2ref.n <- dplyr::tibble(
   order              = c(2, 1),
@@ -228,7 +231,8 @@ norm_schema_npxBridged_proj2ref.n <- dplyr::tibble(
 )
 npxBridged_proj2ref.n <-
   olink_normalization_n(norm_schema = norm_schema_npxBridged_proj2ref.n) |>
-  suppressMessages()
+  suppressMessages() |>
+  suppressWarnings()
 
 ## Subset/Intensity normalization ----
 
