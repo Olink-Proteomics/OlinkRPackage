@@ -148,6 +148,175 @@ test_that(
         norm_mode = olink_norm_modes$bridge
       )
     )
+
+    # multiple quantification columns - one matching ----
+
+    bridge_samples <- intersect(x = npx_data1$SampleID,
+                                y = npx_data2$SampleID) |>
+      (\(x) x[!grepl(pattern = "CONTROL_SAMPLE", x = x)])()
+
+    expect_warning(
+      object = expect_message(
+        object = expect_message(
+          object = lst_check_out <- olink_norm_input_check(
+            df1 = npx_data1 |>
+              dplyr::mutate(
+                Normalization = "Intensity",
+                Ct = .data[["NPX"]]
+              ),
+            df2 = npx_data2 |>
+              dplyr::mutate(
+                Normalization = "Intensity",
+                Quantified_value = .data[["NPX"]]
+              ),
+            overlapping_samples_df1 = bridge_samples,
+            overlapping_samples_df2 = NULL,
+            df1_project_nr = "20200001",
+            df2_project_nr = "20200002",
+            reference_project = "20200002",
+            reference_medians = NULL
+          ),
+          regexp = "Bridge normalization will be performed!"
+        ),
+        regexp = "\"NPX\" will be used for normalization"
+      ),
+      regexp = "Columns not present across datasets"
+    )
+
+    expect_identical(
+      object = lst_check_out,
+      expected = list(
+        ref_df = npx_data2 |>
+          dplyr::mutate(
+            Normalization = "Intensity",
+            Quantified_value = .data[["NPX"]]
+          ),
+        ref_samples = bridge_samples,
+        ref_name = "20200002",
+        ref_cols = list(sample_id = "SampleID",
+                        olink_id = "OlinkID",
+                        uniprot = "UniProt",
+                        assay = "Assay",
+                        panel = "Panel",
+                        panel_version = "Panel_Version",
+                        plate_id = "PlateID",
+                        qc_warn = "QC_Warning",
+                        assay_warn = character(0L),
+                        quant = "NPX",
+                        lod = "LOD",
+                        normalization = "Normalization",
+                        count = character(0L),
+                        sample_type = character(0L)),
+        ref_product = "other",
+        not_ref_df = npx_data1 |>
+          dplyr::mutate(
+            Normalization = "Intensity",
+            Ct = .data[["NPX"]]
+          ),
+        not_ref_samples = NULL,
+        not_ref_name = "20200001",
+        not_ref_cols = list(sample_id = "SampleID",
+                            olink_id = "OlinkID",
+                            uniprot = "UniProt",
+                            assay = "Assay",
+                            panel = "Panel",
+                            panel_version = "Panel_Version",
+                            plate_id = "PlateID",
+                            qc_warn = "QC_Warning",
+                            assay_warn = character(0L),
+                            quant = "NPX",
+                            lod = "LOD",
+                            normalization = "Normalization",
+                            count = character(0L),
+                            sample_type = character(0L)),
+        not_ref_product = "other",
+        reference_medians = NULL,
+        norm_mode = olink_norm_modes$bridge
+      )
+    )
+
+    # multiple quantification columns - multiple matching v1 ----
+
+    bridge_samples <- intersect(x = npx_data1$SampleID,
+                                y = npx_data2$SampleID) |>
+      (\(x) x[!grepl(pattern = "CONTROL_SAMPLE", x = x)])()
+
+    expect_message(
+      object = expect_message(
+        object = lst_check_out <- olink_norm_input_check(
+          df1 = npx_data1 |>
+            dplyr::mutate(
+              Normalization = "Intensity",
+              Quantified_value = .data[["NPX"]]
+            ),
+          df2 = npx_data2 |>
+            dplyr::mutate(
+              Normalization = "Intensity",
+              Quantified_value = .data[["NPX"]]
+            ),
+          overlapping_samples_df1 = bridge_samples,
+          overlapping_samples_df2 = NULL,
+          df1_project_nr = "20200001",
+          df2_project_nr = "20200002",
+          reference_project = "20200002",
+          reference_medians = NULL
+        ),
+        regexp = "Bridge normalization will be performed!"
+      ),
+      regexp = "\"NPX\" will be used for normalization"
+    )
+
+    expect_identical(
+      object = lst_check_out,
+      expected = list(
+        ref_df = npx_data2 |>
+          dplyr::mutate(
+            Normalization = "Intensity",
+            Quantified_value = .data[["NPX"]]
+          ),
+        ref_samples = bridge_samples,
+        ref_name = "20200002",
+        ref_cols = list(sample_id = "SampleID",
+                        olink_id = "OlinkID",
+                        uniprot = "UniProt",
+                        assay = "Assay",
+                        panel = "Panel",
+                        panel_version = "Panel_Version",
+                        plate_id = "PlateID",
+                        qc_warn = "QC_Warning",
+                        assay_warn = character(0L),
+                        quant = "NPX",
+                        lod = "LOD",
+                        normalization = "Normalization",
+                        count = character(0L),
+                        sample_type = character(0L)),
+        ref_product = "other",
+        not_ref_df = npx_data1 |>
+          dplyr::mutate(
+            Normalization = "Intensity",
+            Quantified_value = .data[["NPX"]]
+          ),
+        not_ref_samples = NULL,
+        not_ref_name = "20200001",
+        not_ref_cols = list(sample_id = "SampleID",
+                            olink_id = "OlinkID",
+                            uniprot = "UniProt",
+                            assay = "Assay",
+                            panel = "Panel",
+                            panel_version = "Panel_Version",
+                            plate_id = "PlateID",
+                            qc_warn = "QC_Warning",
+                            assay_warn = character(0L),
+                            quant = "NPX",
+                            lod = "LOD",
+                            normalization = "Normalization",
+                            count = character(0L),
+                            sample_type = character(0L)),
+        not_ref_product = "other",
+        reference_medians = NULL,
+        norm_mode = olink_norm_modes$bridge
+      )
+    )
   }
 )
 
