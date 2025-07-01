@@ -972,7 +972,7 @@ olink_norm_input_check_quant <- function(lst_req_col_quant, quant_cols_set) {
         # remove potential NA matches
         (\(.) .[!is.na(.)])() |>
         # order lst_req_col_quant[[1L]] from quant_cols_set
-        (\(.) c("B", "A", "C", "D")[.])() |>
+        (\(.) lst_req_col_quant[[1L]][.])() |>
         # select first by priority list
         head(n = 1L)
 
