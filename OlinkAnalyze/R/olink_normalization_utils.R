@@ -936,7 +936,7 @@ olink_norm_input_check_df_cols <- function(lst_df) {
 
 # this function will be called by olink_norm_input_check_df_cols to resolve the
 # the quantification columns.
-olink_norm_input_check_quant <- function(lst_req_col_quant) {
+olink_norm_input_check_quant <- function(lst_req_col_quant, quant_cols_set) {
   if (any(sapply(lst_req_col_quant, length) == 0L)) {
     # no quantification identified in at least one datasets
     cli::cli_abort(
