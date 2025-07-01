@@ -972,6 +972,7 @@ olink_norm_input_check_quant <- function(lst_req_col_quant, quant_cols_set) {
       )
 
     }
+
   } else {
     # this holds if we are doing bridge normalization, subset normalization, and
     # cross-product normalization.
