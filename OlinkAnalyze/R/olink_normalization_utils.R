@@ -753,7 +753,6 @@ olink_norm_input_check_df_cols <- function(lst_df) {
 
   # check that quant methods are the same ----
   # if multiple quant columns, select a single quant unit as a req col
-  quant_cols <- list()
 
   quant_cols <-
     lapply(seq_along(lst_req_col), function(i) {
