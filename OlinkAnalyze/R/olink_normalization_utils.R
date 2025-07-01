@@ -935,8 +935,19 @@ olink_norm_input_check_df_cols <- function(lst_df) {
 
 }
 
-# this function will be called by olink_norm_input_check_df_cols to resolve the
-# the quantification columns.
+#' Check quantification columns.
+#'
+#' @description
+#' This function is called from \var{olink_norm_input_check_df_cols} to resolve
+#' ties and cases of multiple the quantification columns across datasets.
+#'
+#' @param quant_cols Named list of vector arrays with quantifications of the
+#' datasets to be normalized.
+#' @param quant_cols_set pre-ordered vector array of accepted quantification
+#' column names.
+#'
+#' @returns \var{quant_cols} with the selected quantification column.
+#'
 olink_norm_input_check_quant <- function(quant_cols, quant_cols_set) {
 
   # check that all datasets have at least one quantification column
