@@ -964,6 +964,7 @@ olink_norm_input_check_quant <- function(lst_req_col_quant, quant_cols_set) {
       ) |>
         head(n = 1L)
 
+      # inform use that column was selected
       cli::cli_inform(
         c("!" = "Multiple quantification methods detected in dataset
           {.val {names(lst_req_col_quant)[1L]}}.",
