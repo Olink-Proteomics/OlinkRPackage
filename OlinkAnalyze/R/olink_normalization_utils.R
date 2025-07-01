@@ -965,11 +965,10 @@ olink_norm_input_check_quant <- function(lst_req_col_quant, quant_cols_set) {
         head(n = 1L)
 
       cli::cli_inform(
-        c("!" = "Multiple quantification methods detected.",
-          "i" = paste0(lst_req_col_quant[[1L]],
-                       " will be used for normalization."),
-          "Priority list  `'NPX','Quantified_value','Ct'` used  to determine
-          quantification used in the normalization process.")
+        c("!" = "Multiple quantification methods detected in dataset
+          {.val {names(lst_req_col_quant)[1L]}}.",
+          "i" = "{.val {lst_req_col_quant[1L]}} will be used for normalization
+          based on the priority list: {.val {quant_cols_set}}.")
       )
 
       lst_req_col_quant[[1L]] <- lst_req_col_quant[[1L]] |> as.character()
