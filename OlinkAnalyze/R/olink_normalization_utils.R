@@ -982,9 +982,11 @@ olink_norm_input_check_quant <- function(lst_req_col_quant, quant_cols_set) {
     }
 
   } else {
+
     # this holds if we are doing bridge normalization, subset normalization, and
     # cross-product normalization.
-    # get the quantification columns present in all datasets
+
+    # get the quantification columns present across all datasets
     quant_col_shared <- Reduce(intersect, lst_req_col_quant)
 
     quant_col_shared <- sort(factor(quant_col_shared,
