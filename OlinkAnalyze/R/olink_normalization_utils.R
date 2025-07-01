@@ -757,7 +757,7 @@ olink_norm_input_check_df_cols <- function(lst_df) {
   quant_cols <- lapply(lst_req_col, function(x) x[["quant"]]) # nolint return_linter
 
   lst_req_col_quant <- olink_norm_input_check_quant(
-    lst_req_col_quant = quant_cols,
+    quant_cols = quant_cols,
     quant_cols_set = required_cols$quant
   )
 
@@ -937,10 +937,10 @@ olink_norm_input_check_df_cols <- function(lst_df) {
 
 # this function will be called by olink_norm_input_check_df_cols to resolve the
 # the quantification columns.
-olink_norm_input_check_quant <- function(lst_req_col_quant, quant_cols_set) {
+olink_norm_input_check_quant <- function(quant_cols, quant_cols_set) {
 
   # check that all datasets have at least one quantification column
-  if (any(sapply(lst_req_col_quant, length) == 0L)) {
+  if (any(sapply(quant_cols, length) == 0L)) {
     # no quantification identified in at least one datasets
     cli::cli_abort(
       c(
@@ -959,29 +959,29 @@ olink_norm_input_check_quant <- function(lst_req_col_quant, quant_cols_set) {
   #       list quant_cols_set.
   # 2. If two datasets - bridge, subset or cross-product normalization:
   #    a.
-  if (length(lst_req_col_quant) == 1L) {
+  if (length(quant_cols) == 1L) {
 
     # this relates to reference normalization, where one dataset is required.
-    if (length(lst_req_col_quant[[1L]]) > 1L) {
+    if (length(quant_cols[[1L]]) > 1L) {
 
       # choose quantification method by discated from order of quant_cols_set
-      lst_req_col_quant[[1L]] <- match( # index order cols from quant_cols_set
-        x = lst_req_col_quant[[1L]],
+      quant_cols[[1L]] <- match( # index order cols from quant_cols_set
+        x = quant_cols[[1L]],
         table = quant_cols_set
       ) |>
         # remove potential NA matches
         (\(.) .[!is.na(.)])() |>
-        # order lst_req_col_quant[[1L]] from quant_cols_set
-        (\(.) lst_req_col_quant[[1L]][.])() |>
+        # order quant_cols[[1L]] from quant_cols_set
+        (\(.) quant_cols[[1L]][.])() |>
         # select first by priority list
         head(n = 1L)
 
       # inform use that column was selected
       cli::cli_inform(
         c("!" = "Multiple quantification methods detected in dataset
-          {.val {names(lst_req_col_quant)[1L]}}.",
-          "i" = "{.val {lst_req_col_quant[[1L]]}} will be used for normalization
-          based on the priority list: {.val {quant_cols_set}}.")
+          {.val {names(quant_cols)[1L]}}.",
+          "i" = "{.val {quant_cols[[1L]]}} will be used for normalization based
+          on the priority list: {.val {quant_cols_set}}.")
       )
 
     }
@@ -992,15 +992,15 @@ olink_norm_input_check_quant <- function(lst_req_col_quant, quant_cols_set) {
     # cross-product normalization.
 
     # get the quantification columns present across all datasets
-    quant_col_shared <- Reduce(intersect, lst_req_col_quant)
+    quant_col_shared <- Reduce(intersect, quant_cols)
 
     if (length(quant_col_shared) == 0L) {
 
       # if no shared quantification methods among datasets, throw an error
       cli::cli_abort(
         c("x"= "Datasets are not quantified with the same method.",
-          paste0("*", names(lst_req_col_quant), " is quantified with: ",
-                 paste0("\"", lst_req_col_quant, "\"")),
+          paste0("*", names(quant_cols), " is quantified with: ",
+                 paste0("\"", quant_cols, "\"")),
           "i" = "Re-export data with at least one shared quantification method."
         ),
         call = rlang::caller_env(),
@@ -1011,13 +1011,13 @@ olink_norm_input_check_quant <- function(lst_req_col_quant, quant_cols_set) {
 
       # if there is exactly one quantification method shared across all datasets
       # simply set that as the one to be used.
-      if (any(sapply(lst_req_col_quant, length) > 1L)) {
+      if (any(sapply(quant_cols, length) > 1L)) {
         cli::cli_inform(
           "{.val {quant_col_shared}} will be used for normalization."
         )
       }
 
-      lst_req_col_quant <- lapply(lst_req_col_quant, function(x) {
+      quant_cols <- lapply(quant_cols, function(x) {
         quant_col_shared # nolint return_linter
       })
 
@@ -1025,8 +1025,8 @@ olink_norm_input_check_quant <- function(lst_req_col_quant, quant_cols_set) {
 
       # both datasets have more than one quantification method. We will choose
       # quantification method by priority order.
-      lst_req_col_quant <- lapply( # keep only shared quant columns
-        lst_req_col_quant,
+      quant_cols <- lapply( # keep only shared quant columns
+        quant_cols,
         intersect,
         quant_col_shared
       ) |>
@@ -1038,7 +1038,7 @@ olink_norm_input_check_quant <- function(lst_req_col_quant, quant_cols_set) {
             ) |>
               # remove potential NA matches
               (\(.) .[!is.na(.)])() |>
-              # order lst_req_col_quant[[1L]] from quant_cols_set
+              # order quant_cols[[1L]] from quant_cols_set
               (\(.) x[.])() |>
               # select first by priority list
               head(n = 1L)
@@ -1047,15 +1047,15 @@ olink_norm_input_check_quant <- function(lst_req_col_quant, quant_cols_set) {
 
       cli::cli_inform(
         c("!" = "Multiple matching quantification methods detected in datasets
-          {.val {names(lst_req_col_quant)}}.",
-          "i" = "{.val {lst_req_col_quant[[1L]]}} will be used for normalization
-          based on the priority list: {.val {quant_cols_set}}.")
+          {.val {names(quant_cols)}}.",
+          "i" = "{.val {quant_cols[[1L]]}} will be used for normalization based
+          on the priority list: {.val {quant_cols_set}}.")
       )
     }
 
   }
 
-  return(lst_req_col_quant)
+  return(quant_cols)
 
 }
 
