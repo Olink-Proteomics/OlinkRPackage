@@ -756,13 +756,13 @@ olink_norm_input_check_df_cols <- function(lst_df) {
 
   quant_cols <- lapply(lst_req_col, function(x) x[["quant"]]) # nolint return_linter
 
-  lst_req_col_quant <- olink_norm_input_check_quant(
+  quant_cols_clean <- olink_norm_input_check_quant(
     quant_cols = quant_cols,
     quant_cols_set = required_cols$quant
   )
 
-  for (i in seq_along(length(lst_req_col_quant))) {
-    lst_req_col[[i]][["quant"]] <- lst_req_col_quant[[i]]
+  for (df_n in names(lst_req_col)) {
+    lst_req_col[[df_n]]$quant <- quant_cols_clean[[df_n]]
   }
 
   ## check for missing columns ----
