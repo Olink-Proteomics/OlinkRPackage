@@ -3010,7 +3010,7 @@ test_that(
     expect_error(
       object = olink_norm_input_check_quant(
         quant_cols = quant_cols,
-        quant_cols_set = c( "NPX", "Quantified_value", "Ct")
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
       ),
       regexp = "No quantification column identified in at least one of the"
     )
@@ -3025,7 +3025,7 @@ test_that(
     expect_error(
       object = olink_norm_input_check_quant(
         quant_cols = quant_cols,
-        quant_cols_set = c( "NPX", "Quantified_value", "Ct")
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
       ),
       regexp = "No quantification column identified in at least one of the"
     )
@@ -3045,7 +3045,7 @@ test_that(
     expect_error(
       object = olink_norm_input_check_quant(
         quant_cols = quant_cols,
-        quant_cols_set = c( "NPX", "Quantified_value", "Ct")
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
       ),
       regexp = "Re-export data with at least one shared quantification method"
     )
@@ -3060,7 +3060,7 @@ test_that(
     expect_error(
       object = olink_norm_input_check_quant(
         quant_cols = quant_cols,
-        quant_cols_set = c( "NPX", "Quantified_value", "Ct")
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
       ),
       regexp = "Re-export data with at least one shared quantification method"
     )
@@ -3079,7 +3079,7 @@ test_that(
     expect_identical(
       object = olink_norm_input_check_quant(
         quant_cols = quant_cols,
-        quant_cols_set = c( "NPX", "Quantified_value", "Ct")
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
       ),
       expected = list("DF1" =  "NPX")
     )
@@ -3093,7 +3093,7 @@ test_that(
     expect_identical(
       object = olink_norm_input_check_quant(
         quant_cols = quant_cols,
-        quant_cols_set = c( "NPX", "Quantified_value", "Ct")
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
       ),
       expected = list("DF1" =  "Quantified_value")
     )
@@ -3107,7 +3107,7 @@ test_that(
     expect_message(
       object = quant_check <- olink_norm_input_check_quant(
         quant_cols = quant_cols,
-        quant_cols_set = c( "NPX", "Quantified_value", "Ct")
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
       ),
       regexp = "Multiple quantification methods detected in dataset \"DF1\""
     )
@@ -3126,7 +3126,7 @@ test_that(
     expect_message(
       object = quant_check <- olink_norm_input_check_quant(
         quant_cols = quant_cols,
-        quant_cols_set = c( "NPX", "Quantified_value", "Ct")
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
       ),
       regexp = "Multiple quantification methods detected in dataset \"DF1\""
     )
@@ -3151,7 +3151,7 @@ test_that(
     expect_message(
       object = quant_check <- olink_norm_input_check_quant(
         quant_cols = quant_cols,
-        quant_cols_set = c( "NPX", "Quantified_value", "Ct")
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
       ),
       regexp = "\"NPX\" will be used for normalization."
     )
@@ -3174,7 +3174,7 @@ test_that(
     expect_message(
       object = quant_check <- olink_norm_input_check_quant(
         quant_cols = quant_cols,
-        quant_cols_set = c( "NPX", "Quantified_value", "Ct")
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
       ),
       regexp = "\"NPX\" will be used for normalization."
     )
@@ -3197,7 +3197,7 @@ test_that(
     expect_message(
       object = quant_check <- olink_norm_input_check_quant(
         quant_cols = quant_cols,
-        quant_cols_set = c( "NPX", "Quantified_value", "Ct")
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
       ),
       regexp = "Multiple matching quantification methods detected in datasets"
     )
@@ -3220,7 +3220,7 @@ test_that(
     expect_message(
       object = quant_check <- olink_norm_input_check_quant(
         quant_cols = quant_cols,
-        quant_cols_set = c( "NPX", "Quantified_value", "Ct")
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
       ),
       regexp = "Multiple matching quantification methods detected in datasets"
     )

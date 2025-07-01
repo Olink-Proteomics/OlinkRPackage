@@ -1012,7 +1012,7 @@ olink_norm_input_check_quant <- function(quant_cols, quant_cols_set) {
 
       # if no shared quantification methods among datasets, throw an error
       cli::cli_abort(
-        c("x"= "Datasets are not quantified with the same method.",
+        c("x" = "Datasets are not quantified with the same method.",
           paste0("*", names(quant_cols), " is quantified with: ",
                  paste0("\"", quant_cols, "\"")),
           "i" = "Re-export data with at least one shared quantification method."
@@ -1046,7 +1046,8 @@ olink_norm_input_check_quant <- function(quant_cols, quant_cols_set) {
       ) |>
         lapply(
           function(x) {
-            match( # index order cols from quant_cols_set
+            # index order cols from quant_cols_set
+            match(  # nolint return_linter
               x = quant_cols_set,
               table = x
             ) |>
