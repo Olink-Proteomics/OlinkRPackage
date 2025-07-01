@@ -952,6 +952,13 @@ olink_norm_input_check_quant <- function(lst_req_col_quant, quant_cols_set) {
     )
   }
 
+  # if each dataset has at least one quantification column, we need to check:
+  # 1. If only one dataset - median reference normalization:
+  #    a. If one quantification colum -> nothing to do.
+  #    b. If multiple quantification colums -> pick the best match from priority
+  #       list quant_cols_set.
+  # 2. If two datasets - bridge, subset or cross-product normalization:
+  #    a.
   if (length(lst_req_col_quant) == 1L) {
 
     # this relates to reference normalization, where one dataset is required.
