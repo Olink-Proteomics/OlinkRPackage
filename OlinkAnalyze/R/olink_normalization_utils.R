@@ -965,10 +965,15 @@ olink_norm_input_check_quant <- function(lst_req_col_quant, quant_cols_set) {
     if (length(lst_req_col_quant[[1L]]) > 1L) {
 
       # choose quantification method by discated from order of quant_cols_set
-      lst_req_col_quant[[1L]] <- intersect(
+      lst_req_col_quant[[1L]] <- match( # index order cols from quant_cols_set
         x = lst_req_col_quant[[1L]],
-        y = quant_cols_set
+        table = quant_cols_set
       ) |>
+        # remove potential NA matches
+        (\(.) .[!is.na(.)])() |>
+        # order lst_req_col_quant[[1L]] from quant_cols_set
+        (\(.) c("B", "A", "C", "D")[.])() |>
+        # select first by priority list
         head(n = 1L)
 
       # inform use that column was selected
