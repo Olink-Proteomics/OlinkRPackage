@@ -1017,8 +1017,9 @@ olink_norm_input_check_quant <- function(lst_req_col_quant, quant_cols_set) {
       })
 
     } else {
-      # both datasets have more than one quantification methods. We will
-      # choose quantification method by priority order
+
+      # both datasets have more than one quantification method. We will choose
+      # quantification method by priority order.
       lst_req_col_quant <-
         lapply(seq_along(lst_req_col_quant), function(i) {
           lst_req_col_quant[[i]] <- quant_col_shared[1L] |> as.character() # nolinter return lint
