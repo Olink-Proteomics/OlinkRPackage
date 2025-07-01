@@ -756,7 +756,9 @@ olink_norm_input_check_df_cols <- function(lst_df) {
 
   quant_cols <- lapply(lst_req_col, function(x) x[["quant"]]) # nolint return_linter
 
-  lst_req_col_quant <- olink_norm_input_check_quant(quant_cols)
+  lst_req_col_quant <- olink_norm_input_check_quant(
+    lst_req_col_quant = quant_cols
+  )
 
   for (i in seq_along(length(lst_req_col_quant))) {
     lst_req_col[[i]][["quant"]] <- lst_req_col_quant[[i]]
