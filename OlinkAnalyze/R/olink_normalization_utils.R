@@ -944,9 +944,8 @@ olink_norm_input_check_quant <- function(lst_req_col_quant, quant_cols_set) {
       c(
         "x" = "No quantification column identified in at least one of the
         datasets.",
-        "i" = "Ensure that at least one quantification column (NPX,
-        Quantified_value, or Ct) is present in each dataset. Re-export of
-        datasets may be required."
+        "i" = "Ensure that at least one quantification column ({quant_cols_set})
+        is present in each dataset. Re-export of datasets may be required."
       )
     )
   }
