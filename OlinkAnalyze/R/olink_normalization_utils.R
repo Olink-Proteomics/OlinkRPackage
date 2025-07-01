@@ -1012,10 +1012,9 @@ olink_norm_input_check_quant <- function(lst_req_col_quant, quant_cols_set) {
         )
       }
 
-      lst_req_col_quant <-
-        lapply(seq_along(lst_req_col_quant), function(i) {
-          lst_req_col_quant[[i]] <- quant_col_shared |> as.character() # nolint return linter
-        })
+      lst_req_col_quant <- lapply(lst_req_col_quant, function(x) {
+        quant_col_shared # nolint return_linter
+      })
 
     } else {
       # both datasets have more than one quantification methods. We will
