@@ -1006,10 +1006,11 @@ olink_norm_input_check_quant <- function(lst_req_col_quant, quant_cols_set) {
 
       # if there is exactly one quantification method shared across all datasets
       # simply set that as the one to be used.
-      if (any(sapply(lst_req_col_quant, length) > 1L))
+      if (any(sapply(lst_req_col_quant, length) > 1L)) {
         cli::cli_inform(
-          paste0(quant_col_shared, " will be used for normalization."),
+          "{.val {quant_col_shared}} will be used for normalization."
         )
+      }
 
       lst_req_col_quant <-
         lapply(seq_along(lst_req_col_quant), function(i) {
