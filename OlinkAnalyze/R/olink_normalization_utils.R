@@ -989,8 +989,9 @@ olink_norm_input_check_quant <- function(lst_req_col_quant, quant_cols_set) {
     # get the quantification columns present across all datasets
     quant_col_shared <- Reduce(intersect, lst_req_col_quant)
 
-    # if no shared quantification methods among datasets, throw an error
     if (length(quant_col_shared) == 0L) {
+
+      # if no shared quantification methods among datasets, throw an error
       cli::cli_abort(
         c("x"= "Datasets are not quantified with the same method.",
           paste0("*", names(lst_req_col_quant), " is quantified with: ",
@@ -1002,7 +1003,9 @@ olink_norm_input_check_quant <- function(lst_req_col_quant, quant_cols_set) {
       )
 
     } else if (length(quant_col_shared) == 1L) {
-      # if either dataset has 2 or more quant columns, print message
+
+      # if there is exactly one quantification method shared across all datasets
+      # simply set that as the one to be used.
       if (any(sapply(lst_req_col_quant, length) > 1L))
         cli::cli_inform(
           paste0(quant_col_shared, " will be used for normalization."),
