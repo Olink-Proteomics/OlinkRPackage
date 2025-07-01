@@ -969,8 +969,8 @@ olink_norm_input_check_quant <- function(quant_cols, quant_cols_set) {
 
       # choose quantification method by discated from order of quant_cols_set
       quant_cols[[1L]] <- match( # index order cols from quant_cols_set
-        x = quant_cols[[1L]],
-        table = quant_cols_set
+        x = quant_cols_set,
+        table = quant_cols[[1L]]
       ) |>
         # remove potential NA matches
         (\(.) .[!is.na(.)])() |>
@@ -1036,8 +1036,8 @@ olink_norm_input_check_quant <- function(quant_cols, quant_cols_set) {
         lapply(
           function(x) {
             match( # index order cols from quant_cols_set
-              x = x,
-              table = quant_cols_set
+              x = quant_cols_set,
+              table = x
             ) |>
               # remove potential NA matches
               (\(.) .[!is.na(.)])() |>
