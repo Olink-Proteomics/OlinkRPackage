@@ -1025,10 +1025,25 @@ olink_norm_input_check_quant <- function(lst_req_col_quant, quant_cols_set) {
 
       # both datasets have more than one quantification method. We will choose
       # quantification method by priority order.
-      lst_req_col_quant <-
-        lapply(seq_along(lst_req_col_quant), function(i) {
-          lst_req_col_quant[[i]] <- quant_col_shared[1L] |> as.character() # nolinter return lint
-        })
+      lst_req_col_quant <- lapply( # keep only shared quant columns
+        lst_req_col_quant,
+        intersect,
+        quant_col_shared
+      ) |>
+        lapply(
+          function(x) {
+            match( # index order cols from quant_cols_set
+              x = x,
+              table = quant_cols_set
+            ) |>
+              # remove potential NA matches
+              (\(.) .[!is.na(.)])() |>
+              # order lst_req_col_quant[[1L]] from quant_cols_set
+              (\(.) x[.])() |>
+              # select first by priority list
+              head(n = 1L)
+          }
+        )
 
       cli::cli_inform(
         c("!" = "Multiple matching quantification methods detected.",
