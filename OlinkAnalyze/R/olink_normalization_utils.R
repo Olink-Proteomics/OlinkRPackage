@@ -953,11 +953,16 @@ olink_norm_input_check_quant <- function(lst_req_col_quant, quant_cols_set) {
   }
 
   if (length(lst_req_col_quant) == 1L) {
+
     # this relates to reference normalization, where one dataset is required.
     if (length(lst_req_col_quant[[1L]]) > 1L) {
-      # choose quantification method by order from required_cols$quant in
-      # function "olink_norm_input_check_df_cols".
-      lst_req_col_quant[[1L]] <- lst_req_col_quant[[1L]][[1L]]
+
+      # choose quantification method by discated from order of quant_cols_set
+      lst_req_col_quant[[1L]] <- intersect(
+        x = lst_req_col_quant[[1L]],
+        y = quant_cols_set
+      ) |>
+        head(n = 1L)
 
       cli::cli_inform(
         c("!" = "Multiple quantification methods detected.",
