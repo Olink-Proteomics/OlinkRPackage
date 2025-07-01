@@ -989,9 +989,12 @@ olink_norm_input_check_quant <- function(lst_req_col_quant, quant_cols_set) {
     # get the quantification columns present across all datasets
     quant_col_shared <- Reduce(intersect, lst_req_col_quant)
 
+    # if no shared quantification methods among datasets, throw an error
     if (length(quant_col_shared) == 0L) {
       cli::cli_abort(
-        c("Datasets are not quantified with the same method.",
+        c("x"= "Datasets are not quantified with the same method.",
+          paste0("*", names(lst_req_col_quant), " is quantified with: ",
+                 paste0("\"", lst_req_col_quant, "\"")),
           "i" = "Re-export data with at least one shared quantification method."
         ),
         call = rlang::caller_env(),
