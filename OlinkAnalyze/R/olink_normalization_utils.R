@@ -989,11 +989,6 @@ olink_norm_input_check_quant <- function(lst_req_col_quant, quant_cols_set) {
     # get the quantification columns present across all datasets
     quant_col_shared <- Reduce(intersect, lst_req_col_quant)
 
-    quant_col_shared <- sort(factor(quant_col_shared,
-                                    levels = c("NPX",
-                                               "Quantified_value",
-                                               "Ct")))
-
     if (length(quant_col_shared) == 0L) {
       cli::cli_abort(
         c("Datasets are not quantified with the same method.",
