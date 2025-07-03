@@ -42,7 +42,7 @@ example 4.
 The argument \var{preferred_names} is a named character vector with internal
 column names as names and column names of the current data set as values.
 Names of the input vector can be one or more of the following:
-sample_id, sample_type, assay_type, olink_id, plate_id, qc_warning, lod, and quant
+sample_id, sample_type, assay_type, olink_id, uniprot, assay, panel, plate_id, panel_version, lod, quant, count, qc_warning, assay_warn, and normalization
 }
 \examples{
 \donttest{
