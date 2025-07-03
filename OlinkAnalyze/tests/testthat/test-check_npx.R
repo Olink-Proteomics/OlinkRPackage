@@ -30,23 +30,19 @@ test_that(
       Assay = LETTERS[1L:4L],
       Panel = LETTERS[1L:4L],
       Panel_Lot_Nr = LETTERS[1L:4L],
-      SampleType = rep("SAMPLE", 4L),
       NPX = rnorm(4L),
       PlateID = rep("plate1", 4L),
-      QC_Warning = rep("Pass", 4L),
-      LOD = rnorm(4L)
+      QC_Warning = rep("Pass", 4L)
     )
 
     expected_result <- list(
       col_names = list(sample_id = "SampleID",
-                       sample_type = "SampleType",
                        olink_id = "OlinkID",
                        uniprot = "UniProt",
                        assay = "Assay",
                        panel = "Panel",
                        plate_id = "PlateID",
                        panel_version = "Panel_Lot_Nr",
-                       lod = "LOD",
                        quant = "NPX",
                        qc_warning = "QC_Warning"),
       oid_invalid = character(0L),
