@@ -4,7 +4,7 @@
 
 [![R-CMD-check](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/R-CMD-check.yaml)
 [![lint](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/lint.yaml/badge.svg)](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/lint.yaml)
-[![codecov.io](https://codecov.io/gh/r-lib/lintr/branch/main/graphs/badge.svg)](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/test-coverage.yaml)
+[![Coverage](https://img.shields.io/badge/Coverage-100%25-green)](https://img.shields.io/badge/Coverage-100%25-green)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/OlinkAnalyze)](https://CRAN.R-project.org/package=OlinkAnalyze)
 [![](https://img.shields.io/badge/DOI-10.32614/CRAN.package.OlinkAnalyze-1f57b6?style=flat&link=https://doi.org/10.32614/CRAN.package.OlinkAnalyze)](https://doi.org/10.32614/CRAN.package.OlinkAnalyze)
@@ -59,7 +59,10 @@ olink_dist_plot(npx_data1 %>% filter(Panel == 'Olink CARDIOMETABOLIC')) +
   scale_fill_manual(values = c('turquoise3', 'red'))
 ```
 
-![dist_plot_example](figures/example_distplot.png)
+<figure>
+<img src="figures/example_distplot.png" alt="dist_plot_example" />
+<figcaption aria-hidden="true">dist_plot_example</figcaption>
+</figure>
 
 ``` r
 # visualize potential outliers by IQR vs. sample median per panel, example for one panel
@@ -67,7 +70,10 @@ olink_qc_plot(npx_data1 %>% filter(Panel == 'Olink CARDIOMETABOLIC')) +
   scale_color_manual(values = c('turquoise3', 'red'))
 ```
 
-![qc_plot_example](figures/example_qcplot.png)
+<figure>
+<img src="figures/example_qcplot.png" alt="qc_plot_example" />
+<figcaption aria-hidden="true">qc_plot_example</figcaption>
+</figure>
 
 ### Normalization
 
@@ -113,7 +119,10 @@ olink_volcano_plot(p.val_tbl = ttest_results_NPX1,
   scale_color_manual(values = c('turquoise3', 'red'))
 ```
 
-![volcano_plot_example](figures/example_volcanoplot.png)
+<figure>
+<img src="figures/example_volcanoplot.png" alt="volcano_plot_example" />
+<figcaption aria-hidden="true">volcano_plot_example</figcaption>
+</figure>
 
 ## Learn more
 
