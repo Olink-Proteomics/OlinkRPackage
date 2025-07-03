@@ -56,6 +56,7 @@ read_npx_parquet <- function(file,
 
     }
   )
+  df_meta <- names(df_olink$metadata)
 
   # Check metadata ----
 
