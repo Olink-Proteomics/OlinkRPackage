@@ -17,7 +17,7 @@ check_is_list <- function(lst,
   check_is_scalar_boolean(bool = error,
                           error = TRUE)
 
-  if (!is.list(x = lst)) {
+  if (!rlang::is_bare_list(x = lst)) {
 
     if (error == TRUE) {
 
