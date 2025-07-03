@@ -114,21 +114,25 @@ test_that(
     df <- dplyr::tibble(
       SampleID = c("A", "A", "C", "D"),
       OlinkID = rep("OID123456", 4L),
-      SampleType = rep("SAMPLE", 4L),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
       NPX = rnorm(4L),
       PlateID = rep("plate1", 4L),
-      QC_Warning = rep("Pass", 4L),
-      LOD = rnorm(4L)
+      QC_Warning = rep("Pass", 4L)
     )
 
     expected_result <- list(
       col_names = list(sample_id = "SampleID",
-                       sample_type = "SampleType",
                        olink_id = "OlinkID",
+                       uniprot = "UniProt",
+                       assay = "Assay",
+                       panel = "Panel",
                        plate_id = "PlateID",
-                       qc_warning = "QC_Warning",
-                       lod = "LOD",
-                       quant = "NPX"),
+                       panel_version = "Panel_Lot_Nr",
+                       quant = "NPX",
+                       qc_warning = "QC_Warning"),
       oid_invalid = c("OID123456"),
       assay_na = character(0L),
       sample_id_dups = c("A")
