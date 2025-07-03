@@ -56,7 +56,6 @@ read_npx_parquet <- function(file,
 
     }
   )
-  df_meta <- names(df_olink$metadata)
 
   # Check metadata ----
 
@@ -68,7 +67,7 @@ read_npx_parquet <- function(file,
 
     cli::cli_abort(
       c(
-        "x" = "Missing required field{?s} in metadata:
+        "x" = "Missing required field{?s} in the metadata of the parquet file:
         {.val {missing_fields}}"
       ),
       call = rlang::caller_env(),
@@ -90,7 +89,7 @@ read_npx_parquet <- function(file,
       c(
         "x" = "Unsupported product:
         {.val {df_olink$metadata[[olink_parquet_product]]}}",
-        "i" = "Metadata field {.val {olink_parquet_product}} expects:
+        "i" = "Metadata field {.val {olink_parquet_product}} expects one of:
         {.val {olink_parquet_spec$parquet_platforms}}."
       ),
       call = rlang::caller_env(),
@@ -110,8 +109,8 @@ read_npx_parquet <- function(file,
       c(
         "x" = "Unsupported file:
         {.val {df_olink$metadata[[olink_parquet_files]]}}",
-        "i" = "Metadata field {.val {olink_parquet_files}} expects:
-        {olink_parquet_spec$parquet_files}"
+        "i" = "Metadata field {.val {olink_parquet_files}} expects one of:
+        {.val {olink_parquet_spec$parquet_files}}."
       ),
       call = rlang::caller_env(),
       wrap = FALSE
@@ -137,8 +136,10 @@ read_npx_parquet <- function(file,
   # Return ----
 
   # if needed convert the object to the requested output
-  df_olink <- convert_read_npx_output(df = df_olink,
-                                      out_df = out_df)
+  df_olink <- convert_read_npx_output(
+    df = df_olink,
+    out_df = out_df
+  )
 
   return(df_olink)
 }
