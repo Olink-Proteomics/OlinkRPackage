@@ -85,7 +85,7 @@ test_that(
         # check that relevant error is thrown
         expect_error(
           object = read_npx_parquet(file = pfile_metadata),
-          regexp = "Missing required fields in metadata: "
+          regexp = "Missing required fields in the metadata of the parquet file"
         )
       }
     )
@@ -127,7 +127,7 @@ test_that(
         # check that relevant error is thrown
         expect_error(
           object = read_npx_parquet(file = pfile_metadata),
-          regexp = "Missing required field in metadata: "
+          regexp = "Missing required field in the metadata of the parquet file"
         )
       }
     )
