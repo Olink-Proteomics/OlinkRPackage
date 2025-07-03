@@ -11,7 +11,7 @@
 #' `r ansi_collapse_quot(read_npx_df_output)`. (default = "tibble")
 #' @param olink_platform Olink platform used to generate the input file.
 #' One of `NULL` (default) for auto-detection,
-#' `r get_olink_platforms(broad_platform = "qPCR") |> ansi_collapse_quot()`.
+#' `r ansi_collapse_quot(get_olink_platforms(broad_platform = "qPCR"))`.
 #' @param data_type Quantification method of the input data. One of `NULL`
 #' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
 #' @param data_type_no_accept Character vector of data types that should be
@@ -20,11 +20,11 @@
 #' @return A list of objects containing the following:
 #' \itemize{
 #' \item \strong{olink_platform}: auto-detected Olink platform. One of
-#' `r get_olink_platforms(broad_platform = "qPCR") |> ansi_collapse_quot()`.
+#' `r ansi_collapse_quot(get_olink_platforms(broad_platform = "qPCR"))`.
 #' \item \strong{long_format}: auto-detected Olink format. Should always be
 #' "FALSE".
 #' \item \strong{data_type}: auto-detected Olink data type. One of
-#' `r ansi_collapse_quot(get_olink_data_types()[!("Ct" %in% get_olink_data_types())])`. # nolint line_length_linter
+#' `r ansi_collapse_quot(get_olink_data_types()[!(get_olink_data_types() %in% c("Ct"))])`. # nolint line_length_linter
 #' \item \strong{df_split}: list of 2 tibbles. Top matrix from the Olink wide
 #' file, and middle combined with bottom matrix.
 #' \item \strong{npxs_v}: Olink NPX software version.
@@ -202,7 +202,7 @@ read_npx_legacy_help <- function(file,
 #' @param df_top Top matrix of Olink dataset in wide format.
 #' @param olink_platform Olink platform used to generate the input file.
 #' One of `NULL` (default) for auto-detection,
-#' `r get_olink_platforms(broad_platform = "qPCR") |> ansi_collapse_quot()`.
+#' `r ansi_collapse_quot(get_olink_platforms(broad_platform = "qPCR"))`.
 #' @param data_type Quantification method of the input data. One of `NULL`
 #' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
 #' @param bottom_mat_v Version of the rows in the bottom matrix of the Olink
@@ -374,8 +374,8 @@ read_npx_legacy_check <- function(file,
 #' format into R from qPCR Olink products.
 #'
 #' @description
-#' This implementation of read_NPX does not cover the latest versions of Olink
-#' files in wide format. Specifically, it supports:
+#' This implementation of \code{\link{read_NPX}} does not cover the latest
+#' versions of Olink files in wide format. Specifically, it supports:
 #' \itemize{
 #' \item \strong{Target 96} output files in wide format \strong{(T96 reports
 #' only NPX)} with the bottom matrix containing one of the following
@@ -411,7 +411,7 @@ read_npx_legacy_check <- function(file,
 #' `r ansi_collapse_quot(read_npx_df_output)`. (default = "tibble")
 #' @param olink_platform Olink platform used to generate the input file.
 #' One of `NULL` (default) for auto-detection,
-#' `r get_olink_platforms(broad_platform = "qPCR") |> ansi_collapse_quot()`.
+#' `r ansi_collapse_quot(get_olink_platforms(broad_platform = "qPCR"))`.
 #' @param data_type Quantification method of the input data. One of `NULL`
 #' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
 #' @param quiet Boolean to print a confirmation message when reading the input

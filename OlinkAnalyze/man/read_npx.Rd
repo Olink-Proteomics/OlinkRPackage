@@ -40,7 +40,7 @@ wide format files.}
 
 \item{olink_platform}{Olink platform used to generate the input file.
 One of \code{NULL} (default) for auto-detection,
-or "Target 48", "Flex", "Target 96", "Explore 3072", "Explore HT", and "Focus".}
+or "Target 48", "Flex", "Target 96", "Explore 3072", "Explore HT", "Focus", and "Reveal".}
 
 \item{data_type}{Quantification method of the input data. One of \code{NULL}
 (default) for auto-detection, "Ct", "NPX", and "Quantified".}
