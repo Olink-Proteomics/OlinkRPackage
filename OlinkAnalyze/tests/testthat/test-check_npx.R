@@ -21,11 +21,15 @@ test_that(
 )
 
 test_that(
-  "check_npx - works -  results as expected",
+  "check_npx - works - minimum set of columns, results as expected",
   {
     df <- dplyr::tibble(
-      SampleID = c("A", "B", "C", "D"),
+      SampleID = LETTERS[1L:4L],
       OlinkID = rep("OID12345", 4L),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
       SampleType = rep("SAMPLE", 4L),
       NPX = rnorm(4L),
       PlateID = rep("plate1", 4L),
@@ -37,10 +41,14 @@ test_that(
       col_names = list(sample_id = "SampleID",
                        sample_type = "SampleType",
                        olink_id = "OlinkID",
+                       uniprot = "UniProt",
+                       assay = "Assay",
+                       panel = "Panel",
                        plate_id = "PlateID",
-                       qc_warning = "QC_Warning",
+                       panel_version = "Panel_Lot_Nr",
                        lod = "LOD",
-                       quant = "NPX"),
+                       quant = "NPX",
+                       qc_warning = "QC_Warning"),
       oid_invalid = character(0L),
       assay_na = character(0L),
       sample_id_dups = character(0L)
