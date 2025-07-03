@@ -160,21 +160,25 @@ test_that(
     df <- arrow::arrow_table(
       SampleID = c("A", "B", "C", "D"),
       OlinkID = rep("OID12345", 4L),
-      SampleType = rep("SAMPLE", 4L),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
       NPX = rnorm(4L),
       PlateID = rep("plate1", 4L),
-      QC_Warning = rep("Pass", 4L),
-      LOD = rnorm(4L)
+      QC_Warning = rep("Pass", 4L)
     )
 
     expected_result <- list(
       sample_id = "SampleID",
-      sample_type = "SampleType",
       olink_id = "OlinkID",
+      uniprot = "UniProt",
+      assay = "Assay",
+      panel = "Panel",
       plate_id = "PlateID",
-      qc_warning = "QC_Warning",
-      lod = "LOD",
-      quant = "NPX"
+      panel_version = "Panel_Lot_Nr",
+      quant = "NPX",
+      qc_warning = "QC_Warning"
     )
 
     expect_equal(
@@ -190,8 +194,12 @@ test_that(
   {
     df <- dplyr::tibble(
       SampleID = c("A", "B", "C", "D"),
-      OlinkID = rep("OID12345", 4L),
       SampleType = rep("SAMPLE", 4L),
+      OlinkID = rep("OID12345", 4L),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
       NPX = rnorm(4L),
       PlateID = rep("plate1", 4L),
       QC_Warning = rep("Pass", 4L),
@@ -209,10 +217,14 @@ test_that(
       expected = list(
         sample_id = "SampleID",
         olink_id = "OlinkID",
+        uniprot = "UniProt",
+        assay = "Assay",
+        panel = "Panel",
         plate_id = "PlateID",
-        qc_warning = "QC_Warning",
+        panel_version = "Panel_Lot_Nr",
         lod = "LOD",
-        quant = "NPX"
+        quant = "NPX",
+        qc_warning = "QC_Warning"
       )
     )
 
@@ -229,9 +241,13 @@ test_that(
         sample_id = "SampleID",
         sample_type = "SampleType",
         olink_id = "OlinkID",
+        uniprot = "UniProt",
+        assay = "Assay",
+        panel = "Panel",
         plate_id = "PlateID",
-        qc_warning = "QC_Warning",
-        quant = "NPX"
+        panel_version = "Panel_Lot_Nr",
+        quant = "NPX",
+        qc_warning = "QC_Warning"
       )
     )
 
@@ -246,9 +262,13 @@ test_that(
       expected = list(
         sample_id = "SampleID",
         olink_id = "OlinkID",
+        uniprot = "UniProt",
+        assay = "Assay",
+        panel = "Panel",
         plate_id = "PlateID",
-        qc_warning = "QC_Warning",
-        quant = "NPX"
+        panel_version = "Panel_Lot_Nr",
+        quant = "NPX",
+        qc_warning = "QC_Warning"
       )
     )
   }
@@ -259,12 +279,15 @@ test_that(
   {
     df <- arrow::arrow_table(
       SampleID = c("A", "B", "C", "D"),
-      OlinkID = rep("OID12345", 4L),
       SampleType = rep("SAMPLE", 4L),
+      OlinkID = rep("OID12345", 4L),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
       NPX = rnorm(4L),
       PlateID = rep("plate1", 4L),
-      QC_Warning = rep("Pass", 4L),
-      LOD = rnorm(4L)
+      QC_Warning = rep("Pass", 4L)
     )
 
     # one column name ----
@@ -281,10 +304,13 @@ test_that(
       expected = list(
         sample_type = "SampleType",
         olink_id = "OlinkID",
+        uniprot = "UniProt",
+        assay = "Assay",
+        panel = "Panel",
         plate_id = "PlateID",
-        qc_warning = "QC_Warning",
-        lod = "LOD",
+        panel_version = "Panel_Lot_Nr",
         quant = "NPX",
+        qc_warning = "QC_Warning",
         sample_id = "IamSampleName"
       )
     )
@@ -307,9 +333,12 @@ test_that(
                               "olink_id" = "IamOlinkIdentifier")
         ),
       expected = list(
-        qc_warning = "QC_Warning",
-        lod = "LOD",
+        uniprot = "UniProt",
+        assay = "Assay",
+        panel = "Panel",
+        panel_version = "Panel_Lot_Nr",
         quant = "NPX",
+        qc_warning = "QC_Warning",
         sample_id = "IamSampleName",
         sample_type = "IamSampleType",
         plate_id = "IamPlateIdentifier",
@@ -339,7 +368,11 @@ test_that(
         ),
       expected = list(
         olink_id = "OlinkID",
+        uniprot = "UniProt",
+        assay = "Assay",
+        panel = "Panel",
         plate_id = "PlateID",
+        panel_version = "Panel_Lot_Nr",
         qc_warning = "QC_Warning",
         sample_id = "IamSampleName",
         sample_type = "IamSampleType",
@@ -355,8 +388,12 @@ test_that(
   {
     df <- arrow::arrow_table(
       SampleID = c("A", "B", "C", "D"),
-      OlinkID = rep("OID12345", 4L),
       SampleType = rep("SAMPLE", 4L),
+      OlinkID = rep("OID12345", 4L),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
       NPX = rnorm(4L),
       PlateID = rep("plate1", 4L),
       QC_Warning = rep("Pass", 4L),
@@ -393,7 +430,10 @@ test_that(
     df <- arrow::arrow_table(
       SampleID = c("A", "B", "C", "D"),
       OlinkID = rep("OID12345", 4L),
-      SampleType = rep("SAMPLE", 4L),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
       NPX = rnorm(4L),
       PlateID = rep("plate1", 4L),
       QC_Warning = rep("Pass", 4L),
@@ -432,12 +472,15 @@ test_that(
   {
     df <- arrow::arrow_table(
       SampleID = c("A", "B", "C", "D"),
-      OlinkID = rep("OID12345", 4L),
       SampleType = rep("SAMPLE", 4L),
+      OlinkID = rep("OID12345", 4L),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
       NPX = rnorm(4L),
       PlateID = rep("plate1", 4L),
-      QC_Warning = rep("Pass", 4L),
-      LOD = rnorm(4L)
+      QC_Warning = rep("Pass", 4L)
     )
 
     # one column with no matches ----
@@ -509,11 +552,13 @@ test_that(
                   "OID1234",
                   "12345",
                   "NA"),
-      SampleType = rep("SAMPLE", 5L),
+      UniProt = LETTERS[1L:5L],
+      Assay = LETTERS[1L:5L],
+      Panel = LETTERS[1L:5L],
+      Panel_Lot_Nr = LETTERS[1L:5L],
       NPX = rnorm(5L),
       PlateID = rep("plate1", 5L),
-      QC_Warning = rep("Pass", 5L),
-      LOD = rnorm(5L)
+      QC_Warning = rep("Pass", 5L)
     )
 
     expect_no_condition(
@@ -541,11 +586,13 @@ test_that(
     df <- arrow::arrow_table(
       SampleID = c("A", "B", "C", "D"),
       OlinkID = rep("OID12345", 4L),
-      SampleType = rep("SAMPLE", 4L),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
       NPX = rnorm(4L),
       PlateID = rep("plate1", 4L),
-      QC_Warning = rep("Pass", 4L),
-      LOD = rnorm(4L)
+      QC_Warning = rep("Pass", 4L)
     )
 
     expect_no_condition(
