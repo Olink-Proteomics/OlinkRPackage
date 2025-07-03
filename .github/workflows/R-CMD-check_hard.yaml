@@ -39,7 +39,6 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          working-directory: OlinkAnalyze
           dependencies: '"hard"'
           cache: false
           extra-packages: |
@@ -49,6 +48,7 @@ jobs:
             any::rmarkdown
             any::kableExtra
           needs: check
+          working-directory: OlinkAnalyze
 
       - uses: r-lib/actions/check-r-package@v2
         with:
