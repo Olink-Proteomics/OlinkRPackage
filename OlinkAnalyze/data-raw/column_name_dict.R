@@ -39,7 +39,7 @@ column_name_dict <- list(
                     "plateid",
                     "plate_id"),
   panel_version = c("Panel_Lot_Nr",
-                    "panel_lod_nr",
+                    "panel_lot_nr",
                     "Panel_Version",
                     "panel_version",
                     "PanelVersion",
