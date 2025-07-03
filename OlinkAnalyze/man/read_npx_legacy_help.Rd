@@ -39,7 +39,7 @@ A list of objects containing the following:
 \item \strong{long_format}: auto-detected Olink format. Should always be
 "FALSE".
 \item \strong{data_type}: auto-detected Olink data type. One of
-"". # nolint line_length_linter
+"NPX" and "Quantified". # nolint line_length_linter
 \item \strong{df_split}: list of 2 tibbles. Top matrix from the Olink wide
 file, and middle combined with bottom matrix.
 \item \strong{npxs_v}: Olink NPX software version.
