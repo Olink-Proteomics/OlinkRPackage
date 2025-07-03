@@ -30,7 +30,7 @@
 #' The argument \var{preferred_names} is a named character vector with internal
 #' column names as names and column names of the current data set as values.
 #' Names of the input vector can be one or more of the following:
-#' `r cli::ansi_collapse(x = names(column_name_dict))`
+#' `r ansi_collapse_quot(x = names(column_name_dict))`
 #'
 #' @author
 #'   Masoumeh Sheikhi
@@ -307,11 +307,20 @@ check_npx_col_names <- function(df,
   # column_name_dict
   if (any(column_name_multi == 0L)) {
 
+    miss_cols <- paste0(
+      "* \"", names(column_name_df[column_name_multi == 0L]), "\": ",
+      lapply(column_name_dict[names(column_name_df[column_name_multi == 0L])],
+             ansi_collapse_quot,
+             sep = "or")
+    )
+
     cli::cli_abort(
       c("x" = "There are no column names associated with the following key(s):",
-        paste0("* \"", names(column_name_df[column_name_multi == 0L]), "\""),
-        "i" = "Please use {.arg preferred_names} to select the correct column
-      names."),
+        miss_cols,
+        "i" = "Please ensure presence of columns above in dataset {.arg df}. If
+        columns are present and the column name does not match one of the
+        expected ones, please use argument {.arg preferred_names} to point to
+        the correct column."),
       call = rlang::caller_env(),
       wrap = FALSE
     )
