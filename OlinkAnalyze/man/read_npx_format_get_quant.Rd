@@ -24,9 +24,9 @@ The name of the data type. One of
 "Ct", "NPX", and "Quantified".
 }
 \description{
-This function uses information from the cell A2 from Olink software files in
-wide format to determine the quantification method of the data that the
-dataset contains.
+This function uses information from the cell \emph{A2} from Olink software
+files in wide format to determine the quantification method of the data that
+the dataset contains.
 }
 \seealso{
 \code{\link{read_npx_format}}
