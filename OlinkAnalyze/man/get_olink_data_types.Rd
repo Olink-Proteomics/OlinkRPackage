@@ -18,7 +18,7 @@ expected.}
 
 \item{platform_name}{Name of the \var{platform_name} to filter the Olink
 data types for. If \code{NULL} all relevant Olink data types are returned,
-otherwise one of "Explore 3072", "Explore HT", "Flex", "Focus", "Target 48", and "Target 96" is
+otherwise one of "Explore 3072", "Explore HT", "Flex", "Focus", "Reveal", "Target 48", and "Target 96" is
 expected.}
 
 \item{quant_type}{Name of the \var{quant_type} to filter the Olink data types

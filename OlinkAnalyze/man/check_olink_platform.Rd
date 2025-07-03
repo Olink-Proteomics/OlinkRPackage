@@ -13,7 +13,7 @@ check_olink_platform(
 }
 \arguments{
 \item{x}{Name of Olink platform. One of
-"Explore 3072", "Explore HT", "Flex", "Focus", "Target 48", and "Target 96".}
+"Explore 3072", "Explore HT", "Flex", "Focus", "Reveal", "Target 48", and "Target 96".}
 
 \item{broad_platform}{Name of the \var{broad_platform} to filter the
 Olink platforms for. If \code{NULL} all relevant Olink platforms are returned,
