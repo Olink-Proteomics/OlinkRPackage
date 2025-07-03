@@ -59,6 +59,56 @@ test_that(
 )
 
 test_that(
+  "check_npx - works - full set of columns, results as expected",
+  {
+    df <- dplyr::tibble(
+      SampleID = LETTERS[1L:4L],
+      SampleType = LETTERS[1L:4L],
+      AssayType = LETTERS[1L:4L],
+      OlinkID = rep("OID12345", 4L),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
+      LOD = rnorm(4L),
+      NPX = rnorm(4L),
+      Count = rnorm(4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L),
+      AssayQC = rep("Pass", 4L),
+      Normalization = LETTERS[1L:4L]
+    )
+
+    expected_result <- list(
+      col_names = list(sample_id = "SampleID",
+                       sample_type = "SampleType",
+                       assay_type = "AssayType",
+                       olink_id = "OlinkID",
+                       uniprot = "UniProt",
+                       assay = "Assay",
+                       panel = "Panel",
+                       plate_id = "PlateID",
+                       panel_version = "Panel_Lot_Nr",
+                       lod = "LOD",
+                       quant = "NPX",
+                       count = "Count",
+                       qc_warning = "QC_Warning",
+                       assay_warn = "AssayQC",
+                       normalization = "Normalization"),
+      oid_invalid = character(0L),
+      assay_na = character(0L),
+      sample_id_dups = character(0L)
+    )
+
+    expect_equal(
+      object = check_npx(df = df,
+                         preferred_names = NULL),
+      expected = expected_result
+    )
+  }
+)
+
+test_that(
   "check_npx - warning - invalid OlinkID and duplicate SampleID",
   {
     df <- dplyr::tibble(
