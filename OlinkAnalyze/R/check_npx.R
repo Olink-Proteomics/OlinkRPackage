@@ -30,7 +30,7 @@
 #' The argument \var{preferred_names} is a named character vector with internal
 #' column names as names and column names of the current data set as values.
 #' Names of the input vector can be one or more of the following:
-#' `r ansi_collapse_quot(x = names(column_name_dict))`
+#' `r ansi_collapse_quot(x = column_name_dict$col_key)`
 #'
 #' @author
 #'   Masoumeh Sheikhi
@@ -164,7 +164,7 @@ check_npx <- function(df = df,
 #' The argument \var{preferred_names} is a named character vector with internal
 #' column names as names and column names of the current data set as values.
 #' Names of the input vector can be one or more of the following:
-#' `r cli::ansi_collapse(x = names(column_name_dict))`
+#' `r cli::ansi_collapse(x = column_name_dict$col_key)`
 #'
 #' @author
 #'  Klev Diamanti;
@@ -350,7 +350,7 @@ check_npx_col_names <- function(df,
 #' This function takes as input a named character vector with internal column
 #' names as names and column names of the current data set as values. Names of
 #' the input vector can be one or more of the following:
-#' `r cli::ansi_collapse(x = names(column_name_dict))`
+#' `r cli::ansi_collapse(x = column_name_dict$col_key)`
 #'
 #' @author
 #'  Klev Diamanti
