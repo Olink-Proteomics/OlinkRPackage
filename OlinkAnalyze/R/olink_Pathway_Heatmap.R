@@ -40,7 +40,8 @@
 #'@importFrom magrittr %>%
 #'@export
 
-olink_pathway_heatmap<- function(enrich_results, test_results, method = "GSEA", keyword = NULL, number_of_terms = 20) {
+olink_pathway_heatmap<- function(enrich_results, test_results, method = "GSEA", keyword = NULL, number_of_terms = 20,
+                                 grid = FALSE) {
   if (!(method %in% c("ORA", "GSEA"))) {
     stop("Method must be \"GSEA\" or \"ORA\".")
   }
@@ -81,12 +82,35 @@ olink_pathway_heatmap<- function(enrich_results, test_results, method = "GSEA", 
   p <- ggplot2::ggplot(data = long_list1, ggplot2::aes(factor(x = Assay, levels = orderprot),
                                                        stringr::str_trunc(string = Pathway, width = 50, side = "center"))) +
     ggplot2::geom_tile(ggplot2::aes(fill = estimate)) +
-    OlinkAnalyze::olink_fill_gradient(coloroption = c('teal', 'red'), name = "estimate") +
+    OlinkAnalyze::olink_fill_gradient(coloroption = c("teal", "red"), name = "estimate") +
     OlinkAnalyze::set_plot_theme() +
     ggplot2::theme(panel.grid.major = ggplot2::element_blank(),
                    axis.text.x = ggplot2::element_text(angle = 60, hjust = 1)) +
     ggplot2::xlab("Protein Symbol") +
     ggplot2::ylab("Pathway")
+
+  if(grid == TRUE){
+    n1 <- length(unique(long_list1$Assay))
+    n2 <- length(unique(long_list1$Pathway))
+
+    n3 <- length(unique(long_list1$Pathway))
+    n4 <- length(unique(long_list1$Assay))
+
+    p <- ggplot2::ggplot(data = long_list1, ggplot2::aes(factor(x = Assay, levels = orderprot),
+                                                         stringr::str_trunc(string = Pathway, width = 50, side = "center"))) +
+      ggplot2::geom_tile(ggplot2::aes(fill = estimate)) +
+      OlinkAnalyze::olink_fill_gradient(coloroption = c("teal", "red"), name = "estimate") +
+      OlinkAnalyze::set_plot_theme() +
+      ggplot2::theme(panel.grid.major = ggplot2::element_blank(),
+                     axis.ticks.length = unit(3,"mm"),
+                     axis.text.x = ggplot2::element_text(angle = 90, hjust = 1)) +
+      ggplot2::xlab("Protein Symbol") +
+      ggplot2::ylab("Pathway") +
+      ggplot2::geom_line(data = data.frame(y = c(0, n2) + 0.5, x = rep(2:n1, each = 2) - 0.5),
+                aes(x = x, y = y, group = x)) + # Vertical lines
+      ggplot2::geom_line(data = data.frame(x = c(0, n4) + 0.5, y = rep(2:n3, each = 2) - 0.5),
+                aes(x = x, y = y, group = y))  # Horizontal lines
+  }
 
   return(p)
 }
