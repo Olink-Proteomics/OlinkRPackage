@@ -85,105 +85,105 @@
 #' log <- OlinkAnalyze::check_npx(npx_df)
 #' clean_df <- OlinkAnalyze::clean_npx(npx_df, log)
 #' }
-clean_npx <- function(
-    df,
-    check_npx_log,
-    out_df = "tibble",
-    control_sample_types_regx = c(
-      "SAMPLE_CONTROL",
-      "PLATE_CONTROL",
-      "NEGATIVE_CONTROL"
-    ),
-    control_assay_types_regx = c(
-      "ext_ctrl",
-      "inc_ctrl",
-      "amp_ctrl"
-    ),
-    control_sample_id_regex = NULL) {
-  # Step 0: Validate inputs
-  check_is_dataset(df = df, error = TRUE)
-
-  if (!inherits(check_npx_log, "list")) {
-    cli::cli_abort(
-      "{.arg check_npx_log} must be the result of the {.fn check_npx} function."
-    )
-  }
-
-  cli::cli_h2("Starting {.fn clean_npx} pipeline")
-
-  # Step 1: Remove invalid Olink IDs
-  cli::cli_h3("Step 1: Removing assays with invalid OlinkIDs")
-  df <- clean_invalid_oid(
-    df,
-    check_npx_log = check_npx_log,
-    out_df = out_df
-  )
-
-  # Step 2: Remove assays with all NA values
-  cli::cli_h3("Step 2: Removing assays with all NA values")
-  df <- clean_assay_na(
-    df,
-    check_npx_log = check_npx_log,
-    out_df = out_df
-  )
-
-  # Step 3: Remove duplicate sample IDs
-  cli::cli_h3("Step 3: Removing duplicate SampleIDs")
-  df <- clean_duplicate_sample_id(
-    df,
-    check_npx_log = check_npx_log,
-    out_df = out_df
-  )
-
-  # Step 4: Remove control samples based on sample type
-  cli::cli_h3("Step 4: Removing control samples based on sample type")
-  df <- clean_sample_type(
-    df,
-    check_npx_log = check_npx_log,
-    control_sample_types = control_sample_types_regx,
-    out_df = out_df
-  )
-
-  # Step 5: Remove samples that failed QC
-  cli::cli_h3("Step 5: Removing samples that failed QC")
-  df <- clean_sample_qc(
-    df,
-    check_npx_log = check_npx_log,
-    out_df = out_df
-  )
-
-  # Step 6: Remove control-like SampleIDs
-  cli::cli_h3("Step 6: Removing control-like SampleIDs")
-  df <- clean_control_sample_id(
-    df,
-    check_npx_log = check_npx_log,
-    control_sample_id = control_sample_id_regex,
-    out_df = out_df
-  )
-
-  # Step 7: Remove internal control assays
-  cli::cli_h3("Step 7: Removing internal control assays")
-  df <- clean_assay_type(
-    df,
-    check_npx_log = check_npx_log,
-    control_assay_types = control_assay_types_regx,
-    out_df = out_df
-  )
-
-  # Final output
-  cli::cli_h2("Completed {.fn clean_npx} pipeline")
-
-  if (out_df == "arrow") {
-    cli::cli_alert_success("Cleaning complete. Returning Arrow Table.")
-  } else {
-    cli::cli_alert_success("Cleaning complete. Returning tibble.")
-  }
-
-  return(
-    df |>
-      convert_read_npx_output(out_df = out_df)
-  )
-}
+# clean_npx <- function(
+#     df,
+#     check_npx_log,
+#     out_df = "tibble",
+#     control_sample_types_regx = c(
+#       "SAMPLE_CONTROL",
+#       "PLATE_CONTROL",
+#       "NEGATIVE_CONTROL"
+#     ),
+#     control_assay_types_regx = c(
+#       "ext_ctrl",
+#       "inc_ctrl",
+#       "amp_ctrl"
+#     ),
+#     control_sample_id_regex = NULL) {
+#   # Step 0: Validate inputs
+#   check_is_dataset(df = df, error = TRUE)
+#
+#   if (!inherits(check_npx_log, "list")) {
+#     cli::cli_abort(
+#       "{.arg check_npx_log} must be the result of the {.fn check_npx} function."
+#     )
+#   }
+#
+#   cli::cli_h2("Starting {.fn clean_npx} pipeline")
+#
+#   # Step 1: Remove invalid Olink IDs
+#   cli::cli_h3("Step 1: Removing assays with invalid OlinkIDs")
+#   df <- clean_invalid_oid(
+#     df,
+#     check_npx_log = check_npx_log,
+#     out_df = out_df
+#   )
+#
+#   # Step 2: Remove assays with all NA values
+#   cli::cli_h3("Step 2: Removing assays with all NA values")
+#   df <- clean_assay_na(
+#     df,
+#     check_npx_log = check_npx_log,
+#     out_df = out_df
+#   )
+#
+#   # Step 3: Remove duplicate sample IDs
+#   cli::cli_h3("Step 3: Removing duplicate SampleIDs")
+#   df <- clean_duplicate_sample_id(
+#     df,
+#     check_npx_log = check_npx_log,
+#     out_df = out_df
+#   )
+#
+#   # Step 4: Remove control samples based on sample type
+#   cli::cli_h3("Step 4: Removing control samples based on sample type")
+#   df <- clean_sample_type(
+#     df,
+#     check_npx_log = check_npx_log,
+#     control_sample_types = control_sample_types_regx,
+#     out_df = out_df
+#   )
+#
+#   # Step 5: Remove samples that failed QC
+#   cli::cli_h3("Step 5: Removing samples that failed QC")
+#   df <- clean_sample_qc(
+#     df,
+#     check_npx_log = check_npx_log,
+#     out_df = out_df
+#   )
+#
+#   # Step 6: Remove control-like SampleIDs
+#   cli::cli_h3("Step 6: Removing control-like SampleIDs")
+#   df <- clean_control_sample_id(
+#     df,
+#     check_npx_log = check_npx_log,
+#     control_sample_id = control_sample_id_regex,
+#     out_df = out_df
+#   )
+#
+#   # Step 7: Remove internal control assays
+#   cli::cli_h3("Step 7: Removing internal control assays")
+#   df <- clean_assay_type(
+#     df,
+#     check_npx_log = check_npx_log,
+#     control_assay_types = control_assay_types_regx,
+#     out_df = out_df
+#   )
+#
+#   # Final output
+#   cli::cli_h2("Completed {.fn clean_npx} pipeline")
+#
+#   if (out_df == "arrow") {
+#     cli::cli_alert_success("Cleaning complete. Returning Arrow Table.")
+#   } else {
+#     cli::cli_alert_success("Cleaning complete. Returning tibble.")
+#   }
+#
+#   return(
+#     df |>
+#       convert_read_npx_output(out_df = out_df)
+#   )
+# }
 
 
 
@@ -257,7 +257,7 @@ clean_assay_na <- function(
       )
 
   cli::cli_alert_success(
-    "Removed rows for assays with only NA values.Returning cleaned data frame."
+    "Removed rows for assays with only NA values.Returning cleaned data table."
   )
 
   # Convert output to desired format (tibble or arrow)
@@ -338,7 +338,7 @@ clean_invalid_oid <- function(
   # Confirmation message
   cli::cli_alert_success(
     "Removed rows for assays with invalid OlinkIDs.
-    Returning cleaned data frame."
+    Returning cleaned data table."
   )
 
   # Return cleaned data frame in desired format
@@ -418,7 +418,7 @@ clean_duplicate_sample_id <- function(
 
   # Success message
   cli::cli_alert_success(
-    "Removed rows with duplicate SampleIDs. Returning cleaned data frame."
+    "Removed rows with duplicate SampleIDs. Returning cleaned data table."
   )
 
   # Convert and return the output in the desired format
@@ -487,7 +487,9 @@ clean_sample_type <- function(
 
   # Return original data if user chooses to keep control samples
   if (keep_control_sample) {
-    cli::cli_alert_info("Control samples are retained as per user input.")
+    cli::cli_alert_info(
+      "Control samples are retained as per user input. Returning data unchanged"
+      )
     return(
       df |>
         convert_read_npx_output(out_df = out_df)
@@ -518,7 +520,7 @@ clean_sample_type <- function(
 
   cli::cli_alert_success(
     "Control samples: {.val {paste(ctrl_sample_type, collapse = ', ')}} removed.
-    Returning cleaned data frame."
+    Returning cleaned data table."
   )
 
   # Format and return output
@@ -529,39 +531,26 @@ clean_sample_type <- function(
 }
 
 
-
-
-
-
-
-
-
-
-
 #' Remove Internal Control Assays by Assay Type
 #'
 #' @description
-#' This function filters out rows from an NPX data where the assay type
-#' matches any of the specified control assay types (e.g., `ext_ctrl`,
-#' `inc_ctrl`, `amp_ctrl`). Matching is case-insensitive and uses regular
-#' expressions via `stringr::str_detect()`. Informative CLI messages report the
-#' number and type of rows removed.
+#' This function filters out internal control assays (`ext_ctrl`, `inc_ctrl`,
+#' `amp_ctrl`) from the NPX data, unless user specified to retain them. The
+#' function uses column mapping provided in the `check_npx_log` and returns
+#' the `tibble` or `arrow` object as specified by the user.
 #'
 #' @author
 #' Kang Dong
 #'
-#' @param df A `tibble` or `arrow` object loaded from `read_npx()`, containing
-#' an assay type column.
+#' @param df A `tibble` or `arrow` object loaded from `read_npx()`.
 #' @param check_npx_log A list generated by `check_npx()` that includes:
 #'   - `col_names$assay_type`: the name of the column holding assay type
 #'   information.
-#' @param control_assay_types A character vector of internal control assay
-#' types to remove. Default is `c("ext_ctrl", "inc_ctrl", "amp_ctrl")`.
-#' @param out_df The class of output data frame. Options are `"tibble"` or
-#' `"arrow"`. Default: `"tibble"`.
+#' @param keep_control_assay Logical; if `TRUE`, internal control assays are
+#' retained and no filtering is applied. Defaults to `FALSE`.
+#' @param out_df Output format: either "tibble" (default) or "arrow".
 #'
-#' @return A filtered tibble or arrow object with internal control assay
-#' rows removed.
+#' @return A cleaned tibble or arrow object with control assays removed.
 #'
 #' @examples
 #' \dontrun{
@@ -587,66 +576,60 @@ clean_sample_type <- function(
 #' # Internal control assay are removed
 #' clean_df <- OlinkAnalyze::clean_assay_type(df, log)
 #'
-#' # Example 2: Set control_assay_types = NULL. Return unchanged data
+#' # Example 2: Set keep_control_assay = TRUE Return unchanged data
 #' clean_df <- OlinkAnalyze::clean_assay_type(df,
 #'   log,
-#'   control_assay_types = NULL
+#'   keep_control_assay = TRUE
 #' )
 #' }
+
 clean_assay_type <- function(
     df,
     check_npx_log,
-    control_assay_types = c(
-      "ext_ctrl",
-      "inc_ctrl",
-      "amp_ctrl"
-    ),
-    out_df = "tibble") {
-  # Early exit if control_assay_types is NULL or assay_type column is missing
-  if (is.null(control_assay_types) ||
-    !"assay_type" %in% names(check_npx_log$col_names)) {
-    if (is.null(control_assay_types)) {
-      cli::cli_alert_info(
-        "No control assay types provided. Returning data unchanged."
+    keep_control_assay = FALSE,
+    out_df = "tibble"
+){
+
+  # Return original data if user chooses to keep control samples
+  if (keep_control_assay) {
+    cli::cli_alert_info(
+      "Control assays (inc_ctrl, ext_ctrl, amp_ctrl) are retained as per
+      user input. Returning data unchanged."
       )
-    } else {
-      cli::cli_alert_warning(c(
-        "No column name found for {.var assay_type} in {.code check_npx_log$col_names}.",
-        "i" = "Returning data unchanged."
-      ))
-    }
     return(
       df |>
         convert_read_npx_output(out_df = out_df)
     )
   }
 
-  # Extract column name for assay type
-  col_assay_type <- check_npx_log$col_names$assay_type
+  # Check if 'assay_type' column name is available
+  if (!"assay_type" %in% names(check_npx_log$col_names)) {
+    cli::cli_alert_warning(
+      "No column name found for {.var assay_type} in
+      {.code check_npx_log$col_names}.",
+      "i" = "Returning data unchanged."
+    )
+    return(
+      df |>
+        convert_read_npx_output(out_df = out_df)
+    )
+  }
 
-  # Construct case-insensitive regex pattern for control assay types
-  ctrl_pattern <- paste0(
-    "(?i)^(",
-    paste(control_assay_types, collapse = "|"),
-    ")$"
+  # List control assay types to be excluded
+  ctrl_assay_type <- c("ext_ctrl", "inc_ctrl", "amp_ctrl")
+
+  # Filter out control assays
+  df_cleaned <- df |>
+    dplyr::filter(
+      !.data[[check_npx_log$col_names$assay_type]] %in% ctrl_assay_type
+    )
+
+  cli::cli_alert_success(
+    "Control assays: {.val {paste(ctrl_assay_type, collapse = ', ')}} removed.
+    Returning cleaned data table."
   )
 
-  # Identify rows matching control assay types
-  rows_to_remove <- stringr::str_detect(df[[col_assay_type]], ctrl_pattern)
-  n_controls <- sum(rows_to_remove, na.rm = TRUE)
-
-  # Inform user
-  cli::cli_inform(c(
-    "Removing {n_controls} row{?s} of internal control assay{?s}.",
-    "i" = "Matching assay type{?s}:
-    {paste(control_assay_types, collapse = ', ')}"
-  ))
-
-  # Filter out control assay rows
-  df_cleaned <- df[!rows_to_remove, ] |>
-    dplyr::collect()
-
-  # Return result in desired output format
+  # Format and return output
   return(
     df_cleaned |>
       convert_read_npx_output(out_df = out_df)
@@ -654,14 +637,13 @@ clean_assay_type <- function(
 }
 
 
-#' Remove Samples That Failed QC
+#' Remove Samples with QC Status 'FAIL'
 #'
 #' @description
-#' This function removes rows from an NPX data where the QC warning column
-#' contains the term `"fail"` (case-insensitive). These rows typically represent
-#' samples that failed quality control checks. The function uses
-#' `stringr::str_detect()` for pattern matching and returns the cleaned data in
-#' the desired output format (`"tibble"` or `"arrow"`).
+#' This function use the QC warning column identified by `check_npx_log` and
+#' removes samples flagged `qc_warning` = "FAIL" from the NPX data. The function
+#' returns the cleaned NPX data in the the desired output format (`"tibble"` or
+#' `"arrow"`).
 #'
 #' @author
 #' Kang Dong
@@ -673,8 +655,7 @@ clean_assay_type <- function(
 #' @param out_df A string specifying the output format of the data frame.
 #'   Options are `"tibble"` or `"arrow"`. Default is `"tibble"`.
 #'
-#' @returns A filtered tibble or arrow object with samples that
-#' failed QC removed.
+#' @returns A cleaned tibble or arrow object with failed QC sample removed.
 #'
 #' @examples
 #' \dontrun{
@@ -690,39 +671,37 @@ clean_assay_type <- function(
 #' )
 #'
 #' log <- OlinkAnalyze::check_npx(df)
-#' clean_df <- OlinkAnalyze::clean_sample_qc(df, log)
+#' clean_df <- OlinkAnalyze::clean_qc_warning(df, log)
 #' }
-clean_sample_qc <- function(
+
+clean_qc_warning <- function(
     df,
     check_npx_log,
     out_df = "tibble") {
+
   # Check if qc_warning column name is defined in check_npx_log
   if (!"qc_warning" %in% names(check_npx_log$col_names)) {
-    cli::cli_alert_warning(c(
+    cli::cli_alert_warning(
       "No column name found for {.var qc_warning} in
       {.code check_npx_log$col_names}.",
       "i" = "Returning data unchanged."
-    ))
+    )
     return(
       df |>
         convert_read_npx_output(out_df = out_df)
     )
   }
 
-  # Extract column name for QC warning
-  col_sample_qc <- check_npx_log$col_names$qc_warning
-
-  # Identify rows where QC warning contains "fail" (case-insensitive)
-  rows_to_remove <- stringr::str_detect(df[[col_sample_qc]], "(?i)fail")
-  n_controls <- sum(rows_to_remove, na.rm = TRUE)
-
-  # Inform user about rows being removed
-  cli::cli_inform(c(
-    "Removing {n_controls} row{?s} of sample{?s} failed QC."
-  ))
-
   # Filter out failed samples and return cleaned data
-  df_cleaned <- df[!rows_to_remove, ] |> dplyr::collect()
+  cli::cli_alert_success(
+    "Samples flaged {.field {check_npx_log$col_names$qc_warning}} =
+    {.val 'FAIL'} Removed. Returning cleaned data table."
+  )
+
+  df_cleaned <- df |>
+    dplyr::filter(
+      !.data[[check_npx_log$col_names$qc_warning]] == "FAIL"
+      )
 
   return(
     df_cleaned |>
@@ -731,13 +710,81 @@ clean_sample_qc <- function(
 }
 
 
-#' Remove Control Samples Based on Sample ID Pattern
+#' #' Remove Assays Flagged with Assay Warning
+#' #'
+#' #' @description
+#' #' Removes assays from the NPX data frame where the Assay warning column (as
+#' #' identified in `check_npx_log`) has a value of `"WARN"`. The function is used
+#' #' to clean assay-level QC warnings from the dataset before analysis.
+#' #'
+#' #' @param df A data frame or tibble containing NPX data.
+#' #' @param check_npx_log A list generated by `check_npx()` that includes:
+#' #'   - `col_names$assay_warning`: the name of the column indicating QC status.
+#' #' @param out_df A string indicating the desired output format. Passed to
+#' #' `convert_read_npx_output()`. Common values include `"tibble"` and `"arrow"`.
+#' #'
+#' #' @return A cleaned tibble or arrow object with warning assay removed.
+#' #'
+#' #' @examples
+#' #' \dontrun{
+#' #'  # Example 1: Remove 1 assay that flagged AssayQC = WARN
+#' #'
+#' #' df <- dplyr::tibble(
+#' #'   SampleID = c("A", "B", "C", "D"),
+#' #'   OlinkID = c(rep("OID1111", 3L), rep("OID22222", 1L)),
+#' #'   NPX = rep(1, 4L),
+#' #'   PlateID = rep("plate1", 4L),
+#' #'   AssayQC = c(rep("Pass", 3L), "WARN"),
+#' #'   LOD = rep(1, 4L)
+#' #' )
+#' #'
+#' #' log <- OlinkAnalyze::check_npx(df)
+#' #' clean_df <- OlinkAnalyze::clean_assay_warning(df, log)
+#' #' }
+#'
+#' clean_assay_warning <- function(
+#'     df,
+#'     check_npx_log,
+#'     out_df = "tibble") {
+#'
+#'   # Check if assay_warning column name is defined
+#'   if (!"assay_warning" %in% names(check_npx_log$col_names)) {
+#'     cli::cli_alert_warning(
+#'       "No column name found for {.var assay_warning} in
+#'       {.code check_npx_log$col_names}.",
+#'       "i" = "Returning data unchanged."
+#'     )
+#'     return(
+#'       df |>
+#'         convert_read_npx_output(out_df = out_df)
+#'     )
+#'   }
+#'
+#'   # Filter out failed assays and return cleaned data
+#'   cli::cli_alert_success(
+#'     "Assays with {.field {check_npx_log$col_names$assay_warning}} =
+#'     {.val 'WARN'} removed. Returning cleaned data frame."
+#'   )
+#'
+#'   df_cleaned <- df |>
+#'     dplyr::filter(
+#'       .data[[check_npx_log$col_names$assay_warning]] != "WARN"
+#'     )
+#'
+#'   return(
+#'     df_cleaned |>
+#'       convert_read_npx_output(out_df = out_df)
+#'   )
+#' }
+
+
+#' Remove Control Samples Based on Sample ID
 #'
 #' @description
-#' This function removes rows from a NPX data where the `sample_id` matches a
-#' regular expression pattern indicating customer control samples. This is
-#' useful for filtering out technical controls or customer control samples based
-#' on their SampleID.
+#' This function removes rows from NPX data where the sample ID column (as
+#' defined in `check_npx_log`) matches any of the provided control sample IDs.
+#' This is useful for filtering out technical or customer control samples prior
+#' to downstream analysis.
 #'
 #' @author
 #' Kang Dong
@@ -746,13 +793,13 @@ clean_sample_qc <- function(
 #' a sample ID column.
 #' @param check_npx_log A list generated by `check_npx()` that includes:
 #'   - `col_names$sample_id`: the column name in `df` identifying sample IDs.
-#' @param control_sample_id A character vector of regex strings
-#' (case-insensitive) used to match control sample IDs, e.g., c("control").
-#' Default is: `NULL`.
+#' @param control_sample_idA character vector of control sample IDs,
+#' e.g., `c("control_a", "control_b")`. Default is `NULL`, in which case the
+#' data is returned unchanged.
 #' @param out_df Output format of the returned data frame.
 #'   Options: `"tibble"` or `"arrow"`. Default is `"tibble"`.
 #'
-#' @returns A filtered data frame with control sample IDs removed.
+#' @returns A filtered data table with control samples removed.
 #'
 #' @examples
 #' \dontrun{
@@ -763,7 +810,7 @@ clean_sample_qc <- function(
 #'
 #' out <- OlinkAnalyze::clean_control_sample_id(npx_data1,
 #'   check_npx_log = log,
-#'   control_sample_id = "control"
+#'   control_sample_id = c("CONTROL_SAMPLE_AS 1", "CONTROL_SAMPLE_AS 2")
 #' )
 #'
 #' # Example 2: check default setting of clean_control_sample_id(). Return data
@@ -773,11 +820,13 @@ clean_sample_qc <- function(
 #'   control_sample_id = NULL
 #' )
 #' }
+
 clean_control_sample_id <- function(
     df,
     check_npx_log,
     control_sample_id = NULL,
     out_df = "tibble") {
+
   # Early exit check
   if (is.null(control_sample_id) ||
     !"sample_id" %in% names(check_npx_log$col_names)) {
@@ -798,25 +847,16 @@ clean_control_sample_id <- function(
     )
   }
 
-  # Extract sample_id column name
-  col_sample_id <- check_npx_log$col_names$sample_id
+  # Filter out control samples and return cleaned data
+  cli::cli_alert_success(
+    "Control sample: {.val {paste(control_sample_id, collapse = ', ')}} removed.
+    Returning cleaned data table."
+  )
 
-  # Combine all regex patterns into one case-insensitive expression
-  ctrl_pattern <- paste0("(?i)", paste(control_sample_id, collapse = "|"))
-
-  # Identify rows to remove
-  rows_to_remove <- stringr::str_detect(df[[col_sample_id]], ctrl_pattern)
-  n_controls <- sum(rows_to_remove, na.rm = TRUE)
-
-  # Inform user of removed rows
-  cli::cli_inform(c(
-    "Removing {n_controls} row{?s} of control sample{?s} based on
-    sample ID pattern.",
-    "i" = "Matching pattern: {paste(control_sample_id, collapse = ', ')}"
-  ))
-
-  # Filter and return the cleaned data
-  df_cleaned <- df[!rows_to_remove, ] |> dplyr::collect()
+  df_cleaned <- df |>
+    dplyr::filter(
+      !.data[[check_npx_log$col_names$sample_id]] %in% control_sample_id
+      )
 
   return(
     df_cleaned |>
