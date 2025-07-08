@@ -373,18 +373,18 @@ check_npx_update_col_names <- function(preferred_names) {
   # check for names not matching expected ----
 
   # Check valid names
-  if (!all(names(preferred_names) %in% names(column_name_dict))) {
+  if (!all(names(preferred_names) %in% column_name_dict$col_key)) {
 
     # identify names of the vector preferred_names that do not match names from
     # column_name_dict. Names should match to be able to update the field.
-    missing_names <- names(preferred_names)[!(names(preferred_names) %in% # nolint object_usage_linter
-                                                names(column_name_dict))]
+    missing_names <- setdiff(x = names(preferred_names),
+                             y = column_name_dict$col_key)
 
     cli::cli_abort(
       c("x" = "Unexpected name{?s} in {.arg preferred_names}:
         {.val {missing_names}}!",
         "i" = "Expected one or more of the following names:
-        {names(column_name_dict)}"),
+        {.val {column_name_dict$col_key}}"),
       call = rlang::caller_env(),
       wrap = FALSE
     )
@@ -394,10 +394,19 @@ check_npx_update_col_names <- function(preferred_names) {
   # update column names ----
 
   # Do not update entries that are not specified in `preferred_names`
-  column_name_dict_keep <- column_name_dict[setdiff(x = names(column_name_dict),
-                                                    y = names(preferred_names))]
+  column_name_dict_keep <- column_name_dict |>
+    dplyr::filter(
+      !(.data[["col_key"]] %in% names(preferred_names))
+    )
   # Update entries that are specified in `preferred_names`
-  column_name_dict_change <- as.list(preferred_names)
+  column_name_dict_change <- column_name_dict |>
+    dplyr::filter(
+      .data[["col_key"]] %in% names(preferred_names)
+    ) |>
+    dplyr::arrange(
+      match(x = .data[["key"]], table = names(preferred_names))
+    )
+  #as.list(preferred_names)
   # Merge the entries to a new updated dictionary
   column_name_dict_updated <- append(column_name_dict_keep,
                                      column_name_dict_change)

@@ -1,4 +1,5 @@
-# Test check_npx ----
++
+  # Test check_npx ----
 
 test_that(
   "check_npx - error - df is not tibble or arrow data frame",
