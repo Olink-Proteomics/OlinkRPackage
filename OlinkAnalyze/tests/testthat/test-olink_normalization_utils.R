@@ -148,6 +148,175 @@ test_that(
         norm_mode = olink_norm_modes$bridge
       )
     )
+
+    # multiple quantification columns - one matching ----
+
+    bridge_samples <- intersect(x = npx_data1$SampleID,
+                                y = npx_data2$SampleID) |>
+      (\(x) x[!grepl(pattern = "CONTROL_SAMPLE", x = x)])()
+
+    expect_warning(
+      object = expect_message(
+        object = expect_message(
+          object = lst_check_out <- olink_norm_input_check(
+            df1 = npx_data1 |>
+              dplyr::mutate(
+                Normalization = "Intensity",
+                Ct = .data[["NPX"]]
+              ),
+            df2 = npx_data2 |>
+              dplyr::mutate(
+                Normalization = "Intensity",
+                Quantified_value = .data[["NPX"]]
+              ),
+            overlapping_samples_df1 = bridge_samples,
+            overlapping_samples_df2 = NULL,
+            df1_project_nr = "20200001",
+            df2_project_nr = "20200002",
+            reference_project = "20200002",
+            reference_medians = NULL
+          ),
+          regexp = "Bridge normalization will be performed!"
+        ),
+        regexp = "\"NPX\" will be used for normalization"
+      ),
+      regexp = "Columns not present across datasets"
+    )
+
+    expect_identical(
+      object = lst_check_out,
+      expected = list(
+        ref_df = npx_data2 |>
+          dplyr::mutate(
+            Normalization = "Intensity",
+            Quantified_value = .data[["NPX"]]
+          ),
+        ref_samples = bridge_samples,
+        ref_name = "20200002",
+        ref_cols = list(sample_id = "SampleID",
+                        olink_id = "OlinkID",
+                        uniprot = "UniProt",
+                        assay = "Assay",
+                        panel = "Panel",
+                        panel_version = "Panel_Version",
+                        plate_id = "PlateID",
+                        qc_warn = "QC_Warning",
+                        assay_warn = character(0L),
+                        quant = "NPX",
+                        lod = "LOD",
+                        normalization = "Normalization",
+                        count = character(0L),
+                        sample_type = character(0L)),
+        ref_product = "other",
+        not_ref_df = npx_data1 |>
+          dplyr::mutate(
+            Normalization = "Intensity",
+            Ct = .data[["NPX"]]
+          ),
+        not_ref_samples = NULL,
+        not_ref_name = "20200001",
+        not_ref_cols = list(sample_id = "SampleID",
+                            olink_id = "OlinkID",
+                            uniprot = "UniProt",
+                            assay = "Assay",
+                            panel = "Panel",
+                            panel_version = "Panel_Version",
+                            plate_id = "PlateID",
+                            qc_warn = "QC_Warning",
+                            assay_warn = character(0L),
+                            quant = "NPX",
+                            lod = "LOD",
+                            normalization = "Normalization",
+                            count = character(0L),
+                            sample_type = character(0L)),
+        not_ref_product = "other",
+        reference_medians = NULL,
+        norm_mode = olink_norm_modes$bridge
+      )
+    )
+
+    # multiple quantification columns - multiple matching v1 ----
+
+    bridge_samples <- intersect(x = npx_data1$SampleID,
+                                y = npx_data2$SampleID) |>
+      (\(x) x[!grepl(pattern = "CONTROL_SAMPLE", x = x)])()
+
+    expect_message(
+      object = expect_message(
+        object = lst_check_out <- olink_norm_input_check(
+          df1 = npx_data1 |>
+            dplyr::mutate(
+              Normalization = "Intensity",
+              Quantified_value = .data[["NPX"]]
+            ),
+          df2 = npx_data2 |>
+            dplyr::mutate(
+              Normalization = "Intensity",
+              Quantified_value = .data[["NPX"]]
+            ),
+          overlapping_samples_df1 = bridge_samples,
+          overlapping_samples_df2 = NULL,
+          df1_project_nr = "20200001",
+          df2_project_nr = "20200002",
+          reference_project = "20200002",
+          reference_medians = NULL
+        ),
+        regexp = "Bridge normalization will be performed!"
+      ),
+      regexp = "\"NPX\" will be used for normalization"
+    )
+
+    expect_identical(
+      object = lst_check_out,
+      expected = list(
+        ref_df = npx_data2 |>
+          dplyr::mutate(
+            Normalization = "Intensity",
+            Quantified_value = .data[["NPX"]]
+          ),
+        ref_samples = bridge_samples,
+        ref_name = "20200002",
+        ref_cols = list(sample_id = "SampleID",
+                        olink_id = "OlinkID",
+                        uniprot = "UniProt",
+                        assay = "Assay",
+                        panel = "Panel",
+                        panel_version = "Panel_Version",
+                        plate_id = "PlateID",
+                        qc_warn = "QC_Warning",
+                        assay_warn = character(0L),
+                        quant = "NPX",
+                        lod = "LOD",
+                        normalization = "Normalization",
+                        count = character(0L),
+                        sample_type = character(0L)),
+        ref_product = "other",
+        not_ref_df = npx_data1 |>
+          dplyr::mutate(
+            Normalization = "Intensity",
+            Quantified_value = .data[["NPX"]]
+          ),
+        not_ref_samples = NULL,
+        not_ref_name = "20200001",
+        not_ref_cols = list(sample_id = "SampleID",
+                            olink_id = "OlinkID",
+                            uniprot = "UniProt",
+                            assay = "Assay",
+                            panel = "Panel",
+                            panel_version = "Panel_Version",
+                            plate_id = "PlateID",
+                            qc_warn = "QC_Warning",
+                            assay_warn = character(0L),
+                            quant = "NPX",
+                            lod = "LOD",
+                            normalization = "Normalization",
+                            count = character(0L),
+                            sample_type = character(0L)),
+        not_ref_product = "other",
+        reference_medians = NULL,
+        norm_mode = olink_norm_modes$bridge
+      )
+    )
   }
 )
 
@@ -2830,29 +2999,42 @@ test_that(
 # Test olink_norm_input_check_quant ----
 
 test_that(
-  "olink_norm_input_check_quant - quant col present",
+  "olink_norm_input_check_quant - error - at least one quant col present",
   {
-    skip_if_not_installed("arrow")
-
-    # df does not have quant col ----
+    # df does not have quant col - one df ----
 
     quant_cols <- list(
       "DF1" = character(0L) ### empty quant list
     )
 
+    expect_error(
+      object = olink_norm_input_check_quant(
+        quant_cols = quant_cols,
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
+      ),
+      regexp = "No quantification column identified in at least one of the"
+    )
+
+    # df does not have quant col - two df ----
+
+    quant_cols <- list(
+      "DF1" = character(0L),
+      "DF2" = "Ct"
+    )
 
     expect_error(
-      object = olink_norm_input_check_quant(quant_cols),
+      object = olink_norm_input_check_quant(
+        quant_cols = quant_cols,
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
+      ),
       regexp = "No quantification column identified in at least one of the"
     )
   }
 )
 
 test_that(
-  "olink_norm_input_check_quant - different quant cols in datasets",
+  "olink_norm_input_check_quant - error - different quant cols in datasets",
   {
-    skip_if_not_installed("arrow")
-
     # dfs does not have matching quant col ----
 
     quant_cols <- list(
@@ -2861,18 +3043,105 @@ test_that(
     )
 
     expect_error(
-      object = olink_norm_input_check_quant(quant_cols),
+      object = olink_norm_input_check_quant(
+        quant_cols = quant_cols,
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
+      ),
+      regexp = "Re-export data with at least one shared quantification method"
+    )
+
+    # dfs does not have matching quant col v2 ----
+
+    quant_cols <- list(
+      "DF1" =  "NPX",
+      "DF2" =  c("Quantified_value", "Ct")
+    )
+
+    expect_error(
+      object = olink_norm_input_check_quant(
+        quant_cols = quant_cols,
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
+      ),
       regexp = "Re-export data with at least one shared quantification method"
     )
   }
 )
 
 test_that(
-  "olink_norm_input_check_quant - same and different quant cols in datasets",
+  "olink_norm_input_check_quant - works - one dataset",
   {
-    skip_if_not_installed("arrow")
+    # dfs has one col ----
 
-    # dfs have one or more matching quant col, 2 dfs ----
+    quant_cols <- list(
+      "DF1" =  "NPX"
+    )
+
+    expect_identical(
+      object = olink_norm_input_check_quant(
+        quant_cols = quant_cols,
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
+      ),
+      expected = list("DF1" =  "NPX")
+    )
+
+    # dfs has one col v2 ----
+
+    quant_cols <- list(
+      "DF1" =  "Quantified_value"
+    )
+
+    expect_identical(
+      object = olink_norm_input_check_quant(
+        quant_cols = quant_cols,
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
+      ),
+      expected = list("DF1" =  "Quantified_value")
+    )
+
+    # dfs has two cols ----
+
+    quant_cols <- list(
+      "DF1" =  c("NPX", "Quantified_value")
+    )
+
+    expect_message(
+      object = quant_check <- olink_norm_input_check_quant(
+        quant_cols = quant_cols,
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
+      ),
+      regexp = "Multiple quantification methods detected in dataset \"DF1\""
+    )
+
+    expect_identical(
+      object = quant_check,
+      expected = list("DF1" =  "NPX")
+    )
+
+    # dfs has two cols v2 ----
+
+    quant_cols <- list(
+      "DF1" =  c("Ct", "Quantified_value")
+    )
+
+    expect_message(
+      object = quant_check <- olink_norm_input_check_quant(
+        quant_cols = quant_cols,
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
+      ),
+      regexp = "Multiple quantification methods detected in dataset \"DF1\""
+    )
+
+    expect_identical(
+      object = quant_check,
+      expected = list("DF1" =  "Quantified_value")
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_check_quant - works - two datasets",
+  {
+    # dfs have one matching quant col, 2 dfs ----
 
     quant_cols <- list(
       "DF1" = c("Ct", "NPX"),
@@ -2880,9 +3149,45 @@ test_that(
     )
 
     expect_message(
-      object = olink_norm_input_check_quant(quant_cols),
-      regexp = "NPX will be used for normalization."
+      object = quant_check <- olink_norm_input_check_quant(
+        quant_cols = quant_cols,
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
+      ),
+      regexp = "\"NPX\" will be used for normalization."
     )
+
+    expect_identical(
+      object = quant_check,
+      expected = list(
+        "DF1" = "NPX",
+        "DF2" = "NPX"
+      )
+    )
+
+    # dfs have one matching quant col, 2 dfs ----
+
+    quant_cols <- list(
+      "DF1" = c("NPX"),
+      "DF2" = c("Quantified_value", "NPX", "Ct")
+    )
+
+    expect_message(
+      object = quant_check <- olink_norm_input_check_quant(
+        quant_cols = quant_cols,
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
+      ),
+      regexp = "\"NPX\" will be used for normalization."
+    )
+
+    expect_identical(
+      object = quant_check,
+      expected = list(
+        "DF1" = "NPX",
+        "DF2" = "NPX"
+      )
+    )
+
+    # dfs have multiple matching quant col, 2 dfs ----
 
     quant_cols <- list(
       "DF1" =  c("Ct", "NPX", "Quantified_value"),
@@ -2890,29 +3195,42 @@ test_that(
     )
 
     expect_message(
-      object = olink_norm_input_check_quant(quant_cols),
-      regexp = "Multiple matching quantification methods detected."
+      object = quant_check <- olink_norm_input_check_quant(
+        quant_cols = quant_cols,
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
+      ),
+      regexp = "Multiple matching quantification methods detected in datasets"
     )
 
-    expect_message(
-      object = olink_norm_input_check_quant(quant_cols),
-      regexp = "NPX"
+    expect_identical(
+      object = quant_check,
+      expected = list(
+        "DF1" = "NPX",
+        "DF2" = "NPX"
+      )
     )
 
-    # dfs have two or more matching quant col, ref normalization ----
+    # dfs have multiple matching quant col, 2 dfs  - v2----
 
     quant_cols <- list(
-      "DF1" =  c("Ct", "NPX", "Quantified_value")
+      "DF1" =  c("Ct", "Quantified_value"),
+      "DF2" =  c("Quantified_value", "Ct", "NPX")
     )
 
     expect_message(
-      object = olink_norm_input_check_quant(quant_cols),
-      regexp = "Multiple quantification methods detected."
+      object = quant_check <- olink_norm_input_check_quant(
+        quant_cols = quant_cols,
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
+      ),
+      regexp = "Multiple matching quantification methods detected in datasets"
     )
 
-    expect_message(
-      object = olink_norm_input_check_quant(quant_cols),
-      regexp = "NPX"
+    expect_identical(
+      object = quant_check,
+      expected = list(
+        "DF1" = "Quantified_value",
+        "DF2" = "Quantified_value"
+      )
     )
   }
 )
