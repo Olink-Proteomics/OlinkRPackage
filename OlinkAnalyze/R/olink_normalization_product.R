@@ -878,9 +878,9 @@ olink_normalization_product_format <- function(df_norm, # nolint object_length_l
     dplyr::bind_rows(
       df2_no_overlap
     ) |>
-    dplyr::mutate(
-      SampleID = paste0(.data[["SampleID"]], "_", .data[["Project"]])
-    ) |>
+    # dplyr::mutate(
+    #   SampleID = paste0(.data[["SampleID"]], "_", .data[["Project"]])
+    # ) |>
     dplyr::select( # Remove extra columns
       -dplyr::any_of(
         c("MedianCenteredNPX", "QSNormalizedNPX", "OlinkID_E3072")
