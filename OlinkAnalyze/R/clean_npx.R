@@ -204,15 +204,16 @@ clean_npx <- function(
   if (stringr::str_detect(check_npx_log$col_names$quant,
                           regex("quantified", ignore_case = TRUE))) {
 
-    cli::cli_alert_warning(
+    cli::cli_text(
       "Detected absolute quantification in {.var check_log$col_names$quant}.",
       "Applying log2 transformation is recommended before downstream analysis."
     )
 
+    # TO BE UPDATE: Move this script into message. Force cli to print this message ----
     # df <- df |>
     #   mutate(log2_quantified_value = log2(.data[[log$col_names$quant]]))
-    #
-    # log$col_names$quant <- "log2_quantified_value"
+
+
   }
 
 
