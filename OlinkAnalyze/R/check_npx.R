@@ -237,7 +237,7 @@ check_npx_col_names <- function(df,
 
   }
 
-  # matches expected names to column names ----
+  # Intersect expected names to column names ----
 
   column_name_dict_updated <- column_name_dict_updated |>
     dplyr::mutate(
@@ -415,14 +415,24 @@ check_npx_update_col_names <- function(preferred_names) {
   column_name_dict_keep <- column_name_dict |>
     dplyr::filter(
       !(.data[["col_key"]] %in% names(preferred_names))
+    ) |>
+    dplyr::mutate(
+      col_name_mod = FALSE
     )
   # Update entries that are specified in `preferred_names`
   column_name_dict_change <- column_name_dict |>
     dplyr::filter(
       .data[["col_key"]] %in% names(preferred_names)
     ) |>
+    dplyr::arrange(
+      match(
+        x = .data[["col_key"]],
+        table = names(preferred_names)
+      )
+    ) |>
     dplyr::mutate(
-      col_names = as.list(.env[["preferred_names"]])
+      col_names = as.list(.env[["preferred_names"]]),
+      col_name_mod = TRUE
     )
   # Merge the entries to a new updated dictionary
   column_name_dict_updated <- column_name_dict_keep |>
