@@ -391,6 +391,23 @@ check_npx_update_col_names <- function(preferred_names) {
 
   }
 
+  # check for duplicated names ----
+
+  dup_names <- names(preferred_names)[duplicated(names(preferred_names))]
+
+  if (length(dup_names) > 0L) {
+
+    cli::cli_abort(
+      c("x" = "Duplicated name{?s} in {.arg preferred_names}:
+        {.val {dup_names}}!",
+        "i" = "Expected unique names for each column."),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
+  }
+
+
   # update column names ----
 
   # Do not update entries that are not specified in `preferred_names`
@@ -403,13 +420,20 @@ check_npx_update_col_names <- function(preferred_names) {
     dplyr::filter(
       .data[["col_key"]] %in% names(preferred_names)
     ) |>
-    dplyr::arrange(
-      match(x = .data[["key"]], table = names(preferred_names))
+    dplyr::mutate(
+      col_names = as.list(.env[["preferred_names"]])
     )
-  #as.list(preferred_names)
   # Merge the entries to a new updated dictionary
-  column_name_dict_updated <- append(column_name_dict_keep,
-                                     column_name_dict_change)
+  column_name_dict_updated <- column_name_dict_keep |>
+    dplyr::bind_rows(
+      column_name_dict_change
+    ) |>
+    dplyr::arrange(
+      match(
+        x = .data[["col_key"]],
+        table = column_name_dict$col_key
+      )
+    )
 
   # return ----
 

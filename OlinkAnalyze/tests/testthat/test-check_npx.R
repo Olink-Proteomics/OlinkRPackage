@@ -1,5 +1,4 @@
-+
-  # Test check_npx ----
+# Test check_npx ----
 
 test_that(
   "check_npx - error - df is not tibble or arrow data frame",
@@ -517,7 +516,7 @@ test_that(
 # here we will check only the errors
 
 test_that(
-  "check_npx_update_col_names - error - no match for non-nullable columns",
+  "check_npx_update_col_names - error - no match in col_keys",
   {
     # one name not in column_name_dict ----
 
@@ -537,6 +536,34 @@ test_that(
                             "lod2" = "LOD")
       ),
       regexp = "Unexpected names in"
+    )
+  }
+)
+
+test_that(
+  "check_npx_update_col_names - error - duplicated names in array",
+  {
+    # one name not in column_name_dict ----
+
+    expect_error(
+      object = check_npx_update_col_names(
+        preferred_names = c("sample_id" = "SampleID",
+                            "sample_id" = "SampleID2")
+      ),
+      regexp = "Duplicated name in"
+    )
+
+    # multiple names not in column_name_dict ----
+
+    expect_error(
+      object = check_npx_update_col_names(
+        preferred_names = c("sample_id" = "SampleID",
+                            "sample_id" = "SampleID2",
+                            "sample_type" = "Sample_Type",
+                            "lod" = "LOD1",
+                            "lod" = "LOD2")
+      ),
+      regexp = "Duplicated names in"
     )
   }
 )
