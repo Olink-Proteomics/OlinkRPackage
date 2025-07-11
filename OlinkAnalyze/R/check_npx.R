@@ -237,25 +237,26 @@ check_npx_col_names <- function(df,
 
   }
 
-  # matches names to column names ----
+  # matches expected names to column names ----
 
-  column_name_df <- lapply(
-    seq_along(column_name_dict_updated),
-    function(x) {
-      # get collection of alternative names
-      col_alt_names <- column_name_dict_updated[[x]]
-      # identify names present in the column names of the data frame
-      col_names <- col_alt_names[col_alt_names %in% names(df)]
-      # return NA ONLY if the entry in the list contains some NA element.
-      # NA elements in column_name_dict signify that the column can be missing
-      if (length(col_names) == 0L && any(is.na(col_alt_names))) {
-        return(NA_character_)
-      } else {
-        return(col_names)
-      }
-    }
-  )
-  names(column_name_df) <- names(column_name_dict_updated)
+  column_name_dict_updated <- column_name_dict_updated |>
+    dplyr::mutate(
+      col_df = lapply(
+        .data[["col_names"]],
+        function(x) {
+          intersect( # nolint return_linter
+            x = x,
+            y = names(df)
+          )
+        }
+      ),
+      in_df = sapply(
+        .data[["col_df"]],
+        function(x) {
+          length(x) > 0L # nolint return_linter
+        }
+      )
+    )
 
   # check correctness ----
 
@@ -377,7 +378,7 @@ check_npx_update_col_names <- function(preferred_names) {
 
     # identify names of the vector preferred_names that do not match names from
     # column_name_dict. Names should match to be able to update the field.
-    missing_names <- setdiff(x = names(preferred_names),
+    missing_names <- setdiff(x = names(preferred_names), # nolint object_usage_linter
                              y = column_name_dict$col_key)
 
     cli::cli_abort(
