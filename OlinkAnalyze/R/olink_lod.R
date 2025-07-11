@@ -42,9 +42,9 @@
 #'
 olink_lod <- function(data, lod_file_path = NULL, lod_method = "NCLOD"){
   #Check data format
-  npxCheck <- npxCheck(df)
+  npxCheck <- npxCheck(data)
   # Rename duplicate UniProts
-  df <- uniprot_replace(df, npxCheck)
+  data <- uniprot_replace(data, npxCheck)
 
   # lod_method must be one of options
   if(!lod_method %in% c("NCLOD", "FixedLOD", "Both")){
