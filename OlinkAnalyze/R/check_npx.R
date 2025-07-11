@@ -295,9 +295,9 @@ check_npx_col_names <- function(df,
 
     miss_cols <- paste0(
       "* \"", df_req_cols$col_key, "\": One of ",
-      lapply(df_req_cols$col_names,
+      sapply(df_req_cols$col_names,
              ansi_collapse_quot,
-             sep = "or")
+             sep = "or"), "."
     )
 
     cli::cli_abort(
@@ -314,6 +314,62 @@ check_npx_col_names <- function(df,
 
   }
 
+  # break ties for multi-matches by order ----
+
+  # keep all required cols for which there is no matching column in dataset
+  df_multi_ties_cols <- column_name_dict_updated |>
+    dplyr::filter(
+      .data[["col_multi"]] == FALSE
+      & .data[["col_df_len"]] > 1L
+      & .data[["col_order"]] == TRUE
+    ) |>
+    dplyr::rename(
+      "col_df_tmp" = "col_df"
+    ) |>
+    dplyr::mutate(
+      col_df = lapply(.data[["col_df_tmp"]], utils::head, n = 1L),
+      col_df_len = sapply(.data[["col_df"]], length)
+    )
+
+  if (nrow(df_multi_ties_cols) > 0L) {
+
+    # update column_name_dict_updated
+    column_name_dict_updated <- column_name_dict_updated |>
+      dplyr::filter(
+        !(.data[["col_key"]] %in% df_multi_ties_cols$col_key)
+      ) |>
+      dplyr::bind_rows(
+        df_multi_ties_cols |>
+          dplyr::select(
+            -dplyr::all_of("col_df_tmp")
+          )
+      ) |>
+      dplyr::arrange(
+        match(x = .data[["col_key"]], table = column_name_dict$col_key)
+      )
+
+    # inform message string
+    multi_ties_cols <- paste0(
+      "* \"", df_multi_ties_cols$col_key, "\": \"",
+      unlist(df_multi_ties_cols$col_df), "\" was selected. Options were ",
+      sapply(df_multi_ties_cols$col_df_tmp,
+             ansi_collapse_quot,
+             sep = "or"), "."
+    )
+
+    cli::cli_inform(
+      c("i" = "{cli::qty(df_multi_ties_cols$col_key)} More than one column names
+      in {.arg df} was associated with certain key{?s}. One was selected based
+      on an ordered list:",
+        multi_ties_cols,
+        "Please use {.arg preferred_names} to select a different column
+        name."),
+      wrap = FALSE
+    )
+
+  }
+
+
   # check multi-matches in non-multi cols columns ----
 
   # keep all cols that are not allowed to have multiple matches and have more
@@ -324,31 +380,25 @@ check_npx_col_names <- function(df,
       & .data[["col_df_len"]] > 1L
     )
 
-  # check if multiple columns from the data frame match the same key from
-  # column_name_dict
-  column_name_multi <- sapply(column_name_df, length)
+  if (nrow(df_multi_cols) > 0L) {
 
-  if (any(column_name_multi > 1L)) {
-
-    column_name_multi_lst <- column_name_df[column_name_multi > 1L]
-    column_name_multi_prnt <- lapply(
-      seq_along(column_name_multi_lst),
-      function(i) {
-        paste0("* \"", names(column_name_multi_lst[i]), "\": ", # nolint return_linter
-               cli::ansi_collapse(x = unlist(column_name_multi_lst[i])))
-      }
-    ) |>
-      unlist()
+    multi_cols <- paste0(
+      "* \"", df_multi_cols$col_key, "\": ",
+      sapply(df_multi_cols$col_names,
+             ansi_collapse_quot,
+             sep = "or"), "."
+    )
 
     cli::cli_abort(
-      c("x" = "There are multiple column names associated with the following
-        key(s):",
-        column_name_multi_prnt,
+      c("x" = "{cli::qty(df_multi_cols$col_key)} There is more than one column
+      names in {.arg df} associated with the following key{?s}:",
+        multi_cols,
         "i" = "Please use {.arg preferred_names} to break ties of column
         names."),
       call = rlang::caller_env(),
       wrap = FALSE
     )
+
   }
 
   # check if no columns from the data frame match the same key from
@@ -358,7 +408,13 @@ check_npx_col_names <- function(df,
   # return ----
 
   # remove any nullable columns
-  column_name_df <- column_name_df[!is.na(column_name_df)]
+  column_name_df <- column_name_dict_updated |>
+    dplyr::filter(
+      .data[["col_df_len"]] >= 1L
+    ) |>
+    dplyr::pull(
+      .data[["col_df"]]
+    )
 
   return(column_name_df)
 }

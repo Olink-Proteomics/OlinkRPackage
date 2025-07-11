@@ -17,6 +17,7 @@ column_name_dict <- dplyr::tibble(
     "panel_version",
     "lod",
     "quant",
+    "ext_npx",
     "count",
     "qc_warning",
     "assay_warn",
@@ -75,15 +76,29 @@ column_name_dict <- dplyr::tibble(
                         "LODNPX",
                         "lodnpx",
                         "LOD_NPX",
-                        "lod_npx"),
+                        "lod_npx",
+                        "PCNormalizedLOD",
+                        "pcnormalizedlod",
+                        "pc_normalized_lod",
+                        "NCLOD",
+                        "NCPCNormalizedLOD",
+                        "FixedLOD",
+                        "FixedPCNormalizedLOD"),
+    # note that quant values should be ordered by preference
     "quant" =         c("NPX",
                         "npx",
+                        "PCNormalizedNPX",
+                        "pcnormalizednpx",
+                        "pc_normalized_npx",
                         "Quantified",
                         "Quantified_value",
                         "quantified",
                         "quantified_value",
                         "Ct",
                         "ct"),
+    "ext_npx" =       c("ExtNPX",
+                        "extnpx",
+                        "ext_npx"),
     "count" =         c("Count",
                         "count"),
     "qc_warning" =    c("QC_Warning",
@@ -110,6 +125,7 @@ column_name_dict <- dplyr::tibble(
     FALSE, # panel_version
     TRUE, # lod
     FALSE, # quant
+    TRUE, # ext_npx
     TRUE, # count
     FALSE, # qc_warning
     TRUE, # assay_warn
@@ -128,7 +144,8 @@ column_name_dict <- dplyr::tibble(
     FALSE, # plate_id
     FALSE, # panel_version
     TRUE, # lod
-    TRUE, # quant
+    FALSE, # quant
+    FALSE, # ext_npx
     FALSE, # count
     FALSE, # qc_warning
     FALSE, # assay_warn
@@ -150,6 +167,7 @@ column_name_dict <- dplyr::tibble(
     FALSE, # panel_version
     FALSE, # lod
     TRUE, # quant
+    FALSE, # ext_npx
     FALSE, # count
     FALSE, # qc_warning
     FALSE, # assay_warn

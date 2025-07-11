@@ -302,6 +302,7 @@ test_that(
           preferred_names = c("sample_id" = "IamSampleName")
         ),
       expected = list(
+        sample_id = "IamSampleName",
         sample_type = "SampleType",
         olink_id = "OlinkID",
         uniprot = "UniProt",
@@ -310,8 +311,7 @@ test_that(
         plate_id = "PlateID",
         panel_version = "Panel_Lot_Nr",
         quant = "NPX",
-        qc_warning = "QC_Warning",
-        sample_id = "IamSampleName"
+        qc_warning = "QC_Warning"
       )
     )
 
@@ -333,16 +333,16 @@ test_that(
                               "olink_id" = "IamOlinkIdentifier")
         ),
       expected = list(
+        sample_id = "IamSampleName",
+        sample_type = "IamSampleType",
+        olink_id = "IamOlinkIdentifier",
         uniprot = "UniProt",
         assay = "Assay",
         panel = "Panel",
+        plate_id = "IamPlateIdentifier",
         panel_version = "Panel_Lot_Nr",
         quant = "NPX",
-        qc_warning = "QC_Warning",
-        sample_id = "IamSampleName",
-        sample_type = "IamSampleType",
-        plate_id = "IamPlateIdentifier",
-        olink_id = "IamOlinkIdentifier"
+        qc_warning = "QC_Warning"
       )
     )
 
@@ -367,17 +367,17 @@ test_that(
                               "quant" = "Quantified_value")
         ),
       expected = list(
+        sample_id = "IamSampleName",
+        sample_type = "IamSampleType",
         olink_id = "OlinkID",
         uniprot = "UniProt",
         assay = "Assay",
         panel = "Panel",
         plate_id = "PlateID",
         panel_version = "Panel_Lot_Nr",
-        qc_warning = "QC_Warning",
-        sample_id = "IamSampleName",
-        sample_type = "IamSampleType",
         lod = "PlateLOD",
-        quant = "Quantified_value"
+        quant = "Quantified_value",
+        qc_warning = "QC_Warning"
       )
     )
   }
@@ -425,6 +425,52 @@ test_that(
 )
 
 test_that(
+  "check_npx_col_names - inform - resolve ties with multiple matches",
+  {
+    df <- arrow::arrow_table(
+      SampleID = c("A", "B", "C", "D"),
+      OlinkID = rep("OID12345", 4L),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L),
+      LOD = rnorm(4L)
+    )
+
+    # two matches ----
+
+    expect_message(
+      object = df |>
+        dplyr::collect() |>
+        dplyr::mutate(
+          NPX = rnorm(4L),
+          Quantified_value = rnorm(4L)
+        ) |>
+        check_npx_col_names(preferred_names = NULL),
+      regexp = paste("\"NPX\" was selected. Options were \"NPX\" or",
+                     "\"Quantified_value\".")
+    )
+
+    # 3 matches ----
+
+    expect_message(
+      object = df |>
+        dplyr::collect() |>
+        dplyr::mutate(
+          Ct = rnorm(4L),
+          Quantified_value = rnorm(4L),
+          NPX = rnorm(4L)
+        ) |>
+        check_npx_col_names(preferred_names = NULL),
+      regexp = paste("\"NPX\" was selected. Options were \"NPX\",",
+                     "\"Quantified_value\", or \"Ct\".")
+    )
+  }
+)
+
+test_that(
   "check_npx_col_names - error - ties (multiple matches)",
   {
     df <- arrow::arrow_table(
@@ -446,10 +492,10 @@ test_that(
       object = df |>
         dplyr::collect() |>
         dplyr::mutate(
-          PlateLOD = rnorm(4L)
+          plate_id = LETTERS[1L:4L]
         ) |>
         check_npx_col_names(preferred_names = NULL),
-      regexp = "There are multiple column names associated with the following k"
+      regexp = "There is more than one column names in `df` associated with the"
     )
 
     # mutiple columns with multiple matches ----
@@ -458,11 +504,11 @@ test_that(
       object = df |>
         dplyr::collect() |>
         dplyr::mutate(
-          PlateLOD = rnorm(4L),
-          Quantified_value = rnorm(4L)
+          plate_id = LETTERS[1L:4L],
+          assay = LETTERS[1L:4L]
         ) |>
         check_npx_col_names(preferred_names = NULL),
-      regexp = "There are multiple column names associated with the following k"
+      regexp = "There is more than one column names in `df` associated with the"
     )
   }
 )
