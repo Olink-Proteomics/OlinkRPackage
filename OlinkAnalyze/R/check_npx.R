@@ -233,7 +233,10 @@ check_npx_col_names <- function(df,
 
   } else {
 
-    column_name_dict_updated <- column_name_dict
+    column_name_dict_updated <- column_name_dict |>
+      dplyr::mutate(
+        col_name_mod = FALSE
+      )
 
   }
 
@@ -250,32 +253,76 @@ check_npx_col_names <- function(df,
           )
         }
       ),
-      in_df = sapply(
-        .data[["col_df"]],
-        function(x) {
-          length(x) > 0L # nolint return_linter
-        }
-      )
+      col_df_len = sapply(.data[["col_df"]], length)
     )
 
-  # check correctness ----
+  # Check correctness of preferred_names ----
 
   # is user's input correct?
   # check if the user input has no matches to the column names of the data frame
-  if (!is.null(preferred_names)) {
-    # pick user-defined column names
-    col_name_user <- column_name_df[names(preferred_names)]
+  df_custom_names <- column_name_dict_updated |>
+    dplyr::filter(
+      .data[["col_name_mod"]] == TRUE
+      & .data[["col_df_len"]] == 0L
+    )
 
-    if (any(sapply(col_name_user, length) == 0L) || any(is.na(col_name_user))) {
-      cli::cli_abort(
-        c("x" = "Some of the values of {.arg preferred_names} are not detected
-          in the column names of the input data set {.arg df}."),
-        call = rlang::caller_env(),
-        wrap = FALSE
-      )
+  if (!is.null(preferred_names) && nrow(df_custom_names) > 0L) {
 
-    }
+    cli::cli_abort(
+      c(
+        "x" = "{cli::qty(df_custom_names$col_key)} Value{?s}
+        {.val {unlist(df_custom_names$col_names)}} from {.arg preferred_names}
+        corresponding to key{?s} {.val {df_custom_names$col_key}} {?is/are}
+        missing from the input dataset {.arg df}.",
+        "i" = "Please ensure all provided column names are present in the data!"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
   }
+
+  # check presence of required columns ----
+
+  # keep all required cols for which there is no matching column in dataset
+  df_req_cols <- column_name_dict_updated |>
+    dplyr::filter(
+      .data[["col_miss"]] == FALSE
+      & .data[["col_df_len"]] == 0L
+    )
+
+  if (nrow(df_req_cols) > 0L) {
+
+    miss_cols <- paste0(
+      "* \"", df_req_cols$col_key, "\": One of ",
+      lapply(df_req_cols$col_names,
+             ansi_collapse_quot,
+             sep = "or")
+    )
+
+    cli::cli_abort(
+      c("x" = "{cli::qty(df_req_cols$col_key)} There {?is/are} no column
+        name{?s} associated with the following key{?s}:",
+        miss_cols,
+        "i" = "Please ensure presence of columns above in dataset {.arg df}. If
+        columns are present and the column name does not match one of the
+        expected ones, please use argument {.arg preferred_names} to point to
+        the correct column."),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
+  }
+
+  # check multi-matches in non-multi cols columns ----
+
+  # keep all cols that are not allowed to have multiple matches and have more
+  # than one matching columns in dataset
+  df_multi_cols <- column_name_dict_updated |>
+    dplyr::filter(
+      .data[["col_multi"]] == FALSE
+      & .data[["col_df_len"]] > 1L
+    )
 
   # check if multiple columns from the data frame match the same key from
   # column_name_dict
@@ -306,26 +353,7 @@ check_npx_col_names <- function(df,
 
   # check if no columns from the data frame match the same key from
   # column_name_dict
-  if (any(column_name_multi == 0L)) {
 
-    miss_cols <- paste0(
-      "* \"", names(column_name_df[column_name_multi == 0L]), "\": ",
-      lapply(column_name_dict[names(column_name_df[column_name_multi == 0L])],
-             ansi_collapse_quot,
-             sep = "or")
-    )
-
-    cli::cli_abort(
-      c("x" = "There are no column names associated with the following key(s):",
-        miss_cols,
-        "i" = "Please ensure presence of columns above in dataset {.arg df}. If
-        columns are present and the column name does not match one of the
-        expected ones, please use argument {.arg preferred_names} to point to
-        the correct column."),
-      call = rlang::caller_env(),
-      wrap = FALSE
-    )
-  }
 
   # return ----
 

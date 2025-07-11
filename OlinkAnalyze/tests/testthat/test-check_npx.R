@@ -407,7 +407,7 @@ test_that(
         check_npx_col_names(
           preferred_names = c("sample_id" = "IamSampleName")
         ),
-      regexp = "Some of the values of `preferred_names` are not detected in"
+      regexp = "Value \"IamSampleName\" from `preferred_names` corresponding to"
     )
 
     # multiple non existing column column names ----
@@ -419,7 +419,7 @@ test_that(
                               "lod" = "PlateLOD",
                               "sample_type" = "IamSampleType")
         ),
-      regexp = "Some of the values of `preferred_names` are not detected in"
+      regexp = "Values \"IamSampleName\", \"IamSampleType\", and \"PlateLOD\""
     )
   }
 )
@@ -492,7 +492,7 @@ test_that(
         ) |>
         dplyr::compute() |>
         check_npx_col_names(preferred_names = NULL),
-      regexp = "There are no column names associated with the following key"
+      regexp = "There is no column name associated with the following key"
     )
 
     # mutiple columns with no matches ----
@@ -501,11 +501,11 @@ test_that(
       object = df |>
         dplyr::rename(
           "IamSampleName" = "SampleID",
-          "IamSampleType" = "SampleType"
+          "IamPlateID" = "PlateID"
         ) |>
         dplyr::compute() |>
         check_npx_col_names(preferred_names = NULL),
-      regexp = "There are no column names associated with the following key"
+      regexp = "There are no column names associated with the following keys"
     )
   }
 )
