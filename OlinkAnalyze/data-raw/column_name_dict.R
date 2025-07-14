@@ -179,5 +179,41 @@ column_name_dict <- dplyr::tibble(
     FALSE, # qc_warning
     FALSE, # assay_warn
     FALSE # normalization
+  ),
+  col_class = c(
+    "character", # sample_id
+    "character", # sample_type
+    "character", # assay_type
+    "character", # olink_id
+    "character", # uniprot
+    "character", # assay
+    "character", # panel
+    "character", # plate_id
+    "character", # panel_version
+    "numeric", # lod
+    "numeric", # quant
+    "numeric", # ext_npx
+    "numeric", # count
+    "character", # qc_warning
+    "character", # assay_warn
+    "character" # normalization
+  ),
+  col_class_check = c(
+    FALSE, # sample_id
+    FALSE, # sample_type
+    FALSE, # assay_type
+    FALSE, # olink_id
+    FALSE, # uniprot
+    FALSE, # assay
+    FALSE, # panel
+    FALSE, # plate_id
+    FALSE, # panel_version
+    TRUE, # lod
+    TRUE, # quant
+    TRUE, # ext_npx
+    TRUE, # count
+    FALSE, # qc_warning
+    FALSE, # assay_warn
+    FALSE # normalization
   )
 )
