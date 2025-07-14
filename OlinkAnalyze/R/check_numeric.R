@@ -23,7 +23,7 @@ check_is_numeric <- function(num,
                           error = TRUE)
 
   # check if input is a numeric vector
-  if ((!rlang::is_character(num) && !rlang::is_integer(num) && !is.numeric(num))
+  if ((!rlang::is_integer(num) && !is.numeric(num))
       || any(rlang::are_na(num))) {
 
     if (error == TRUE) {
