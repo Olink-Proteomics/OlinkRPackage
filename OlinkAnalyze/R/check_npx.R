@@ -147,6 +147,12 @@ check_npx <- function(df,
     col_names = check_npx_out_lst$col_names
   )
 
+  # assay QC
+  check_npx_out_lst$assay_qc <- check_npx_qcwarn_assays(
+    df = df,
+    col_names = check_npx_out_lst$col_names
+  )
+
   # return results ----
 
   return(check_npx_out_lst)
@@ -935,4 +941,58 @@ check_npx_col_class <- function(df, col_names) {
 
   return(df_col_class)
 
+}
+
+#' Help function checking data for assay QC warnings.
+#'
+#' @param df A tibble or an arrow object containing the columns \var{AssayQC}
+#' and \var{OlinkID}.
+#' @param col_names A list of matched column names. This is the output of the
+#' \var{check_npx_col_names} function.
+#'
+#' @returns A character vector containing \var{OlinkID} of assays with at least
+#' one QC warning, otherwise a \emph{character(0)}.
+#'
+check_npx_qcwarn_assays <- function(df, col_names) {
+
+  if ("assay_warn" %in% names(col_names)) {
+
+    qc_warn_assays <- df |>
+      dplyr::select(
+        dplyr::all_of(
+          c(col_names$olink_id, col_names$assay_warn)
+        )
+      ) |>
+      dplyr::filter(
+        grepl(
+          pattern = "warn",
+          x = .data[[col_names$assay_warn]],
+          ignore.case = TRUE
+        )
+      ) |>
+      dplyr::distinct(
+        .data[[col_names$olink_id]]
+      ) |>
+      dplyr::collect() |>
+      dplyr::pull(
+        .data[[col_names$olink_id]]
+      ) |>
+      unique() |>
+      sort()
+
+    if (length(qc_warn_assays) > 0L) {
+      cli::cli_inform(
+        c("{.val {length(qc_warn_assays)}} assay{?s} exhibited assay QC warnings
+        in column {.arg {unname(col_names$assay_warn)}} of the dataset:
+          {.val {qc_warn_assays}}.")
+      )
+    }
+
+  } else {
+
+    qc_warn_assays <- character(0L)
+
+  }
+
+  return(qc_warn_assays)
 }

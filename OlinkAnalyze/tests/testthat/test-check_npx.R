@@ -54,7 +54,8 @@ test_that(
         "col_class" = character(0L),
         "col_key" = character(0L),
         "expected_col_class" = character(0L)
-      )
+      ),
+      assay_qc = character(0L)
     )
 
     expect_equal(
@@ -82,7 +83,7 @@ test_that(
       Count = rnorm(4L),
       PlateID = rep("plate1", 4L),
       QC_Warning = rep("Pass", 4L),
-      AssayQC = rep("Pass", 4L),
+      AssayQC = c(rep("Pass", 3L), "Warning"),
       Normalization = LETTERS[1L:4L]
     )
 
@@ -111,13 +112,17 @@ test_that(
         "col_class" = character(0L),
         "col_key" = character(0L),
         "expected_col_class" = character(0L)
-      )
+      ),
+      assay_qc = c("OID12345")
     )
 
-    expect_equal(
-      object = check_npx(df = df,
-                         preferred_names = NULL),
-      expected = expected_result
+    expect_message(
+      object = expect_equal(
+        object = check_npx(df = df,
+                           preferred_names = NULL),
+        expected = expected_result
+      ),
+      regexp = "QC warnings in column `AssayQC` of the dataset: \"OID12345\"."
     )
   }
 )
@@ -156,7 +161,8 @@ test_that(
         "col_class" = c("character"),
         "col_key" = c("quant"),
         "expected_col_class" = c("numeric")
-      )
+      ),
+      assay_qc = character(0L)
     )
 
     expect_warning(
@@ -1070,6 +1076,142 @@ test_that(
         )
       ),
       regexp = "\"PlateLOD\": Expected \"numeric\". Detected \"character\"."
+    )
+  }
+)
+
+# Test check_npx_qcwarn_assays ----
+
+test_that(
+  "check_npx_qcwarn_assays - works - no AssayQC or Assay_Warning columns",
+  {
+    df <- arrow::arrow_table(
+      SampleID = c("A", "B", "C", "D"),
+      OlinkID = rep("OID12345", 4L),
+      NPX = as.character(rnorm(4L))
+    )
+
+    col_names <-  list(
+      quant = "NPX",
+      olink_id = "OlinkID",
+      sample_id = "SampleID"
+    )
+
+    expect_equal(
+      object = check_npx_qcwarn_assays(df = df,
+                                       col_names = col_names),
+      expected = character(0L)
+    )
+  }
+)
+
+test_that(
+  "check_npx_qcwarn_assays - works - no assay with warning",
+  {
+    # AssayQC all pass v1 ----
+
+    df <- arrow::arrow_table(
+      SampleID = rep(x = c("A", "B", "C", "D"), times = 4L),
+      OlinkID = rep(x = c("OID12345", "OID12346", "OID12347", "OID12348"),
+                    each = 4L),
+      NPX = as.character(x = rnorm(n = 16L)),
+      AssayQC = rep(x = "Pass", times = 16L)
+    )
+
+    col_names <-  list(
+      quant = "NPX",
+      olink_id = "OlinkID",
+      sample_id = "SampleID",
+      assay_warn = "AssayQC"
+    )
+
+    expect_equal(
+      object = check_npx_qcwarn_assays(df = df,
+                                       col_names = col_names),
+      expected = character(0L)
+    )
+
+    # AssayQC all pass v2 ----
+
+    df <- arrow::arrow_table(
+      SampleID = rep(x = c("A", "B", "C", "D"), times = 4L),
+      OlinkID = rep(x = c("OID12345", "OID12346", "OID12347", "OID12348"),
+                    each = 4L),
+      NPX = as.character(x = rnorm(n = 16L)),
+      Assay_Warning = rep(x = "PASS", times = 16L)
+    )
+
+    col_names <-  list(
+      quant = "NPX",
+      olink_id = "OlinkID",
+      sample_id = "SampleID",
+      assay_warn = "Assay_Warning"
+    )
+
+    expect_equal(
+      object = check_npx_qcwarn_assays(df = df,
+                                       col_names = col_names),
+      expected = character(0L)
+    )
+  }
+)
+
+test_that(
+  "check_npx_qcwarn_assays - works - assays with warnings",
+  {
+    # AssayQC 2 assays with warn ----
+
+    df <- arrow::arrow_table(
+      SampleID = rep(x = c("A", "B", "C", "D"), times = 4L),
+      OlinkID = rep(x = c("OID12345", "OID12346", "OID12347", "OID12348"),
+                    each = 4L),
+      NPX = as.character(x = rnorm(n = 16L)),
+      AssayQC = c(rep(x = c("PASS", rep(x = "WARN", times = 3L)), times = 2L),
+                  rep(x = "PASS", times = 8L))
+    )
+
+    col_names <-  list(
+      quant = "NPX",
+      olink_id = "OlinkID",
+      sample_id = "SampleID",
+      assay_warn = "AssayQC"
+    )
+
+    expect_message(
+      object = expect_equal(
+        object = check_npx_qcwarn_assays(df = df,
+                                         col_names = col_names),
+        expected = c("OID12345", "OID12346")
+      ),
+      regexp = "column `AssayQC` of the dataset: \"OID12345\" and \"OID12346\"."
+    )
+
+
+    # AssayQC 4 assays with warn ----
+
+    df <- arrow::arrow_table(
+      SampleID = rep(x = c("A", "B", "C", "D"), times = 4L),
+      OlinkID = rep(x = c("OID12345", "OID12346", "OID12347", "OID12348"),
+                    each = 4L),
+      NPX = as.character(x = rnorm(n = 16L)),
+      Assay_Warning = rep(x = c("PASS", rep(x = "WARN", times = 3L)),
+                          times = 4L)
+    )
+
+    col_names <-  list(
+      quant = "NPX",
+      olink_id = "OlinkID",
+      sample_id = "SampleID",
+      assay_warn = "Assay_Warning"
+    )
+
+    expect_message(
+      object = expect_equal(
+        object = check_npx_qcwarn_assays(df = df,
+                                         col_names = col_names),
+        expected = c("OID12345", "OID12346", "OID12347", "OID12348")
+      ),
+      regexp = "\"OID12345\", \"OID12346\", \"OID12347\", and \"OID12348\"."
     )
   }
 )
