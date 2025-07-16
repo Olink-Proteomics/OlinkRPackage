@@ -289,8 +289,8 @@ test_that(
   "clean_col_class - works - correct column class",
   {
     test_df <- OlinkAnalyze::npx_data1 |>
-      mutate(NPX = as.character(NPX),
-             LOD = as.character(LOD))
+      dplyr::mutate(NPX = as.character(NPX),
+                    LOD = as.character(LOD))
 
     log <- suppressWarnings(check_npx(test_df))
 

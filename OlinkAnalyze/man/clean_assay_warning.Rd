@@ -2,7 +2,7 @@
 % Please edit documentation in R/clean_npx.R
 \name{clean_assay_warning}
 \alias{clean_assay_warning}
-\title{Clean Assays Flagged with Assay Warning}
+\title{Help function cleaning assays flagged with assay warning}
 \usage{
 clean_assay_warning(df, check_npx_log, out_df = "tibble")
 }
@@ -24,21 +24,4 @@ A cleaned tibble or arrow object with warning assay removed.
 Removes assays from the NPX data frame where the Assay warning column (as
 identified in \code{check_npx_log}) has a value of \code{"WARN"}. The function is used
 to clean assay-level QC warnings from the dataset before analysis.
-}
-\examples{
-\dontrun{
- # Example 1: Remove 1 assay that flagged AssayQC = WARN
-
-df <- dplyr::tibble(
-  SampleID = c("A", "B", "C", "D"),
-  OlinkID = c(rep("OID1111", 3L), rep("OID22222", 1L)),
-  NPX = rep(1, 4L),
-  PlateID = rep("plate1", 4L),
-  AssayQC = c(rep("Pass", 3L), "WARN"),
-  LOD = rep(1, 4L)
-)
-
-log <- OlinkAnalyze::check_npx(df)
-clean_df <- OlinkAnalyze::clean_assay_warning(df, log)
-}
 }

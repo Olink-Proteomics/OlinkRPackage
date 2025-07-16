@@ -2,7 +2,7 @@
 % Please edit documentation in R/clean_npx.R
 \name{clean_assay_na}
 \alias{clean_assay_na}
-\title{Clean assays with only NA values}
+\title{Help functino cleaning assays with only NA values}
 \usage{
 clean_assay_na(df, check_npx_log, out_df = "tibble")
 }
@@ -28,23 +28,6 @@ This function filters out rows from a \code{tibble} or \code{arrow} object where
 assay identifier (e.g.,\code{OlinkID}) matches those listed in
 \code{check_npx_log$assay_na}, which contains assays composed entirely of NA
 values. It uses CLI messaging to report which assays were removed.
-}
-\examples{
-\dontrun{
-# Example 1: Exclude 1 assay with only NA values
-df <- dplyr::tibble(
-  SampleID = c("A", "B", "C", "D"),
-  OlinkID = rep("OID12345", 4L),
-  SampleType = rep("SAMPLE", 4L),
-  NPX = NA,
-  PlateID = rep("plate1", 4L),
-  QC_Warning = rep("Pass", 4L),
-  LOD = rnorm(4L)
-)
-
-log <- OlinkAnalyze::check_npx(df)
-out <- OlinkAnalyze::clean_assay_na(df, check_npx_log = log)
-}
 }
 \author{
 Kang Dong

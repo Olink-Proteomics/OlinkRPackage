@@ -2,7 +2,7 @@
 % Please edit documentation in R/clean_npx.R
 \name{clean_sample_type}
 \alias{clean_sample_type}
-\title{Clean control samples based on sample type}
+\title{Help function cleaning control samples based on sample type}
 \usage{
 clean_sample_type(
   df,
@@ -30,38 +30,12 @@ A cleaned tibble or arrow object with control sample removed.
 }
 \description{
 This function filters out rows from an NPX dataset where the sample type
-column matches known control sample types: \code{"SAMPLE_CONTROL"}, \code{"PLATE_CONTROL"},
-or \code{"NEGATIVE_CONTROL"}. If \code{keep_control_sample} is \code{TRUE}, or if the
-sample type column is not found in the \code{check_npx_log}, the function
-returns the original data unchanged. The function outputs a cleaned dataset
-in either \code{tibble} or \code{arrow} format, depending on user preference.
-}
-\examples{
-\dontrun{
-# Example 1: Run clean_sample_type() with default setting
-df <- dplyr::tibble(
-  SampleID = c("A", "B", "C", "D"),
-  OlinkID = rep("OID12345", 4L),
-  SampleType = c(
-    "SAMPLE",
-    "SAMPLE_CONTROL",
-    "PLATE_CONTROL",
-    "NEGATIVE_CONTROL"
-  ),
-  NPX = rep(1, 4L),
-  PlateID = rep("plate1", 4L),
-  QC_Warning = rep("Pass", 4L),
-  LOD = rep(1, 4L)
-)
-log <- OlinkAnalyze::check_npx(df)
-clean_df <- OlinkAnalyze::clean_sample_type(df, log)
-
-# Example 2: Run control_sample_types = NULL to  return the unchanged data
-clean_df <- OlinkAnalyze::clean_sample_type(df,
-  log,
-  keep_control_sample = FALSE
-)
-}
+column matches known control sample types: \code{"SAMPLE_CONTROL"},
+\code{"PLATE_CONTROL"} or \code{"NEGATIVE_CONTROL"}. If \code{keep_control_sample} is
+\code{TRUE}, or if the sample type column is not found in the \code{check_npx_log},
+the function returns the original data unchanged. The function outputs a
+cleaned dataset in either \code{tibble} or \code{arrow} format, depending on user
+preference.
 }
 \author{
 Kang Dong

@@ -2,7 +2,7 @@
 % Please edit documentation in R/clean_npx.R
 \name{clean_control_sample_id}
 \alias{clean_control_sample_id}
-\title{Clean Control Samples Based on Sample ID}
+\title{Help function cleaning Control Samples Based on Sample ID}
 \usage{
 clean_control_sample_id(
   df,
@@ -55,6 +55,7 @@ out <- OlinkAnalyze::clean_control_sample_id(npx_data1,
   control_sample_id = NULL
 )
 }
+
 }
 \author{
 Kang Dong

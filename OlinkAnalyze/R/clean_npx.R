@@ -148,6 +148,7 @@
 #'    Count = rnorm(10L),
 #'    Normalization = rep("Intensity", 10L)
 #' )
+#' }
 #'
 clean_npx <- function(
     df,

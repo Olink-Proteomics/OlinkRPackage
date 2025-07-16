@@ -2,7 +2,7 @@
 % Please edit documentation in R/clean_npx.R
 \name{clean_npx}
 \alias{clean_npx}
-\title{Clean Olink NPX Data Frame}
+\title{Function Cleaning NPX data}
 \usage{
 clean_npx(
   df,
@@ -11,7 +11,7 @@ clean_npx(
   keep_controls = NULL,
   control_sample_ids = NULL,
   out_df = "tibble",
-  verbose = TRUE
+  verbose = FALSE
 )
 }
 \arguments{
@@ -37,7 +37,8 @@ Typically used to remove customer-provided or technical control samples.}
 
 \item{out_df}{Output format: \code{"tibble"} (default) or \code{"arrow"}.}
 
-\item{verbose}{Logical. If \code{TRUE} (default), prints step-wise CLI messages.}
+\item{verbose}{Logical. If \code{FALSE} (default), Silences step-wise CLI
+messages.}
 }
 \value{
 A cleaned NPX dataset in either tibble or Arrow Table format,
@@ -65,11 +66,114 @@ The cleaning pipeline performs the following steps:
 \item \strong{Remove samples failing QC}: Samples with QC status \code{'FAIL'}.
 \item \strong{Remove internal control assays}: Based on \code{AssayType} (e.g.,
 \code{"ext_ctrl"}, \code{"inc_ctrl"}, \code{"amp_ctrl"}).
-\item \strong{Remove assays flagged with assay warnings}.
+\item \strong{Remove assays flagged with assay QC warnings}.
+\item \strong{Correct column class}: Ensures columns following expected column class
+defined in \code{column_name_dict}.
 }
 
 #' If the dataset includes absolute quantification, a message is shown
 recommending log2 transformation for downstream analysis.
+}
+\examples{
+\dontrun{
+# Example 1. Run clean_npx() to check multiple errors
+df <- dplyr::tibble(
+  SampleID = c(
+    "ValidSample",     # valid
+    "InvalidOID",      # invalid OlinkID (too short)
+    "AllNA",           # all NPX values NA for assay
+    "DuplicateSample", # duplicate SampleID
+    "ControlType",     # control SampleType
+    "ControlID",       # control SampleID (e.g., contains 'control')
+    "FailQC",          # QC_Warning is FAIL
+    "ControlAssay",    # internal control assay
+    "AssayWarn",       # flagged by AssayQC warning
+    "DuplicateSample"  # duplicate SampleID
+  ),
+ OlinkID = c(
+    "OID12345",  # valid (5 digits)
+    "OID1234",   # invalid (only 4 digits)
+    "OID23456",  # valid, but will be all NA
+    "OID34567",  # valid
+    "OID45678",  # valid
+    "OID56789",  # valid
+    "OID67890",  # valid
+    "OID78901",  # valid
+    "OID89012",  # valid
+    "OID34567"   # valid
+  ),
+  NPX = c(
+    10,   # valid
+    11,   # still gets removed due to invalid OlinkID
+    NA,   # all NA for assay
+    12,   # duplicate SampleID ("DuplicateSample")
+    13,   # control sample type
+    14,   # control SampleID
+    15,   # fails QC
+    16,   # internal control assay
+    17,   # flagged by assay warning
+    12    # duplicate SampleID ("DuplicateSample")
+  ),
+  SampleType = c(
+    "SAMPLE",
+    "SAMPLE",
+    "SAMPLE",
+    "SAMPLE",
+    "PLATE_CONTROL",  # control sample
+    "SAMPLE",
+    "SAMPLE",
+    "SAMPLE",
+    "SAMPLE",
+    "SAMPLE"
+  ),
+  AssayType = c(
+    "assay",
+    "assay",
+    "assay",
+    "assay",
+    "assay",
+    "assay",
+    "assay",
+    "ext_ctrl",   #control assay
+    "assay",
+    "assay"
+  ),
+  SampleQC = c(
+    "PASS",
+    "PASS",
+    "PASS",
+    "PASS",
+    "PASS",
+    "PASS",
+    "FAIL",    #fails QC
+    "PASS",
+    "PASS",
+    "PASS"
+  ),
+ AssayQC = c(
+    "PASS",
+    "PASS",
+    "PASS",
+    "PASS",
+    "PASS",
+    "PASS",
+    "PASS",
+    "PASS",
+    "WARN", #to be removed by clean_assay_warning
+    "PASS"
+  ),
+   PlateID = rep("plate1", 10L),
+   UniProt = rep("uniprotid1", 10L),
+   Assay = rep("assay_a", 10L),
+   Panel = rep("panel_a", 10L),
+   PanelVersion = rep("panel_version_a", 10L),
+   LOD = rnorm(10L),
+   ExtNPX = rnorm(10L),
+   Count = rnorm(10L),
+   Normalization = rep("Intensity", 10L)
+)
+}
+
 }
 \author{
 Kang Dong

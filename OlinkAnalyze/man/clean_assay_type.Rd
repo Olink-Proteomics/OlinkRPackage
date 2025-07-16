@@ -2,7 +2,7 @@
 % Please edit documentation in R/clean_npx.R
 \name{clean_assay_type}
 \alias{clean_assay_type}
-\title{Clean Internal Control Assays by Assay Type}
+\title{Help function cleaning Internal Control Assays by Assay Type}
 \usage{
 clean_assay_type(
   df,
@@ -33,37 +33,6 @@ This function filters out internal control assays (\code{ext_ctrl}, \code{inc_ct
 \code{amp_ctrl}) from the NPX data, unless user specified to retain them. The
 function uses column mapping provided in the \code{check_npx_log} and returns
 the \code{tibble} or \code{arrow} object as specified by the user.
-}
-\examples{
-\dontrun{
-
-df <- dplyr::tibble(
-  SampleID = c("A", "B", "C", "D"),
-  OlinkID = rep("OID12345", 4L),
-  NPX = rep(1, 4L),
-  PlateID = rep("plate1", 4L),
-  QC_Warning = rep("Pass", 4L),
-  LOD = rep(1, 4L),
-  AssayType = c(
-    "assay",
-    "ext_ctrl",
-    "inc_ctrl",
-    "amp_ctrl"
-  )
-)
-
-log <- OlinkAnalyze::check_npx(df)
-
-# Example 1: Run clean_assay_type() as default.
-# Internal control assay are removed
-clean_df <- OlinkAnalyze::clean_assay_type(df, log)
-
-# Example 2: Set keep_control_assay = TRUE Return unchanged data
-clean_df <- OlinkAnalyze::clean_assay_type(df,
-  log,
-  keep_control_assay = TRUE
-)
-}
 }
 \author{
 Kang Dong

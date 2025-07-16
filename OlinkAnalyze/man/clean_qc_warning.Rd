@@ -2,7 +2,7 @@
 % Please edit documentation in R/clean_npx.R
 \name{clean_qc_warning}
 \alias{clean_qc_warning}
-\title{Clean Samples with QC Status 'FAIL'}
+\title{Help function cleaning Samples with QC Status 'FAIL'}
 \usage{
 clean_qc_warning(df, check_npx_log, out_df = "tibble")
 }
@@ -26,23 +26,6 @@ This function use the QC warning column identified by \code{check_npx_log} and
 removes samples flagged \code{qc_warning} = "FAIL" from the NPX data. The function
 returns the cleaned NPX data in the the desired output format (\code{"tibble"} or
 \code{"arrow"}).
-}
-\examples{
-\dontrun{
-# Example 1: Remove 1 sample that failed sample QC
-
-df <- dplyr::tibble(
-  SampleID = c("A", "B", "C", "D"),
-  OlinkID = rep("OID12345", 4L),
-  NPX = rep(1, 4L),
-  PlateID = rep("plate1", 4L),
-  QC_Warning = c(rep("Pass", 3L), "FAIL"),
-  LOD = rep(1, 4L)
-)
-
-log <- OlinkAnalyze::check_npx(df)
-clean_df <- OlinkAnalyze::clean_qc_warning(df, log)
-}
 }
 \author{
 Kang Dong

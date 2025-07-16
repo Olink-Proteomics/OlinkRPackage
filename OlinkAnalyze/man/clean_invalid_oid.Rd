@@ -2,7 +2,7 @@
 % Please edit documentation in R/clean_npx.R
 \name{clean_invalid_oid}
 \alias{clean_invalid_oid}
-\title{Clean assays with invalid OlinkID}
+\title{Help function cleaning assays with invalid OlinkID}
 \usage{
 clean_invalid_oid(df, check_npx_log, out_df = "tibble")
 }
@@ -29,23 +29,6 @@ This function filters out rows from a NPX data where the assay identifier
 column (e.g.,\code{OlinkID}) matches values listed in \code{check_npx_log$oid_invalid},
 which identifies invalid or malformed assay identifiers. Uses CLI messages to
 inform users of what was excluded.
-}
-\examples{
-\dontrun{
-# Example 1: Exclude invalid OlinkID using clean_invalid_oid()
-df <- dplyr::tibble(
-  SampleID = c("A", "B", "C", "D"),
-  OlinkID = c(rep("OID12345", 2L), rep("OID123456", 2L)),
-  SampleType = rep("SAMPLE", 4L),
-  NPX = c(rep(1.0, 2L), rep(2.0, 2L)),
-  PlateID = rep("plate1", 4L),
-  QC_Warning = rep("Pass", 4L),
-  LOD = rep(1.0, 4L)
-)
-
-log <- suppressWarnings(OlinkAnalyze::check_npx(df))
-out <- OlinkAnalyze::clean_invalid_oid(df, check_npx_log = log)
-}
 }
 \author{
 Kang Dong
