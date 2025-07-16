@@ -48,6 +48,10 @@
 #'   \item \strong{assay_na} Character vector of assays with all samples having
 #'   \emph{NA} values.
 #'   \item \strong{sample_id_dups} Character vector of duplicate \var{SampleID}.
+#'   \item \strong{col_class} Data frame with columns of incorrect type
+#'   including column key \var{col_key}, column name \var{col_name}, detected
+#'   column type \var{col_class} and expected column type
+#'   \var{expected_col_class}.
 #' }
 #'
 #' @export
@@ -95,7 +99,7 @@
 #'   )
 #' }
 #'
-check_npx <- function(df = df,
+check_npx <- function(df,
                       preferred_names = NULL) {
 
   # check input ----
@@ -127,6 +131,12 @@ check_npx <- function(df = df,
 
   # duplicate sample IDs
   check_npx_out_lst$sample_id_dups <- check_npx_duplicate_sample_ids(
+    df = df,
+    col_names = check_npx_out_lst$col_names
+  )
+
+  # column classes
+  check_npx_out_lst$col_class <- check_npx_col_class(
     df = df,
     col_names = check_npx_out_lst$col_names
   )
@@ -704,4 +714,145 @@ check_npx_duplicate_sample_ids <- function(df, col_names) {
   }
 
   return(duplicates)
+}
+
+#' Help function checking types of columns in data.
+#'
+#' @description
+#' This function checks if certain columns from \var{df} have the correct type
+#' to enable downstream analysis. Columns to be checked are marked as such in
+#' the columns \var{col_class} and \var{col_class_check} of
+#' \var{column_name_dict}.
+#'
+#' @param df A tibble or an arrow object containing the columns \var{SampleID}
+#' and \var{OlinkID}.
+#' @param col_names A list of matched column names. This is the output of the
+#' \var{check_npx_col_names} function.
+#'
+#' @returns A data frame with the columns \var{col_name}, \var{col_key},
+#' \var{col_class} and \var{expected_col_class} marking columns with the
+#' incorrect type.
+#'
+check_npx_col_class <- function(df, col_names) {
+
+  # we first convert 'col_names' into a data frame with 'col_key' the names of
+  # 'col_names', and 'col_df' the elements of the list of 'col_names'.
+  # Basically, 'col_key' is used to match to 'column_name_dict', and 'col_df' is
+  # used to match to the actual column names of the dataset 'df'.
+  df_col_names <- dplyr::tibble(
+    col_key = names(col_names),
+    col_df = unname(col_names)
+  ) |>
+    tidyr::unnest(
+      cols = dplyr::all_of(
+        c("col_key", "col_df")
+      )
+    )
+
+  # we select only the columns for which we want to confirm they column class.
+  # Then we select only 'col_key' and 'col_class', which we rename to
+  # 'expected_col_class'. 'col_key' is used to match to 'df_col_names' to allow
+  # checking only the column names of the dataset 'df' in question.
+  # 'expected_col_class' is used to retain the expected column classes. The
+  # goal is that this data frame will contain 'col_class' that will allow us to
+  # check if it matches the dataset, and 'col_df' that will match the column
+  # name of the dataset.
+  col_keys_check <- column_name_dict |>
+    dplyr::filter(
+      .data[["col_class_check"]] == TRUE
+    ) |>
+    dplyr::select(
+      dplyr::all_of(
+        c("col_key", "expected_col_class" = "col_class")
+      )
+    ) |>
+    dplyr::inner_join(
+      df_col_names,
+      by = "col_key",
+      relationship = "one-to-many"
+    )
+
+  # Check column class for each column in dataset 'df' using the internal
+  # functions 'check_is_numeric' and 'check_is_character'.
+  col_class_numeric <- df |>
+    dplyr::slice_head(
+      n = 100L
+    ) |>
+    dplyr::collect() |>
+    lapply(
+      check_is_numeric,
+      error = FALSE
+    ) |>
+    as.matrix()
+  col_class_character <- df |>
+    dplyr::slice_head(
+      n = 100L
+    ) |>
+    dplyr::collect() |>
+    lapply(
+      check_is_character,
+      error = FALSE
+    ) |>
+    as.matrix()
+
+  # combine the checks from numeric and character from above before, and
+  # ultimately, check if expected column class matches the column class found in
+  # the dataset 'df'.
+  df_col_class <- dplyr::tibble(
+    col_name = rownames(col_class_numeric),
+    is_numeric = col_class_numeric[, 1L]
+  ) |>
+    dplyr::left_join(
+      dplyr::tibble(
+        col_name = rownames(col_class_character),
+        is_character = col_class_character[, 1L]
+      ),
+      by = "col_name",
+      relationship = "one-to-one"
+    ) |>
+    dplyr::mutate(
+      col_class = dplyr::case_when(
+        .data[["is_numeric"]] == TRUE ~ "numeric",
+        .data[["is_character"]] == TRUE ~ "character",
+        .data[["is_numeric"]] == TRUE
+        & .data[["is_character"]] == TRUE ~ "unknown",
+        TRUE ~ "other",
+        .default = "unknown"
+      )
+    ) |>
+    dplyr::select(
+      -dplyr::all_of(
+        c("is_numeric", "is_character")
+      )
+    ) |>
+    dplyr::inner_join(
+      col_keys_check,
+      by = c("col_name" = "col_df"),
+      relationship = "one-to-one"
+    ) |>
+    dplyr::filter(
+      .data[["col_class"]] != .data[["expected_col_class"]]
+    )
+
+  if (nrow(df_col_class) > 0L) {
+
+    col_class_msg <- paste0("* \"", df_col_class$col_name, "\"",
+                            ": Expected \"", df_col_class$expected_col_class,
+                            "\". Detected \"", df_col_class$col_class, "\".")
+
+    cli::cli_warn(
+      c(
+        "{cli::qty(col_class_msg)} Detected column{?s} with incorrect data
+        type{?s}:",
+        col_class_msg,
+        "i" = "{cli::qty(col_class_msg)} Use the function {.fn clean_npx} or
+        manually convert the column{?s} to the expected type prior to downstream
+        analyses."
+      )
+    )
+
+  }
+
+  return(df_col_class)
+
 }

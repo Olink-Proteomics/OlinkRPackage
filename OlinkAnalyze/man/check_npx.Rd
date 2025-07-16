@@ -4,7 +4,7 @@
 \alias{check_npx}
 \title{Check NPX data format}
 \usage{
-check_npx(df = df, preferred_names = NULL)
+check_npx(df, preferred_names = NULL)
 }
 \arguments{
 \item{df}{A tibble or and arrow object from \code{\link{read_npx}}.}
@@ -22,6 +22,10 @@ marking the columns to be used in downstream analyses.
 \item \strong{assay_na} Character vector of assays with all samples having
 \emph{NA} values.
 \item \strong{sample_id_dups} Character vector of duplicate \var{SampleID}.
+\item \strong{col_class} Data frame with columns of incorrect type
+including column key \var{col_key}, column name \var{col_name}, detected
+column type \var{col_class} and expected column type
+\var{expected_col_class}.
 }
 }
 \description{

@@ -47,7 +47,13 @@ test_that(
                        qc_warning = "QC_Warning"),
       oid_invalid = character(0L),
       assay_na = character(0L),
-      sample_id_dups = character(0L)
+      sample_id_dups = character(0L),
+      col_class = dplyr::tibble(
+        "col_name" = character(0L),
+        "col_class" = character(0L),
+        "col_key" = character(0L),
+        "expected_col_class" = character(0L)
+      )
     )
 
     expect_equal(
@@ -97,7 +103,13 @@ test_that(
                        normalization = "Normalization"),
       oid_invalid = character(0L),
       assay_na = character(0L),
-      sample_id_dups = character(0L)
+      sample_id_dups = character(0L),
+      col_class = dplyr::tibble(
+        "col_name" = character(0L),
+        "col_class" = character(0L),
+        "col_key" = character(0L),
+        "expected_col_class" = character(0L)
+      )
     )
 
     expect_equal(
@@ -109,7 +121,7 @@ test_that(
 )
 
 test_that(
-  "check_npx - warning - invalid OlinkID and duplicate SampleID",
+  "check_npx - warnings - invalid OlinkID, duplicate SampleID and NPX non-num",
   {
     df <- dplyr::tibble(
       SampleID = c("A", "A", "C", "D"),
@@ -118,7 +130,7 @@ test_that(
       Assay = LETTERS[1L:4L],
       Panel = LETTERS[1L:4L],
       Panel_Lot_Nr = LETTERS[1L:4L],
-      NPX = rnorm(4L),
+      NPX = as.character(rnorm(4L)),
       PlateID = rep("plate1", 4L),
       QC_Warning = rep("Pass", 4L)
     )
@@ -135,19 +147,28 @@ test_that(
                        qc_warning = "QC_Warning"),
       oid_invalid = c("OID123456"),
       assay_na = character(0L),
-      sample_id_dups = c("A")
+      sample_id_dups = c("A"),
+      col_class = dplyr::tibble(
+        "col_name" = c("NPX"),
+        "col_class" = c("character"),
+        "col_key" = c("quant"),
+        "expected_col_class" = c("numeric")
+      )
     )
 
     expect_warning(
       object = expect_warning(
-        object = expect_equal(
-          object = check_npx(df = df,
-                             preferred_names = NULL),
-          expected = expected_result
+        object = expect_warning(
+          object = expect_equal(
+            object = check_npx(df = df,
+                               preferred_names = NULL),
+            expected = expected_result
+          ),
+          regexp = "Unrecognized OlinkID detected"
         ),
-        regexp = "Unrecognized OlinkID detected"
+        regexp = "Duplicate SampleID detected"
       ),
-      regexp = "Duplicate SampleID detected"
+      regexp = "\"NPX\": Expected \"numeric\". Detected \"character\"."
     )
   }
 )
@@ -682,7 +703,7 @@ test_that(
   }
 )
 
-# check_npx_all_na_assays ----
+# Test check_npx_all_na_assays ----
 
 test_that(
   "check_npx_all_na_assays - warning - all-NA assay captured",
@@ -795,7 +816,7 @@ test_that(
   }
 )
 
-# check_npx_duplicate_sample_ids ----
+# Test check_npx_duplicate_sample_ids ----
 
 test_that(
   "check_npx_duplicate_sample_ids - warning - duplicate SampleID",
@@ -860,6 +881,75 @@ test_that(
       object = check_npx_duplicate_sample_ids(df = df,
                                               col_names = col_names),
       expected = character(0L)
+    )
+  }
+)
+
+# Test check_npx_col_class ----
+
+test_that(
+  "check_npx_col_class - warning - NPX non-numeric",
+  {
+    df <- arrow::arrow_table(
+      SampleID = c("A", "B", "C", "D"),
+      OlinkID = rep("OID12345", 4L),
+      NPX = as.character(rnorm(4L))
+    )
+
+    col_names <-  list(
+      quant = "NPX",
+      olink_id = "OlinkID",
+      sample_id = "SampleID"
+    )
+
+    expect_warning(
+      object = expect_equal(
+        object = check_npx_col_class(df = df,
+                                     col_names = col_names),
+        expected = dplyr::tibble(
+          "col_name" = c("NPX"),
+          "col_class" = c("character"),
+          "col_key" = c("quant"),
+          "expected_col_class" = c("numeric")
+        )
+      ),
+      regexp = "\"NPX\": Expected \"numeric\". Detected \"character\"."
+    )
+  }
+)
+
+test_that(
+  "check_npx_col_class - warning - NPX, LOD and PlateLOD non-numeric",
+  {
+    df <- arrow::arrow_table(
+      SampleID = c("A", "B", "C", "D"),
+      OlinkID = rep("OID12345", 4L),
+      NPX = as.character(rnorm(4L)),
+      LOD = as.character(rnorm(4L))
+    ) |>
+      dplyr::mutate(
+        PlateLOD = .data[["LOD"]]
+      )
+
+    col_names <-  list(
+      quant = "NPX",
+      olink_id = "OlinkID",
+      sample_id = "SampleID",
+      lod = c("LOD", "PlateLOD")
+    )
+
+    expect_warning(
+      object = expect_equal(
+        object = check_npx_col_class(df = df,
+                                     col_names = col_names),
+        expected = dplyr::tibble(
+          "col_name" = c("NPX", "LOD", "PlateLOD"),
+          "col_class" = c("character", "character", "character"),
+          "col_key" = c("quant", "lod", "lod"),
+          "expected_col_class" = c("numeric", "numeric", "numeric")
+        )
+      ),
+      regexp = "\"PlateLOD\": Expected \"numeric\". Detected \"character\"."
     )
   }
 )
