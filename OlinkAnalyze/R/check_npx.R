@@ -135,6 +135,12 @@ check_npx <- function(df,
     col_names = check_npx_out_lst$col_names
   )
 
+  # samples with all NA values
+  check_npx_out_lst$sample_id_na <- check_npx_all_na_sample(
+    df = df,
+    col_names = check_npx_out_lst$col_names
+  )
+
   # column classes
   check_npx_out_lst$col_class <- check_npx_col_class(
     df = df,
@@ -654,7 +660,8 @@ check_npx_all_na_assays <- function(df, col_names) {
     dplyr::collect() |>
     dplyr::pull(
       .data[[col_names$olink_id]]
-    )
+    ) |>
+    sort()
 
   # Issue warning if any assays with only NAs are found
   if (length(all_nas) > 0L) {
@@ -714,6 +721,79 @@ check_npx_duplicate_sample_ids <- function(df, col_names) {
   }
 
   return(duplicates)
+}
+
+#' Help function to identify Olink samples with all quantified values \emph{NA}
+#'
+#' @description
+#' This function checks if there are samples with the quantified values for all
+#' assays \emph{NA}.
+#'
+#' @details
+#' We have added the tags importFrom for "dbplyr" and "duckdb" because
+#' "devtools::check()" would complain with a note that the two libraries are
+#' imported but never used. To avoid that we used solutions taken from here:
+#' 1. https://github.com/hadley/r-pkgs/issues/203
+#' 2. https://github.com/pbs-software/pbs-modelling/issues/95
+#'
+#' @author
+#'  Simon Forsberg;
+#'  Masoumeh Sheikhi
+#'  Klev Diamanti
+#'
+#' @param df A tibble or an arrow object containing columns \var{SampleID} and
+#' the quantification column
+#' `r ansi_collapse_quot(x = get_olink_data_types(), sep = "or")`.
+#' @param col_names A list of matched column names. This is the output of the
+#' \var{check_npx_col_names} function.
+#'
+#' @return A character vector containing \var{SampleID} of samples with
+#' quantified values \emph{NA} for all assays, otherwise returns
+#' \emph{character(0)}.
+#'
+#' @importFrom duckdb duckdb
+#' @importFrom dbplyr memdb_frame
+#'
+check_npx_all_na_sample <- function(df, col_names) {
+
+  # Identify assays with only NAs
+  all_na_sample <- df |>
+    dplyr::select(
+      dplyr::all_of(
+        c(col_names$sample_id,
+          col_names$quant)
+      )
+    ) |>
+    dplyr::group_by(
+      .data[[col_names$sample_id]]
+    ) |>
+    dplyr::mutate(
+      is_na = dplyr::if_else(is.na(.data[[col_names$quant]]), 1L, 0L)
+    ) |>
+    arrow::to_duckdb() |>
+    dplyr::summarise(
+      n = dplyr::n(),
+      n_na = sum(.data[["is_na"]], na.rm = TRUE),
+      .groups = "drop"
+    ) |>
+    dplyr::filter(
+      .data[["n"]] == .data[["n_na"]]
+    ) |>
+    dplyr::collect() |>
+    dplyr::pull(
+      .data[[col_names$sample_id]]
+    ) |>
+    sort()
+
+  # Issue warning if any assays with only NAs are found
+  if (length(all_na_sample) > 0L) {
+    cli::cli_warn(c(
+      "{.val {all_na_sample}} ha{?s/ve} {.val {col_names$quant}} = NA for all
+      assays."
+    ))
+  }
+
+  return(all_na_sample)
 }
 
 #' Help function checking types of columns in data.

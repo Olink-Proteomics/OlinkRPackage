@@ -48,6 +48,7 @@ test_that(
       oid_invalid = character(0L),
       assay_na = character(0L),
       sample_id_dups = character(0L),
+      sample_id_na = character(0L),
       col_class = dplyr::tibble(
         "col_name" = character(0L),
         "col_class" = character(0L),
@@ -104,6 +105,7 @@ test_that(
       oid_invalid = character(0L),
       assay_na = character(0L),
       sample_id_dups = character(0L),
+      sample_id_na = character(0L),
       col_class = dplyr::tibble(
         "col_name" = character(0L),
         "col_class" = character(0L),
@@ -148,6 +150,7 @@ test_that(
       oid_invalid = c("OID123456"),
       assay_na = character(0L),
       sample_id_dups = c("A"),
+      sample_id_na = character(0L),
       col_class = dplyr::tibble(
         "col_name" = c("NPX"),
         "col_class" = c("character"),
@@ -880,6 +883,123 @@ test_that(
     expect_equal(
       object = check_npx_duplicate_sample_ids(df = df,
                                               col_names = col_names),
+      expected = character(0L)
+    )
+  }
+)
+
+# Test check_npx_all_na_sample ----
+
+test_that(
+  "check_npx_all_na_sample - warning - all-NA assays captured",
+  {
+    df <- dplyr::tibble(
+      SampleID = c("A", "B", "A", "B"),
+      OlinkID = c("OID12345",
+                  "OID12345",
+                  "OID23456",
+                  "OID23456"),
+      NPX = c(NA_real_,
+              1.2,
+              NA_real_,
+              1.3)
+    )
+
+    col_names <-  list(quant = "NPX",
+                       sample_id = "SampleID")
+
+    expect_warning(
+      object = expect_equal(
+        object = check_npx_all_na_sample(
+          df = df,
+          col_names = col_names
+        ),
+        expected = "A"
+      ),
+      regexp = "\"A\" has \"NPX\" = NA for all assays."
+    )
+  }
+)
+
+test_that(
+  "check_npx_all_na_sample - works - no sample has all NAs",
+  {
+    df <- dplyr::tibble(
+      SampleID = c("A", "B", "A", "B"),
+      OlinkID = c("OID12345",
+                  "OID12345",
+                  "OID23456",
+                  "OID23456"),
+      NPX = c(1.1,
+              1.2,
+              1.3,
+              NA_real_)
+    )
+
+    col_names <-  list(quant = "NPX",
+                       sample_id = "SampleID")
+
+    expect_equal(
+      object = check_npx_all_na_sample(df = df,
+                                       col_names = col_names),
+      expected = character(0L)
+    )
+  }
+)
+
+test_that(
+  "check_npx_all_na_sample - warning - arrow - all-NA assay captured",
+  {
+    df <- arrow::arrow_table(
+      SampleID = c("A", "B", "C", "A", "B", "C"),
+      OlinkID = c("OID12345",
+                  "OID12345",
+                  "OID12345",
+                  "OID23456",
+                  "OID23456",
+                  "OID23456"),
+      NPX = c(NA_real_,
+              1.2,
+              NA_real_,
+              NA_real_,
+              1.3,
+              NA_real_)
+    )
+
+    col_names <-  list(quant = "NPX",
+                       sample_id = "SampleID")
+
+    expect_warning(
+      object = expect_equal(
+        object = check_npx_all_na_sample(
+          df = df,
+          col_names = col_names
+        ),
+        expected = c("A", "C")
+      ),
+      regexp = "\"A\" and \"C\" have \"NPX\" = NA for all assays."
+    )
+  }
+)
+
+test_that(
+  "check_npx_all_na_sample - works - arrow - no assay has all NAs",
+  {
+    df <- arrow::arrow_table(
+      SampleID = c("A", "B", "A", "B"),
+      OlinkID = c("OID12345",
+                  "OID12345",
+                  "OID23456",
+                  "OID23456"),
+      NPX = rnorm(4L)
+    )
+
+    col_names <- list(quant = "NPX",
+                      sample_id = "SampleID")
+
+    expect_equal(
+      object = check_npx_all_na_sample(df = df,
+                                       col_names = col_names),
       expected = character(0L)
     )
   }
