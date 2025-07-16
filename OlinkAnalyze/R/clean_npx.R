@@ -170,10 +170,10 @@ clean_npx <- function(
   if(verbose) cli::cli_h2("Starting {.fn clean_npx} pipeline")
 
 
-  # Validate input dataset ----
+  # Validate input dataset
   check_is_dataset(df, error = TRUE)
 
-  # Validate or generate check_log from check_npx() ----
+  # Validate or generate check_log from check_npx()
   if (is.null(check_log)) {
     cli::cli_inform("{.arg check_log} is not provided.
                     Running {.fn check_npx}.")
@@ -192,7 +192,7 @@ clean_npx <- function(
   }
 
 
-  # Clean invalid Olink IDs ----
+  # Clean invalid Olink IDs
   if(verbose) cli::cli_h3("Cleaning assays with invalid OlinkIDs")
   df <- clean_invalid_oid(
     df,
@@ -210,7 +210,7 @@ clean_npx <- function(
   )
 
 
-  # Clean duplicate sample IDs ----
+  # Clean duplicate sample IDs
   if(verbose) cli::cli_h3("Cleaning duplicate SampleIDs")
   df <- clean_duplicate_sample_id(
     df,
@@ -219,7 +219,7 @@ clean_npx <- function(
   )
 
 
-  # Clean control samples based on sample type ----
+  # Clean control samples based on sample type
   if(verbose) cli::cli_h3("Cleaning control samples based on sample type")
 
   if(is.null(keep_controls) || !keep_controls %in% c("sample", "both")) {
@@ -236,7 +236,7 @@ clean_npx <- function(
   )
 
 
-  # Clean control samples based on Sample ID ----
+  # Clean control samples based on Sample ID
   if(verbose) cli::cli_h3("Cleaning control samples based on Sample ID")
   df <- clean_control_sample_id(
     df,
@@ -246,7 +246,7 @@ clean_npx <- function(
   )
 
 
-  # Clean Samples with QC Status 'FAIL' ----
+  # Clean Samples with QC Status 'FAIL'
   if(verbose) cli::cli_h3("Cleaning Samples with QC Status 'FAIL'")
   df <- clean_qc_warning(
     df,
@@ -255,7 +255,7 @@ clean_npx <- function(
   )
 
 
-  # Clean internal control assays ----
+  # Clean internal control assays
   if(verbose) cli::cli_h3("Cleaning internal control assays")
 
   if(is.null(keep_controls) || !keep_controls %in% c("assay", "both")) {
@@ -272,7 +272,7 @@ clean_npx <- function(
   )
 
 
-  # Clean assays flagged by assay warning ----
+  # Clean assays flagged by assay warning
   if(verbose) cli::cli_h3("Cleaning assays flagged by assay warning")
   df <- clean_assay_warning(
     df,
@@ -316,8 +316,8 @@ clean_npx <- function(
 }
 
 
-# Support Functions -------------------------------------------------------
 
+# Help Functions ----------------------------------------------------------
 
 #' Help functino cleaning assays with only NA values
 #'
