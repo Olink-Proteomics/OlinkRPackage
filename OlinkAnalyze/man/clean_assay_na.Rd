@@ -2,7 +2,7 @@
 % Please edit documentation in R/clean_npx.R
 \name{clean_assay_na}
 \alias{clean_assay_na}
-\title{Remove assays with only NA values}
+\title{Clean assays with only NA values}
 \usage{
 clean_assay_na(df, check_npx_log, out_df = "tibble")
 }

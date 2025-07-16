@@ -2,7 +2,7 @@
 % Please edit documentation in R/clean_npx.R
 \name{clean_invalid_oid}
 \alias{clean_invalid_oid}
-\title{Remove assays with invalid OlinkID}
+\title{Clean assays with invalid OlinkID}
 \usage{
 clean_invalid_oid(df, check_npx_log, out_df = "tibble")
 }

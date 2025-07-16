@@ -2,12 +2,12 @@
 % Please edit documentation in R/clean_npx.R
 \name{clean_sample_type}
 \alias{clean_sample_type}
-\title{Remove control samples based on sample type}
+\title{Clean control samples based on sample type}
 \usage{
 clean_sample_type(
   df,
   check_npx_log,
-  control_sample_types = c("SAMPLE_CONTROL", "PLATE_CONTROL", "NEGATIVE_CONTROL"),
+  keep_control_sample = FALSE,
   out_df = "tibble"
 )
 }
@@ -20,9 +20,8 @@ clean_sample_type(
 sample type.
 }}
 
-\item{control_sample_types}{A character vector of control sample types to
-exclude. Regular expression matching is used. Default is c("SAMPLE_CONTROL",
-"PLATE_CONTROL", "NEGATIVE_CONTROL").}
+\item{keep_control_sample}{Logical; if \code{TRUE}, control samples are retained
+and no filtering is applied. Defaults to \code{FALSE}.}
 
 \item{out_df}{Output format: either "tibble" (default) or "arrow".}
 }
@@ -30,9 +29,12 @@ exclude. Regular expression matching is used. Default is c("SAMPLE_CONTROL",
 A cleaned tibble or arrow object with control sample removed.
 }
 \description{
-This function filters out rows from an NPX data where the sample type
-column matches one of the defined control types using regular expressions
-(case-insensitive).
+This function filters out rows from an NPX dataset where the sample type
+column matches known control sample types: \code{"SAMPLE_CONTROL"}, \code{"PLATE_CONTROL"},
+or \code{"NEGATIVE_CONTROL"}. If \code{keep_control_sample} is \code{TRUE}, or if the
+sample type column is not found in the \code{check_npx_log}, the function
+returns the original data unchanged. The function outputs a cleaned dataset
+in either \code{tibble} or \code{arrow} format, depending on user preference.
 }
 \examples{
 \dontrun{
@@ -57,7 +59,7 @@ clean_df <- OlinkAnalyze::clean_sample_type(df, log)
 # Example 2: Run control_sample_types = NULL to  return the unchanged data
 clean_df <- OlinkAnalyze::clean_sample_type(df,
   log,
-  control_sample_types = NULL
+  keep_control_sample = FALSE
 )
 }
 }

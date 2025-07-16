@@ -2,12 +2,12 @@
 % Please edit documentation in R/clean_npx.R
 \name{clean_control_sample_id}
 \alias{clean_control_sample_id}
-\title{Remove Control Samples Based on Sample ID Pattern}
+\title{Clean Control Samples Based on Sample ID}
 \usage{
 clean_control_sample_id(
   df,
   check_npx_log,
-  control_sample_id = NULL,
+  control_sample_ids = NULL,
   out_df = "tibble"
 )
 }
@@ -20,21 +20,21 @@ a sample ID column.}
 \item \code{col_names$sample_id}: the column name in \code{df} identifying sample IDs.
 }}
 
-\item{control_sample_id}{A character vector of regex strings
-(case-insensitive) used to match control sample IDs, e.g., c("control").
-Default is: \code{NULL}.}
-
 \item{out_df}{Output format of the returned data frame.
 Options: \code{"tibble"} or \code{"arrow"}. Default is \code{"tibble"}.}
+
+\item{control_sample_idA}{character vector of control sample IDs,
+e.g., \code{c("control_a", "control_b")}. Default is \code{NULL}, in which case the
+data is returned unchanged.}
 }
 \value{
-A filtered data frame with control sample IDs removed.
+A filtered data table with control samples removed.
 }
 \description{
-This function removes rows from a NPX data where the \code{sample_id} matches a
-regular expression pattern indicating customer control samples. This is
-useful for filtering out technical controls or customer control samples based
-on their SampleID.
+This function removes rows from NPX data where the sample ID column (as
+defined in \code{check_npx_log}) matches any of the provided control sample IDs.
+This is useful for filtering out technical or customer control samples prior
+to downstream analysis.
 }
 \examples{
 \dontrun{
@@ -45,7 +45,7 @@ log <- OlinkAnalyze::npx_data1 |>
 
 out <- OlinkAnalyze::clean_control_sample_id(npx_data1,
   check_npx_log = log,
-  control_sample_id = "control"
+  control_sample_id = c("CONTROL_SAMPLE_AS 1", "CONTROL_SAMPLE_AS 2")
 )
 
 # Example 2: check default setting of clean_control_sample_id(). Return data

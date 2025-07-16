@@ -2,13 +2,13 @@
 % Please edit documentation in R/clean_npx.R
 \name{clean_duplicate_sample_id}
 \alias{clean_duplicate_sample_id}
-\title{Remove samples with duplicate SampleIDs}
+\title{Clean samples with duplicate SampleIDs}
 \usage{
 clean_duplicate_sample_id(df, check_npx_log, out_df = "tibble")
 }
 \arguments{
 \item{df}{A \code{tibble} or \code{arrow} object loaded from \code{read_npx()},
-containing a columnmspecified by \code{check_npx_log$col_names$sample_id}.}
+containing a column specified by \code{check_npx_log$col_names$sample_id}.}
 
 \item{check_npx_log}{A list returned by \code{check_npx()}, containing:
 \itemize{
