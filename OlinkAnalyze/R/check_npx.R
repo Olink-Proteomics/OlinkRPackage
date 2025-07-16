@@ -30,7 +30,7 @@
 #' The argument \var{preferred_names} is a named character vector with internal
 #' column names as names and column names of the current data set as values.
 #' Names of the input vector can be one or more of the following:
-#' `r cli::ansi_collapse(x = names(column_name_dict))`
+#' `r ansi_collapse_quot(x = column_name_dict$col_key)`
 #'
 #' @author
 #'   Masoumeh Sheikhi
@@ -48,6 +48,10 @@
 #'   \item \strong{assay_na} Character vector of assays with all samples having
 #'   \emph{NA} values.
 #'   \item \strong{sample_id_dups} Character vector of duplicate \var{SampleID}.
+#'   \item \strong{col_class} Data frame with columns of incorrect type
+#'   including column key \var{col_key}, column name \var{col_name}, detected
+#'   column type \var{col_class} and expected column type
+#'   \var{expected_col_class}.
 #' }
 #'
 #' @export
@@ -95,7 +99,7 @@
 #'   )
 #' }
 #'
-check_npx <- function(df = df,
+check_npx <- function(df,
                       preferred_names = NULL) {
 
   # check input ----
@@ -127,6 +131,24 @@ check_npx <- function(df = df,
 
   # duplicate sample IDs
   check_npx_out_lst$sample_id_dups <- check_npx_duplicate_sample_ids(
+    df = df,
+    col_names = check_npx_out_lst$col_names
+  )
+
+  # samples with all NA values
+  check_npx_out_lst$sample_id_na <- check_npx_all_na_sample(
+    df = df,
+    col_names = check_npx_out_lst$col_names
+  )
+
+  # column classes
+  check_npx_out_lst$col_class <- check_npx_col_class(
+    df = df,
+    col_names = check_npx_out_lst$col_names
+  )
+
+  # assay QC
+  check_npx_out_lst$assay_qc <- check_npx_qcwarn_assays(
     df = df,
     col_names = check_npx_out_lst$col_names
   )
@@ -164,7 +186,7 @@ check_npx <- function(df = df,
 #' The argument \var{preferred_names} is a named character vector with internal
 #' column names as names and column names of the current data set as values.
 #' Names of the input vector can be one or more of the following:
-#' `r cli::ansi_collapse(x = names(column_name_dict))`
+#' `r cli::ansi_collapse(x = column_name_dict$col_key)`
 #'
 #' @author
 #'  Klev Diamanti;
@@ -233,94 +255,188 @@ check_npx_col_names <- function(df,
 
   } else {
 
-    column_name_dict_updated <- column_name_dict
+    column_name_dict_updated <- column_name_dict |>
+      dplyr::mutate(
+        col_name_mod = FALSE
+      )
 
   }
 
-  # matches names to column names ----
+  # Intersect expected names to column names ----
 
-  column_name_df <- lapply(
-    seq_along(column_name_dict_updated),
-    function(x) {
-      # get collection of alternative names
-      col_alt_names <- column_name_dict_updated[[x]]
-      # identify names present in the column names of the data frame
-      col_names <- col_alt_names[col_alt_names %in% names(df)]
-      # return NA ONLY if the entry in the list contains some NA element.
-      # NA elements in column_name_dict signify that the column can be missing
-      if (length(col_names) == 0L && any(is.na(col_alt_names))) {
-        return(NA_character_)
-      } else {
-        return(col_names)
-      }
-    }
-  )
-  names(column_name_df) <- names(column_name_dict_updated)
+  column_name_dict_updated <- column_name_dict_updated |>
+    dplyr::mutate(
+      col_df = lapply(
+        .data[["col_names"]],
+        function(x) {
+          intersect( # nolint return_linter
+            x = x,
+            y = names(df)
+          )
+        }
+      ),
+      col_df_len = sapply(.data[["col_df"]], length)
+    )
 
-  # check correctness ----
+  # Check correctness of preferred_names ----
 
   # is user's input correct?
   # check if the user input has no matches to the column names of the data frame
-  if (!is.null(preferred_names)) {
-    # pick user-defined column names
-    col_name_user <- column_name_df[names(preferred_names)]
+  df_custom_names <- column_name_dict_updated |>
+    dplyr::filter(
+      .data[["col_name_mod"]] == TRUE
+      & .data[["col_df_len"]] == 0L
+    )
 
-    if (any(sapply(col_name_user, length) == 0L) || any(is.na(col_name_user))) {
-      cli::cli_abort(
-        c("x" = "Some of the values of {.arg preferred_names} are not detected
-          in the column names of the input data set {.arg df}."),
-        call = rlang::caller_env(),
-        wrap = FALSE
-      )
-
-    }
-  }
-
-  # check if multiple columns from the data frame match the same key from
-  # column_name_dict
-  column_name_multi <- sapply(column_name_df, length)
-
-  if (any(column_name_multi > 1L)) {
-
-    column_name_multi_lst <- column_name_df[column_name_multi > 1L]
-    column_name_multi_prnt <- lapply(
-      seq_along(column_name_multi_lst),
-      function(i) {
-        paste0("* \"", names(column_name_multi_lst[i]), "\": ", # nolint return_linter
-               cli::ansi_collapse(x = unlist(column_name_multi_lst[i])))
-      }
-    ) |>
-      unlist()
+  if (!is.null(preferred_names) && nrow(df_custom_names) > 0L) {
 
     cli::cli_abort(
-      c("x" = "There are multiple column names associated with the following
-        key(s):",
-        column_name_multi_prnt,
+      c(
+        "x" = "{cli::qty(df_custom_names$col_key)} Value{?s}
+        {.val {unlist(df_custom_names$col_names)}} from {.arg preferred_names}
+        corresponding to key{?s} {.val {df_custom_names$col_key}} {?is/are}
+        missing from the input dataset {.arg df}.",
+        "i" = "Please ensure all provided column names are present in the data!"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
+  }
+
+  # check presence of required columns ----
+
+  # keep all required cols for which there is no matching column in dataset
+  df_req_cols <- column_name_dict_updated |>
+    dplyr::filter(
+      .data[["col_miss"]] == FALSE
+      & .data[["col_df_len"]] == 0L
+    )
+
+  if (nrow(df_req_cols) > 0L) {
+
+    miss_cols <- paste0(
+      "* \"", df_req_cols$col_key, "\": One of ",
+      sapply(df_req_cols$col_names,
+             ansi_collapse_quot,
+             sep = "or"), "."
+    )
+
+    cli::cli_abort(
+      c("x" = "{cli::qty(df_req_cols$col_key)} There {?is/are} no column
+        name{?s} associated with the following key{?s}:",
+        miss_cols,
+        "i" = "Please ensure presence of columns above in dataset {.arg df}. If
+        columns are present and the column name does not match one of the
+        expected ones, please use argument {.arg preferred_names} to point to
+        the correct column."),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
+  }
+
+  # break ties for multi-matches by order ----
+
+  # keep all required cols for which there is no matching column in dataset
+  df_multi_ties_cols <- column_name_dict_updated |>
+    dplyr::filter(
+      .data[["col_multi"]] == FALSE
+      & .data[["col_df_len"]] > 1L
+      & .data[["col_order"]] == TRUE
+    ) |>
+    dplyr::rename(
+      "col_df_tmp" = "col_df"
+    ) |>
+    dplyr::mutate(
+      col_df = lapply(.data[["col_df_tmp"]], utils::head, n = 1L),
+      col_df_len = sapply(.data[["col_df"]], length)
+    )
+
+  if (nrow(df_multi_ties_cols) > 0L) {
+
+    # update column_name_dict_updated
+    column_name_dict_updated <- column_name_dict_updated |>
+      dplyr::filter(
+        !(.data[["col_key"]] %in% df_multi_ties_cols$col_key)
+      ) |>
+      dplyr::bind_rows(
+        df_multi_ties_cols |>
+          dplyr::select(
+            -dplyr::all_of("col_df_tmp")
+          )
+      ) |>
+      dplyr::arrange(
+        match(x = .data[["col_key"]], table = column_name_dict$col_key)
+      )
+
+    # inform message string
+    multi_ties_cols <- paste0(
+      "* \"", df_multi_ties_cols$col_key, "\": \"",
+      unlist(df_multi_ties_cols$col_df), "\" was selected. Options were ",
+      sapply(df_multi_ties_cols$col_df_tmp,
+             ansi_collapse_quot,
+             sep = "or"), "."
+    )
+
+    cli::cli_inform(
+      c("i" = "{cli::qty(df_multi_ties_cols$col_key)} More than one column names
+      in {.arg df} was associated with certain key{?s}. One was selected based
+      on an ordered list:",
+        multi_ties_cols,
+        "Please use {.arg preferred_names} to select a different column
+        name."),
+      wrap = FALSE
+    )
+
+  }
+
+
+  # check multi-matches in non-multi cols columns ----
+
+  # keep all cols that are not allowed to have multiple matches and have more
+  # than one matching columns in dataset
+  df_multi_cols <- column_name_dict_updated |>
+    dplyr::filter(
+      .data[["col_multi"]] == FALSE
+      & .data[["col_df_len"]] > 1L
+    )
+
+  if (nrow(df_multi_cols) > 0L) {
+
+    multi_cols <- paste0(
+      "* \"", df_multi_cols$col_key, "\": ",
+      sapply(df_multi_cols$col_names,
+             ansi_collapse_quot,
+             sep = "or"), "."
+    )
+
+    cli::cli_abort(
+      c("x" = "{cli::qty(df_multi_cols$col_key)} There is more than one column
+      names in {.arg df} associated with the following key{?s}:",
+        multi_cols,
         "i" = "Please use {.arg preferred_names} to break ties of column
         names."),
       call = rlang::caller_env(),
       wrap = FALSE
     )
+
   }
 
   # check if no columns from the data frame match the same key from
   # column_name_dict
-  if (any(column_name_multi == 0L)) {
 
-    cli::cli_abort(
-      c("x" = "There are no column names associated with the following key(s):",
-        paste0("* \"", names(column_name_df[column_name_multi == 0L]), "\""),
-        "i" = "Please use {.arg preferred_names} to select the correct column
-      names."),
-      call = rlang::caller_env(),
-      wrap = FALSE
-    )
-  }
 
   # return ----
 
   # remove any nullable columns
-  column_name_df <- column_name_df[!is.na(column_name_df)]
+  column_name_df <- column_name_dict_updated |>
+    dplyr::filter(
+      .data[["col_df_len"]] >= 1L
+    ) |>
+    dplyr::pull(
+      .data[["col_df"]]
+    )
 
   return(column_name_df)
 }
@@ -341,7 +457,7 @@ check_npx_col_names <- function(df,
 #' This function takes as input a named character vector with internal column
 #' names as names and column names of the current data set as values. Names of
 #' the input vector can be one or more of the following:
-#' `r cli::ansi_collapse(x = names(column_name_dict))`
+#' `r cli::ansi_collapse(x = column_name_dict$col_key)`
 #'
 #' @author
 #'  Klev Diamanti
@@ -364,34 +480,77 @@ check_npx_update_col_names <- function(preferred_names) {
   # check for names not matching expected ----
 
   # Check valid names
-  if (!all(names(preferred_names) %in% names(column_name_dict))) {
+  if (!all(names(preferred_names) %in% column_name_dict$col_key)) {
 
     # identify names of the vector preferred_names that do not match names from
     # column_name_dict. Names should match to be able to update the field.
-    missing_names <- names(preferred_names)[!(names(preferred_names) %in% # nolint object_usage_linter
-                                                names(column_name_dict))]
+    missing_names <- setdiff(x = names(preferred_names), # nolint object_usage_linter
+                             y = column_name_dict$col_key)
 
     cli::cli_abort(
       c("x" = "Unexpected name{?s} in {.arg preferred_names}:
         {.val {missing_names}}!",
         "i" = "Expected one or more of the following names:
-        {names(column_name_dict)}"),
+        {.val {column_name_dict$col_key}}"),
       call = rlang::caller_env(),
       wrap = FALSE
     )
 
   }
 
+  # check for duplicated names ----
+
+  dup_names <- names(preferred_names)[duplicated(names(preferred_names))]
+
+  if (length(dup_names) > 0L) {
+
+    cli::cli_abort(
+      c("x" = "Duplicated name{?s} in {.arg preferred_names}:
+        {.val {dup_names}}!",
+        "i" = "Expected unique names for each column."),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
+  }
+
+
   # update column names ----
 
   # Do not update entries that are not specified in `preferred_names`
-  column_name_dict_keep <- column_name_dict[setdiff(x = names(column_name_dict),
-                                                    y = names(preferred_names))]
+  column_name_dict_keep <- column_name_dict |>
+    dplyr::filter(
+      !(.data[["col_key"]] %in% names(preferred_names))
+    ) |>
+    dplyr::mutate(
+      col_name_mod = FALSE
+    )
   # Update entries that are specified in `preferred_names`
-  column_name_dict_change <- as.list(preferred_names)
+  column_name_dict_change <- column_name_dict |>
+    dplyr::filter(
+      .data[["col_key"]] %in% names(preferred_names)
+    ) |>
+    dplyr::arrange(
+      match(
+        x = .data[["col_key"]],
+        table = names(preferred_names)
+      )
+    ) |>
+    dplyr::mutate(
+      col_names = as.list(.env[["preferred_names"]]),
+      col_name_mod = TRUE
+    )
   # Merge the entries to a new updated dictionary
-  column_name_dict_updated <- append(column_name_dict_keep,
-                                     column_name_dict_change)
+  column_name_dict_updated <- column_name_dict_keep |>
+    dplyr::bind_rows(
+      column_name_dict_change
+    ) |>
+    dplyr::arrange(
+      match(
+        x = .data[["col_key"]],
+        table = column_name_dict$col_key
+      )
+    )
 
   # return ----
 
@@ -507,7 +666,8 @@ check_npx_all_na_assays <- function(df, col_names) {
     dplyr::collect() |>
     dplyr::pull(
       .data[[col_names$olink_id]]
-    )
+    ) |>
+    sort()
 
   # Issue warning if any assays with only NAs are found
   if (length(all_nas) > 0L) {
@@ -567,4 +727,272 @@ check_npx_duplicate_sample_ids <- function(df, col_names) {
   }
 
   return(duplicates)
+}
+
+#' Help function to identify Olink samples with all quantified values \emph{NA}
+#'
+#' @description
+#' This function checks if there are samples with the quantified values for all
+#' assays \emph{NA}.
+#'
+#' @details
+#' We have added the tags importFrom for "dbplyr" and "duckdb" because
+#' "devtools::check()" would complain with a note that the two libraries are
+#' imported but never used. To avoid that we used solutions taken from here:
+#' 1. https://github.com/hadley/r-pkgs/issues/203
+#' 2. https://github.com/pbs-software/pbs-modelling/issues/95
+#'
+#' @author
+#'  Simon Forsberg;
+#'  Masoumeh Sheikhi
+#'  Klev Diamanti
+#'
+#' @param df A tibble or an arrow object containing columns \var{SampleID} and
+#' the quantification column
+#' `r ansi_collapse_quot(x = get_olink_data_types(), sep = "or")`.
+#' @param col_names A list of matched column names. This is the output of the
+#' \var{check_npx_col_names} function.
+#'
+#' @return A character vector containing \var{SampleID} of samples with
+#' quantified values \emph{NA} for all assays, otherwise returns
+#' \emph{character(0)}.
+#'
+#' @importFrom duckdb duckdb
+#' @importFrom dbplyr memdb_frame
+#'
+check_npx_all_na_sample <- function(df, col_names) {
+
+  # Identify assays with only NAs
+  all_na_sample <- df |>
+    dplyr::select(
+      dplyr::all_of(
+        c(col_names$sample_id,
+          col_names$quant)
+      )
+    ) |>
+    dplyr::group_by(
+      .data[[col_names$sample_id]]
+    ) |>
+    dplyr::mutate(
+      is_na = dplyr::if_else(is.na(.data[[col_names$quant]]), 1L, 0L)
+    ) |>
+    arrow::to_duckdb() |>
+    dplyr::summarise(
+      n = dplyr::n(),
+      n_na = sum(.data[["is_na"]], na.rm = TRUE),
+      .groups = "drop"
+    ) |>
+    dplyr::filter(
+      .data[["n"]] == .data[["n_na"]]
+    ) |>
+    dplyr::collect() |>
+    dplyr::pull(
+      .data[[col_names$sample_id]]
+    ) |>
+    sort()
+
+  # Issue warning if any assays with only NAs are found
+  if (length(all_na_sample) > 0L) {
+    cli::cli_warn(c(
+      "{.val {all_na_sample}} ha{?s/ve} {.val {col_names$quant}} = NA for all
+      assays."
+    ))
+  }
+
+  return(all_na_sample)
+}
+
+#' Help function checking types of columns in data.
+#'
+#' @description
+#' This function checks if certain columns from \var{df} have the correct type
+#' to enable downstream analysis. Columns to be checked are marked as such in
+#' the columns \var{col_class} and \var{col_class_check} of
+#' \var{column_name_dict}.
+#'
+#' @param df A tibble or an arrow object containing the columns \var{SampleID}
+#' and \var{OlinkID}.
+#' @param col_names A list of matched column names. This is the output of the
+#' \var{check_npx_col_names} function.
+#'
+#' @returns A data frame with the columns \var{col_name}, \var{col_key},
+#' \var{col_class} and \var{expected_col_class} marking columns with the
+#' incorrect type.
+#'
+check_npx_col_class <- function(df, col_names) {
+
+  # we first convert 'col_names' into a data frame with 'col_key' the names of
+  # 'col_names', and 'col_df' the elements of the list of 'col_names'.
+  # Basically, 'col_key' is used to match to 'column_name_dict', and 'col_df' is
+  # used to match to the actual column names of the dataset 'df'.
+  df_col_names <- dplyr::tibble(
+    col_key = names(col_names),
+    col_df = unname(col_names)
+  ) |>
+    tidyr::unnest(
+      cols = dplyr::all_of(
+        c("col_key", "col_df")
+      )
+    )
+
+  # we select only the columns for which we want to confirm they column class.
+  # Then we select only 'col_key' and 'col_class', which we rename to
+  # 'expected_col_class'. 'col_key' is used to match to 'df_col_names' to allow
+  # checking only the column names of the dataset 'df' in question.
+  # 'expected_col_class' is used to retain the expected column classes. The
+  # goal is that this data frame will contain 'col_class' that will allow us to
+  # check if it matches the dataset, and 'col_df' that will match the column
+  # name of the dataset.
+  col_keys_check <- column_name_dict |>
+    dplyr::filter(
+      .data[["col_class_check"]] == TRUE
+    ) |>
+    dplyr::select(
+      dplyr::all_of(
+        c("col_key", "expected_col_class" = "col_class")
+      )
+    ) |>
+    dplyr::inner_join(
+      df_col_names,
+      by = "col_key",
+      relationship = "one-to-many"
+    )
+
+  # Check column class for each column in dataset 'df' using the internal
+  # functions 'check_is_numeric' and 'check_is_character'.
+  col_class_numeric <- df |>
+    dplyr::slice_head(
+      n = 100L
+    ) |>
+    dplyr::collect() |>
+    lapply(
+      check_is_numeric,
+      error = FALSE
+    ) |>
+    as.matrix()
+  col_class_character <- df |>
+    dplyr::slice_head(
+      n = 100L
+    ) |>
+    dplyr::collect() |>
+    lapply(
+      check_is_character,
+      error = FALSE
+    ) |>
+    as.matrix()
+
+  # combine the checks from numeric and character from above before, and
+  # ultimately, check if expected column class matches the column class found in
+  # the dataset 'df'.
+  df_col_class <- dplyr::tibble(
+    col_name = rownames(col_class_numeric),
+    is_numeric = col_class_numeric[, 1L]
+  ) |>
+    dplyr::left_join(
+      dplyr::tibble(
+        col_name = rownames(col_class_character),
+        is_character = col_class_character[, 1L]
+      ),
+      by = "col_name",
+      relationship = "one-to-one"
+    ) |>
+    dplyr::mutate(
+      col_class = dplyr::case_when(
+        .data[["is_numeric"]] == TRUE ~ "numeric",
+        .data[["is_character"]] == TRUE ~ "character",
+        .data[["is_numeric"]] == TRUE
+        & .data[["is_character"]] == TRUE ~ "unknown",
+        TRUE ~ "other",
+        .default = "unknown"
+      )
+    ) |>
+    dplyr::select(
+      -dplyr::all_of(
+        c("is_numeric", "is_character")
+      )
+    ) |>
+    dplyr::inner_join(
+      col_keys_check,
+      by = c("col_name" = "col_df"),
+      relationship = "one-to-one"
+    ) |>
+    dplyr::filter(
+      .data[["col_class"]] != .data[["expected_col_class"]]
+    )
+
+  if (nrow(df_col_class) > 0L) {
+
+    col_class_msg <- paste0("* \"", df_col_class$col_name, "\"",
+                            ": Expected \"", df_col_class$expected_col_class,
+                            "\". Detected \"", df_col_class$col_class, "\".")
+
+    cli::cli_warn(
+      c(
+        "{cli::qty(col_class_msg)} Detected column{?s} with incorrect data
+        type{?s}:",
+        col_class_msg,
+        "i" = "{cli::qty(col_class_msg)} Use the function {.fn clean_npx} or
+        manually convert the column{?s} to the expected type prior to downstream
+        analyses."
+      )
+    )
+
+  }
+
+  return(df_col_class)
+
+}
+
+#' Help function checking data for assay QC warnings.
+#'
+#' @param df A tibble or an arrow object containing the columns \var{AssayQC}
+#' and \var{OlinkID}.
+#' @param col_names A list of matched column names. This is the output of the
+#' \var{check_npx_col_names} function.
+#'
+#' @returns A character vector containing \var{OlinkID} of assays with at least
+#' one QC warning, otherwise a \emph{character(0)}.
+#'
+check_npx_qcwarn_assays <- function(df, col_names) {
+
+  if ("assay_warn" %in% names(col_names)) {
+
+    qc_warn_assays <- df |>
+      dplyr::select(
+        dplyr::all_of(
+          c(col_names$olink_id, col_names$assay_warn)
+        )
+      ) |>
+      dplyr::filter(
+        grepl(
+          pattern = "warn",
+          x = .data[[col_names$assay_warn]],
+          ignore.case = TRUE
+        )
+      ) |>
+      dplyr::distinct(
+        .data[[col_names$olink_id]]
+      ) |>
+      dplyr::collect() |>
+      dplyr::pull(
+        .data[[col_names$olink_id]]
+      ) |>
+      unique() |>
+      sort()
+
+    if (length(qc_warn_assays) > 0L) {
+      cli::cli_inform(
+        c("{.val {length(qc_warn_assays)}} assay{?s} exhibited assay QC warnings
+        in column {.arg {unname(col_names$assay_warn)}} of the dataset:
+          {.val {qc_warn_assays}}.")
+      )
+    }
+
+  } else {
+
+    qc_warn_assays <- character(0L)
+
+  }
+
+  return(qc_warn_assays)
 }
