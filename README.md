@@ -4,7 +4,7 @@
 
 [![R-CMD-check](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/R-CMD-check.yaml)
 [![lint](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/lint.yaml/badge.svg)](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/lint.yaml)
-[![Coverage](https://img.shields.io/badge/Coverage-100%25-green)](https://img.shields.io/badge/Coverage-100%25-green)
+[![Coverage](https://img.shields.io/badge/Coverage-97%25-green)](https://img.shields.io/badge/Coverage-97%25-green)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/OlinkAnalyze)](https://CRAN.R-project.org/package=OlinkAnalyze)
 [![](https://img.shields.io/badge/DOI-10.32614/CRAN.package.OlinkAnalyze-1f57b6?style=flat&link=https://doi.org/10.32614/CRAN.package.OlinkAnalyze)](https://doi.org/10.32614/CRAN.package.OlinkAnalyze)
