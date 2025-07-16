@@ -17,8 +17,8 @@
 #' Files in wide format are subsequently handled by the function
 #' \code{\link{read_npx_wide}}.
 #'
-#' \strong{Olink software files in wide format} always originate from the Olink
-#' qPCR platforms, and are further processed by
+#' \strong{Olink software files in wide format} always originate from Olink qPCR
+#' platforms, and are further processed by
 #' \code{\link{read_npx_format_get_format}} and
 #' \code{\link{read_npx_format_get_quant}} to determine the data type and Olink
 #' platform, respectively.
@@ -34,7 +34,7 @@
 #'
 #' @param file Path to Olink software output file in wide or long format.
 #' Expecting file extensions
-#' `r get_file_ext(name_sub = c("excel", "delim")) |> ansi_collapse_quot()`.
+#' `r  ansi_collapse_quot(get_file_ext(name_sub = c("excel", "delim")))`.
 #' @param out_df The class of output data frame. One of
 #' `r ansi_collapse_quot(read_npx_df_output)`.
 #' @param long_format Boolean marking format of input file. One of `NULL`
@@ -42,7 +42,7 @@
 #' wide format files.
 #' @param olink_platform Olink platform used to generate the input file.
 #' One of `NULL` (default) for auto-detection,
-#' `r get_olink_platforms(broad_platform = "qPCR") |> ansi_collapse_quot()`.
+#' `r ansi_collapse_quot(get_olink_platforms(broad_platform = "qPCR"))`.
 #' @param data_type Quantification method of the input data. One of `NULL`
 #' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
 #' @param quiet Boolean to print a confirmation message when reading the input
@@ -235,7 +235,7 @@ read_npx_format <- function(file,
 #'
 #' @param file Path to Olink software output file in wide or long format.
 #' Expecting file extensions
-#' `r get_file_ext(name_sub = c("excel", "delim")) |> ansi_collapse_quot()`.
+#' `r ansi_collapse_quot(get_file_ext(name_sub = c("excel", "delim")))`.
 #' @param read_n Number of top rows to read.
 #'
 #' @return A list with two elements:
@@ -378,7 +378,7 @@ read_npx_format_read <- function(file,
 #' Olink file.
 #' @param file Path to Olink software output file in wide or long format.
 #' Expecting file extensions
-#' `r get_file_ext(name_sub = c("excel", "delim")) |> ansi_collapse_quot()`.
+#' `r ansi_collapse_quot(get_file_ext(name_sub = c("excel", "delim")))`.
 #' @param long_format Boolean marking format of input file. One of `NULL`
 #' (default) for auto-detection, `TRUE` for long format files or `FALSE` for
 #' wide format files.
@@ -449,20 +449,20 @@ read_npx_format_get_format <- function(df_top_n,
                         x = data_cells_long,
                         ignore.case = FALSE)
 
-  if (is_data_wide == FALSE && any(is_data_long == TRUE)) {
+  if (is_data_wide == TRUE) {
+    # in wide format files we expect the quantification method to appear in
+    # cell A2 and we also expect cells L1:O1 to be empty.
+
+    detected_long_format <- FALSE
+    data_cells <- data_cells_wide
+
+  } else if (is_data_wide == FALSE && any(is_data_long == TRUE)) {
     # in long format files we expect the quantification method to appear in
     # cells L1:O1 and we also expect no matches to cell A2. This is what marks
     # wide format files.
 
     detected_long_format <- TRUE
     data_cells <- data_cells_long
-
-  } else if (is_data_wide == TRUE && all(is_data_long == FALSE)) {
-    # in wide format files we expect the quantification method to appear in
-    # cell A2 and we also expect cells L1:O1 to be empty.
-
-    detected_long_format <- FALSE
-    data_cells <- data_cells_wide
 
   } else {
     # Throw an error only if the user has not provided any info if the file is
@@ -591,10 +591,10 @@ read_npx_format_get_format <- function(df_top_n,
 #' Olink file.
 #' @param file Path to Olink software output file in wide format. Expecting file
 #' extensions
-#' `r get_file_ext(name_sub = c("excel", "delim")) |> ansi_collapse_quot()`.
+#' `r ansi_collapse_quot(get_file_ext(name_sub = c("excel", "delim")))`.
 #' @param olink_platform Olink platform used to generate the input file.
 #' One of `NULL` (default) for auto-detection,
-#' `r get_olink_platforms(broad_platform = "qPCR") |> ansi_collapse_quot()`.
+#' `r ansi_collapse_quot(get_olink_platforms(broad_platform = "qPCR"))`.
 #'
 #' @return The name of the Olink platform. One of
 #' `r ansi_collapse_quot(get_olink_platforms(broad_platform = "qPCR"))`.
@@ -763,16 +763,16 @@ read_npx_format_get_platform <- function(df_top_n,
 #' wide format.
 #'
 #' @description
-#' This function uses information from the cell A2 from Olink software files in
-#' wide format to determine the quantification method of the data that the
-#' dataset contains.
+#' This function uses information from the cell \emph{A2} from Olink software
+#' files in wide format to determine the quantification method of the data that
+#' the dataset contains.
 #'
 #' @author
 #'   Klev Diamanti
 #'
 #' @param file Path to Olink software output file in wide format. Expecting file
 #' extensions
-#' `r get_file_ext(name_sub = c("excel", "delim")) |> ansi_collapse_quot()`.
+#' `r ansi_collapse_quot(get_file_ext(name_sub = c("excel", "delim")))`.
 #' @param data_type Quantification method of the input data. One of `NULL`
 #' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
 #' @param data_cells A character vector with the contents of the cell \emph{A2}

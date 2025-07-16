@@ -13,7 +13,7 @@ get_olink_broader_platforms(
 \arguments{
 \item{platform_name}{Name of the \var{platform_name} to filter the Olink
 broader platforms for. If \code{NULL} all relevant Olink broader platforms are
-returned, otherwise one of "Explore 3072", "Explore HT", "Flex", "Focus", "Target 48", and "Target 96" is
+returned, otherwise one of "Explore 3072", "Explore HT", "Flex", "Focus", "Reveal", "Target 48", and "Target 96" is
 expected.}
 
 \item{data_type}{Name of the \var{data_type} to filter the Olink broader

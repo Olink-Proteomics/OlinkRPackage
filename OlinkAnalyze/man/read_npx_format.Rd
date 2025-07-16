@@ -62,8 +62,8 @@ are imported in R by the functions \code{\link{read_npx_delim}} or
 Files in wide format are subsequently handled by the function
 \code{\link{read_npx_wide}}.
 
-\strong{Olink software files in wide format} always originate from the Olink
-qPCR platforms, and are further processed by
+\strong{Olink software files in wide format} always originate from Olink qPCR
+platforms, and are further processed by
 \code{\link{read_npx_format_get_format}} and
 \code{\link{read_npx_format_get_quant}} to determine the data type and Olink
 platform, respectively.
