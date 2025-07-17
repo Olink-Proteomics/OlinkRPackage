@@ -85,15 +85,15 @@ df <- dplyr::tibble(
     "WARN", # assay qc warning flag
     "PASS"
   ),
-  PlateID = rep("plate1", 10L),
-  UniProt = rep("uniprotid1", 10L),
-  Assay = rep("assay_a", 10L),
-  Panel = rep("panel_a", 10L),
-  PanelVersion = rep("panel_version_a", 10L),
-  LOD = rnorm(10L),
-  ExtNPX = rnorm(10L),
-  Count = rnorm(10L),
-  Normalization = rep("Intensity", 10L)
+  PlateID = rep(x = "plate1", times = 10L),
+  UniProt = rep(x = "uniprotid1", times = 10L),
+  Assay = rep(x = "assay_a", times = 10L),
+  Panel = rep(x = "panel_a", times = 10L),
+  PanelVersion = rep(x = "panel_version_a", times = 10L),
+  LOD = rnorm(n = 10L),
+  ExtNPX = rnorm(n = 10L),
+  Count = rnorm(n = 10L),
+  Normalization = rep(x = "Intensity", times = 10L)
 )
 
 # Test clean_assay_na -----------------------------------------------------
