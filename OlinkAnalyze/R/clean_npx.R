@@ -927,11 +927,11 @@ clean_col_class <- function(df,
   }
 
   # Correct the column class using coercion function
-  df[check_npx_log$col_class$col_name] <- purrr::map2(
-    .x = df[check_npx_log$col_class$col_name],
-    .y = check_npx_log$col_class$expected_col_class,
-    .f = coerce_col
-  )
+  for (i in seq_along(check_npx_log$col_class$col_name)) {
+    df[[check_npx_log$col_class$col_name[i]]] <-
+      coerce_col(df[[check_npx_log$col_class$col_name[i]]],
+                 check_npx_log$col_class$expected_col_class[i])
+  }
 
   cli::cli_inform(c(
     "Corrected column classes for: {.field {check_npx_log$col_class$col_name}}",
