@@ -831,7 +831,7 @@ clean_control_sample_id <- function(
 
     if (is.null(control_sample_ids)) {
       cli::cli_inform(c(
-        "No control sample ID pattern provided.",
+        "No control sample IDs provided.",
         "i" = "Returning data unchanged."
       ))
     } else {
