@@ -825,27 +825,26 @@ clean_control_sample_id <- function(
     control_sample_ids = NULL,
     out_df = "tibble") {
 
-  # Early exit check
-  if (is.null(control_sample_ids)
-      || !"sample_id" %in% names(check_npx_log$col_names)) {
+  # Check if sample_id column exist in the data table
+  if(is.null(control_sample_ids)
+     || !check_npx_log$col_names$sample_id %in% names(df)) {
 
-    if (is.null(control_sample_ids)) {
-      cli::cli_inform(c(
-        "No control sample IDs provided.",
-        "i" = "Returning data unchanged."
-      ))
-    } else {
-      cli::cli_inform(c(
-        "No column name found for {.var sample_id} in
-        {.code check_npx_log$col_names}.",
-        "i" = "Returning data unchanged."
-      ))
-    }
+      if (is.null(control_sample_ids)) {
+        cli::cli_inform(c(
+          "No control sample IDs provided.",
+          "i" = "Returning data unchanged."
+        ))
+      } else {
+        cli::cli_inform(c(
+          "{check_npx_log$col_names$sample_id} is missing from the data table.",
+          "i" = "Reutrning data unchanged."
+        ))
+      }
 
-    return(
-      df |>
-        convert_read_npx_output(out_df = out_df)
-    )
+      return(
+        df |>
+          convert_read_npx_output(out_df = out_df)
+      )
   }
 
   # Filter out control samples and return cleaned data
