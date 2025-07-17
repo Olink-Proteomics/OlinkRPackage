@@ -117,7 +117,7 @@ olink_pathway_enrichment <- function(data, test_results, method = "GSEA", ontolo
          install.packages(\"msigdbr\")")
   }
 
-  if(packageVersion("msigdbr") < package_version("9.0.0")) {
+  if(utils::packageVersion("msigdbr") < package_version("9.0.0")) {
     stop(" Pathway enrichment requires version >=9.0.0 of the msigdbr package.
          Please install a supported version of msigdbr before continuing.
 
