@@ -96,8 +96,6 @@ df <- dplyr::tibble(
   Normalization = rep("Intensity", 10L)
 )
 
-
-
 # Test clean_assay_na -----------------------------------------------------
 test_that(
   "clean_assay_na - works - assays with only NA values",
