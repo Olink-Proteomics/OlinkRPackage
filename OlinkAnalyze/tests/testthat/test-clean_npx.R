@@ -15,7 +15,7 @@ df <- dplyr::tibble(
     "AssayWarn",       # flagged by AssayQC warning
     "DuplicateSample"  # duplicate SampleID
   ),
- OlinkID = c(
+  OlinkID = c(
     "OID12345",  # valid (5 digits)
     "OID1234",   # invalid (only 4 digits)
     "OID23456",  # valid, but will be all NA
@@ -75,7 +75,7 @@ df <- dplyr::tibble(
     "PASS",
     "PASS"
   ),
- AssayQC = c(
+  AssayQC = c(
     "PASS",
     "PASS",
     "PASS",
@@ -87,15 +87,15 @@ df <- dplyr::tibble(
     "WARN", # assay qc warning flag
     "PASS"
   ),
- PlateID = rep("plate1", 10L),
- UniProt = rep("uniprotid1", 10L),
- Assay = rep("assay_a", 10L),
- Panel = rep("panel_a", 10L),
- PanelVersion = rep("panel_version_a", 10L),
- LOD = rnorm(10L),
- ExtNPX = rnorm(10L),
- Count = rnorm(10L),
- Normalization = rep("Intensity", 10L)
+  PlateID = rep("plate1", 10L),
+  UniProt = rep("uniprotid1", 10L),
+  Assay = rep("assay_a", 10L),
+  Panel = rep("panel_a", 10L),
+  PanelVersion = rep("panel_version_a", 10L),
+  LOD = rnorm(10L),
+  ExtNPX = rnorm(10L),
+  Count = rnorm(10L),
+  Normalization = rep("Intensity", 10L)
 )
 
 
