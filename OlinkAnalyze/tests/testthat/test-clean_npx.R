@@ -1,7 +1,5 @@
-library(testthat)
-
-
 # Create Test Data Table --------------------------------------------------
+
 df <- dplyr::tibble(
   SampleID = c(
     "ValidSample",     # valid
