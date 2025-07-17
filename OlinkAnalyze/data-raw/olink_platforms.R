@@ -15,7 +15,8 @@ accepted_olink_platforms <- dplyr::tibble(
     "Olink Target 96",
     "Olink Explore 3072",
     "Olink Explore HT",
-    "Olink Focus"
+    "Olink Focus",
+    "Olink Reveal"
   ),
   name = c(
     "Target 48",
@@ -23,7 +24,8 @@ accepted_olink_platforms <- dplyr::tibble(
     "Target 96",
     "Explore 3072",
     "Explore HT",
-    "Focus"
+    "Focus",
+    "Reveal"
   ),
   code_friendly_name = c(
     "Target_48",
@@ -31,7 +33,8 @@ accepted_olink_platforms <- dplyr::tibble(
     "Target_96",
     "Explore_3072",
     "Explore_HT",
-    "Focus"
+    "Focus",
+    "Reveal"
   ),
   short_name = c(
     "T48",
@@ -39,7 +42,8 @@ accepted_olink_platforms <- dplyr::tibble(
     "T96",
     "3k",
     "HT",
-    "Focus"
+    "Focus",
+    "Reveal"
   ),
   broader_platform = c(
     "qPCR",
@@ -47,12 +51,14 @@ accepted_olink_platforms <- dplyr::tibble(
     "qPCR",
     "NGS",
     "NGS",
-    "qPCR"
+    "qPCR",
+    "NGS"
   ),
   regexp = c(
     "Target 48",
     "[A-Z]{4}-[A-Z]{4}|Flex",
     "Target 96",
+    NA_character_,
     NA_character_,
     NA_character_,
     NA_character_
@@ -63,7 +69,8 @@ accepted_olink_platforms <- dplyr::tibble(
     c("NPX", "Ct"),
     c("NPX"),
     c("NPX"),
-    c("NPX", "Quantified", "Ct")
+    c("NPX", "Quantified", "Ct"),
+    c("NPX")
   ),
   quant_type = list(
     c("relative", "absolute", "relative"),
@@ -71,12 +78,14 @@ accepted_olink_platforms <- dplyr::tibble(
     c("relative", "relative"),
     c("relative"),
     c("relative"),
-    c("relative", "absolute", "relative")
+    c("relative", "absolute", "relative"),
+    c("relative")
   ),
   base_index = c(
     NA_integer_,
     NA_integer_,
     92L,
+    NA_integer_,
     NA_integer_,
     NA_integer_,
     NA_integer_
@@ -87,6 +96,7 @@ accepted_olink_platforms <- dplyr::tibble(
     FALSE,
     NA,
     NA,
-    TRUE
+    TRUE,
+    NA
   )
 )

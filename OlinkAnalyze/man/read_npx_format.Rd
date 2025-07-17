@@ -8,7 +8,6 @@ their format, data type and platform.}
 read_npx_format(
   file,
   out_df = "arrow",
-  sep = NULL,
   long_format = NULL,
   olink_platform = NULL,
   data_type = NULL,
@@ -23,10 +22,6 @@ Expecting file extensions
 
 \item{out_df}{The class of output data frame. One of
 "tibble" and "arrow".}
-
-\item{sep}{Character separator of delimited input file. One of \code{NULL}
-(default) for auto-detection, or ";" and ",".
-Used only for delimited output files from Olink software.}
 
 \item{long_format}{Boolean marking format of input file. One of \code{NULL}
 (default) for auto-detection, \code{TRUE} for long format files or \code{FALSE} for
@@ -67,8 +62,8 @@ are imported in R by the functions \code{\link{read_npx_delim}} or
 Files in wide format are subsequently handled by the function
 \code{\link{read_npx_wide}}.
 
-\strong{Olink software files in wide format} always originate from the Olink
-qPCR platforms, and are further processed by
+\strong{Olink software files in wide format} always originate from Olink qPCR
+platforms, and are further processed by
 \code{\link{read_npx_format_get_format}} and
 \code{\link{read_npx_format_get_quant}} to determine the data type and Olink
 platform, respectively.

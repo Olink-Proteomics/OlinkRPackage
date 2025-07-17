@@ -36,8 +36,8 @@ and \code{FALSE} to print.}
 Tibble or ArrowObject with Olink data in long format.
 }
 \description{
-This implementation of read_NPX does not cover the latest versions of Olink
-files in wide format. Specifically, it supports:
+This implementation of \code{\link{read_NPX}} does not cover the latest
+versions of Olink files in wide format. Specifically, it supports:
 \itemize{
 \item \strong{Target 96} output files in wide format \strong{(T96 reports
 only NPX)} with the bottom matrix containing one of the following

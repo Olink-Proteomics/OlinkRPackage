@@ -6,15 +6,14 @@
 "Ct", "NPX", and "Quantified" data from delimited file
 exported from Olink software.}
 \usage{
-read_npx_delim_long(file, sep = NULL)
+read_npx_delim_long(file, sep)
 }
 \arguments{
 \item{file}{Path to Olink software output delimited file in long format.
-Expecting file extensions
-"csv" and "txt".}
+Expecting file extensions}
 
 \item{sep}{Character separator of delimited input file. One of \code{NULL}
-(default) for auto-detection, or ";" and ",".
+(default) for auto-detection, or ";", ",", "    ", "|", and ":".
 Used only for delimited output files from Olink software.}
 }
 \value{
@@ -31,5 +30,6 @@ The function can handle delimited files in long format.
 \author{
 Klev Diamanti;
 Christoffer Cambronero;
-Kathleen Nevola
+Kathleen Nevola;
+Ola Caster
 }

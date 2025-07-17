@@ -78,3 +78,19 @@ get_example_data <- function(filename) {
     return(NULL)
   }
 }
+
+# load example files living under inst/extdata
+get_inst_extdata_file <- function(filename) {
+  # get file path under inst/extdata
+  sample_data_file <- system.file("extdata", filename,
+                                  package = "OlinkAnalyze")
+  # check that file exists
+  if (file.exists(sample_data_file)) {
+    # return full file path
+    return(sample_data_file)
+  } else {
+    # if not, skip the test
+    testthat::skip()
+    return(NULL)
+  }
+}

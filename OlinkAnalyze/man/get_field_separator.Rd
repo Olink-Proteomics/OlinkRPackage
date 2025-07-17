@@ -12,7 +12,8 @@ Expecting file extensions
 "csv" and "txt".}
 }
 \value{
-The file separator ";" and ",".
+The file delimiter
+";", ",", "	", "|", or ":".
 }
 \description{
 This function uses the first line of the provided file to determine the
@@ -22,8 +23,6 @@ separator of the file.
 on the same line.
 }
 \seealso{
-\code{\link{read_npx_delim_long}}
-\code{\link{read_npx_delim_wide}}
 \code{\link{read_npx_delim}}
 }
 \author{

@@ -1,10 +1,4 @@
-on:
-  pull_request:
-    branches:
-      - 'main'
-      - 'develop'
-      - 'optimization_develop'
-      - 'optimization_main'
+on: [pull_request]
 
 name: R-CMD-check-docker
 
@@ -14,7 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        r_version: ["4.1.3", "4.2.3", "4.3.3"]
+        r_version: ["4.1.3", "4.2.3", "4.3.3", "4.4.3"]
     steps:
       -
         name: Checkout
@@ -23,21 +17,13 @@ jobs:
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       -
-        name: Cache Docker layers
-        uses: actions/cache@v4
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-      -
         name: Build docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           push: false
           tags: oa:latest
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           file: docker/Dockerfile_for_tests
           load: true
           build-args: R_VERSION=${{matrix.r_version}}
@@ -48,7 +34,7 @@ jobs:
       -
         name: Upload check results
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@main
         with:
           name: docker-r${{ matrix.config.r }}-check-results
           path: check

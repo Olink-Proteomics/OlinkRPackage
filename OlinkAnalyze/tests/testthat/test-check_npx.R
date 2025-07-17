@@ -21,29 +21,41 @@ test_that(
 )
 
 test_that(
-  "check_npx - works -  results as expected",
+  "check_npx - works - minimum set of columns, results as expected",
   {
     df <- dplyr::tibble(
-      SampleID = c("A", "B", "C", "D"),
+      SampleID = LETTERS[1L:4L],
       OlinkID = rep("OID12345", 4L),
-      SampleType = rep("SAMPLE", 4L),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
       NPX = rnorm(4L),
       PlateID = rep("plate1", 4L),
-      QC_Warning = rep("Pass", 4L),
-      LOD = rnorm(4L)
+      QC_Warning = rep("Pass", 4L)
     )
 
     expected_result <- list(
       col_names = list(sample_id = "SampleID",
-                       sample_type = "SampleType",
                        olink_id = "OlinkID",
+                       uniprot = "UniProt",
+                       assay = "Assay",
+                       panel = "Panel",
                        plate_id = "PlateID",
-                       qc_warning = "QC_Warning",
-                       lod = "LOD",
-                       quant = "NPX"),
+                       panel_version = "Panel_Lot_Nr",
+                       quant = "NPX",
+                       qc_warning = "QC_Warning"),
       oid_invalid = character(0L),
       assay_na = character(0L),
-      sample_id_dups = character(0L)
+      sample_id_dups = character(0L),
+      sample_id_na = character(0L),
+      col_class = dplyr::tibble(
+        "col_name" = character(0L),
+        "col_class" = character(0L),
+        "col_key" = character(0L),
+        "expected_col_class" = character(0L)
+      ),
+      assay_qc = character(0L)
     )
 
     expect_equal(
@@ -55,41 +67,117 @@ test_that(
 )
 
 test_that(
-  "check_npx - warning - invalid OlinkID and duplicate SampleID",
+  "check_npx - works - full set of columns, results as expected",
   {
     df <- dplyr::tibble(
-      SampleID = c("A", "A", "C", "D"),
-      OlinkID = rep("OID123456", 4L),
-      SampleType = rep("SAMPLE", 4L),
+      SampleID = LETTERS[1L:4L],
+      SampleType = LETTERS[1L:4L],
+      AssayType = LETTERS[1L:4L],
+      OlinkID = rep("OID12345", 4L),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
+      LOD = rnorm(4L),
       NPX = rnorm(4L),
+      Count = rnorm(4L),
       PlateID = rep("plate1", 4L),
       QC_Warning = rep("Pass", 4L),
-      LOD = rnorm(4L)
+      AssayQC = c(rep("Pass", 3L), "Warning"),
+      Normalization = LETTERS[1L:4L]
     )
 
     expected_result <- list(
       col_names = list(sample_id = "SampleID",
                        sample_type = "SampleType",
+                       assay_type = "AssayType",
                        olink_id = "OlinkID",
+                       uniprot = "UniProt",
+                       assay = "Assay",
+                       panel = "Panel",
                        plate_id = "PlateID",
-                       qc_warning = "QC_Warning",
+                       panel_version = "Panel_Lot_Nr",
                        lod = "LOD",
-                       quant = "NPX"),
+                       quant = "NPX",
+                       count = "Count",
+                       qc_warning = "QC_Warning",
+                       assay_warn = "AssayQC",
+                       normalization = "Normalization"),
+      oid_invalid = character(0L),
+      assay_na = character(0L),
+      sample_id_dups = character(0L),
+      sample_id_na = character(0L),
+      col_class = dplyr::tibble(
+        "col_name" = character(0L),
+        "col_class" = character(0L),
+        "col_key" = character(0L),
+        "expected_col_class" = character(0L)
+      ),
+      assay_qc = c("OID12345")
+    )
+
+    expect_message(
+      object = expect_equal(
+        object = check_npx(df = df,
+                           preferred_names = NULL),
+        expected = expected_result
+      ),
+      regexp = "QC warnings in column `AssayQC` of the dataset: \"OID12345\"."
+    )
+  }
+)
+
+test_that(
+  "check_npx - warnings - invalid OlinkID, duplicate SampleID and NPX non-num",
+  {
+    df <- dplyr::tibble(
+      SampleID = c("A", "A", "C", "D"),
+      OlinkID = rep("OID123456", 4L),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
+      NPX = as.character(rnorm(4L)),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L)
+    )
+
+    expected_result <- list(
+      col_names = list(sample_id = "SampleID",
+                       olink_id = "OlinkID",
+                       uniprot = "UniProt",
+                       assay = "Assay",
+                       panel = "Panel",
+                       plate_id = "PlateID",
+                       panel_version = "Panel_Lot_Nr",
+                       quant = "NPX",
+                       qc_warning = "QC_Warning"),
       oid_invalid = c("OID123456"),
       assay_na = character(0L),
-      sample_id_dups = c("A")
+      sample_id_dups = c("A"),
+      sample_id_na = character(0L),
+      col_class = dplyr::tibble(
+        "col_name" = c("NPX"),
+        "col_class" = c("character"),
+        "col_key" = c("quant"),
+        "expected_col_class" = c("numeric")
+      ),
+      assay_qc = character(0L)
     )
 
     expect_warning(
       object = expect_warning(
-        object = expect_equal(
-          object = check_npx(df = df,
-                             preferred_names = NULL),
-          expected = expected_result
+        object = expect_warning(
+          object = expect_equal(
+            object = check_npx(df = df,
+                               preferred_names = NULL),
+            expected = expected_result
+          ),
+          regexp = "Unrecognized OlinkID detected"
         ),
-        regexp = "Unrecognized OlinkID detected"
+        regexp = "Duplicate SampleID detected"
       ),
-      regexp = "Duplicate SampleID detected"
+      regexp = "\"NPX\": Expected \"numeric\". Detected \"character\"."
     )
   }
 )
@@ -102,21 +190,25 @@ test_that(
     df <- arrow::arrow_table(
       SampleID = c("A", "B", "C", "D"),
       OlinkID = rep("OID12345", 4L),
-      SampleType = rep("SAMPLE", 4L),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
       NPX = rnorm(4L),
       PlateID = rep("plate1", 4L),
-      QC_Warning = rep("Pass", 4L),
-      LOD = rnorm(4L)
+      QC_Warning = rep("Pass", 4L)
     )
 
     expected_result <- list(
       sample_id = "SampleID",
-      sample_type = "SampleType",
       olink_id = "OlinkID",
+      uniprot = "UniProt",
+      assay = "Assay",
+      panel = "Panel",
       plate_id = "PlateID",
-      qc_warning = "QC_Warning",
-      lod = "LOD",
-      quant = "NPX"
+      panel_version = "Panel_Lot_Nr",
+      quant = "NPX",
+      qc_warning = "QC_Warning"
     )
 
     expect_equal(
@@ -132,8 +224,12 @@ test_that(
   {
     df <- dplyr::tibble(
       SampleID = c("A", "B", "C", "D"),
-      OlinkID = rep("OID12345", 4L),
       SampleType = rep("SAMPLE", 4L),
+      OlinkID = rep("OID12345", 4L),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
       NPX = rnorm(4L),
       PlateID = rep("plate1", 4L),
       QC_Warning = rep("Pass", 4L),
@@ -151,10 +247,14 @@ test_that(
       expected = list(
         sample_id = "SampleID",
         olink_id = "OlinkID",
+        uniprot = "UniProt",
+        assay = "Assay",
+        panel = "Panel",
         plate_id = "PlateID",
-        qc_warning = "QC_Warning",
+        panel_version = "Panel_Lot_Nr",
         lod = "LOD",
-        quant = "NPX"
+        quant = "NPX",
+        qc_warning = "QC_Warning"
       )
     )
 
@@ -171,9 +271,13 @@ test_that(
         sample_id = "SampleID",
         sample_type = "SampleType",
         olink_id = "OlinkID",
+        uniprot = "UniProt",
+        assay = "Assay",
+        panel = "Panel",
         plate_id = "PlateID",
-        qc_warning = "QC_Warning",
-        quant = "NPX"
+        panel_version = "Panel_Lot_Nr",
+        quant = "NPX",
+        qc_warning = "QC_Warning"
       )
     )
 
@@ -188,9 +292,13 @@ test_that(
       expected = list(
         sample_id = "SampleID",
         olink_id = "OlinkID",
+        uniprot = "UniProt",
+        assay = "Assay",
+        panel = "Panel",
         plate_id = "PlateID",
-        qc_warning = "QC_Warning",
-        quant = "NPX"
+        panel_version = "Panel_Lot_Nr",
+        quant = "NPX",
+        qc_warning = "QC_Warning"
       )
     )
   }
@@ -201,12 +309,15 @@ test_that(
   {
     df <- arrow::arrow_table(
       SampleID = c("A", "B", "C", "D"),
-      OlinkID = rep("OID12345", 4L),
       SampleType = rep("SAMPLE", 4L),
+      OlinkID = rep("OID12345", 4L),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
       NPX = rnorm(4L),
       PlateID = rep("plate1", 4L),
-      QC_Warning = rep("Pass", 4L),
-      LOD = rnorm(4L)
+      QC_Warning = rep("Pass", 4L)
     )
 
     # one column name ----
@@ -221,13 +332,16 @@ test_that(
           preferred_names = c("sample_id" = "IamSampleName")
         ),
       expected = list(
+        sample_id = "IamSampleName",
         sample_type = "SampleType",
         olink_id = "OlinkID",
+        uniprot = "UniProt",
+        assay = "Assay",
+        panel = "Panel",
         plate_id = "PlateID",
-        qc_warning = "QC_Warning",
-        lod = "LOD",
+        panel_version = "Panel_Lot_Nr",
         quant = "NPX",
-        sample_id = "IamSampleName"
+        qc_warning = "QC_Warning"
       )
     )
 
@@ -249,13 +363,16 @@ test_that(
                               "olink_id" = "IamOlinkIdentifier")
         ),
       expected = list(
-        qc_warning = "QC_Warning",
-        lod = "LOD",
-        quant = "NPX",
         sample_id = "IamSampleName",
         sample_type = "IamSampleType",
+        olink_id = "IamOlinkIdentifier",
+        uniprot = "UniProt",
+        assay = "Assay",
+        panel = "Panel",
         plate_id = "IamPlateIdentifier",
-        olink_id = "IamOlinkIdentifier"
+        panel_version = "Panel_Lot_Nr",
+        quant = "NPX",
+        qc_warning = "QC_Warning"
       )
     )
 
@@ -280,13 +397,17 @@ test_that(
                               "quant" = "Quantified_value")
         ),
       expected = list(
-        olink_id = "OlinkID",
-        plate_id = "PlateID",
-        qc_warning = "QC_Warning",
         sample_id = "IamSampleName",
         sample_type = "IamSampleType",
+        olink_id = "OlinkID",
+        uniprot = "UniProt",
+        assay = "Assay",
+        panel = "Panel",
+        plate_id = "PlateID",
+        panel_version = "Panel_Lot_Nr",
         lod = "PlateLOD",
-        quant = "Quantified_value"
+        quant = "Quantified_value",
+        qc_warning = "QC_Warning"
       )
     )
   }
@@ -297,8 +418,12 @@ test_that(
   {
     df <- arrow::arrow_table(
       SampleID = c("A", "B", "C", "D"),
-      OlinkID = rep("OID12345", 4L),
       SampleType = rep("SAMPLE", 4L),
+      OlinkID = rep("OID12345", 4L),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
       NPX = rnorm(4L),
       PlateID = rep("plate1", 4L),
       QC_Warning = rep("Pass", 4L),
@@ -312,7 +437,7 @@ test_that(
         check_npx_col_names(
           preferred_names = c("sample_id" = "IamSampleName")
         ),
-      regexp = "Some of the values of `preferred_names` are not detected in"
+      regexp = "Value \"IamSampleName\" from `preferred_names` corresponding to"
     )
 
     # multiple non existing column column names ----
@@ -324,7 +449,53 @@ test_that(
                               "lod" = "PlateLOD",
                               "sample_type" = "IamSampleType")
         ),
-      regexp = "Some of the values of `preferred_names` are not detected in"
+      regexp = "Values \"IamSampleName\", \"IamSampleType\", and \"PlateLOD\""
+    )
+  }
+)
+
+test_that(
+  "check_npx_col_names - inform - resolve ties with multiple matches",
+  {
+    df <- arrow::arrow_table(
+      SampleID = c("A", "B", "C", "D"),
+      OlinkID = rep("OID12345", 4L),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L),
+      LOD = rnorm(4L)
+    )
+
+    # two matches ----
+
+    expect_message(
+      object = df |>
+        dplyr::collect() |>
+        dplyr::mutate(
+          NPX = rnorm(4L),
+          Quantified_value = rnorm(4L)
+        ) |>
+        check_npx_col_names(preferred_names = NULL),
+      regexp = paste("\"NPX\" was selected. Options were \"NPX\" or",
+                     "\"Quantified_value\".")
+    )
+
+    # 3 matches ----
+
+    expect_message(
+      object = df |>
+        dplyr::collect() |>
+        dplyr::mutate(
+          Ct = rnorm(4L),
+          Quantified_value = rnorm(4L),
+          NPX = rnorm(4L)
+        ) |>
+        check_npx_col_names(preferred_names = NULL),
+      regexp = paste("\"NPX\" was selected. Options were \"NPX\",",
+                     "\"Quantified_value\", or \"Ct\".")
     )
   }
 )
@@ -335,7 +506,10 @@ test_that(
     df <- arrow::arrow_table(
       SampleID = c("A", "B", "C", "D"),
       OlinkID = rep("OID12345", 4L),
-      SampleType = rep("SAMPLE", 4L),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
       NPX = rnorm(4L),
       PlateID = rep("plate1", 4L),
       QC_Warning = rep("Pass", 4L),
@@ -348,10 +522,10 @@ test_that(
       object = df |>
         dplyr::collect() |>
         dplyr::mutate(
-          PlateLOD = rnorm(4L)
+          plate_id = LETTERS[1L:4L]
         ) |>
         check_npx_col_names(preferred_names = NULL),
-      regexp = "There are multiple column names associated with the following k"
+      regexp = "There is more than one column names in `df` associated with the"
     )
 
     # mutiple columns with multiple matches ----
@@ -360,11 +534,11 @@ test_that(
       object = df |>
         dplyr::collect() |>
         dplyr::mutate(
-          PlateLOD = rnorm(4L),
-          Quantified_value = rnorm(4L)
+          plate_id = LETTERS[1L:4L],
+          assay = LETTERS[1L:4L]
         ) |>
         check_npx_col_names(preferred_names = NULL),
-      regexp = "There are multiple column names associated with the following k"
+      regexp = "There is more than one column names in `df` associated with the"
     )
   }
 )
@@ -374,12 +548,15 @@ test_that(
   {
     df <- arrow::arrow_table(
       SampleID = c("A", "B", "C", "D"),
-      OlinkID = rep("OID12345", 4L),
       SampleType = rep("SAMPLE", 4L),
+      OlinkID = rep("OID12345", 4L),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
       NPX = rnorm(4L),
       PlateID = rep("plate1", 4L),
-      QC_Warning = rep("Pass", 4L),
-      LOD = rnorm(4L)
+      QC_Warning = rep("Pass", 4L)
     )
 
     # one column with no matches ----
@@ -391,7 +568,7 @@ test_that(
         ) |>
         dplyr::compute() |>
         check_npx_col_names(preferred_names = NULL),
-      regexp = "There are no column names associated with the following key"
+      regexp = "There is no column name associated with the following key"
     )
 
     # mutiple columns with no matches ----
@@ -400,11 +577,11 @@ test_that(
       object = df |>
         dplyr::rename(
           "IamSampleName" = "SampleID",
-          "IamSampleType" = "SampleType"
+          "IamPlateID" = "PlateID"
         ) |>
         dplyr::compute() |>
         check_npx_col_names(preferred_names = NULL),
-      regexp = "There are no column names associated with the following key"
+      regexp = "There are no column names associated with the following keys"
     )
   }
 )
@@ -415,7 +592,7 @@ test_that(
 # here we will check only the errors
 
 test_that(
-  "check_npx_update_col_names - error - no match for non-nullable columns",
+  "check_npx_update_col_names - error - no match in col_keys",
   {
     # one name not in column_name_dict ----
 
@@ -439,6 +616,34 @@ test_that(
   }
 )
 
+test_that(
+  "check_npx_update_col_names - error - duplicated names in array",
+  {
+    # one name not in column_name_dict ----
+
+    expect_error(
+      object = check_npx_update_col_names(
+        preferred_names = c("sample_id" = "SampleID",
+                            "sample_id" = "SampleID2")
+      ),
+      regexp = "Duplicated name in"
+    )
+
+    # multiple names not in column_name_dict ----
+
+    expect_error(
+      object = check_npx_update_col_names(
+        preferred_names = c("sample_id" = "SampleID",
+                            "sample_id" = "SampleID2",
+                            "sample_type" = "Sample_Type",
+                            "lod" = "LOD1",
+                            "lod" = "LOD2")
+      ),
+      regexp = "Duplicated names in"
+    )
+  }
+)
+
 # Test check_npx_olinkid ----
 
 test_that(
@@ -451,11 +656,13 @@ test_that(
                   "OID1234",
                   "12345",
                   "NA"),
-      SampleType = rep("SAMPLE", 5L),
+      UniProt = LETTERS[1L:5L],
+      Assay = LETTERS[1L:5L],
+      Panel = LETTERS[1L:5L],
+      Panel_Lot_Nr = LETTERS[1L:5L],
       NPX = rnorm(5L),
       PlateID = rep("plate1", 5L),
-      QC_Warning = rep("Pass", 5L),
-      LOD = rnorm(5L)
+      QC_Warning = rep("Pass", 5L)
     )
 
     expect_no_condition(
@@ -483,11 +690,13 @@ test_that(
     df <- arrow::arrow_table(
       SampleID = c("A", "B", "C", "D"),
       OlinkID = rep("OID12345", 4L),
-      SampleType = rep("SAMPLE", 4L),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
       NPX = rnorm(4L),
       PlateID = rep("plate1", 4L),
-      QC_Warning = rep("Pass", 4L),
-      LOD = rnorm(4L)
+      QC_Warning = rep("Pass", 4L)
     )
 
     expect_no_condition(
@@ -503,7 +712,7 @@ test_that(
   }
 )
 
-# check_npx_all_na_assays ----
+# Test check_npx_all_na_assays ----
 
 test_that(
   "check_npx_all_na_assays - warning - all-NA assay captured",
@@ -616,7 +825,7 @@ test_that(
   }
 )
 
-# check_npx_duplicate_sample_ids ----
+# Test check_npx_duplicate_sample_ids ----
 
 test_that(
   "check_npx_duplicate_sample_ids - warning - duplicate SampleID",
@@ -681,6 +890,328 @@ test_that(
       object = check_npx_duplicate_sample_ids(df = df,
                                               col_names = col_names),
       expected = character(0L)
+    )
+  }
+)
+
+# Test check_npx_all_na_sample ----
+
+test_that(
+  "check_npx_all_na_sample - warning - all-NA assays captured",
+  {
+    df <- dplyr::tibble(
+      SampleID = c("A", "B", "A", "B"),
+      OlinkID = c("OID12345",
+                  "OID12345",
+                  "OID23456",
+                  "OID23456"),
+      NPX = c(NA_real_,
+              1.2,
+              NA_real_,
+              1.3)
+    )
+
+    col_names <-  list(quant = "NPX",
+                       sample_id = "SampleID")
+
+    expect_warning(
+      object = expect_equal(
+        object = check_npx_all_na_sample(
+          df = df,
+          col_names = col_names
+        ),
+        expected = "A"
+      ),
+      regexp = "\"A\" has \"NPX\" = NA for all assays."
+    )
+  }
+)
+
+test_that(
+  "check_npx_all_na_sample - works - no sample has all NAs",
+  {
+    df <- dplyr::tibble(
+      SampleID = c("A", "B", "A", "B"),
+      OlinkID = c("OID12345",
+                  "OID12345",
+                  "OID23456",
+                  "OID23456"),
+      NPX = c(1.1,
+              1.2,
+              1.3,
+              NA_real_)
+    )
+
+    col_names <-  list(quant = "NPX",
+                       sample_id = "SampleID")
+
+    expect_equal(
+      object = check_npx_all_na_sample(df = df,
+                                       col_names = col_names),
+      expected = character(0L)
+    )
+  }
+)
+
+test_that(
+  "check_npx_all_na_sample - warning - arrow - all-NA assay captured",
+  {
+    df <- arrow::arrow_table(
+      SampleID = c("A", "B", "C", "A", "B", "C"),
+      OlinkID = c("OID12345",
+                  "OID12345",
+                  "OID12345",
+                  "OID23456",
+                  "OID23456",
+                  "OID23456"),
+      NPX = c(NA_real_,
+              1.2,
+              NA_real_,
+              NA_real_,
+              1.3,
+              NA_real_)
+    )
+
+    col_names <-  list(quant = "NPX",
+                       sample_id = "SampleID")
+
+    expect_warning(
+      object = expect_equal(
+        object = check_npx_all_na_sample(
+          df = df,
+          col_names = col_names
+        ),
+        expected = c("A", "C")
+      ),
+      regexp = "\"A\" and \"C\" have \"NPX\" = NA for all assays."
+    )
+  }
+)
+
+test_that(
+  "check_npx_all_na_sample - works - arrow - no assay has all NAs",
+  {
+    df <- arrow::arrow_table(
+      SampleID = c("A", "B", "A", "B"),
+      OlinkID = c("OID12345",
+                  "OID12345",
+                  "OID23456",
+                  "OID23456"),
+      NPX = rnorm(4L)
+    )
+
+    col_names <- list(quant = "NPX",
+                      sample_id = "SampleID")
+
+    expect_equal(
+      object = check_npx_all_na_sample(df = df,
+                                       col_names = col_names),
+      expected = character(0L)
+    )
+  }
+)
+
+# Test check_npx_col_class ----
+
+test_that(
+  "check_npx_col_class - warning - NPX non-numeric",
+  {
+    df <- arrow::arrow_table(
+      SampleID = c("A", "B", "C", "D"),
+      OlinkID = rep("OID12345", 4L),
+      NPX = as.character(rnorm(4L))
+    )
+
+    col_names <-  list(
+      quant = "NPX",
+      olink_id = "OlinkID",
+      sample_id = "SampleID"
+    )
+
+    expect_warning(
+      object = expect_equal(
+        object = check_npx_col_class(df = df,
+                                     col_names = col_names),
+        expected = dplyr::tibble(
+          "col_name" = c("NPX"),
+          "col_class" = c("character"),
+          "col_key" = c("quant"),
+          "expected_col_class" = c("numeric")
+        )
+      ),
+      regexp = "\"NPX\": Expected \"numeric\". Detected \"character\"."
+    )
+  }
+)
+
+test_that(
+  "check_npx_col_class - warning - NPX, LOD and PlateLOD non-numeric",
+  {
+    df <- arrow::arrow_table(
+      SampleID = c("A", "B", "C", "D"),
+      OlinkID = rep("OID12345", 4L),
+      NPX = as.character(rnorm(4L)),
+      LOD = as.character(rnorm(4L))
+    ) |>
+      dplyr::mutate(
+        PlateLOD = .data[["LOD"]]
+      )
+
+    col_names <-  list(
+      quant = "NPX",
+      olink_id = "OlinkID",
+      sample_id = "SampleID",
+      lod = c("LOD", "PlateLOD")
+    )
+
+    expect_warning(
+      object = expect_equal(
+        object = check_npx_col_class(df = df,
+                                     col_names = col_names),
+        expected = dplyr::tibble(
+          "col_name" = c("NPX", "LOD", "PlateLOD"),
+          "col_class" = c("character", "character", "character"),
+          "col_key" = c("quant", "lod", "lod"),
+          "expected_col_class" = c("numeric", "numeric", "numeric")
+        )
+      ),
+      regexp = "\"PlateLOD\": Expected \"numeric\". Detected \"character\"."
+    )
+  }
+)
+
+# Test check_npx_qcwarn_assays ----
+
+test_that(
+  "check_npx_qcwarn_assays - works - no AssayQC or Assay_Warning columns",
+  {
+    df <- arrow::arrow_table(
+      SampleID = c("A", "B", "C", "D"),
+      OlinkID = rep("OID12345", 4L),
+      NPX = as.character(rnorm(4L))
+    )
+
+    col_names <-  list(
+      quant = "NPX",
+      olink_id = "OlinkID",
+      sample_id = "SampleID"
+    )
+
+    expect_equal(
+      object = check_npx_qcwarn_assays(df = df,
+                                       col_names = col_names),
+      expected = character(0L)
+    )
+  }
+)
+
+test_that(
+  "check_npx_qcwarn_assays - works - no assay with warning",
+  {
+    # AssayQC all pass v1 ----
+
+    df <- arrow::arrow_table(
+      SampleID = rep(x = c("A", "B", "C", "D"), times = 4L),
+      OlinkID = rep(x = c("OID12345", "OID12346", "OID12347", "OID12348"),
+                    each = 4L),
+      NPX = as.character(x = rnorm(n = 16L)),
+      AssayQC = rep(x = "Pass", times = 16L)
+    )
+
+    col_names <-  list(
+      quant = "NPX",
+      olink_id = "OlinkID",
+      sample_id = "SampleID",
+      assay_warn = "AssayQC"
+    )
+
+    expect_equal(
+      object = check_npx_qcwarn_assays(df = df,
+                                       col_names = col_names),
+      expected = character(0L)
+    )
+
+    # AssayQC all pass v2 ----
+
+    df <- arrow::arrow_table(
+      SampleID = rep(x = c("A", "B", "C", "D"), times = 4L),
+      OlinkID = rep(x = c("OID12345", "OID12346", "OID12347", "OID12348"),
+                    each = 4L),
+      NPX = as.character(x = rnorm(n = 16L)),
+      Assay_Warning = rep(x = "PASS", times = 16L)
+    )
+
+    col_names <-  list(
+      quant = "NPX",
+      olink_id = "OlinkID",
+      sample_id = "SampleID",
+      assay_warn = "Assay_Warning"
+    )
+
+    expect_equal(
+      object = check_npx_qcwarn_assays(df = df,
+                                       col_names = col_names),
+      expected = character(0L)
+    )
+  }
+)
+
+test_that(
+  "check_npx_qcwarn_assays - works - assays with warnings",
+  {
+    # AssayQC 2 assays with warn ----
+
+    df <- arrow::arrow_table(
+      SampleID = rep(x = c("A", "B", "C", "D"), times = 4L),
+      OlinkID = rep(x = c("OID12345", "OID12346", "OID12347", "OID12348"),
+                    each = 4L),
+      NPX = as.character(x = rnorm(n = 16L)),
+      AssayQC = c(rep(x = c("PASS", rep(x = "WARN", times = 3L)), times = 2L),
+                  rep(x = "PASS", times = 8L))
+    )
+
+    col_names <-  list(
+      quant = "NPX",
+      olink_id = "OlinkID",
+      sample_id = "SampleID",
+      assay_warn = "AssayQC"
+    )
+
+    expect_message(
+      object = expect_equal(
+        object = check_npx_qcwarn_assays(df = df,
+                                         col_names = col_names),
+        expected = c("OID12345", "OID12346")
+      ),
+      regexp = "column `AssayQC` of the dataset: \"OID12345\" and \"OID12346\"."
+    )
+
+
+    # AssayQC 4 assays with warn ----
+
+    df <- arrow::arrow_table(
+      SampleID = rep(x = c("A", "B", "C", "D"), times = 4L),
+      OlinkID = rep(x = c("OID12345", "OID12346", "OID12347", "OID12348"),
+                    each = 4L),
+      NPX = as.character(x = rnorm(n = 16L)),
+      Assay_Warning = rep(x = c("PASS", rep(x = "WARN", times = 3L)),
+                          times = 4L)
+    )
+
+    col_names <-  list(
+      quant = "NPX",
+      olink_id = "OlinkID",
+      sample_id = "SampleID",
+      assay_warn = "Assay_Warning"
+    )
+
+    expect_message(
+      object = expect_equal(
+        object = check_npx_qcwarn_assays(df = df,
+                                         col_names = col_names),
+        expected = c("OID12345", "OID12346", "OID12347", "OID12348")
+      ),
+      regexp = "\"OID12345\", \"OID12346\", \"OID12347\", and \"OID12348\"."
     )
   }
 )

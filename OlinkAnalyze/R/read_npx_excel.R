@@ -36,8 +36,10 @@ read_npx_excel <- function(file,
 
   # check if readxl is available ----
 
-  check_library_installed(libraries = "readxl",
-                          error = TRUE)
+  rlang::check_installed(
+    pkg = "readxl",
+    call = rlang::caller_env()
+  )
 
   # read data ----
 

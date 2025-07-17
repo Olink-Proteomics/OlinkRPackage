@@ -6,7 +6,7 @@
 "csv" and "txt" data from
 delimited file exported from Olink software.}
 \usage{
-read_npx_delim_wide(file, sep = NULL)
+read_npx_delim_wide(file, sep)
 }
 \arguments{
 \item{file}{Path to Olink software output delimited file in wide format.
@@ -14,7 +14,7 @@ Expecting file extensions
 "csv" and "txt".}
 
 \item{sep}{Character separator of delimited input file. One of \code{NULL}
-(default) for auto-detection, or ";" and ",".
+(default) for auto-detection, or ";", ",", "    ", "|", and ":".
 Used only for delimited output files from Olink software.}
 }
 \value{

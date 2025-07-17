@@ -116,6 +116,16 @@ test_that(
       object = check_is_list(lst = TRUE,
                              error = FALSE)
     )
+
+    expect_false(
+      object = check_is_list(
+        lst = dplyr::tibble(
+          "A" = 1L:5L,
+          "B" = LETTERS[1L:5L]
+        ),
+        error = FALSE
+      )
+    )
   }
 )
 
@@ -171,6 +181,20 @@ test_that(
     expect_error(
       object = check_is_list(lst = TRUE,
                              error = TRUE),
+      regexp = gsub(pattern = " ",
+                    replacement = "([[:space:]].*|\\n.*)?",
+                    x = "is not a list!",
+                    fixed = TRUE)
+    )
+
+    expect_error(
+      object = check_is_list(
+        lst = dplyr::tibble(
+          "A" = 1L:5L,
+          "B" = LETTERS[1L:5L]
+        ),
+        error = TRUE
+      ),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
                     x = "is not a list!",

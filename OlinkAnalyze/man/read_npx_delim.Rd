@@ -6,9 +6,9 @@
 \title{Help function to read "Ct", "NPX", and "Quantified" data
 from delimited Olink software output files in R.}
 \usage{
-read_npx_delim(file, out_df = "arrow", sep = NULL)
+read_npx_delim(file, out_df = "arrow")
 
-read_npx_csv(file, out_df = "arrow", sep = NULL)
+read_npx_csv(file, out_df = "arrow")
 }
 \arguments{
 \item{file}{Path to Olink software output delimited file in wide or long
@@ -17,10 +17,6 @@ format. Expecting file extensions
 
 \item{out_df}{The class of output data frame. One of
 "tibble" and "arrow".}
-
-\item{sep}{Character separator of delimited input file. One of \code{NULL}
-(default) for auto-detection, or ";" and ",".
-Used only for delimited output files from Olink software.}
 }
 \value{
 "tibble" or "ArrowObject" with
@@ -35,8 +31,6 @@ The function can handle delimited files in long and wide format.
 \code{\link{read_npx_zip}}
 \code{\link{read_npx_excel}}
 \code{\link{read_npx_format}}
-\code{\link{read_npx_delim_wide}}
-\code{\link{read_npx_delim_long}}
 }
 \author{
 Klev Diamanti;

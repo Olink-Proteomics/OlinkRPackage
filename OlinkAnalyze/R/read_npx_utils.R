@@ -103,7 +103,7 @@ read_npx_format_colnames <- function(df,
   # check if column names are correct
   # in wide format we expect only cells A1 and B1 to be populated
   # in long format no column names should not be empty
-  if (all(grepl(pattern = "^V", x = names(df)))) { # wide format
+  if (all(grepl(pattern = "^V", x = names(df))) && ncol(df) > 1L) { # wideformat
 
     # get first row of df
     df_row_1 <- df |>

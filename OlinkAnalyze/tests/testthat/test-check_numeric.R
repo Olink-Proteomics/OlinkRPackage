@@ -83,6 +83,12 @@ test_that(
     )
 
     expect_false(
+      object = check_is_numeric(num = c("I_Shall_Pass",
+                                        "Me_Neither"),
+                                error = FALSE)
+    )
+
+    expect_false(
       object = check_is_numeric(num = NA_character_,
                                 error = FALSE)
     )
@@ -105,6 +111,16 @@ test_that(
     expect_error(
       object = check_is_numeric(num = c("I_Shall_Pass",
                                         NA_character_),
+                                error = TRUE),
+      regexp = gsub(pattern = " ",
+                    replacement = "([[:space:]].*|\\n.*)?",
+                    x = "must be a numeric vector!",
+                    fixed = TRUE)
+    )
+
+    expect_error(
+      object = check_is_numeric(num = c("I_Shall_Pass",
+                                        "Me_Neither"),
                                 error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",

@@ -8,7 +8,6 @@
 read_npx(
   filename,
   out_df = "tibble",
-  sep = NULL,
   long_format = NULL,
   olink_platform = NULL,
   data_type = NULL,
@@ -20,7 +19,6 @@ read_npx(
 read_NPX(
   filename,
   out_df = "tibble",
-  sep = NULL,
   long_format = NULL,
   olink_platform = NULL,
   data_type = NULL,
@@ -36,17 +34,13 @@ Expecting extensions "xls" or "xlsx" for excel files, "csv" or "txt" for delim f
 \item{out_df}{The class of the output dataset. One of
 "tibble" and "arrow". (default = "tibble")}
 
-\item{sep}{Character separator of delimited input file. One of \code{NULL}
-(default) for auto-detection, or ";" and ",".
-Used only for delimited output files from Olink software.}
-
 \item{long_format}{Boolean marking format of input file. One of \code{NULL}
 (default) for auto-detection, or \code{TRUE} for long format and \code{FALSE} for
 wide format files.}
 
 \item{olink_platform}{Olink platform used to generate the input file.
 One of \code{NULL} (default) for auto-detection,
-or "Target 48", "Flex", "Target 96", "Explore 3072", "Explore HT", and "Focus".}
+or "Target 48", "Flex", "Target 96", "Explore 3072", "Explore HT", "Focus", and "Reveal".}
 
 \item{data_type}{Quantification method of the input data. One of \code{NULL}
 (default) for auto-detection, "Ct", "NPX", and "Quantified".}
@@ -76,14 +70,9 @@ importing it with \code{\link{read_npx}} as it might fail.
 \examples{
 \donttest{
 file <- system.file("extdata",
-                    "npx_data_long_csv.csv",
+                    "npx_data_ext.parquet",
                     package = "OlinkAnalyze")
-
-read_NPX(filename = file,
-         sep = NULL)
-
-read_NPX(filename = file,
-         sep = ";")
+read_npx(filename = file)
 }
 
 }

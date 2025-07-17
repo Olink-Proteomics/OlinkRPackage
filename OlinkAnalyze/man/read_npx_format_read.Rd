@@ -4,16 +4,12 @@
 \alias{read_npx_format_read}
 \title{Help function to read excel and delimited Olink data files in R.}
 \usage{
-read_npx_format_read(file, sep = NULL, read_n = 3L)
+read_npx_format_read(file, read_n = 3L)
 }
 \arguments{
 \item{file}{Path to Olink software output file in wide or long format.
 Expecting file extensions
 "xls", "xlsx", "csv", and "txt".}
-
-\item{sep}{Character separator of delimited input file. One of \code{NULL}
-(default) for auto-detection, or ";" and ",".
-Used only for delimited output files from Olink software.}
 
 \item{read_n}{Number of top rows to read.}
 }
