@@ -20,12 +20,12 @@ a sample ID column.}
 \item \code{col_names$sample_id}: the column name in \code{df} identifying sample IDs.
 }}
 
-\item{out_df}{Output format of the returned data frame.
-Options: \code{"tibble"} or \code{"arrow"}. Default is \code{"tibble"}.}
-
-\item{control_sample_idA}{character vector of control sample IDs,
+\item{control_sample_ids}{character vector of control sample IDs,
 e.g., \code{c("control_a", "control_b")}. Default is \code{NULL}, in which case the
 data is returned unchanged.}
+
+\item{out_df}{Output format of the returned data frame.
+Options: \code{"tibble"} or \code{"arrow"}. Default is \code{"tibble"}.}
 }
 \value{
 A filtered data table with control samples removed.

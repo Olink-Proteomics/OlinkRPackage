@@ -150,15 +150,13 @@
 #' )
 #' }
 #'
-clean_npx <- function(
-    df,
-    check_log = NULL,
-    preferred_names = NULL,
-    keep_controls = NULL,  # options are "sample", "assay", "both",
-    control_sample_ids = NULL,
-    out_df = "tibble",
-    verbose = FALSE
-) {
+clean_npx <- function(df,
+                      check_log = NULL,
+                      preferred_names = NULL,
+                      keep_controls = NULL,
+                      control_sample_ids = NULL,
+                      out_df = "tibble",
+                      verbose = FALSE) {
 
   # Silence messages and warnings if requested
   if (!verbose) {
@@ -168,7 +166,7 @@ clean_npx <- function(
     ))
   }
 
-  if(verbose) cli::cli_h2("Starting {.fn clean_npx} pipeline")
+  if (verbose) cli::cli_h2("Starting {.fn clean_npx} pipeline")
 
 
   # Validate input dataset
@@ -194,7 +192,7 @@ clean_npx <- function(
 
 
   # Clean invalid Olink IDs
-  if(verbose) cli::cli_h3("Cleaning assays with invalid OlinkIDs")
+  if (verbose) cli::cli_h3("Cleaning assays with invalid OlinkIDs")
   df <- clean_invalid_oid(
     df,
     check_npx_log = check_npx_log,
@@ -203,7 +201,7 @@ clean_npx <- function(
 
 
   # Clean assays with all NA values
-  if(verbose) cli::cli_h3("Cleaning assays with all NA values")
+  if (verbose) cli::cli_h3("Cleaning assays with all NA values")
   df <- clean_assay_na(
     df,
     check_npx_log = check_npx_log,
@@ -212,7 +210,7 @@ clean_npx <- function(
 
 
   # Clean duplicate sample IDs
-  if(verbose) cli::cli_h3("Cleaning duplicate SampleIDs")
+  if (verbose) cli::cli_h3("Cleaning duplicate SampleIDs")
   df <- clean_duplicate_sample_id(
     df,
     check_npx_log = check_npx_log,
@@ -221,9 +219,9 @@ clean_npx <- function(
 
 
   # Clean control samples based on sample type
-  if(verbose) cli::cli_h3("Cleaning control samples based on sample type")
+  if (verbose) cli::cli_h3("Cleaning control samples based on sample type")
 
-  if(is.null(keep_controls) || !keep_controls %in% c("sample", "both")) {
+  if (is.null(keep_controls) || !keep_controls %in% c("sample", "both")) {
     keep_control_sample <- FALSE
   } else {
     keep_control_sample <-  TRUE
@@ -238,7 +236,7 @@ clean_npx <- function(
 
 
   # Clean control samples based on Sample ID
-  if(verbose) cli::cli_h3("Cleaning control samples based on Sample ID")
+  if (verbose) cli::cli_h3("Cleaning control samples based on Sample ID")
   df <- clean_control_sample_id(
     df,
     check_npx_log = check_npx_log,
@@ -248,7 +246,7 @@ clean_npx <- function(
 
 
   # Clean Samples with QC Status 'FAIL'
-  if(verbose) cli::cli_h3("Cleaning Samples with QC Status 'FAIL'")
+  if (verbose) cli::cli_h3("Cleaning Samples with QC Status 'FAIL'")
   df <- clean_qc_warning(
     df,
     check_npx_log = check_npx_log,
@@ -257,9 +255,9 @@ clean_npx <- function(
 
 
   # Clean internal control assays
-  if(verbose) cli::cli_h3("Cleaning internal control assays")
+  if (verbose) cli::cli_h3("Cleaning internal control assays")
 
-  if(is.null(keep_controls) || !keep_controls %in% c("assay", "both")) {
+  if (is.null(keep_controls) || !keep_controls %in% c("assay", "both")) {
     keep_control_assay <- FALSE
   } else {
     keep_control_assay <-  TRUE
@@ -274,7 +272,7 @@ clean_npx <- function(
 
 
   # Clean assays flagged by assay warning
-  if(verbose) cli::cli_h3("Cleaning assays flagged by assay warning")
+  if (verbose) cli::cli_h3("Cleaning assays flagged by assay warning")
   df <- clean_assay_warning(
     df,
     check_npx_log = check_npx_log,
@@ -283,7 +281,7 @@ clean_npx <- function(
 
 
   # Correct column class
-  if(verbose) cli::cli_h3("Correcting flagged column class")
+  if (verbose) cli::cli_h3("Correcting flagged column class")
   df <- clean_col_class(
     df,
     check_npx_log = check_npx_log,
@@ -292,10 +290,9 @@ clean_npx <- function(
 
 
   # Check for absolute quantification and apply log2 transformation
-  if(grepl(pattern = "Quantified",
-           x = check_npx_log$col_names$quant,
-           ignore.case = TRUE)
-  ){
+  if (grepl(pattern = "Quantified",
+            x = check_npx_log$col_names$quant,
+            ignore.case = TRUE)) {
     cli::cli_text("
     Detected absolute quant in column '{check_npx_log$col_names$quant}'.
     Applying log2 transformation is recommended before downstream analysis.
@@ -369,7 +366,7 @@ clean_assay_na <- function(
   df_cleaned <- df |>
     dplyr::filter(
       !.data[[check_npx_log$col_names$olink_id]] %in% check_npx_log$assay_na
-      )
+    )
 
   cli::cli_inform(c(
     "Removed rows for assays with only NA values.",
@@ -434,7 +431,7 @@ clean_invalid_oid <- function(
   df_cleaned <- df |>
     dplyr::filter(
       !.data[[check_npx_log$col_names$olink_id]] %in% check_npx_log$oid_invalid
-      )
+    )
 
   # Confirmation message
   cli::cli_inform(c(
@@ -501,7 +498,7 @@ clean_duplicate_sample_id <- function(
     dplyr::filter(
       !.data[[check_npx_log$col_names$sample_id]] %in%
         check_npx_log$sample_id_dups
-      )
+    )
 
   # Success message
   cli::cli_inform(c(
@@ -541,19 +538,17 @@ clean_duplicate_sample_id <- function(
 #'
 #' @return A cleaned tibble or arrow object with control sample removed.
 #'
-clean_sample_type <- function(
-    df,
-    check_npx_log,
-    keep_control_sample = FALSE,
-    out_df = "tibble"
-) {
+clean_sample_type <- function(df,
+                              check_npx_log,
+                              keep_control_sample = FALSE,
+                              out_df = "tibble") {
 
   # Return original data if user chooses to keep control samples
   if (keep_control_sample) {
     cli::cli_inform(c(
       "Control samples are retained as per user input.",
       "i" = "Returning data unchanged"
-      ))
+    ))
     return(
       df |>
         convert_read_npx_output(out_df = out_df)
@@ -619,12 +614,10 @@ clean_sample_type <- function(
 #'
 #' @return A cleaned tibble or arrow object with control assays removed.
 #'
-clean_assay_type <- function(
-    df,
-    check_npx_log,
-    keep_control_assay = FALSE,
-    out_df = "tibble"
-){
+clean_assay_type <- function(df,
+                             check_npx_log,
+                             keep_control_assay = FALSE,
+                             out_df = "tibble") {
 
   # Return original data if user chooses to keep control samples
   if (keep_control_assay) {
@@ -632,7 +625,7 @@ clean_assay_type <- function(
       "Control assays (inc_ctrl, ext_ctrl, amp_ctrl) are retained as per
       user input.",
       "i" = "Returning data unchanged."
-      ))
+    ))
     return(
       df |>
         convert_read_npx_output(out_df = out_df)
@@ -809,7 +802,7 @@ clean_assay_warning <- function(
 #' a sample ID column.
 #' @param check_npx_log A list generated by `check_npx()` that includes:
 #'   - `col_names$sample_id`: the column name in `df` identifying sample IDs.
-#' @param control_sample_idA character vector of control sample IDs,
+#' @param control_sample_ids character vector of control sample IDs,
 #' e.g., `c("control_a", "control_b")`. Default is `NULL`, in which case the
 #' data is returned unchanged.
 #' @param out_df Output format of the returned data frame.
@@ -844,8 +837,8 @@ clean_control_sample_id <- function(
     out_df = "tibble") {
 
   # Early exit check
-  if (is.null(control_sample_ids) ||
-    !"sample_id" %in% names(check_npx_log$col_names)) {
+  if (is.null(control_sample_ids)
+      || !"sample_id" %in% names(check_npx_log$col_names)) {
 
     if (is.null(control_sample_ids)) {
       cli::cli_inform(c(
@@ -876,7 +869,7 @@ clean_control_sample_id <- function(
   df_cleaned <- df |>
     dplyr::filter(
       !.data[[check_npx_log$col_names$sample_id]] %in% control_sample_ids
-      )
+    )
 
   return(
     df_cleaned |>
@@ -926,9 +919,10 @@ clean_col_class <- function(df,
   # Define coercion function
   coerce_col <- function(x, to_class) {
     switch(to_class,
-           character = as.character(x),
-           numeric   = suppressWarnings(as.numeric(x)),
-           x # fallback: no conversion
+           character = as.character(x), # nolint return_linter
+           numeric   = suppressWarnings(as.numeric(x)), # nolint return_linter
+           # fallback: no conversion
+           x # nolint return_linter
     )
   }
 
