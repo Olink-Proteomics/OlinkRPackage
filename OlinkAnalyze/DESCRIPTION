@@ -76,6 +76,7 @@ Imports:
     dbplyr,
     dplyr,
     duckdb,
+    purrr,
     rlang,
     stringr,
     tidyr
