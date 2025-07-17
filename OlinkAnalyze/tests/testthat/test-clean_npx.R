@@ -97,6 +97,7 @@ df <- dplyr::tibble(
 )
 
 # Test clean_assay_na -----------------------------------------------------
+
 test_that(
   "clean_assay_na - works - assays with only NA values",
   {
@@ -110,13 +111,11 @@ test_that(
                               check_npx_log = log),
       expected = expected_result
     )
-
   }
 )
 
-
-
 # Test clean_invalid_oid --------------------------------------------------
+
 test_that(
   "clean_invalid_oid - works - remove invalid OlinkId",
   {
@@ -130,13 +129,11 @@ test_that(
                                  check_npx_log = log),
       expected = expected_result
     )
-
   }
 )
 
-
-
 # Test clean_duplicate_sample_id ------------------------------------------
+
 test_that(
   "clean_duplicate_sample_id - works - remove duplicate sample id",
   {
@@ -150,13 +147,11 @@ test_that(
                                          check_npx_log = log),
       expected = expected_result
     )
-
   }
 )
 
-
-
 # Test clean_sample_type --------------------------------------------------
+
 test_that(
   "clean_sample_type - works - remove control sample based on sample type",
   {
@@ -174,9 +169,8 @@ test_that(
   }
 )
 
-
-
 # Test clean_assay_type ---------------------------------------------------
+
 test_that(
   "clean_assay_type - works - remove control assays",
   {
@@ -194,13 +188,11 @@ test_that(
   }
 )
 
-
-
 # Test clean_qc_warning ---------------------------------------------------
+
 test_that(
   "clean_qc_warning - works - sample QC failed",
   {
-
     expected_result <- df |>
       dplyr::filter(!SampleID == "FailQC")
 
@@ -214,13 +206,11 @@ test_that(
   }
 )
 
-
-
 # Test clean_assay_warning ------------------------------------------------
+
 test_that(
   "clean_assay_warning - works - assays flagged with assay warning",
   {
-
     expected_result <- df |>
       dplyr::filter(!SampleID == "AssayWarn")
 
@@ -234,9 +224,8 @@ test_that(
   }
 )
 
-
-
 # Test clean_control_sample_id --------------------------------------------
+
 test_that(
   "clean_control_sample_id - works - remove control sample",
   {
@@ -254,9 +243,8 @@ test_that(
   }
 )
 
-
-
 # Test clean_npx ----------------------------------------------------------
+
 test_that(
   "clean_npx - works - remove samples/assays identified by check_npx",
   {
@@ -273,14 +261,11 @@ test_that(
                          verbose = TRUE),
       expected = expected_result
     )
-
-
   }
 )
 
-
-
 # Test clean_col_class ----------------------------------------------------
+
 test_that(
   "clean_col_class - works - correct column class",
   {
