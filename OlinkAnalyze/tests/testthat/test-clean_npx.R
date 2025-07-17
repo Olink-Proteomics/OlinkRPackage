@@ -312,17 +312,13 @@ test_that(
       suppressWarnings() |>
       suppressMessages()
 
-    cli_output <- cli::cli_capture_output(
-      {
-        expect_equal(
-          object = clean_npx(df,
-                             check_log = log,
-                             keep_controls = NULL,
-                             control_sample_ids = c("ControlID"),
-                             verbose = TRUE),
-          expected = expected_result
-        )
-      }
+    expect_equal(
+      object = clean_npx(df,
+                         check_log = log,
+                         keep_controls = NULL,
+                         control_sample_ids = c("ControlID"),
+                         verbose = TRUE),
+      expected = expected_result
     )
   }
 )
@@ -333,15 +329,22 @@ test_that(
   "clean_col_class - works - correct column class",
   {
     test_df <- OlinkAnalyze::npx_data1 |>
-      dplyr::mutate(NPX = as.character(NPX),
-                    LOD = as.character(LOD))
+      dplyr::mutate(
+        NPX = as.character(.data[["NPX"]]),
+        LOD = as.character(.data[["LOD"]])
+      )
 
-    log <- suppressWarnings(check_npx(test_df))
+    log <- check_npx(test_df) |>
+      suppressWarnings() |>
+      suppressMessages()
 
-    expect_equal(
-      object = clean_col_class(test_df,
-                               check_npx_log = log),
-      expected = OlinkAnalyze::npx_data1
+    expect_message(
+      object = expect_equal(
+        object = clean_col_class(df = test_df,
+                                 check_npx_log = log),
+        expected = OlinkAnalyze::npx_data1
+      ),
+      regexp = "Corrected column classes for: NPX and LOD"
     )
   }
 )
