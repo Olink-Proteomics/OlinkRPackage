@@ -119,14 +119,24 @@ test_that(
   "clean_invalid_oid - works - remove invalid OlinkId",
   {
     expected_result <- df |>
-      dplyr::filter(!SampleID == "InvalidOID")
+      dplyr::filter(
+        .data[["SampleID"]] != "InvalidOID"
+      )
 
-    log <- suppressWarnings(check_npx(df))
+    log <- check_npx(df) |>
+      suppressWarnings() |>
+      suppressMessages()
 
-    expect_equal(
-      object = clean_invalid_oid(df,
-                                 check_npx_log = log),
-      expected = expected_result
+    expect_message(
+      object = expect_message(
+        object = expect_equal(
+          object = clean_invalid_oid(df,
+                                     check_npx_log = log),
+          expected = expected_result
+        ),
+        regexp = "Excluding 1 assay with invalid OlinkIDs: OID1234"
+      ),
+      regexp = "Removed rows for assays with invalid OlinkIDs."
     )
   }
 )
