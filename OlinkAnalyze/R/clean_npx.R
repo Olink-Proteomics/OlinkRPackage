@@ -683,13 +683,13 @@ clean_qc_warning <- function(
     check_npx_log,
     out_df = "tibble") {
 
-  # Check if qc_warning column name is defined in check_npx_log
-  if (!"qc_warning" %in% names(check_npx_log$col_names)) {
+  # Check if qc_warning column exist in the data table
+  if(!check_npx_log$col_names$qc_warning %in% names(df)){
     cli::cli_inform(c(
-      "No column name found for {.var qc_warning} in
-      {.code check_npx_log$col_names}.",
+      "{check_npx_log$col_names$qc_warning} is not found in data table.",
       "i" = "Returning data unchanged."
     ))
+
     return(
       df |>
         convert_read_npx_output(out_df = out_df)
