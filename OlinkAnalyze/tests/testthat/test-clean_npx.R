@@ -91,14 +91,24 @@ test_that(
   "clean_assay_na - works - assays with only NA values",
   {
     expected_result <- df |>
-      dplyr::filter(!SampleID == "AllNA")
+      dplyr::filter(
+        .data[["SampleID"]] != "AllNA"
+      )
 
-    log <- suppressWarnings(check_npx(df))
+    log <- check_npx(df = df) |>
+      suppressWarnings() |>
+      suppressMessages()
 
-    expect_equal(
-      object = clean_assay_na(df,
-                              check_npx_log = log),
-      expected = expected_result
+    expect_message(
+      object = expect_message(
+        object = expect_equal(
+          object = clean_assay_na(df = df,
+                                  check_npx_log = log),
+          expected = expected_result
+        ),
+        regexp = "Excluding 1 assay with only NA values: OID23456"
+      ),
+      regexp = "Removed rows for assays with only NA values"
     )
   }
 )
