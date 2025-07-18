@@ -367,7 +367,7 @@ clean_assay_na <- function(df,
   # Exclude assays with only NA values
   df_cleaned <- df |>
     dplyr::filter(
-      !.data[[check_npx_log$col_names$olink_id]] %in% check_npx_log$assay_na
+      !(.data[[check_npx_log$col_names$olink_id]] %in% check_npx_log$assay_na)
     )
 
   if (verbose == TRUE) {
@@ -410,48 +410,60 @@ clean_assay_na <- function(df,
 #' }
 #' @param out_df The class of the output dataset. One of
 #' `r ansi_collapse_quot(read_npx_df_output)`. (default = "tibble")
+#' @param verbose Logical. If `FALSE` (default), silences step-wise CLI
+#' messages.
 #'
 #' @return A `tibble` or `arrow` object with rows corresponding to assays with
 #' invalid identifiers removed.
 #'
 clean_invalid_oid <- function(df,
                               check_npx_log,
-                              out_df = "tibble") {
+                              out_df = "tibble",
+                              verbose = FALSE) {
 
   # Check if there are any invalid OlinkIDs to remove
-  if (length(check_npx_log$oid_invalid) == 0) {
-    cli::cli_inform(c(
-      "No invalid OlinkIDs found.",
-      "i" = "Returning original data frame."
-    ))
+  if (length(check_npx_log$oid_invalid) == 0L) {
+    if (verbose == TRUE) {
+      cli::cli_inform(
+        c("No invalid assay identifiers.",
+          "i" = "Returning original data frame.")
+      )
+    }
     return(
-      df |>
-        convert_read_npx_output(out_df = out_df)
+      convert_read_npx_output(
+        df = df,
+        out_df = out_df
+      )
     )
   }
 
   # Inform user of which assays will be excluded
   cli::cli_inform(
-    "Excluding {length(check_npx_log$oid_invalid)} assay{?s} with invalid
-    OlinkIDs: {paste(check_npx_log$oid_invalid, collapse = ', ')}"
+    "Excluding {.val {length(check_npx_log$oid_invalid)}} assay{?s} with invalid
+    identifier{?s}: {.val {check_npx_log$oid_invalid}}."
   )
 
   # Remove rows where the OlinkID is invalid
   df_cleaned <- df |>
     dplyr::filter(
-      !.data[[check_npx_log$col_names$olink_id]] %in% check_npx_log$oid_invalid
+      !(.data[[check_npx_log$col_names$olink_id]]
+        %in% check_npx_log$oid_invalid)
     )
 
   # Confirmation message
-  cli::cli_inform(c(
-    "Removed rows for assays with invalid OlinkIDs.",
-    "v" = "Returning cleaned data table."
-  ))
+  if (verbose == TRUE) {
+    cli::cli_inform(
+      c("Removed assays with invalid identifiers.",
+        "v" = "Returning cleaned data table.")
+    )
+  }
 
   # Return cleaned data frame in desired format
   return(
-    df_cleaned |>
-      convert_read_npx_output(out_df = out_df)
+    convert_read_npx_output(
+      df = df_cleaned,
+      out_df = out_df
+    )
   )
 }
 

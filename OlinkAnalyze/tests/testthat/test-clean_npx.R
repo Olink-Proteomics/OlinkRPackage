@@ -166,7 +166,7 @@ test_that(
 # Test clean_invalid_oid --------------------------------------------------
 
 test_that(
-  "clean_invalid_oid - works - remove invalid OlinkId",
+  "clean_invalid_oid - works - 1 invalid OlinkID",
   {
     expected_result <- df |>
       dplyr::filter(
@@ -177,22 +177,37 @@ test_that(
       suppressWarnings() |>
       suppressMessages()
 
+    ## verbose = FALSE ----
+
+    expect_message(
+      object = expect_equal(
+        object = clean_invalid_oid(df,
+                                   check_npx_log = log,
+                                   verbose = FALSE),
+        expected = expected_result
+      ),
+      regexp = "Excluding 1 assay with invalid identifier: \"OID1234\"."
+    )
+
+    ## verbose = TRUE ----
+
     expect_message(
       object = expect_message(
         object = expect_equal(
           object = clean_invalid_oid(df,
-                                     check_npx_log = log),
+                                     check_npx_log = log,
+                                     verbose = TRUE),
           expected = expected_result
         ),
-        regexp = "Excluding 1 assay with invalid OlinkIDs: OID1234"
+        regexp = "Excluding 1 assay with invalid identifier: \"OID1234\"."
       ),
-      regexp = "Removed rows for assays with invalid OlinkIDs."
+      regexp = "Removed assays with invalid identifiers"
     )
   }
 )
 
 test_that(
-  "clean_invalid_oid - return original data frame",
+  "clean_invalid_oid - works - no invalid OlinkID",
   {
     expected_result <- df |>
       dplyr::filter(
@@ -203,13 +218,25 @@ test_that(
       suppressWarnings() |>
       suppressMessages()
 
+    ## verbose = FALSE ----
+
+    expect_equal(
+      object = clean_invalid_oid(df = expected_result,
+                                 check_npx_log = log,
+                                 verbose = FALSE),
+      expected = expected_result
+    )
+
+    ## verbose = TRUE ----
+
     expect_message(
       object = expect_equal(
         object = clean_invalid_oid(df = expected_result,
-                                   check_npx_log = log),
+                                   check_npx_log = log,
+                                   verbose = TRUE),
         expected = expected_result
       ),
-      regexp = "No invalid OlinkIDs found."
+      regexp = "No invalid assay identifiers."
     )
   }
 )

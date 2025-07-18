@@ -4,7 +4,7 @@
 \alias{clean_invalid_oid}
 \title{Help function removing assays with invalid identifiers.}
 \usage{
-clean_invalid_oid(df, check_npx_log, out_df = "tibble")
+clean_invalid_oid(df, check_npx_log, out_df = "tibble", verbose = FALSE)
 }
 \arguments{
 \item{df}{A \code{tibble} or \code{arrow} object loaded from \code{read_npx()}, including a
@@ -21,6 +21,9 @@ dataset.
 
 \item{out_df}{The class of the output dataset. One of
 "tibble" and "arrow". (default = "tibble")}
+
+\item{verbose}{Logical. If \code{FALSE} (default), silences step-wise CLI
+messages.}
 }
 \value{
 A \code{tibble} or \code{arrow} object with rows corresponding to assays with
