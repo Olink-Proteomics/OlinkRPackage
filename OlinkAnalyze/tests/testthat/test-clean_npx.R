@@ -88,7 +88,7 @@ df <- dplyr::tibble(
 # Test clean_assay_na -----------------------------------------------------
 
 test_that(
-  "clean_assay_na - works - assays with only NA values",
+  "clean_assay_na - works - 1 assay with only NA values",
   {
     expected_result <- df |>
       dplyr::filter(
@@ -99,22 +99,37 @@ test_that(
       suppressWarnings() |>
       suppressMessages()
 
+    ## verbose FALSE ----
+
+    expect_message(
+      object = expect_equal(
+        object = clean_assay_na(df = df,
+                                check_npx_log = log,
+                                verbose = FALSE),
+        expected = expected_result
+      ),
+      regexp = "Excluding 1 assay with only \"NA\" values: \"OID23456\""
+    )
+
+    ## verbose TRUE ----
+
     expect_message(
       object = expect_message(
         object = expect_equal(
           object = clean_assay_na(df = df,
-                                  check_npx_log = log),
+                                  check_npx_log = log,
+                                  verbose = TRUE),
           expected = expected_result
         ),
-        regexp = "Excluding 1 assay with only NA values: OID23456"
+        regexp = "Excluding 1 assay with only \"NA\" values: \"OID23456\""
       ),
-      regexp = "Removed rows for assays with only NA values"
+      regexp = "Removed assays with only \"NA\" values"
     )
   }
 )
 
 test_that(
-  "clean_assay_na - return original data frame",
+  "clean_assay_na - works - no assay with NA values",
   {
     expected_result <- df |>
       dplyr::filter(
@@ -125,13 +140,25 @@ test_that(
       suppressWarnings() |>
       suppressMessages()
 
+    ## verbose FALSE ----
+
+    expect_equal(
+      object = clean_assay_na(df = expected_result,
+                              check_npx_log = log,
+                              verbose = FALSE),
+      expected = expected_result
+    )
+
+    ## verbose TRUE ----
+
     expect_message(
       object = expect_equal(
         object = clean_assay_na(df = expected_result,
-                                check_npx_log = log),
+                                check_npx_log = log,
+                                verbose = TRUE),
         expected = expected_result
       ),
-      regexp = "No assays with only NA values found."
+      regexp = "No assays with only \"NA\" values."
     )
   }
 )

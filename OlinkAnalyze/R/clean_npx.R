@@ -346,7 +346,7 @@ clean_assay_na <- function(df,
   if (length(check_npx_log$assay_na) == 0L) {
     if (verbose == TRUE) {
       cli::cli_inform(
-        c("No assays with only NA values found.",
+        c("No assays with only {.val NA} values.",
           "i" = "Returning original data frame.")
       )
     }
@@ -372,15 +372,10 @@ clean_assay_na <- function(df,
 
   if (verbose == TRUE) {
     cli::cli_inform(
-      c("No assays with only NA values found.",
-        "i" = "Returning original data frame.")
+      c("Removed assays with only {.val NA} values.",
+        "v" = "Returning cleaned data table.")
     )
   }
-
-  cli::cli_inform(
-    c("Removed rows for assays with only NA values.",
-      "v" = "Returning cleaned data table.")
-  )
 
   # Convert output to desired format (tibble or arrow)
   return(
