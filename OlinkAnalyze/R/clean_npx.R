@@ -700,7 +700,8 @@ clean_sample_type <- function(df,
 #' @param verbose Logical. If `FALSE` (default), silences step-wise CLI
 #' messages.
 #'
-#' @return A cleaned tibble or arrow object with control assays removed.
+#' @return A `tibble` or `arrow` object with rows corresponding to control
+#' assays removed.
 #'
 clean_assay_type <- function(df,
                              check_npx_log,
@@ -816,11 +817,9 @@ clean_assay_type <- function(df,
 #'
 #' @returns A cleaned tibble or arrow object with failed QC sample removed.
 #'
-#'
-clean_qc_warning <- function(
-    df,
-    check_npx_log,
-    out_df = "tibble") {
+clean_qc_warning <- function(df,
+                             check_npx_log,
+                             out_df = "tibble") {
 
   # Check if qc_warning column exist in the data table
   if (!check_npx_log$col_names$qc_warning %in% names(df)) {

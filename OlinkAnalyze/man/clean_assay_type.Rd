@@ -33,7 +33,8 @@ retained and no filtering is applied. Defaults to \code{FALSE}.}
 messages.}
 }
 \value{
-A cleaned tibble or arrow object with control assays removed.
+A \code{tibble} or \code{arrow} object with rows corresponding to control
+assays removed.
 }
 \description{
 This function filters out internal control assays (\code{ext_ctrl}, \code{inc_ctrl},
