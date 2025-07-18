@@ -331,30 +331,37 @@ clean_npx <- function(df,
 #' }
 #' @param out_df The class of the output dataset. One of
 #' `r ansi_collapse_quot(read_npx_df_output)`. (default = "tibble")
+#' @param verbose Logical. If `FALSE` (default), silences step-wise CLI
+#' messages.
 #'
 #' @return A `tibble` or `arrow` object with rows corresponding to assays with
 #' all quantified values `NA` removed.
 #'
 clean_assay_na <- function(df,
                            check_npx_log,
-                           out_df = "tibble") {
+                           out_df = "tibble",
+                           verbose = FALSE) {
 
   # If there are no assays with all NA values, skip filtering
-  if (length(check_npx_log$assay_na) == 0) {
-    cli::cli_inform(c(
-      "No assays with only NA values found.",
-      "i" = "Returning original data frame."
-    ))
+  if (length(check_npx_log$assay_na) == 0L) {
+    if (verbose == TRUE) {
+      cli::cli_inform(
+        c("No assays with only NA values found.",
+          "i" = "Returning original data frame.")
+      )
+    }
     return(
-      df |>
-        convert_read_npx_output(out_df = out_df)
+      convert_read_npx_output(
+        df = df,
+        out_df = out_df
+      )
     )
   }
 
   # CLI message listing excluded assays
   cli::cli_inform(
-    "Excluding {length(check_npx_log$assay_na)} assay{?s} with only NA values:
-    {paste(check_npx_log$assay_na, collapse = ', ')}"
+    "Excluding {.val {length(check_npx_log$assay_na)}} assay{?s} with only
+    {.val NA} values: {.val {check_npx_log$assay_na}}."
   )
 
   # Exclude assays with only NA values
@@ -363,15 +370,24 @@ clean_assay_na <- function(df,
       !.data[[check_npx_log$col_names$olink_id]] %in% check_npx_log$assay_na
     )
 
-  cli::cli_inform(c(
-    "Removed rows for assays with only NA values.",
-    "v" = "Returning cleaned data table."
-  ))
+  if (verbose == TRUE) {
+    cli::cli_inform(
+      c("No assays with only NA values found.",
+        "i" = "Returning original data frame.")
+    )
+  }
+
+  cli::cli_inform(
+    c("Removed rows for assays with only NA values.",
+      "v" = "Returning cleaned data table.")
+  )
 
   # Convert output to desired format (tibble or arrow)
   return(
-    df_cleaned |>
-      convert_read_npx_output(out_df = out_df)
+    convert_read_npx_output(
+      df = df_cleaned,
+      out_df = out_df
+    )
   )
 }
 
