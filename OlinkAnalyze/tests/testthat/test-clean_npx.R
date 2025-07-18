@@ -335,43 +335,77 @@ test_that(
       suppressWarnings() |>
       suppressMessages()
 
+    ## vebose = FALSE ----
+
     expect_message(
       object = expect_equal(
         object = clean_sample_type(df,
                                    check_npx_log = log,
-                                   keep_control_sample = FALSE),
+                                   keep_control_sample = FALSE,
+                                   verbose = FALSE),
         expected = expected_result
       ),
-      regexp = paste("Control samples: \"SAMPLE_CONTROL, PLATE_CONTROL,",
-                     "NEGATIVE_CONTROL\" removed.")
+      regexp = "Excluding 1 control sample: \"ControlType\"."
+    )
+
+    ## vebose = TRUE ----
+
+    expect_message(
+      object = expect_message(
+        object = expect_equal(
+          object = clean_sample_type(df,
+                                     check_npx_log = log,
+                                     keep_control_sample = FALSE,
+                                     verbose = TRUE),
+          expected = expected_result
+        ),
+        regexp = "Excluding 1 control sample: \"ControlType\"."
+      ),
+      regexp = paste("Removed control samples marked as \"SAMPLE_CONTROL\",",
+                     "\"PLATE_CONTROL\", and \"NEGATIVE_CONTROL\".")
     )
   }
 )
 
 test_that(
-  "clean_sample_type - keep_control_sample as TRUE",
+  "clean_sample_type - works - do not remove control samples",
   {
     log <- check_npx(df) |>
       suppressWarnings() |>
       suppressMessages()
 
+    ## verbose = FALSE ----
+
+    expect_equal(
+      object = clean_sample_type(df = df,
+                                 check_npx_log = log,
+                                 keep_control_sample = TRUE,
+                                 verbose = FALSE),
+      expected = df
+    )
+
+    ## verbose = TRUE ----
+
     expect_message(
       object = expect_equal(
-        object = clean_sample_type(df,
+        object = clean_sample_type(df = df,
                                    check_npx_log = log,
-                                   keep_control_sample = TRUE),
+                                   keep_control_sample = TRUE,
+                                   verbose = TRUE),
         expected = df
       ),
-      regexp = "Control samples are retained as per user input."
+      regexp = "Skipping exclusion of control samples as per user input"
     )
   }
 )
 
 test_that(
-  "clean_sample_type - sample_type is not available",
+  "clean_sample_type - works - sample_type is not available",
   {
     test_df <- df |>
-      dplyr::select(!SampleType)
+      dplyr::select(
+        -dplyr::all_of("SampleType")
+      )
 
     log <- check_npx(test_df) |>
       suppressWarnings() |>
@@ -379,13 +413,12 @@ test_that(
 
     expect_message(
       object = expect_equal(
-        object = clean_sample_type(test_df,
+        object = clean_sample_type(df = test_df,
                                    check_npx_log = log,
                                    keep_control_sample = FALSE),
         expected = test_df
       ),
-      regexp = paste("No column name found for `sample_type` in",
-                     "`check_npx_log\\$col_names`\\.")
+      regexp = paste("No column marking control samples in dataset.")
     )
   }
 )
@@ -762,52 +795,56 @@ test_that("clean_npx emits clean messages without ANSI styling", {
 
   # Validate processing message
   expect_true(grepl("Starting `clean_npx\\(\\)` pipeline",
-                    msgs_clean[1]))
+                    msgs_clean[1L]))
   expect_true(grepl("Cleaning assays with invalid OlinkIDs",
-                    msgs_clean[2]))
+                    msgs_clean[2L]))
   expect_true(grepl("Excluding 1 assay with invalid identifier: \"OID1234\"",
-                    msgs_clean[3]))
+                    msgs_clean[3L]))
   expect_true(grepl("Removed assays with invalid identifiers",
-                    msgs_clean[4]))
+                    msgs_clean[4L]))
   expect_true(grepl("Cleaning assays with all NA values",
-                    msgs_clean[5]))
+                    msgs_clean[5L]))
   expect_true(grepl("Excluding 1 assay with only \"NA\" values: \"OID23456\"",
-                    msgs_clean[6]))
+                    msgs_clean[6L]))
   expect_true(grepl("Removed assays with only \"NA\" values",
-                    msgs_clean[7]))
+                    msgs_clean[7L]))
   expect_true(grepl("Cleaning duplicate SampleIDs",
-                    msgs_clean[8]))
+                    msgs_clean[8L]))
   expect_true(grepl(paste("Excluding 1 sample with duplicate identifier:",
                           "\"DuplicateSample\""),
-                    msgs_clean[9]))
+                    msgs_clean[9L]))
   expect_true(grepl("Removed samples with duplicate identifiers",
-                    msgs_clean[10]))
+                    msgs_clean[10L]))
   expect_true(grepl("Cleaning control samples based on sample type",
-                    msgs_clean[11]))
-  expect_true(grepl("Control samples: .* removed",
-                    msgs_clean[12]))
+                    msgs_clean[11L]))
+  expect_true(grepl("Excluding 1 control sample: \"ControlType\"",
+                    msgs_clean[12L]))
+  expect_true(grepl(paste("Removed control samples marked as",
+                          "\"SAMPLE_CONTROL\", \"PLATE_CONTROL\",",
+                          "and \"NEGATIVE_CONTROL\""),
+                    msgs_clean[13L]))
   expect_true(grepl("Cleaning control samples based on Sample ID",
-                    msgs_clean[13]))
+                    msgs_clean[14L]))
   expect_true(grepl("No control sample IDs provided",
-                    msgs_clean[14]))
+                    msgs_clean[15L]))
   expect_true(grepl("Cleaning Samples with QC Status 'FAIL'",
-                    msgs_clean[15]))
+                    msgs_clean[16L]))
   expect_true(grepl("Samples flaged SampleQC = .* Removed",
-                    msgs_clean[16]))
+                    msgs_clean[17L]))
   expect_true(grepl("Cleaning internal control assays",
-                    msgs_clean[17]))
+                    msgs_clean[18L]))
   expect_true(grepl("Control assays: .* removed",
-                    msgs_clean[18]))
+                    msgs_clean[19L]))
   expect_true(grepl("Cleaning assays flagged by assay warning",
-                    msgs_clean[19]))
+                    msgs_clean[20L]))
   expect_true(grepl("Removing assays where AssayQC contains a warning flag",
-                    msgs_clean[20]))
+                    msgs_clean[21L]))
   expect_true(grepl("Correcting flagged column class",
-                    msgs_clean[21]))
+                    msgs_clean[22L]))
   expect_true(grepl(paste("Corrected column classes for: .* Returning cleaned",
                           "data table"),
-                    msgs_clean[22]))
+                    msgs_clean[23L]))
   expect_true(grepl("Completed `clean_npx\\(\\)`",
-                    msgs_clean[23]))
+                    msgs_clean[24L]))
 
 })
