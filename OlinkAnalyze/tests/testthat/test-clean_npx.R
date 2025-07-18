@@ -437,34 +437,66 @@ test_that(
       suppressWarnings() |>
       suppressMessages()
 
+    ## verbose = FALSE ----
+
     expect_message(
       object = expect_equal(
         object = clean_assay_type(df,
                                   check_npx_log = log,
-                                  keep_control_assay = FALSE),
+                                  keep_control_assay = FALSE,
+                                  verbose = FALSE),
         expected = expected_result
       ),
-      regexp = "Control assays: \"ext_ctrl, inc_ctrl, amp_ctrl\" removed."
+      regexp = "Excluding 1 control assay: \"OID78901\"."
+    )
+
+    ## verbose = TRUE ----
+
+    expect_message(
+      object = expect_message(
+        object = expect_equal(
+          object = clean_assay_type(df,
+                                    check_npx_log = log,
+                                    keep_control_assay = FALSE,
+                                    verbose = TRUE),
+          expected = expected_result
+        ),
+        regexp = "Excluding 1 control assay: \"OID78901\"."
+      ),
+      regexp = paste("Removed control assays marked as \"ext_ctrl\",",
+                     "\"inc_ctrl\", and \"amp_ctrl\".")
     )
   }
 )
 
 test_that(
-  "clean_assay_type  - keep_control_assay as TRUE",
+  "clean_assay_type - works - do not remove control assays",
   {
     log <- check_npx(df) |>
       suppressWarnings() |>
       suppressMessages()
 
+    ## verbose = FALSE ----
+
+    expect_equal(
+      object = clean_assay_type(df,
+                                check_npx_log = log,
+                                keep_control_assay = TRUE,
+                                verbose = FALSE),
+      expected = df
+    )
+
+    ## verbose = TRUE ----
+
     expect_message(
       object = expect_equal(
         object = clean_assay_type(df,
                                   check_npx_log = log,
-                                  keep_control_assay  = TRUE),
+                                  keep_control_assay = TRUE,
+                                  verbose = TRUE),
         expected = df
       ),
-      regexp = paste("Control assays \\(inc_ctrl, ext_ctrl, amp_ctrl\\) are",
-                     "retained as per user input.")
+      regexp = "Skipping exclusion of control assays as per user input"
     )
   }
 )
@@ -473,7 +505,9 @@ test_that(
   "clean_assay_type - assay_type is not available",
   {
     test_df <- df |>
-      dplyr::select(!AssayType)
+      dplyr::select(
+        -dplyr::all_of("AssayType")
+      )
 
     log <- check_npx(test_df) |>
       suppressWarnings() |>
@@ -486,8 +520,7 @@ test_that(
                                   keep_control_assay = FALSE),
         expected = test_df
       ),
-      regexp = paste("No column name found for `assay_type` in",
-                     "`check_npx_log\\$col_names`\\.")
+      regexp = "No column marking control assays in dataset."
     )
   }
 )
@@ -833,18 +866,21 @@ test_that("clean_npx emits clean messages without ANSI styling", {
                     msgs_clean[17L]))
   expect_true(grepl("Cleaning internal control assays",
                     msgs_clean[18L]))
-  expect_true(grepl("Control assays: .* removed",
+  expect_true(grepl("Excluding 1 control assay: \"OID78901\"",
                     msgs_clean[19L]))
-  expect_true(grepl("Cleaning assays flagged by assay warning",
+  expect_true(grepl(paste("Removed control assays marked as \"ext_ctrl\",",
+                          "\"inc_ctrl\", and \"amp_ctrl\""),
                     msgs_clean[20L]))
-  expect_true(grepl("Removing assays where AssayQC contains a warning flag",
+  expect_true(grepl("Cleaning assays flagged by assay warning",
                     msgs_clean[21L]))
-  expect_true(grepl("Correcting flagged column class",
+  expect_true(grepl("Removing assays where AssayQC contains a warning flag",
                     msgs_clean[22L]))
+  expect_true(grepl("Correcting flagged column class",
+                    msgs_clean[23L]))
   expect_true(grepl(paste("Corrected column classes for: .* Returning cleaned",
                           "data table"),
-                    msgs_clean[23L]))
-  expect_true(grepl("Completed `clean_npx\\(\\)`",
                     msgs_clean[24L]))
+  expect_true(grepl("Completed `clean_npx\\(\\)`",
+                    msgs_clean[25L]))
 
 })
