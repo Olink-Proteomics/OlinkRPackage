@@ -67,9 +67,9 @@ read_npx_zip <- function(file,
                          quiet = FALSE) {
 
   # Check if all required libraries for this function are installed
-  check_library_installed(
-    libraries = c("zip"),
-    error = TRUE
+  rlang::check_installed(
+    pkg = "zip",
+    call = rlang::caller_env()
   )
 
   # check if file exists
