@@ -244,7 +244,7 @@ test_that(
 # Test clean_duplicate_sample_id ------------------------------------------
 
 test_that(
-  "clean_duplicate_sample_id - works - remove duplicate sample id",
+  "clean_duplicate_sample_id - works - 1 duplicate SampleID",
   {
     expected_result <- df |>
       dplyr::filter(
@@ -255,22 +255,39 @@ test_that(
       suppressWarnings() |>
       suppressMessages()
 
+    ## verbose = FALSE ----
+
+    expect_message(
+      object = expect_equal(
+        object = clean_duplicate_sample_id(df,
+                                           check_npx_log = log,
+                                           verbose = FALSE),
+        expected = expected_result
+      ),
+      regexp = paste("Excluding 1 sample with duplicate identifier:",
+                     "\"DuplicateSample\"")
+    )
+
+    ## verbose = TRUE ----
+
     expect_message(
       object = expect_message(
         object = expect_equal(
           object = clean_duplicate_sample_id(df,
-                                             check_npx_log = log),
+                                             check_npx_log = log,
+                                             verbose = TRUE),
           expected = expected_result
         ),
-        regexp = "Excluding 1 sample with duplicate SampleIDs: DuplicateSample"
+        regexp = paste("Excluding 1 sample with duplicate identifier:",
+                       "\"DuplicateSample\"")
       ),
-      regexp = "Removed rows with duplicate SampleIDs."
+      regexp = "Removed samples with duplicate identifiers."
     )
   }
 )
 
 test_that(
-  "clean_duplicate_sample_id - return original data frame",
+  "clean_duplicate_sample_id - works - no duplicate SampleID",
   {
     expected_result <- df |>
       dplyr::filter(
@@ -281,13 +298,25 @@ test_that(
       suppressWarnings() |>
       suppressMessages()
 
+    ## verbose = FALSE ----
+
+    expect_equal(
+      object = clean_duplicate_sample_id(df = expected_result,
+                                         check_npx_log = log,
+                                         verbose = FALSE),
+      expected = expected_result
+    )
+
+    ## verbose = TRUE ----
+
     expect_message(
       object = expect_equal(
         object = clean_duplicate_sample_id(df = expected_result,
-                                           check_npx_log = log),
+                                           check_npx_log = log,
+                                           verbose = TRUE),
         expected = expected_result
       ),
-      regexp = "No duplicate SampleIDs found."
+      regexp = "No duplicate sample identifiers."
     )
   }
 )
@@ -736,22 +765,22 @@ test_that("clean_npx emits clean messages without ANSI styling", {
                     msgs_clean[1]))
   expect_true(grepl("Cleaning assays with invalid OlinkIDs",
                     msgs_clean[2]))
-  expect_true(grepl("Excluding 1 assay with invalid OlinkIDs: OID1234",
+  expect_true(grepl("Excluding 1 assay with invalid identifier: \"OID1234\"",
                     msgs_clean[3]))
-  expect_true(grepl("Removed rows for assays with invalid OlinkIDs",
+  expect_true(grepl("Removed assays with invalid identifiers",
                     msgs_clean[4]))
   expect_true(grepl("Cleaning assays with all NA values",
                     msgs_clean[5]))
-  expect_true(grepl("Excluding 1 assay with only NA values: OID23456",
+  expect_true(grepl("Excluding 1 assay with only \"NA\" values: \"OID23456\"",
                     msgs_clean[6]))
-  expect_true(grepl("Removed rows for assays with only NA values",
+  expect_true(grepl("Removed assays with only \"NA\" values",
                     msgs_clean[7]))
   expect_true(grepl("Cleaning duplicate SampleIDs",
                     msgs_clean[8]))
-  expect_true(grepl(paste("Excluding 1 sample with duplicate SampleIDs:",
-                          "DuplicateSample"),
+  expect_true(grepl(paste("Excluding 1 sample with duplicate identifier:",
+                          "\"DuplicateSample\""),
                     msgs_clean[9]))
-  expect_true(grepl("Removed rows with duplicate SampleIDs",
+  expect_true(grepl("Removed samples with duplicate identifiers",
                     msgs_clean[10]))
   expect_true(grepl("Cleaning control samples based on sample type",
                     msgs_clean[11]))
