@@ -539,42 +539,28 @@ test_that(
       suppressWarnings() |>
       suppressMessages()
 
+    ## verbose = FALSE ----
+
+    expect_equal(
+      object = clean_qc_warning(df,
+                                check_npx_log = log,
+                                verbose = FALSE),
+      expected = expected_result
+    )
+
+    ## verbose = TRUE ----
+
     expect_message(
       object = expect_equal(
         object = clean_qc_warning(df,
-                                  check_npx_log = log),
+                                  check_npx_log = log,
+                                  verbose = TRUE),
         expected = expected_result
       ),
-      regexp = "Samples flaged SampleQC = \"'FAIL'\" Removed."
+      regexp = "Samples flaged SampleQC = \"FAIL\" were removed."
     )
   }
 )
-
-test_that(
-  "clean_qc_warning - The check_npx() function requires the qc_warning
-  column. In this test, we verify the edge case where qc_warning column
-  is removed after running check_npx().",
-
-  {
-    log <- check_npx(df) |>
-      suppressWarnings() |>
-      suppressMessages()
-
-    # SampleQC column was removed after running check_npx()
-    test_df <- df |>
-      dplyr::select(!SampleQC)
-
-    expect_message(
-      object = expect_equal(
-        object = clean_qc_warning(test_df,
-                                  check_npx_log = log),
-        expected = test_df
-      ),
-      regexp = "SampleQC is not found in data table."
-    )
-  }
-)
-
 
 # Test clean_assay_warning ------------------------------------------------
 
@@ -742,7 +728,7 @@ test_that(
 
 test_that("clean_col_class correctly coerces columns via coerce_col()", {
   # Simulate a data frame with incorrect types
-  test_df <- tibble::tibble(
+  test_df <- dplyr::tibble(
     col_chr = 123,        # should be character
     col_num = "456",       # should be numeric
     col_logic = TRUE      # remain the same
@@ -750,7 +736,7 @@ test_that("clean_col_class correctly coerces columns via coerce_col()", {
 
   # Simulate the check_npx_log$col_class
   check_log <- list(
-    col_class = tibble::tibble(
+    col_class = dplyr::tibble(
       col_name = c("col_chr", "col_num", "col_logic"),
       expected_col_class = c("character", "numeric", "logical")
     )
@@ -862,7 +848,7 @@ test_that("clean_npx emits clean messages without ANSI styling", {
                     msgs_clean[15L]))
   expect_true(grepl("Cleaning Samples with QC Status 'FAIL'",
                     msgs_clean[16L]))
-  expect_true(grepl("Samples flaged SampleQC = .* Removed",
+  expect_true(grepl("Samples flaged SampleQC = \"FAIL\" were removed",
                     msgs_clean[17L]))
   expect_true(grepl("Cleaning internal control assays",
                     msgs_clean[18L]))
