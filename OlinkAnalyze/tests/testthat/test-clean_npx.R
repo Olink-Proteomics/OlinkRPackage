@@ -126,13 +126,13 @@ test_that(
       suppressMessages()
 
     expect_message(
-        object = expect_equal(
-          object = clean_assay_na(df = expected_result,
-                                  check_npx_log = log),
-          expected = expected_result
-        ),
-        regexp = "No assays with only NA values found."
-        )
+      object = expect_equal(
+        object = clean_assay_na(df = expected_result,
+                                check_npx_log = log),
+        expected = expected_result
+      ),
+      regexp = "No assays with only NA values found."
+    )
   }
 )
 
@@ -230,7 +230,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_duplicate_sample_id(df = expected_result,
-                                   check_npx_log = log),
+                                           check_npx_log = log),
         expected = expected_result
       ),
       regexp = "No duplicate SampleIDs found."
@@ -301,9 +301,8 @@ test_that(
                                    keep_control_sample = FALSE),
         expected = test_df
       ),
-      regexp = paste(
-        "No column name found for `sample_type` in",
-        "`check_npx_log\\$col_names`\\.")
+      regexp = paste("No column name found for `sample_type` in",
+                     "`check_npx_log\\$col_names`\\.")
     )
   }
 )
@@ -344,8 +343,8 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_assay_type(df,
-                                   check_npx_log = log,
-                                   keep_control_assay  = TRUE),
+                                  check_npx_log = log,
+                                  keep_control_assay  = TRUE),
         expected = df
       ),
       regexp = paste("Control assays \\(inc_ctrl, ext_ctrl, amp_ctrl\\) are",
@@ -371,9 +370,8 @@ test_that(
                                   keep_control_assay = FALSE),
         expected = test_df
       ),
-      regexp = paste(
-        "No column name found for `assay_type` in",
-        "`check_npx_log\\$col_names`\\.")
+      regexp = paste("No column name found for `assay_type` in",
+                     "`check_npx_log\\$col_names`\\.")
     )
   }
 )
@@ -536,14 +534,13 @@ test_that(
     test_df <- df |>
       dplyr::select(!SampleID)
 
-    expect_message(
-      object = expect_equal(
-        object = clean_control_sample_id(test_df,
-                                         check_npx_log = log,
-                                         control_sample_ids = c("ControlID")),
-        expected = test_df
-      ),
-      regexp = "SampleID is missing from the data table.")
+    expect_message(object = expect_equal(
+      object = clean_control_sample_id(test_df,
+                                       check_npx_log = log,
+                                       control_sample_ids = c("ControlID")),
+      expected = test_df
+    ),
+    regexp = "SampleID is missing from the data table.")
   }
 )
 
@@ -731,5 +728,3 @@ test_that("clean_npx emits clean messages without ANSI styling", {
                     msgs_clean[23]))
 
 })
-
-

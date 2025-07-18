@@ -102,18 +102,6 @@ df <- dplyr::tibble(
     "OID89012",  # valid
     "OID34567"   # valid
   ),
-  NPX = c(
-    10,   # valid
-    11,   # still gets removed due to invalid OlinkID
-    NA,   # all NA for assay
-    12,   # duplicate SampleID ("DuplicateSample")
-    13,   # control sample type
-    14,   # control SampleID
-    15,   # fails QC
-    16,   # internal control assay
-    17,   # flagged by assay warning
-    12    # duplicate SampleID ("DuplicateSample")
-  ),
   SampleType = c(
     "SAMPLE",
     "SAMPLE",
@@ -162,6 +150,7 @@ df <- dplyr::tibble(
     "WARN", #to be removed by clean_assay_warning
     "PASS"
   ),
+   NPX = replace(x = rnorm(n = 10L), list = 3L, values = NA_real_),
    PlateID = rep("plate1", 10L),
    UniProt = rep("uniprotid1", 10L),
    Assay = rep("assay_a", 10L),
