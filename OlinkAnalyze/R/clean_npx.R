@@ -549,13 +549,11 @@ clean_duplicate_sample_id <- function(df,
 #' Help function removing control samples based on sample type.
 #'
 #' @description
-#' This function filters out rows from an NPX dataset where the sample type
-#' column matches known control sample types: `"SAMPLE_CONTROL"`,
-#' `"PLATE_CONTROL"` or `"NEGATIVE_CONTROL"`. If `keep_control_sample` is
-#' `TRUE`, or if the sample type column is not found in the `check_npx_log`,
-#' the function returns the original data unchanged. The function outputs a
-#' cleaned dataset in either `tibble` or `arrow` format, depending on user
-#' preference.
+#' This function filters out rows from a dataset where the sample type column
+#' matches known control sample types: `"SAMPLE_CONTROL"`, `"PLATE_CONTROL"` or
+#' `"NEGATIVE_CONTROL"`. If `keep_control_sample` is set to `TRUE`, or if the
+#' sample type column is present in the `check_npx_log`, the function returns
+#' the original data unchanged.
 #'
 #' @author
 #'   Kang Dong
@@ -674,7 +672,6 @@ clean_sample_type <- function(df,
     )
   )
 }
-
 
 #' Help function cleaning Internal Control Assays by Assay Type
 #'

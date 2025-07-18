@@ -39,13 +39,11 @@ A \code{tibble} or \code{arrow} object with rows corresponding to control
 samples removed.
 }
 \description{
-This function filters out rows from an NPX dataset where the sample type
-column matches known control sample types: \code{"SAMPLE_CONTROL"},
-\code{"PLATE_CONTROL"} or \code{"NEGATIVE_CONTROL"}. If \code{keep_control_sample} is
-\code{TRUE}, or if the sample type column is not found in the \code{check_npx_log},
-the function returns the original data unchanged. The function outputs a
-cleaned dataset in either \code{tibble} or \code{arrow} format, depending on user
-preference.
+This function filters out rows from a dataset where the sample type column
+matches known control sample types: \code{"SAMPLE_CONTROL"}, \code{"PLATE_CONTROL"} or
+\code{"NEGATIVE_CONTROL"}. If \code{keep_control_sample} is set to \code{TRUE}, or if the
+sample type column is present in the \code{check_npx_log}, the function returns
+the original data unchanged.
 }
 \author{
 Kang Dong
