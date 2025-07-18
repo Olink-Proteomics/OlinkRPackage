@@ -13,6 +13,7 @@ column_name_dict <- dplyr::tibble(
     "uniprot",
     "assay",
     "panel",
+    "block",
     "plate_id",
     "panel_version",
     "lod",
@@ -47,6 +48,8 @@ column_name_dict <- dplyr::tibble(
                         "assay"),
     "panel" =         c("Panel",
                         "panel"),
+    "block" =         c("Block",
+                        "block"),
     "plate_id" =      c("PlateID",
                         "plateid",
                         "plate_id"),
@@ -128,6 +131,7 @@ column_name_dict <- dplyr::tibble(
     FALSE, # uniprot
     FALSE, # assay
     FALSE, # panel
+    TRUE, # block
     FALSE, # plate_id
     FALSE, # panel_version
     TRUE, # lod
@@ -148,6 +152,7 @@ column_name_dict <- dplyr::tibble(
     FALSE, # uniprot
     FALSE, # assay
     FALSE, # panel
+    FALSE, # block
     FALSE, # plate_id
     FALSE, # panel_version
     TRUE, # lod
@@ -170,6 +175,7 @@ column_name_dict <- dplyr::tibble(
     FALSE, # uniprot
     FALSE, # assay
     FALSE, # panel
+    FALSE, # block
     FALSE, # plate_id
     FALSE, # panel_version
     FALSE, # lod
@@ -188,6 +194,7 @@ column_name_dict <- dplyr::tibble(
     "character", # uniprot
     "character", # assay
     "character", # panel
+    "character", # block
     "character", # plate_id
     "character", # panel_version
     "numeric", # lod
@@ -206,6 +213,7 @@ column_name_dict <- dplyr::tibble(
     FALSE, # uniprot
     FALSE, # assay
     FALSE, # panel
+    FALSE, # block
     FALSE, # plate_id
     FALSE, # panel_version
     TRUE, # lod
