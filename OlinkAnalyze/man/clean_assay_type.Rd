@@ -39,4 +39,5 @@ function uses column mapping provided by \code{check_npx_log}.
 }
 \author{
 Kang Dong
+Klev Diamanti
 }

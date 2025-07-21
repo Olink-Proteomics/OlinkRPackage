@@ -10,6 +10,11 @@ clean_npx(
   preferred_names = NULL,
   keep_controls = NULL,
   control_sample_ids = NULL,
+  keep_assay_all_na = FALSE,
+  keep_invalid_oid = FALSE,
+  keep_duplicate_sample_id = FALSE,
+  keep_qc_warning = FALSE,
+  keep_assay_warning = FALSE,
   out_df = "tibble",
   verbose = FALSE
 )
@@ -166,4 +171,5 @@ df <- dplyr::tibble(
 }
 \author{
 Kang Dong
+Klev Diamanti
 }

@@ -4,7 +4,12 @@
 \alias{clean_assay_warning}
 \title{Help function removing instances of assays flagged with warnings.}
 \usage{
-clean_assay_warning(df, check_npx_log, verbose = FALSE)
+clean_assay_warning(
+  df,
+  check_npx_log,
+  keep_assay_warning = FALSE,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{df}{A \code{tibble} or \code{arrow} object loaded from \code{read_npx()}, including a

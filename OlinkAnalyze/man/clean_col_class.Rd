@@ -32,4 +32,5 @@ class using information from \code{check_npx_log$col_class}.
 }
 \author{
 Kang Dong
+Klev Diamanti
 }

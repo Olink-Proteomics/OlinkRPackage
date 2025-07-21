@@ -59,4 +59,5 @@ out <- OlinkAnalyze:::clean_control_sample_id(
 }
 \author{
 Kang Dong
+Klev Diamanti
 }

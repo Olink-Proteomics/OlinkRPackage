@@ -4,7 +4,7 @@
 \alias{clean_invalid_oid}
 \title{Help function removing assays with invalid identifiers.}
 \usage{
-clean_invalid_oid(df, check_npx_log, verbose = FALSE)
+clean_invalid_oid(df, check_npx_log, keep_invalid_oid = FALSE, verbose = FALSE)
 }
 \arguments{
 \item{df}{A \code{tibble} or \code{arrow} object loaded from \code{read_npx()}, including a
@@ -18,6 +18,9 @@ containing:
 \item \code{col_names$olink_id}: the column name of the assay identifier in the
 dataset.
 }}
+
+\item{keep_invalid_oid}{Logical. If \code{TRUE}, skips filtering of assays with
+invalid OlinkID. Defaults to \code{FALSE}.}
 
 \item{verbose}{Logical. If \code{FALSE} (default), silences step-wise CLI
 messages.}
@@ -35,4 +38,5 @@ invalid or malformed assay identifiers.
 }
 \author{
 Kang Dong
+Klev Diamanti
 }
