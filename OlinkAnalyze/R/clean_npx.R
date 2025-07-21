@@ -372,12 +372,7 @@ clean_assay_na <- function(df,
   }
 
   # Convert output to desired format (tibble or arrow)
-  return(
-    convert_read_npx_output(
-      df = df_cleaned,
-      out_df = out_df
-    )
-  )
+  return(df_cleaned)
 }
 
 #' Help function removing assays with invalid identifiers.
@@ -423,12 +418,7 @@ clean_invalid_oid <- function(df,
           "i" = "Returning original data frame.")
       )
     }
-    return(
-      convert_read_npx_output(
-        df = df,
-        out_df = out_df
-      )
-    )
+    return(df)
   }
 
   # Inform user of which assays will be excluded
@@ -442,8 +432,7 @@ clean_invalid_oid <- function(df,
     dplyr::filter(
       !(.data[[check_npx_log$col_names$olink_id]]
         %in% check_npx_log$oid_invalid)
-    ) |>
-    dplyr::collect()
+    )
 
   # Confirmation message
   if (verbose == TRUE) {
@@ -454,12 +443,7 @@ clean_invalid_oid <- function(df,
   }
 
   # Return cleaned data frame in desired format
-  return(
-    convert_read_npx_output(
-      df = df_cleaned,
-      out_df = out_df
-    )
-  )
+  return(df_cleaned)
 }
 
 #' Help function removing samples with duplicate identifiers.
@@ -505,12 +489,7 @@ clean_duplicate_sample_id <- function(df,
           "i" = "Returning original data frame.")
       )
     }
-    return(
-      convert_read_npx_output(
-        df = df,
-        out_df = out_df
-      )
-    )
+    return(df)
   }
 
   # Inform user about excluded SampleIDs
@@ -536,12 +515,7 @@ clean_duplicate_sample_id <- function(df,
   }
 
   # Convert and return the output in the desired format
-  return(
-    convert_read_npx_output(
-      df = df_cleaned,
-      out_df = out_df
-    )
-  )
+  return(df_cleaned)
 }
 
 #' Help function removing control samples based on sample type.
@@ -591,12 +565,7 @@ clean_sample_type <- function(df,
           "i" = "Returning original data frame.")
       )
     }
-    return(
-      convert_read_npx_output(
-        df = df,
-        out_df = out_df
-      )
-    )
+    return(df)
   }
 
   # Check if 'sample_type' column name is available
@@ -607,12 +576,7 @@ clean_sample_type <- function(df,
         "i" = "Returning original data frame."
       )
     )
-    return(
-      convert_read_npx_output(
-        df = df,
-        out_df = out_df
-      )
-    )
+    return(df)
   }
 
   # list control sample types to be excluded
@@ -666,12 +630,7 @@ clean_sample_type <- function(df,
   }
 
   # Format and return output
-  return(
-    convert_read_npx_output(
-      df = df_cleaned,
-      out_df = out_df
-    )
-  )
+  return(df_cleaned)
 }
 
 #' Help function removing control assays based on assay type.
@@ -717,12 +676,7 @@ clean_assay_type <- function(df,
           "i" = "Returning original data frame.")
       )
     }
-    return(
-      convert_read_npx_output(
-        df = df,
-        out_df = out_df
-      )
-    )
+    return(df)
   }
 
   # Check if 'assay_type' column name is available
@@ -733,12 +687,7 @@ clean_assay_type <- function(df,
         "i" = "Returning original data frame."
       )
     )
-    return(
-      convert_read_npx_output(
-        df = df,
-        out_df = out_df
-      )
-    )
+    return(df)
   }
 
   # List control assay types to be excluded
@@ -792,19 +741,14 @@ clean_assay_type <- function(df,
   }
 
   # Format and return output
-  return(
-    convert_read_npx_output(
-      df = df_cleaned,
-      out_df = out_df
-    )
-  )
+  return(df_cleaned)
 }
 
-#' Help function removing instances of samples that have failed QC
+#' Help function removing instances of samples that failed QC.
 #'
 #' @description
 #' This function uses the column marking QC warnings identified by
-#' `check_npx_log` to samples flagged `FAIL` in the dataset.
+#' `check_npx_log` to remove samples flagged `FAIL` in the dataset.
 #'
 #' @author
 #'   Kang Dong
