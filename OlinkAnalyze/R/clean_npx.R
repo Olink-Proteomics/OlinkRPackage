@@ -183,7 +183,6 @@ clean_npx <- function(df,
   df <- clean_invalid_oid(
     df,
     check_npx_log = check_npx_log,
-    out_df = out_df,
     verbose = verbose
   )
 
@@ -192,7 +191,6 @@ clean_npx <- function(df,
   df <- clean_assay_na(
     df,
     check_npx_log = check_npx_log,
-    out_df = out_df,
     verbose = verbose
   )
 
@@ -201,7 +199,6 @@ clean_npx <- function(df,
   df <- clean_duplicate_sample_id(
     df,
     check_npx_log = check_npx_log,
-    out_df = out_df,
     verbose = verbose
   )
 
@@ -218,7 +215,6 @@ clean_npx <- function(df,
     df,
     check_npx_log = check_npx_log,
     keep_control_sample = keep_control_sample,
-    out_df = out_df,
     verbose = verbose
   )
 
@@ -228,8 +224,7 @@ clean_npx <- function(df,
   df <- clean_control_sample_id(
     df,
     check_npx_log = check_npx_log,
-    control_sample_ids = control_sample_ids,
-    out_df = out_df
+    control_sample_ids = control_sample_ids
   )
 
 
@@ -238,7 +233,6 @@ clean_npx <- function(df,
   df <- clean_qc_warning(
     df,
     check_npx_log = check_npx_log,
-    out_df = out_df,
     verbose = verbose
   )
 
@@ -256,7 +250,6 @@ clean_npx <- function(df,
     df,
     check_npx_log = check_npx_log,
     keep_control_assay = keep_control_assay,
-    out_df = out_df,
     verbose = verbose
   )
 
@@ -265,8 +258,7 @@ clean_npx <- function(df,
   if (verbose) cli::cli_h3("Cleaning assays flagged by assay warning")
   df <- clean_assay_warning(
     df,
-    check_npx_log = check_npx_log,
-    out_df = out_df
+    check_npx_log = check_npx_log
   )
 
 
@@ -274,8 +266,7 @@ clean_npx <- function(df,
   if (verbose) cli::cli_h3("Correcting flagged column class")
   df <- clean_col_class(
     df,
-    check_npx_log = check_npx_log,
-    out_df = out_df
+    check_npx_log = check_npx_log
   )
 
 
@@ -328,8 +319,6 @@ clean_npx <- function(df,
 #' \item `col_names$olink_id`: the column name of the assay identifier in the
 #' dataset.
 #' }
-#' @param out_df The class of the output dataset. One of
-#' `r ansi_collapse_quot(read_npx_df_output)`. (default = "tibble")
 #' @param verbose Logical. If `FALSE` (default), silences step-wise CLI
 #' messages.
 #'
@@ -338,7 +327,6 @@ clean_npx <- function(df,
 #'
 clean_assay_na <- function(df,
                            check_npx_log,
-                           out_df = "tibble",
                            verbose = FALSE) {
 
   # If there are no assays with all NA values, skip filtering
@@ -397,8 +385,6 @@ clean_assay_na <- function(df,
 #' \item `col_names$olink_id`: the column name of the assay identifier in the
 #' dataset.
 #' }
-#' @param out_df The class of the output dataset. One of
-#' `r ansi_collapse_quot(read_npx_df_output)`. (default = "tibble")
 #' @param verbose Logical. If `FALSE` (default), silences step-wise CLI
 #' messages.
 #'
@@ -407,7 +393,6 @@ clean_assay_na <- function(df,
 #'
 clean_invalid_oid <- function(df,
                               check_npx_log,
-                              out_df = "tibble",
                               verbose = FALSE) {
 
   # Check if there are any invalid OlinkIDs to remove
@@ -468,8 +453,6 @@ clean_invalid_oid <- function(df,
 #' \item `col_names$sample_id`: the column name of the sample identifier in the
 #' dataset.
 #' }
-#' @param out_df The class of the output dataset. One of
-#' `r ansi_collapse_quot(read_npx_df_output)`. (default = "tibble")
 #' @param verbose Logical. If `FALSE` (default), silences step-wise CLI
 #' messages.
 #'
@@ -478,7 +461,6 @@ clean_invalid_oid <- function(df,
 #'
 clean_duplicate_sample_id <- function(df,
                                       check_npx_log,
-                                      out_df = "tibble",
                                       verbose = FALSE) {
 
   # Check if there are any duplicate SampleIDs to remove
@@ -542,8 +524,6 @@ clean_duplicate_sample_id <- function(df,
 #' }
 #' @param keep_control_sample Logical. If `TRUE`, control samples are retained
 #' and no filtering is attempted. Defaults to `FALSE`.
-#' @param out_df The class of the output dataset. One of
-#' `r ansi_collapse_quot(read_npx_df_output)`. (default = "tibble")
 #' @param verbose Logical. If `FALSE` (default), silences step-wise CLI
 #' messages.
 #'
@@ -553,7 +533,6 @@ clean_duplicate_sample_id <- function(df,
 clean_sample_type <- function(df,
                               check_npx_log,
                               keep_control_sample = FALSE,
-                              out_df = "tibble",
                               verbose = FALSE) {
 
   # Return original data if user chooses to keep control samples
@@ -653,8 +632,6 @@ clean_sample_type <- function(df,
 #' }
 #' @param keep_control_assay Logical. If `TRUE`, internal control assays are
 #' retained and no filtering is applied. Defaults to `FALSE`.
-#' @param out_df The class of the output dataset. One of
-#' `r ansi_collapse_quot(read_npx_df_output)`. (default = "tibble")
 #' @param verbose Logical. If `FALSE` (default), silences step-wise CLI
 #' messages.
 #'
@@ -664,7 +641,6 @@ clean_sample_type <- function(df,
 clean_assay_type <- function(df,
                              check_npx_log,
                              keep_control_assay = FALSE,
-                             out_df = "tibble",
                              verbose = FALSE) {
 
   # Return original data if user chooses to keep control samples
@@ -763,8 +739,6 @@ clean_assay_type <- function(df,
 #' dataset.
 #' \item `col_names$qc_warning`: the name of the column indicating QC status.
 #' }
-#' @param out_df The class of the output dataset. One of
-#' `r ansi_collapse_quot(read_npx_df_output)`. (default = "tibble")
 #' @param verbose Logical. If `FALSE` (default), silences step-wise CLI
 #' messages.
 #'
@@ -773,7 +747,6 @@ clean_assay_type <- function(df,
 #'
 clean_qc_warning <- function(df,
                              check_npx_log,
-                             out_df = "tibble",
                              verbose = FALSE) {
 
   # Filter out failed samples and return cleaned data
@@ -786,8 +759,6 @@ clean_qc_warning <- function(df,
     )
   }
 
-  df_tmp <-
-
   df_cleaned <- df |>
     dplyr::filter(
       !grepl(
@@ -797,12 +768,7 @@ clean_qc_warning <- function(df,
       )
     )
 
-  return(
-    convert_read_npx_output(
-      df = df_cleaned,
-      out_df = out_df
-    )
-  )
+  return(df_cleaned)
 }
 
 #' Help function cleaning assays flagged with assay warning
@@ -823,8 +789,7 @@ clean_qc_warning <- function(df,
 #'
 clean_assay_warning <- function(
     df,
-    check_npx_log,
-    out_df = "tibble") {
+    check_npx_log) {
 
   # Check if assay_warn column name is defined
   if (!"assay_warn" %in% names(check_npx_log$col_names)) {
@@ -833,10 +798,7 @@ clean_assay_warning <- function(
       {.code check_npx_log$col_names}.",
       "i" = "Returning data unchanged."
     ))
-    return(
-      df |>
-        convert_read_npx_output(out_df = out_df)
-    )
+    return(df)
   }
 
   # Filter out failed assays and return cleaned data
@@ -855,10 +817,7 @@ clean_assay_warning <- function(
       )
     )
 
-  return(
-    df_cleaned |>
-      convert_read_npx_output(out_df = out_df)
-  )
+  return(df_cleaned)
 }
 
 #' Help function cleaning Control Samples Based on Sample ID
@@ -879,8 +838,6 @@ clean_assay_warning <- function(
 #' @param control_sample_ids character vector of control sample IDs,
 #' e.g., `c("control_a", "control_b")`. Default is `NULL`, in which case the
 #' data is returned unchanged.
-#' @param out_df Output format of the returned data frame.
-#'   Options: `"tibble"` or `"arrow"`. Default is `"tibble"`.
 #'
 #' @returns A filtered data table with control samples removed.
 #'
@@ -926,10 +883,7 @@ clean_control_sample_id <- function(
       ))
     }
 
-    return(
-      df |>
-        convert_read_npx_output(out_df = out_df)
-    )
+    return(df)
   }
 
   # Filter out control samples and return cleaned data
@@ -944,10 +898,7 @@ clean_control_sample_id <- function(
       !.data[[check_npx_log$col_names$sample_id]] %in% control_sample_ids
     )
 
-  return(
-    df_cleaned |>
-      convert_read_npx_output(out_df = out_df)
-  )
+  return(df_cleaned)
 }
 
 #' Help function correcting column types in NPX data
@@ -964,14 +915,11 @@ clean_control_sample_id <- function(
 #' `col_class` table with columns:
 #'   - `col_name`: column names in `df` that need class correction
 #'   - `expected_col_class`: expected data types (e.g., "character", "numeric")
-#' @param out_df Output format of the returned data frame.
-#'   Options: `"tibble"` or `"arrow"`. Default is `"tibble"`.
 #'
 #' @return A cleaned data table with column class corrected.
 #'
 clean_col_class <- function(df,
-                            check_npx_log,
-                            out_df = "tibble") {
+                            check_npx_log) {
 
   # Early return if no corrections needed
   if (nrow(check_npx_log$col_class) == 0) {
@@ -982,10 +930,7 @@ clean_col_class <- function(df,
       "i" = "Returning data unchanged."
     ))
 
-    return(
-      df |>
-        convert_read_npx_output(out_df = out_df)
-    )
+    return(df)
   }
 
   # Define coercion function
@@ -1010,5 +955,5 @@ clean_col_class <- function(df,
     "v" = "Returning cleaned data table."
   ))
 
-  return(convert_read_npx_output(df, out_df = out_df))
+  return(df)
 }
