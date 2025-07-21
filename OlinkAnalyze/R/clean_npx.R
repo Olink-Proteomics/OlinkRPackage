@@ -148,6 +148,8 @@ clean_npx <- function(df,
                       keep_assay_all_na = FALSE,
                       keep_invalid_oid = FALSE,
                       keep_duplicate_sample_id = FALSE,
+                      keep_qc_warning = FALSE,
+                      keep_assay_warning = FALSE,
                       out_df = "tibble",
                       verbose = FALSE) {
 
@@ -347,14 +349,16 @@ clean_assay_na <- function(df,
   # If assays with all NA values are retained by the user or if such assays
   # are not present, skip filtering
   if (keep_assay_all_na == TRUE || length(check_npx_log$assay_na) == 0L) {
-    if (verbose == TRUE) {
-      if (keep_assay_all_na == TRUE) {
+    if (keep_assay_all_na == TRUE) {
+      if (verbose == TRUE) {
         cli::cli_inform(
           c("Skipping exclusion of assay with all quantified values 'NA' as per
           user input {.arg keep_assay_all_na}.",
             "i" = "Returning original dataset.")
         )
-      } else {
+      }
+    } else {
+      if (verbose == TRUE) {
         cli::cli_inform(
           c("No assays with only {.val NA} values.",
             "i" = "Returning original dataset.")
@@ -425,14 +429,16 @@ clean_invalid_oid <- function(df,
 
   # Check if there are any invalid OlinkIDs to remove
   if (keep_invalid_oid == TRUE || length(check_npx_log$oid_invalid) == 0L) {
-    if (verbose == TRUE) {
-      if(keep_invalid_oid == TRUE) {
+    if(keep_invalid_oid == TRUE) {
+      if (verbose == TRUE) {
         cli::cli_inform(
           c("Skipping exclusion of assay with invalid OlinkID as per user
             input {.arg keep_invalid_oid}.",
             "i" = "Returning original dataset.")
         )
-      } else {
+      }
+    } else {
+      if (verbose == TRUE) {
         cli::cli_inform(
           c("No invalid assay identifiers.",
             "i" = "Returning original dataset.")
@@ -507,19 +513,23 @@ clean_duplicate_sample_id <- function(df,
   # duplicate SampleIDs to remove
   if (keep_duplicate_sample_id == TRUE
       || length(check_npx_log$sample_id_dups) == 0L) {
-    if (verbose == TRUE) {
-      if (keep_duplicate_sample_id == TRUE) {
+    if (keep_duplicate_sample_id == TRUE) {
+      if (verbose == TRUE) {
         cli::cli_inform(
           c("Skipping exclusion of samples with duplicate sample identifiers
           as per user input `keep_duplicate_sample_id`.",
             "i" = "Returning original dataset.")
         )
-      } else {
+      }
+
+    } else {
+      if (verbose == TRUE) {
         cli::cli_inform(
           c("No duplicate sample identifiers.",
             "i" = "Returning original dataset.")
         )
       }
+
     }
     return(df)
   }
@@ -900,17 +910,32 @@ clean_qc_warning <- function(df,
 #'
 clean_assay_warning <- function(df,
                                 check_npx_log,
+                                keep_assay_warning = FALSE,
                                 verbose = FALSE) {
 
   # Check if assay_warn column name is defined
-  if (!("assay_warn" %in% names(check_npx_log$col_names))) {
-    cli::cli_inform(
-      c("No column marking assay warnings in dataset.",
-        "i" = "Ensure assays with QC warnings are removed prior to downstream
+  if (keep_assay_warning == TRUE
+      || !("assay_warn" %in% names(check_npx_log$col_names))) {
+    if (keep_assay_warning == TRUE) {
+      if (verbose == TRUE) {
+        cli::cli_inform(
+          c("Skipping exclusion of assays falgged as `WARN` as per user
+            input {.arg keep_assay_warning}.",
+            "i" = "Returning original dataset."
+          )
+        )
+      }
+
+    } else {
+      cli::cli_inform(
+        c("No column marking assay warnings in dataset.",
+          "i" = "Ensure assays with QC warnings are removed prior to downstream
         analysis!",
-        "i" = "Returning original dataset."
+          "i" = "Returning original dataset."
+        )
       )
-    )
+    }
+
     return(df)
   }
 
@@ -983,6 +1008,7 @@ clean_assay_warning <- function(df,
 #'
 #' @author
 #'   Kang Dong
+#'   Klev Diamanti
 #'
 #' @param df A `tibble` or `arrow` object loaded from `read_npx()`, including a
 #' column identified by
@@ -1093,6 +1119,7 @@ clean_control_sample_id <- function(df,
 #'
 #' @author
 #'   Kang Dong
+#'   Klev Diamanti
 #'
 #' @param df A `tibble` or `arrow` object loaded from `read_npx()`, including a
 #' column identified by
