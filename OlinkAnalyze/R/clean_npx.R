@@ -349,12 +349,7 @@ clean_assay_na <- function(df,
           "i" = "Returning original data frame.")
       )
     }
-    return(
-      convert_read_npx_output(
-        df = df,
-        out_df = out_df
-      )
-    )
+    return(df)
   }
 
   # CLI message listing excluded assays
@@ -447,7 +442,8 @@ clean_invalid_oid <- function(df,
     dplyr::filter(
       !(.data[[check_npx_log$col_names$olink_id]]
         %in% check_npx_log$oid_invalid)
-    )
+    ) |>
+    dplyr::collect()
 
   # Confirmation message
   if (verbose == TRUE) {
@@ -845,6 +841,8 @@ clean_qc_warning <- function(df,
         "v" = "Returning cleaned data table.")
     )
   }
+
+  df_tmp <-
 
   df_cleaned <- df |>
     dplyr::filter(
