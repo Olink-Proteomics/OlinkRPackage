@@ -361,8 +361,13 @@ test_that(
         ),
         regexp = "Excluding 1 control sample: \"ControlType\"."
       ),
-      regexp = paste("Removed control samples marked as \"SAMPLE_CONTROL\",",
-                     "\"PLATE_CONTROL\", and \"NEGATIVE_CONTROL\".")
+      regexp = olink_sample_types[
+        !(names(olink_sample_types) %in% c("sample"))
+      ] |>
+        unlist() |>
+        unname() |>
+        ansi_collapse_quot() |>
+        (\(x) paste0("Removed control samples marked as ", x, "."))()
     )
   }
 )
@@ -463,8 +468,13 @@ test_that(
         ),
         regexp = "Excluding 1 control assay: \"OID78901\"."
       ),
-      regexp = paste("Removed control assays marked as \"ext_ctrl\",",
-                     "\"inc_ctrl\", and \"amp_ctrl\".")
+      regexp = olink_assay_types[
+        !(names(olink_assay_types) %in% c("assay"))
+      ] |>
+        unlist() |>
+        unname() |>
+        ansi_collapse_quot() |>
+        (\(x) paste0("Removed control assays marked as ", x, "."))()
     )
   }
 )
@@ -838,9 +848,7 @@ test_that("clean_npx emits clean messages without ANSI styling", {
                     msgs_clean[11L]))
   expect_true(grepl("Excluding 1 control sample: \"ControlType\"",
                     msgs_clean[12L]))
-  expect_true(grepl(paste("Removed control samples marked as",
-                          "\"SAMPLE_CONTROL\", \"PLATE_CONTROL\",",
-                          "and \"NEGATIVE_CONTROL\""),
+  expect_true(grepl(paste("Removed control samples marked as"),
                     msgs_clean[13L]))
   expect_true(grepl("Cleaning control samples based on Sample ID",
                     msgs_clean[14L]))
@@ -854,8 +862,7 @@ test_that("clean_npx emits clean messages without ANSI styling", {
                     msgs_clean[18L]))
   expect_true(grepl("Excluding 1 control assay: \"OID78901\"",
                     msgs_clean[19L]))
-  expect_true(grepl(paste("Removed control assays marked as \"ext_ctrl\",",
-                          "\"inc_ctrl\", and \"amp_ctrl\""),
+  expect_true(grepl(paste("Removed control assays marked as"),
                     msgs_clean[20L]))
   expect_true(grepl("Cleaning assays flagged by assay warning",
                     msgs_clean[21L]))

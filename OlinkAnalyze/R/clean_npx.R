@@ -620,9 +620,11 @@ clean_sample_type <- function(df,
   }
 
   # list control sample types to be excluded
-  ctrl_sample_type <- c("SAMPLE_CONTROL",
-                        "PLATE_CONTROL",
-                        "NEGATIVE_CONTROL")
+  ctrl_sample_type <- olink_sample_types[
+    !(names(olink_sample_types) %in% c("sample"))
+  ] |>
+    unlist() |>
+    unname()
 
   # detect how many samples are to be removed
   df_sid_stype <- df |>
@@ -744,7 +746,11 @@ clean_assay_type <- function(df,
   }
 
   # List control assay types to be excluded
-  ctrl_assay_type <- c("ext_ctrl", "inc_ctrl", "amp_ctrl")
+  ctrl_assay_type <- olink_assay_types[
+    !(names(olink_assay_types) %in% c("assay"))
+  ] |>
+    unlist() |>
+    unname()
 
   # detect how many samples are to be removed
   df_oid_atype <- df |>
