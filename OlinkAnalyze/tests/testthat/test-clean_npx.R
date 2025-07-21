@@ -1408,6 +1408,70 @@ test_that(
   }
 )
 
+test_that(
+  "clean_assay_warning - works - keep assays with assay QC WARN",
+  {
+
+    ## verbose = FALSE ----
+
+    expect_equal(
+      object = clean_assay_warning(df = df,
+                                   check_npx_log = log,
+                                   keep_assay_warning = TRUE,
+                                   verbose = FALSE),
+      expected = df
+    )
+
+
+    ## verbose = TRUE ----
+
+    expect_message(
+      object = expect_equal(
+        object = clean_assay_warning(df = df,
+                                     check_npx_log = log,
+                                     keep_assay_warning = TRUE,
+                                     verbose = TRUE),
+        expected = df
+      ),
+      regexp = paste("Skipping exclusion of assays falgged as `WARN` as per",
+                     "user input `keep_assay_warning`")
+    )
+  }
+)
+
+test_that(
+  "clean_assay_warning - works - arrow - keep assays with assay QC WARN",
+  {
+
+    ## verbose = FALSE ----
+
+    expect_equal(
+      object = clean_assay_warning(df = df_arrow,
+                                   check_npx_log = log,
+                                   keep_assay_warning = TRUE,
+                                   verbose = FALSE),
+      expected = df_arrow
+    )
+
+
+    ## verbose = TRUE ----
+
+    expect_message(
+      object = expect_equal(
+        object = clean_assay_warning(df = df_arrow,
+                                     check_npx_log = log,
+                                     keep_assay_warning = TRUE,
+                                     verbose = TRUE),
+        expected = df_arrow
+      ),
+      regexp = paste("Skipping exclusion of assays falgged as `WARN` as per",
+                     "user input `keep_assay_warning`")
+    )
+  }
+)
+
+
+
 # Test clean_control_sample_id --------------------------------------------
 
 test_that(
