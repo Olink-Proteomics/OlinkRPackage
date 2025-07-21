@@ -29,6 +29,7 @@
 #'
 #' @author
 #' Kang Dong
+#' Klev Diamanti
 #'
 #' @param df A `tibble` or Arrow `Table` loaded from `read_npx()`.
 #' @param check_log A list returned by [`check_npx()`]. If `NULL`,
@@ -144,6 +145,8 @@ clean_npx <- function(df,
                       preferred_names = NULL,
                       keep_controls = NULL,
                       control_sample_ids = NULL,
+                      keep_assay_all_na = FALSE,
+                      keep_invalid_oid = FALSE,
                       out_df = "tibble",
                       verbose = FALSE) {
 
@@ -183,6 +186,7 @@ clean_npx <- function(df,
   df <- clean_invalid_oid(
     df = df,
     check_npx_log = check_npx_log,
+    keep_invalid_oid = keep_invalid_oid,
     verbose = verbose
   )
 
@@ -191,6 +195,7 @@ clean_npx <- function(df,
   df <- clean_assay_na(
     df = df,
     check_npx_log = check_npx_log,
+    keep_assay_all_na = keep_assay_all_na,
     verbose = verbose
   )
 
@@ -312,6 +317,7 @@ clean_npx <- function(df,
 #'
 #' @author
 #'   Kang Dong
+#'   Klev Diamanti
 #'
 #' @param df A `tibble` or `arrow` object loads from `read_npx()`, including a
 #' column identified by
@@ -324,6 +330,8 @@ clean_npx <- function(df,
 #' \item `col_names$olink_id`: the column name of the assay identifier in the
 #' dataset.
 #' }
+#' @param keep_assay_all_na Logical. If `TRUE`, skips filtering of assay
+#' identifiers with all quantified values `NA`. Defaults to `FALSE`.
 #' @param verbose Logical. If `FALSE` (default), silences step-wise CLI
 #' messages.
 #'
@@ -332,15 +340,25 @@ clean_npx <- function(df,
 #'
 clean_assay_na <- function(df,
                            check_npx_log,
+                           keep_assay_all_na = FALSE,
                            verbose = FALSE) {
 
-  # If there are no assays with all NA values, skip filtering
-  if (length(check_npx_log$assay_na) == 0L) {
+  # If assays with all NA values are retained by the user or if such assays
+  # are not present, skip filtering
+  if (keep_assay_all_na == TRUE || length(check_npx_log$assay_na) == 0L) {
     if (verbose == TRUE) {
-      cli::cli_inform(
-        c("No assays with only {.val NA} values.",
-          "i" = "Returning original dataset.")
-      )
+      if (keep_assay_all_na == TRUE) {
+        cli::cli_inform(
+          c("Skipping exclusion of assay with all quantified values 'NA' as per
+          user input {.arg keep_assay_all_na}.",
+            "i" = "Returning original dataset.")
+        )
+      } else {
+        cli::cli_inform(
+          c("No assays with only {.val NA} values.",
+            "i" = "Returning original dataset.")
+        )
+      }
     }
     return(df)
   }
@@ -390,6 +408,8 @@ clean_assay_na <- function(df,
 #' \item `col_names$olink_id`: the column name of the assay identifier in the
 #' dataset.
 #' }
+#' @param keep_invalid_oid Logical. If `TRUE`, skips filtering of assays with
+#' invalid OlinkID. Defaults to `FALSE`.
 #' @param verbose Logical. If `FALSE` (default), silences step-wise CLI
 #' messages.
 #'
@@ -398,15 +418,24 @@ clean_assay_na <- function(df,
 #'
 clean_invalid_oid <- function(df,
                               check_npx_log,
+                              keep_invalid_oid = FALSE,
                               verbose = FALSE) {
 
   # Check if there are any invalid OlinkIDs to remove
-  if (length(check_npx_log$oid_invalid) == 0L) {
+  if (keep_invalid_oid == TRUE || length(check_npx_log$oid_invalid) == 0L) {
     if (verbose == TRUE) {
-      cli::cli_inform(
-        c("No invalid assay identifiers.",
-          "i" = "Returning original dataset.")
-      )
+      if(keep_invalid_oid == TRUE) {
+        cli::cli_inform(
+          c("Skipping exclusion of assay with invalid OlinkID as per user
+            input {.arg keep_invalid_oid}.",
+            "i" = "Returning original dataset.")
+        )
+      } else {
+        cli::cli_inform(
+          c("No invalid assay identifiers.",
+            "i" = "Returning original dataset.")
+        )
+      }
     }
     return(df)
   }
