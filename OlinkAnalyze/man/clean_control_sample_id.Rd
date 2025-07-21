@@ -23,9 +23,6 @@ a sample ID column.}
 \item{control_sample_ids}{character vector of control sample IDs,
 e.g., \code{c("control_a", "control_b")}. Default is \code{NULL}, in which case the
 data is returned unchanged.}
-
-\item{out_df}{Output format of the returned data frame.
-Options: \code{"tibble"} or \code{"arrow"}. Default is \code{"tibble"}.}
 }
 \value{
 A filtered data table with control samples removed.

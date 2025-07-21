@@ -84,6 +84,14 @@ df <- dplyr::tibble(
   Count = rnorm(n = 10L),
   Normalization = rep(x = "Intensity", times = 10L)
 )
+log <- check_npx(df = df) |>
+  suppressWarnings() |>
+  suppressMessages()
+
+df_arrow <- arrow::as_arrow_table(x = df)
+log_arrow <- log <- check_npx(df = df_arrow) |>
+  suppressWarnings() |>
+  suppressMessages()
 
 # Test clean_assay_na -----------------------------------------------------
 
@@ -95,7 +103,46 @@ test_that(
         .data[["SampleID"]] != "AllNA"
       )
 
-    log <- check_npx(df = df) |>
+    log <-
+
+    ## verbose FALSE ----
+
+    expect_message(
+      object = expect_equal(
+        object = clean_assay_na(df = df,
+                                check_npx_log = log,
+                                verbose = FALSE),
+        expected = expected_result
+      ),
+      regexp = "Excluding 1 assay with only \"NA\" values: \"OID23456\""
+    )
+
+    ## verbose TRUE ----
+
+    expect_message(
+      object = expect_message(
+        object = expect_equal(
+          object = clean_assay_na(df = df,
+                                  check_npx_log = log,
+                                  verbose = TRUE),
+          expected = expected_result
+        ),
+        regexp = "Excluding 1 assay with only \"NA\" values: \"OID23456\""
+      ),
+      regexp = "Removed assays with only \"NA\" values"
+    )
+  }
+)
+
+test_that(
+  "clean_assay_na - works - arrow - 1 assay with only NA values",
+  {
+    expected_result <- df_arrow |>
+      dplyr::filter(
+        .data[["SampleID"]] != "AllNA"
+      )
+
+    log <- check_npx(df = df_arrow) |>
       suppressWarnings() |>
       suppressMessages()
 
@@ -103,7 +150,7 @@ test_that(
 
     expect_message(
       object = expect_equal(
-        object = clean_assay_na(df = df,
+        object = clean_assay_na(df = df_arrow,
                                 check_npx_log = log,
                                 verbose = FALSE),
         expected = expected_result
@@ -567,7 +614,7 @@ test_that(
                                   verbose = TRUE),
         expected = expected_result
       ),
-      regexp = "Samples flaged SampleQC = \"FAIL\" were removed."
+      regexp = "Samples flagged SampleQC = \"FAIL\" were removed."
     )
   }
 )
@@ -856,7 +903,7 @@ test_that("clean_npx emits clean messages without ANSI styling", {
                     msgs_clean[15L]))
   expect_true(grepl("Cleaning Samples with QC Status 'FAIL'",
                     msgs_clean[16L]))
-  expect_true(grepl("Samples flaged SampleQC = \"FAIL\" were removed",
+  expect_true(grepl("Samples flagged SampleQC = \"FAIL\" were removed",
                     msgs_clean[17L]))
   expect_true(grepl("Cleaning internal control assays",
                     msgs_clean[18L]))

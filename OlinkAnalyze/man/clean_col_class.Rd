@@ -4,7 +4,7 @@
 \alias{clean_col_class}
 \title{Help function correcting column types in NPX data}
 \usage{
-clean_col_class(df, check_npx_log, out_df = "tibble")
+clean_col_class(df, check_npx_log)
 }
 \arguments{
 \item{df}{A data frame containing NPX data or similar structure.}
@@ -15,9 +15,6 @@ clean_col_class(df, check_npx_log, out_df = "tibble")
 \item \code{col_name}: column names in \code{df} that need class correction
 \item \code{expected_col_class}: expected data types (e.g., "character", "numeric")
 }}
-
-\item{out_df}{Output format of the returned data frame.
-Options: \code{"tibble"} or \code{"arrow"}. Default is \code{"tibble"}.}
 }
 \value{
 A cleaned data table with column class corrected.

@@ -4,7 +4,7 @@
 \alias{clean_assay_warning}
 \title{Help function cleaning assays flagged with assay warning}
 \usage{
-clean_assay_warning(df, check_npx_log, out_df = "tibble")
+clean_assay_warning(df, check_npx_log)
 }
 \arguments{
 \item{df}{A data frame or tibble containing NPX data.}
