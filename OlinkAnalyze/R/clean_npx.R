@@ -838,11 +838,12 @@ clean_qc_warning <- function(df,
 
   # Filter out failed samples and return cleaned data
   if (verbose == TRUE) {
-    cli::cli_inform(c(
-      "Samples flaged {.field {check_npx_log$col_names$qc_warning}} =
+    cli::cli_inform(
+      c(
+        "Samples flagged {.field {check_npx_log$col_names$qc_warning}} =
       {.val {'FAIL'}} were removed.",
-      "v" = "Returning cleaned data table."
-    ))
+        "v" = "Returning cleaned data table.")
+    )
   }
 
   df_cleaned <- df |>
@@ -917,7 +918,6 @@ clean_assay_warning <- function(
       convert_read_npx_output(out_df = out_df)
   )
 }
-
 
 #' Help function cleaning Control Samples Based on Sample ID
 #'
@@ -1007,7 +1007,6 @@ clean_control_sample_id <- function(
       convert_read_npx_output(out_df = out_df)
   )
 }
-
 
 #' Help function correcting column types in NPX data
 #'
