@@ -467,6 +467,7 @@ test_that(
       object = expect_equal(
         object = clean_duplicate_sample_id(df = df,
                                            check_npx_log = log,
+                                           keep_duplicate_sample_id = FALSE,
                                            verbose = FALSE),
         expected = expected_result
       ),
@@ -481,6 +482,7 @@ test_that(
         object = expect_equal(
           object = clean_duplicate_sample_id(df = df,
                                              check_npx_log = log,
+                                             keep_duplicate_sample_id = FALSE,
                                              verbose = TRUE),
           expected = expected_result
         ),
@@ -507,6 +509,7 @@ test_that(
       object = expect_equal(
         object = clean_duplicate_sample_id(df = df_arrow,
                                            check_npx_log = log,
+                                           keep_duplicate_sample_id = FALSE,
                                            verbose = FALSE) |>
           dplyr::collect(),
         expected = expected_result
@@ -522,6 +525,7 @@ test_that(
         object = expect_equal(
           object = clean_duplicate_sample_id(df = df_arrow,
                                              check_npx_log = log,
+                                             keep_duplicate_sample_id = FALSE,
                                              verbose = TRUE) |>
             dplyr::collect(),
           expected = expected_result
@@ -535,36 +539,105 @@ test_that(
 )
 
 test_that(
-  "clean_duplicate_sample_id - works - no duplicate SampleID",
+  "clean_duplicate_sample_id - works - 1 duplicate SampleID",
   {
     expected_result <- df |>
       dplyr::filter(
         .data[["SampleID"]] != "DuplicateSample"
       )
 
-    log_exp <- check_npx(df = expected_result) |>
-      suppressWarnings() |>
-      suppressMessages()
+    ## verbose = FALSE ----
+
+    expect_message(
+      object = expect_equal(
+        object = clean_duplicate_sample_id(df = df,
+                                           check_npx_log = log,
+                                           keep_duplicate_sample_id = FALSE,
+                                           verbose = FALSE),
+        expected = expected_result
+      ),
+      regexp = paste("Excluding 1 sample with duplicate identifier:",
+                     "\"DuplicateSample\"")
+    )
+
+    ## verbose = TRUE ----
+
+    expect_message(
+      object = expect_message(
+        object = expect_equal(
+          object = clean_duplicate_sample_id(df = df,
+                                             check_npx_log = log,
+                                             keep_duplicate_sample_id = FALSE,
+                                             verbose = TRUE),
+          expected = expected_result
+        ),
+        regexp = paste("Excluding 1 sample with duplicate identifier:",
+                       "\"DuplicateSample\"")
+      ),
+      regexp = "Removed samples with duplicate identifiers."
+    )
+  }
+)
+
+test_that(
+  "clean_duplicate_sample_id - works - keep samples with duplicate sample ID",
+  {
 
     ## verbose = FALSE ----
 
     expect_equal(
-      object = clean_duplicate_sample_id(df = expected_result,
-                                         check_npx_log = log_exp,
+      object = clean_duplicate_sample_id(df = df,
+                                         check_npx_log = log,
+                                         keep_duplicate_sample_id = TRUE,
                                          verbose = FALSE),
-      expected = expected_result
+      expected = df
     )
 
     ## verbose = TRUE ----
 
     expect_message(
       object = expect_equal(
-        object = clean_duplicate_sample_id(df = expected_result,
-                                           check_npx_log = log_exp,
+        object = clean_duplicate_sample_id(df = df,
+                                           check_npx_log = log,
+                                           keep_duplicate_sample_id = TRUE,
                                            verbose = TRUE),
-        expected = expected_result
+        expected = df
       ),
-      regexp = "No duplicate sample identifiers."
+      regexp = paste("Skipping exclusion of samples with duplicate sample",
+                     "identifiers as per user input `keep_duplicate_sample_id`."
+                     )
+    )
+  }
+)
+
+test_that(
+  "clean_duplicate_sample_id - works - arrow - keep samples with duplicate
+  sample ID",
+  {
+
+    ## verbose = FALSE ----
+
+    expect_equal(
+      object = clean_duplicate_sample_id(df = df_arrow,
+                                         check_npx_log = log,
+                                         keep_duplicate_sample_id = TRUE,
+                                         verbose = FALSE),
+      expected = df_arrow
+    )
+
+    ## verbose = TRUE ----
+
+    expect_message(
+      object = expect_equal(
+        object = clean_duplicate_sample_id(df = df_arrow,
+                                           check_npx_log = log,
+                                           keep_duplicate_sample_id = TRUE,
+                                           verbose = TRUE),
+        expected = df_arrow
+      ),
+      regexp = paste("Skipping exclusion of samples with duplicate sample",
+                     "identifiers as per user input `keep_duplicate_sample_id`."
+      )
     )
   }
 )
@@ -879,6 +952,7 @@ test_that(
       object = expect_equal(
         object = clean_qc_warning(df = df,
                                   check_npx_log = log,
+                                  keep_qc_warning = FALSE,
                                   verbose = FALSE),
         expected = expected_result
       ),
@@ -892,6 +966,7 @@ test_that(
       object = expect_equal(
         object = clean_qc_warning(df = df,
                                   check_npx_log = log,
+                                  keep_qc_warning = FALSE,
                                   verbose = TRUE),
         expected = expected_result
       ),
@@ -916,6 +991,7 @@ test_that(
       object = expect_equal(
         object = clean_qc_warning(df = df_arrow,
                                   check_npx_log = log,
+                                  keep_qc_warning = FALSE,
                                   verbose = FALSE) |>
           dplyr::collect(),
         expected = expected_result
@@ -930,6 +1006,7 @@ test_that(
       object = expect_equal(
         object = clean_qc_warning(df = df_arrow,
                                   check_npx_log = log,
+                                  keep_qc_warning = FALSE,
                                   verbose = TRUE) |>
           dplyr::collect(),
         expected = expected_result
@@ -975,6 +1052,7 @@ test_that(
               )
             ),
           check_npx_log = log,
+          keep_qc_warning = FALSE,
           verbose = FALSE
         ),
         expected = expected_result
@@ -1010,6 +1088,7 @@ test_that(
               )
             ),
           check_npx_log = log,
+          keep_qc_warning = FALSE,
           verbose = FALSE
         ),
         expected = expected_result
@@ -1033,6 +1112,7 @@ test_that(
     expect_equal(
       object = clean_qc_warning(df = expected_result,
                                 check_npx_log = log,
+                                keep_qc_warning = FALSE,
                                 verbose = FALSE),
       expected = expected_result
     )
@@ -1043,6 +1123,7 @@ test_that(
       object = expect_equal(
         object = clean_qc_warning(df = expected_result,
                                   check_npx_log = log,
+                                  keep_qc_warning = FALSE,
                                   verbose = TRUE),
         expected = expected_result
       ),
@@ -1050,6 +1131,70 @@ test_that(
     )
   }
 )
+
+test_that(
+  "clean_qc_warning - works - keep samples with sample QC failed",
+  {
+
+    ## verbose = FALSE ----
+
+    expect_equal(
+      object = clean_qc_warning(df = df,
+                                check_npx_log = log,
+                                keep_qc_warning = TRUE,
+                                verbose = FALSE),
+      expected = df
+    )
+
+
+    ## verbose = TRUE ----
+
+    expect_message(
+      object = expect_equal(
+        object = clean_qc_warning(df = df,
+                                  check_npx_log = log,
+                                  keep_qc_warning = TRUE,
+                                  verbose = TRUE),
+        expected = df
+      ),
+      regexp = paste("Skipping exclusion of samples flagged `FAIL` as per",
+                     "user input `keep_qc_warning`")
+    )
+  }
+)
+
+test_that(
+  "clean_qc_warning - works - arrow - keep samples with sample QC failed",
+  {
+
+    ## verbose = FALSE ----
+
+    expect_equal(
+      object = clean_qc_warning(df = df_arrow,
+                                check_npx_log = log,
+                                keep_qc_warning = TRUE,
+                                verbose = FALSE),
+      expected = df_arrow
+    )
+
+
+    ## verbose = TRUE ----
+
+    expect_message(
+      object = expect_equal(
+        object = clean_qc_warning(df = df_arrow,
+                                  check_npx_log = log,
+                                  keep_qc_warning = TRUE,
+                                  verbose = TRUE),
+        expected = df_arrow
+      ),
+      regexp = paste("Skipping exclusion of samples flagged `FAIL` as per",
+                     "user input `keep_qc_warning`")
+    )
+  }
+)
+
+
 
 # Test clean_assay_warning ------------------------------------------------
 
