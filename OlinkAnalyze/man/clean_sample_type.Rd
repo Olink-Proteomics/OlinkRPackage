@@ -8,7 +8,6 @@ clean_sample_type(
   df,
   check_npx_log,
   keep_control_sample = FALSE,
-  out_df = "tibble",
   verbose = FALSE
 )
 }
@@ -27,9 +26,6 @@ dataset.}
 
 \item{keep_control_sample}{Logical. If \code{TRUE}, control samples are retained
 and no filtering is attempted. Defaults to \code{FALSE}.}
-
-\item{out_df}{The class of the output dataset. One of
-"tibble" and "arrow". (default = "tibble")}
 
 \item{verbose}{Logical. If \code{FALSE} (default), silences step-wise CLI
 messages.}

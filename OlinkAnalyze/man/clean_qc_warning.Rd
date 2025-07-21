@@ -2,9 +2,9 @@
 % Please edit documentation in R/clean_npx.R
 \name{clean_qc_warning}
 \alias{clean_qc_warning}
-\title{Help function removing instances of samples that have failed QC}
+\title{Help function removing instances of samples that failed QC.}
 \usage{
-clean_qc_warning(df, check_npx_log, out_df = "tibble", verbose = FALSE)
+clean_qc_warning(df, check_npx_log, verbose = FALSE)
 }
 \arguments{
 \item{df}{A \code{tibble} or \code{arrow} object loaded from \code{read_npx()}, including a
@@ -19,9 +19,6 @@ dataset.
 \item \code{col_names$qc_warning}: the name of the column indicating QC status.
 }}
 
-\item{out_df}{The class of the output dataset. One of
-"tibble" and "arrow". (default = "tibble")}
-
 \item{verbose}{Logical. If \code{FALSE} (default), silences step-wise CLI
 messages.}
 }
@@ -31,7 +28,7 @@ QC removed.
 }
 \description{
 This function uses the column marking QC warnings identified by
-\code{check_npx_log} to samples flagged \code{FAIL} in the dataset.
+\code{check_npx_log} to remove samples flagged \code{FAIL} in the dataset.
 }
 \author{
 Kang Dong

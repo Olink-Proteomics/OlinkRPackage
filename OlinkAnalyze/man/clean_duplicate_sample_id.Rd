@@ -4,12 +4,7 @@
 \alias{clean_duplicate_sample_id}
 \title{Help function removing samples with duplicate identifiers.}
 \usage{
-clean_duplicate_sample_id(
-  df,
-  check_npx_log,
-  out_df = "tibble",
-  verbose = FALSE
-)
+clean_duplicate_sample_id(df, check_npx_log, verbose = FALSE)
 }
 \arguments{
 \item{df}{A \code{tibble} or \code{arrow} object loaded from \code{read_npx()}, including a
@@ -23,9 +18,6 @@ containing:
 \item \code{col_names$sample_id}: the column name of the sample identifier in the
 dataset.
 }}
-
-\item{out_df}{The class of the output dataset. One of
-"tibble" and "arrow". (default = "tibble")}
 
 \item{verbose}{Logical. If \code{FALSE} (default), silences step-wise CLI
 messages.}

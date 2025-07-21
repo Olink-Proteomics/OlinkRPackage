@@ -4,7 +4,7 @@
 \alias{clean_assay_na}
 \title{Help function removing assays with all quantified values \code{NA}.}
 \usage{
-clean_assay_na(df, check_npx_log, out_df = "tibble", verbose = FALSE)
+clean_assay_na(df, check_npx_log, verbose = FALSE)
 }
 \arguments{
 \item{df}{A \code{tibble} or \code{arrow} object loads from \code{read_npx()}, including a
@@ -19,9 +19,6 @@ values \code{NA}.
 \item \code{col_names$olink_id}: the column name of the assay identifier in the
 dataset.
 }}
-
-\item{out_df}{The class of the output dataset. One of
-"tibble" and "arrow". (default = "tibble")}
 
 \item{verbose}{Logical. If \code{FALSE} (default), silences step-wise CLI
 messages.}

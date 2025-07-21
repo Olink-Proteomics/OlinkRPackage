@@ -8,7 +8,6 @@ clean_assay_type(
   df,
   check_npx_log,
   keep_control_assay = FALSE,
-  out_df = "tibble",
   verbose = FALSE
 )
 }
@@ -25,9 +24,6 @@ column is missing then function will return the original dataset.}
 
 \item{keep_control_assay}{Logical. If \code{TRUE}, internal control assays are
 retained and no filtering is applied. Defaults to \code{FALSE}.}
-
-\item{out_df}{The class of the output dataset. One of
-"tibble" and "arrow". (default = "tibble")}
 
 \item{verbose}{Logical. If \code{FALSE} (default), silences step-wise CLI
 messages.}
