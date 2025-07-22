@@ -633,7 +633,7 @@ test_that(
       object = expect_equal(
         object = clean_sample_type(df = df,
                                    check_npx_log = log,
-                                   keep_control_sample = FALSE,
+                                   remove_control_sample = TRUE,
                                    verbose = FALSE),
         expected = expected_result
       ),
@@ -643,23 +643,14 @@ test_that(
     ## vebose = TRUE ----
 
     expect_message(
-      object = expect_message(
-        object = expect_equal(
-          object = clean_sample_type(df = df,
-                                     check_npx_log = log,
-                                     keep_control_sample = FALSE,
-                                     verbose = TRUE),
-          expected = expected_result
-        ),
-        regexp = "Excluding 1 control sample: \"ControlType\"."
+      object = expect_equal(
+        object = clean_sample_type(df = df,
+                                   check_npx_log = log,
+                                   remove_control_sample = TRUE,
+                                   verbose = TRUE),
+        expected = expected_result
       ),
-      regexp = olink_sample_types[
-        !(names(olink_sample_types) %in% c("sample"))
-      ] |>
-        unlist() |>
-        unname() |>
-        ansi_collapse_quot() |>
-        (\(x) paste0("Removed control samples marked as ", x, "."))()
+      regexp = "Excluding 1 control sample: \"ControlType\"."
     )
   }
 )
@@ -679,7 +670,7 @@ test_that(
       object = expect_equal(
         object = clean_sample_type(df = df_arrow,
                                    check_npx_log = log,
-                                   keep_control_sample = FALSE,
+                                   remove_control_sample = TRUE,
                                    verbose = FALSE) |>
           dplyr::collect(),
         expected = expected_result
@@ -690,24 +681,15 @@ test_that(
     ## vebose = TRUE ----
 
     expect_message(
-      object = expect_message(
-        object = expect_equal(
-          object = clean_sample_type(df = df_arrow,
-                                     check_npx_log = log,
-                                     keep_control_sample = FALSE,
-                                     verbose = TRUE) |>
-            dplyr::collect(),
-          expected = expected_result
-        ),
-        regexp = "Excluding 1 control sample: \"ControlType\"."
+      object = expect_equal(
+        object = clean_sample_type(df = df_arrow,
+                                   check_npx_log = log,
+                                   remove_control_sample = TRUE,
+                                   verbose = TRUE) |>
+          dplyr::collect(),
+        expected = expected_result
       ),
-      regexp = olink_sample_types[
-        !(names(olink_sample_types) %in% c("sample"))
-      ] |>
-        unlist() |>
-        unname() |>
-        ansi_collapse_quot() |>
-        (\(x) paste0("Removed control samples marked as ", x, "."))()
+      regexp = "Excluding 1 control sample: \"ControlType\"."
     )
   }
 )
@@ -720,7 +702,7 @@ test_that(
     expect_equal(
       object = clean_sample_type(df = df,
                                  check_npx_log = log,
-                                 keep_control_sample = TRUE,
+                                 remove_control_sample = FALSE,
                                  verbose = FALSE),
       expected = df
     )
@@ -731,11 +713,111 @@ test_that(
       object = expect_equal(
         object = clean_sample_type(df = df,
                                    check_npx_log = log,
-                                   keep_control_sample = TRUE,
+                                   remove_control_sample = FALSE,
                                    verbose = TRUE),
         expected = df
       ),
-      regexp = "Skipping exclusion of control samples as per user input"
+      regexp = paste("Skipping exclusion of control samples as per user input:",
+                     "remove_control_sample = FALSE.")
+    )
+  }
+)
+
+test_that(
+  "clean_sample_type - works - selectively remove control samples",
+  {
+    # v1 ----
+
+    expected_result <- df |>
+      dplyr::filter(
+        .data[["SampleID"]] != "ControlType"
+      )
+
+    expect_message(
+      object = expect_equal(
+        object = clean_sample_type(df = df,
+                                   check_npx_log = log,
+                                   remove_control_sample = c("pc"),
+                                   verbose = FALSE),
+        expected = expected_result
+      ),
+      regexp = "Excluding 1 control sample: \"ControlType\"."
+    )
+
+    # v2 ----
+
+    expected_result <- df |>
+      dplyr::filter(
+        .data[["SampleID"]] != "ControlType"
+      )
+
+    expect_message(
+      object = expect_equal(
+        object = clean_sample_type(df = df,
+                                   check_npx_log = log,
+                                   remove_control_sample = c("sc", "pc", "nc"),
+                                   verbose = FALSE),
+        expected = expected_result
+      ),
+      regexp = "Excluding 1 control sample: \"ControlType\"."
+    )
+
+    # v3 ----
+
+    expected_result <- df |>
+      dplyr::filter(
+        .data[["SampleID"]] == "ControlType"
+      )
+
+    expect_message(
+      object = expect_equal(
+        object = clean_sample_type(df = df,
+                                   check_npx_log = log,
+                                   remove_control_sample = c("sample"),
+                                   verbose = FALSE),
+        expected = expected_result
+      ),
+      regexp = paste("Excluding 8 control samples: \"ValidSample\",",
+                     "\"InvalidOID\", \"AllNA\", \"DuplicateSample\",",
+                     "\"ControlID\", \"FailQC\", \"ControlAssay\",",
+                     "and \"AssayWarn\".")
+    )
+
+    # v4 ----
+
+    expected_result <- df |>
+      dplyr::filter(
+        .data[["SampleID"]] != "ControlType"
+      )
+
+    expect_message(
+      object = expect_message(
+        object = expect_equal(
+          object = clean_sample_type(df = df,
+                                     check_npx_log = log,
+                                     remove_control_sample = c("pc", "pc2"),
+                                     verbose = FALSE),
+          expected = expected_result
+        ),
+        regexp = paste("Unexpected entries \"pc2\" in `remove_control_sample`.",
+                       "Expected values: \"sample\", \"sc\", \"pc\",",
+                       "and \"nc\".")
+      ),
+      regexp = "Excluding 1 control sample: \"ControlType\"."
+    )
+  }
+)
+
+test_that(
+  "clean_sample_type - error - no control samples matches expected ones",
+  {
+    expect_error(
+      object = clean_sample_type(df = df,
+                                 check_npx_log = log,
+                                 remove_control_sample = c("pc2"),
+                                 verbose = FALSE),
+      regexp = paste("No overlap of value from `remove_control_sample` to",
+                     "expected values.")
     )
   }
 )
@@ -756,7 +838,7 @@ test_that(
       object = expect_equal(
         object = clean_sample_type(df = test_df,
                                    check_npx_log = log_test,
-                                   keep_control_sample = FALSE),
+                                   remove_control_sample = TRUE),
         expected = test_df
       ),
       regexp = paste("No column marking control samples in dataset.")
@@ -1780,7 +1862,6 @@ test_that(
     expect_equal(
       object = clean_npx(df = df,
                          check_log = log,
-                         keep_controls = NULL,
                          control_sample_ids = c("ControlID"),
                          verbose = TRUE) |>
         suppressMessages(),
@@ -1801,12 +1882,6 @@ test_that(
       dplyr::filter(
         .data[["SampleID"]] == "ValidSample"
       )
-
-    # Minimal fake check_log with required structure
-    log <- check_npx(df) |>
-      suppressWarnings() |>
-      suppressMessages()
-
 
     msgs <- capture_messages(
       {
@@ -1854,33 +1929,31 @@ test_that(
                       msgs_clean[8L]))
     expect_true(grepl("Excluding 1 control sample: \"ControlType\"",
                       msgs_clean[9L]))
-    expect_true(grepl(paste("Removed control samples marked as"),
-                      msgs_clean[10L]))
     expect_true(grepl("Cleaning control samples based on Sample ID",
-                      msgs_clean[11L]))
+                      msgs_clean[10L]))
     expect_true(grepl(paste("Skipping exclusion of control samples based on",
                             "`control_sample_ids`."),
-                      msgs_clean[12L]))
+                      msgs_clean[11L]))
     expect_true(grepl("Cleaning Samples with QC Status 'FAIL'",
-                      msgs_clean[13L]))
+                      msgs_clean[12L]))
     expect_true(grepl(paste("Excluding 1 datapoint from 1 sample flagged with",
                             "SampleQC = \"FAIL\": \"FailQC\"."),
-                      msgs_clean[14L]))
+                      msgs_clean[13L]))
     expect_true(grepl("Cleaning internal control assays",
-                      msgs_clean[15L]))
+                      msgs_clean[14L]))
     expect_true(grepl("Excluding 1 control assay: \"OID78901\"",
-                      msgs_clean[16L]))
+                      msgs_clean[15L]))
     expect_true(grepl("Cleaning assays flagged by assay warning",
-                      msgs_clean[17L]))
+                      msgs_clean[16L]))
     expect_true(grepl(paste("Excluding 1 datapoint from 1 assay flagged with",
                             "AssayQC = \"WARN\" or \"Warning\": \"OID89012\""),
-                      msgs_clean[18L]))
+                      msgs_clean[17L]))
     expect_true(grepl("Correcting flagged column class",
-                      msgs_clean[19L]))
+                      msgs_clean[18L]))
     expect_true(grepl("Columns are in the correct format.",
-                      msgs_clean[20L]))
+                      msgs_clean[19L]))
     expect_true(grepl("Completed `clean_npx\\(\\)`",
-                      msgs_clean[21L]))
+                      msgs_clean[20L]))
 
   }
 )

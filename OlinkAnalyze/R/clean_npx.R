@@ -144,11 +144,11 @@ clean_npx <- function(df,
                       check_log = NULL,
                       preferred_names = NULL,
                       control_sample_ids = NULL,
-                      keep_controls = NULL,
                       remove_assay_na = TRUE,
                       remove_invalid_oid = TRUE,
                       remove_dup_sample_id = TRUE,
                       remove_control_assay = TRUE,
+                      remove_control_sample = TRUE,
                       keep_qc_warning = FALSE,
                       keep_assay_warning = FALSE,
                       out_df = "tibble",
@@ -217,16 +217,10 @@ clean_npx <- function(df,
   # Clean control samples based on sample type
   if (verbose) cli::cli_h3("Cleaning control samples based on sample type")
 
-  if (is.null(keep_controls) || !keep_controls %in% c("sample", "both")) {
-    keep_control_sample <- FALSE
-  } else {
-    keep_control_sample <-  TRUE
-  }
-
   df <- clean_sample_type(
     df = df,
     check_npx_log = check_npx_log,
-    keep_control_sample = keep_control_sample,
+    remove_control_sample = remove_control_sample,
     verbose = verbose
   )
 
@@ -579,8 +573,10 @@ clean_duplicate_sample_id <- function(df,
 #' dataset. \strong{If column is missing then function will return the original
 #' dataset.}
 #' }
-#' @param keep_control_sample Logical. If `TRUE`, control samples are retained
-#' and no filtering is attempted. Defaults to `FALSE`.
+#' @param remove_control_sample If `FALSE`, all control samples are retained. If
+#' `TRUE`, all control samples are removed. Alternatively, a character vector
+#' with one or more of `r ansi_collapse_quot(x = names(olink_sample_types))`
+#' indicating the sample types to remove.
 #' @param verbose Logical. If `FALSE` (default), silences step-wise CLI
 #' messages.
 #'
@@ -589,15 +585,66 @@ clean_duplicate_sample_id <- function(df,
 #'
 clean_sample_type <- function(df,
                               check_npx_log,
-                              keep_control_sample = FALSE,
+                              remove_control_sample = TRUE,
                               verbose = FALSE) {
+  # if remove_control_sample is boolean then we either remove all control
+  # samples (when TRUE), or we keep samples (when FALSE).
+  # When remove_control_sample is a character vector, then we remove all user
+  # designated controls.
+  if (check_is_scalar_boolean(bool = remove_control_sample, error = FALSE)) {
+
+    if (remove_control_sample == TRUE) {
+      ctrl_sample_type <- olink_sample_types[
+        !(names(olink_sample_types) %in% c("sample"))
+      ] |>
+        unlist() |>
+        unname()
+    } else {
+      ctrl_sample_type <- character(0L)
+    }
+
+  } else if (check_is_character(string = remove_control_sample, error = TRUE)) {
+
+    if (all(remove_control_sample %in% names(olink_sample_types))) {
+      ctrl_sample_type <- olink_sample_types[names(olink_sample_types)
+                                             %in% remove_control_sample] |>
+        unlist() |>
+        unname()
+    } else if (any(remove_control_sample %in% names(olink_sample_types))) {
+      ctrl_sample_type <- olink_sample_types[names(olink_sample_types)
+                                             %in% remove_control_sample] |>
+        unlist() |>
+        unname()
+      olink_sampless_compl <- setdiff(x = remove_control_sample, # nolint object_usage_linter
+                                      y = names(olink_sample_types))
+
+      cli::cli_inform(
+        c("Unexpected entries {.val {olink_sampless_compl}} in
+          {.arg remove_control_sample}. Expected values:
+          {.val {names(olink_sample_types)}}.",
+          "i" = "Proceeding with entries: {.val {ctrl_sample_type}}.")
+      )
+    } else {
+      cli::cli_abort(
+        c(
+          "x" = "{cli::qty(remove_control_sample)} No overlap of value{?s} from
+          {.arg remove_control_sample} to expected values.",
+          "i" = "Ensure {.arg remove_control_sample} is a scalar boolean or
+          contains one or more of {.val {names(olink_sample_types)}}!"
+        ),
+        call = rlang::caller_env(),
+        wrap = TRUE
+      )
+    }
+
+  }
 
   # Return original data if user chooses to keep control samples
-  if (keep_control_sample == TRUE) {
+  if (length(ctrl_sample_type) == 0L) {
     if (verbose == TRUE) {
       cli::cli_inform(
-        c("Skipping exclusion of control samples as per user input
-          {.arg keep_control_sample}.",
+        c("Skipping exclusion of control samples as per user input:
+          {.field remove_control_sample} = {.val {remove_control_sample}}.",
           "i" = "Returning original dataset.")
       )
     }
@@ -614,13 +661,6 @@ clean_sample_type <- function(df,
     )
     return(df)
   }
-
-  # list control sample types to be excluded
-  ctrl_sample_type <- olink_sample_types[
-    !(names(olink_sample_types) %in% c("sample"))
-  ] |>
-    unlist() |>
-    unname()
 
   # detect how many samples are to be removed
   df_sid_stype <- df |>
@@ -646,8 +686,11 @@ clean_sample_type <- function(df,
       )
 
     cli::cli_inform(
-      "Excluding {.val {length(uniq_sid)}} control sample{?s}:
-        {.val {uniq_sid}}."
+      c(
+        "Excluding {.val {length(uniq_sid)}} control sample{?s}:
+        {.val {uniq_sid}}.",
+        "v" = "Returning cleaned dataset."
+      )
     )
   }
 
@@ -657,13 +700,6 @@ clean_sample_type <- function(df,
       !(.data[[check_npx_log$col_names$sample_type]]
         %in% .env[["ctrl_sample_type"]])
     )
-
-  if (verbose == TRUE) {
-    cli::cli_inform(
-      c("Removed control samples marked as {.val {ctrl_sample_type}}.",
-        "v" = "Returning cleaned dataset.")
-    )
-  }
 
   # Format and return output
   return(df_cleaned)
@@ -703,8 +739,8 @@ clean_assay_type <- function(df,
                              check_npx_log,
                              remove_control_assay = TRUE,
                              verbose = FALSE) {
-  # if remove_control_assay is boolean then we either keep all control assays
-  # (when TRUE), or we keep only non-control assays (when FALSE).
+  # if remove_control_assay is boolean then we either remove all control assays
+  # (when TRUE), or we keep all assays (when FALSE).
   # When remove_control_assay is a character vector, then we remove all user
   # designated controls.
   if (check_is_scalar_boolean(bool = remove_control_assay, error = FALSE)) {

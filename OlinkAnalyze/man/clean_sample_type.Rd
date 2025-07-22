@@ -7,7 +7,7 @@
 clean_sample_type(
   df,
   check_npx_log,
-  keep_control_sample = FALSE,
+  remove_control_sample = TRUE,
   verbose = FALSE
 )
 }
@@ -24,8 +24,10 @@ dataset. \strong{If column is missing then function will return the original
 dataset.}
 }}
 
-\item{keep_control_sample}{Logical. If \code{TRUE}, control samples are retained
-and no filtering is attempted. Defaults to \code{FALSE}.}
+\item{remove_control_sample}{If \code{FALSE}, all control samples are retained. If
+\code{TRUE}, all control samples are removed. Alternatively, a character vector
+with one or more of "sample", "sc", "pc", and "nc"
+indicating the sample types to remove.}
 
 \item{verbose}{Logical. If \code{FALSE} (default), silences step-wise CLI
 messages.}
