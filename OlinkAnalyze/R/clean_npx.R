@@ -146,7 +146,7 @@ clean_npx <- function(df,
                       control_sample_ids = NULL,
                       keep_controls = NULL,
                       remove_assay_na = TRUE,
-                      keep_invalid_oid = FALSE,
+                      remove_invalid_oid = TRUE,
                       keep_duplicate_sample_id = FALSE,
                       keep_qc_warning = FALSE,
                       keep_assay_warning = FALSE,
@@ -189,7 +189,7 @@ clean_npx <- function(df,
   df <- clean_invalid_oid(
     df = df,
     check_npx_log = check_npx_log,
-    keep_invalid_oid = keep_invalid_oid,
+    remove_invalid_oid = remove_invalid_oid,
     verbose = verbose
   )
 
@@ -415,8 +415,8 @@ clean_assay_na <- function(df,
 #' \item `col_names$olink_id`: the column name of the assay identifier in the
 #' dataset.
 #' }
-#' @param keep_invalid_oid Logical. If `TRUE`, skips filtering of assays with
-#' invalid OlinkID. Defaults to `FALSE`.
+#' @param remove_invalid_oid Logical. If `FALSE`, skips filtering assays with
+#' invalid identifiers. Defaults to `TRUE`.
 #' @param verbose Logical. If `FALSE` (default), silences step-wise CLI
 #' messages.
 #'
@@ -425,26 +425,28 @@ clean_assay_na <- function(df,
 #'
 clean_invalid_oid <- function(df,
                               check_npx_log,
-                              keep_invalid_oid = FALSE,
+                              remove_invalid_oid = TRUE,
                               verbose = FALSE) {
 
-  # Check if there are any invalid OlinkIDs to remove
-  if (keep_invalid_oid == TRUE || length(check_npx_log$oid_invalid) == 0L) {
-    if(keep_invalid_oid == TRUE) {
-      if (verbose == TRUE) {
-        cli::cli_inform(
-          c("Skipping exclusion of assay with invalid OlinkID as per user
-            input {.arg keep_invalid_oid}.",
-            "i" = "Returning original dataset.")
-        )
-      }
-    } else {
-      if (verbose == TRUE) {
-        cli::cli_inform(
-          c("No invalid assay identifiers.",
-            "i" = "Returning original dataset.")
-        )
-      }
+  # Keep invalid assay identifiers if user indicates so
+  if (remove_invalid_oid == FALSE) {
+    if (verbose == TRUE) {
+      cli::cli_inform(
+        c("Skipping exclusion of assays with invalid identifiers as per user
+          input: {.field remove_invalid_oid} = {.val {FALSE}}.",
+          "i" = "Returning original dataset.")
+      )
+    }
+    return(df)
+  }
+
+  # Check if there are any invalid assay identifiers to remove
+  if (length(check_npx_log$oid_invalid) == 0L) {
+    if (verbose == TRUE) {
+      cli::cli_inform(
+        c("No invalid assay identifiers.",
+          "i" = "Returning original dataset.")
+      )
     }
     return(df)
   }

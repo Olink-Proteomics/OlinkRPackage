@@ -11,7 +11,7 @@ clean_npx(
   control_sample_ids = NULL,
   keep_controls = NULL,
   remove_assay_na = TRUE,
-  keep_invalid_oid = FALSE,
+  remove_invalid_oid = TRUE,
   keep_duplicate_sample_id = FALSE,
   keep_qc_warning = FALSE,
   keep_assay_warning = FALSE,

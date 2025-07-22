@@ -287,7 +287,7 @@ test_that(
       object = expect_equal(
         object = clean_invalid_oid(df = df,
                                    check_npx_log = log,
-                                   keep_invalid_oid = FALSE,
+                                   remove_invalid_oid = TRUE,
                                    verbose = FALSE),
         expected = expected_result
       ),
@@ -301,7 +301,7 @@ test_that(
         object = expect_equal(
           object = clean_invalid_oid(df = df,
                                      check_npx_log = log,
-                                     keep_invalid_oid = FALSE,
+                                     remove_invalid_oid = TRUE,
                                      verbose = TRUE),
           expected = expected_result
         ),
@@ -327,7 +327,7 @@ test_that(
       object = expect_equal(
         object = clean_invalid_oid(df = df_arrow,
                                    check_npx_log = log,
-                                   keep_invalid_oid = FALSE,
+                                   remove_invalid_oid = TRUE,
                                    verbose = FALSE) |>
           dplyr::collect(),
         expected = expected_result
@@ -342,7 +342,7 @@ test_that(
         object = expect_equal(
           object = clean_invalid_oid(df = df_arrow,
                                      check_npx_log = log,
-                                     keep_invalid_oid = FALSE,
+                                     remove_invalid_oid = TRUE,
                                      verbose = TRUE) |>
             dplyr::collect(),
           expected = expected_result
@@ -371,7 +371,7 @@ test_that(
     expect_equal(
       object = clean_invalid_oid(df = expected_result,
                                  check_npx_log = log_exp,
-                                 keep_invalid_oid = FALSE,
+                                 remove_invalid_oid = TRUE,
                                  verbose = FALSE),
       expected = expected_result
     )
@@ -382,7 +382,7 @@ test_that(
       object = expect_equal(
         object = clean_invalid_oid(df = expected_result,
                                    check_npx_log = log_exp,
-                                   keep_invalid_oid = FALSE,
+                                   remove_invalid_oid = TRUE,
                                    verbose = TRUE),
         expected = expected_result
       ),
@@ -401,12 +401,12 @@ test_that(
       object = expect_equal(
         object = clean_invalid_oid(df = df,
                                    check_npx_log = log,
-                                   keep_invalid_oid = TRUE,
+                                   remove_invalid_oid = FALSE,
                                    verbose = TRUE),
         expected = df
       ),
-      regexp = paste("Skipping exclusion of assay with invalid OlinkID",
-                     "as per user input `keep_invalid_oid`.")
+      regexp = paste("Skipping exclusion of assays with invalid identifiers as",
+                     "per user input: remove_invalid_oid = FALSE.")
     )
 
     ## verbose FALSE ----
@@ -414,7 +414,7 @@ test_that(
     expect_equal(
       object = clean_invalid_oid(df = df,
                                  check_npx_log = log,
-                                 keep_invalid_oid = TRUE,
+                                 remove_invalid_oid = FALSE,
                                  verbose = FALSE),
       expected = df
     )
@@ -431,12 +431,12 @@ test_that(
       object = expect_equal(
         object = clean_invalid_oid(df = df_arrow,
                                    check_npx_log = log,
-                                   keep_invalid_oid = TRUE,
+                                   remove_invalid_oid = FALSE,
                                    verbose = TRUE),
         expected = df_arrow
       ),
-      regexp = paste("Skipping exclusion of assay with invalid OlinkID",
-                     "as per user input `keep_invalid_oid`.")
+      regexp = paste("Skipping exclusion of assays with invalid identifiers as",
+                     "per user input: remove_invalid_oid = FALSE.")
     )
 
     ## verbose FALSE ----
@@ -444,7 +444,7 @@ test_that(
     expect_equal(
       object = clean_invalid_oid(df = df_arrow,
                                  check_npx_log = log,
-                                 keep_invalid_oid = TRUE,
+                                 remove_invalid_oid = FALSE,
                                  verbose = FALSE),
       expected = df_arrow
     )
