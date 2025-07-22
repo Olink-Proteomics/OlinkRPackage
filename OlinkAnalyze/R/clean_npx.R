@@ -143,9 +143,9 @@
 clean_npx <- function(df,
                       check_log = NULL,
                       preferred_names = NULL,
-                      keep_controls = NULL,
                       control_sample_ids = NULL,
-                      keep_assay_all_na = FALSE,
+                      keep_controls = NULL,
+                      remove_assay_na = TRUE,
                       keep_invalid_oid = FALSE,
                       keep_duplicate_sample_id = FALSE,
                       keep_qc_warning = FALSE,
@@ -198,7 +198,7 @@ clean_npx <- function(df,
   df <- clean_assay_na(
     df = df,
     check_npx_log = check_npx_log,
-    keep_assay_all_na = keep_assay_all_na,
+    remove_assay_na = remove_assay_na,
     verbose = verbose
   )
 
@@ -333,8 +333,8 @@ clean_npx <- function(df,
 #' \item `col_names$olink_id`: the column name of the assay identifier in the
 #' dataset.
 #' }
-#' @param keep_assay_all_na Logical. If `TRUE`, skips filtering of assay
-#' identifiers with all quantified values `NA`. Defaults to `FALSE`.
+#' @param remove_assay_na Logical. If `FALSE`, skips filtering assays with all
+#' quantified values `NA`. Defaults to `TRUE`.
 #' @param verbose Logical. If `FALSE` (default), silences step-wise CLI
 #' messages.
 #'
@@ -343,27 +343,28 @@ clean_npx <- function(df,
 #'
 clean_assay_na <- function(df,
                            check_npx_log,
-                           keep_assay_all_na = FALSE,
+                           remove_assay_na = TRUE,
                            verbose = FALSE) {
 
-  # If assays with all NA values are retained by the user or if such assays
-  # are not present, skip filtering
-  if (keep_assay_all_na == TRUE || length(check_npx_log$assay_na) == 0L) {
-    if (keep_assay_all_na == TRUE) {
-      if (verbose == TRUE) {
-        cli::cli_inform(
-          c("Skipping exclusion of assay with all quantified values 'NA' as per
-          user input {.arg keep_assay_all_na}.",
-            "i" = "Returning original dataset.")
-        )
-      }
-    } else {
-      if (verbose == TRUE) {
-        cli::cli_inform(
-          c("No assays with only {.val NA} values.",
-            "i" = "Returning original dataset.")
-        )
-      }
+  # If assays with all NA values are retained by the user
+  if (remove_assay_na == FALSE) {
+    if (verbose == TRUE) {
+      cli::cli_inform(
+        c("Skipping exclusion of assays with all quantified values {.val NA} as
+        per user input: {.field remove_assay_na} = {.val {FALSE}}.",
+          "i" = "Returning original dataset.")
+      )
+    }
+    return(df)
+  }
+
+  # Id not assays with all values NA
+  if (length(check_npx_log$assay_na) == 0L) {
+    if (verbose == TRUE) {
+      cli::cli_inform(
+        c("No assays with only {.val NA} values.",
+          "i" = "Returning original dataset.")
+      )
     }
     return(df)
   }

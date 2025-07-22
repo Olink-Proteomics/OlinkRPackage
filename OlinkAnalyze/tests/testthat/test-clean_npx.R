@@ -107,7 +107,7 @@ test_that(
       object = expect_equal(
         object = clean_assay_na(df = df,
                                 check_npx_log = log,
-                                keep_assay_all_na = FALSE,
+                                remove_assay_na = TRUE,
                                 verbose = FALSE),
         expected = expected_result
       ),
@@ -121,7 +121,7 @@ test_that(
         object = expect_equal(
           object = clean_assay_na(df = df,
                                   check_npx_log = log,
-                                  keep_assay_all_na = FALSE,
+                                  remove_assay_na = TRUE,
                                   verbose = TRUE),
           expected = expected_result
         ),
@@ -147,7 +147,7 @@ test_that(
       object = expect_equal(
         object = clean_assay_na(df = df_arrow,
                                 check_npx_log = log,
-                                keep_assay_all_na = FALSE,
+                                remove_assay_na = TRUE,
                                 verbose = FALSE) |>
           dplyr::collect(),
         expected = expected_result
@@ -162,7 +162,7 @@ test_that(
         object = expect_equal(
           object = clean_assay_na(df = df_arrow,
                                   check_npx_log = log,
-                                  keep_assay_all_na = FALSE,
+                                  remove_assay_na = TRUE,
                                   verbose = TRUE) |>
             dplyr::collect(),
           expected = expected_result
@@ -191,7 +191,7 @@ test_that(
     expect_equal(
       object = clean_assay_na(df = expected_result,
                               check_npx_log = log_exp,
-                              keep_assay_all_na = FALSE,
+                              remove_assay_na = TRUE,
                               verbose = FALSE),
       expected = expected_result
     )
@@ -202,7 +202,7 @@ test_that(
       object = expect_equal(
         object = clean_assay_na(df = expected_result,
                                 check_npx_log = log_exp,
-                                keep_assay_all_na = FALSE,
+                                remove_assay_na = TRUE,
                                 verbose = TRUE),
         expected = expected_result
       ),
@@ -221,12 +221,12 @@ test_that(
       object = expect_equal(
         object = clean_assay_na(df = df,
                                 check_npx_log = log,
-                                keep_assay_all_na = TRUE,
+                                remove_assay_na = FALSE,
                                 verbose = TRUE),
         expected = df
       ),
-      regexp = paste("Skipping exclusion of assay with all quantified",
-                     "values 'NA' as per user input `keep_assay_all_na`.")
+      regexp = paste("Skipping exclusion of assays with all quantified values",
+                     "\"NA\" as per user input: remove_assay_na = FALSE.")
     )
 
     ## verbose FALSE ----
@@ -234,7 +234,7 @@ test_that(
     expect_equal(
       object = clean_assay_na(df = df,
                               check_npx_log = log,
-                              keep_assay_all_na = TRUE,
+                              remove_assay_na = FALSE,
                               verbose = FALSE),
       expected = df
     )
@@ -251,12 +251,12 @@ test_that(
       object = expect_equal(
         object = clean_assay_na(df = df_arrow,
                                 check_npx_log = log,
-                                keep_assay_all_na = TRUE,
+                                remove_assay_na = FALSE,
                                 verbose = TRUE),
         expected = df_arrow
       ),
-      regexp = paste("Skipping exclusion of assay with all quantified",
-                     "values 'NA' as per user input `keep_assay_all_na`.")
+      regexp = paste("Skipping exclusion of assays with all quantified values",
+                     "\"NA\" as per user input: remove_assay_na = FALSE.")
     )
 
     ## verbose FALSE ----
@@ -264,7 +264,7 @@ test_that(
     expect_equal(
       object = clean_assay_na(df = df_arrow,
                               check_npx_log = log,
-                              keep_assay_all_na = TRUE,
+                              remove_assay_na = FALSE,
                               verbose = FALSE),
       expected = df_arrow
     )

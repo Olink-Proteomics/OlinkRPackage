@@ -8,9 +8,9 @@ clean_npx(
   df,
   check_log = NULL,
   preferred_names = NULL,
-  keep_controls = NULL,
   control_sample_ids = NULL,
-  keep_assay_all_na = FALSE,
+  keep_controls = NULL,
+  remove_assay_na = TRUE,
   keep_invalid_oid = FALSE,
   keep_duplicate_sample_id = FALSE,
   keep_qc_warning = FALSE,
@@ -28,6 +28,9 @@ clean_npx(
 \item{preferred_names}{An optional named list to supply preferred column
 names to \code{check_npx()}, if \code{check_log} is not provided.}
 
+\item{control_sample_ids}{A character vector of \code{SampleID}s to remove.
+Typically used to remove customer-provided or technical control samples.}
+
 \item{keep_controls}{Character string indicating whether to retain any
 controls:
 \itemize{
@@ -36,9 +39,6 @@ controls:
 \item \code{"both"}: keep all controls,
 \item \code{NULL} (default): remove all controls.
 }}
-
-\item{control_sample_ids}{A character vector of \code{SampleID}s to remove.
-Typically used to remove customer-provided or technical control samples.}
 
 \item{out_df}{Output format: \code{"tibble"} (default) or \code{"arrow"}.}
 
