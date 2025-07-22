@@ -14,8 +14,8 @@ clean_npx(
   remove_dup_sample_id = TRUE,
   remove_control_assay = TRUE,
   remove_control_sample = TRUE,
-  keep_qc_warning = FALSE,
-  keep_assay_warning = FALSE,
+  remove_qc_warning = FALSE,
+  remove_assay_warning = TRUE,
   out_df = "tibble",
   verbose = FALSE
 )

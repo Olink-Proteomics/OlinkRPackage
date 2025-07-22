@@ -149,8 +149,8 @@ clean_npx <- function(df,
                       remove_dup_sample_id = TRUE,
                       remove_control_assay = TRUE,
                       remove_control_sample = TRUE,
-                      keep_qc_warning = FALSE,
-                      keep_assay_warning = FALSE,
+                      remove_qc_warning = FALSE,
+                      remove_assay_warning = TRUE,
                       out_df = "tibble",
                       verbose = FALSE) {
 
@@ -216,7 +216,6 @@ clean_npx <- function(df,
 
   # Clean control samples based on sample type
   if (verbose) cli::cli_h3("Cleaning control samples based on sample type")
-
   df <- clean_sample_type(
     df = df,
     check_npx_log = check_npx_log,
@@ -238,13 +237,12 @@ clean_npx <- function(df,
   df <- clean_qc_warning(
     df = df,
     check_npx_log = check_npx_log,
+    remove_qc_warning = remove_qc_warning,
     verbose = verbose
   )
 
   # Clean internal control assays
   if (verbose) cli::cli_h3("Cleaning internal control assays")
-
-  # remove_control_assay
   df <- clean_assay_type(
     df = df,
     check_npx_log = check_npx_log,
@@ -257,9 +255,9 @@ clean_npx <- function(df,
   df <- clean_assay_warning(
     df = df,
     check_npx_log = check_npx_log,
+    remove_assay_warning = remove_assay_warning,
     verbose = verbose
   )
-
 
   # Correct column class
   if (verbose) cli::cli_h3("Correcting flagged column class")
@@ -268,7 +266,6 @@ clean_npx <- function(df,
     check_npx_log = check_npx_log,
     verbose = verbose
   )
-
 
   # Check for absolute quantification and apply log2 transformation
   if (grepl(pattern = "Quantified",
@@ -283,7 +280,6 @@ clean_npx <- function(df,
     )
   }
 
-
   # Final output
   cli::cli_inform("Completed {.fn clean_npx}. Returning `{out_df}` object.")
 
@@ -293,7 +289,6 @@ clean_npx <- function(df,
       out_df = out_df
     )
   )
-
 }
 
 # Help Functions ----------------------------------------------------------
@@ -877,8 +872,8 @@ clean_assay_type <- function(df,
 #' dataset.
 #' \item `col_names$qc_warning`: the name of the column indicating QC status.
 #' }
-#' @param keep_qc_warning Logical. If `TRUE`, keeps samples flagged `FAIL` in
-#' QC warnings. Defaults to `FALSE`.
+#' @param remove_qc_warning Logical. If `TRUE`, removes samples flagged as
+#' `FAIL` in QC warning. Defaults to `FALSE`.
 #' @param verbose Logical. If `FALSE` (default), silences step-wise CLI
 #' messages.
 #'
@@ -887,14 +882,14 @@ clean_assay_type <- function(df,
 #'
 clean_qc_warning <- function(df,
                              check_npx_log,
-                             keep_qc_warning = FALSE,
+                             remove_qc_warning = FALSE,
                              verbose = FALSE) {
 
-  if (keep_qc_warning == TRUE) {
+  if (remove_qc_warning == FALSE) {
     if (verbose == TRUE) {
       cli::cli_inform(
-        c("Skipping exclusion of samples flagged `FAIL` as per user input
-          {.arg keep_qc_warning}",
+        c("Skipping exclusion of samples flagged {.val {'FAIL'}} as per user
+          input {.field remove_qc_warning} = {.val {FALSE}}.",
           "i" = "Returning original dataset.")
       )
     }
@@ -977,6 +972,8 @@ clean_qc_warning <- function(df,
 #' \item `col_names$assay_warning`: the name of the column indicating assay QC
 #' status.
 #' }
+#' @param remove_assay_warning Logical. If `FALSE`, retains assays flagged as
+#' `WARN` in assay warning. Defaults to `TRUE`.
 #' @param verbose Logical. If `FALSE` (default), silences step-wise CLI
 #' messages.
 #'
@@ -985,32 +982,29 @@ clean_qc_warning <- function(df,
 #'
 clean_assay_warning <- function(df,
                                 check_npx_log,
-                                keep_assay_warning = FALSE,
+                                remove_assay_warning = TRUE,
                                 verbose = FALSE) {
-
-  # Check if assay_warn column name is defined
-  if (keep_assay_warning == TRUE
-      || !("assay_warn" %in% names(check_npx_log$col_names))) {
-    if (keep_assay_warning == TRUE) {
-      if (verbose == TRUE) {
-        cli::cli_inform(
-          c("Skipping exclusion of assays falgged as `WARN` as per user
-            input {.arg keep_assay_warning}.",
-            "i" = "Returning original dataset."
-          )
-        )
-      }
-
-    } else {
+  # retain assays marked with assay warning
+  if (remove_assay_warning == FALSE) {
+    if (verbose == TRUE) {
       cli::cli_inform(
-        c("No column marking assay warnings in dataset.",
-          "i" = "Ensure assays with QC warnings are removed prior to downstream
-        analysis!",
-          "i" = "Returning original dataset."
-        )
+        c("Skipping exclusion of assays flagged with {.val {'WARN'}} as per user
+          input {.field remove_assay_warning} = {.val {FALSE}}.",
+          "i" = "Returning original dataset.")
       )
     }
+    return(df)
+  }
 
+  # Check if assay_warn column name is defined
+  if (!("assay_warn" %in% names(check_npx_log$col_names))) {
+    cli::cli_inform(
+      c("No column marking assay warnings in dataset.",
+        "i" = "Ensure assays with QC warnings are removed prior to downstream
+          analysis!",
+        "i" = "Returning original dataset."
+      )
+    )
     return(df)
   }
 

@@ -1091,7 +1091,7 @@ test_that(
       object = expect_equal(
         object = clean_qc_warning(df = df,
                                   check_npx_log = log,
-                                  keep_qc_warning = FALSE,
+                                  remove_qc_warning = TRUE,
                                   verbose = FALSE),
         expected = expected_result
       ),
@@ -1105,7 +1105,7 @@ test_that(
       object = expect_equal(
         object = clean_qc_warning(df = df,
                                   check_npx_log = log,
-                                  keep_qc_warning = FALSE,
+                                  remove_qc_warning = TRUE,
                                   verbose = TRUE),
         expected = expected_result
       ),
@@ -1130,7 +1130,7 @@ test_that(
       object = expect_equal(
         object = clean_qc_warning(df = df_arrow,
                                   check_npx_log = log,
-                                  keep_qc_warning = FALSE,
+                                  remove_qc_warning = TRUE,
                                   verbose = FALSE) |>
           dplyr::collect(),
         expected = expected_result
@@ -1145,7 +1145,7 @@ test_that(
       object = expect_equal(
         object = clean_qc_warning(df = df_arrow,
                                   check_npx_log = log,
-                                  keep_qc_warning = FALSE,
+                                  remove_qc_warning = TRUE,
                                   verbose = TRUE) |>
           dplyr::collect(),
         expected = expected_result
@@ -1191,7 +1191,7 @@ test_that(
               )
             ),
           check_npx_log = log,
-          keep_qc_warning = FALSE,
+          remove_qc_warning = TRUE,
           verbose = FALSE
         ),
         expected = expected_result
@@ -1227,7 +1227,7 @@ test_that(
               )
             ),
           check_npx_log = log,
-          keep_qc_warning = FALSE,
+          remove_qc_warning = TRUE,
           verbose = FALSE
         ),
         expected = expected_result
@@ -1251,7 +1251,7 @@ test_that(
     expect_equal(
       object = clean_qc_warning(df = expected_result,
                                 check_npx_log = log,
-                                keep_qc_warning = FALSE,
+                                remove_qc_warning = TRUE,
                                 verbose = FALSE),
       expected = expected_result
     )
@@ -1262,7 +1262,7 @@ test_that(
       object = expect_equal(
         object = clean_qc_warning(df = expected_result,
                                   check_npx_log = log,
-                                  keep_qc_warning = FALSE,
+                                  remove_qc_warning = TRUE,
                                   verbose = TRUE),
         expected = expected_result
       ),
@@ -1280,7 +1280,7 @@ test_that(
     expect_equal(
       object = clean_qc_warning(df = df,
                                 check_npx_log = log,
-                                keep_qc_warning = TRUE,
+                                remove_qc_warning = FALSE,
                                 verbose = FALSE),
       expected = df
     )
@@ -1292,12 +1292,12 @@ test_that(
       object = expect_equal(
         object = clean_qc_warning(df = df,
                                   check_npx_log = log,
-                                  keep_qc_warning = TRUE,
+                                  remove_qc_warning = FALSE,
                                   verbose = TRUE),
         expected = df
       ),
-      regexp = paste("Skipping exclusion of samples flagged `FAIL` as per",
-                     "user input `keep_qc_warning`")
+      regexp = paste("Skipping exclusion of samples flagged \"FAIL\" as per",
+                     "user input remove_qc_warning = FALSE.")
     )
   }
 )
@@ -1311,7 +1311,7 @@ test_that(
     expect_equal(
       object = clean_qc_warning(df = df_arrow,
                                 check_npx_log = log,
-                                keep_qc_warning = TRUE,
+                                remove_qc_warning = FALSE,
                                 verbose = FALSE),
       expected = df_arrow
     )
@@ -1323,17 +1323,15 @@ test_that(
       object = expect_equal(
         object = clean_qc_warning(df = df_arrow,
                                   check_npx_log = log,
-                                  keep_qc_warning = TRUE,
+                                  remove_qc_warning = FALSE,
                                   verbose = TRUE),
         expected = df_arrow
       ),
-      regexp = paste("Skipping exclusion of samples flagged `FAIL` as per",
-                     "user input `keep_qc_warning`")
+      regexp = paste("Skipping exclusion of samples flagged \"FAIL\" as per",
+                     "user input remove_qc_warning = FALSE.")
     )
   }
 )
-
-
 
 # Test clean_assay_warning ------------------------------------------------
 
@@ -1351,6 +1349,7 @@ test_that(
       object = expect_equal(
         object = clean_assay_warning(df = df,
                                      check_npx_log = log,
+                                     remove_assay_warning = TRUE,
                                      verbose = FALSE),
         expected = expected_result
       ),
@@ -1364,6 +1363,7 @@ test_that(
       object = expect_equal(
         object = clean_assay_warning(df = df,
                                      check_npx_log = log,
+                                     remove_assay_warning = TRUE,
                                      verbose = TRUE),
         expected = expected_result
       ),
@@ -1388,6 +1388,7 @@ test_that(
       object = expect_equal(
         object = clean_assay_warning(df = df_arrow,
                                      check_npx_log = log,
+                                     remove_assay_warning = TRUE,
                                      verbose = FALSE) |>
           dplyr::collect(),
         expected = expected_result
@@ -1402,6 +1403,7 @@ test_that(
       object = expect_equal(
         object = clean_assay_warning(df = df_arrow,
                                      check_npx_log = log,
+                                     remove_assay_warning = TRUE,
                                      verbose = TRUE) |>
           dplyr::collect(),
         expected = expected_result
@@ -1447,6 +1449,7 @@ test_that(
               )
             ),
           check_npx_log = log,
+          remove_assay_warning = TRUE,
           verbose = FALSE
         ),
         expected = expected_result
@@ -1482,6 +1485,7 @@ test_that(
               )
             ),
           check_npx_log = log,
+          remove_assay_warning = TRUE,
           verbose = TRUE
         ),
         expected = expected_result
@@ -1508,7 +1512,8 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_assay_warning(df = test_df,
-                                     check_npx_log = log_test),
+                                     check_npx_log = log_test,
+                                     remove_assay_warning = TRUE),
         expected = test_df
       ),
       regexp = "No column marking assay warnings in dataset."
@@ -1529,6 +1534,7 @@ test_that(
     expect_equal(
       object = clean_assay_warning(df = expected_result,
                                    check_npx_log = log,
+                                   remove_assay_warning = TRUE,
                                    verbose = FALSE),
       expected = expected_result
     )
@@ -1539,6 +1545,7 @@ test_that(
       object = expect_equal(
         object = clean_assay_warning(df = expected_result,
                                      check_npx_log = log,
+                                     remove_assay_warning = TRUE,
                                      verbose = TRUE),
         expected = expected_result
       ),
@@ -1556,7 +1563,7 @@ test_that(
     expect_equal(
       object = clean_assay_warning(df = df,
                                    check_npx_log = log,
-                                   keep_assay_warning = TRUE,
+                                   remove_assay_warning = FALSE,
                                    verbose = FALSE),
       expected = df
     )
@@ -1568,12 +1575,12 @@ test_that(
       object = expect_equal(
         object = clean_assay_warning(df = df,
                                      check_npx_log = log,
-                                     keep_assay_warning = TRUE,
+                                     remove_assay_warning = FALSE,
                                      verbose = TRUE),
         expected = df
       ),
-      regexp = paste("Skipping exclusion of assays falgged as `WARN` as per",
-                     "user input `keep_assay_warning`")
+      regexp = paste("Skipping exclusion of assays flagged with \"WARN\" as",
+                     "per user input remove_assay_warning = FALSE.")
     )
   }
 )
@@ -1587,7 +1594,7 @@ test_that(
     expect_equal(
       object = clean_assay_warning(df = df_arrow,
                                    check_npx_log = log,
-                                   keep_assay_warning = TRUE,
+                                   remove_assay_warning = FALSE,
                                    verbose = FALSE),
       expected = df_arrow
     )
@@ -1599,17 +1606,15 @@ test_that(
       object = expect_equal(
         object = clean_assay_warning(df = df_arrow,
                                      check_npx_log = log,
-                                     keep_assay_warning = TRUE,
+                                     remove_assay_warning = FALSE,
                                      verbose = TRUE),
         expected = df_arrow
       ),
-      regexp = paste("Skipping exclusion of assays falgged as `WARN` as per",
-                     "user input `keep_assay_warning`")
+      regexp = paste("Skipping exclusion of assays flagged with \"WARN\" as",
+                     "per user input remove_assay_warning = FALSE.")
     )
   }
 )
-
-
 
 # Test clean_control_sample_id --------------------------------------------
 
@@ -1862,6 +1867,7 @@ test_that(
     expect_equal(
       object = clean_npx(df = df,
                          check_log = log,
+                         remove_qc_warning = TRUE,
                          control_sample_ids = c("ControlID"),
                          verbose = TRUE) |>
         suppressMessages(),
@@ -1887,6 +1893,7 @@ test_that(
       {
         clean_npx(
           df = df,
+          remove_qc_warning = TRUE,
           check_log = log,
           verbose = TRUE
         )
@@ -1954,6 +1961,5 @@ test_that(
                       msgs_clean[19L]))
     expect_true(grepl("Completed `clean_npx\\(\\)`",
                       msgs_clean[20L]))
-
   }
 )

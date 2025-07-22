@@ -7,7 +7,7 @@
 clean_assay_warning(
   df,
   check_npx_log,
-  keep_assay_warning = FALSE,
+  remove_assay_warning = TRUE,
   verbose = FALSE
 )
 }
@@ -24,6 +24,9 @@ dataset.
 \item \code{col_names$assay_warning}: the name of the column indicating assay QC
 status.
 }}
+
+\item{remove_assay_warning}{Logical. If \code{FALSE}, retains assays flagged as
+\code{WARN} in assay warning. Defaults to \code{TRUE}.}
 
 \item{verbose}{Logical. If \code{FALSE} (default), silences step-wise CLI
 messages.}
