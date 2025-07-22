@@ -28,8 +28,8 @@
 #' recommending log2 transformation for downstream analysis.
 #'
 #' @author
-#' Kang Dong
-#' Klev Diamanti
+#'   Kang Dong
+#'   Klev Diamanti
 #'
 #' @param df A `tibble` or Arrow `Table` loaded from `read_npx()`.
 #' @param check_log A list returned by [`check_npx()`]. If `NULL`,
@@ -960,6 +960,10 @@ clean_qc_warning <- function(df,
 #' The function is used to remove assay-level QC warnings from the dataset
 #' before analysis. It uses the column marking assay QC warnings identified by
 #' `check_npx_log` to remove assays flagged as `WARN` in the dataset.
+#'
+#' @author
+#'   Kang Dong
+#'   Klev Diamanti
 #'
 #' @param df A `tibble` or `arrow` object loaded from `read_npx()`, including a
 #' column identified by
