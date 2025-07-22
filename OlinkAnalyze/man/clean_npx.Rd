@@ -8,7 +8,6 @@ clean_npx(
   df,
   check_log = NULL,
   preferred_names = NULL,
-  control_sample_ids = NULL,
   remove_assay_na = TRUE,
   remove_invalid_oid = TRUE,
   remove_dup_sample_id = TRUE,
@@ -16,12 +15,14 @@ clean_npx(
   remove_control_sample = TRUE,
   remove_qc_warning = FALSE,
   remove_assay_warning = TRUE,
+  control_sample_ids = NULL,
+  convert_df_cols = TRUE,
   out_df = "tibble",
   verbose = FALSE
 )
 }
 \arguments{
-\item{df}{A \code{tibble} or Arrow \code{Table} loaded from \code{read_npx()}.}
+\item{df}{A \code{tibble} or \code{arrow} object loads from \code{read_npx()}.}
 
 \item{check_log}{A list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
 \code{check_npx()}will be run internally using \code{df} and \code{preferred_names}.}
@@ -29,26 +30,48 @@ clean_npx(
 \item{preferred_names}{An optional named list to supply preferred column
 names to \code{check_npx()}, if \code{check_log} is not provided.}
 
-\item{control_sample_ids}{A character vector of \code{SampleID}s to remove.
-Typically used to remove customer-provided or technical control samples.}
+\item{remove_assay_na}{Logical. If \code{FALSE}, skips filtering assays with all
+quantified values \code{NA}. Defaults to \code{TRUE}.}
 
-\item{out_df}{Output format: \code{"tibble"} (default) or \code{"arrow"}.}
+\item{remove_invalid_oid}{Logical. If \code{FALSE}, skips filtering assays with
+invalid identifiers. Defaults to \code{TRUE}.}
+
+\item{remove_dup_sample_id}{Logical. If \code{FALSE}, skips filtering samples with
+duplicate sample identifiers. Defaults to \code{TRUE}.}
+
+\item{remove_control_assay}{If \code{FALSE}, all internal control assays are
+retained. If \code{TRUE}, all internal control assays are removed. Alternatively,
+a character vector with one or more of
+"assay", "inc", "det", "ext", and "amp" indicating the assay
+types to remove.}
+
+\item{remove_control_sample}{If \code{FALSE}, all control samples are retained. If
+\code{TRUE}, all control samples are removed. Alternatively, a character vector
+with one or more of "sample", "sc", "pc", and "nc"
+indicating the sample types to remove.}
+
+\item{remove_qc_warning}{Logical. If \code{TRUE}, removes samples flagged as
+\code{FAIL} in QC warning. Defaults to \code{FALSE}.}
+
+\item{remove_assay_warning}{Logical. If \code{FALSE}, retains assays flagged as
+\code{WARN} in assay warning. Defaults to \code{TRUE}.}
+
+\item{control_sample_ids}{character vector of sample identifiers of control
+samples. Default \code{NULL}, to mark no samples to be removed.}
+
+\item{convert_df_cols}{Logical. If \code{FALSE}, retains columns of \code{df} as are.
+Defaults to \code{TRUE}, were columns required for downstream analysis are
+converted to the expected format.}
+
+\item{out_df}{The class of the output dataset. One of
+"tibble" and "arrow". (default = "tibble")}
 
 \item{verbose}{Logical. If \code{FALSE} (default), Silences step-wise CLI
 messages.}
-
-\item{keep_controls}{Character string indicating whether to retain any
-controls:
-\itemize{
-\item \code{"sample"}: keep only sample-level controls,
-\item \code{"assay"}: keep only assay-level controls,
-\item \code{"both"}: keep all controls,
-\item \code{NULL} (default): remove all controls.
-}}
 }
 \value{
-A cleaned NPX dataset in either tibble or Arrow Table format,
-depending on \code{out_df}.
+Clean dataset, tibble, ArrowObject, with Olink data in long
+format.
 }
 \description{
 This function applies a series of cleaning steps to an NPX data based on

@@ -1782,6 +1782,7 @@ test_that(
       object = expect_equal(
         object = clean_col_class(df = test_df,
                                  check_npx_log = log_test,
+                                 convert_df_cols = TRUE,
                                  verbose = FALSE),
         expected = OlinkAnalyze::npx_data1
       ),
@@ -1814,6 +1815,7 @@ test_that(
       object = expect_equal(
         object = clean_col_class(df = test_df,
                                  check_npx_log = log_test,
+                                 convert_df_cols = TRUE,
                                  verbose = FALSE),
         expected = OlinkAnalyze::npx_data1
       ),
@@ -1823,7 +1825,100 @@ test_that(
 )
 
 test_that(
-  "clean_col_class - return data unchanged",
+  "clean_col_class - works - arrow - correct column class",
+  {
+    # one column ----
+
+    test_df <- OlinkAnalyze::npx_data1 |>
+      dplyr::mutate(
+        NPX = as.character(.data[["NPX"]])
+      ) |>
+      arrow::as_arrow_table()
+
+    log_test <- check_npx(df = test_df) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    expect_message(
+      object = expect_equal(
+        object = clean_col_class(df = test_df,
+                                 check_npx_log = log_test,
+                                 convert_df_cols = TRUE,
+                                 verbose = FALSE) |>
+          dplyr::collect(),
+        expected = OlinkAnalyze::npx_data1
+      ),
+      regexp = "Converted class of column:"
+    )
+
+    # multiple columns ----
+
+    test_df <- OlinkAnalyze::npx_data1 |>
+      dplyr::mutate(
+        NPX = as.character(.data[["NPX"]]),
+        LOD = as.character(.data[["LOD"]])
+      ) |>
+      arrow::as_arrow_table()
+
+    log_test <- check_npx(df = test_df) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    log_test$col_class <- log_test$col_class |>
+      dplyr::bind_rows(
+        dplyr::tibble(
+          "col_name" = "PlateID",
+          "col_class" = "numeric",
+          "col_key" = "plate_id",
+          "expected_col_class" = "character"
+        )
+      )
+
+    expect_message(
+      object = expect_equal(
+        object = clean_col_class(df = test_df,
+                                 check_npx_log = log_test,
+                                 convert_df_cols = TRUE,
+                                 verbose = FALSE) |>
+          dplyr::collect(),
+        expected = OlinkAnalyze::npx_data1
+      ),
+      regexp = "Converted classes of columns:"
+    )
+  }
+)
+
+test_that(
+  "clean_col_class - works - do not correct the columns",
+  {
+    ## verbose = TRUE ----
+
+    expect_message(
+      object = expect_equal(
+        object = clean_col_class(df = df,
+                                 check_npx_log = log,
+                                 convert_df_cols = FALSE,
+                                 verbose = TRUE),
+        expected = df
+      ),
+      regexp = paste("Skipping conversion of columns with non-expected format",
+                     "as per user input convert_df_cols = FALSE.")
+    )
+
+    ## verbose = FALSE ----
+
+    expect_equal(
+      object = clean_col_class(df = df,
+                               check_npx_log = log,
+                               convert_df_cols = FALSE,
+                               verbose = FALSE),
+      expected = df
+    )
+  }
+)
+
+test_that(
+  "clean_col_class - data is in correct format",
   {
     test_df <- OlinkAnalyze::npx_data1
 
@@ -1836,6 +1931,7 @@ test_that(
     expect_equal(
       object = clean_col_class(df = test_df,
                                check_npx_log = log_test,
+                               convert_df_cols = TRUE,
                                verbose = FALSE),
       expected = OlinkAnalyze::npx_data1
     )
@@ -1846,6 +1942,7 @@ test_that(
       object = expect_equal(
         object = clean_col_class(df = test_df,
                                  check_npx_log = log_test,
+                                 convert_df_cols = TRUE,
                                  verbose = TRUE),
         expected = OlinkAnalyze::npx_data1
       ),
