@@ -117,17 +117,14 @@ test_that(
     ## verbose TRUE ----
 
     expect_message(
-      object = expect_message(
-        object = expect_equal(
-          object = clean_assay_na(df = df,
-                                  check_npx_log = log,
-                                  remove_assay_na = TRUE,
-                                  verbose = TRUE),
-          expected = expected_result
-        ),
-        regexp = "Excluding 1 assay with only \"NA\" values: \"OID23456\""
+      object = expect_equal(
+        object = clean_assay_na(df = df,
+                                check_npx_log = log,
+                                remove_assay_na = TRUE,
+                                verbose = TRUE),
+        expected = expected_result
       ),
-      regexp = "Removed assays with only \"NA\" values"
+      regexp = "Excluding 1 assay with only \"NA\" values: \"OID23456\""
     )
   }
 )
@@ -158,18 +155,15 @@ test_that(
     ## verbose TRUE ----
 
     expect_message(
-      object = expect_message(
-        object = expect_equal(
-          object = clean_assay_na(df = df_arrow,
-                                  check_npx_log = log,
-                                  remove_assay_na = TRUE,
-                                  verbose = TRUE) |>
-            dplyr::collect(),
-          expected = expected_result
-        ),
-        regexp = "Excluding 1 assay with only \"NA\" values: \"OID23456\""
+      object = expect_equal(
+        object = clean_assay_na(df = df_arrow,
+                                check_npx_log = log,
+                                remove_assay_na = TRUE,
+                                verbose = TRUE) |>
+          dplyr::collect(),
+        expected = expected_result
       ),
-      regexp = "Removed assays with only \"NA\" values"
+      regexp = "Excluding 1 assay with only \"NA\" values: \"OID23456\""
     )
   }
 )
@@ -297,17 +291,14 @@ test_that(
     ## verbose = TRUE ----
 
     expect_message(
-      object = expect_message(
-        object = expect_equal(
-          object = clean_invalid_oid(df = df,
-                                     check_npx_log = log,
-                                     remove_invalid_oid = TRUE,
-                                     verbose = TRUE),
-          expected = expected_result
-        ),
-        regexp = "Excluding 1 assay with invalid identifier: \"OID1234\"."
+      object = expect_equal(
+        object = clean_invalid_oid(df = df,
+                                   check_npx_log = log,
+                                   remove_invalid_oid = TRUE,
+                                   verbose = TRUE),
+        expected = expected_result
       ),
-      regexp = "Removed assays with invalid identifiers"
+      regexp = "Excluding 1 assay with invalid identifier: \"OID1234\"."
     )
   }
 )
@@ -338,18 +329,15 @@ test_that(
     ## verbose = TRUE ----
 
     expect_message(
-      object = expect_message(
-        object = expect_equal(
-          object = clean_invalid_oid(df = df_arrow,
-                                     check_npx_log = log,
-                                     remove_invalid_oid = TRUE,
-                                     verbose = TRUE) |>
-            dplyr::collect(),
-          expected = expected_result
-        ),
-        regexp = "Excluding 1 assay with invalid identifier: \"OID1234\"."
+      object = expect_equal(
+        object = clean_invalid_oid(df = df_arrow,
+                                   check_npx_log = log,
+                                   remove_invalid_oid = TRUE,
+                                   verbose = TRUE) |>
+          dplyr::collect(),
+        expected = expected_result
       ),
-      regexp = "Removed assays with invalid identifiers"
+      regexp = "Excluding 1 assay with invalid identifier: \"OID1234\"."
     )
   }
 )
@@ -478,18 +466,15 @@ test_that(
     ## verbose = TRUE ----
 
     expect_message(
-      object = expect_message(
-        object = expect_equal(
-          object = clean_duplicate_sample_id(df = df,
-                                             check_npx_log = log,
-                                             remove_dup_sample_id = TRUE,
-                                             verbose = TRUE),
-          expected = expected_result
-        ),
-        regexp = paste("Excluding 1 sample with duplicate identifier:",
-                       "\"DuplicateSample\"")
+      object = expect_equal(
+        object = clean_duplicate_sample_id(df = df,
+                                           check_npx_log = log,
+                                           remove_dup_sample_id = TRUE,
+                                           verbose = TRUE),
+        expected = expected_result
       ),
-      regexp = "Removed samples with duplicate identifiers."
+      regexp = paste("Excluding 1 sample with duplicate identifier:",
+                     "\"DuplicateSample\"")
     )
   }
 )
@@ -521,25 +506,22 @@ test_that(
     ## verbose = TRUE ----
 
     expect_message(
-      object = expect_message(
-        object = expect_equal(
-          object = clean_duplicate_sample_id(df = df_arrow,
-                                             check_npx_log = log,
-                                             remove_dup_sample_id = TRUE,
-                                             verbose = TRUE) |>
-            dplyr::collect(),
-          expected = expected_result
-        ),
-        regexp = paste("Excluding 1 sample with duplicate identifier:",
-                       "\"DuplicateSample\"")
+      object = expect_equal(
+        object = clean_duplicate_sample_id(df = df_arrow,
+                                           check_npx_log = log,
+                                           remove_dup_sample_id = TRUE,
+                                           verbose = TRUE) |>
+          dplyr::collect(),
+        expected = expected_result
       ),
-      regexp = "Removed samples with duplicate identifiers."
+      regexp = paste("Excluding 1 sample with duplicate identifier:",
+                     "\"DuplicateSample\"")
     )
   }
 )
 
 test_that(
-  "clean_duplicate_sample_id - works - 1 duplicate SampleID",
+  "clean_duplicate_sample_id - works - no duplicate SampleID",
   {
     expected_result <- df |>
       dplyr::filter(
@@ -1777,54 +1759,48 @@ test_that(
                       msgs_clean[2L]))
     expect_true(grepl("Excluding 1 assay with invalid identifier: \"OID1234\"",
                       msgs_clean[3L]))
-    expect_true(grepl("Removed assays with invalid identifiers",
-                      msgs_clean[4L]))
     expect_true(grepl("Cleaning assays with all NA values",
-                      msgs_clean[5L]))
+                      msgs_clean[4L]))
     expect_true(grepl("Excluding 1 assay with only \"NA\" values: \"OID23456\"",
-                      msgs_clean[6L]))
-    expect_true(grepl("Removed assays with only \"NA\" values",
-                      msgs_clean[7L]))
+                      msgs_clean[5L]))
     expect_true(grepl("Cleaning duplicate SampleIDs",
-                      msgs_clean[8L]))
+                      msgs_clean[6L]))
     expect_true(grepl(paste("Excluding 1 sample with duplicate identifier:",
                             "\"DuplicateSample\""),
-                      msgs_clean[9L]))
-    expect_true(grepl("Removed samples with duplicate identifiers",
-                      msgs_clean[10L]))
+                      msgs_clean[7L]))
     expect_true(grepl("Cleaning control samples based on sample type",
-                      msgs_clean[11L]))
+                      msgs_clean[8L]))
     expect_true(grepl("Excluding 1 control sample: \"ControlType\"",
-                      msgs_clean[12L]))
+                      msgs_clean[9L]))
     expect_true(grepl(paste("Removed control samples marked as"),
-                      msgs_clean[13L]))
+                      msgs_clean[10L]))
     expect_true(grepl("Cleaning control samples based on Sample ID",
-                      msgs_clean[14L]))
+                      msgs_clean[11L]))
     expect_true(grepl(paste("Skipping exclusion of control samples based on",
                             "`control_sample_ids`."),
-                      msgs_clean[15L]))
+                      msgs_clean[12L]))
     expect_true(grepl("Cleaning Samples with QC Status 'FAIL'",
-                      msgs_clean[16L]))
+                      msgs_clean[13L]))
     expect_true(grepl(paste("Excluding 1 datapoint from 1 sample flagged with",
                             "SampleQC = \"FAIL\": \"FailQC\"."),
-                      msgs_clean[17L]))
+                      msgs_clean[14L]))
     expect_true(grepl("Cleaning internal control assays",
-                      msgs_clean[18L]))
+                      msgs_clean[15L]))
     expect_true(grepl("Excluding 1 control assay: \"OID78901\"",
-                      msgs_clean[19L]))
+                      msgs_clean[16L]))
     expect_true(grepl(paste("Removed control assays marked as"),
-                      msgs_clean[20L]))
+                      msgs_clean[17L]))
     expect_true(grepl("Cleaning assays flagged by assay warning",
-                      msgs_clean[21L]))
+                      msgs_clean[18L]))
     expect_true(grepl(paste("Excluding 1 datapoint from 1 assay flagged with",
                             "AssayQC = \"WARN\" or \"Warning\": \"OID89012\""),
-                      msgs_clean[22L]))
+                      msgs_clean[19L]))
     expect_true(grepl("Correcting flagged column class",
-                      msgs_clean[23L]))
+                      msgs_clean[20L]))
     expect_true(grepl("Columns are in the correct format.",
-                      msgs_clean[24L]))
+                      msgs_clean[21L]))
     expect_true(grepl("Completed `clean_npx\\(\\)`",
-                      msgs_clean[25L]))
+                      msgs_clean[22L]))
 
   }
 )

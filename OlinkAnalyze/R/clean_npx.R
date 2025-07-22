@@ -372,8 +372,11 @@ clean_assay_na <- function(df,
 
   # CLI message listing excluded assays
   cli::cli_inform(
-    "Excluding {.val {length(check_npx_log$assay_na)}} assay{?s} with only
-    {.val NA} values: {.val {check_npx_log$assay_na}}."
+    c(
+      "Excluding {.val {length(check_npx_log$assay_na)}} assay{?s} with only
+    {.val NA} values: {.val {check_npx_log$assay_na}}.",
+      "v" = "Returning cleaned dataset."
+    )
   )
 
   # Exclude assays with only NA values
@@ -381,13 +384,6 @@ clean_assay_na <- function(df,
     dplyr::filter(
       !(.data[[check_npx_log$col_names$olink_id]] %in% check_npx_log$assay_na)
     )
-
-  if (verbose == TRUE) {
-    cli::cli_inform(
-      c("Removed assays with only {.val NA} values.",
-        "v" = "Returning cleaned dataset.")
-    )
-  }
 
   # Convert output to desired format (tibble or arrow)
   return(df_cleaned)
@@ -454,8 +450,11 @@ clean_invalid_oid <- function(df,
 
   # Inform user of which assays will be excluded
   cli::cli_inform(
-    "Excluding {.val {length(check_npx_log$oid_invalid)}} assay{?s} with invalid
-    identifier{?s}: {.val {check_npx_log$oid_invalid}}."
+    c(
+      "Excluding {.val {length(check_npx_log$oid_invalid)}} assay{?s} with
+      invalid identifier{?s}: {.val {check_npx_log$oid_invalid}}.",
+      "v" = "Returning cleaned dataset."
+    )
   )
 
   # Remove rows where the OlinkID is invalid
@@ -464,14 +463,6 @@ clean_invalid_oid <- function(df,
       !(.data[[check_npx_log$col_names$olink_id]]
         %in% check_npx_log$oid_invalid)
     )
-
-  # Confirmation message
-  if (verbose == TRUE) {
-    cli::cli_inform(
-      c("Removed assays with invalid identifiers.",
-        "v" = "Returning cleaned dataset.")
-    )
-  }
 
   # Return cleaned data frame in desired format
   return(df_cleaned)
@@ -537,8 +528,11 @@ clean_duplicate_sample_id <- function(df,
 
   # Inform user about excluded SampleIDs
   cli::cli_inform(
-    "Excluding {.val {length(check_npx_log$sample_id_dups)}} sample{?s} with
-    duplicate identifier{?s}: {.val {check_npx_log$sample_id_dups}}."
+    c(
+      "Excluding {.val {length(check_npx_log$sample_id_dups)}} sample{?s} with
+    duplicate identifier{?s}: {.val {check_npx_log$sample_id_dups}}.",
+      "v" = "Returning cleaned dataset."
+    )
   )
 
   # Filter out rows with duplicate SampleIDs
@@ -547,15 +541,6 @@ clean_duplicate_sample_id <- function(df,
       !(.data[[check_npx_log$col_names$sample_id]]
         %in% check_npx_log$sample_id_dups)
     )
-
-  # Success message
-  if (verbose == TRUE) {
-    cli::cli_inform(c(
-      "Removed samples with duplicate identifiers.",
-      "v" = "Returning cleaned dataset."
-    ))
-
-  }
 
   # Convert and return the output in the desired format
   return(df_cleaned)
