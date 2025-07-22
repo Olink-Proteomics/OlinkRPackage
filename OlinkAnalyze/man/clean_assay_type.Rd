@@ -7,7 +7,7 @@
 clean_assay_type(
   df,
   check_npx_log,
-  keep_control_assay = FALSE,
+  remove_control_assay = TRUE,
   verbose = FALSE
 )
 }
@@ -22,8 +22,11 @@ containing:
 column is missing then function will return the original dataset.}
 }}
 
-\item{keep_control_assay}{Logical. If \code{TRUE}, internal control assays are
-retained and no filtering is applied. Defaults to \code{FALSE}.}
+\item{remove_control_assay}{If \code{FALSE}, all internal control assays are
+retained. If \code{TRUE}, all internal control assays are removed. Alternatively,
+a character vector with one or more of
+"assay", "inc", "det", "ext", and "amp" indicating the assay
+types to remove.}
 
 \item{verbose}{Logical. If \code{FALSE} (default), silences step-wise CLI
 messages.}

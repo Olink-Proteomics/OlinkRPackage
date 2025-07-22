@@ -148,6 +148,7 @@ clean_npx <- function(df,
                       remove_assay_na = TRUE,
                       remove_invalid_oid = TRUE,
                       remove_dup_sample_id = TRUE,
+                      remove_control_assay = TRUE,
                       keep_qc_warning = FALSE,
                       keep_assay_warning = FALSE,
                       out_df = "tibble",
@@ -165,6 +166,8 @@ clean_npx <- function(df,
 
   # Validate input dataset
   check_is_dataset(df = df, error = TRUE)
+
+  check_is_scalar_boolean(bool = verbose, error = TRUE)
 
   # Validate or generate check_log from check_npx()
   if (is.null(check_log)) {
@@ -227,7 +230,6 @@ clean_npx <- function(df,
     verbose = verbose
   )
 
-
   # Clean control samples based on Sample ID
   if (verbose) cli::cli_h3("Cleaning control samples based on Sample ID")
   df <- clean_control_sample_id(
@@ -237,7 +239,6 @@ clean_npx <- function(df,
     verbose = verbose
   )
 
-
   # Clean Samples with QC Status 'FAIL'
   if (verbose) cli::cli_h3("Cleaning Samples with QC Status 'FAIL'")
   df <- clean_qc_warning(
@@ -246,23 +247,16 @@ clean_npx <- function(df,
     verbose = verbose
   )
 
-
   # Clean internal control assays
   if (verbose) cli::cli_h3("Cleaning internal control assays")
 
-  if (is.null(keep_controls) || !keep_controls %in% c("assay", "both")) {
-    keep_control_assay <- FALSE
-  } else {
-    keep_control_assay <-  TRUE
-  }
-
+  # remove_control_assay
   df <- clean_assay_type(
     df = df,
     check_npx_log = check_npx_log,
-    keep_control_assay = keep_control_assay,
+    remove_control_assay = remove_control_assay,
     verbose = verbose
   )
-
 
   # Clean assays flagged by assay warning
   if (verbose) cli::cli_h3("Cleaning assays flagged by assay warning")
@@ -346,6 +340,11 @@ clean_assay_na <- function(df,
                            check_npx_log,
                            remove_assay_na = TRUE,
                            verbose = FALSE) {
+  # input check
+  check_is_scalar_boolean(
+    bool = remove_assay_na,
+    error = TRUE
+  )
 
   # If assays with all NA values are retained by the user
   if (remove_assay_na == FALSE) {
@@ -424,6 +423,11 @@ clean_invalid_oid <- function(df,
                               check_npx_log,
                               remove_invalid_oid = TRUE,
                               verbose = FALSE) {
+  # input check
+  check_is_scalar_boolean(
+    bool = remove_invalid_oid,
+    error = TRUE
+  )
 
   # Keep invalid assay identifiers if user indicates so
   if (remove_invalid_oid == FALSE) {
@@ -503,6 +507,12 @@ clean_duplicate_sample_id <- function(df,
                                       check_npx_log,
                                       remove_dup_sample_id = TRUE,
                                       verbose = FALSE) {
+  # input check
+  check_is_scalar_boolean(
+    bool = remove_dup_sample_id,
+    error = TRUE
+  )
+
   # Retain samples with duplicate identifiers
   if (remove_dup_sample_id == FALSE) {
     if (verbose == TRUE) {
@@ -678,8 +688,11 @@ clean_sample_type <- function(df,
 #' \item `col_names$assay_type`: the column name of the assay type. \strong{If
 #' column is missing then function will return the original dataset.}
 #' }
-#' @param keep_control_assay Logical. If `TRUE`, internal control assays are
-#' retained and no filtering is applied. Defaults to `FALSE`.
+#' @param remove_control_assay If `FALSE`, all internal control assays are
+#' retained. If `TRUE`, all internal control assays are removed. Alternatively,
+#' a character vector with one or more of
+#' `r ansi_collapse_quot(x = names(olink_assay_types))` indicating the assay
+#' types to remove.
 #' @param verbose Logical. If `FALSE` (default), silences step-wise CLI
 #' messages.
 #'
@@ -688,15 +701,66 @@ clean_sample_type <- function(df,
 #'
 clean_assay_type <- function(df,
                              check_npx_log,
-                             keep_control_assay = FALSE,
+                             remove_control_assay = TRUE,
                              verbose = FALSE) {
+  # if remove_control_assay is boolean then we either keep all control assays
+  # (when TRUE), or we keep only non-control assays (when FALSE).
+  # When remove_control_assay is a character vector, then we remove all user
+  # designated controls.
+  if (check_is_scalar_boolean(bool = remove_control_assay, error = FALSE)) {
+
+    if (remove_control_assay == TRUE) {
+      ctrl_assay_type <- olink_assay_types[
+        !(names(olink_assay_types) %in% c("assay"))
+      ] |>
+        unlist() |>
+        unname()
+    } else {
+      ctrl_assay_type <- character(0L)
+    }
+
+  } else if (check_is_character(string = remove_control_assay, error = TRUE)) {
+
+    if (all(remove_control_assay %in% names(olink_assay_types))) {
+      ctrl_assay_type <- olink_assay_types[names(olink_assay_types)
+                                           %in% remove_control_assay] |>
+        unlist() |>
+        unname()
+    } else if (any(remove_control_assay %in% names(olink_assay_types))) {
+      ctrl_assay_type <- olink_assay_types[names(olink_assay_types)
+                                           %in% remove_control_assay] |>
+        unlist() |>
+        unname()
+      olink_assays_compl <- setdiff(x = remove_control_assay, # nolint object_usage_linter
+                                    y = names(olink_assay_types))
+
+      cli::cli_inform(
+        c("Unexpected entries {.val {olink_assays_compl}} in
+          {.arg remove_control_assay}. Expected values:
+          {.val {names(olink_assay_types)}}.",
+          "i" = "Proceeding with entries: {.val {ctrl_assay_type}}.")
+      )
+    } else {
+      cli::cli_abort(
+        c(
+          "x" = "{cli::qty(remove_control_assay)} No overlap of value{?s} from
+          {.arg remove_control_assay} to expected values.",
+          "i" = "Ensure {.arg remove_control_assay} is a scalar boolean or
+          contains one or more of {.val {names(olink_assay_types)}}!"
+        ),
+        call = rlang::caller_env(),
+        wrap = TRUE
+      )
+    }
+
+  }
 
   # Return original data if user chooses to keep control samples
-  if (keep_control_assay == TRUE) {
+  if (length(ctrl_assay_type) == 0L) {
     if (verbose == TRUE) {
       cli::cli_inform(
-        c("Skipping exclusion of control assays as per user input
-          {.arg keep_control_assay}.",
+        c("Skipping exclusion of control assays as per user input:
+          {.field remove_control_assay} = {.val {remove_control_assay}}.",
           "i" = "Returning original dataset.")
       )
     }
@@ -713,13 +777,6 @@ clean_assay_type <- function(df,
     )
     return(df)
   }
-
-  # List control assay types to be excluded
-  ctrl_assay_type <- olink_assay_types[
-    !(names(olink_assay_types) %in% c("assay"))
-  ] |>
-    unlist() |>
-    unname()
 
   # detect how many samples are to be removed
   df_oid_atype <- df |>
@@ -745,8 +802,11 @@ clean_assay_type <- function(df,
       )
 
     cli::cli_inform(
-      "Excluding {.val {length(uniq_oid)}} control assay{?s}:
-        {.val {uniq_oid}}."
+      c(
+        "Excluding {.val {length(uniq_oid)}} control assay{?s}:
+        {.val {uniq_oid}}.",
+        "v" = "Returning cleaned dataset."
+      )
     )
   }
 
@@ -756,13 +816,6 @@ clean_assay_type <- function(df,
       !(.data[[check_npx_log$col_names$assay_type]]
         %in% .env[["ctrl_assay_type"]])
     )
-
-  if (verbose == TRUE) {
-    cli::cli_inform(
-      c("Removed control assays marked as {.val {ctrl_assay_type}}.",
-        "v" = "Returning cleaned dataset.")
-    )
-  }
 
   # Format and return output
   return(df_cleaned)
