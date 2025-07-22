@@ -147,7 +147,7 @@ clean_npx <- function(df,
                       keep_controls = NULL,
                       remove_assay_na = TRUE,
                       remove_invalid_oid = TRUE,
-                      keep_duplicate_sample_id = FALSE,
+                      remove_dup_sample_id = TRUE,
                       keep_qc_warning = FALSE,
                       keep_assay_warning = FALSE,
                       out_df = "tibble",
@@ -207,6 +207,7 @@ clean_npx <- function(df,
   df <- clean_duplicate_sample_id(
     df = df,
     check_npx_log = check_npx_log,
+    remove_dup_sample_id = remove_dup_sample_id,
     verbose = verbose
   )
 
@@ -499,8 +500,8 @@ clean_invalid_oid <- function(df,
 #' \item `col_names$sample_id`: the column name of the sample identifier in the
 #' dataset.
 #' }
-#' @param keep_duplicate_sample_id Logical. If `TRUE`, skips filtering of
-#' samples with duplicate sample identifiers. Defaults to `FALSE`.
+#' @param remove_dup_sample_id Logical. If `FALSE`, skips filtering samples with
+#' duplicate sample identifiers. Defaults to `TRUE`.
 #' @param verbose Logical. If `FALSE` (default), silences step-wise CLI
 #' messages.
 #'
@@ -509,30 +510,27 @@ clean_invalid_oid <- function(df,
 #'
 clean_duplicate_sample_id <- function(df,
                                       check_npx_log,
-                                      keep_duplicate_sample_id = FALSE,
+                                      remove_dup_sample_id = TRUE,
                                       verbose = FALSE) {
+  # Retain samples with duplicate identifiers
+  if (remove_dup_sample_id == FALSE) {
+    if (verbose == TRUE) {
+      cli::cli_inform(
+        c("Skipping exclusion of samples with duplicate identifiers as per user
+          input: {.field remove_dup_sample_id} = {.val {FALSE}}.",
+          "i" = "Returning original dataset.")
+      )
+    }
+    return(df)
+  }
 
-  # Retrain samples with duplicate SampleID, or check if there are any
-  # duplicate SampleIDs to remove
-  if (keep_duplicate_sample_id == TRUE
-      || length(check_npx_log$sample_id_dups) == 0L) {
-    if (keep_duplicate_sample_id == TRUE) {
-      if (verbose == TRUE) {
-        cli::cli_inform(
-          c("Skipping exclusion of samples with duplicate sample identifiers
-          as per user input `keep_duplicate_sample_id`.",
-            "i" = "Returning original dataset.")
-        )
-      }
-
-    } else {
-      if (verbose == TRUE) {
-        cli::cli_inform(
-          c("No duplicate sample identifiers.",
-            "i" = "Returning original dataset.")
-        )
-      }
-
+  # Check if there are any samples with duplicate identifiers to remove
+  if (length(check_npx_log$sample_id_dups) == 0L) {
+    if (verbose == TRUE) {
+      cli::cli_inform(
+        c("No duplicate sample identifiers.",
+          "i" = "Returning original dataset.")
+      )
     }
     return(df)
   }

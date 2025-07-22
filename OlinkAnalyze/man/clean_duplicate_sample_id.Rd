@@ -7,7 +7,7 @@
 clean_duplicate_sample_id(
   df,
   check_npx_log,
-  keep_duplicate_sample_id = FALSE,
+  remove_dup_sample_id = TRUE,
   verbose = FALSE
 )
 }
@@ -24,8 +24,8 @@ containing:
 dataset.
 }}
 
-\item{keep_duplicate_sample_id}{Logical. If \code{TRUE}, skips filtering of
-samples with duplicate sample identifiers. Defaults to \code{FALSE}.}
+\item{remove_dup_sample_id}{Logical. If \code{FALSE}, skips filtering samples with
+duplicate sample identifiers. Defaults to \code{TRUE}.}
 
 \item{verbose}{Logical. If \code{FALSE} (default), silences step-wise CLI
 messages.}

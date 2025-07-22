@@ -467,7 +467,7 @@ test_that(
       object = expect_equal(
         object = clean_duplicate_sample_id(df = df,
                                            check_npx_log = log,
-                                           keep_duplicate_sample_id = FALSE,
+                                           remove_dup_sample_id = TRUE,
                                            verbose = FALSE),
         expected = expected_result
       ),
@@ -482,7 +482,7 @@ test_that(
         object = expect_equal(
           object = clean_duplicate_sample_id(df = df,
                                              check_npx_log = log,
-                                             keep_duplicate_sample_id = FALSE,
+                                             remove_dup_sample_id = TRUE,
                                              verbose = TRUE),
           expected = expected_result
         ),
@@ -509,7 +509,7 @@ test_that(
       object = expect_equal(
         object = clean_duplicate_sample_id(df = df_arrow,
                                            check_npx_log = log,
-                                           keep_duplicate_sample_id = FALSE,
+                                           remove_dup_sample_id = TRUE,
                                            verbose = FALSE) |>
           dplyr::collect(),
         expected = expected_result
@@ -525,7 +525,7 @@ test_that(
         object = expect_equal(
           object = clean_duplicate_sample_id(df = df_arrow,
                                              check_npx_log = log,
-                                             keep_duplicate_sample_id = FALSE,
+                                             remove_dup_sample_id = TRUE,
                                              verbose = TRUE) |>
             dplyr::collect(),
           expected = expected_result
@@ -546,41 +546,37 @@ test_that(
         .data[["SampleID"]] != "DuplicateSample"
       )
 
+    log_exp <- check_npx(df = expected_result) |>
+      suppressWarnings() |>
+      suppressMessages()
+
     ## verbose = FALSE ----
 
-    expect_message(
-      object = expect_equal(
-        object = clean_duplicate_sample_id(df = df,
-                                           check_npx_log = log,
-                                           keep_duplicate_sample_id = FALSE,
-                                           verbose = FALSE),
-        expected = expected_result
-      ),
-      regexp = paste("Excluding 1 sample with duplicate identifier:",
-                     "\"DuplicateSample\"")
+    expect_equal(
+      object = clean_duplicate_sample_id(df = expected_result,
+                                         check_npx_log = log_exp,
+                                         remove_dup_sample_id = TRUE,
+                                         verbose = FALSE),
+      expected = expected_result
     )
 
     ## verbose = TRUE ----
 
     expect_message(
-      object = expect_message(
-        object = expect_equal(
-          object = clean_duplicate_sample_id(df = df,
-                                             check_npx_log = log,
-                                             keep_duplicate_sample_id = FALSE,
-                                             verbose = TRUE),
-          expected = expected_result
-        ),
-        regexp = paste("Excluding 1 sample with duplicate identifier:",
-                       "\"DuplicateSample\"")
+      object = expect_equal(
+        object = clean_duplicate_sample_id(df = expected_result,
+                                           check_npx_log = log_exp,
+                                           remove_dup_sample_id = TRUE,
+                                           verbose = TRUE),
+        expected = expected_result
       ),
-      regexp = "Removed samples with duplicate identifiers."
+      regexp = "No duplicate sample identifiers."
     )
   }
 )
 
 test_that(
-  "clean_duplicate_sample_id - works - keep samples with duplicate sample ID",
+  "clean_duplicate_sample_id - works - keep samples with duplicate id",
   {
 
     ## verbose = FALSE ----
@@ -588,7 +584,7 @@ test_that(
     expect_equal(
       object = clean_duplicate_sample_id(df = df,
                                          check_npx_log = log,
-                                         keep_duplicate_sample_id = TRUE,
+                                         remove_dup_sample_id = FALSE,
                                          verbose = FALSE),
       expected = df
     )
@@ -599,20 +595,18 @@ test_that(
       object = expect_equal(
         object = clean_duplicate_sample_id(df = df,
                                            check_npx_log = log,
-                                           keep_duplicate_sample_id = TRUE,
+                                           remove_dup_sample_id = FALSE,
                                            verbose = TRUE),
         expected = df
       ),
-      regexp = paste("Skipping exclusion of samples with duplicate sample",
-                     "identifiers as per user input `keep_duplicate_sample_id`."
-                     )
+      regexp = paste("Skipping exclusion of samples with duplicate identifiers",
+                     "as per user input: remove_dup_sample_id = FALSE.")
     )
   }
 )
 
 test_that(
-  "clean_duplicate_sample_id - works - arrow - keep samples with duplicate
-  sample ID",
+  "clean_duplicate_sample_id - works - arrow - keep samples with duplicate id",
   {
 
     ## verbose = FALSE ----
@@ -620,7 +614,7 @@ test_that(
     expect_equal(
       object = clean_duplicate_sample_id(df = df_arrow,
                                          check_npx_log = log,
-                                         keep_duplicate_sample_id = TRUE,
+                                         remove_dup_sample_id = FALSE,
                                          verbose = FALSE),
       expected = df_arrow
     )
@@ -631,13 +625,12 @@ test_that(
       object = expect_equal(
         object = clean_duplicate_sample_id(df = df_arrow,
                                            check_npx_log = log,
-                                           keep_duplicate_sample_id = TRUE,
+                                           remove_dup_sample_id = FALSE,
                                            verbose = TRUE),
         expected = df_arrow
       ),
-      regexp = paste("Skipping exclusion of samples with duplicate sample",
-                     "identifiers as per user input `keep_duplicate_sample_id`."
-      )
+      regexp = paste("Skipping exclusion of samples with duplicate identifiers",
+                     "as per user input: remove_dup_sample_id = FALSE.")
     )
   }
 )

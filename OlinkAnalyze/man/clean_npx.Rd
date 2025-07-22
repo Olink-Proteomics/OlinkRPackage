@@ -12,7 +12,7 @@ clean_npx(
   keep_controls = NULL,
   remove_assay_na = TRUE,
   remove_invalid_oid = TRUE,
-  keep_duplicate_sample_id = FALSE,
+  remove_dup_sample_id = TRUE,
   keep_qc_warning = FALSE,
   keep_assay_warning = FALSE,
   out_df = "tibble",
