@@ -1196,3 +1196,9 @@ clean_col_class <- function(df,
 
   return(df_cleaned)
 }
+
+
+
+# Replace duplicate UniProt ID --------------------------------------------
+
+
