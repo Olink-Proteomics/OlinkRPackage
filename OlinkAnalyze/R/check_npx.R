@@ -994,3 +994,40 @@ check_npx_qcwarn_assays <- function(df, col_names) {
 
   return(qc_warn_assays)
 }
+
+#' Help function checking data for duplicate UniProt ID
+#'
+#' - Borrowed from Main branch npx_check_uniprot_dups.R by Kathy
+#'
+check_npx_duplicate_uniprot_id <- function (df, col_names) {
+
+  # Select relevant columns
+  assay_summary <- df |>
+    dplyr::select(dplyr::all_of(c(
+      col_names$olink_id,
+      col_names$uniprot
+    ))) |>
+    dplyr::group_by(
+      .data[[col_names$olink_id]]
+    ) |>
+    dplyr::summarise(freq = dplyr::n(),
+                     .groups = "drop") |>
+    dplyr::collect()
+
+  # Find duplicates
+  duplicates <- character(0L)
+  duplicates <- assay_summary |>
+    dplyr::filter(.data[["freq"]] > 1) |>
+    dplyr::pull(.data[[col_names$olink_id]]) |>
+    unique()
+
+  # Warn if duplicates are found
+  if (length(duplicates) > 0L) {
+    cli::cli_warn(c(
+      "Multiple UniProt ID{?s} detected in assay{?s}: {.val {duplicates}}."
+    ))
+  }
+
+  return(duplicates)
+
+}
