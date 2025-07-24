@@ -207,6 +207,7 @@ clean_npx <- function(df,
   df <- clean_duplicate_sample_id(
     df = df,
     check_npx_log = check_npx_log,
+    keep_duplicate_sample_id = keep_duplicate_sample_id,
     verbose = verbose
   )
 
@@ -242,6 +243,7 @@ clean_npx <- function(df,
   df <- clean_qc_warning(
     df = df,
     check_npx_log = check_npx_log,
+    keep_qc_warning = keep_qc_warning,
     verbose = verbose
   )
 
@@ -268,6 +270,7 @@ clean_npx <- function(df,
   df <- clean_assay_warning(
     df = df,
     check_npx_log = check_npx_log,
+    keep_assay_warning = keep_assay_warning,
     verbose = verbose
   )
 
