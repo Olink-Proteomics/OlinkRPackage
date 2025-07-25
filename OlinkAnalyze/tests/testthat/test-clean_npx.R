@@ -1835,3 +1835,54 @@ test_that(
 
   }
 )
+
+
+
+
+# -------------------------------------------------------------------------
+
+
+# Test clean_duplicate_uniprot_id -----------------------------------------
+
+df <- dplyr::tibble(
+  SampleID = c("ValidateSample","Duplicate_Uniprot1", "Duplicate_Uniprot2"),
+  OlinkID = c("OID12345", rep(x = "OID23456", times = 2L)),
+  SampleType = rep(x = "SAMPLE", times = 3L),
+  AssayType = rep(x = "assay", times = 3L),
+  SampleQC = rep(x = "PASS", times = 3L),
+  AssayQC = rep(x = "PASS", times = 3L),
+  NPX = rnorm(n = 3L),
+  PlateID = rep(x = "plate1", times = 3L),
+  UniProt = c("Uniprot_0", "Uniprot_1", "Uniprot_2"),
+  Assay = rep(x = "assay_a", times = 3L),
+  Panel = rep(x = "panel_a", times = 3L),
+  PanelVersion = rep(x = "panel_version_a", times = 3L),
+  LOD = rnorm(n = 3L),
+  ExtNPX = rnorm(n = 3L),
+  Count = rnorm(n = 3L),
+  Normalization = rep(x = "Intensity", times = 3L)
+)
+
+col_names <- list(
+  sample_id = "SampleID",
+  sample_type = "SampleType",
+  assay_type = "AssayType",
+  olink_id = "OlinkID",
+  uniprot = "UniProt",
+  assay = "Assay",
+  panel = "Panel",
+  plate_id = "PlateID",
+  panel_version = "PanelVersion",
+  lod = "LOD",
+  quant = "NPX",
+  ext_npx = "ExtNPX",
+  count = "Count",
+  qc_warning = "SampleQC",
+  assay_warn = "AssayQC",
+  normalization = "Normalization"
+)
+
+qc <- check_npx_nonunique_uniprot(df, col_names = col_names)
+qc <- check_npx(df = df)
+qc$non_unique_uniprot
+
