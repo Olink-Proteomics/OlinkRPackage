@@ -1201,4 +1201,93 @@ clean_col_class <- function(df,
 
 # Replace duplicate UniProt ID --------------------------------------------
 
+clean_nonunique_uniprot <- function(df,
+                                    keep_nonunique_uniprot = FALSE,
+                                    check_npx_log,
+                                    verbose = TRUE) {
+
+  if (keep_nonunique_uniprot == TRUE) {
+    if (verbose == TRUE) {
+      cli::cli_inform(c(
+      "Skipping unification of non-unique
+      {.val {check_npx_log$col_names$olink_id}} -
+      {.val {check_npx_log$col_names$uniprot}}
+      mappings as per user input {.arg keep_nonunique_uniprot}",
+      "i" = "Returning original dataset."
+      ))
+    }
+    return(df)
+  }
+
+  if (length(check_npx_log$non_unique_uniprot) == 0L) {
+    if (verbose == TRUE) {
+      cli::cli_inform(c(
+        "Each {.val {check_npx_log$col_names$olink_id}} maps to a unique
+        {.val {check_npx_log$col_names$uniprot}} identifier.",
+        "i" = "Returning original dataset."
+      ))
+    }
+    return(df)
+
+  } else {
+
+    oid_uniprot_map <- df |>
+      dplyr::filter(
+        .data[[check_npx_log$col_names$olink_id]] %in%
+                      check_npx_log$non_unique_uniprot
+        ) |>
+      dplyr::select(dplyr::all_of(c(
+        check_npx_log$col_names$olink_id,
+        check_npx_log$col_names$uniprot
+      ))) |>
+      dplyr::distinct() |>
+      dplyr::collect()
+
+
+  }
+
+
+
+
+}
+
+
+# -------------------------------------------------------------------------
+
+df <- npx_data1 |>
+  dplyr::mutate(UniProt = dplyr::case_when(SampleID == "A1" & OlinkID == "OID00471" ~ "P00001",
+                                           SampleID == "A1" & OlinkID == "OID00482" ~ "P00002",
+                                           TRUE ~ UniProt))
+log <- check_npx(df)
+
+# log$non_unique_uniprot
+clean_nonunique_uniprot(df, check_npx_log = log, keep_nonunique_uniprot = TRUE)
+
+
+qc <- clean_nonunique_uniprot(npx_data1,
+                              check_npx_log = check_npx(npx_data1),
+                              keep_nonunique_uniprot = FALSE,
+                              verbose = TRUE)
+
+check_npx_log <- log
+
+
+oid_uniprot_map <- df_arrow |>
+  dplyr::filter(
+    .data[[check_npx_log$col_names$olink_id]] %in%
+      check_npx_log$non_unique_uniprot
+  ) |>
+  dplyr::select(dplyr::all_of(c(
+    check_npx_log$col_names$olink_id,
+    check_npx_log$col_names$uniprot
+  ))) |>
+  dplyr::distinct() |>
+  dplyr::collect() |>
+  dplyr::group_by(OlinkID) %>%
+  dplyr::mutate(iteration = dplyr::row_number()) |>
+  dplyr::ungroup() |>
+  dplyr::filter(iteration == 1)
+
+
+
 
