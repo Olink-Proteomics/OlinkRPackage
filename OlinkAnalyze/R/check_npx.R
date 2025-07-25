@@ -52,6 +52,8 @@
 #'   including column key \var{col_key}, column name \var{col_name}, detected
 #'   column type \var{col_class} and expected column type
 #'   \var{expected_col_class}.
+#'   \item\strong{non_unique_uniprot} Character vector of \var{OlinkID} mapped
+#'   to more than one \var{UniProt} ID.
 #' }
 #'
 #' @export
@@ -152,6 +154,11 @@ check_npx <- function(df,
     df = df,
     col_names = check_npx_out_lst$col_names
   )
+
+  # non-unique uniprot id
+  check_npx_out_lst$non_unique_uniprot <- check_npx_nonunique_uniprot(
+    df = df,
+    col_names = check_npx_out_lst$col_names)
 
   # return results ----
 
@@ -995,39 +1002,64 @@ check_npx_qcwarn_assays <- function(df, col_names) {
   return(qc_warn_assays)
 }
 
-#' Help function checking data for duplicate UniProt ID
+#' Helping function checking for OlinkID mapped to multiple UniProt IDs.
 #'
-#' - Borrowed from Main branch npx_check_uniprot_dups.R by Kathy
+#' Between Panel versions, sometimes the \var{UniProt} identifiers will be
+#' updated or change formatting. This function identifies cases where a single
+#' \var{OlinkID} is mapped to multiple \var{UniProt} identifiers.
 #'
-check_npx_duplicate_uniprot_id <- function (df, col_names) {
+#' @param df A tibble or an arrow object containing the columns \var{Uniprot}
+#' and \var{OlinkID}.
+#' @param col_names A list of matched column names. This is the output of the
+#' \var{check_npx_col_names} function.
+#'   Must include:
+#'   \describe{
+#'     \item{\var{olink_id}}{Name of the column containing OlinkID values.}
+#'     \item{\var{uniprot}}{Name of the column containing UniProt ID values.}
+#'   }
+#'
+#' @return A character vector of \var{OlinkID}s that are mapped with more
+#' than one \var{UniProt} ID. If no such cases are found, returns an empty
+#' character vector.
+#'
+#'
+check_npx_nonunique_uniprot <- function(df, col_names) {
 
-  # Select relevant columns
+  # Group by OlinkID and count distinct UniProt entries
   assay_summary <- df |>
     dplyr::select(dplyr::all_of(c(
       col_names$olink_id,
       col_names$uniprot
     ))) |>
+    dplyr::distinct() |>  # Ensure uniqueness of OlinkID-UniProt pairs
     dplyr::group_by(
       .data[[col_names$olink_id]]
-    ) |>
-    dplyr::summarise(freq = dplyr::n(),
-                     .groups = "drop") |>
-    dplyr::collect()
+      ) |>
+    dplyr::summarise(
+      freq = dplyr::n(),
+      .groups = "drop"
+    )
 
-  # Find duplicates
-  duplicates <- character(0L)
+  # Identify OlinkIDs linked to multiple UniProt IDs
   duplicates <- assay_summary |>
     dplyr::filter(.data[["freq"]] > 1) |>
-    dplyr::pull(.data[[col_names$olink_id]]) |>
+    dplyr::pull(
+      .data[[col_names$olink_id]]
+      ) |>
     unique()
 
-  # Warn if duplicates are found
+  # Emit a warning if any duplicates are found
   if (length(duplicates) > 0L) {
+
     cli::cli_warn(c(
-      "Multiple UniProt ID{?s} detected in assay{?s}: {.val {duplicates}}."
+      "Multiple UniProt IDs detected for assay{?s}: {.val {duplicates}}."
     ))
+
+  } else {
+
+    duplicates <- character(0L)
+
   }
 
   return(duplicates)
-
 }
