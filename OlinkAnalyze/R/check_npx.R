@@ -1038,7 +1038,8 @@ check_npx_nonunique_uniprot <- function(df, col_names) {
     dplyr::summarise(
       freq = dplyr::n(),
       .groups = "drop"
-    )
+    ) |>
+    dplyr::collect()
 
   # Identify OlinkIDs linked to multiple UniProt IDs
   duplicates <- assay_summary |>
