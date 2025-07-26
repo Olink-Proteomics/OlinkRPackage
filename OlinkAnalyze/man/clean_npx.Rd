@@ -2,7 +2,7 @@
 % Please edit documentation in R/clean_npx.R
 \name{clean_npx}
 \alias{clean_npx}
-\title{Function Cleaning NPX data}
+\title{Clean proteomics data quantified with Olink's PEA technology}
 \usage{
 clean_npx(
   df,
@@ -22,13 +22,15 @@ clean_npx(
 )
 }
 \arguments{
-\item{df}{A \code{tibble} or \code{arrow} object loads from \code{read_npx()}.}
+\item{df}{A tibble or and arrow object from \code{\link{read_npx}}.}
 
-\item{check_log}{A list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{check_npx()}will be run internally using \code{df} and \code{preferred_names}.}
+\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df} and \code{preferred_names}.}
 
-\item{preferred_names}{An optional named list to supply preferred column
-names to \code{check_npx()}, if \code{check_log} is not provided.}
+\item{preferred_names}{Optional to be provided only if \code{check_log} is \code{NULL}.
+A named character vector where names are internal column names and values are
+column names to be selected from the input data frame. Read the
+\emph{description} from \code{\link[=check_npx]{check_npx()}} for further information.}
 
 \item{remove_assay_na}{Logical. If \code{FALSE}, skips filtering assays with all
 quantified values \code{NA}. Defaults to \code{TRUE}.}
@@ -63,45 +65,67 @@ samples. Default \code{NULL}, to mark no samples to be removed.}
 Defaults to \code{TRUE}, were columns required for downstream analysis are
 converted to the expected format.}
 
-\item{out_df}{The class of the output dataset. One of
-"tibble" and "arrow". (default = "tibble")}
+\item{out_df}{The class of the output data set. One of
+"tibble" and "arrow". (default = \code{"tibble"})}
 
-\item{verbose}{Logical. If \code{FALSE} (default), Silences step-wise CLI
-messages.}
+\item{verbose}{Logical. If \code{FALSE} (default), silences step-wise messages.}
 }
 \value{
-Clean dataset, tibble, ArrowObject, with Olink data in long
+Clean data set, tibble, ArrowObject, with Olink data in long
 format.
 }
 \description{
-This function applies a series of cleaning steps to an NPX data based on
-the results from \code{\link[=check_npx]{check_npx()}}. It removes problematic samples and assays
-to prepare a clean NPX data for downstream analysis, including duplicates
-samples, controls samples, internal control assays, and samples or assays
-with QC flag. Additionally, an instruction message is printed when user plan
-to analyze absolute quantification value.
+This function applies a series of cleaning steps to a data set exported by
+Olink Software and imported in R by \code{\link[=read_npx]{read_npx()}}. Some of the steps of this
+function rely on results from \code{\link[=check_npx]{check_npx()}}.
 
-The cleaning pipeline performs the following steps:
+This function removes samples and assays that are not suitable for downstream
+statistical analysis. Some of the data records that are removed include
+duplicate sample identifiers, external controls samples, internal control
+assays, and samples or assays with quality control flags.
+}
+\details{
+The pipeline performs the following steps:
 \enumerate{
-\item \strong{Remove invalid Olink IDs}: Assays flagged as having invalid Olink IDs.
-\item \strong{Remove assays with all NA values}: Assays without quantifiable data.
-\item \strong{Remove duplicate Sample IDs}: Ensures uniqueness across samples.
-\item \strong{Remove control samples}:
+\item \strong{Remove assays with invalid identifiers}: assays flagged as having
+invalid identifiers from \code{\link[=check_npx]{check_npx()}}. Occurs when the original data set
+provided by Olink Software has been modified.
+\item \strong{Remove assays with \code{NA} quantification values}: assays lacking
+quantification data are reported with \code{NA} as quantification. These assays
+are identified in \code{\link[=check_npx]{check_npx()}}.
+\item \strong{Remove samples with duplicate identifiers}: samples with identical
+identifiers detected by \code{\link[=check_npx]{check_npx()}}. Instances of duplicate sample
+identifiers cause errors in the downstream analysis of data with, and it is
+highly discouraged.
+\item \strong{Remove external control samples}:
 \itemize{
-\item Based on \code{SampleType} (e.g., \code{"SAMPLE_CONTROL"}, \code{"PLATE_CONTROL"},
-\code{"NEGATIVE_CONTROL"}).
-\item Based on \code{SampleID} matching known control sample IDs.
+\item Uses column marking sample type (e.g. \code{SampleType}) to exclude external
+control samples.
+\item Uses column marking sample identifier (e.g. \code{SampleID}) to remove
+external control samples, or samples that ones wants to exclude from the
+downstream analysis.
 }
-\item \strong{Remove samples failing QC}: Samples with QC status \code{'FAIL'}.
-\item \strong{Remove internal control assays}: Based on \code{AssayType} (e.g.,
-\code{"ext_ctrl"}, \code{"inc_ctrl"}, \code{"amp_ctrl"}).
-\item \strong{Remove assays flagged with assay QC warnings}.
-\item \strong{Correct column class}: Ensures columns following expected column class
-defined in \code{column_name_dict}.
+\item \strong{Remove samples failing quality control}: samples with QC status \code{FAIL}.
+\item \strong{Remove internal control assays}: Uses column marking assay type (e.g.
+\code{AssayType}) to exclude internal control assays.
+\item \strong{Remove assays with quality controls warnings}: assays with QC status
+\code{WARN}.
+\item \strong{Correct column data type}: ensure that certain columns have the
+expected data type (class). These columns are identified in \code{\link[=check_npx]{check_npx()}}.
 }
 
-#' If the dataset includes absolute quantification, a message is shown
-recommending log2 transformation for downstream analysis.
+\strong{Important:}
+\itemize{
+\item When data set lacks a column marking sample type (e.g. \code{SampleType}), one
+should remove external control samples based on their sample identifiers.
+This function does not auto-detect external control samples based on their
+sample identifiers. \emph{Please ensure external control samples have been}
+\emph{removed prior to downstream statistical analysis.}
+\item When data set lacks a column marking assay type (e.g. \code{AssayType}), one
+should remove internal control assays manually. This function does not
+auto-detect internal control assays. \emph{Please ensure internal control assays}
+\emph{have been removed prior to downstream statistical analysis.}
+}
 }
 \examples{
 \dontrun{

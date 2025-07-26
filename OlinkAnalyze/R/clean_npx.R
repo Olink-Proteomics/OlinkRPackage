@@ -1,41 +1,65 @@
-#' Function Cleaning NPX data
+#' Clean proteomics data quantified with Olink's PEA technology
 #'
 #' @description
-#' This function applies a series of cleaning steps to an NPX data based on
-#' the results from [`check_npx()`]. It removes problematic samples and assays
-#' to prepare a clean NPX data for downstream analysis, including duplicates
-#' samples, controls samples, internal control assays, and samples or assays
-#' with QC flag. Additionally, an instruction message is printed when user plan
-#' to analyze absolute quantification value.
+#' This function applies a series of cleaning steps to a data set exported by
+#' Olink Software and imported in R by [`read_npx()`]. Some of the steps of this
+#' function rely on results from [`check_npx()`].
 #'
-#' The cleaning pipeline performs the following steps:
+#' This function removes samples and assays that are not suitable for downstream
+#' statistical analysis. Some of the data records that are removed include
+#' duplicate sample identifiers, external controls samples, internal control
+#' assays, and samples or assays with quality control flags.
 #'
-#' 1. **Remove invalid Olink IDs**: Assays flagged as having invalid Olink IDs.
-#' 2. **Remove assays with all NA values**: Assays without quantifiable data.
-#' 3. **Remove duplicate Sample IDs**: Ensures uniqueness across samples.
-#' 4. **Remove control samples**:
-#'    - Based on `SampleType` (e.g., `"SAMPLE_CONTROL"`, `"PLATE_CONTROL"`,
-#'    `"NEGATIVE_CONTROL"`).
-#'    - Based on `SampleID` matching known control sample IDs.
-#' 5. **Remove samples failing QC**: Samples with QC status `'FAIL'`.
-#' 6. **Remove internal control assays**: Based on `AssayType` (e.g.,
-#' `"ext_ctrl"`, `"inc_ctrl"`, `"amp_ctrl"`).
-#' 7. **Remove assays flagged with assay QC warnings**.
-#' 8. **Correct column class**: Ensures columns following expected column class
-#' defined in `column_name_dict`.
+#' @details
+#' The pipeline performs the following steps:
 #'
-#' #' If the dataset includes absolute quantification, a message is shown
-#' recommending log2 transformation for downstream analysis.
+#' 1. **Remove assays with invalid identifiers**: assays flagged as having
+#' invalid identifiers from [`check_npx()`]. Occurs when the original data set
+#' provided by Olink Software has been modified.
+#' 2. **Remove assays with `NA` quantification values**: assays lacking
+#' quantification data are reported with `NA` as quantification. These assays
+#' are identified in [`check_npx()`].
+#' 3. **Remove samples with duplicate identifiers**: samples with identical
+#' identifiers detected by [`check_npx()`]. Instances of duplicate sample
+#' identifiers cause errors in the downstream analysis of data with, and it is
+#' highly discouraged.
+#' 4. **Remove external control samples**:
+#'    - Uses column marking sample type (e.g. `SampleType`) to exclude external
+#'    control samples.
+#'    - Uses column marking sample identifier (e.g. `SampleID`) to remove
+#'    external control samples, or samples that ones wants to exclude from the
+#'    downstream analysis.
+#' 5. **Remove samples failing quality control**: samples with QC status `FAIL`.
+#' 6. **Remove internal control assays**: Uses column marking assay type (e.g.
+#' `AssayType`) to exclude internal control assays.
+#' 7. **Remove assays with quality controls warnings**: assays with QC status
+#' `WARN`.
+#' 8. **Correct column data type**: ensure that certain columns have the
+#' expected data type (class). These columns are identified in [`check_npx()`].
+#'
+#' **Important:**
+#'
+#' - When data set lacks a column marking sample type (e.g. `SampleType`), one
+#' should remove external control samples based on their sample identifiers.
+#' This function does not auto-detect external control samples based on their
+#' sample identifiers. *Please ensure external control samples have been*
+#' *removed prior to downstream statistical analysis.*
+#' - When data set lacks a column marking assay type (e.g. `AssayType`), one
+#' should remove internal control assays manually. This function does not
+#' auto-detect internal control assays. *Please ensure internal control assays*
+#' *have been removed prior to downstream statistical analysis.*
 #'
 #' @author
 #'   Kang Dong
 #'   Klev Diamanti
 #'
-#' @param df A `tibble` or `arrow` object loads from `read_npx()`.
-#' @param check_log A list returned by [`check_npx()`]. If `NULL`,
-#' `check_npx()`will be run internally using `df` and `preferred_names`.
-#' @param preferred_names An optional named list to supply preferred column
-#' names to `check_npx()`, if `check_log` is not provided.
+#' @inheritParams check_npx
+#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
+#' [`check_npx()`] will be run internally using `df` and `preferred_names`.
+#' @param preferred_names Optional to be provided only if `check_log` is `NULL`.
+#' A named character vector where names are internal column names and values are
+#' column names to be selected from the input data frame. Read the
+#' \emph{description} from [`check_npx()`] for further information.
 #' @param remove_assay_na Logical. If `FALSE`, skips filtering assays with all
 #' quantified values `NA`. Defaults to `TRUE`.
 #' @param remove_invalid_oid Logical. If `FALSE`, skips filtering assays with
@@ -60,12 +84,11 @@
 #' @param convert_df_cols Logical. If `FALSE`, retains columns of `df` as are.
 #' Defaults to `TRUE`, were columns required for downstream analysis are
 #' converted to the expected format.
-#' @param out_df The class of the output dataset. One of
-#' `r ansi_collapse_quot(read_npx_df_output)`. (default = "tibble")
-#' @param verbose Logical. If `FALSE` (default), Silences step-wise CLI
-#' messages.
+#' @param out_df The class of the output data set. One of
+#' `r ansi_collapse_quot(read_npx_df_output)`. (default = `"tibble"`)
+#' @param verbose Logical. If `FALSE` (default), silences step-wise messages.
 #'
-#' @returns Clean dataset, `r get_df_output_print()`, with Olink data in long
+#' @returns Clean data set, `r get_df_output_print()`, with Olink data in long
 #' format.
 #'
 #' @export
@@ -529,12 +552,10 @@ clean_duplicate_sample_id <- function(df,
   }
 
   # Inform user about excluded SampleIDs
-  cli::cli_inform(
-    c(
-      "Excluding {.val {length(check_npx_log$sample_id_dups)}} sample{?s} with
-    duplicate identifier{?s}: {.val {check_npx_log$sample_id_dups}}.",
-      "v" = "Returning cleaned dataset."
-    )
+  cli::cli_alert_success(
+    text = "Excluding {.val {length(check_npx_log$sample_id_dups)}} sample{?s}
+    with duplicate identifier{?s}: {.val {check_npx_log$sample_id_dups}}.",
+    wrap = TRUE
   )
 
   # Filter out rows with duplicate SampleIDs
@@ -792,7 +813,7 @@ clean_assay_type <- function(df,
   if (!("assay_type" %in% names(check_npx_log$col_names))) {
     cli::cli_inform(
       c("No column marking control assays in dataset.",
-        "i" = "Ensure exclusion of control control for downstream analysis!",
+        "i" = "Ensure exclusion of control assays for downstream analysis!",
         "i" = "Returning original dataset."
       )
     )
