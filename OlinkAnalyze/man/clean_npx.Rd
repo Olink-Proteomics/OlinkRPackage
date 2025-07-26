@@ -129,90 +129,22 @@ auto-detect internal control assays. \emph{Please ensure internal control assays
 }
 \examples{
 \dontrun{
-# Example 1. Run clean_npx() to check multiple errors
-df <- dplyr::tibble(
-  SampleID = c(
-    "ValidSample",     # valid
-    "InvalidOID",      # invalid OlinkID (too short)
-    "AllNA",           # all NPX values NA for assay
-    "DuplicateSample", # duplicate SampleID
-    "ControlType",     # control SampleType
-    "ControlID",       # control SampleID (e.g., contains 'control')
-    "FailQC",          # QC_Warning is FAIL
-    "ControlAssay",    # internal control assay
-    "AssayWarn",       # flagged by AssayQC warning
-    "DuplicateSample"  # duplicate SampleID
-  ),
- OlinkID = c(
-    "OID12345",  # valid (5 digits)
-    "OID1234",   # invalid (only 4 digits)
-    "OID23456",  # valid, but will be all NA
-    "OID34567",  # valid
-    "OID45678",  # valid
-    "OID56789",  # valid
-    "OID67890",  # valid
-    "OID78901",  # valid
-    "OID89012",  # valid
-    "OID34567"   # valid
-  ),
-  SampleType = c(
-    "SAMPLE",
-    "SAMPLE",
-    "SAMPLE",
-    "SAMPLE",
-    "PLATE_CONTROL",  # control sample
-    "SAMPLE",
-    "SAMPLE",
-    "SAMPLE",
-    "SAMPLE",
-    "SAMPLE"
-  ),
-  AssayType = c(
-    "assay",
-    "assay",
-    "assay",
-    "assay",
-    "assay",
-    "assay",
-    "assay",
-    "ext_ctrl",   #control assay
-    "assay",
-    "assay"
-  ),
-  SampleQC = c(
-    "PASS",
-    "PASS",
-    "PASS",
-    "PASS",
-    "PASS",
-    "PASS",
-    "FAIL",    #fails QC
-    "PASS",
-    "PASS",
-    "PASS"
-  ),
- AssayQC = c(
-    "PASS",
-    "PASS",
-    "PASS",
-    "PASS",
-    "PASS",
-    "PASS",
-    "PASS",
-    "PASS",
-    "WARN", #to be removed by clean_assay_warning
-    "PASS"
-  ),
-   NPX = replace(x = rnorm(n = 10L), list = 3L, values = NA_real_),
-   PlateID = rep("plate1", 10L),
-   UniProt = rep("uniprotid1", 10L),
-   Assay = rep("assay_a", 10L),
-   Panel = rep("panel_a", 10L),
-   PanelVersion = rep("panel_version_a", 10L),
-   LOD = rnorm(10L),
-   ExtNPX = rnorm(10L),
-   Count = rnorm(10L),
-   Normalization = rep("Intensity", 10L)
+# run check_npx
+check_log <- check_npx(
+  df = npx_data1
+)
+
+# run clean_npx
+clean_npx(
+  df = npx_data1,
+  check_log = check_log
+)
+
+# run clean_npx with messages for all steps
+clean_npx(
+  df = npx_data1,
+  check_log = check_log,
+  verbose = TRUE
 )
 }
 
