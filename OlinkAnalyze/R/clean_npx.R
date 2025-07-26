@@ -197,14 +197,6 @@ clean_npx <- function(df,
                       out_df = "tibble",
                       verbose = FALSE) {
 
-  # Silence messages and warnings if requested
-  if (!verbose) {
-    withr::local_options(list(
-      rlib_message_verbosity = "quiet",
-      rlib_warning_verbosity = "quiet"
-    ))
-  }
-
   if (verbose) cli::cli_h2("Starting {.fn clean_npx} pipeline")
 
   # Validate input dataset
@@ -552,10 +544,12 @@ clean_duplicate_sample_id <- function(df,
   }
 
   # Inform user about excluded SampleIDs
-  cli::cli_alert_success(
-    text = "Excluding {.val {length(check_npx_log$sample_id_dups)}} sample{?s}
-    with duplicate identifier{?s}: {.val {check_npx_log$sample_id_dups}}.",
-    wrap = TRUE
+  cli::cli_inform(
+    c(
+      "Excluding {.val {length(check_npx_log$sample_id_dups)}} sample{?s} with
+    duplicate identifier{?s}: {.val {check_npx_log$sample_id_dups}}.",
+      "v" = "Returning cleaned dataset."
+    )
   )
 
   # Filter out rows with duplicate SampleIDs
