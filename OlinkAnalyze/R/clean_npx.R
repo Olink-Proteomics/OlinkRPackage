@@ -131,26 +131,31 @@ clean_npx <- function(df,
 
   # Validate input dataset
   check_is_dataset(df = df, error = TRUE)
-  check_is_list(lst = check_log, error = TRUE)
   check_is_scalar_boolean(bool = verbose, error = TRUE)
 
   if (verbose) cli::cli_h2("Starting {.fn clean_npx} pipeline")
 
   # Validate or generate check_log from check_npx()
   if (is.null(check_log)) {
-    cli::cli_inform("{.arg check_log} is not provided.
-                    Running {.fn check_npx}.")
-    check_npx_log <- check_npx(df,
-                               preferred_names = preferred_names) |>
-      suppressWarnings()
 
-  } else if (check_is_list(check_log)) {
-    check_npx_log <- check_log
-
-  } else {
-    cli::cli_abort(
-      "{.arg check_log} must be the result of the {.fn check_npx} function."
+    cli::cli_inform(
+      c(
+        "{.arg check_log} not provided. Running {.fn check_npx}.",
+        "i" = "It is recommended that the user runs {.fn check_npx} to get a
+        full picture of the results from the data validity check!"
+      )
     )
+
+    check_npx_log <- check_npx(
+      df = df,
+      preferred_names = preferred_names
+    ) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+  } else if (check_is_list(lst = check_log, error = TRUE)) {
+
+    check_npx_log <- check_log
 
   }
 
