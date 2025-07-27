@@ -2016,43 +2016,43 @@ test_that(
     # Validate processing message
     expect_true(grepl("Starting `clean_npx\\(\\)` pipeline",
                       msgs_clean[1L]))
-    expect_true(grepl("Cleaning assays with invalid OlinkIDs",
+    expect_true(grepl("Removing assays with invalid identifiers.",
                       msgs_clean[2L]))
     expect_true(grepl("Excluding 1 assay with invalid identifier: \"OID1234\"",
                       msgs_clean[3L]))
-    expect_true(grepl("Cleaning assays with all NA values",
+    expect_true(grepl("Removing assays missing all quantified values.",
                       msgs_clean[4L]))
     expect_true(grepl("Excluding 1 assay with only \"NA\" values: \"OID23456\"",
                       msgs_clean[5L]))
-    expect_true(grepl("Cleaning duplicate SampleIDs",
+    expect_true(grepl("Removing duplicated sample identifiers.",
                       msgs_clean[6L]))
     expect_true(grepl(paste("Excluding 1 sample with duplicate identifier:",
                             "\"DuplicateSample\""),
                       msgs_clean[7L]))
-    expect_true(grepl("Cleaning control samples based on sample type",
+    expect_true(grepl("Removing control samples based on sample type.",
                       msgs_clean[8L]))
     expect_true(grepl("Excluding 1 control sample: \"ControlType\"",
                       msgs_clean[9L]))
-    expect_true(grepl("Cleaning control samples based on Sample ID",
+    expect_true(grepl("Removing samples based on sample identifiers.",
                       msgs_clean[10L]))
     expect_true(grepl(paste("Skipping exclusion of control samples based on",
                             "`control_sample_ids`."),
                       msgs_clean[11L]))
-    expect_true(grepl("Cleaning Samples with QC Status 'FAIL'",
+    expect_true(grepl("Removing samples with QC status 'FAIL'.",
                       msgs_clean[12L]))
     expect_true(grepl(paste("Excluding 1 datapoint from 1 sample flagged with",
                             "SampleQC = \"FAIL\": \"FailQC\"."),
                       msgs_clean[13L]))
-    expect_true(grepl("Cleaning internal control assays",
+    expect_true(grepl("Removing internal control assays.",
                       msgs_clean[14L]))
     expect_true(grepl("Excluding 1 control assay: \"OID78901\"",
                       msgs_clean[15L]))
-    expect_true(grepl("Cleaning assays flagged by assay warning",
+    expect_true(grepl("Removing assays flagged with assays warning.",
                       msgs_clean[16L]))
     expect_true(grepl(paste("Excluding 1 datapoint from 1 assay flagged with",
                             "AssayQC = \"WARN\" or \"Warning\": \"OID89012\""),
                       msgs_clean[17L]))
-    expect_true(grepl("Correcting flagged column class",
+    expect_true(grepl("Converting data types of selected columns.",
                       msgs_clean[18L]))
     expect_true(grepl("Columns are in the correct format.",
                       msgs_clean[19L]))
