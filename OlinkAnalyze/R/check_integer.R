@@ -1,11 +1,7 @@
 #' Help function checking if a variable is a vector of integers.
 #'
-#' @author
-#'   Klev Diamanti
-#'
+#' @inherit .check_params params author
 #' @param int Variable to check.
-#' @param error Scalar boolean to return an error instead of a `FALSE`
-#' (`default = FALSE`).
 #'
 #' @return `TRUE` if the variable is an integer vector, and `FALSE` if not;
 #' error if the variable is not an integer vector and `error = TRUE`.
@@ -52,12 +48,7 @@ check_is_integer <- function(int,
 
 #' Help function checking if a variable is a scalar integer.
 #'
-#' @author
-#'   Klev Diamanti
-#'
-#' @param int Variable to check.
-#' @param error Scalar boolean to return an error instead of a `FALSE`
-#' (`default = FALSE`).
+#' @inherit check_is_integer params author
 #'
 #' @return `TRUE` if the variable is an integer vector of length 1, and `FALSE`
 #' if not; error if the variable is not an integer vector of length 1, and

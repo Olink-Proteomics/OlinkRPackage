@@ -1,11 +1,7 @@
 #' Help function checking if a variable is a list.
 #'
-#' @author
-#'   Klev Diamanti
-#'
+#' @inherit .check_params params author
 #' @param lst Variable to check.
-#' @param error Scalar boolean to return an error instead of a `FALSE`
-#' (`default = FALSE`).
 #'
 #' @return `TRUE` if the variable is a list, and `FALSE` if not; error if the
 #' variable is not a list and `error = TRUE`.

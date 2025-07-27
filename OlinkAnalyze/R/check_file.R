@@ -1,14 +1,10 @@
 #' Help function checking if file exists.
 #'
-#' @author
-#'   Klev Diamanti
-#'
 #' @description
 #' Check \strong{one file at a time} if it exists.
 #'
+#' @inherit .check_params params author
 #' @param file Path to file.
-#' @param error Scalar boolean to return an error instead of a `FALSE`
-#' (`default = FALSE`).
 #'
 #' @return `TRUE` if the file exists, and `FALSE` if not; error if the file does
 #' not exist and `error = TRUE`.
@@ -54,15 +50,12 @@ check_file_exists <- function(file,
 
 #' Help function checking if file extension is acceptable.
 #'
-#' @author
-#'   Klev Diamanti
-#'
 #' @description
 #' Use variable \var{accepted_npx_file_ext} to check if extension of the input
 #' file is acceptable. Expecting one of
 #' `r ansi_collapse_quot(get_file_ext_summary())`.
 #'
-#' @param file Path to file.
+#' @inherit check_file_exists params author
 #'
 #' @return The type of the file extension based on the global variable
 #' \var{accepted_npx_file_ext}.

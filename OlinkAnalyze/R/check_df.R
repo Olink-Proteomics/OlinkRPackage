@@ -1,11 +1,6 @@
 #' Help function checking if a variable is an R6 ArrowObject.
 #'
-#' @author
-#'   Klev Diamanti
-#'
-#' @param df Variable to check.
-#' @param error Scalar boolean to return an error instead of a `FALSE`
-#' (`default = FALSE`).
+#' @inherit check_is_dataset params author
 #'
 #' @return `TRUE` if the variable is an ArrowObject, and `FALSE` if not; error
 #' if the variable is not an ArrowObject and `error = TRUE`.
@@ -52,12 +47,7 @@ check_is_arrow_object <- function(df,
 
 #' Help function checking if a variable is a tibble dataset.
 #'
-#' @author
-#'   Klev Diamanti
-#'
-#' @param df Variable to check.
-#' @param error Scalar boolean to return an error instead of a `FALSE`
-#' (`default = FALSE`).
+#' @inherit check_is_dataset params author
 #'
 #' @return `TRUE` if the variable is a tibble, and `FALSE` if not; error if the
 #' variable is not a tibble and `error = TRUE`.
@@ -104,12 +94,8 @@ check_is_tibble <- function(df,
 
 #' Help function checking if a variable is a tibble or an ArrowObject dataset.
 #'
-#' @author
-#'   Klev Diamanti
-#'
+#' @inherit .check_params params author
 #' @param df Variable to check.
-#' @param error Scalar boolean to return an error instead of a `FALSE`
-#' (`default = FALSE`).
 #'
 #' @return `TRUE` if the variable is a tibble or an ArrowObject, and `FALSE` if
 #' not; error if the variable is not a tibble or an ArrowObject and

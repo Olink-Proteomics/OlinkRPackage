@@ -28,10 +28,10 @@
 #' @examples
 #' \dontrun{
 #' tmp_data <- dplyr::tibble(
-#'   "A" = c(1,2,3),
-#'   "B" = c(T,T,F),
+#'   "A" = c(1L, 2L, 3L),
+#'   "B" = c(TRUE, TRUE, FALSE),
 #'   "C" = c("A", "B", "C"),
-#'   "D" = c(F,F,T)
+#'   "D" = c(FALSE, FALSE, TRUE)
 #' )
 #'
 #' # OK

@@ -1,11 +1,7 @@
 #' Help function checking if a variable is a vector of numerics.
 #'
-#' @author
-#'   Klev Diamanti
-#'
+#' @inherit .check_params params author
 #' @param num Variable to check.
-#' @param error Scalar boolean to return an error instead of a `FALSE`
-#' (`default = FALSE`).
 #'
 #' @return `TRUE` if the variable is a numeric vector, and `FALSE` if not;
 #' error if the variable is not a numeric vector and `error = TRUE`.
@@ -52,12 +48,7 @@ check_is_numeric <- function(num,
 
 #' Help function checking if a variable is a scalar numeric
 #'
-#' @author
-#'   Klev Diamanti
-#'
-#' @param num Variable to check.
-#' @param error Scalar boolean to return an error instead of a `FALSE`
-#' (`default = FALSE`).
+#' @inherit check_is_numeric params author
 #'
 #' @return `TRUE` if the variable is a numeric vector of length 1, and `FALSE`
 #' if not; error if the variable is not a numeric vector of length 1, and

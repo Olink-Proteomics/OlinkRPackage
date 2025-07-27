@@ -1,11 +1,7 @@
 #' Help function checking if a variable is a vector of booleans.
 #'
-#' @author
-#'   Klev Diamanti
-#'
+#' @inherit .check_params params author
 #' @param bool Variable to check.
-#' @param error Scalar boolean to return an error instead of a `FALSE`
-#' (`default = FALSE`).
 #'
 #' @return `TRUE` if the variable is a boolean vector, and `FALSE` if not; error
 #' if the variable is not a boolean vector, and `error = TRUE`.
@@ -48,12 +44,7 @@ check_is_boolean <- function(bool,
 
 #' Help function checking if a variable is a scalar boolean.
 #'
-#' @author
-#'   Klev Diamanti
-#'
-#' @param bool Variable to check.
-#' @param error Scalar boolean to return an error instead of a `FALSE`
-#' (`default = FALSE`).
+#' @inherit check_is_boolean params author
 #'
 #' @return `TRUE` if the variable is a boolean vector of length 1, and `FALSE`
 #' if not; error if the variable is not a boolean vector of length 1, and
