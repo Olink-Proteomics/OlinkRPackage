@@ -1974,7 +1974,7 @@ test_that(
 )
 
 test_that(
-  "clean_npx emits clean messages without ANSI styling",
+  "clean_npx - works - emits clean messages without ANSI styling",
   {
 
     # Set CLI color option locally for this test
@@ -2058,5 +2058,37 @@ test_that(
                       msgs_clean[19L]))
     expect_true(grepl("Completed `clean_npx\\(\\)`",
                       msgs_clean[20L]))
+  }
+)
+
+test_that(
+  "clean_npx - works - absolute quantified data",
+  {
+    test_result <- npx_data1 |>
+      dplyr::rename(
+        "Quantified_value" = "NPX"
+      ) |>
+      dplyr::filter(
+        !(.data[["SampleID"]] %in% c("CONTROL_SAMPLE_AS 1",
+                                     "CONTROL_SAMPLE_AS 2"))
+      ) |>
+      dplyr::mutate(
+        SampleType = "SAMPLE",
+        AssayType = "assay",
+        Assay_Warning = "Pass"
+      )
+
+    log_test <- check_npx(df = test_result)
+
+    expect_message(
+      object = expect_equal(
+        object = clean_npx(df = test_result,
+                           check_log = log_test),
+        expected = test_result
+      ),
+      regexp = paste("Detected data in absolute quantification in column",
+                     "Quantified_value.")
+    )
+
   }
 )
