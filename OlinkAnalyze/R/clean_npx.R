@@ -129,12 +129,12 @@ clean_npx <- function(df,
                       out_df = "tibble",
                       verbose = FALSE) {
 
-  if (verbose) cli::cli_h2("Starting {.fn clean_npx} pipeline")
-
   # Validate input dataset
   check_is_dataset(df = df, error = TRUE)
-
+  check_is_list(lst = check_log, error = TRUE)
   check_is_scalar_boolean(bool = verbose, error = TRUE)
+
+  if (verbose) cli::cli_h2("Starting {.fn clean_npx} pipeline")
 
   # Validate or generate check_log from check_npx()
   if (is.null(check_log)) {
@@ -815,6 +815,11 @@ clean_qc_warning <- function(df,
                              check_npx_log,
                              remove_qc_warning = FALSE,
                              verbose = FALSE) {
+  # input check
+  check_is_scalar_boolean(
+    bool = remove_qc_warning,
+    error = TRUE
+  )
 
   if (remove_qc_warning == FALSE) {
     if (verbose == TRUE) {
@@ -913,6 +918,12 @@ clean_assay_warning <- function(df,
                                 check_npx_log,
                                 remove_assay_warning = TRUE,
                                 verbose = FALSE) {
+  # input check
+  check_is_scalar_boolean(
+    bool = remove_assay_warning,
+    error = TRUE
+  )
+
   # retain assays marked with assay warning
   if (remove_assay_warning == FALSE) {
     if (verbose == TRUE) {
@@ -1128,6 +1139,12 @@ clean_col_class <- function(df,
                             check_npx_log,
                             convert_df_cols = TRUE,
                             verbose = FALSE) {
+  # input check
+  check_is_scalar_boolean(
+    bool = convert_df_cols,
+    error = TRUE
+  )
+
   # check if user wants df columns to be converted
   if (convert_df_cols == FALSE) {
     if (verbose == TRUE) {
