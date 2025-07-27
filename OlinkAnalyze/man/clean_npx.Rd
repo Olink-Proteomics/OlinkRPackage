@@ -2,169 +2,149 @@
 % Please edit documentation in R/clean_npx.R
 \name{clean_npx}
 \alias{clean_npx}
-\title{Function Cleaning NPX data}
+\title{Clean proteomics data quantified with Olink's PEA technology}
 \usage{
 clean_npx(
   df,
   check_log = NULL,
   preferred_names = NULL,
-  keep_controls = NULL,
+  remove_assay_na = TRUE,
+  remove_invalid_oid = TRUE,
+  remove_dup_sample_id = TRUE,
+  remove_control_assay = TRUE,
+  remove_control_sample = TRUE,
+  remove_qc_warning = TRUE,
+  remove_assay_warning = TRUE,
   control_sample_ids = NULL,
-  keep_assay_all_na = FALSE,
-  keep_invalid_oid = FALSE,
-  keep_duplicate_sample_id = FALSE,
-  keep_qc_warning = FALSE,
-  keep_assay_warning = FALSE,
+  convert_df_cols = TRUE,
   out_df = "tibble",
   verbose = FALSE
 )
 }
 \arguments{
-\item{df}{A \code{tibble} or Arrow \code{Table} loaded from \code{read_npx()}.}
+\item{df}{A tibble or and arrow object from \code{\link{read_npx}}.}
 
-\item{check_log}{A list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{check_npx()}will be run internally using \code{df} and \code{preferred_names}.}
+\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df} and \code{preferred_names}.}
 
-\item{preferred_names}{An optional named list to supply preferred column
-names to \code{check_npx()}, if \code{check_log} is not provided.}
+\item{preferred_names}{Optional to be provided only if \code{check_log} is \code{NULL}.
+A named character vector where names are internal column names and values are
+column names to be selected from the input data frame. Read the
+\emph{description} from \code{\link[=check_npx]{check_npx()}} for further information.}
 
-\item{keep_controls}{Character string indicating whether to retain any
-controls:
-\itemize{
-\item \code{"sample"}: keep only sample-level controls,
-\item \code{"assay"}: keep only assay-level controls,
-\item \code{"both"}: keep all controls,
-\item \code{NULL} (default): remove all controls.
-}}
+\item{remove_assay_na}{Logical. If \code{FALSE}, skips filtering assays with all
+quantified values \code{NA}. Defaults to \code{TRUE}.}
 
-\item{control_sample_ids}{A character vector of \code{SampleID}s to remove.
-Typically used to remove customer-provided or technical control samples.}
+\item{remove_invalid_oid}{Logical. If \code{FALSE}, skips filtering assays with
+invalid identifiers. Defaults to \code{TRUE}.}
 
-\item{out_df}{Output format: \code{"tibble"} (default) or \code{"arrow"}.}
+\item{remove_dup_sample_id}{Logical. If \code{FALSE}, skips filtering samples with
+duplicate sample identifiers. Defaults to \code{TRUE}.}
 
-\item{verbose}{Logical. If \code{FALSE} (default), Silences step-wise CLI
-messages.}
+\item{remove_control_assay}{If \code{FALSE}, all internal control assays are
+retained. If \code{TRUE}, all internal control assays are removed. Alternatively,
+a character vector with one or more of
+"assay", "inc", "det", "ext", and "amp" indicating the assay
+types to remove.}
+
+\item{remove_control_sample}{If \code{FALSE}, all control samples are retained. If
+\code{TRUE}, all control samples are removed. Alternatively, a character vector
+with one or more of "sample", "sc", "pc", and "nc"
+indicating the sample types to remove.}
+
+\item{remove_qc_warning}{Logical. If \code{FALSE}, retains samples flagged as
+\code{FAIL} in QC warning. Defaults to \code{TRUE}.}
+
+\item{remove_assay_warning}{Logical. If \code{FALSE}, retains assays flagged as
+\code{WARN} in assay warning. Defaults to \code{TRUE}.}
+
+\item{control_sample_ids}{character vector of sample identifiers of control
+samples. Default \code{NULL}, to mark no samples to be removed.}
+
+\item{convert_df_cols}{Logical. If \code{FALSE}, retains columns of \code{df} as are.
+Defaults to \code{TRUE}, were columns required for downstream analysis are
+converted to the expected format.}
+
+\item{out_df}{The class of the output data set. One of
+"tibble" and "arrow". (default = \code{"tibble"})}
+
+\item{verbose}{Logical. If \code{FALSE} (default), silences step-wise messages.}
 }
 \value{
-A cleaned NPX dataset in either tibble or Arrow Table format,
-depending on \code{out_df}.
+Clean data set, tibble, ArrowObject, with Olink data in long
+format.
 }
 \description{
-This function applies a series of cleaning steps to an NPX data based on
-the results from \code{\link[=check_npx]{check_npx()}}. It removes problematic samples and assays
-to prepare a clean NPX data for downstream analysis, including duplicates
-samples, controls samples, internal control assays, and samples or assays
-with QC flag. Additionally, an instruction message is printed when user plan
-to analyze absolute quantification value.
+This function applies a series of cleaning steps to a data set exported by
+Olink Software and imported in R by \code{\link[=read_npx]{read_npx()}}. Some of the steps of this
+function rely on results from \code{\link[=check_npx]{check_npx()}}.
 
-The cleaning pipeline performs the following steps:
+This function removes samples and assays that are not suitable for downstream
+statistical analysis. Some of the data records that are removed include
+duplicate sample identifiers, external controls samples, internal control
+assays, and samples or assays with quality control flags.
+}
+\details{
+The pipeline performs the following steps:
 \enumerate{
-\item \strong{Remove invalid Olink IDs}: Assays flagged as having invalid Olink IDs.
-\item \strong{Remove assays with all NA values}: Assays without quantifiable data.
-\item \strong{Remove duplicate Sample IDs}: Ensures uniqueness across samples.
-\item \strong{Remove control samples}:
+\item \strong{Remove assays with invalid identifiers}: assays flagged as having
+invalid identifiers from \code{\link[=check_npx]{check_npx()}}. Occurs when the original data set
+provided by Olink Software has been modified.
+\item \strong{Remove assays with \code{NA} quantification values}: assays lacking
+quantification data are reported with \code{NA} as quantification. These assays
+are identified in \code{\link[=check_npx]{check_npx()}}.
+\item \strong{Remove samples with duplicate identifiers}: samples with identical
+identifiers detected by \code{\link[=check_npx]{check_npx()}}. Instances of duplicate sample
+identifiers cause errors in the downstream analysis of data with, and it is
+highly discouraged.
+\item \strong{Remove external control samples}:
 \itemize{
-\item Based on \code{SampleType} (e.g., \code{"SAMPLE_CONTROL"}, \code{"PLATE_CONTROL"},
-\code{"NEGATIVE_CONTROL"}).
-\item Based on \code{SampleID} matching known control sample IDs.
+\item Uses column marking sample type (e.g. \code{SampleType}) to exclude external
+control samples.
+\item Uses column marking sample identifier (e.g. \code{SampleID}) to remove
+external control samples, or samples that ones wants to exclude from the
+downstream analysis.
 }
-\item \strong{Remove samples failing QC}: Samples with QC status \code{'FAIL'}.
-\item \strong{Remove internal control assays}: Based on \code{AssayType} (e.g.,
-\code{"ext_ctrl"}, \code{"inc_ctrl"}, \code{"amp_ctrl"}).
-\item \strong{Remove assays flagged with assay QC warnings}.
-\item \strong{Correct column class}: Ensures columns following expected column class
-defined in \code{column_name_dict}.
+\item \strong{Remove samples failing quality control}: samples with QC status \code{FAIL}.
+\item \strong{Remove internal control assays}: Uses column marking assay type (e.g.
+\code{AssayType}) to exclude internal control assays.
+\item \strong{Remove assays with quality controls warnings}: assays with QC status
+\code{WARN}.
+\item \strong{Correct column data type}: ensure that certain columns have the
+expected data type (class). These columns are identified in \code{\link[=check_npx]{check_npx()}}.
 }
 
-#' If the dataset includes absolute quantification, a message is shown
-recommending log2 transformation for downstream analysis.
+\strong{Important:}
+\itemize{
+\item When data set lacks a column marking sample type (e.g. \code{SampleType}), one
+should remove external control samples based on their sample identifiers.
+This function does not auto-detect external control samples based on their
+sample identifiers. \emph{Please ensure external control samples have been}
+\emph{removed prior to downstream statistical analysis.}
+\item When data set lacks a column marking assay type (e.g. \code{AssayType}), one
+should remove internal control assays manually. This function does not
+auto-detect internal control assays. \emph{Please ensure internal control assays}
+\emph{have been removed prior to downstream statistical analysis.}
+}
 }
 \examples{
 \dontrun{
-# Example 1. Run clean_npx() to check multiple errors
-df <- dplyr::tibble(
-  SampleID = c(
-    "ValidSample",     # valid
-    "InvalidOID",      # invalid OlinkID (too short)
-    "AllNA",           # all NPX values NA for assay
-    "DuplicateSample", # duplicate SampleID
-    "ControlType",     # control SampleType
-    "ControlID",       # control SampleID (e.g., contains 'control')
-    "FailQC",          # QC_Warning is FAIL
-    "ControlAssay",    # internal control assay
-    "AssayWarn",       # flagged by AssayQC warning
-    "DuplicateSample"  # duplicate SampleID
-  ),
- OlinkID = c(
-    "OID12345",  # valid (5 digits)
-    "OID1234",   # invalid (only 4 digits)
-    "OID23456",  # valid, but will be all NA
-    "OID34567",  # valid
-    "OID45678",  # valid
-    "OID56789",  # valid
-    "OID67890",  # valid
-    "OID78901",  # valid
-    "OID89012",  # valid
-    "OID34567"   # valid
-  ),
-  SampleType = c(
-    "SAMPLE",
-    "SAMPLE",
-    "SAMPLE",
-    "SAMPLE",
-    "PLATE_CONTROL",  # control sample
-    "SAMPLE",
-    "SAMPLE",
-    "SAMPLE",
-    "SAMPLE",
-    "SAMPLE"
-  ),
-  AssayType = c(
-    "assay",
-    "assay",
-    "assay",
-    "assay",
-    "assay",
-    "assay",
-    "assay",
-    "ext_ctrl",   #control assay
-    "assay",
-    "assay"
-  ),
-  SampleQC = c(
-    "PASS",
-    "PASS",
-    "PASS",
-    "PASS",
-    "PASS",
-    "PASS",
-    "FAIL",    #fails QC
-    "PASS",
-    "PASS",
-    "PASS"
-  ),
- AssayQC = c(
-    "PASS",
-    "PASS",
-    "PASS",
-    "PASS",
-    "PASS",
-    "PASS",
-    "PASS",
-    "PASS",
-    "WARN", #to be removed by clean_assay_warning
-    "PASS"
-  ),
-   NPX = replace(x = rnorm(n = 10L), list = 3L, values = NA_real_),
-   PlateID = rep("plate1", 10L),
-   UniProt = rep("uniprotid1", 10L),
-   Assay = rep("assay_a", 10L),
-   Panel = rep("panel_a", 10L),
-   PanelVersion = rep("panel_version_a", 10L),
-   LOD = rnorm(10L),
-   ExtNPX = rnorm(10L),
-   Count = rnorm(10L),
-   Normalization = rep("Intensity", 10L)
+# run check_npx
+check_log <- check_npx(
+  df = npx_data1
+)
+
+# run clean_npx
+clean_npx(
+  df = npx_data1,
+  check_log = check_log
+)
+
+# run clean_npx with messages for all steps
+clean_npx(
+  df = npx_data1,
+  check_log = check_log,
+  verbose = TRUE
 )
 }
 

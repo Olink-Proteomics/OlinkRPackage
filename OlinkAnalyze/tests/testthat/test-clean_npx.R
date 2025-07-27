@@ -107,7 +107,7 @@ test_that(
       object = expect_equal(
         object = clean_assay_na(df = df,
                                 check_npx_log = log,
-                                keep_assay_all_na = FALSE,
+                                remove_assay_na = TRUE,
                                 verbose = FALSE),
         expected = expected_result
       ),
@@ -117,17 +117,14 @@ test_that(
     ## verbose TRUE ----
 
     expect_message(
-      object = expect_message(
-        object = expect_equal(
-          object = clean_assay_na(df = df,
-                                  check_npx_log = log,
-                                  keep_assay_all_na = FALSE,
-                                  verbose = TRUE),
-          expected = expected_result
-        ),
-        regexp = "Excluding 1 assay with only \"NA\" values: \"OID23456\""
+      object = expect_equal(
+        object = clean_assay_na(df = df,
+                                check_npx_log = log,
+                                remove_assay_na = TRUE,
+                                verbose = TRUE),
+        expected = expected_result
       ),
-      regexp = "Removed assays with only \"NA\" values"
+      regexp = "Excluding 1 assay with only \"NA\" values: \"OID23456\""
     )
   }
 )
@@ -147,7 +144,7 @@ test_that(
       object = expect_equal(
         object = clean_assay_na(df = df_arrow,
                                 check_npx_log = log,
-                                keep_assay_all_na = FALSE,
+                                remove_assay_na = TRUE,
                                 verbose = FALSE) |>
           dplyr::collect(),
         expected = expected_result
@@ -158,18 +155,15 @@ test_that(
     ## verbose TRUE ----
 
     expect_message(
-      object = expect_message(
-        object = expect_equal(
-          object = clean_assay_na(df = df_arrow,
-                                  check_npx_log = log,
-                                  keep_assay_all_na = FALSE,
-                                  verbose = TRUE) |>
-            dplyr::collect(),
-          expected = expected_result
-        ),
-        regexp = "Excluding 1 assay with only \"NA\" values: \"OID23456\""
+      object = expect_equal(
+        object = clean_assay_na(df = df_arrow,
+                                check_npx_log = log,
+                                remove_assay_na = TRUE,
+                                verbose = TRUE) |>
+          dplyr::collect(),
+        expected = expected_result
       ),
-      regexp = "Removed assays with only \"NA\" values"
+      regexp = "Excluding 1 assay with only \"NA\" values: \"OID23456\""
     )
   }
 )
@@ -191,7 +185,7 @@ test_that(
     expect_equal(
       object = clean_assay_na(df = expected_result,
                               check_npx_log = log_exp,
-                              keep_assay_all_na = FALSE,
+                              remove_assay_na = TRUE,
                               verbose = FALSE),
       expected = expected_result
     )
@@ -202,7 +196,7 @@ test_that(
       object = expect_equal(
         object = clean_assay_na(df = expected_result,
                                 check_npx_log = log_exp,
-                                keep_assay_all_na = FALSE,
+                                remove_assay_na = TRUE,
                                 verbose = TRUE),
         expected = expected_result
       ),
@@ -221,12 +215,12 @@ test_that(
       object = expect_equal(
         object = clean_assay_na(df = df,
                                 check_npx_log = log,
-                                keep_assay_all_na = TRUE,
+                                remove_assay_na = FALSE,
                                 verbose = TRUE),
         expected = df
       ),
-      regexp = paste("Skipping exclusion of assay with all quantified",
-                     "values 'NA' as per user input `keep_assay_all_na`.")
+      regexp = paste("Skipping exclusion of assays with all quantified values",
+                     "\"NA\" as per user input: remove_assay_na = FALSE.")
     )
 
     ## verbose FALSE ----
@@ -234,7 +228,7 @@ test_that(
     expect_equal(
       object = clean_assay_na(df = df,
                               check_npx_log = log,
-                              keep_assay_all_na = TRUE,
+                              remove_assay_na = FALSE,
                               verbose = FALSE),
       expected = df
     )
@@ -251,12 +245,12 @@ test_that(
       object = expect_equal(
         object = clean_assay_na(df = df_arrow,
                                 check_npx_log = log,
-                                keep_assay_all_na = TRUE,
+                                remove_assay_na = FALSE,
                                 verbose = TRUE),
         expected = df_arrow
       ),
-      regexp = paste("Skipping exclusion of assay with all quantified",
-                     "values 'NA' as per user input `keep_assay_all_na`.")
+      regexp = paste("Skipping exclusion of assays with all quantified values",
+                     "\"NA\" as per user input: remove_assay_na = FALSE.")
     )
 
     ## verbose FALSE ----
@@ -264,7 +258,7 @@ test_that(
     expect_equal(
       object = clean_assay_na(df = df_arrow,
                               check_npx_log = log,
-                              keep_assay_all_na = TRUE,
+                              remove_assay_na = FALSE,
                               verbose = FALSE),
       expected = df_arrow
     )
@@ -287,7 +281,7 @@ test_that(
       object = expect_equal(
         object = clean_invalid_oid(df = df,
                                    check_npx_log = log,
-                                   keep_invalid_oid = FALSE,
+                                   remove_invalid_oid = TRUE,
                                    verbose = FALSE),
         expected = expected_result
       ),
@@ -297,17 +291,14 @@ test_that(
     ## verbose = TRUE ----
 
     expect_message(
-      object = expect_message(
-        object = expect_equal(
-          object = clean_invalid_oid(df = df,
-                                     check_npx_log = log,
-                                     keep_invalid_oid = FALSE,
-                                     verbose = TRUE),
-          expected = expected_result
-        ),
-        regexp = "Excluding 1 assay with invalid identifier: \"OID1234\"."
+      object = expect_equal(
+        object = clean_invalid_oid(df = df,
+                                   check_npx_log = log,
+                                   remove_invalid_oid = TRUE,
+                                   verbose = TRUE),
+        expected = expected_result
       ),
-      regexp = "Removed assays with invalid identifiers"
+      regexp = "Excluding 1 assay with invalid identifier: \"OID1234\"."
     )
   }
 )
@@ -327,7 +318,7 @@ test_that(
       object = expect_equal(
         object = clean_invalid_oid(df = df_arrow,
                                    check_npx_log = log,
-                                   keep_invalid_oid = FALSE,
+                                   remove_invalid_oid = TRUE,
                                    verbose = FALSE) |>
           dplyr::collect(),
         expected = expected_result
@@ -338,18 +329,15 @@ test_that(
     ## verbose = TRUE ----
 
     expect_message(
-      object = expect_message(
-        object = expect_equal(
-          object = clean_invalid_oid(df = df_arrow,
-                                     check_npx_log = log,
-                                     keep_invalid_oid = FALSE,
-                                     verbose = TRUE) |>
-            dplyr::collect(),
-          expected = expected_result
-        ),
-        regexp = "Excluding 1 assay with invalid identifier: \"OID1234\"."
+      object = expect_equal(
+        object = clean_invalid_oid(df = df_arrow,
+                                   check_npx_log = log,
+                                   remove_invalid_oid = TRUE,
+                                   verbose = TRUE) |>
+          dplyr::collect(),
+        expected = expected_result
       ),
-      regexp = "Removed assays with invalid identifiers"
+      regexp = "Excluding 1 assay with invalid identifier: \"OID1234\"."
     )
   }
 )
@@ -371,7 +359,7 @@ test_that(
     expect_equal(
       object = clean_invalid_oid(df = expected_result,
                                  check_npx_log = log_exp,
-                                 keep_invalid_oid = FALSE,
+                                 remove_invalid_oid = TRUE,
                                  verbose = FALSE),
       expected = expected_result
     )
@@ -382,7 +370,7 @@ test_that(
       object = expect_equal(
         object = clean_invalid_oid(df = expected_result,
                                    check_npx_log = log_exp,
-                                   keep_invalid_oid = FALSE,
+                                   remove_invalid_oid = TRUE,
                                    verbose = TRUE),
         expected = expected_result
       ),
@@ -401,12 +389,12 @@ test_that(
       object = expect_equal(
         object = clean_invalid_oid(df = df,
                                    check_npx_log = log,
-                                   keep_invalid_oid = TRUE,
+                                   remove_invalid_oid = FALSE,
                                    verbose = TRUE),
         expected = df
       ),
-      regexp = paste("Skipping exclusion of assay with invalid OlinkID",
-                     "as per user input `keep_invalid_oid`.")
+      regexp = paste("Skipping exclusion of assays with invalid identifiers as",
+                     "per user input: remove_invalid_oid = FALSE.")
     )
 
     ## verbose FALSE ----
@@ -414,7 +402,7 @@ test_that(
     expect_equal(
       object = clean_invalid_oid(df = df,
                                  check_npx_log = log,
-                                 keep_invalid_oid = TRUE,
+                                 remove_invalid_oid = FALSE,
                                  verbose = FALSE),
       expected = df
     )
@@ -431,12 +419,12 @@ test_that(
       object = expect_equal(
         object = clean_invalid_oid(df = df_arrow,
                                    check_npx_log = log,
-                                   keep_invalid_oid = TRUE,
+                                   remove_invalid_oid = FALSE,
                                    verbose = TRUE),
         expected = df_arrow
       ),
-      regexp = paste("Skipping exclusion of assay with invalid OlinkID",
-                     "as per user input `keep_invalid_oid`.")
+      regexp = paste("Skipping exclusion of assays with invalid identifiers as",
+                     "per user input: remove_invalid_oid = FALSE.")
     )
 
     ## verbose FALSE ----
@@ -444,7 +432,7 @@ test_that(
     expect_equal(
       object = clean_invalid_oid(df = df_arrow,
                                  check_npx_log = log,
-                                 keep_invalid_oid = TRUE,
+                                 remove_invalid_oid = FALSE,
                                  verbose = FALSE),
       expected = df_arrow
     )
@@ -467,7 +455,7 @@ test_that(
       object = expect_equal(
         object = clean_duplicate_sample_id(df = df,
                                            check_npx_log = log,
-                                           keep_duplicate_sample_id = FALSE,
+                                           remove_dup_sample_id = TRUE,
                                            verbose = FALSE),
         expected = expected_result
       ),
@@ -478,18 +466,15 @@ test_that(
     ## verbose = TRUE ----
 
     expect_message(
-      object = expect_message(
-        object = expect_equal(
-          object = clean_duplicate_sample_id(df = df,
-                                             check_npx_log = log,
-                                             keep_duplicate_sample_id = FALSE,
-                                             verbose = TRUE),
-          expected = expected_result
-        ),
-        regexp = paste("Excluding 1 sample with duplicate identifier:",
-                       "\"DuplicateSample\"")
+      object = expect_equal(
+        object = clean_duplicate_sample_id(df = df,
+                                           check_npx_log = log,
+                                           remove_dup_sample_id = TRUE,
+                                           verbose = TRUE),
+        expected = expected_result
       ),
-      regexp = "Removed samples with duplicate identifiers."
+      regexp = paste("Excluding 1 sample with duplicate identifier:",
+                     "\"DuplicateSample\"")
     )
   }
 )
@@ -509,7 +494,7 @@ test_that(
       object = expect_equal(
         object = clean_duplicate_sample_id(df = df_arrow,
                                            check_npx_log = log,
-                                           keep_duplicate_sample_id = FALSE,
+                                           remove_dup_sample_id = TRUE,
                                            verbose = FALSE) |>
           dplyr::collect(),
         expected = expected_result
@@ -521,66 +506,59 @@ test_that(
     ## verbose = TRUE ----
 
     expect_message(
-      object = expect_message(
-        object = expect_equal(
-          object = clean_duplicate_sample_id(df = df_arrow,
-                                             check_npx_log = log,
-                                             keep_duplicate_sample_id = FALSE,
-                                             verbose = TRUE) |>
-            dplyr::collect(),
-          expected = expected_result
-        ),
-        regexp = paste("Excluding 1 sample with duplicate identifier:",
-                       "\"DuplicateSample\"")
+      object = expect_equal(
+        object = clean_duplicate_sample_id(df = df_arrow,
+                                           check_npx_log = log,
+                                           remove_dup_sample_id = TRUE,
+                                           verbose = TRUE) |>
+          dplyr::collect(),
+        expected = expected_result
       ),
-      regexp = "Removed samples with duplicate identifiers."
+      regexp = paste("Excluding 1 sample with duplicate identifier:",
+                     "\"DuplicateSample\"")
     )
   }
 )
 
 test_that(
-  "clean_duplicate_sample_id - works - 1 duplicate SampleID",
+  "clean_duplicate_sample_id - works - no duplicate SampleID",
   {
     expected_result <- df |>
       dplyr::filter(
         .data[["SampleID"]] != "DuplicateSample"
       )
 
+    log_exp <- check_npx(df = expected_result) |>
+      suppressWarnings() |>
+      suppressMessages()
+
     ## verbose = FALSE ----
 
-    expect_message(
-      object = expect_equal(
-        object = clean_duplicate_sample_id(df = df,
-                                           check_npx_log = log,
-                                           keep_duplicate_sample_id = FALSE,
-                                           verbose = FALSE),
-        expected = expected_result
-      ),
-      regexp = paste("Excluding 1 sample with duplicate identifier:",
-                     "\"DuplicateSample\"")
+    expect_equal(
+      object = clean_duplicate_sample_id(df = expected_result,
+                                         check_npx_log = log_exp,
+                                         remove_dup_sample_id = TRUE,
+                                         verbose = FALSE),
+      expected = expected_result
     )
 
     ## verbose = TRUE ----
 
     expect_message(
-      object = expect_message(
-        object = expect_equal(
-          object = clean_duplicate_sample_id(df = df,
-                                             check_npx_log = log,
-                                             keep_duplicate_sample_id = FALSE,
-                                             verbose = TRUE),
-          expected = expected_result
-        ),
-        regexp = paste("Excluding 1 sample with duplicate identifier:",
-                       "\"DuplicateSample\"")
+      object = expect_equal(
+        object = clean_duplicate_sample_id(df = expected_result,
+                                           check_npx_log = log_exp,
+                                           remove_dup_sample_id = TRUE,
+                                           verbose = TRUE),
+        expected = expected_result
       ),
-      regexp = "Removed samples with duplicate identifiers."
+      regexp = "No duplicate sample identifiers."
     )
   }
 )
 
 test_that(
-  "clean_duplicate_sample_id - works - keep samples with duplicate sample ID",
+  "clean_duplicate_sample_id - works - keep samples with duplicate id",
   {
 
     ## verbose = FALSE ----
@@ -588,7 +566,7 @@ test_that(
     expect_equal(
       object = clean_duplicate_sample_id(df = df,
                                          check_npx_log = log,
-                                         keep_duplicate_sample_id = TRUE,
+                                         remove_dup_sample_id = FALSE,
                                          verbose = FALSE),
       expected = df
     )
@@ -599,20 +577,18 @@ test_that(
       object = expect_equal(
         object = clean_duplicate_sample_id(df = df,
                                            check_npx_log = log,
-                                           keep_duplicate_sample_id = TRUE,
+                                           remove_dup_sample_id = FALSE,
                                            verbose = TRUE),
         expected = df
       ),
-      regexp = paste("Skipping exclusion of samples with duplicate sample",
-                     "identifiers as per user input `keep_duplicate_sample_id`."
-                     )
+      regexp = paste("Skipping exclusion of samples with duplicate identifiers",
+                     "as per user input: remove_dup_sample_id = FALSE.")
     )
   }
 )
 
 test_that(
-  "clean_duplicate_sample_id - works - arrow - keep samples with duplicate
-  sample ID",
+  "clean_duplicate_sample_id - works - arrow - keep samples with duplicate id",
   {
 
     ## verbose = FALSE ----
@@ -620,7 +596,7 @@ test_that(
     expect_equal(
       object = clean_duplicate_sample_id(df = df_arrow,
                                          check_npx_log = log,
-                                         keep_duplicate_sample_id = TRUE,
+                                         remove_dup_sample_id = FALSE,
                                          verbose = FALSE),
       expected = df_arrow
     )
@@ -631,13 +607,12 @@ test_that(
       object = expect_equal(
         object = clean_duplicate_sample_id(df = df_arrow,
                                            check_npx_log = log,
-                                           keep_duplicate_sample_id = TRUE,
+                                           remove_dup_sample_id = FALSE,
                                            verbose = TRUE),
         expected = df_arrow
       ),
-      regexp = paste("Skipping exclusion of samples with duplicate sample",
-                     "identifiers as per user input `keep_duplicate_sample_id`."
-      )
+      regexp = paste("Skipping exclusion of samples with duplicate identifiers",
+                     "as per user input: remove_dup_sample_id = FALSE.")
     )
   }
 )
@@ -658,7 +633,7 @@ test_that(
       object = expect_equal(
         object = clean_sample_type(df = df,
                                    check_npx_log = log,
-                                   keep_control_sample = FALSE,
+                                   remove_control_sample = TRUE,
                                    verbose = FALSE),
         expected = expected_result
       ),
@@ -668,23 +643,14 @@ test_that(
     ## vebose = TRUE ----
 
     expect_message(
-      object = expect_message(
-        object = expect_equal(
-          object = clean_sample_type(df = df,
-                                     check_npx_log = log,
-                                     keep_control_sample = FALSE,
-                                     verbose = TRUE),
-          expected = expected_result
-        ),
-        regexp = "Excluding 1 control sample: \"ControlType\"."
+      object = expect_equal(
+        object = clean_sample_type(df = df,
+                                   check_npx_log = log,
+                                   remove_control_sample = TRUE,
+                                   verbose = TRUE),
+        expected = expected_result
       ),
-      regexp = olink_sample_types[
-        !(names(olink_sample_types) %in% c("sample"))
-      ] |>
-        unlist() |>
-        unname() |>
-        ansi_collapse_quot() |>
-        (\(x) paste0("Removed control samples marked as ", x, "."))()
+      regexp = "Excluding 1 control sample: \"ControlType\"."
     )
   }
 )
@@ -704,7 +670,7 @@ test_that(
       object = expect_equal(
         object = clean_sample_type(df = df_arrow,
                                    check_npx_log = log,
-                                   keep_control_sample = FALSE,
+                                   remove_control_sample = TRUE,
                                    verbose = FALSE) |>
           dplyr::collect(),
         expected = expected_result
@@ -715,24 +681,15 @@ test_that(
     ## vebose = TRUE ----
 
     expect_message(
-      object = expect_message(
-        object = expect_equal(
-          object = clean_sample_type(df = df_arrow,
-                                     check_npx_log = log,
-                                     keep_control_sample = FALSE,
-                                     verbose = TRUE) |>
-            dplyr::collect(),
-          expected = expected_result
-        ),
-        regexp = "Excluding 1 control sample: \"ControlType\"."
+      object = expect_equal(
+        object = clean_sample_type(df = df_arrow,
+                                   check_npx_log = log,
+                                   remove_control_sample = TRUE,
+                                   verbose = TRUE) |>
+          dplyr::collect(),
+        expected = expected_result
       ),
-      regexp = olink_sample_types[
-        !(names(olink_sample_types) %in% c("sample"))
-      ] |>
-        unlist() |>
-        unname() |>
-        ansi_collapse_quot() |>
-        (\(x) paste0("Removed control samples marked as ", x, "."))()
+      regexp = "Excluding 1 control sample: \"ControlType\"."
     )
   }
 )
@@ -745,7 +702,7 @@ test_that(
     expect_equal(
       object = clean_sample_type(df = df,
                                  check_npx_log = log,
-                                 keep_control_sample = TRUE,
+                                 remove_control_sample = FALSE,
                                  verbose = FALSE),
       expected = df
     )
@@ -756,11 +713,111 @@ test_that(
       object = expect_equal(
         object = clean_sample_type(df = df,
                                    check_npx_log = log,
-                                   keep_control_sample = TRUE,
+                                   remove_control_sample = FALSE,
                                    verbose = TRUE),
         expected = df
       ),
-      regexp = "Skipping exclusion of control samples as per user input"
+      regexp = paste("Skipping exclusion of control samples as per user input:",
+                     "remove_control_sample = FALSE.")
+    )
+  }
+)
+
+test_that(
+  "clean_sample_type - works - selectively remove control samples",
+  {
+    # v1 ----
+
+    expected_result <- df |>
+      dplyr::filter(
+        .data[["SampleID"]] != "ControlType"
+      )
+
+    expect_message(
+      object = expect_equal(
+        object = clean_sample_type(df = df,
+                                   check_npx_log = log,
+                                   remove_control_sample = c("pc"),
+                                   verbose = FALSE),
+        expected = expected_result
+      ),
+      regexp = "Excluding 1 control sample: \"ControlType\"."
+    )
+
+    # v2 ----
+
+    expected_result <- df |>
+      dplyr::filter(
+        .data[["SampleID"]] != "ControlType"
+      )
+
+    expect_message(
+      object = expect_equal(
+        object = clean_sample_type(df = df,
+                                   check_npx_log = log,
+                                   remove_control_sample = c("sc", "pc", "nc"),
+                                   verbose = FALSE),
+        expected = expected_result
+      ),
+      regexp = "Excluding 1 control sample: \"ControlType\"."
+    )
+
+    # v3 ----
+
+    expected_result <- df |>
+      dplyr::filter(
+        .data[["SampleID"]] == "ControlType"
+      )
+
+    expect_message(
+      object = expect_equal(
+        object = clean_sample_type(df = df,
+                                   check_npx_log = log,
+                                   remove_control_sample = c("sample"),
+                                   verbose = FALSE),
+        expected = expected_result
+      ),
+      regexp = paste("Excluding 8 control samples: \"ValidSample\",",
+                     "\"InvalidOID\", \"AllNA\", \"DuplicateSample\",",
+                     "\"ControlID\", \"FailQC\", \"ControlAssay\",",
+                     "and \"AssayWarn\".")
+    )
+
+    # v4 ----
+
+    expected_result <- df |>
+      dplyr::filter(
+        .data[["SampleID"]] != "ControlType"
+      )
+
+    expect_message(
+      object = expect_message(
+        object = expect_equal(
+          object = clean_sample_type(df = df,
+                                     check_npx_log = log,
+                                     remove_control_sample = c("pc", "pc2"),
+                                     verbose = FALSE),
+          expected = expected_result
+        ),
+        regexp = paste("Unexpected entries \"pc2\" in `remove_control_sample`.",
+                       "Expected values: \"sample\", \"sc\", \"pc\",",
+                       "and \"nc\".")
+      ),
+      regexp = "Excluding 1 control sample: \"ControlType\"."
+    )
+  }
+)
+
+test_that(
+  "clean_sample_type - error - no control samples matches expected ones",
+  {
+    expect_error(
+      object = clean_sample_type(df = df,
+                                 check_npx_log = log,
+                                 remove_control_sample = c("pc2"),
+                                 verbose = FALSE),
+      regexp = paste("No overlap of value from `remove_control_sample` to",
+                     "expected values.")
     )
   }
 )
@@ -781,7 +838,7 @@ test_that(
       object = expect_equal(
         object = clean_sample_type(df = test_df,
                                    check_npx_log = log_test,
-                                   keep_control_sample = FALSE),
+                                   remove_control_sample = TRUE),
         expected = test_df
       ),
       regexp = paste("No column marking control samples in dataset.")
@@ -805,7 +862,7 @@ test_that(
       object = expect_equal(
         object = clean_assay_type(df = df,
                                   check_npx_log = log,
-                                  keep_control_assay = FALSE,
+                                  remove_control_assay = TRUE,
                                   verbose = FALSE),
         expected = expected_result
       ),
@@ -815,23 +872,14 @@ test_that(
     ## verbose = TRUE ----
 
     expect_message(
-      object = expect_message(
-        object = expect_equal(
-          object = clean_assay_type(df = df,
-                                    check_npx_log = log,
-                                    keep_control_assay = FALSE,
-                                    verbose = TRUE),
-          expected = expected_result
-        ),
-        regexp = "Excluding 1 control assay: \"OID78901\"."
+      object = expect_equal(
+        object = clean_assay_type(df = df,
+                                  check_npx_log = log,
+                                  remove_control_assay = TRUE,
+                                  verbose = TRUE),
+        expected = expected_result
       ),
-      regexp = olink_assay_types[
-        !(names(olink_assay_types) %in% c("assay"))
-      ] |>
-        unlist() |>
-        unname() |>
-        ansi_collapse_quot() |>
-        (\(x) paste0("Removed control assays marked as ", x, "."))()
+      regexp = "Excluding 1 control assay: \"OID78901\"."
     )
   }
 )
@@ -851,7 +899,7 @@ test_that(
       object = expect_equal(
         object = clean_assay_type(df = df,
                                   check_npx_log = log,
-                                  keep_control_assay = FALSE,
+                                  remove_control_assay = TRUE,
                                   verbose = FALSE) |>
           dplyr::collect(),
         expected = expected_result
@@ -862,24 +910,15 @@ test_that(
     ## verbose = TRUE ----
 
     expect_message(
-      object = expect_message(
-        object = expect_equal(
-          object = clean_assay_type(df = df,
-                                    check_npx_log = log,
-                                    keep_control_assay = FALSE,
-                                    verbose = TRUE) |>
-            dplyr::collect(),
-          expected = expected_result
-        ),
-        regexp = "Excluding 1 control assay: \"OID78901\"."
+      object = expect_equal(
+        object = clean_assay_type(df = df,
+                                  check_npx_log = log,
+                                  remove_control_assay = TRUE,
+                                  verbose = TRUE) |>
+          dplyr::collect(),
+        expected = expected_result
       ),
-      regexp = olink_assay_types[
-        !(names(olink_assay_types) %in% c("assay"))
-      ] |>
-        unlist() |>
-        unname() |>
-        ansi_collapse_quot() |>
-        (\(x) paste0("Removed control assays marked as ", x, "."))()
+      regexp = "Excluding 1 control assay: \"OID78901\"."
     )
   }
 )
@@ -892,7 +931,7 @@ test_that(
     expect_equal(
       object = clean_assay_type(df = df,
                                 check_npx_log = log,
-                                keep_control_assay = TRUE,
+                                remove_control_assay = FALSE,
                                 verbose = FALSE),
       expected = df
     )
@@ -903,11 +942,111 @@ test_that(
       object = expect_equal(
         object = clean_assay_type(df = df,
                                   check_npx_log = log,
-                                  keep_control_assay = TRUE,
+                                  remove_control_assay = FALSE,
                                   verbose = TRUE),
         expected = df
       ),
-      regexp = "Skipping exclusion of control assays as per user input"
+      regexp = paste("Skipping exclusion of control assays as per user input:",
+                     "remove_control_assay = FALSE.")
+    )
+  }
+)
+
+test_that(
+  "clean_assay_type - works - selectively remove control assays",
+  {
+    # v1 ----
+
+    expected_result <- df |>
+      dplyr::filter(
+        .data[["SampleID"]] != "ControlAssay"
+      )
+
+    expect_message(
+      object = expect_equal(
+        object = clean_assay_type(df = df,
+                                  check_npx_log = log,
+                                  remove_control_assay = c("ext"),
+                                  verbose = FALSE),
+        expected = expected_result
+      ),
+      regexp = "Excluding 1 control assay: \"OID78901\"."
+    )
+
+    # v2 ----
+
+    expected_result <- df |>
+      dplyr::filter(
+        .data[["SampleID"]] != "ControlAssay"
+      )
+
+    expect_message(
+      object = expect_equal(
+        object = clean_assay_type(df = df,
+                                  check_npx_log = log,
+                                  remove_control_assay = c("ext", "inc",
+                                                           "amp", "det"),
+                                  verbose = FALSE),
+        expected = expected_result
+      ),
+      regexp = "Excluding 1 control assay: \"OID78901\"."
+    )
+
+    # v3 ----
+
+    expected_result <- df |>
+      dplyr::filter(
+        .data[["SampleID"]] == "ControlAssay"
+      )
+
+    expect_message(
+      object = expect_equal(
+        object = clean_assay_type(df = df,
+                                  check_npx_log = log,
+                                  remove_control_assay = c("assay"),
+                                  verbose = FALSE),
+        expected = expected_result
+      ),
+      regexp = paste("Excluding 8 control assays: \"OID12345\", \"OID1234\",",
+                     "\"OID23456\", \"OID34567\", \"OID45678\", \"OID56789\",",
+                     "\"OID67890\", and \"OID89012\".")
+    )
+
+    # v4 ----
+
+    expected_result <- df |>
+      dplyr::filter(
+        .data[["SampleID"]] != "ControlAssay"
+      )
+
+    expect_message(
+      object = expect_message(
+        object = expect_equal(
+          object = clean_assay_type(df = df,
+                                    check_npx_log = log,
+                                    remove_control_assay = c("ext", "ext2"),
+                                    verbose = FALSE),
+          expected = expected_result
+        ),
+        regexp = paste("Unexpected entries \"ext2\" in `remove_control_assay`.",
+                       "Expected values: \"assay\", \"inc\", \"det\", \"ext\",",
+                       "and \"amp\".")
+      ),
+      regexp = "Excluding 1 control assay: \"OID78901\"."
+    )
+  }
+)
+
+test_that(
+  "clean_assay_type - error - no control assay matches expected ones",
+  {
+    expect_error(
+      object = clean_assay_type(df = df,
+                                check_npx_log = log,
+                                remove_control_assay = c("ext2"),
+                                verbose = FALSE),
+      regexp = paste("No overlap of value from `remove_control_assay` to",
+                     "expected values.")
     )
   }
 )
@@ -928,7 +1067,7 @@ test_that(
       object = expect_equal(
         object = clean_assay_type(df = test_df,
                                   check_npx_log = log_test,
-                                  keep_control_assay = FALSE),
+                                  remove_control_assay = TRUE),
         expected = test_df
       ),
       regexp = "No column marking control assays in dataset."
@@ -952,7 +1091,7 @@ test_that(
       object = expect_equal(
         object = clean_qc_warning(df = df,
                                   check_npx_log = log,
-                                  keep_qc_warning = FALSE,
+                                  remove_qc_warning = TRUE,
                                   verbose = FALSE),
         expected = expected_result
       ),
@@ -966,7 +1105,7 @@ test_that(
       object = expect_equal(
         object = clean_qc_warning(df = df,
                                   check_npx_log = log,
-                                  keep_qc_warning = FALSE,
+                                  remove_qc_warning = TRUE,
                                   verbose = TRUE),
         expected = expected_result
       ),
@@ -991,7 +1130,7 @@ test_that(
       object = expect_equal(
         object = clean_qc_warning(df = df_arrow,
                                   check_npx_log = log,
-                                  keep_qc_warning = FALSE,
+                                  remove_qc_warning = TRUE,
                                   verbose = FALSE) |>
           dplyr::collect(),
         expected = expected_result
@@ -1006,7 +1145,7 @@ test_that(
       object = expect_equal(
         object = clean_qc_warning(df = df_arrow,
                                   check_npx_log = log,
-                                  keep_qc_warning = FALSE,
+                                  remove_qc_warning = TRUE,
                                   verbose = TRUE) |>
           dplyr::collect(),
         expected = expected_result
@@ -1052,7 +1191,7 @@ test_that(
               )
             ),
           check_npx_log = log,
-          keep_qc_warning = FALSE,
+          remove_qc_warning = TRUE,
           verbose = FALSE
         ),
         expected = expected_result
@@ -1088,7 +1227,7 @@ test_that(
               )
             ),
           check_npx_log = log,
-          keep_qc_warning = FALSE,
+          remove_qc_warning = TRUE,
           verbose = FALSE
         ),
         expected = expected_result
@@ -1112,7 +1251,7 @@ test_that(
     expect_equal(
       object = clean_qc_warning(df = expected_result,
                                 check_npx_log = log,
-                                keep_qc_warning = FALSE,
+                                remove_qc_warning = TRUE,
                                 verbose = FALSE),
       expected = expected_result
     )
@@ -1123,7 +1262,7 @@ test_that(
       object = expect_equal(
         object = clean_qc_warning(df = expected_result,
                                   check_npx_log = log,
-                                  keep_qc_warning = FALSE,
+                                  remove_qc_warning = TRUE,
                                   verbose = TRUE),
         expected = expected_result
       ),
@@ -1141,7 +1280,7 @@ test_that(
     expect_equal(
       object = clean_qc_warning(df = df,
                                 check_npx_log = log,
-                                keep_qc_warning = TRUE,
+                                remove_qc_warning = FALSE,
                                 verbose = FALSE),
       expected = df
     )
@@ -1153,12 +1292,12 @@ test_that(
       object = expect_equal(
         object = clean_qc_warning(df = df,
                                   check_npx_log = log,
-                                  keep_qc_warning = TRUE,
+                                  remove_qc_warning = FALSE,
                                   verbose = TRUE),
         expected = df
       ),
-      regexp = paste("Skipping exclusion of samples flagged `FAIL` as per",
-                     "user input `keep_qc_warning`")
+      regexp = paste("Skipping exclusion of samples flagged \"FAIL\" as per",
+                     "user input remove_qc_warning = FALSE.")
     )
   }
 )
@@ -1172,7 +1311,7 @@ test_that(
     expect_equal(
       object = clean_qc_warning(df = df_arrow,
                                 check_npx_log = log,
-                                keep_qc_warning = TRUE,
+                                remove_qc_warning = FALSE,
                                 verbose = FALSE),
       expected = df_arrow
     )
@@ -1184,17 +1323,15 @@ test_that(
       object = expect_equal(
         object = clean_qc_warning(df = df_arrow,
                                   check_npx_log = log,
-                                  keep_qc_warning = TRUE,
+                                  remove_qc_warning = FALSE,
                                   verbose = TRUE),
         expected = df_arrow
       ),
-      regexp = paste("Skipping exclusion of samples flagged `FAIL` as per",
-                     "user input `keep_qc_warning`")
+      regexp = paste("Skipping exclusion of samples flagged \"FAIL\" as per",
+                     "user input remove_qc_warning = FALSE.")
     )
   }
 )
-
-
 
 # Test clean_assay_warning ------------------------------------------------
 
@@ -1212,6 +1349,7 @@ test_that(
       object = expect_equal(
         object = clean_assay_warning(df = df,
                                      check_npx_log = log,
+                                     remove_assay_warning = TRUE,
                                      verbose = FALSE),
         expected = expected_result
       ),
@@ -1225,6 +1363,7 @@ test_that(
       object = expect_equal(
         object = clean_assay_warning(df = df,
                                      check_npx_log = log,
+                                     remove_assay_warning = TRUE,
                                      verbose = TRUE),
         expected = expected_result
       ),
@@ -1249,6 +1388,7 @@ test_that(
       object = expect_equal(
         object = clean_assay_warning(df = df_arrow,
                                      check_npx_log = log,
+                                     remove_assay_warning = TRUE,
                                      verbose = FALSE) |>
           dplyr::collect(),
         expected = expected_result
@@ -1263,6 +1403,7 @@ test_that(
       object = expect_equal(
         object = clean_assay_warning(df = df_arrow,
                                      check_npx_log = log,
+                                     remove_assay_warning = TRUE,
                                      verbose = TRUE) |>
           dplyr::collect(),
         expected = expected_result
@@ -1308,6 +1449,7 @@ test_that(
               )
             ),
           check_npx_log = log,
+          remove_assay_warning = TRUE,
           verbose = FALSE
         ),
         expected = expected_result
@@ -1343,6 +1485,7 @@ test_that(
               )
             ),
           check_npx_log = log,
+          remove_assay_warning = TRUE,
           verbose = TRUE
         ),
         expected = expected_result
@@ -1369,7 +1512,8 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_assay_warning(df = test_df,
-                                     check_npx_log = log_test),
+                                     check_npx_log = log_test,
+                                     remove_assay_warning = TRUE),
         expected = test_df
       ),
       regexp = "No column marking assay warnings in dataset."
@@ -1390,6 +1534,7 @@ test_that(
     expect_equal(
       object = clean_assay_warning(df = expected_result,
                                    check_npx_log = log,
+                                   remove_assay_warning = TRUE,
                                    verbose = FALSE),
       expected = expected_result
     )
@@ -1400,6 +1545,7 @@ test_that(
       object = expect_equal(
         object = clean_assay_warning(df = expected_result,
                                      check_npx_log = log,
+                                     remove_assay_warning = TRUE,
                                      verbose = TRUE),
         expected = expected_result
       ),
@@ -1417,7 +1563,7 @@ test_that(
     expect_equal(
       object = clean_assay_warning(df = df,
                                    check_npx_log = log,
-                                   keep_assay_warning = TRUE,
+                                   remove_assay_warning = FALSE,
                                    verbose = FALSE),
       expected = df
     )
@@ -1429,12 +1575,12 @@ test_that(
       object = expect_equal(
         object = clean_assay_warning(df = df,
                                      check_npx_log = log,
-                                     keep_assay_warning = TRUE,
+                                     remove_assay_warning = FALSE,
                                      verbose = TRUE),
         expected = df
       ),
-      regexp = paste("Skipping exclusion of assays falgged as `WARN` as per",
-                     "user input `keep_assay_warning`")
+      regexp = paste("Skipping exclusion of assays flagged with \"WARN\" as",
+                     "per user input remove_assay_warning = FALSE.")
     )
   }
 )
@@ -1448,7 +1594,7 @@ test_that(
     expect_equal(
       object = clean_assay_warning(df = df_arrow,
                                    check_npx_log = log,
-                                   keep_assay_warning = TRUE,
+                                   remove_assay_warning = FALSE,
                                    verbose = FALSE),
       expected = df_arrow
     )
@@ -1460,17 +1606,15 @@ test_that(
       object = expect_equal(
         object = clean_assay_warning(df = df_arrow,
                                      check_npx_log = log,
-                                     keep_assay_warning = TRUE,
+                                     remove_assay_warning = FALSE,
                                      verbose = TRUE),
         expected = df_arrow
       ),
-      regexp = paste("Skipping exclusion of assays falgged as `WARN` as per",
-                     "user input `keep_assay_warning`")
+      regexp = paste("Skipping exclusion of assays flagged with \"WARN\" as",
+                     "per user input remove_assay_warning = FALSE.")
     )
   }
 )
-
-
 
 # Test clean_control_sample_id --------------------------------------------
 
@@ -1638,6 +1782,7 @@ test_that(
       object = expect_equal(
         object = clean_col_class(df = test_df,
                                  check_npx_log = log_test,
+                                 convert_df_cols = TRUE,
                                  verbose = FALSE),
         expected = OlinkAnalyze::npx_data1
       ),
@@ -1670,6 +1815,7 @@ test_that(
       object = expect_equal(
         object = clean_col_class(df = test_df,
                                  check_npx_log = log_test,
+                                 convert_df_cols = TRUE,
                                  verbose = FALSE),
         expected = OlinkAnalyze::npx_data1
       ),
@@ -1679,7 +1825,100 @@ test_that(
 )
 
 test_that(
-  "clean_col_class - return data unchanged",
+  "clean_col_class - works - arrow - correct column class",
+  {
+    # one column ----
+
+    test_df <- OlinkAnalyze::npx_data1 |>
+      dplyr::mutate(
+        NPX = as.character(.data[["NPX"]])
+      ) |>
+      arrow::as_arrow_table()
+
+    log_test <- check_npx(df = test_df) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    expect_message(
+      object = expect_equal(
+        object = clean_col_class(df = test_df,
+                                 check_npx_log = log_test,
+                                 convert_df_cols = TRUE,
+                                 verbose = FALSE) |>
+          dplyr::collect(),
+        expected = OlinkAnalyze::npx_data1
+      ),
+      regexp = "Converted class of column:"
+    )
+
+    # multiple columns ----
+
+    test_df <- OlinkAnalyze::npx_data1 |>
+      dplyr::mutate(
+        NPX = as.character(.data[["NPX"]]),
+        LOD = as.character(.data[["LOD"]])
+      ) |>
+      arrow::as_arrow_table()
+
+    log_test <- check_npx(df = test_df) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    log_test$col_class <- log_test$col_class |>
+      dplyr::bind_rows(
+        dplyr::tibble(
+          "col_name" = "PlateID",
+          "col_class" = "numeric",
+          "col_key" = "plate_id",
+          "expected_col_class" = "character"
+        )
+      )
+
+    expect_message(
+      object = expect_equal(
+        object = clean_col_class(df = test_df,
+                                 check_npx_log = log_test,
+                                 convert_df_cols = TRUE,
+                                 verbose = FALSE) |>
+          dplyr::collect(),
+        expected = OlinkAnalyze::npx_data1
+      ),
+      regexp = "Converted classes of columns:"
+    )
+  }
+)
+
+test_that(
+  "clean_col_class - works - do not correct the columns",
+  {
+    ## verbose = TRUE ----
+
+    expect_message(
+      object = expect_equal(
+        object = clean_col_class(df = df,
+                                 check_npx_log = log,
+                                 convert_df_cols = FALSE,
+                                 verbose = TRUE),
+        expected = df
+      ),
+      regexp = paste("Skipping conversion of columns with non-expected format",
+                     "as per user input convert_df_cols = FALSE.")
+    )
+
+    ## verbose = FALSE ----
+
+    expect_equal(
+      object = clean_col_class(df = df,
+                               check_npx_log = log,
+                               convert_df_cols = FALSE,
+                               verbose = FALSE),
+      expected = df
+    )
+  }
+)
+
+test_that(
+  "clean_col_class - data is in correct format",
   {
     test_df <- OlinkAnalyze::npx_data1
 
@@ -1692,6 +1931,7 @@ test_that(
     expect_equal(
       object = clean_col_class(df = test_df,
                                check_npx_log = log_test,
+                               convert_df_cols = TRUE,
                                verbose = FALSE),
       expected = OlinkAnalyze::npx_data1
     )
@@ -1702,6 +1942,7 @@ test_that(
       object = expect_equal(
         object = clean_col_class(df = test_df,
                                  check_npx_log = log_test,
+                                 convert_df_cols = TRUE,
                                  verbose = TRUE),
         expected = OlinkAnalyze::npx_data1
       ),
@@ -1723,7 +1964,6 @@ test_that(
     expect_equal(
       object = clean_npx(df = df,
                          check_log = log,
-                         keep_controls = NULL,
                          control_sample_ids = c("ControlID"),
                          verbose = TRUE) |>
         suppressMessages(),
@@ -1733,7 +1973,7 @@ test_that(
 )
 
 test_that(
-  "clean_npx emits clean messages without ANSI styling",
+  "clean_npx - works - emits clean messages without ANSI styling",
   {
 
     # Set CLI color option locally for this test
@@ -1745,16 +1985,11 @@ test_that(
         .data[["SampleID"]] == "ValidSample"
       )
 
-    # Minimal fake check_log with required structure
-    log <- check_npx(df) |>
-      suppressWarnings() |>
-      suppressMessages()
-
-
     msgs <- capture_messages(
       {
         clean_npx(
           df = df,
+          remove_qc_warning = TRUE,
           check_log = log,
           verbose = TRUE
         )
@@ -1780,58 +2015,102 @@ test_that(
     # Validate processing message
     expect_true(grepl("Starting `clean_npx\\(\\)` pipeline",
                       msgs_clean[1L]))
-    expect_true(grepl("Cleaning assays with invalid OlinkIDs",
+    expect_true(grepl("Removing assays with invalid identifiers.",
                       msgs_clean[2L]))
     expect_true(grepl("Excluding 1 assay with invalid identifier: \"OID1234\"",
                       msgs_clean[3L]))
-    expect_true(grepl("Removed assays with invalid identifiers",
+    expect_true(grepl("Removing assays missing all quantified values.",
                       msgs_clean[4L]))
-    expect_true(grepl("Cleaning assays with all NA values",
-                      msgs_clean[5L]))
     expect_true(grepl("Excluding 1 assay with only \"NA\" values: \"OID23456\"",
+                      msgs_clean[5L]))
+    expect_true(grepl("Removing duplicated sample identifiers.",
                       msgs_clean[6L]))
-    expect_true(grepl("Removed assays with only \"NA\" values",
-                      msgs_clean[7L]))
-    expect_true(grepl("Cleaning duplicate SampleIDs",
-                      msgs_clean[8L]))
     expect_true(grepl(paste("Excluding 1 sample with duplicate identifier:",
                             "\"DuplicateSample\""),
-                      msgs_clean[9L]))
-    expect_true(grepl("Removed samples with duplicate identifiers",
-                      msgs_clean[10L]))
-    expect_true(grepl("Cleaning control samples based on sample type",
-                      msgs_clean[11L]))
+                      msgs_clean[7L]))
+    expect_true(grepl("Removing control samples based on sample type.",
+                      msgs_clean[8L]))
     expect_true(grepl("Excluding 1 control sample: \"ControlType\"",
-                      msgs_clean[12L]))
-    expect_true(grepl(paste("Removed control samples marked as"),
-                      msgs_clean[13L]))
-    expect_true(grepl("Cleaning control samples based on Sample ID",
-                      msgs_clean[14L]))
+                      msgs_clean[9L]))
+    expect_true(grepl("Removing samples based on sample identifiers.",
+                      msgs_clean[10L]))
     expect_true(grepl(paste("Skipping exclusion of control samples based on",
                             "`control_sample_ids`."),
-                      msgs_clean[15L]))
-    expect_true(grepl("Cleaning Samples with QC Status 'FAIL'",
-                      msgs_clean[16L]))
+                      msgs_clean[11L]))
+    expect_true(grepl("Removing samples with QC status 'FAIL'.",
+                      msgs_clean[12L]))
     expect_true(grepl(paste("Excluding 1 datapoint from 1 sample flagged with",
                             "SampleQC = \"FAIL\": \"FailQC\"."),
-                      msgs_clean[17L]))
-    expect_true(grepl("Cleaning internal control assays",
-                      msgs_clean[18L]))
+                      msgs_clean[13L]))
+    expect_true(grepl("Removing internal control assays.",
+                      msgs_clean[14L]))
     expect_true(grepl("Excluding 1 control assay: \"OID78901\"",
-                      msgs_clean[19L]))
-    expect_true(grepl(paste("Removed control assays marked as"),
-                      msgs_clean[20L]))
-    expect_true(grepl("Cleaning assays flagged by assay warning",
-                      msgs_clean[21L]))
+                      msgs_clean[15L]))
+    expect_true(grepl("Removing assays flagged with assays warning.",
+                      msgs_clean[16L]))
     expect_true(grepl(paste("Excluding 1 datapoint from 1 assay flagged with",
                             "AssayQC = \"WARN\" or \"Warning\": \"OID89012\""),
-                      msgs_clean[22L]))
-    expect_true(grepl("Correcting flagged column class",
-                      msgs_clean[23L]))
+                      msgs_clean[17L]))
+    expect_true(grepl("Converting data types of selected columns.",
+                      msgs_clean[18L]))
     expect_true(grepl("Columns are in the correct format.",
-                      msgs_clean[24L]))
+                      msgs_clean[19L]))
     expect_true(grepl("Completed `clean_npx\\(\\)`",
-                      msgs_clean[25L]))
+                      msgs_clean[20L]))
+  }
+)
 
+test_that(
+  "clean_npx - works - absolute quantified data",
+  {
+    test_result <- npx_data1 |>
+      dplyr::rename(
+        "Quantified_value" = "NPX"
+      ) |>
+      dplyr::filter(
+        !(.data[["SampleID"]] %in% c("CONTROL_SAMPLE_AS 1",
+                                     "CONTROL_SAMPLE_AS 2"))
+      ) |>
+      dplyr::mutate(
+        SampleType = "SAMPLE",
+        AssayType = "assay",
+        Assay_Warning = "Pass"
+      )
+
+    log_test <- check_npx(df = test_result)
+
+    expect_message(
+      object = expect_equal(
+        object = clean_npx(df = test_result,
+                           check_log = log_test),
+        expected = test_result
+      ),
+      regexp = paste("Detected data in absolute quantification in column",
+                     "Quantified_value.")
+    )
+  }
+)
+
+test_that(
+  "clean_npx - works - no check_npx log",
+  {
+    test_result <- npx_data1 |>
+      dplyr::filter(
+        !(.data[["SampleID"]] %in% c("CONTROL_SAMPLE_AS 1",
+                                     "CONTROL_SAMPLE_AS 2"))
+      ) |>
+      dplyr::mutate(
+        SampleType = "SAMPLE",
+        AssayType = "assay",
+        Assay_Warning = "Pass"
+      )
+
+    expect_message(
+      object = expect_equal(
+        object = clean_npx(df = test_result),
+        expected = test_result
+      ),
+      regexp = "`check_log` not provided. Running `check_npx\\(\\)`"
+    )
   }
 )
