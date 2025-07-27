@@ -13,7 +13,7 @@ clean_npx(
   remove_dup_sample_id = TRUE,
   remove_control_assay = TRUE,
   remove_control_sample = TRUE,
-  remove_qc_warning = FALSE,
+  remove_qc_warning = TRUE,
   remove_assay_warning = TRUE,
   control_sample_ids = NULL,
   convert_df_cols = TRUE,
@@ -52,8 +52,8 @@ types to remove.}
 with one or more of "sample", "sc", "pc", and "nc"
 indicating the sample types to remove.}
 
-\item{remove_qc_warning}{Logical. If \code{TRUE}, removes samples flagged as
-\code{FAIL} in QC warning. Defaults to \code{FALSE}.}
+\item{remove_qc_warning}{Logical. If \code{FALSE}, retains samples flagged as
+\code{FAIL} in QC warning. Defaults to \code{TRUE}.}
 
 \item{remove_assay_warning}{Logical. If \code{FALSE}, retains assays flagged as
 \code{WARN} in assay warning. Defaults to \code{TRUE}.}

@@ -75,8 +75,8 @@
 #' a character vector with one or more of
 #' `r ansi_collapse_quot(x = names(olink_assay_types))` indicating the assay
 #' types to remove.
-#' @param remove_qc_warning Logical. If `TRUE`, removes samples flagged as
-#' `FAIL` in QC warning. Defaults to `FALSE`.
+#' @param remove_qc_warning Logical. If `FALSE`, retains samples flagged as
+#' `FAIL` in QC warning. Defaults to `TRUE`.
 #' @param remove_assay_warning Logical. If `FALSE`, retains assays flagged as
 #' `WARN` in assay warning. Defaults to `TRUE`.
 #' @param control_sample_ids character vector of sample identifiers of control
@@ -122,7 +122,7 @@ clean_npx <- function(df,
                       remove_dup_sample_id = TRUE,
                       remove_control_assay = TRUE,
                       remove_control_sample = TRUE,
-                      remove_qc_warning = FALSE,
+                      remove_qc_warning = TRUE,
                       remove_assay_warning = TRUE,
                       control_sample_ids = NULL,
                       convert_df_cols = TRUE,
@@ -818,7 +818,7 @@ clean_assay_type <- function(df,
 #'
 clean_qc_warning <- function(df,
                              check_npx_log,
-                             remove_qc_warning = FALSE,
+                             remove_qc_warning = TRUE,
                              verbose = FALSE) {
   # input check
   check_is_scalar_boolean(

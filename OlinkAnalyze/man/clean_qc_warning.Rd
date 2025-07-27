@@ -4,7 +4,7 @@
 \alias{clean_qc_warning}
 \title{Help function removing instances of samples that failed QC.}
 \usage{
-clean_qc_warning(df, check_npx_log, remove_qc_warning = FALSE, verbose = FALSE)
+clean_qc_warning(df, check_npx_log, remove_qc_warning = TRUE, verbose = FALSE)
 }
 \arguments{
 \item{df}{A tibble or and arrow object from \code{\link{read_npx}}.}
@@ -17,8 +17,8 @@ dataset.
 \item \code{col_names$qc_warning}: the name of the column indicating QC status.
 }}
 
-\item{remove_qc_warning}{Logical. If \code{TRUE}, removes samples flagged as
-\code{FAIL} in QC warning. Defaults to \code{FALSE}.}
+\item{remove_qc_warning}{Logical. If \code{FALSE}, retains samples flagged as
+\code{FAIL} in QC warning. Defaults to \code{TRUE}.}
 
 \item{verbose}{Logical. If \code{FALSE} (default), silences step-wise messages.}
 }
