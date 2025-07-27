@@ -53,3 +53,13 @@ ansi_collapse_quot <- function(x,
   }
   return(x)
 }
+
+#' Common parameters for check functions.
+#'
+#' @author
+#'   Klev Diamanti
+#'
+#' @param error Scalar boolean to return an error instead of a `FALSE`
+#' (`default = FALSE`).
+#'
+.check_params <- function(error) {}
