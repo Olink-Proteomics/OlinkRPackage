@@ -241,20 +241,26 @@ clean_npx <- function(df,
   )
 
   # Check for absolute quantification and apply log2 transformation
-  if (grepl(pattern = "Quantified",
+  if (grepl(pattern = "quantified",
             x = check_npx_log$col_names$quant,
             ignore.case = TRUE)) {
-    cli::cli_text("
-    Detected absolute quant in column '{check_npx_log$col_names$quant}'.
-    Applying log2 transformation is recommended before downstream analysis.
-    For example:
-    df <- df |>
-    mutate(log2_value = log2(.data[['check_npx_log$col_names$quant']]))"
+    q_col <- check_npx_log$col_names$quant # nolint object_usage_linter
+    q_log2 <- paste0(check_npx_log$col_names$quant, "_log2") # nolint object_usage_linter
+    cli::cli_inform(
+      c(
+        "Detected data in absolute quantification in column
+        {.field {check_npx_log$col_names$quant}}.",
+        "i" = "We recommend you apply a logarithmic transformation to the
+        data:",
+        "{.code df_log2 <- df |> dplyr::mutate({q_log2} = log2(x = {q_col}))}"
+      ), wrap = TRUE
     )
   }
 
   # Final output
-  cli::cli_inform("Completed {.fn clean_npx}. Returning clean dataset.")
+  if (verbose) {
+    cli::cli_h2("Completed {.fn clean_npx}. Returning clean dataset.")
+  }
 
   return(
     convert_read_npx_output(
