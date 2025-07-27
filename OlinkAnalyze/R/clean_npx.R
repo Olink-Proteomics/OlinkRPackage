@@ -133,7 +133,7 @@ clean_npx <- function(df,
   check_is_dataset(df = df, error = TRUE)
   check_is_scalar_boolean(bool = verbose, error = TRUE)
 
-  if (verbose) cli::cli_h2("Starting {.fn clean_npx} pipeline")
+  if (verbose) cli::cli_h2("Starting {.fn clean_npx} pipeline.")
 
   # Validate or generate check_log from check_npx()
   if (is.null(check_log)) {
@@ -160,7 +160,7 @@ clean_npx <- function(df,
   }
 
   # Clean invalid Olink IDs
-  if (verbose) cli::cli_h3("Cleaning assays with invalid OlinkIDs")
+  if (verbose) cli::cli_h3("Removing assays with invalid identifiers.")
   df <- clean_invalid_oid(
     df = df,
     check_npx_log = check_npx_log,
@@ -169,7 +169,7 @@ clean_npx <- function(df,
   )
 
   # Clean assays with all NA values
-  if (verbose) cli::cli_h3("Cleaning assays with all NA values")
+  if (verbose) cli::cli_h3("Removing assays missing all quantified values.")
   df <- clean_assay_na(
     df = df,
     check_npx_log = check_npx_log,
@@ -178,7 +178,7 @@ clean_npx <- function(df,
   )
 
   # Clean duplicate sample IDs
-  if (verbose) cli::cli_h3("Cleaning duplicate SampleIDs")
+  if (verbose) cli::cli_h3("Removing duplicated sample identifiers.")
   df <- clean_duplicate_sample_id(
     df = df,
     check_npx_log = check_npx_log,
@@ -187,7 +187,7 @@ clean_npx <- function(df,
   )
 
   # Clean control samples based on sample type
-  if (verbose) cli::cli_h3("Cleaning control samples based on sample type")
+  if (verbose) cli::cli_h3("Removing control samples based on sample type.")
   df <- clean_sample_type(
     df = df,
     check_npx_log = check_npx_log,
@@ -196,7 +196,7 @@ clean_npx <- function(df,
   )
 
   # Clean control samples based on Sample ID
-  if (verbose) cli::cli_h3("Cleaning control samples based on Sample ID")
+  if (verbose) cli::cli_h3("Removing samples based on sample identifiers.")
   df <- clean_control_sample_id(
     df = df,
     check_npx_log = check_npx_log,
@@ -205,7 +205,7 @@ clean_npx <- function(df,
   )
 
   # Clean Samples with QC Status 'FAIL'
-  if (verbose) cli::cli_h3("Cleaning Samples with QC Status 'FAIL'")
+  if (verbose) cli::cli_h3("Removing samples with QC status 'FAIL'.")
   df <- clean_qc_warning(
     df = df,
     check_npx_log = check_npx_log,
@@ -214,7 +214,7 @@ clean_npx <- function(df,
   )
 
   # Clean internal control assays
-  if (verbose) cli::cli_h3("Cleaning internal control assays")
+  if (verbose) cli::cli_h3("Removing internal control assays.")
   df <- clean_assay_type(
     df = df,
     check_npx_log = check_npx_log,
@@ -223,7 +223,7 @@ clean_npx <- function(df,
   )
 
   # Clean assays flagged by assay warning
-  if (verbose) cli::cli_h3("Cleaning assays flagged by assay warning")
+  if (verbose) cli::cli_h3("Removing assays flagged with assays warning.")
   df <- clean_assay_warning(
     df = df,
     check_npx_log = check_npx_log,
@@ -232,7 +232,7 @@ clean_npx <- function(df,
   )
 
   # Correct column class
-  if (verbose) cli::cli_h3("Correcting flagged column class")
+  if (verbose) cli::cli_h3("Converting data types of selected columns.")
   df <- clean_col_class(
     df = df,
     check_npx_log = check_npx_log,
@@ -254,7 +254,7 @@ clean_npx <- function(df,
   }
 
   # Final output
-  cli::cli_inform("Completed {.fn clean_npx}. Returning `{out_df}` object.")
+  cli::cli_inform("Completed {.fn clean_npx}. Returning clean dataset.")
 
   return(
     convert_read_npx_output(
