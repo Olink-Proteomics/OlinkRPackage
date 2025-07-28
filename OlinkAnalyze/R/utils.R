@@ -82,14 +82,18 @@ ansi_collapse_quot <- function(x,
 #' @param olink_platform Olink platform used to generate the input file.
 #' One of `NULL` (default) for auto-detection,
 #' or `r ansi_collapse_quot(x = accepted_olink_platforms$name)`.
-#' @param data_type Quantification method of the input data. One of `NULL`
-#' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
+#' @param data_type Quantification method of the input data. One of
+#' `r ansi_collapse_quot(get_olink_data_types(), "or")`. Defaults to `NULL` for
+#' auto-detection.
 #' @param .ignore_files Character vector of files included in the zip-compressed
 #' Olink software output files that should be ignored. Used only for
 #' zip-compressed input files (default = \emph{c("README.txt")}).
 #' @param quiet Boolean to print a confirmation message when reading the input
 #' file. Applies to excel or delimited input only. `TRUE` (default) to not print
 #' and `FALSE` to print.
+#' @param legacy Boolean to run the legacy version of the read_npx function.
+#' \strong{Important: should be used only to wide format files from Target 96 or
+#' Target 48 with NPX Software version earlier than 1.8!} (default `FALSE`).
 #'
 #' @return Dataset,
 #' `r ansi_collapse_quot(x = get_df_output_print(), sep = "or")`, with Olink
@@ -102,4 +106,5 @@ ansi_collapse_quot <- function(x,
                            olink_platform,
                            data_type,
                            .ignore_files,
-                           quiet) {}
+                           quiet,
+                           legacy) {}

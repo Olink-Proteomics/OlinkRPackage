@@ -12,7 +12,8 @@
   olink_platform,
   data_type,
   .ignore_files,
-  quiet
+  quiet,
+  legacy
 )
 }
 \arguments{
@@ -34,8 +35,9 @@ wide format files.}
 One of \code{NULL} (default) for auto-detection,
 or "Target 48", "Flex", "Target 96", "Explore 3072", "Explore HT", "Focus", and "Reveal".}
 
-\item{data_type}{Quantification method of the input data. One of \code{NULL}
-(default) for auto-detection, "Ct", "NPX", and "Quantified".}
+\item{data_type}{Quantification method of the input data. One of
+"Ct", "NPX", or "Quantified". Defaults to \code{NULL} for
+auto-detection.}
 
 \item{.ignore_files}{Character vector of files included in the zip-compressed
 Olink software output files that should be ignored. Used only for
@@ -44,6 +46,10 @@ zip-compressed input files (default = \emph{c("README.txt")}).}
 \item{quiet}{Boolean to print a confirmation message when reading the input
 file. Applies to excel or delimited input only. \code{TRUE} (default) to not print
 and \code{FALSE} to print.}
+
+\item{legacy}{Boolean to run the legacy version of the read_npx function.
+\strong{Important: should be used only to wide format files from Target 96 or
+Target 48 with NPX Software version earlier than 1.8!} (default \code{FALSE}).}
 }
 \value{
 Dataset,
