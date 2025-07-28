@@ -166,13 +166,8 @@ clean_npx <- function(df,
   if (verbose) cli::cli_h3("Removing duplicated sample identifiers.")
   df <- clean_duplicate_sample_id(
     df = df,
-<<<<<<< HEAD
-    check_npx_log = check_npx_log,
-    keep_duplicate_sample_id = keep_duplicate_sample_id,
-=======
     check_log = check_log,
     remove_dup_sample_id = remove_dup_sample_id,
->>>>>>> 6d488153e0e87e089100dc0b11d5618d3db754c2
     verbose = verbose
   )
 
