@@ -10,10 +10,11 @@ read_npx_format_get_quant(file, data_type = NULL, data_cells)
 \arguments{
 \item{file}{Path to Olink software output file in wide format. Expecting file
 extensions
-"xls", "xlsx", "csv", and "txt".}
+"xls", "xlsx", "csv", or "txt".}
 
-\item{data_type}{Quantification method of the input data. One of \code{NULL}
-(default) for auto-detection, "Ct", "NPX", and "Quantified".}
+\item{data_type}{Quantification method of the input data. One of
+"Ct", "NPX", or "Quantified". Defaults to \code{NULL} for
+auto-detection.}
 
 \item{data_cells}{A character vector with the contents of the cell \emph{A2}
 from the Olink software file in wide format indicating the quantification
@@ -21,7 +22,7 @@ method.}
 }
 \value{
 The name of the data type. One of
-"Ct", "NPX", and "Quantified".
+"Ct", "NPX", or "Quantified".
 }
 \description{
 This function uses information from the cell \emph{A2} from Olink software

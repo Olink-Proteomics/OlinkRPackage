@@ -18,8 +18,8 @@
 #' \code{\link{read_npx_wide}}.
 #'
 #' \strong{Olink software files in wide format} always originate from Olink qPCR
-#' platforms, and are further processed by
-#' \code{\link{read_npx_format_get_format}} and
+#' platforms, and are further processed by the functions
+#' \code{\link{read_npx_format_get_platform}} and
 #' \code{\link{read_npx_format_get_quant}} to determine the data type and Olink
 #' platform, respectively.
 #'
@@ -32,28 +32,14 @@
 #'   Olof Mansson;
 #'   Marianne Sandin
 #'
+#' @inherit .read_npx_args params return
 #' @param file Path to Olink software output file in wide or long format.
 #' Expecting file extensions
-#' `r  ansi_collapse_quot(get_file_ext(name_sub = c("excel", "delim")))`.
-#' @param out_df The class of output data frame. One of
-#' `r ansi_collapse_quot(read_npx_df_output)`.
-#' @param long_format Boolean marking format of input file. One of `NULL`
-#' (default) for auto-detection, `TRUE` for long format files or `FALSE` for
-#' wide format files.
-#' @param olink_platform Olink platform used to generate the input file.
-#' One of `NULL` (default) for auto-detection,
-#' `r ansi_collapse_quot(get_olink_platforms(broad_platform = "qPCR"))`.
-#' @param data_type Quantification method of the input data. One of `NULL`
-#' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
-#' @param quiet Boolean to print a confirmation message when reading the input
-#' file. `TRUE` (default) to skip printing, and `FALSE` to print.
-#' @param legacy Boolean to enforce returning a list containing olink_platform,
-#' data_type and long_format information together with the dataset. Used only
-#' when \code{\link{read_npx_format}} is called from
+#' `r  ansi_collapse_quot(get_file_ext(name_sub = c("excel", "delim")), "or")`.
+#' @param legacy Boolean to enforce returning a list containing
+#' *olink_platform*, *data_type* and *long_format* information together with the
+#' dataset. Used only when \code{\link{read_npx_format}} is called from
 #' \code{\link{read_npx_legacy}}.
-#'
-#' @return `r ansi_collapse_quot(x = get_df_output_print(), sep = "or")` with
-#' Olink data in long or wide format.
 #'
 #' @seealso
 #'   \code{\link{read_npx}}
@@ -209,7 +195,7 @@ read_npx_format <- function(file,
 #' Help function to read excel and delimited Olink data files in R.
 #'
 #' @description
-#' This function reads Olink software excel or delimited files regardless of
+#' This function reads Olink software excel and delimited files regardless of
 #' data type, platform or format.
 #'
 #' \strong{Olink software excel files} with the extension
@@ -226,21 +212,20 @@ read_npx_format <- function(file,
 #' \item Files in wide format are read with column names as V1, V2, etc.
 #' }
 #'
-#' This function also extracts the first \var{read_n} rows of the dataset read
-#' earlier to determine the Olink platform that generated the file, the data
-#' type and and file format.
+#' This function also extracts the first \var{read_n} rows of the dataset to
+#' determine the Olink platform that generated the file, the data type and and
+#' file format.
 #'
 #' @author
 #'   Klev Diamanti
 #'
-#' @param file Path to Olink software output file in wide or long format.
-#' Expecting file extensions
-#' `r ansi_collapse_quot(get_file_ext(name_sub = c("excel", "delim")))`.
-#' @param read_n Number of top rows to read.
+#' @inheritParams read_npx_format
+#' @param read_n Number of top *n* rows to read.
 #'
 #' @return A list with two elements:
 #' \itemize{
-#' \item An ArrowObject (\var{df}) containing the full dataset.
+#' \item An ArrowObject (\var{df}) containing the full dataset in wide or long
+#' format.
 #' \item A tibble (\var{df_top_n}) containing the \var{read_n} rows of the full
 #' dataset. This subset of data is used to determine \var{long_format},
 #' \var{olink_platform} and \var{data_type}.
@@ -358,30 +343,25 @@ read_npx_format_read <- function(file,
 
 }
 
-#' Help function to determine wide or long file format.
+#' Help function to determine the format (wide or long) of the input dataset.
 #'
 #' @description
 #' The function uses the first \var{read_n} rows of the input dataset to
 #' determine the format of the input file.
 #'
-#' The user can provide the file format as an input argument. If the user did
-#' not provide an input with regards to the file format, then it is
-#' auto-determined exclusively from the function. If user provided the file
-#' format as input, then the function cross-checks that it's auto-detection
-#' matches user's input. If not, it will throw a warning, and accept user's
-#' input as the correct answer.
+#' The user can provide the file format as an input argument \var{long_format}.
+#' If the user did not provide an input with regards to the file format, then it
+#' is auto-determined is this function. If file format was provided as input,
+#' then the function cross-checks that its auto-detection matches the user
+#' input. If not, it will throw a warning, and accept user's input as the
+#' correct answer.
 #'
 #' @author
 #'   Klev Diamanti
 #'
+#' @inheritParams read_npx_format
 #' @param df_top_n A tibble containing the first \var{read_n} rows of the input
-#' Olink file.
-#' @param file Path to Olink software output file in wide or long format.
-#' Expecting file extensions
-#' `r ansi_collapse_quot(get_file_ext(name_sub = c("excel", "delim")))`.
-#' @param long_format Boolean marking format of input file. One of `NULL`
-#' (default) for auto-detection, `TRUE` for long format files or `FALSE` for
-#' wide format files.
+#' dataset.
 #'
 #' @return A list with two elements:
 #' \itemize{
@@ -577,7 +557,7 @@ read_npx_format_get_format <- function(df_top_n,
 
 }
 
-#' Help function to determine Olink platform from the input file in wide format.
+#' Help function to determine the Olink platform from the input dataset.
 #'
 #' @description
 #' This function uses the panel name from Olink software files in wide format to
@@ -587,17 +567,16 @@ read_npx_format_get_format <- function(df_top_n,
 #' @author
 #'   Klev Diamanti
 #'
-#' @param df_top_n A tibble containing the first \var{read_n} rows of the input
-#' Olink file.
+#' @inheritParams read_npx_format_get_format
 #' @param file Path to Olink software output file in wide format. Expecting file
 #' extensions
-#' `r ansi_collapse_quot(get_file_ext(name_sub = c("excel", "delim")))`.
-#' @param olink_platform Olink platform used to generate the input file.
-#' One of `NULL` (default) for auto-detection,
-#' `r ansi_collapse_quot(get_olink_platforms(broad_platform = "qPCR"))`.
+#' `r  ansi_collapse_quot(get_file_ext(name_sub = c("excel", "delim")), "or")`.
+#' @param olink_platform Olink platform used to generate the input file. One of
+#' `NULL` (default) for auto-detection,
+#' `r ansi_collapse_quot(get_olink_platforms(broad_platform = "qPCR"), "or")`.
 #'
 #' @return The name of the Olink platform. One of
-#' `r ansi_collapse_quot(get_olink_platforms(broad_platform = "qPCR"))`.
+#' `r ansi_collapse_quot(get_olink_platforms(broad_platform = "qPCR"), "or")`.
 #'
 #' @seealso
 #'   \code{\link{read_npx_format}}
@@ -770,17 +749,16 @@ read_npx_format_get_platform <- function(df_top_n,
 #' @author
 #'   Klev Diamanti
 #'
-#' @param file Path to Olink software output file in wide format. Expecting file
-#' extensions
-#' `r ansi_collapse_quot(get_file_ext(name_sub = c("excel", "delim")))`.
-#' @param data_type Quantification method of the input data. One of `NULL`
-#' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
+#' @inheritParams read_npx_format_get_platform
+#' @param data_type Quantification method of the input data. One of
+#' `r ansi_collapse_quot(get_olink_data_types(), "or")`. Defaults to `NULL` for
+#' auto-detection.
 #' @param data_cells A character vector with the contents of the cell \emph{A2}
 #' from the Olink software file in wide format indicating the quantification
 #' method.
 #'
 #' @return The name of the data type. One of
-#' `r ansi_collapse_quot(get_olink_data_types(broad_platform = "qPCR"))`.
+#' `r ansi_collapse_quot(get_olink_data_types(broad_platform = "qPCR"), "or")`.
 #'
 #' @seealso
 #'   \code{\link{read_npx_format}}
