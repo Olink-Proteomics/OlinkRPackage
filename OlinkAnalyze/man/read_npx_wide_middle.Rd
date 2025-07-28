@@ -11,10 +11,11 @@ read_npx_wide_middle(df, file, data_type, col_names)
 
 \item{file}{Path to Olink software output file in wide format. Expected one
 of file extensions
-"xls", "xlsx", "csv", and "txt".}
+"xls", "xlsx", "csv", or "txt".}
 
-\item{data_type}{Quantification method of the input data. One of \code{NULL}
-(default) for auto-detection, "Ct", "NPX", and "Quantified".}
+\item{data_type}{Quantification method of the input data. One of
+"Ct", "NPX", or "Quantified". Defaults to
+\code{NULL} for auto-detection.}
 
 \item{col_names}{Names list of character vectors containing column names from
 each chunk of columns \var{df_top} was split on in function.

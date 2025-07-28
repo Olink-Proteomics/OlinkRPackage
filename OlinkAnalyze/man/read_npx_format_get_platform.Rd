@@ -2,25 +2,25 @@
 % Please edit documentation in R/read_npx_format.R
 \name{read_npx_format_get_platform}
 \alias{read_npx_format_get_platform}
-\title{Help function to determine Olink platform from the input file in wide format.}
+\title{Help function to determine the Olink platform from the input dataset.}
 \usage{
 read_npx_format_get_platform(df_top_n, file, olink_platform = NULL)
 }
 \arguments{
 \item{df_top_n}{A tibble containing the first \var{read_n} rows of the input
-Olink file.}
+dataset.}
 
-\item{file}{Path to Olink software output file in wide format. Expecting file
-extensions
-"xls", "xlsx", "csv", and "txt".}
+\item{file}{Path to Olink software output file in wide format. Expected one
+of file extensions
+"xls", "xlsx", "csv", or "txt".}
 
 \item{olink_platform}{Olink platform used to generate the input file.
 One of \code{NULL} (default) for auto-detection,
-"Flex", "Focus", "Target 48", and "Target 96".}
+"Flex", "Focus", "Target 48", or "Target 96".}
 }
 \value{
 The name of the Olink platform. One of
-"Flex", "Focus", "Target 48", and "Target 96".
+"Flex", "Focus", "Target 48", or "Target 96".
 }
 \description{
 This function uses the panel name from Olink software files in wide format to

@@ -28,28 +28,10 @@
 #'   Kathleen Nevola;
 #'   Pascal Pucholt
 #'
+#' @inherit .read_npx_args params return
 #' @param file Path to Olink software output zip-compressed file in wide or long
 #' format. Expected file extensions
 #' `r ansi_collapse_quot(get_file_ext(name_sub = "compressed"))`.
-#' @param out_df The class of the output dataset. One of
-#' `r ansi_collapse_quot(read_npx_df_output)`. (default = "tibble")
-#' @param long_format Boolean marking format of input file. One of `NULL`
-#' (default) for auto-detection, `TRUE` for long format files or `FALSE` for
-#' wide format files.
-#' @param olink_platform Olink platform used to generate the input file.
-#' One of `NULL` (default) for auto-detection,
-#' `r get_olink_platforms(broad_platform = "qPCR") |> ansi_collapse_quot()`.
-#' @param data_type Quantification method of the input data. One of `NULL`
-#' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
-#' @param .ignore_files Character vector of files included in the zip-compressed
-#' Olink software output files that should be ignored. Used only for
-#' zip-compressed input files (default = \emph{c("README.txt")}).
-#' @param quiet Boolean to print a confirmation message when reading the input
-#' file. Applies to excel or delimited input only. `TRUE` (default) to not print
-#' and `FALSE` to print.
-#'
-#' @return `r ansi_collapse_quot(x = get_df_output_print(), sep = "or")` with
-#' Olink data in long or wide format.
 #'
 #' @seealso
 #'   \code{\link{read_npx}}
@@ -80,7 +62,7 @@ read_npx_zip <- function(file,
   check_out_df_arg(out_df = out_df)
 
   # check that .ignore_files is a character vector
-  check_is_character(string = .ignore_files,
+  check_is_character(x = .ignore_files,
                      error = TRUE)
 
   # **** Prep ****
@@ -222,7 +204,7 @@ read_npx_zip <- function(file,
 get_checksum_file <- function(files) {
 
   # check that the input is a character vector
-  check_is_character(string = files,
+  check_is_character(x = files,
                      error = TRUE)
 
   # if none of the files matches the accepted file names
@@ -279,7 +261,7 @@ get_npx_file <- function(files,
                          excl_file_ext = c("zip")) {
 
   # check that the input is a character vector
-  check_is_character(string = files,
+  check_is_character(x = files,
                      error = TRUE)
 
   # remove (if any) checksum files
@@ -368,9 +350,9 @@ check_checksum <- function(checksum_file,
                            npx_file) {
 
   # check if input is character vectors of length 1
-  check_is_scalar_character(string = checksum_file,
+  check_is_scalar_character(x = checksum_file,
                             error = TRUE)
-  check_is_scalar_character(string = npx_file,
+  check_is_scalar_character(x = npx_file,
                             error = TRUE)
 
   # make the checksum filename easier to parse

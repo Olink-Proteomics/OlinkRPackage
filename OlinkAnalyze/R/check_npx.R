@@ -34,8 +34,9 @@
 #'
 #' @author
 #'   Masoumeh Sheikhi
+#'   Klev Diamanti
 #'
-#' @param df A tibble or and arrow object from \code{\link{read_npx}}.
+#' @inheritParams .downstream_fun_args
 #' @param preferred_names A named character vector where names are internal
 #' column names and values are column names to be selected from the input data
 #' frame. Read the \emph{description} for further information.
@@ -104,7 +105,7 @@ check_npx <- function(df,
 
   # check input ----
 
-  check_is_dataset(df = df,
+  check_is_dataset(x = df,
                    error = TRUE)
 
   # check functions ----
@@ -192,10 +193,7 @@ check_npx <- function(df,
 #'  Klev Diamanti;
 #'  Masoumeh Sheikhi
 #'
-#' @param df A tibble or and arrow object from \code{\link{read_npx}}.
-#' @param preferred_names A named character vector where names are internal
-#' column names and values are column names to be selected from the input data
-#' frame. Read the \emph{description} for further information.
+#' @inheritParams check_npx
 #'
 #' @return List of column names from the input data frame marking the columns to
 #' be used in downstream analyses.
@@ -240,11 +238,6 @@ check_npx <- function(df,
 #'
 check_npx_col_names <- function(df,
                                 preferred_names = NULL) {
-
-  # check input ----
-
-  check_is_dataset(df = df,
-                   error = TRUE)
 
   # if not NULL, preferred_names is checked in check_npx_update_col_names
   if (!is.null(preferred_names)) {
@@ -463,9 +456,7 @@ check_npx_col_names <- function(df,
 #'  Klev Diamanti
 #'  Masoumeh Sheikhi
 #'
-#' @param preferred_names A named character vector where names are internal
-#' column names and values are column names to be selected from the input data
-#' frame. Read the \emph{description} for further information.
+#' @inheritParams check_npx
 #'
 #' @return \var{column_name_dict} updated based on \var{preferred_names}.
 #'
@@ -474,7 +465,7 @@ check_npx_update_col_names <- function(preferred_names) {
   # check input ----
 
   # Check if preferred_names is character
-  check_is_character(string = preferred_names,
+  check_is_character(x = preferred_names,
                      error = TRUE)
 
   # check for names not matching expected ----
@@ -567,8 +558,7 @@ check_npx_update_col_names <- function(preferred_names) {
 #' @author
 #'  Masoumeh Sheikhi
 #'
-#' @param df A tibble or an arrow object containing containing column
-#' \var{OlinkID}.
+#' @inheritParams check_npx
 #' @param col_names A list of matched column names. This is the output of the
 #' \var{check_npx_col_names} function.
 #'
@@ -623,14 +613,11 @@ check_npx_olinkid <- function(df,
 #' 2. https://github.com/pbs-software/pbs-modelling/issues/95
 #'
 #' @author
-#'  Simon Forsberg;
+#'  Simon Forsberg
 #'  Masoumeh Sheikhi
 #'
-#' @param df A tibble or an arrow object containing columns \var{OlinkID} and
-#' the quantification column
-#' `r ansi_collapse_quot(x = get_olink_data_types(), sep = "or")`.
-#' @param col_names A list of matched column names. This is the output of the
-#' \var{check_npx_col_names} function.
+#' @inheritParams check_npx
+#' @inheritParams check_npx_olinkid
 #'
 #' @return A character vector containing \var{OlinkID} of assays with quantified
 #' values \emph{NA} for all samples, otherwise returns \emph{character(0)}.
@@ -688,10 +675,8 @@ check_npx_all_na_assays <- function(df, col_names) {
 #' @author
 #'  Masoumeh Sheikhi
 #'
-#' @param df A tibble or an arrow object containing the columns \var{SampleID}
-#' and \var{OlinkID}.
-#' @param col_names A list of matched column names. This is the output of the
-#' \var{check_npx_col_names} function.
+#' @inheritParams check_npx
+#' @inheritParams check_npx_olinkid
 #'
 #' @return A character vector of duplicate \var{SampleID} found in the data.
 #'
@@ -743,15 +728,12 @@ check_npx_duplicate_sample_ids <- function(df, col_names) {
 #' 2. https://github.com/pbs-software/pbs-modelling/issues/95
 #'
 #' @author
-#'  Simon Forsberg;
+#'  Simon Forsberg
 #'  Masoumeh Sheikhi
 #'  Klev Diamanti
 #'
-#' @param df A tibble or an arrow object containing columns \var{SampleID} and
-#' the quantification column
-#' `r ansi_collapse_quot(x = get_olink_data_types(), sep = "or")`.
-#' @param col_names A list of matched column names. This is the output of the
-#' \var{check_npx_col_names} function.
+#' @inheritParams check_npx
+#' @inheritParams check_npx_olinkid
 #'
 #' @return A character vector containing \var{SampleID} of samples with
 #' quantified values \emph{NA} for all assays, otherwise returns
@@ -810,10 +792,11 @@ check_npx_all_na_sample <- function(df, col_names) {
 #' the columns \var{col_class} and \var{col_class_check} of
 #' \var{column_name_dict}.
 #'
-#' @param df A tibble or an arrow object containing the columns \var{SampleID}
-#' and \var{OlinkID}.
-#' @param col_names A list of matched column names. This is the output of the
-#' \var{check_npx_col_names} function.
+#' @author
+#'  Klev Diamanti
+#'
+#' @inheritParams check_npx
+#' @inheritParams check_npx_olinkid
 #'
 #' @returns A data frame with the columns \var{col_name}, \var{col_key},
 #' \var{col_class} and \var{expected_col_class} marking columns with the
@@ -945,10 +928,11 @@ check_npx_col_class <- function(df, col_names) {
 
 #' Help function checking data for assay QC warnings.
 #'
-#' @param df A tibble or an arrow object containing the columns \var{AssayQC}
-#' and \var{OlinkID}.
-#' @param col_names A list of matched column names. This is the output of the
-#' \var{check_npx_col_names} function.
+#' @author
+#'  Klev Diamanti
+#'
+#' @inheritParams check_npx
+#' @inheritParams check_npx_olinkid
 #'
 #' @returns A character vector containing \var{OlinkID} of assays with at least
 #' one QC warning, otherwise a \emph{character(0)}.

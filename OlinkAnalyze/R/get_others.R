@@ -1,5 +1,8 @@
 #' Prints class type output from read_npx* functions.
 #'
+#' @author
+#'   Klev Diamanti
+#'
 #' @return A scalar character vector with the class type of outputs from
 #' read_npx* functions.
 #'
@@ -13,6 +16,9 @@ get_df_output_print <- function() {
 }
 
 #' Describes acceptable file extension for each file type.
+#'
+#' @author
+#'   Klev Diamanti
 #'
 #' @return A scalar character vector with one sentence describing the acceptable
 #' extensions of each file type.
@@ -34,6 +40,9 @@ get_file_ext_summary <- function() {
 
 #' Get all acceptable file formats.
 #'
+#' @author
+#'   Klev Diamanti
+#'
 #' @return A character vector with the acceptable file formats.
 #'
 get_file_formats <- function() {
@@ -46,6 +55,9 @@ get_file_formats <- function() {
 
 #' Gets all file extensions based on the file format.
 #'
+#' @author
+#'   Klev Diamanti
+#'
 #' @param name_sub Substring of file format. One of
 #' `r ansi_collapse_quot(c(get_file_formats(), "NULL"))`. If `NULL` all
 #' file extensions are returned.
@@ -56,7 +68,7 @@ get_file_ext <- function(name_sub = NULL) {
 
   if (!is.null(name_sub)) {
 
-    check_is_character(string = name_sub,
+    check_is_character(x = name_sub,
                        error = TRUE)
 
     if (!all(name_sub %in% get_file_formats())) {

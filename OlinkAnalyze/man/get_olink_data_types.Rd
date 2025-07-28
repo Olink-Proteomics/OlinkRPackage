@@ -11,18 +11,16 @@ get_olink_data_types(
 )
 }
 \arguments{
-\item{broad_platform}{Name of the \var{broad_platform} to filter the Olink
-data types for. If \code{NULL} all relevant Olink data types are returned,
-otherwise one of "NGS" and "qPCR" is
-expected.}
+\item{broad_platform}{Name of the \var{broad_platform} to filter for. If
+\code{NULL} all broader platforms are considered, otherwise one of
+"NGS" and "qPCR" is expected.}
 
-\item{platform_name}{Name of the \var{platform_name} to filter the Olink
-data types for. If \code{NULL} all relevant Olink data types are returned,
-otherwise one of "Explore 3072", "Explore HT", "Flex", "Focus", "Reveal", "Target 48", and "Target 96" is
-expected.}
+\item{platform_name}{Name of the \var{platform_name} to filter for. If \code{NULL}
+all platforms are considered, otherwise one of
+"Explore 3072", "Explore HT", "Flex", "Focus", "Reveal", "Target 48", and "Target 96" is expected.}
 
-\item{quant_type}{Name of the \var{quant_type} to filter the Olink data types
-for. If \code{NULL} all relevant Olink data types are returned, otherwise one of
+\item{quant_type}{Name of the \var{quant_type} to filter for. If \code{NULL} all
+quantification types are considered, otherwise one of
 "absolute" and "relative" is expected.}
 }
 \value{

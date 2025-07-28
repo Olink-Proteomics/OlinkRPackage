@@ -8,10 +8,12 @@
 convert_read_npx_output(df, out_df)
 }
 \arguments{
-\item{df}{Dataset to be converted.}
+\item{df}{A "tibble" or "ArrowObject"
+from \code{\link{read_npx}}.}
 
-\item{out_df}{Class of output data frame. One of
-"tibble" and "arrow".}
+\item{out_df}{The class of the output dataset. One of
+"tibble" or "arrow". Defaults to
+"tibble".}
 }
 \value{
 The dataset in the requested class.

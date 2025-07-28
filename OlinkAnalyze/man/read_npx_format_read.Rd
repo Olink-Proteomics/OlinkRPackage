@@ -9,21 +9,22 @@ read_npx_format_read(file, read_n = 3L)
 \arguments{
 \item{file}{Path to Olink software output file in wide or long format.
 Expecting file extensions
-"xls", "xlsx", "csv", and "txt".}
+"xls", "xlsx", "csv", or "txt".}
 
-\item{read_n}{Number of top rows to read.}
+\item{read_n}{Number of top \emph{n} rows to read.}
 }
 \value{
 A list with two elements:
 \itemize{
-\item An ArrowObject (\var{df}) containing the full dataset.
+\item An ArrowObject (\var{df}) containing the full dataset in wide or long
+format.
 \item A tibble (\var{df_top_n}) containing the \var{read_n} rows of the full
 dataset. This subset of data is used to determine \var{long_format},
 \var{olink_platform} and \var{data_type}.
 }
 }
 \description{
-This function reads Olink software excel or delimited files regardless of
+This function reads Olink software excel and delimited files regardless of
 data type, platform or format.
 
 \strong{Olink software excel files} with the extension
@@ -40,9 +41,9 @@ are imported in R by the functions \code{\link{read_npx_delim}} or
 \item Files in wide format are read with column names as V1, V2, etc.
 }
 
-This function also extracts the first \var{read_n} rows of the dataset read
-earlier to determine the Olink platform that generated the file, the data
-type and and file format.
+This function also extracts the first \var{read_n} rows of the dataset to
+determine the Olink platform that generated the file, the data type and and
+file format.
 }
 \seealso{
 \code{\link{read_npx_format}}

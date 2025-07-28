@@ -4,24 +4,34 @@
 \alias{check_is_tibble}
 \title{Help function checking if a variable is a tibble dataset.}
 \usage{
-check_is_tibble(df, error = FALSE)
+check_is_tibble(x, error = FALSE)
 }
 \arguments{
-\item{df}{Variable to check.}
+\item{x}{Variable to check.}
 
 \item{error}{Scalar boolean to return an error instead of a \code{FALSE}
 (\code{default = FALSE}).}
 }
 \value{
-\code{TRUE} if the variable is a tibble, and \code{FALSE} if not; error if the
-variable is not a tibble and \code{error = TRUE}.
+Boolean, \code{TRUE} or \code{FALSE}, if the variable is of the correct class;
+If output is \code{FALSE} and \var{error} = \code{TRUE}, an error is thrown.
 }
 \description{
 Help function checking if a variable is a tibble dataset.
 }
 \seealso{
-\code{\link{check_is_arrow_object}}
+\code{\link{check_is_character}}
+\code{\link{check_is_integer}}
+\code{\link{check_is_numeric}}
+\code{\link{check_is_boolean}}
+\code{\link{check_is_scalar_character}}
+\code{\link{check_is_scalar_integer}}
+\code{\link{check_is_scalar_numeric}}
+\code{\link{check_is_scalar_boolean}}
+\code{\link{check_is_tibble}}
 \code{\link{check_is_dataset}}
+\code{\link{check_is_arrow_object}}
+\code{\link{check_is_list}}
 }
 \author{
 Klev Diamanti

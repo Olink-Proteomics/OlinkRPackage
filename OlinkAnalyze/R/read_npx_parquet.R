@@ -6,14 +6,10 @@
 #'   Kathleen Nevola;
 #'   Pascal Pucholt
 #'
+#' @inherit .read_npx_args params return
 #' @param file Path to Olink software output parquet file in long format.
 #' Expecting file extension
 #' `r ansi_collapse_quot(get_file_ext(name_sub = "parquet"))`.
-#' @param out_df The class of the output dataset. One of
-#' `r ansi_collapse_quot(read_npx_df_output)`. (default = "tibble")
-#'
-#' @return `r ansi_collapse_quot(x = get_df_output_print(), sep = "or")` with
-#' Olink data in long or wide format.
 #'
 #' @seealso
 #'   \code{\link{read_npx}}

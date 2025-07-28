@@ -7,8 +7,8 @@
 check_npx_col_class(df, col_names)
 }
 \arguments{
-\item{df}{A tibble or an arrow object containing the columns \var{SampleID}
-and \var{OlinkID}.}
+\item{df}{A "tibble" or "ArrowObject"
+from \code{\link{read_npx}}.}
 
 \item{col_names}{A list of matched column names. This is the output of the
 \var{check_npx_col_names} function.}
@@ -23,4 +23,7 @@ This function checks if certain columns from \var{df} have the correct type
 to enable downstream analysis. Columns to be checked are marked as such in
 the columns \var{col_class} and \var{col_class_check} of
 \var{column_name_dict}.
+}
+\author{
+Klev Diamanti
 }

@@ -11,20 +11,17 @@ get_olink_quant_types(
 )
 }
 \arguments{
-\item{broad_platform}{Name of the \var{broad_platform} to filter the Olink
-quantification types for. If \code{NULL} all relevant Olink quantification types
-are returned, otherwise one of
+\item{broad_platform}{Name of the \var{broad_platform} to filter for. If
+\code{NULL} all broader platforms are considered, otherwise one of
 "NGS" and "qPCR" is expected.}
 
-\item{platform_name}{Name of the \var{platform_name} to filter the Olink
-quantification types for. If \code{NULL} all relevant Olink quantification types
-are returned, otherwise one of "Explore 3072", "Explore HT", "Flex", "Focus", "Reveal", "Target 48", and "Target 96"
-is expected.}
+\item{platform_name}{Name of the \var{platform_name} to filter for. If \code{NULL}
+all platforms are considered, otherwise one of
+"Explore 3072", "Explore HT", "Flex", "Focus", "Reveal", "Target 48", and "Target 96" is expected.}
 
-\item{data_type}{Name of the \var{data_type} to filter the Olink
-quantification types for. If \code{NULL} all relevant Olink quantification types
-are returned, otherwise one of "Ct", "NPX", and "Quantified"
-is expected.}
+\item{data_type}{Name of the \var{data_type} to filter the Olink for. If
+\code{NULL} all data types are considered, otherwise one of
+"Ct", "NPX", and "Quantified" is expected.}
 }
 \value{
 A character vector with names of Olink quantification types filtered
