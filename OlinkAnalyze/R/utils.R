@@ -108,3 +108,13 @@ ansi_collapse_quot <- function(x,
                            .ignore_files,
                            quiet,
                            legacy) {}
+
+#' Common parameters for downstream anaysis functions.
+#'
+#' @author
+#'   Klev Diamanti
+#'
+#' @param df A `r ansi_collapse_quot(x = get_df_output_print(), sep = "or")`
+#' from \code{\link{read_npx}}.
+#'
+.downstream_fun_args <- function(df) {}
