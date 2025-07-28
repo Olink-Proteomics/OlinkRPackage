@@ -19,17 +19,19 @@ read_npx_wide_bottom(
 
 \item{file}{Path to Olink software output file in wide format. Expected one
 of file extensions
-"xls", "xlsx", "csv", and "txt".}
+"xls", "xlsx", "csv", or "txt".}
 
 \item{olink_platform}{Olink platform used to generate the input file.
 One of \code{NULL} (default) for auto-detection,
-"Flex", "Focus", "Target 48", and "Target 96".}
+"Flex", "Focus", "Target 48", or "Target 96".}
 
-\item{data_type}{Quantification method of the input data. One of \code{NULL}
-(default) for auto-detection, "Ct", "NPX", and "Quantified".}
+\item{data_type}{Quantification method of the input data. One of
+"Ct", "NPX", or "Quantified". Defaults to \code{NULL} for
+auto-detection.}
 
 \item{col_names}{Names list of character vectors containing column names from
-each chunk of columns \var{df_top} was split on in function.}
+each chunk of columns \var{df_top} was split on in function.
+\code{\link{read_npx_wide_top}}.}
 
 \item{format_spec}{A tibble derived from \var{olink_wide_spec} in the local
 environment containing the expected format of the Olink wide file based on
