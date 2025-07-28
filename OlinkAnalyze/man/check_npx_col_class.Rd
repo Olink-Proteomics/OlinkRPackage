@@ -24,3 +24,6 @@ to enable downstream analysis. Columns to be checked are marked as such in
 the columns \var{col_class} and \var{col_class_check} of
 \var{column_name_dict}.
 }
+\author{
+Klev Diamanti
+}

@@ -62,7 +62,7 @@ read_npx <- function(filename,
   # check that the requested putput df is ok
   check_out_df_arg(out_df = out_df)
 
-  check_is_scalar_boolean(bool = legacy,
+  check_is_scalar_boolean(x = legacy,
                           error = TRUE)
 
   # sep and .ignore_file are checked in the functions they target

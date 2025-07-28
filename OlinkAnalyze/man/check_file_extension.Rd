@@ -19,6 +19,3 @@ Use variable \var{accepted_npx_file_ext} to check if extension of the input
 file is acceptable. Expecting one of
 ""xls" or "xlsx" for excel files, "csv" or "txt" for delim files, "parquet" for parquet files, and "zip" for compressed files".
 }
-\author{
-Klev Diamanti
-}

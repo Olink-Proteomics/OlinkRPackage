@@ -68,7 +68,7 @@ read_npx_format <- function(file,
 
   # check long format input
   if (!is.null(long_format)) {
-    check_is_scalar_boolean(bool = long_format,
+    check_is_scalar_boolean(x = long_format,
                             error = TRUE)
   }
 
@@ -82,7 +82,7 @@ read_npx_format <- function(file,
     check_olink_data_type(x = data_type)
   }
 
-  check_is_scalar_boolean(bool = quiet,
+  check_is_scalar_boolean(x = quiet,
                           error = TRUE)
 
   # Determine data format, Olink platform and quant method from excel file ----
@@ -245,7 +245,7 @@ read_npx_format_read <- function(file,
   check_file_exists(file = file,
                     error = TRUE)
 
-  check_is_scalar_integer(int = read_n,
+  check_is_scalar_integer(x = read_n,
                           error = TRUE)
 
   # sep is checked in the delim function
@@ -384,7 +384,7 @@ read_npx_format_get_format <- function(df_top_n,
 
   # Check inputs ----
 
-  check_is_tibble(df = df_top_n,
+  check_is_tibble(x = df_top_n,
                   error = TRUE)
 
   check_file_exists(file = file,
@@ -585,7 +585,7 @@ read_npx_format_get_platform <- function(df_top_n,
 
   # Checks inputs ----
 
-  check_is_tibble(df = df_top_n,
+  check_is_tibble(x = df_top_n,
                   error = TRUE)
 
   check_file_exists(file = file,
@@ -594,7 +594,7 @@ read_npx_format_get_platform <- function(df_top_n,
   # help vars
   broad_platform <- "qPCR"
 
-  check_is_scalar_character(string = broad_platform,
+  check_is_scalar_character(x = broad_platform,
                             error = TRUE)
 
   # check olink platform
@@ -767,7 +767,7 @@ read_npx_format_get_quant <- function(file,
   check_file_exists(file = file,
                     error = TRUE)
 
-  check_is_character(string = data_cells,
+  check_is_character(x = data_cells,
                      error = TRUE)
 
   # help vars

@@ -12,7 +12,7 @@
 check_out_df_arg <- function(out_df) {
 
   # check that out_df is a string
-  check_is_scalar_character(string = out_df,
+  check_is_scalar_character(x = out_df,
                             error = TRUE)
 
   if (!(out_df %in% read_npx_df_output)) {
@@ -47,7 +47,7 @@ convert_read_npx_output <- function(df,
   # check that out_df is ok
   check_out_df_arg(out_df = out_df)
 
-  if (check_is_dataset(df = df, error = FALSE)) {
+  if (check_is_dataset(x = df, error = FALSE)) {
 
     if (out_df == "tibble") {
 
@@ -90,7 +90,7 @@ read_npx_format_colnames <- function(df,
                                      file) {
 
   # check input ----
-  check_is_dataset(df = df,
+  check_is_dataset(x = df,
                    error = TRUE)
 
   # check columns names ----

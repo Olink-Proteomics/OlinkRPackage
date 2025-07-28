@@ -89,7 +89,7 @@ check_olink_platform <- function(x,
 
   # input check ----
 
-  check_is_scalar_character(string = x,
+  check_is_scalar_character(x = x,
                             error = TRUE)
 
   # get relevant platforms ----
@@ -222,7 +222,7 @@ check_olink_broader_platform <- function(x,
 
   # input check ----
 
-  check_is_scalar_character(string = x,
+  check_is_scalar_character(x = x,
                             error = TRUE)
 
   # get relevant broader platforms ----
@@ -363,7 +363,7 @@ check_olink_data_type <- function(x,
 
   # input check ----
 
-  check_is_scalar_character(string = x,
+  check_is_scalar_character(x = x,
                             error = TRUE)
 
   # get relevant data types ----
@@ -498,7 +498,7 @@ check_olink_quant_type <- function(x,
                                    data_type = NULL) {
   # input check ----
 
-  check_is_scalar_character(string = x,
+  check_is_scalar_character(x = x,
                             error = TRUE)
 
   # get relevant data types ----

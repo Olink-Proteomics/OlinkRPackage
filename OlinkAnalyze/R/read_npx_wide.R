@@ -29,7 +29,7 @@ read_npx_wide <- function(df,
 
   # initial checks ----
 
-  check_is_tibble(df = df,
+  check_is_tibble(x = df,
                   error = TRUE)
 
   check_file_exists(file = file,
@@ -223,20 +223,6 @@ read_npx_wide_split_row <- function(df,
                                     data_type,
                                     format_spec) {
 
-  # initial checks ----
-
-  check_is_tibble(df = df,
-                  error = TRUE)
-
-  check_file_exists(file = file,
-                    error = TRUE)
-
-  check_olink_data_type(x = data_type,
-                        broad_platform = "qPCR")
-
-  check_is_tibble(df = format_spec,
-                  error = TRUE)
-
   # help function to fill NA ----
 
   # we are not using tidyr::fill because it still depends on dplyr::mutate_at
@@ -396,11 +382,6 @@ read_npx_wide_split_row <- function(df,
 #'
 read_npx_wide_npxs_version <- function(df) {
 
-  # check input ----
-
-  check_is_tibble(df = df,
-                  error = TRUE)
-
   # check necessary columns ----
 
   check_columns(df = df, col_list = list("V1", "V2"))
@@ -440,17 +421,6 @@ read_npx_wide_npxs_version <- function(df) {
 read_npx_wide_check_top <- function(df,
                                     file,
                                     format_spec) {
-
-  # initial checks ----
-
-  check_is_tibble(df = df,
-                  error = TRUE)
-
-  check_file_exists(file = file,
-                    error = TRUE)
-
-  check_is_tibble(df = format_spec,
-                  error = TRUE)
 
   # checks ----
 
@@ -755,12 +725,6 @@ read_npx_wide_top <- function(df,
 
   # check input and top matrix ----
 
-  check_olink_platform(x = olink_platform,
-                       broad_platform = "qPCR")
-
-  check_is_tibble(df = format_spec,
-                  error = TRUE)
-
   read_npx_wide_check_top(
     df = df,
     file = file,
@@ -996,22 +960,6 @@ read_npx_wide_middle <- function(df,
                                  data_type,
                                  col_names) {
 
-  # check input ----
-
-  check_is_tibble(df = df,
-                  error = TRUE)
-
-  check_file_exists(file = file,
-                    error = TRUE)
-
-  check_olink_data_type(x = data_type,
-                        broad_platform = "qPCR")
-
-  check_is_list(lst = col_names,
-                error = TRUE)
-
-  sapply(col_names, function(x) check_is_character(string = x, error = TRUE))
-
   # check columns ----
 
   check_columns(df = df, col_list = list("V1"))
@@ -1207,11 +1155,6 @@ read_npx_wide_middle <- function(df,
 #'
 read_npx_wide_panel_version <- function(df) {
 
-  # check input ----
-
-  check_is_tibble(df = df,
-                  error = TRUE)
-
   # check columns ----
 
   check_columns(df = df,
@@ -1286,19 +1229,6 @@ red_npx_wide_top_mid_long <- function(df_top_list,
                                       df_middle_list,
                                       data_type,
                                       format_spec) {
-  # check input ----
-
-  check_is_list(lst = df_top_list)
-
-  sapply(df_top_list, check_is_tibble, error = TRUE)
-
-  check_is_list(lst = df_middle_list)
-
-  sapply(df_middle_list, check_is_tibble, error = TRUE)
-
-  check_is_tibble(df = format_spec,
-                  error = TRUE)
-
   # prepare components of long df ----
 
   ## df oid ----
@@ -1617,31 +1547,6 @@ read_npx_wide_bottom <- function(df,
                                  col_names,
                                  format_spec,
                                  df_plate_panel) {
-  # check input ----
-
-  check_is_tibble(df = df,
-                  error = TRUE)
-
-  check_file_exists(file = file,
-                    error = TRUE)
-
-  check_olink_platform(x = olink_platform,
-                       broad_platform = "qPCR")
-
-  check_olink_data_type(x = data_type,
-                        broad_platform = "qPCR")
-
-  check_is_list(lst = col_names,
-                error = TRUE)
-
-  sapply(col_names, function(x) check_is_character(string = x, error = TRUE))
-
-  check_is_tibble(df = format_spec,
-                  error = TRUE)
-
-  check_is_tibble(df = df_plate_panel,
-                  error = TRUE)
-
   # get first column options ----
 
   # clean up format_spec_bottom for downstream use

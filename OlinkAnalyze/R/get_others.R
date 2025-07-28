@@ -68,7 +68,7 @@ get_file_ext <- function(name_sub = NULL) {
 
   if (!is.null(name_sub)) {
 
-    check_is_character(string = name_sub,
+    check_is_character(x = name_sub,
                        error = TRUE)
 
     if (!all(name_sub %in% get_file_formats())) {

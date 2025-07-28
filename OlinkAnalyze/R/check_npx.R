@@ -105,7 +105,7 @@ check_npx <- function(df,
 
   # check input ----
 
-  check_is_dataset(df = df,
+  check_is_dataset(x = df,
                    error = TRUE)
 
   # check functions ----
@@ -238,11 +238,6 @@ check_npx <- function(df,
 #'
 check_npx_col_names <- function(df,
                                 preferred_names = NULL) {
-
-  # check input ----
-
-  check_is_dataset(df = df,
-                   error = TRUE)
 
   # if not NULL, preferred_names is checked in check_npx_update_col_names
   if (!is.null(preferred_names)) {
@@ -470,7 +465,7 @@ check_npx_update_col_names <- function(preferred_names) {
   # check input ----
 
   # Check if preferred_names is character
-  check_is_character(string = preferred_names,
+  check_is_character(x = preferred_names,
                      error = TRUE)
 
   # check for names not matching expected ----
@@ -797,6 +792,9 @@ check_npx_all_na_sample <- function(df, col_names) {
 #' the columns \var{col_class} and \var{col_class_check} of
 #' \var{column_name_dict}.
 #'
+#' @author
+#'  Klev Diamanti
+#'
 #' @inheritParams check_npx
 #' @inheritParams check_npx_olinkid
 #'
@@ -929,6 +927,9 @@ check_npx_col_class <- function(df, col_names) {
 }
 
 #' Help function checking data for assay QC warnings.
+#'
+#' @author
+#'  Klev Diamanti
 #'
 #' @inheritParams check_npx
 #' @inheritParams check_npx_olinkid

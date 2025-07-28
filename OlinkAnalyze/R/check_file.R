@@ -4,7 +4,7 @@
 #' Check \strong{one file at a time} if it exists.
 #'
 #' @inherit .check_params params author
-#' @inheritParams .read_npx_args
+#' @inherit .read_npx_args params
 #'
 #' @return `TRUE` if the file exists, and `FALSE` if not; error if the file does
 #' not exist and `error = TRUE`.
@@ -13,11 +13,11 @@ check_file_exists <- function(file,
                               error = FALSE) {
 
   # check if input file is character vector of length 1
-  check_is_scalar_character(string = file,
+  check_is_scalar_character(x = file,
                             error = TRUE)
 
   # check if input error is boolean vector of length 1
-  check_is_scalar_boolean(bool = error,
+  check_is_scalar_boolean(x = error,
                           error = TRUE)
 
   if (!file.exists(file)) {
@@ -55,7 +55,7 @@ check_file_exists <- function(file,
 #' file is acceptable. Expecting one of
 #' `r ansi_collapse_quot(get_file_ext_summary())`.
 #'
-#' @inherit check_file_exists params author
+#' @inherit .read_npx_args params
 #'
 #' @return The type of the file extension based on the global variable
 #' \var{accepted_npx_file_ext}.
@@ -64,7 +64,7 @@ check_file_extension <- function(file) {
 
   # check input ----
 
-  check_is_scalar_character(string = file,
+  check_is_scalar_character(x = file,
                             error = TRUE)
 
   # get file extension ----

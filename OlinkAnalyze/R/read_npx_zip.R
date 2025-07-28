@@ -62,7 +62,7 @@ read_npx_zip <- function(file,
   check_out_df_arg(out_df = out_df)
 
   # check that .ignore_files is a character vector
-  check_is_character(string = .ignore_files,
+  check_is_character(x = .ignore_files,
                      error = TRUE)
 
   # **** Prep ****
@@ -204,7 +204,7 @@ read_npx_zip <- function(file,
 get_checksum_file <- function(files) {
 
   # check that the input is a character vector
-  check_is_character(string = files,
+  check_is_character(x = files,
                      error = TRUE)
 
   # if none of the files matches the accepted file names
@@ -261,7 +261,7 @@ get_npx_file <- function(files,
                          excl_file_ext = c("zip")) {
 
   # check that the input is a character vector
-  check_is_character(string = files,
+  check_is_character(x = files,
                      error = TRUE)
 
   # remove (if any) checksum files
@@ -350,9 +350,9 @@ check_checksum <- function(checksum_file,
                            npx_file) {
 
   # check if input is character vectors of length 1
-  check_is_scalar_character(string = checksum_file,
+  check_is_scalar_character(x = checksum_file,
                             error = TRUE)
-  check_is_scalar_character(string = npx_file,
+  check_is_scalar_character(x = npx_file,
                             error = TRUE)
 
   # make the checksum filename easier to parse

@@ -71,10 +71,10 @@ check_columns <- function(df,
 
   # Check input ----
 
-  check_is_dataset(df = df,
+  check_is_dataset(x = df,
                    error = TRUE)
 
-  check_is_list(lst = col_list,
+  check_is_list(x = col_list,
                 error = TRUE)
 
   # check that each element of the  col_list is a character vector

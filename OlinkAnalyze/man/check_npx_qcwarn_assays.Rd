@@ -20,3 +20,6 @@ one QC warning, otherwise a \emph{character(0)}.
 \description{
 Help function checking data for assay QC warnings.
 }
+\author{
+Klev Diamanti
+}

@@ -4,14 +4,34 @@
 \alias{.check_params}
 \title{Common parameters for check functions.}
 \usage{
-.check_params(error)
+.check_params(x, error)
 }
 \arguments{
+\item{x}{Variable to check.}
+
 \item{error}{Scalar boolean to return an error instead of a \code{FALSE}
 (\code{default = FALSE}).}
 }
+\value{
+Boolean, \code{TRUE} or \code{FALSE}, if the variable is of the correct class;
+If output is \code{FALSE} and \var{error} = \code{TRUE}, an error is thrown.
+}
 \description{
 Common parameters for check functions.
+}
+\seealso{
+\code{\link{check_is_character}}
+\code{\link{check_is_integer}}
+\code{\link{check_is_numeric}}
+\code{\link{check_is_boolean}}
+\code{\link{check_is_scalar_character}}
+\code{\link{check_is_scalar_integer}}
+\code{\link{check_is_scalar_numeric}}
+\code{\link{check_is_scalar_boolean}}
+\code{\link{check_is_tibble}}
+\code{\link{check_is_dataset}}
+\code{\link{check_is_arrow_object}}
+\code{\link{check_is_list}}
 }
 \author{
 Klev Diamanti

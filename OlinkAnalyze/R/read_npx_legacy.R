@@ -32,7 +32,7 @@ read_npx_legacy_help <- function(file,
                                  data_type_no_accept = c("Ct")) {
   # check input ----
 
-  check_is_character(string = data_type_no_accept,
+  check_is_character(x = data_type_no_accept,
                      error = TRUE)
 
   # check that file can be processed ----
@@ -202,7 +202,7 @@ read_npx_legacy_check <- function(file,
                                   bottom_mat_v) {
   # check input ----
 
-  check_is_dataset(df = df_top,
+  check_is_dataset(x = df_top,
                    error = TRUE)
 
   check_olink_data_type(x = data_type,
@@ -412,7 +412,7 @@ read_npx_legacy <- function(file,
 
   # check input ----
 
-  check_is_scalar_boolean(bool = quiet,
+  check_is_scalar_boolean(x = quiet,
                           error = TRUE)
 
   # the remaining variables are checked in read_npx_legacy_help

@@ -11,7 +11,7 @@ remove_all_na_cols <- function(df) {
 
   # input check ----
 
-  check_is_dataset(df = df,
+  check_is_dataset(x = df,
                    error = TRUE)
 
   # identify all NA cols ----
@@ -59,10 +59,28 @@ ansi_collapse_quot <- function(x,
 #' @author
 #'   Klev Diamanti
 #'
+#' @param x Variable to check.
 #' @param error Scalar boolean to return an error instead of a `FALSE`
 #' (`default = FALSE`).
 #'
-.check_params <- function(error) {}
+#' @return Boolean, `TRUE` or `FALSE`, if the variable is of the correct class;
+#' If output is `FALSE` and \var{error} = `TRUE`, an error is thrown.
+#'
+#' @seealso
+#'   \code{\link{check_is_character}}
+#'   \code{\link{check_is_integer}}
+#'   \code{\link{check_is_numeric}}
+#'   \code{\link{check_is_boolean}}
+#'   \code{\link{check_is_scalar_character}}
+#'   \code{\link{check_is_scalar_integer}}
+#'   \code{\link{check_is_scalar_numeric}}
+#'   \code{\link{check_is_scalar_boolean}}
+#'   \code{\link{check_is_tibble}}
+#'   \code{\link{check_is_dataset}}
+#'   \code{\link{check_is_arrow_object}}
+#'   \code{\link{check_is_list}}
+#'
+.check_params <- function(x, error) {}
 
 #' Common parameters for read_npx-related functions.
 #'
