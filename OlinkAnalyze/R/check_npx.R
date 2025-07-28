@@ -849,8 +849,7 @@ check_npx_col_class <- function(df, col_names) {
     ) |>
     dplyr::collect() |>
     lapply(
-      check_is_numeric,
-      error = FALSE
+      is.numeric
     ) |>
     as.matrix()
   col_class_character <- df |>
@@ -859,8 +858,7 @@ check_npx_col_class <- function(df, col_names) {
     ) |>
     dplyr::collect() |>
     lapply(
-      check_is_character,
-      error = FALSE
+      is.character
     ) |>
     as.matrix()
 
