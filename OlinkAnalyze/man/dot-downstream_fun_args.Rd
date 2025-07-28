@@ -4,11 +4,14 @@
 \alias{.downstream_fun_args}
 \title{Common parameters for downstream anaysis functions.}
 \usage{
-.downstream_fun_args(df)
+.downstream_fun_args(df, check_log)
 }
 \arguments{
 \item{df}{A "tibble" or "ArrowObject"
 from \code{\link{read_npx}}.}
+
+\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
 }
 \description{
 Common parameters for downstream anaysis functions.

@@ -106,7 +106,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_assay_na(df = df,
-                                check_npx_log = log,
+                                check_log = log,
                                 remove_assay_na = TRUE,
                                 verbose = FALSE),
         expected = expected_result
@@ -119,7 +119,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_assay_na(df = df,
-                                check_npx_log = log,
+                                check_log = log,
                                 remove_assay_na = TRUE,
                                 verbose = TRUE),
         expected = expected_result
@@ -143,7 +143,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_assay_na(df = df_arrow,
-                                check_npx_log = log,
+                                check_log = log,
                                 remove_assay_na = TRUE,
                                 verbose = FALSE) |>
           dplyr::collect(),
@@ -157,7 +157,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_assay_na(df = df_arrow,
-                                check_npx_log = log,
+                                check_log = log,
                                 remove_assay_na = TRUE,
                                 verbose = TRUE) |>
           dplyr::collect(),
@@ -184,7 +184,7 @@ test_that(
 
     expect_equal(
       object = clean_assay_na(df = expected_result,
-                              check_npx_log = log_exp,
+                              check_log = log_exp,
                               remove_assay_na = TRUE,
                               verbose = FALSE),
       expected = expected_result
@@ -195,7 +195,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_assay_na(df = expected_result,
-                                check_npx_log = log_exp,
+                                check_log = log_exp,
                                 remove_assay_na = TRUE,
                                 verbose = TRUE),
         expected = expected_result
@@ -214,7 +214,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_assay_na(df = df,
-                                check_npx_log = log,
+                                check_log = log,
                                 remove_assay_na = FALSE,
                                 verbose = TRUE),
         expected = df
@@ -227,7 +227,7 @@ test_that(
 
     expect_equal(
       object = clean_assay_na(df = df,
-                              check_npx_log = log,
+                              check_log = log,
                               remove_assay_na = FALSE,
                               verbose = FALSE),
       expected = df
@@ -244,7 +244,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_assay_na(df = df_arrow,
-                                check_npx_log = log,
+                                check_log = log,
                                 remove_assay_na = FALSE,
                                 verbose = TRUE),
         expected = df_arrow
@@ -257,7 +257,7 @@ test_that(
 
     expect_equal(
       object = clean_assay_na(df = df_arrow,
-                              check_npx_log = log,
+                              check_log = log,
                               remove_assay_na = FALSE,
                               verbose = FALSE),
       expected = df_arrow
@@ -280,7 +280,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_invalid_oid(df = df,
-                                   check_npx_log = log,
+                                   check_log = log,
                                    remove_invalid_oid = TRUE,
                                    verbose = FALSE),
         expected = expected_result
@@ -293,7 +293,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_invalid_oid(df = df,
-                                   check_npx_log = log,
+                                   check_log = log,
                                    remove_invalid_oid = TRUE,
                                    verbose = TRUE),
         expected = expected_result
@@ -317,7 +317,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_invalid_oid(df = df_arrow,
-                                   check_npx_log = log,
+                                   check_log = log,
                                    remove_invalid_oid = TRUE,
                                    verbose = FALSE) |>
           dplyr::collect(),
@@ -331,7 +331,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_invalid_oid(df = df_arrow,
-                                   check_npx_log = log,
+                                   check_log = log,
                                    remove_invalid_oid = TRUE,
                                    verbose = TRUE) |>
           dplyr::collect(),
@@ -358,7 +358,7 @@ test_that(
 
     expect_equal(
       object = clean_invalid_oid(df = expected_result,
-                                 check_npx_log = log_exp,
+                                 check_log = log_exp,
                                  remove_invalid_oid = TRUE,
                                  verbose = FALSE),
       expected = expected_result
@@ -369,7 +369,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_invalid_oid(df = expected_result,
-                                   check_npx_log = log_exp,
+                                   check_log = log_exp,
                                    remove_invalid_oid = TRUE,
                                    verbose = TRUE),
         expected = expected_result
@@ -388,7 +388,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_invalid_oid(df = df,
-                                   check_npx_log = log,
+                                   check_log = log,
                                    remove_invalid_oid = FALSE,
                                    verbose = TRUE),
         expected = df
@@ -401,7 +401,7 @@ test_that(
 
     expect_equal(
       object = clean_invalid_oid(df = df,
-                                 check_npx_log = log,
+                                 check_log = log,
                                  remove_invalid_oid = FALSE,
                                  verbose = FALSE),
       expected = df
@@ -418,7 +418,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_invalid_oid(df = df_arrow,
-                                   check_npx_log = log,
+                                   check_log = log,
                                    remove_invalid_oid = FALSE,
                                    verbose = TRUE),
         expected = df_arrow
@@ -431,7 +431,7 @@ test_that(
 
     expect_equal(
       object = clean_invalid_oid(df = df_arrow,
-                                 check_npx_log = log,
+                                 check_log = log,
                                  remove_invalid_oid = FALSE,
                                  verbose = FALSE),
       expected = df_arrow
@@ -454,7 +454,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_duplicate_sample_id(df = df,
-                                           check_npx_log = log,
+                                           check_log = log,
                                            remove_dup_sample_id = TRUE,
                                            verbose = FALSE),
         expected = expected_result
@@ -468,7 +468,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_duplicate_sample_id(df = df,
-                                           check_npx_log = log,
+                                           check_log = log,
                                            remove_dup_sample_id = TRUE,
                                            verbose = TRUE),
         expected = expected_result
@@ -493,7 +493,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_duplicate_sample_id(df = df_arrow,
-                                           check_npx_log = log,
+                                           check_log = log,
                                            remove_dup_sample_id = TRUE,
                                            verbose = FALSE) |>
           dplyr::collect(),
@@ -508,7 +508,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_duplicate_sample_id(df = df_arrow,
-                                           check_npx_log = log,
+                                           check_log = log,
                                            remove_dup_sample_id = TRUE,
                                            verbose = TRUE) |>
           dplyr::collect(),
@@ -536,7 +536,7 @@ test_that(
 
     expect_equal(
       object = clean_duplicate_sample_id(df = expected_result,
-                                         check_npx_log = log_exp,
+                                         check_log = log_exp,
                                          remove_dup_sample_id = TRUE,
                                          verbose = FALSE),
       expected = expected_result
@@ -547,7 +547,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_duplicate_sample_id(df = expected_result,
-                                           check_npx_log = log_exp,
+                                           check_log = log_exp,
                                            remove_dup_sample_id = TRUE,
                                            verbose = TRUE),
         expected = expected_result
@@ -565,7 +565,7 @@ test_that(
 
     expect_equal(
       object = clean_duplicate_sample_id(df = df,
-                                         check_npx_log = log,
+                                         check_log = log,
                                          remove_dup_sample_id = FALSE,
                                          verbose = FALSE),
       expected = df
@@ -576,7 +576,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_duplicate_sample_id(df = df,
-                                           check_npx_log = log,
+                                           check_log = log,
                                            remove_dup_sample_id = FALSE,
                                            verbose = TRUE),
         expected = df
@@ -595,7 +595,7 @@ test_that(
 
     expect_equal(
       object = clean_duplicate_sample_id(df = df_arrow,
-                                         check_npx_log = log,
+                                         check_log = log,
                                          remove_dup_sample_id = FALSE,
                                          verbose = FALSE),
       expected = df_arrow
@@ -606,7 +606,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_duplicate_sample_id(df = df_arrow,
-                                           check_npx_log = log,
+                                           check_log = log,
                                            remove_dup_sample_id = FALSE,
                                            verbose = TRUE),
         expected = df_arrow
@@ -632,7 +632,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_sample_type(df = df,
-                                   check_npx_log = log,
+                                   check_log = log,
                                    remove_control_sample = TRUE,
                                    verbose = FALSE),
         expected = expected_result
@@ -645,7 +645,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_sample_type(df = df,
-                                   check_npx_log = log,
+                                   check_log = log,
                                    remove_control_sample = TRUE,
                                    verbose = TRUE),
         expected = expected_result
@@ -669,7 +669,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_sample_type(df = df_arrow,
-                                   check_npx_log = log,
+                                   check_log = log,
                                    remove_control_sample = TRUE,
                                    verbose = FALSE) |>
           dplyr::collect(),
@@ -683,7 +683,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_sample_type(df = df_arrow,
-                                   check_npx_log = log,
+                                   check_log = log,
                                    remove_control_sample = TRUE,
                                    verbose = TRUE) |>
           dplyr::collect(),
@@ -701,7 +701,7 @@ test_that(
 
     expect_equal(
       object = clean_sample_type(df = df,
-                                 check_npx_log = log,
+                                 check_log = log,
                                  remove_control_sample = FALSE,
                                  verbose = FALSE),
       expected = df
@@ -712,7 +712,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_sample_type(df = df,
-                                   check_npx_log = log,
+                                   check_log = log,
                                    remove_control_sample = FALSE,
                                    verbose = TRUE),
         expected = df
@@ -736,7 +736,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_sample_type(df = df,
-                                   check_npx_log = log,
+                                   check_log = log,
                                    remove_control_sample = c("pc"),
                                    verbose = FALSE),
         expected = expected_result
@@ -754,7 +754,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_sample_type(df = df,
-                                   check_npx_log = log,
+                                   check_log = log,
                                    remove_control_sample = c("sc", "pc", "nc"),
                                    verbose = FALSE),
         expected = expected_result
@@ -772,7 +772,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_sample_type(df = df,
-                                   check_npx_log = log,
+                                   check_log = log,
                                    remove_control_sample = c("sample"),
                                    verbose = FALSE),
         expected = expected_result
@@ -794,7 +794,7 @@ test_that(
       object = expect_message(
         object = expect_equal(
           object = clean_sample_type(df = df,
-                                     check_npx_log = log,
+                                     check_log = log,
                                      remove_control_sample = c("pc", "pc2"),
                                      verbose = FALSE),
           expected = expected_result
@@ -813,7 +813,7 @@ test_that(
   {
     expect_error(
       object = clean_sample_type(df = df,
-                                 check_npx_log = log,
+                                 check_log = log,
                                  remove_control_sample = c("pc2"),
                                  verbose = FALSE),
       regexp = paste("No overlap of value from `remove_control_sample` to",
@@ -837,7 +837,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_sample_type(df = test_df,
-                                   check_npx_log = log_test,
+                                   check_log = log_test,
                                    remove_control_sample = TRUE),
         expected = test_df
       ),
@@ -861,7 +861,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_assay_type(df = df,
-                                  check_npx_log = log,
+                                  check_log = log,
                                   remove_control_assay = TRUE,
                                   verbose = FALSE),
         expected = expected_result
@@ -874,7 +874,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_assay_type(df = df,
-                                  check_npx_log = log,
+                                  check_log = log,
                                   remove_control_assay = TRUE,
                                   verbose = TRUE),
         expected = expected_result
@@ -898,7 +898,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_assay_type(df = df,
-                                  check_npx_log = log,
+                                  check_log = log,
                                   remove_control_assay = TRUE,
                                   verbose = FALSE) |>
           dplyr::collect(),
@@ -912,7 +912,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_assay_type(df = df,
-                                  check_npx_log = log,
+                                  check_log = log,
                                   remove_control_assay = TRUE,
                                   verbose = TRUE) |>
           dplyr::collect(),
@@ -930,7 +930,7 @@ test_that(
 
     expect_equal(
       object = clean_assay_type(df = df,
-                                check_npx_log = log,
+                                check_log = log,
                                 remove_control_assay = FALSE,
                                 verbose = FALSE),
       expected = df
@@ -941,7 +941,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_assay_type(df = df,
-                                  check_npx_log = log,
+                                  check_log = log,
                                   remove_control_assay = FALSE,
                                   verbose = TRUE),
         expected = df
@@ -965,7 +965,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_assay_type(df = df,
-                                  check_npx_log = log,
+                                  check_log = log,
                                   remove_control_assay = c("ext"),
                                   verbose = FALSE),
         expected = expected_result
@@ -983,7 +983,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_assay_type(df = df,
-                                  check_npx_log = log,
+                                  check_log = log,
                                   remove_control_assay = c("ext", "inc",
                                                            "amp", "det"),
                                   verbose = FALSE),
@@ -1002,7 +1002,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_assay_type(df = df,
-                                  check_npx_log = log,
+                                  check_log = log,
                                   remove_control_assay = c("assay"),
                                   verbose = FALSE),
         expected = expected_result
@@ -1023,7 +1023,7 @@ test_that(
       object = expect_message(
         object = expect_equal(
           object = clean_assay_type(df = df,
-                                    check_npx_log = log,
+                                    check_log = log,
                                     remove_control_assay = c("ext", "ext2"),
                                     verbose = FALSE),
           expected = expected_result
@@ -1042,7 +1042,7 @@ test_that(
   {
     expect_error(
       object = clean_assay_type(df = df,
-                                check_npx_log = log,
+                                check_log = log,
                                 remove_control_assay = c("ext2"),
                                 verbose = FALSE),
       regexp = paste("No overlap of value from `remove_control_assay` to",
@@ -1066,7 +1066,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_assay_type(df = test_df,
-                                  check_npx_log = log_test,
+                                  check_log = log_test,
                                   remove_control_assay = TRUE),
         expected = test_df
       ),
@@ -1090,7 +1090,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_qc_warning(df = df,
-                                  check_npx_log = log,
+                                  check_log = log,
                                   remove_qc_warning = TRUE,
                                   verbose = FALSE),
         expected = expected_result
@@ -1104,7 +1104,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_qc_warning(df = df,
-                                  check_npx_log = log,
+                                  check_log = log,
                                   remove_qc_warning = TRUE,
                                   verbose = TRUE),
         expected = expected_result
@@ -1129,7 +1129,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_qc_warning(df = df_arrow,
-                                  check_npx_log = log,
+                                  check_log = log,
                                   remove_qc_warning = TRUE,
                                   verbose = FALSE) |>
           dplyr::collect(),
@@ -1144,7 +1144,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_qc_warning(df = df_arrow,
-                                  check_npx_log = log,
+                                  check_log = log,
                                   remove_qc_warning = TRUE,
                                   verbose = TRUE) |>
           dplyr::collect(),
@@ -1190,7 +1190,7 @@ test_that(
                 "Normalization" = "Intensity"
               )
             ),
-          check_npx_log = log,
+          check_log = log,
           remove_qc_warning = TRUE,
           verbose = FALSE
         ),
@@ -1226,7 +1226,7 @@ test_that(
                 "Normalization" = "Intensity"
               )
             ),
-          check_npx_log = log,
+          check_log = log,
           remove_qc_warning = TRUE,
           verbose = FALSE
         ),
@@ -1250,7 +1250,7 @@ test_that(
 
     expect_equal(
       object = clean_qc_warning(df = expected_result,
-                                check_npx_log = log,
+                                check_log = log,
                                 remove_qc_warning = TRUE,
                                 verbose = FALSE),
       expected = expected_result
@@ -1261,7 +1261,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_qc_warning(df = expected_result,
-                                  check_npx_log = log,
+                                  check_log = log,
                                   remove_qc_warning = TRUE,
                                   verbose = TRUE),
         expected = expected_result
@@ -1279,7 +1279,7 @@ test_that(
 
     expect_equal(
       object = clean_qc_warning(df = df,
-                                check_npx_log = log,
+                                check_log = log,
                                 remove_qc_warning = FALSE,
                                 verbose = FALSE),
       expected = df
@@ -1291,7 +1291,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_qc_warning(df = df,
-                                  check_npx_log = log,
+                                  check_log = log,
                                   remove_qc_warning = FALSE,
                                   verbose = TRUE),
         expected = df
@@ -1310,7 +1310,7 @@ test_that(
 
     expect_equal(
       object = clean_qc_warning(df = df_arrow,
-                                check_npx_log = log,
+                                check_log = log,
                                 remove_qc_warning = FALSE,
                                 verbose = FALSE),
       expected = df_arrow
@@ -1322,7 +1322,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_qc_warning(df = df_arrow,
-                                  check_npx_log = log,
+                                  check_log = log,
                                   remove_qc_warning = FALSE,
                                   verbose = TRUE),
         expected = df_arrow
@@ -1348,7 +1348,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_assay_warning(df = df,
-                                     check_npx_log = log,
+                                     check_log = log,
                                      remove_assay_warning = TRUE,
                                      verbose = FALSE),
         expected = expected_result
@@ -1362,7 +1362,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_assay_warning(df = df,
-                                     check_npx_log = log,
+                                     check_log = log,
                                      remove_assay_warning = TRUE,
                                      verbose = TRUE),
         expected = expected_result
@@ -1387,7 +1387,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_assay_warning(df = df_arrow,
-                                     check_npx_log = log,
+                                     check_log = log,
                                      remove_assay_warning = TRUE,
                                      verbose = FALSE) |>
           dplyr::collect(),
@@ -1402,7 +1402,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_assay_warning(df = df_arrow,
-                                     check_npx_log = log,
+                                     check_log = log,
                                      remove_assay_warning = TRUE,
                                      verbose = TRUE) |>
           dplyr::collect(),
@@ -1448,7 +1448,7 @@ test_that(
                 "Normalization" = "Intensity"
               )
             ),
-          check_npx_log = log,
+          check_log = log,
           remove_assay_warning = TRUE,
           verbose = FALSE
         ),
@@ -1484,7 +1484,7 @@ test_that(
                 "Normalization" = "Intensity"
               )
             ),
-          check_npx_log = log,
+          check_log = log,
           remove_assay_warning = TRUE,
           verbose = TRUE
         ),
@@ -1512,7 +1512,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_assay_warning(df = test_df,
-                                     check_npx_log = log_test,
+                                     check_log = log_test,
                                      remove_assay_warning = TRUE),
         expected = test_df
       ),
@@ -1533,7 +1533,7 @@ test_that(
 
     expect_equal(
       object = clean_assay_warning(df = expected_result,
-                                   check_npx_log = log,
+                                   check_log = log,
                                    remove_assay_warning = TRUE,
                                    verbose = FALSE),
       expected = expected_result
@@ -1544,7 +1544,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_assay_warning(df = expected_result,
-                                     check_npx_log = log,
+                                     check_log = log,
                                      remove_assay_warning = TRUE,
                                      verbose = TRUE),
         expected = expected_result
@@ -1562,7 +1562,7 @@ test_that(
 
     expect_equal(
       object = clean_assay_warning(df = df,
-                                   check_npx_log = log,
+                                   check_log = log,
                                    remove_assay_warning = FALSE,
                                    verbose = FALSE),
       expected = df
@@ -1574,7 +1574,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_assay_warning(df = df,
-                                     check_npx_log = log,
+                                     check_log = log,
                                      remove_assay_warning = FALSE,
                                      verbose = TRUE),
         expected = df
@@ -1593,7 +1593,7 @@ test_that(
 
     expect_equal(
       object = clean_assay_warning(df = df_arrow,
-                                   check_npx_log = log,
+                                   check_log = log,
                                    remove_assay_warning = FALSE,
                                    verbose = FALSE),
       expected = df_arrow
@@ -1605,7 +1605,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_assay_warning(df = df_arrow,
-                                     check_npx_log = log,
+                                     check_log = log,
                                      remove_assay_warning = FALSE,
                                      verbose = TRUE),
         expected = df_arrow
@@ -1631,7 +1631,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_control_sample_id(df = df,
-                                         check_npx_log = log,
+                                         check_log = log,
                                          control_sample_ids = c("ControlID"),
                                          verbose = FALSE),
         expected = expected_result
@@ -1644,7 +1644,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_control_sample_id(df = df,
-                                         check_npx_log = log,
+                                         check_log = log,
                                          control_sample_ids = c("ControlID"),
                                          verbose = TRUE),
         expected = expected_result
@@ -1668,7 +1668,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_control_sample_id(df = df_arrow,
-                                         check_npx_log = log,
+                                         check_log = log,
                                          control_sample_ids = c("ControlID"),
                                          verbose = FALSE) |>
           dplyr::collect(),
@@ -1682,7 +1682,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_control_sample_id(df = df_arrow,
-                                         check_npx_log = log,
+                                         check_log = log,
                                          control_sample_ids = c("ControlID"),
                                          verbose = TRUE) |>
           dplyr::collect(),
@@ -1700,7 +1700,7 @@ test_that(
 
     expect_equal(
       object = clean_control_sample_id(df = df,
-                                       check_npx_log = log,
+                                       check_log = log,
                                        control_sample_ids = NULL,
                                        verbose = FALSE),
       expected = df
@@ -1711,7 +1711,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_control_sample_id(df = df,
-                                         check_npx_log = log,
+                                         check_log = log,
                                          control_sample_ids = NULL,
                                          verbose = TRUE),
         expected = df
@@ -1736,7 +1736,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_control_sample_id(df = df,
-                                         check_npx_log = log,
+                                         check_log = log,
                                          control_sample_ids = c("ControlID_22"),
                                          verbose = FALSE),
         expected = df
@@ -1750,7 +1750,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_control_sample_id(df = df,
-                                         check_npx_log = log,
+                                         check_log = log,
                                          control_sample_ids = c("ControlID",
                                                                 "ControlID_22"),
                                          verbose = FALSE),
@@ -1781,7 +1781,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_col_class(df = test_df,
-                                 check_npx_log = log_test,
+                                 check_log = log_test,
                                  convert_df_cols = TRUE,
                                  verbose = FALSE),
         expected = OlinkAnalyze::npx_data1
@@ -1814,7 +1814,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_col_class(df = test_df,
-                                 check_npx_log = log_test,
+                                 check_log = log_test,
                                  convert_df_cols = TRUE,
                                  verbose = FALSE),
         expected = OlinkAnalyze::npx_data1
@@ -1842,7 +1842,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_col_class(df = test_df,
-                                 check_npx_log = log_test,
+                                 check_log = log_test,
                                  convert_df_cols = TRUE,
                                  verbose = FALSE) |>
           dplyr::collect(),
@@ -1877,7 +1877,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_col_class(df = test_df,
-                                 check_npx_log = log_test,
+                                 check_log = log_test,
                                  convert_df_cols = TRUE,
                                  verbose = FALSE) |>
           dplyr::collect(),
@@ -1896,7 +1896,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_col_class(df = df,
-                                 check_npx_log = log,
+                                 check_log = log,
                                  convert_df_cols = FALSE,
                                  verbose = TRUE),
         expected = df
@@ -1909,7 +1909,7 @@ test_that(
 
     expect_equal(
       object = clean_col_class(df = df,
-                               check_npx_log = log,
+                               check_log = log,
                                convert_df_cols = FALSE,
                                verbose = FALSE),
       expected = df
@@ -1930,7 +1930,7 @@ test_that(
 
     expect_equal(
       object = clean_col_class(df = test_df,
-                               check_npx_log = log_test,
+                               check_log = log_test,
                                convert_df_cols = TRUE,
                                verbose = FALSE),
       expected = OlinkAnalyze::npx_data1
@@ -1941,7 +1941,7 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_col_class(df = test_df,
-                                 check_npx_log = log_test,
+                                 check_log = log_test,
                                  convert_df_cols = TRUE,
                                  verbose = TRUE),
         expected = OlinkAnalyze::npx_data1
