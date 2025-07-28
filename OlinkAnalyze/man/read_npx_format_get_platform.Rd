@@ -10,12 +10,12 @@ read_npx_format_get_platform(df_top_n, file, olink_platform = NULL)
 \item{df_top_n}{A tibble containing the first \var{read_n} rows of the input
 dataset.}
 
-\item{file}{Path to Olink software output file in wide format. Expecting file
-extensions
+\item{file}{Path to Olink software output file in wide format. Expected one
+of file extensions
 "xls", "xlsx", "csv", or "txt".}
 
-\item{olink_platform}{Olink platform used to generate the input file. One of
-\code{NULL} (default) for auto-detection,
+\item{olink_platform}{Olink platform used to generate the input file.
+One of \code{NULL} (default) for auto-detection,
 "Flex", "Focus", "Target 48", or "Target 96".}
 }
 \value{

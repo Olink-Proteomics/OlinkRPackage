@@ -388,13 +388,8 @@ read_npx_legacy_check <- function(file,
 #'   Olof Mansson;
 #'   Marianne Sandin
 #'
-#' @inherit read_npx params return
-#' @param olink_platform Olink platform used to generate the input file. One of
-#' `NULL` (default) for auto-detection,
-#' `r ansi_collapse_quot(get_olink_platforms(broad_platform = "qPCR"), "or")`.
-#' @param file Path to Olink software output file in wide format. Expected one
-#' of file extensions
-#' `r ansi_collapse_quot(x = get_file_ext(name_sub = c("excel", "delim")))`.
+#' @inherit read_npx_wide params return
+#' @inherit read_npx params
 #'
 #' @seealso
 #'   \code{\link{read_npx_format_read}}

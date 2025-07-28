@@ -567,13 +567,8 @@ read_npx_format_get_format <- function(df_top_n,
 #' @author
 #'   Klev Diamanti
 #'
+#' @inheritParams read_npx_wide
 #' @inheritParams read_npx_format_get_format
-#' @param file Path to Olink software output file in wide format. Expecting file
-#' extensions
-#' `r  ansi_collapse_quot(get_file_ext(name_sub = c("excel", "delim")), "or")`.
-#' @param olink_platform Olink platform used to generate the input file. One of
-#' `NULL` (default) for auto-detection,
-#' `r ansi_collapse_quot(get_olink_platforms(broad_platform = "qPCR"), "or")`.
 #'
 #' @return The name of the Olink platform. One of
 #' `r ansi_collapse_quot(get_olink_platforms(broad_platform = "qPCR"), "or")`.
@@ -749,10 +744,7 @@ read_npx_format_get_platform <- function(df_top_n,
 #' @author
 #'   Klev Diamanti
 #'
-#' @inheritParams read_npx_format_get_platform
-#' @param data_type Quantification method of the input data. One of
-#' `r ansi_collapse_quot(get_olink_data_types(), "or")`. Defaults to `NULL` for
-#' auto-detection.
+#' @inheritParams read_npx_wide
 #' @param data_cells A character vector with the contents of the cell \emph{A2}
 #' from the Olink software file in wide format indicating the quantification
 #' method.

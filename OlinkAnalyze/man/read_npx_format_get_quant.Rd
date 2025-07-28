@@ -8,8 +8,8 @@ wide format.}
 read_npx_format_get_quant(file, data_type = NULL, data_cells)
 }
 \arguments{
-\item{file}{Path to Olink software output file in wide format. Expecting file
-extensions
+\item{file}{Path to Olink software output file in wide format. Expected one
+of file extensions
 "xls", "xlsx", "csv", or "txt".}
 
 \item{data_type}{Quantification method of the input data. One of

@@ -16,14 +16,14 @@ read_npx_legacy_help(
 \arguments{
 \item{file}{Path to Olink software output file in wide format. Expected one
 of file extensions
-"xls", "xlsx", "csv", and "txt".}
+"xls", "xlsx", "csv", or "txt".}
 
 \item{out_df}{The class of the output dataset. One of
 "tibble" or "arrow". (default =
 "tibble")}
 
-\item{olink_platform}{Olink platform used to generate the input file. One of
-\code{NULL} (default) for auto-detection,
+\item{olink_platform}{Olink platform used to generate the input file.
+One of \code{NULL} (default) for auto-detection,
 "Flex", "Focus", "Target 48", or "Target 96".}
 
 \item{data_type}{Quantification method of the input data. One of
