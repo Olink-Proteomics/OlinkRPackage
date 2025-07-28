@@ -2,14 +2,15 @@
 % Please edit documentation in R/read_npx_delim.R
 \name{get_field_separator}
 \alias{get_field_separator}
-\title{Help function to get the separator of a delimited file from Olink software.}
+\title{Help function to get the separator of a delimited file exported from Olink
+software.}
 \usage{
 get_field_separator(file)
 }
 \arguments{
-\item{file}{Path to Olink software output delimited file in wide format.
-Expecting file extensions
-"csv" and "txt".}
+\item{file}{Path to Olink software output delimited file in wide or long
+format. Expecting file extensions
+"csv" or "txt".}
 }
 \value{
 The file delimiter

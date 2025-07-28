@@ -13,14 +13,16 @@ read_npx_csv(file, out_df = "arrow")
 \arguments{
 \item{file}{Path to Olink software output delimited file in wide or long
 format. Expecting file extensions
-"csv" and "txt".}
+"csv" or "txt".}
 
-\item{out_df}{The class of output data frame. One of
-"tibble" and "arrow".}
+\item{out_df}{The class of the output dataset. One of
+"tibble" or "arrow". (default =
+"tibble")}
 }
 \value{
-"tibble" or "ArrowObject" with
-Olink data in long or wide format.
+Dataset,
+"tibble" or "ArrowObject", with Olink
+data in long format.
 }
 \description{
 The function can handle delimited files in long and wide format.

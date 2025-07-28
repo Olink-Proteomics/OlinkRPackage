@@ -9,14 +9,10 @@
 #'   Christoffer Cambronero;
 #'   Kathleen Nevola
 #'
+#' @inherit .read_npx_args params return
 #' @param file Path to Olink software output delimited file in wide or long
 #' format. Expecting file extensions
-#' `r get_file_ext(name_sub = "delim") |> ansi_collapse_quot()`.
-#' @param out_df The class of output data frame. One of
-#' `r ansi_collapse_quot(read_npx_df_output)`.
-#'
-#' @return `r ansi_collapse_quot(x = get_df_output_print(), sep = "or")` with
-#' Olink data in long or wide format.
+#' `r ansi_collapse_quot(x = get_file_ext(name_sub = "delim"), sep = "or")`.
 #'
 #' @seealso
 #'   \code{\link{read_npx}}
@@ -175,8 +171,10 @@ read_npx_delim <- function(file,
 read_npx_csv <- read_npx_delim
 
 #' Help function to read long format
-#' `r ansi_collapse_quot(get_olink_data_types())` data from delimited file
-#' exported from Olink software.
+#' `r ansi_collapse_quot(x = get_olink_data_types(), sep = "or")` data from
+#' delimited
+#' `r ansi_collapse_quot(x = get_file_ext(name_sub = "delim"), sep = "or")`
+#' files exported from Olink software.
 #'
 #' @description
 #' The function can handle delimited files in long format.
@@ -187,14 +185,13 @@ read_npx_csv <- read_npx_delim
 #'   Kathleen Nevola;
 #'   Ola Caster
 #'
-#' @param file Path to Olink software output delimited file in long format.
-#' Expecting file extensions
+#' @inherit read_npx_delim params
 #' @param sep Character separator of delimited input file. One of `NULL`
 #' (default) for auto-detection, or `r ansi_collapse_quot(accepted_field_sep)`.
 #' Used only for delimited output files from Olink software.
 #'
-#' @return `r ansi_collapse_quot(x = get_df_output_print(), sep = "or")` with
-#' Olink data in long format.
+#' @return Dataset, `r ansi_collapse_quot(x = "tibble")`, with Olink data in
+#' long format.
 #'
 #' @seealso
 #'   \code{\link{read_npx_delim_wide}}
@@ -223,8 +220,10 @@ read_npx_delim_long <- function(file,
 }
 
 #' Help function to read wide format
-#' `r get_file_ext(name_sub = "delim") |> ansi_collapse_quot()` data from
-#' delimited file exported from Olink software.
+#' `r ansi_collapse_quot(x = get_olink_data_types(), sep = "or")` data from
+#' delimited
+#' `r ansi_collapse_quot(x = get_file_ext(name_sub = "delim"), sep = "or")`
+#' files exported from Olink software.
 #'
 #' @description
 #' The function can handle delimited files in wide format.
@@ -232,15 +231,13 @@ read_npx_delim_long <- function(file,
 #' @author
 #'   Klev Diamanti
 #'
-#' @param file Path to Olink software output delimited file in wide format.
-#' Expecting file extensions
-#' `r get_file_ext(name_sub = "delim") |> ansi_collapse_quot()`.
+#' @inherit read_npx_delim params
 #' @param sep Character separator of delimited input file. One of `NULL`
 #' (default) for auto-detection, or `r ansi_collapse_quot(accepted_field_sep)`.
 #' Used only for delimited output files from Olink software.
 #'
-#' @return `r ansi_collapse_quot(x = get_df_output_print(), sep = "or")` with
-#' Olink data in wide format.
+#' @return Dataset, `r ansi_collapse_quot(x = "tibble")`, with Olink data in
+#' wide format.
 #'
 #' @seealso
 #'   \code{\link{read_npx_delim_long}}
@@ -298,7 +295,8 @@ read_npx_delim_wide <- function(file,
 
 }
 
-#' Help function to get the separator of a delimited file from Olink software.
+#' Help function to get the separator of a delimited file exported from Olink
+#' software.
 #'
 #' @description
 #' This function uses the first line of the provided file to determine the
@@ -310,9 +308,7 @@ read_npx_delim_wide <- function(file,
 #' @author
 #'   Klev Diamanti
 #'
-#' @param file Path to Olink software output delimited file in wide format.
-#' Expecting file extensions
-#' `r get_file_ext(name_sub = "delim") |> ansi_collapse_quot()`.
+#' @inherit read_npx_delim params
 #'
 #' @return The file delimiter
 #' `r ansi_collapse_quot(x = accepted_field_sep, sep = "or")`.
