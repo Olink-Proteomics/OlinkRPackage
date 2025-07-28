@@ -22,7 +22,7 @@ format. Expecting file extensions
 \value{
 Dataset,
 "tibble" or "ArrowObject", with Olink
-data in long format.
+data in long or wide format.
 }
 \description{
 The function can handle delimited files in long and wide format.

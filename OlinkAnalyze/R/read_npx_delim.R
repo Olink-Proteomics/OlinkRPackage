@@ -9,10 +9,14 @@
 #'   Christoffer Cambronero;
 #'   Kathleen Nevola
 #'
-#' @inherit .read_npx_args params return
+#' @inherit .read_npx_args params
 #' @param file Path to Olink software output delimited file in wide or long
 #' format. Expecting file extensions
 #' `r ansi_collapse_quot(x = get_file_ext(name_sub = "delim"), sep = "or")`.
+#'
+#' @return Dataset,
+#' `r ansi_collapse_quot(x = get_df_output_print(), sep = "or")`, with Olink
+#' data in long or wide format.
 #'
 #' @seealso
 #'   \code{\link{read_npx}}
