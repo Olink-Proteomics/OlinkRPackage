@@ -4,16 +4,7 @@
 #' @author
 #'   Klev Diamanti
 #'
-#' @param file Path to Olink software output file in wide format. Expected one
-#' of file extensions
-#' `r ansi_collapse_quot(x = get_file_ext(name_sub = c("excel", "delim")))`.
-#' @param out_df The class of the output dataset. One of
-#' `r ansi_collapse_quot(read_npx_df_output)`. (default = "tibble")
-#' @param olink_platform Olink platform used to generate the input file.
-#' One of `NULL` (default) for auto-detection,
-#' `r ansi_collapse_quot(get_olink_platforms(broad_platform = "qPCR"))`.
-#' @param data_type Quantification method of the input data. One of `NULL`
-#' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
+#' @inheritParams read_npx_legacy
 #' @param data_type_no_accept Character vector of data types that should be
 #' rejected (default = "Ct").
 #'
@@ -196,15 +187,8 @@ read_npx_legacy_help <- function(file,
 #' @author
 #'   Klev Diamanti
 #'
-#' @param file Path to Olink software output file in wide format. Expected one
-#' of file extensions
-#' `r ansi_collapse_quot(x = get_file_ext(name_sub = c("excel", "delim")))`.
+#' @inheritParams read_npx_legacy
 #' @param df_top Top matrix of Olink dataset in wide format.
-#' @param olink_platform Olink platform used to generate the input file.
-#' One of `NULL` (default) for auto-detection,
-#' `r ansi_collapse_quot(get_olink_platforms(broad_platform = "qPCR"))`.
-#' @param data_type Quantification method of the input data. One of `NULL`
-#' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
 #' @param bottom_mat_v Version of the rows in the bottom matrix of the Olink
 #' file in wide format based on the local environment variable
 #' \var{olink_wide_bottom_matrix}.
@@ -404,21 +388,13 @@ read_npx_legacy_check <- function(file,
 #'   Olof Mansson;
 #'   Marianne Sandin
 #'
+#' @inherit read_npx params return
+#' @param olink_platform Olink platform used to generate the input file. One of
+#' `NULL` (default) for auto-detection,
+#' `r ansi_collapse_quot(get_olink_platforms(broad_platform = "qPCR"), "or")`.
 #' @param file Path to Olink software output file in wide format. Expected one
 #' of file extensions
 #' `r ansi_collapse_quot(x = get_file_ext(name_sub = c("excel", "delim")))`.
-#' @param out_df The class of the output dataset. One of
-#' `r ansi_collapse_quot(read_npx_df_output)`. (default = "tibble")
-#' @param olink_platform Olink platform used to generate the input file.
-#' One of `NULL` (default) for auto-detection,
-#' `r ansi_collapse_quot(get_olink_platforms(broad_platform = "qPCR"))`.
-#' @param data_type Quantification method of the input data. One of `NULL`
-#' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
-#' @param quiet Boolean to print a confirmation message when reading the input
-#' file. Applies to excel or delimited input only. `TRUE` (default) to not print
-#' and `FALSE` to print.
-#'
-#' @return Tibble or ArrowObject with Olink data in long format.
 #'
 #' @seealso
 #'   \code{\link{read_npx_format_read}}

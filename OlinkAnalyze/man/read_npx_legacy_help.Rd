@@ -19,14 +19,16 @@ of file extensions
 "xls", "xlsx", "csv", and "txt".}
 
 \item{out_df}{The class of the output dataset. One of
-"tibble" and "arrow". (default = "tibble")}
+"tibble" or "arrow". (default =
+"tibble")}
 
-\item{olink_platform}{Olink platform used to generate the input file.
-One of \code{NULL} (default) for auto-detection,
-"Flex", "Focus", "Target 48", and "Target 96".}
+\item{olink_platform}{Olink platform used to generate the input file. One of
+\code{NULL} (default) for auto-detection,
+"Flex", "Focus", "Target 48", or "Target 96".}
 
-\item{data_type}{Quantification method of the input data. One of \code{NULL}
-(default) for auto-detection, "Ct", "NPX", and "Quantified".}
+\item{data_type}{Quantification method of the input data. One of
+"Ct", "NPX", or "Quantified". Defaults to \code{NULL} for
+auto-detection.}
 
 \item{data_type_no_accept}{Character vector of data types that should be
 rejected (default = "Ct").}
