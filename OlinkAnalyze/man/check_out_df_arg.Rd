@@ -9,8 +9,8 @@ check_out_df_arg(out_df)
 }
 \arguments{
 \item{out_df}{The class of the output dataset. One of
-"tibble" or "arrow". (default =
-"tibble")}
+"tibble" or "arrow". Defaults to
+"tibble".}
 }
 \value{
 Error if \var{out_df} is not one of

@@ -21,24 +21,24 @@ Expecting file extensions
 "xls", "xlsx", "csv", or "txt".}
 
 \item{out_df}{The class of the output dataset. One of
-"tibble" or "arrow". (default =
-"tibble")}
+"tibble" or "arrow". Defaults to
+"tibble".}
 
-\item{long_format}{Boolean marking format of input file. One of \code{NULL}
-(default) for auto-detection, or \code{TRUE} for long format and \code{FALSE} for
-wide format files.}
-
-\item{olink_platform}{Olink platform used to generate the input file.
-One of \code{NULL} (default) for auto-detection,
-or "Target 48", "Flex", "Target 96", "Explore 3072", "Explore HT", "Focus", and "Reveal".}
-
-\item{data_type}{Quantification method of the input data. One of
-"Ct", "NPX", or "Quantified". Defaults to \code{NULL} for
+\item{long_format}{Boolean marking format of input file. One of \code{TRUE} for
+long format and \code{FALSE} for wide format files. Defaults to \code{NULL} for
 auto-detection.}
 
+\item{olink_platform}{Olink platform used to generate the input file. One of
+"Target 48", "Flex", "Target 96", "Explore 3072", "Explore HT", "Focus", or "Reveal".
+Defaults to \code{NULL} for auto-detection.}
+
+\item{data_type}{Quantification method of the input data. One of
+"Ct", "NPX", or "Quantified". Defaults to
+\code{NULL} for auto-detection.}
+
 \item{quiet}{Boolean to print a confirmation message when reading the input
-file. Applies to excel or delimited input only. \code{TRUE} (default) to not print
-and \code{FALSE} to print.}
+file. Applies to excel or delimited input only. \code{TRUE} skips printing the
+message, and \code{FALSE} otherwise.}
 
 \item{legacy}{Boolean to enforce returning a list containing
 \emph{olink_platform}, \emph{data_type} and \emph{long_format} information together with the

@@ -16,8 +16,8 @@ of file extensions
 "xls", "xlsx", "csv", or "txt".}
 
 \item{data_type}{Quantification method of the input data. One of
-"Ct", "NPX", or "Quantified". Defaults to \code{NULL} for
-auto-detection.}
+"Ct", "NPX", or "Quantified". Defaults to
+\code{NULL} for auto-detection.}
 
 \item{olink_platform}{Olink platform used to generate the input file.
 One of \code{NULL} (default) for auto-detection,

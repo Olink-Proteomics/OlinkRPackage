@@ -17,9 +17,6 @@
 #'   Marianne Sandin
 #'
 #' @inherit .read_npx_args params return
-#' @param legacy Boolean to run the legacy version of the read_npx function.
-#' \strong{Important: should be used only to wide format files from Target 96 or
-#' Target 48 with NPX Software version earlier than 1.8!} (default `FALSE`).
 #'
 #' @keywords
 #'   NPX;

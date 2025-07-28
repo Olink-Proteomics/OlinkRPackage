@@ -74,23 +74,23 @@ ansi_collapse_quot <- function(x,
 #' @param file Path to Olink software output file in wide or long format.
 #' Expecting extensions `r get_file_ext_summary()`.
 #' @param out_df The class of the output dataset. One of
-#' `r ansi_collapse_quot(x = read_npx_df_output, sep = "or")`. (default =
-#' "tibble")
-#' @param long_format Boolean marking format of input file. One of `NULL`
-#' (default) for auto-detection, or `TRUE` for long format and `FALSE` for
-#' wide format files.
-#' @param olink_platform Olink platform used to generate the input file.
-#' One of `NULL` (default) for auto-detection,
-#' or `r ansi_collapse_quot(x = accepted_olink_platforms$name)`.
-#' @param data_type Quantification method of the input data. One of
-#' `r ansi_collapse_quot(get_olink_data_types(), "or")`. Defaults to `NULL` for
+#' `r ansi_collapse_quot(x = read_npx_df_output, sep = "or")`. Defaults to
+#' "tibble".
+#' @param long_format Boolean marking format of input file. One of `TRUE` for
+#' long format and `FALSE` for wide format files. Defaults to `NULL` for
 #' auto-detection.
+#' @param olink_platform Olink platform used to generate the input file. One of
+#' `r ansi_collapse_quot(x = accepted_olink_platforms$name, sep = "or")`.
+#' Defaults to `NULL` for auto-detection.
+#' @param data_type Quantification method of the input data. One of
+#' `r ansi_collapse_quot(x = get_olink_data_types(), sep = "or")`. Defaults to
+#' `NULL` for auto-detection.
 #' @param .ignore_files Character vector of files included in the zip-compressed
 #' Olink software output files that should be ignored. Used only for
 #' zip-compressed input files (default = \emph{c("README.txt")}).
 #' @param quiet Boolean to print a confirmation message when reading the input
-#' file. Applies to excel or delimited input only. `TRUE` (default) to not print
-#' and `FALSE` to print.
+#' file. Applies to excel or delimited input only. `TRUE` skips printing the
+#' message, and `FALSE` otherwise.
 #' @param legacy Boolean to run the legacy version of the read_npx function.
 #' \strong{Important: should be used only to wide format files from Target 96 or
 #' Target 48 with NPX Software version earlier than 1.8!} (default `FALSE`).

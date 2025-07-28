@@ -14,8 +14,8 @@ of file extensions
 "xls", "xlsx", "csv", or "txt".}
 
 \item{data_type}{Quantification method of the input data. One of
-"Ct", "NPX", or "Quantified". Defaults to \code{NULL} for
-auto-detection.}
+"Ct", "NPX", or "Quantified". Defaults to
+\code{NULL} for auto-detection.}
 
 \item{col_names}{Names list of character vectors containing column names from
 each chunk of columns \var{df_top} was split on in function.

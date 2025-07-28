@@ -19,8 +19,8 @@ format. Expecting file extensions
 "csv" or "txt".}
 
 \item{out_df}{The class of the output dataset. One of
-"tibble" or "arrow". (default =
-"tibble")}
+"tibble" or "arrow". Defaults to
+"tibble".}
 }
 \value{
 Dataset,

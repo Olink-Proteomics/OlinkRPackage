@@ -13,8 +13,8 @@ of file extensions
 "xls", "xlsx", "csv", or "txt".}
 
 \item{data_type}{Quantification method of the input data. One of
-"Ct", "NPX", or "Quantified". Defaults to \code{NULL} for
-auto-detection.}
+"Ct", "NPX", or "Quantified". Defaults to
+\code{NULL} for auto-detection.}
 
 \item{data_cells}{A character vector with the contents of the cell \emph{A2}
 from the Olink software file in wide format indicating the quantification

@@ -14,9 +14,9 @@ dataset.}
 Expecting file extensions
 "xls", "xlsx", "csv", or "txt".}
 
-\item{long_format}{Boolean marking format of input file. One of \code{NULL}
-(default) for auto-detection, or \code{TRUE} for long format and \code{FALSE} for
-wide format files.}
+\item{long_format}{Boolean marking format of input file. One of \code{TRUE} for
+long format and \code{FALSE} for wide format files. Defaults to \code{NULL} for
+auto-detection.}
 }
 \value{
 A list with two elements:

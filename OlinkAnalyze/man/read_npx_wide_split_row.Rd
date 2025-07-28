@@ -14,8 +14,8 @@ of file extensions
 "xls", "xlsx", "csv", or "txt".}
 
 \item{data_type}{Quantification method of the input data. One of
-"Ct", "NPX", or "Quantified". Defaults to \code{NULL} for
-auto-detection.}
+"Ct", "NPX", or "Quantified". Defaults to
+\code{NULL} for auto-detection.}
 
 \item{format_spec}{A tibble derived from \var{olink_wide_spec} in the local
 environment containing the expected format of the Olink wide file based on
