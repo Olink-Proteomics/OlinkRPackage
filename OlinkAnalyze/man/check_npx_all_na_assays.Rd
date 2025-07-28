@@ -7,9 +7,8 @@
 check_npx_all_na_assays(df, col_names)
 }
 \arguments{
-\item{df}{A tibble or an arrow object containing columns \var{OlinkID} and
-the quantification column
-"Ct", "NPX", or "Quantified".}
+\item{df}{A "tibble" or "ArrowObject"
+from \code{\link{read_npx}}.}
 
 \item{col_names}{A list of matched column names. This is the output of the
 \var{check_npx_col_names} function.}
@@ -32,6 +31,6 @@ imported but never used. To avoid that we used solutions taken from here:
 }
 }
 \author{
-Simon Forsberg;
+Simon Forsberg
 Masoumeh Sheikhi
 }
