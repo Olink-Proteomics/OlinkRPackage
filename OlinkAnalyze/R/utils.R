@@ -134,5 +134,8 @@ ansi_collapse_quot <- function(x,
 #'
 #' @param df A `r ansi_collapse_quot(x = get_df_output_print(), sep = "or")`
 #' from \code{\link{read_npx}}.
+#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
+#' [`check_npx()`] will be run internally using `df`.
 #'
-.downstream_fun_args <- function(df) {}
+.downstream_fun_args <- function(df,
+                                 check_log) {}
