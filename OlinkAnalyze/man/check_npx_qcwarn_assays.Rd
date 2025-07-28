@@ -7,8 +7,8 @@
 check_npx_qcwarn_assays(df, col_names)
 }
 \arguments{
-\item{df}{A tibble or an arrow object containing the columns \var{AssayQC}
-and \var{OlinkID}.}
+\item{df}{A "tibble" or "ArrowObject"
+from \code{\link{read_npx}}.}
 
 \item{col_names}{A list of matched column names. This is the output of the
 \var{check_npx_col_names} function.}
@@ -19,4 +19,7 @@ one QC warning, otherwise a \emph{character(0)}.
 }
 \description{
 Help function checking data for assay QC warnings.
+}
+\author{
+Klev Diamanti
 }

@@ -16,24 +16,28 @@ read_npx_legacy(
 \arguments{
 \item{file}{Path to Olink software output file in wide format. Expected one
 of file extensions
-"xls", "xlsx", "csv", and "txt".}
+"xls", "xlsx", "csv", or "txt".}
 
 \item{out_df}{The class of the output dataset. One of
-"tibble" and "arrow". (default = "tibble")}
+"tibble" or "arrow". Defaults to
+"tibble".}
 
 \item{olink_platform}{Olink platform used to generate the input file.
 One of \code{NULL} (default) for auto-detection,
-"Flex", "Focus", "Target 48", and "Target 96".}
+"Flex", "Focus", "Target 48", or "Target 96".}
 
-\item{data_type}{Quantification method of the input data. One of \code{NULL}
-(default) for auto-detection, "Ct", "NPX", and "Quantified".}
+\item{data_type}{Quantification method of the input data. One of
+"Ct", "NPX", or "Quantified". Defaults to
+\code{NULL} for auto-detection.}
 
 \item{quiet}{Boolean to print a confirmation message when reading the input
-file. Applies to excel or delimited input only. \code{TRUE} (default) to not print
-and \code{FALSE} to print.}
+file. Applies to excel or delimited input only. \code{TRUE} skips printing the
+message, and \code{FALSE} otherwise.}
 }
 \value{
-Tibble or ArrowObject with Olink data in long format.
+Dataset,
+"tibble" or "ArrowObject", with Olink
+data in long format.
 }
 \description{
 This implementation of \code{\link{read_NPX}} does not cover the latest

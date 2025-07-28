@@ -1,19 +1,19 @@
-#' Help function to read `r ansi_collapse_quot(x = get_olink_data_types())` data
-#' from excel Olink software output files in R.
+#' Help function to read long or wide format
+#' `r ansi_collapse_quot(x = get_olink_data_types(), sep = "or")` data from
+#' Microsoft
+#' `r ansi_collapse_quot(x = get_file_ext(name_sub = "excel"), sep = "or")`
+#' files exported from Olink software in R.
 #'
 #' @author
 #'   Klev Diamanti;
 #'   Christoffer Cambronero;
 #'   Kathleen Nevola
 #'
+#' @inherit .read_npx_args params
+#' @inherit read_npx_delim return
 #' @param file Path to Olink software output excel file in wide or long format.
 #' Expected file extensions
-#' `r ansi_collapse_quot(get_file_ext(name_sub = "excel"))`.
-#' @param out_df The class of output data frame. One of
-#' `r ansi_collapse_quot(get_df_output_print())`.
-#'
-#' @return `r ansi_collapse_quot(x = get_df_output_print(), sep = "or")` with
-#' Olink data in long or wide format.
+#' `r ansi_collapse_quot(get_file_ext(name_sub = "excel"), sep = "or")`.
 #'
 #' @seealso
 #'   \code{\link{read_npx}}

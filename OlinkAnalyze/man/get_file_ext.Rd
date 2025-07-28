@@ -17,3 +17,6 @@ Character vector with accepted file extensions.
 \description{
 Gets all file extensions based on the file format.
 }
+\author{
+Klev Diamanti
+}

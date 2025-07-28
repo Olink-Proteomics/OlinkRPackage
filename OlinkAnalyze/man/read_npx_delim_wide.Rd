@@ -3,23 +3,25 @@
 \name{read_npx_delim_wide}
 \alias{read_npx_delim_wide}
 \title{Help function to read wide format
-"csv" and "txt" data from
-delimited file exported from Olink software.}
+"Ct", "NPX", or "Quantified" data from
+delimited
+"csv" or "txt"
+files exported from Olink software in R.}
 \usage{
 read_npx_delim_wide(file, sep)
 }
 \arguments{
-\item{file}{Path to Olink software output delimited file in wide format.
-Expecting file extensions
-"csv" and "txt".}
+\item{file}{Path to Olink software output delimited file in wide or long
+format. Expecting file extensions
+"csv" or "txt".}
 
 \item{sep}{Character separator of delimited input file. One of \code{NULL}
 (default) for auto-detection, or ";", ",", "    ", "|", and ":".
 Used only for delimited output files from Olink software.}
 }
 \value{
-"tibble" or "ArrowObject" with
-Olink data in wide format.
+Dataset, "tibble", with Olink data in
+wide format.
 }
 \description{
 The function can handle delimited files in wide format.

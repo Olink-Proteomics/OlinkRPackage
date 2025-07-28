@@ -7,7 +7,8 @@
 check_npx_col_names(df, preferred_names = NULL)
 }
 \arguments{
-\item{df}{A tibble or and arrow object from \code{\link{read_npx}}.}
+\item{df}{A "tibble" or "ArrowObject"
+from \code{\link{read_npx}}.}
 
 \item{preferred_names}{A named character vector where names are internal
 column names and values are column names to be selected from the input data

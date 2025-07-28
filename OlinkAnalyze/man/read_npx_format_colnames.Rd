@@ -8,12 +8,11 @@ its column names}
 read_npx_format_colnames(df, file)
 }
 \arguments{
-\item{df}{Olink dataset
-("tibble" or "ArrowObject")
-in wide or long format.}
+\item{df}{A "tibble" or "ArrowObject"
+from \code{\link{read_npx}}.}
 
 \item{file}{Path to Olink software output file in wide or long format.
-Expected file types: "xls" or "xlsx" for excel files, "csv" or "txt" for delim files, "parquet" for parquet files, and "zip" for compressed files.}
+Expecting extensions "xls" or "xlsx" for excel files, "csv" or "txt" for delim files, "parquet" for parquet files, and "zip" for compressed files.}
 }
 \value{
 Error is file contains problematic column names. \code{NULL} otherwise.

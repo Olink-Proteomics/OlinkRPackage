@@ -7,17 +7,16 @@
 get_olink_platforms(broad_platform = NULL, data_type = NULL, quant_type = NULL)
 }
 \arguments{
-\item{broad_platform}{Name of the \var{broad_platform} to filter the
-Olink platforms for. If \code{NULL} all relevant Olink platforms are returned,
-otherwise one of "NGS" and "qPCR" is
-expected.}
+\item{broad_platform}{Name of the \var{broad_platform} to filter for. If
+\code{NULL} all broader platforms are considered, otherwise one of
+"NGS" and "qPCR" is expected.}
 
-\item{data_type}{Name of the \var{data_type} to filter the Olink platforms
-for. If \code{NULL} all relevant Olink platforms are returned, otherwise one of
+\item{data_type}{Name of the \var{data_type} to filter the Olink for. If
+\code{NULL} all data types are considered, otherwise one of
 "Ct", "NPX", and "Quantified" is expected.}
 
-\item{quant_type}{Name of the \var{quant_type} to filter the Olink platforms
-for. If \code{NULL} all relevant Olink platforms are returned, otherwise one of
+\item{quant_type}{Name of the \var{quant_type} to filter for. If \code{NULL} all
+quantification types are considered, otherwise one of
 "absolute" and "relative" is expected.}
 }
 \value{
