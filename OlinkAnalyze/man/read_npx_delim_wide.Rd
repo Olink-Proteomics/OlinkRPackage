@@ -6,7 +6,7 @@
 "Ct", "NPX", or "Quantified" data from
 delimited
 "csv" or "txt"
-files exported from Olink software.}
+files exported from Olink software in R.}
 \usage{
 read_npx_delim_wide(file, sep)
 }

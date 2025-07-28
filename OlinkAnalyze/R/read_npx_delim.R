@@ -1,5 +1,8 @@
-#' Help function to read `r ansi_collapse_quot(get_olink_data_types())` data
-#' from delimited Olink software output files in R.
+#' Help function to read long or wide format
+#' `r ansi_collapse_quot(x = get_olink_data_types(), sep = "or")` data from
+#' delimited
+#' `r ansi_collapse_quot(x = get_file_ext(name_sub = "delim"), sep = "or")`
+#' files exported from Olink software in R.
 #'
 #' @description
 #' The function can handle delimited files in long and wide format.
@@ -178,7 +181,7 @@ read_npx_csv <- read_npx_delim
 #' `r ansi_collapse_quot(x = get_olink_data_types(), sep = "or")` data from
 #' delimited
 #' `r ansi_collapse_quot(x = get_file_ext(name_sub = "delim"), sep = "or")`
-#' files exported from Olink software.
+#' files exported from Olink software in R.
 #'
 #' @description
 #' The function can handle delimited files in long format.
@@ -227,7 +230,7 @@ read_npx_delim_long <- function(file,
 #' `r ansi_collapse_quot(x = get_olink_data_types(), sep = "or")` data from
 #' delimited
 #' `r ansi_collapse_quot(x = get_file_ext(name_sub = "delim"), sep = "or")`
-#' files exported from Olink software.
+#' files exported from Olink software in R.
 #'
 #' @description
 #' The function can handle delimited files in wide format.

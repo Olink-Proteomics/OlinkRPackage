@@ -3,8 +3,11 @@
 \name{read_npx_delim}
 \alias{read_npx_delim}
 \alias{read_npx_csv}
-\title{Help function to read "Ct", "NPX", and "Quantified" data
-from delimited Olink software output files in R.}
+\title{Help function to read long or wide format
+"Ct", "NPX", or "Quantified" data from
+delimited
+"csv" or "txt"
+files exported from Olink software in R.}
 \usage{
 read_npx_delim(file, out_df = "arrow")
 
