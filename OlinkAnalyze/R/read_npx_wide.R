@@ -5,18 +5,14 @@
 #' @author
 #'   Klev Diamanti
 #'
+#' @inherit .read_npx_args params return
 #' @param df A tibble containing the full Olink dataset in wide format.
 #' @param file Path to Olink software output file in wide format. Expected one
 #' of file extensions
-#' `r ansi_collapse_quot(x = get_file_ext(name_sub = c("excel", "delim")))`.
+#' `r ansi_collapse_quot(get_file_ext(name_sub = c("excel", "delim")), "or")`.
 #' @param olink_platform Olink platform used to generate the input file.
 #' One of `NULL` (default) for auto-detection,
-#' `r get_olink_platforms(broad_platform = "qPCR") |> ansi_collapse_quot()`.
-#' @param data_type Quantification method of the input data. One of `NULL`
-#' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
-#'
-#' @return `r ansi_collapse_quot(x = get_df_output_print(), sep = "or")` with
-#' Olink data in long or wide format.
+#' `r ansi_collapse_quot(get_olink_platforms(broad_platform = "qPCR"), "or")`.
 #'
 #' @seealso
 #'   \code{\link{read_npx_format}}
@@ -33,7 +29,7 @@ read_npx_wide <- function(df,
 
   # initial checks ----
 
-  check_is_tibble(df = df,
+  check_is_tibble(x = df,
                   error = TRUE)
 
   check_file_exists(file = file,
@@ -201,12 +197,7 @@ read_npx_wide <- function(df,
 #' @author
 #'   Klev Diamanti
 #'
-#' @param df A tibble containing the full Olink dataset in wide format.
-#' @param file Path to Olink software output file in wide format. Expected one
-#' of file extensions
-#' `r ansi_collapse_quot(x = get_file_ext(name_sub = c("excel", "delim")))`.
-#' @param data_type Quantification method of the input data. One of `NULL`
-#' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
+#' @inheritParams read_npx_wide
 #' @param format_spec A tibble derived from \var{olink_wide_spec} in the local
 #' environment containing the expected format of the Olink wide file based on
 #' the \var{olink_platform} and \var{data_type}.
@@ -231,20 +222,6 @@ read_npx_wide_split_row <- function(df,
                                     file,
                                     data_type,
                                     format_spec) {
-
-  # initial checks ----
-
-  check_is_tibble(df = df,
-                  error = TRUE)
-
-  check_file_exists(file = file,
-                    error = TRUE)
-
-  check_olink_data_type(x = data_type,
-                        broad_platform = "qPCR")
-
-  check_is_tibble(df = format_spec,
-                  error = TRUE)
 
   # help function to fill NA ----
 
@@ -405,11 +382,6 @@ read_npx_wide_split_row <- function(df,
 #'
 read_npx_wide_npxs_version <- function(df) {
 
-  # check input ----
-
-  check_is_tibble(df = df,
-                  error = TRUE)
-
   # check necessary columns ----
 
   check_columns(df = df, col_list = list("V1", "V2"))
@@ -439,13 +411,7 @@ read_npx_wide_npxs_version <- function(df) {
 #' @author
 #'   Klev Diamanti
 #'
-#' @param df Top matrix of Olink datasets in wide format \var{df_top}.
-#' @param file Path to Olink software output file in wide format. Expected one
-#' of file extensions
-#' `r ansi_collapse_quot(x = get_file_ext(name_sub = c("excel", "delim")))`.
-#' @param format_spec A tibble derived from \var{olink_wide_spec} in the local
-#' environment containing the expected format of the Olink wide file based on
-#' the \var{olink_platform} and \var{data_type}.
+#' @inheritParams read_npx_wide_top
 #'
 #' @return NULL unless an inconsistency is spotted.
 #'
@@ -455,17 +421,6 @@ read_npx_wide_npxs_version <- function(df) {
 read_npx_wide_check_top <- function(df,
                                     file,
                                     format_spec) {
-
-  # initial checks ----
-
-  check_is_tibble(df = df,
-                  error = TRUE)
-
-  check_file_exists(file = file,
-                    error = TRUE)
-
-  check_is_tibble(df = format_spec,
-                  error = TRUE)
 
   # checks ----
 
@@ -742,16 +697,9 @@ read_npx_wide_check_top <- function(df,
 #' @author
 #'   Klev Diamanti
 #'
+#' @inheritParams read_npx_wide
+#' @inheritParams read_npx_wide_split_row
 #' @param df Top matrix of Olink dataset in wide format \var{df_top}.
-#' @param file Path to Olink software output file in wide format. Expected one
-#' of file extensions
-#' `r ansi_collapse_quot(x = get_file_ext(name_sub = c("excel", "delim")))`.
-#' @param olink_platform Olink platform used to generate the input file.
-#' One of `NULL` (default) for auto-detection,
-#' `r get_olink_platforms(broad_platform = "qPCR") |> ansi_collapse_quot()`.
-#' @param format_spec A tibble derived from \var{olink_wide_spec} in the local
-#' environment containing the expected format of the Olink wide file based on
-#' the \var{olink_platform} and \var{data_type}.
 #'
 #' @return A list of data frames from top matrix in long format:
 #' \itemize{
@@ -776,12 +724,6 @@ read_npx_wide_top <- function(df,
                               format_spec) {
 
   # check input and top matrix ----
-
-  check_olink_platform(x = olink_platform,
-                       broad_platform = "qPCR")
-
-  check_is_tibble(df = format_spec,
-                  error = TRUE)
 
   read_npx_wide_check_top(
     df = df,
@@ -986,12 +928,8 @@ read_npx_wide_top <- function(df,
 #' @author
 #'   Klev Diamanti
 #'
+#' @inheritParams read_npx_wide
 #' @param df Middle matrix of Olink dataset in wide format \var{df_mid}.
-#' @param file Path to Olink software output file in wide format. Expected one
-#' of file extensions
-#' `r ansi_collapse_quot(x = get_file_ext(name_sub = c("excel", "delim")))`.
-#' @param data_type Quantification method of the input data. One of `NULL`
-#' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
 #' @param col_names Names list of character vectors containing column names from
 #' each chunk of columns \var{df_top} was split on in function.
 #' \code{\link{read_npx_wide_top}}.
@@ -1021,22 +959,6 @@ read_npx_wide_middle <- function(df,
                                  file,
                                  data_type,
                                  col_names) {
-
-  # check input ----
-
-  check_is_tibble(df = df,
-                  error = TRUE)
-
-  check_file_exists(file = file,
-                    error = TRUE)
-
-  check_olink_data_type(x = data_type,
-                        broad_platform = "qPCR")
-
-  check_is_list(lst = col_names,
-                error = TRUE)
-
-  sapply(col_names, function(x) check_is_character(string = x, error = TRUE))
 
   # check columns ----
 
@@ -1233,11 +1155,6 @@ read_npx_wide_middle <- function(df,
 #'
 read_npx_wide_panel_version <- function(df) {
 
-  # check input ----
-
-  check_is_tibble(df = df,
-                  error = TRUE)
-
   # check columns ----
 
   check_columns(df = df,
@@ -1295,15 +1212,12 @@ read_npx_wide_panel_version <- function(df) {
 #' @author
 #'   Klev Diamanti
 #'
+#' @inheritParams read_npx_wide
+#' @inheritParams read_npx_wide_split_row
 #' @param df_top_list List of data frames from the top matrix. Output of
 #' function \code{\link{read_npx_wide_top}}.
 #' @param df_middle_list List of data frames from the middle matrix. Output of
 #' function \code{\link{read_npx_wide_middle}}.
-#' @param data_type Quantification method of the input data. One of `NULL`
-#' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
-#' @param format_spec A tibble derived from \var{olink_wide_spec} in the local
-#' environment containing the expected format of the Olink wide file based on
-#' the \var{olink_platform} and \var{data_type}.
 #'
 #' @return Tibble in long format combining the top and middle matrices.
 #'
@@ -1315,19 +1229,6 @@ red_npx_wide_top_mid_long <- function(df_top_list,
                                       df_middle_list,
                                       data_type,
                                       format_spec) {
-  # check input ----
-
-  check_is_list(lst = df_top_list)
-
-  sapply(df_top_list, check_is_tibble, error = TRUE)
-
-  check_is_list(lst = df_middle_list)
-
-  sapply(df_middle_list, check_is_tibble, error = TRUE)
-
-  check_is_tibble(df = format_spec,
-                  error = TRUE)
-
   # prepare components of long df ----
 
   ## df oid ----
@@ -1468,15 +1369,7 @@ red_npx_wide_top_mid_long <- function(df_top_list,
 #' @author
 #'   Klev Diamanti
 #'
-#' @param df Bottom matrix of Olink dataset in wide format \var{df_bottom}.
-#' @param file Path to Olink software output file in wide format. Expected one
-#' of file extensions
-#' `r ansi_collapse_quot(x = get_file_ext(name_sub = c("excel", "delim")))`.
-#' @param data_type Quantification method of the input data. One of `NULL`
-#' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
-#' @param olink_platform Olink platform used to generate the input file.
-#' One of `NULL` (default) for auto-detection,
-#' `r get_olink_platforms(broad_platform = "qPCR") |> ansi_collapse_quot()`.
+#' @inheritParams read_npx_wide_bottom
 #'
 #' @return Tibble with the bottom matrix specifications for the Olink wide file.
 #'
@@ -1631,20 +1524,10 @@ read_npx_wide_bottom_version <- function(df,
 #' @author
 #'   Klev Diamanti
 #'
+#' @inheritParams read_npx_wide
+#' @inheritParams read_npx_wide_split_row
+#' @inheritParams read_npx_wide_middle
 #' @param df Bottom matrix of Olink dataset in wide format \var{df_bottom}.
-#' @param file Path to Olink software output file in wide format. Expected one
-#' of file extensions
-#' `r ansi_collapse_quot(x = get_file_ext(name_sub = c("excel", "delim")))`.
-#' @param olink_platform Olink platform used to generate the input file.
-#' One of `NULL` (default) for auto-detection,
-#' `r get_olink_platforms(broad_platform = "qPCR") |> ansi_collapse_quot()`.
-#' @param data_type Quantification method of the input data. One of `NULL`
-#' (default) for auto-detection, `r ansi_collapse_quot(get_olink_data_types())`.
-#' @param col_names Names list of character vectors containing column names from
-#' each chunk of columns \var{df_top} was split on in function.
-#' @param format_spec A tibble derived from \var{olink_wide_spec} in the local
-#' environment containing the expected format of the Olink wide file based on
-#' the \var{olink_platform} and \var{data_type}.
 #' @param df_plate_panel Tibble with unique combinations of panels and plates
 #' from the combination of top and middle data frames.
 #'
@@ -1664,31 +1547,6 @@ read_npx_wide_bottom <- function(df,
                                  col_names,
                                  format_spec,
                                  df_plate_panel) {
-  # check input ----
-
-  check_is_tibble(df = df,
-                  error = TRUE)
-
-  check_file_exists(file = file,
-                    error = TRUE)
-
-  check_olink_platform(x = olink_platform,
-                       broad_platform = "qPCR")
-
-  check_olink_data_type(x = data_type,
-                        broad_platform = "qPCR")
-
-  check_is_list(lst = col_names,
-                error = TRUE)
-
-  sapply(col_names, function(x) check_is_character(string = x, error = TRUE))
-
-  check_is_tibble(df = format_spec,
-                  error = TRUE)
-
-  check_is_tibble(df = df_plate_panel,
-                  error = TRUE)
-
   # get first column options ----
 
   # clean up format_spec_bottom for downstream use

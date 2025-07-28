@@ -22,7 +22,8 @@ clean_npx(
 )
 }
 \arguments{
-\item{df}{A tibble or and arrow object from \code{\link{read_npx}}.}
+\item{df}{A "tibble" or "ArrowObject"
+from \code{\link{read_npx}}.}
 
 \item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
 \code{\link[=check_npx]{check_npx()}} will be run internally using \code{df} and \code{preferred_names}.}

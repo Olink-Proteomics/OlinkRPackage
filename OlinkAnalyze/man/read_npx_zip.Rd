@@ -21,30 +21,33 @@ format. Expected file extensions
 "zip".}
 
 \item{out_df}{The class of the output dataset. One of
-"tibble" and "arrow". (default = "tibble")}
+"tibble" or "arrow". Defaults to
+"tibble".}
 
-\item{long_format}{Boolean marking format of input file. One of \code{NULL}
-(default) for auto-detection, \code{TRUE} for long format files or \code{FALSE} for
-wide format files.}
+\item{long_format}{Boolean marking format of input file. One of \code{TRUE} for
+long format and \code{FALSE} for wide format files. Defaults to \code{NULL} for
+auto-detection.}
 
-\item{olink_platform}{Olink platform used to generate the input file.
-One of \code{NULL} (default) for auto-detection,
-"Flex", "Focus", "Target 48", and "Target 96".}
+\item{olink_platform}{Olink platform used to generate the input file. One of
+"Target 48", "Flex", "Target 96", "Explore 3072", "Explore HT", "Focus", or "Reveal".
+Defaults to \code{NULL} for auto-detection.}
 
-\item{data_type}{Quantification method of the input data. One of \code{NULL}
-(default) for auto-detection, "Ct", "NPX", and "Quantified".}
+\item{data_type}{Quantification method of the input data. One of
+"Ct", "NPX", or "Quantified". Defaults to
+\code{NULL} for auto-detection.}
 
 \item{.ignore_files}{Character vector of files included in the zip-compressed
 Olink software output files that should be ignored. Used only for
 zip-compressed input files (default = \emph{c("README.txt")}).}
 
 \item{quiet}{Boolean to print a confirmation message when reading the input
-file. Applies to excel or delimited input only. \code{TRUE} (default) to not print
-and \code{FALSE} to print.}
+file. Applies to excel or delimited input only. \code{TRUE} skips printing the
+message, and \code{FALSE} otherwise.}
 }
 \value{
-"tibble" or "ArrowObject" with
-Olink data in long or wide format.
+Dataset,
+"tibble" or "ArrowObject", with Olink
+data in long format.
 }
 \description{
 A zip-compressed input file might contain a file from the Olink software
