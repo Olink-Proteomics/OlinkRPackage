@@ -13,11 +13,13 @@ Expecting file extension
 "parquet".}
 
 \item{out_df}{The class of the output dataset. One of
-"tibble" and "arrow". (default = "tibble")}
+"tibble" or "arrow". (default =
+"tibble")}
 }
 \value{
-"tibble" or "ArrowObject" with
-Olink data in long or wide format.
+Dataset,
+"tibble" or "ArrowObject", with Olink
+data in long format.
 }
 \description{
 Help function to read NPX data from long format parquet Olink software output
