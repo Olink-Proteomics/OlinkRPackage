@@ -3,22 +3,25 @@
 \name{read_npx_delim_long}
 \alias{read_npx_delim_long}
 \title{Help function to read long format
-"Ct", "NPX", and "Quantified" data from delimited file
-exported from Olink software.}
+"Ct", "NPX", or "Quantified" data from
+delimited
+"csv" or "txt"
+files exported from Olink software in R.}
 \usage{
 read_npx_delim_long(file, sep)
 }
 \arguments{
-\item{file}{Path to Olink software output delimited file in long format.
-Expecting file extensions}
+\item{file}{Path to Olink software output delimited file in wide or long
+format. Expecting file extensions
+"csv" or "txt".}
 
 \item{sep}{Character separator of delimited input file. One of \code{NULL}
 (default) for auto-detection, or ";", ",", "    ", "|", and ":".
 Used only for delimited output files from Olink software.}
 }
 \value{
-"tibble" or "ArrowObject" with
-Olink data in long format.
+Dataset, "tibble", with Olink data in
+long format.
 }
 \description{
 The function can handle delimited files in long format.

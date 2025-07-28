@@ -15,18 +15,17 @@ check_olink_broader_platform(
 \item{x}{Name of the broader Olink platform. One of
 "NGS" and "qPCR".}
 
-\item{platform_name}{Name of the \var{platform_name} to filter the Olink
-broader platforms for. If \code{NULL} all relevant Olink broader platforms are
-returned, otherwise one of "Explore 3072", "Explore HT", "Flex", "Focus", "Reveal", "Target 48", and "Target 96" is
-expected.}
+\item{platform_name}{Name of the \var{platform_name} to filter for. If \code{NULL}
+all platforms are considered, otherwise one of
+"Explore 3072", "Explore HT", "Flex", "Focus", "Reveal", "Target 48", and "Target 96" is expected.}
 
-\item{data_type}{Name of the \var{data_type} to filter the Olink broader
-platforms for. If \code{NULL} all relevant Olink broader platforms are returned,
-otherwise one of "Ct", "NPX", and "Quantified" is expected.}
+\item{data_type}{Name of the \var{data_type} to filter the Olink for. If
+\code{NULL} all data types are considered, otherwise one of
+"Ct", "NPX", and "Quantified" is expected.}
 
-\item{quant_type}{Name of the \var{quant_type} to filter the Olink broader
-platforms for. If \code{NULL} all relevant Olink broader platforms are returned,
-otherwise one of "absolute" and "relative" is expected.}
+\item{quant_type}{Name of the \var{quant_type} to filter for. If \code{NULL} all
+quantification types are considered, otherwise one of
+"absolute" and "relative" is expected.}
 }
 \value{
 \code{NULL} if broader Olink platform is expected, otherwise an error.

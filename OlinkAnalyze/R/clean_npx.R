@@ -53,13 +53,8 @@
 #'   Kang Dong
 #'   Klev Diamanti
 #'
-#' @inheritParams check_npx
-#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
-#' [`check_npx()`] will be run internally using `df` and `preferred_names`.
-#' @param preferred_names Optional to be provided only if `check_log` is `NULL`.
-#' A named character vector where names are internal column names and values are
-#' column names to be selected from the input data frame. Read the
-#' \emph{description} from [`check_npx()`] for further information.
+#' @inherit .downstream_fun_args params return
+#' @inherit .read_npx_args params
 #' @param remove_assay_na Logical. If `FALSE`, skips filtering assays with all
 #' quantified values `NA`. Defaults to `TRUE`.
 #' @param remove_invalid_oid Logical. If `FALSE`, skips filtering assays with
@@ -84,12 +79,7 @@
 #' @param convert_df_cols Logical. If `FALSE`, retains columns of `df` as are.
 #' Defaults to `TRUE`, were columns required for downstream analysis are
 #' converted to the expected format.
-#' @param out_df The class of the output data set. One of
-#' `r ansi_collapse_quot(read_npx_df_output)`. (default = `"tibble"`)
 #' @param verbose Logical. If `FALSE` (default), silences step-wise messages.
-#'
-#' @returns Clean data set, `r get_df_output_print()`, with Olink data in long
-#' format.
 #'
 #' @export
 #'
@@ -116,7 +106,6 @@
 #'
 clean_npx <- function(df,
                       check_log = NULL,
-                      preferred_names = NULL,
                       remove_assay_na = TRUE,
                       remove_invalid_oid = TRUE,
                       remove_dup_sample_id = TRUE,
@@ -130,8 +119,8 @@ clean_npx <- function(df,
                       verbose = FALSE) {
 
   # Validate input dataset
-  check_is_dataset(df = df, error = TRUE)
-  check_is_scalar_boolean(bool = verbose, error = TRUE)
+  check_is_dataset(x = df, error = TRUE)
+  check_is_scalar_boolean(x = verbose, error = TRUE)
 
   if (verbose) cli::cli_h2("Starting {.fn clean_npx} pipeline.")
 
@@ -146,24 +135,20 @@ clean_npx <- function(df,
       )
     )
 
-    check_npx_log <- check_npx(
-      df = df,
-      preferred_names = preferred_names
+    check_log <- check_npx(
+      df = df
     ) |>
       suppressWarnings() |>
       suppressMessages()
 
-  } else if (check_is_list(lst = check_log, error = TRUE)) {
-
-    check_npx_log <- check_log
-
   }
+  check_is_list(x = check_log, error = TRUE)
 
   # Clean invalid Olink IDs
   if (verbose) cli::cli_h3("Removing assays with invalid identifiers.")
   df <- clean_invalid_oid(
     df = df,
-    check_npx_log = check_npx_log,
+    check_log = check_log,
     remove_invalid_oid = remove_invalid_oid,
     verbose = verbose
   )
@@ -172,7 +157,7 @@ clean_npx <- function(df,
   if (verbose) cli::cli_h3("Removing assays missing all quantified values.")
   df <- clean_assay_na(
     df = df,
-    check_npx_log = check_npx_log,
+    check_log = check_log,
     remove_assay_na = remove_assay_na,
     verbose = verbose
   )
@@ -181,7 +166,7 @@ clean_npx <- function(df,
   if (verbose) cli::cli_h3("Removing duplicated sample identifiers.")
   df <- clean_duplicate_sample_id(
     df = df,
-    check_npx_log = check_npx_log,
+    check_log = check_log,
     remove_dup_sample_id = remove_dup_sample_id,
     verbose = verbose
   )
@@ -190,7 +175,7 @@ clean_npx <- function(df,
   if (verbose) cli::cli_h3("Removing control samples based on sample type.")
   df <- clean_sample_type(
     df = df,
-    check_npx_log = check_npx_log,
+    check_log = check_log,
     remove_control_sample = remove_control_sample,
     verbose = verbose
   )
@@ -199,7 +184,7 @@ clean_npx <- function(df,
   if (verbose) cli::cli_h3("Removing samples based on sample identifiers.")
   df <- clean_control_sample_id(
     df = df,
-    check_npx_log = check_npx_log,
+    check_log = check_log,
     control_sample_ids = control_sample_ids,
     verbose = verbose
   )
@@ -208,7 +193,7 @@ clean_npx <- function(df,
   if (verbose) cli::cli_h3("Removing samples with QC status 'FAIL'.")
   df <- clean_qc_warning(
     df = df,
-    check_npx_log = check_npx_log,
+    check_log = check_log,
     remove_qc_warning = remove_qc_warning,
     verbose = verbose
   )
@@ -217,7 +202,7 @@ clean_npx <- function(df,
   if (verbose) cli::cli_h3("Removing internal control assays.")
   df <- clean_assay_type(
     df = df,
-    check_npx_log = check_npx_log,
+    check_log = check_log,
     remove_control_assay = remove_control_assay,
     verbose = verbose
   )
@@ -226,7 +211,7 @@ clean_npx <- function(df,
   if (verbose) cli::cli_h3("Removing assays flagged with assays warning.")
   df <- clean_assay_warning(
     df = df,
-    check_npx_log = check_npx_log,
+    check_log = check_log,
     remove_assay_warning = remove_assay_warning,
     verbose = verbose
   )
@@ -235,21 +220,21 @@ clean_npx <- function(df,
   if (verbose) cli::cli_h3("Converting data types of selected columns.")
   df <- clean_col_class(
     df = df,
-    check_npx_log = check_npx_log,
+    check_log = check_log,
     convert_df_cols = convert_df_cols,
     verbose = verbose
   )
 
   # Check for absolute quantification and apply log2 transformation
   if (grepl(pattern = "quantified",
-            x = check_npx_log$col_names$quant,
+            x = check_log$col_names$quant,
             ignore.case = TRUE)) {
-    q_col <- check_npx_log$col_names$quant # nolint object_usage_linter
-    q_log2 <- paste0(check_npx_log$col_names$quant, "_log2") # nolint object_usage_linter
+    q_col <- check_log$col_names$quant # nolint object_usage_linter
+    q_log2 <- paste0(check_log$col_names$quant, "_log2") # nolint object_usage_linter
     cli::cli_inform(
       c(
         "Detected data in absolute quantification in column
-        {.field {check_npx_log$col_names$quant}}.",
+        {.field {check_log$col_names$quant}}.",
         "i" = "We recommend you apply a logarithmic transformation to the
         data:",
         "{.code df_log2 <- df |> dplyr::mutate({q_log2} = log2(x = {q_col}))}"
@@ -281,30 +266,15 @@ clean_npx <- function(df,
 #' matches those listed in `check_npx_log$assay_na`, which contains assays
 #' composed entirely of `NA` values in their quantification column.
 #'
-#' @author
-#'   Kang Dong
-#'   Klev Diamanti
-#'
-#' @inheritParams clean_npx
-#' @param check_npx_log A named list generated by the function `check_npx()`,
-#' containing:
-#' \itemize{
-#' \item `assay_na`: a character vector of assay identifiers with all quantified
-#' values `NA`.
-#' \item `col_names$olink_id`: the column name of the assay identifier in the
-#' dataset.
-#' }
-#'
-#' @return A `tibble` or `arrow` object with rows corresponding to assays with
-#' all quantified values `NA` removed.
+#' @inherit clean_npx params return author
 #'
 clean_assay_na <- function(df,
-                           check_npx_log,
+                           check_log,
                            remove_assay_na = TRUE,
                            verbose = FALSE) {
   # input check
   check_is_scalar_boolean(
-    bool = remove_assay_na,
+    x = remove_assay_na,
     error = TRUE
   )
 
@@ -321,7 +291,7 @@ clean_assay_na <- function(df,
   }
 
   # Id not assays with all values NA
-  if (length(check_npx_log$assay_na) == 0L) {
+  if (length(check_log$assay_na) == 0L) {
     if (verbose == TRUE) {
       cli::cli_inform(
         c("No assays with only {.val NA} values.",
@@ -334,8 +304,8 @@ clean_assay_na <- function(df,
   # CLI message listing excluded assays
   cli::cli_inform(
     c(
-      "Excluding {.val {length(check_npx_log$assay_na)}} assay{?s} with only
-    {.val NA} values: {.val {check_npx_log$assay_na}}.",
+      "Excluding {.val {length(check_log$assay_na)}} assay{?s} with only
+      {.val NA} values: {.val {check_log$assay_na}}.",
       "v" = "Returning cleaned dataset."
     )
   )
@@ -343,7 +313,7 @@ clean_assay_na <- function(df,
   # Exclude assays with only NA values
   df_cleaned <- df |>
     dplyr::filter(
-      !(.data[[check_npx_log$col_names$olink_id]] %in% check_npx_log$assay_na)
+      !(.data[[check_log$col_names$olink_id]] %in% check_log$assay_na)
     )
 
   # Convert output to desired format (tibble or arrow)
@@ -359,29 +329,15 @@ clean_assay_na <- function(df,
 #' matches values listed in `check_npx_log$oid_invalid`, which identifies
 #' invalid or malformed assay identifiers.
 #'
-#' @author
-#'   Kang Dong
-#'   Klev Diamanti
-#'
-#' @inheritParams clean_npx
-#' @param check_npx_log A named list generated by the function `check_npx()`,
-#' containing:
-#' \itemize{
-#' \item `oid_invalid`: a character vector of invalid assay identifiers.
-#' \item `col_names$olink_id`: the column name of the assay identifier in the
-#' dataset.
-#' }
-#'
-#' @return A `tibble` or `arrow` object with rows corresponding to assays with
-#' invalid identifiers removed.
+#' @inherit clean_npx params return author
 #'
 clean_invalid_oid <- function(df,
-                              check_npx_log,
+                              check_log,
                               remove_invalid_oid = TRUE,
                               verbose = FALSE) {
   # input check
   check_is_scalar_boolean(
-    bool = remove_invalid_oid,
+    x = remove_invalid_oid,
     error = TRUE
   )
 
@@ -398,7 +354,7 @@ clean_invalid_oid <- function(df,
   }
 
   # Check if there are any invalid assay identifiers to remove
-  if (length(check_npx_log$oid_invalid) == 0L) {
+  if (length(check_log$oid_invalid) == 0L) {
     if (verbose == TRUE) {
       cli::cli_inform(
         c("No invalid assay identifiers.",
@@ -411,8 +367,8 @@ clean_invalid_oid <- function(df,
   # Inform user of which assays will be excluded
   cli::cli_inform(
     c(
-      "Excluding {.val {length(check_npx_log$oid_invalid)}} assay{?s} with
-      invalid identifier{?s}: {.val {check_npx_log$oid_invalid}}.",
+      "Excluding {.val {length(check_log$oid_invalid)}} assay{?s} with invalid
+      identifier{?s}: {.val {check_log$oid_invalid}}.",
       "v" = "Returning cleaned dataset."
     )
   )
@@ -420,8 +376,7 @@ clean_invalid_oid <- function(df,
   # Remove rows where the OlinkID is invalid
   df_cleaned <- df |>
     dplyr::filter(
-      !(.data[[check_npx_log$col_names$olink_id]]
-        %in% check_npx_log$oid_invalid)
+      !(.data[[check_log$col_names$olink_id]] %in% check_log$oid_invalid)
     )
 
   # Return cleaned data frame in desired format
@@ -437,29 +392,15 @@ clean_invalid_oid <- function(df,
 #' matches values listed in `check_npx_log$sample_id_dups`, which identifies
 #' samples with duplicated identifiers.
 #'
-#' @author
-#'   Kang Dong
-#'   Klev Diamanti
-#'
-#' @inheritParams clean_npx
-#' @param check_npx_log A named list generated by the function `check_npx()`,
-#' containing:
-#' \itemize{
-#' \item `sample_id_dups`: a character vector of duplicated sample identifiers.
-#' \item `col_names$sample_id`: the column name of the sample identifier in the
-#' dataset.
-#' }
-#'
-#' @return A `tibble` or `arrow` object with rows corresponding to samples with
-#' duplicated identifiers removed.
+#' @inherit clean_npx params return author
 #'
 clean_duplicate_sample_id <- function(df,
-                                      check_npx_log,
+                                      check_log,
                                       remove_dup_sample_id = TRUE,
                                       verbose = FALSE) {
   # input check
   check_is_scalar_boolean(
-    bool = remove_dup_sample_id,
+    x = remove_dup_sample_id,
     error = TRUE
   )
 
@@ -476,7 +417,7 @@ clean_duplicate_sample_id <- function(df,
   }
 
   # Check if there are any samples with duplicate identifiers to remove
-  if (length(check_npx_log$sample_id_dups) == 0L) {
+  if (length(check_log$sample_id_dups) == 0L) {
     if (verbose == TRUE) {
       cli::cli_inform(
         c("No duplicate sample identifiers.",
@@ -489,8 +430,8 @@ clean_duplicate_sample_id <- function(df,
   # Inform user about excluded SampleIDs
   cli::cli_inform(
     c(
-      "Excluding {.val {length(check_npx_log$sample_id_dups)}} sample{?s} with
-    duplicate identifier{?s}: {.val {check_npx_log$sample_id_dups}}.",
+      "Excluding {.val {length(check_log$sample_id_dups)}} sample{?s} with
+      duplicate identifier{?s}: {.val {check_log$sample_id_dups}}.",
       "v" = "Returning cleaned dataset."
     )
   )
@@ -498,8 +439,7 @@ clean_duplicate_sample_id <- function(df,
   # Filter out rows with duplicate SampleIDs
   df_cleaned <- df |>
     dplyr::filter(
-      !(.data[[check_npx_log$col_names$sample_id]]
-        %in% check_npx_log$sample_id_dups)
+      !(.data[[check_log$col_names$sample_id]] %in% check_log$sample_id_dups)
     )
 
   # Convert and return the output in the desired format
@@ -515,33 +455,17 @@ clean_duplicate_sample_id <- function(df,
 #' sample type column is present in the `check_npx_log`, the function returns
 #' the original data unchanged.
 #'
-#' @author
-#'   Kang Dong
-#'   Klev Diamanti
-#'
-#' @inheritParams clean_npx
-#' @param check_npx_log A named list generated by the function `check_npx()`,
-#' containing:
-#' \itemize{
-#' \item `col_names$sample_id`: the column name of the sample identifier in the
-#' dataset.
-#' \item `col_names$sample_type`: the column name of the sample type in the
-#' dataset. \strong{If column is missing then function will return the original
-#' dataset.}
-#' }
-#'
-#' @return A `tibble` or `arrow` object with rows corresponding to control
-#' samples removed.
+#' @inherit clean_npx params return author
 #'
 clean_sample_type <- function(df,
-                              check_npx_log,
+                              check_log,
                               remove_control_sample = TRUE,
                               verbose = FALSE) {
   # if remove_control_sample is boolean then we either remove all control
   # samples (when TRUE), or we keep samples (when FALSE).
   # When remove_control_sample is a character vector, then we remove all user
   # designated controls.
-  if (check_is_scalar_boolean(bool = remove_control_sample, error = FALSE)) {
+  if (check_is_scalar_boolean(x = remove_control_sample, error = FALSE)) {
 
     if (remove_control_sample == TRUE) {
       ctrl_sample_type <- olink_sample_types[
@@ -553,7 +477,7 @@ clean_sample_type <- function(df,
       ctrl_sample_type <- character(0L)
     }
 
-  } else if (check_is_character(string = remove_control_sample, error = TRUE)) {
+  } else if (check_is_character(x = remove_control_sample, error = TRUE)) {
 
     if (all(remove_control_sample %in% names(olink_sample_types))) {
       ctrl_sample_type <- olink_sample_types[names(olink_sample_types)
@@ -602,7 +526,7 @@ clean_sample_type <- function(df,
   }
 
   # Check if 'sample_type' column name is available
-  if (!("sample_type" %in% names(check_npx_log$col_names))) {
+  if (!("sample_type" %in% names(check_log$col_names))) {
     cli::cli_inform(
       c("No column marking control samples in dataset.",
         "i" = "Ensure exclusion of control samples for downstream analysis!",
@@ -615,13 +539,13 @@ clean_sample_type <- function(df,
   # detect how many samples are to be removed
   df_sid_stype <- df |>
     dplyr::distinct(
-      .data[[check_npx_log$col_names$sample_id]],
-      .data[[check_npx_log$col_names$sample_type]]
+      .data[[check_log$col_names$sample_id]],
+      .data[[check_log$col_names$sample_type]]
     ) |>
     dplyr::collect()
   uniq_sample_type <- df_sid_stype |>
     dplyr::pull(
-      .data[[check_npx_log$col_names$sample_type]]
+      .data[[check_log$col_names$sample_type]]
     ) |>
     unique()
 
@@ -629,10 +553,10 @@ clean_sample_type <- function(df,
   if (any(ctrl_sample_type %in% uniq_sample_type)) {
     uniq_sid <- df_sid_stype |> # nolint object_usage_linter
       dplyr::filter(
-        .data[[check_npx_log$col_names$sample_type]] %in% ctrl_sample_type
+        .data[[check_log$col_names$sample_type]] %in% .env[["ctrl_sample_type"]]
       ) |>
       dplyr::pull(
-        .data[[check_npx_log$col_names$sample_id]]
+        .data[[check_log$col_names$sample_id]]
       )
 
     cli::cli_inform(
@@ -647,7 +571,7 @@ clean_sample_type <- function(df,
   # Filter out control samples
   df_cleaned <- df |>
     dplyr::filter(
-      !(.data[[check_npx_log$col_names$sample_type]]
+      !(.data[[check_log$col_names$sample_type]]
         %in% .env[["ctrl_sample_type"]])
     )
 
@@ -662,31 +586,17 @@ clean_sample_type <- function(df,
 #' `amp_ctrl`) from the dataset, unless user specified to retain them. The
 #' function uses column mapping provided by `check_npx_log`.
 #'
-#' @author
-#'   Kang Dong
-#'   Klev Diamanti
-#'
-#' @inheritParams clean_npx
-#' @param check_npx_log A named list generated by the function `check_npx()`,
-#' containing:
-#' \itemize{
-#' \item `col_names$olink_id`: the column name of the assay identifier.
-#' \item `col_names$assay_type`: the column name of the assay type. \strong{If
-#' column is missing then function will return the original dataset.}
-#' }
-#'
-#' @return A `tibble` or `arrow` object with rows corresponding to control
-#' assays removed.
+#' @inherit clean_npx params return author
 #'
 clean_assay_type <- function(df,
-                             check_npx_log,
+                             check_log,
                              remove_control_assay = TRUE,
                              verbose = FALSE) {
   # if remove_control_assay is boolean then we either remove all control assays
   # (when TRUE), or we keep all assays (when FALSE).
   # When remove_control_assay is a character vector, then we remove all user
   # designated controls.
-  if (check_is_scalar_boolean(bool = remove_control_assay, error = FALSE)) {
+  if (check_is_scalar_boolean(x = remove_control_assay, error = FALSE)) {
 
     if (remove_control_assay == TRUE) {
       ctrl_assay_type <- olink_assay_types[
@@ -698,7 +608,7 @@ clean_assay_type <- function(df,
       ctrl_assay_type <- character(0L)
     }
 
-  } else if (check_is_character(string = remove_control_assay, error = TRUE)) {
+  } else if (check_is_character(x = remove_control_assay, error = TRUE)) {
 
     if (all(remove_control_assay %in% names(olink_assay_types))) {
       ctrl_assay_type <- olink_assay_types[names(olink_assay_types)
@@ -747,7 +657,7 @@ clean_assay_type <- function(df,
   }
 
   # Check if 'assay_type' column name is available
-  if (!("assay_type" %in% names(check_npx_log$col_names))) {
+  if (!("assay_type" %in% names(check_log$col_names))) {
     cli::cli_inform(
       c("No column marking control assays in dataset.",
         "i" = "Ensure exclusion of control assays for downstream analysis!",
@@ -760,13 +670,13 @@ clean_assay_type <- function(df,
   # detect how many samples are to be removed
   df_oid_atype <- df |>
     dplyr::distinct(
-      .data[[check_npx_log$col_names$olink_id]],
-      .data[[check_npx_log$col_names$assay_type]]
+      .data[[check_log$col_names$olink_id]],
+      .data[[check_log$col_names$assay_type]]
     ) |>
     dplyr::collect()
   uniq_atype <- df_oid_atype |>
     dplyr::pull(
-      .data[[check_npx_log$col_names$assay_type]]
+      .data[[check_log$col_names$assay_type]]
     ) |>
     unique()
 
@@ -774,10 +684,10 @@ clean_assay_type <- function(df,
   if (any(ctrl_assay_type %in% uniq_atype)) {
     uniq_oid <- df_oid_atype |> # nolint object_usage_linter
       dplyr::filter(
-        .data[[check_npx_log$col_names$assay_type]] %in% ctrl_assay_type
+        .data[[check_log$col_names$assay_type]] %in% .env[["ctrl_assay_type"]]
       ) |>
       dplyr::pull(
-        .data[[check_npx_log$col_names$olink_id]]
+        .data[[check_log$col_names$olink_id]]
       )
 
     cli::cli_inform(
@@ -792,8 +702,7 @@ clean_assay_type <- function(df,
   # Filter out control assays
   df_cleaned <- df |>
     dplyr::filter(
-      !(.data[[check_npx_log$col_names$assay_type]]
-        %in% .env[["ctrl_assay_type"]])
+      !(.data[[check_log$col_names$assay_type]] %in% .env[["ctrl_assay_type"]])
     )
 
   # Format and return output
@@ -806,29 +715,15 @@ clean_assay_type <- function(df,
 #' This function uses the column marking QC warnings identified by
 #' `check_npx_log` to remove samples flagged `FAIL` in the dataset.
 #'
-#' @author
-#'   Kang Dong
-#'   Klev Diamanti
-#'
-#' @inheritParams clean_npx
-#' @param check_npx_log A named list generated by the function `check_npx()`,
-#' containing:
-#' \itemize{
-#' \item `col_names$sample_id`: the column name of the sample identifier in the
-#' dataset.
-#' \item `col_names$qc_warning`: the name of the column indicating QC status.
-#' }
-#'
-#' @returns A `tibble` or `arrow` object with rows corresponding samples failed
-#' QC removed.
+#' @inherit clean_npx params return author
 #'
 clean_qc_warning <- function(df,
-                             check_npx_log,
+                             check_log,
                              remove_qc_warning = TRUE,
                              verbose = FALSE) {
   # input check
   check_is_scalar_boolean(
-    bool = remove_qc_warning,
+    x = remove_qc_warning,
     error = TRUE
   )
 
@@ -845,14 +740,14 @@ clean_qc_warning <- function(df,
 
   if (nrow(dplyr::filter(.data = df,
                          grepl(pattern = "fail",
-                               x = .data[[check_npx_log$col_names$qc_warning]],
+                               x = .data[[check_log$col_names$qc_warning]],
                                ignore.case = TRUE))) > 0L) {
 
     df_fail_sample <- df |>
       dplyr::filter(
         grepl(
           pattern = "fail",
-          x = .data[[check_npx_log$col_names$qc_warning]],
+          x = .data[[check_log$col_names$qc_warning]],
           ignore.case = TRUE
         )
       ) |>
@@ -860,7 +755,7 @@ clean_qc_warning <- function(df,
 
     fail_sample_n <- df_fail_sample |> # nolint object_usage_linter
       dplyr::pull(
-        .data[[check_npx_log$col_names$sample_id]]
+        .data[[check_log$col_names$sample_id]]
       ) |>
       unique()
 
@@ -869,7 +764,7 @@ clean_qc_warning <- function(df,
       c(
         "Excluding {.val {nrow(df_fail_sample)}} datapoint{?s} from
         {.val {length(fail_sample_n)}} sample{?s} flagged with
-        {.field {check_npx_log$col_names$qc_warning}} = {.val {'FAIL'}}:
+        {.field {check_log$col_names$qc_warning}} = {.val {'FAIL'}}:
         {.val {fail_sample_n}}.",
         "v" = "Returning cleaned dataset."
       )
@@ -879,7 +774,7 @@ clean_qc_warning <- function(df,
       dplyr::filter(
         !grepl(
           pattern = "fail",
-          x = .data[[check_npx_log$col_names$qc_warning]],
+          x = .data[[check_log$col_names$qc_warning]],
           ignore.case = TRUE
         )
       )
@@ -890,7 +785,7 @@ clean_qc_warning <- function(df,
 
     if (verbose == TRUE) {
       cli::cli_inform(
-        c("No samples flagged with {.field {check_npx_log$col_names$qc_warning}}
+        c("No samples flagged with {.field {check_log$col_names$qc_warning}}
           = {.val {'FAIL'}}.",
           "i" = "Returning original dataset.")
       )
@@ -908,30 +803,15 @@ clean_qc_warning <- function(df,
 #' before analysis. It uses the column marking assay QC warnings identified by
 #' `check_npx_log` to remove assays flagged as `WARN` in the dataset.
 #'
-#' @author
-#'   Kang Dong
-#'   Klev Diamanti
-#'
-#' @inheritParams clean_npx
-#' @param check_npx_log A named list generated by the function `check_npx()`,
-#' containing:
-#' \itemize{
-#' \item `col_names$olink_id`: the column name of the assay identifier in the
-#' dataset.
-#' \item `col_names$assay_warning`: the name of the column indicating assay QC
-#' status.
-#' }
-#'
-#' @return A `tibble` or `arrow` object with rows corresponding assay with
-#' warning flags removed.
+#' @inherit clean_npx params return author
 #'
 clean_assay_warning <- function(df,
-                                check_npx_log,
+                                check_log,
                                 remove_assay_warning = TRUE,
                                 verbose = FALSE) {
   # input check
   check_is_scalar_boolean(
-    bool = remove_assay_warning,
+    x = remove_assay_warning,
     error = TRUE
   )
 
@@ -948,7 +828,7 @@ clean_assay_warning <- function(df,
   }
 
   # Check if assay_warn column name is defined
-  if (!("assay_warn" %in% names(check_npx_log$col_names))) {
+  if (!("assay_warn" %in% names(check_log$col_names))) {
     cli::cli_inform(
       c("No column marking assay warnings in dataset.",
         "i" = "Ensure assays with QC warnings are removed prior to downstream
@@ -961,14 +841,14 @@ clean_assay_warning <- function(df,
 
   if (nrow(dplyr::filter(.data = df,
                          grepl(pattern = "warn",
-                               x = .data[[check_npx_log$col_names$assay_warn]],
+                               x = .data[[check_log$col_names$assay_warn]],
                                ignore.case = TRUE))) > 0L) {
 
     df_warn_assay <- df |>
       dplyr::filter(
         grepl(
           pattern = "warn",
-          x = .data[[check_npx_log$col_names$assay_warn]],
+          x = .data[[check_log$col_names$assay_warn]],
           ignore.case = TRUE
         )
       ) |>
@@ -976,7 +856,7 @@ clean_assay_warning <- function(df,
 
     warn_assay_n <- df_warn_assay |> # nolint object_usage_linter
       dplyr::pull(
-        .data[[check_npx_log$col_names$olink_id]]
+        .data[[check_log$col_names$olink_id]]
       ) |>
       unique()
 
@@ -985,7 +865,7 @@ clean_assay_warning <- function(df,
       c(
         "Excluding {.val {nrow(df_warn_assay)}} datapoint{?s} from
         {.val {length(warn_assay_n)}} assay{?s} flagged with
-        {.field {check_npx_log$col_names$assay_warn}} = {.val {'WARN'}} or
+        {.field {check_log$col_names$assay_warn}} = {.val {'WARN'}} or
         {.val {'Warning'}}: {.val {warn_assay_n}}.",
         "v" = "Returning cleaned dataset."
       )
@@ -995,7 +875,7 @@ clean_assay_warning <- function(df,
       dplyr::filter(
         !grepl(
           pattern = "warn",
-          x = .data[[check_npx_log$col_names$assay_warn]],
+          x = .data[[check_log$col_names$assay_warn]],
           ignore.case = TRUE
         )
       )
@@ -1006,7 +886,7 @@ clean_assay_warning <- function(df,
 
     if (verbose == TRUE) {
       cli::cli_inform(
-        c("No assays flagged with {.field {check_npx_log$col_names$assay_warn}}
+        c("No assays flagged with {.field {check_log$col_names$assay_warn}}
           = {.val {'WARN'}} or {.val {'Warning'}}.",
           "i" = "Returning original dataset.")
       )
@@ -1026,20 +906,7 @@ clean_assay_warning <- function(df,
 #' filtering out technical replicates or control samples prior to downstream
 #' analysis.
 #'
-#' @author
-#'   Kang Dong
-#'   Klev Diamanti
-#'
-#' @inheritParams clean_npx
-#' @param check_npx_log A named list generated by the function `check_npx()`,
-#' containing:
-#' \itemize{
-#' \item `col_names$sample_id`: the column name of the sample identifier in the
-#' dataset.
-#' }
-#'
-#' @returns A `tibble` or `arrow` object with rows corresponding to the provided
-#' control samples removed.
+#' @inherit clean_npx params return author
 #'
 #' @examples
 #' \dontrun{
@@ -1058,7 +925,7 @@ clean_assay_warning <- function(df,
 #' }
 #'
 clean_control_sample_id <- function(df,
-                                    check_npx_log,
+                                    check_log,
                                     control_sample_ids = NULL,
                                     verbose = FALSE) {
 
@@ -1074,22 +941,24 @@ clean_control_sample_id <- function(df,
     return(df)
   }
 
+  check_is_character(x = control_sample_ids, error = TRUE)
+
   if (nrow(dplyr::filter(.data = df,
-                         .data[[check_npx_log$col_names$sample_id]]
+                         .data[[check_log$col_names$sample_id]]
                          %in% .env[["control_sample_ids"]])) > 0L) {
 
     sid <- df |>
       dplyr::distinct(
-        .data[[check_npx_log$col_names$sample_id]]
+        .data[[check_log$col_names$sample_id]]
       ) |>
       dplyr::collect() |>
       dplyr::pull(
-        .data[[check_npx_log$col_names$sample_id]]
+        .data[[check_log$col_names$sample_id]]
       )
 
     df_cleaned <- df |>
       dplyr::filter(
-        !(.data[[check_npx_log$col_names$sample_id]]
+        !(.data[[check_log$col_names$sample_id]]
           %in% .env[["control_sample_ids"]])
       )
 
@@ -1131,28 +1000,15 @@ clean_control_sample_id <- function(df,
 #' classes in the input data frame and coerces those columns to the expected
 #' class using information from `check_npx_log$col_class`.
 #'
-#' @author
-#'   Kang Dong
-#'   Klev Diamanti
-#'
-#' @inheritParams clean_npx
-#' @param check_npx_log A named list generated by the function `check_npx()`,
-#' containing:
-#' \itemize{
-#' \item `col_names$col_class`: a data frame containing column names that need
-#' to be converted to a different type.
-#' }
-#'
-#' @return A `tibble` or `arrow` object with types of selected columns converted
-#' to the expected type.
+#' @inherit clean_npx params return author
 #'
 clean_col_class <- function(df,
-                            check_npx_log,
+                            check_log,
                             convert_df_cols = TRUE,
                             verbose = FALSE) {
   # input check
   check_is_scalar_boolean(
-    bool = convert_df_cols,
+    x = convert_df_cols,
     error = TRUE
   )
 
@@ -1169,7 +1025,7 @@ clean_col_class <- function(df,
   }
 
   # Early return if no corrections needed
-  if (nrow(check_npx_log$col_class) == 0L) {
+  if (nrow(check_log$col_class) == 0L) {
     if (verbose == TRUE) {
       cli::cli_inform(
         c("Columns are in the correct format.",
@@ -1183,7 +1039,7 @@ clean_col_class <- function(df,
   df_cleaned <- df |>
     dplyr::mutate(
       dplyr::across(
-        check_npx_log$col_class |>
+        check_log$col_class |>
           dplyr::filter(
             .data[["expected_col_class"]] == "numeric"
           ) |>
@@ -1195,7 +1051,7 @@ clean_col_class <- function(df,
     ) |>
     dplyr::mutate(
       dplyr::across(
-        check_npx_log$col_class |>
+        check_log$col_class |>
           dplyr::filter(
             .data[["expected_col_class"]] == "character"
           ) |>
@@ -1207,9 +1063,9 @@ clean_col_class <- function(df,
     )
 
   col_class_msg <- paste0(
-    "* \"", check_npx_log$col_class$col_name, "\": ",
-    "from \"", check_npx_log$col_class$col_class, "\" converted to ",
-    "\"", check_npx_log$col_class$expected_col_class, "\"."
+    "* \"", check_log$col_class$col_name, "\": ",
+    "from \"", check_log$col_class$col_class, "\" converted to ",
+    "\"", check_log$col_class$expected_col_class, "\"."
   )
 
   cli::cli_inform(

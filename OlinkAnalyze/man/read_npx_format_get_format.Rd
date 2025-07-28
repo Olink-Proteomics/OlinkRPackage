@@ -2,21 +2,21 @@
 % Please edit documentation in R/read_npx_format.R
 \name{read_npx_format_get_format}
 \alias{read_npx_format_get_format}
-\title{Help function to determine wide or long file format.}
+\title{Help function to determine the format (wide or long) of the input dataset.}
 \usage{
 read_npx_format_get_format(df_top_n, file, long_format = NULL)
 }
 \arguments{
 \item{df_top_n}{A tibble containing the first \var{read_n} rows of the input
-Olink file.}
+dataset.}
 
 \item{file}{Path to Olink software output file in wide or long format.
 Expecting file extensions
-"xls", "xlsx", "csv", and "txt".}
+"xls", "xlsx", "csv", or "txt".}
 
-\item{long_format}{Boolean marking format of input file. One of \code{NULL}
-(default) for auto-detection, \code{TRUE} for long format files or \code{FALSE} for
-wide format files.}
+\item{long_format}{Boolean marking format of input file. One of \code{TRUE} for
+long format and \code{FALSE} for wide format files. Defaults to \code{NULL} for
+auto-detection.}
 }
 \value{
 A list with two elements:
@@ -32,12 +32,12 @@ detection of the quantification method. Used in function
 The function uses the first \var{read_n} rows of the input dataset to
 determine the format of the input file.
 
-The user can provide the file format as an input argument. If the user did
-not provide an input with regards to the file format, then it is
-auto-determined exclusively from the function. If user provided the file
-format as input, then the function cross-checks that it's auto-detection
-matches user's input. If not, it will throw a warning, and accept user's
-input as the correct answer.
+The user can provide the file format as an input argument \var{long_format}.
+If the user did not provide an input with regards to the file format, then it
+is auto-determined is this function. If file format was provided as input,
+then the function cross-checks that its auto-detection matches the user
+input. If not, it will throw a warning, and accept user's input as the
+correct answer.
 }
 \seealso{
 \code{\link{read_npx_format}}

@@ -18,33 +18,37 @@ read_npx_format(
 \arguments{
 \item{file}{Path to Olink software output file in wide or long format.
 Expecting file extensions
-"xls", "xlsx", "csv", and "txt".}
+"xls", "xlsx", "csv", or "txt".}
 
-\item{out_df}{The class of output data frame. One of
-"tibble" and "arrow".}
+\item{out_df}{The class of the output dataset. One of
+"tibble" or "arrow". Defaults to
+"tibble".}
 
-\item{long_format}{Boolean marking format of input file. One of \code{NULL}
-(default) for auto-detection, \code{TRUE} for long format files or \code{FALSE} for
-wide format files.}
+\item{long_format}{Boolean marking format of input file. One of \code{TRUE} for
+long format and \code{FALSE} for wide format files. Defaults to \code{NULL} for
+auto-detection.}
 
-\item{olink_platform}{Olink platform used to generate the input file.
-One of \code{NULL} (default) for auto-detection,
-"Flex", "Focus", "Target 48", and "Target 96".}
+\item{olink_platform}{Olink platform used to generate the input file. One of
+"Target 48", "Flex", "Target 96", "Explore 3072", "Explore HT", "Focus", or "Reveal".
+Defaults to \code{NULL} for auto-detection.}
 
-\item{data_type}{Quantification method of the input data. One of \code{NULL}
-(default) for auto-detection, "Ct", "NPX", and "Quantified".}
+\item{data_type}{Quantification method of the input data. One of
+"Ct", "NPX", or "Quantified". Defaults to
+\code{NULL} for auto-detection.}
 
 \item{quiet}{Boolean to print a confirmation message when reading the input
-file. \code{TRUE} (default) to skip printing, and \code{FALSE} to print.}
+file. Applies to excel or delimited input only. \code{TRUE} skips printing the
+message, and \code{FALSE} otherwise.}
 
-\item{legacy}{Boolean to enforce returning a list containing olink_platform,
-data_type and long_format information together with the dataset. Used only
-when \code{\link{read_npx_format}} is called from
+\item{legacy}{Boolean to enforce returning a list containing
+\emph{olink_platform}, \emph{data_type} and \emph{long_format} information together with the
+dataset. Used only when \code{\link{read_npx_format}} is called from
 \code{\link{read_npx_legacy}}.}
 }
 \value{
-"tibble" or "ArrowObject" with
-Olink data in long or wide format.
+Dataset,
+"tibble" or "ArrowObject", with Olink
+data in long format.
 }
 \description{
 This function processes Olink software excel or delimited files regardless of
@@ -63,8 +67,8 @@ Files in wide format are subsequently handled by the function
 \code{\link{read_npx_wide}}.
 
 \strong{Olink software files in wide format} always originate from Olink qPCR
-platforms, and are further processed by
-\code{\link{read_npx_format_get_format}} and
+platforms, and are further processed by the functions
+\code{\link{read_npx_format_get_platform}} and
 \code{\link{read_npx_format_get_quant}} to determine the data type and Olink
 platform, respectively.
 }

@@ -12,3 +12,6 @@ A character vector with the acceptable file formats.
 \description{
 Get all acceptable file formats.
 }
+\author{
+Klev Diamanti
+}

@@ -7,7 +7,8 @@
 check_file_exists(file, error = FALSE)
 }
 \arguments{
-\item{file}{Path to file.}
+\item{file}{Path to Olink software output file in wide or long format.
+Expecting extensions "xls" or "xlsx" for excel files, "csv" or "txt" for delim files, "parquet" for parquet files, and "zip" for compressed files.}
 
 \item{error}{Scalar boolean to return an error instead of a \code{FALSE}
 (\code{default = FALSE}).}
