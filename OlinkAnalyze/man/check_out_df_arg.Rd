@@ -8,8 +8,9 @@ functions is acceptable.}
 check_out_df_arg(out_df)
 }
 \arguments{
-\item{out_df}{Class of output data frame. One of
-"tibble" and "arrow".}
+\item{out_df}{The class of the output dataset. One of
+"tibble" or "arrow". (default =
+"tibble")}
 }
 \value{
 Error if \var{out_df} is not one of

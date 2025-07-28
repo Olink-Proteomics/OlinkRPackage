@@ -4,8 +4,7 @@
 #' @author
 #'   Klev Diamanti
 #'
-#' @param out_df Class of output data frame. One of
-#' `r ansi_collapse_quot(x = read_npx_df_output, sep = "and")`.
+#' @inheritParams .read_npx_args
 #'
 #' @return Error if \var{out_df} is not one of
 #' `r ansi_collapse_quot(x = read_npx_df_output, sep = "and")`.
@@ -37,9 +36,8 @@ check_out_df_arg <- function(out_df) {
 #' @author
 #'   Klev Diamanti
 #'
-#' @param df Dataset to be converted.
-#' @param out_df Class of output data frame. One of
-#' `r ansi_collapse_quot(x = read_npx_df_output, sep = "and")`.
+#' @inheritParams .read_npx_args
+#' @inheritParams .downstream_fun_args
 #'
 #' @return The dataset in the requested class.
 #'
@@ -83,11 +81,8 @@ convert_read_npx_output <- function(df,
 #' @author
 #'   Klev Diamanti
 #'
-#' @param df Olink dataset
-#' (`r ansi_collapse_quot(x = get_df_output_print(), sep = "or")`)
-#' in wide or long format.
-#' @param file Path to Olink software output file in wide or long format.
-#' Expected file types: `r get_file_ext_summary()`.
+#' @inheritParams .read_npx_args
+#' @inheritParams .downstream_fun_args
 #'
 #' @return Error is file contains problematic column names. `NULL` otherwise.
 #'
