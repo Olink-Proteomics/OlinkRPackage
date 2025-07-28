@@ -130,8 +130,8 @@ clean_npx <- function(df,
                       verbose = FALSE) {
 
   # Validate input dataset
-  check_is_dataset(df = df, error = TRUE)
-  check_is_scalar_boolean(bool = verbose, error = TRUE)
+  check_is_dataset(x = df, error = TRUE)
+  check_is_scalar_boolean(x = verbose, error = TRUE)
 
   if (verbose) cli::cli_h2("Starting {.fn clean_npx} pipeline.")
 
@@ -153,7 +153,7 @@ clean_npx <- function(df,
       suppressWarnings() |>
       suppressMessages()
 
-  } else if (check_is_list(lst = check_log, error = TRUE)) {
+  } else if (check_is_list(x = check_log, error = TRUE)) {
 
     check_npx_log <- check_log
 
@@ -304,7 +304,7 @@ clean_assay_na <- function(df,
                            verbose = FALSE) {
   # input check
   check_is_scalar_boolean(
-    bool = remove_assay_na,
+    x = remove_assay_na,
     error = TRUE
   )
 
@@ -381,7 +381,7 @@ clean_invalid_oid <- function(df,
                               verbose = FALSE) {
   # input check
   check_is_scalar_boolean(
-    bool = remove_invalid_oid,
+    x = remove_invalid_oid,
     error = TRUE
   )
 
@@ -459,7 +459,7 @@ clean_duplicate_sample_id <- function(df,
                                       verbose = FALSE) {
   # input check
   check_is_scalar_boolean(
-    bool = remove_dup_sample_id,
+    x = remove_dup_sample_id,
     error = TRUE
   )
 
@@ -541,7 +541,7 @@ clean_sample_type <- function(df,
   # samples (when TRUE), or we keep samples (when FALSE).
   # When remove_control_sample is a character vector, then we remove all user
   # designated controls.
-  if (check_is_scalar_boolean(bool = remove_control_sample, error = FALSE)) {
+  if (check_is_scalar_boolean(x = remove_control_sample, error = FALSE)) {
 
     if (remove_control_sample == TRUE) {
       ctrl_sample_type <- olink_sample_types[
@@ -553,7 +553,7 @@ clean_sample_type <- function(df,
       ctrl_sample_type <- character(0L)
     }
 
-  } else if (check_is_character(string = remove_control_sample, error = TRUE)) {
+  } else if (check_is_character(x = remove_control_sample, error = TRUE)) {
 
     if (all(remove_control_sample %in% names(olink_sample_types))) {
       ctrl_sample_type <- olink_sample_types[names(olink_sample_types)
@@ -686,7 +686,7 @@ clean_assay_type <- function(df,
   # (when TRUE), or we keep all assays (when FALSE).
   # When remove_control_assay is a character vector, then we remove all user
   # designated controls.
-  if (check_is_scalar_boolean(bool = remove_control_assay, error = FALSE)) {
+  if (check_is_scalar_boolean(x = remove_control_assay, error = FALSE)) {
 
     if (remove_control_assay == TRUE) {
       ctrl_assay_type <- olink_assay_types[
@@ -698,7 +698,7 @@ clean_assay_type <- function(df,
       ctrl_assay_type <- character(0L)
     }
 
-  } else if (check_is_character(string = remove_control_assay, error = TRUE)) {
+  } else if (check_is_character(x = remove_control_assay, error = TRUE)) {
 
     if (all(remove_control_assay %in% names(olink_assay_types))) {
       ctrl_assay_type <- olink_assay_types[names(olink_assay_types)
@@ -828,7 +828,7 @@ clean_qc_warning <- function(df,
                              verbose = FALSE) {
   # input check
   check_is_scalar_boolean(
-    bool = remove_qc_warning,
+    x = remove_qc_warning,
     error = TRUE
   )
 
@@ -931,7 +931,7 @@ clean_assay_warning <- function(df,
                                 verbose = FALSE) {
   # input check
   check_is_scalar_boolean(
-    bool = remove_assay_warning,
+    x = remove_assay_warning,
     error = TRUE
   )
 
@@ -1074,6 +1074,8 @@ clean_control_sample_id <- function(df,
     return(df)
   }
 
+  check_is_character(x = control_sample_ids, error = TRUE)
+
   if (nrow(dplyr::filter(.data = df,
                          .data[[check_npx_log$col_names$sample_id]]
                          %in% .env[["control_sample_ids"]])) > 0L) {
@@ -1152,7 +1154,7 @@ clean_col_class <- function(df,
                             verbose = FALSE) {
   # input check
   check_is_scalar_boolean(
-    bool = convert_df_cols,
+    x = convert_df_cols,
     error = TRUE
   )
 
