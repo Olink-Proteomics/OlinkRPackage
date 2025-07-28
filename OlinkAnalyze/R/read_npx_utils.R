@@ -125,7 +125,7 @@ read_npx_format_colnames <- function(df,
   } else { # long format
 
     if (any(names(df) == "") == TRUE
-        || check_is_character(string = names(df),
+        || check_is_character(x = names(df),
                               error = FALSE) == FALSE) {
 
       cli::cli_abort( # nolint return_linter

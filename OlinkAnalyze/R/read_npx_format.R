@@ -392,7 +392,7 @@ read_npx_format_get_format <- function(df_top_n,
 
   # check long format input
   if (!is.null(long_format)) {
-    check_is_scalar_boolean(bool = long_format,
+    check_is_scalar_boolean(x = long_format,
                             error = TRUE)
   }
 

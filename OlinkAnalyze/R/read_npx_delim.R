@@ -88,7 +88,7 @@ read_npx_delim <- function(file,
   # warnings.
   #
   # In any case when warning or error persists, we also return an error.
-  if (check_is_dataset(df = df_olink, error = FALSE)) {
+  if (check_is_dataset(x = df_olink, error = FALSE)) {
     num_v_cols <- grepl(
       pattern = "^V\\d*$",
       x = names(df_olink),
@@ -129,7 +129,7 @@ read_npx_delim <- function(file,
 
   # check if any error or warning occurred ----
 
-  if (check_is_character(string = df_olink, error = FALSE)
+  if (check_is_character(x = df_olink, error = FALSE)
       && grepl("warning|error", df_olink)) {
 
     # If both functions throw errors, return an error message

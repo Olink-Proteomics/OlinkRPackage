@@ -80,7 +80,7 @@ check_file_extension <- function(file) {
 
   # if the extension of the input file was within the accepted ones it should
   # be a scalar character
-  if (!check_is_scalar_character(string = f_label, error = FALSE)) {
+  if (!check_is_scalar_character(x = f_label, error = FALSE)) {
 
     cli::cli_abort(
       message = c(
