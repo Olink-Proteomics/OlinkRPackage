@@ -7,7 +7,8 @@
 check_file_extension(file)
 }
 \arguments{
-\item{file}{Path to file.}
+\item{file}{Path to Olink software output file in wide or long format.
+Expecting extensions "xls" or "xlsx" for excel files, "csv" or "txt" for delim files, "parquet" for parquet files, and "zip" for compressed files.}
 }
 \value{
 The type of the file extension based on the global variable

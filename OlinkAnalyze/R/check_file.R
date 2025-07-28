@@ -4,7 +4,7 @@
 #' Check \strong{one file at a time} if it exists.
 #'
 #' @inherit .check_params params author
-#' @param file Path to file.
+#' @inheritParams .read_npx_args
 #'
 #' @return `TRUE` if the file exists, and `FALSE` if not; error if the file does
 #' not exist and `error = TRUE`.
