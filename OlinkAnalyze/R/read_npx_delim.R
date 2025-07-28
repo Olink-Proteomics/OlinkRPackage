@@ -239,9 +239,7 @@ read_npx_delim_long <- function(file,
 #'   Klev Diamanti
 #'
 #' @inherit read_npx_delim params
-#' @param sep Character separator of delimited input file. One of `NULL`
-#' (default) for auto-detection, or `r ansi_collapse_quot(accepted_field_sep)`.
-#' Used only for delimited output files from Olink software.
+#' @inherit read_npx_delim_long params
 #'
 #' @return Dataset, `r ansi_collapse_quot(x = "tibble")`, with Olink data in
 #' wide format.
