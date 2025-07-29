@@ -1,3 +1,10 @@
+# Olink Analyze 4.3.1
+## Bug Fixes
+* `olink_lod()` call to `checkNPX()` now correctly uses data instead of df, allowing the function to run without error (#579, @klevdiamanti)
+* broken link in bridging tutorial has been fixed (@amrita-kar)
+* minor edits have been made to the bridging tutorial and `olink_bridgeselector()` to clarify how to set `sampleMissingFreq` argument for different products and biological contexts (@amrita-kar, @kathy-nevola)
+* minor edits have been made to the bridging tutorial to clarify that Ct and count data is not normalized during bridging and to define a batch (@amrita-kar)
+
 # Olink Analyze 4.3.0
 ## Minor Changes
 * Recommended Olink Reveal bridge sample numbers have been added to the bridging tutorial (#523, @kathy-nevola)
