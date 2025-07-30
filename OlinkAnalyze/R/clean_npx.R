@@ -193,13 +193,8 @@ clean_npx <- function(df,
   if (verbose) cli::cli_h3("Removing samples with QC status 'FAIL'.")
   df <- clean_qc_warning(
     df = df,
-<<<<<<< HEAD
-    check_npx_log = check_npx_log,
-    keep_qc_warning = keep_qc_warning,
-=======
     check_log = check_log,
     remove_qc_warning = remove_qc_warning,
->>>>>>> 6d488153e0e87e089100dc0b11d5618d3db754c2
     verbose = verbose
   )
 
@@ -216,13 +211,8 @@ clean_npx <- function(df,
   if (verbose) cli::cli_h3("Removing assays flagged with assays warning.")
   df <- clean_assay_warning(
     df = df,
-<<<<<<< HEAD
-    check_npx_log = check_npx_log,
-    keep_assay_warning = keep_assay_warning,
-=======
     check_log = check_log,
     remove_assay_warning = remove_assay_warning,
->>>>>>> 6d488153e0e87e089100dc0b11d5618d3db754c2
     verbose = verbose
   )
 
