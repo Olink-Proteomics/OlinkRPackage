@@ -1079,31 +1079,31 @@ clean_col_class <- function(df,
 
 
 
-# Replace duplicate UniProt ID --------------------------------------------
+# Convert non-unique UniProt ID --------------------------------------------
 
 clean_nonunique_uniprot <- function(df,
-                                    keep_nonunique_uniprot = FALSE,
-                                    check_npx_log,
+                                    convert_nonunique_uniprot = TRUE,
+                                    check_log,
                                     verbose = TRUE) {
 
-  if (keep_nonunique_uniprot == TRUE) {
+  if (convert_nonunique_uniprot == FALSE) {
     if (verbose == TRUE) {
       cli::cli_inform(c(
-      "Skipping unification of non-unique
-      {.val {check_npx_log$col_names$olink_id}} -
-      {.val {check_npx_log$col_names$uniprot}}
-      mappings as per user input {.arg keep_nonunique_uniprot}",
-      "i" = "Returning original dataset."
+        "Skipping unification of non-unique
+      {.val {check_log$col_names$olink_id}} -
+      {.val {check_log$col_names$uniprot}}
+      mappings as per user input {.arg convert_nonunique_uniprot}",
+        "i" = "Returning original dataset."
       ))
     }
     return(df)
   }
 
-  if (length(check_npx_log$non_unique_uniprot) == 0L) {
+  if (length(check_log$non_unique_uniprot) == 0L) {
     if (verbose == TRUE) {
       cli::cli_inform(c(
-        "Each {.val {check_npx_log$col_names$olink_id}} maps to a unique
-        {.val {check_npx_log$col_names$uniprot}} identifier.",
+        "Each {.val {check_log$col_names$olink_id}} maps to a unique
+        {.val {check_log$col_names$uniprot}} identifier.",
         "i" = "Returning original dataset."
       ))
     }
@@ -1113,15 +1113,55 @@ clean_nonunique_uniprot <- function(df,
 
     oid_uniprot_map <- df |>
       dplyr::filter(
-        .data[[check_npx_log$col_names$olink_id]] %in%
-                      check_npx_log$non_unique_uniprot
-        ) |>
+        .data[[check_log$col_names$olink_id]] %in%
+          check_log$non_unique_uniprot
+      ) |>
       dplyr::select(dplyr::all_of(c(
-        check_npx_log$col_names$olink_id,
-        check_npx_log$col_names$uniprot
+        check_log$col_names$olink_id,
+        check_log$col_names$uniprot
       ))) |>
       dplyr::distinct() |>
-      dplyr::collect()
+      dplyr::collect() |>
+      dplyr::group_by(.data[[check_log$col_names$olink_id]]) |>
+      dplyr::mutate(iteration = dplyr::row_number()) |>
+      dplyr::summarise(
+        uniprot_keep = .data[[check_log$col_names$uniprot]][iteration == 1],
+        uniprot_extra = paste(
+          .data[[check_log$col_names$uniprot]][iteration != 1],
+          collapse = ","
+        ),
+        .groups = "drop"
+      )
+
+    cli::cli_warn(c(
+      "{nrow(oid_uniprot_map)} assay{?s} ha{?s/ve} multiple UniProt IDs. The
+      first iteration will be used for downstream analysis.",
+      "i" = paste("{.val {check_log$col_names$uniprot}}",
+                  oid_uniprot_map$uniprot_extra,
+                  "will be replaced with {.val {check_log$col_names$uniprot}}",
+                  oid_uniprot_map$uniprot_keep,
+                  "for {.val {check_log$col_names$olink_id}}",
+                  oid_uniprot_map$OlinkID, ".\n")
+    ))
+
+    # df_cleaned <- test |>
+    #   dplyr::left_join(oid_uniprot_map,
+    #                    by = c(.data[[check_log$col_names$olink_id]],
+    #                           "check_log$col_names$uniprot = uniprot_keep"))
+    #
+    # df_cleaned <- test |>
+    #   dplyr::left_join(
+    #     oid_uniprot_map,
+    #     by = c(
+    #       check_log$col_names$olink_id,
+    #       check_log$col_names$uniprot == "uniprot_keep"
+    #     )
+    #   )
+
+
+
+
+
 
 
   }
@@ -1134,40 +1174,59 @@ clean_nonunique_uniprot <- function(df,
 
 # -------------------------------------------------------------------------
 
-df <- npx_data1 |>
+df <- OlinkAnalyze::npx_data1 |>
   dplyr::mutate(UniProt = dplyr::case_when(SampleID == "A1" & OlinkID == "OID00471" ~ "P00001",
                                            SampleID == "A1" & OlinkID == "OID00482" ~ "P00002",
                                            TRUE ~ UniProt))
 log <- check_npx(df)
 
 # log$non_unique_uniprot
-clean_nonunique_uniprot(df, check_npx_log = log, keep_nonunique_uniprot = TRUE)
+clean_nonunique_uniprot(df, check_log = log, convert_nonunique_uniprot = FALSE)
 
 
 qc <- clean_nonunique_uniprot(npx_data1,
-                              check_npx_log = check_npx(npx_data1),
-                              keep_nonunique_uniprot = FALSE,
+                              check_log = check_npx(npx_data1),
+                              convert_nonunique_uniprot = TRUE,
                               verbose = TRUE)
 
-check_npx_log <- log
+check_log <- log
 
 
-oid_uniprot_map <- df_arrow |>
+df_arrow <- arrow::arrow_table(df)
+
+
+
+test <- df_arrow |>
   dplyr::filter(
-    .data[[check_npx_log$col_names$olink_id]] %in%
-      check_npx_log$non_unique_uniprot
+    .data[[check_log$col_names$olink_id]] %in%
+      check_log$non_unique_uniprot
   ) |>
   dplyr::select(dplyr::all_of(c(
-    check_npx_log$col_names$olink_id,
-    check_npx_log$col_names$uniprot
+    check_log$col_names$olink_id,
+    check_log$col_names$uniprot
   ))) |>
   dplyr::distinct() |>
   dplyr::collect() |>
-  dplyr::group_by(OlinkID) %>%
+  dplyr::group_by(.data[[check_log$col_names$olink_id]]) |>
   dplyr::mutate(iteration = dplyr::row_number()) |>
-  dplyr::ungroup() |>
-  dplyr::filter(iteration == 1)
+  dplyr::summarise(
+    uniprot = .data[[check_log$col_names$uniprot]][iteration == 1],
+    uniprot_extra = paste(
+      .data[[check_log$col_names$uniprot]][iteration != 1],
+      collapse = ","
+    ),
+    .groups = "drop"
+  )
 
 
+test <- df |> dplyr::filter(OlinkID %in% oid_uniprot_map$OlinkID)
 
+df_cleaned <- test|>
+  dplyr::mutate(
+    check_log$col_names$uniprot = ifelse(
+      .data[[check_log$col_names$olink_id]] %in% oid_uniprot_map[[check_log$col_names$olink_id]],
+      oid_uniprot_map[[check_log$col_names$uniprot]],
+      .data[[check_log$col_names$uniprot]]
 
+    )
+  )
