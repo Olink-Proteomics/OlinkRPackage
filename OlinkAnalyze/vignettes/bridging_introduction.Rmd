@@ -120,13 +120,7 @@ due to naming convention differences, it is necessary to exclude the
 control samples using either `SampleType == "SAMPLE"` if available or
 `stringr::str_detect()` as shown below.
 
-To select samples across the range of the data, the samples are ordered
-by mean NPX value and selected across this range. When running the
-selector, Olink recommends starting at sampleMissingFreq = 0.10 which
-represents a maximum of 10% data below LOD per sample. If there are not
-enough samples output, increase to 20%. For alternative matrices and
-specific disease types, it may be needed to increase the
-sampleMissingFreq to higher levels.
+To select samples across the range of the data, the samples are ordered by mean NPX value and selected across this range. When running the selector, the sampleMissingFreq value represents a maximum percentage of data below LOD allowed per sample. When running plasma on smaller panels, such as Target 96, sampleMissingFreq = 0.10 can be a good starting point. Larger panels such as Explore HT have many proteins that are only expressed in certain diseases or matrices and therefore more data below LOD is expected. In this case sampleMissingFreq = 0.5 can be a good starting point. Note that these values may need to be adjusted based on the Olink product, sample matrix, and biological context of the samples (for example specific disease types). sampleMissingFreq  = 1 will provide a list of all elegible samples, regardless of the % of data below LOD and the function output provides the percent of assays below LOD (PercAssaysBelowLOD) which can help inform a good starting point for a specific study.
 
 In this example we will demonstrate how to select 16 bridging samples
 using `npx_data1` which will act as the reference data. The selected
