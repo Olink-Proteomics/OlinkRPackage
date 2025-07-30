@@ -1,9 +1,19 @@
 #' Bridge selection function
 #'
 #'The bridge selection function will select a number of bridge samples based on the input data. It selects samples with
-#'good detection, which passes QC and cover a good range of the data. If possible, Olink recommends 8-16 bridge samples.
-#'When running the selector, Olink recommends starting at sampleMissingFreq = 0.10 which represents a maximum of 10\%
-#'data below LOD per sample. If there are not enough samples output, increase to 20\%. \cr\cr
+#'good detection, which passes QC and cover a good range of the data.
+#'
+#'When running the selector, the `sampleMissingFreq` value
+#'represents a maximum percentage of data below LOD allowed per
+#'sample. When running plasma on smaller panels, such as Target
+#'96, `sampleMissingFreq = 0.10` can be a good starting point.
+#'Larger panels such as Explore HT have many proteins that are
+#'only expressed in certain diseases or matrices and therefore
+#'more data below LOD is expected. In this case
+#'`sampleMissingFreq = 0.5` can be a good starting point.
+#'
+#'For more information, please consult the Introduction to
+#'Bridging tutorial. \cr\cr
 #'The function accepts NPX Excel files with data < LOD replaced.
 #'
 #' @param df Tibble/data frame in long format such as produced by the Olink Analyze read_NPX function.
