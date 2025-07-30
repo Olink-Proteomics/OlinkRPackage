@@ -177,7 +177,7 @@ f3 <- "Figure 3. PCA plot of both datasets before bridging."
 
 f4 <- "Figure 4. Density plot of NPX distribution in both datasets after bridging."
 
-f5 <- "Figure 5. Histogram of adjustment factors in normalized data from Project \"data2\"."
+f5 <- "Figure 5. Histogram of adjustment factors in normalized data from Project `data2`."
 
 f6 <- "Figure 6. Violin plot of CHL1 in both datasets prior to bridging. Bridge samples are indicated by black points."
 
