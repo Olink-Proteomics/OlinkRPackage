@@ -46,6 +46,10 @@ NPX datasets often requires an additional batch correction step to
 remove technical variations, which is referred to as overlapping sample
 reference normalization, bridge normalization, or just simply bridging.
 
+A batch is groups of samples run at different times. May or may not use
+the same lot of reagents but requires bridging since good randomization
+across sample batches is unlikely.
+
 Bridging is also needed if Olink® NPX datasets are:
 
 -   plate control normalized only and run conditions (e.g lab and
