@@ -48,7 +48,7 @@ reference normalization, bridge normalization, or just simply bridging.
 
 Batches are groups of samples run at different times. They may or may not use
 the same lot of reagents, however bridging is recommended because good randomization
-across sample batches is unlikely.
+across these sample batches is unlikely.
 
 Bridging is also needed if Olink® NPX datasets are:
 
