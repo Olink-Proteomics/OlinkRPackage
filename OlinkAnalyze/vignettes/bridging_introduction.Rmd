@@ -46,6 +46,10 @@ NPX datasets often requires an additional batch correction step to
 remove technical variations, which is referred to as overlapping sample
 reference normalization, bridge normalization, or just simply bridging.
 
+Batches are groups of samples run at different times. They may or may
+not use the same lot of reagents, however bridging is recommended
+because good randomization across these sample batches is unlikely.
+
 Bridging is also needed if Olink® NPX datasets are:
 
 -   plate control normalized only and run conditions (e.g lab and
@@ -122,11 +126,19 @@ control samples using either `SampleType == "SAMPLE"` if available or
 
 To select samples across the range of the data, the samples are ordered
 by mean NPX value and selected across this range. When running the
-selector, Olink recommends starting at sampleMissingFreq = 0.10 which
-represents a maximum of 10% data below LOD per sample. If there are not
-enough samples output, increase to 20%. For alternative matrices and
-specific disease types, it may be needed to increase the
-sampleMissingFreq to higher levels.
+selector, the sampleMissingFreq value represents a maximum percentage of
+data below LOD allowed per sample. When running plasma on smaller
+panels, such as Target 96, `sampleMissingFreq = 0.10` can be a good
+starting point. Larger panels such as Explore HT have many proteins that
+are only expressed in certain diseases or matrices and therefore more
+data below LOD is expected. In this case `sampleMissingFreq = 0.5` can
+be a good starting point. Note that these values may need to be adjusted
+based on the Olink product, sample matrix, and biological context of the
+samples, for example, specific disease types. `sampleMissingFreq = 1`
+will provide a list of all elegible samples, regardless of the % of data
+below LOD and the function output provides the percent of assays below
+LOD (`PercAssaysBelowLOD`) which can help inform a good starting point
+for a specific study.
 
 In this example we will demonstrate how to select 16 bridging samples
 using `npx_data1` which will act as the reference data. The selected
@@ -169,7 +181,7 @@ f3 <- "Figure 3. PCA plot of both datasets before bridging."
 
 f4 <- "Figure 4. Density plot of NPX distribution in both datasets after bridging."
 
-f5 <- "Figure 5. Histogram of adjustment factors in normalized data from Project \"data2\"."
+f5 <- "Figure 5. Histogram of adjustment factors in normalized data from Project `data2`."
 
 f6 <- "Figure 6. Violin plot of CHL1 in both datasets prior to bridging. Bridge samples are indicated by black points."
 
@@ -327,6 +339,9 @@ to the user to define which dataset is the reference dataset and specify
 the names of the bridge samples. The resulting dataset will contain the
 reference dataset, which will be identical to the input reference data,
 with adjustment factors of 0, and the newly bridged dataset.
+
+NOTE : The alternative quantification columns (for example: Quantified
+value, count, and Ct data) are not normalized.
 
 ```{r bridging, message=FALSE}
 # Find shared samples
