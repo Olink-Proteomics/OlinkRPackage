@@ -336,6 +336,9 @@ the names of the bridge samples. The resulting dataset will contain the
 reference dataset, which will be identical to the input reference data,
 with adjustment factors of 0, and the newly bridged dataset.
 
+NOTE : The alternative quantification columns (example :Quantified
+value, Count/Ct data) are not normalized.
+
 ```{r bridging, message=FALSE}
 # Find shared samples
 npx_1 <- npx_data1 %>%
