@@ -46,7 +46,7 @@ NPX datasets often requires an additional batch correction step to
 remove technical variations, which is referred to as overlapping sample
 reference normalization, bridge normalization, or just simply bridging.
 
-A batch is groups of samples run at different times. May or may not use
+Batches are groups of samples run at different times. They may or may not use
 the same lot of reagents but requires bridging since good randomization
 across sample batches is unlikely.
 
