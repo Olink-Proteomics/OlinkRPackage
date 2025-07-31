@@ -110,7 +110,14 @@ olink_pathway_enrichment <- function(data, test_results, method = "GSEA", ontolo
          BiocManager::install(\"clusterProfiler\")")
   }
 
-  if(!requireNamespace("msigdbr", minVersion = "9.0.0", quietly = TRUE)) {
+  if(!requireNamespace("msigdbr", quietly = TRUE)) {
+    stop(" Pathway enrichment requires the msigdbr package.
+         Please install msigdbr before continuing.
+
+         install.packages(\"msigdbr\")")
+  }
+
+  if(utils::packageVersion("msigdbr") < package_version("9.0.0")) {
     stop(" Pathway enrichment requires version >=9.0.0 of the msigdbr package.
          Please install a supported version of msigdbr before continuing.
 
