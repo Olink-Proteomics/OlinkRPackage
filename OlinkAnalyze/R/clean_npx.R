@@ -36,6 +36,8 @@
 #' `WARN`.
 #' 8. **Correct column data type**: ensure that certain columns have the
 #' expected data type (class). These columns are identified in [`check_npx()`].
+#' 9. **Resolve multiple UniProt mappings per assay**: ensure that each assay
+#' identifier (e.g., `OlinkID`) maps uniquely to a single UniProt ID.
 #'
 #' **Important:**
 #'
@@ -79,6 +81,8 @@
 #' @param convert_df_cols Logical. If `FALSE`, retains columns of `df` as are.
 #' Defaults to `TRUE`, were columns required for downstream analysis are
 #' converted to the expected format.
+#' @param convert_nonunique_uniprot Logical. If `FALSE`, retains non-unique
+#' OlinkID - UniProt mapping. Defaults to `TRUE`.
 #' @param verbose Logical. If `FALSE` (default), silences step-wise messages.
 #'
 #' @export
@@ -115,6 +119,7 @@ clean_npx <- function(df,
                       remove_assay_warning = TRUE,
                       control_sample_ids = NULL,
                       convert_df_cols = TRUE,
+                      convert_nonunique_uniprot = TRUE,
                       out_df = "tibble",
                       verbose = FALSE) {
 
@@ -142,6 +147,7 @@ clean_npx <- function(df,
       suppressMessages()
 
   }
+
   check_is_list(x = check_log, error = TRUE)
 
   # Clean invalid Olink IDs
@@ -225,6 +231,15 @@ clean_npx <- function(df,
     verbose = verbose
   )
 
+  # Correct non-unique Uniprot IDs
+  if (verbose) cli::cli_h3("Converting non-unique OlinkID - UniProt Mapping.")
+  df <- clean_nonunique_uniprot(
+    df = df,
+    check_log = check_log,
+    convert_nonunique_uniprot = convert_nonunique_uniprot,
+    verbose = verbose
+  )
+
   # Check for absolute quantification and apply log2 transformation
   if (grepl(pattern = "quantified",
             x = check_log$col_names$quant,
@@ -263,7 +278,7 @@ clean_npx <- function(df,
 #' This function filters out rows from a `tibble` or `arrow` object where the
 #' assay identifier (one of
 #' `r ansi_collapse_quot(x = column_name_dict$col_names$olink_id, sep = "or")`)
-#' matches those listed in `check_npx_log$assay_na`, which contains assays
+#' matches those listed in `check_log$assay_na`, which contains assays
 #' composed entirely of `NA` values in their quantification column.
 #'
 #' @inherit clean_npx params return author
@@ -326,7 +341,7 @@ clean_assay_na <- function(df,
 #' This function filters out rows from a `tibble` or `arrow` object where the
 #' assay identifier (one of
 #' `r ansi_collapse_quot(x = column_name_dict$col_names$olink_id, sep = "or")`)
-#' matches values listed in `check_npx_log$oid_invalid`, which identifies
+#' matches values listed in `check_log$oid_invalid`, which identifies
 #' invalid or malformed assay identifiers.
 #'
 #' @inherit clean_npx params return author
@@ -389,7 +404,7 @@ clean_invalid_oid <- function(df,
 #' This function filters out rows from a `tibble` or `arrow` object where the
 #' sample identifier (one of
 #' `r ansi_collapse_quot(x = column_name_dict$col_names$sample_id, sep = "or")`)
-#' matches values listed in `check_npx_log$sample_id_dups`, which identifies
+#' matches values listed in `check_log$sample_id_dups`, which identifies
 #' samples with duplicated identifiers.
 #'
 #' @inherit clean_npx params return author
@@ -452,7 +467,7 @@ clean_duplicate_sample_id <- function(df,
 #' This function filters out rows from a dataset where the sample type column
 #' matches known control sample types: `"SAMPLE_CONTROL"`, `"PLATE_CONTROL"` or
 #' `"NEGATIVE_CONTROL"`. If `keep_control_sample` is set to `TRUE`, or if the
-#' sample type column is present in the `check_npx_log`, the function returns
+#' sample type column is present in the `check_log`, the function returns
 #' the original data unchanged.
 #'
 #' @inherit clean_npx params return author
@@ -584,7 +599,7 @@ clean_sample_type <- function(df,
 #' @description
 #' This function filters out internal control assays (`ext_ctrl`, `inc_ctrl`,
 #' `amp_ctrl`) from the dataset, unless user specified to retain them. The
-#' function uses column mapping provided by `check_npx_log`.
+#' function uses column mapping provided by `check_log`.
 #'
 #' @inherit clean_npx params return author
 #'
@@ -713,7 +728,7 @@ clean_assay_type <- function(df,
 #'
 #' @description
 #' This function uses the column marking QC warnings identified by
-#' `check_npx_log` to remove samples flagged `FAIL` in the dataset.
+#' `check_log` to remove samples flagged `FAIL` in the dataset.
 #'
 #' @inherit clean_npx params return author
 #'
@@ -801,7 +816,7 @@ clean_qc_warning <- function(df,
 #' @description
 #' The function is used to remove assay-level QC warnings from the dataset
 #' before analysis. It uses the column marking assay QC warnings identified by
-#' `check_npx_log` to remove assays flagged as `WARN` in the dataset.
+#' `check_log` to remove assays flagged as `WARN` in the dataset.
 #'
 #' @inherit clean_npx params return author
 #'
@@ -901,7 +916,7 @@ clean_assay_warning <- function(df,
 #'
 #' @description
 #' This function removes rows from NPX data where the sample identifiers, as
-#' defined in `check_npx_log`, match samples provided in
+#' defined in `check_log`, match samples provided in
 #' \var{control_sample_ids}. Primary goal of the function is to serve for
 #' filtering out technical replicates or control samples prior to downstream
 #' analysis.
@@ -998,7 +1013,7 @@ clean_control_sample_id <- function(df,
 #' @description
 #' This function checks for mismatches between actual and expected column
 #' classes in the input data frame and coerces those columns to the expected
-#' class using information from `check_npx_log$col_class`.
+#' class using information from `check_log$col_class`.
 #'
 #' @inherit clean_npx params return author
 #'
@@ -1077,10 +1092,15 @@ clean_col_class <- function(df,
   return(df_cleaned)
 }
 
-
-
-# Convert non-unique UniProt ID --------------------------------------------
-
+#' Help function converting types of columns to the expected ones.
+#'
+#' @description
+#' This function checks the non-unique "OlinkID - UniProt" mappings, as defined
+#' in `check_log`.  it selects the first UniProt ID per OlinkID and replaces
+#' the original UniProt column with the unified mapping.
+#'
+#' @inherit clean_npx params return author
+#'
 clean_nonunique_uniprot <- function(df,
                                     check_log,
                                     convert_nonunique_uniprot = TRUE,
@@ -1143,29 +1163,20 @@ clean_nonunique_uniprot <- function(df,
       )
 
     # Convert non-unique UniProt ID
-    # Solution #1: Simplify process, but use "!!" and ":=" operator
     df_cleaned <- df |>
       dplyr::left_join(oid_uniprot_map,
                        by = check_log$col_names$olink_id) |>
-      dplyr::mutate(!!check_log$col_names$uniprot :=
-                      ifelse(is.na(.data[["uniprot_keep"]]),
-                             .data[[check_log$col_names$uniprot]],
-                             .data[["uniprot_keep"]])) |>
+      dplyr::mutate(uniprot_keep = ifelse(is.na(.data[["uniprot_keep"]]),
+                                          .data[[check_log$col_names$uniprot]],
+                                          .data[["uniprot_keep"]])) |>
       dplyr::select(
-        !dplyr::all_of(c("uniprot_keep", "uniprot_extra"))
-      )
+        !dplyr::all_of(c(check_log$col_names$uniprot,
+                         "uniprot_extra"))
+        ) |>
+      dplyr::rename_with(~ check_log$col_names$uniprot,
+                         .cols = "uniprot_keep")
 
-    # # Solution #2: This solution does not use "!!" and ":=" operator.
-    # df_cleaned <- df |>
-    #   dplyr::left_join(oid_uniprot_map,
-    #                    by = check_log$col_names$olink_id) |>
-    #   dplyr::mutate(uniprot_keep = ifelse(is.na(.data[["uniprot_keep"]]),
-    #                                       .data[[check_log$col_names$uniprot]],
-    #                                       .data[["uniprot_keep"]])) |>
-    #   dplyr::select(!dplyr::all_of(c(check_log$col_names$uniprot, "uniprot_extra")))
-    # names(df_cleaned)[names(df_cleaned) == "uniprot_keep"] <- check_log$col_names$uniprot
-
-    cli::cli_warn(c(
+    cli::cli_inform(c(
       "{nrow(oid_uniprot_map)} assay{?s} ha{?s/ve} multiple UniProt IDs. The
       first iteration will be used for downstream analysis.",
       "i" = paste("{.val {check_log$col_names$uniprot}} IDs",
@@ -1181,61 +1192,3 @@ clean_nonunique_uniprot <- function(df,
   }
 
 }
-
-
-# -------------------------------------------------------------------------
-
-df <- OlinkAnalyze::npx_data1 |>
-  dplyr::mutate(UniProt = dplyr::case_when(SampleID == "A1" & OlinkID == "OID00471" ~ "P00001",
-                                           SampleID == "A3" & OlinkID == "OID00471" ~ "P00003",
-                                           SampleID == "A1" & OlinkID == "OID00482" ~ "P00002",
-                                           SampleID == "A3" & OlinkID == "OID00482" ~ "P00004",
-                                           TRUE ~ UniProt))
-log <- OlinkAnalyze::check_npx(df)
-
-# log$non_unique_uniprot
-qc <- clean_nonunique_uniprot(df, check_log = log, convert_nonunique_uniprot = TRUE)
-
-
-
-check_log <- log
-
-
-df_arrow <- arrow::arrow_table(df)
-
-
-
-test <- df_arrow |>
-  dplyr::filter(
-    .data[[check_log$col_names$olink_id]] %in%
-      check_log$non_unique_uniprot
-  ) |>
-  dplyr::select(dplyr::all_of(c(
-    check_log$col_names$olink_id,
-    check_log$col_names$uniprot
-  ))) |>
-  dplyr::distinct() |>
-  dplyr::collect() |>
-  dplyr::group_by(.data[[check_log$col_names$olink_id]]) |>
-  dplyr::mutate(iteration = dplyr::row_number()) |>
-  dplyr::summarise(
-    uniprot = .data[[check_log$col_names$uniprot]][iteration == 1],
-    uniprot_extra = paste(
-      .data[[check_log$col_names$uniprot]][iteration != 1],
-      collapse = ","
-    ),
-    .groups = "drop"
-  )
-
-
-test <- df |> dplyr::filter(OlinkID %in% oid_uniprot_map$OlinkID)
-
-df_cleaned <- test|>
-  dplyr::mutate(
-    check_log$col_names$uniprot = ifelse(
-      .data[[check_log$col_names$olink_id]] %in% oid_uniprot_map[[check_log$col_names$olink_id]],
-      oid_uniprot_map[[check_log$col_names$uniprot]],
-      .data[[check_log$col_names$uniprot]]
-
-    )
-  )
