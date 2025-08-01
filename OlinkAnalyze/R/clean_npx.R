@@ -1082,10 +1082,17 @@ clean_col_class <- function(df,
 # Convert non-unique UniProt ID --------------------------------------------
 
 clean_nonunique_uniprot <- function(df,
-                                    convert_nonunique_uniprot = TRUE,
                                     check_log,
+                                    convert_nonunique_uniprot = TRUE,
                                     verbose = TRUE) {
 
+  # input check
+  check_is_scalar_boolean(
+    x = convert_nonunique_uniprot,
+    error = TRUE
+  )
+
+  # check if user wants non-unique uniprot IDs to be converted
   if (convert_nonunique_uniprot == FALSE) {
     if (verbose == TRUE) {
       cli::cli_inform(c(
@@ -1099,6 +1106,7 @@ clean_nonunique_uniprot <- function(df,
     return(df)
   }
 
+  # early return if no corrections needed
   if (length(check_log$non_unique_uniprot) == 0L) {
     if (verbose == TRUE) {
       cli::cli_inform(c(
@@ -1111,6 +1119,7 @@ clean_nonunique_uniprot <- function(df,
 
   } else {
 
+    # Map Olink ID - UniProt ID
     oid_uniprot_map <- df |>
       dplyr::filter(
         .data[[check_log$col_names$olink_id]] %in%
@@ -1133,41 +1142,43 @@ clean_nonunique_uniprot <- function(df,
         .groups = "drop"
       )
 
+    # Convert non-unique UniProt ID
+    # Solution #1: Simplify process, but use "!!" and ":=" operator
+    df_cleaned <- df |>
+      dplyr::left_join(oid_uniprot_map,
+                       by = check_log$col_names$olink_id) |>
+      dplyr::mutate(!!check_log$col_names$uniprot :=
+                      ifelse(is.na(.data[["uniprot_keep"]]),
+                             .data[[check_log$col_names$uniprot]],
+                             .data[["uniprot_keep"]])) |>
+      dplyr::select(
+        !dplyr::all_of(c("uniprot_keep", "uniprot_extra"))
+      )
+
+    # # Solution #2: This solution does not use "!!" and ":=" operator.
+    # df_cleaned <- df |>
+    #   dplyr::left_join(oid_uniprot_map,
+    #                    by = check_log$col_names$olink_id) |>
+    #   dplyr::mutate(uniprot_keep = ifelse(is.na(.data[["uniprot_keep"]]),
+    #                                       .data[[check_log$col_names$uniprot]],
+    #                                       .data[["uniprot_keep"]])) |>
+    #   dplyr::select(!dplyr::all_of(c(check_log$col_names$uniprot, "uniprot_extra")))
+    # names(df_cleaned)[names(df_cleaned) == "uniprot_keep"] <- check_log$col_names$uniprot
+
     cli::cli_warn(c(
       "{nrow(oid_uniprot_map)} assay{?s} ha{?s/ve} multiple UniProt IDs. The
       first iteration will be used for downstream analysis.",
-      "i" = paste("{.val {check_log$col_names$uniprot}}",
+      "i" = paste("{.val {check_log$col_names$uniprot}} IDs",
                   oid_uniprot_map$uniprot_extra,
-                  "will be replaced with {.val {check_log$col_names$uniprot}}",
+                  "will be replaced with",
                   oid_uniprot_map$uniprot_keep,
                   "for {.val {check_log$col_names$olink_id}}",
                   oid_uniprot_map$OlinkID, ".\n")
     ))
 
-    # df_cleaned <- test |>
-    #   dplyr::left_join(oid_uniprot_map,
-    #                    by = c(.data[[check_log$col_names$olink_id]],
-    #                           "check_log$col_names$uniprot = uniprot_keep"))
-    #
-    # df_cleaned <- test |>
-    #   dplyr::left_join(
-    #     oid_uniprot_map,
-    #     by = c(
-    #       check_log$col_names$olink_id,
-    #       check_log$col_names$uniprot == "uniprot_keep"
-    #     )
-    #   )
-
-
-
-
-
-
+    return(df_cleaned)
 
   }
-
-
-
 
 }
 
@@ -1176,18 +1187,16 @@ clean_nonunique_uniprot <- function(df,
 
 df <- OlinkAnalyze::npx_data1 |>
   dplyr::mutate(UniProt = dplyr::case_when(SampleID == "A1" & OlinkID == "OID00471" ~ "P00001",
+                                           SampleID == "A3" & OlinkID == "OID00471" ~ "P00003",
                                            SampleID == "A1" & OlinkID == "OID00482" ~ "P00002",
+                                           SampleID == "A3" & OlinkID == "OID00482" ~ "P00004",
                                            TRUE ~ UniProt))
-log <- check_npx(df)
+log <- OlinkAnalyze::check_npx(df)
 
 # log$non_unique_uniprot
-clean_nonunique_uniprot(df, check_log = log, convert_nonunique_uniprot = FALSE)
+qc <- clean_nonunique_uniprot(df, check_log = log, convert_nonunique_uniprot = TRUE)
 
 
-qc <- clean_nonunique_uniprot(npx_data1,
-                              check_log = check_npx(npx_data1),
-                              convert_nonunique_uniprot = TRUE,
-                              verbose = TRUE)
 
 check_log <- log
 
