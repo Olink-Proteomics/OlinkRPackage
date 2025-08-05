@@ -159,7 +159,8 @@ check_npx <- function(df,
   # non-unique uniprot id
   check_npx_out_lst$non_unique_uniprot <- check_npx_nonunique_uniprot(
     df = df,
-    col_names = check_npx_out_lst$col_names)
+    col_names = check_npx_out_lst$col_names
+  )
 
   # return results ----
 
@@ -1018,7 +1019,7 @@ check_npx_nonunique_uniprot <- function(df, col_names) {
     dplyr::distinct() |>  # Ensure uniqueness of OlinkID-UniProt pairs
     dplyr::group_by(
       .data[[col_names$olink_id]]
-      ) |>
+    ) |>
     dplyr::summarise(
       freq = dplyr::n(),
       .groups = "drop"
@@ -1030,7 +1031,7 @@ check_npx_nonunique_uniprot <- function(df, col_names) {
     dplyr::filter(.data[["freq"]] > 1) |>
     dplyr::pull(
       .data[[col_names$olink_id]]
-      ) |>
+    ) |>
     unique()
 
   # Emit a warning if any duplicates are found
