@@ -1951,6 +1951,92 @@ test_that(
   }
 )
 
+# Test clean_nonunique_uniprot --------------------------------------------
+test_that(
+  "clean_nonunique_uniprot - works - do not correct non-unique unirpot",
+  {
+
+    log_test <- check_npx(df = OlinkAnalyze::npx_data1) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    expect_message(
+      object = expect_equal(
+        object = clean_nonunique_uniprot(df = OlinkAnalyze::npx_data1,
+                                         check_log = log_test,
+                                         convert_nonunique_uniprot = FALSE,
+                                         verbose = TRUE),
+        expected = OlinkAnalyze::npx_data1
+      ),
+      regexp = paste("Skipping unification of non-unique",
+                     "\"OlinkID\" - \"UniProt\" mappings as",
+                     "per user input `convert_nonunique_uniprot`.")
+    )
+
+  }
+)
+
+test_that(
+  "clean_nonunique_uniprot - works - all OlinkIDs map to a unique UniProt",
+  {
+
+    log_test <- check_npx(df = OlinkAnalyze::npx_data1) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    expect_message(
+      object = expect_equal(
+        object = clean_nonunique_uniprot(df = OlinkAnalyze::npx_data1,
+                                         check_log = log_test,
+                                         convert_nonunique_uniprot = TRUE,
+                                         verbose = TRUE),
+        expected = OlinkAnalyze::npx_data1
+      ),
+      regexp = "Each \"OlinkID\" maps to a unique \"UniProt\" identifier."
+    )
+  }
+)
+
+test_that(
+  "clean_nonunique_uniprot - works - convert non-unique uniprots",
+  {
+    test_df <- OlinkAnalyze::npx_data1 |>
+      dplyr::mutate(
+        UniProt = dplyr::case_when(
+          SampleID == "A1" & OlinkID == "OID00471" ~ "P00001",
+          SampleID == "A3" & OlinkID == "OID00471" ~ "P00003",
+          SampleID == "A1" & OlinkID == "OID00482" ~ "P00002",
+          SampleID == "A3" & OlinkID == "OID00482" ~ "P00004",
+          TRUE ~ UniProt
+        )
+      )
+
+    log_test <- check_npx(df = test_df) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    expected_df <- test_df |>
+      dplyr::mutate(UniProt = dplyr::case_when(
+        OlinkID == "OID00471" ~ "P00001",
+        OlinkID == "OID00482" ~ "P00002",
+        TRUE ~ UniProt
+      ))
+
+    expect_message(
+      object = expect_equal(
+        object = clean_nonunique_uniprot(df = test_df,
+                                         check_log = log_test,
+                                         convert_nonunique_uniprot = TRUE,
+                                         verbose = TRUE),
+        expected = expected_df
+      ),
+      regexp = paste("2 assays have multiple UniProt IDs. The first",
+                     "iteration will be used for downstream analysis.")
+    )
+
+  }
+)
+
 # Test clean_npx ----------------------------------------------------------
 
 test_that(
@@ -1979,17 +2065,11 @@ test_that(
     # Set CLI color option locally for this test
     withr::local_options(cli.num_colors = 1)
 
-    # Expected result
-    expected_result <- df |>
-      dplyr::filter(
-        .data[["SampleID"]] == "ValidSample"
-      )
-
     msgs <- capture_messages(
       {
         clean_npx(
           df = df,
-          remove_qc_warning = TRUE,
+          control_sample_ids = c("ControlID"),
           check_log = log,
           verbose = TRUE
         )
@@ -2034,8 +2114,7 @@ test_that(
                       msgs_clean[9L]))
     expect_true(grepl("Removing samples based on sample identifiers.",
                       msgs_clean[10L]))
-    expect_true(grepl(paste("Skipping exclusion of control samples based on",
-                            "`control_sample_ids`."),
+    expect_true(grepl("Excluding sample: \"ControlID\".",
                       msgs_clean[11L]))
     expect_true(grepl("Removing samples with QC status 'FAIL'.",
                       msgs_clean[12L]))
@@ -2055,8 +2134,13 @@ test_that(
                       msgs_clean[18L]))
     expect_true(grepl("Columns are in the correct format.",
                       msgs_clean[19L]))
-    expect_true(grepl("Completed `clean_npx\\(\\)`",
+    expect_true(grepl("Converting non-unique OlinkID - UniProt Mapping.",
                       msgs_clean[20L]))
+    expect_true(grepl(paste("Each \"OlinkID\" maps to a unique",
+                            "\"UniProt\" identifier."),
+                      msgs_clean[21L]))
+    expect_true(grepl("Completed `clean_npx\\(\\)`",
+                      msgs_clean[22L]))
   }
 )
 
@@ -2114,54 +2198,3 @@ test_that(
     )
   }
 )
-
-
-
-
-# -------------------------------------------------------------------------
-
-
-# Test clean_duplicate_uniprot_id -----------------------------------------
-
-df <- dplyr::tibble(
-  SampleID = c("ValidateSample","Duplicate_Uniprot1", "Duplicate_Uniprot2"),
-  OlinkID = c("OID12345", rep(x = "OID23456", times = 2L)),
-  SampleType = rep(x = "SAMPLE", times = 3L),
-  AssayType = rep(x = "assay", times = 3L),
-  SampleQC = rep(x = "PASS", times = 3L),
-  AssayQC = rep(x = "PASS", times = 3L),
-  NPX = rnorm(n = 3L),
-  PlateID = rep(x = "plate1", times = 3L),
-  UniProt = c("Uniprot_0", "Uniprot_1", "Uniprot_2"),
-  Assay = rep(x = "assay_a", times = 3L),
-  Panel = rep(x = "panel_a", times = 3L),
-  PanelVersion = rep(x = "panel_version_a", times = 3L),
-  LOD = rnorm(n = 3L),
-  ExtNPX = rnorm(n = 3L),
-  Count = rnorm(n = 3L),
-  Normalization = rep(x = "Intensity", times = 3L)
-)
-
-col_names <- list(
-  sample_id = "SampleID",
-  sample_type = "SampleType",
-  assay_type = "AssayType",
-  olink_id = "OlinkID",
-  uniprot = "UniProt",
-  assay = "Assay",
-  panel = "Panel",
-  plate_id = "PlateID",
-  panel_version = "PanelVersion",
-  lod = "LOD",
-  quant = "NPX",
-  ext_npx = "ExtNPX",
-  count = "Count",
-  qc_warning = "SampleQC",
-  assay_warn = "AssayQC",
-  normalization = "Normalization"
-)
-
-qc <- check_npx_nonunique_uniprot(df, col_names = col_names)
-qc <- check_npx(df = df)
-qc$non_unique_uniprot
-
