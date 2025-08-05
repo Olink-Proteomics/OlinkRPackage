@@ -22,7 +22,7 @@ quantified values \code{NA}. Defaults to \code{TRUE}.}
 This function filters out rows from a \code{tibble} or \code{arrow} object where the
 assay identifier (one of
 "OlinkID", "OID", "olinkid", "oid", or "olink_id")
-matches those listed in \code{check_npx_log$assay_na}, which contains assays
+matches those listed in \code{check_log$assay_na}, which contains assays
 composed entirely of \code{NA} values in their quantification column.
 }
 \author{

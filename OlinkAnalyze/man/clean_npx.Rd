@@ -16,6 +16,7 @@ clean_npx(
   remove_assay_warning = TRUE,
   control_sample_ids = NULL,
   convert_df_cols = TRUE,
+  convert_nonunique_uniprot = TRUE,
   out_df = "tibble",
   verbose = FALSE
 )
@@ -59,6 +60,9 @@ samples. Default \code{NULL}, to mark no samples to be removed.}
 \item{convert_df_cols}{Logical. If \code{FALSE}, retains columns of \code{df} as are.
 Defaults to \code{TRUE}, were columns required for downstream analysis are
 converted to the expected format.}
+
+\item{convert_nonunique_uniprot}{Logical. If \code{FALSE}, retains non-unique
+OlinkID - UniProt mapping. Defaults to \code{TRUE}.}
 
 \item{out_df}{The class of the output dataset. One of
 "tibble" or "arrow". Defaults to
@@ -104,6 +108,8 @@ downstream analysis.
 \code{WARN}.
 \item \strong{Correct column data type}: ensure that certain columns have the
 expected data type (class). These columns are identified in \code{\link[=check_npx]{check_npx()}}.
+\item \strong{Resolve multiple UniProt mappings per assay}: ensure that each assay
+identifier (e.g., \code{OlinkID}) maps uniquely to a single UniProt ID.
 }
 
 \strong{Important:}

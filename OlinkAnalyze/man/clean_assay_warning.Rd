@@ -26,7 +26,7 @@ from \code{\link{read_npx}}.}
 \description{
 The function is used to remove assay-level QC warnings from the dataset
 before analysis. It uses the column marking assay QC warnings identified by
-\code{check_npx_log} to remove assays flagged as \code{WARN} in the dataset.
+\code{check_log} to remove assays flagged as \code{WARN} in the dataset.
 }
 \author{
 Kang Dong

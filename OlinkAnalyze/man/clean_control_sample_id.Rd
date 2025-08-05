@@ -25,7 +25,7 @@ samples. Default \code{NULL}, to mark no samples to be removed.}
 }
 \description{
 This function removes rows from NPX data where the sample identifiers, as
-defined in \code{check_npx_log}, match samples provided in
+defined in \code{check_log}, match samples provided in
 \var{control_sample_ids}. Primary goal of the function is to serve for
 filtering out technical replicates or control samples prior to downstream
 analysis.

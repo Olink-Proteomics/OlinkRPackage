@@ -24,7 +24,7 @@ types to remove.}
 \description{
 This function filters out internal control assays (\code{ext_ctrl}, \code{inc_ctrl},
 \code{amp_ctrl}) from the dataset, unless user specified to retain them. The
-function uses column mapping provided by \code{check_npx_log}.
+function uses column mapping provided by \code{check_log}.
 }
 \author{
 Kang Dong

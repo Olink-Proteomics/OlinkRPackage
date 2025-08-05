@@ -24,7 +24,7 @@ indicating the sample types to remove.}
 This function filters out rows from a dataset where the sample type column
 matches known control sample types: \code{"SAMPLE_CONTROL"}, \code{"PLATE_CONTROL"} or
 \code{"NEGATIVE_CONTROL"}. If \code{keep_control_sample} is set to \code{TRUE}, or if the
-sample type column is present in the \code{check_npx_log}, the function returns
+sample type column is present in the \code{check_log}, the function returns
 the original data unchanged.
 }
 \author{

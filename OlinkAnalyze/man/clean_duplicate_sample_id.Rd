@@ -27,7 +27,7 @@ duplicate sample identifiers. Defaults to \code{TRUE}.}
 This function filters out rows from a \code{tibble} or \code{arrow} object where the
 sample identifier (one of
 "SampleID", "sampleid", or "sample_id")
-matches values listed in \code{check_npx_log$sample_id_dups}, which identifies
+matches values listed in \code{check_log$sample_id_dups}, which identifies
 samples with duplicated identifiers.
 }
 \author{

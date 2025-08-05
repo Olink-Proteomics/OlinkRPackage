@@ -20,7 +20,7 @@ from \code{\link{read_npx}}.}
 }
 \description{
 This function uses the column marking QC warnings identified by
-\code{check_npx_log} to remove samples flagged \code{FAIL} in the dataset.
+\code{check_log} to remove samples flagged \code{FAIL} in the dataset.
 }
 \author{
 Kang Dong

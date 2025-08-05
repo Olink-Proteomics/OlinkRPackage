@@ -22,7 +22,7 @@ invalid identifiers. Defaults to \code{TRUE}.}
 This function filters out rows from a \code{tibble} or \code{arrow} object where the
 assay identifier (one of
 "OlinkID", "OID", "olinkid", "oid", or "olink_id")
-matches values listed in \code{check_npx_log$oid_invalid}, which identifies
+matches values listed in \code{check_log$oid_invalid}, which identifies
 invalid or malformed assay identifiers.
 }
 \author{
