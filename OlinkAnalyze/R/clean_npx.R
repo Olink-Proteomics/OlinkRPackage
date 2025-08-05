@@ -1119,7 +1119,7 @@ clean_nonunique_uniprot <- function(df,
         "Skipping unification of non-unique
       {.val {check_log$col_names$olink_id}} -
       {.val {check_log$col_names$uniprot}}
-      mappings as per user input {.arg convert_nonunique_uniprot}",
+      mappings as per user input {.arg convert_nonunique_uniprot}.",
         "i" = "Returning original dataset."
       ))
     }
