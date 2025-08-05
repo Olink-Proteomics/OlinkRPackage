@@ -1154,9 +1154,9 @@ clean_nonunique_uniprot <- function(df,
       dplyr::group_by(.data[[check_log$col_names$olink_id]]) |>
       dplyr::mutate(iteration = dplyr::row_number()) |>
       dplyr::summarise(
-        uniprot_keep = .data[[check_log$col_names$uniprot]][iteration == 1],
+        uniprot_keep = .data[[check_log$col_names$uniprot]][iteration == 1],  # nolint object_usage_linter
         uniprot_extra = paste(
-          .data[[check_log$col_names$uniprot]][iteration != 1],
+          .data[[check_log$col_names$uniprot]][iteration != 1], # nolint object_usage_linter
           collapse = ","
         ),
         .groups = "drop"
@@ -1172,10 +1172,10 @@ clean_nonunique_uniprot <- function(df,
       dplyr::select(
         !dplyr::all_of(c(check_log$col_names$uniprot,
                          "uniprot_extra"))
-        ) |>
+      ) |>
       dplyr::rename_with(~ check_log$col_names$uniprot,
                          .cols = "uniprot_keep") |>
-      dplyr::select(all_of(names(df)))
+      dplyr::select(dplyr::all_of(names(df)))
 
     cli::cli_inform(c(
       "{nrow(oid_uniprot_map)} assay{?s} ha{?s/ve} multiple UniProt IDs. The
