@@ -188,7 +188,7 @@ test_that(
   "check_npx - warnings - OlinkIDs mapped with >1 Uniprots",
   {
     df <- dplyr::tibble(
-      SampleID = c("Sample1","Sample1", "Sample2"),
+      SampleID = c("Sample1", "Sample1", "Sample2"),
       OlinkID = c("OID00001", "OID00002", "OID00002"),
       UniProt = c("Uniprot_1", "Uniprot_2", "Uniprot_3"),
       SampleType = rep(x = "SAMPLE", times = 3L),
@@ -1294,7 +1294,7 @@ test_that(
 
     # test tibble ----
     df <- dplyr::tibble(
-      SampleID = c("Sample1","Sample1", "Sample1"),
+      SampleID = c("Sample1", "Sample1", "Sample1"),
       OlinkID = c("OID00001", "OID00002", "OID00003"),
       UniProt = c("Uniprot_1", "Uniprot_2", "Uniprot_3")
     )
@@ -1313,7 +1313,7 @@ test_that(
 
     # test arrow tibble ----
     arrow_df <- arrow::arrow_table(
-      SampleID = c("Sample1","Sample1", "Sample1"),
+      SampleID = c("Sample1", "Sample1", "Sample1"),
       OlinkID = c("OID00001", "OID00002", "OID00003"),
       UniProt = c("Uniprot_1", "Uniprot_2", "Uniprot_3")
     )
@@ -1339,7 +1339,7 @@ test_that(
 
     # test tibble ----
     df <- dplyr::tibble(
-      SampleID = c("Sample1","Sample1", "Sample1"),
+      SampleID = c("Sample1", "Sample1", "Sample1"),
       OlinkID = c("OID00001", "OID00002", "OID00002"),
       UniProt = c("Uniprot_1", "Uniprot_2", "Uniprot_3")
     )
@@ -1362,7 +1362,7 @@ test_that(
 
     # test arrow tibble ----
     arrow_df <- arrow::arrow_table(
-      SampleID = c("Sample1","Sample1", "Sample1"),
+      SampleID = c("Sample1", "Sample1", "Sample1"),
       OlinkID = c("OID00001", "OID00002", "OID00002"),
       UniProt = c("Uniprot_1", "Uniprot_2", "Uniprot_3")
     )
