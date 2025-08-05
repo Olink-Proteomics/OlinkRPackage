@@ -1162,7 +1162,7 @@ clean_nonunique_uniprot <- function(df,
         .groups = "drop"
       )
 
-    # Convert non-unique UniProt ID
+    # Convert non-unique UniProt ID, and return all columns from input df
     df_cleaned <- df |>
       dplyr::left_join(oid_uniprot_map,
                        by = check_log$col_names$olink_id) |>
@@ -1174,7 +1174,8 @@ clean_nonunique_uniprot <- function(df,
                          "uniprot_extra"))
         ) |>
       dplyr::rename_with(~ check_log$col_names$uniprot,
-                         .cols = "uniprot_keep")
+                         .cols = "uniprot_keep") |>
+      dplyr::select(all_of(names(df)))
 
     cli::cli_inform(c(
       "{nrow(oid_uniprot_map)} assay{?s} ha{?s/ve} multiple UniProt IDs. The
