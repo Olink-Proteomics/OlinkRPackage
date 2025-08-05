@@ -25,7 +25,7 @@ test_that(
   {
     df <- dplyr::tibble(
       SampleID = LETTERS[1L:4L],
-      OlinkID = rep("OID12345", 4L),
+      OlinkID = paste0("OID1234", seq(1L:4L)),
       UniProt = LETTERS[1L:4L],
       Assay = LETTERS[1L:4L],
       Panel = LETTERS[1L:4L],
@@ -55,7 +55,8 @@ test_that(
         "col_key" = character(0L),
         "expected_col_class" = character(0L)
       ),
-      assay_qc = character(0L)
+      assay_qc = character(0L),
+      non_unique_uniprot = character(0L)
     )
 
     expect_equal(
@@ -73,7 +74,7 @@ test_that(
       SampleID = LETTERS[1L:4L],
       SampleType = LETTERS[1L:4L],
       AssayType = LETTERS[1L:4L],
-      OlinkID = rep("OID12345", 4L),
+      OlinkID = c(paste0("OID1234", seq(1L:3L)), "OID12345"),
       UniProt = LETTERS[1L:4L],
       Assay = LETTERS[1L:4L],
       Panel = LETTERS[1L:4L],
@@ -115,7 +116,8 @@ test_that(
         "col_key" = character(0L),
         "expected_col_class" = character(0L)
       ),
-      assay_qc = c("OID12345")
+      assay_qc = c("OID12345"),
+      non_unique_uniprot = character(0L)
     )
 
     expect_message(
@@ -135,7 +137,7 @@ test_that(
     df <- dplyr::tibble(
       SampleID = c("A", "A", "C", "D"),
       OlinkID = rep("OID123456", 4L),
-      UniProt = LETTERS[1L:4L],
+      UniProt = rep(LETTERS[1L], 4L),
       Assay = LETTERS[1L:4L],
       Panel = LETTERS[1L:4L],
       Panel_Lot_Nr = LETTERS[1L:4L],
@@ -164,7 +166,8 @@ test_that(
         "col_key" = c("quant"),
         "expected_col_class" = c("numeric")
       ),
-      assay_qc = character(0L)
+      assay_qc = character(0L),
+      non_unique_uniprot = character(0L)
     )
 
     expect_warning(
