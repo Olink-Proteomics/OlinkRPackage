@@ -1140,7 +1140,7 @@ clean_nonunique_uniprot <- function(df,
   } else {
 
     # Map Olink ID - UniProt ID
-    oid_uniprot_map <- df |>
+    oid_uniprot_map <- df |> # nolint object_usage_linter
       dplyr::filter(
         .data[[check_log$col_names$olink_id]] %in%
           check_log$non_unique_uniprot
