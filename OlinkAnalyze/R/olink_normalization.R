@@ -83,8 +83,8 @@
 #' @param reference_medians Dataset with columns "OlinkID" and "Reference_NPX".
 #' Required for reference median normalization.
 #' @param format Boolean that controls whether the normalized dataset will be
-#' formatted for input to downstream analysis. Only applicable for cross-product
-#' bridge normalization.
+#' formatted for input to downstream analysis. Only applicable for
+#' within-product and cross-product bridge normalization.
 #'
 #' @return Tibble or ArrowObject with the normalized dataset.
 #'
@@ -289,12 +289,12 @@ olink_normalization <- function(df1,
       # bridge normalization ----
 
       cli::cli_inform(c("i" =
-                          paste0("Output includes two sets of bridging ",
-                          "samples.") ,
+                          paste0("Output includes two sets of bridging
+                                 samples.") ,
                         "*" =
-                          paste0("Retaining only bridging samples from the ",
-                                 "reference dataset is recommended for ",
-                                 "downstream analysis.")))
+                          paste0("Retaining only bridging samples from the
+                                 reference dataset is recommended for
+                                 downstream analysis.")))
 
       df_norm <- norm_internal_bridge(
         ref_df = lst_check$ref_df,
@@ -306,16 +306,27 @@ olink_normalization <- function(df1,
         not_ref_cols = lst_check$not_ref_cols
       )
 
+
+      if (format == TRUE) {
+        df_norm <- olink_normalization_format(
+          lst_check = lst_check,
+          df_norm = df_norm,
+          df1 = df1,
+          df1_project_nr = df1_project_nr,
+          df2 = df2,
+          df2_project_nr = df2_project_nr)
+      }
+
     } else if (lst_check$norm_mode == olink_norm_modes$norm_cross_product) {
       # HT-3K normalization ----
 
       cli::cli_inform(c("i" =
-                          paste0("Output includes two sets of bridging ",
-                                 "samples.") ,
+                          paste0("Output includes two sets of bridging
+                                 samples.") ,
                         "*" =
-                          paste0("Retaining only bridging samples from the ",
-                                 "reference dataset is recommended for ",
-                                 "downstream analysis.")))
+                          paste0("Retaining only bridging samples from the
+                                 reference dataset is recommended for
+                                 downstream analysis.")))
 
       df_norm <- norm_internal_cross_product(
         ref_df = lst_check$ref_df,
@@ -329,15 +340,13 @@ olink_normalization <- function(df1,
       )
 
       if (format == TRUE) {
-        df_norm <- olink_normalization_product_format(
+        df_norm <- olink_normalization_format(
+          lst_check = lst_check,
           df_norm = df_norm,
           df1 = df1,
           df1_project_nr = df1_project_nr,
           df2 = df2,
-          df2_project_nr = df2_project_nr,
-          reference_project = reference_project,
-          ref_product = lst_check$ref_product
-        )
+          df2_project_nr = df2_project_nr)
       }
 
     } else if (lst_check$norm_mode == olink_norm_modes$subset) {

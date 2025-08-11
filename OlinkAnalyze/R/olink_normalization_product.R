@@ -782,113 +782,113 @@ olink_normalization_qs <- function(lst_df,
 #' )
 #' }
 #'
-olink_normalization_product_format <- function(df_norm, # nolint object_length_linter
-                                               df1,
-                                               df1_project_nr,
-                                               df2,
-                                               df2_project_nr,
-                                               reference_project,
-                                               ref_product) {
-
-  # Extract data for assays = "NotBridgeable" ----
-
-  df_not_bridgeable <- df_norm |>
-    dplyr::filter(
-      .data[["SampleType"]] == "SAMPLE" # remove control samples
-      & .data[["AssayType"]] == "assay" # remove control assays
-      # keep only assays that are not bridgeable
-      & .data[["BridgingRecommendation"]] == "NotBridgeable"
-    ) |>
-    dplyr::mutate(
-      OlinkID = dplyr::if_else(
-        .data[["Project"]] == .env[["reference_project"]],
-        .data[["OlinkID"]],
-        .data[["OlinkID_E3072"]]
-      )
-    )
-
-  # Extract data from non-overlapping assays ----
-
-  # There are different mapping datsets for 3k-HT and 3k-Reveal. Using this
-  # function we always select the relevant mapping dataset.
-  # We also keep OlinkIDs of assays from both products that are being normalized
-  # as one vector, to identify assays that were excluded from the cross-product
-  # normalization.
-  oid_ref_notref <- mapping_file_id(ref_product = ref_product) |> # nolint object_usage_linter
-    dplyr::select(
-      dplyr::starts_with("OlinkID_")
-    ) |>
-    unlist(use.names = FALSE)
-
-  df1_no_overlap <- df1 |>
-    dplyr::filter(
-      .data[["SampleType"]] == "SAMPLE" # remove control samples
-      & .data[["AssayType"]] == "assay" # remove control assays
-      # keep non-overlapping assays
-      & !(.data[["OlinkID"]] %in% .env[["oid_ref_notref"]])
-    ) |>
-    # add missing variables
-    dplyr::mutate(
-      Project = .env[["df1_project_nr"]],
-      BridgingRecommendation = "NotOverlapping"
-    )
-
-  df2_no_overlap <- df2 |>
-    dplyr::filter(
-      .data[["SampleType"]] == "SAMPLE" # remove control samples
-      & .data[["AssayType"]] == "assay" # remove control assays
-      # keep non-overlapping assays
-      & !(.data[["OlinkID"]] %in% .env[["oid_ref_notref"]])
-    ) |>
-    # add missing variables
-    dplyr::mutate(
-      Project = .env[["df2_project_nr"]],
-      BridgingRecommendation = "NotOverlapping"
-    )
-
-  # Keep the data following BridgingRecommendation for bridgeable assays ----
-
-  df_bridgeable <- df_norm |>
-    dplyr::filter(
-      .data[["SampleType"]] == "SAMPLE" # remove control samples
-      & .data[["AssayType"]] == "assay" # remove control assays
-      # keep only assays that are bridgeable
-      & .data[["BridgingRecommendation"]] != "NotBridgeable"
-    ) |> # Remove controls
-    dplyr::mutate(
-      OlinkID = paste0(.data[["OlinkID"]], "_", .data[["OlinkID_E3072"]]),
-      NPX = dplyr::case_when(
-        .data[["BridgingRecommendation"]] == "MedianCentering" ~
-          .data[["MedianCenteredNPX"]],
-        .data[["BridgingRecommendation"]] == "QuantileSmoothing" ~
-          .data[["QSNormalizedNPX"]],
-        .default = .data[["NPX"]]
-      )
-    )
-
-  # combine data and sort ----
-
-  df_full <- df_bridgeable |>
-    dplyr::bind_rows(
-      df_not_bridgeable
-    ) |>
-    dplyr::bind_rows(
-      df1_no_overlap
-    ) |>
-    dplyr::bind_rows(
-      df2_no_overlap
-    ) |>
-    # dplyr::mutate(
-    #   SampleID = paste0(.data[["SampleID"]], "_", .data[["Project"]])
-    # ) |>
-    dplyr::select( # Remove extra columns
-      -dplyr::any_of(
-        c("MedianCenteredNPX", "QSNormalizedNPX", "OlinkID_E3072")
-      )
-    ) |>
-    dplyr::arrange(
-      .data[["Project"]], .data[["SampleID"]]
-    )
-
-  return(df_full)
-}
+# olink_normalization_product_format <- function(df_norm, # nolint object_length_linter
+#                                                df1,
+#                                                df1_project_nr,
+#                                                df2,
+#                                                df2_project_nr,
+#                                                reference_project,
+#                                                ref_product) {
+#
+#   # Extract data for assays = "NotBridgeable" ----
+#
+#   df_not_bridgeable <- df_norm |>
+#     dplyr::filter(
+#       .data[["SampleType"]] == "SAMPLE" # remove control samples
+#       & .data[["AssayType"]] == "assay" # remove control assays
+#       # keep only assays that are not bridgeable
+#       & .data[["BridgingRecommendation"]] == "NotBridgeable"
+#     ) |>
+#     dplyr::mutate(
+#       OlinkID = dplyr::if_else(
+#         .data[["Project"]] == .env[["reference_project"]],
+#         .data[["OlinkID"]],
+#         .data[["OlinkID_E3072"]]
+#       )
+#     )
+#
+#   # Extract data from non-overlapping assays ----
+#
+#   # There are different mapping datsets for 3k-HT and 3k-Reveal. Using this
+#   # function we always select the relevant mapping dataset.
+#   # We also keep OlinkIDs of assays from both products that are being normalized
+#   # as one vector, to identify assays that were excluded from the cross-product
+#   # normalization.
+#   oid_ref_notref <- mapping_file_id(ref_product = ref_product) |> # nolint object_usage_linter
+#     dplyr::select(
+#       dplyr::starts_with("OlinkID_")
+#     ) |>
+#     unlist(use.names = FALSE)
+#
+#   df1_no_overlap <- df1 |>
+#     dplyr::filter(
+#       .data[["SampleType"]] == "SAMPLE" # remove control samples
+#       & .data[["AssayType"]] == "assay" # remove control assays
+#       # keep non-overlapping assays
+#       & !(.data[["OlinkID"]] %in% .env[["oid_ref_notref"]])
+#     ) |>
+#     # add missing variables
+#     dplyr::mutate(
+#       Project = .env[["df1_project_nr"]],
+#       BridgingRecommendation = "NotOverlapping"
+#     )
+#
+#   df2_no_overlap <- df2 |>
+#     dplyr::filter(
+#       .data[["SampleType"]] == "SAMPLE" # remove control samples
+#       & .data[["AssayType"]] == "assay" # remove control assays
+#       # keep non-overlapping assays
+#       & !(.data[["OlinkID"]] %in% .env[["oid_ref_notref"]])
+#     ) |>
+#     # add missing variables
+#     dplyr::mutate(
+#       Project = .env[["df2_project_nr"]],
+#       BridgingRecommendation = "NotOverlapping"
+#     )
+#
+#   # Keep the data following BridgingRecommendation for bridgeable assays ----
+#
+#   df_bridgeable <- df_norm |>
+#     dplyr::filter(
+#       .data[["SampleType"]] == "SAMPLE" # remove control samples
+#       & .data[["AssayType"]] == "assay" # remove control assays
+#       # keep only assays that are bridgeable
+#       & .data[["BridgingRecommendation"]] != "NotBridgeable"
+#     ) |> # Remove controls
+#     dplyr::mutate(
+#       OlinkID = paste0(.data[["OlinkID"]], "_", .data[["OlinkID_E3072"]]),
+#       NPX = dplyr::case_when(
+#         .data[["BridgingRecommendation"]] == "MedianCentering" ~
+#           .data[["MedianCenteredNPX"]],
+#         .data[["BridgingRecommendation"]] == "QuantileSmoothing" ~
+#           .data[["QSNormalizedNPX"]],
+#         .default = .data[["NPX"]]
+#       )
+#     )
+#
+#   # combine data and sort ----
+#
+#   df_full <- df_bridgeable |>
+#     dplyr::bind_rows(
+#       df_not_bridgeable
+#     ) |>
+#     dplyr::bind_rows(
+#       df1_no_overlap
+#     ) |>
+#     dplyr::bind_rows(
+#       df2_no_overlap
+#     ) |>
+#     # dplyr::mutate(
+#     #   SampleID = paste0(.data[["SampleID"]], "_", .data[["Project"]])
+#     # ) |>
+#     dplyr::select( # Remove extra columns
+#       -dplyr::any_of(
+#         c("MedianCenteredNPX", "QSNormalizedNPX", "OlinkID_E3072")
+#       )
+#     ) |>
+#     dplyr::arrange(
+#       .data[["Project"]], .data[["SampleID"]]
+#     )
+#
+#   return(df_full)
+# }
