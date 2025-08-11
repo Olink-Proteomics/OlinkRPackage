@@ -1,8 +1,17 @@
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+#
+# NOTE: This workflow only directly installs "hard" dependencies, i.e. Depends,
+# Imports, and LinkingTo dependencies. Notably, Suggests dependencies are never
+# installed, with the exception of testthat, knitr, and rmarkdown. The cache is
+# never used to avoid accidentally restoring a cache containing a suggested
+# dependency.
+#
 # For help debugging build failures open an issue on the RStudio community with the 'github-actions' tag.
 # https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions
+#
+# From https://github.com/r-lib/actions/blob/5e080d8d4241b4e7ed3834b113a6fa643d3f1351/examples/check-no-suggests.yaml#L8
 on: [push, pull_request]
-
-# From https://github.com/r-lib/actions/blob/5e080d8d4241b4e7ed3834b113a6fa643d3f1351/examples/check-no-suggests.yaml#L8 
 
 name: R-CMD-check-hard
 
@@ -16,14 +25,14 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: ubuntu-latest,   r: 'release'}
+          - {os: ubuntu-latest, r: 'release'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: r-lib/actions/setup-pandoc@v2
 
@@ -31,12 +40,12 @@ jobs:
         with:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
-          use-public-rspm: true  
+          use-public-rspm: true
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           dependencies: '"hard"'
-          cache: false 
+          cache: false
           extra-packages: |
             any::rcmdcheck
             any::testthat
@@ -49,5 +58,4 @@ jobs:
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
-          working-directory: OlinkAnalyze    
- 
+          working-directory: OlinkAnalyze

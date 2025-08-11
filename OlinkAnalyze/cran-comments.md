@@ -1,6 +1,6 @@
 ## Release Summary
 
-This release adds minor functionality and bug fixes to Olink Analyze 4.2
+This release adds bug fixes to Olink Analyze 4.3
 
 ## R CMD check results
 
