@@ -318,7 +318,8 @@ test_that(
                             sample_type = character(0L)),
         not_ref_product = "other",
         reference_medians = NULL,
-        norm_mode = olink_norm_modes$bridge
+        norm_mode = olink_norm_modes$bridge,
+        non_overlapping_oid = NULL
       )
     )
 
@@ -401,7 +402,8 @@ test_that(
                             sample_type = character(0L)),
         not_ref_product = "other",
         reference_medians = NULL,
-        norm_mode = olink_norm_modes$bridge
+        norm_mode = olink_norm_modes$bridge,
+        non_overlapping_oid = NULL
       )
     )
   }
