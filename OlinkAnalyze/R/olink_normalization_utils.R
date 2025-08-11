@@ -2263,6 +2263,14 @@ olink_normalization_format <- function(df_norm = df_norm,
   if (lst_check$norm_mode == olink_norm_modes$bridge) {
     # Bridge normalization ----
 
+    nc_pc_sampleids <- df_norm |>
+      dplyr::select(.data[["SampleID"]]) |>
+      dplyr::distinct() |>
+      dplyr::filter(
+        stringr::str_detect(.data[["SampleID"]], control.neg.plt.regex)
+      ) |>
+      dplyr::pull(.data[["SampleID"]])
+
     # Extract data from non-overlapping assays ----
     if (!is.null(lst_check$non_overlapping_oid)) {
       df1_no_overlap <- df1 |>
@@ -2287,15 +2295,7 @@ olink_normalization_format <- function(df_norm = df_norm,
           Adj_factor = 0
         )
 
-      # combine data and sort, remove controls ----
-
-      nc_pc_sampleids <- df_norm |>
-        dplyr::select(.data[["SampleID"]]) |>
-        dplyr::distinct() |>
-        dplyr::filter(
-          stringr::str_detect(.data[["SampleID"]], control.neg.plt.regex)
-        ) |>
-        dplyr::pull(.data[["SampleID"]])
+      # combine data and sort, remove controls ---
 
       df_full <- df_norm |>
         dplyr::bind_rows(
