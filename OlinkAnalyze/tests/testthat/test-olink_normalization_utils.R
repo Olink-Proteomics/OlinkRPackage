@@ -179,7 +179,7 @@ test_that(
           reference_medians = NULL
         ),
         regexp = "*not shared across input dataset(s)*"
-        ),
+      ),
       regexp = "Bridge normalization will be performed!"
     )
 
@@ -6773,7 +6773,8 @@ test_that(
               object = bridge_norm_format <- olink_normalization(
                 df1 = df1_nonoverlapping,
                 df2 = df2_nonoverlapping,
-                overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
+                overlapping_samples_df1 =
+                  ref_norm_res$lst_sample$bridge_samples,
                 df1_project_nr = "df1_norm",
                 df2_project_nr = "df2_norm",
                 reference_project = "df1_norm",
@@ -6782,9 +6783,9 @@ test_that(
               regexp = "Bridge normalization will be performed!"
             ),
             regexp =
-              "2 Negative Controls or Plate Controls removed from bridged dataset"
+              "2 Negative Controls or Plate Controls removed from bridged"
           ),
-          regexp = "4 non-overlapping assays are included in the bridged dataset."
+          regexp = "4 non-overlapping assays are included in the bridged"
         ),
         regexp = "Assays will be returned without adjustment"
       ),
@@ -6977,22 +6978,22 @@ test_that(
       filter(!.data[["OlinkID"]] %in% lst_check_3k_ht$non_overlapping_oid)
 
     expect_message(
+      expect_message(
         expect_message(
-          expect_message(
-            object = df_3k_ht_format_all_overlap <- olink_normalization(
-                df1 = data_3k_all_overlap,
-                df2 = data_ht_all_overlap,
-                overlapping_samples_df1 = bridge_samples_3k_ht,
-                df1_project_nr = "P1",
-                df2_project_nr = "P2",
-                reference_project = "P2",
-                format = TRUE # format data
-            ),
-            regexp = "Cross-product normalization will be performed!"
+          object = df_3k_ht_format_all_overlap <- olink_normalization(
+            df1 = data_3k_all_overlap,
+            df2 = data_ht_all_overlap,
+            overlapping_samples_df1 = bridge_samples_3k_ht,
+            df1_project_nr = "P1",
+            df2_project_nr = "P2",
+            reference_project = "P2",
+            format = TRUE # format data
           ),
-          regexp =
-            "16 Negative Controls or Plate Controls removed"
+          regexp = "Cross-product normalization will be performed!"
         ),
+        regexp =
+          "16 Negative Controls or Plate Controls removed"
+      ),
       regexp = "Output includes two sets of bridging samples"
     )
 
@@ -7123,8 +7124,8 @@ test_that(
       object = df_3k_ht_format |>
         dplyr::filter(.data[["SampleType"]] %in%
                         c("NEGATIVE_CONTROL", "PLATE_CONTROL")) |>
-      nrow(),
-    expected = 0L
+        nrow(),
+      expected = 0L
     )
 
     # check that non-overlapping assays are added to formatted file
@@ -7440,4 +7441,3 @@ test_that(
     )
   }
 )
-
