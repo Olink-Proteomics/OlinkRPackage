@@ -309,7 +309,7 @@ olink_normalization <- function(df1,
 
       if (format == TRUE) {
         df_norm <- olink_normalization_format(
-          lst_check = lst_check,
+          lst_check = lst_check, # nolint indentation_linter
           df_norm = df_norm,
           df1 = df1,
           df1_project_nr = df1_project_nr,
@@ -341,7 +341,7 @@ olink_normalization <- function(df1,
 
       if (format == TRUE) {
         df_norm <- olink_normalization_format(
-          lst_check = lst_check,
+          lst_check = lst_check, # nolint indentation_linter
           df_norm = df_norm,
           df1 = df1,
           df1_project_nr = df1_project_nr,

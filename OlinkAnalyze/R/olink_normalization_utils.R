@@ -2254,7 +2254,7 @@ olink_normalization_format <- function(df_norm = df_norm,
                                        df1 = df1,
                                        df1_project_nr = df1_project_nr,
                                        df2 = df2,
-                                       df2_project_nr = df2_project_nr){
+                                       df2_project_nr = df2_project_nr) {
 
   # Set variable to capture Negative Controls and Plate Controls
   control.neg.plt.regex <- "Negative|NEGATIVE|NEG|Neg|PLATE|IPC|Plate|plate|Plate Control|plate control|plate_control|Plate_Control" # nolint object_usage_linter
@@ -2306,7 +2306,7 @@ olink_normalization_format <- function(df_norm = df_norm,
         ) |>
         dplyr::filter(
           !(.data[["SampleID"]] %in% nc_pc_sampleids)
-          ) |>
+        ) |>
         dplyr::arrange(
           .data[["Project"]], .data[["SampleID"]]
         )
@@ -2318,20 +2318,22 @@ olink_normalization_format <- function(df_norm = df_norm,
         cli::cli_inform(c("i" = paste0(length(nc_pc_sampleids),
                                        " Negative Controls or Plate Controls
                                removed from bridged dataset: ",
-                                       paste0(nc_pc_sampleids, collapse=", "))))
+                                       paste0(nc_pc_sampleids, collapse = ", "
+                                       ))))
       }
 
       cli::cli_inform(c("i" = paste0(length(lst_check$non_overlapping_oid),
-                               " non-overlapping assays are included in the
-                               bridged dataset. Assays found in only one
-                               project will have decreased statistical
-                               power due to the lower number of samples.")))
+                        " non-overlapping assays are included in
+                        the bridged dataset. Assays found in only
+                        one project will have decreased statistical
+                        power due to the lower number of samples."
+                      )))
     } else {
       # If all assays overlap
       df_full <- df_norm |>
         dplyr::filter(
           !(.data[["SampleID"]] %in% nc_pc_sampleids) # rm nc, pc
-          ) |>
+        ) |>
         dplyr::arrange(
           .data[["Project"]], .data[["SampleID"]]
         )
@@ -2352,13 +2354,13 @@ olink_normalization_format <- function(df_norm = df_norm,
     # If non-overlapping OlinkIDs exist
     # Split any combined product OlinkIDs in lst_check to catch all assays
     if (!is.null(lst_check$non_overlapping_oid)) {
-      split_OIDs <- lst_check$non_overlapping_oid[
-        which(stringr::str_detect(lst_check$non_overlapping_oid, "_"))] |>
+      split_oids <- lst_check$non_overlapping_oid[  # nolint indentation_linter
+        which(stringr::str_detect(lst_check$non_overlapping_oid, "_"))] |> # nolint indentation_linter
         strsplit("_") |>
         unlist()
 
       non_overlapping_oid_split <- unique(c(lst_check$non_overlapping_oid,
-                                            split_OIDs))
+                                            split_oids))
     } else {
       non_overlapping_oid_split <- lst_check$non_overlapping_oid
     }
@@ -2381,17 +2383,6 @@ olink_normalization_format <- function(df_norm = df_norm,
       )
 
     # Extract data from non-overlapping assays ----
-
-    # # There are different mapping datsets for 3k-HT and 3k-Reveal. Using this
-    # # function we always select the relevant mapping dataset.
-    # # We also keep OlinkIDs of assays from both products that are being normalized
-    # # as one vector, to identify assays that were excluded from the cross-product
-    # # normalization.
-    # oid_ref_notref <- mapping_file_id(ref_product = ref_product) |> # nolint object_usage_linter
-    #   dplyr::select(
-    #     dplyr::starts_with("OlinkID_")
-    #   ) |>
-    #   unlist(use.names = FALSE)
 
     df1_no_overlap <- df1 |>
       dplyr::filter(
@@ -2465,16 +2456,16 @@ olink_normalization_format <- function(df_norm = df_norm,
       cli::cli_inform(c("i" = paste0(length(nc_pc_sampleids),
                                      " Negative Controls or Plate Controls
                                removed from bridged dataset: ",
-                                     paste0(nc_pc_sampleids, collapse=", "))))
+                                     paste0(nc_pc_sampleids, collapse = ", "))))
     }
 
     if (!is.null(lst_check$non_overlapping_oid)) {
       cli::cli_inform(c("i" = paste0(length(lst_check$non_overlapping_oid),
-                                     " not bridgeable or non-overlapping assays
-                               are included in the bridged dataset. Assays
-                               found in only one project will have decreased
-                               statistical power due to the lower number of
-                               samples.")))
+                        " non-overlapping assays are included in
+                        the bridged dataset. Assays found in only
+                        one project will have decreased statistical
+                        power due to the lower number of samples."
+                      )))
     }
 
 
@@ -2483,4 +2474,3 @@ olink_normalization_format <- function(df_norm = df_norm,
 
   return(df_full)
 }
-
