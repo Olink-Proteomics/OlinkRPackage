@@ -993,20 +993,12 @@ check_npx_qcwarn_assays <- function(df, col_names) {
 #' updated or change formatting. This function identifies cases where a single
 #' \var{OlinkID} is mapped to multiple \var{UniProt} identifiers.
 #'
-#' @param df A tibble or an arrow object containing the columns \var{Uniprot}
-#' and \var{OlinkID}.
-#' @param col_names A list of matched column names. This is the output of the
-#' \var{check_npx_col_names} function.
-#'   Must include:
-#'   \describe{
-#'     \item{\var{olink_id}}{Name of the column containing OlinkID values.}
-#'     \item{\var{uniprot}}{Name of the column containing UniProt ID values.}
-#'   }
+#' @inheritParams check_npx
+#' @inheritParams check_npx_olinkid
 #'
 #' @return A character vector of \var{OlinkID}s that are mapped with more
 #' than one \var{UniProt} ID. If no such cases are found, returns an empty
 #' character vector.
-#'
 #'
 check_npx_nonunique_uniprot <- function(df, col_names) {
 
