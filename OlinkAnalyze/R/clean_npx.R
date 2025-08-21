@@ -1092,12 +1092,12 @@ clean_col_class <- function(df,
   return(df_cleaned)
 }
 
-#' Help function converting types of columns to the expected ones.
+#' Help function unifying pairs of OlinkID and UniProt identifiers.
 #'
 #' @description
 #' This function checks the non-unique "OlinkID - UniProt" mappings, as defined
-#' in `check_log`.  it selects the first UniProt ID per OlinkID and replaces
-#' the original UniProt column with the unified mapping.
+#' in `check_log`. It selects the first instance of UniProt ID per OlinkID and
+#' replaces the original UniProt column with the unified mapping.
 #'
 #' @inherit clean_npx params return author
 #'

@@ -25,8 +25,8 @@ OlinkID - UniProt mapping. Defaults to \code{TRUE}.}
 }
 \description{
 This function checks the non-unique "OlinkID - UniProt" mappings, as defined
-in \code{check_log}.  it selects the first UniProt ID per OlinkID and replaces
-the original UniProt column with the unified mapping.
+in \code{check_log}. It selects the first instance of UniProt ID per OlinkID and
+replaces the original UniProt column with the unified mapping.
 }
 \author{
 Kang Dong
