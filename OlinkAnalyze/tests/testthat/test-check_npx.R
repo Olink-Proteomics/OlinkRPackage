@@ -1340,8 +1340,8 @@ test_that(
 test_that(
   "check_npx_nonunique_uniprot - works - 1 OlinkID mapped with >1 Uniprot IDs",
   {
-
     # test tibble ----
+
     df <- dplyr::tibble(
       SampleID = c("Sample1", "Sample1", "Sample1"),
       OlinkID = c("OID00001", "OID00002", "OID00002"),
@@ -1360,11 +1360,11 @@ test_that(
                                              col_names = col_names),
         expected = "OID00002"
       ),
-
-      regexp = "Multiple UniProt IDs detected for assay: \"OID00002\"."
+      regexp = "Detected multiple UniProt identifiers for assay: \"OID00002\"."
     )
 
     # test arrow tibble ----
+
     arrow_df <- arrow::arrow_table(
       SampleID = c("Sample1", "Sample1", "Sample1"),
       OlinkID = c("OID00001", "OID00002", "OID00002"),
@@ -1383,9 +1383,7 @@ test_that(
                                              col_names = col_names),
         expected = "OID00002"
       ),
-
-      regexp = "Multiple UniProt IDs detected for assay: \"OID00002\"."
+      regexp = "Detected multiple UniProt identifiers for assay: \"OID00002\"."
     )
-
   }
 )
