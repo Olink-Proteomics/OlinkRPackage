@@ -1951,11 +1951,11 @@ test_that(
   }
 )
 
-# Test clean_nonunique_uniprot --------------------------------------------
+# Test clean_nonunique_uniprot ----
+
 test_that(
   "clean_nonunique_uniprot - works - do not correct non-unique unirpot",
   {
-
     log_test <- check_npx(df = OlinkAnalyze::npx_data1) |>
       suppressWarnings() |>
       suppressMessages()
@@ -1972,14 +1972,12 @@ test_that(
                      "\"OlinkID\" - \"UniProt\" mappings as",
                      "per user input `convert_nonunique_uniprot`.")
     )
-
   }
 )
 
 test_that(
   "clean_nonunique_uniprot - works - all OlinkIDs map to a unique UniProt",
   {
-
     log_test <- check_npx(df = OlinkAnalyze::npx_data1) |>
       suppressWarnings() |>
       suppressMessages()
@@ -2003,11 +2001,15 @@ test_that(
     test_df <- OlinkAnalyze::npx_data1 |>
       dplyr::mutate(
         UniProt = dplyr::case_when(
-          SampleID == "A1" & OlinkID == "OID00471" ~ "P00001",
-          SampleID == "A3" & OlinkID == "OID00471" ~ "P00003",
-          SampleID == "A1" & OlinkID == "OID00482" ~ "P00002",
-          SampleID == "A3" & OlinkID == "OID00482" ~ "P00004",
-          TRUE ~ UniProt
+          .data[["SampleID"]] == "A1" &
+            .data[["OlinkID"]] == "OID00471" ~ "P00001",
+          .data[["SampleID"]] == "A3" &
+            .data[["OlinkID"]] == "OID00471" ~ "P00003",
+          .data[["SampleID"]] == "A1" &
+            .data[["OlinkID"]] == "OID00482" ~ "P00002",
+          .data[["SampleID"]] == "A3" &
+            .data[["OlinkID"]] == "OID00482" ~ "P00004",
+          TRUE ~ .data[["UniProt"]]
         )
       )
 
@@ -2016,11 +2018,13 @@ test_that(
       suppressMessages()
 
     expected_df <- test_df |>
-      dplyr::mutate(UniProt = dplyr::case_when(
-        OlinkID == "OID00471" ~ "P00001",
-        OlinkID == "OID00482" ~ "P00002",
-        TRUE ~ UniProt
-      ))
+      dplyr::mutate(
+        UniProt = dplyr::case_when(
+          .data[["OlinkID"]] == "OID00471" ~ "P00001",
+          .data[["OlinkID"]] == "OID00482" ~ "P00002",
+          TRUE ~ .data[["UniProt"]]
+        )
+      )
 
     expect_message(
       object = expect_equal(
@@ -2030,8 +2034,65 @@ test_that(
                                          verbose = TRUE),
         expected = expected_df
       ),
-      regexp = paste("2 assays have multiple UniProt IDs. The first",
-                     "iteration will be used for downstream analysis.")
+      regexp = paste("2 assay identifiers map multiple UniProt identifiers.",
+                     "The first instance will be used for downstream analysis.")
+    )
+
+  }
+)
+
+test_that(
+  "clean_nonunique_uniprot - works - arrow - convert non-unique uniprots",
+  {
+    test_df <- OlinkAnalyze::npx_data1 |>
+      dplyr::mutate(
+        UniProt = dplyr::case_when(
+          .data[["SampleID"]] == "A1" &
+            .data[["OlinkID"]] == "OID00471" ~ "P00001",
+          .data[["SampleID"]] == "A3" &
+            .data[["OlinkID"]] == "OID00471" ~ "P00003",
+          .data[["SampleID"]] == "A1" &
+            .data[["OlinkID"]] == "OID00482" ~ "P00002",
+          .data[["SampleID"]] == "A3" &
+            .data[["OlinkID"]] == "OID00482" ~ "P00004",
+          TRUE ~ .data[["UniProt"]]
+        )
+      ) |>
+      arrow::as_arrow_table()
+
+    log_test <- check_npx(df = test_df) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    expected_df <- test_df |>
+      dplyr::as_tibble() |>
+      dplyr::mutate(
+        UniProt = dplyr::case_when(
+          .data[["OlinkID"]] == "OID00471" ~ "P00001",
+          .data[["OlinkID"]] == "OID00482" ~ "P00002",
+          TRUE ~ .data[["UniProt"]]
+        )
+      ) |>
+      dplyr::arrange(
+        .data[["SampleID"]],
+        .data[["OlinkID"]]
+      )
+
+    expect_message(
+      object = expect_equal(
+        object = clean_nonunique_uniprot(df = test_df,
+                                         check_log = log_test,
+                                         convert_nonunique_uniprot = TRUE,
+                                         verbose = TRUE) |>
+          dplyr::as_tibble() |>
+          dplyr::arrange(
+            .data[["SampleID"]],
+            .data[["OlinkID"]]
+          ),
+        expected = expected_df
+      ),
+      regexp = paste("2 assay identifiers map multiple UniProt identifiers.",
+                     "The first instance will be used for downstream analysis.")
     )
 
   }
@@ -2061,7 +2122,6 @@ test_that(
 test_that(
   "clean_npx - works - emits clean messages without ANSI styling",
   {
-
     # Set CLI color option locally for this test
     withr::local_options(cli.num_colors = 1)
 
