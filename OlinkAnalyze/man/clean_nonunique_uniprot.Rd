@@ -2,7 +2,7 @@
 % Please edit documentation in R/clean_npx.R
 \name{clean_nonunique_uniprot}
 \alias{clean_nonunique_uniprot}
-\title{Help function converting types of columns to the expected ones.}
+\title{Help function unifying pairs of OlinkID and UniProt identifiers.}
 \usage{
 clean_nonunique_uniprot(
   df,
