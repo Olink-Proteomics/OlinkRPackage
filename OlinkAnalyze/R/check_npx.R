@@ -987,18 +987,23 @@ check_npx_qcwarn_assays <- function(df, col_names) {
   return(qc_warn_assays)
 }
 
-#' Helping function checking for OlinkID mapped to multiple UniProt IDs.
+#' Help function checking for assays mapping to multiple UniProt identifiers.
 #'
-#' Between Panel versions, sometimes the \var{UniProt} identifiers will be
-#' updated or change formatting. This function identifies cases where a single
-#' \var{OlinkID} is mapped to multiple \var{UniProt} identifiers.
+#' @author
+#'  Kathleen Nevola
+#'  Kang Dong
+#'  Klev Diamanti
+#'
+#' @description
+#' Occasionally, updates in panel versions include updates in \var{UniProt}
+#' identifiers (e.g. change in formatting). This function identifies cases where
+#' an assay identifier \var{OlinkID} maps to multiple \var{UniProt} identifiers.
 #'
 #' @inheritParams check_npx
 #' @inheritParams check_npx_olinkid
 #'
-#' @return A character vector of \var{OlinkID}s that are mapped with more
-#' than one \var{UniProt} ID. If no such cases are found, returns an empty
-#' character vector.
+#' @return A character vector of assay identifiers \var{OlinkID} that map to
+#' more than one \var{UniProt} identifiers.
 #'
 check_npx_nonunique_uniprot <- function(df, col_names) {
 
