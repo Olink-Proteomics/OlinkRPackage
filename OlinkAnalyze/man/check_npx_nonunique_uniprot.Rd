@@ -2,29 +2,28 @@
 % Please edit documentation in R/check_npx.R
 \name{check_npx_nonunique_uniprot}
 \alias{check_npx_nonunique_uniprot}
-\title{Helping function checking for OlinkID mapped to multiple UniProt IDs.}
+\title{Help function checking for assays mapping to multiple UniProt identifiers.}
 \usage{
 check_npx_nonunique_uniprot(df, col_names)
 }
 \arguments{
-\item{df}{A tibble or an arrow object containing the columns \var{Uniprot}
-and \var{OlinkID}.}
+\item{df}{A "tibble" or "ArrowObject"
+from \code{\link{read_npx}}.}
 
 \item{col_names}{A list of matched column names. This is the output of the
-\var{check_npx_col_names} function.
-Must include:
-\describe{
-\item{\var{olink_id}}{Name of the column containing OlinkID values.}
-\item{\var{uniprot}}{Name of the column containing UniProt ID values.}
-}}
+\var{check_npx_col_names} function.}
 }
 \value{
-A character vector of \var{OlinkID}s that are mapped with more
-than one \var{UniProt} ID. If no such cases are found, returns an empty
-character vector.
+A character vector of assay identifiers \var{OlinkID} that map to
+more than one \var{UniProt} identifiers.
 }
 \description{
-Between Panel versions, sometimes the \var{UniProt} identifiers will be
-updated or change formatting. This function identifies cases where a single
-\var{OlinkID} is mapped to multiple \var{UniProt} identifiers.
+Occasionally, updates in panel versions include updates in \var{UniProt}
+identifiers (e.g. change in formatting). This function identifies cases where
+an assay identifier \var{OlinkID} maps to multiple \var{UniProt} identifiers.
+}
+\author{
+Kathleen Nevola
+Kang Dong
+Klev Diamanti
 }

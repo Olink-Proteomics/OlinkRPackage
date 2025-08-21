@@ -232,7 +232,7 @@ clean_npx <- function(df,
   )
 
   # Correct non-unique Uniprot IDs
-  if (verbose) cli::cli_h3("Converting non-unique OlinkID - UniProt Mapping.")
+  if (verbose) cli::cli_h3("Converting non-unique OlinkID - UniProt mapping.")
   df <- clean_nonunique_uniprot(
     df = df,
     check_log = check_log,
@@ -1092,12 +1092,12 @@ clean_col_class <- function(df,
   return(df_cleaned)
 }
 
-#' Help function converting types of columns to the expected ones.
+#' Help function unifying pairs of OlinkID and UniProt identifiers.
 #'
 #' @description
 #' This function checks the non-unique "OlinkID - UniProt" mappings, as defined
-#' in `check_log`.  it selects the first UniProt ID per OlinkID and replaces
-#' the original UniProt column with the unified mapping.
+#' in `check_log`. It selects the first instance of UniProt ID per OlinkID and
+#' replaces the original UniProt column with the unified mapping.
 #'
 #' @inherit clean_npx params return author
 #'
@@ -1115,13 +1115,15 @@ clean_nonunique_uniprot <- function(df,
   # check if user wants non-unique uniprot IDs to be converted
   if (convert_nonunique_uniprot == FALSE) {
     if (verbose == TRUE) {
-      cli::cli_inform(c(
-        "Skipping unification of non-unique
-      {.val {check_log$col_names$olink_id}} -
-      {.val {check_log$col_names$uniprot}}
-      mappings as per user input {.arg convert_nonunique_uniprot}.",
-        "i" = "Returning original dataset."
-      ))
+      cli::cli_inform(
+        c(
+          "Skipping unification of non-unique
+          {.val {check_log$col_names$olink_id}} -
+          {.val {check_log$col_names$uniprot}} mappings as per user input
+          {.arg convert_nonunique_uniprot}.",
+          "i" = "Returning original dataset."
+        )
+      )
     }
     return(df)
   }
@@ -1136,57 +1138,75 @@ clean_nonunique_uniprot <- function(df,
       ))
     }
     return(df)
-
   } else {
 
     # Map Olink ID - UniProt ID
     oid_uniprot_map <- df |> # nolint object_usage_linter
       dplyr::filter(
-        .data[[check_log$col_names$olink_id]] %in%
-          check_log$non_unique_uniprot
+        .data[[check_log$col_names$olink_id]] %in% check_log$non_unique_uniprot
       ) |>
-      dplyr::select(dplyr::all_of(c(
-        check_log$col_names$olink_id,
-        check_log$col_names$uniprot
-      ))) |>
-      dplyr::distinct() |>
+      dplyr::distinct(
+        .data[[check_log$col_names$olink_id]],
+        .data[[check_log$col_names$uniprot]]
+      ) |>
       dplyr::collect() |>
-      dplyr::group_by(.data[[check_log$col_names$olink_id]]) |>
-      dplyr::mutate(iteration = dplyr::row_number()) |>
+      dplyr::group_by(
+        dplyr::pick(
+          dplyr::all_of(check_log$col_names$olink_id)
+        )
+      ) |>
       dplyr::summarise(
-        uniprot_keep = .data[[check_log$col_names$uniprot]][iteration == 1],  # nolint object_usage_linter
-        uniprot_extra = paste(
-          .data[[check_log$col_names$uniprot]][iteration != 1], # nolint object_usage_linter
-          collapse = ","
+        uniprot_keep = utils::head(
+          x = .data[[check_log$col_names$uniprot]],
+          n = 1L
         ),
+        uniprot_extra = utils::tail(
+          x = .data[[check_log$col_names$uniprot]],
+          n = -1L
+        ) |>
+          ansi_collapse_quot(),
         .groups = "drop"
       )
 
     # Convert non-unique UniProt ID, and return all columns from input df
     df_cleaned <- df |>
-      dplyr::left_join(oid_uniprot_map,
-                       by = check_log$col_names$olink_id) |>
-      dplyr::mutate(uniprot_keep = ifelse(is.na(.data[["uniprot_keep"]]),
-                                          .data[[check_log$col_names$uniprot]],
-                                          .data[["uniprot_keep"]])) |>
-      dplyr::select(
-        !dplyr::all_of(c(check_log$col_names$uniprot,
-                         "uniprot_extra"))
+      dplyr::left_join(
+        oid_uniprot_map,
+        by = check_log$col_names$olink_id
       ) |>
-      dplyr::rename_with(~ check_log$col_names$uniprot,
-                         .cols = "uniprot_keep") |>
-      dplyr::select(dplyr::all_of(names(df)))
+      dplyr::mutate(
+        uniprot_keep = dplyr::if_else(
+          is.na(.data[["uniprot_keep"]]),
+          .data[[check_log$col_names$uniprot]],
+          .data[["uniprot_keep"]]
+        )
+      ) |>
+      dplyr::select(
+        -dplyr::all_of(
+          c(check_log$col_names$uniprot, "uniprot_extra")
+        )
+      ) |>
+      dplyr::rename_with(
+        .fn = ~ check_log$col_names$uniprot,
+        .cols = "uniprot_keep"
+      ) |>
+      dplyr::select(
+        dplyr::all_of(
+          names(df)
+        )
+      )
 
-    cli::cli_inform(c(
-      "{nrow(oid_uniprot_map)} assay{?s} ha{?s/ve} multiple UniProt IDs. The
-      first iteration will be used for downstream analysis.",
-      "i" = paste("{.val {check_log$col_names$uniprot}} IDs",
-                  oid_uniprot_map$uniprot_extra,
-                  "will be replaced with",
-                  oid_uniprot_map$uniprot_keep,
-                  "for {.val {check_log$col_names$olink_id}}",
-                  oid_uniprot_map$OlinkID, ".\n")
-    ))
+    cli::cli_inform(
+      c(
+        "{nrow(oid_uniprot_map)} assay identifier{?s} map multiple UniProt
+        identifiers. The first instance will be used for downstream analysis.",
+        paste0(
+          "* ", oid_uniprot_map$uniprot_extra, " will be replaced with ",
+          "\"", oid_uniprot_map$uniprot_keep, "\" for ",
+          "\"", oid_uniprot_map$OlinkID, "\"."
+        )
+      )
+    )
 
     return(df_cleaned)
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/clean_npx.R
 \name{clean_nonunique_uniprot}
 \alias{clean_nonunique_uniprot}
-\title{Help function converting types of columns to the expected ones.}
+\title{Help function unifying pairs of OlinkID and UniProt identifiers.}
 \usage{
 clean_nonunique_uniprot(
   df,
@@ -25,8 +25,8 @@ OlinkID - UniProt mapping. Defaults to \code{TRUE}.}
 }
 \description{
 This function checks the non-unique "OlinkID - UniProt" mappings, as defined
-in \code{check_log}.  it selects the first UniProt ID per OlinkID and replaces
-the original UniProt column with the unified mapping.
+in \code{check_log}. It selects the first instance of UniProt ID per OlinkID and
+replaces the original UniProt column with the unified mapping.
 }
 \author{
 Kang Dong
