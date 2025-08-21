@@ -1379,7 +1379,7 @@ test_that(
                   "OID00004", "OID00004", "OID00004", "OID00004", "OID00004"),
       UniProt = c("UP_1", "UP_2", "UP_3",
                   "UP_4", "UP_5", "UP_6",
-                  "UP_7", "UP_7", "UP_8","UP_8", "UP_9")
+                  "UP_7", "UP_7", "UP_8", "UP_8", "UP_9")
     )
 
     col_names <- list(
