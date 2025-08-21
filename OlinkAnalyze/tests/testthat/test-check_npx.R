@@ -1294,8 +1294,6 @@ test_that(
 test_that(
   "check_npx_nonunique_uniprot - works - no OlinkID mapped with >1 Uniprot IDs",
   {
-    # test tibble ----
-
     df <- dplyr::tibble(
       SampleID = c("Sample1", "Sample1", "Sample1"),
       OlinkID = c("OID00001", "OID00002", "OID00003"),
@@ -1308,6 +1306,8 @@ test_that(
       uniprot = "UniProt"
     )
 
+    # test tibble ----
+
     expect_equal(
       object = check_npx_nonunique_uniprot(df = df,
                                            col_names = col_names),
@@ -1316,17 +1316,7 @@ test_that(
 
     # test arrow tibble ----
 
-    arrow_df <- arrow::arrow_table(
-      SampleID = c("Sample1", "Sample1", "Sample1"),
-      OlinkID = c("OID00001", "OID00002", "OID00003"),
-      UniProt = c("Uniprot_1", "Uniprot_2", "Uniprot_3")
-    )
-
-    col_names <- list(
-      sample_id = "SampleID",
-      olink_id = "OlinkID",
-      uniprot = "UniProt"
-    )
+    arrow_df <- arrow::as_arrow_table(x = df)
 
     expect_equal(
       object = check_npx_nonunique_uniprot(df = arrow_df,
@@ -1340,8 +1330,6 @@ test_that(
 test_that(
   "check_npx_nonunique_uniprot - works - 1 OlinkID mapped with >1 Uniprot IDs",
   {
-    # test tibble ----
-
     df <- dplyr::tibble(
       SampleID = c("Sample1", "Sample1", "Sample1"),
       OlinkID = c("OID00001", "OID00002", "OID00002"),
@@ -1354,6 +1342,8 @@ test_that(
       uniprot = "UniProt"
     )
 
+    # test tibble ----
+
     expect_warning(
       object = expect_equal(
         object = check_npx_nonunique_uniprot(df = df,
@@ -1365,17 +1355,7 @@ test_that(
 
     # test arrow tibble ----
 
-    arrow_df <- arrow::arrow_table(
-      SampleID = c("Sample1", "Sample1", "Sample1"),
-      OlinkID = c("OID00001", "OID00002", "OID00002"),
-      UniProt = c("Uniprot_1", "Uniprot_2", "Uniprot_3")
-    )
-
-    col_names <- list(
-      sample_id = "SampleID",
-      olink_id = "OlinkID",
-      uniprot = "UniProt"
-    )
+    arrow_df <- arrow::as_arrow_table(x = df)
 
     expect_warning(
       object = expect_equal(
