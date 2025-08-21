@@ -2134,7 +2134,7 @@ test_that(
                       msgs_clean[18L]))
     expect_true(grepl("Columns are in the correct format.",
                       msgs_clean[19L]))
-    expect_true(grepl("Converting non-unique OlinkID - UniProt Mapping.",
+    expect_true(grepl("Converting non-unique OlinkID - UniProt mapping.",
                       msgs_clean[20L]))
     expect_true(grepl(paste("Each \"OlinkID\" maps to a unique",
                             "\"UniProt\" identifier."),

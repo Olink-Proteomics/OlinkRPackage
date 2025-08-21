@@ -232,7 +232,7 @@ clean_npx <- function(df,
   )
 
   # Correct non-unique Uniprot IDs
-  if (verbose) cli::cli_h3("Converting non-unique OlinkID - UniProt Mapping.")
+  if (verbose) cli::cli_h3("Converting non-unique OlinkID - UniProt mapping.")
   df <- clean_nonunique_uniprot(
     df = df,
     check_log = check_log,
