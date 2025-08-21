@@ -597,9 +597,12 @@ check_npx_olinkid <- function(df,
 
   # warning if there is any invalid Olink ID
   if (length(invalid_oid) > 0L) {
-    cli::cli_warn(c(
-      "Unrecognized OlinkID{?s} detected: {.val {invalid_oid}}"
-    ))
+    cli::cli_warn(
+      c(
+        "Unrecognized OlinkID{?s} detected: {.val {invalid_oid}}",
+        "i" = "Consider running {.fn clean_npx} next!"
+      )
+    )
   }
 
   # return ----
@@ -666,10 +669,13 @@ check_npx_all_na_assays <- function(df, col_names) {
 
   # Issue warning if any assays with only NAs are found
   if (length(all_nas) > 0L) {
-    cli::cli_warn(c(
-      "{.val {all_nas}} ha{?s/ve} {.val {col_names$quant}} = NA for all
-      samples."
-    ))
+    cli::cli_warn(
+      c(
+        "{.val {all_nas}} ha{?s/ve} {.val {col_names$quant}} = NA for all
+        samples.",
+        "i" = "Consider running {.fn clean_npx} next!"
+      )
+    )
   }
 
   return(all_nas)
@@ -714,9 +720,12 @@ check_npx_duplicate_sample_ids <- function(df, col_names) {
 
   # Warn if duplicates are found
   if (length(duplicates) > 0L) {
-    cli::cli_warn(c(
-      "Duplicate SampleID{?s} detected: {.val {duplicates}}"
-    ))
+    cli::cli_warn(
+      c(
+        "Duplicate SampleID{?s} detected: {.val {duplicates}}",
+        "i" = "Consider running {.fn clean_npx} next!"
+      )
+    )
   }
 
   return(duplicates)
@@ -783,10 +792,13 @@ check_npx_all_na_sample <- function(df, col_names) {
 
   # Issue warning if any assays with only NAs are found
   if (length(all_na_sample) > 0L) {
-    cli::cli_warn(c(
-      "{.val {all_na_sample}} ha{?s/ve} {.val {col_names$quant}} = NA for all
-      assays."
-    ))
+    cli::cli_warn(
+      c(
+        "{.val {all_na_sample}} ha{?s/ve} {.val {col_names$quant}} = NA for all
+        assays.",
+        "i" = "Consider running {.fn clean_npx} next!"
+      )
+    )
   }
 
   return(all_na_sample)
@@ -972,9 +984,12 @@ check_npx_qcwarn_assays <- function(df, col_names) {
 
     if (length(qc_warn_assays) > 0L) {
       cli::cli_inform(
-        c("{.val {length(qc_warn_assays)}} assay{?s} exhibited assay QC warnings
-        in column {.arg {unname(col_names$assay_warn)}} of the dataset:
-          {.val {qc_warn_assays}}.")
+        c(
+          "{.val {length(qc_warn_assays)}} assay{?s} exhibited assay QC warnings
+          in column {.arg {unname(col_names$assay_warn)}} of the dataset:
+          {.val {qc_warn_assays}}.",
+          "i" = "Consider running {.fn clean_npx} next!"
+        )
       )
     }
 
