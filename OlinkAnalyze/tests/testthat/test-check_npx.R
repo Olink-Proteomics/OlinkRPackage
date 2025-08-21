@@ -191,7 +191,7 @@ test_that(
   "check_npx - warnings - OlinkIDs mapped with >1 Uniprots",
   {
     df <- dplyr::tibble(
-      SampleID = c("Sample1", "Sample1", "Sample2"),
+      SampleID = rep(x = "Sample1", times = 3L),
       OlinkID = c("OID00001", "OID00002", "OID00002"),
       UniProt = c("Uniprot_1", "Uniprot_2", "Uniprot_3"),
       SampleType = rep(x = "SAMPLE", times = 3L),
@@ -230,7 +230,7 @@ test_that(
       ),
       oid_invalid = character(0L),
       assay_na = character(0L),
-      sample_id_dups = character(0L),
+      sample_id_dups = c("Sample1"),
       sample_id_na = character(0L),
       col_class = dplyr::tibble(
         "col_name" = character(0L),
@@ -244,14 +244,15 @@ test_that(
     )
 
     expect_warning(
-      object = expect_equal(
-        object = check_npx(df = df),
-        expected = expected_result
+      object = expect_warning(
+        object = expect_equal(
+          object = check_npx(df = df),
+          expected = expected_result
+        ),
+        regexp = "Duplicate SampleID detected: \"Sample1\""
       ),
-
-      regexp = "Multiple UniProt IDs detected for assay: \"OID00002\"."
+      regexp = "Detected multiple UniProt identifiers for assay: \"OID00002\"."
     )
-
   }
 )
 
