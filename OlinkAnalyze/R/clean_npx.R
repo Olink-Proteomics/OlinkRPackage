@@ -1156,8 +1156,11 @@ clean_nonunique_uniprot <- function(df,
         )
       ) |>
       dplyr::summarise(
-        uniprot_keep = head(x = .data[[check_log$col_names$uniprot]], n = 1L),
-        uniprot_extra = tail(
+        uniprot_keep = utils::head(
+          x = .data[[check_log$col_names$uniprot]],
+          n = 1L
+        ),
+        uniprot_extra = utils::tail(
           x = .data[[check_log$col_names$uniprot]],
           n = -1L
         ) |>
