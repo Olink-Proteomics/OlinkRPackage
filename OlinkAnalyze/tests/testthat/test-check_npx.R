@@ -1294,8 +1294,8 @@ test_that(
 test_that(
   "check_npx_nonunique_uniprot - works - no OlinkID mapped with >1 Uniprot IDs",
   {
-
     # test tibble ----
+
     df <- dplyr::tibble(
       SampleID = c("Sample1", "Sample1", "Sample1"),
       OlinkID = c("OID00001", "OID00002", "OID00003"),
@@ -1315,6 +1315,7 @@ test_that(
     )
 
     # test arrow tibble ----
+
     arrow_df <- arrow::arrow_table(
       SampleID = c("Sample1", "Sample1", "Sample1"),
       OlinkID = c("OID00001", "OID00002", "OID00003"),
