@@ -1007,13 +1007,13 @@ check_npx_qcwarn_assays <- function(df, col_names) {
 #'
 check_npx_nonunique_uniprot <- function(df, col_names) {
 
-  # Group by OlinkID and count distinct UniProt entries
-  assay_summary <- df |>
-    dplyr::select(dplyr::all_of(c(
-      col_names$olink_id,
-      col_names$uniprot
-    ))) |>
-    dplyr::distinct() |>  # Ensure uniqueness of OlinkID-UniProt pairs
+  # Group by OlinkID and count distinct UniProt entries, and identify OlinkIDs
+  # linked to multiple UniProt IDs
+  oid_uniprot_dups <- df |>
+    dplyr::distinct( # Ensure uniqueness of OlinkID-UniProt pairs
+      .data[[col_names$olink_id]],
+      .data[[col_names$uniprot]]
+    ) |>
     dplyr::group_by(
       .data[[col_names$olink_id]]
     ) |>
@@ -1021,28 +1021,26 @@ check_npx_nonunique_uniprot <- function(df, col_names) {
       freq = dplyr::n(),
       .groups = "drop"
     ) |>
-    dplyr::collect()
-
-  # Identify OlinkIDs linked to multiple UniProt IDs
-  duplicates <- assay_summary |>
-    dplyr::filter(.data[["freq"]] > 1) |>
+    dplyr::filter(
+      .data[["freq"]] > 1L
+    ) |>
+    dplyr::collect() |>
     dplyr::pull(
       .data[[col_names$olink_id]]
-    ) |>
-    unique()
+    )
 
   # Emit a warning if any duplicates are found
-  if (length(duplicates) > 0L) {
-
-    cli::cli_warn(c(
-      "Multiple UniProt IDs detected for assay{?s}: {.val {duplicates}}."
-    ))
-
+  if (length(oid_uniprot_dups) > 0L) {
+    cli::cli_warn(
+      c(
+        "Detected multiple UniProt identifiers for assay{?s}:
+        {.val {oid_uniprot_dups}}.",
+        "i" = "Consider running {.fn clean_npx} next!"
+      )
+    )
   } else {
-
-    duplicates <- character(0L)
-
+    oid_uniprot_dups <- character(0L)
   }
 
-  return(duplicates)
+  return(oid_uniprot_dups)
 }
