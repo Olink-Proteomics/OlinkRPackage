@@ -5,8 +5,8 @@ test_that(
   "check is arrow object - ERROR",
   {
     expect_error(
-      object = check_is_arrow_object(df = c("I_Shall_Pass",
-                                            NA_character_),
+      object = check_is_arrow_object(x = c("I_Shall_Pass",
+                                           NA_character_),
                                      error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
@@ -15,7 +15,7 @@ test_that(
     )
 
     expect_error(
-      object = check_is_arrow_object(df = NA_character_,
+      object = check_is_arrow_object(x = NA_character_,
                                      error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
@@ -24,7 +24,7 @@ test_that(
     )
 
     expect_error(
-      object = check_is_arrow_object(df = NULL,
+      object = check_is_arrow_object(x = NULL,
                                      error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
@@ -33,7 +33,7 @@ test_that(
     )
 
     expect_error(
-      object = check_is_arrow_object(df = 1,
+      object = check_is_arrow_object(x = 1,
                                      error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
@@ -42,7 +42,7 @@ test_that(
     )
 
     expect_error(
-      object = check_is_arrow_object(df = 1L,
+      object = check_is_arrow_object(x = 1L,
                                      error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
@@ -51,7 +51,7 @@ test_that(
     )
 
     expect_error(
-      object = check_is_arrow_object(df = TRUE,
+      object = check_is_arrow_object(x = TRUE,
                                      error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
@@ -60,9 +60,9 @@ test_that(
     )
 
     expect_error(
-      object = check_is_arrow_object(df = data.frame(a = c(1, 2),
-                                                     b = c("a", "b"),
-                                                     c = c(TRUE, FALSE)),
+      object = check_is_arrow_object(x = data.frame(a = c(1, 2),
+                                                    b = c("a", "b"),
+                                                    c = c(TRUE, FALSE)),
                                      error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
@@ -71,9 +71,9 @@ test_that(
     )
 
     expect_error(
-      object = check_is_arrow_object(df = data.frame(a = c(1, 2),
-                                                     b = c("a", "b"),
-                                                     c = c(TRUE, FALSE)) |>
+      object = check_is_arrow_object(x = data.frame(a = c(1, 2),
+                                                    b = c("a", "b"),
+                                                    c = c(TRUE, FALSE)) |>
                                        dplyr::as_tibble(),
                                      error = TRUE),
       regexp = gsub(pattern = " ",
@@ -89,47 +89,47 @@ test_that(
   "check is arrow object - FALSE",
   {
     expect_false(
-      object = check_is_arrow_object(df = c("I_Shall_Pass",
-                                            NA_character_),
+      object = check_is_arrow_object(x = c("I_Shall_Pass",
+                                           NA_character_),
                                      error = FALSE)
     )
 
     expect_false(
-      object = check_is_arrow_object(df = NA_character_,
+      object = check_is_arrow_object(x = NA_character_,
                                      error = FALSE)
     )
 
     expect_false(
-      object = check_is_arrow_object(df = NULL,
+      object = check_is_arrow_object(x = NULL,
                                      error = FALSE)
     )
 
     expect_false(
-      object = check_is_arrow_object(df = 1,
+      object = check_is_arrow_object(x = 1,
                                      error = FALSE)
     )
 
     expect_false(
-      object = check_is_arrow_object(df = 1L,
+      object = check_is_arrow_object(x = 1L,
                                      error = FALSE)
     )
 
     expect_false(
-      object = check_is_arrow_object(df = TRUE,
+      object = check_is_arrow_object(x = TRUE,
                                      error = FALSE)
     )
 
     expect_false(
-      object = check_is_arrow_object(df = data.frame(a = c(1, 2),
-                                                     b = c("a", "b"),
-                                                     c = c(TRUE, FALSE)),
+      object = check_is_arrow_object(x = data.frame(a = c(1, 2),
+                                                    b = c("a", "b"),
+                                                    c = c(TRUE, FALSE)),
                                      error = FALSE)
     )
 
     expect_false(
-      object = check_is_arrow_object(df = data.frame(a = c(1, 2),
-                                                     b = c("a", "b"),
-                                                     c = c(TRUE, FALSE)) |>
+      object = check_is_arrow_object(x = data.frame(a = c(1, 2),
+                                                    b = c("a", "b"),
+                                                    c = c(TRUE, FALSE)) |>
                                        dplyr::as_tibble(),
                                      error = FALSE)
     )
@@ -182,13 +182,13 @@ test_that(
 
         # check if return from check_is_arrow_object is TRUE
         expect_true(
-          object = check_is_arrow_object(df = df_arrow,
+          object = check_is_arrow_object(x = df_arrow,
                                          error = FALSE)
         )
 
         # check if return from check_is_arrow_object is TRUE
         expect_true(
-          object = check_is_arrow_object(df = df_arrow,
+          object = check_is_arrow_object(x = df_arrow,
                                          error = TRUE)
         )
       }
@@ -233,13 +233,13 @@ test_that(
 
         # check if check_is_arrow_object returns TRUE
         expect_true(
-          object = check_is_arrow_object(df = df_arrow,
+          object = check_is_arrow_object(x = df_arrow,
                                          error = FALSE)
         )
 
         # check if check_is_arrow_object returns TRUE
         expect_true(
-          object = check_is_arrow_object(df = df_arrow,
+          object = check_is_arrow_object(x = df_arrow,
                                          error = TRUE)
         )
       }
@@ -267,13 +267,13 @@ test_that(
 
     # check if check_is_arrow_object returns TRUE
     expect_true(
-      object = check_is_arrow_object(df = df,
+      object = check_is_arrow_object(x = df,
                                      error = FALSE)
     )
 
     # check if check_is_arrow_object returns TRUE
     expect_true(
-      object = check_is_arrow_object(df = df,
+      object = check_is_arrow_object(x = df,
                                      error = TRUE)
     )
   }
@@ -286,8 +286,8 @@ test_that(
   "check is tibble - ERROR",
   {
     expect_error(
-      object = check_is_tibble(df = c("I_Shall_Not_Pass",
-                                      NA_character_),
+      object = check_is_tibble(x = c("I_Shall_Not_Pass",
+                                     NA_character_),
                                error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
@@ -296,7 +296,7 @@ test_that(
     )
 
     expect_error(
-      object = check_is_tibble(df = NA_character_,
+      object = check_is_tibble(x = NA_character_,
                                error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
@@ -305,7 +305,7 @@ test_that(
     )
 
     expect_error(
-      object = check_is_tibble(df = NULL,
+      object = check_is_tibble(x = NULL,
                                error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
@@ -314,7 +314,7 @@ test_that(
     )
 
     expect_error(
-      object = check_is_tibble(df = 1,
+      object = check_is_tibble(x = 1,
                                error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
@@ -323,7 +323,7 @@ test_that(
     )
 
     expect_error(
-      object = check_is_tibble(df = 1L,
+      object = check_is_tibble(x = 1L,
                                error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
@@ -332,7 +332,7 @@ test_that(
     )
 
     expect_error(
-      object = check_is_tibble(df = TRUE,
+      object = check_is_tibble(x = TRUE,
                                error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
@@ -341,9 +341,9 @@ test_that(
     )
 
     expect_error(
-      object = check_is_tibble(df = data.frame(a = c(1, 2),
-                                               b = c("a", "b"),
-                                               c = c(TRUE, FALSE)),
+      object = check_is_tibble(x = data.frame(a = c(1, 2),
+                                              b = c("a", "b"),
+                                              c = c(TRUE, FALSE)),
                                error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
@@ -352,9 +352,9 @@ test_that(
     )
 
     expect_error(
-      object = check_is_tibble(df = data.frame(a = c(1, 2),
-                                               b = c("a", "b"),
-                                               c = c(TRUE, FALSE)) |>
+      object = check_is_tibble(x = data.frame(a = c(1, 2),
+                                              b = c("a", "b"),
+                                              c = c(TRUE, FALSE)) |>
                                  arrow::as_arrow_table(),
                                error = TRUE),
       regexp = gsub(pattern = " ",
@@ -370,47 +370,47 @@ test_that(
   "check is tibble - FALSE",
   {
     expect_false(
-      object = check_is_tibble(df = c("I_Shall_Not_Pass",
-                                      NA_character_),
+      object = check_is_tibble(x = c("I_Shall_Not_Pass",
+                                     NA_character_),
                                error = FALSE)
     )
 
     expect_false(
-      object = check_is_tibble(df = NA_character_,
+      object = check_is_tibble(x = NA_character_,
                                error = FALSE)
     )
 
     expect_false(
-      object = check_is_tibble(df = NULL,
+      object = check_is_tibble(x = NULL,
                                error = FALSE)
     )
 
     expect_false(
-      object = check_is_tibble(df = 1,
+      object = check_is_tibble(x = 1,
                                error = FALSE)
     )
 
     expect_false(
-      object = check_is_tibble(df = 1L,
+      object = check_is_tibble(x = 1L,
                                error = FALSE)
     )
 
     expect_false(
-      object = check_is_tibble(df = TRUE,
+      object = check_is_tibble(x = TRUE,
                                error = FALSE)
     )
 
     expect_false(
-      object = check_is_tibble(df = data.frame(a = c(1, 2),
-                                               b = c("a", "b"),
-                                               c = c(TRUE, FALSE)),
+      object = check_is_tibble(x = data.frame(a = c(1, 2),
+                                              b = c("a", "b"),
+                                              c = c(TRUE, FALSE)),
                                error = FALSE)
     )
 
     expect_false(
-      object = check_is_tibble(df = data.frame(a = c(1, 2),
-                                               b = c("a", "b"),
-                                               c = c(TRUE, FALSE)) |>
+      object = check_is_tibble(x = data.frame(a = c(1, 2),
+                                              b = c("a", "b"),
+                                              c = c(TRUE, FALSE)) |>
                                  arrow::as_arrow_table(),
                                error = FALSE)
     )
@@ -468,13 +468,13 @@ test_that(
 
         # check if return from check_is_tibble is TRUE
         expect_true(
-          object = check_is_tibble(df = df_read,
+          object = check_is_tibble(x = df_read,
                                    error = FALSE)
         )
 
         # check if return from check_is_tibble is TRUE
         expect_true(
-          object = check_is_tibble(df = df_read,
+          object = check_is_tibble(x = df_read,
                                    error = TRUE)
         )
       }
@@ -521,13 +521,13 @@ test_that(
 
         # check if check_is_tibble returns TRUE
         expect_true(
-          object = check_is_tibble(df = df_read,
+          object = check_is_tibble(x = df_read,
                                    error = FALSE)
         )
 
         # check if check_is_tibble returns TRUE
         expect_true(
-          object = check_is_tibble(df = df_read,
+          object = check_is_tibble(x = df_read,
                                    error = TRUE)
         )
       }
@@ -553,13 +553,13 @@ test_that(
 
     # check if check_is_tibble returns TRUE
     expect_true(
-      object = check_is_tibble(df = df,
+      object = check_is_tibble(x = df,
                                error = FALSE)
     )
 
     # check if check_is_tibble returns TRUE
     expect_true(
-      object = check_is_tibble(df = df,
+      object = check_is_tibble(x = df,
                                error = TRUE)
     )
   }
@@ -571,8 +571,8 @@ test_that(
   "check_is_dataset - error",
   {
     expect_error(
-      object = check_is_dataset(df = c("I_Shall_Not_Pass",
-                                       NA_character_),
+      object = check_is_dataset(x = c("I_Shall_Not_Pass",
+                                      NA_character_),
                                 error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
@@ -581,7 +581,7 @@ test_that(
     )
 
     expect_error(
-      object = check_is_dataset(df = NA_character_,
+      object = check_is_dataset(x = NA_character_,
                                 error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
@@ -590,7 +590,7 @@ test_that(
     )
 
     expect_error(
-      object = check_is_dataset(df = NULL,
+      object = check_is_dataset(x = NULL,
                                 error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
@@ -599,7 +599,7 @@ test_that(
     )
 
     expect_error(
-      object = check_is_dataset(df = 1,
+      object = check_is_dataset(x = 1,
                                 error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
@@ -608,7 +608,7 @@ test_that(
     )
 
     expect_error(
-      object = check_is_dataset(df = 1L,
+      object = check_is_dataset(x = 1L,
                                 error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
@@ -617,7 +617,7 @@ test_that(
     )
 
     expect_error(
-      object = check_is_dataset(df = TRUE,
+      object = check_is_dataset(x = TRUE,
                                 error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
@@ -631,33 +631,33 @@ test_that(
   "check_is_dataset - FALSE",
   {
     expect_false(
-      object = check_is_dataset(df = c("I_Shall_Not_Pass",
-                                       NA_character_),
+      object = check_is_dataset(x = c("I_Shall_Not_Pass",
+                                      NA_character_),
                                 error = FALSE)
     )
 
     expect_false(
-      object = check_is_dataset(df = NA_character_,
+      object = check_is_dataset(x = NA_character_,
                                 error = FALSE)
     )
 
     expect_false(
-      object = check_is_dataset(df = NULL,
+      object = check_is_dataset(x = NULL,
                                 error = FALSE)
     )
 
     expect_false(
-      object = check_is_dataset(df = 1,
+      object = check_is_dataset(x = 1,
                                 error = FALSE)
     )
 
     expect_false(
-      object = check_is_dataset(df = 1L,
+      object = check_is_dataset(x = 1L,
                                 error = FALSE)
     )
 
     expect_false(
-      object = check_is_dataset(df = TRUE,
+      object = check_is_dataset(x = TRUE,
                                 error = FALSE)
     )
   }
@@ -717,13 +717,13 @@ test_that(
 
         # read.delim return a data.frame
         expect_false(
-          object = check_is_dataset(df = df_read,
+          object = check_is_dataset(x = df_read,
                                     error = FALSE)
         )
 
         # check if return from check_is_data_frame is TRUE
         expect_true(
-          object = check_is_dataset(df = dplyr::as_tibble(df_read),
+          object = check_is_dataset(x = dplyr::as_tibble(df_read),
                                     error = TRUE)
         )
       }
@@ -780,7 +780,7 @@ test_that(
 
         # arrow::open_delim_dataset returns an arrow object
         expect_true(
-          object = check_is_dataset(df = df_read,
+          object = check_is_dataset(x = df_read,
                                     error = TRUE)
         )
       }
@@ -826,7 +826,7 @@ test_that(
 
         # check if check_is_dataset returns TRUE
         expect_true(
-          object = check_is_dataset(df = df_read,
+          object = check_is_dataset(x = df_read,
                                     error = TRUE)
         )
 
@@ -842,7 +842,7 @@ test_that(
 
         # check if check_is_dataset returns TRUE
         expect_true(
-          object = check_is_dataset(df = df_parquet,
+          object = check_is_dataset(x = df_parquet,
                                     error = TRUE)
         )
       }
@@ -884,7 +884,7 @@ test_that(
 
         # check if check_is_dataset returns TRUE
         expect_true(
-          object = check_is_dataset(df = df_read,
+          object = check_is_dataset(x = df_read,
                                     error = TRUE)
         )
 
@@ -901,7 +901,7 @@ test_that(
 
         # check if check_is_dataset returns TRUE
         expect_true(
-          object = check_is_dataset(df = df_parquet,
+          object = check_is_dataset(x = df_parquet,
                                     error = TRUE)
         )
       }
@@ -926,19 +926,19 @@ test_that(
 
     # check if check_is_dataset returns FALSE
     expect_false(
-      object = check_is_dataset(df = df,
+      object = check_is_dataset(x = df,
                                 error = FALSE)
     )
 
     # check if check_is_dataset returns TRUE
     expect_true(
-      object = check_is_dataset(df = dplyr::as_tibble(df),
+      object = check_is_dataset(x = dplyr::as_tibble(df),
                                 error = TRUE)
     )
 
     # check if check_is_dataset returns TRUE
     expect_true(
-      object = check_is_dataset(df = arrow::as_arrow_table(df),
+      object = check_is_dataset(x = arrow::as_arrow_table(df),
                                 error = FALSE)
     )
   }

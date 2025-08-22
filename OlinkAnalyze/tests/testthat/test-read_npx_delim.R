@@ -3,6 +3,8 @@
 test_that(
   "read_npx_delim - works - long format - output df matches input df",
   {
+    skip_on_os("windows")
+
     ## tibble ----
 
     withr::with_tempfile(

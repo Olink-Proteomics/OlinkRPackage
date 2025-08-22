@@ -3,6 +3,8 @@
 #' @author
 #'   Klev Diamanti
 #'
+#' @keywords internal
+#'
 #' @return A character vector with names of all Olink platforms.
 #'
 get_all_olink_platforms <- function() {
@@ -19,19 +21,9 @@ get_all_olink_platforms <- function() {
 
 #' Get names of selected Olink platforms.
 #'
-#' @author
-#'   Klev Diamanti
+#' @inherit .get_olink_data_details params author
 #'
-#' @param broad_platform Name of the \var{broad_platform} to filter the
-#' Olink platforms for. If `NULL` all relevant Olink platforms are returned,
-#' otherwise one of `r ansi_collapse_quot(get_olink_broader_platforms())` is
-#' expected.
-#' @param data_type Name of the \var{data_type} to filter the Olink platforms
-#' for. If `NULL` all relevant Olink platforms are returned, otherwise one of
-#' `r ansi_collapse_quot(get_olink_data_types())` is expected.
-#' @param quant_type Name of the \var{quant_type} to filter the Olink platforms
-#' for. If `NULL` all relevant Olink platforms are returned, otherwise one of
-#' `r ansi_collapse_quot(get_olink_quant_types())` is expected.
+#' @keywords internal
 #'
 #' @return A character vector with names of Olink platforms filtered by
 #' \var{broad_platform}, \var{data_type}, and \var{quant_type}.
@@ -87,21 +79,11 @@ get_olink_platforms <- function(broad_platform = NULL,
 
 #' Help function checking that \var{olink_platform} is expected.
 #'
-#' @author
-#'   Klev Diamanti
-#'
+#' @inherit .get_olink_data_details params author
 #' @param x Name of Olink platform. One of
 #' `r ansi_collapse_quot(get_olink_platforms())`.
-#' @param broad_platform Name of the \var{broad_platform} to filter the
-#' Olink platforms for. If `NULL` all relevant Olink platforms are returned,
-#' otherwise one of `r ansi_collapse_quot(get_olink_broader_platforms())` is
-#' expected.
-#' @param data_type Name of the \var{data_type} to filter the Olink platforms
-#' for. If `NULL` all relevant Olink platforms are returned, otherwise one of
-#' `r ansi_collapse_quot(get_olink_data_types())` is expected.
-#' @param quant_type Name of the \var{quant_type} to filter the Olink platforms
-#' for. If `NULL` all relevant Olink platforms are returned, otherwise one of
-#' `r ansi_collapse_quot(get_olink_quant_types())` is expected.
+#'
+#' @keywords internal
 #'
 #' @return
 #' `NULL` if platform is expected, otherwise an error.
@@ -113,7 +95,7 @@ check_olink_platform <- function(x,
 
   # input check ----
 
-  check_is_scalar_character(string = x,
+  check_is_scalar_character(x = x,
                             error = TRUE)
 
   # get relevant platforms ----
@@ -160,6 +142,8 @@ check_olink_platform <- function(x,
 #' @author
 #'   Klev Diamanti
 #'
+#' @keywords internal
+#'
 #' @return A character vector with names of all Olink broader platforms.
 #'
 get_all_olink_broader_platforms <- function() { # nolint object_length_linter
@@ -176,19 +160,9 @@ get_all_olink_broader_platforms <- function() { # nolint object_length_linter
 
 #' Get names of selected broader Olink platforms.
 #'
-#' @author
-#'   Klev Diamanti
+#' @inherit .get_olink_data_details params author
 #'
-#' @param platform_name Name of the \var{platform_name} to filter the Olink
-#' broader platforms for. If `NULL` all relevant Olink broader platforms are
-#' returned, otherwise one of `r ansi_collapse_quot(get_olink_platforms())` is
-#' expected.
-#' @param data_type Name of the \var{data_type} to filter the Olink broader
-#' platforms for. If `NULL` all relevant Olink broader platforms are returned,
-#' otherwise one of `r ansi_collapse_quot(get_olink_data_types())` is expected.
-#' @param quant_type Name of the \var{quant_type} to filter the Olink broader
-#' platforms for. If `NULL` all relevant Olink broader platforms are returned,
-#' otherwise one of `r ansi_collapse_quot(get_olink_quant_types())` is expected.
+#' @keywords internal
 #'
 #' @return A character vector with names of Olink broader platforms filtered by
 #' \var{platform_name}, \var{data_type}, and \var{quant_type}.
@@ -244,21 +218,11 @@ get_olink_broader_platforms <- function(platform_name = NULL,
 
 #' Help function checking that \var{broad_platform} is expected.
 #'
-#' @author
-#'   Klev Diamanti
-#'
+#' @inherit .get_olink_data_details params author
 #' @param x Name of the broader Olink platform. One of
 #' `r ansi_collapse_quot(get_olink_broader_platforms())`.
-#' @param platform_name Name of the \var{platform_name} to filter the Olink
-#' broader platforms for. If `NULL` all relevant Olink broader platforms are
-#' returned, otherwise one of `r ansi_collapse_quot(get_olink_platforms())` is
-#' expected.
-#' @param data_type Name of the \var{data_type} to filter the Olink broader
-#' platforms for. If `NULL` all relevant Olink broader platforms are returned,
-#' otherwise one of `r ansi_collapse_quot(get_olink_data_types())` is expected.
-#' @param quant_type Name of the \var{quant_type} to filter the Olink broader
-#' platforms for. If `NULL` all relevant Olink broader platforms are returned,
-#' otherwise one of `r ansi_collapse_quot(get_olink_quant_types())` is expected.
+#'
+#' @keywords internal
 #'
 #' @return
 #' `NULL` if broader Olink platform is expected, otherwise an error.
@@ -270,7 +234,7 @@ check_olink_broader_platform <- function(x,
 
   # input check ----
 
-  check_is_scalar_character(string = x,
+  check_is_scalar_character(x = x,
                             error = TRUE)
 
   # get relevant broader platforms ----
@@ -317,6 +281,8 @@ check_olink_broader_platform <- function(x,
 #' @author
 #'   Klev Diamanti
 #'
+#' @keywords internal
+#'
 #' @return A character vector with names of all Olink quantification methods
 #' (data types).
 #'
@@ -340,17 +306,9 @@ get_all_olink_data_types <- function() {
 #' @author
 #'   Klev Diamanti
 #'
-#' @param broad_platform Name of the \var{broad_platform} to filter the Olink
-#' data types for. If `NULL` all relevant Olink data types are returned,
-#' otherwise one of `r ansi_collapse_quot(get_olink_broader_platforms())` is
-#' expected.
-#' @param platform_name Name of the \var{platform_name} to filter the Olink
-#' data types for. If `NULL` all relevant Olink data types are returned,
-#' otherwise one of `r ansi_collapse_quot(get_olink_platforms())` is
-#' expected.
-#' @param quant_type Name of the \var{quant_type} to filter the Olink data types
-#' for. If `NULL` all relevant Olink data types are returned, otherwise one of
-#' `r ansi_collapse_quot(get_olink_quant_types())` is expected.
+#' @inherit .get_olink_data_details params author
+#'
+#' @keywords internal
 #'
 #' @return A character vector with names of Olink quantification methods (data
 #' types) filtered by \var{broad_platform}, \var{platform_name}, and
@@ -407,22 +365,11 @@ get_olink_data_types <- function(broad_platform = NULL,
 
 #' Help function checking that \var{data_type} is expected.
 #'
-#' @author
-#'   Klev Diamanti
-#'
+#' @inherit .get_olink_data_details params author
 #' @param x The name of the Olink data type. One of
 #' `r ansi_collapse_quot(get_olink_data_types())`.
-#' @param broad_platform Name of the \var{broad_platform} to filter the Olink
-#' data types for. If `NULL` all relevant Olink data types are returned,
-#' otherwise one of `r ansi_collapse_quot(get_olink_broader_platforms())` is
-#' expected.
-#' @param platform_name Name of the \var{platform_name} to filter the Olink
-#' data types for. If `NULL` all relevant Olink data types are returned,
-#' otherwise one of `r ansi_collapse_quot(get_olink_platforms())` is
-#' expected.
-#' @param quant_type Name of the \var{quant_type} to filter the Olink data types
-#' for. If `NULL` all relevant Olink data types are returned, otherwise one of
-#' `r ansi_collapse_quot(get_olink_quant_types())` is expected.
+#'
+#' @keywords internal
 #'
 #' @return
 #' `NULL` if quantification method (data type) is expected, otherwise an error.
@@ -434,7 +381,7 @@ check_olink_data_type <- function(x,
 
   # input check ----
 
-  check_is_scalar_character(string = x,
+  check_is_scalar_character(x = x,
                             error = TRUE)
 
   # get relevant data types ----
@@ -481,6 +428,8 @@ check_olink_data_type <- function(x,
 #' @author
 #'   Klev Diamanti
 #'
+#' @keywords internal
+#'
 #' @return A character vector with names of all Olink quantification types.
 #'
 get_all_olink_quant_types <- function() {
@@ -500,21 +449,9 @@ get_all_olink_quant_types <- function() {
 
 #' Get names of selected Olink quantification types.
 #'
-#' @author
-#'   Klev Diamanti
+#' @inherit .get_olink_data_details params author
 #'
-#' @param broad_platform Name of the \var{broad_platform} to filter the Olink
-#' quantification types for. If `NULL` all relevant Olink quantification types
-#' are returned, otherwise one of
-#' `r ansi_collapse_quot(get_olink_broader_platforms())` is expected.
-#' @param platform_name Name of the \var{platform_name} to filter the Olink
-#' quantification types for. If `NULL` all relevant Olink quantification types
-#' are returned, otherwise one of `r ansi_collapse_quot(get_olink_platforms())`
-#' is expected.
-#' @param data_type Name of the \var{data_type} to filter the Olink
-#' quantification types for. If `NULL` all relevant Olink quantification types
-#' are returned, otherwise one of `r ansi_collapse_quot(get_olink_data_types())`
-#' is expected.
+#' @keywords internal
 #'
 #' @return A character vector with names of Olink quantification types filtered
 #' by \var{broad_platform}, \var{platform_name}, and \var{data_type}.
@@ -570,23 +507,11 @@ get_olink_quant_types <- function(broad_platform = NULL,
 
 #' Help function checking that \var{data_type} is expected.
 #'
-#' @author
-#'   Klev Diamanti
-#'
+#' @inherit .get_olink_data_details params author
 #' @param x The name of the Olink quantification type. One of
 #' `r ansi_collapse_quot(get_olink_quant_types())`.
-#' @param broad_platform Name of the \var{broad_platform} to filter the Olink
-#' quantification types for. If `NULL` all relevant Olink quantification types
-#' are returned, otherwise one of
-#' `r ansi_collapse_quot(get_olink_broader_platforms())` is expected.
-#' @param platform_name Name of the \var{platform_name} to filter the Olink
-#' quantification types for. If `NULL` all relevant Olink quantification types
-#' are returned, otherwise one of `r ansi_collapse_quot(get_olink_platforms())`
-#' is expected.
-#' @param data_type Name of the \var{data_type} to filter the Olink
-#' quantification types for. If `NULL` all relevant Olink quantification types
-#' are returned, otherwise one of `r ansi_collapse_quot(get_olink_data_types())`
-#' is expected.
+#'
+#' @keywords internal
 #'
 #' @return
 #' `NULL` if quantification type is expected, otherwise an error.
@@ -597,7 +522,7 @@ check_olink_quant_type <- function(x,
                                    data_type = NULL) {
   # input check ----
 
-  check_is_scalar_character(string = x,
+  check_is_scalar_character(x = x,
                             error = TRUE)
 
   # get relevant data types ----
@@ -637,3 +562,28 @@ check_olink_quant_type <- function(x,
 
   }
 }
+
+#' Common parameters for getter functions in this file.
+#'
+#' @author
+#'   Klev Diamanti
+#'
+#' @param broad_platform Name of the \var{broad_platform} to filter for. If
+#' `NULL` all broader platforms are considered, otherwise one of
+#' `r ansi_collapse_quot(get_olink_broader_platforms())` is expected.
+#' @param platform_name Name of the \var{platform_name} to filter for. If `NULL`
+#' all platforms are considered, otherwise one of
+#' `r ansi_collapse_quot(get_olink_platforms())` is expected.
+#' @param data_type Name of the \var{data_type} to filter the Olink for. If
+#' `NULL` all data types are considered, otherwise one of
+#' `r ansi_collapse_quot(get_olink_data_types())` is expected.
+#' @param quant_type Name of the \var{quant_type} to filter for. If `NULL` all
+#' quantification types are considered, otherwise one of
+#' `r ansi_collapse_quot(get_olink_quant_types())` is expected.
+#'
+#' @keywords internal
+#'
+.get_olink_data_details <- function(broad_platform,
+                                    platform_name,
+                                    data_type,
+                                    quant_type) {}

@@ -7,7 +7,8 @@
 check_npx(df, preferred_names = NULL)
 }
 \arguments{
-\item{df}{A tibble or and arrow object from \code{\link{read_npx}}.}
+\item{df}{A "tibble" or "ArrowObject"
+from \code{\link{read_npx}}.}
 
 \item{preferred_names}{A named character vector where names are internal
 column names and values are column names to be selected from the input data
@@ -26,6 +27,8 @@ marking the columns to be used in downstream analyses.
 including column key \var{col_key}, column name \var{col_name}, detected
 column type \var{col_class} and expected column type
 \var{expected_col_class}.
+\item\strong{non_unique_uniprot} Character vector of \var{OlinkID} mapped
+to more than one \var{UniProt} ID.
 }
 }
 \description{
@@ -58,7 +61,7 @@ example 4.
 The argument \var{preferred_names} is a named character vector with internal
 column names as names and column names of the current data set as values.
 Names of the input vector can be one or more of the following:
-"sample_id", "sample_type", "assay_type", "olink_id", "uniprot", "assay", "panel", "plate_id", "panel_version", "lod", "quant", "ext_npx", "count", "qc_warning", "assay_warn", and "normalization"
+"sample_id", "sample_type", "assay_type", "olink_id", "uniprot", "assay", "panel", "block", "plate_id", "panel_version", "lod", "quant", "ext_npx", "count", "qc_warning", "assay_warn", and "normalization"
 }
 \examples{
 \dontrun{
@@ -106,4 +109,5 @@ npx_df |>
 }
 \author{
 Masoumeh Sheikhi
+Klev Diamanti
 }

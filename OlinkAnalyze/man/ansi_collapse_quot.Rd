@@ -19,3 +19,4 @@ Scalar character vector collapsed by "and" or "or".
 Utility function that adds quotation marks on elements printed by
 ansi_collapse from cli.
 }
+\keyword{internal}

@@ -4,16 +4,17 @@
 #' @author
 #'   Klev Diamanti
 #'
-#' @param out_df Class of output data frame. One of
-#' `r ansi_collapse_quot(x = read_npx_df_output, sep = "and")`.
+#' @inheritParams .read_npx_args
 #'
 #' @return Error if \var{out_df} is not one of
 #' `r ansi_collapse_quot(x = read_npx_df_output, sep = "and")`.
 #'
+#' @keywords internal
+#'
 check_out_df_arg <- function(out_df) {
 
   # check that out_df is a string
-  check_is_scalar_character(string = out_df,
+  check_is_scalar_character(x = out_df,
                             error = TRUE)
 
   if (!(out_df %in% read_npx_df_output)) {
@@ -37,11 +38,12 @@ check_out_df_arg <- function(out_df) {
 #' @author
 #'   Klev Diamanti
 #'
-#' @param df Dataset to be converted.
-#' @param out_df Class of output data frame. One of
-#' `r ansi_collapse_quot(x = read_npx_df_output, sep = "and")`.
+#' @inheritParams .read_npx_args
+#' @inheritParams .downstream_fun_args
 #'
 #' @return The dataset in the requested class.
+#'
+#' @keywords internal
 #'
 convert_read_npx_output <- function(df,
                                     out_df) {
@@ -49,7 +51,7 @@ convert_read_npx_output <- function(df,
   # check that out_df is ok
   check_out_df_arg(out_df = out_df)
 
-  if (check_is_dataset(df = df, error = FALSE)) {
+  if (check_is_dataset(x = df, error = FALSE)) {
 
     if (out_df == "tibble") {
 
@@ -83,19 +85,18 @@ convert_read_npx_output <- function(df,
 #' @author
 #'   Klev Diamanti
 #'
-#' @param df Olink dataset
-#' (`r ansi_collapse_quot(x = get_df_output_print(), sep = "or")`)
-#' in wide or long format.
-#' @param file Path to Olink software output file in wide or long format.
-#' Expected file types: `r get_file_ext_summary()`.
+#' @inheritParams .read_npx_args
+#' @inheritParams .downstream_fun_args
 #'
 #' @return Error is file contains problematic column names. `NULL` otherwise.
+#'
+#' @keywords internal
 #'
 read_npx_format_colnames <- function(df,
                                      file) {
 
   # check input ----
-  check_is_dataset(df = df,
+  check_is_dataset(x = df,
                    error = TRUE)
 
   # check columns names ----
@@ -130,7 +131,7 @@ read_npx_format_colnames <- function(df,
   } else { # long format
 
     if (any(names(df) == "") == TRUE
-        || check_is_character(string = names(df),
+        || check_is_character(x = names(df),
                               error = FALSE) == FALSE) {
 
       cli::cli_abort( # nolint return_linter

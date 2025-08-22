@@ -15,3 +15,4 @@ Get names of all Olink quantification types.
 \author{
 Klev Diamanti
 }
+\keyword{internal}

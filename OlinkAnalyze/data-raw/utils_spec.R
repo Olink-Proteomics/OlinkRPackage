@@ -45,3 +45,22 @@ read_npx_df_output <- c(
   "tibble",
   "arrow"
 )
+
+## Acceptable samples types ----
+
+olink_sample_types <- list(
+  "sample" = c("SAMPLE"),
+  "sc" = c("CONTROL", "SAMPLE_CONTROL"),
+  "pc" = c("PLATE_CONTROL"),
+  "nc" = c("NEGATIVE_CONTROL")
+)
+
+## Acceptable samples types ----
+
+olink_assay_types <- list(
+  "assay" = c("assay"),
+  "inc" = c("inc_ctrl"),
+  "det" = c("det_ctrl"),
+  "ext" = c("ext_ctrl"),
+  "amp" = c("amp_ctrl")
+)

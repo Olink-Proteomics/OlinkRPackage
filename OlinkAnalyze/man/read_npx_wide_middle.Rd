@@ -11,10 +11,11 @@ read_npx_wide_middle(df, file, data_type, col_names)
 
 \item{file}{Path to Olink software output file in wide format. Expected one
 of file extensions
-"xls", "xlsx", "csv", and "txt".}
+"xls", "xlsx", "csv", or "txt".}
 
-\item{data_type}{Quantification method of the input data. One of \code{NULL}
-(default) for auto-detection, "Ct", "NPX", and "Quantified".}
+\item{data_type}{Quantification method of the input data. One of
+"Ct", "NPX", or "Quantified". Defaults to
+\code{NULL} for auto-detection.}
 
 \item{col_names}{Names list of character vectors containing column names from
 each chunk of columns \var{df_top} was split on in function.
@@ -22,9 +23,7 @@ each chunk of columns \var{df_top} was split on in function.
 }
 \value{
 A list of data frames (df_oid, df_pid, df_qc_warn and df_int_ctrl) in
-long format from the middle matrix of an Olink wide file.
-
-A list of data frames from middle matrix in long format:
+long format from the middle matrix of an Olink wide file:
 \itemize{
 \item Data frame containing measurements of Olink assays \var{df_mid_oid}
 \item Data frame containing plate identifiers \var{df_mid_pid}
@@ -49,3 +48,4 @@ middle matrix \var{df_mid} into corresponding chunks of columns.
 \author{
 Klev Diamanti
 }
+\keyword{internal}

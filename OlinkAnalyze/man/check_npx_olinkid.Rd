@@ -7,8 +7,8 @@
 check_npx_olinkid(df, col_names)
 }
 \arguments{
-\item{df}{A tibble or an arrow object containing containing column
-\var{OlinkID}.}
+\item{df}{A "tibble" or "ArrowObject"
+from \code{\link{read_npx}}.}
 
 \item{col_names}{A list of matched column names. This is the output of the
 \var{check_npx_col_names} function.}
@@ -23,3 +23,4 @@ of a prefix "OID" followed by 5 integer numbers.
 \author{
 Masoumeh Sheikhi
 }
+\keyword{internal}

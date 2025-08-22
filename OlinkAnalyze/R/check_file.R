@@ -1,27 +1,25 @@
 #' Help function checking if file exists.
 #'
-#' @author
-#'   Klev Diamanti
-#'
 #' @description
 #' Check \strong{one file at a time} if it exists.
 #'
-#' @param file Path to file.
-#' @param error Scalar boolean to return an error instead of a `FALSE`
-#' (`default = FALSE`).
+#' @inherit .check_params params author
+#' @inherit .read_npx_args params
 #'
 #' @return `TRUE` if the file exists, and `FALSE` if not; error if the file does
 #' not exist and `error = TRUE`.
+#'
+#' @keywords internal
 #'
 check_file_exists <- function(file,
                               error = FALSE) {
 
   # check if input file is character vector of length 1
-  check_is_scalar_character(string = file,
+  check_is_scalar_character(x = file,
                             error = TRUE)
 
   # check if input error is boolean vector of length 1
-  check_is_scalar_boolean(bool = error,
+  check_is_scalar_boolean(x = error,
                           error = TRUE)
 
   if (!file.exists(file)) {
@@ -54,24 +52,23 @@ check_file_exists <- function(file,
 
 #' Help function checking if file extension is acceptable.
 #'
-#' @author
-#'   Klev Diamanti
-#'
 #' @description
 #' Use variable \var{accepted_npx_file_ext} to check if extension of the input
 #' file is acceptable. Expecting one of
 #' `r ansi_collapse_quot(get_file_ext_summary())`.
 #'
-#' @param file Path to file.
+#' @inherit .read_npx_args params
 #'
 #' @return The type of the file extension based on the global variable
 #' \var{accepted_npx_file_ext}.
+#'
+#' @keywords internal
 #'
 check_file_extension <- function(file) {
 
   # check input ----
 
-  check_is_scalar_character(string = file,
+  check_is_scalar_character(x = file,
                             error = TRUE)
 
   # get file extension ----
@@ -87,7 +84,7 @@ check_file_extension <- function(file) {
 
   # if the extension of the input file was within the accepted ones it should
   # be a scalar character
-  if (!check_is_scalar_character(string = f_label, error = FALSE)) {
+  if (!check_is_scalar_character(x = f_label, error = FALSE)) {
 
     cli::cli_abort(
       message = c(

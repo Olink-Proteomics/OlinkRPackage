@@ -11,12 +11,12 @@ get_wide_synthetic_data <- function(olink_platform,
   # check inputs
   check_olink_platform(x = olink_platform)
   check_olink_data_type(x = data_type)
-  check_is_scalar_integer(int = n_panels, error = TRUE)
-  check_is_scalar_integer(int = n_assays, error = TRUE)
-  check_is_scalar_integer(int = n_samples, error = TRUE)
-  check_is_scalar_boolean(bool = show_dev_int_ctrl, error = TRUE)
-  check_is_scalar_boolean(bool = show_int_ctrl, error = TRUE)
-  check_is_scalar_integer(int = version, error = TRUE)
+  check_is_scalar_integer(x = n_panels, error = TRUE)
+  check_is_scalar_integer(x = n_assays, error = TRUE)
+  check_is_scalar_integer(x = n_samples, error = TRUE)
+  check_is_scalar_boolean(x = show_dev_int_ctrl, error = TRUE)
+  check_is_scalar_boolean(x = show_int_ctrl, error = TRUE)
+  check_is_scalar_integer(x = version, error = TRUE)
 
   # get internal variables
   olink_p <- accepted_olink_platforms |>

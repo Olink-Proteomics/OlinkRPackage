@@ -15,3 +15,4 @@ Get names of all broader Olink platforms.
 \author{
 Klev Diamanti
 }
+\keyword{internal}
