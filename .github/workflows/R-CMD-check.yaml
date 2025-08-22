@@ -49,8 +49,8 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           working-directory: OlinkAnalyze
-          extra-packages: any::rcmdcheck, any::pillar
-      
+          extra-packages: any::rcmdcheck, any::pillar, any::tzdb
+          
       - uses: r-lib/actions/check-r-package@v2
         with:
           working-directory: OlinkAnalyze
