@@ -54,7 +54,7 @@ jobs:
       - name: Install tzdb explicitly for windows
         if: matrix.os == 'windows-latest'
         run: |
-          install.packages('tzdb', repos = 'https://cloud.r-project.org')
+          install.packages(c('tzdb','arrow'), repos = c('https://apache.r-universe.dev', 'https://cloud.r-project.org'))
         shell: Rscript {0}
           
       - uses: r-lib/actions/check-r-package@v2
