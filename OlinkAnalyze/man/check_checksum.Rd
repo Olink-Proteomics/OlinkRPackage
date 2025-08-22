@@ -27,3 +27,4 @@ the \var{checksum_file} is in acceptable format.
 \author{
 Klev Diamanti
 }
+\keyword{internal}

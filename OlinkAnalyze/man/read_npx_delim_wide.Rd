@@ -33,3 +33,4 @@ The function can handle delimited files in wide format.
 \author{
 Klev Diamanti
 }
+\keyword{internal}
